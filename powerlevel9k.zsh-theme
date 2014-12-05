@@ -1,33 +1,31 @@
 # vim:ft=zsh ts=2 sw=2 sts=2
 #
-# agnoster's Theme - https://gist.github.com/3712874
-# A Powerline-inspired theme for ZSH
+# powerlevel9k Theme - 
+#
+# This theme is based off of: agnoster's Theme - https://gist.github.com/3712874
 #
 # # README
 #
 # In order for this theme to render correctly, you will need a
 # [Powerline-patched font](https://github.com/Lokaltog/powerline-fonts).
 #
-# In addition, I recommend the
-# [Solarized theme](https://github.com/altercation/solarized/) and, if you're
-# using it on Mac OS X, [iTerm 2](http://www.iterm2.com/) over Terminal.app -
-# it has significantly better color fidelity.
-#
-# # Goals
-#
-# The aim of this theme is to only show you *relevant* information. Like most
-# prompts, it will only show git information when in a git working directory.
-# However, it goes a step further: everything from the current user and
-# hostname to whether the last call exited with an error to whether background
-# jobs are running in this shell will all be displayed automatically when
-# appropriate.
 
 ### Segment drawing
 # A few utility functions to make it easy and re-usable to draw segmented prompts
 
+# The `CURRENT_BG` variable is used to remember what the last BG color used was
+# when building the left-hand prompt. Because the RPROMPT is created from
+# right-left but reads the opposite, this isn't necessary for the other side.
 CURRENT_BG='NONE'
+
+# These characters require the Powerline fonts to work properly. If see boxes or
+# bizarre characters below, your fonts are not correctly installed.
 LEFT_SEGMENT_SEPARATOR=''
 RIGHT_SEGMENT_SEPARATOR=''
+
+################################################################
+# Prompt Segment Constructors
+################################################################
 
 # Begin a left prompt segment
 # Takes two arguments, background and foreground. Both can be omitted,
@@ -58,7 +56,8 @@ left_prompt_end() {
 
 # Begin a right prompt segment
 # Takes two arguments, background and foreground. Both can be omitted,
-# rendering default background/foreground.
+# rendering default background/foreground. No ending for the right prompt
+# segment is needed (unlike the left prompt, above).
 right_prompt_segment() {
   local bg fg
   [[ -n $1 ]] && bg="%K{$1}" || bg="%k"
@@ -67,10 +66,12 @@ right_prompt_segment() {
   [[ -n $3 ]] && echo -n $3
 }
 
-### Prompt components
-# Each component will draw itself, and hide itself if no information needs to be shown
+################################################################
+# Prompt Components
+################################################################
 
 # Context: user@hostname (who am I and where am I)
+# Note that if $DEFAULT_USER is not set, this prompt segment will always print
 prompt_context() {
   if [[ "$USER" != "$DEFAULT_USER" || -n "$SSH_CLIENT" ]]; then
     left_prompt_segment black default "%(!.%{%F{yellow}%}.)$USER@%m"
@@ -114,6 +115,7 @@ prompt_git() {
   fi
 }
 
+# Mercurial status
 prompt_hg() {
   local rev status
   if $(hg id >/dev/null 2>&1); then
@@ -155,6 +157,8 @@ prompt_dir() {
 }
 
 # Virtualenv: current working virtualenv
+# More information on virtualenv (Python):
+# https://virtualenv.pypa.io/en/latest/virtualenv.html
 prompt_virtualenv() {
   local virtualenv_path="$VIRTUAL_ENV"
   if [[ -n $virtualenv_path && -n $VIRTUAL_ENV_DISABLE_PROMPT ]]; then
@@ -162,10 +166,8 @@ prompt_virtualenv() {
   fi
 }
 
-# Status:
-# - was there an error
-# - am I root
-# - are there background jobs?
+# Left Status: (return code, root status, background jobs)
+# This creates a status segment for the *left* prompt
 prompt_status() {
   local symbols
   symbols=()
@@ -176,15 +178,25 @@ prompt_status() {
   [[ -n "$symbols" ]] && left_prompt_segment black default "$symbols"
 }
 
-# Same thing as 'status' above, except for the right-side prompt
+# Right Status: (return code, root status, background jobs)
+# This creates a status segment for the *right* prompt. Exact same thing as
+# above - just other side.
 rprompt_status() {
-  local symbols
+  local symbols bg
   symbols=()
-  [[ $RETVAL -ne 0 ]] && symbols+="%{%F{red}%}%? ↵" || symbols+="%{%F{green}%}✓"
+
+  if [[ $RETVAL -ne 0 ]]; then
+    symbols+="%{%F{"226"}%}%? ↵"
+    bg="009"
+  else
+    symbols+="%{%F{"046"}%}✓"
+    bg="008"
+  fi
+
   [[ $UID -eq 0 ]] && symbols+="%{%F{yellow}%}⚡"
   [[ $(jobs -l | wc -l) -gt 0 ]] && symbols+="%{%F{cyan}%}⚙"
 
-  [[ -n "$symbols" ]] && right_prompt_segment black default "$symbols"
+  [[ -n "$symbols" ]] && right_prompt_segment $bg default "$symbols"
 }
 
 # System time
@@ -194,7 +206,7 @@ prompt_time() {
 
 # Command number (in local history)
 prompt_history() {
-  right_prompt_segment blue black '%h'
+  right_prompt_segment "244" black '%h'
 }
 
 # Ruby Version Manager information
@@ -208,7 +220,7 @@ prompt_rvm() {
 
 # Main prompt
 build_left_prompt() {
-  prompt_virtualenv
+  #prompt_virtualenv
   prompt_context
   prompt_dir
   prompt_git
@@ -225,5 +237,6 @@ build_right_prompt() {
   prompt_time
 }
 
+# Create the prompts
 PROMPT='%{%f%b%k%}$(build_left_prompt) '
 RPROMPT='%{%f%b%k%}$(build_right_prompt)%{$reset_color%}'
