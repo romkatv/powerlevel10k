@@ -179,7 +179,7 @@ prompt_status() {
 rprompt_status() {
   local symbols
   symbols=()
-  [[ $RETVAL -ne 0 ]] && symbols+="%{%F{red}%}✘" || symbols+="%{%F{red}%}y"
+  [[ $RETVAL -ne 0 ]] && symbols+="%{%F{red}%}✘" || symbols+="%{%F{green}%}✓"
   [[ $UID -eq 0 ]] && symbols+="%{%F{yellow}%}⚡"
   [[ $(jobs -l | wc -l) -gt 0 ]] && symbols+="%{%F{cyan}%}⚙"
 
@@ -189,6 +189,11 @@ rprompt_status() {
 # System time of the prompt print-out
 prompt_time() {
   right_prompt_segment white black '%D{%H:%M:%S} '
+}
+
+# Command number (in current history)
+prompt_history() {
+  right_prompt_segment blue black '%h'
 }
 
 # Ruby Version Manager information
@@ -215,6 +220,7 @@ build_left_prompt() {
 build_right_prompt() {
   #prompt_rvm
   rprompt_status
+  prompt_history
   prompt_time
 }
 
