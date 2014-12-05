@@ -176,22 +176,23 @@ prompt_status() {
   [[ -n "$symbols" ]] && left_prompt_segment black default "$symbols"
 }
 
+# Same thing as 'status' above, except for the right-side prompt
 rprompt_status() {
   local symbols
   symbols=()
-  [[ $RETVAL -ne 0 ]] && symbols+="%{%F{red}%}✘" || symbols+="%{%F{green}%}✓"
+  [[ $RETVAL -ne 0 ]] && symbols+="%{%F{red}%}%? ↵" || symbols+="%{%F{green}%}✓"
   [[ $UID -eq 0 ]] && symbols+="%{%F{yellow}%}⚡"
   [[ $(jobs -l | wc -l) -gt 0 ]] && symbols+="%{%F{cyan}%}⚙"
 
   [[ -n "$symbols" ]] && right_prompt_segment black default "$symbols"
 }
 
-# System time of the prompt print-out
+# System time
 prompt_time() {
   right_prompt_segment white black '%D{%H:%M:%S} '
 }
 
-# Command number (in current history)
+# Command number (in local history)
 prompt_history() {
   right_prompt_segment blue black '%h'
 }
@@ -201,24 +202,23 @@ prompt_rvm() {
   local rvm_prompt
   rvm_prompt=`rvm-prompt`
   if [ "$rvm_prompt" != "" ]; then
-    right_prompt_segment "240" white "$rvm_prompt "
+    left_prompt_segment "240" white "$rvm_prompt "
   fi
 }
 
 ## Main prompt
 build_left_prompt() {
-  RETVAL=$?
-  prompt_status
   prompt_virtualenv
   prompt_context
   prompt_dir
   prompt_git
   prompt_hg
+  #prompt_rvm
   left_prompt_end
 }
 
 build_right_prompt() {
-  #prompt_rvm
+  RETVAL=$?
   rprompt_status
   prompt_history
   prompt_time
