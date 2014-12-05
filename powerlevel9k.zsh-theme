@@ -206,7 +206,7 @@ prompt_rvm() {
   fi
 }
 
-## Main prompt
+# Main prompt
 build_left_prompt() {
   prompt_virtualenv
   prompt_context
@@ -217,6 +217,7 @@ build_left_prompt() {
   left_prompt_end
 }
 
+# Right prompt
 build_right_prompt() {
   RETVAL=$?
   rprompt_status
