@@ -224,7 +224,7 @@ build_left_prompt() {
   prompt_context
   prompt_dir
   prompt_git
-  prompt_hg
+  #prompt_hg
   #prompt_rvm
   left_prompt_end
 }
