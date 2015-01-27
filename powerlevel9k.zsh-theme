@@ -3,7 +3,7 @@
 # powerlevel9k Theme
 # https://github.com/bhilburn/oh-my-zsh/blob/master/themes/powerlevel9k.zsh-theme
 #
-# This theme is based off of agnoster's Theme:
+# This theme was inspired by agnoster's Theme:
 # https://gist.github.com/3712874
 #
 # In order for this theme to render correctly, you will need a
@@ -51,7 +51,7 @@ left_prompt_segment() {
   if [[ $CURRENT_BG != 'NONE' && $1 != $CURRENT_BG ]]; then
     echo -n " %{$bg%F{$CURRENT_BG}%}$LEFT_SEGMENT_SEPARATOR%{$fg%} "
   else
-    echo -n "%{$bg%}%{$fg%} "
+    echo -n " %{$bg%}%{$fg%} "
   fi
   CURRENT_BG=$1
   [[ -n $3 ]] && echo -n $3
@@ -62,7 +62,7 @@ left_prompt_end() {
   if [[ -n $CURRENT_BG ]]; then
     echo -n " %{%k%F{$CURRENT_BG}%}$LEFT_SEGMENT_SEPARATOR"
   else
-    echo -n "%{%k%}"
+    echo -n " %{%k%}"
   fi
   echo -n "%{%f%}"
   CURRENT_BG=''
