@@ -10,16 +10,6 @@
 # [Powerline-patched font](https://github.com/Lokaltog/powerline-fonts).
 #
 
-setopt prompt_subst
-autoload -Uz vcs_info
-zstyle ':vcs_info:*' stagedstr '%F{black}✚%f'
-zstyle ':vcs_info:git:*' unstagedstr '%F{black}●%f'
-zstyle ':vcs_info:git*' actionformats " %b %F{red}| %a%f"
-zstyle ':vcs_info:git*' formats " %b %c%u%m"
-zstyle ':vcs_info:*' check-for-changes true
-zstyle ':vcs_info:git*+set-message:*' hooks git-untracked git-aheadbehind git-remotebranch git-tagname
-zstyle ':vcs_info:*' enable git
-
 ### Segment drawing
 # A few utility functions to make it easy and re-usable to draw segmented prompts
 
@@ -32,6 +22,20 @@ CURRENT_BG='NONE'
 # bizarre characters below, your fonts are not correctly installed.
 LEFT_SEGMENT_SEPARATOR=''
 RIGHT_SEGMENT_SEPARATOR=''
+
+################################################################
+# vcs_info settings for git
+################################################################
+
+setopt prompt_subst
+autoload -Uz vcs_info
+zstyle ':vcs_info:*' stagedstr ' %F{black}✚%f'
+zstyle ':vcs_info:git:*' unstagedstr ' %F{black}●%f'
+zstyle ':vcs_info:git*' actionformats " %b %F{red}| %a%f"
+zstyle ':vcs_info:git*' formats " %b%c%u%m"
+zstyle ':vcs_info:*' check-for-changes true
+zstyle ':vcs_info:git*+set-message:*' hooks git-untracked git-aheadbehind git-remotebranch git-tagname
+zstyle ':vcs_info:*' enable git
 
 ################################################################
 # Prompt Segment Constructors
@@ -107,7 +111,7 @@ prompt_git() {
 function +vi-git-untracked() {
     if [[ $(git rev-parse --is-inside-work-tree 2> /dev/null) == 'true' && \
             $(git ls-files --others --exclude-standard | sed q | wc -l | tr -d ' ') != 0 ]]; then
-        hook_com[unstaged]+="%F{black}?%f"
+        hook_com[unstaged]+=" %F{black}?%f"
     fi
 }
 
@@ -120,12 +124,12 @@ function +vi-git-aheadbehind() {
     # for git prior to 1.7
     # ahead=$(git rev-list origin/${branch_name}..HEAD | wc -l)
     ahead=$(git rev-list ${branch_name}@{upstream}..HEAD 2>/dev/null | wc -l | tr -d ' ')
-    (( $ahead )) && gitstatus+=( "%F{black}↑${ahead}%f" )
+    (( $ahead )) && gitstatus+=( " %F{black}↑${ahead}%f" )
 
     # for git prior to 1.7
     # behind=$(git rev-list HEAD..origin/${branch_name} | wc -l)
     behind=$(git rev-list HEAD..${branch_name}@{upstream} 2>/dev/null | wc -l | tr -d ' ')
-    (( $behind )) && gitstatus+=( "%F{black}↓${behind}%f" )
+    (( $behind )) && gitstatus+=( " %F{black}↓${behind}%f" )
 
     hook_com[misc]+=${(j::)gitstatus}
 }
@@ -137,12 +141,12 @@ function +vi-git-remotebranch() {
     remote=${$(git rev-parse --verify HEAD@{upstream} --symbolic-full-name 2>/dev/null)/refs\/(remotes|heads)\/}
     branch_name=${$(git symbolic-ref --short HEAD 2>/dev/null)}
 
-    hook_com[branch]="%F{black}${hook_com[branch]}%f"
+    hook_com[branch]=" %F{black}${hook_com[branch]}%f"
     # Always show the remote
     #if [[ -n ${remote} ]] ; then
     # Only show the remote if it differs from the local
     if [[ -n ${remote} && ${remote#*/} != ${branch_name} ]] ; then
-        hook_com[branch]+="%F{black}→%f%F{black}${remote}%f"
+        hook_com[branch]+=" %F{black}→%f%F{black}${remote}%f"
     fi
 }
 
@@ -150,7 +154,7 @@ function +vi-git-tagname() {
     local tag
 
     tag=$(git describe --tags --exact-match HEAD 2>/dev/null)
-    [[ -n ${tag} ]] && hook_com[branch]="%F{black}${tag}%f"
+    [[ -n ${tag} ]] && hook_com[branch]=" %F{black}${tag}%f"
 }
 
 # Mercurial status
