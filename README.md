@@ -45,15 +45,15 @@ To install this theme, drop the `.zsh-theme` file into your `.oh-my-zsh/themes`
 directory. A better form of installation is to clone this repository and then
 create a symlink in your 'themes' directory:
 
-    $ git clone https://github.com/bhilburn/hackersaurus.git
-    $ ln -s hackersaurus.git/hackersaurus.zsh-theme ~/.oh-my-zsh/themes/hackersaurus.zsh-theme
+    $ git clone https://github.com/bhilburn/powerlevel9k.git powerlevel9k.git
+    $ ln -s powerlevel9k.git/powerlevel9k.zsh-theme ~/.oh-my-zsh/themes/powerlevel9k.zsh-theme
 
 Note that *you cannot clone this repository into your `~/.oh-my-zsh/themes/` directory*.
 Oh-My-Zsh does not traverse subdirectories for themes, and will not find your theme.
 
 You then need to select it in your `~/.zshrc`:
 
-    ZSH_THEME="hackersaurus"
+    ZSH_THEME="powerlevel9k"
 
 If you do not want to display the `user@host` string, you should also put this
 in your `~/.zshrc`:
@@ -62,12 +62,9 @@ in your `~/.zshrc`:
 
 ### History
 
-This theme was first announced [on my
-blog](http://bhilburn.org/powerlevel9k-oh-my-zsh-theme/) in December of 2014. At
-the time, the theme was missing some of the more advanced Git information. [Tom
-Upton](http://www.thomasupton.com/) then helped me get things fixed up with [his
-`vcs_info` hooks](https://github.com/tupton/dotfiles/blob/master/zsh/zshrc).
-
+This theme was first announced [on my blog](http://bhilburn.org/powerlevel9k-oh-my-zsh-theme/) in December of 2014. At
+the time, the theme was missing some of the more advanced Git information. [Tom Upton](http://www.thomasupton.com/) then [helped me](http://bhilburn.org/powerlevel9k-improved-git-repo-information/) get things
+fixed up with [his `vcs_info` hooks](https://github.com/tupton/dotfiles/blob/master/zsh/zshrc).
 
 ### Bugs / Contact
 
