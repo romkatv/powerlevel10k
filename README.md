@@ -64,8 +64,9 @@ in your `~/.zshrc`:
 
 I discovered the ['agnoster' OMZ theme](https://gist.github.com/agnoster/3712874)
 while looking around for a new OMZ theme. I loved the Powerline styling, but the
-terminal status lines themselves were missing a lot of the information I liked
-having.
+terminal status lines themselves were missing a lot of the information I like
+having. So, I started building on-top of the 'agnoster' theme, changing some
+things as I went.
 
 This theme was first announced [on my blog](http://bhilburn.org/powerlevel9k-oh-my-zsh-theme/) in December of 2014. At
 the time, the theme was missing some of the more advanced Git information. [Tom Upton](http://www.thomasupton.com/) then [helped me](http://bhilburn.org/powerlevel9k-improved-git-repo-information/) get things
