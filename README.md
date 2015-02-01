@@ -35,7 +35,7 @@ These screenshots should give you an idea of what `powerlevel9k` looks like:
 
 ### Installation
 
-First, you need to install Powerline Fonts. You can find the installation
+First, you need to install Powerline Fonts. You can find the [installation
 instructions
 here](https://powerline.readthedocs.org/en/latest/installation/linux.html#fonts-installation).
 You can also find the raw font files [in this Github
