@@ -1,13 +1,16 @@
 # vim:ft=zsh ts=2 sw=2 sts=2
 #
 # powerlevel9k Theme
-# https://github.com/bhilburn/oh-my-zsh/blob/master/themes/powerlevel9k.zsh-theme
+# https://github.com/bhilburn/powerlevel9k
 #
 # This theme was inspired by agnoster's Theme:
 # https://gist.github.com/3712874
+# 
+# The `vcs_info` hooks in this file are from Tom Upton:
+# https://github.com/tupton/dotfiles/blob/master/zsh/zshrc
 #
-# In order for this theme to render correctly, you will need a
-# [Powerline-patched font](https://github.com/Lokaltog/powerline-fonts).
+# In order for this theme to render correctly, you will need a Powerline-patched font:
+# https://github.com/Lokaltog/powerline-fonts
 #
 
 ### Segment drawing
