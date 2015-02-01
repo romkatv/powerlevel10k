@@ -4,7 +4,7 @@ This is a theme for [Oh-My-Zsh](https://github.com/robbyrussell/oh-my-zsh). This
 theme uses [Powerline Fonts](https://github.com/Lokaltog/powerline-fonts), thus
 giving you the most bad-ass terminal styling in the universe (as of 2015 C.E.).
 
-Look like an 1337 hacker. Use powerlevel9k.
+Look like a bad-ass. Impress everyone in 'Screenshot Your Desktop' threads. Use powerlevel9k.
 
 In addition to looking amazing, this theme actually provides a lot of useful
 information.
