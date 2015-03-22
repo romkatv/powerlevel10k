@@ -25,6 +25,8 @@ CURRENT_BG='NONE'
 # bizarre characters below, your fonts are not correctly installed.
 LEFT_SEGMENT_SEPARATOR=''
 RIGHT_SEGMENT_SEPARATOR=''
+VCS_UNSTAGED_ICON='●'
+VCS_STAGED_ICON='✚'
 
 ################################################################
 # vcs_info settings for git
@@ -32,12 +34,14 @@ RIGHT_SEGMENT_SEPARATOR=''
 
 setopt prompt_subst
 autoload -Uz vcs_info
-zstyle ':vcs_info:*' stagedstr " %F{black}✚%f"
-zstyle ':vcs_info:*' unstagedstr " %F{black}●%f"
+zstyle ':vcs_info:*' stagedstr " %F{black}$VCS_STAGED_ICON%f"
+zstyle ':vcs_info:*' unstagedstr " %F{black}$VCS_UNSTAGED_ICON%f"
 zstyle ':vcs_info:*' actionformats " %b %F{red}| %a%f"
 zstyle ':vcs_info:*' formats " %b%c%u%m"
 zstyle ':vcs_info:*' check-for-changes true
 zstyle ':vcs_info:git*+set-message:*' hooks git-untracked git-aheadbehind git-remotebranch git-tagname
+zstyle ':vcs_info:hg*' get-revision true # If false, the dirty-check won't work in mercurial
+zstyle ':vcs_info:hg*:*' branchformat "%b" # only show branch
 zstyle ':vcs_info:*' enable git hg
 
 ################################################################
@@ -96,18 +100,24 @@ prompt_context() {
 }
 
 # Git: branch/detached head, dirty status
-prompt_git() {
-  local dirty
+prompt_vcs() {
+  local dirty=false
+  local vcs_prompt="${vcs_info_msg_0_}"
 
-  if $(git rev-parse --is-inside-work-tree >/dev/null 2>&1); then
-    dirty=$(parse_git_dirty)
-    if [[ -n $dirty ]]; then
+  if [[ -n $vcs_prompt ]]; then
+    if [[ $vcs_prompt =~ $VCS_UNSTAGED_ICON ]]; then
+      dirty=true
+    elif [[ $vcs_prompt =~ $VCS_STAGED_ICON ]]; then
+      dirty=true
+    fi
+
+    if ( $dirty ); then
       $1_prompt_segment yellow black
     else
       $1_prompt_segment green black
     fi
 
-    echo -n "${vcs_info_msg_0_}"
+    echo -n "$vcs_prompt"
   fi
 }
 
@@ -230,7 +240,7 @@ prompt_rvm() {
 # Main prompt
 build_left_prompt() {
   if (( ${#POWERLEVEL9K_LEFT_PROMPT_ELEMENTS} == 0 )); then
-    POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(context dir git)
+    POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(context dir vcs)
   fi
 
   for element in $POWERLEVEL9K_LEFT_PROMPT_ELEMENTS; do
