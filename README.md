@@ -41,24 +41,29 @@ here](https://powerline.readthedocs.org/en/latest/installation/linux.html#fonts-
 You can also find the raw font files [in this Github
 repository](https://github.com/powerline/fonts).
 
-To install this theme, drop the `.zsh-theme` file into your `.oh-my-zsh/themes`
-directory. A better form of installation is to clone this repository and then
-create a symlink in your 'themes' directory:
+To install this theme, drop the `.zsh-theme` file into your `.oh-my-zsh/custom/themes`
+directory:
 
-    $ git clone https://github.com/bhilburn/powerlevel9k.git powerlevel9k.git
-    $ ln -s powerlevel9k.git/powerlevel9k.zsh-theme ~/.oh-my-zsh/themes/powerlevel9k.zsh-theme
-
-Note that *you cannot clone this repository into your `~/.oh-my-zsh/themes/` directory*.
-Oh-My-Zsh does not traverse subdirectories for themes, and will not find your theme.
+    $ cd ~/.oh-my-zsh/custom/themes
+    $ git clone https://github.com/bhilburn/powerlevel9k.git powerlevel9k
 
 You then need to select it in your `~/.zshrc`:
 
-    ZSH_THEME="powerlevel9k"
+    ZSH_THEME="powerlevel9k/powerlevel9k"
 
 If you do not want to display the `user@host` string, you should also put this
 in your `~/.zshrc`:
 
     export DEFAULT_USER=<your username>
+
+### Customization
+
+You can choose which segments are shown on each side. Just add the following variables to
+your `~/.zshrc`. The below also shows the default settings if you don't define
+your own.
+
+    POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(context dir git)
+    POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(status history time)
 
 ### Bugs / Contact
 
