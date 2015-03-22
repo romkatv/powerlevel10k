@@ -60,6 +60,14 @@ in your `~/.zshrc`:
 
     export DEFAULT_USER=<your username>
 
+### Customization
+
+You can choose, which segments are shown on each side. Just add the following variables to
+your `~/.zshrc`:
+
+    POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(context dir git)
+    POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(status history time)
+
 ### Bugs / Contact
 
 If you have any requests or bug reports, please use the tracker in this Github

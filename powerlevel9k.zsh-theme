@@ -91,7 +91,7 @@ right_prompt_segment() {
 # Note that if $DEFAULT_USER is not set, this prompt segment will always print
 prompt_context() {
   if [[ "$USER" != "$DEFAULT_USER" || -n "$SSH_CLIENT" ]]; then
-    left_prompt_segment black default "%(!.%{%F{yellow}%}.)$USER@%m"
+    $1_prompt_segment black default "%(!.%{%F{yellow}%}.)$USER@%m"
   fi
 }
 
@@ -102,9 +102,9 @@ prompt_git() {
   if $(git rev-parse --is-inside-work-tree >/dev/null 2>&1); then
     dirty=$(parse_git_dirty)
     if [[ -n $dirty ]]; then
-      left_prompt_segment yellow black
+      $1_prompt_segment yellow black
     else
-      left_prompt_segment green black
+      $1_prompt_segment green black
     fi
 
     echo -n "${vcs_info_msg_0_}"
@@ -162,7 +162,7 @@ function +vi-git-tagname() {
 
 # Dir: current working directory
 prompt_dir() {
-  left_prompt_segment blue black '%~'
+  $1_prompt_segment blue black '%~'
 }
 
 # Virtualenv: current working virtualenv
@@ -171,7 +171,7 @@ prompt_dir() {
 prompt_virtualenv() {
   local virtualenv_path="$VIRTUAL_ENV"
   if [[ -n $virtualenv_path && -n $VIRTUAL_ENV_DISABLE_PROMPT ]]; then
-    left_prompt_segment blue black "(`basename $virtualenv_path`)"
+    $1_prompt_segment blue black "(`basename $virtualenv_path`)"
   fi
 }
 
@@ -184,13 +184,13 @@ prompt_status() {
   [[ $UID -eq 0 ]] && symbols+="%{%F{yellow}%}⚡"
   [[ $(jobs -l | wc -l) -gt 0 ]] && symbols+="%{%F{cyan}%}⚙"
 
-  [[ -n "$symbols" ]] && left_prompt_segment black default "$symbols"
+  [[ -n "$symbols" ]] && $1_prompt_segment black default "$symbols"
 }
 
 # Right Status: (return code, root status, background jobs)
 # This creates a status segment for the *right* prompt. Exact same thing as
 # above - just other side.
-rprompt_status() {
+prompt_longstatus() {
   local symbols bg
   symbols=()
 
@@ -205,17 +205,17 @@ rprompt_status() {
   [[ $UID -eq 0 ]] && symbols+="%{%F{yellow}%}⚡"
   [[ $(jobs -l | wc -l) -gt 0 ]] && symbols+="%{%F{cyan}%}⚙"
 
-  [[ -n "$symbols" ]] && right_prompt_segment $bg default "$symbols"
+  [[ -n "$symbols" ]] && $1_prompt_segment $bg default "$symbols"
 }
 
 # System time
 prompt_time() {
-  right_prompt_segment white black '%D{%H:%M:%S} '
+  $1_prompt_segment white black '%D{%H:%M:%S} '
 }
 
 # Command number (in local history)
 prompt_history() {
-  right_prompt_segment "244" black '%h'
+  $1_prompt_segment "244" black '%h'
 }
 
 # Ruby Version Manager information
@@ -229,20 +229,28 @@ prompt_rvm() {
 
 # Main prompt
 build_left_prompt() {
-  #prompt_virtualenv
-  prompt_context
-  prompt_dir
-  prompt_git
-  #prompt_rvm
+  if (( ${#POWERLEVEL9K_LEFT_PROMPT_ELEMENTS} == 0 )); then
+    POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(context dir git)
+  fi
+
+  for element in $POWERLEVEL9K_LEFT_PROMPT_ELEMENTS; do
+    prompt_$element "left"
+  done
+  
   left_prompt_end
 }
 
 # Right prompt
 build_right_prompt() {
   RETVAL=$?
-  rprompt_status
-  prompt_history
-  prompt_time
+
+  if (( ${#POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS} == 0 )); then
+    POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(longstatus history time)
+  fi
+
+  for element in $POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS; do
+    prompt_$element "right"
+  done
 }
 
 # Create the prompts
