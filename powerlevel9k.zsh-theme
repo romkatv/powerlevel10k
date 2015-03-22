@@ -223,7 +223,7 @@ prompt_rvm() {
   local rvm_prompt
   rvm_prompt=`rvm-prompt`
   if [ "$rvm_prompt" != "" ]; then
-    left_prompt_segment "240" white "$rvm_prompt "
+    $1_prompt_segment "240" white "$rvm_prompt "
   fi
 }
 
