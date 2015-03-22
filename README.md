@@ -58,8 +58,9 @@ in your `~/.zshrc`:
 
 ### Customization
 
-You can choose, which segments are shown on each side. Just add the following variables to
-your `~/.zshrc`:
+You can choose which segments are shown on each side. Just add the following variables to
+your `~/.zshrc`. The below also shows the default settings if you don't define
+your own.
 
     POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(context dir git)
     POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(status history time)

@@ -5,7 +5,7 @@
 #
 # This theme was inspired by agnoster's Theme:
 # https://gist.github.com/3712874
-# 
+#
 # The `vcs_info` hooks in this file are from Tom Upton:
 # https://github.com/tupton/dotfiles/blob/master/zsh/zshrc
 #
@@ -236,7 +236,7 @@ build_left_prompt() {
   for element in $POWERLEVEL9K_LEFT_PROMPT_ELEMENTS; do
     prompt_$element "left"
   done
-  
+
   left_prompt_end
 }
 
