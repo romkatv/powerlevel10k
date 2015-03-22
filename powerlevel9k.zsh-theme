@@ -33,12 +33,12 @@ RIGHT_SEGMENT_SEPARATOR=''
 setopt prompt_subst
 autoload -Uz vcs_info
 zstyle ':vcs_info:*' stagedstr " %F{black}✚%f"
-zstyle ':vcs_info:git:*' unstagedstr " %F{black}●%f"
-zstyle ':vcs_info:git*' actionformats " %b %F{red}| %a%f"
-zstyle ':vcs_info:git*' formats " %b%c%u%m"
+zstyle ':vcs_info:*' unstagedstr " %F{black}●%f"
+zstyle ':vcs_info:*' actionformats " %b %F{red}| %a%f"
+zstyle ':vcs_info:*' formats " %b%c%u%m"
 zstyle ':vcs_info:*' check-for-changes true
 zstyle ':vcs_info:git*+set-message:*' hooks git-untracked git-aheadbehind git-remotebranch git-tagname
-zstyle ':vcs_info:*' enable git
+zstyle ':vcs_info:*' enable git hg
 
 ################################################################
 # Prompt Segment Constructors
