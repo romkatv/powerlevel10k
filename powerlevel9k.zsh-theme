@@ -227,6 +227,13 @@ prompt_rvm() {
   fi
 }
 
+# rbenv information
+prompt_rbenv() {
+  if [[ -n "$RBENV_VERSION" ]]; then
+    $1_prompt_segment red black "$RBENV_VERSION"
+  fi
+}
+
 # Main prompt
 build_left_prompt() {
   if (( ${#POWERLEVEL9K_LEFT_PROMPT_ELEMENTS} == 0 )); then
