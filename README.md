@@ -89,6 +89,11 @@ elements (it is by default), and define a `DEFAULT_USER` in your `~/.zshrc`:
 
     export DEFAULT_USER=<your username>
 
+#### Prompt on new line
+
+If you like, you can have your prompt on a new line by setting 
+`POWERLEVEL9K_PROMPT_ON_NEWLINE` to `true` in your `~/.zshrc`.
+
 ### Bugs / Contact
 
 If you have any requests or bug reports, please use the tracker in this Github
