@@ -259,7 +259,7 @@ prompt_rbenv() {
 # Main prompt
 build_left_prompt() {
   if (( ${#POWERLEVEL9K_LEFT_PROMPT_ELEMENTS} == 0 )); then
-    POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(context dir vcs)
+    POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(context dir rbenv vcs)
   fi
 
   for element in $POWERLEVEL9K_LEFT_PROMPT_ELEMENTS; do

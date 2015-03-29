@@ -2,7 +2,7 @@
 
 This is a theme for [Oh-My-Zsh](https://github.com/robbyrussell/oh-my-zsh). This
 theme uses [Powerline Fonts](https://github.com/Lokaltog/powerline-fonts), thus
-giving you the most epic terminal styling in the universe (as of 2015 C.E.).
+giving you the most epic terminal styling in the universe.
 
 Look like a bad-ass. Impress everyone in 'Screenshot Your Desktop' threads. Use powerlevel9k.
 
@@ -11,9 +11,7 @@ information.
 
 ### Features
 
-* Mercurial support is now in development Check out the `mercurial_support` branch!
-
-* Shows lots of information about Git repositories, including:
+* Shows lots of information about Git and Hg repositories, including:
     * branch / tag name
     * current action status (rebasing, merging, etc.,)
     * being behind / ahead of your remote
@@ -41,31 +39,55 @@ First, you need to install Powerline Fonts. You can find the [installation
 instructions
 here](https://powerline.readthedocs.org/en/latest/installation/linux.html#fonts-installation).
 You can also find the raw font files [in this Github
-repository](https://github.com/powerline/fonts).
+repository](https://github.com/powerline/fonts) if you want to manually install
+them for your OS.
 
-To install this theme, drop the `.zsh-theme` file into your `.oh-my-zsh/custom/themes`
-directory:
+To install this theme, clone this repository, and then copy or symlink the theme
+file into your OMZ's `custom` directory. Note that you cannot simply clone the
+repository into `custom/themes`, because OMZ does not traverse sub-directories
+in `themes`.
 
-    $ cd ~/.oh-my-zsh/custom/themes
-    $ git clone https://github.com/bhilburn/powerlevel9k.git powerlevel9k
+    $ cd <prefix>
+    $ git clone https://github.com/bhilburn/powerlevel9k.git powerlevel9k.git
+    $ cd ~/.oh-my-zsh/custom
+    $ mkdir themes              # if it doesn't already exist
+    $ cd themes
+    $ ln -s <prefix>/powerlevel9k.git/powerlevel9k.zsh-theme powerlevel9k.zsh-theme
 
-You then need to select it in your `~/.zshrc`:
+You then need to select this theme in your `~/.zshrc`:
 
-    ZSH_THEME="powerlevel9k/powerlevel9k"
-
-If you do not want to display the `user@host` string, you should also put this
-in your `~/.zshrc`:
-
-    export DEFAULT_USER=<your username>
+    ZSH_THEME="powerlevel9k"
 
 ### Customization
 
-You can choose which segments are shown on each side. Just add the following variables to
-your `~/.zshrc`. The below also shows the default settings if you don't define
-your own.
+You can choose which segments are shown on each side. The segments that are
+currently available are:
 
-    POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(context dir git)
+* **context** - Your username and host.
+* **dir** - Your current working directory.
+* **vcs** - Information about this `git` or `hg` repository (if you are in one).
+* **rbenv** - Ruby environment information (if one is active).
+* **status** - The return code of the previous command, and status of background jobs.
+* **history** - The command number for the current line.
+* **time** - System time.
+
+To specify which segments you want, just add the following variables to your
+`~/.zshrc`. If you don't customize this, the below configuration is the default:
+
+    POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(context dir rbenv vcs)
     POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(status history time)
+
+#### Conditional 'context'
+
+The `context` segment (user@host string) is conditional. This lets you enable it, but only display
+it if you are not your normal user or on a remote host (basically, only print it
+when it likely you need it).
+
+To use this feature, make sure the `context` segment is enabled in your prompt
+elements (it is by default), and define a `DEFAULT_USER` in your `~/.zshrc`:
+
+    export DEFAULT_USER=<your username>
+
 
 ### Bugs / Contact
 
