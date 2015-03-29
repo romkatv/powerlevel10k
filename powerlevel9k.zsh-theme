@@ -25,20 +25,28 @@ CURRENT_BG='NONE'
 # bizarre characters below, your fonts are not correctly installed.
 LEFT_SEGMENT_SEPARATOR=''
 RIGHT_SEGMENT_SEPARATOR=''
+VCS_UNSTAGED_ICON='●'
+VCS_STAGED_ICON='✚'
 
 ################################################################
 # vcs_info settings for git
 ################################################################
 
+local VCS_WORKDIR_DIRTY=false
 setopt prompt_subst
 autoload -Uz vcs_info
-zstyle ':vcs_info:*' stagedstr " %F{black}✚%f"
-zstyle ':vcs_info:git:*' unstagedstr " %F{black}●%f"
-zstyle ':vcs_info:git*' actionformats " %b %F{red}| %a%f"
-zstyle ':vcs_info:git*' formats " %b%c%u%m"
+zstyle ':vcs_info:*' stagedstr " %F{black}$VCS_STAGED_ICON%f"
+zstyle ':vcs_info:*' unstagedstr " %F{black}$VCS_UNSTAGED_ICON%f"
+zstyle ':vcs_info:*' actionformats " %b %F{red}| %a%f"
+zstyle ':vcs_info:*' formats " %b%c%u%m"
 zstyle ':vcs_info:*' check-for-changes true
 zstyle ':vcs_info:git*+set-message:*' hooks git-untracked git-aheadbehind git-remotebranch git-tagname
-zstyle ':vcs_info:*' enable git
+zstyle ':vcs_info:hg*' get-revision true # If false, the dirty-check won't work in mercurial
+zstyle ':vcs_info:hg*:*' branchformat "%b" # only show branch
+zstyle ':vcs_info:*' enable git hg
+
+## Debugging
+#zstyle ':vcs_info:*+*:*' debug true
 
 ################################################################
 # Prompt Segment Constructors
@@ -95,19 +103,18 @@ prompt_context() {
   fi
 }
 
-# Git: branch/detached head, dirty status
-prompt_git() {
-  local dirty
+# branch/detached head, dirty status
+prompt_vcs() {
+  local vcs_prompt="${vcs_info_msg_0_}"
 
-  if $(git rev-parse --is-inside-work-tree >/dev/null 2>&1); then
-    dirty=$(parse_git_dirty)
-    if [[ -n $dirty ]]; then
+  if [[ -n $vcs_prompt ]]; then
+    if ( $VCS_WORKDIR_DIRTY ); then
       $1_prompt_segment yellow black
     else
       $1_prompt_segment green black
     fi
 
-    echo -n "${vcs_info_msg_0_}"
+    echo -n "$vcs_prompt"
   fi
 }
 
@@ -158,6 +165,14 @@ function +vi-git-tagname() {
 
     tag=$(git describe --tags --exact-match HEAD 2>/dev/null)
     [[ -n ${tag} ]] && hook_com[branch]=" %F{black}${tag}%f"
+}
+
+function +vi-vcs-detect-changes() {
+  if [[ -n ${hook_com[staged]} ]] || [[ -n ${hook_com[unstaged]} ]]; then
+    VCS_WORKDIR_DIRTY=true
+  else
+    VCS_WORKDIR_DIRTY=false
+  fi
 }
 
 # Dir: current working directory
@@ -237,7 +252,7 @@ prompt_rbenv() {
 # Main prompt
 build_left_prompt() {
   if (( ${#POWERLEVEL9K_LEFT_PROMPT_ELEMENTS} == 0 )); then
-    POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(context dir git)
+    POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(context dir vcs)
   fi
 
   for element in $POWERLEVEL9K_LEFT_PROMPT_ELEMENTS; do
@@ -261,7 +276,11 @@ build_right_prompt() {
 }
 
 # Create the prompts
-precmd() { vcs_info }
+precmd() { 
+  vcs_info 
+  # Add a static hook to examine staged/unstaged changes.
+  vcs_info_hookadd set-message vcs-detect-changes
+}
 
 PROMPT='%{%f%b%k%}$(build_left_prompt) '
 RPROMPT='%{%f%b%k%}$(build_right_prompt)%{$reset_color%}'
