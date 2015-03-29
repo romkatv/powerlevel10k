@@ -172,12 +172,12 @@ function +vi-git-remotebranch() {
     remote=${$(git rev-parse --verify HEAD@{upstream} --symbolic-full-name 2>/dev/null)/refs\/(remotes|heads)\/}
     branch_name=${$(git symbolic-ref --short HEAD 2>/dev/null)}
 
-    hook_com[branch]=" %F{black}${hook_com[branch]}%f"
+    hook_com[branch]="%F{black}${hook_com[branch]}%f"
     # Always show the remote
     #if [[ -n ${remote} ]] ; then
     # Only show the remote if it differs from the local
     if [[ -n ${remote} && ${remote#*/} != ${branch_name} ]] ; then
-        hook_com[branch]+=" %F{black}→%f%F{black}${remote}%f"
+        hook_com[branch]+="%F{black}→%f%F{black}${remote}%f"
     fi
 }
 
