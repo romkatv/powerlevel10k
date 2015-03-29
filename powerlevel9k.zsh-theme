@@ -32,6 +32,7 @@ VCS_STAGED_ICON='✚'
 # vcs_info settings for git
 ################################################################
 
+local VCS_WORKDIR_DIRTY=false
 setopt prompt_subst
 autoload -Uz vcs_info
 zstyle ':vcs_info:*' stagedstr " %F{black}$VCS_STAGED_ICON%f"
@@ -101,17 +102,10 @@ prompt_context() {
 
 # Git: branch/detached head, dirty status
 prompt_vcs() {
-  local dirty=false
   local vcs_prompt="${vcs_info_msg_0_}"
 
   if [[ -n $vcs_prompt ]]; then
-    if [[ $vcs_prompt =~ $VCS_UNSTAGED_ICON ]]; then
-      dirty=true
-    elif [[ $vcs_prompt =~ $VCS_STAGED_ICON ]]; then
-      dirty=true
-    fi
-
-    if ( $dirty ); then
+    if ( $VCS_WORKDIR_DIRTY ); then
       $1_prompt_segment yellow black
     else
       $1_prompt_segment green black
@@ -168,6 +162,12 @@ function +vi-git-tagname() {
 
     tag=$(git describe --tags --exact-match HEAD 2>/dev/null)
     [[ -n ${tag} ]] && hook_com[branch]=" %F{black}${tag}%f"
+}
+
+function +vi-vcs-detect-changes() {
+	if [[ -n ${hook_com[staged]} ]] || [[ -n ${hook_com[unstaged]} ]]; then
+		VCS_WORKDIR_DIRTY=true
+	fi
 }
 
 # Dir: current working directory
@@ -264,7 +264,11 @@ build_right_prompt() {
 }
 
 # Create the prompts
-precmd() { vcs_info }
+precmd() { 
+	vcs_info 
+	# Add a static hook to examine staged/unstaged changes.
+	vcs_info_hookadd set-message vcs-detect-changes
+}
 
 PROMPT='%{%f%b%k%}$(build_left_prompt) '
 RPROMPT='%{%f%b%k%}$(build_right_prompt)%{$reset_color%}'
