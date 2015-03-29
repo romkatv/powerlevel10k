@@ -43,21 +43,16 @@ You can also find the raw font files [in this Github
 repository](https://github.com/powerline/fonts) if you want to manually install
 them for your OS.
 
-To install this theme, clone this repository, and then copy or symlink the theme
-file into your OMZ's `custom` directory. Note that you cannot simply clone the
-repository into `custom/themes`, because OMZ does not traverse sub-directories
-in `themes`.
+To install this theme, clone this repository into your Oh-My-Zsh `custom/themes`
+directory.
 
-    $ cd <prefix>
-    $ git clone https://github.com/bhilburn/powerlevel9k.git powerlevel9k.git
     $ cd ~/.oh-my-zsh/custom
     $ mkdir themes              # if it doesn't already exist
-    $ cd themes
-    $ ln -s <prefix>/powerlevel9k.git/powerlevel9k.zsh-theme powerlevel9k.zsh-theme
+    $ git clone https://github.com/bhilburn/powerlevel9k.git powerlevel9k
 
 You then need to select this theme in your `~/.zshrc`:
 
-    ZSH_THEME="powerlevel9k"
+    ZSH_THEME="powerlevel9k/powerlevel9k"
 
 ### Customization
 
