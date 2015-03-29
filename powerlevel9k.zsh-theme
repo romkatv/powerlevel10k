@@ -103,7 +103,7 @@ prompt_context() {
   fi
 }
 
-# Git: branch/detached head, dirty status
+# branch/detached head, dirty status
 prompt_vcs() {
   local vcs_prompt="${vcs_info_msg_0_}"
 
@@ -168,9 +168,11 @@ function +vi-git-tagname() {
 }
 
 function +vi-vcs-detect-changes() {
-	if [[ -n ${hook_com[staged]} ]] || [[ -n ${hook_com[unstaged]} ]]; then
-		VCS_WORKDIR_DIRTY=true
-	fi
+  if [[ -n ${hook_com[staged]} ]] || [[ -n ${hook_com[unstaged]} ]]; then
+    VCS_WORKDIR_DIRTY=true
+  else
+    VCS_WORKDIR_DIRTY=false
+  fi
 }
 
 # Dir: current working directory
@@ -268,9 +270,9 @@ build_right_prompt() {
 
 # Create the prompts
 precmd() { 
-	vcs_info 
-	# Add a static hook to examine staged/unstaged changes.
-	vcs_info_hookadd set-message vcs-detect-changes
+  vcs_info 
+  # Add a static hook to examine staged/unstaged changes.
+  vcs_info_hookadd set-message vcs-detect-changes
 }
 
 PROMPT='%{%f%b%k%}$(build_left_prompt) '
