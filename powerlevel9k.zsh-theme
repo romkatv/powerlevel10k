@@ -35,15 +35,22 @@ VCS_STAGED_ICON='✚'
 local VCS_WORKDIR_DIRTY=false
 setopt prompt_subst
 autoload -Uz vcs_info
+
+zstyle ':vcs_info:*' enable git hg
+# The `get-revision` function must be turned on for dirty-check to work for Hg
+zstyle ':vcs_info:*' get-revision true
+zstyle ':vcs_info:*' check-for-changes true
+
+zstyle ':vcs_info:*' formats "%b%c%u%m"
+zstyle ':vcs_info:*' actionformats "%b %F{red}| %a%f"
+
 zstyle ':vcs_info:*' stagedstr " %F{black}$VCS_STAGED_ICON%f"
 zstyle ':vcs_info:*' unstagedstr " %F{black}$VCS_UNSTAGED_ICON%f"
-zstyle ':vcs_info:*' actionformats " %b %F{red}| %a%f"
-zstyle ':vcs_info:*' formats " %b%c%u%m"
-zstyle ':vcs_info:*' check-for-changes true
+
 zstyle ':vcs_info:git*+set-message:*' hooks git-untracked git-aheadbehind git-remotebranch git-tagname
-zstyle ':vcs_info:hg*' get-revision true # If false, the dirty-check won't work in mercurial
-zstyle ':vcs_info:hg*:*' branchformat "%b" # only show branch
-zstyle ':vcs_info:*' enable git hg
+
+# For Hg, only show the branch name (as opposed to the rev)
+zstyle ':vcs_info:hg*:*' branchformat "%b"
 
 ## Debugging
 #zstyle ':vcs_info:*+*:*' debug true
@@ -278,6 +285,7 @@ build_right_prompt() {
 # Create the prompts
 precmd() { 
   vcs_info 
+
   # Add a static hook to examine staged/unstaged changes.
   vcs_info_hookadd set-message vcs-detect-changes
 }
