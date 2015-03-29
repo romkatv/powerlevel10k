@@ -89,6 +89,11 @@ elements (it is by default), and define a `DEFAULT_USER` in your `~/.zshrc`:
 
     export DEFAULT_USER=<your username>
 
+#### Solarized colors
+
+If you want your terminal colors not so bright, you may want to use an alternate 
+color scheme. One of them is "solarized": https://github.com/altercation/solarized
+
 ### Bugs / Contact
 
 If you have any requests or bug reports, please use the tracker in this Github
