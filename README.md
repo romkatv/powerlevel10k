@@ -15,6 +15,7 @@ information.
     * branch / tag name
     * current action status (rebasing, merging, etc.,)
     * being behind / ahead of your remote
+    * conditionally shows remote tracking branch if it differs from local
     * various local working tree statuses
 * Shows command number in right-prompt (so you can `$ !<num>` to re-run)
 * Shows return-code of command if it is an error code
@@ -77,8 +78,8 @@ To specify which segments you want, just add the following variables to your
     POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(context dir rbenv vcs)
     POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(status history time)
 
-If you want to show the current changeset, enable `POWERLEVEL9K_SHOW_CHANGESET` 
-in your `~/.zshrc`:
+If you want to show the current changeset in a `git` or `hg` repository, enable
+`POWERLEVEL9K_SHOW_CHANGESET` in your `~/.zshrc`:
 
     POWERLEVEL9K_SHOW_CHANGESET=true
 
