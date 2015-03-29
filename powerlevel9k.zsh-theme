@@ -38,6 +38,7 @@ autoload -Uz vcs_info
 local VCS_WORKDIR_DIRTY=false
 local VCS_CHANGESET_PREFIX=''
 if ( $POWERLEVEL9K_SHOW_CHANGESET ); then
+  # Just display the first 12 characters of our changeset-ID.
   VCS_CHANGESET_PREFIX='%12.12i@'
 fi
 
