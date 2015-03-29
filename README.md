@@ -47,8 +47,7 @@ To install this theme, clone this repository into your Oh-My-Zsh `custom/themes`
 directory.
 
     $ cd ~/.oh-my-zsh/custom
-    $ mkdir themes              # if it doesn't already exist
-    $ git clone https://github.com/bhilburn/powerlevel9k.git powerlevel9k
+    $ git clone https://github.com/bhilburn/powerlevel9k.git themes/powerlevel9k
 
 You then need to select this theme in your `~/.zshrc`:
 
