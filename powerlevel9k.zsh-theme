@@ -37,32 +37,32 @@ autoload -Uz vcs_info
 
 local VCS_WORKDIR_DIRTY=false
 local VCS_CHANGESET_PREFIX=''
-if ( $POWERLEVEL9K_SHOW_CHANGESET ); then
+if [ $POWERLEVEL9K_SHOW_CHANGESET ]; then
   # Just display the first 12 characters of our changeset-ID.
   VCS_CHANGESET_PREFIX='%12.12i@'
 fi
 
 zstyle ':vcs_info:*' enable git hg
-# The `get-revision` function must be turned on for dirty-check to work for Hg
-zstyle ':vcs_info:*' get-revision true
 zstyle ':vcs_info:*' check-for-changes true
 
 zstyle ':vcs_info:*' formats " $VCS_CHANGESET_PREFIX%b%c%u%m"
-zstyle ':vcs_info:*' actionformats "%b %F{red}| %a%f"
+zstyle ':vcs_info:*' actionformats " %b %F{red}| %a%f"
 
 zstyle ':vcs_info:*' stagedstr " %F{black}$VCS_STAGED_ICON%f"
 zstyle ':vcs_info:*' unstagedstr " %F{black}$VCS_UNSTAGED_ICON%f"
 
 zstyle ':vcs_info:git*+set-message:*' hooks git-untracked git-aheadbehind git-remotebranch git-tagname
 
-# For Hg, only show the branch name (as opposed to the rev)
+# For Hg, only show the branch name
 zstyle ':vcs_info:hg*:*' branchformat "%b"
+# The `get-revision` function must be turned on for dirty-check to work for Hg
+zstyle ':vcs_info:hg*:*' get-revision true
 
-if ( $POWERLEVEL9K_SHOW_CHANGESET ); then
-  zstyle ':vcs_info:*' get-revision true # If false, the dirty-check won't work in mercurial
+if [ $POWERLEVEL9K_SHOW_CHANGESET ]; then
+  zstyle ':vcs_info:*' get-revision true
 else
-  # A little performance-boost (at least for mercurial). If we don't show 
-  # the changeset, we can switch to simple mode.
+  # A little performance-boost for large repositories (especially Hg). If we
+  # don't show the changeset, we can switch to simple mode.
   zstyle ':vcs_info:*' use-simple true
 fi
 
@@ -297,8 +297,8 @@ build_right_prompt() {
 }
 
 # Create the prompts
-precmd() { 
-  vcs_info 
+precmd() {
+  vcs_info
 
   # Add a static hook to examine staged/unstaged changes.
   vcs_info_hookadd set-message vcs-detect-changes
