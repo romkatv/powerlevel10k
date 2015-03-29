@@ -32,16 +32,21 @@ VCS_STAGED_ICON='✚'
 # vcs_info settings for git
 ################################################################
 
-local VCS_WORKDIR_DIRTY=false
 setopt prompt_subst
 autoload -Uz vcs_info
+
+local VCS_WORKDIR_DIRTY=false
+local VCS_CHANGESET_PREFIX=''
+if ( $POWERLEVEL9K_SHOW_CHANGESET ); then
+  VCS_CHANGESET_PREFIX='%12.12i@'
+fi
 
 zstyle ':vcs_info:*' enable git hg
 # The `get-revision` function must be turned on for dirty-check to work for Hg
 zstyle ':vcs_info:*' get-revision true
 zstyle ':vcs_info:*' check-for-changes true
 
-zstyle ':vcs_info:*' formats "%b%c%u%m"
+zstyle ':vcs_info:*' formats " $VCS_CHANGESET_PREFIX%b%c%u%m"
 zstyle ':vcs_info:*' actionformats "%b %F{red}| %a%f"
 
 zstyle ':vcs_info:*' stagedstr " %F{black}$VCS_STAGED_ICON%f"
@@ -51,6 +56,14 @@ zstyle ':vcs_info:git*+set-message:*' hooks git-untracked git-aheadbehind git-re
 
 # For Hg, only show the branch name (as opposed to the rev)
 zstyle ':vcs_info:hg*:*' branchformat "%b"
+
+if ( $POWERLEVEL9K_SHOW_CHANGESET ); then
+  zstyle ':vcs_info:*' get-revision true # If false, the dirty-check won't work in mercurial
+else
+  # A little performance-boost (at least for mercurial). If we don't show 
+  # the changeset, we can switch to simple mode.
+  zstyle ':vcs_info:*' use-simple true
+fi
 
 ## Debugging
 #zstyle ':vcs_info:*+*:*' debug true

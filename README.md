@@ -77,6 +77,11 @@ To specify which segments you want, just add the following variables to your
     POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(context dir rbenv vcs)
     POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(status history time)
 
+If you want to show the current changeset, enable `POWERLEVEL9K_SHOW_CHANGESET` 
+in your `~/.zshrc`:
+
+    POWERLEVEL9K_SHOW_CHANGESET=true
+
 #### Conditional 'context'
 
 The `context` segment (user@host string) is conditional. This lets you enable it, but only display
@@ -87,7 +92,6 @@ To use this feature, make sure the `context` segment is enabled in your prompt
 elements (it is by default), and define a `DEFAULT_USER` in your `~/.zshrc`:
 
     export DEFAULT_USER=<your username>
-
 
 ### Bugs / Contact
 
