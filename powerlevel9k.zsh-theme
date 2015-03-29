@@ -45,6 +45,9 @@ zstyle ':vcs_info:hg*' get-revision true # If false, the dirty-check won't work 
 zstyle ':vcs_info:hg*:*' branchformat "%b" # only show branch
 zstyle ':vcs_info:*' enable git hg
 
+## Debugging
+#zstyle ':vcs_info:*+*:*' debug true
+
 ################################################################
 # Prompt Segment Constructors
 ################################################################
