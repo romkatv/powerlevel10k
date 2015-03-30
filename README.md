@@ -76,11 +76,6 @@ To specify which segments you want, just add the following variables to your
     POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(context dir rbenv vcs)
     POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(status history time)
 
-If you want to show the current changeset in a `git` or `hg` repository, enable
-`POWERLEVEL9K_SHOW_CHANGESET` in your `~/.zshrc`:
-
-    POWERLEVEL9K_SHOW_CHANGESET=true
-
 #### The AWS Profile Segment
 
 If you would like to display the [current AWS
@@ -129,6 +124,14 @@ The 'light' color scheme works well for ['Solarized
 Light'](https://github.com/altercation/solarized) users. Check it out:
 
 ![](http://bhilburn.org/content/images/2015/03/solarized-light.png)
+
+#### The VCS Information Segment
+
+By default, the `vcs` segment will provide quite a bit of information. If you
+would also like for it to display the current hash / changeset, simply define
+`POWERLEVEL9K_SHOW_CHANGESET` in your `~/.zshrc`:
+
+    POWERLEVEL9K_SHOW_CHANGESET=true
 
 ### Bugs / Contact
 
