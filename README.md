@@ -7,22 +7,21 @@ giving you the most epic terminal styling in the universe.
 Look like a bad-ass. Impress everyone in 'Screenshot Your Desktop' threads. Use powerlevel9k.
 
 In addition to looking amazing, this theme actually provides a lot of useful
-information.
+information in configurable prompt segments.
 
 ### Features
 
-* Shows lots of information about Git and Hg repositories, including:
+* Supports `git` and `mercurial` repo information through OMZ's `VCS_INFO`:
     * branch / tag name
     * current action status (rebasing, merging, etc.,)
-    * being behind / ahead of your remote
-    * conditionally shows remote tracking branch if it differs from local
-    * various local working tree statuses
-* Shows command number in right-prompt (so you can `$ !<num>` to re-run)
-* Shows return-code of command if it is an error code
-* Shows system time in right-prompt
-* Indicates background jobs with a gear
-* Will conditionally display the `user@host` string
-* Plenty of other segments you can enable if you want them (e.g., ruby, AWS)
+    * being behind / ahead of your remote by some number of commits
+    * conditionally shows remote tracking branch if the name differs from local
+    * various working tree statuses (e.g., unstaged, staged, etc.,)
+* Shows return-code of the last command if it is an error code
+* Indicates background jobs with a gear icon
+* Can conditionally display the `user@host` string when needed
+* Provides segment for command history (so you can `$ !<num>` to re-run)
+* Plenty of additional segments to choose from (e.g., AWS, ruby)
 * Can be used as a single or double-lined prompt (see screenshots below)
 * Several built-in color configurations to choose from
 
