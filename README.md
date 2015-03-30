@@ -124,7 +124,7 @@ By default, `powerlevel9k` is a single-lined prompt. If you would like to have
 the segments display on one line, and print the command prompt below it, simply
 define `POWERLEVEL9K_PROMPT_ON_NEWLINE` in your `~/.zshrc`:
 
-    export POWERLEVEL9K_PROMPT_ON_NEWLINE=true
+    POWERLEVEL9K_PROMPT_ON_NEWLINE=true
 
 Here is what it looks like:
 
