@@ -11,7 +11,7 @@ information in configurable prompt segments.
 
 ### Features
 
-* Supports `git` and `mercurial` repo information through OMZ's `VCS_INFO`:
+* Supports `git` and `mercurial` repo information through ZSH's `VCS_INFO`:
     * branch / tag name
     * current action status (rebasing, merging, etc.,)
     * being behind / ahead of your remote by some number of commits
