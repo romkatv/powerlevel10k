@@ -109,9 +109,15 @@ elements (it is by default), and define a `DEFAULT_USER` in your `~/.zshrc`:
 
 By default, the `vcs` segment will provide quite a bit of information. If you
 would also like for it to display the current hash / changeset, simply define
-`POWERLEVEL9K_SHOW_CHANGESET` in your `~/.zshrc`:
+`POWERLEVEL9K_SHOW_CHANGESET` in your `~/.zshrc`. If activated, it will show
+the first 12 characters of the changeset id. To change the amount of characters,
+set `POWERLEVEL9K_CHANGESET_HASH_LENTH` to any value you want.
+Example:
 
+    # enable the vcs segment in general
     POWERLEVEL9K_SHOW_CHANGESET=true
+    # just show the 6 first characters of changeset
+    POWERLEVEL9K_CHANGESET_HASH_LENGTH=6
 
 ### Styling
 
