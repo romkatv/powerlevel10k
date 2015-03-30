@@ -38,12 +38,21 @@ Here are some screenshots of `powerlevel9k` with default settings:
 
 ### Installation
 
+There are two things you need to make this theme work correctly: Powerline
+fonts, and the theme itself.
+
+#### Install Powerline Fonts
 First, you need to install Powerline Fonts. You can find the [installation
 instructions
 here](https://powerline.readthedocs.org/en/latest/installation/linux.html#fonts-installation).
 You can also find the raw font files [in this Github
 repository](https://github.com/powerline/fonts) if you want to manually install
 them for your OS.
+
+After you have installed Powerline fonts, make the default font in your terminal
+emulator the Powerline font you want to use.
+
+#### Install Powerlevel9k
 
 To install this theme, clone this repository into your Oh-My-Zsh `custom/themes`
 directory.
@@ -132,6 +141,20 @@ The 'light' color scheme works well for ['Solarized
 Light'](https://github.com/altercation/solarized) users. Check it out:
 
 ![](http://bhilburn.org/content/images/2015/03/solarized-light.png)
+
+### Troubleshooting
+
+Here are some fixes to some common problems.
+
+#### Gaps Between Segments
+
+You can see this issue in the screenshot, below:
+
+![](http://bhilburn.org/content/images/2014/12/font_issue.png)
+
+Thankfully, this is easy to fix. This happens if you have successfully installed
+Powerline fonts, but did not make a Powerline font the default font in your
+terminal emulator (e.g., 'terminator', 'gnome-terminal', 'konsole', etc.,).
 
 ### Contributions / Bugs / Contact
 
