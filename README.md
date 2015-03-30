@@ -89,6 +89,11 @@ elements (it is by default), and define a `DEFAULT_USER` in your `~/.zshrc`:
 
     export DEFAULT_USER=<your username>
 
+#### Light theme
+
+If you want your shell in a "light" variant, just set `POWERLEVEL9K_COLOR_SCHEME` 
+to `light` and you are done!
+
 ### Bugs / Contact
 
 If you have any requests or bug reports, please use the tracker in this Github
