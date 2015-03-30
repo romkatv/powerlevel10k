@@ -29,6 +29,20 @@ VCS_UNSTAGED_ICON='●'
 VCS_STAGED_ICON='✚'
 
 ################################################################
+# color scheme
+################################################################
+
+if [[ $POWERLEVEL9K_COLOR_SCHEME == "light" ]]; then
+	DEFAULT_COLOR=white
+	DEFAULT_COLOR_INVERTED=black
+	DEFAULT_COLOR_DARK="252"
+else
+	DEFAULT_COLOR=black
+	DEFAULT_COLOR_INVERTED=white
+	DEFAULT_COLOR_DARK="236"
+fi
+
+################################################################
 # vcs_info settings for git
 ################################################################
 
@@ -39,17 +53,17 @@ local VCS_WORKDIR_DIRTY=false
 local VCS_CHANGESET_PREFIX=''
 if [ $POWERLEVEL9K_SHOW_CHANGESET ]; then
   # Just display the first 12 characters of our changeset-ID.
-  VCS_CHANGESET_PREFIX='%12.12i@'
+  VCS_CHANGESET_PREFIX="%F{$DEFAULT_COLOR_DARK}%12.12i@%f"
 fi
 
 zstyle ':vcs_info:*' enable git hg
 zstyle ':vcs_info:*' check-for-changes true
 
-zstyle ':vcs_info:*' formats " $VCS_CHANGESET_PREFIX%b%c%u%m"
+zstyle ':vcs_info:*' formats " $VCS_CHANGESET_PREFIX%F{$DEFAULT_COLOR}%b%c%u%m%f"
 zstyle ':vcs_info:*' actionformats " %b %F{red}| %a%f"
 
-zstyle ':vcs_info:*' stagedstr " %F{black}$VCS_STAGED_ICON%f"
-zstyle ':vcs_info:*' unstagedstr " %F{black}$VCS_UNSTAGED_ICON%f"
+zstyle ':vcs_info:*' stagedstr " %F{$DEFAULT_COLOR}$VCS_STAGED_ICON%f"
+zstyle ':vcs_info:*' unstagedstr " %F{$DEFAULT_COLOR}$VCS_UNSTAGED_ICON%f"
 
 zstyle ':vcs_info:git*+set-message:*' hooks git-untracked git-aheadbehind git-remotebranch git-tagname
 
@@ -120,7 +134,7 @@ right_prompt_segment() {
 # Note that if $DEFAULT_USER is not set, this prompt segment will always print
 prompt_context() {
   if [[ "$USER" != "$DEFAULT_USER" || -n "$SSH_CLIENT" ]]; then
-    $1_prompt_segment black default "%(!.%{%F{yellow}%}.)$USER@%m"
+    $1_prompt_segment $DEFAULT_COLOR "011" "%(!.%{%F{yellow}%}.)$USER@%m"
   fi
 }
 
@@ -130,19 +144,19 @@ prompt_vcs() {
 
   if [[ -n $vcs_prompt ]]; then
     if ( $VCS_WORKDIR_DIRTY ); then
-      $1_prompt_segment yellow black
+      $1_prompt_segment yellow $DEFAULT_COLOR
     else
-      $1_prompt_segment green black
+      $1_prompt_segment green $DEFAULT_COLOR
     fi
 
-    echo -n "$vcs_prompt"
+    echo -n "%F{$DEFAULT_COLOR}%f$vcs_prompt"
   fi
 }
 
 function +vi-git-untracked() {
     if [[ $(git rev-parse --is-inside-work-tree 2> /dev/null) == 'true' && \
             $(git ls-files --others --exclude-standard | sed q | wc -l | tr -d ' ') != 0 ]]; then
-        hook_com[unstaged]+=" %F{black}?%f"
+        hook_com[unstaged]+=" %F{$DEFAULT_COLOR}?%f"
     fi
 }
 
@@ -155,12 +169,12 @@ function +vi-git-aheadbehind() {
     # for git prior to 1.7
     # ahead=$(git rev-list origin/${branch_name}..HEAD | wc -l)
     ahead=$(git rev-list ${branch_name}@{upstream}..HEAD 2>/dev/null | wc -l | tr -d ' ')
-    (( $ahead )) && gitstatus+=( " %F{black}↑${ahead}%f" )
+    (( $ahead )) && gitstatus+=( " %F{$DEFAULT_COLOR}↑${ahead}%f" )
 
     # for git prior to 1.7
     # behind=$(git rev-list HEAD..origin/${branch_name} | wc -l)
     behind=$(git rev-list HEAD..${branch_name}@{upstream} 2>/dev/null | wc -l | tr -d ' ')
-    (( $behind )) && gitstatus+=( " %F{black}↓${behind}%f" )
+    (( $behind )) && gitstatus+=( " %F{$DEFAULT_COLOR}↓${behind}%f" )
 
     hook_com[misc]+=${(j::)gitstatus}
 }
@@ -172,12 +186,12 @@ function +vi-git-remotebranch() {
     remote=${$(git rev-parse --verify HEAD@{upstream} --symbolic-full-name 2>/dev/null)/refs\/(remotes|heads)\/}
     branch_name=${$(git symbolic-ref --short HEAD 2>/dev/null)}
 
-    hook_com[branch]="%F{black}${hook_com[branch]}%f"
+    hook_com[branch]="%F{$DEFAULT_COLOR}${hook_com[branch]}%f"
     # Always show the remote
     #if [[ -n ${remote} ]] ; then
     # Only show the remote if it differs from the local
     if [[ -n ${remote} && ${remote#*/} != ${branch_name} ]] ; then
-        hook_com[branch]+="%F{black}→%f%F{black}${remote}%f"
+        hook_com[branch]+="%F{$DEFAULT_COLOR}→%f%F{$DEFAULT_COLOR}${remote}%f"
     fi
 }
 
@@ -185,7 +199,7 @@ function +vi-git-tagname() {
     local tag
 
     tag=$(git describe --tags --exact-match HEAD 2>/dev/null)
-    [[ -n ${tag} ]] && hook_com[branch]=" %F{black}${tag}%f"
+    [[ -n ${tag} ]] && hook_com[branch]=" %F{$DEFAULT_COLOR}${tag}%f"
 }
 
 function +vi-vcs-detect-changes() {
@@ -198,7 +212,7 @@ function +vi-vcs-detect-changes() {
 
 # Dir: current working directory
 prompt_dir() {
-  $1_prompt_segment blue black '%~'
+  $1_prompt_segment blue $DEFAULT_COLOR '%~'
 }
 
 # Virtualenv: current working virtualenv
@@ -207,7 +221,7 @@ prompt_dir() {
 prompt_virtualenv() {
   local virtualenv_path="$VIRTUAL_ENV"
   if [[ -n $virtualenv_path && -n $VIRTUAL_ENV_DISABLE_PROMPT ]]; then
-    $1_prompt_segment blue black "(`basename $virtualenv_path`)"
+    $1_prompt_segment blue $DEFAULT_COLOR "(`basename $virtualenv_path`)"
   fi
 }
 
@@ -220,7 +234,7 @@ prompt_status() {
   [[ $UID -eq 0 ]] && symbols+="%{%F{yellow}%}⚡"
   [[ $(jobs -l | wc -l) -gt 0 ]] && symbols+="%{%F{cyan}%}⚙"
 
-  [[ -n "$symbols" ]] && $1_prompt_segment black default "$symbols"
+  [[ -n "$symbols" ]] && $1_prompt_segment $DEFAULT_COLOR default "$symbols"
 }
 
 # Right Status: (return code, root status, background jobs)
@@ -241,17 +255,17 @@ prompt_longstatus() {
   [[ $UID -eq 0 ]] && symbols+="%{%F{yellow}%}⚡"
   [[ $(jobs -l | wc -l) -gt 0 ]] && symbols+="%{%F{cyan}%}⚙"
 
-  [[ -n "$symbols" ]] && $1_prompt_segment $bg default "$symbols"
+  [[ -n "$symbols" ]] && $1_prompt_segment $bg $DEFAULT_COLOR "$symbols"
 }
 
 # System time
 prompt_time() {
-  $1_prompt_segment white black '%D{%H:%M:%S} '
+  $1_prompt_segment $DEFAULT_COLOR_INVERTED $DEFAULT_COLOR '%D{%H:%M:%S} '
 }
 
 # Command number (in local history)
 prompt_history() {
-  $1_prompt_segment "244" black '%h'
+  $1_prompt_segment "244" $DEFAULT_COLOR '%h'
 }
 
 # Ruby Version Manager information
@@ -259,14 +273,14 @@ prompt_rvm() {
   local rvm_prompt
   rvm_prompt=`rvm-prompt`
   if [ "$rvm_prompt" != "" ]; then
-    $1_prompt_segment "240" white "$rvm_prompt "
+    $1_prompt_segment "240" $DEFAULT_COLOR "$rvm_prompt "
   fi
 }
 
 # rbenv information
 prompt_rbenv() {
   if [[ -n "$RBENV_VERSION" ]]; then
-    $1_prompt_segment red black "$RBENV_VERSION"
+    $1_prompt_segment red $DEFAULT_COLOR "$RBENV_VERSION"
   fi
 }
 
