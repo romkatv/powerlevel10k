@@ -102,7 +102,6 @@ elements (it is by default), and define a `DEFAULT_USER` in your `~/.zshrc`:
 
     export DEFAULT_USER=<your username>
 
-<<<<<<< HEAD
 ### Styling
 
 You can configure the look and feel of your prompt easily with some built-in
@@ -123,10 +122,8 @@ to `light` in your `~/.zshrc`, and you're all set!
 
     POWERLEVEL9K_COLOR_SCHEME='light'
 
-#### Solarized colors
-
-If you want your terminal colors not so bright, you may want to use an alternate 
-color scheme. One of them is "solarized": https://github.com/altercation/solarized
+The 'light' color scheme works well for ['Solarized
+Light'](https://github.com/altercation/solarized) users.
 
 ### Bugs / Contact
 
