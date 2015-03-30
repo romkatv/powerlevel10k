@@ -313,5 +313,10 @@ precmd() {
   vcs_info_hookadd set-message vcs-detect-changes
 }
 
-PROMPT='%{%f%b%k%}$(build_left_prompt) '
+if [ $POWERLEVEL9K_PROMPT_ON_NEWLINE ] ; then
+  PROMPT='╭─%{%f%b%k%}$(build_left_prompt) 
+╰─ '
+else
+  PROMPT='%{%f%b%k%}$(build_left_prompt) '
+fi
 RPROMPT='%{%f%b%k%}$(build_right_prompt)%{$reset_color%}'

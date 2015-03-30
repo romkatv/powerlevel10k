@@ -22,7 +22,8 @@ information.
 * Shows system time in right-prompt
 * Indicates background jobs with a gear
 * Will conditionally display the `user@host` string
-* Plenty of other segments you can enable if you want them (e.g., ruby env, AWS)
+* Plenty of other segments you can enable if you want them (e.g., ruby, AWS)
+* Can be used as a single or double-lined prompt (see screenshots below)
 
 **If you would like an OMZ theme that provides most of the same features but
 doesn't require Powerline fonts, check out the sister font,
@@ -54,13 +55,14 @@ You then need to select this theme in your `~/.zshrc`:
 
     ZSH_THEME="powerlevel9k/powerlevel9k"
 
-### Customization
+### Segment Customization
 
-You can choose which segments are shown on each side. The segments that are
+Customizing your prompt is easy! Select the segments you want to have displayed,
+and then assign them to either the left or right prompt. The segments that are
 currently available are:
 
-* **aws** - The current AWS profile, if active.
-* **context** - Your username and host.
+* **aws** - The current AWS profile, if active (more info below)
+* **context** - Your username and host (more info below)
 * **dir** - Your current working directory.
 * **history** - The command number for the current line.
 * **rbenv** - Ruby environment information (if one is active).
@@ -79,7 +81,16 @@ If you want to show the current changeset in a `git` or `hg` repository, enable
 
     POWERLEVEL9K_SHOW_CHANGESET=true
 
-#### Conditional 'context'
+#### The AWS Profile Segment
+
+If you would like to display the [current AWS
+profile](http://docs.aws.amazon.com/cli/latest/userguide/installing.html), add
+the `aws` segment to one of the prompts, and define `AWS_DEFAULT_PROFILE` in
+your `~/.zshrc`:
+
+    export AWS_DEFAULT_PROFILE=<profile_name>
+
+#### The 'context' Segment
 
 The `context` segment (user@host string) is conditional. This lets you enable it, but only display
 it if you are not your normal user or on a remote host (basically, only print it
@@ -90,14 +101,18 @@ elements (it is by default), and define a `DEFAULT_USER` in your `~/.zshrc`:
 
     export DEFAULT_USER=<your username>
 
-#### AWS Profile
+### Styling
 
-If you would like to display the [current AWS
-profile](http://docs.aws.amazon.com/cli/latest/userguide/installing.html), add
-the `aws` segment to one of the prompts, and define `AWS_DEFAULT_PROFILE` in
-your `~/.zshrc`:
+You can configure the look and feel of your prompt easily with some built-in
+options.
 
-    export AWS_DEFAULT_PROFILE=<profile_name>
+#### Double-Lined Prompt
+
+By default, `powerlevel9k` is a single-lined prompt. If you would like to have
+the segments display on one line, and print the command prompt below it, simply
+define `POWERLEVEL9K_PROMPT_ON_NEWLINE` in your `~/.zshrc`:
+
+    export POWERLEVEL9K_PROMPT_ON_NEWLINE=true
 
 ### Bugs / Contact
 
