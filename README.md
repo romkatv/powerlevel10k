@@ -89,7 +89,7 @@ your `~/.zshrc`:
 
 The `context` segment (user@host string) is conditional. This lets you enable it, but only display
 it if you are not your normal user or on a remote host (basically, only print it
-when it likely you need it).
+when it's likely you need it).
 
 To use this feature, make sure the `context` segment is enabled in your prompt
 elements (it is by default), and define a `DEFAULT_USER` in your `~/.zshrc`:
@@ -133,8 +133,14 @@ Light'](https://github.com/altercation/solarized) users. Check it out:
 
 ![](http://bhilburn.org/content/images/2015/03/solarized-light.png)
 
-### Bugs / Contact
+### Contributions / Bugs / Contact
 
 If you have any requests or bug reports, please use the tracker in this Github
 repository.
+
+I'm happy to accept code contributions from anyone who has an improvement!
+Please submit your contribution as a Github pull-request.
+
+If you would like to contact me directly, you can find my e-mail address on my
+[Github profile page](https://github.com/bhilburn).
 
