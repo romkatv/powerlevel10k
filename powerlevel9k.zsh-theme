@@ -271,7 +271,6 @@ prompt_rbenv() {
 }
 
 # AWS Profile
-# See http://docs.aws.amazon.com/cli/latest/userguide/installing.html
 prompt_aws() {
   local aws_profile=$AWS_DEFAULT_PROFILE
   if [[ -n $aws_profile ]]; 

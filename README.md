@@ -58,14 +58,14 @@ You then need to select this theme in your `~/.zshrc`:
 You can choose which segments are shown on each side. The segments that are
 currently available are:
 
+* **aws** - The current AWS profile, if active.
 * **context** - Your username and host.
 * **dir** - Your current working directory.
-* **vcs** - Information about this `git` or `hg` repository (if you are in one).
+* **history** - The command number for the current line.
 * **rbenv** - Ruby environment information (if one is active).
 * **status** - The return code of the previous command, and status of background jobs.
-* **history** - The command number for the current line.
-* **aws** - The current AWS profile, if you exported it with `export AWS_DEFAULT_PROFILE=<profile_name>`
 * **time** - System time.
+* **vcs** - Information about this `git` or `hg` repository (if you are in one).
 
 To specify which segments you want, just add the following variables to your
 `~/.zshrc`. If you don't customize this, the below configuration is the default:
@@ -88,6 +88,15 @@ To use this feature, make sure the `context` segment is enabled in your prompt
 elements (it is by default), and define a `DEFAULT_USER` in your `~/.zshrc`:
 
     export DEFAULT_USER=<your username>
+
+#### AWS Profile
+
+If you would like to display the [current AWS
+profile](http://docs.aws.amazon.com/cli/latest/userguide/installing.html), add
+the `aws` segment to one of the prompts, and define `AWS_DEFAULT_PROFILE` in
+your `~/.zshrc`:
+
+    export AWS_DEFAULT_PROFILE=<profile_name>
 
 ### Bugs / Contact
 
