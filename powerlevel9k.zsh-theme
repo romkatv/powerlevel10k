@@ -270,6 +270,16 @@ prompt_rbenv() {
   fi
 }
 
+# AWS Profile
+# See http://docs.aws.amazon.com/cli/latest/userguide/installing.html
+prompt_aws() {
+  local aws_profile=$AWS_DEFAULT_PROFILE
+  if [[ -n $aws_profile ]]; 
+  then
+    $1_prompt_segment red white "AWS: $aws_profile"
+  fi
+}
+
 # Main prompt
 build_left_prompt() {
   if (( ${#POWERLEVEL9K_LEFT_PROMPT_ELEMENTS} == 0 )); then

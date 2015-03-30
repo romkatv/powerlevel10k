@@ -64,6 +64,7 @@ currently available are:
 * **rbenv** - Ruby environment information (if one is active).
 * **status** - The return code of the previous command, and status of background jobs.
 * **history** - The command number for the current line.
+* **aws** - The current AWS profile, if you exported it with `export AWS_DEFAULT_PROFILE=<profile_name>`
 * **time** - System time.
 
 To specify which segments you want, just add the following variables to your
