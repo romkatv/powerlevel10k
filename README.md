@@ -25,11 +25,11 @@ information in configurable prompt segments.
 * Can be used as a single or double-lined prompt (see screenshots below)
 * Several built-in color configurations to choose from
 
-**If you would like an OMZ theme that provides most of the same features but
+**If you would like an OMZ theme that provides some of the same features but
 doesn't require Powerline fonts, check out the sister font,
 [hackersaurus](https://github.com/bhilburn/hackersaurus).**
 
-These screenshots should give you an idea of what `powerlevel9k` looks like:
+Here are some screenshots of `powerlevel9k` with default settings:
 
 ![](http://bhilburn.org/content/images/2014/12/powerlevel9k.png)
 
