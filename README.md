@@ -22,6 +22,7 @@ information.
 * Shows system time in right-prompt
 * Indicates background jobs with a gear
 * Will conditionally display the `user@host` string
+* Plenty of other segments you can enable if you want them (e.g., ruby env, AWS)
 
 **If you would like an OMZ theme that provides most of the same features but
 doesn't require Powerline fonts, check out the sister font,
