@@ -115,6 +115,10 @@ define `POWERLEVEL9K_PROMPT_ON_NEWLINE` in your `~/.zshrc`:
 
     export POWERLEVEL9K_PROMPT_ON_NEWLINE=true
 
+Here is what it looks like:
+
+![](http://bhilburn.org/content/images/2015/03/double-line.png)
+
 #### Light Color Theme
 
 If you prefer to use "light" colors, simply set `POWERLEVEL9K_COLOR_SCHEME`
@@ -123,7 +127,9 @@ to `light` in your `~/.zshrc`, and you're all set!
     POWERLEVEL9K_COLOR_SCHEME='light'
 
 The 'light' color scheme works well for ['Solarized
-Light'](https://github.com/altercation/solarized) users.
+Light'](https://github.com/altercation/solarized) users. Check it out:
+
+![](http://bhilburn.org/content/images/2015/03/solarized-light.png)
 
 ### Bugs / Contact
 
