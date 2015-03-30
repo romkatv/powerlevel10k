@@ -24,6 +24,7 @@ information.
 * Will conditionally display the `user@host` string
 * Plenty of other segments you can enable if you want them (e.g., ruby, AWS)
 * Can be used as a single or double-lined prompt (see screenshots below)
+* Several built-in color configurations to choose from
 
 **If you would like an OMZ theme that provides most of the same features but
 doesn't require Powerline fonts, check out the sister font,
@@ -113,6 +114,13 @@ the segments display on one line, and print the command prompt below it, simply
 define `POWERLEVEL9K_PROMPT_ON_NEWLINE` in your `~/.zshrc`:
 
     export POWERLEVEL9K_PROMPT_ON_NEWLINE=true
+
+#### Light Color Theme
+
+If you prefer to use "light" colors, simply set `POWERLEVEL9K_COLOR_SCHEME`
+to `light` in your `~/.zshrc`, and you're all set!
+
+    POWERLEVEL9K_COLOR_SCHEME='light'
 
 ### Bugs / Contact
 
