@@ -203,7 +203,7 @@ prompt_dir() {
 
 # Virtualenv: current working virtualenv
 # More information on virtualenv (Python):
-# https://virtualenv.pypa.io/en/latest/virtualenv.html
+# https://virtualenv.pypa.io/en/latest/
 prompt_virtualenv() {
   local virtualenv_path="$VIRTUAL_ENV"
   if [[ -n $virtualenv_path && -n $VIRTUAL_ENV_DISABLE_PROMPT ]]; then
