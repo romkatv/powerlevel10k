@@ -29,7 +29,7 @@ VCS_UNSTAGED_ICON='●'
 VCS_STAGED_ICON='✚'
 
 ################################################################
-# vcs_info settings for git
+# vcs_info settings
 ################################################################
 
 setopt prompt_subst
