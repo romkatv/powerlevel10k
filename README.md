@@ -11,7 +11,7 @@ information in configurable prompt segments.
 
 ### Features
 
-* Supports `git` and `mercurial` repo information through OMZ's `VCS_INFO`:
+* Supports `git` and `mercurial` repo information through ZSH's `VCS_INFO`:
     * branch / tag name
     * current action status (rebasing, merging, etc.,)
     * being behind / ahead of your remote by some number of commits
@@ -130,7 +130,7 @@ By default, `powerlevel9k` is a single-lined prompt. If you would like to have
 the segments display on one line, and print the command prompt below it, simply
 define `POWERLEVEL9K_PROMPT_ON_NEWLINE` in your `~/.zshrc`:
 
-    export POWERLEVEL9K_PROMPT_ON_NEWLINE=true
+    POWERLEVEL9K_PROMPT_ON_NEWLINE=true
 
 Here is what it looks like:
 
