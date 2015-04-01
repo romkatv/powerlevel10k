@@ -52,7 +52,7 @@ autoload -Uz vcs_info
 
 local VCS_WORKDIR_DIRTY=false
 local VCS_CHANGESET_PREFIX=''
-if [ $POWERLEVEL9K_SHOW_CHANGESET ]; then
+if [[ "$POWERLEVEL9K_SHOW_CHANGESET" == true ]]; then
   # Default: Just display the first 12 characters of our changeset-ID.
   local VCS_CHANGESET_HASH_LENGTH=12
 	if [[ -n $POWERLEVEL9K_CHANGESET_HASH_LENGTH ]]; then
@@ -78,7 +78,7 @@ zstyle ':vcs_info:hg*:*' branchformat "%b"
 # The `get-revision` function must be turned on for dirty-check to work for Hg
 zstyle ':vcs_info:hg*:*' get-revision true
 
-if [ $POWERLEVEL9K_SHOW_CHANGESET ]; then
+if [[ "$POWERLEVEL9K_SHOW_CHANGESET" == true ]]; then
   zstyle ':vcs_info:*' get-revision true
 else
   # A little performance-boost for large repositories (especially Hg). If we
@@ -149,7 +149,7 @@ prompt_vcs() {
   local vcs_prompt="${vcs_info_msg_0_}"
 
   if [[ -n $vcs_prompt ]]; then
-    if ( $VCS_WORKDIR_DIRTY ); then
+    if [[ "$VCS_WORKDIR_DIRTY" == true ]]; then
       $1_prompt_segment yellow $DEFAULT_COLOR
     else
       $1_prompt_segment green $DEFAULT_COLOR
@@ -301,7 +301,7 @@ prompt_aws() {
 
 # Main prompt
 build_left_prompt() {
-  if (( ${#POWERLEVEL9K_LEFT_PROMPT_ELEMENTS} == 0 )); then
+  if [[ ${#POWERLEVEL9K_LEFT_PROMPT_ELEMENTS} == 0 ]]; then
     POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(context dir rbenv vcs)
   fi
 
@@ -316,7 +316,7 @@ build_left_prompt() {
 build_right_prompt() {
   RETVAL=$?
 
-  if (( ${#POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS} == 0 )); then
+  if [[ ${#POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS} == 0 ]]; then
     POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(longstatus history time)
   fi
 
@@ -333,7 +333,7 @@ precmd() {
   vcs_info_hookadd set-message vcs-detect-changes
 }
 
-if [ $POWERLEVEL9K_PROMPT_ON_NEWLINE ] ; then
+if [[ "$POWERLEVEL9K_PROMPT_ON_NEWLINE" == true ]]; then
   PROMPT='╭─%{%f%b%k%}$(build_left_prompt) 
 ╰─ '
 else
