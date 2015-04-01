@@ -294,6 +294,41 @@ prompt_aws() {
   fi
 }
 
+# RSpec test ratio
+prompt_rspec_stats() {
+  if [[ (-d app && -d spec) ]]; then
+    local code_amount=$(wc -l app/**/*.rb | grep -oE "[0-9]+" | tail -n 1)
+    local tests_amount=$(wc -l spec/**/*.rb | grep -oE "[0-9]+" | tail -n 1)
+
+    build_test_stats $1 $code_amount $tests_amount "RSpec"
+  fi
+}
+
+# Symfony2-PHPUnit test ratio
+prompt_symfony2_tests() {
+  if [[ (-d src && -d app && -f app/AppKernel.php) ]]; then
+    local code_amount=$(ls -1 src/**/*.php | grep -v Tests | wc -l)
+    local tests_amount=$(ls -1 src/**/*.php | grep Tests | wc -l)
+
+    build_test_stats $1 $code_amount $tests_amount "SF2-Tests"
+  fi
+}
+
+# Show a ratio of tests vs code
+build_test_stats() {
+  local code_amount=$2
+  local tests_amount=$3+0.01
+  local headline=$4
+
+	# Set float precision to 2 digits:
+	typeset -F 2 ratio
+	local ratio=$(( (tests_amount/code_amount) * 100 ))
+
+  [[ ratio -ge 0.75 ]] && $1_prompt_segment cyan $DEFAULT_COLOR "$headline: $ratio%%"
+  [[ ratio -ge 0.5 && ratio -lt 0.75 ]] && $1_prompt_segment yellow $DEFAULT_COLOR "$headline: $ratio%%"
+  [[ ratio -lt 0.5 ]] && $1_prompt_segment red $DEFAULT_COLOR "$headline: $ratio%%"
+}
+
 # Main prompt
 build_left_prompt() {
   if [[ ${#POWERLEVEL9K_LEFT_PROMPT_ELEMENTS} == 0 ]]; then
