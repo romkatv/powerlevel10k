@@ -53,8 +53,13 @@ autoload -Uz vcs_info
 local VCS_WORKDIR_DIRTY=false
 local VCS_CHANGESET_PREFIX=''
 if [[ "$POWERLEVEL9K_SHOW_CHANGESET" == true ]]; then
-  # Just display the first 12 characters of our changeset-ID.
-  VCS_CHANGESET_PREFIX="%F{$DEFAULT_COLOR_DARK}%12.12i@%f"
+  # Default: Just display the first 12 characters of our changeset-ID.
+  local VCS_CHANGESET_HASH_LENGTH=12
+  if [[ -n $POWERLEVEL9K_CHANGESET_HASH_LENGTH ]]; then
+    VCS_CHANGESET_HASH_LENGTH=$POWERLEVEL9K_CHANGESET_HASH_LENGTH
+  fi
+
+  VCS_CHANGESET_PREFIX="%F{$DEFAULT_COLOR_DARK}%0.$VCS_CHANGESET_HASH_LENGTH""i@%f"
 fi
 
 zstyle ':vcs_info:*' enable git hg
