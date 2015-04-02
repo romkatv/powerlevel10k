@@ -336,9 +336,9 @@ build_test_stats() {
   local tests_amount=$3+0.01
   local headline=$4
 
-	# Set float precision to 2 digits:
-	typeset -F 2 ratio
-	local ratio=$(( (tests_amount/code_amount) * 100 ))
+  # Set float precision to 2 digits:
+  typeset -F 2 ratio
+  local ratio=$(( (tests_amount/code_amount) * 100 ))
 
   [[ ratio -ge 0.75 ]] && $1_prompt_segment cyan $DEFAULT_COLOR "$headline: $ratio%%"
   [[ ratio -ge 0.5 && ratio -lt 0.75 ]] && $1_prompt_segment yellow $DEFAULT_COLOR "$headline: $ratio%%"
