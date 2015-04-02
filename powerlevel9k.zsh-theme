@@ -333,7 +333,7 @@ prompt_symfony2_tests() {
 # Show a ratio of tests vs code
 build_test_stats() {
   local code_amount=$2
-  local tests_amount=$3+0.01
+  local tests_amount=$3+0.00001
   local headline=$4
 
   # Set float precision to 2 digits:
