@@ -313,8 +313,8 @@ prompt_aws() {
 # RSpec test ratio
 prompt_rspec_stats() {
   if [[ (-d app && -d spec) ]]; then
-    local code_amount=$(wc -l app/**/*.rb | grep -oE "[0-9]+" | tail -n 1)
-    local tests_amount=$(wc -l spec/**/*.rb | grep -oE "[0-9]+" | tail -n 1)
+    local code_amount=$(ls -1 app/**/*.rb | wc -l)
+    local tests_amount=$(ls -1 spec/**/*.rb | wc -l)
 
     build_test_stats $1 $code_amount $tests_amount "RSpec"
   fi
