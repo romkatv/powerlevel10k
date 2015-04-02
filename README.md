@@ -76,7 +76,7 @@ currently available are:
 * **dir** - Your current working directory.
 * **history** - The command number for the current line.
 * **rbenv** - Ruby environment information (if one is active).
-* **rspec** - Show a ratio of test classes vs code classes for RSpec.
+* **rspec_stats** - Show a ratio of test classes vs code classes for RSpec.
 * **status** - The return code of the previous command, and status of background jobs.
 * **symfony2_tests** - Show a ratio of test classes vs code classes for Symfony2.
 * **time** - System time.
