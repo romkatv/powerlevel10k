@@ -53,8 +53,13 @@ autoload -Uz vcs_info
 local VCS_WORKDIR_DIRTY=false
 local VCS_CHANGESET_PREFIX=''
 if [[ "$POWERLEVEL9K_SHOW_CHANGESET" == true ]]; then
-  # Just display the first 12 characters of our changeset-ID.
-  VCS_CHANGESET_PREFIX="%F{$DEFAULT_COLOR_DARK}%12.12i@%f"
+  # Default: Just display the first 12 characters of our changeset-ID.
+  local VCS_CHANGESET_HASH_LENGTH=12
+  if [[ -n $POWERLEVEL9K_CHANGESET_HASH_LENGTH ]]; then
+    VCS_CHANGESET_HASH_LENGTH=$POWERLEVEL9K_CHANGESET_HASH_LENGTH
+  fi
+
+  VCS_CHANGESET_PREFIX="%F{$DEFAULT_COLOR_DARK}%0.$VCS_CHANGESET_HASH_LENGTH""i@%f"
 fi
 
 zstyle ':vcs_info:*' enable git hg
@@ -66,7 +71,7 @@ zstyle ':vcs_info:*' actionformats " %b %F{red}| %a%f"
 zstyle ':vcs_info:*' stagedstr " %F{$DEFAULT_COLOR}$VCS_STAGED_ICON%f"
 zstyle ':vcs_info:*' unstagedstr " %F{$DEFAULT_COLOR}$VCS_UNSTAGED_ICON%f"
 
-zstyle ':vcs_info:git*+set-message:*' hooks git-untracked git-aheadbehind git-remotebranch git-tagname
+zstyle ':vcs_info:git*+set-message:*' hooks git-untracked git-aheadbehind git-stash git-remotebranch git-tagname
 
 # For Hg, only show the branch name
 zstyle ':vcs_info:hg*:*' branchformat "%b"
@@ -201,6 +206,17 @@ function +vi-git-tagname() {
 
     tag=$(git describe --tags --exact-match HEAD 2>/dev/null)
     [[ -n ${tag} ]] && hook_com[branch]=" %F{$DEFAULT_COLOR}${tag}%f"
+}
+
+# Show count of stashed changes
+# Port from https://github.com/whiteinge/dotfiles/blob/5dfd08d30f7f2749cfc60bc55564c6ea239624d9/.zsh_shouse_prompt#L268
+function +vi-git-stash() {
+  local -a stashes
+
+  if [[ -s $(git rev-parse --git-dir)/refs/stash ]] ; then
+    stashes=$(git stash list 2>/dev/null | wc -l)
+    hook_com[misc]+=" %F{$DEFAULT_COLOR}⍟${stashes}%f"
+  fi
 }
 
 function +vi-vcs-detect-changes() {

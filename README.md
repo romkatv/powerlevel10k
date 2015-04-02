@@ -15,6 +15,7 @@ information in configurable prompt segments.
     * branch / tag name
     * current action status (rebasing, merging, etc.,)
     * being behind / ahead of your remote by some number of commits
+    * number of stashes (git only)
     * conditionally shows remote tracking branch if the name differs from local
     * various working tree statuses (e.g., unstaged, staged, etc.,)
 * Shows return-code of the last command if it is an error code
@@ -111,9 +112,26 @@ elements (it is by default), and define a `DEFAULT_USER` in your `~/.zshrc`:
 
 By default, the `vcs` segment will provide quite a bit of information. If you
 would also like for it to display the current hash / changeset, simply define
-`POWERLEVEL9K_SHOW_CHANGESET` in your `~/.zshrc`:
+`POWERLEVEL9K_SHOW_CHANGESET` in your `~/.zshrc`. If activated, it will show
+the first 12 characters of the changeset id. To change the amount of characters,
+set `POWERLEVEL9K_CHANGESET_HASH_LENTH` to any value you want.
+Example:
 
+    # enable the vcs segment in general
     POWERLEVEL9K_SHOW_CHANGESET=true
+    # just show the 6 first characters of changeset
+    POWERLEVEL9K_CHANGESET_HASH_LENGTH=6
+
+##### Symbols
+
+The `vcs` segment uses various symbols to tell you the state of your repository:
+
+* `↑4` - The number of commits your repository is ahead of your remote branch
+* `↓5` - The number of commits your repository is behind of your remote branch
+* `⍟3` - The number of stashes, here 3.
+* `●`  - There are unstaged changes in your working copy
+* `✚`  - There are staged changes in your working copy
+* `?`  - There are files in your working copy, that are unknown to your repository
 
 ### Styling
 
