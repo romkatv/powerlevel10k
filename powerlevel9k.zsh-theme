@@ -395,6 +395,7 @@ build_right_prompt() {
   done
 }
 
+################################################################
 # Create the prompts
 precmd() {
   vcs_info

@@ -80,6 +80,7 @@ currently available are:
 * **status** - The return code of the previous command, and status of background jobs.
 * **symfony2_tests** - Show a ratio of test classes vs code classes for Symfony2.
 * **time** - System time.
+* **virtualenv** - Your Python [VirtualEnv](https://virtualenv.pypa.io/en/latest/).
 * **vcs** - Information about this `git` or `hg` repository (if you are in one).
 
 To specify which segments you want, just add the following variables to your
@@ -132,6 +133,7 @@ The `vcs` segment uses various symbols to tell you the state of your repository:
 * `●`  - There are unstaged changes in your working copy
 * `✚`  - There are staged changes in your working copy
 * `?`  - There are files in your working copy, that are unknown to your repository
+* `→`  - The name of your branch differs from it's tracking branch.
 
 ### Styling
 
