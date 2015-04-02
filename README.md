@@ -133,7 +133,7 @@ The `vcs` segment uses various symbols to tell you the state of your repository:
 * `●`  - There are unstaged changes in your working copy
 * `✚`  - There are staged changes in your working copy
 * `?`  - There are files in your working copy, that are unknown to your repository
-* `→`  - The name of your branch differs from it's tracking branch.
+* `→`  - The name of your branch differs from its tracking branch.
 
 ### Styling
 
