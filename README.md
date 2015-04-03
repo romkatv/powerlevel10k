@@ -109,6 +109,14 @@ elements (it is by default), and define a `DEFAULT_USER` in your `~/.zshrc`:
 
     export DEFAULT_USER=<your username>
 
+#### The 'time' segment
+
+By default the time is show in 'H:M:S' format. If you want to change it, 
+just set another format in your `~/.zshrc`:
+
+   # Reversed time format
+   POWERLEVEL9K_TIME_FORMAT='%D{%S:%M:%H}' 
+
 #### The VCS Information Segment
 
 By default, the `vcs` segment will provide quite a bit of information. If you
