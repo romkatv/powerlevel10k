@@ -1,5 +1,5 @@
 # vim:ft=zsh ts=2 sw=2 sts=2
-#
+################################################################
 # powerlevel9k Theme
 # https://github.com/bhilburn/powerlevel9k
 #
@@ -11,10 +11,34 @@
 #
 # In order for this theme to render correctly, you will need a Powerline-patched font:
 # https://github.com/Lokaltog/powerline-fonts
-#
+################################################################
 
-### Segment drawing
-# A few utility functions to make it easy and re-usable to draw segmented prompts
+################################################################
+# Please see the README file located in the source repository for full docs.
+# What follows is a brief list of the settings variables used by this theme.
+# You should define these variables in your `~/.zshrc`.
+#
+# Customize which segments appear in which prompts (below is also the default):
+#   POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(context dir rbenv vcs)
+#   POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(status history time)
+#
+# Set your Amazon Web Services profile for the `aws` segment:
+#   export AWS_DEFAULT_PROFILE=<profile_name>
+#
+# Set your username for the `context` segment:
+#   export DEFAULT_USER=<your username>
+#
+# Show the hash/changeset string in the `vcs` segment:
+#   POWERLEVEL9K_SHOW_CHANGESET=true
+# Set the length of the hash/changeset if enabled in the `vcs` segment:
+#   POWERLEVEL9K_CHANGESET_HASH_LENGTH=6
+#
+# Make powerlevel9k a double-lined prompt:
+#   POWERLEVEL9K_PROMPT_ON_NEWLINE=true
+#
+# Set the colorscheme:
+#   POWERLEVEL9K_COLOR_SCHEME='light'
+################################################################
 
 # The `CURRENT_BG` variable is used to remember what the last BG color used was
 # when building the left-hand prompt. Because the RPROMPT is created from
@@ -315,6 +339,41 @@ prompt_aws() {
   fi
 }
 
+# RSpec test ratio
+prompt_rspec_stats() {
+  if [[ (-d app && -d spec) ]]; then
+    local code_amount=$(ls -1 app/**/*.rb | wc -l)
+    local tests_amount=$(ls -1 spec/**/*.rb | wc -l)
+
+    build_test_stats $1 $code_amount $tests_amount "RSpec"
+  fi
+}
+
+# Symfony2-PHPUnit test ratio
+prompt_symfony2_tests() {
+  if [[ (-d src && -d app && -f app/AppKernel.php) ]]; then
+    local code_amount=$(ls -1 src/**/*.php | grep -v Tests | wc -l)
+    local tests_amount=$(ls -1 src/**/*.php | grep Tests | wc -l)
+
+    build_test_stats $1 $code_amount $tests_amount "SF2-Tests"
+  fi
+}
+
+# Show a ratio of tests vs code
+build_test_stats() {
+  local code_amount=$2
+  local tests_amount=$3+0.00001
+  local headline=$4
+
+  # Set float precision to 2 digits:
+  typeset -F 2 ratio
+  local ratio=$(( (tests_amount/code_amount) * 100 ))
+
+  [[ ratio -ge 0.75 ]] && $1_prompt_segment cyan $DEFAULT_COLOR "$headline: $ratio%%"
+  [[ ratio -ge 0.5 && ratio -lt 0.75 ]] && $1_prompt_segment yellow $DEFAULT_COLOR "$headline: $ratio%%"
+  [[ ratio -lt 0.5 ]] && $1_prompt_segment red $DEFAULT_COLOR "$headline: $ratio%%"
+}
+
 # Main prompt
 build_left_prompt() {
   if [[ ${#POWERLEVEL9K_LEFT_PROMPT_ELEMENTS} == 0 ]]; then
@@ -341,6 +400,7 @@ build_right_prompt() {
   done
 }
 
+################################################################
 # Create the prompts
 precmd() {
   vcs_info
