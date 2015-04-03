@@ -117,7 +117,7 @@ just set another format in your `~/.zshrc`:
    # Reversed time format
    POWERLEVEL9K_TIME_FORMAT='%D{%S:%M:%H}' 
 
-#### The VCS Information Segment
+#### The 'vcs' Segment
 
 By default, the `vcs` segment will provide quite a bit of information. If you
 would also like for it to display the current hash / changeset, simply define
