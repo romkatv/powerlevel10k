@@ -301,12 +301,12 @@ prompt_longstatus() {
 
 # System time
 prompt_time() {
-  local time_format='%D{%H:%M:%S} '
+  local time_format='%D{%H:%M:%S}'
   if [[ -n $POWERLEVEL9K_TIME_FORMAT ]]; then
     time_format=$POWERLEVEL9K_TIME_FORMAT
   fi
 
-  $1_prompt_segment $DEFAULT_COLOR_INVERTED $DEFAULT_COLOR $time_format
+  $1_prompt_segment $DEFAULT_COLOR_INVERTED $DEFAULT_COLOR "$time_format "
 }
 
 # Command number (in local history)
