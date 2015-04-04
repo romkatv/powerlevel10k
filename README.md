@@ -111,13 +111,21 @@ elements (it is by default), and define a `DEFAULT_USER` in your `~/.zshrc`:
 
 #### Test ratio
 
-The `symfony2_tests` and `rspec_tests` segments show both a ratio of code classes
+The `symfony2_tests` and `rspec_tests` segments show both a ratio of "real" classes
 vs test classes. This is just a very simple ratio, and does not show your code
 coverage or any sophisticated stats. All this does is just to count your files
 and test files and calculate the ratio between them. Not more, but is may give
 a quick overview about the test situation of the project you are dealing with.
 
-#### The VCS Information Segment
+#### The 'time' segment
+
+By default the time is show in 'H:M:S' format. If you want to change it, 
+just set another format in your `~/.zshrc`:
+
+   # Reversed time format
+   POWERLEVEL9K_TIME_FORMAT='%D{%S:%M:%H}' 
+
+#### The 'vcs' Segment
 
 By default, the `vcs` segment will provide quite a bit of information. If you
 would also like for it to display the current hash / changeset, simply define

@@ -28,6 +28,9 @@
 # Set your username for the `context` segment:
 #   export DEFAULT_USER=<your username>
 #
+# Customized the format of the time segment. Example of reverse format:
+#   POWERLEVEL9K_TIME_FORMAT='%D{%S:%M:%H}' 
+#
 # Show the hash/changeset string in the `vcs` segment:
 #   POWERLEVEL9K_SHOW_CHANGESET=true
 # Set the length of the hash/changeset if enabled in the `vcs` segment:
@@ -157,18 +160,8 @@ right_prompt_segment() {
 }
 
 ################################################################
-# Prompt Components
+# The 'vcs' Segment and VCS_INFO hooks / helper functions
 ################################################################
-
-# Context: user@hostname (who am I and where am I)
-# Note that if $DEFAULT_USER is not set, this prompt segment will always print
-prompt_context() {
-  if [[ "$USER" != "$DEFAULT_USER" || -n "$SSH_CLIENT" ]]; then
-    $1_prompt_segment $DEFAULT_COLOR "011" "%(!.%{%F{yellow}%}.)$USER@%m"
-  fi
-}
-
-# branch/detached head, dirty status
 prompt_vcs() {
   local vcs_prompt="${vcs_info_msg_0_}"
 
@@ -251,31 +244,35 @@ function +vi-vcs-detect-changes() {
   fi
 }
 
+################################################################
+# Prompt Segments
+################################################################
+
+# AWS Profile
+prompt_aws() {
+  local aws_profile=$AWS_DEFAULT_PROFILE
+  if [[ -n $aws_profile ]]; 
+  then
+    $1_prompt_segment red white "AWS: $aws_profile"
+  fi
+}
+
+# Context: user@hostname (who am I and where am I)
+# Note that if $DEFAULT_USER is not set, this prompt segment will always print
+prompt_context() {
+  if [[ "$USER" != "$DEFAULT_USER" || -n "$SSH_CLIENT" ]]; then
+    $1_prompt_segment $DEFAULT_COLOR "011" "%(!.%{%F{yellow}%}.)$USER@%m"
+  fi
+}
+
 # Dir: current working directory
 prompt_dir() {
   $1_prompt_segment blue $DEFAULT_COLOR '%~'
 }
 
-# Virtualenv: current working virtualenv
-# More information on virtualenv (Python):
-# https://virtualenv.pypa.io/en/latest/
-prompt_virtualenv() {
-  local virtualenv_path="$VIRTUAL_ENV"
-  if [[ -n $virtualenv_path && -n $VIRTUAL_ENV_DISABLE_PROMPT ]]; then
-    $1_prompt_segment blue $DEFAULT_COLOR "(`basename $virtualenv_path`)"
-  fi
-}
-
-# Left Status: (return code, root status, background jobs)
-# This creates a status segment for the *left* prompt
-prompt_status() {
-  local symbols
-  symbols=()
-  [[ $RETVAL -ne 0 ]] && symbols+="%{%F{red}%}✘"
-  [[ $UID -eq 0 ]] && symbols+="%{%F{yellow}%}⚡"
-  [[ $(jobs -l | wc -l) -gt 0 ]] && symbols+="%{%F{cyan}%}⚙"
-
-  [[ -n "$symbols" ]] && $1_prompt_segment $DEFAULT_COLOR default "$symbols"
+# Command number (in local history)
+prompt_history() {
+  $1_prompt_segment "244" $DEFAULT_COLOR '%h'
 }
 
 # Right Status: (return code, root status, background jobs)
@@ -299,38 +296,10 @@ prompt_longstatus() {
   [[ -n "$symbols" ]] && $1_prompt_segment $bg $DEFAULT_COLOR "$symbols"
 }
 
-# System time
-prompt_time() {
-  $1_prompt_segment $DEFAULT_COLOR_INVERTED $DEFAULT_COLOR '%D{%H:%M:%S} '
-}
-
-# Command number (in local history)
-prompt_history() {
-  $1_prompt_segment "244" $DEFAULT_COLOR '%h'
-}
-
-# Ruby Version Manager information
-prompt_rvm() {
-  local rvm_prompt
-  rvm_prompt=`rvm-prompt`
-  if [ "$rvm_prompt" != "" ]; then
-    $1_prompt_segment "240" $DEFAULT_COLOR "$rvm_prompt "
-  fi
-}
-
 # rbenv information
 prompt_rbenv() {
   if [[ -n "$RBENV_VERSION" ]]; then
     $1_prompt_segment red $DEFAULT_COLOR "$RBENV_VERSION"
-  fi
-}
-
-# AWS Profile
-prompt_aws() {
-  local aws_profile=$AWS_DEFAULT_PROFILE
-  if [[ -n $aws_profile ]]; 
-  then
-    $1_prompt_segment red white "AWS: $aws_profile"
   fi
 }
 
@@ -342,6 +311,27 @@ prompt_rspec_stats() {
 
     build_test_stats $1 $code_amount $tests_amount "RSpec"
   fi
+}
+
+# Ruby Version Manager information
+prompt_rvm() {
+  local rvm_prompt
+  rvm_prompt=`rvm-prompt`
+  if [ "$rvm_prompt" != "" ]; then
+    $1_prompt_segment "240" $DEFAULT_COLOR "$rvm_prompt "
+  fi
+}
+
+# Left Status: (return code, root status, background jobs)
+# This creates a status segment for the *left* prompt
+prompt_status() {
+  local symbols
+  symbols=()
+  [[ $RETVAL -ne 0 ]] && symbols+="%{%F{red}%}✘"
+  [[ $UID -eq 0 ]] && symbols+="%{%F{yellow}%}⚡"
+  [[ $(jobs -l | wc -l) -gt 0 ]] && symbols+="%{%F{cyan}%}⚙"
+
+  [[ -n "$symbols" ]] && $1_prompt_segment $DEFAULT_COLOR default "$symbols"
 }
 
 # Symfony2-PHPUnit test ratio
@@ -369,6 +359,30 @@ build_test_stats() {
   [[ ratio -lt 0.5 ]] && $1_prompt_segment red $DEFAULT_COLOR "$headline: $ratio%%"
 }
 
+# System time
+prompt_time() {
+  local time_format='%D{%H:%M:%S}'
+  if [[ -n $POWERLEVEL9K_TIME_FORMAT ]]; then
+    time_format=$POWERLEVEL9K_TIME_FORMAT
+  fi
+
+  $1_prompt_segment $DEFAULT_COLOR_INVERTED $DEFAULT_COLOR "$time_format "
+}
+
+# Virtualenv: current working virtualenv
+# More information on virtualenv (Python):
+# https://virtualenv.pypa.io/en/latest/
+prompt_virtualenv() {
+  local virtualenv_path="$VIRTUAL_ENV"
+  if [[ -n $virtualenv_path && -n $VIRTUAL_ENV_DISABLE_PROMPT ]]; then
+    $1_prompt_segment blue $DEFAULT_COLOR "(`basename $virtualenv_path`)"
+  fi
+}
+
+################################################################
+# Prompt processing and drawing
+################################################################
+
 # Main prompt
 build_left_prompt() {
   if [[ ${#POWERLEVEL9K_LEFT_PROMPT_ELEMENTS} == 0 ]]; then
@@ -395,8 +409,6 @@ build_right_prompt() {
   done
 }
 
-################################################################
-# Create the prompts
 precmd() {
   vcs_info
 
