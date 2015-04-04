@@ -17,6 +17,7 @@ information in configurable prompt segments.
     * being behind / ahead of your remote by some number of commits
     * number of stashes (git only)
     * conditionally shows remote tracking branch if the name differs from local
+    * current active bookmark (mercurial only)
     * various working tree statuses (e.g., unstaged, staged, etc.,)
 * Shows return-code of the last command if it is an error code
 * Indicates background jobs with a gear icon
@@ -142,6 +143,7 @@ The `vcs` segment uses various symbols to tell you the state of your repository:
 * `✚`  - There are staged changes in your working copy
 * `?`  - There are files in your working copy, that are unknown to your repository
 * `→`  - The name of your branch differs from its tracking branch.
+* `☿`  - A mercurial bookmark is active.
 
 ### Styling
 
