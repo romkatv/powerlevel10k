@@ -104,6 +104,8 @@ zstyle ':vcs_info:git*+set-message:*' hooks git-untracked git-aheadbehind git-st
 zstyle ':vcs_info:hg*:*' branchformat "%b"
 # The `get-revision` function must be turned on for dirty-check to work for Hg
 zstyle ':vcs_info:hg*:*' get-revision true
+zstyle ':vcs_info:hg*:*' get-bookmarks true
+zstyle ':vcs_info:hg*+gen-hg-bookmark-string:*' hooks hg-bookmarks
 
 if [[ "$POWERLEVEL9K_SHOW_CHANGESET" == true ]]; then
   zstyle ':vcs_info:*' get-revision true
@@ -234,6 +236,18 @@ function +vi-git-stash() {
     stashes=$(git stash list 2>/dev/null | wc -l)
     hook_com[misc]+=" %F{$DEFAULT_COLOR}⍟${stashes}%f"
   fi
+}
+
+function +vi-hg-bookmarks() {
+	if [[ -n "${hgbmarks[@]}" ]]; then
+		hook_com[hg-bookmark-string]=" ☿ ${hgbmarks[@]}"
+
+		# And to signal, that we want to use the sting we just generated,
+		# set the special variable `ret' to something other than the default
+		# zero:
+		ret=1
+		return 0
+	fi
 }
 
 function +vi-vcs-detect-changes() {
