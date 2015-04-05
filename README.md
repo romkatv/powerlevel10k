@@ -109,6 +109,14 @@ elements (it is by default), and define a `DEFAULT_USER` in your `~/.zshrc`:
 
     export DEFAULT_USER=<your username>
 
+#### Test ratio
+
+The `symfony2_tests` and `rspec_tests` segments show both a ratio of "real" classes
+vs test classes. This is just a very simple ratio, and does not show your code
+coverage or any sophisticated stats. All this does is just to count your files
+and test files and calculate the ratio between them. Not more, but is may give
+a quick overview about the test situation of the project you are dealing with.
+
 #### The 'time' segment
 
 By default the time is show in 'H:M:S' format. If you want to change it, 
