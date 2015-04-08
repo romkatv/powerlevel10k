@@ -123,8 +123,8 @@ a quick overview about the test situation of the project you are dealing with.
 By default the time is show in 'H:M:S' format. If you want to change it, 
 just set another format in your `~/.zshrc`:
 
-   # Reversed time format
-   POWERLEVEL9K_TIME_FORMAT='%D{%S:%M:%H}' 
+    # Reversed time format
+    POWERLEVEL9K_TIME_FORMAT='%D{%S:%M:%H}' 
 
 #### The 'vcs' Segment
 
