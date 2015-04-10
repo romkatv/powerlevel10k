@@ -28,7 +28,7 @@
 # Set your username for the `context` segment:
 #   export DEFAULT_USER=<your username>
 #
-# Customized the format of the time segment. Example of reverse format:
+# Customize the format of the time segment. Example of reverse format:
 #   POWERLEVEL9K_TIME_FORMAT='%D{%S:%M:%H}' 
 #
 # Show the hash/changeset string in the `vcs` segment:
