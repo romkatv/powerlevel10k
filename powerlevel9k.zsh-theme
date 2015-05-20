@@ -194,12 +194,12 @@ function +vi-git-aheadbehind() {
     # for git prior to 1.7
     # ahead=$(git rev-list origin/${branch_name}..HEAD | wc -l)
     ahead=$(git rev-list ${branch_name}@{upstream}..HEAD 2>/dev/null | wc -l | tr -d ' ')
-    (( $ahead )) && gitstatus+=( " %F{$DEFAULT_COLOR}↑${ahead}%f" )
+    (( $ahead )) && gitstatus+=( " %F{$DEFAULT_COLOR}↑${ahead// /}%f" )
 
     # for git prior to 1.7
     # behind=$(git rev-list HEAD..origin/${branch_name} | wc -l)
     behind=$(git rev-list HEAD..${branch_name}@{upstream} 2>/dev/null | wc -l | tr -d ' ')
-    (( $behind )) && gitstatus+=( " %F{$DEFAULT_COLOR}↓${behind}%f" )
+    (( $behind )) && gitstatus+=( " %F{$DEFAULT_COLOR}↓${behind// /}%f" )
 
     hook_com[misc]+=${(j::)gitstatus}
 }
@@ -216,7 +216,7 @@ function +vi-git-remotebranch() {
     #if [[ -n ${remote} ]] ; then
     # Only show the remote if it differs from the local
     if [[ -n ${remote} && ${remote#*/} != ${branch_name} ]] ; then
-        hook_com[branch]+="%F{$DEFAULT_COLOR}→%f%F{$DEFAULT_COLOR}${remote}%f"
+        hook_com[branch]+="%F{$DEFAULT_COLOR}→%f%F{$DEFAULT_COLOR}${remote// /}%f"
     fi
 }
 
@@ -234,7 +234,7 @@ function +vi-git-stash() {
 
   if [[ -s $(git rev-parse --git-dir)/refs/stash ]] ; then
     stashes=$(git stash list 2>/dev/null | wc -l)
-    hook_com[misc]+=" %F{$DEFAULT_COLOR}⍟${stashes}%f"
+    hook_com[misc]+=" %F{$DEFAULT_COLOR}⍟${stashes// /}%f"
   fi
 }
 
