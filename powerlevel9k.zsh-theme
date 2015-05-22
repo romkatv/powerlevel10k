@@ -126,16 +126,29 @@ fi
 # Takes two arguments, background and foreground. Both can be omitted,
 # rendering default background/foreground.
 left_prompt_segment() {
+# Unfortunately that doesn't work..
+#  local BG_COLOR_MODIFIER=${(P)POWERLEVEL9K_${(U)1#prompt_}_BACKGROUND}
+
+  # Overwrite given background-color by user defined variable for this segment.
+  local BACKGROUND_USER_VARIABLE=POWERLEVEL9K_${(U)1#prompt_}_BACKGROUND
+  local BG_COLOR_MODIFIER=${(P)BACKGROUND_USER_VARIABLE}
+  [[ -n $BG_COLOR_MODIFIER ]] && 2=$BG_COLOR_MODIFIER
+
+  # Overwrite given foreground-color by user defined variable for this segment.
+  local FOREGROUND_USER_VARIABLE=POWERLEVEL9K_${(U)1#prompt_}_FOREGROUND
+  local FG_COLOR_MODIFIER=${(P)FOREGROUND_USER_VARIABLE}
+  [[ -n $FG_COLOR_MODIFIER ]] && 3=$FG_COLOR_MODIFIER
+
   local bg fg
-  [[ -n $1 ]] && bg="%K{$1}" || bg="%k"
-  [[ -n $2 ]] && fg="%F{$2}" || fg="%f"
-  if [[ $CURRENT_BG != 'NONE' && $1 != $CURRENT_BG ]]; then
+  [[ -n $2 ]] && bg="%K{$2}" || bg="%k"
+  [[ -n $3 ]] && fg="%F{$3}" || fg="%f"
+  if [[ $CURRENT_BG != 'NONE' && $2 != $CURRENT_BG ]]; then
     echo -n "%{$bg%F{$CURRENT_BG}%}$LEFT_SEGMENT_SEPARATOR%{$fg%} "
   else
     echo -n "%{$bg%}%{$fg%} "
   fi
-  CURRENT_BG=$1
-  [[ -n $3 ]] && echo -n $3
+  CURRENT_BG=$2
+  [[ -n $4 ]] && echo -n $4
 }
 
 # End the left prompt, closing any open segments
@@ -154,11 +167,21 @@ left_prompt_end() {
 # rendering default background/foreground. No ending for the right prompt
 # segment is needed (unlike the left prompt, above).
 right_prompt_segment() {
+  # Overwrite given background-color by user defined variable for this segment.
+  local BACKGROUND_USER_VARIABLE=POWERLEVEL9K_${(U)1#prompt_}_BACKGROUND
+  local BG_COLOR_MODIFIER=${(P)BACKGROUND_USER_VARIABLE}
+  [[ -n $BG_COLOR_MODIFIER ]] && 2=$BG_COLOR_MODIFIER
+
+  # Overwrite given foreground-color by user defined variable for this segment.
+  local FOREGROUND_USER_VARIABLE=POWERLEVEL9K_${(U)1#prompt_}_FOREGROUND
+  local FG_COLOR_MODIFIER=${(P)FOREGROUND_USER_VARIABLE}
+  [[ -n $FG_COLOR_MODIFIER ]] && 3=$FG_COLOR_MODIFIER
+
   local bg fg
-  [[ -n $1 ]] && bg="%K{$1}" || bg="%k"
-  [[ -n $2 ]] && fg="%F{$2}" || fg="%f"
-    echo -n " %f%F{$1}$RIGHT_SEGMENT_SEPARATOR%f%{$bg%}%{$fg%} "
-  [[ -n $3 ]] && echo -n $3
+  [[ -n $2 ]] && bg="%K{$2}" || bg="%k"
+  [[ -n $3 ]] && fg="%F{$3}" || fg="%f"
+    echo -n " %f%F{$2}$RIGHT_SEGMENT_SEPARATOR%f%{$bg%}%{$fg%} "
+  [[ -n $4 ]] && echo -n $4
 }
 
 ################################################################
@@ -169,9 +192,9 @@ prompt_vcs() {
 
   if [[ -n $vcs_prompt ]]; then
     if [[ "$VCS_WORKDIR_DIRTY" == true ]]; then
-      $1_prompt_segment yellow $DEFAULT_COLOR
+      $1_prompt_segment $0_MODIFIED yellow $DEFAULT_COLOR
     else
-      $1_prompt_segment green $DEFAULT_COLOR
+      $1_prompt_segment $0 green $DEFAULT_COLOR
     fi
 
     echo -n "%F{$DEFAULT_COLOR}%f$vcs_prompt"
@@ -267,7 +290,7 @@ prompt_aws() {
   local aws_profile=$AWS_DEFAULT_PROFILE
   if [[ -n $aws_profile ]]; 
   then
-    $1_prompt_segment red white "AWS: $aws_profile"
+    $1_prompt_segment $0 red white "AWS: $aws_profile"
   fi
 }
 
@@ -275,18 +298,18 @@ prompt_aws() {
 # Note that if $DEFAULT_USER is not set, this prompt segment will always print
 prompt_context() {
   if [[ "$USER" != "$DEFAULT_USER" || -n "$SSH_CLIENT" ]]; then
-    $1_prompt_segment $DEFAULT_COLOR "011" "%(!.%{%F{yellow}%}.)$USER@%m"
+    $1_prompt_segment $0 $DEFAULT_COLOR "011" "%(!.%{%F{yellow}%}.)$USER@%m"
   fi
 }
 
 # Dir: current working directory
 prompt_dir() {
-  $1_prompt_segment blue $DEFAULT_COLOR '%~'
+  $1_prompt_segment $0 blue $DEFAULT_COLOR '%~'
 }
 
 # Command number (in local history)
 prompt_history() {
-  $1_prompt_segment "244" $DEFAULT_COLOR '%h'
+  $1_prompt_segment $0 "244" $DEFAULT_COLOR '%h'
 }
 
 # Right Status: (return code, root status, background jobs)
@@ -307,13 +330,13 @@ prompt_longstatus() {
   [[ $UID -eq 0 ]] && symbols+="%{%F{yellow}%}⚡"
   [[ $(jobs -l | wc -l) -gt 0 ]] && symbols+="%{%F{cyan}%}⚙"
 
-  [[ -n "$symbols" ]] && $1_prompt_segment $bg $DEFAULT_COLOR "$symbols"
+  [[ -n "$symbols" ]] && $1_prompt_segment $0 $bg $DEFAULT_COLOR "$symbols"
 }
 
 # rbenv information
 prompt_rbenv() {
   if [[ -n "$RBENV_VERSION" ]]; then
-    $1_prompt_segment red $DEFAULT_COLOR "$RBENV_VERSION"
+    $1_prompt_segment $0 red $DEFAULT_COLOR "$RBENV_VERSION"
   fi
 }
 
@@ -323,7 +346,7 @@ prompt_rspec_stats() {
     local code_amount=$(ls -1 app/**/*.rb | wc -l)
     local tests_amount=$(ls -1 spec/**/*.rb | wc -l)
 
-    build_test_stats $1 $code_amount $tests_amount "RSpec"
+    build_test_stats $1 $0 $code_amount $tests_amount "RSpec"
   fi
 }
 
@@ -332,7 +355,7 @@ prompt_rvm() {
   local rvm_prompt
   rvm_prompt=`rvm-prompt`
   if [ "$rvm_prompt" != "" ]; then
-    $1_prompt_segment "240" $DEFAULT_COLOR "$rvm_prompt "
+    $1_prompt_segment $0 "240" $DEFAULT_COLOR "$rvm_prompt "
   fi
 }
 
@@ -345,7 +368,7 @@ prompt_status() {
   [[ $UID -eq 0 ]] && symbols+="%{%F{yellow}%}⚡"
   [[ $(jobs -l | wc -l) -gt 0 ]] && symbols+="%{%F{cyan}%}⚙"
 
-  [[ -n "$symbols" ]] && $1_prompt_segment $DEFAULT_COLOR default "$symbols"
+  [[ -n "$symbols" ]] && $1_prompt_segment $0 $DEFAULT_COLOR default "$symbols"
 }
 
 # Symfony2-PHPUnit test ratio
@@ -354,23 +377,23 @@ prompt_symfony2_tests() {
     local code_amount=$(ls -1 src/**/*.php | grep -v Tests | wc -l)
     local tests_amount=$(ls -1 src/**/*.php | grep Tests | wc -l)
 
-    build_test_stats $1 $code_amount $tests_amount "SF2-Tests"
+    build_test_stats $1 $0 $code_amount $tests_amount "SF2-Tests"
   fi
 }
 
 # Show a ratio of tests vs code
 build_test_stats() {
-  local code_amount=$2
-  local tests_amount=$3+0.00001
-  local headline=$4
+  local code_amount=$3
+  local tests_amount=$4+0.00001
+  local headline=$5
 
   # Set float precision to 2 digits:
   typeset -F 2 ratio
   local ratio=$(( (tests_amount/code_amount) * 100 ))
 
-  [[ ratio -ge 0.75 ]] && $1_prompt_segment cyan $DEFAULT_COLOR "$headline: $ratio%%"
-  [[ ratio -ge 0.5 && ratio -lt 0.75 ]] && $1_prompt_segment yellow $DEFAULT_COLOR "$headline: $ratio%%"
-  [[ ratio -lt 0.5 ]] && $1_prompt_segment red $DEFAULT_COLOR "$headline: $ratio%%"
+  [[ ratio -ge 0.75 ]] && $1_prompt_segment ${2}_GOOD cyan $DEFAULT_COLOR "$headline: $ratio%%"
+  [[ ratio -ge 0.5 && ratio -lt 0.75 ]] && $1_prompt_segment $2_AVG yellow $DEFAULT_COLOR "$headline: $ratio%%"
+  [[ ratio -lt 0.5 ]] && $1_prompt_segment $2_BAD red $DEFAULT_COLOR "$headline: $ratio%%"
 }
 
 # System time
@@ -380,7 +403,7 @@ prompt_time() {
     time_format=$POWERLEVEL9K_TIME_FORMAT
   fi
 
-  $1_prompt_segment $DEFAULT_COLOR_INVERTED $DEFAULT_COLOR "$time_format "
+  $1_prompt_segment $0 $DEFAULT_COLOR_INVERTED $DEFAULT_COLOR "$time_format "
 }
 
 # Virtualenv: current working virtualenv
@@ -389,7 +412,7 @@ prompt_time() {
 prompt_virtualenv() {
   local virtualenv_path="$VIRTUAL_ENV"
   if [[ -n $virtualenv_path && -n $VIRTUAL_ENV_DISABLE_PROMPT ]]; then
-    $1_prompt_segment blue $DEFAULT_COLOR "(`basename $virtualenv_path`)"
+    $1_prompt_segment $0 blue $DEFAULT_COLOR "(`basename $virtualenv_path`)"
   fi
 }
 
