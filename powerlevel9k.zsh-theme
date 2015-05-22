@@ -126,7 +126,8 @@ fi
 # Takes two arguments, background and foreground. Both can be omitted,
 # rendering default background/foreground.
 left_prompt_segment() {
-# Unfortunately that doesn't work..
+# Unfortunately that doesn't work. But it should. The Example in
+# http://zsh.sourceforge.net/FAQ/zshfaq03.html#l39 is quite similar.
 #  local BG_COLOR_MODIFIER=${(P)POWERLEVEL9K_${(U)1#prompt_}_BACKGROUND}
 
   # Overwrite given background-color by user defined variable for this segment.
