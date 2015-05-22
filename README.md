@@ -182,6 +182,40 @@ Light'](https://github.com/altercation/solarized) users. Check it out:
 
 ![](http://bhilburn.org/content/images/2015/03/solarized-light.png)
 
+#### Further color customizations
+
+For every segment you can specify foreground and background color by setting them in your `~/.zshrc`:
+
+    POWERLEVEL9K_TIME_FOREGROUND='red'
+    POWERLEVEL9K_TIME_BACKGROUND='blue'
+
+This will change the appearance of the `time` segment. Take the segment names from the Chapter `Segment Customization`.
+Some of the Segments have special color variables, as they change the colors according some internal rules. These Segments are `vcs`, `rspec_stats`, `symfony2_tests`:
+
+    POWERLEVEL9K_VCS_FOREGROUND='blue'
+    POWERLEVEL9K_VCS_BACKGROUND='green'
+    # If VCS changes are detected:
+    POWERLEVEL9K_VCS_MODIFIED_FOREGROUND='red'
+    POWERLEVEL9K_VCS_MODIFIED_BACKGROUND='cyan'
+    # rspec_stats for good test coverage
+    POWERLEVEL9K_RSPEC_STATS_GOOD_FOREGROUND='blue'
+    POWERLEVEL9K_RSPEC_STATS_GOOD_BACKGROUND='green'
+    # rspec_stats for average test coverage
+    POWERLEVEL9K_RSPEC_STATS_AVG_FOREGROUND='black'
+    POWERLEVEL9K_RSPEC_STATS_AVG_BACKGROUND='cyan'
+    # rspec_stats for poor test coverage
+    POWERLEVEL9K_RSPEC_STATS_BAD_FOREGROUND='red'
+    POWERLEVEL9K_RSPEC_STATS_BAD_BACKGROUND='white'
+    # symfony2_tests for good test coverage
+    POWERLEVEL9K_SYMFONY2_TESTS_GOOD_FOREGROUND='blue'
+    POWERLEVEL9K_SYMFONY2_TESTS_GOOD_BACKGROUND='green'
+    # symfony2_tests for average test coverage
+    POWERLEVEL9K_SYMFONY2_TESTS_AVG_FOREGROUND='black'
+    POWERLEVEL9K_SYMFONY2_TESTS_AVG_BACKGROUND='cyan'
+    # symfony2_tests for poor test coverage
+    POWERLEVEL9K_SYMFONY2_TESTS_BAD_FOREGROUND='red'
+    POWERLEVEL9K_SYMFONY2_TESTS_BAD_BACKGROUND='white'
+
 ### Troubleshooting
 
 Here are some fixes to some common problems.
