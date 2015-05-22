@@ -144,6 +144,11 @@ left_prompt_segment() {
 #  local BG_COLOR_MODIFIER=${(P)POWERLEVEL9K_${(U)1#prompt_}_BACKGROUND}
 
   # Overwrite given background-color by user defined variable for this segment.
+	# We get as first Parameter the function name, which called this function. 
+	# From the given function name, we strip the "prompt_"-prefix and uppercase it.
+	# This is, prefixed with "POWERLEVEL9K_" and suffixed with either "_BACKGROUND"
+	# of "_FOREGROUND", our variable name. So each new Segment should automatically
+	# be overwritable by a variable following this naming convention.
   local BACKGROUND_USER_VARIABLE=POWERLEVEL9K_${(U)1#prompt_}_BACKGROUND
   local BG_COLOR_MODIFIER=${(P)BACKGROUND_USER_VARIABLE}
   [[ -n $BG_COLOR_MODIFIER ]] && 2=$BG_COLOR_MODIFIER
