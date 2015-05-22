@@ -193,6 +193,7 @@ This will change the appearance of the `time` segment. Take the segment names fr
 Some of the Segments have special color variables, as they change the colors according some internal rules. These Segments are `vcs`, `rspec_stats`, `symfony2_tests`:
 
     POWERLEVEL9K_VCS_FOREGROUND='blue'
+    POWERLEVEL9K_VCS_DARK_FOREGROUND='black'
     POWERLEVEL9K_VCS_BACKGROUND='green'
     # If VCS changes are detected:
     POWERLEVEL9K_VCS_MODIFIED_FOREGROUND='red'
