@@ -225,6 +225,7 @@ currently available are:
 * **rspec_stats** - Show a ratio of test classes vs code classes for RSpec.
 * **status** - The return code of the previous command, and status of background jobs.
 * **symfony2_tests** - Show a ratio of test classes vs code classes for Symfony2.
+* **symfony2_version** - Show the current Symfony2 version, if you are in a Symfony2-Project dir.
 * **time** - System time.
 * **virtualenv** - Your Python [VirtualEnv](https://virtualenv.pypa.io/en/latest/).
 * **vcs** - Information about this `git` or `hg` repository (if you are in one).

@@ -61,6 +61,7 @@ case $POWERLEVEL9K_MODE in
     TEST_ICON="\uE891" # 
     OK_ICON="\u2713" # ✓
     FAIL_ICON="\u2718" # ✘
+    SYMFONY_ICON="SF"
     VCS_UNTRACKED_ICON="\uE16C" # 
     VCS_UNSTAGED_ICON="\uE17C" # 
     VCS_STAGED_ICON="\uE168" # 
@@ -90,6 +91,7 @@ case $POWERLEVEL9K_MODE in
     TEST_ICON=''
     OK_ICON="\u2713" # ✓
     FAIL_ICON="\u2718" # ✘
+    SYMFONY_ICON="SF"
     VCS_UNTRACKED_ICON='?'
     VCS_UNSTAGED_ICON="\u25CF" # ●
     VCS_STAGED_ICON="\u271A" # ✚
@@ -117,6 +119,7 @@ case $POWERLEVEL9K_MODE in
     TEST_ICON="\uE891" # 
     OK_ICON="\u2713" # ✓
     FAIL_ICON="\u2718" # ✘
+    SYMFONY_ICON="SF"
     VCS_UNTRACKED_ICON="\uE16C" # 
     VCS_UNSTAGED_ICON="\uE17C" # 
     VCS_STAGED_ICON="\uE168" # 
@@ -148,6 +151,7 @@ case $POWERLEVEL9K_MODE in
     TEST_ICON=''
     OK_ICON="\u2713" # ✓
     FAIL_ICON="\u2718" # ✘
+    SYMFONY_ICON="SF"
     VCS_UNTRACKED_ICON='?'
     VCS_UNSTAGED_ICON="\u25CF" # ●
     VCS_STAGED_ICON="\u271A" # ✚
@@ -507,6 +511,14 @@ prompt_symfony2_tests() {
     local tests_amount=$(ls -1 src/**/*.php | grep Tests | wc -l)
 
     build_test_stats "$1" "$0" "$code_amount" "$tests_amount" "SF2 $TEST_ICON"
+  fi
+}
+
+# Symfony2-Version
+prompt_symfony2_version() {
+  if [[ -f app/bootstrap.php.cache ]]; then
+    local symfony2_version=$(grep " VERSION " app/bootstrap.php.cache | sed -e 's/[^.0-9]*//g')
+    $1_prompt_segment "$0" "240" "$DEFAULT_COLOR" "$SYMFONY_ICON $symfony2_version"
   fi
 }
 
