@@ -76,6 +76,7 @@ currently available are:
 * **context** - Your username and host (more info below)
 * **dir** - Your current working directory.
 * **history** - The command number for the current line.
+* **node_version** - Show the version number of the installed node.
 * **rbenv** - Ruby environment information (if one is active).
 * **rspec_stats** - Show a ratio of test classes vs code classes for RSpec.
 * **status** - The return code of the previous command, and status of background jobs.
