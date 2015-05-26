@@ -310,6 +310,14 @@ prompt_longstatus() {
   [[ -n "$symbols" ]] && $1_prompt_segment $bg $DEFAULT_COLOR "$symbols"
 }
 
+# Node version
+prompt_node_version() {
+  local nvm_prompt=$(node -v 2>/dev/null)
+  [[ -z "${nvm_prompt}" ]] && return
+
+  $1_prompt_segment green white ${nvm_prompt:1}
+}
+
 # rbenv information
 prompt_rbenv() {
   if [[ -n "$RBENV_VERSION" ]]; then
