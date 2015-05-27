@@ -56,7 +56,9 @@ emulator the Powerline font you want to use.
 
 #### Install Powerlevel9k
 
-To install this theme, clone this repository into your Oh-My-Zsh `custom/themes`
+##### Within Oh-my-ZSH
+
+To install this theme, clone this repository into your [Oh-my-Zsh](https://github.com/robbyrussell/oh-my-zsh) `custom/themes`
 directory.
 
     $ cd ~/.oh-my-zsh/custom
@@ -65,6 +67,19 @@ directory.
 You then need to select this theme in your `~/.zshrc`:
 
     ZSH_THEME="powerlevel9k/powerlevel9k"
+
+##### With Prezto
+
+To install this theme, clone this repository into your [Prezto](https://github.com/sorin-ionescu/prezto) `prompt/external`
+directory.
+
+    $ cd ~.zprezto/modules/prompt/external
+    $ git clone https://github.com/bhilburn/powerlevel9k.git
+    $ ln -s powerlevel9k/powerlevel9k.zsh-theme ../functions/prompt_powerlevel9k_setup
+
+You then need to select this theme in your `~/.zpreztorc`:
+
+    zstyle ':prezto:module:prompt' theme 'powerlevel9k'
 
 ### Segment Customization
 
