@@ -423,17 +423,29 @@ build_right_prompt() {
   done
 }
 
-precmd() {
+prompt_powerlevel9k_precmd() {
   vcs_info
 
   # Add a static hook to examine staged/unstaged changes.
   vcs_info_hookadd set-message vcs-detect-changes
 }
 
-if [[ "$POWERLEVEL9K_PROMPT_ON_NEWLINE" == true ]]; then
-  PROMPT='╭─%{%f%b%k%}$(build_left_prompt) 
-╰─ '
-else
-  PROMPT='%{%f%b%k%}$(build_left_prompt) '
-fi
-RPROMPT='%{%f%b%k%}$(build_right_prompt)%{$reset_color%}'
+powerlevel9k_init() {
+  setopt LOCAL_OPTIONS
+  unsetopt XTRACE KSH_ARRAYS
+  prompt_opts=(cr percent subst)
+
+  autoload -Uz add-zsh-hook
+
+  add-zsh-hook precmd prompt_powerlevel9k_precmd
+
+  if [[ "$POWERLEVEL9K_PROMPT_ON_NEWLINE" == true ]]; then
+    PROMPT="╭─%{%f%b%k%}"'$(build_left_prompt)'" 
+╰─ "
+  else
+    PROMPT="%{%f%b%k%}"'$(build_left_prompt)'" "
+  fi
+  RPROMPT="%{%f%b%k%}"'$(build_right_prompt)'"%{$reset_color%}"
+}
+
+powerlevel9k_init "$@"
