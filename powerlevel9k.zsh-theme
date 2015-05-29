@@ -60,7 +60,7 @@ VCS_STAGED_ICON='✚'
 ################################################################
 
 local DEFAULT_COLOR DEFAULT_COLOR_INVERTED DEFAULT_COLOR_DARK
-if [[ $POWERLEVEL9K_COLOR_SCHEME == "light" ]]; then
+if [[ "$POWERLEVEL9K_COLOR_SCHEME" == "light" ]]; then
   DEFAULT_COLOR=white
   DEFAULT_COLOR_INVERTED=black
   DEFAULT_COLOR_DARK="252"
@@ -82,8 +82,8 @@ local VCS_CHANGESET_PREFIX=''
 if [[ "$POWERLEVEL9K_SHOW_CHANGESET" == true ]]; then
   # Default: Just display the first 12 characters of our changeset-ID.
   local VCS_CHANGESET_HASH_LENGTH=12
-  if [[ -n $POWERLEVEL9K_CHANGESET_HASH_LENGTH ]]; then
-    VCS_CHANGESET_HASH_LENGTH=$POWERLEVEL9K_CHANGESET_HASH_LENGTH
+  if [[ -n "$POWERLEVEL9K_CHANGESET_HASH_LENGTH" ]]; then
+    VCS_CHANGESET_HASH_LENGTH="$POWERLEVEL9K_CHANGESET_HASH_LENGTH"
   fi
 
   VCS_CHANGESET_PREFIX="%F{$DEFAULT_COLOR_DARK}%0.$VCS_CHANGESET_HASH_LENGTH""i@%f"
@@ -125,27 +125,27 @@ fi
 # Begin a left prompt segment
 # Takes two arguments, background and foreground. Both can be omitted,
 # rendering default background/foreground.
-left_prompt_segment() {
+function left_prompt_segment {
   local bg fg
-  [[ -n $1 ]] && bg="%K{$1}" || bg="%k"
-  [[ -n $2 ]] && fg="%F{$2}" || fg="%f"
-  if [[ $CURRENT_BG != 'NONE' && $1 != $CURRENT_BG ]]; then
-    echo -n "%{$bg%F{$CURRENT_BG}%}$LEFT_SEGMENT_SEPARATOR%{$fg%} "
+  [[ -n "$1" ]] && bg="%K{$1}" || bg="%k"
+  [[ -n "$2" ]] && fg="%F{$2}" || fg="%f"
+  if [[ "$CURRENT_BG" != 'NONE' && "$1" != "$CURRENT_BG" ]]; then
+    echo -n "$bg%F{$CURRENT_BG}$LEFT_SEGMENT_SEPARATOR$fg "
   else
-    echo -n "%{$bg%}%{$fg%} "
+    echo -n "$bg$fg "
   fi
-  CURRENT_BG=$1
-  [[ -n $3 ]] && echo -n $3
+  CURRENT_BG="$1"
+  [[ -n "$3" ]] && echo -n "$3"
 }
 
 # End the left prompt, closing any open segments
-left_prompt_end() {
-  if [[ -n $CURRENT_BG ]]; then
-    echo -n " %{%k%F{$CURRENT_BG}%}$LEFT_SEGMENT_SEPARATOR"
+function left_prompt_end {
+  if [[ -n "$CURRENT_BG" ]]; then
+    echo -n " %k%F{$CURRENT_BG}$LEFT_SEGMENT_SEPARATOR"
   else
-    echo -n " %{%k%}"
+    echo -n "%k"
   fi
-  echo -n "%{%f%}"
+  echo -n "%f"
   CURRENT_BG=''
 }
 
@@ -153,12 +153,12 @@ left_prompt_end() {
 # Takes two arguments, background and foreground. Both can be omitted,
 # rendering default background/foreground. No ending for the right prompt
 # segment is needed (unlike the left prompt, above).
-right_prompt_segment() {
+function right_prompt_segment {
   local bg fg
-  [[ -n $1 ]] && bg="%K{$1}" || bg="%k"
-  [[ -n $2 ]] && fg="%F{$2}" || fg="%f"
+  [[ -n "$1" ]] && bg="%K{$1}" || bg="%k"
+  [[ -n "$2" ]] && fg="%F{$2}" || fg="%f"
     echo -n " %f%F{$1}$RIGHT_SEGMENT_SEPARATOR%f%{$bg%}%{$fg%} "
-  [[ -n $3 ]] && echo -n $3
+  [[ -n "$3" ]] && echo -n "$3"
 }
 
 ################################################################
@@ -167,11 +167,11 @@ right_prompt_segment() {
 prompt_vcs() {
   local vcs_prompt="${vcs_info_msg_0_}"
 
-  if [[ -n $vcs_prompt ]]; then
+  if [[ -n "$vcs_prompt" ]]; then
     if [[ "$VCS_WORKDIR_DIRTY" == true ]]; then
-      $1_prompt_segment yellow $DEFAULT_COLOR
+      $1_prompt_segment "yellow" "$DEFAULT_COLOR"
     else
-      $1_prompt_segment green $DEFAULT_COLOR
+      $1_prompt_segment "green" "$DEFAULT_COLOR"
     fi
 
     echo -n "%F{$DEFAULT_COLOR}%f$vcs_prompt"
@@ -224,7 +224,7 @@ function +vi-git-tagname() {
     local tag
 
     tag=$(git describe --tags --exact-match HEAD 2>/dev/null)
-    [[ -n ${tag} ]] && hook_com[branch]=" %F{$DEFAULT_COLOR}${tag}%f"
+    [[ -n "${tag}" ]] && hook_com[branch]=" %F{$DEFAULT_COLOR}${tag}%f"
 }
 
 # Show count of stashed changes
@@ -251,7 +251,7 @@ function +vi-hg-bookmarks() {
 }
 
 function +vi-vcs-detect-changes() {
-  if [[ -n ${hook_com[staged]} ]] || [[ -n ${hook_com[unstaged]} ]]; then
+  if [[ -n "${hook_com[staged]}" ]] || [[ -n "${hook_com[unstaged]}" ]]; then
     VCS_WORKDIR_DIRTY=true
   else
     VCS_WORKDIR_DIRTY=false
@@ -264,8 +264,8 @@ function +vi-vcs-detect-changes() {
 
 # AWS Profile
 prompt_aws() {
-  local aws_profile=$AWS_DEFAULT_PROFILE
-  if [[ -n $aws_profile ]]; 
+  local aws_profile="$AWS_DEFAULT_PROFILE"
+  if [[ -n "$aws_profile" ]]; 
   then
     $1_prompt_segment red white "AWS: $aws_profile"
   fi
@@ -275,18 +275,18 @@ prompt_aws() {
 # Note that if $DEFAULT_USER is not set, this prompt segment will always print
 prompt_context() {
   if [[ "$USER" != "$DEFAULT_USER" || -n "$SSH_CLIENT" ]]; then
-    $1_prompt_segment $DEFAULT_COLOR "011" "%(!.%{%F{yellow}%}.)$USER@%m"
+    $1_prompt_segment "$DEFAULT_COLOR" "011" "%(!.%F{yellow}.)$USER@%m"
   fi
 }
 
 # Dir: current working directory
 prompt_dir() {
-  $1_prompt_segment blue $DEFAULT_COLOR '%~'
+  $1_prompt_segment "blue" "$DEFAULT_COLOR" '%~'
 }
 
 # Command number (in local history)
 prompt_history() {
-  $1_prompt_segment "244" $DEFAULT_COLOR '%h'
+  $1_prompt_segment "244" "$DEFAULT_COLOR" '%h'
 }
 
 # Right Status: (return code, root status, background jobs)
@@ -296,24 +296,24 @@ prompt_longstatus() {
   local symbols bg
   symbols=()
 
-  if [[ $RETVAL -ne 0 ]]; then
-    symbols+="%{%F{"226"}%}%? ↵"
+  if [[ "$RETVAL" -ne 0 ]]; then
+    symbols+="%F{226}%? ↵"
     bg="009"
   else
-    symbols+="%{%F{"046"}%}✓"
+    symbols+="%F{046}✓"
     bg="008"
   fi
 
-  [[ $UID -eq 0 ]] && symbols+="%{%F{yellow}%}⚡"
-  [[ $(jobs -l | wc -l) -gt 0 ]] && symbols+="%{%F{cyan}%}⚙"
+  [[ "$UID" -eq 0 ]] && symbols+="%F{yellow}⚡"
+  [[ $(jobs -l | wc -l) -gt 0 ]] && symbols+="%F{cyan}⚙"
 
-  [[ -n "$symbols" ]] && $1_prompt_segment $bg $DEFAULT_COLOR "$symbols"
+  [[ -n "$symbols" ]] && $1_prompt_segment "$bg" "$DEFAULT_COLOR" "$symbols"
 }
 
 # rbenv information
 prompt_rbenv() {
   if [[ -n "$RBENV_VERSION" ]]; then
-    $1_prompt_segment red $DEFAULT_COLOR "$RBENV_VERSION"
+    $1_prompt_segment "red" "$DEFAULT_COLOR" "$RBENV_VERSION"
   fi
 }
 
@@ -323,7 +323,7 @@ prompt_rspec_stats() {
     local code_amount=$(ls -1 app/**/*.rb | wc -l)
     local tests_amount=$(ls -1 spec/**/*.rb | wc -l)
 
-    build_test_stats $1 $code_amount $tests_amount "RSpec"
+    build_test_stats "$1" "$code_amount" "$tests_amount" "RSpec"
   fi
 }
 
@@ -332,7 +332,7 @@ prompt_rvm() {
   local rvm_prompt
   rvm_prompt=`rvm-prompt`
   if [ "$rvm_prompt" != "" ]; then
-    $1_prompt_segment "240" $DEFAULT_COLOR "$rvm_prompt "
+    $1_prompt_segment "240" "$DEFAULT_COLOR" "$rvm_prompt "
   fi
 }
 
@@ -341,11 +341,11 @@ prompt_rvm() {
 prompt_status() {
   local symbols
   symbols=()
-  [[ $RETVAL -ne 0 ]] && symbols+="%{%F{red}%}✘"
-  [[ $UID -eq 0 ]] && symbols+="%{%F{yellow}%}⚡"
+  [[ "$RETVAL" -ne 0 ]] && symbols+="%{%F{red}%}✘"
+  [[ "$UID" -eq 0 ]] && symbols+="%{%F{yellow}%}⚡"
   [[ $(jobs -l | wc -l) -gt 0 ]] && symbols+="%{%F{cyan}%}⚙"
 
-  [[ -n "$symbols" ]] && $1_prompt_segment $DEFAULT_COLOR default "$symbols"
+  [[ -n "$symbols" ]] && $1_prompt_segment "$DEFAULT_COLOR" "default" "$symbols"
 }
 
 # Symfony2-PHPUnit test ratio
@@ -354,33 +354,33 @@ prompt_symfony2_tests() {
     local code_amount=$(ls -1 src/**/*.php | grep -v Tests | wc -l)
     local tests_amount=$(ls -1 src/**/*.php | grep Tests | wc -l)
 
-    build_test_stats $1 $code_amount $tests_amount "SF2-Tests"
+    build_test_stats "$1" "$code_amount" "$tests_amount" "SF2-Tests"
   fi
 }
 
 # Show a ratio of tests vs code
 build_test_stats() {
-  local code_amount=$2
-  local tests_amount=$3+0.00001
-  local headline=$4
+  local code_amount="$2"
+  local tests_amount="$3"+0.00001
+  local headline="$4"
 
   # Set float precision to 2 digits:
   typeset -F 2 ratio
   local ratio=$(( (tests_amount/code_amount) * 100 ))
 
-  [[ ratio -ge 0.75 ]] && $1_prompt_segment cyan $DEFAULT_COLOR "$headline: $ratio%%"
-  [[ ratio -ge 0.5 && ratio -lt 0.75 ]] && $1_prompt_segment yellow $DEFAULT_COLOR "$headline: $ratio%%"
-  [[ ratio -lt 0.5 ]] && $1_prompt_segment red $DEFAULT_COLOR "$headline: $ratio%%"
+  [[ ratio -ge 0.75 ]] && $1_prompt_segment "cyan" "$DEFAULT_COLOR" "$headline: $ratio%%"
+  [[ ratio -ge 0.5 && ratio -lt 0.75 ]] && $1_prompt_segment "yellow" "$DEFAULT_COLOR" "$headline: $ratio%%"
+  [[ ratio -lt 0.5 ]] && $1_prompt_segment "red" "$DEFAULT_COLOR" "$headline: $ratio%%"
 }
 
 # System time
 prompt_time() {
-  local time_format='%D{%H:%M:%S}'
-  if [[ -n $POWERLEVEL9K_TIME_FORMAT ]]; then
-    time_format=$POWERLEVEL9K_TIME_FORMAT
+  local time_format="%D{%H:%M:%S}"
+  if [[ -n "$POWERLEVEL9K_TIME_FORMAT" ]]; then
+    time_format="$POWERLEVEL9K_TIME_FORMAT"
   fi
 
-  $1_prompt_segment $DEFAULT_COLOR_INVERTED $DEFAULT_COLOR "$time_format "
+  $1_prompt_segment "$DEFAULT_COLOR_INVERTED" "$DEFAULT_COLOR" "$time_format "
 }
 
 # Virtualenv: current working virtualenv
@@ -388,8 +388,8 @@ prompt_time() {
 # https://virtualenv.pypa.io/en/latest/
 prompt_virtualenv() {
   local virtualenv_path="$VIRTUAL_ENV"
-  if [[ -n $virtualenv_path && -n $VIRTUAL_ENV_DISABLE_PROMPT ]]; then
-    $1_prompt_segment blue $DEFAULT_COLOR "(`basename $virtualenv_path`)"
+  if [[ -n "$virtualenv_path" && -n "$VIRTUAL_ENV_DISABLE_PROMPT" ]]; then
+    $1_prompt_segment "blue" "$DEFAULT_COLOR" "(`basename $virtualenv_path`)"
   fi
 }
 
@@ -399,7 +399,7 @@ prompt_virtualenv() {
 
 # Main prompt
 build_left_prompt() {
-  if [[ ${#POWERLEVEL9K_LEFT_PROMPT_ELEMENTS} == 0 ]]; then
+  if [[ "${#POWERLEVEL9K_LEFT_PROMPT_ELEMENTS}" == 0 ]]; then
     POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(context dir rbenv vcs)
   fi
 
@@ -414,7 +414,7 @@ build_left_prompt() {
 build_right_prompt() {
   RETVAL=$?
 
-  if [[ ${#POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS} == 0 ]]; then
+  if [[ "${#POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS}" == 0 ]]; then
     POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(longstatus history time)
   fi
 
@@ -435,6 +435,10 @@ powerlevel9k_init() {
   unsetopt XTRACE KSH_ARRAYS
   prompt_opts=(cr percent subst)
 
+  # initialize colors
+  autoload -U colors && colors
+
+  # initialize VCS
   autoload -Uz add-zsh-hook
 
   add-zsh-hook precmd prompt_powerlevel9k_precmd
