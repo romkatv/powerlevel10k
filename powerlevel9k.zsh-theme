@@ -46,7 +46,7 @@
 # The `CURRENT_BG` variable is used to remember what the last BG color used was
 # when building the left-hand prompt. Because the RPROMPT is created from
 # right-left but reads the opposite, this isn't necessary for the other side.
-CURRENT_BG='NONE'
+local CURRENT_BG='NONE'
 
 # These characters require the Powerline fonts to work properly. If see boxes or
 # bizarre characters below, your fonts are not correctly installed.
