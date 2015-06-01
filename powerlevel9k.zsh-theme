@@ -117,6 +117,7 @@ fi
 
 ## Debugging
 #zstyle ':vcs_info:*+*:*' debug true
+#set -o xtrace
 
 ################################################################
 # Prompt Segment Constructors
