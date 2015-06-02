@@ -8,9 +8,6 @@
 #
 # The `vcs_info` hooks in this file are from Tom Upton:
 # https://github.com/tupton/dotfiles/blob/master/zsh/zshrc
-#
-# In order for this theme to render correctly, you will need a Powerline-patched font:
-# https://github.com/Lokaltog/powerline-fonts
 ################################################################
 
 ################################################################
@@ -49,11 +46,108 @@
 CURRENT_BG='NONE'
 
 # These characters require the Powerline fonts to work properly. If see boxes or
-# bizarre characters below, your fonts are not correctly installed.
-LEFT_SEGMENT_SEPARATOR=''
-RIGHT_SEGMENT_SEPARATOR=''
-VCS_UNSTAGED_ICON='●'
-VCS_STAGED_ICON='✚'
+# bizarre characters below, your fonts are not correctly installed. In case you
+# do not want to install a special font, you can set `POWERLEVEL9K_MODE` to
+# `compatible`. This shows all icons in regular symbols.
+case $POWERLEVEL9K_MODE in
+  'flat')
+    LEFT_SEGMENT_SEPARATOR=''
+    RIGHT_SEGMENT_SEPARATOR=''
+    ROOT_ICON="\uE801" # 
+    RUBY_ICON="\uE847" # 
+    AWS_ICON="\uE895" # 
+    BACKGROUND_JOBS_ICON="\uE82F " # 
+    TEST_ICON="\uE891" # 
+		OK_ICON="\u2713" # ✓
+		FAIL_ICON="\u2718" # ✘
+    VCS_UNSTAGED_ICON="\uE16C" # 
+    VCS_STAGED_ICON="\uE168" # 
+    VCS_STASH_ICON="\uE133 " # 
+    #VCS_INCOMING_CHANGES="\uE1EB " # 
+    VCS_INCOMING_CHANGES="\uE80D " # 
+    #VCS_OUTGOING_CHANGES="\uE1EC " # 
+    VCS_OUTGOING_CHANGES="\uE80E " # 
+    VCS_TAG_ICON="\uE817 " # 
+    VCS_BOOKMARK_ICON="\uE87B" # 
+    VCS_COMMIT_ICON="\uE821 " # 
+    VCS_BRANCH_ICON=" \uE220" # 
+    VCS_REMOTE_BRANCH_ICON="\uE804" # 
+    VCS_GIT_ICON="\uE20E" # 
+    VCS_HG_ICON="\uE1C3" # 
+  ;;
+  'compatible')
+    LEFT_SEGMENT_SEPARATOR="\u2B80" # ⮀
+    RIGHT_SEGMENT_SEPARATOR="\u2B82" # ⮂
+    ROOT_ICON='*R*'
+    RUBY_ICON=''
+    AWS_ICON="AWS:"
+    BACKGROUND_JOBS_ICON="\u2699" # ⚙
+    TEST_ICON=''
+		OK_ICON=''
+		FAIL_ICON='x'
+    VCS_UNSTAGED_ICON="\u25CF" # ●
+    VCS_STAGED_ICON="\u271A" # ✚
+    VCS_INCOMING_CHANGES="\u2193" # ↓
+    VCS_OUTGOING_CHANGES="\u2191" # ↑
+    VCS_TAG_ICON=''
+    VCS_BOOKMARK_ICON=''
+    VCS_COMMIT_ICON=''
+    VCS_BRANCH_ICON='@'
+    VCS_REMOTE_BRANCH_ICON="\u2192" # →
+    VCS_GIT_ICON='Git'
+    VCS_HG_ICON='HG'
+  ;;
+  'awesome-patched')
+    # Awesome-Patched Font required! See https://github.com/gabrielelana/awesome-terminal-fonts/tree/patching-strategy/patched
+    LEFT_SEGMENT_SEPARATOR="\uE0B0" # 
+    RIGHT_SEGMENT_SEPARATOR="\uE0B2" # 
+    ROOT_ICON="\u26A1" # ⚡
+    RUBY_ICON="\uE847" # 
+    AWS_ICON="\uE895" # 
+    BACKGROUND_JOBS_ICON="\uE82F " # 
+    TEST_ICON="\uE891" # 
+		OK_ICON="\u2713" # ✓
+		FAIL_ICON="\u2718" # ✘
+    VCS_UNSTAGED_ICON="\uE16C" # 
+    VCS_STAGED_ICON="\uE168" # 
+    VCS_STASH_ICON="\uE133 " # 
+    #VCS_INCOMING_CHANGES="\uE1EB " # 
+    VCS_INCOMING_CHANGES="\uE80D " # 
+    #VCS_OUTGOING_CHANGES="\uE1EC " # 
+    VCS_OUTGOING_CHANGES="\uE80E " # 
+    VCS_TAG_ICON="\uE817 " # 
+    VCS_BOOKMARK_ICON="\uE87B" # 
+    VCS_COMMIT_ICON="\uE821 " # 
+    VCS_BRANCH_ICON=" \uE220" # 
+    VCS_REMOTE_BRANCH_ICON="\uE804" # 
+    VCS_GIT_ICON="\uE20E" # 
+    VCS_HG_ICON="\uE1C3" # 
+  ;;
+  *)
+    # Powerline-Patched Font required! See https://github.com/Lokaltog/powerline-fonts
+    LEFT_SEGMENT_SEPARATOR="\uE0B0" # 
+    RIGHT_SEGMENT_SEPARATOR="\uE0B2" # 
+    ROOT_ICON="\u26A1" # ⚡
+    RUBY_ICON=''
+    AWS_ICON="AWS:"
+    BACKGROUND_JOBS_ICON="\u2699" # ⚙
+    TEST_ICON=''
+		OK_ICON="\u2713" # ✓
+		FAIL_ICON="\u2718" # ✘
+    VCS_UNSTAGED_ICON="\u25CF" # ●
+    VCS_STAGED_ICON="\u271A" # ✚
+    VCS_STASH_ICON="\u235F" # ⍟
+    VCS_INCOMING_CHANGES="\u2193" # ↓
+    VCS_OUTGOING_CHANGES="\u2191" # ↑
+    VCS_TAG_ICON=''
+    VCS_BOOKMARK_ICON="\u263F" # ☿
+    VCS_COMMIT_ICON=''
+    VCS_BRANCH_ICON='@'
+    VCS_REMOTE_BRANCH_ICON="\u2192" # →
+    VCS_GIT_ICON="\uE0A0" # 
+    VCS_HG_ICON="\uE0A0" # 
+  ;;
+esac
 
 ################################################################
 # color scheme
@@ -86,13 +180,16 @@ if [[ "$POWERLEVEL9K_SHOW_CHANGESET" == true ]]; then
     VCS_CHANGESET_HASH_LENGTH=$POWERLEVEL9K_CHANGESET_HASH_LENGTH
   fi
 
-  VCS_CHANGESET_PREFIX="%F{$DEFAULT_COLOR_DARK}%0.$VCS_CHANGESET_HASH_LENGTH""i@%f"
+  VCS_CHANGESET_PREFIX="%F{$DEFAULT_COLOR_DARK}$VCS_COMMIT_ICON%0.$VCS_CHANGESET_HASH_LENGTH""i%f"
 fi
 
 zstyle ':vcs_info:*' enable git hg
 zstyle ':vcs_info:*' check-for-changes true
 
-zstyle ':vcs_info:*' formats " $VCS_CHANGESET_PREFIX%F{$DEFAULT_COLOR}%b%c%u%m%f"
+local VCS_DEFAULT_FORMAT="$VCS_CHANGESET_PREFIX%F{$DEFAULT_COLOR}%b%c%u%m%f"
+zstyle ':vcs_info:git:*' formats "%F{$DEFAULT_COLOR}$VCS_GIT_ICON%f $VCS_DEFAULT_FORMAT" 
+zstyle ':vcs_info:hg:*' formats "%F{$DEFAULT_COLOR}$VCS_HG_ICON%f $VCS_DEFAULT_FORMAT" 
+
 zstyle ':vcs_info:*' actionformats " %b %F{red}| %a%f"
 
 zstyle ':vcs_info:*' stagedstr " %F{$DEFAULT_COLOR}$VCS_STAGED_ICON%f"
@@ -101,7 +198,7 @@ zstyle ':vcs_info:*' unstagedstr " %F{$DEFAULT_COLOR}$VCS_UNSTAGED_ICON%f"
 zstyle ':vcs_info:git*+set-message:*' hooks git-untracked git-aheadbehind git-stash git-remotebranch git-tagname
 
 # For Hg, only show the branch name
-zstyle ':vcs_info:hg*:*' branchformat "%b"
+zstyle ':vcs_info:hg*:*' branchformat "$VCS_BRANCH_ICON%b"
 # The `get-revision` function must be turned on for dirty-check to work for Hg
 zstyle ':vcs_info:hg*:*' get-revision true
 zstyle ':vcs_info:hg*:*' get-bookmarks true
@@ -174,15 +271,8 @@ prompt_vcs() {
       $1_prompt_segment green $DEFAULT_COLOR
     fi
 
-    echo -n "%F{$DEFAULT_COLOR}%f$vcs_prompt"
+    echo -n "%F{$DEFAULT_COLOR}%f$vcs_prompt"
   fi
-}
-
-function +vi-git-untracked() {
-    if [[ $(git rev-parse --is-inside-work-tree 2> /dev/null) == 'true' && \
-            $(git ls-files --others --exclude-standard | sed q | wc -l | tr -d ' ') != 0 ]]; then
-        hook_com[unstaged]+=" %F{$DEFAULT_COLOR}?%f"
-    fi
 }
 
 function +vi-git-aheadbehind() {
@@ -194,12 +284,12 @@ function +vi-git-aheadbehind() {
     # for git prior to 1.7
     # ahead=$(git rev-list origin/${branch_name}..HEAD | wc -l)
     ahead=$(git rev-list ${branch_name}@{upstream}..HEAD 2>/dev/null | wc -l | tr -d ' ')
-    (( $ahead )) && gitstatus+=( " %F{$DEFAULT_COLOR}↑${ahead// /}%f" )
+    (( $ahead )) && gitstatus+=( " %F{$DEFAULT_COLOR}$VCS_OUTGOING_CHANGES${ahead// /}%f" )
 
     # for git prior to 1.7
     # behind=$(git rev-list HEAD..origin/${branch_name} | wc -l)
     behind=$(git rev-list HEAD..${branch_name}@{upstream} 2>/dev/null | wc -l | tr -d ' ')
-    (( $behind )) && gitstatus+=( " %F{$DEFAULT_COLOR}↓${behind// /}%f" )
+    (( $behind )) && gitstatus+=( " %F{$DEFAULT_COLOR}$VCS_INCOMING_CHANGES${behind// /}%f" )
 
     hook_com[misc]+=${(j::)gitstatus}
 }
@@ -211,12 +301,12 @@ function +vi-git-remotebranch() {
     remote=${$(git rev-parse --verify HEAD@{upstream} --symbolic-full-name 2>/dev/null)/refs\/(remotes|heads)\/}
     branch_name=${$(git symbolic-ref --short HEAD 2>/dev/null)}
 
-    hook_com[branch]="%F{$DEFAULT_COLOR}${hook_com[branch]}%f"
+    hook_com[branch]="%F{$DEFAULT_COLOR}$VCS_BRANCH_ICON${hook_com[branch]}%f"
     # Always show the remote
     #if [[ -n ${remote} ]] ; then
     # Only show the remote if it differs from the local
     if [[ -n ${remote} && ${remote#*/} != ${branch_name} ]] ; then
-        hook_com[branch]+="%F{$DEFAULT_COLOR}→%f%F{$DEFAULT_COLOR}${remote// /}%f"
+        hook_com[branch]+="%F{$DEFAULT_COLOR}$VCS_REMOTE_BRANCH_ICON%f%F{$DEFAULT_COLOR}${remote// /}%f"
     fi
 }
 
@@ -224,7 +314,7 @@ function +vi-git-tagname() {
     local tag
 
     tag=$(git describe --tags --exact-match HEAD 2>/dev/null)
-    [[ -n ${tag} ]] && hook_com[branch]=" %F{$DEFAULT_COLOR}${tag}%f"
+    [[ -n ${tag} ]] && hook_com[branch]=" %F{$DEFAULT_COLOR}$VCS_TAG_ICON${tag}%f"
 }
 
 # Show count of stashed changes
@@ -234,20 +324,20 @@ function +vi-git-stash() {
 
   if [[ -s $(git rev-parse --git-dir)/refs/stash ]] ; then
     stashes=$(git stash list 2>/dev/null | wc -l)
-    hook_com[misc]+=" %F{$DEFAULT_COLOR}⍟${stashes// /}%f"
+    hook_com[misc]+=" %F{$DEFAULT_COLOR}$VCS_STASH_ICON${stashes// /}%f"
   fi
 }
 
 function +vi-hg-bookmarks() {
-	if [[ -n "${hgbmarks[@]}" ]]; then
-		hook_com[hg-bookmark-string]=" ☿ ${hgbmarks[@]}"
+  if [[ -n "${hgbmarks[@]}" ]]; then
+    hook_com[hg-bookmark-string]=" $VCS_BOOKMARK_ICON ${hgbmarks[@]}"
 
-		# And to signal, that we want to use the sting we just generated,
-		# set the special variable `ret' to something other than the default
-		# zero:
-		ret=1
-		return 0
-	fi
+    # And to signal, that we want to use the sting we just generated,
+    # set the special variable `ret' to something other than the default
+    # zero:
+    ret=1
+    return 0
+  fi
 }
 
 function +vi-vcs-detect-changes() {
@@ -267,7 +357,7 @@ prompt_aws() {
   local aws_profile=$AWS_DEFAULT_PROFILE
   if [[ -n $aws_profile ]]; 
   then
-    $1_prompt_segment red white "AWS: $aws_profile"
+    $1_prompt_segment red white "$AWS_ICON $aws_profile"
   fi
 }
 
@@ -300,12 +390,12 @@ prompt_longstatus() {
     symbols+="%{%F{"226"}%}%? ↵"
     bg="009"
   else
-    symbols+="%{%F{"046"}%}✓"
+    symbols+="%{%F{"046"}%}$OK_ICON"
     bg="008"
   fi
 
-  [[ $UID -eq 0 ]] && symbols+="%{%F{yellow}%}⚡"
-  [[ $(jobs -l | wc -l) -gt 0 ]] && symbols+="%{%F{cyan}%}⚙"
+  [[ $UID -eq 0 ]] && symbols+="%{%F{yellow}%} $ROOT_ICON"
+  [[ $(jobs -l | wc -l) -gt 0 ]] && symbols+="%{%F{cyan}%}$BACKGROUND_JOBS_ICON"
 
   [[ -n "$symbols" ]] && $1_prompt_segment $bg $DEFAULT_COLOR "$symbols"
 }
@@ -323,7 +413,7 @@ prompt_rspec_stats() {
     local code_amount=$(ls -1 app/**/*.rb | wc -l)
     local tests_amount=$(ls -1 spec/**/*.rb | wc -l)
 
-    build_test_stats $1 $code_amount $tests_amount "RSpec"
+    build_test_stats $1 $code_amount $tests_amount "RSpec $TEST_ICON"
   fi
 }
 
@@ -332,7 +422,7 @@ prompt_rvm() {
   local rvm_prompt
   rvm_prompt=`rvm-prompt`
   if [ "$rvm_prompt" != "" ]; then
-    $1_prompt_segment "240" $DEFAULT_COLOR "$rvm_prompt "
+    $1_prompt_segment "240" $DEFAULT_COLOR "$rvm_prompt $RUBY_ICON "
   fi
 }
 
@@ -341,9 +431,9 @@ prompt_rvm() {
 prompt_status() {
   local symbols
   symbols=()
-  [[ $RETVAL -ne 0 ]] && symbols+="%{%F{red}%}✘"
-  [[ $UID -eq 0 ]] && symbols+="%{%F{yellow}%}⚡"
-  [[ $(jobs -l | wc -l) -gt 0 ]] && symbols+="%{%F{cyan}%}⚙"
+  [[ $RETVAL -ne 0 ]] && symbols+="%{%F{red}%}$FAIL_ICON"
+  [[ $UID -eq 0 ]] && symbols+="%{%F{yellow}%} $ROOT_ICON"
+  [[ $(jobs -l | wc -l) -gt 0 ]] && symbols+="%{%F{cyan}%}$BACKGROUND_JOBS_ICON"
 
   [[ -n "$symbols" ]] && $1_prompt_segment $DEFAULT_COLOR default "$symbols"
 }
@@ -354,7 +444,7 @@ prompt_symfony2_tests() {
     local code_amount=$(ls -1 src/**/*.php | grep -v Tests | wc -l)
     local tests_amount=$(ls -1 src/**/*.php | grep Tests | wc -l)
 
-    build_test_stats $1 $code_amount $tests_amount "SF2-Tests"
+    build_test_stats $1 $code_amount $tests_amount "SF2 $TEST_ICON"
   fi
 }
 
