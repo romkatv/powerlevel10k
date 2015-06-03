@@ -1,3 +1,29 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [powerlevel9k Theme for Oh-My-Zsh](#powerlevel9k-theme-for-oh-my-zsh)
+  - [Features](#features)
+  - [Installation](#installation)
+    - [Install Powerline Fonts](#install-powerline-fonts)
+    - [Install Powerlevel9k](#install-powerlevel9k)
+  - [Segment Customization](#segment-customization)
+    - [The AWS Profile Segment](#the-aws-profile-segment)
+    - [The 'context' Segment](#the-context-segment)
+    - [Test ratio](#test-ratio)
+    - [The 'time' segment](#the-time-segment)
+    - [The 'vcs' Segment](#the-vcs-segment)
+      - [Symbols](#symbols)
+  - [Styling](#styling)
+    - [Fonts](#fonts)
+    - [Double-Lined Prompt](#double-lined-prompt)
+    - [Light Color Theme](#light-color-theme)
+  - [Troubleshooting](#troubleshooting)
+    - [Gaps Between Segments](#gaps-between-segments)
+  - [Contributions / Bugs / Contact](#contributions--bugs--contact)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 ## powerlevel9k Theme for Oh-My-Zsh
 
 This is a theme for [Oh-My-Zsh](https://github.com/robbyrussell/oh-my-zsh). This
@@ -40,8 +66,9 @@ Here are some screenshots of `powerlevel9k` with default settings:
 
 ### Installation
 
-There are two things you need to make this theme work correctly: Powerline
-fonts, and the theme itself.
+You just need to install the theme and set `POWERLEVEL9K_MODE='compatible'`
+to join the experience. If you want to customize your experience even further
+read the chapter about "[fonts](#fonts)" or about "[segment customization](#segment-customization)".
 
 #### Install Powerline Fonts
 First, you need to install Powerline Fonts. You can find the [installation
@@ -157,6 +184,25 @@ The `vcs` segment uses various symbols to tell you the state of your repository:
 
 You can configure the look and feel of your prompt easily with some built-in
 options.
+
+#### Fonts
+
+If you set `POWERLEVEL9K_MODE='compatible'` you just get a little glimpse of 
+the beauty of this theme.
+
+To get nicer Icons you need to install a [powerline-patched](https://github.com/Lokaltog/powerline-fonts) font. 
+In your Terminal you need to select this font and in your `~/.zshrc` you need 
+to set `POWERLEVEL9K_MODE='powerline-patched'`.
+Screenshot:
+![](http://bhilburn.org/content/images/2015/01/pl9k-improved.png)
+
+If even these Icons did not impress you, have a look at `POWERLEVEL9K_MODE='awesome-patched'`.
+For this mode, you have to install a [awesome-patched](https://github.com/gabrielelana/awesome-terminal-fonts/tree/patching-strategy/patched) font and set the according mode.
+Screenshot:
+![](https://cloud.githubusercontent.com/assets/1544760/7959660/67612918-09fb-11e5-9ef2-2308363c3c51.png)
+
+If you prefer segements as rectangles, just set `POWERLEVEL9K_MODE='flat'`, but
+beware: You still need a [awesome-patched](https://github.com/gabrielelana/awesome-terminal-fonts/tree/patching-strategy/patched) font.
 
 #### Double-Lined Prompt
 
