@@ -217,6 +217,12 @@ Some of the Segments have special color variables, as they change the colors acc
     POWERLEVEL9K_SYMFONY2_TESTS_BAD_FOREGROUND='red'
     POWERLEVEL9K_SYMFONY2_TESTS_BAD_BACKGROUND='white'
 
+You could also use a colorcode as value. Example:
+
+    POWERLEVEL9K_VCS_FOREGROUND='021' # Dark blue
+
+For a full list of supported colors just type `spectrum_ls` in your terminal to see all possibilities. 
+
 ### Troubleshooting
 
 Here are some fixes to some common problems.
