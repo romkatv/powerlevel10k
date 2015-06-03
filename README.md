@@ -70,17 +70,6 @@ You just need to install the theme and set `POWERLEVEL9K_MODE='compatible'`
 to join the experience. If you want to customize your experience even further
 read the chapter about "[fonts](#fonts)" or about "[segment customization](#segment-customization)".
 
-#### Install Powerline Fonts
-First, you need to install Powerline Fonts. You can find the [installation
-instructions
-here](https://powerline.readthedocs.org/en/latest/installation/linux.html#fonts-installation).
-You can also find the raw font files [in this Github
-repository](https://github.com/powerline/fonts) if you want to manually install
-them for your OS.
-
-After you have installed Powerline fonts, make the default font in your terminal
-emulator the Powerline font you want to use.
-
 #### Install Powerlevel9k
 
 To install this theme, clone this repository into your Oh-My-Zsh `custom/themes`
@@ -191,8 +180,10 @@ If you set `POWERLEVEL9K_MODE='compatible'` you just get a little glimpse of
 the beauty of this theme.
 
 To get nicer Icons you need to install a [powerline-patched](https://github.com/Lokaltog/powerline-fonts) font. 
-In your Terminal you need to select this font and in your `~/.zshrc` you need 
+In your terminal emulator you need to select this font and in your `~/.zshrc` you need 
 to set `POWERLEVEL9K_MODE='powerline-patched'`.
+You can find the [installation instructions here](https://powerline.readthedocs.org/en/latest/installation/linux.html#fonts-installation).
+You can also find the raw font files [in this Github repository](https://github.com/powerline/fonts) if you want to manually install them for your OS.
 Screenshot:
 ![](http://bhilburn.org/content/images/2015/01/pl9k-improved.png)
 
