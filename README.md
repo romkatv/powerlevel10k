@@ -1,3 +1,14 @@
+## powerlevel9k Theme for Oh-My-Zsh
+
+This is a theme for [Oh-My-Zsh](https://github.com/robbyrussell/oh-my-zsh). This
+theme uses [Powerline Fonts](https://github.com/Lokaltog/powerline-fonts), thus
+giving you the most epic terminal styling in the universe.
+
+Look like a bad-ass. Impress everyone in 'Screenshot Your Desktop' threads. Use powerlevel9k.
+
+In addition to looking amazing, this theme actually provides a lot of useful
+information in configurable prompt segments.
+
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
@@ -23,17 +34,6 @@
   - [Contributions / Bugs / Contact](#contributions--bugs--contact)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
-
-## powerlevel9k Theme for Oh-My-Zsh
-
-This is a theme for [Oh-My-Zsh](https://github.com/robbyrussell/oh-my-zsh). This
-theme uses [Powerline Fonts](https://github.com/Lokaltog/powerline-fonts), thus
-giving you the most epic terminal styling in the universe.
-
-Look like a bad-ass. Impress everyone in 'Screenshot Your Desktop' threads. Use powerlevel9k.
-
-In addition to looking amazing, this theme actually provides a lot of useful
-information in configurable prompt segments.
 
 ### Features
 
