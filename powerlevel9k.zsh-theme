@@ -75,8 +75,8 @@ case $POWERLEVEL9K_MODE in
     VCS_COMMIT_ICON="\uE821 " # 
     VCS_BRANCH_ICON=" \uE220" # 
     VCS_REMOTE_BRANCH_ICON="\uE804" # 
-    VCS_GIT_ICON="\uE20E" # 
-    VCS_HG_ICON="\uE1C3" # 
+    VCS_GIT_ICON="\uE20E " # 
+    VCS_HG_ICON="\uE1C3 " # 
   ;;
   'compatible')
     LEFT_SEGMENT_SEPARATOR="\u2B80" # ⮀
@@ -127,8 +127,8 @@ case $POWERLEVEL9K_MODE in
     VCS_COMMIT_ICON="\uE821 " # 
     VCS_BRANCH_ICON=" \uE220" # 
     VCS_REMOTE_BRANCH_ICON="\uE804" # 
-    VCS_GIT_ICON="\uE20E" # 
-    VCS_HG_ICON="\uE1C3" # 
+    VCS_GIT_ICON="\uE20E " # 
+    VCS_HG_ICON="\uE1C3 " # 
   ;;
   *)
     # Powerline-Patched Font required! See https://github.com/Lokaltog/powerline-fonts
