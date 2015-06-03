@@ -60,7 +60,8 @@ case $POWERLEVEL9K_MODE in
     TEST_ICON="\uE891" # 
 		OK_ICON="\u2713" # ✓
 		FAIL_ICON="\u2718" # ✘
-    VCS_UNSTAGED_ICON="\uE16C" # 
+    VCS_UNTRACKED_ICON="\uE16C" # 
+    VCS_UNSTAGED_ICON="\uE17C" # 
     VCS_STAGED_ICON="\uE168" # 
     VCS_STASH_ICON="\uE133 " # 
     #VCS_INCOMING_CHANGES="\uE1EB " # 
@@ -85,6 +86,7 @@ case $POWERLEVEL9K_MODE in
     TEST_ICON=''
 		OK_ICON=''
 		FAIL_ICON='x'
+    VCS_UNTRACKED_ICON='?'
     VCS_UNSTAGED_ICON="\u25CF" # ●
     VCS_STAGED_ICON="\u271A" # ✚
     VCS_INCOMING_CHANGES="\u2193" # ↓
@@ -108,7 +110,8 @@ case $POWERLEVEL9K_MODE in
     TEST_ICON="\uE891" # 
 		OK_ICON="\u2713" # ✓
 		FAIL_ICON="\u2718" # ✘
-    VCS_UNSTAGED_ICON="\uE16C" # 
+    VCS_UNTRACKED_ICON="\uE16C" # 
+    VCS_UNSTAGED_ICON="\uE17C" # 
     VCS_STAGED_ICON="\uE168" # 
     VCS_STASH_ICON="\uE133 " # 
     #VCS_INCOMING_CHANGES="\uE1EB " # 
@@ -134,6 +137,7 @@ case $POWERLEVEL9K_MODE in
     TEST_ICON=''
 		OK_ICON="\u2713" # ✓
 		FAIL_ICON="\u2718" # ✘
+    VCS_UNTRACKED_ICON='?'
     VCS_UNSTAGED_ICON="\u25CF" # ●
     VCS_STAGED_ICON="\u271A" # ✚
     VCS_STASH_ICON="\u235F" # ⍟
@@ -273,6 +277,13 @@ prompt_vcs() {
 
     echo -n "%F{$DEFAULT_COLOR}%f$vcs_prompt"
   fi
+}
+
+function +vi-git-untracked() {
+    if [[ $(git rev-parse --is-inside-work-tree 2> /dev/null) == 'true' && \
+            $(git ls-files --others --exclude-standard | sed q | wc -l | tr -d ' ') != 0 ]]; then
+        hook_com[unstaged]+=" %F{$DEFAULT_COLOR}$VCS_UNTRACKED_ICON%f"
+    fi
 }
 
 function +vi-git-aheadbehind() {
