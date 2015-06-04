@@ -382,7 +382,7 @@ function +vi-git-stash() {
 
 function +vi-hg-bookmarks() {
   if [[ -n "${hgbmarks[@]}" ]]; then
-    hook_com[hg-bookmark-string]=" $VCS_BOOKMARK_ICON ${hgbmarks[@]}"
+    hook_com[hg-bookmark-string]=" %F{$VCS_FOREGROUND_COLOR}$VCS_BOOKMARK_ICON${hgbmarks[@]}%f"
 
     # And to signal, that we want to use the sting we just generated,
     # set the special variable `ret' to something other than the default
