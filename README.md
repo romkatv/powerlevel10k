@@ -126,14 +126,6 @@ elements (it is by default), and define a `DEFAULT_USER` in your `~/.zshrc`:
 
     export DEFAULT_USER=<your username>
 
-#### Test ratio
-
-The `symfony2_tests` and `rspec_tests` segments show both a ratio of "real" classes
-vs test classes. This is just a very simple ratio, and does not show your code
-coverage or any sophisticated stats. All this does is just to count your files
-and test files and calculate the ratio between them. Not more, but is may give
-a quick overview about the test situation of the project you are dealing with.
-
 #### The 'time' segment
 
 By default the time is show in 'H:M:S' format. If you want to change it, 
@@ -141,6 +133,15 @@ just set another format in your `~/.zshrc`:
 
     # Reversed time format
     POWERLEVEL9K_TIME_FORMAT='%D{%S:%M:%H}' 
+
+#### Unit Test Ratios
+
+The `symfony2_tests` and `rspec_tests` segments both show a ratio of "real"
+classes vs test classes in your source code. This is just a very simple ratio,
+and does not show your code coverage or any sophisticated stats. All this does
+is count your source files and test files, and calculate the ratio between them.
+Just enough to give you a quick overview about the test situation of the project
+you are dealing with.
 
 #### The 'vcs' Segment
 
@@ -218,6 +219,54 @@ The 'light' color scheme works well for ['Solarized
 Light'](https://github.com/altercation/solarized) users. Check it out:
 
 ![](http://bhilburn.org/content/images/2015/03/solarized-light.png)
+
+#### Further color customizations
+
+For each segment in your prompt, you can specify a foreground and background
+color by setting them in your `~/.zshrc`. For example, to change the appearance
+of the `time` segment, you would use:
+
+    POWERLEVEL9K_TIME_FOREGROUND='red'
+    POWERLEVEL9K_TIME_BACKGROUND='blue'
+
+Use the segment names from the above section `Segment Customization`.  Some of
+the Segments have special color variables, as they change the colors according
+to some internal rules. These Segments are `vcs`, `rspec_stats`, `symfony2_tests`:
+
+    # General VCS color segments:
+    POWERLEVEL9K_VCS_FOREGROUND='blue'
+    POWERLEVEL9K_VCS_DARK_FOREGROUND='black'
+    POWERLEVEL9K_VCS_BACKGROUND='green'
+    # If VCS changes are detected:
+    POWERLEVEL9K_VCS_MODIFIED_FOREGROUND='red'
+    POWERLEVEL9K_VCS_MODIFIED_BACKGROUND='cyan'
+
+    # rspec_stats for good test coverage
+    POWERLEVEL9K_RSPEC_STATS_GOOD_FOREGROUND='blue'
+    POWERLEVEL9K_RSPEC_STATS_GOOD_BACKGROUND='green'
+    # rspec_stats for average test coverage
+    POWERLEVEL9K_RSPEC_STATS_AVG_FOREGROUND='black'
+    POWERLEVEL9K_RSPEC_STATS_AVG_BACKGROUND='cyan'
+    # rspec_stats for poor test coverage
+    POWERLEVEL9K_RSPEC_STATS_BAD_FOREGROUND='red'
+    POWERLEVEL9K_RSPEC_STATS_BAD_BACKGROUND='white'
+
+    # symfony2_tests for good test coverage
+    POWERLEVEL9K_SYMFONY2_TESTS_GOOD_FOREGROUND='blue'
+    POWERLEVEL9K_SYMFONY2_TESTS_GOOD_BACKGROUND='green'
+    # symfony2_tests for average test coverage
+    POWERLEVEL9K_SYMFONY2_TESTS_AVG_FOREGROUND='black'
+    POWERLEVEL9K_SYMFONY2_TESTS_AVG_BACKGROUND='cyan'
+    # symfony2_tests for poor test coverage
+    POWERLEVEL9K_SYMFONY2_TESTS_BAD_FOREGROUND='red'
+    POWERLEVEL9K_SYMFONY2_TESTS_BAD_BACKGROUND='white'
+
+You could also use a colorcode value. Example:
+
+    POWERLEVEL9K_VCS_FOREGROUND='021' # Dark blue
+
+For a full list of supported colors, run the `spectrum_ls` program in your
+terminal.
 
 ### Troubleshooting
 

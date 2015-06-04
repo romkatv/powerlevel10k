@@ -172,6 +172,17 @@ else
   DEFAULT_COLOR_DARK="236"
 fi
 
+local VCS_FOREGROUND_COLOR=$DEFAULT_COLOR
+local VCS_FOREGROUND_COLOR_DARK=$DEFAULT_COLOR_DARK
+
+# If user has defined custom colors for the `vcs` segment, override the defaults
+if [[ -n $POWERLEVEL9K_VCS_FOREGROUND ]]; then
+  VCS_FOREGROUND_COLOR=$POWERLEVEL9K_VCS_FOREGROUND
+fi
+if [[ -n $POWERLEVEL9K_VCS_DARK_FOREGROUND ]]; then
+  VCS_FOREGROUND_COLOR_DARK=$POWERLEVEL9K_VCS_DARK_FOREGROUND
+fi
+
 ################################################################
 # VCS Information Settings
 ################################################################
@@ -188,20 +199,20 @@ if [[ "$POWERLEVEL9K_SHOW_CHANGESET" == true ]]; then
     VCS_CHANGESET_HASH_LENGTH=$POWERLEVEL9K_CHANGESET_HASH_LENGTH
   fi
 
-  VCS_CHANGESET_PREFIX="%F{$DEFAULT_COLOR_DARK}$VCS_COMMIT_ICON%0.$VCS_CHANGESET_HASH_LENGTH""i%f"
+  VCS_CHANGESET_PREFIX="%F{$VCS_FOREGROUND_COLOR_DARK}$VCS_COMMIT_ICON%0.$VCS_CHANGESET_HASH_LENGTH""i%f"
 fi
 
 zstyle ':vcs_info:*' enable git hg
 zstyle ':vcs_info:*' check-for-changes true
 
-local VCS_DEFAULT_FORMAT="$VCS_CHANGESET_PREFIX%F{$DEFAULT_COLOR}%b%c%u%m%f"
-zstyle ':vcs_info:git:*' formats "%F{$DEFAULT_COLOR}$VCS_GIT_ICON%f $VCS_DEFAULT_FORMAT" 
-zstyle ':vcs_info:hg:*' formats "%F{$DEFAULT_COLOR}$VCS_HG_ICON%f $VCS_DEFAULT_FORMAT" 
+local VCS_DEFAULT_FORMAT="$VCS_CHANGESET_PREFIX%F{$VCS_FOREGROUND_COLOR}%b%c%u%m%f"
+zstyle ':vcs_info:git:*' formats "%F{$VCS_FOREGROUND_COLOR}$VCS_GIT_ICON%f $VCS_DEFAULT_FORMAT" 
+zstyle ':vcs_info:hg:*' formats "%F{$VCS_FOREGROUND_COLOR}$VCS_HG_ICON%f $VCS_DEFAULT_FORMAT" 
 
 zstyle ':vcs_info:*' actionformats " %b %F{red}| %a%f"
 
-zstyle ':vcs_info:*' stagedstr " %F{$DEFAULT_COLOR}$VCS_STAGED_ICON%f"
-zstyle ':vcs_info:*' unstagedstr " %F{$DEFAULT_COLOR}$VCS_UNSTAGED_ICON%f"
+zstyle ':vcs_info:*' stagedstr " %F{$VCS_FOREGROUND_COLOR}$VCS_STAGED_ICON%f"
+zstyle ':vcs_info:*' unstagedstr " %F{$VCS_FOREGROUND_COLOR}$VCS_UNSTAGED_ICON%f"
 
 zstyle ':vcs_info:git*+set-message:*' hooks git-untracked git-aheadbehind git-stash git-remotebranch git-tagname
 
@@ -232,16 +243,31 @@ fi
 # Takes two arguments, background and foreground. Both can be omitted,
 # rendering default background/foreground.
 left_prompt_segment() {
+  # Overwrite given background-color by user defined variable for this segment.
+  # We get as first Parameter the function name, which called this function. 
+  # From the given function name, we strip the "prompt_"-prefix and uppercase it.
+  # This is, prefixed with "POWERLEVEL9K_" and suffixed with either "_BACKGROUND"
+  # of "_FOREGROUND", our variable name. So each new Segment should automatically
+  # be overwritable by a variable following this naming convention.
+  local BACKGROUND_USER_VARIABLE=POWERLEVEL9K_${(U)1#prompt_}_BACKGROUND
+  local BG_COLOR_MODIFIER=${(P)BACKGROUND_USER_VARIABLE}
+  [[ -n $BG_COLOR_MODIFIER ]] && 2=$BG_COLOR_MODIFIER
+
+  # Overwrite given foreground-color by user defined variable for this segment.
+  local FOREGROUND_USER_VARIABLE=POWERLEVEL9K_${(U)1#prompt_}_FOREGROUND
+  local FG_COLOR_MODIFIER=${(P)FOREGROUND_USER_VARIABLE}
+  [[ -n $FG_COLOR_MODIFIER ]] && 3=$FG_COLOR_MODIFIER
+
   local bg fg
-  [[ -n $1 ]] && bg="%K{$1}" || bg="%k"
-  [[ -n $2 ]] && fg="%F{$2}" || fg="%f"
-  if [[ $CURRENT_BG != 'NONE' && $1 != $CURRENT_BG ]]; then
+  [[ -n $2 ]] && bg="%K{$2}" || bg="%k"
+  [[ -n $3 ]] && fg="%F{$3}" || fg="%f"
+  if [[ $CURRENT_BG != 'NONE' && $2 != $CURRENT_BG ]]; then
     echo -n "%{$bg%F{$CURRENT_BG}%}$LEFT_SEGMENT_SEPARATOR%{$fg%} "
   else
     echo -n "%{$bg%}%{$fg%} "
   fi
-  CURRENT_BG=$1
-  [[ -n $3 ]] && echo -n $3
+  CURRENT_BG=$2
+  [[ -n $4 ]] && echo -n $4
 }
 
 # End the left prompt, closing any open segments
@@ -260,11 +286,21 @@ left_prompt_end() {
 # rendering default background/foreground. No ending for the right prompt
 # segment is needed (unlike the left prompt, above).
 right_prompt_segment() {
+  # Overwrite given background-color by user defined variable for this segment.
+  local BACKGROUND_USER_VARIABLE=POWERLEVEL9K_${(U)1#prompt_}_BACKGROUND
+  local BG_COLOR_MODIFIER=${(P)BACKGROUND_USER_VARIABLE}
+  [[ -n $BG_COLOR_MODIFIER ]] && 2=$BG_COLOR_MODIFIER
+
+  # Overwrite given foreground-color by user defined variable for this segment.
+  local FOREGROUND_USER_VARIABLE=POWERLEVEL9K_${(U)1#prompt_}_FOREGROUND
+  local FG_COLOR_MODIFIER=${(P)FOREGROUND_USER_VARIABLE}
+  [[ -n $FG_COLOR_MODIFIER ]] && 3=$FG_COLOR_MODIFIER
+
   local bg fg
-  [[ -n $1 ]] && bg="%K{$1}" || bg="%k"
-  [[ -n $2 ]] && fg="%F{$2}" || fg="%f"
-    echo -n " %f%F{$1}$RIGHT_SEGMENT_SEPARATOR%f%{$bg%}%{$fg%} "
-  [[ -n $3 ]] && echo -n $3
+  [[ -n $2 ]] && bg="%K{$2}" || bg="%k"
+  [[ -n $3 ]] && fg="%F{$3}" || fg="%f"
+    echo -n " %f%F{$2}$RIGHT_SEGMENT_SEPARATOR%f%{$bg%}%{$fg%} "
+  [[ -n $4 ]] && echo -n $4
 }
 
 ################################################################
@@ -275,19 +311,19 @@ prompt_vcs() {
 
   if [[ -n $vcs_prompt ]]; then
     if [[ "$VCS_WORKDIR_DIRTY" == true ]]; then
-      $1_prompt_segment yellow $DEFAULT_COLOR
+      $1_prompt_segment $0_MODIFIED yellow $DEFAULT_COLOR
     else
-      $1_prompt_segment green $DEFAULT_COLOR
+      $1_prompt_segment $0 green $DEFAULT_COLOR
     fi
 
-    echo -n "%F{$DEFAULT_COLOR}%f$vcs_prompt"
+    echo -n "%F{$VCS_FOREGROUND_COLOR}%f$vcs_prompt"
   fi
 }
 
 function +vi-git-untracked() {
     if [[ $(git rev-parse --is-inside-work-tree 2> /dev/null) == 'true' && \
             $(git ls-files --others --exclude-standard | sed q | wc -l | tr -d ' ') != 0 ]]; then
-        hook_com[unstaged]+=" %F{$DEFAULT_COLOR}$VCS_UNTRACKED_ICON%f"
+        hook_com[unstaged]+=" %F{$VCS_FOREGROUND_COLOR}$VCS_UNTRACKED_ICON%f"
     fi
 }
 
@@ -300,12 +336,12 @@ function +vi-git-aheadbehind() {
     # for git prior to 1.7
     # ahead=$(git rev-list origin/${branch_name}..HEAD | wc -l)
     ahead=$(git rev-list ${branch_name}@{upstream}..HEAD 2>/dev/null | wc -l | tr -d ' ')
-    (( $ahead )) && gitstatus+=( " %F{$DEFAULT_COLOR}$VCS_OUTGOING_CHANGES${ahead// /}%f" )
+    (( $ahead )) && gitstatus+=( " %F{$VCS_FOREGROUND_COLOR}$VCS_OUTGOING_CHANGES${ahead// /}%f" )
 
     # for git prior to 1.7
     # behind=$(git rev-list HEAD..origin/${branch_name} | wc -l)
     behind=$(git rev-list HEAD..${branch_name}@{upstream} 2>/dev/null | wc -l | tr -d ' ')
-    (( $behind )) && gitstatus+=( " %F{$DEFAULT_COLOR}$VCS_INCOMING_CHANGES${behind// /}%f" )
+    (( $behind )) && gitstatus+=( " %F{$VCS_FOREGROUND_COLOR}$VCS_INCOMING_CHANGES${behind// /}%f" )
 
     hook_com[misc]+=${(j::)gitstatus}
 }
@@ -317,12 +353,12 @@ function +vi-git-remotebranch() {
     remote=${$(git rev-parse --verify HEAD@{upstream} --symbolic-full-name 2>/dev/null)/refs\/(remotes|heads)\/}
     branch_name=${$(git symbolic-ref --short HEAD 2>/dev/null)}
 
-    hook_com[branch]="%F{$DEFAULT_COLOR}$VCS_BRANCH_ICON${hook_com[branch]}%f"
+    hook_com[branch]="%F{$VCS_FOREGROUND_COLOR}$VCS_BRANCH_ICON${hook_com[branch]}%f"
     # Always show the remote
     #if [[ -n ${remote} ]] ; then
     # Only show the remote if it differs from the local
     if [[ -n ${remote} && ${remote#*/} != ${branch_name} ]] ; then
-        hook_com[branch]+="%F{$DEFAULT_COLOR}$VCS_REMOTE_BRANCH_ICON%f%F{$DEFAULT_COLOR}${remote// /}%f"
+        hook_com[branch]+="%F{$VCS_FOREGROUND_COLOR}$VCS_REMOTE_BRANCH_ICON%f%F{$VCS_FOREGROUND_COLOR}${remote// /}%f"
     fi
 }
 
@@ -330,7 +366,7 @@ function +vi-git-tagname() {
     local tag
 
     tag=$(git describe --tags --exact-match HEAD 2>/dev/null)
-    [[ -n ${tag} ]] && hook_com[branch]=" %F{$DEFAULT_COLOR}$VCS_TAG_ICON${tag}%f"
+    [[ -n ${tag} ]] && hook_com[branch]=" %F{$VCS_FOREGROUND_COLOR}$VCS_TAG_ICON${tag}%f"
 }
 
 # Show count of stashed changes
@@ -340,7 +376,7 @@ function +vi-git-stash() {
 
   if [[ -s $(git rev-parse --git-dir)/refs/stash ]] ; then
     stashes=$(git stash list 2>/dev/null | wc -l)
-    hook_com[misc]+=" %F{$DEFAULT_COLOR}$VCS_STASH_ICON${stashes// /}%f"
+    hook_com[misc]+=" %F{$VCS_FOREGROUND_COLOR}$VCS_STASH_ICON${stashes// /}%f"
   fi
 }
 
@@ -373,7 +409,7 @@ prompt_aws() {
   local aws_profile=$AWS_DEFAULT_PROFILE
   if [[ -n $aws_profile ]]; 
   then
-    $1_prompt_segment red white "$AWS_ICON $aws_profile"
+    $1_prompt_segment $0 red white "$AWS_ICON $aws_profile"
   fi
 }
 
@@ -381,18 +417,18 @@ prompt_aws() {
 # Note that if $DEFAULT_USER is not set, this prompt segment will always print
 prompt_context() {
   if [[ "$USER" != "$DEFAULT_USER" || -n "$SSH_CLIENT" ]]; then
-    $1_prompt_segment $DEFAULT_COLOR "011" "%(!.%{%F{yellow}%}.)$USER@%m"
+    $1_prompt_segment $0 $DEFAULT_COLOR "011" "%(!.%{%F{yellow}%}.)$USER@%m"
   fi
 }
 
 # Dir: current working directory
 prompt_dir() {
-  $1_prompt_segment blue $DEFAULT_COLOR '%~'
+  $1_prompt_segment $0 blue $DEFAULT_COLOR '%~'
 }
 
 # Command number (in local history)
 prompt_history() {
-  $1_prompt_segment "244" $DEFAULT_COLOR '%h'
+  $1_prompt_segment $0 "244" $DEFAULT_COLOR '%h'
 }
 
 # Right Status: (return code, root status, background jobs)
@@ -413,13 +449,13 @@ prompt_longstatus() {
   [[ $UID -eq 0 ]] && symbols+="%{%F{yellow}%} $ROOT_ICON"
   [[ $(jobs -l | wc -l) -gt 0 ]] && symbols+="%{%F{cyan}%}$BACKGROUND_JOBS_ICON"
 
-  [[ -n "$symbols" ]] && $1_prompt_segment $bg $DEFAULT_COLOR "$symbols"
+  [[ -n "$symbols" ]] && $1_prompt_segment $0 $bg $DEFAULT_COLOR "$symbols"
 }
 
 # rbenv information
 prompt_rbenv() {
   if [[ -n "$RBENV_VERSION" ]]; then
-    $1_prompt_segment red $DEFAULT_COLOR "$RBENV_VERSION"
+    $1_prompt_segment $0 red $DEFAULT_COLOR "$RBENV_VERSION"
   fi
 }
 
@@ -429,7 +465,7 @@ prompt_rspec_stats() {
     local code_amount=$(ls -1 app/**/*.rb | wc -l)
     local tests_amount=$(ls -1 spec/**/*.rb | wc -l)
 
-    build_test_stats $1 $code_amount $tests_amount "RSpec $TEST_ICON"
+    build_test_stats $1 $0 $code_amount $tests_amount "RSpec $TEST_ICON"
   fi
 }
 
@@ -438,7 +474,7 @@ prompt_rvm() {
   local rvm_prompt
   rvm_prompt=`rvm-prompt`
   if [ "$rvm_prompt" != "" ]; then
-    $1_prompt_segment "240" $DEFAULT_COLOR "$rvm_prompt $RUBY_ICON "
+    $1_prompt_segment $0 "240" $DEFAULT_COLOR "$rvm_prompt $RUBY_ICON "
   fi
 }
 
@@ -451,7 +487,7 @@ prompt_status() {
   [[ $UID -eq 0 ]] && symbols+="%{%F{yellow}%} $ROOT_ICON"
   [[ $(jobs -l | wc -l) -gt 0 ]] && symbols+="%{%F{cyan}%}$BACKGROUND_JOBS_ICON"
 
-  [[ -n "$symbols" ]] && $1_prompt_segment $DEFAULT_COLOR default "$symbols"
+  [[ -n "$symbols" ]] && $1_prompt_segment $0 $DEFAULT_COLOR default "$symbols"
 }
 
 # Symfony2-PHPUnit test ratio
@@ -460,23 +496,23 @@ prompt_symfony2_tests() {
     local code_amount=$(ls -1 src/**/*.php | grep -v Tests | wc -l)
     local tests_amount=$(ls -1 src/**/*.php | grep Tests | wc -l)
 
-    build_test_stats $1 $code_amount $tests_amount "SF2 $TEST_ICON"
+    build_test_stats $1 $0 $code_amount $tests_amount "SF2 $TEST_ICON"
   fi
 }
 
 # Show a ratio of tests vs code
 build_test_stats() {
-  local code_amount=$2
-  local tests_amount=$3+0.00001
-  local headline=$4
+  local code_amount=$3
+  local tests_amount=$4+0.00001
+  local headline=$5
 
   # Set float precision to 2 digits:
   typeset -F 2 ratio
   local ratio=$(( (tests_amount/code_amount) * 100 ))
 
-  [[ ratio -ge 0.75 ]] && $1_prompt_segment cyan $DEFAULT_COLOR "$headline: $ratio%%"
-  [[ ratio -ge 0.5 && ratio -lt 0.75 ]] && $1_prompt_segment yellow $DEFAULT_COLOR "$headline: $ratio%%"
-  [[ ratio -lt 0.5 ]] && $1_prompt_segment red $DEFAULT_COLOR "$headline: $ratio%%"
+  [[ ratio -ge 0.75 ]] && $1_prompt_segment ${2}_GOOD cyan $DEFAULT_COLOR "$headline: $ratio%%"
+  [[ ratio -ge 0.5 && ratio -lt 0.75 ]] && $1_prompt_segment $2_AVG yellow $DEFAULT_COLOR "$headline: $ratio%%"
+  [[ ratio -lt 0.5 ]] && $1_prompt_segment $2_BAD red $DEFAULT_COLOR "$headline: $ratio%%"
 }
 
 # System time
@@ -486,7 +522,7 @@ prompt_time() {
     time_format=$POWERLEVEL9K_TIME_FORMAT
   fi
 
-  $1_prompt_segment $DEFAULT_COLOR_INVERTED $DEFAULT_COLOR "$time_format "
+  $1_prompt_segment $0 $DEFAULT_COLOR_INVERTED $DEFAULT_COLOR "$time_format "
 }
 
 # Virtualenv: current working virtualenv
@@ -495,7 +531,7 @@ prompt_time() {
 prompt_virtualenv() {
   local virtualenv_path="$VIRTUAL_ENV"
   if [[ -n $virtualenv_path && -n $VIRTUAL_ENV_DISABLE_PROMPT ]]; then
-    $1_prompt_segment blue $DEFAULT_COLOR "(`basename $virtualenv_path`)"
+    $1_prompt_segment $0 blue $DEFAULT_COLOR "(`basename $virtualenv_path`)"
   fi
 }
 
