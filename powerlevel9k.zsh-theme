@@ -70,18 +70,16 @@ else
   DEFAULT_COLOR_DARK="236"
 fi
 
-# Unfortunately the foreground colors for the VCS segment have
-# to be overwritten at this point.
-# Overwrite given foreground-color by user defined variable for this segment.
 local VCS_FOREGROUND_COLOR=$DEFAULT_COLOR
-local VCS_FOREGROUND_USER_VARIABLE=POWERLEVEL9K_VCS_FOREGROUND
-local VCS_FG_COLOR_MODIFIER=${(P)VCS_FOREGROUND_USER_VARIABLE}
-[[ -n $VCS_FG_COLOR_MODIFIER ]] && VCS_FOREGROUND_COLOR=$VCS_FG_COLOR_MODIFIER
-
 local VCS_FOREGROUND_COLOR_DARK=$DEFAULT_COLOR_DARK
-local VCS_FOREGROUND_USER_VARIABLE_DARK=POWERLEVEL9K_VCS_DARK_FOREGROUND
-local VCS_FG_DARK_COLOR_MODIFIER=${(P)VCS_FOREGROUND_USER_VARIABLE_DARK}
-[[ -n $VCS_FG_DARK_COLOR_MODIFIER ]] && VCS_FOREGROUND_COLOR_DARK=$VCS_FG_DARK_COLOR_MODIFIER
+
+# If user has defined custom colors for the `vcs` segment, override the defaults
+if [[ -n $POWERLEVEL9K_VCS_FOREGROUND ]]; then
+  VCS_FOREGROUND_COLOR=$POWERLEVEL9K_VCS_FOREGROUND
+fi
+if [[ -n $POWERLEVEL9K_VCS_DARK_FOREGROUND ]]; then
+  VCS_FOREGROUND_COLOR_DARK=$POWERLEVEL9K_VCS_DARK_FOREGROUND
+fi
 
 ################################################################
 # VCS Information Settings
@@ -140,10 +138,6 @@ fi
 # Takes two arguments, background and foreground. Both can be omitted,
 # rendering default background/foreground.
 left_prompt_segment() {
-# Unfortunately that doesn't work. But it should. The Example in
-# http://zsh.sourceforge.net/FAQ/zshfaq03.html#l39 is quite similar.
-#  local BG_COLOR_MODIFIER=${(P)POWERLEVEL9K_${(U)1#prompt_}_BACKGROUND}
-
   # Overwrite given background-color by user defined variable for this segment.
   # We get as first Parameter the function name, which called this function. 
   # From the given function name, we strip the "prompt_"-prefix and uppercase it.
