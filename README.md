@@ -13,25 +13,23 @@ information in configurable prompt segments.
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
-- [powerlevel9k Theme for Oh-My-Zsh](#powerlevel9k-theme-for-oh-my-zsh)
-  - [Features](#features)
-  - [Installation](#installation)
-    - [Install Powerline Fonts](#install-powerline-fonts)
-    - [Install Powerlevel9k](#install-powerlevel9k)
-  - [Segment Customization](#segment-customization)
-    - [The AWS Profile Segment](#the-aws-profile-segment)
-    - [The 'context' Segment](#the-context-segment)
-    - [Test ratio](#test-ratio)
-    - [The 'time' segment](#the-time-segment)
-    - [The 'vcs' Segment](#the-vcs-segment)
-      - [Symbols](#symbols)
-  - [Styling](#styling)
-    - [Fonts](#fonts)
-    - [Double-Lined Prompt](#double-lined-prompt)
-    - [Light Color Theme](#light-color-theme)
-  - [Troubleshooting](#troubleshooting)
-    - [Gaps Between Segments](#gaps-between-segments)
-  - [Contributions / Bugs / Contact](#contributions--bugs--contact)
+- [Features](#features)
+- [Installation](#installation)
+  - [Install Powerlevel9k](#install-powerlevel9k)
+- [Segment Customization](#segment-customization)
+  - [The AWS Profile Segment](#the-aws-profile-segment)
+  - [The 'context' Segment](#the-context-segment)
+  - [Test ratio](#test-ratio)
+  - [The 'time' segment](#the-time-segment)
+  - [The 'vcs' Segment](#the-vcs-segment)
+    - [Symbols](#symbols)
+- [Styling](#styling)
+  - [Fonts](#fonts)
+  - [Double-Lined Prompt](#double-lined-prompt)
+  - [Light Color Theme](#light-color-theme)
+- [Troubleshooting](#troubleshooting)
+  - [Gaps Between Segments](#gaps-between-segments)
+- [Contributions / Bugs / Contact](#contributions--bugs--contact)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -159,16 +157,20 @@ Example:
 
 ##### Symbols
 
-The `vcs` segment uses various symbols to tell you the state of your repository:
+The `vcs` segment uses various symbols to tell you the state of your repository.
+These symbols depend on your installed [Font](#fonts) and your `POWERLEVEL9K_MODE`
+set.
 
-* `↑4` - The number of commits your repository is ahead of your remote branch
-* `↓5` - The number of commits your repository is behind of your remote branch
-* `⍟3` - The number of stashes, here 3.
-* `●`  - There are unstaged changes in your working copy
-* `✚`  - There are staged changes in your working copy
-* `?`  - There are files in your working copy, that are unknown to your repository
-* `→`  - The name of your branch differs from its tracking branch.
-* `☿`  - A mercurial bookmark is active.
+| `powerline-patched` | `awesome-patched` | explanation
+|---------------------|-------------------|---------------------------------------------
+| `↑4`                |                   | Number of commits your repository is ahead of your remote branch
+| `↓5`                |                   | Number of commits your repository is behind of your remote branch
+| `⍟3`                |                   | Number of stashes, here 3.
+| `●`                 |                   | There are unstaged changes in your working copy
+| `✚`                 |                   | There are staged changes in your working copy
+| `?`                 |                   | There are files in your working copy, that are unknown to your repository
+| `→`                 |                   | The name of your branch differs from its tracking branch.
+| `☿`                 |                   | A mercurial bookmark is active.
 
 ### Styling
 
