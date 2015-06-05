@@ -576,7 +576,15 @@ precmd() {
 if [[ "$POWERLEVEL9K_PROMPT_ON_NEWLINE" == true ]]; then
   PROMPT='╭─%{%f%b%k%}$(build_left_prompt) 
 ╰─ '
+  # The right prompt should be on the same line as the first line of the left prompt.
+  # To do so, there is just a quite ugly workaround: Before zsh draws the RPROMPT,
+  # we advise it, to go one line up. At the end of RPROMPT, we advise it to go one
+  # line down. See http://superuser.com/questions/357107/zsh-right-justify-in-ps1
+  RPROMPT_PREFIX='%{'$'\e[1A''%}' # one line up
+  RPROMPT_SUFFIX='%{'$'\e[1B''%}' # one line down
 else
   PROMPT='%{%f%b%k%}$(build_left_prompt) '
+  RPROMPT_PREFIX=''
+  RPROMPT_SUFFIX=''
 fi
-RPROMPT='%{%f%b%k%}$(build_right_prompt)%{$reset_color%}'
+RPROMPT=$RPROMPT_PREFIX'%{%f%b%k%}$(build_right_prompt)%{$reset_color%}'$RPROMPT_SUFFIX
