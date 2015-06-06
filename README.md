@@ -100,8 +100,8 @@ necessary.
 #### Alternative Configuration: Über
 
 Alternatively, you can install [Awesome Powerline
-Fonts](https://github.com/gabrielelana/awesome-terminal-fonts/tree/patching-strategy/patched),
-which provide a number of additional glyphs.
+Fonts](https://github.com/gabrielelana/awesome-terminal-fonts), which provide
+a number of additional glyphs.
 
 You then need to indicate that you wish to use the additional glyphs by defining
 the following in your `~/.zshrc`:
