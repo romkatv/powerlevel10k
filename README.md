@@ -110,6 +110,14 @@ elements (it is by default), and define a `DEFAULT_USER` in your `~/.zshrc`:
 
     export DEFAULT_USER=<your username>
 
+#### The `dir` segment
+
+The `dir` segment shows the current working directory. You can limit the output
+to a certain length:
+
+    # Limit to 20 characters
+    POWERLEVEL9K_SHORTEN_PWD_LENGTH=20
+
 #### The 'time' segment
 
 By default the time is show in 'H:M:S' format. If you want to change it, 
