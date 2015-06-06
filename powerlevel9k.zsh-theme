@@ -263,22 +263,24 @@ left_prompt_segment() {
   [[ -n $2 ]] && bg="%K{$2}" || bg="%k"
   [[ -n $3 ]] && fg="%F{$3}" || fg="%f"
   if [[ $CURRENT_BG != 'NONE' && $2 != $CURRENT_BG ]]; then
+    # Middle segment
     echo -n "%{$bg%F{$CURRENT_BG}%}$LEFT_SEGMENT_SEPARATOR%{$fg%} "
   else
+    # First segment
     echo -n "%{$bg%}%{$fg%} "
   fi
   CURRENT_BG=$2
-  [[ -n $4 ]] && echo -n $4
+  [[ -n $4 ]] && echo -n "$4 "
 }
 
 # End the left prompt, closing any open segments
 left_prompt_end() {
   if [[ -n $CURRENT_BG ]]; then
-    echo -n " %{%k%F{$CURRENT_BG}%}$LEFT_SEGMENT_SEPARATOR"
+    echo -n "%{%k%F{$CURRENT_BG}%}$LEFT_SEGMENT_SEPARATOR"
   else
-    echo -n " %{%k%}"
+    echo -n "%{%k%}"
   fi
-  echo -n "%{%f%}"
+  echo -n "%{%f%} "
   CURRENT_BG=''
 }
 
@@ -300,8 +302,8 @@ right_prompt_segment() {
   local bg fg
   [[ -n $2 ]] && bg="%K{$2}" || bg="%k"
   [[ -n $3 ]] && fg="%F{$3}" || fg="%f"
-    echo -n " %f%F{$2}$RIGHT_SEGMENT_SEPARATOR%f%{$bg%}%{$fg%} "
-  [[ -n $4 ]] && echo -n $4
+  echo -n "%f%F{$2}$RIGHT_SEGMENT_SEPARATOR%f%{$bg%}%{$fg%} "
+  [[ -n $4 ]] && echo -n "$4 "
 }
 
 ################################################################
@@ -317,7 +319,7 @@ prompt_vcs() {
       $1_prompt_segment $0 green $DEFAULT_COLOR
     fi
 
-    echo -n "%F{$VCS_FOREGROUND_COLOR}%f$vcs_prompt"
+    echo -n "%F{$VCS_FOREGROUND_COLOR}%f$vcs_prompt "
   fi
 }
 
@@ -523,7 +525,7 @@ prompt_time() {
     time_format=$POWERLEVEL9K_TIME_FORMAT
   fi
 
-  $1_prompt_segment $0 $DEFAULT_COLOR_INVERTED $DEFAULT_COLOR "$time_format "
+  $1_prompt_segment $0 $DEFAULT_COLOR_INVERTED $DEFAULT_COLOR $time_format
 }
 
 # Virtualenv: current working virtualenv
@@ -583,7 +585,7 @@ if [[ "$POWERLEVEL9K_PROMPT_ON_NEWLINE" == true ]]; then
   RPROMPT_PREFIX='%{'$'\e[1A''%}' # one line up
   RPROMPT_SUFFIX='%{'$'\e[1B''%}' # one line down
 else
-  PROMPT='%{%f%b%k%}$(build_left_prompt) '
+  PROMPT='%{%f%b%k%}$(build_left_prompt)'
   RPROMPT_PREFIX=''
   RPROMPT_SUFFIX=''
 fi
