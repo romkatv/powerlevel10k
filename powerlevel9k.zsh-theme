@@ -319,9 +319,9 @@ prompt_context() {
 # Dir: current working directory
 prompt_dir() {
   local current_path='%~'
-  if [[ -n "$POWERLEVEL9K_SHORTEN_PWD_LENGTH" ]]; then
-    # shorten path to $POWERLEVEL9K_SHORTEN_PWD_LENGTH characters
-    local current_path="%${POWERLEVEL9K_SHORTEN_PWD_LENGTH}<..<%~%<<"
+  if [[ -n "$POWERLEVEL9K_SHORTEN_DIR_LENGTH" ]]; then
+    # shorten path to $POWERLEVEL9K_SHORTEN_DIR_LENGTH
+    current_path="%$((POWERLEVEL9K_SHORTEN_DIR_LENGTH+1))(c:.../:)%${POWERLEVEL9K_SHORTEN_DIR_LENGTH}c"
   fi
 
   $1_prompt_segment $0 blue $DEFAULT_COLOR $current_path
