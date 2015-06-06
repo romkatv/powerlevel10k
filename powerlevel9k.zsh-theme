@@ -314,8 +314,9 @@ prompt_longstatus() {
 prompt_node_version() {
   local nvm_prompt=$(node -v 2>/dev/null)
   [[ -z "${nvm_prompt}" ]] && return
+	NODE_ICON="\u2B22 " # ⬢
 
-  $1_prompt_segment green white ${nvm_prompt:1}
+  $1_prompt_segment green white "${nvm_prompt:1} $NODE_ICON"
 }
 
 # rbenv information
