@@ -46,11 +46,13 @@
 CURRENT_BG='NONE'
 
 # These characters require the Powerline fonts to work properly. If see boxes or
-# bizarre characters below, your fonts are not correctly installed. In case you
+# bizarre characters below, your fonts are not correctly installed. If you
 # do not want to install a special font, you can set `POWERLEVEL9K_MODE` to
 # `compatible`. This shows all icons in regular symbols.
 case $POWERLEVEL9K_MODE in
   'flat')
+    # Awesome-Patched Font required!
+    # See https://github.com/gabrielelana/awesome-terminal-fonts/tree/patching-strategy/patched
     LEFT_SEGMENT_SEPARATOR=''
     RIGHT_SEGMENT_SEPARATOR=''
     ROOT_ICON="\uE801" # 
@@ -103,7 +105,8 @@ case $POWERLEVEL9K_MODE in
     VCS_HG_ICON='HG'
   ;;
   'awesome-patched')
-    # Awesome-Patched Font required! See https://github.com/gabrielelana/awesome-terminal-fonts/tree/patching-strategy/patched
+    # Awesome-Patched Font required!
+    # See https://github.com/gabrielelana/awesome-terminal-fonts/tree/patching-strategy/patched
     LEFT_SEGMENT_SEPARATOR="\uE0B0" # 
     RIGHT_SEGMENT_SEPARATOR="\uE0B2" # 
     ROOT_ICON="\u26A1" # ⚡
@@ -132,7 +135,8 @@ case $POWERLEVEL9K_MODE in
     VCS_HG_ICON="\uE1C3 " # 
   ;;
   *)
-    # Powerline-Patched Font required! See https://github.com/Lokaltog/powerline-fonts
+    # Powerline-Patched Font required!
+    # See https://github.com/Lokaltog/powerline-fonts
     LEFT_SEGMENT_SEPARATOR="\uE0B0" # 
     RIGHT_SEGMENT_SEPARATOR="\uE0B2" # 
     ROOT_ICON="\u26A1" # ⚡
