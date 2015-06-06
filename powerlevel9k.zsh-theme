@@ -40,10 +40,9 @@
 #   POWERLEVEL9K_COLOR_SCHEME='light'
 ################################################################
 
-# The `CURRENT_BG` variable is used to remember what the last BG color used was
-# when building the left-hand prompt. Because the RPROMPT is created from
-# right-left but reads the opposite, this isn't necessary for the other side.
-CURRENT_BG='NONE'
+## Debugging
+#zstyle ':vcs_info:*+*:*' debug true
+#set -o xtrace
 
 # These characters require the Powerline fonts to work properly. If see boxes or
 # bizarre characters below, your fonts are not correctly installed. If you
@@ -236,10 +235,6 @@ else
   zstyle ':vcs_info:*' use-simple true
 fi
 
-## Debugging
-#zstyle ':vcs_info:*+*:*' debug true
-#set -o xtrace
-
 ################################################################
 # Prompt Segment Constructors
 ################################################################
@@ -410,6 +405,11 @@ function +vi-vcs-detect-changes() {
 ################################################################
 # Prompt Segments
 ################################################################
+
+# The `CURRENT_BG` variable is used to remember what the last BG color used was
+# when building the left-hand prompt. Because the RPROMPT is created from
+# right-left but reads the opposite, this isn't necessary for the other side.
+CURRENT_BG='NONE'
 
 # AWS Profile
 prompt_aws() {
