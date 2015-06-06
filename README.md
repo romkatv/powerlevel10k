@@ -63,10 +63,12 @@ Here are some screenshots of `powerlevel9k` with default settings:
 
 
 ### Installation
+There are three different forms of installation that you can use to make use of
+this theme:
 
-You just need to install the theme and set `POWERLEVEL9K_MODE='compatible'`
-to join the experience. If you want to customize your experience even further
-read the chapter about "[fonts](#fonts)" or about "[segment customization](#segment-customization)".
+* Normal - Theme + Powerline Fonts
+* Über - Theme + Awesome Powerline Fonts
+* Bare Bones - Theme Only
 
 #### Install Powerlevel9k
 
@@ -79,6 +81,60 @@ directory.
 You then need to select this theme in your `~/.zshrc`:
 
     ZSH_THEME="powerlevel9k/powerlevel9k"
+
+
+#### Install Powerline Fonts for Normal Configuration
+
+You can find the [installation instructions for Powerline Fonts here]
+(https://powerline.readthedocs.org/en/latest/installation/linux.html#fonts-installation).
+You can also find the raw font files [in this Github
+repository](https://github.com/powerline/fonts) if you want to manually install
+them for your OS.
+
+After you have installed Powerline fonts, make the default font in your terminal
+emulator the Powerline font you want to use.
+
+This is the default mode for `Powerlevel9k`, and no further configuration is
+necessary.
+
+#### Alternative Configuration: Über
+
+Alternatively, you can install [Awesome Powerline
+Fonts](https://github.com/gabrielelana/awesome-terminal-fonts/tree/patching-strategy/patched),
+which provide a number of additional glyphs.
+
+You then need to indicate that you wish to use the additional glyphs by defining
+the following in your `~/.zshrc`:
+
+    POWERLEVEL9K_MODE='awesome-patched'
+
+If you choose to make use of this, your prompt will look something like this:
+
+![](https://cloud.githubusercontent.com/assets/1544760/7959660/67612918-09fb-11e5-9ef2-2308363c3c51.png)
+
+Note that if you prefer flat segment transitions, you can use the following with
+`Awesome Powerline Fonts` installed:
+
+    POWERLEVEL9K_MODE='flat'
+
+Which looks like this:
+
+![](https://cloud.githubusercontent.com/assets/1544760/7981324/76d0eb5a-0aae-11e5-9608-d662123d0b0a.png)
+
+#### Alternative Configuration: Bare Bones
+
+This option is best if you prefer not to install additional fonts. This option
+will work out-of-the-box if your your terminal font supports the segment
+separator characters `\uE0B0` (left segment separator) and `\uE0B2` (right
+segment separator).
+
+All you need to do to in this case is install the `Powerlevel9k` theme itself,
+as explained above, and then define the following in your `~/.zshrc`:
+
+    POWERLEVEL9K_MODE='compatible'
+
+Note that depending on your terminal font, this may still not render
+appropriately. This configuration should be used as a back-up.
 
 ### Segment Customization
 
@@ -158,10 +214,10 @@ Example:
 ##### Symbols
 
 The `vcs` segment uses various symbols to tell you the state of your repository.
-These symbols depend on your installed [Font](#fonts) and your `POWERLEVEL9K_MODE`
-set.
+These symbols depend on your installed font and selected `POWERLEVEL9K_MODE`
+from the [Installation](#Installation) section above.
 
-| `compatible` | `powerline-patched` | `awesome-patched` | explanation
+| `Bare Bones` | `Normal` | `Über` | explanation
 |--------------|---------------------|-------------------|--------------------------
 | `↑4`         | `↑4`                | ![icon_outgoing](https://cloud.githubusercontent.com/assets/1544760/7976089/b5904d6e-0a76-11e5-8147-5e873ac52d79.gif)4  | Number of commits your repository is ahead of your remote branch
 | `↓5`         | `↓5`                | ![icon_incoming](https://cloud.githubusercontent.com/assets/1544760/7976091/b5909c9c-0a76-11e5-9cad-9bf0a28a897c.gif)5  | Number of commits your repository is behind of your remote branch
@@ -180,27 +236,6 @@ set.
 
 You can configure the look and feel of your prompt easily with some built-in
 options.
-
-#### Fonts
-
-If you set `POWERLEVEL9K_MODE='compatible'` you just get a little glimpse of 
-the beauty of this theme.
-
-To get nicer Icons you need to install a [powerline-patched](https://github.com/Lokaltog/powerline-fonts) font. 
-In your terminal emulator you need to select this font and in your `~/.zshrc` you need 
-to set `POWERLEVEL9K_MODE='powerline-patched'`.
-You can find the [installation instructions here](https://powerline.readthedocs.org/en/latest/installation/linux.html#fonts-installation).
-You can also find the raw font files [in this Github repository](https://github.com/powerline/fonts) if you want to manually install them for your OS.
-Screenshot:
-![](http://bhilburn.org/content/images/2015/01/pl9k-improved.png)
-
-If even these Icons did not impress you, have a look at `POWERLEVEL9K_MODE='awesome-patched'`.
-For this mode, you have to install a [awesome-patched](https://github.com/gabrielelana/awesome-terminal-fonts/tree/patching-strategy/patched) font and set the according mode.
-Screenshot:
-![](https://cloud.githubusercontent.com/assets/1544760/7959660/67612918-09fb-11e5-9ef2-2308363c3c51.png)
-
-If you prefer segements as rectangles, just set `POWERLEVEL9K_MODE='flat'`, but
-beware: You still need a [awesome-patched](https://github.com/gabrielelana/awesome-terminal-fonts/tree/patching-strategy/patched) font.
 
 #### Double-Lined Prompt
 
