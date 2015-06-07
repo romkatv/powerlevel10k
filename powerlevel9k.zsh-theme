@@ -43,6 +43,16 @@
 #   POWERLEVEL9K_COLOR_SCHEME='light'
 ################################################################
 
+# OS detection, default to Linux
+case $(uname) in
+    FreeBSD)   OS=FreeBSD ;;
+    DragonFly) OS=FreeBSD ;;
+    OpenBSD)   OS=OpenBSD ;;
+    Darwin)    OS=Darwin  ;;
+    SunOS)     OS=SunOS   ;;
+    *)         OS=Linux   ;;
+esac
+
 # The `CURRENT_BG` variable is used to remember what the last BG color used was
 # when building the left-hand prompt. Because the RPROMPT is created from
 # right-left but reads the opposite, this isn't necessary for the other side.
@@ -345,6 +355,19 @@ prompt_longstatus() {
   [[ $(jobs -l | wc -l) -gt 0 ]] && symbols+="%{%F{cyan}%}⚙"
 
   [[ -n "$symbols" ]] && $1_prompt_segment $0 $bg $DEFAULT_COLOR "$symbols"
+}
+
+# print a little OS icon
+prompt_os_icon() {
+  if [[ "$OS" == "Darwin" ]]; then
+    LOGO="\uF8FF" # 
+  elif [[ "$OS" == 'Linux' ]]; then
+    LOGO="\u1F427" # 🐧 
+  elif [[ "$OS" == 'FreeBSD' ]]; then
+    LOGO="\u1F608" # 😈
+  fi
+
+  $1_prompt_segment $0 008 241 $LOGO
 }
 
 # rbenv information
