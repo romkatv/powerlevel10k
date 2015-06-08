@@ -7,7 +7,10 @@ giving you the most epic terminal styling in the universe.
 Look like a bad-ass. Impress everyone in 'Screenshot Your Desktop' threads. Use powerlevel9k.
 
 In addition to looking amazing, this theme actually provides a lot of useful
-information in configurable prompt segments.
+information in configurable prompt segments. Here is an example of what it looks
+like with a normal installation and default settings:
+
+![](http://bhilburn.org/content/images/2015/01/pl9k-improved.png)
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
@@ -58,12 +61,10 @@ information in configurable prompt segments.
 doesn't require Powerline fonts, check out the sister font,
 [hackersaurus](https://github.com/bhilburn/hackersaurus).**
 
-Here are some screenshots of `powerlevel9k` with default settings:
+Here is a detailed screenshot showing `powerlevel9k` with default settings and
+varying terminal status indicators:
 
 ![](http://bhilburn.org/content/images/2014/12/powerlevel9k.png)
-
-![](http://bhilburn.org/content/images/2015/01/pl9k-improved.png)
-
 
 ### Installation
 There are three different forms of installation that you can use to make use of
