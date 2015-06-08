@@ -74,7 +74,8 @@ case $POWERLEVEL9K_MODE in
     VCS_TAG_ICON="\uE817 " # 
     VCS_BOOKMARK_ICON="\uE87B" # 
     VCS_COMMIT_ICON="\uE821 " # 
-    VCS_BRANCH_ICON=" \uE220" # 
+    #VCS_BRANCH_ICON=" \uE220" # 
+    VCS_BRANCH_ICON=''
     VCS_REMOTE_BRANCH_ICON="\uE804" # 
     VCS_GIT_ICON="\uE20E " # 
     VCS_HG_ICON="\uE1C3 " # 
@@ -98,7 +99,8 @@ case $POWERLEVEL9K_MODE in
     VCS_TAG_ICON=''
     VCS_BOOKMARK_ICON="\u263F" # ☿
     VCS_COMMIT_ICON=''
-    VCS_BRANCH_ICON='@'
+    #VCS_BRANCH_ICON='@'
+    VCS_BRANCH_ICON=''
     VCS_REMOTE_BRANCH_ICON="\u2192" # →
     VCS_GIT_ICON='Git'
     VCS_HG_ICON='HG'
@@ -128,7 +130,8 @@ case $POWERLEVEL9K_MODE in
     VCS_TAG_ICON="\uE817 " # 
     VCS_BOOKMARK_ICON="\uE87B" # 
     VCS_COMMIT_ICON="\uE821 " # 
-    VCS_BRANCH_ICON=" \uE220" # 
+    #VCS_BRANCH_ICON=" \uE220" # 
+    VCS_BRANCH_ICON=''
     VCS_REMOTE_BRANCH_ICON="\uE804" # 
     VCS_GIT_ICON="\uE20E " # 
     VCS_HG_ICON="\uE1C3 " # 
@@ -154,7 +157,8 @@ case $POWERLEVEL9K_MODE in
     VCS_TAG_ICON=''
     VCS_BOOKMARK_ICON="\u263F" # ☿
     VCS_COMMIT_ICON=''
-    VCS_BRANCH_ICON='@'
+    #VCS_BRANCH_ICON='@'
+    VCS_BRANCH_ICON=''
     VCS_REMOTE_BRANCH_ICON="\u2192" # →
     VCS_GIT_ICON="\uE0A0" # 
     VCS_HG_ICON="\uE0A0" # 
@@ -582,10 +586,11 @@ precmd() {
 if [[ "$POWERLEVEL9K_PROMPT_ON_NEWLINE" == true ]]; then
   PROMPT='╭─%{%f%b%k%}$(build_left_prompt) 
 ╰─ '
-  # The right prompt should be on the same line as the first line of the left prompt.
-  # To do so, there is just a quite ugly workaround: Before zsh draws the RPROMPT,
-  # we advise it, to go one line up. At the end of RPROMPT, we advise it to go one
-  # line down. See http://superuser.com/questions/357107/zsh-right-justify-in-ps1
+  # The right prompt should be on the same line as the first line of the left
+  # prompt.  To do so, there is just a quite ugly workaround: Before zsh draws
+  # the RPROMPT, we advise it, to go one line up. At the end of RPROMPT, we
+  # advise it to go one line down. See:
+  # http://superuser.com/questions/357107/zsh-right-justify-in-ps1
   RPROMPT_PREFIX='%{'$'\e[1A''%}' # one line up
   RPROMPT_SUFFIX='%{'$'\e[1B''%}' # one line down
 else
