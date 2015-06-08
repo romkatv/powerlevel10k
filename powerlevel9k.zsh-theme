@@ -40,17 +40,18 @@
 #   POWERLEVEL9K_COLOR_SCHEME='light'
 ################################################################
 
-# The `CURRENT_BG` variable is used to remember what the last BG color used was
-# when building the left-hand prompt. Because the RPROMPT is created from
-# right-left but reads the opposite, this isn't necessary for the other side.
-CURRENT_BG='NONE'
+## Debugging
+#zstyle ':vcs_info:*+*:*' debug true
+#set -o xtrace
 
 # These characters require the Powerline fonts to work properly. If see boxes or
-# bizarre characters below, your fonts are not correctly installed. In case you
+# bizarre characters below, your fonts are not correctly installed. If you
 # do not want to install a special font, you can set `POWERLEVEL9K_MODE` to
 # `compatible`. This shows all icons in regular symbols.
 case $POWERLEVEL9K_MODE in
   'flat')
+    # Awesome-Patched Font required!
+    # See https://github.com/gabrielelana/awesome-terminal-fonts/tree/patching-strategy/patched
     LEFT_SEGMENT_SEPARATOR=''
     RIGHT_SEGMENT_SEPARATOR=''
     ROOT_ICON="\uE801" # 
@@ -73,7 +74,8 @@ case $POWERLEVEL9K_MODE in
     VCS_TAG_ICON="\uE817 " # 
     VCS_BOOKMARK_ICON="\uE87B" # 
     VCS_COMMIT_ICON="\uE821 " # 
-    VCS_BRANCH_ICON=" \uE220" # 
+    #VCS_BRANCH_ICON=" \uE220" # 
+    VCS_BRANCH_ICON=''
     VCS_REMOTE_BRANCH_ICON="\uE804" # 
     VCS_GIT_ICON="\uE20E " # 
     VCS_HG_ICON="\uE1C3 " # 
@@ -97,13 +99,15 @@ case $POWERLEVEL9K_MODE in
     VCS_TAG_ICON=''
     VCS_BOOKMARK_ICON="\u263F" # ☿
     VCS_COMMIT_ICON=''
-    VCS_BRANCH_ICON='@'
+    #VCS_BRANCH_ICON='@'
+    VCS_BRANCH_ICON=''
     VCS_REMOTE_BRANCH_ICON="\u2192" # →
     VCS_GIT_ICON='Git'
     VCS_HG_ICON='HG'
   ;;
   'awesome-patched')
-    # Awesome-Patched Font required! See https://github.com/gabrielelana/awesome-terminal-fonts/tree/patching-strategy/patched
+    # Awesome-Patched Font required!
+    # See https://github.com/gabrielelana/awesome-terminal-fonts/tree/patching-strategy/patched
     LEFT_SEGMENT_SEPARATOR="\uE0B0" # 
     RIGHT_SEGMENT_SEPARATOR="\uE0B2" # 
     ROOT_ICON="\u26A1" # ⚡
@@ -126,13 +130,15 @@ case $POWERLEVEL9K_MODE in
     VCS_TAG_ICON="\uE817 " # 
     VCS_BOOKMARK_ICON="\uE87B" # 
     VCS_COMMIT_ICON="\uE821 " # 
-    VCS_BRANCH_ICON=" \uE220" # 
+    #VCS_BRANCH_ICON=" \uE220" # 
+    VCS_BRANCH_ICON=''
     VCS_REMOTE_BRANCH_ICON="\uE804" # 
     VCS_GIT_ICON="\uE20E " # 
     VCS_HG_ICON="\uE1C3 " # 
   ;;
   *)
-    # Powerline-Patched Font required! See https://github.com/Lokaltog/powerline-fonts
+    # Powerline-Patched Font required!
+    # See https://github.com/Lokaltog/powerline-fonts
     LEFT_SEGMENT_SEPARATOR="\uE0B0" # 
     RIGHT_SEGMENT_SEPARATOR="\uE0B2" # 
     ROOT_ICON="\u26A1" # ⚡
@@ -151,7 +157,8 @@ case $POWERLEVEL9K_MODE in
     VCS_TAG_ICON=''
     VCS_BOOKMARK_ICON="\u263F" # ☿
     VCS_COMMIT_ICON=''
-    VCS_BRANCH_ICON='@'
+    #VCS_BRANCH_ICON='@'
+    VCS_BRANCH_ICON=''
     VCS_REMOTE_BRANCH_ICON="\u2192" # →
     VCS_GIT_ICON="\uE0A0" # 
     VCS_HG_ICON="\uE0A0" # 
@@ -232,10 +239,6 @@ else
   zstyle ':vcs_info:*' use-simple true
 fi
 
-## Debugging
-#zstyle ':vcs_info:*+*:*' debug true
-#set -o xtrace
-
 ################################################################
 # Prompt Segment Constructors
 ################################################################
@@ -263,22 +266,24 @@ left_prompt_segment() {
   [[ -n $2 ]] && bg="%K{$2}" || bg="%k"
   [[ -n $3 ]] && fg="%F{$3}" || fg="%f"
   if [[ $CURRENT_BG != 'NONE' && $2 != $CURRENT_BG ]]; then
+    # Middle segment
     echo -n "%{$bg%F{$CURRENT_BG}%}$LEFT_SEGMENT_SEPARATOR%{$fg%} "
   else
+    # First segment
     echo -n "%{$bg%}%{$fg%} "
   fi
   CURRENT_BG=$2
-  [[ -n $4 ]] && echo -n $4
+  [[ -n $4 ]] && echo -n "$4 "
 }
 
 # End the left prompt, closing any open segments
 left_prompt_end() {
   if [[ -n $CURRENT_BG ]]; then
-    echo -n " %{%k%F{$CURRENT_BG}%}$LEFT_SEGMENT_SEPARATOR"
+    echo -n "%{%k%F{$CURRENT_BG}%}$LEFT_SEGMENT_SEPARATOR"
   else
-    echo -n " %{%k%}"
+    echo -n "%{%k%}"
   fi
-  echo -n "%{%f%}"
+  echo -n "%{%f%} "
   CURRENT_BG=''
 }
 
@@ -300,8 +305,8 @@ right_prompt_segment() {
   local bg fg
   [[ -n $2 ]] && bg="%K{$2}" || bg="%k"
   [[ -n $3 ]] && fg="%F{$3}" || fg="%f"
-    echo -n " %f%F{$2}$RIGHT_SEGMENT_SEPARATOR%f%{$bg%}%{$fg%} "
-  [[ -n $4 ]] && echo -n $4
+  echo -n "%f%F{$2}$RIGHT_SEGMENT_SEPARATOR%f%{$bg%}%{$fg%} "
+  [[ -n $4 ]] && echo -n "$4 "
 }
 
 ################################################################
@@ -317,7 +322,7 @@ prompt_vcs() {
       $1_prompt_segment $0 green $DEFAULT_COLOR
     fi
 
-    echo -n "%F{$VCS_FOREGROUND_COLOR}%f$vcs_prompt"
+    echo -n "%F{$VCS_FOREGROUND_COLOR}%f$vcs_prompt "
   fi
 }
 
@@ -404,6 +409,11 @@ function +vi-vcs-detect-changes() {
 ################################################################
 # Prompt Segments
 ################################################################
+
+# The `CURRENT_BG` variable is used to remember what the last BG color used was
+# when building the left-hand prompt. Because the RPROMPT is created from
+# right-left but reads the opposite, this isn't necessary for the other side.
+CURRENT_BG='NONE'
 
 # AWS Profile
 prompt_aws() {
@@ -523,7 +533,7 @@ prompt_time() {
     time_format=$POWERLEVEL9K_TIME_FORMAT
   fi
 
-  $1_prompt_segment $0 $DEFAULT_COLOR_INVERTED $DEFAULT_COLOR "$time_format "
+  $1_prompt_segment $0 $DEFAULT_COLOR_INVERTED $DEFAULT_COLOR $time_format
 }
 
 # Virtualenv: current working virtualenv
@@ -576,14 +586,15 @@ precmd() {
 if [[ "$POWERLEVEL9K_PROMPT_ON_NEWLINE" == true ]]; then
   PROMPT='╭─%{%f%b%k%}$(build_left_prompt) 
 ╰─ '
-  # The right prompt should be on the same line as the first line of the left prompt.
-  # To do so, there is just a quite ugly workaround: Before zsh draws the RPROMPT,
-  # we advise it, to go one line up. At the end of RPROMPT, we advise it to go one
-  # line down. See http://superuser.com/questions/357107/zsh-right-justify-in-ps1
+  # The right prompt should be on the same line as the first line of the left
+  # prompt.  To do so, there is just a quite ugly workaround: Before zsh draws
+  # the RPROMPT, we advise it, to go one line up. At the end of RPROMPT, we
+  # advise it to go one line down. See:
+  # http://superuser.com/questions/357107/zsh-right-justify-in-ps1
   RPROMPT_PREFIX='%{'$'\e[1A''%}' # one line up
   RPROMPT_SUFFIX='%{'$'\e[1B''%}' # one line down
 else
-  PROMPT='%{%f%b%k%}$(build_left_prompt) '
+  PROMPT='%{%f%b%k%}$(build_left_prompt)'
   RPROMPT_PREFIX=''
   RPROMPT_SUFFIX=''
 fi
