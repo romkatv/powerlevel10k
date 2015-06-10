@@ -15,10 +15,10 @@ Vagrant.configure(2) do |config|
   config.vm.box = "ubuntu/precise64"
 
   # Bootstrap
-#  config.vm.provision :shell, path: "bootstrap.sh", privileged: false
-#  config.vm.provision :shell, path: "plain.sh"
-#  config.vm.provision :shell, path: "antigen.sh"
-#  config.vm.provision :shell, path: "prezto.sh"
+  config.vm.provision :shell, path: "bootstrap.sh", privileged: false
+  config.vm.provision :shell, path: "plain.sh"
+  config.vm.provision :shell, path: "antigen.sh"
+  config.vm.provision :shell, path: "prezto.sh"
   config.vm.provision :shell, path: "omz.sh"
 
   # Disable automatic box update checking. If you disable this, then
