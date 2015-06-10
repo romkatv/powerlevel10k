@@ -3,7 +3,7 @@
 NEW_USER=vagrant-prezto
 # Create User
 PASSWORD='$6$OgLg9v2Z$Db38Jr9inZG7y8BzL8kqFK23fF5jZ7FU1oiIBLFjNYR9XVX03fwQayMgA6Rm1rzLbXaf.gkZaTWhB9pv5XLq11'
-sudo useradd -p $PASSWORD -g vagrant -s $(which zsh) -m $NEW_USER
+useradd -p $PASSWORD -g vagrant -s $(which zsh) -m $NEW_USER
 echo "$NEW_USER ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers.d/$NEW_USER
 chmod 440 /etc/sudoers.d/$NEW_USER
 
@@ -21,7 +21,6 @@ chmod 440 /etc/sudoers.d/$NEW_USER
                 ln -s "$rcfile" "${ZDOTDIR:-$HOME}/.${rcfile:t}"
         done
 
-        git clone https://github.com/bhilburn/powerlevel9k.git ~/powerlevel9k
-        ln -s ~/powerlevel9k/powerlevel9k.zsh-theme ~/.zprezto/modules/prompt/functions/prompt_powerlevel9k_setup
+        ln -s /vagrant_data/powerlevel9k.zsh-theme ~/.zprezto/modules/prompt/functions/prompt_powerlevel9k_setup
         sed -i "s/theme\ 'sorin'/theme\ 'powerlevel9k'/g" ~/.zpreztorc
 )
