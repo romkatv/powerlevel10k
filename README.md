@@ -76,34 +76,14 @@ this theme:
 
 #### Install Powerlevel9k
 
-To install this theme, clone this repository into your Oh-My-Zsh `custom/themes`
-directory.
+##### With plain ZSH
 
-    $ cd ~/.oh-my-zsh/custom
-    $ git clone https://github.com/bhilburn/powerlevel9k.git themes/powerlevel9k
+If you use just a plain ZSH, just clone this repository and reference it in your `~/.zshrc`:
 
-You then need to select this theme in your `~/.zshrc`:
+    $ git clone https://github.com/bhilburn/powerlevel9k.git
+    $ echo 'source  powerlevel9k/powerlevel9k.zsh-theme' >> ~/.zshrc
 
-    ZSH_THEME="powerlevel9k/powerlevel9k"
-
-
-#### Install Powerline Fonts for Normal Configuration
-
-You can find the [installation instructions for Powerline Fonts here]
-(https://powerline.readthedocs.org/en/latest/installation/linux.html#fonts-installation).
-You can also find the raw font files [in this Github
-repository](https://github.com/powerline/fonts) if you want to manually install
-them for your OS.
-
-After you have installed Powerline fonts, make the default font in your terminal
-emulator the Powerline font you want to use.
-
-This is the default mode for `Powerlevel9k`, and no further configuration is
-necessary.
-
-#### Install Powerlevel9k
-
-##### Within Oh-my-ZSH
+##### With Oh-my-ZSH
 
 To install this theme, clone this repository into your [Oh-my-Zsh](https://github.com/robbyrussell/oh-my-zsh) `custom/themes`
 directory.
@@ -127,6 +107,27 @@ directory.
 You then need to select this theme in your `~/.zpreztorc`:
 
     zstyle ':prezto:module:prompt' theme 'powerlevel9k'
+
+##### With antigen
+
+If you prefer [antigen](https://github.com/zsh-users/antigen), just add it to your `~/.zshrc`:
+
+    $ echo 'antigen theme /vagrant_data powerlevel9k' >> ~/.zshrc
+    $ echo 'antigen apply' >> ~/.zshrc
+
+#### Install Powerline Fonts for Normal Configuration
+
+You can find the [installation instructions for Powerline Fonts here]
+(https://powerline.readthedocs.org/en/latest/installation/linux.html#fonts-installation).
+You can also find the raw font files [in this Github
+repository](https://github.com/powerline/fonts) if you want to manually install
+them for your OS.
+
+After you have installed Powerline fonts, make the default font in your terminal
+emulator the Powerline font you want to use.
+
+This is the default mode for `Powerlevel9k`, and no further configuration is
+necessary.
 
 #### Alternative Configuration: Über
 
