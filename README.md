@@ -370,3 +370,6 @@ Please submit your contribution as a Github pull-request.
 If you would like to contact me directly, you can find my e-mail address on my
 [Github profile page](https://github.com/bhilburn).
 
+### Testing
+
+Check out the [vagrant](https://www.vagrantup.com/) configuration in the [test-vm](test-vm) folder.
