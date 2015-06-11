@@ -169,7 +169,6 @@ esac
 # color scheme
 ################################################################
 
-local DEFAULT_COLOR DEFAULT_COLOR_INVERTED DEFAULT_COLOR_DARK
 if [[ "$POWERLEVEL9K_COLOR_SCHEME" == "light" ]]; then
   DEFAULT_COLOR=white
   DEFAULT_COLOR_INVERTED=black
