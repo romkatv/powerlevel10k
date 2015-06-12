@@ -179,8 +179,8 @@ else
   DEFAULT_COLOR_DARK="236"
 fi
 
-local VCS_FOREGROUND_COLOR=$DEFAULT_COLOR
-local VCS_FOREGROUND_COLOR_DARK=$DEFAULT_COLOR_DARK
+VCS_FOREGROUND_COLOR=$DEFAULT_COLOR
+VCS_FOREGROUND_COLOR_DARK=$DEFAULT_COLOR_DARK
 
 # If user has defined custom colors for the `vcs` segment, override the defaults
 if [[ -n $POWERLEVEL9K_VCS_FOREGROUND ]]; then
@@ -197,8 +197,8 @@ fi
 setopt prompt_subst
 autoload -Uz vcs_info
 
-local VCS_WORKDIR_DIRTY=false
-local VCS_CHANGESET_PREFIX=''
+VCS_WORKDIR_DIRTY=false
+VCS_CHANGESET_PREFIX=''
 if [[ "$POWERLEVEL9K_SHOW_CHANGESET" == true ]]; then
   # Default: Just display the first 12 characters of our changeset-ID.
   local VCS_CHANGESET_HASH_LENGTH=12
@@ -212,7 +212,7 @@ fi
 zstyle ':vcs_info:*' enable git hg
 zstyle ':vcs_info:*' check-for-changes true
 
-local VCS_DEFAULT_FORMAT="$VCS_CHANGESET_PREFIX%F{$VCS_FOREGROUND_COLOR}%b%c%u%m%f"
+VCS_DEFAULT_FORMAT="$VCS_CHANGESET_PREFIX%F{$VCS_FOREGROUND_COLOR}%b%c%u%m%f"
 zstyle ':vcs_info:git:*' formats "%F{$VCS_FOREGROUND_COLOR}$VCS_GIT_ICON%f $VCS_DEFAULT_FORMAT" 
 zstyle ':vcs_info:hg:*' formats "%F{$VCS_FOREGROUND_COLOR}$VCS_HG_ICON%f $VCS_DEFAULT_FORMAT" 
 
