@@ -136,8 +136,11 @@ You then need to select this theme in your `~/.zpreztorc`:
 If you prefer [antigen](https://github.com/zsh-users/antigen), just add this
 theme to the antigen config in your `~/.zshrc`:
 
-    $ echo 'antigen theme /vagrant_data powerlevel9k' >> ~/.zshrc
+    $ echo 'antigen theme bhilburn/powerlevel9k powerlevel9k' >> ~/.zshrc
     $ echo 'antigen apply' >> ~/.zshrc
+
+Note that you should define any customizations before calling `antigen theme`
+(i.e. setting the `POWERLEVEL9K_*` variables) in your `.zshrc`.
 
 #### Step 2: Install Powerline Fonts
 Technically, you don't *have* to install Powerline fonts. If you are using
