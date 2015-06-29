@@ -19,6 +19,10 @@ like with a normal installation and default settings:
 - [Features](#features)
 - [Installation](#installation)
   - [Install Powerlevel9k](#install-powerlevel9k)
+    - [With plain ZSH](#with-plain-zsh)
+    - [With Oh-my-ZSH](#with-oh-my-zsh)
+    - [With Prezto](#with-prezto)
+    - [With antigen](#with-antigen)
   - [Install Powerline Fonts for Normal Configuration](#install-powerline-fonts-for-normal-configuration)
   - [Alternative Configuration: Über](#alternative-configuration-%C3%BCber)
   - [Alternative Configuration: Bare Bones](#alternative-configuration-bare-bones)
@@ -76,7 +80,16 @@ this theme:
 
 #### Install Powerlevel9k
 
-To install this theme, clone this repository into your Oh-My-Zsh `custom/themes`
+##### With plain ZSH
+
+If you use just a plain ZSH, just clone this repository and reference it in your `~/.zshrc`:
+
+    $ git clone https://github.com/bhilburn/powerlevel9k.git
+    $ echo 'source  powerlevel9k/powerlevel9k.zsh-theme' >> ~/.zshrc
+
+##### With Oh-my-ZSH
+
+To install this theme, clone this repository into your [Oh-my-Zsh](https://github.com/robbyrussell/oh-my-zsh) `custom/themes`
 directory.
 
     $ cd ~/.oh-my-zsh/custom
@@ -86,6 +99,25 @@ You then need to select this theme in your `~/.zshrc`:
 
     ZSH_THEME="powerlevel9k/powerlevel9k"
 
+##### With Prezto
+
+To install this theme, clone this repository into your [Prezto](https://github.com/sorin-ionescu/prezto) `prompt/external`
+directory.
+
+    $ cd ~.zprezto/modules/prompt/external
+    $ git clone https://github.com/bhilburn/powerlevel9k.git
+    $ ln -s powerlevel9k/powerlevel9k.zsh-theme ../functions/prompt_powerlevel9k_setup
+
+You then need to select this theme in your `~/.zpreztorc`:
+
+    zstyle ':prezto:module:prompt' theme 'powerlevel9k'
+
+##### With antigen
+
+If you prefer [antigen](https://github.com/zsh-users/antigen), just add it to your `~/.zshrc`:
+
+    $ echo 'antigen theme /vagrant_data powerlevel9k' >> ~/.zshrc
+    $ echo 'antigen apply' >> ~/.zshrc
 
 #### Install Powerline Fonts for Normal Configuration
 
@@ -338,3 +370,6 @@ Please submit your contribution as a Github pull-request.
 If you would like to contact me directly, you can find my e-mail address on my
 [Github profile page](https://github.com/bhilburn).
 
+### Testing
+
+Check out the [vagrant](https://www.vagrantup.com/) configuration in the [test-vm](test-vm) folder.
