@@ -1,10 +1,16 @@
-## powerlevel9k Theme for Oh-My-Zsh
+## powerlevel9k Theme for ZSH
 
-This is a theme for [Oh-My-Zsh](https://github.com/robbyrussell/oh-my-zsh). This
-theme uses [Powerline Fonts](https://github.com/Lokaltog/powerline-fonts), thus
-giving you the most epic terminal styling in the universe.
+Powerlevel9k is a theme for ZSH which uses [Powerline
+Fonts](https://github.com/Lokaltog/powerline-fonts), thus giving you the most
+epic terminal styling in the universe.
 
 Look like a bad-ass. Impress everyone in 'Screenshot Your Desktop' threads. Use powerlevel9k.
+
+Powerlevel9k can be used with vanilla ZSH,
+[Oh-My-Zsh](https://github.com/robbyrussell/oh-my-zsh), or
+[Prezto](https://github.com/sorin-ionescu/prezto), and can also be installed
+using [antigen](https://github.com/zsh-users/antigen).
+
 
 In addition to looking amazing, this theme actually provides a lot of useful
 information in configurable prompt segments. Here is an example of what it looks
@@ -18,14 +24,15 @@ like with a normal installation and default settings:
 
 - [Features](#features)
 - [Installation](#installation)
-  - [Install Powerlevel9k](#install-powerlevel9k)
-    - [With plain ZSH](#with-plain-zsh)
-    - [With Oh-my-ZSH](#with-oh-my-zsh)
-    - [With Prezto](#with-prezto)
-    - [With antigen](#with-antigen)
-  - [Install Powerline Fonts for Normal Configuration](#install-powerline-fonts-for-normal-configuration)
-  - [Alternative Configuration: Über](#alternative-configuration-%C3%BCber)
-  - [Alternative Configuration: Bare Bones](#alternative-configuration-bare-bones)
+  - [Step 1: Install Powerlevel9k](#step-1-install-powerlevel9k)
+    - [Option 1: Install for Vanilla ZSH](#option-1-install-for-vanilla-zsh)
+    - [Option 2: Install for Oh-My-ZSH](#option-2-install-for-oh-my-zsh)
+    - [Option 3: Install for Prezto](#option-3-install-for-prezto)
+    - [Option 4: Install for antigen](#option-4-install-for-antigen)
+  - [Step 2: Install Powerline Fonts](#step-2-install-powerline-fonts)
+    - [Option 1: Install Powerline Fonts](#option-1-install-powerline-fonts)
+    - [Option 2: Install Awesome Powerline Fonts](#option-2-install-awesome-powerline-fonts)
+    - [Option 3: Compatible Mode](#option-3-compatible-mode)
 - [Segment Customization](#segment-customization)
   - [The AWS Profile Segment](#the-aws-profile-segment)
   - [The 'context' Segment](#the-context-segment)
@@ -55,7 +62,7 @@ like with a normal installation and default settings:
     * various working tree statuses (e.g., unstaged, staged, etc.,)
 * Shows return-code of the last command if it is an error code
 * Indicates background jobs with a gear icon
-* Can conditionally display the `user@host` string when needed
+* Can conditionally display the `user@host` string when needed (e.g., SSH)
 * Provides segment for command history (so you can `$ !<num>` to re-run)
 * Plenty of additional segments to choose from (e.g., AWS, ruby)
 * Can be used as a single or double-lined prompt (see screenshots below)
@@ -71,26 +78,38 @@ varying terminal status indicators:
 ![](http://bhilburn.org/content/images/2014/12/powerlevel9k.png)
 
 ### Installation
-There are three different forms of installation that you can use to make use of
-this theme:
+There are two steps to start using this theme:
 
-* Normal - Theme + Powerline Fonts
-* Über - Theme + Awesome Powerline Fonts
-* Bare Bones - Theme Only
+1. Install the Powerlevel9k theme.
+2. Install Powerline-patched fonts.
+3. [Optional] Configuration
 
-#### Install Powerlevel9k
+To get the most out of Powerlevel9k, you need to install both the theme as well
+as Powerline-patched fonts, if you don't have them installed already. If you
+cannot install Powerline-patched fonts for some reason, follow the instructions
+below for a `compatible` install.
 
-##### With plain ZSH
+No configuration is necessary post-installation if you like the default
+settings, but there is plenty of segment configuration available if you are
+interested.
 
-If you use just a plain ZSH, just clone this repository and reference it in your `~/.zshrc`:
+#### Step 1: Install Powerlevel9k
+There are four ways to install and use the Powerlevel9k theme: vanilla ZSH,
+Oh-My-Zsh, Prezto, and antigen. Do one of the following:
+
+##### Option 1: Install for Vanilla ZSH
+
+If you use just a vanilla ZSH install, simply clone this repository and
+reference it in your `~/.zshrc`:
 
     $ git clone https://github.com/bhilburn/powerlevel9k.git
     $ echo 'source  powerlevel9k/powerlevel9k.zsh-theme' >> ~/.zshrc
 
-##### With Oh-my-ZSH
+##### Option 2: Install for Oh-My-ZSH
 
-To install this theme, clone this repository into your [Oh-my-Zsh](https://github.com/robbyrussell/oh-my-zsh) `custom/themes`
-directory.
+To install this theme for
+[Oh-My-Zsh](https://github.com/robbyrussell/oh-my-zsh), clone this repository
+into your OMZ `custom/themes` directory.
 
     $ cd ~/.oh-my-zsh/custom
     $ git clone https://github.com/bhilburn/powerlevel9k.git themes/powerlevel9k
@@ -99,10 +118,10 @@ You then need to select this theme in your `~/.zshrc`:
 
     ZSH_THEME="powerlevel9k/powerlevel9k"
 
-##### With Prezto
+##### Option 3: Install for Prezto
 
-To install this theme, clone this repository into your [Prezto](https://github.com/sorin-ionescu/prezto) `prompt/external`
-directory.
+To install this theme for use in Prezto, clone this repository into your
+[Prezto](https://github.com/sorin-ionescu/prezto) `prompt/external` directory.
 
     $ cd ~.zprezto/modules/prompt/external
     $ git clone https://github.com/bhilburn/powerlevel9k.git
@@ -112,14 +131,27 @@ You then need to select this theme in your `~/.zpreztorc`:
 
     zstyle ':prezto:module:prompt' theme 'powerlevel9k'
 
-##### With antigen
+##### Option 4: Install for antigen
 
-If you prefer [antigen](https://github.com/zsh-users/antigen), just add it to your `~/.zshrc`:
+If you prefer [antigen](https://github.com/zsh-users/antigen), just add this
+theme to the antigen config in your `~/.zshrc`:
 
     $ echo 'antigen theme /vagrant_data powerlevel9k' >> ~/.zshrc
     $ echo 'antigen apply' >> ~/.zshrc
 
-#### Install Powerline Fonts for Normal Configuration
+#### Step 2: Install Powerline Fonts
+Technically, you don't *have* to install Powerline fonts. If you are using
+a font that has some of the basic glyphs we need, you can use the theme in
+`compatible` mode - see the third option, below.
+
+To get the most out of theme, though, you'll want Powerline-patched fonts. There
+are two varieties of these: 'Powerline Fonts' and 'Awesome Powerline
+Fonts'. The latter includes additional glyphs that aren't required for a normal
+install.
+
+Do one of the following:
+
+##### Option 1: Install Powerline Fonts
 
 You can find the [installation instructions for Powerline Fonts here]
 (https://powerline.readthedocs.org/en/latest/installation/linux.html#fonts-installation).
@@ -133,7 +165,11 @@ emulator the Powerline font you want to use.
 This is the default mode for `Powerlevel9k`, and no further configuration is
 necessary.
 
-#### Alternative Configuration: Über
+**N.B.:** If Powerlevel9k is not working properly, it is almost always the case
+that the fonts were not properly installed, or you have not configured your
+terminal to use a Powerline-patched font!
+
+##### Option 2: Install Awesome Powerline Fonts
 
 Alternatively, you can install [Awesome Powerline
 Fonts](https://github.com/gabrielelana/awesome-terminal-fonts), which provide
@@ -157,7 +193,7 @@ Which looks like this:
 
 ![](https://cloud.githubusercontent.com/assets/1544760/7981324/76d0eb5a-0aae-11e5-9608-d662123d0b0a.png)
 
-#### Alternative Configuration: Bare Bones
+##### Option 3: Compatible Mode
 
 This option is best if you prefer not to install additional fonts. This option
 will work out-of-the-box if your your terminal font supports the segment
