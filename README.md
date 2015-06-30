@@ -398,13 +398,20 @@ Thankfully, this is easy to fix. This happens if you have successfully installed
 Powerline fonts, but did not make a Powerline font the default font in your
 terminal emulator (e.g., 'terminator', 'gnome-terminal', 'konsole', etc.,).
 
-### Contributions / Bugs / Contact
+### Meta
+
+#### Kudos
+
+This theme wouldn't have happened without inspiration from the original [agnoster](https://gist.github.com/agnoster/3712874) Oh-My-ZSH theme.
+
+Before creating this theme, I also tried [jeremyFreeAgent's theme](https://github.com/jeremyFreeAgent/oh-my-zsh-powerline-theme) and [maverick2000's theme ZSH2000](https://github.com/maverick2000/zsh2000).
+
+#### Contributions / Bugs / Contact
 
 If you have any requests or bug reports, please use the tracker in this Github
 repository.
 
-I'm happy to accept code contributions from anyone who has an improvement!
-Please submit your contribution as a Github pull-request.
+I'm happy to accept code contributions from anyone who has a bug fix, new feature, or just a general improvement! Please submit your contribution as a Github pull-request.
 
 If you would like to contact me directly, you can find my e-mail address on my
 [Github profile page](https://github.com/bhilburn).
