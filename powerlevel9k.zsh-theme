@@ -221,7 +221,8 @@ zstyle ':vcs_info:*' actionformats " %b %F{red}| %a%f"
 zstyle ':vcs_info:*' stagedstr " %F{$VCS_FOREGROUND_COLOR}$VCS_STAGED_ICON%f"
 zstyle ':vcs_info:*' unstagedstr " %F{$VCS_FOREGROUND_COLOR}$VCS_UNSTAGED_ICON%f"
 
-zstyle ':vcs_info:git*+set-message:*' hooks git-untracked git-aheadbehind git-stash git-remotebranch git-tagname
+zstyle ':vcs_info:git*+set-message:*' hooks vcs-detect-changes git-untracked git-aheadbehind git-stash git-remotebranch git-tagname
+zstyle ':vcs_info:hg*+set-message:*' hooks vcs-detect-changes
 
 # For Hg, only show the branch name
 zstyle ':vcs_info:hg*:*' branchformat "$VCS_BRANCH_ICON%b"
@@ -575,13 +576,6 @@ build_right_prompt() {
   done
 }
 
-prompt_powerlevel9k_precmd() {
-  vcs_info
-
-  # Add a static hook to examine staged/unstaged changes.
-  vcs_info_hookadd set-message vcs-detect-changes
-}
-
 powerlevel9k_init() {
   setopt LOCAL_OPTIONS
   unsetopt XTRACE KSH_ARRAYS
@@ -593,7 +587,7 @@ powerlevel9k_init() {
   # initialize VCS
   autoload -Uz add-zsh-hook
 
-  add-zsh-hook precmd prompt_powerlevel9k_precmd
+  add-zsh-hook precmd vcs_info
 
   if [[ "$POWERLEVEL9K_PROMPT_ON_NEWLINE" == true ]]; then
     PROMPT="╭─%{%f%b%k%}"'$(build_left_prompt)'" 
