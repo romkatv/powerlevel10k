@@ -75,8 +75,7 @@ case $POWERLEVEL9K_MODE in
     VCS_TAG_ICON="\uE817 " # 
     VCS_BOOKMARK_ICON="\uE87B" # 
     VCS_COMMIT_ICON="\uE821 " # 
-    #VCS_BRANCH_ICON=" \uE220" # 
-    VCS_BRANCH_ICON=''
+    VCS_BRANCH_ICON=" \uE220" # 
     VCS_REMOTE_BRANCH_ICON="\uE804" # 
     VCS_GIT_ICON="\uE20E " # 
     VCS_HG_ICON="\uE1C3 " # 
@@ -101,8 +100,7 @@ case $POWERLEVEL9K_MODE in
     VCS_TAG_ICON=''
     VCS_BOOKMARK_ICON="\u263F" # ☿
     VCS_COMMIT_ICON=''
-    #VCS_BRANCH_ICON='@'
-    VCS_BRANCH_ICON=''
+    VCS_BRANCH_ICON='@'
     VCS_REMOTE_BRANCH_ICON="\u2192" # →
     VCS_GIT_ICON='Git'
     VCS_HG_ICON='HG'
@@ -133,8 +131,7 @@ case $POWERLEVEL9K_MODE in
     VCS_TAG_ICON="\uE817 " # 
     VCS_BOOKMARK_ICON="\uE87B" # 
     VCS_COMMIT_ICON="\uE821 " # 
-    #VCS_BRANCH_ICON=" \uE220" # 
-    VCS_BRANCH_ICON=''
+    VCS_BRANCH_ICON=" \uE220" # 
     VCS_REMOTE_BRANCH_ICON="\uE804" # 
     VCS_GIT_ICON="\uE20E " # 
     VCS_HG_ICON="\uE1C3 " # 
@@ -161,13 +158,16 @@ case $POWERLEVEL9K_MODE in
     VCS_TAG_ICON=''
     VCS_BOOKMARK_ICON="\u263F" # ☿
     VCS_COMMIT_ICON=''
-    #VCS_BRANCH_ICON='@'
-    VCS_BRANCH_ICON=''
+    VCS_BRANCH_ICON='@'
     VCS_REMOTE_BRANCH_ICON="\u2192" # →
     VCS_GIT_ICON="\uE0A0" # 
     VCS_HG_ICON="\uE0A0" # 
   ;;
 esac
+
+if [[ "$POWERLEVEL9K_SHOW_BRANCH_ICON" != true ]]; then
+    VCS_BRANCH_ICON=''
+fi
 
 ################################################################
 # color scheme
