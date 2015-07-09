@@ -75,10 +75,10 @@ case $POWERLEVEL9K_MODE in
     VCS_TAG_ICON="\uE817 " # 
     VCS_BOOKMARK_ICON="\uE87B" # 
     VCS_COMMIT_ICON="\uE821 " # 
-    VCS_BRANCH_ICON=" \uE220" # 
+    VCS_BRANCH_ICON="\uE220" # 
     VCS_REMOTE_BRANCH_ICON="\uE804" # 
-    VCS_GIT_ICON="\uE20E " # 
-    VCS_HG_ICON="\uE1C3 " # 
+    VCS_GIT_ICON="\uE20E  " # 
+    VCS_HG_ICON="\uE1C3  " # 
   ;;
   'compatible')
     LEFT_SEGMENT_SEPARATOR="\u2B80" # ⮀
@@ -131,10 +131,10 @@ case $POWERLEVEL9K_MODE in
     VCS_TAG_ICON="\uE817 " # 
     VCS_BOOKMARK_ICON="\uE87B" # 
     VCS_COMMIT_ICON="\uE821 " # 
-    VCS_BRANCH_ICON=" \uE220" # 
+    VCS_BRANCH_ICON="\uE220" # 
     VCS_REMOTE_BRANCH_ICON="\uE804" # 
-    VCS_GIT_ICON="\uE20E " # 
-    VCS_HG_ICON="\uE1C3 " # 
+    VCS_GIT_ICON="\uE20E  " # 
+    VCS_HG_ICON="\uE1C3  " # 
   ;;
   *)
     # Powerline-Patched Font required!
@@ -158,14 +158,14 @@ case $POWERLEVEL9K_MODE in
     VCS_TAG_ICON=''
     VCS_BOOKMARK_ICON="\u263F" # ☿
     VCS_COMMIT_ICON=''
-    VCS_BRANCH_ICON='@'
+    VCS_BRANCH_ICON="\uE0A0 " # 
     VCS_REMOTE_BRANCH_ICON="\u2192" # →
-    VCS_GIT_ICON="\uE0A0" # 
-    VCS_HG_ICON="\uE0A0" # 
+    VCS_GIT_ICON=""
+    VCS_HG_ICON=""
   ;;
 esac
 
-if [[ "$POWERLEVEL9K_SHOW_BRANCH_ICON" != true ]]; then
+if [[ "$POWERLEVEL9K_HIDE_BRANCH_ICON" == true ]]; then
     VCS_BRANCH_ICON=''
 fi
 
@@ -210,15 +210,15 @@ if [[ "$POWERLEVEL9K_SHOW_CHANGESET" == true ]]; then
     VCS_CHANGESET_HASH_LENGTH="$POWERLEVEL9K_CHANGESET_HASH_LENGTH"
   fi
 
-  VCS_CHANGESET_PREFIX="%F{$VCS_FOREGROUND_COLOR_DARK}$VCS_COMMIT_ICON%0.$VCS_CHANGESET_HASH_LENGTH""i%f"
+  VCS_CHANGESET_PREFIX="%F{$VCS_FOREGROUND_COLOR_DARK}$VCS_COMMIT_ICON%0.$VCS_CHANGESET_HASH_LENGTH""i%f "
 fi
 
 zstyle ':vcs_info:*' enable git hg
 zstyle ':vcs_info:*' check-for-changes true
 
 VCS_DEFAULT_FORMAT="$VCS_CHANGESET_PREFIX%F{$VCS_FOREGROUND_COLOR}%b%c%u%m%f"
-zstyle ':vcs_info:git:*' formats "%F{$VCS_FOREGROUND_COLOR}$VCS_GIT_ICON%f $VCS_DEFAULT_FORMAT" 
-zstyle ':vcs_info:hg:*' formats "%F{$VCS_FOREGROUND_COLOR}$VCS_HG_ICON%f $VCS_DEFAULT_FORMAT" 
+zstyle ':vcs_info:git:*' formats "%F{$VCS_FOREGROUND_COLOR}$VCS_GIT_ICON%f$VCS_DEFAULT_FORMAT" 
+zstyle ':vcs_info:hg:*' formats "%F{$VCS_FOREGROUND_COLOR}$VCS_HG_ICON%f$VCS_DEFAULT_FORMAT" 
 
 zstyle ':vcs_info:*' actionformats " %b %F{red}| %a%f"
 
