@@ -46,7 +46,9 @@ like with a normal installation and default settings:
   - [Further color customizations](#further-color-customizations)
 - [Troubleshooting](#troubleshooting)
   - [Gaps Between Segments](#gaps-between-segments)
-- [Contributions / Bugs / Contact](#contributions--bugs--contact)
+- [Meta](#meta)
+  - [Kudos](#kudos)
+  - [Contributions / Bugs / Contact](#contributions--bugs--contact)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -280,14 +282,15 @@ would also like for it to display the current hash / changeset, simply define
 `POWERLEVEL9K_SHOW_CHANGESET` in your `~/.zshrc`. If activated, it will show
 the first 12 characters of the changeset id. To change the amount of characters,
 set `POWERLEVEL9K_CHANGESET_HASH_LENGTH` to any value you want.
-By setting `POWERLEVEL9K_SHOW_BRANCH_ICON` it shows a nice icon before the
-branch name.
-Example:
 
     # enable the vcs segment in general
     POWERLEVEL9K_SHOW_CHANGESET=true
     # just show the 6 first characters of changeset
     POWERLEVEL9K_CHANGESET_HASH_LENGTH=6
+
+You can also enable an additional branch icon in your prompt by setting
+`POWERLEVEL9K_SHOW_BRANCH_ICON` to `true`:
+
     # Show an icon before the branch name
     POWERLEVEL9K_SHOW_BRANCH_ICON=true
 
