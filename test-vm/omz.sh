@@ -13,18 +13,19 @@ chmod 440 /etc/sudoers.d/$NEW_USER
         #UID=$(id -u $NEW_USER)
         #EUID=$(id -u $NEW_USER)
         HOME=/home/$NEW_USER
+	SHELL=$(which zsh)
 
-        curl -L https://raw.github.com/robbyrussell/oh-my-zsh/master/tools/install.sh | sh
+        sh -c "$(curl -fsSL https://raw.github.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
 
         mkdir -p ~/.oh-my-zsh/custom/themes
         ln -s /vagrant_data ~/.oh-my-zsh/custom/themes/powerlevel9k
 
         echo '
 export ZSH=$HOME/.oh-my-zsh
-plugins=(git bundler osx rake ruby)
 ZSH_THEME="powerlevel9k/powerlevel9k"
+plugins=(git rake ruby)
 
 source $ZSH/oh-my-zsh.sh
-' > ~/.zshrc
+' > $HOME/.zshrc
 
 )
