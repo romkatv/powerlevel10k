@@ -237,10 +237,6 @@ zstyle ':vcs_info:hg*+gen-hg-bookmark-string:*' hooks hg-bookmarks
 
 if [[ "$POWERLEVEL9K_SHOW_CHANGESET" == true ]]; then
   zstyle ':vcs_info:*' get-revision true
-else
-  # A little performance-boost for large repositories (especially Hg). If we
-  # don't show the changeset, we can switch to simple mode.
-  zstyle ':vcs_info:*' use-simple true
 fi
 
 ################################################################
