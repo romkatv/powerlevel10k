@@ -288,11 +288,11 @@ set `POWERLEVEL9K_CHANGESET_HASH_LENGTH` to any value you want.
     # just show the 6 first characters of changeset
     POWERLEVEL9K_CHANGESET_HASH_LENGTH=6
 
-You can also enable an additional branch icon in your prompt by setting
-`POWERLEVEL9K_SHOW_BRANCH_ICON` to `true`:
+You can also disable the branch icon in your prompt by setting
+`POWERLEVEL9K_HIDE_BRANCH_ICON` to `true`:
 
-    # Show an icon before the branch name
-    POWERLEVEL9K_SHOW_BRANCH_ICON=true
+    # Hide the branch icon
+    POWERLEVEL9K_HIDE_BRANCH_ICON=true
 
 ##### Symbols
 
