@@ -301,7 +301,7 @@ The `vcs` segment uses various symbols to tell you the state of your repository.
 These symbols depend on your installed font and selected `POWERLEVEL9K_MODE`
 from the [Installation](#Installation) section above.
 
-| `Bare Bones` | `Normal` | `Über` | explanation
+| `Compatible` | `Powerline` | `Awesome Powerline` | Explanation
 |--------------|---------------------|-------------------|--------------------------
 | `↑4`         | `↑4`                | ![icon_outgoing](https://cloud.githubusercontent.com/assets/1544760/7976089/b5904d6e-0a76-11e5-8147-5e873ac52d79.gif)4  | Number of commits your repository is ahead of your remote branch
 | `↓5`         | `↓5`                | ![icon_incoming](https://cloud.githubusercontent.com/assets/1544760/7976091/b5909c9c-0a76-11e5-9cad-9bf0a28a897c.gif)5  | Number of commits your repository is behind of your remote branch
