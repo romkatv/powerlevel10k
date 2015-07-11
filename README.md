@@ -48,6 +48,7 @@ like with a normal installation and default settings:
   - [Gaps Between Segments](#gaps-between-segments)
 - [Meta](#meta)
   - [Kudos](#kudos)
+  - [Developing](#developing)
   - [Contributions / Bugs / Contact](#contributions--bugs--contact)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
@@ -414,6 +415,11 @@ This theme wouldn't have happened without inspiration from the original [agnoste
 
 Before creating this theme, I also tried [jeremyFreeAgent's theme](https://github.com/jeremyFreeAgent/oh-my-zsh-powerline-theme) and [maverick2000's theme, ZSH2000](https://github.com/maverick2000/zsh2000).
 
+#### Developing
+
+Documentation for developers is kept on the [Powerlevel9k Github
+wiki](https://github.com/bhilburn/powerlevel9k/wiki/Developers'-Guide).
+
 #### Contributions / Bugs / Contact
 
 If you have any requests or bug reports, please use the tracker in this Github
@@ -423,56 +429,3 @@ I'm happy to accept code contributions from anyone who has a bug fix, new featur
 
 If you would like to contact me directly, you can find my e-mail address on my
 [Github profile page](https://github.com/bhilburn).
-
-#### Developers Guide
-
-The theme has grown a lot lately, so I think a little explanation would be 
-helpful.
-
-##### Basic Knowledge
-
-Our main entry point are the `PROMPT` and `RPROMPT` variables, which are 
-interpreted by zsh itself. All that this (and any other) theme does is
-filling these two variables with control instructions (like defining 
-colors, etc.) and ready-to-use data. So within this theme we collect a
-whole bunch of information to put in that variables. You can find 
-`PROMPT` and `RPROMPT` at the very end of the `powerlevel9k.zsh-theme`.
-
-This simple diagram may explain the invoking order better:
-
-```
-+-----+    +---------+
-| Zsh |--->| $PROMPT |
-+-----+    +---------+
-                |
-                V
-    +---------------------+    +------------+  +---------------------+
-    | build_left_prompt() |--->| prompt_*() |->| $1_prompt_segment() |
-    +---------------------+    +------------+  +---------------------+
-```
-
-##### Adding Segments
-
-Feel free to add your own segments. Every segment gets called with an
-orientation as first parameter (`left` or `right`), so we can figure
-out on which side we should draw the segment. This information is 
-used at the time we call the actual segment-drawing function:
-`$1_prompt_segment`. To make the magic color-overwrite mechanism to
-work, we have to pass our function name as first argument. Usually
-this is just `$0`. Second parameter is a default background color,
-third the default foreground color. And finally we pass our content
-to the function. So our function could look somewhat like this:
-
-```zsh
-    prompt_echo() {
-        local content='Hello World!'
-        $1_prompt_segment $0 blue red $content
-    }
-```
-
-At this point we can overwrite our blue-on-red segment by putting 
-    
-    POWERLEVEL9K_ECHO_FOREGROUND="200"
-    POWERLEVEL9K_ECHO_BACKGROUND="040"
-
-in our `~/.zshrc`. We now have a pink-on-green segment. Yay!
