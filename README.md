@@ -48,6 +48,7 @@ like with a normal installation and default settings:
   - [Gaps Between Segments](#gaps-between-segments)
 - [Meta](#meta)
   - [Kudos](#kudos)
+  - [Developing](#developing)
   - [Contributions / Bugs / Contact](#contributions--bugs--contact)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
@@ -414,6 +415,11 @@ This theme wouldn't have happened without inspiration from the original [agnoste
 
 Before creating this theme, I also tried [jeremyFreeAgent's theme](https://github.com/jeremyFreeAgent/oh-my-zsh-powerline-theme) and [maverick2000's theme, ZSH2000](https://github.com/maverick2000/zsh2000).
 
+#### Developing
+
+Documentation for developers is kept on the [Powerlevel9k Github
+wiki](https://github.com/bhilburn/powerlevel9k/wiki/Developers'-Guide).
+
 #### Contributions / Bugs / Contact
 
 If you have any requests or bug reports, please use the tracker in this Github
@@ -423,4 +429,3 @@ I'm happy to accept code contributions from anyone who has a bug fix, new featur
 
 If you would like to contact me directly, you can find my e-mail address on my
 [Github profile page](https://github.com/bhilburn).
-

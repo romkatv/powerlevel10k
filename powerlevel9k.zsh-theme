@@ -244,8 +244,13 @@ fi
 ################################################################
 
 # Begin a left prompt segment
-# Takes two arguments, background and foreground. Both can be omitted,
-# rendering default background/foreground.
+# Takes four arguments:
+#   * $1: Name of the function that was orginally invoked (mandatory).
+#         Necessary, to make the dynamic color-overwrite mechanism work.
+#   * $2: Background color
+#   * $3: Foreground color
+#   * $4: The segment content
+# The latter three can be omitted,
 left_prompt_segment() {
   # Overwrite given background-color by user defined variable for this segment.
   # We get as first Parameter the function name, which called this function. 
@@ -288,9 +293,13 @@ left_prompt_end() {
 }
 
 # Begin a right prompt segment
-# Takes two arguments, background and foreground. Both can be omitted,
-# rendering default background/foreground. No ending for the right prompt
-# segment is needed (unlike the left prompt, above).
+# Takes four arguments:
+#   * $1: Name of the function that was orginally invoked (mandatory).
+#         Necessary, to make the dynamic color-overwrite mechanism work.
+#   * $2: Background color
+#   * $3: Foreground color
+#   * $4: The segment content
+# No ending for the right prompt segment is needed (unlike the left prompt, above).
 right_prompt_segment() {
   # Overwrite given background-color by user defined variable for this segment.
   local BACKGROUND_USER_VARIABLE=POWERLEVEL9K_${(U)1#prompt_}_BACKGROUND
