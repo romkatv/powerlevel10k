@@ -36,6 +36,7 @@ like with a normal installation and default settings:
 - [Segment Customization](#segment-customization)
   - [The AWS Profile Segment](#the-aws-profile-segment)
   - [The 'context' Segment](#the-context-segment)
+  - [The 'dir' segment](#the-dir-segment)
   - [The 'time' segment](#the-time-segment)
   - [Unit Test Ratios](#unit-test-ratios)
   - [The 'vcs' Segment](#the-vcs-segment)
@@ -260,7 +261,7 @@ elements (it is by default), and define a `DEFAULT_USER` in your `~/.zshrc`:
 
     export DEFAULT_USER=<your username>
 
-#### The `dir` segment
+#### The 'dir' segment
 
 The `dir` segment shows the current working directory. You can limit the output
 to a certain length:
@@ -427,7 +428,7 @@ Before creating this theme, I also tried [jeremyFreeAgent's theme](https://githu
 #### Developing
 
 Documentation for developers is kept on the [Powerlevel9k Github
-wiki](https://github.com/bhilburn/powerlevel9k/wiki/Developers'-Guide).
+wiki](https://github.com/bhilburn/powerlevel9k/wiki/Developer's-Guide).
 
 #### Contributions / Bugs / Contact
 
