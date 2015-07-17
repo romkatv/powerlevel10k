@@ -662,15 +662,15 @@ prompt_longstatus() {
   symbols=()
 
   if [[ "$RETVAL" -ne 0 ]]; then
-    symbols+="%F{226}%? ↵"
+    symbols+="%F{226}%? ↵%f"
     bg="009"
   else
-    symbols+="%{%F{"046"}%}$(print_icon 'OK_ICON')"
+    symbols+="%F{046}$(print_icon 'OK_ICON')%f"
     bg="008"
   fi
 
-  [[ "$UID" -eq 0 ]] && symbols+="%{%F{yellow}%} $(print_icon 'ROOT_ICON')"
-  [[ $(jobs -l | wc -l) -gt 0 ]] && symbols+="%{%F{cyan}%}$(print_icon 'BACKGROUND_JOBS_ICON')"
+  [[ "$UID" -eq 0 ]] && symbols+="%F{yellow} $(print_icon 'ROOT_ICON')%f"
+  [[ $(jobs -l | wc -l) -gt 0 ]] && symbols+="%F{cyan}$(print_icon 'BACKGROUND_JOBS_ICON')%f"
 
   [[ -n "$symbols" ]] && $1_prompt_segment "$0" "$bg" "$DEFAULT_COLOR" "$symbols"
 }
