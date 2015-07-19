@@ -1,22 +1,23 @@
 ## powerlevel9k Theme for ZSH
 
 Powerlevel9k is a theme for ZSH which uses [Powerline
-Fonts](https://github.com/Lokaltog/powerline-fonts), thus giving you the most
-epic terminal styling in the universe.
-
-Look like a bad-ass. Impress everyone in 'Screenshot Your Desktop' threads. Use powerlevel9k.
-
-Powerlevel9k can be used with vanilla ZSH,
-[Oh-My-Zsh](https://github.com/robbyrussell/oh-my-zsh), or
+Fonts](https://github.com/Lokaltog/powerline-fonts). It can be used with vanilla
+ZSH, [Oh-My-Zsh](https://github.com/robbyrussell/oh-my-zsh), or
 [Prezto](https://github.com/sorin-ionescu/prezto), and can also be installed
 using [antigen](https://github.com/zsh-users/antigen).
 
-
-In addition to looking amazing, this theme actually provides a lot of useful
-information in configurable prompt segments. Here is an example of what it looks
-like with a normal installation and default settings:
+Look like a bad-ass. Impress everyone in 'Screenshot Your Desktop' threads. Use powerlevel9k.
 
 ![](http://bhilburn.org/content/images/2015/01/pl9k-improved.png)
+
+There are a number of Powerline ZSH themes available, now. The developers of
+this theme focus on three primary goals:
+1. Give users a great out-of-the-box configuration with no additional
+   configuration required.
+2. Make customization easy for users who do want to tweak their prompt.
+3. Provide useful segments that you can enable to make your prompt even more
+   effective and helpful. We have prompt segments for everything from unit test
+   coverage to your AWS instance.
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
