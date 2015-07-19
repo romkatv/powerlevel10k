@@ -337,7 +337,7 @@ prompt_vcs() {
 
 function +vi-git-untracked() {
     if [[ $(git rev-parse --is-inside-work-tree 2> /dev/null) == 'true' && \
-            $(git ls-files --others --exclude-standard | sed q | wc -l | tr -d ' ') != 0 ]]; then
+            $(git ls-files --others --exclude-standard | sed q | wc -l) != 0 ]]; then
         hook_com[unstaged]+=" %F{$VCS_FOREGROUND_COLOR}$VCS_UNTRACKED_ICON%f"
     fi
 }
@@ -350,12 +350,12 @@ function +vi-git-aheadbehind() {
 
     # for git prior to 1.7
     # ahead=$(git rev-list origin/${branch_name}..HEAD | wc -l)
-    ahead=$(git rev-list ${branch_name}@{upstream}..HEAD 2>/dev/null | wc -l | tr -d ' ')
+    ahead=$(git rev-list ${branch_name}@{upstream}..HEAD 2>/dev/null | wc -l)
     (( $ahead )) && gitstatus+=( " %F{$VCS_FOREGROUND_COLOR}$VCS_OUTGOING_CHANGES${ahead// /}%f" )
 
     # for git prior to 1.7
     # behind=$(git rev-list HEAD..origin/${branch_name} | wc -l)
-    behind=$(git rev-list HEAD..${branch_name}@{upstream} 2>/dev/null | wc -l | tr -d ' ')
+    behind=$(git rev-list HEAD..${branch_name}@{upstream} 2>/dev/null | wc -l)
     (( $behind )) && gitstatus+=( " %F{$VCS_FOREGROUND_COLOR}$VCS_INCOMING_CHANGES${behind// /}%f" )
 
     hook_com[misc]+=${(j::)gitstatus}
