@@ -344,6 +344,11 @@ Here is what it looks like:
 
 ![](http://bhilburn.org/content/images/2015/03/double-line.png)
 
+If you want other icons, you can set the following variables in your `~/.zshrc`:
+
+    POWERLEVEL9K_MULTILINE_FIRST_PROMPT_PREFIX="↱"
+    POWERLEVEL9K_MULTILINE_SECOND_PROMPT_PREFIX="↳ "
+
 #### Light Color Theme
 
 If you prefer to use "light" colors, simply set `POWERLEVEL9K_COLOR_SCHEME`

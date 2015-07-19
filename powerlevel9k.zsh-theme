@@ -627,8 +627,11 @@ powerlevel9k_init() {
   add-zsh-hook precmd vcs_info
 
   if [[ "$POWERLEVEL9K_PROMPT_ON_NEWLINE" == true ]]; then
-    PROMPT="╭─%{%f%b%k%}"'$(build_left_prompt)'" 
-╰─ "
+    [[ -n $POWERLEVEL9K_MULTILINE_FIRST_PROMPT_PREFIX ]] || POWERLEVEL9K_MULTILINE_FIRST_PROMPT_PREFIX="╭─"
+    [[ -n $POWERLEVEL9K_MULTILINE_SECOND_PROMPT_PREFIX ]] || POWERLEVEL9K_MULTILINE_SECOND_PROMPT_PREFIX="╰─ "
+
+    PROMPT="$POWERLEVEL9K_MULTILINE_FIRST_PROMPT_PREFIX%{%f%b%k%}"'$(build_left_prompt)'"
+$POWERLEVEL9K_MULTILINE_SECOND_PROMPT_PREFIX"
     # The right prompt should be on the same line as the first line of the left
     # prompt.  To do so, there is just a quite ugly workaround: Before zsh draws
     # the RPROMPT, we advise it, to go one line up. At the end of RPROMPT, we
