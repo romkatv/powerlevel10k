@@ -344,7 +344,8 @@ Here is what it looks like:
 
 ![](http://bhilburn.org/content/images/2015/03/double-line.png)
 
-If you want other icons, you can set the following variables in your `~/.zshrc`:
+You can customize the icons used to draw the multiline prompt by setting the
+following variables in your `~/.zshrc`:
 
     POWERLEVEL9K_MULTILINE_FIRST_PROMPT_PREFIX="↱"
     POWERLEVEL9K_MULTILINE_SECOND_PROMPT_PREFIX="↳ "
@@ -436,9 +437,12 @@ terminal emulator (e.g., 'terminator', 'gnome-terminal', 'konsole', etc.,).
 
 #### Kudos
 
-This theme wouldn't have happened without inspiration from the original [agnoster](https://gist.github.com/agnoster/3712874) Oh-My-ZSH theme.
+This theme wouldn't have happened without inspiration from the original
+[agnoster](https://gist.github.com/agnoster/3712874) Oh-My-ZSH theme.
 
-Before creating this theme, I also tried [jeremyFreeAgent's theme](https://github.com/jeremyFreeAgent/oh-my-zsh-powerline-theme) and [maverick2000's theme, ZSH2000](https://github.com/maverick2000/zsh2000).
+Before creating this theme, I also tried [jeremyFreeAgent's
+theme](https://github.com/jeremyFreeAgent/oh-my-zsh-powerline-theme) and
+[maverick2000's theme, ZSH2000](https://github.com/maverick2000/zsh2000).
 
 #### Developing
 
@@ -450,7 +454,9 @@ wiki](https://github.com/bhilburn/powerlevel9k/wiki/Developer's-Guide).
 If you have any requests or bug reports, please use the tracker in this Github
 repository.
 
-I'm happy to accept code contributions from anyone who has a bug fix, new feature, or just a general improvement! Please submit your contribution as a Github pull-request.
+I'm happy to accept code contributions from anyone who has a bug fix, new
+feature, or just a general improvement! Please submit your contribution as
+a Github pull-request.
 
 If you would like to contact me directly, you can find my e-mail address on my
 [Github profile page](https://github.com/bhilburn).
