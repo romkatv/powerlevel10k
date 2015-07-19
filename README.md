@@ -44,7 +44,8 @@ like with a normal installation and default settings:
 - [Styling](#styling)
   - [Double-Lined Prompt](#double-lined-prompt)
   - [Light Color Theme](#light-color-theme)
-  - [Further color customizations](#further-color-customizations)
+  - [Segment Color Customization](#segment-color-customization)
+  - [Special Segment Colors](#special-segment-colors)
 - [Troubleshooting](#troubleshooting)
   - [Gaps Between Segments](#gaps-between-segments)
 - [Meta](#meta)
@@ -355,26 +356,36 @@ Light'](https://github.com/altercation/solarized) users. Check it out:
 
 ![](http://bhilburn.org/content/images/2015/03/solarized-light.png)
 
-#### Further color customizations
+#### Segment Color Customization
 
 For each segment in your prompt, you can specify a foreground and background
-color by setting them in your `~/.zshrc`. For example, to change the appearance
-of the `time` segment, you would use:
+color by setting them in your `~/.zshrc`. Use the segment names from the above
+section `Segment Customization`. For example, to change the appearance of the
+`time` segment, you would use:
 
     POWERLEVEL9K_TIME_FOREGROUND='red'
     POWERLEVEL9K_TIME_BACKGROUND='blue'
 
-Use the segment names from the above section `Segment Customization`.  Some of
-the Segments have special color variables, as they change the colors according
-to some internal rules. These Segments are `context`, `vcs`, `rspec_stats`, `symfony2_tests`:
+Note that you can also use a colorcode value. Example:
 
-    # Colors for root and other users:
+    POWERLEVEL9K_VCS_FOREGROUND='021' # Dark blue
+
+For a full list of supported colors, run the `spectrum_ls` program in your
+terminal.
+
+#### Special Segment Colors
+
+Some segments have additional color options if you want to customize the look of
+your prompt even further. These Segments are `context`, `vcs`, `rspec_stats`,
+`symfony2_tests`:
+
+    # Customizing `context` colors for root and non-root users
     POWERLEVEL9K_CONTEXT_DEFAULT_BACKGROUND="green"
     POWERLEVEL9K_CONTEXT_DEFAULT_FOREGROUND="cyan"
     POWERLEVEL9K_CONTEXT_ROOT_BACKGROUND="red"
     POWERLEVEL9K_CONTEXT_ROOT_FOREGROUND="blue"
 
-    # General VCS color segments:
+    # Advanced `vcs` color customization
     POWERLEVEL9K_VCS_FOREGROUND='blue'
     POWERLEVEL9K_VCS_DARK_FOREGROUND='black'
     POWERLEVEL9K_VCS_BACKGROUND='green'
@@ -401,13 +412,6 @@ to some internal rules. These Segments are `context`, `vcs`, `rspec_stats`, `sym
     # symfony2_tests for poor test coverage
     POWERLEVEL9K_SYMFONY2_TESTS_BAD_FOREGROUND='red'
     POWERLEVEL9K_SYMFONY2_TESTS_BAD_BACKGROUND='white'
-
-You could also use a colorcode value. Example:
-
-    POWERLEVEL9K_VCS_FOREGROUND='021' # Dark blue
-
-For a full list of supported colors, run the `spectrum_ls` program in your
-terminal.
 
 ### Troubleshooting
 
