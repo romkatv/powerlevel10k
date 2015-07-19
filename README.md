@@ -366,7 +366,13 @@ of the `time` segment, you would use:
 
 Use the segment names from the above section `Segment Customization`.  Some of
 the Segments have special color variables, as they change the colors according
-to some internal rules. These Segments are `vcs`, `rspec_stats`, `symfony2_tests`:
+to some internal rules. These Segments are `context`, `vcs`, `rspec_stats`, `symfony2_tests`:
+
+    # Colors for root and other users:
+    POWERLEVEL9K_CONTEXT_DEFAULT_BACKGROUND="green"
+    POWERLEVEL9K_CONTEXT_DEFAULT_FOREGROUND="cyan"
+    POWERLEVEL9K_CONTEXT_ROOT_BACKGROUND="red"
+    POWERLEVEL9K_CONTEXT_ROOT_FOREGROUND="blue"
 
     # General VCS color segments:
     POWERLEVEL9K_VCS_FOREGROUND='blue'

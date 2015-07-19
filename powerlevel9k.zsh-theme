@@ -437,7 +437,12 @@ prompt_aws() {
 # Note that if $DEFAULT_USER is not set, this prompt segment will always print
 prompt_context() {
   if [[ "$USER" != "$DEFAULT_USER" || -n "$SSH_CLIENT" ]]; then
-    $1_prompt_segment "$0" "$DEFAULT_COLOR" "011" "%(!.%{%F{yellow}%}.)$USER@%m"
+    if [[ $(print -P "%#") == '#' ]]; then
+      # Shell runs as root
+      $1_prompt_segment "$0_ROOT" "$DEFAULT_COLOR" "yellow" "$USER@%m"
+    else
+      $1_prompt_segment "$0_DEFAULT" "$DEFAULT_COLOR" "011" "$USER@%m"
+    fi
   fi
 }
 
