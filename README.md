@@ -12,6 +12,7 @@ Look like a bad-ass. Impress everyone in 'Screenshot Your Desktop' threads. Use 
 
 There are a number of Powerline ZSH themes available, now. The developers of
 this theme focus on three primary goals:
+
 1. Give users a great out-of-the-box configuration with no additional
    configuration required.
 2. Make customization easy for users who do want to tweak their prompt.
