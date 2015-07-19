@@ -76,7 +76,7 @@ case $POWERLEVEL9K_MODE in
     VCS_BOOKMARK_ICON="\uE87B" # 
     VCS_COMMIT_ICON="\uE821 " # 
     VCS_BRANCH_ICON="\uE220" # 
-    VCS_REMOTE_BRANCH_ICON="\uE804" # 
+    VCS_REMOTE_BRANCH_ICON=" \uE804 " # 
     VCS_GIT_ICON="\uE20E  " # 
     VCS_HG_ICON="\uE1C3  " # 
   ;;
@@ -132,7 +132,7 @@ case $POWERLEVEL9K_MODE in
     VCS_BOOKMARK_ICON="\uE87B" # 
     VCS_COMMIT_ICON="\uE821 " # 
     VCS_BRANCH_ICON="\uE220" # 
-    VCS_REMOTE_BRANCH_ICON="\uE804" # 
+    VCS_REMOTE_BRANCH_ICON=" \uE804 " # 
     VCS_GIT_ICON="\uE20E  " # 
     VCS_HG_ICON="\uE1C3  " # 
   ;;
@@ -482,7 +482,7 @@ prompt_longstatus() {
 prompt_node_version() {
   local nvm_prompt=$(node -v 2>/dev/null)
   [[ -z "${nvm_prompt}" ]] && return
-	NODE_ICON=$'\u2B22 ' # ⬢
+	NODE_ICON=$'\u2B22' # ⬢
 
   $1_prompt_segment "$0" "green" "white" "${nvm_prompt:1} $NODE_ICON"
 }
