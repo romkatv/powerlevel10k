@@ -510,14 +510,14 @@ prompt_node_version() {
 # print a little OS icon
 prompt_os_icon() {
   if [[ "$OS" == "Darwin" ]]; then
-    LOGO="\uF8FF" # 
+    LOGO=$'\uF8FF' # 
   elif [[ "$OS" == 'Linux' ]]; then
-    LOGO="\u1F427" # 🐧 
+    LOGO=$'\u1F427' # 🐧 
   elif [[ "$OS" == 'FreeBSD' ]]; then
-    LOGO="\u1F608" # 😈
+    LOGO=$'\u1F608' # 😈
   fi
 
-  $1_prompt_segment $0 008 241 $LOGO
+  $1_prompt_segment "$0" "008" "241" "$LOGO"
 }
 
 # rbenv information
