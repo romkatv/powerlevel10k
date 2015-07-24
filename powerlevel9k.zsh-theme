@@ -450,8 +450,19 @@ prompt_context() {
 prompt_dir() {
   local current_path='%~'
   if [[ -n "$POWERLEVEL9K_SHORTEN_DIR_LENGTH" ]]; then
-    # shorten path to $POWERLEVEL9K_SHORTEN_DIR_LENGTH
-    current_path="%$((POWERLEVEL9K_SHORTEN_DIR_LENGTH+1))(c:.../:)%${POWERLEVEL9K_SHORTEN_DIR_LENGTH}c"
+
+    case "$POWERLEVEL9K_SHORTEN_STRATEGY" in
+      complete_directories)
+        current_path="%$((POWERLEVEL9K_SHORTEN_DIR_LENGTH+1))(c:.../:)%${POWERLEVEL9K_SHORTEN_DIR_LENGTH}c"
+      ;;
+      truncate_from_right)
+        current_path=$(pwd | sed -e "s,^$HOME,~," | sed -E "s/([^/]{$POWERLEVEL9K_SHORTEN_DIR_LENGTH})[^/]+\//\1\//g")
+      ;;
+      *)
+        current_path=$(pwd | sed -e "s,^$HOME,~," | sed -E "s/([^/]{$POWERLEVEL9K_SHORTEN_DIR_LENGTH})[^/]+([^/]{$POWERLEVEL9K_SHORTEN_DIR_LENGTH})\//\1\.\.\2\//g")
+      ;;
+    esac
+
   fi
 
   $1_prompt_segment "$0" "blue" "$DEFAULT_COLOR" "$current_path"
