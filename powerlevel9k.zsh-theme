@@ -26,7 +26,7 @@
 #   export DEFAULT_USER=<your username>
 #
 # Customize the format of the time segment. Example of reverse format:
-#   POWERLEVEL9K_TIME_FORMAT='%D{%S:%M:%H}' 
+#   POWERLEVEL9K_TIME_FORMAT='%D{%S:%M:%H}'
 #
 # Show the hash/changeset string in the `vcs` segment:
 #   POWERLEVEL9K_SHOW_CHANGESET=true
@@ -217,8 +217,8 @@ zstyle ':vcs_info:*' enable git hg
 zstyle ':vcs_info:*' check-for-changes true
 
 VCS_DEFAULT_FORMAT="$VCS_CHANGESET_PREFIX%F{$VCS_FOREGROUND_COLOR}%b%c%u%m%f"
-zstyle ':vcs_info:git:*' formats "%F{$VCS_FOREGROUND_COLOR}$VCS_GIT_ICON%f$VCS_DEFAULT_FORMAT" 
-zstyle ':vcs_info:hg:*' formats "%F{$VCS_FOREGROUND_COLOR}$VCS_HG_ICON%f$VCS_DEFAULT_FORMAT" 
+zstyle ':vcs_info:git:*' formats "%F{$VCS_FOREGROUND_COLOR}$VCS_GIT_ICON%f$VCS_DEFAULT_FORMAT"
+zstyle ':vcs_info:hg:*' formats "%F{$VCS_FOREGROUND_COLOR}$VCS_HG_ICON%f$VCS_DEFAULT_FORMAT"
 
 zstyle ':vcs_info:*' actionformats " %b %F{red}| %a%f"
 
@@ -253,7 +253,7 @@ fi
 # The latter three can be omitted,
 left_prompt_segment() {
   # Overwrite given background-color by user defined variable for this segment.
-  # We get as first Parameter the function name, which called this function. 
+  # We get as first Parameter the function name, which called this function.
   # From the given function name, we strip the "prompt_"-prefix and uppercase it.
   # This is, prefixed with "POWERLEVEL9K_" and suffixed with either "_BACKGROUND"
   # of "_FOREGROUND", our variable name. So each new Segment should automatically
@@ -427,7 +427,7 @@ CURRENT_BG='NONE'
 # AWS Profile
 prompt_aws() {
   local aws_profile="$AWS_DEFAULT_PROFILE"
-  if [[ -n "$aws_profile" ]]; 
+  if [[ -n "$aws_profile" ]];
   then
     $1_prompt_segment "$0" red white "$AWS_ICON $aws_profile"
   fi
@@ -487,7 +487,7 @@ prompt_longstatus() {
 prompt_node_version() {
   local nvm_prompt=$(node -v 2>/dev/null)
   [[ -z "${nvm_prompt}" ]] && return
-	NODE_ICON=$'\u2B22' # ⬢
+  NODE_ICON=$'\u2B22' # ⬢
 
   $1_prompt_segment "$0" "green" "white" "${nvm_prompt:1} $NODE_ICON"
 }
@@ -645,7 +645,6 @@ $POWERLEVEL9K_MULTILINE_SECOND_PROMPT_PREFIX"
     RPROMPT_SUFFIX=''
   fi
   RPROMPT=$RPROMPT_PREFIX"%{%f%b%k%}"'$(build_right_prompt)'"%{$reset_color%}"$RPROMPT_SUFFIX
-
 }
 
 powerlevel9k_init "$@"
