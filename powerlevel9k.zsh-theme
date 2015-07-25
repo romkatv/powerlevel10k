@@ -644,7 +644,10 @@ $POWERLEVEL9K_MULTILINE_SECOND_PROMPT_PREFIX"
     RPROMPT_PREFIX=''
     RPROMPT_SUFFIX=''
   fi
-  RPROMPT=$RPROMPT_PREFIX"%{%f%b%k%}"'$(build_right_prompt)'"%{$reset_color%}"$RPROMPT_SUFFIX
+
+  if [[ "$POWERLEVEL9K_DISABLE_RPROMPT" != true ]]; then
+    RPROMPT=$RPROMPT_PREFIX"%{%f%b%k%}"'$(build_right_prompt)'"%{$reset_color%}"$RPROMPT_SUFFIX
+  fi
 
 }
 
