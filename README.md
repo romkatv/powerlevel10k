@@ -50,6 +50,7 @@ this theme focus on three primary goals:
   - [Special Segment Colors](#special-segment-colors)
 - [Troubleshooting](#troubleshooting)
   - [Gaps Between Segments](#gaps-between-segments)
+  - [Segments are printed in strange colors](#segments-are-printed-in-strange-colors)
 - [Meta](#meta)
   - [Kudos](#kudos)
   - [Developing](#developing)
@@ -434,6 +435,16 @@ You can see this issue in the screenshot, below:
 Thankfully, this is easy to fix. This happens if you have successfully installed
 Powerline fonts, but did not make a Powerline font the default font in your
 terminal emulator (e.g., 'terminator', 'gnome-terminal', 'konsole', etc.,).
+
+#### Segments are printed in strange colors
+
+Besides of choosing the right color scheme for your terminal editor, you should
+be aware that your terminal is capable of displaying 256 colors. You can check 
+that by invoking `echotc Co` in your terminal. It should show 256. If it shows
+less than that, you have to set a terminal that is capable of displaying 256
+colors like `xterm-256color` in your `~/.zshrc`:
+
+    TERM=xterm-256color
 
 ### Meta
 
