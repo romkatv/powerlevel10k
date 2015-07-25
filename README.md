@@ -278,8 +278,8 @@ to a certain length:
 By default the time is show in 'H:M:S' format. If you want to change it, 
 just set another format in your `~/.zshrc`:
 
-    # Reversed time format
-    POWERLEVEL9K_TIME_FORMAT='%D{%S:%M:%H}' 
+    # Output date and time with a nice symbol (awesome-terminal-font required)
+    POWERLEVEL9K_TIME_FORMAT="%D{%H:%M:%S \uE868  %d.%m.%y}"
 
 #### Unit Test Ratios
 
