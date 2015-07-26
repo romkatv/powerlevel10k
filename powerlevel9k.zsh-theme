@@ -44,6 +44,21 @@
 #zstyle ':vcs_info:*+*:*' debug true
 #set -o xtrace
 
+# OS detection, default to Linux
+case $(uname) in
+    FreeBSD)   OS=FreeBSD ;;
+    DragonFly) OS=FreeBSD ;;
+    OpenBSD)   OS=OpenBSD ;;
+    Darwin)    OS=Darwin  ;;
+    SunOS)     OS=SunOS   ;;
+    *)         OS=Linux   ;;
+esac
+
+# The `CURRENT_BG` variable is used to remember what the last BG color used was
+# when building the left-hand prompt. Because the RPROMPT is created from
+# right-left but reads the opposite, this isn't necessary for the other side.
+CURRENT_BG='NONE'
+
 # These characters require the Powerline fonts to work properly. If see boxes or
 # bizarre characters below, your fonts are not correctly installed. If you
 # do not want to install a special font, you can set `POWERLEVEL9K_MODE` to
@@ -490,6 +505,19 @@ prompt_node_version() {
 	NODE_ICON=$'\u2B22' # ⬢
 
   $1_prompt_segment "$0" "green" "white" "${nvm_prompt:1} $NODE_ICON"
+}
+
+# print a little OS icon
+prompt_os_icon() {
+  if [[ "$OS" == "Darwin" ]]; then
+    LOGO=$'\uF8FF' # 
+  elif [[ "$OS" == 'Linux' ]]; then
+    LOGO=$'\u1F427' # 🐧 
+  elif [[ "$OS" == 'FreeBSD' ]]; then
+    LOGO=$'\u1F608' # 😈
+  fi
+
+  $1_prompt_segment "$0" "008" "241" "$LOGO"
 }
 
 # rbenv information
