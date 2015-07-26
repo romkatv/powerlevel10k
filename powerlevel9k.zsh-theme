@@ -46,12 +46,30 @@
 
 # OS detection, default to Linux
 case $(uname) in
-    FreeBSD)   OS=FreeBSD ;;
-    DragonFly) OS=FreeBSD ;;
-    OpenBSD)   OS=OpenBSD ;;
-    Darwin)    OS=Darwin  ;;
-    SunOS)     OS=SunOS   ;;
-    *)         OS=Linux   ;;
+    FreeBSD)
+      OS=FreeBSD
+      OS_ICON=$'\u1F608' # 😈
+      ;;
+    DragonFly)
+      OS=FreeBSD
+      OS_ICON=$'\u1F608' # 😈
+      ;;
+    OpenBSD)
+      OS=OpenBSD
+      OS_ICON=$'\u1F608' # 😈
+      ;;
+    Darwin)
+      OS=Darwin
+      OS_ICON=$'\uF8FF' # 
+      ;;
+    SunOS)
+      OS=SunOS
+      OS_ICON=$'\u1F31E' # 🌞
+      ;;
+    *)
+      OS=Linux
+      OS_ICON=$'\u1F427' # 🐧
+      ;;
 esac
 
 # The `CURRENT_BG` variable is used to remember what the last BG color used was
@@ -509,15 +527,7 @@ prompt_node_version() {
 
 # print a little OS icon
 prompt_os_icon() {
-  if [[ "$OS" == "Darwin" ]]; then
-    LOGO=$'\uF8FF' # 
-  elif [[ "$OS" == 'Linux' ]]; then
-    LOGO=$'\u1F427' # 🐧 
-  elif [[ "$OS" == 'FreeBSD' ]]; then
-    LOGO=$'\u1F608' # 😈
-  fi
-
-  $1_prompt_segment "$0" "008" "241" "$LOGO"
+  $1_prompt_segment "$0" "008" "241" "$OS_ICON"
 }
 
 # rbenv information
