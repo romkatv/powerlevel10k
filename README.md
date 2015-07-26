@@ -50,6 +50,7 @@ this theme focus on three primary goals:
   - [Special Segment Colors](#special-segment-colors)
 - [Troubleshooting](#troubleshooting)
   - [Gaps Between Segments](#gaps-between-segments)
+  - [Segment Colors are Wrong](#segment-colors-are-wrong)
 - [Meta](#meta)
   - [Kudos](#kudos)
   - [Developing](#developing)
@@ -275,10 +276,17 @@ to a certain length:
 #### The 'time' segment
 
 By default the time is show in 'H:M:S' format. If you want to change it, 
-just set another format in your `~/.zshrc`:
+just set another format in your `~/.zshrc`. As an example, this is a reversed
+time format:
 
     # Reversed time format
-    POWERLEVEL9K_TIME_FORMAT='%D{%S:%M:%H}' 
+    POWERLEVEL9K_TIME_FORMAT='%D{%S:%M:%H}'
+
+If you are using an "Awesome Powerline Font", you can add a time symbol to this
+segment, as well:
+
+    # Output time, date, and a symbol from the "Awesome Powerline Font" set
+    POWERLEVEL9K_TIME_FORMAT="%D{%H:%M:%S \uE868  %d.%m.%y}"
 
 #### Unit Test Ratios
 
@@ -434,6 +442,15 @@ You can see this issue in the screenshot, below:
 Thankfully, this is easy to fix. This happens if you have successfully installed
 Powerline fonts, but did not make a Powerline font the default font in your
 terminal emulator (e.g., 'terminator', 'gnome-terminal', 'konsole', etc.,).
+
+#### Segment Colors are Wrong
+
+If the color display within your terminal seems off, it's possible you are using
+a reduced color set. You can check this by invoking `echotc Co` in your
+terminal, which should yield `256`. If you see something different, try setting
+`xterm-256color` in your `~/.zshrc`:
+
+    TERM=xterm-256color
 
 ### Meta
 
