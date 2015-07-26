@@ -26,7 +26,7 @@
 #   export DEFAULT_USER=<your username>
 #
 # Customize the format of the time segment. Example of reverse format:
-#   POWERLEVEL9K_TIME_FORMAT='%D{%S:%M:%H}' 
+#   POWERLEVEL9K_TIME_FORMAT='%D{%S:%M:%H}'
 #
 # Show the hash/changeset string in the `vcs` segment:
 #   POWERLEVEL9K_SHOW_CHANGESET=true
@@ -46,12 +46,30 @@
 
 # OS detection, default to Linux
 case $(uname) in
-    FreeBSD)   OS=FreeBSD ;;
-    DragonFly) OS=FreeBSD ;;
-    OpenBSD)   OS=OpenBSD ;;
-    Darwin)    OS=Darwin  ;;
-    SunOS)     OS=SunOS   ;;
-    *)         OS=Linux   ;;
+    FreeBSD)
+      OS=FreeBSD
+      OS_ICON=$'\U1F608' # 😈
+      ;;
+    DragonFly)
+      OS=FreeBSD
+      OS_ICON=$'\U1F608' # 😈
+      ;;
+    OpenBSD)
+      OS=OpenBSD
+      OS_ICON=$'\U1F608' # 😈
+      ;;
+    Darwin)
+      OS=Darwin
+      OS_ICON=$'\UF8FF' # 
+      ;;
+    SunOS)
+      OS=SunOS
+      OS_ICON=$'\U1F31E' # 🌞
+      ;;
+    *)
+      OS=Linux
+      OS_ICON=$'\U1F427' # 🐧
+      ;;
 esac
 
 # The `CURRENT_BG` variable is used to remember what the last BG color used was
@@ -69,112 +87,112 @@ case $POWERLEVEL9K_MODE in
     # See https://github.com/gabrielelana/awesome-terminal-fonts/tree/patching-strategy/patched
     LEFT_SEGMENT_SEPARATOR=''
     RIGHT_SEGMENT_SEPARATOR=''
-    ROOT_ICON="\uE801" # 
-    RUBY_ICON="\uE847" # 
-    AWS_ICON="\uE895" # 
-    BACKGROUND_JOBS_ICON="\uE82F " # 
-    TEST_ICON="\uE891" # 
-    OK_ICON="\u2713" # ✓
-    FAIL_ICON="\u2718" # ✘
+    ROOT_ICON="\UE801" # 
+    RUBY_ICON="\UE847" # 
+    AWS_ICON="\UE895" # 
+    BACKGROUND_JOBS_ICON="\UE82F " # 
+    TEST_ICON="\UE891" # 
+    OK_ICON="\U2713" # ✓
+    FAIL_ICON="\U2718" # ✘
     SYMFONY_ICON="SF"
-    VCS_UNTRACKED_ICON="\uE16C" # 
-    VCS_UNSTAGED_ICON="\uE17C" # 
-    VCS_STAGED_ICON="\uE168" # 
-    VCS_STASH_ICON="\uE133 " # 
-    #VCS_INCOMING_CHANGES="\uE1EB " # 
-    #VCS_INCOMING_CHANGES="\uE80D " # 
-    VCS_INCOMING_CHANGES="\uE131 " # 
-    #VCS_OUTGOING_CHANGES="\uE1EC " # 
-    #VCS_OUTGOING_CHANGES="\uE80E " # 
-    VCS_OUTGOING_CHANGES="\uE132 " # 
-    VCS_TAG_ICON="\uE817 " # 
-    VCS_BOOKMARK_ICON="\uE87B" # 
-    VCS_COMMIT_ICON="\uE821 " # 
-    VCS_BRANCH_ICON="\uE220" # 
-    VCS_REMOTE_BRANCH_ICON=" \uE804 " # 
-    VCS_GIT_ICON="\uE20E  " # 
-    VCS_HG_ICON="\uE1C3  " # 
+    VCS_UNTRACKED_ICON="\UE16C" # 
+    VCS_UNSTAGED_ICON="\UE17C" # 
+    VCS_STAGED_ICON="\UE168" # 
+    VCS_STASH_ICON="\UE133 " # 
+    #VCS_INCOMING_CHANGES="\UE1EB " # 
+    #VCS_INCOMING_CHANGES="\UE80D " # 
+    VCS_INCOMING_CHANGES="\UE131 " # 
+    #VCS_OUTGOING_CHANGES="\UE1EC " # 
+    #VCS_OUTGOING_CHANGES="\UE80E " # 
+    VCS_OUTGOING_CHANGES="\UE132 " # 
+    VCS_TAG_ICON="\UE817 " # 
+    VCS_BOOKMARK_ICON="\UE87B" # 
+    VCS_COMMIT_ICON="\UE821 " # 
+    VCS_BRANCH_ICON="\UE220" # 
+    VCS_REMOTE_BRANCH_ICON=" \UE804 " # 
+    VCS_GIT_ICON="\UE20E  " # 
+    VCS_HG_ICON="\UE1C3  " # 
   ;;
   'compatible')
-    LEFT_SEGMENT_SEPARATOR="\u2B80" # ⮀
-    RIGHT_SEGMENT_SEPARATOR="\u2B82" # ⮂
-    ROOT_ICON="\u26A1" # ⚡
+    LEFT_SEGMENT_SEPARATOR="\U2B80" # ⮀
+    RIGHT_SEGMENT_SEPARATOR="\U2B82" # ⮂
+    ROOT_ICON="\U26A1" # ⚡
     RUBY_ICON=''
     AWS_ICON="AWS:"
-    BACKGROUND_JOBS_ICON="\u2699" # ⚙
+    BACKGROUND_JOBS_ICON="\U2699" # ⚙
     TEST_ICON=''
-    OK_ICON="\u2713" # ✓
-    FAIL_ICON="\u2718" # ✘
+    OK_ICON="\U2713" # ✓
+    FAIL_ICON="\U2718" # ✘
     SYMFONY_ICON="SF"
     VCS_UNTRACKED_ICON='?'
-    VCS_UNSTAGED_ICON="\u25CF" # ●
-    VCS_STAGED_ICON="\u271A" # ✚
-    VCS_STASH_ICON="\u235F" # ⍟
-    VCS_INCOMING_CHANGES="\u2193" # ↓
-    VCS_OUTGOING_CHANGES="\u2191" # ↑
+    VCS_UNSTAGED_ICON="\U25CF" # ●
+    VCS_STAGED_ICON="\U271A" # ✚
+    VCS_STASH_ICON="\U235F" # ⍟
+    VCS_INCOMING_CHANGES="\U2193" # ↓
+    VCS_OUTGOING_CHANGES="\U2191" # ↑
     VCS_TAG_ICON=''
-    VCS_BOOKMARK_ICON="\u263F" # ☿
+    VCS_BOOKMARK_ICON="\U263F" # ☿
     VCS_COMMIT_ICON=''
     VCS_BRANCH_ICON='@'
-    VCS_REMOTE_BRANCH_ICON="\u2192" # →
+    VCS_REMOTE_BRANCH_ICON="\U2192" # →
     VCS_GIT_ICON='Git'
     VCS_HG_ICON='HG'
   ;;
   'awesome-patched')
     # Awesome-Patched Font required!
     # See https://github.com/gabrielelana/awesome-terminal-fonts/tree/patching-strategy/patched
-    LEFT_SEGMENT_SEPARATOR="\uE0B0" # 
-    RIGHT_SEGMENT_SEPARATOR="\uE0B2" # 
-    ROOT_ICON="\u26A1" # ⚡
-    RUBY_ICON="\uE847" # 
-    AWS_ICON="\uE895" # 
-    BACKGROUND_JOBS_ICON="\uE82F " # 
-    TEST_ICON="\uE891" # 
-    OK_ICON="\u2713" # ✓
-    FAIL_ICON="\u2718" # ✘
+    LEFT_SEGMENT_SEPARATOR="\UE0B0" # 
+    RIGHT_SEGMENT_SEPARATOR="\UE0B2" # 
+    ROOT_ICON="\U26A1" # ⚡
+    RUBY_ICON="\UE847" # 
+    AWS_ICON="\UE895" # 
+    BACKGROUND_JOBS_ICON="\UE82F " # 
+    TEST_ICON="\UE891" # 
+    OK_ICON="\U2713" # ✓
+    FAIL_ICON="\U2718" # ✘
     SYMFONY_ICON="SF"
-    VCS_UNTRACKED_ICON="\uE16C" # 
-    VCS_UNSTAGED_ICON="\uE17C" # 
-    VCS_STAGED_ICON="\uE168" # 
-    VCS_STASH_ICON="\uE133 " # 
-    #VCS_INCOMING_CHANGES="\uE1EB " # 
-    #VCS_INCOMING_CHANGES="\uE80D " # 
-    VCS_INCOMING_CHANGES="\uE131 " # 
-    #VCS_OUTGOING_CHANGES="\uE1EC " # 
-    #VCS_OUTGOING_CHANGES="\uE80E " # 
-    VCS_OUTGOING_CHANGES="\uE132 " # 
-    VCS_TAG_ICON="\uE817 " # 
-    VCS_BOOKMARK_ICON="\uE87B" # 
-    VCS_COMMIT_ICON="\uE821 " # 
-    VCS_BRANCH_ICON="\uE220" # 
-    VCS_REMOTE_BRANCH_ICON=" \uE804 " # 
-    VCS_GIT_ICON="\uE20E  " # 
-    VCS_HG_ICON="\uE1C3  " # 
+    VCS_UNTRACKED_ICON="\UE16C" # 
+    VCS_UNSTAGED_ICON="\UE17C" # 
+    VCS_STAGED_ICON="\UE168" # 
+    VCS_STASH_ICON="\UE133 " # 
+    #VCS_INCOMING_CHANGES="\UE1EB " # 
+    #VCS_INCOMING_CHANGES="\UE80D " # 
+    VCS_INCOMING_CHANGES="\UE131 " # 
+    #VCS_OUTGOING_CHANGES="\UE1EC " # 
+    #VCS_OUTGOING_CHANGES="\UE80E " # 
+    VCS_OUTGOING_CHANGES="\UE132 " # 
+    VCS_TAG_ICON="\UE817 " # 
+    VCS_BOOKMARK_ICON="\UE87B" # 
+    VCS_COMMIT_ICON="\UE821 " # 
+    VCS_BRANCH_ICON="\UE220" # 
+    VCS_REMOTE_BRANCH_ICON=" \UE804 " # 
+    VCS_GIT_ICON="\UE20E  " # 
+    VCS_HG_ICON="\UE1C3  " # 
   ;;
   *)
     # Powerline-Patched Font required!
     # See https://github.com/Lokaltog/powerline-fonts
-    LEFT_SEGMENT_SEPARATOR="\uE0B0" # 
-    RIGHT_SEGMENT_SEPARATOR="\uE0B2" # 
-    ROOT_ICON="\u26A1" # ⚡
+    LEFT_SEGMENT_SEPARATOR="\UE0B0" # 
+    RIGHT_SEGMENT_SEPARATOR="\UE0B2" # 
+    ROOT_ICON="\U26A1" # ⚡
     RUBY_ICON=''
     AWS_ICON="AWS:"
-    BACKGROUND_JOBS_ICON="\u2699" # ⚙
+    BACKGROUND_JOBS_ICON="\U2699" # ⚙
     TEST_ICON=''
-    OK_ICON="\u2713" # ✓
-    FAIL_ICON="\u2718" # ✘
+    OK_ICON="\U2713" # ✓
+    FAIL_ICON="\U2718" # ✘
     SYMFONY_ICON="SF"
     VCS_UNTRACKED_ICON='?'
-    VCS_UNSTAGED_ICON="\u25CF" # ●
-    VCS_STAGED_ICON="\u271A" # ✚
-    VCS_STASH_ICON="\u235F" # ⍟
-    VCS_INCOMING_CHANGES="\u2193" # ↓
-    VCS_OUTGOING_CHANGES="\u2191" # ↑
+    VCS_UNSTAGED_ICON="\U25CF" # ●
+    VCS_STAGED_ICON="\U271A" # ✚
+    VCS_STASH_ICON="\U235F" # ⍟
+    VCS_INCOMING_CHANGES="\U2193" # ↓
+    VCS_OUTGOING_CHANGES="\U2191" # ↑
     VCS_TAG_ICON=''
-    VCS_BOOKMARK_ICON="\u263F" # ☿
+    VCS_BOOKMARK_ICON="\U263F" # ☿
     VCS_COMMIT_ICON=''
-    VCS_BRANCH_ICON="\uE0A0 " # 
-    VCS_REMOTE_BRANCH_ICON="\u2192" # →
+    VCS_BRANCH_ICON="\UE0A0 " # 
+    VCS_REMOTE_BRANCH_ICON="\U2192" # →
     VCS_GIT_ICON=""
     VCS_HG_ICON=""
   ;;
@@ -232,8 +250,8 @@ zstyle ':vcs_info:*' enable git hg
 zstyle ':vcs_info:*' check-for-changes true
 
 VCS_DEFAULT_FORMAT="$VCS_CHANGESET_PREFIX%F{$VCS_FOREGROUND_COLOR}%b%c%u%m%f"
-zstyle ':vcs_info:git:*' formats "%F{$VCS_FOREGROUND_COLOR}$VCS_GIT_ICON%f$VCS_DEFAULT_FORMAT" 
-zstyle ':vcs_info:hg:*' formats "%F{$VCS_FOREGROUND_COLOR}$VCS_HG_ICON%f$VCS_DEFAULT_FORMAT" 
+zstyle ':vcs_info:git:*' formats "%F{$VCS_FOREGROUND_COLOR}$VCS_GIT_ICON%f$VCS_DEFAULT_FORMAT"
+zstyle ':vcs_info:hg:*' formats "%F{$VCS_FOREGROUND_COLOR}$VCS_HG_ICON%f$VCS_DEFAULT_FORMAT"
 
 zstyle ':vcs_info:*' actionformats " %b %F{red}| %a%f"
 
@@ -268,7 +286,7 @@ fi
 # The latter three can be omitted,
 left_prompt_segment() {
   # Overwrite given background-color by user defined variable for this segment.
-  # We get as first Parameter the function name, which called this function. 
+  # We get as first Parameter the function name, which called this function.
   # From the given function name, we strip the "prompt_"-prefix and uppercase it.
   # This is, prefixed with "POWERLEVEL9K_" and suffixed with either "_BACKGROUND"
   # of "_FOREGROUND", our variable name. So each new Segment should automatically
@@ -442,7 +460,7 @@ CURRENT_BG='NONE'
 # AWS Profile
 prompt_aws() {
   local aws_profile="$AWS_DEFAULT_PROFILE"
-  if [[ -n "$aws_profile" ]]; 
+  if [[ -n "$aws_profile" ]];
   then
     $1_prompt_segment "$0" red white "$AWS_ICON $aws_profile"
   fi
@@ -502,22 +520,14 @@ prompt_longstatus() {
 prompt_node_version() {
   local nvm_prompt=$(node -v 2>/dev/null)
   [[ -z "${nvm_prompt}" ]] && return
-	NODE_ICON=$'\u2B22' # ⬢
+  NODE_ICON=$'\U2B22' # ⬢
 
   $1_prompt_segment "$0" "green" "white" "${nvm_prompt:1} $NODE_ICON"
 }
 
 # print a little OS icon
 prompt_os_icon() {
-  if [[ "$OS" == "Darwin" ]]; then
-    LOGO=$'\uF8FF' # 
-  elif [[ "$OS" == 'Linux' ]]; then
-    LOGO=$'\u1F427' # 🐧 
-  elif [[ "$OS" == 'FreeBSD' ]]; then
-    LOGO=$'\u1F608' # 😈
-  fi
-
-  $1_prompt_segment "$0" "008" "241" "$LOGO"
+  $1_prompt_segment "$0" "008" "241" "$OS_ICON"
 }
 
 # rbenv information
@@ -673,7 +683,6 @@ $POWERLEVEL9K_MULTILINE_SECOND_PROMPT_PREFIX"
     RPROMPT_SUFFIX=''
   fi
   RPROMPT=$RPROMPT_PREFIX"%{%f%b%k%}"'$(build_right_prompt)'"%{$reset_color%}"$RPROMPT_SUFFIX
-
 }
 
 powerlevel9k_init "$@"
