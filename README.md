@@ -45,6 +45,7 @@ this theme focus on three primary goals:
     - [Symbols](#symbols)
 - [Styling](#styling)
   - [Double-Lined Prompt](#double-lined-prompt)
+  - [Disable Right Prompt](#disable-right-prompt)
   - [Light Color Theme](#light-color-theme)
   - [Segment Color Customization](#segment-color-customization)
   - [Special Segment Colors](#special-segment-colors)
@@ -359,6 +360,12 @@ following variables in your `~/.zshrc`:
 
     POWERLEVEL9K_MULTILINE_FIRST_PROMPT_PREFIX="↱"
     POWERLEVEL9K_MULTILINE_SECOND_PROMPT_PREFIX="↳ "
+
+#### Disable Right Prompt
+
+If you do not want a right prompt, you can disable it by setting:
+
+    POWERLEVEL9K_DISABLE_RPROMPT=true
 
 #### Light Color Theme
 
