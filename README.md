@@ -11,7 +11,7 @@ Look like a bad-ass. Impress everyone in 'Screenshot Your Desktop' threads. Use 
 ![](http://bhilburn.org/content/images/2015/01/pl9k-improved.png)
 
 There are a number of Powerline ZSH themes available, now. The developers of
-this theme focus on three primary goals:
+this theme focus on four primary goals:
 
 1. Give users a great out-of-the-box configuration with no additional
    configuration required.
@@ -19,6 +19,8 @@ this theme focus on three primary goals:
 3. Provide useful segments that you can enable to make your prompt even more
    effective and helpful. We have prompt segments for everything from unit test
    coverage to your AWS instance.
+4. Optimize the code for execution speed as much as possible. A snappy terminal
+   is a happy terminal.
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
