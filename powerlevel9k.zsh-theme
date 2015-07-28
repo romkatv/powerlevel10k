@@ -529,7 +529,7 @@ prompt_os_icon() {
     "Darwin")  OS_ICON=$APPLE_ICON   ;;
     "FreeBSD") OS_ICON=$FREEBSD_ICON ;;
     "Linux")   OS_ICON=$LINUX_ICON   ;;
-    "SunOS")   OS_ICON=$SUNOS_ICON     ;;
+    "SunOS")   OS_ICON=$SUNOS_ICON   ;;
     *)         OS_ICON=''            ;;
   esac
   $1_prompt_segment "$0" "008" "241" "$OS_ICON"
