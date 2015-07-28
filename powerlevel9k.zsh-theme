@@ -46,30 +46,12 @@
 
 # OS detection, default to Linux
 case $(uname) in
-    FreeBSD)
-      OS=FreeBSD
-      OS_ICON=$'\U1F608' # 😈
-      ;;
-    DragonFly)
-      OS=FreeBSD
-      OS_ICON=$'\U1F608' # 😈
-      ;;
-    OpenBSD)
-      OS=OpenBSD
-      OS_ICON=$'\U1F608' # 😈
-      ;;
-    Darwin)
-      OS=Darwin
-      OS_ICON=$'\UF8FF' # 
-      ;;
-    SunOS)
-      OS=SunOS
-      OS_ICON=$'\U1F31E' # 🌞
-      ;;
-    *)
-      OS=Linux
-      OS_ICON=$'\U1F427' # 🐧
-      ;;
+    FreeBSD)   OS=FreeBSD ;;
+    DragonFly) OS=FreeBSD ;;
+    OpenBSD)   OS=OpenBSD ;;
+    Darwin)    OS=Darwin  ;;
+    SunOS)     OS=SunOS   ;;
+    *)         OS=Linux   ;;
 esac
 
 # The `CURRENT_BG` variable is used to remember what the last BG color used was
@@ -95,6 +77,10 @@ case $POWERLEVEL9K_MODE in
     OK_ICON="\U2713" # ✓
     FAIL_ICON="\U2718" # ✘
     SYMFONY_ICON="SF"
+    APPLE_ICON=$'\UF8FF' # 
+    FREEBSD_ICON=$'\U1F608 ' # 😈
+    LINUX_ICON=$'\U1F427 ' # 🐧
+    SUNOS_ICON=$'\U1F31E ' # 🌞
     VCS_UNTRACKED_ICON="\UE16C" # 
     VCS_UNSTAGED_ICON="\UE17C" # 
     VCS_STAGED_ICON="\UE168" # 
@@ -124,6 +110,10 @@ case $POWERLEVEL9K_MODE in
     OK_ICON="\U2713" # ✓
     FAIL_ICON="\U2718" # ✘
     SYMFONY_ICON="SF"
+    APPLE_ICON='OSX'
+    FREEBSD_ICON='BSD'
+    LINUX_ICON='Lx'
+    SUNOS_ICON='Sun'
     VCS_UNTRACKED_ICON='?'
     VCS_UNSTAGED_ICON="\U25CF" # ●
     VCS_STAGED_ICON="\U271A" # ✚
@@ -151,6 +141,10 @@ case $POWERLEVEL9K_MODE in
     OK_ICON="\U2713" # ✓
     FAIL_ICON="\U2718" # ✘
     SYMFONY_ICON="SF"
+    APPLE_ICON=$'\UF8FF' # 
+    FREEBSD_ICON=$'\U1F608 ' # 😈
+    LINUX_ICON=$'\U1F427 ' # 🐧
+    SUNOS_ICON=$'\U1F31E ' # 🌞
     VCS_UNTRACKED_ICON="\UE16C" # 
     VCS_UNSTAGED_ICON="\UE17C" # 
     VCS_STAGED_ICON="\UE168" # 
@@ -182,6 +176,10 @@ case $POWERLEVEL9K_MODE in
     OK_ICON="\U2713" # ✓
     FAIL_ICON="\U2718" # ✘
     SYMFONY_ICON="SF"
+    APPLE_ICON='OSX'
+    FREEBSD_ICON='BSD'
+    LINUX_ICON='Lx'
+    SUNOS_ICON='Sun'
     VCS_UNTRACKED_ICON='?'
     VCS_UNSTAGED_ICON="\U25CF" # ●
     VCS_STAGED_ICON="\U271A" # ✚
@@ -527,6 +525,13 @@ prompt_node_version() {
 
 # print a little OS icon
 prompt_os_icon() {
+  case "$OS" in
+    "Darwin")  OS_ICON=$APPLE_ICON   ;;
+    "FreeBSD") OS_ICON=$FREEBSD_ICON ;;
+    "Linux")   OS_ICON=$LINUX_ICON   ;;
+    "SunOS")   OS_ICON=$SUNOS_ICON     ;;
+    *)         OS_ICON=''            ;;
+  esac
   $1_prompt_segment "$0" "008" "241" "$OS_ICON"
 }
 
