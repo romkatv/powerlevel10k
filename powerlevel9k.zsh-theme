@@ -44,16 +44,6 @@
 #zstyle ':vcs_info:*+*:*' debug true
 #set -o xtrace
 
-# OS detection, default to Linux
-case $(uname) in
-    FreeBSD)   OS=FreeBSD ;;
-    DragonFly) OS=FreeBSD ;;
-    OpenBSD)   OS=OpenBSD ;;
-    Darwin)    OS=Darwin  ;;
-    SunOS)     OS=SunOS   ;;
-    *)         OS=Linux   ;;
-esac
-
 # The `CURRENT_BG` variable is used to remember what the last BG color used was
 # when building the left-hand prompt. Because the RPROMPT is created from
 # right-left but reads the opposite, this isn't necessary for the other side.
@@ -194,6 +184,15 @@ case $POWERLEVEL9K_MODE in
     VCS_GIT_ICON=""
     VCS_HG_ICON=""
   ;;
+esac
+
+# OS detection for the `os_icon` segment
+case $(uname) in
+    Darwin)   OS_ICON=$APPLE_ICON   ;;
+    FreeBSD)  OS_ICON=$FREEBSD_ICON ;;
+    Linux)    OS_ICON=$LINUX_ICON   ;;
+    SunOS)    OS_ICON=$SUNOS_ICON   ;;
+    *)        OS_ICON=''            ;;
 esac
 
 if [[ "$POWERLEVEL9K_HIDE_BRANCH_ICON" == true ]]; then
@@ -525,14 +524,7 @@ prompt_node_version() {
 
 # print a little OS icon
 prompt_os_icon() {
-  case "$OS" in
-    "Darwin")  OS_ICON=$APPLE_ICON   ;;
-    "FreeBSD") OS_ICON=$FREEBSD_ICON ;;
-    "Linux")   OS_ICON=$LINUX_ICON   ;;
-    "SunOS")   OS_ICON=$SUNOS_ICON   ;;
-    *)         OS_ICON=''            ;;
-  esac
-  $1_prompt_segment "$0" "008" "241" "$OS_ICON"
+  $1_prompt_segment "$0" "008" "255" "$OS_ICON"
 }
 
 # rbenv information
