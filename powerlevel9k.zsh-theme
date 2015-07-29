@@ -456,7 +456,7 @@ prompt_dir() {
         current_path="%$((POWERLEVEL9K_SHORTEN_DIR_LENGTH+1))(c:.../:)%${POWERLEVEL9K_SHORTEN_DIR_LENGTH}c"
       ;;
       truncate_from_right)
-        current_path=$(pwd | sed -e "s,^$HOME,~," | sed -E "s/([^/]{$POWERLEVEL9K_SHORTEN_DIR_LENGTH})[^/]+\//\1\//g")
+        current_path=$(pwd | sed -e "s,^$HOME,~," | sed -E "s/([^/]{$POWERLEVEL9K_SHORTEN_DIR_LENGTH})[^/]+\//\1..\//g")
       ;;
       *)
         current_path=$(pwd | sed -e "s,^$HOME,~," | sed -E "s/([^/]{$POWERLEVEL9K_SHORTEN_DIR_LENGTH})[^/]+([^/]{$POWERLEVEL9K_SHORTEN_DIR_LENGTH})\//\1\.\.\2\//g")
