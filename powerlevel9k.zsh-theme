@@ -337,7 +337,7 @@ prompt_vcs() {
 
 function +vi-git-untracked() {
     if [[ $(git rev-parse --is-inside-work-tree 2> /dev/null) == 'true' && \
-            ${$(git ls-files --others --exclude-standard | sed q | wc -l)// /} != 0 ]]; then
+            -n $(git ls-files --others --exclude-standard) ]]; then
         hook_com[unstaged]+=" %F{$VCS_FOREGROUND_COLOR}$VCS_UNTRACKED_ICON%f"
     fi
 }
