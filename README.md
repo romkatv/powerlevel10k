@@ -277,6 +277,18 @@ to a certain length:
     # Limit to the last two folders
     POWERLEVEL9K_SHORTEN_DIR_LENGTH=2
 
+To change the way how the current working directory is truncated, just set:
+
+    # truncate whole directories
+    POWERLEVEL9K_SHORTEN_STRATEGY="complete_directories"
+    # truncate from right, leaving the first X characters untouched
+    POWERLEVEL9K_SHORTEN_STRATEGY="truncate_from_right"
+    # default behaviour is to truncate the middle part of the directory
+
+In each case you have to specify the length you want to shorten the directory
+to. So in some cases `POWERLEVEL9K_SHORTEN_DIR_LENGTH` means characters, in 
+others whole directories.
+
 #### The 'time' segment
 
 By default the time is show in 'H:M:S' format. If you want to change it, 
