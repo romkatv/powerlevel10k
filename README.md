@@ -279,11 +279,11 @@ to a certain length:
 
 To change the way how the current working directory is truncated, just set:
 
-    # truncate whole directories
-    POWERLEVEL9K_SHORTEN_STRATEGY="complete_directories"
+    # truncate the middle part
+    POWERLEVEL9K_SHORTEN_STRATEGY="truncate_middle"
     # truncate from right, leaving the first X characters untouched
     POWERLEVEL9K_SHORTEN_STRATEGY="truncate_from_right"
-    # default behaviour is to truncate the middle part of the directory
+    # default behaviour is to truncate whole directories
 
 In each case you have to specify the length you want to shorten the directory
 to. So in some cases `POWERLEVEL9K_SHORTEN_DIR_LENGTH` means characters, in 
