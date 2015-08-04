@@ -54,75 +54,7 @@
 # `compatible`. This shows all icons in regular symbols.
 typeset -A icons
 case $POWERLEVEL9K_MODE in
-  'flat')
-    # Awesome-Patched Font required!
-    # See https://github.com/gabrielelana/awesome-terminal-fonts/tree/patching-strategy/patched
-    icons=(
-      LEFT_SEGMENT_SEPARATOR      ''
-      RIGHT_SEGMENT_SEPARATOR     ''
-      ROOT_ICON                   "\UE801" # 
-      RUBY_ICON                   "\UE847" # 
-      AWS_ICON                    "\UE895" # 
-      BACKGROUND_JOBS_ICON        "\UE82F " # 
-      TEST_ICON                   "\UE891" # 
-      OK_ICON                     "\U2713" # ✓
-      FAIL_ICON                   "\U2718" # ✘
-      SYMFONY_ICON                "SF"
-      APPLE_ICON                  $'\UF8FF' # 
-      FREEBSD_ICON                $'\U1F608 ' # 😈
-      LINUX_ICON                  $'\U1F427 ' # 🐧
-      SUNOS_ICON                  $'\U1F31E ' # 🌞
-      VCS_UNTRACKED_ICON          "\UE16C" # 
-      VCS_UNSTAGED_ICON           "\UE17C" # 
-      VCS_STAGED_ICON             "\UE168" # 
-      VCS_STASH_ICON              "\UE133 " # 
-      #VCS_INCOMING_CHANGES       "\UE1EB " # 
-      #VCS_INCOMING_CHANGES       "\UE80D " # 
-      VCS_INCOMING_CHANGES        "\UE131 " # 
-      #VCS_OUTGOING_CHANGES       "\UE1EC " # 
-      #VCS_OUTGOING_CHANGES       "\UE80E " # 
-      VCS_OUTGOING_CHANGES        "\UE132 " # 
-      VCS_TAG_ICON                "\UE817 " # 
-      VCS_BOOKMARK_ICON           "\UE87B" # 
-      VCS_COMMIT_ICON             "\UE821 " # 
-      VCS_BRANCH_ICON             $'\UE220' # 
-      VCS_REMOTE_BRANCH_ICON      " \UE804 " # 
-      VCS_GIT_ICON                "\UE20E  " # 
-      VCS_HG_ICON                 "\UE1C3  " # 
-    )
-  ;;
-  'compatible')
-    icons=(
-      LEFT_SEGMENT_SEPARATOR      "\U2B80" # ⮀
-      RIGHT_SEGMENT_SEPARATOR     "\U2B82" # ⮂
-      ROOT_ICON                   "\U26A1" # ⚡
-      RUBY_ICON                   ''
-      AWS_ICON                    "AWS:"
-      BACKGROUND_JOBS_ICON        "\U2699" # ⚙
-      TEST_ICON                   ''
-      OK_ICON                     "\U2713" # ✓
-      FAIL_ICON                   "\U2718" # ✘
-      SYMFONY_ICON                "SF"
-      APPLE_ICON                  'OSX'
-      FREEBSD_ICON                'BSD'
-      LINUX_ICON                  'Lx'
-      SUNOS_ICON                  'Sun'
-      VCS_UNTRACKED_ICON          '?'
-      VCS_UNSTAGED_ICON           "\U25CF" # ●
-      VCS_STAGED_ICON             "\U271A" # ✚
-      VCS_STASH_ICON              "\U235F" # ⍟
-      VCS_INCOMING_CHANGES        "\U2193" # ↓
-      VCS_OUTGOING_CHANGES        "\U2191" # ↑
-      VCS_TAG_ICON                ''
-      VCS_BOOKMARK_ICON           "\U263F" # ☿
-      VCS_COMMIT_ICON             ''
-      VCS_BRANCH_ICON             '@'
-      VCS_REMOTE_BRANCH_ICON      "\U2192" # →
-      VCS_GIT_ICON                'Git'
-      VCS_HG_ICON                 'HG'
-    )
-  ;;
-  'awesome-patched')
+  'flat'|'awesome-patched')
     # Awesome-Patched Font required!
     # See https://github.com/gabrielelana/awesome-terminal-fonts/tree/patching-strategy/patched
     icons=(
@@ -191,6 +123,19 @@ case $POWERLEVEL9K_MODE in
       VCS_GIT_ICON                ""
       VCS_HG_ICON                 ""
     )
+  ;;
+esac
+
+# Second switch for overrides
+case $POWERLEVEL9K_MODE in
+  'flat')
+    icons[LEFT_SEGMENT_SEPARATOR]=''
+    icons[RIGHT_SEGMENT_SEPARATOR]=''
+  ;;
+  'compatible')
+    icons[LEFT_SEGMENT_SEPARATOR]="\U2B80" # ⮀
+    icons[RIGHT_SEGMENT_SEPARATOR]="\U2B82" # ⮂
+    icons[VCS_BRANCH_ICON]='@'
   ;;
 esac
 
