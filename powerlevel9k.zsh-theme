@@ -68,8 +68,8 @@ case $POWERLEVEL9K_MODE in
       OK_ICON                        "\U2713" # ✓
       FAIL_ICON                      "\U2718" # ✘
       SYMFONY_ICON                   "SF"
-      MULTILINE_FIRST_PROMPT_PREFIX  "╭─"
-      MULTILINE_SECOND_PROMPT_PREFIX "╰─ "
+      MULTILINE_FIRST_PROMPT_PREFIX  $'\U256D'$'\U2500'
+      MULTILINE_SECOND_PROMPT_PREFIX $'\U2570'$'\U2500 '
       APPLE_ICON                     $'\UF8FF' # 
       FREEBSD_ICON                   $'\U1F608 ' # 😈
       LINUX_ICON                     $'\U1F427 ' # 🐧
@@ -107,8 +107,8 @@ case $POWERLEVEL9K_MODE in
       OK_ICON                        "\U2713" # ✓
       FAIL_ICON                      "\U2718" # ✘
       SYMFONY_ICON                   "SF"
-      MULTILINE_FIRST_PROMPT_PREFIX  "╭─"
-      MULTILINE_SECOND_PROMPT_PREFIX "╰─ "
+      MULTILINE_FIRST_PROMPT_PREFIX  $'\U256D'$'\U2500'
+      MULTILINE_SECOND_PROMPT_PREFIX $'\U2570'$'\U2500 '
       APPLE_ICON                     'OSX'
       FREEBSD_ICON                   'BSD'
       LINUX_ICON                     'Lx'
