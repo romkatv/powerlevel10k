@@ -58,70 +58,74 @@ case $POWERLEVEL9K_MODE in
     # Awesome-Patched Font required!
     # See https://github.com/gabrielelana/awesome-terminal-fonts/tree/patching-strategy/patched
     icons=(
-      LEFT_SEGMENT_SEPARATOR      "\UE0B0" # 
-      RIGHT_SEGMENT_SEPARATOR     "\UE0B2" # 
-      ROOT_ICON                   "\UE801" # 
-      RUBY_ICON                   "\UE847" # 
-      AWS_ICON                    "\UE895" # 
-      BACKGROUND_JOBS_ICON        "\UE82F " # 
-      TEST_ICON                   "\UE891" # 
-      OK_ICON                     "\U2713" # ✓
-      FAIL_ICON                   "\U2718" # ✘
-      SYMFONY_ICON                "SF"
-      APPLE_ICON                  $'\UF8FF' # 
-      FREEBSD_ICON                $'\U1F608 ' # 😈
-      LINUX_ICON                  $'\U1F427 ' # 🐧
-      SUNOS_ICON                  $'\U1F31E ' # 🌞
-      VCS_UNTRACKED_ICON          "\UE16C" # 
-      VCS_UNSTAGED_ICON           "\UE17C" # 
-      VCS_STAGED_ICON             "\UE168" # 
-      VCS_STASH_ICON              "\UE133 " # 
-      #VCS_INCOMING_CHANGES       "\UE1EB " # 
-      #VCS_INCOMING_CHANGES       "\UE80D " # 
-      VCS_INCOMING_CHANGES        "\UE131 " # 
-      #VCS_OUTGOING_CHANGES       "\UE1EC " # 
-      #VCS_OUTGOING_CHANGES       "\UE80E " # 
-      VCS_OUTGOING_CHANGES        "\UE132 " # 
-      VCS_TAG_ICON                "\UE817 " # 
-      VCS_BOOKMARK_ICON           "\UE87B" # 
-      VCS_COMMIT_ICON             "\UE821 " # 
-      VCS_BRANCH_ICON             $'\UE220' # 
-      VCS_REMOTE_BRANCH_ICON      " \UE804 " # 
-      VCS_GIT_ICON                "\UE20E  " # 
-      VCS_HG_ICON                 "\UE1C3  " # 
+      LEFT_SEGMENT_SEPARATOR         "\UE0B0" # 
+      RIGHT_SEGMENT_SEPARATOR        "\UE0B2" # 
+      ROOT_ICON                      "\UE801" # 
+      RUBY_ICON                      "\UE847" # 
+      AWS_ICON                       "\UE895" # 
+      BACKGROUND_JOBS_ICON           "\UE82F " # 
+      TEST_ICON                      "\UE891" # 
+      OK_ICON                        "\U2713" # ✓
+      FAIL_ICON                      "\U2718" # ✘
+      SYMFONY_ICON                   "SF"
+      MULTILINE_FIRST_PROMPT_PREFIX  "╭─"
+      MULTILINE_SECOND_PROMPT_PREFIX "╰─ "
+      APPLE_ICON                     $'\UF8FF' # 
+      FREEBSD_ICON                   $'\U1F608 ' # 😈
+      LINUX_ICON                     $'\U1F427 ' # 🐧
+      SUNOS_ICON                     $'\U1F31E ' # 🌞
+      VCS_UNTRACKED_ICON             "\UE16C" # 
+      VCS_UNSTAGED_ICON              "\UE17C" # 
+      VCS_STAGED_ICON                "\UE168" # 
+      VCS_STASH_ICON                 "\UE133 " # 
+      #VCS_INCOMING_CHANGES          "\UE1EB " # 
+      #VCS_INCOMING_CHANGES          "\UE80D " # 
+      VCS_INCOMING_CHANGES           "\UE131 " # 
+      #VCS_OUTGOING_CHANGES          "\UE1EC " # 
+      #VCS_OUTGOING_CHANGES          "\UE80E " # 
+      VCS_OUTGOING_CHANGES           "\UE132 " # 
+      VCS_TAG_ICON                   "\UE817 " # 
+      VCS_BOOKMARK_ICON              "\UE87B" # 
+      VCS_COMMIT_ICON                "\UE821 " # 
+      VCS_BRANCH_ICON                $'\UE220' # 
+      VCS_REMOTE_BRANCH_ICON         " \UE804 " # 
+      VCS_GIT_ICON                   "\UE20E  " # 
+      VCS_HG_ICON                    "\UE1C3  " # 
     )
   ;;
   *)
     # Powerline-Patched Font required!
     # See https://github.com/Lokaltog/powerline-fonts
     icons=(
-      LEFT_SEGMENT_SEPARATOR      "\UE0B0" # 
-      RIGHT_SEGMENT_SEPARATOR     "\UE0B2" # 
-      ROOT_ICON                   "\U26A1" # ⚡
-      RUBY_ICON                   ''
-      AWS_ICON                    "AWS:"
-      BACKGROUND_JOBS_ICON        "\U2699" # ⚙
-      TEST_ICON                   ''
-      OK_ICON                     "\U2713" # ✓
-      FAIL_ICON                   "\U2718" # ✘
-      SYMFONY_ICON                "SF"
-      APPLE_ICON                  'OSX'
-      FREEBSD_ICON                'BSD'
-      LINUX_ICON                  'Lx'
-      SUNOS_ICON                  'Sun'
-      VCS_UNTRACKED_ICON          '?'
-      VCS_UNSTAGED_ICON           "\U25CF" # ●
-      VCS_STAGED_ICON             "\U271A" # ✚
-      VCS_STASH_ICON              "\U235F" # ⍟
-      VCS_INCOMING_CHANGES        "\U2193" # ↓
-      VCS_OUTGOING_CHANGES        "\U2191" # ↑
-      VCS_TAG_ICON                ''
-      VCS_BOOKMARK_ICON           "\U263F" # ☿
-      VCS_COMMIT_ICON             ''
-      VCS_BRANCH_ICON             "\UE0A0 " # 
-      VCS_REMOTE_BRANCH_ICON      "\U2192" # →
-      VCS_GIT_ICON                ""
-      VCS_HG_ICON                 ""
+      LEFT_SEGMENT_SEPARATOR         "\UE0B0" # 
+      RIGHT_SEGMENT_SEPARATOR        "\UE0B2" # 
+      ROOT_ICON                      "\U26A1" # ⚡
+      RUBY_ICON                      ''
+      AWS_ICON                       "AWS:"
+      BACKGROUND_JOBS_ICON           "\U2699" # ⚙
+      TEST_ICON                      ''
+      OK_ICON                        "\U2713" # ✓
+      FAIL_ICON                      "\U2718" # ✘
+      SYMFONY_ICON                   "SF"
+      MULTILINE_FIRST_PROMPT_PREFIX  "╭─"
+      MULTILINE_SECOND_PROMPT_PREFIX "╰─ "
+      APPLE_ICON                     'OSX'
+      FREEBSD_ICON                   'BSD'
+      LINUX_ICON                     'Lx'
+      SUNOS_ICON                     'Sun'
+      VCS_UNTRACKED_ICON             '?'
+      VCS_UNSTAGED_ICON              "\U25CF" # ●
+      VCS_STAGED_ICON                "\U271A" # ✚
+      VCS_STASH_ICON                 "\U235F" # ⍟
+      VCS_INCOMING_CHANGES           "\U2193" # ↓
+      VCS_OUTGOING_CHANGES           "\U2191" # ↑
+      VCS_TAG_ICON                   ''
+      VCS_BOOKMARK_ICON              "\U263F" # ☿
+      VCS_COMMIT_ICON                ''
+      VCS_BRANCH_ICON                "\UE0A0 " # 
+      VCS_REMOTE_BRANCH_ICON         "\U2192" # →
+      VCS_GIT_ICON                   ""
+      VCS_HG_ICON                    ""
     )
   ;;
 esac
@@ -140,7 +144,7 @@ case $POWERLEVEL9K_MODE in
 esac
 
 if [[ "$POWERLEVEL9K_HIDE_BRANCH_ICON" == true ]]; then
-    $icons['VCS_BRANCH_ICON']=''
+    icons[VCS_BRANCH_ICON]=''
 fi
 
 function print_icon() {
@@ -643,11 +647,8 @@ powerlevel9k_init() {
   add-zsh-hook precmd vcs_info
 
   if [[ "$POWERLEVEL9K_PROMPT_ON_NEWLINE" == true ]]; then
-    [[ -n $POWERLEVEL9K_MULTILINE_FIRST_PROMPT_PREFIX ]] || POWERLEVEL9K_MULTILINE_FIRST_PROMPT_PREFIX="╭─"
-    [[ -n $POWERLEVEL9K_MULTILINE_SECOND_PROMPT_PREFIX ]] || POWERLEVEL9K_MULTILINE_SECOND_PROMPT_PREFIX="╰─ "
-
-    PROMPT="$POWERLEVEL9K_MULTILINE_FIRST_PROMPT_PREFIX%{%f%b%k%}"'$(build_left_prompt)'"
-$POWERLEVEL9K_MULTILINE_SECOND_PROMPT_PREFIX"
+    PROMPT="$(print_icon 'MULTILINE_FIRST_PROMPT_PREFIX')%{%f%b%k%}"'$(build_left_prompt)'"
+$(print_icon 'MULTILINE_SECOND_PROMPT_PREFIX')"
     # The right prompt should be on the same line as the first line of the left
     # prompt.  To do so, there is just a quite ugly workaround: Before zsh draws
     # the RPROMPT, we advise it, to go one line up. At the end of RPROMPT, we
