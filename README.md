@@ -467,7 +467,7 @@ terminal, which should yield `256`. If you see something different, try setting
 #### Kudos
 
 This theme wouldn't have happened without inspiration from the original
-[agnoster](https://gist.github.com/agnoster/3712874) Oh-My-ZSH theme.
+[agnoster](https://github.com/agnoster/agnoster-zsh-theme) ZSH theme.
 
 Before creating this theme, I also tried [jeremyFreeAgent's
 theme](https://github.com/jeremyFreeAgent/oh-my-zsh-powerline-theme) and
