@@ -68,6 +68,7 @@ case $POWERLEVEL9K_MODE in
       OK_ICON                        "\U2713" # ✓
       FAIL_ICON                      "\U2718" # ✘
       SYMFONY_ICON                   "SF"
+      NODE_ICON                      $'\U2B22' # ⬢
       MULTILINE_FIRST_PROMPT_PREFIX  $'\U256D'$'\U2500'
       MULTILINE_SECOND_PROMPT_PREFIX $'\U2570'$'\U2500 '
       APPLE_ICON                     $'\UF8FF' # 
@@ -107,6 +108,7 @@ case $POWERLEVEL9K_MODE in
       OK_ICON                        "\U2713" # ✓
       FAIL_ICON                      "\U2718" # ✘
       SYMFONY_ICON                   "SF"
+      NODE_ICON                      $'\U2B22' # ⬢
       MULTILINE_FIRST_PROMPT_PREFIX  $'\U256D'$'\U2500'
       MULTILINE_SECOND_PROMPT_PREFIX $'\U2570'$'\U2500 '
       APPLE_ICON                     'OSX'
@@ -502,9 +504,8 @@ prompt_longstatus() {
 prompt_node_version() {
   local nvm_prompt=$(node -v 2>/dev/null)
   [[ -z "${nvm_prompt}" ]] && return
-  NODE_ICON=$'\U2B22' # ⬢
 
-  $1_prompt_segment "$0" "green" "white" "${nvm_prompt:1} $NODE_ICON"
+  $1_prompt_segment "$0" "green" "white" "${nvm_prompt:1} $(print_icon 'NODE_ICON')"
 }
 
 # print a little OS icon
