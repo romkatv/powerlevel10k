@@ -1,7 +1,7 @@
 ## powerlevel9k Theme for ZSH
 
 Powerlevel9k is a theme for ZSH which uses [Powerline
-Fonts](https://github.com/Lokaltog/powerline-fonts). It can be used with vanilla
+Fonts](https://github.com/powerline/fonts). It can be used with vanilla
 ZSH, [Oh-My-Zsh](https://github.com/robbyrussell/oh-my-zsh), or
 [Prezto](https://github.com/sorin-ionescu/prezto), and can also be installed
 using [antigen](https://github.com/zsh-users/antigen).
@@ -486,7 +486,7 @@ terminal, which should yield `256`. If you see something different, try setting
 #### Kudos
 
 This theme wouldn't have happened without inspiration from the original
-[agnoster](https://gist.github.com/agnoster/3712874) Oh-My-ZSH theme.
+[agnoster](https://github.com/agnoster/agnoster-zsh-theme) ZSH theme.
 
 Before creating this theme, I also tried [jeremyFreeAgent's
 theme](https://github.com/jeremyFreeAgent/oh-my-zsh-powerline-theme) and
