@@ -54,6 +54,7 @@ this theme focus on four primary goals:
 - [Troubleshooting](#troubleshooting)
   - [Gaps Between Segments](#gaps-between-segments)
   - [Segment Colors are Wrong](#segment-colors-are-wrong)
+  - [Strange Characters in prompt](#strange-characters-in-prompt)
 - [Meta](#meta)
   - [Kudos](#kudos)
   - [Developing](#developing)
@@ -461,6 +462,15 @@ terminal, which should yield `256`. If you see something different, try setting
 `xterm-256color` in your `~/.zshrc`:
 
     TERM=xterm-256color
+
+#### Strange Characters in prompt
+
+If your prompt shows strange character like this:
+
+![](https://cloud.githubusercontent.com/assets/1544760/9156161/e0e584e6-3ed0-11e5-897a-2318a8e32d35.png)
+
+it is most likely that you set `POWERLEVEL9K_MODE="awesome-patched"`, but
+did not install an [awesome-font](https://github.com/gabrielelana/awesome-terminal-fonts). For most other modes, you need a [powerline-patched](https://github.com/powerline/fonts) font.
 
 ### Meta
 
