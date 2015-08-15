@@ -186,19 +186,49 @@ case $POWERLEVEL9K_MODE in
   ;;
 esac
 
-# OS detection for the `os_icon` segment
-case $(uname) in
-    Darwin)     OS_ICON=$APPLE_ICON   ;;
-    FreeBSD)    OS_ICON=$FREEBSD_ICON ;;
-    OpenBSD)    OS_ICON=$FREEBSD_ICON ;;
-    DragonFly)  OS_ICON=$FREEBSD_ICON ;;
-    Linux)      OS_ICON=$LINUX_ICON   ;;
-    SunOS)      OS_ICON=$SUNOS_ICON   ;;
-    *)          OS_ICON=''            ;;
-esac
-
 if [[ "$POWERLEVEL9K_HIDE_BRANCH_ICON" == true ]]; then
     VCS_BRANCH_ICON=''
+fi
+
+# OS detection for the `os_icon` segment
+case $(uname) in
+    Darwin)
+      OS='OSX'
+      OS_ICON=$APPLE_ICON
+      ;;
+    FreeBSD)
+      OS='BSD'
+      OS_ICON=$FREEBSD_ICON
+      ;;
+    OpenBSD)
+      OS='BSD'
+      OS_ICON=$FREEBSD_ICON
+      ;;
+    DragonFly)
+      OS='BSD'
+      OS_ICON=$FREEBSD_ICON
+      ;;
+    Linux)
+      OS='Linux'
+      OS_ICON=$LINUX_ICON
+      ;;
+    SunOS)
+      OS='Solaris'
+      OS_ICON=$SUNOS_ICON
+      ;;
+    *)
+      OS=''
+      OS_ICON=''
+      ;;
+esac
+
+# Determine the correct sed parameter.
+SED_EXTENDED_REGEX_PARAMETER="-r"
+if [[ "$OS" == 'OSX' ]]; then
+  local IS_BSD_SED=$(sed --version &>> /dev/null || echo "BSD sed")
+  if [[ -n "$IS_BSD_SED" ]]; then
+    SED_EXTENDED_REGEX_PARAMETER="-E"
+  fi
 fi
 
 ################################################################
@@ -485,10 +515,10 @@ prompt_dir() {
 
     case "$POWERLEVEL9K_SHORTEN_STRATEGY" in
       truncate_middle)
-        current_path=$(pwd | sed -e "s,^$HOME,~," | sed -E "s/([^/]{$POWERLEVEL9K_SHORTEN_DIR_LENGTH})[^/]+([^/]{$POWERLEVEL9K_SHORTEN_DIR_LENGTH})\//\1\.\.\2\//g")
+        current_path=$(pwd | sed -e "s,^$HOME,~," | sed $SED_EXTENDED_REGEX_PARAMETER "s/([^/]{$POWERLEVEL9K_SHORTEN_DIR_LENGTH})[^/]+([^/]{$POWERLEVEL9K_SHORTEN_DIR_LENGTH})\//\1\.\.\2\//g")
       ;;
       truncate_from_right)
-        current_path=$(pwd | sed -e "s,^$HOME,~," | sed -E "s/([^/]{$POWERLEVEL9K_SHORTEN_DIR_LENGTH})[^/]+\//\1..\//g")
+        current_path=$(pwd | sed -e "s,^$HOME,~," | sed $SED_EXTENDED_REGEX_PARAMETER "s/([^/]{$POWERLEVEL9K_SHORTEN_DIR_LENGTH})[^/]+\//\1..\//g")
       ;;
       *)
         current_path="%$((POWERLEVEL9K_SHORTEN_DIR_LENGTH+1))(c:.../:)%${POWERLEVEL9K_SHORTEN_DIR_LENGTH}c"
