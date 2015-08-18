@@ -52,7 +52,7 @@
 # bizarre characters below, your fonts are not correctly installed. If you
 # do not want to install a special font, you can set `POWERLEVEL9K_MODE` to
 # `compatible`. This shows all icons in regular symbols.
-typeset -A icons
+typeset -gAH icons
 case $POWERLEVEL9K_MODE in
   'flat'|'awesome-patched')
     # Awesome-Patched Font required!
