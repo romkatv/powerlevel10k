@@ -79,12 +79,12 @@ case $POWERLEVEL9K_MODE in
       VCS_UNSTAGED_ICON              "\UE17C" # 
       VCS_STAGED_ICON                "\UE168" # 
       VCS_STASH_ICON                 "\UE133 " # 
-      #VCS_INCOMING_CHANGES          "\UE1EB " # 
-      #VCS_INCOMING_CHANGES          "\UE80D " # 
-      VCS_INCOMING_CHANGES           "\UE131 " # 
-      #VCS_OUTGOING_CHANGES          "\UE1EC " # 
-      #VCS_OUTGOING_CHANGES          "\UE80E " # 
-      VCS_OUTGOING_CHANGES           "\UE132 " # 
+      #VCS_INCOMING_CHANGES_ICON     "\UE1EB " # 
+      #VCS_INCOMING_CHANGES_ICON     "\UE80D " # 
+      VCS_INCOMING_CHANGES_ICON      "\UE131 " # 
+      #VCS_OUTGOING_CHANGES_ICON     "\UE1EC " # 
+      #VCS_OUTGOING_CHANGES_ICON     "\UE80E " # 
+      VCS_OUTGOING_CHANGES_ICON      "\UE132 " # 
       VCS_TAG_ICON                   "\UE817 " # 
       VCS_BOOKMARK_ICON              "\UE87B" # 
       VCS_COMMIT_ICON                "\UE821 " # 
@@ -98,34 +98,34 @@ case $POWERLEVEL9K_MODE in
     # Powerline-Patched Font required!
     # See https://github.com/Lokaltog/powerline-fonts
     icons=(
-      LEFT_SEGMENT_SEPARATOR         "\UE0B0" # 
-      RIGHT_SEGMENT_SEPARATOR        "\UE0B2" # 
-      ROOT_ICON                      "\U26A1" # ⚡
+      LEFT_SEGMENT_SEPARATOR         "\uE0B0" # 
+      RIGHT_SEGMENT_SEPARATOR        "\uE0B2" # 
+      ROOT_ICON                      "\u26A1" # ⚡
       RUBY_ICON                      ''
       AWS_ICON                       "AWS:"
-      BACKGROUND_JOBS_ICON           "\U2699" # ⚙
+      BACKGROUND_JOBS_ICON           "\u2699" # ⚙
       TEST_ICON                      ''
-      OK_ICON                        "\U2713" # ✓
-      FAIL_ICON                      "\U2718" # ✘
+      OK_ICON                        "\u2713" # ✓
+      FAIL_ICON                      "\u2718" # ✘
       SYMFONY_ICON                   "SF"
-      NODE_ICON                      $'\U2B22' # ⬢
-      MULTILINE_FIRST_PROMPT_PREFIX  $'\U256D'$'\U2500'
-      MULTILINE_SECOND_PROMPT_PREFIX $'\U2570'$'\U2500 '
+      NODE_ICON                      $'\u2B22' # ⬢
+      MULTILINE_FIRST_PROMPT_PREFIX  $'\u256D'$'\u2500'
+      MULTILINE_SECOND_PROMPT_PREFIX $'\u2570'$'\u2500 '
       APPLE_ICON                     'OSX'
       FREEBSD_ICON                   'BSD'
       LINUX_ICON                     'Lx'
       SUNOS_ICON                     'Sun'
       VCS_UNTRACKED_ICON             '?'
-      VCS_UNSTAGED_ICON              "\U25CF" # ●
-      VCS_STAGED_ICON                "\U271A" # ✚
-      VCS_STASH_ICON                 "\U235F" # ⍟
-      VCS_INCOMING_CHANGES           "\U2193" # ↓
-      VCS_OUTGOING_CHANGES           "\U2191" # ↑
+      VCS_UNSTAGED_ICON              "\u25CF" # ●
+      VCS_STAGED_ICON                "\u271A" # ✚
+      VCS_STASH_ICON                 "\u235F" # ⍟
+      VCS_INCOMING_CHANGES_ICON      "\u2193" # ↓
+      VCS_OUTGOING_CHANGES_ICON      "\u2191" # ↑
       VCS_TAG_ICON                   ''
-      VCS_BOOKMARK_ICON              "\U263F" # ☿
+      VCS_BOOKMARK_ICON              "\u263F" # ☿
       VCS_COMMIT_ICON                ''
-      VCS_BRANCH_ICON                "\UE0A0 " # 
-      VCS_REMOTE_BRANCH_ICON         "\U2192" # →
+      VCS_BRANCH_ICON                "\uE0A0 " # 
+      VCS_REMOTE_BRANCH_ICON         "\u2192" # →
       VCS_GIT_ICON                   ""
       VCS_HG_ICON                    ""
     )
@@ -139,8 +139,8 @@ case $POWERLEVEL9K_MODE in
     icons[RIGHT_SEGMENT_SEPARATOR]=''
   ;;
   'compatible')
-    icons[LEFT_SEGMENT_SEPARATOR]="\U2B80" # ⮀
-    icons[RIGHT_SEGMENT_SEPARATOR]="\U2B82" # ⮂
+    icons[LEFT_SEGMENT_SEPARATOR]="\u2B80" # ⮀
+    icons[RIGHT_SEGMENT_SEPARATOR]="\u2B82" # ⮂
     icons[VCS_BRANCH_ICON]='@'
   ;;
 esac
@@ -358,12 +358,12 @@ function +vi-git-aheadbehind() {
     # for git prior to 1.7
     # ahead=$(git rev-list origin/${branch_name}..HEAD | wc -l)
     ahead=$(git rev-list ${branch_name}@{upstream}..HEAD 2>/dev/null | wc -l)
-    (( $ahead )) && gitstatus+=( " %F{$VCS_FOREGROUND_COLOR}$VCS_OUTGOING_CHANGES${ahead// /}%f" )
+    (( $ahead )) && gitstatus+=( " %F{$VCS_FOREGROUND_COLOR}$(print_icon 'VCS_OUTGOING_CHANGES_ICON')${ahead// /}%f" )
 
     # for git prior to 1.7
     # behind=$(git rev-list HEAD..origin/${branch_name} | wc -l)
     behind=$(git rev-list HEAD..${branch_name}@{upstream} 2>/dev/null | wc -l)
-    (( $behind )) && gitstatus+=( " %F{$VCS_FOREGROUND_COLOR}$VCS_INCOMING_CHANGES${behind// /}%f" )
+    (( $behind )) && gitstatus+=( " %F{$VCS_FOREGROUND_COLOR}$(print_icon 'VCS_INCOMING_CHANGES_ICON')${behind// /}%f" )
 
     hook_com[misc]+=${(j::)gitstatus}
 }
