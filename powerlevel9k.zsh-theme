@@ -589,6 +589,8 @@ prompt_virtualenv() {
 
 # Main prompt
 build_left_prompt() {
+  RETVAL=$?
+
   if [[ "${#POWERLEVEL9K_LEFT_PROMPT_ELEMENTS}" == 0 ]]; then
     POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(context dir rbenv vcs)
   fi
