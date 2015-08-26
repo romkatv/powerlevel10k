@@ -558,15 +558,16 @@ prompt_icons_test() {
 }
 
 prompt_ip() {
-  # TODO: Specify Interface by variable!
-  if [[ "$OS" == "OSX" ]]; then
-    # Try to get IP addresses from common interfaces.
-    ip=$(ipconfig getifaddr en0 || ipconfig getifaddr en1)
-  else
-    # Take the first IP that `hostname -I` gives us.
-    ip=$(hostname -I | grep -o "[0-9.]*" | head -n 1)
+  if [[ -z "$POWERLEVEL9K_IP_INTERFACE" ]]; then
+    if [[ "$OS" == "OSX" ]]; then
+      POWERLEVEL9K_IP_INTERFACE="en1"
+    else
+      POWERLEVEL9K_IP_INTERFACE="eth0"
+    fi
   fi
-  $1_prompt_segment "$0" "cyan" "$DEFAULT_COLOR" "$(print_icon 'NETWORK_ICON') $ip"
+
+  ip=$(ifconfig $POWERLEVEL9K_IP_INTERFACE 2> /dev/null | grep -o "inet\s[0-9.]*")
+  $1_prompt_segment "$0" "cyan" "$DEFAULT_COLOR" "$(print_icon 'NETWORK_ICON') ${ip#inet }"
 }
 
 prompt_load() {
