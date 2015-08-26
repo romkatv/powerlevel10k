@@ -149,6 +149,47 @@ if [[ "$POWERLEVEL9K_HIDE_BRANCH_ICON" == true ]]; then
     icons[VCS_BRANCH_ICON]=''
 fi
 
+# OS detection for the `os_icon` segment
+case $(uname) in
+    Darwin)
+      OS='OSX'
+      OS_ICON=$(print_icon 'APPLE_ICON')
+      ;;
+    FreeBSD)
+      OS='BSD'
+      OS_ICON=$(print_icon 'FREEBSD_ICON')
+      ;;
+    OpenBSD)
+      OS='BSD'
+      OS_ICON=$(print_icon 'FREEBSD_ICON')
+      ;;
+    DragonFly)
+      OS='BSD'
+      OS_ICON=$(print_icon 'FREEBSD_ICON')
+      ;;
+    Linux)
+      OS='Linux'
+      OS_ICON=$(print_icon 'LINUX_ICON')
+      ;;
+    SunOS)
+      OS='Solaris'
+      OS_ICON=$(print_icon 'SUNOS_ICON')
+      ;;
+    *)
+      OS=''
+      OS_ICON=''
+      ;;
+esac
+
+# Determine the correct sed parameter.
+SED_EXTENDED_REGEX_PARAMETER="-r"
+if [[ "$OS" == 'OSX' ]]; then
+  local IS_BSD_SED=$(sed --version &>> /dev/null || echo "BSD sed")
+  if [[ -n "$IS_BSD_SED" ]]; then
+    SED_EXTENDED_REGEX_PARAMETER="-E"
+  fi
+fi
+
 function print_icon() {
   local icon_name=$1
   local ICON_USER_VARIABLE=POWERLEVEL9K_${icon_name}
@@ -159,17 +200,6 @@ function print_icon() {
     echo -n ${icons[$icon_name]}
   fi
 }
-
-# OS detection for the `os_icon` segment
-case $(uname) in
-  "Darwin")    OS_ICON=$(print_icon 'APPLE_ICON')   ;;
-  "FreeBSD")   OS_ICON=$(print_icon 'FREEBSD_ICON') ;;
-  "OpenBSD")   OS_ICON=$(print_icon 'FREEBSD_ICON') ;;
-  "DragonFly") OS_ICON=$(print_icon 'FREEBSD_ICON') ;;
-  "Linux")     OS_ICON=$(print_icon 'LINUX_ICON')   ;;
-  "SunOS")     OS_ICON=$(print_icon 'SUNOS_ICON')   ;;
-  *)           OS_ICON=''                           ;;
-esac
 
 ################################################################
 # color scheme
@@ -457,8 +487,19 @@ prompt_context() {
 prompt_dir() {
   local current_path='%~'
   if [[ -n "$POWERLEVEL9K_SHORTEN_DIR_LENGTH" ]]; then
-    # shorten path to $POWERLEVEL9K_SHORTEN_DIR_LENGTH
-    current_path="%$((POWERLEVEL9K_SHORTEN_DIR_LENGTH+1))(c:.../:)%${POWERLEVEL9K_SHORTEN_DIR_LENGTH}c"
+
+    case "$POWERLEVEL9K_SHORTEN_STRATEGY" in
+      truncate_middle)
+        current_path=$(pwd | sed -e "s,^$HOME,~," | sed $SED_EXTENDED_REGEX_PARAMETER "s/([^/]{$POWERLEVEL9K_SHORTEN_DIR_LENGTH})[^/]+([^/]{$POWERLEVEL9K_SHORTEN_DIR_LENGTH})\//\1\.\.\2\//g")
+      ;;
+      truncate_from_right)
+        current_path=$(pwd | sed -e "s,^$HOME,~," | sed $SED_EXTENDED_REGEX_PARAMETER "s/([^/]{$POWERLEVEL9K_SHORTEN_DIR_LENGTH})[^/]+\//\1..\//g")
+      ;;
+      *)
+        current_path="%$((POWERLEVEL9K_SHORTEN_DIR_LENGTH+1))(c:.../:)%${POWERLEVEL9K_SHORTEN_DIR_LENGTH}c"
+      ;;
+    esac
+
   fi
 
   $1_prompt_segment "$0" "blue" "$DEFAULT_COLOR" "$current_path"
