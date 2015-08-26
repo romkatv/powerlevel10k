@@ -115,6 +115,7 @@ case $POWERLEVEL9K_MODE in
       LINUX_ICON                     $'\UE271' # 
       SUNOS_ICON                     $'\U1F31E ' # 🌞
       HOME_ICON                      $'\UE12C' # 
+      NETWORK_ICON                   $'\UE1AD' # 
       LOAD_ICON                      $'\UE190 ' # 
       #RAM_ICON                       $'\UE87D' # 
       RAM_ICON                       $'\UE1E2 ' # 
@@ -159,6 +160,7 @@ case $POWERLEVEL9K_MODE in
       LINUX_ICON                     'Lx'
       SUNOS_ICON                     'Sun'
       HOME_ICON                      ''
+      NETWORK_ICON                   ''
       LOAD_ICON                      ''
       RAM_ICON                       ''
       VCS_UNTRACKED_ICON             '?'
@@ -553,6 +555,18 @@ prompt_icons_test() {
     local next_color=$((random_color+1))
     $1_prompt_segment "$0" "$random_color" "$next_color" "$key: ${icons[$key]}"
   done
+}
+
+prompt_ip() {
+  # TODO: Specify Interface by variable!
+  if [[ "$OS" == "OSX" ]]; then
+    # Try to get IP addresses from common interfaces.
+    ip=$(ipconfig getifaddr en0 || ipconfig getifaddr en1)
+  else
+    # Take the first IP that `hostname -I` gives us.
+    ip=$(hostname -I | grep -o "[0-9.]*" | head -n 1)
+  fi
+  $1_prompt_segment "$0" "cyan" "$DEFAULT_COLOR" "$(print_icon 'NETWORK_ICON') $ip"
 }
 
 prompt_load() {
