@@ -71,9 +71,9 @@ case $POWERLEVEL9K_MODE in
       NODE_ICON                      $'\U2B22' # ⬢
       MULTILINE_FIRST_PROMPT_PREFIX  $'\U256D'$'\U2500'
       MULTILINE_SECOND_PROMPT_PREFIX $'\U2570'$'\U2500 '
-      APPLE_ICON                     $'\UF8FF' # 
+      APPLE_ICON                     $'\UE26E' # 
       FREEBSD_ICON                   $'\U1F608 ' # 😈
-      LINUX_ICON                     $'\U1F427 ' # 🐧
+      LINUX_ICON                     $'\UE271' # 
       SUNOS_ICON                     $'\U1F31E ' # 🌞
       VCS_UNTRACKED_ICON             "\UE16C" # 
       VCS_UNSTAGED_ICON              "\UE17C" # 
