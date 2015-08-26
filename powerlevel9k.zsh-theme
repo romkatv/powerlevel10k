@@ -114,6 +114,7 @@ case $POWERLEVEL9K_MODE in
       FREEBSD_ICON                   $'\U1F608 ' # 😈
       LINUX_ICON                     $'\UE271' # 
       SUNOS_ICON                     $'\U1F31E ' # 🌞
+      HOME_ICON                      $'\UE12C' # 
       LOAD_ICON                      $'\UE190 ' # 
       #RAM_ICON                       $'\UE87D' # 
       RAM_ICON                       $'\UE1E2 ' # 
@@ -157,6 +158,7 @@ case $POWERLEVEL9K_MODE in
       FREEBSD_ICON                   'BSD'
       LINUX_ICON                     'Lx'
       SUNOS_ICON                     'Sun'
+      HOME_ICON                      ''
       LOAD_ICON                      ''
       RAM_ICON                       ''
       VCS_UNTRACKED_ICON             '?'
@@ -535,7 +537,7 @@ prompt_dir() {
 
   fi
 
-  $1_prompt_segment "$0" "blue" "$DEFAULT_COLOR" "$current_path"
+  $1_prompt_segment "$0" "blue" "$DEFAULT_COLOR" "$(print_icon 'HOME_ICON') $current_path"
 }
 
 # Command number (in local history)
