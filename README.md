@@ -234,6 +234,8 @@ currently available are:
 * **context** - Your username and host (more info below)
 * **dir** - Your current working directory.
 * **history** - The command number for the current line.
+* **ip** - Shows the current IP address.
+* **load** - Your machines 5 minute load average and free RAM.
 * **node_version** - Show the version number of the installed Node.js.
 * **os_icon** - Display a nice little icon, depending on your operating system.
 * **rbenv** - Ruby environment information (if one is active).
