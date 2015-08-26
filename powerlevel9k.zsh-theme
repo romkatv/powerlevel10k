@@ -160,9 +160,9 @@ case $POWERLEVEL9K_MODE in
       LINUX_ICON                     'Lx'
       SUNOS_ICON                     'Sun'
       HOME_ICON                      ''
-      NETWORK_ICON                   ''
-      LOAD_ICON                      ''
-      RAM_ICON                       ''
+      NETWORK_ICON                   'IP'
+      LOAD_ICON                      'L'
+      RAM_ICON                       'RAM'
       VCS_UNTRACKED_ICON             '?'
       VCS_UNSTAGED_ICON              "\u25CF" # ●
       VCS_STAGED_ICON                "\u271A" # ✚
