@@ -59,6 +59,30 @@ function print_icon() {
   fi
 }
 
+printSizeHumanReadable() {
+  local size=$1
+  local extension
+  extension=(B K M G T P E Z Y)
+  local index=1
+
+  # if the base is not Bytes
+  if [[ -n $2 ]]; then
+    for idx in ${extension}; do
+      if [[ "$2" == "$idx" ]]; then
+        break
+      fi
+      index=$(( $index + 1 ))
+    done
+  fi
+
+  while (( ($size / 1024) > 0 )); do
+    size=$(( $size / 1024 ))
+    index=$(( $index + 1 ))
+  done
+
+  echo $size${extension[$index]}
+}
+
 ################################################################
 # Icons
 ################################################################
@@ -90,6 +114,9 @@ case $POWERLEVEL9K_MODE in
       FREEBSD_ICON                   $'\U1F608 ' # 😈
       LINUX_ICON                     $'\UE271' # 
       SUNOS_ICON                     $'\U1F31E ' # 🌞
+      LOAD_ICON                      $'\UE190 ' # 
+      #RAM_ICON                       $'\UE87D' # 
+      RAM_ICON                       $'\UE1E2 ' # 
       VCS_UNTRACKED_ICON             "\UE16C" # 
       VCS_UNSTAGED_ICON              "\UE17C" # 
       VCS_STAGED_ICON                "\UE168" # 
@@ -130,6 +157,8 @@ case $POWERLEVEL9K_MODE in
       FREEBSD_ICON                   'BSD'
       LINUX_ICON                     'Lx'
       SUNOS_ICON                     'Sun'
+      LOAD_ICON                      ''
+      RAM_ICON                       ''
       VCS_UNTRACKED_ICON             '?'
       VCS_UNSTAGED_ICON              "\u25CF" # ●
       VCS_STAGED_ICON                "\u271A" # ✚
@@ -522,6 +551,30 @@ prompt_icons_test() {
     local next_color=$((random_color+1))
     $1_prompt_segment "$0" "$random_color" "$next_color" "$key: ${icons[$key]}"
   done
+}
+
+prompt_load() {
+  if [[ "$OS" == "OSX" ]]; then
+    load_avg_5min=$(sysctl vm.loadavg | grep -o -E -e '[0-9]+\.[0-9]+' | head -n 1)
+    ramfree=$(vm_stat | grep "Pages free" | grep -o -E '[0-9]+')
+    # Convert pages into Bytes
+    ramfree=$(( $ramfree * 4096 ))
+    base=''
+  else
+    load_avg_5min=$(grep -o "[0-9.]*" /proc/loadavg | head -n 1)
+    ramfree=$(grep -o -E "MemFree:\s+[0-9]+" /proc/meminfo | grep -o "[0-9]*")
+    base=K
+  fi
+
+  if [[ "$5min_load_avg" -gt 10 ]]; then
+    BACKGROUND_COLOR="001"
+  elif [[ "$5min_load_avg" -gt 3 ]]; then
+    BACKGROUND_COLOR="003"
+  else
+    BACKGROUND_COLOR="002"
+  fi
+
+  $1_prompt_segment "$0" $BACKGROUND_COLOR "$DEFAULT_COLOR" "$(print_icon 'LOAD_ICON') $load_avg_5min $(print_icon 'RAM_ICON') $(printSizeHumanReadable $ramfree $base)"
 }
 
 # Right Status: (return code, root status, background jobs)
