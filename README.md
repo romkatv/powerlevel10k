@@ -49,6 +49,7 @@ this theme focus on four primary goals:
   - [Double-Lined Prompt](#double-lined-prompt)
   - [Disable Right Prompt](#disable-right-prompt)
   - [Light Color Theme](#light-color-theme)
+  - [Icon Customization](#icon-customization)
   - [Segment Color Customization](#segment-color-customization)
   - [Special Segment Colors](#special-segment-colors)
 - [Troubleshooting](#troubleshooting)
@@ -394,6 +395,24 @@ The 'light' color scheme works well for ['Solarized
 Light'](https://github.com/altercation/solarized) users. Check it out:
 
 ![](http://bhilburn.org/content/images/2015/03/solarized-light.png)
+
+#### Icon Customization
+
+Each icon used can be customized too by specifying a variable named like
+the icon and prefixed with 'POWERLEVEL9K'. If you want to use another icon
+as segment separators, you can easily do that:
+
+    POWERLEVEL9K_LEFT_SEGMENT_SEPARATOR=$'\uE0B1'
+    POWERLEVEL9K_RIGHT_SEGMENT_SEPARATOR=$'\uE0B3'
+
+You could get a list of all icons defined in random colors, by adding the 
+special segment `icons_test` to your prompt:
+
+    POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(icons_test)
+
+This special prompt does not work on the right side, as it would be too long,
+and ZSH hides it automatically. Also have in mind, that the output depends on
+your `POWERLEVEL9K_MODE` settings.
 
 #### Segment Color Customization
 
