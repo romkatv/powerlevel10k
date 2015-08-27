@@ -1,7 +1,7 @@
 ## powerlevel9k Theme for ZSH
 
 Powerlevel9k is a theme for ZSH which uses [Powerline
-Fonts](https://github.com/Lokaltog/powerline-fonts). It can be used with vanilla
+Fonts](https://github.com/powerline/fonts). It can be used with vanilla
 ZSH, [Oh-My-Zsh](https://github.com/robbyrussell/oh-my-zsh), or
 [Prezto](https://github.com/sorin-ionescu/prezto), and can also be installed
 using [antigen](https://github.com/zsh-users/antigen).
@@ -54,6 +54,7 @@ this theme focus on four primary goals:
 - [Troubleshooting](#troubleshooting)
   - [Gaps Between Segments](#gaps-between-segments)
   - [Segment Colors are Wrong](#segment-colors-are-wrong)
+  - [Strange Characters in prompt](#strange-characters-in-prompt)
 - [Meta](#meta)
   - [Kudos](#kudos)
   - [Developing](#developing)
@@ -474,12 +475,21 @@ terminal, which should yield `256`. If you see something different, try setting
 
     TERM=xterm-256color
 
+#### Strange Characters in prompt
+
+If your prompt shows strange character like this:
+
+![](https://cloud.githubusercontent.com/assets/1544760/9156161/e0e584e6-3ed0-11e5-897a-2318a8e32d35.png)
+
+it is most likely that you set `POWERLEVEL9K_MODE="awesome-patched"`, but
+did not install an [awesome-font](https://github.com/gabrielelana/awesome-terminal-fonts). For most other modes, you need a [powerline-patched](https://github.com/powerline/fonts) font.
+
 ### Meta
 
 #### Kudos
 
 This theme wouldn't have happened without inspiration from the original
-[agnoster](https://gist.github.com/agnoster/3712874) Oh-My-ZSH theme.
+[agnoster](https://github.com/agnoster/agnoster-zsh-theme) ZSH theme.
 
 Before creating this theme, I also tried [jeremyFreeAgent's
 theme](https://github.com/jeremyFreeAgent/oh-my-zsh-powerline-theme) and
