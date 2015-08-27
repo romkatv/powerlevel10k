@@ -583,15 +583,18 @@ prompt_load() {
     base=K
   fi
 
-  if [[ "$5min_load_avg" -gt 10 ]]; then
-    BACKGROUND_COLOR="001"
-  elif [[ "$5min_load_avg" -gt 3 ]]; then
-    BACKGROUND_COLOR="003"
+  if [[ "$load_avg_5min" -gt 10 ]]; then
+    BACKGROUND_COLOR="red"
+    FUNCTION_SUFFIX="_CRITICAL"
+  elif [[ "$load_avg_5min" -gt 3 ]]; then
+    BACKGROUND_COLOR="yellow"
+    FUNCTION_SUFFIX="_WARNING"
   else
-    BACKGROUND_COLOR="002"
+    BACKGROUND_COLOR="green"
+    FUNCTION_SUFFIX="_NORMAL"
   fi
 
-  $1_prompt_segment "$0" $BACKGROUND_COLOR "$DEFAULT_COLOR" "$(print_icon 'LOAD_ICON') $load_avg_5min $(print_icon 'RAM_ICON') $(printSizeHumanReadable $ramfree $base)"
+  $1_prompt_segment "$0$FUNCTION_SUFFIX" $BACKGROUND_COLOR "$DEFAULT_COLOR" "$(print_icon 'LOAD_ICON') $load_avg_5min $(print_icon 'RAM_ICON') $(printSizeHumanReadable $ramfree $base)"
 }
 
 # Right Status: (return code, root status, background jobs)
