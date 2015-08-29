@@ -83,6 +83,30 @@ printSizeHumanReadable() {
   echo $size${extension[$index]}
 }
 
+# Gets the first value out of a list of items that is not empty.
+# The items are examined by a callback-function.
+# Takes two arguments:
+#   * $list - A list of items
+#   * $callback - A callback function to examine if the item is
+#                 worthy. The callback function has access to
+#                 the inner variable $item.
+function getRelevantItem() {
+  setopt shwordsplit # We need to split the words in $interfaces
+
+  local list callback
+  list=$1
+  callback=$2
+
+  for item in $list; do
+    # The first non-empty item wins
+    try=$(eval $callback)
+    if [[ -n "$try" ]]; then
+      echo $try
+      break;
+    fi
+  done
+}
+
 ################################################################
 # Icons
 ################################################################
@@ -558,16 +582,33 @@ prompt_icons_test() {
 }
 
 prompt_ip() {
-  if [[ -z "$POWERLEVEL9K_IP_INTERFACE" ]]; then
-    if [[ "$OS" == "OSX" ]]; then
-      POWERLEVEL9K_IP_INTERFACE="en1"
+  if [[ "$OS" == "OSX" ]]; then
+    if [[ -z "$POWERLEVEL9K_IP_INTERFACE" ]]; then
+      local interfaces callback
+      # Get network interface names ordered by service precedence.
+      interfaces=$(networksetup -listnetworkserviceorder | grep -o "Device:\s*[a-z0-9]*" | grep -o -E '[a-z0-9]*$')
+      callback='ipconfig getifaddr $item'
+
+      ip=$(getRelevantItem $interfaces $callback)
     else
-      POWERLEVEL9K_IP_INTERFACE="eth0"
+      # Get the IP address of the specified interface.
+      ip=$(ipconfig getifaddr $POWERLEVEL9K_IP_INTERFACE)
+    fi
+  else
+    if [[ -z "$POWERLEVEL9K_IP_INTERFACE" ]]; then
+      local interfaces callback
+      # Get all network interface names that are up
+      interfaces=$(ip link ls up | grep -o -E ":\s+[a-z0-9]+:" | grep -v "lo" | grep -o "[a-z0-9]*")
+      callback='ip -4 a show $item | grep -o "inet\s*[0-9.]*" | grep -o "[0-9.]*"'
+
+      ip=$(getRelevantItem $interfaces $callback)
+    else
+      # Get the IP address of the specified interface.
+      ip=$(ip -4 a show $POWERLEVEL9K_IP_INTERFACE | grep -o "inet\s*[0-9.]*" | grep -o "[0-9.]*")
     fi
   fi
 
-  ip=$(ifconfig $POWERLEVEL9K_IP_INTERFACE 2> /dev/null | grep -o "inet\s[0-9.]*")
-  $1_prompt_segment "$0" "cyan" "$DEFAULT_COLOR" "$(print_icon 'NETWORK_ICON') ${ip#inet }"
+  $1_prompt_segment "$0" "cyan" "$DEFAULT_COLOR" "$(print_icon 'NETWORK_ICON') $ip"
 }
 
 prompt_load() {
