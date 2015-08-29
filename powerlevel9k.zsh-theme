@@ -59,6 +59,12 @@ function print_icon() {
   fi
 }
 
+get_icon_names() {
+  for key in "${(@k)icons}"; do
+    echo "POWERLEVEL9K_$key: ${icons[$key]}"
+  done
+}
+
 ################################################################
 # Icons
 ################################################################

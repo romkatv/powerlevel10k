@@ -414,6 +414,9 @@ This special prompt does not work on the right side, as it would be too long,
 and ZSH hides it automatically. Also have in mind, that the output depends on
 your `POWERLEVEL9K_MODE` settings.
 
+You can change any icon by setting a environment variable. To get a full list
+of icons just type `get_icon_names` in your terminal.
+
 #### Segment Color Customization
 
 For each segment in your prompt, you can specify a foreground and background
