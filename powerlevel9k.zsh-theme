@@ -613,7 +613,7 @@ prompt_ip() {
 
 prompt_load() {
   if [[ "$OS" == "OSX" ]]; then
-    load_avg_5min=$(sysctl vm.loadavg | grep -o -E '[0-9]+\.[0-9]+' | head -n 1)
+    load_avg_5min=$(sysctl vm.loadavg | grep -o -E '[0-9]+(\.|,)[0-9]+' | head -n 1)
     ramfree=$(vm_stat | grep "Pages free" | grep -o -E '[0-9]+')
     # Convert pages into Bytes
     ramfree=$(( $ramfree * 4096 ))
@@ -623,6 +623,9 @@ prompt_load() {
     ramfree=$(grep -o -E "MemFree:\s+[0-9]+" /proc/meminfo | grep -o "[0-9]*")
     base=K
   fi
+
+  # Replace comma
+  load_avg_5min=${load_avg_5min//,/.}
 
   if [[ "$load_avg_5min" -gt 10 ]]; then
     BACKGROUND_COLOR="red"
