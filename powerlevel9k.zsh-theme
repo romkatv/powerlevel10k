@@ -60,7 +60,7 @@ function print_icon() {
   local icon_name=$1
   local ICON_USER_VARIABLE=POWERLEVEL9K_${icon_name}
   local USER_ICON=${(P)ICON_USER_VARIABLE}
-  if [[ -n "$USER_ICON" ]]; then
+  if defined "$ICON_USER_VARIABLE"; then
     echo -n $USER_ICON
   else
     echo -n ${icons[$icon_name]}
