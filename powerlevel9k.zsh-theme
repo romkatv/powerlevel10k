@@ -48,6 +48,14 @@
 # Utility functions
 ################################################################
 
+# Exits with 0 if a variable has been previously defined (even if empty)
+# Takes the name of a variable that should be checked.
+function defined() {
+  local varname="$1"
+
+  typeset -p "$varname" > /dev/null 2>&1
+}
+
 function print_icon() {
   local icon_name=$1
   local ICON_USER_VARIABLE=POWERLEVEL9K_${icon_name}
@@ -57,6 +65,18 @@ function print_icon() {
   else
     echo -n ${icons[$icon_name]}
   fi
+}
+
+# Given the name of a variable and a default value, sets the variable
+# value to the default only if it has not been defined.
+#
+# typeset cannot set the value for an array, so this will only work
+# for scalar values.
+function set_default() {
+  local varname="$1"
+  local default_value="$2"
+
+  defined "$varname" || typeset -g "$varname"="$default_value"
 }
 
 ################################################################
