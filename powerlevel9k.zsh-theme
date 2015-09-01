@@ -669,9 +669,7 @@ prompt_virtualenv() {
 
 # Main prompt
 build_left_prompt() {
-  if [[ "${#POWERLEVEL9K_LEFT_PROMPT_ELEMENTS}" == 0 ]]; then
-    POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(context dir rbenv vcs)
-  fi
+  defined POWERLEVEL9K_LEFT_PROMPT_ELEMENTS || POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(context dir rbenv vcs)
 
   for element in $POWERLEVEL9K_LEFT_PROMPT_ELEMENTS; do
     prompt_$element "left"
@@ -684,9 +682,7 @@ build_left_prompt() {
 build_right_prompt() {
   RETVAL=$?
 
-  if [[ "${#POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS}" == 0 ]]; then
-    POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(longstatus history time)
-  fi
+  defined POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS || POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(longstatus history time)
 
   for element in $POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS; do
     prompt_$element "right"
