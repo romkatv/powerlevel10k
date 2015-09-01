@@ -217,8 +217,8 @@ zstyle ':vcs_info:*' enable git hg
 zstyle ':vcs_info:*' check-for-changes true
 
 VCS_DEFAULT_FORMAT="$VCS_CHANGESET_PREFIX%F{$VCS_FOREGROUND_COLOR}%b%c%u%m%f"
-zstyle ':vcs_info:git:*' formats "%F{$VCS_FOREGROUND_COLOR}$VCS_GIT_ICON%f$VCS_DEFAULT_FORMAT"
-zstyle ':vcs_info:hg:*' formats "%F{$VCS_FOREGROUND_COLOR}$VCS_HG_ICON%f$VCS_DEFAULT_FORMAT"
+zstyle ':vcs_info:git*:*' formats "%F{$VCS_FOREGROUND_COLOR}$VCS_GIT_ICON%f$VCS_DEFAULT_FORMAT"
+zstyle ':vcs_info:hg*:*' formats "%F{$VCS_FOREGROUND_COLOR}$VCS_HG_ICON%f$VCS_DEFAULT_FORMAT"
 
 zstyle ':vcs_info:*' actionformats " %b %F{red}| %a%f"
 
