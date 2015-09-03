@@ -267,8 +267,8 @@ zstyle ':vcs_info:*' enable git hg
 zstyle ':vcs_info:*' check-for-changes true
 
 VCS_DEFAULT_FORMAT="$VCS_CHANGESET_PREFIX%F{$POWERLEVEL9K_VCS_FOREGROUND}%b%c%u%m%f"
-zstyle ':vcs_info:git:*' formats "%F{$POWERLEVEL9K_VCS_FOREGROUND}$(print_icon 'VCS_GIT_ICON')%f$VCS_DEFAULT_FORMAT"
-zstyle ':vcs_info:hg:*' formats "%F{$POWERLEVEL9K_VCS_FOREGROUND}$(print_icon 'VCS_HG_ICON')%f$VCS_DEFAULT_FORMAT"
+zstyle ':vcs_info:git*:*' formats "%F{$POWERLEVEL9K_VCS_FOREGROUND}$(print_icon 'VCS_GIT_ICON')%f$VCS_DEFAULT_FORMAT"
+zstyle ':vcs_info:hg*:*' formats "%F{$POWERLEVEL9K_VCS_FOREGROUND}$(print_icon 'VCS_HG_ICON')%f$VCS_DEFAULT_FORMAT"
 
 zstyle ':vcs_info:*' actionformats " %b %F{red}| %a%f"
 
@@ -669,6 +669,8 @@ prompt_virtualenv() {
 
 # Main prompt
 build_left_prompt() {
+  RETVAL=$?
+
   defined POWERLEVEL9K_LEFT_PROMPT_ELEMENTS || POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(context dir rbenv vcs)
 
   for element in $POWERLEVEL9K_LEFT_PROMPT_ELEMENTS; do
