@@ -12,35 +12,11 @@
 
 ################################################################
 # Please see the README file located in the source repository for full docs.
-# What follows is a brief list of the settings variables used by this theme.
-# You should define these variables in your `~/.zshrc`.
-#
-# Customize which segments appear in which prompts (below is also the default):
-#   POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(context dir rbenv vcs)
-#   POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(status history time)
-#
-# Set your Amazon Web Services profile for the `aws` segment:
-#   export AWS_DEFAULT_PROFILE=<profile_name>
-#
-# Set your username for the `context` segment:
-#   export DEFAULT_USER=<your username>
-#
-# Customize the format of the time segment. Example of reverse format:
-#   POWERLEVEL9K_TIME_FORMAT='%D{%S:%M:%H}'
-#
-# Show the hash/changeset string in the `vcs` segment:
-#   POWERLEVEL9K_SHOW_CHANGESET=true
-# Set the length of the hash/changeset if enabled in the `vcs` segment:
-#   POWERLEVEL9K_CHANGESET_HASH_LENGTH=6
-#
-# Make powerlevel9k a double-lined prompt:
-#   POWERLEVEL9K_PROMPT_ON_NEWLINE=true
-#
-# Set the colorscheme:
-#   POWERLEVEL9K_COLOR_SCHEME='light'
+# There are a lot of easy ways you can customize your prompt segments and
+# theming with simple variables defined in your `~/.zshrc`.
 ################################################################
 
-## Debugging
+## Turn on for Debugging
 #zstyle ':vcs_info:*+*:*' debug true
 #set -o xtrace
 
@@ -56,6 +32,8 @@ function defined() {
   typeset -p "$varname" > /dev/null 2>&1
 }
 
+# Safety function for printing icons
+# Prints the named icon, or if that icon is undefined, the string name.
 function print_icon() {
   local icon_name=$1
   local ICON_USER_VARIABLE=POWERLEVEL9K_${icon_name}
@@ -70,7 +48,7 @@ function print_icon() {
 # Given the name of a variable and a default value, sets the variable
 # value to the default only if it has not been defined.
 #
-# typeset cannot set the value for an array, so this will only work
+# Typeset cannot set the value for an array, so this will only work
 # for scalar values.
 function set_default() {
   local varname="$1"
@@ -83,10 +61,12 @@ function set_default() {
 # Icons
 ################################################################
 
-# These characters require the Powerline fonts to work properly. If see boxes or
-# bizarre characters below, your fonts are not correctly installed. If you
-# do not want to install a special font, you can set `POWERLEVEL9K_MODE` to
+# These characters require the Powerline fonts to work properly. If you see
+# boxes or bizarre characters below, your fonts are not correctly installed. If
+# you do not want to install a special font, you can set `POWERLEVEL9K_MODE` to
 # `compatible`. This shows all icons in regular symbols.
+
+# Initialize the icon list according to the user's `POWERLEVEL9K_MODE`.
 typeset -gAH icons
 case $POWERLEVEL9K_MODE in
   'flat'|'awesome-patched')
@@ -169,7 +149,7 @@ case $POWERLEVEL9K_MODE in
   ;;
 esac
 
-# Second switch for overrides
+# Override the above icon settings with any user-defined variables.
 case $POWERLEVEL9K_MODE in
   'flat')
     icons[LEFT_SEGMENT_SEPARATOR]=''
@@ -219,6 +199,8 @@ case $(uname) in
 esac
 
 # Determine the correct sed parameter.
+#
+# `sed` is unfortunately not consistent across OSes when it comes to flags.
 SED_EXTENDED_REGEX_PARAMETER="-r"
 if [[ "$OS" == 'OSX' ]]; then
   local IS_BSD_SED=$(sed --version &>> /dev/null || echo "BSD sed")
@@ -228,7 +210,7 @@ if [[ "$OS" == 'OSX' ]]; then
 fi
 
 ################################################################
-# color scheme
+# Color Scheme
 ################################################################
 
 if [[ "$POWERLEVEL9K_COLOR_SCHEME" == "light" ]]; then
@@ -291,6 +273,14 @@ fi
 
 ################################################################
 # Prompt Segment Constructors
+#
+# Methodology behind user-defined variables overwriting colors:
+#     The first parameter to the segment constructors is the calling function's
+#     name.  From this function name, we strip the "prompt_"-prefix and
+#     uppercase it.  This is then prefixed with "POWERLEVEL9K_" and suffixed
+#     with either "_BACKGROUND" or "_FOREGROUND", thus giving us the variable
+#     name. So each new segment is user-overwritable by a variable following
+#     this naming convention.
 ################################################################
 
 # The `CURRENT_BG` variable is used to remember what the last BG color used was
@@ -308,11 +298,6 @@ CURRENT_BG='NONE'
 # The latter three can be omitted,
 left_prompt_segment() {
   # Overwrite given background-color by user defined variable for this segment.
-  # We get as first Parameter the function name, which called this function.
-  # From the given function name, we strip the "prompt_"-prefix and uppercase it.
-  # This is, prefixed with "POWERLEVEL9K_" and suffixed with either "_BACKGROUND"
-  # of "_FOREGROUND", our variable name. So each new Segment should automatically
-  # be overwritable by a variable following this naming convention.
   local BACKGROUND_USER_VARIABLE=POWERLEVEL9K_${(U)1#prompt_}_BACKGROUND
   local BG_COLOR_MODIFIER=${(P)BACKGROUND_USER_VARIABLE}
   [[ -n $BG_COLOR_MODIFIER ]] && 2=$BG_COLOR_MODIFIER
@@ -336,7 +321,7 @@ left_prompt_segment() {
   [[ -n $4 ]] && echo -n "$4 "
 }
 
-# End the left prompt, closing any open segments
+# End the left prompt, closes the final segment.
 left_prompt_end() {
   if [[ -n $CURRENT_BG ]]; then
     echo -n "%{%k%F{$CURRENT_BG}%}$(print_icon 'LEFT_SEGMENT_SEPARATOR')"
@@ -374,7 +359,7 @@ right_prompt_segment() {
 }
 
 ################################################################
-# The 'vcs' Segment and VCS_INFO hooks / helper functions
+# The `vcs` Segment and VCS_INFO hooks / helper functions
 ################################################################
 prompt_vcs() {
   local vcs_prompt="${vcs_info_msg_0_}"
@@ -454,9 +439,8 @@ function +vi-hg-bookmarks() {
   if [[ -n "${hgbmarks[@]}" ]]; then
     hook_com[hg-bookmark-string]=" %F{$POWERLEVEL9K_VCS_FOREGROUND}$(print_icon 'VCS_BOOKMARK_ICON')${hgbmarks[@]}%f"
 
-    # And to signal, that we want to use the sting we just generated,
-    # set the special variable `ret' to something other than the default
-    # zero:
+    # To signal that we want to use the sting we just generated, set the special
+    # variable `ret' to something other than the default zero:
     ret=1
     return 0
   fi
@@ -471,7 +455,7 @@ function +vi-vcs-detect-changes() {
 }
 
 ################################################################
-# Prompt Segments
+# Prompt Segment Definitions
 ################################################################
 
 # The `CURRENT_BG` variable is used to remember what the last BG color used was
