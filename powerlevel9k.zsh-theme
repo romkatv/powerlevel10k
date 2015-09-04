@@ -12,35 +12,11 @@
 
 ################################################################
 # Please see the README file located in the source repository for full docs.
-# What follows is a brief list of the settings variables used by this theme.
-# You should define these variables in your `~/.zshrc`.
-#
-# Customize which segments appear in which prompts (below is also the default):
-#   POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(context dir rbenv vcs)
-#   POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(status history time)
-#
-# Set your Amazon Web Services profile for the `aws` segment:
-#   export AWS_DEFAULT_PROFILE=<profile_name>
-#
-# Set your username for the `context` segment:
-#   export DEFAULT_USER=<your username>
-#
-# Customize the format of the time segment. Example of reverse format:
-#   POWERLEVEL9K_TIME_FORMAT='%D{%S:%M:%H}'
-#
-# Show the hash/changeset string in the `vcs` segment:
-#   POWERLEVEL9K_SHOW_CHANGESET=true
-# Set the length of the hash/changeset if enabled in the `vcs` segment:
-#   POWERLEVEL9K_CHANGESET_HASH_LENGTH=6
-#
-# Make powerlevel9k a double-lined prompt:
-#   POWERLEVEL9K_PROMPT_ON_NEWLINE=true
-#
-# Set the colorscheme:
-#   POWERLEVEL9K_COLOR_SCHEME='light'
+# There are a lot of easy ways you can customize your prompt segments and
+# theming with simple variables defined in your `~/.zshrc`.
 ################################################################
 
-## Debugging
+## Turn on for Debugging
 #zstyle ':vcs_info:*+*:*' debug true
 #set -o xtrace
 
@@ -48,15 +24,37 @@
 # Utility functions
 ################################################################
 
+# Exits with 0 if a variable has been previously defined (even if empty)
+# Takes the name of a variable that should be checked.
+function defined() {
+  local varname="$1"
+
+  typeset -p "$varname" > /dev/null 2>&1
+}
+
+# Safety function for printing icons
+# Prints the named icon, or if that icon is undefined, the string name.
 function print_icon() {
   local icon_name=$1
   local ICON_USER_VARIABLE=POWERLEVEL9K_${icon_name}
   local USER_ICON=${(P)ICON_USER_VARIABLE}
-  if [[ -n "$USER_ICON" ]]; then
+  if defined "$ICON_USER_VARIABLE"; then
     echo -n $USER_ICON
   else
     echo -n ${icons[$icon_name]}
   fi
+}
+
+# Given the name of a variable and a default value, sets the variable
+# value to the default only if it has not been defined.
+#
+# Typeset cannot set the value for an array, so this will only work
+# for scalar values.
+function set_default() {
+  local varname="$1"
+  local default_value="$2"
+
+  defined "$varname" || typeset -g "$varname"="$default_value"
 }
 
 get_icon_names() {
@@ -69,10 +67,12 @@ get_icon_names() {
 # Icons
 ################################################################
 
-# These characters require the Powerline fonts to work properly. If see boxes or
-# bizarre characters below, your fonts are not correctly installed. If you
-# do not want to install a special font, you can set `POWERLEVEL9K_MODE` to
+# These characters require the Powerline fonts to work properly. If you see
+# boxes or bizarre characters below, your fonts are not correctly installed. If
+# you do not want to install a special font, you can set `POWERLEVEL9K_MODE` to
 # `compatible`. This shows all icons in regular symbols.
+
+# Initialize the icon list according to the user's `POWERLEVEL9K_MODE`.
 typeset -gAH icons
 case $POWERLEVEL9K_MODE in
   'flat'|'awesome-patched')
@@ -155,7 +155,7 @@ case $POWERLEVEL9K_MODE in
   ;;
 esac
 
-# Second switch for overrides
+# Override the above icon settings with any user-defined variables.
 case $POWERLEVEL9K_MODE in
   'flat')
     icons[LEFT_SEGMENT_SEPARATOR]=''
@@ -205,6 +205,8 @@ case $(uname) in
 esac
 
 # Determine the correct sed parameter.
+#
+# `sed` is unfortunately not consistent across OSes when it comes to flags.
 SED_EXTENDED_REGEX_PARAMETER="-r"
 if [[ "$OS" == 'OSX' ]]; then
   local IS_BSD_SED=$(sed --version &>> /dev/null || echo "BSD sed")
@@ -214,7 +216,7 @@ if [[ "$OS" == 'OSX' ]]; then
 fi
 
 ################################################################
-# color scheme
+# Color Scheme
 ################################################################
 
 if [[ "$POWERLEVEL9K_COLOR_SCHEME" == "light" ]]; then
@@ -227,16 +229,8 @@ else
   DEFAULT_COLOR_DARK="236"
 fi
 
-VCS_FOREGROUND_COLOR=$DEFAULT_COLOR
-VCS_FOREGROUND_COLOR_DARK=$DEFAULT_COLOR_DARK
-
-# If user has defined custom colors for the `vcs` segment, override the defaults
-if [[ -n $POWERLEVEL9K_VCS_FOREGROUND ]]; then
-  VCS_FOREGROUND_COLOR=$POWERLEVEL9K_VCS_FOREGROUND
-fi
-if [[ -n $POWERLEVEL9K_VCS_DARK_FOREGROUND ]]; then
-  VCS_FOREGROUND_COLOR_DARK=$POWERLEVEL9K_VCS_DARK_FOREGROUND
-fi
+set_default POWERLEVEL9K_VCS_FOREGROUND "$DEFAULT_COLOR"
+set_default POWERLEVEL9K_VCS_DARK_FOREGROUND "$DEFAULT_COLOR_DARK"
 
 ################################################################
 # VCS Information Settings
@@ -254,20 +248,20 @@ if [[ "$POWERLEVEL9K_SHOW_CHANGESET" == true ]]; then
     VCS_CHANGESET_HASH_LENGTH="$POWERLEVEL9K_CHANGESET_HASH_LENGTH"
   fi
 
-  VCS_CHANGESET_PREFIX="%F{$VCS_FOREGROUND_COLOR_DARK}$(print_icon 'VCS_COMMIT_ICON')%0.$VCS_CHANGESET_HASH_LENGTH""i%f "
+  VCS_CHANGESET_PREFIX="%F{$POWERLEVEL9K_VCS_DARK_FOREGROUND}$(print_icon 'VCS_COMMIT_ICON')%0.$VCS_CHANGESET_HASH_LENGTH""i%f "
 fi
 
 zstyle ':vcs_info:*' enable git hg
 zstyle ':vcs_info:*' check-for-changes true
 
-VCS_DEFAULT_FORMAT="$VCS_CHANGESET_PREFIX%F{$VCS_FOREGROUND_COLOR}%b%c%u%m%f"
-zstyle ':vcs_info:git:*' formats "%F{$VCS_FOREGROUND_COLOR}$(print_icon 'VCS_GIT_ICON')%f$VCS_DEFAULT_FORMAT"
-zstyle ':vcs_info:hg:*' formats "%F{$VCS_FOREGROUND_COLOR}$(print_icon 'VCS_HG_ICON')%f$VCS_DEFAULT_FORMAT"
+VCS_DEFAULT_FORMAT="$VCS_CHANGESET_PREFIX%F{$POWERLEVEL9K_VCS_FOREGROUND}%b%c%u%m%f"
+zstyle ':vcs_info:git*:*' formats "%F{$POWERLEVEL9K_VCS_FOREGROUND}$(print_icon 'VCS_GIT_ICON')%f$VCS_DEFAULT_FORMAT"
+zstyle ':vcs_info:hg*:*' formats "%F{$POWERLEVEL9K_VCS_FOREGROUND}$(print_icon 'VCS_HG_ICON')%f$VCS_DEFAULT_FORMAT"
 
 zstyle ':vcs_info:*' actionformats " %b %F{red}| %a%f"
 
-zstyle ':vcs_info:*' stagedstr " %F{$VCS_FOREGROUND_COLOR}$(print_icon 'VCS_STAGED_ICON')%f"
-zstyle ':vcs_info:*' unstagedstr " %F{$VCS_FOREGROUND_COLOR}$(print_icon 'VCS_UNSTAGED_ICON')%f"
+zstyle ':vcs_info:*' stagedstr " %F{$POWERLEVEL9K_VCS_FOREGROUND}$(print_icon 'VCS_STAGED_ICON')%f"
+zstyle ':vcs_info:*' unstagedstr " %F{$POWERLEVEL9K_VCS_FOREGROUND}$(print_icon 'VCS_UNSTAGED_ICON')%f"
 
 zstyle ':vcs_info:git*+set-message:*' hooks vcs-detect-changes git-untracked git-aheadbehind git-stash git-remotebranch git-tagname
 zstyle ':vcs_info:hg*+set-message:*' hooks vcs-detect-changes
@@ -285,6 +279,14 @@ fi
 
 ################################################################
 # Prompt Segment Constructors
+#
+# Methodology behind user-defined variables overwriting colors:
+#     The first parameter to the segment constructors is the calling function's
+#     name.  From this function name, we strip the "prompt_"-prefix and
+#     uppercase it.  This is then prefixed with "POWERLEVEL9K_" and suffixed
+#     with either "_BACKGROUND" or "_FOREGROUND", thus giving us the variable
+#     name. So each new segment is user-overwritable by a variable following
+#     this naming convention.
 ################################################################
 
 # The `CURRENT_BG` variable is used to remember what the last BG color used was
@@ -302,11 +304,6 @@ CURRENT_BG='NONE'
 # The latter three can be omitted,
 left_prompt_segment() {
   # Overwrite given background-color by user defined variable for this segment.
-  # We get as first Parameter the function name, which called this function.
-  # From the given function name, we strip the "prompt_"-prefix and uppercase it.
-  # This is, prefixed with "POWERLEVEL9K_" and suffixed with either "_BACKGROUND"
-  # of "_FOREGROUND", our variable name. So each new Segment should automatically
-  # be overwritable by a variable following this naming convention.
   local BACKGROUND_USER_VARIABLE=POWERLEVEL9K_${(U)1#prompt_}_BACKGROUND
   local BG_COLOR_MODIFIER=${(P)BACKGROUND_USER_VARIABLE}
   [[ -n $BG_COLOR_MODIFIER ]] && 2=$BG_COLOR_MODIFIER
@@ -330,7 +327,7 @@ left_prompt_segment() {
   [[ -n $4 ]] && echo -n "$4 "
 }
 
-# End the left prompt, closing any open segments
+# End the left prompt, closes the final segment.
 left_prompt_end() {
   if [[ -n $CURRENT_BG ]]; then
     echo -n "%{%k%F{$CURRENT_BG}%}$(print_icon 'LEFT_SEGMENT_SEPARATOR')"
@@ -368,7 +365,7 @@ right_prompt_segment() {
 }
 
 ################################################################
-# The 'vcs' Segment and VCS_INFO hooks / helper functions
+# The `vcs` Segment and VCS_INFO hooks / helper functions
 ################################################################
 prompt_vcs() {
   local vcs_prompt="${vcs_info_msg_0_}"
@@ -380,14 +377,14 @@ prompt_vcs() {
       $1_prompt_segment "$0" "green" "$DEFAULT_COLOR"
     fi
 
-    echo -n "%F{$VCS_FOREGROUND_COLOR}%f$vcs_prompt "
+    echo -n "%F{$POWERLEVEL9K_VCS_FOREGROUND}%f$vcs_prompt "
   fi
 }
 
 function +vi-git-untracked() {
     if [[ $(git rev-parse --is-inside-work-tree 2> /dev/null) == 'true' && \
             -n $(git ls-files --others --exclude-standard | sed q) ]]; then
-        hook_com[unstaged]+=" %F{$VCS_FOREGROUND_COLOR}$(print_icon 'VCS_UNTRACKED_ICON')%f"
+        hook_com[unstaged]+=" %F{$POWERLEVEL9K_VCS_FOREGROUND}$(print_icon 'VCS_UNTRACKED_ICON')%f"
     fi
 }
 
@@ -400,12 +397,12 @@ function +vi-git-aheadbehind() {
     # for git prior to 1.7
     # ahead=$(git rev-list origin/${branch_name}..HEAD | wc -l)
     ahead=$(git rev-list ${branch_name}@{upstream}..HEAD 2>/dev/null | wc -l)
-    (( $ahead )) && gitstatus+=( " %F{$VCS_FOREGROUND_COLOR}$(print_icon 'VCS_OUTGOING_CHANGES_ICON')${ahead// /}%f" )
+    (( $ahead )) && gitstatus+=( " %F{$POWERLEVEL9K_VCS_FOREGROUND}$(print_icon 'VCS_OUTGOING_CHANGES_ICON')${ahead// /}%f" )
 
     # for git prior to 1.7
     # behind=$(git rev-list HEAD..origin/${branch_name} | wc -l)
     behind=$(git rev-list HEAD..${branch_name}@{upstream} 2>/dev/null | wc -l)
-    (( $behind )) && gitstatus+=( " %F{$VCS_FOREGROUND_COLOR}$(print_icon 'VCS_INCOMING_CHANGES_ICON')${behind// /}%f" )
+    (( $behind )) && gitstatus+=( " %F{$POWERLEVEL9K_VCS_FOREGROUND}$(print_icon 'VCS_INCOMING_CHANGES_ICON')${behind// /}%f" )
 
     hook_com[misc]+=${(j::)gitstatus}
 }
@@ -417,12 +414,12 @@ function +vi-git-remotebranch() {
     remote=${$(git rev-parse --verify HEAD@{upstream} --symbolic-full-name 2>/dev/null)/refs\/(remotes|heads)\/}
     branch_name=${$(git symbolic-ref --short HEAD 2>/dev/null)}
 
-    hook_com[branch]="%F{$VCS_FOREGROUND_COLOR}$(print_icon 'VCS_BRANCH_ICON')${hook_com[branch]}%f"
+    hook_com[branch]="%F{$POWERLEVEL9K_VCS_FOREGROUND}$(print_icon 'VCS_BRANCH_ICON')${hook_com[branch]}%f"
     # Always show the remote
     #if [[ -n ${remote} ]] ; then
     # Only show the remote if it differs from the local
     if [[ -n ${remote} && ${remote#*/} != ${branch_name} ]] ; then
-        hook_com[branch]+="%F{$VCS_FOREGROUND_COLOR}$(print_icon 'VCS_REMOTE_BRANCH_ICON')%f%F{$VCS_FOREGROUND_COLOR}${remote// /}%f"
+        hook_com[branch]+="%F{$POWERLEVEL9K_VCS_FOREGROUND}$(print_icon 'VCS_REMOTE_BRANCH_ICON')%f%F{$POWERLEVEL9K_VCS_FOREGROUND}${remote// /}%f"
     fi
 }
 
@@ -430,7 +427,7 @@ function +vi-git-tagname() {
     local tag
 
     tag=$(git describe --tags --exact-match HEAD 2>/dev/null)
-    [[ -n "${tag}" ]] && hook_com[branch]=" %F{$VCS_FOREGROUND_COLOR}$(print_icon 'VCS_TAG_ICON')${tag}%f"
+    [[ -n "${tag}" ]] && hook_com[branch]=" %F{$POWERLEVEL9K_VCS_FOREGROUND}$(print_icon 'VCS_TAG_ICON')${tag}%f"
 }
 
 # Show count of stashed changes
@@ -440,17 +437,16 @@ function +vi-git-stash() {
 
   if [[ -s $(git rev-parse --git-dir)/refs/stash ]] ; then
     stashes=$(git stash list 2>/dev/null | wc -l)
-    hook_com[misc]+=" %F{$VCS_FOREGROUND_COLOR}$(print_icon 'VCS_STASH_ICON')${stashes// /}%f"
+    hook_com[misc]+=" %F{$POWERLEVEL9K_VCS_FOREGROUND}$(print_icon 'VCS_STASH_ICON')${stashes// /}%f"
   fi
 }
 
 function +vi-hg-bookmarks() {
   if [[ -n "${hgbmarks[@]}" ]]; then
-    hook_com[hg-bookmark-string]=" %F{$VCS_FOREGROUND_COLOR}$(print_icon 'VCS_BOOKMARK_ICON')${hgbmarks[@]}%f"
+    hook_com[hg-bookmark-string]=" %F{$POWERLEVEL9K_VCS_FOREGROUND}$(print_icon 'VCS_BOOKMARK_ICON')${hgbmarks[@]}%f"
 
-    # And to signal, that we want to use the sting we just generated,
-    # set the special variable `ret' to something other than the default
-    # zero:
+    # To signal that we want to use the sting we just generated, set the special
+    # variable `ret' to something other than the default zero:
     ret=1
     return 0
   fi
@@ -465,7 +461,7 @@ function +vi-vcs-detect-changes() {
 }
 
 ################################################################
-# Prompt Segments
+# Prompt Segment Definitions
 ################################################################
 
 # The `CURRENT_BG` variable is used to remember what the last BG color used was
@@ -663,9 +659,9 @@ prompt_virtualenv() {
 
 # Main prompt
 build_left_prompt() {
-  if [[ "${#POWERLEVEL9K_LEFT_PROMPT_ELEMENTS}" == 0 ]]; then
-    POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(context dir rbenv vcs)
-  fi
+  RETVAL=$?
+
+  defined POWERLEVEL9K_LEFT_PROMPT_ELEMENTS || POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(context dir rbenv vcs)
 
   for element in $POWERLEVEL9K_LEFT_PROMPT_ELEMENTS; do
     prompt_$element "left"
@@ -678,9 +674,7 @@ build_left_prompt() {
 build_right_prompt() {
   RETVAL=$?
 
-  if [[ "${#POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS}" == 0 ]]; then
-    POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(longstatus history time)
-  fi
+  defined POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS || POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(longstatus history time)
 
   for element in $POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS; do
     prompt_$element "right"
