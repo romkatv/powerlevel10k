@@ -331,7 +331,7 @@ prompt_vcs() {
       $1_prompt_segment "$0" "green" "$DEFAULT_COLOR"
     fi
 
-    echo -n "%F{$VCS_FOREGROUND_COLOR}%f$vcs_prompt "
+    echo -n "$vcs_prompt "
   fi
 }
 
