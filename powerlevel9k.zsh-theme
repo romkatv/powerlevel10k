@@ -607,17 +607,22 @@ prompt_ip() {
   $1_prompt_segment "$0" "cyan" "$DEFAULT_COLOR" "$(print_icon 'NETWORK_ICON') $ip"
 }
 
+set_default POWERLEVEL9K_LOAD_SHOW_FREE_RAM true
 prompt_load() {
   if [[ "$OS" == "OSX" ]]; then
     load_avg_5min=$(sysctl vm.loadavg | grep -o -E '[0-9]+(\.|,)[0-9]+' | head -n 1)
-    ramfree=$(vm_stat | grep "Pages free" | grep -o -E '[0-9]+')
-    # Convert pages into Bytes
-    ramfree=$(( $ramfree * 4096 ))
-    base=''
+    if [[ "$POWERLEVEL9K_LOAD_SHOW_FREE_RAM" == true ]]; then
+      ramfree=$(vm_stat | grep "Pages free" | grep -o -E '[0-9]+')
+      # Convert pages into Bytes
+      ramfree=$(( $ramfree * 4096 ))
+      base=''
+    fi
   else
     load_avg_5min=$(grep -o "[0-9.]*" /proc/loadavg | head -n 1)
-    ramfree=$(grep -o -E "MemFree:\s+[0-9]+" /proc/meminfo | grep -o "[0-9]*")
-    base=K
+    if [[ "$POWERLEVEL9K_LOAD_SHOW_FREE_RAM" == true ]]; then
+      ramfree=$(grep -o -E "MemFree:\s+[0-9]+" /proc/meminfo | grep -o "[0-9]*")
+      base=K
+    fi
   fi
 
   # Replace comma
@@ -634,7 +639,11 @@ prompt_load() {
     FUNCTION_SUFFIX="_NORMAL"
   fi
 
-  $1_prompt_segment "$0$FUNCTION_SUFFIX" $BACKGROUND_COLOR "$DEFAULT_COLOR" "$(print_icon 'LOAD_ICON') $load_avg_5min $(print_icon 'RAM_ICON') $(printSizeHumanReadable $ramfree $base)"
+  $1_prompt_segment "$0$FUNCTION_SUFFIX" $BACKGROUND_COLOR "$DEFAULT_COLOR" "$(print_icon 'LOAD_ICON') $load_avg_5min"
+
+  if [[ "$POWERLEVEL9K_LOAD_SHOW_FREE_RAM" == true ]]; then
+    echo -n "$(print_icon 'RAM_ICON') $(printSizeHumanReadable $ramfree $base) "
+  fi
 }
 
 # Right Status: (return code, root status, background jobs)
