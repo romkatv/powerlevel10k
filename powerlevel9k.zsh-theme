@@ -567,7 +567,7 @@ prompt_longstatus() {
   [[ "$UID" -eq 0 ]] && symbols+="%{%F{yellow}%} $(print_icon 'ROOT_ICON')"
   [[ $(jobs -l | wc -l) -gt 0 ]] && symbols+="%{%F{cyan}%}$(print_icon 'BACKGROUND_JOBS_ICON')"
 
-  [[ -n "$symbols" ]] && $1_prompt_segment "$0" "$bg" "$DEFAULT_COLOR" "$symbols"
+  [[ -n "$symbols" ]] && $1_prompt_segment "$0" "$bg" "white" "$symbols"
 }
 
 # Node version
