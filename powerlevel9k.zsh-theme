@@ -579,28 +579,28 @@ prompt_icons_test() {
 
 prompt_ip() {
   if [[ "$OS" == "OSX" ]]; then
-    if [[ -z "$POWERLEVEL9K_IP_INTERFACE" ]]; then
+    if defined POWERLEVEL9K_IP_INTERFACE; then
+      # Get the IP address of the specified interface.
+      ip=$(ipconfig getifaddr $POWERLEVEL9K_IP_INTERFACE)
+    else
       local interfaces callback
       # Get network interface names ordered by service precedence.
       interfaces=$(networksetup -listnetworkserviceorder | grep -o "Device:\s*[a-z0-9]*" | grep -o -E '[a-z0-9]*$')
       callback='ipconfig getifaddr $item'
 
       ip=$(getRelevantItem $interfaces $callback)
-    else
-      # Get the IP address of the specified interface.
-      ip=$(ipconfig getifaddr $POWERLEVEL9K_IP_INTERFACE)
     fi
   else
-    if [[ -z "$POWERLEVEL9K_IP_INTERFACE" ]]; then
+    if defined POWERLEVEL9K_IP_INTERFACE; then
+      # Get the IP address of the specified interface.
+      ip=$(ip -4 a show $POWERLEVEL9K_IP_INTERFACE | grep -o "inet\s*[0-9.]*" | grep -o "[0-9.]*")
+    else
       local interfaces callback
       # Get all network interface names that are up
       interfaces=$(ip link ls up | grep -o -E ":\s+[a-z0-9]+:" | grep -v "lo" | grep -o "[a-z0-9]*")
       callback='ip -4 a show $item | grep -o "inet\s*[0-9.]*" | grep -o "[0-9.]*"'
 
       ip=$(getRelevantItem $interfaces $callback)
-    else
-      # Get the IP address of the specified interface.
-      ip=$(ip -4 a show $POWERLEVEL9K_IP_INTERFACE | grep -o "inet\s*[0-9.]*" | grep -o "[0-9.]*")
     fi
   fi
 
