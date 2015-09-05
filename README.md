@@ -236,6 +236,7 @@ currently available are:
 * **history** - The command number for the current line.
 * **node_version** - Show the version number of the installed Node.js.
 * **os_icon** - Display a nice little icon, depending on your operating system.
+* **php_version** - Show the current PHP version.
 * **rbenv** - Ruby environment information (if one is active).
 * **rspec_stats** - Show a ratio of test classes vs code classes for RSpec.
 * **status** - The return code of the previous command, and status of background jobs.
