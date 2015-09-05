@@ -32,6 +32,18 @@ function defined() {
   typeset -p "$varname" > /dev/null 2>&1
 }
 
+# Given the name of a variable and a default value, sets the variable
+# value to the default only if it has not been defined.
+#
+# Typeset cannot set the value for an array, so this will only work
+# for scalar values.
+function set_default() {
+  local varname="$1"
+  local default_value="$2"
+
+  defined "$varname" || typeset -g "$varname"="$default_value"
+}
+
 # Safety function for printing icons
 # Prints the named icon, or if that icon is undefined, the string name.
 function print_icon() {
@@ -45,16 +57,52 @@ function print_icon() {
   fi
 }
 
-# Given the name of a variable and a default value, sets the variable
-# value to the default only if it has not been defined.
-#
-# Typeset cannot set the value for an array, so this will only work
-# for scalar values.
-function set_default() {
-  local varname="$1"
-  local default_value="$2"
+printSizeHumanReadable() {
+  local size=$1
+  local extension
+  extension=(B K M G T P E Z Y)
+  local index=1
 
-  defined "$varname" || typeset -g "$varname"="$default_value"
+  # if the base is not Bytes
+  if [[ -n $2 ]]; then
+    for idx in ${extension}; do
+      if [[ "$2" == "$idx" ]]; then
+        break
+      fi
+      index=$(( $index + 1 ))
+    done
+  fi
+
+  while (( ($size / 1024) > 0 )); do
+    size=$(( $size / 1024 ))
+    index=$(( $index + 1 ))
+  done
+
+  echo $size${extension[$index]}
+}
+
+# Gets the first value out of a list of items that is not empty.
+# The items are examined by a callback-function.
+# Takes two arguments:
+#   * $list - A list of items
+#   * $callback - A callback function to examine if the item is
+#                 worthy. The callback function has access to
+#                 the inner variable $item.
+function getRelevantItem() {
+  setopt shwordsplit # We need to split the words in $interfaces
+
+  local list callback
+  list=$1
+  callback=$2
+
+  for item in $list; do
+    # The first non-empty item wins
+    try=$(eval $callback)
+    if [[ -n "$try" ]]; then
+      echo $try
+      break;
+    fi
+  done
 }
 
 ################################################################
@@ -86,11 +134,15 @@ case $POWERLEVEL9K_MODE in
       NODE_ICON                      $'\U2B22' # ⬢
       MULTILINE_FIRST_PROMPT_PREFIX  $'\U256D'$'\U2500'
       MULTILINE_SECOND_PROMPT_PREFIX $'\U2570'$'\U2500 '
-      APPLE_ICON                     $'\UF8FF' # 
+      APPLE_ICON                     $'\UE26E' # 
       FREEBSD_ICON                   $'\U1F608 ' # 😈
-      LINUX_ICON                     $'\U1F427 ' # 🐧
+      LINUX_ICON                     $'\UE271' # 
       SUNOS_ICON                     $'\U1F31E ' # 🌞
       HOME_ICON                      $'\UE12C ' # 
+      NETWORK_ICON                   $'\UE1AD ' # 
+      LOAD_ICON                      $'\UE190 ' # 
+      #RAM_ICON                       $'\UE87D' # 
+      RAM_ICON                       $'\UE1E2 ' # 
       VCS_UNTRACKED_ICON             "\UE16C" # 
       VCS_UNSTAGED_ICON              "\UE17C" # 
       VCS_STAGED_ICON                "\UE168" # 
@@ -132,6 +184,9 @@ case $POWERLEVEL9K_MODE in
       LINUX_ICON                     'Lx'
       SUNOS_ICON                     'Sun'
       HOME_ICON                      ''
+      NETWORK_ICON                   'IP'
+      LOAD_ICON                      'L'
+      RAM_ICON                       'RAM'
       VCS_UNTRACKED_ICON             '?'
       VCS_UNSTAGED_ICON              "\u25CF" # ●
       VCS_STAGED_ICON                "\u271A" # ✚
@@ -520,6 +575,75 @@ prompt_icons_test() {
     local next_color=$((random_color+1))
     $1_prompt_segment "$0" "$random_color" "$next_color" "$key: ${icons[$key]}"
   done
+}
+
+prompt_ip() {
+  if [[ "$OS" == "OSX" ]]; then
+    if defined POWERLEVEL9K_IP_INTERFACE; then
+      # Get the IP address of the specified interface.
+      ip=$(ipconfig getifaddr $POWERLEVEL9K_IP_INTERFACE)
+    else
+      local interfaces callback
+      # Get network interface names ordered by service precedence.
+      interfaces=$(networksetup -listnetworkserviceorder | grep -o "Device:\s*[a-z0-9]*" | grep -o -E '[a-z0-9]*$')
+      callback='ipconfig getifaddr $item'
+
+      ip=$(getRelevantItem $interfaces $callback)
+    fi
+  else
+    if defined POWERLEVEL9K_IP_INTERFACE; then
+      # Get the IP address of the specified interface.
+      ip=$(ip -4 a show $POWERLEVEL9K_IP_INTERFACE | grep -o "inet\s*[0-9.]*" | grep -o "[0-9.]*")
+    else
+      local interfaces callback
+      # Get all network interface names that are up
+      interfaces=$(ip link ls up | grep -o -E ":\s+[a-z0-9]+:" | grep -v "lo" | grep -o "[a-z0-9]*")
+      callback='ip -4 a show $item | grep -o "inet\s*[0-9.]*" | grep -o "[0-9.]*"'
+
+      ip=$(getRelevantItem $interfaces $callback)
+    fi
+  fi
+
+  $1_prompt_segment "$0" "cyan" "$DEFAULT_COLOR" "$(print_icon 'NETWORK_ICON') $ip"
+}
+
+set_default POWERLEVEL9K_LOAD_SHOW_FREE_RAM true
+prompt_load() {
+  if [[ "$OS" == "OSX" ]]; then
+    load_avg_5min=$(sysctl vm.loadavg | grep -o -E '[0-9]+(\.|,)[0-9]+' | head -n 1)
+    if [[ "$POWERLEVEL9K_LOAD_SHOW_FREE_RAM" == true ]]; then
+      ramfree=$(vm_stat | grep "Pages free" | grep -o -E '[0-9]+')
+      # Convert pages into Bytes
+      ramfree=$(( $ramfree * 4096 ))
+      base=''
+    fi
+  else
+    load_avg_5min=$(grep -o "[0-9.]*" /proc/loadavg | head -n 1)
+    if [[ "$POWERLEVEL9K_LOAD_SHOW_FREE_RAM" == true ]]; then
+      ramfree=$(grep -o -E "MemFree:\s+[0-9]+" /proc/meminfo | grep -o "[0-9]*")
+      base=K
+    fi
+  fi
+
+  # Replace comma
+  load_avg_5min=${load_avg_5min//,/.}
+
+  if [[ "$load_avg_5min" -gt 10 ]]; then
+    BACKGROUND_COLOR="red"
+    FUNCTION_SUFFIX="_CRITICAL"
+  elif [[ "$load_avg_5min" -gt 3 ]]; then
+    BACKGROUND_COLOR="yellow"
+    FUNCTION_SUFFIX="_WARNING"
+  else
+    BACKGROUND_COLOR="green"
+    FUNCTION_SUFFIX="_NORMAL"
+  fi
+
+  $1_prompt_segment "$0$FUNCTION_SUFFIX" $BACKGROUND_COLOR "$DEFAULT_COLOR" "$(print_icon 'LOAD_ICON') $load_avg_5min"
+
+  if [[ "$POWERLEVEL9K_LOAD_SHOW_FREE_RAM" == true ]]; then
+    echo -n "$(print_icon 'RAM_ICON') $(printSizeHumanReadable $ramfree $base) "
+  fi
 }
 
 # Right Status: (return code, root status, background jobs)

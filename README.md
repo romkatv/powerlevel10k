@@ -41,6 +41,7 @@ this theme focus on four primary goals:
   - [The AWS Profile Segment](#the-aws-profile-segment)
   - [The 'context' Segment](#the-context-segment)
   - [The 'dir' segment](#the-dir-segment)
+  - [The 'ip' segment](#the-ip-segment)
   - [The 'time' segment](#the-time-segment)
   - [Unit Test Ratios](#unit-test-ratios)
   - [The 'vcs' Segment](#the-vcs-segment)
@@ -234,6 +235,8 @@ currently available are:
 * **context** - Your username and host (more info below)
 * **dir** - Your current working directory.
 * **history** - The command number for the current line.
+* **ip** - Shows the current IP address.
+* **load** - Your machines 5 minute load average and free RAM.
 * **node_version** - Show the version number of the installed Node.js.
 * **os_icon** - Display a nice little icon, depending on your operating system.
 * **rbenv** - Ruby environment information (if one is active).
@@ -290,6 +293,15 @@ To change the way how the current working directory is truncated, just set:
 In each case you have to specify the length you want to shorten the directory
 to. So in some cases `POWERLEVEL9K_SHORTEN_DIR_LENGTH` means characters, in 
 others whole directories.
+
+#### The 'ip' segment
+
+This segment shows you your current internal IP address. It tries to examine
+all currently used network interfaces and prints the first address it finds.
+In the case that this is not the right IP address you can specify the correct
+network interface by setting:
+
+    POWERLEVEL9K_IP_INTERFACE="eth0"
 
 #### The 'time' segment
 
