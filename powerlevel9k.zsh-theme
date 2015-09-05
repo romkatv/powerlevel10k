@@ -680,6 +680,16 @@ prompt_os_icon() {
   $1_prompt_segment "$0" "008" "255" "$OS_ICON"
 }
 
+# print PHP version number
+prompt_php_version() {
+  local php_version
+  php_version=$(php -v 2>&1 | grep -oe "^PHP\s*[0-9.]*")
+
+  if [[ -n "$php_version" ]]; then
+    $1_prompt_segment "$0" "013" "255" "$php_version"
+  fi
+}
+
 # rbenv information
 prompt_rbenv() {
   if [[ -n "$RBENV_VERSION" ]]; then
