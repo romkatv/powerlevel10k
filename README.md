@@ -1,7 +1,7 @@
 ## powerlevel9k Theme for ZSH
 
 Powerlevel9k is a theme for ZSH which uses [Powerline
-Fonts](https://github.com/Lokaltog/powerline-fonts). It can be used with vanilla
+Fonts](https://github.com/powerline/fonts). It can be used with vanilla
 ZSH, [Oh-My-Zsh](https://github.com/robbyrussell/oh-my-zsh), or
 [Prezto](https://github.com/sorin-ionescu/prezto), and can also be installed
 using [antigen](https://github.com/zsh-users/antigen).
@@ -49,11 +49,13 @@ this theme focus on four primary goals:
   - [Double-Lined Prompt](#double-lined-prompt)
   - [Disable Right Prompt](#disable-right-prompt)
   - [Light Color Theme](#light-color-theme)
+  - [Icon Customization](#icon-customization)
   - [Segment Color Customization](#segment-color-customization)
   - [Special Segment Colors](#special-segment-colors)
 - [Troubleshooting](#troubleshooting)
   - [Gaps Between Segments](#gaps-between-segments)
   - [Segment Colors are Wrong](#segment-colors-are-wrong)
+  - [Strange Characters in prompt](#strange-characters-in-prompt)
 - [Meta](#meta)
   - [Kudos](#kudos)
   - [Developing](#developing)
@@ -277,6 +279,18 @@ to a certain length:
     # Limit to the last two folders
     POWERLEVEL9K_SHORTEN_DIR_LENGTH=2
 
+To change the way how the current working directory is truncated, just set:
+
+    # truncate the middle part
+    POWERLEVEL9K_SHORTEN_STRATEGY="truncate_middle"
+    # truncate from right, leaving the first X characters untouched
+    POWERLEVEL9K_SHORTEN_STRATEGY="truncate_from_right"
+    # default behaviour is to truncate whole directories
+
+In each case you have to specify the length you want to shorten the directory
+to. So in some cases `POWERLEVEL9K_SHORTEN_DIR_LENGTH` means characters, in 
+others whole directories.
+
 #### The 'time' segment
 
 By default the time is show in 'H:M:S' format. If you want to change it, 
@@ -382,6 +396,24 @@ Light'](https://github.com/altercation/solarized) users. Check it out:
 
 ![](http://bhilburn.org/content/images/2015/03/solarized-light.png)
 
+#### Icon Customization
+
+Each icon used can be customized too by specifying a variable named like
+the icon and prefixed with 'POWERLEVEL9K'. If you want to use another icon
+as segment separators, you can easily do that:
+
+    POWERLEVEL9K_LEFT_SEGMENT_SEPARATOR=$'\uE0B1'
+    POWERLEVEL9K_RIGHT_SEGMENT_SEPARATOR=$'\uE0B3'
+
+You could get a list of all icons defined in random colors, by adding the 
+special segment `icons_test` to your prompt:
+
+    POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(icons_test)
+
+This special prompt does not work on the right side, as it would be too long,
+and ZSH hides it automatically. Also have in mind, that the output depends on
+your `POWERLEVEL9K_MODE` settings.
+
 #### Segment Color Customization
 
 For each segment in your prompt, you can specify a foreground and background
@@ -462,12 +494,21 @@ terminal, which should yield `256`. If you see something different, try setting
 
     TERM=xterm-256color
 
+#### Strange Characters in prompt
+
+If your prompt shows strange character like this:
+
+![](https://cloud.githubusercontent.com/assets/1544760/9156161/e0e584e6-3ed0-11e5-897a-2318a8e32d35.png)
+
+it is most likely that you set `POWERLEVEL9K_MODE="awesome-patched"`, but
+did not install an [awesome-font](https://github.com/gabrielelana/awesome-terminal-fonts). For most other modes, you need a [powerline-patched](https://github.com/powerline/fonts) font.
+
 ### Meta
 
 #### Kudos
 
 This theme wouldn't have happened without inspiration from the original
-[agnoster](https://gist.github.com/agnoster/3712874) Oh-My-ZSH theme.
+[agnoster](https://github.com/agnoster/agnoster-zsh-theme) ZSH theme.
 
 Before creating this theme, I also tried [jeremyFreeAgent's
 theme](https://github.com/jeremyFreeAgent/oh-my-zsh-powerline-theme) and
