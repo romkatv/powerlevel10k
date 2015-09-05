@@ -220,7 +220,7 @@ VCS_DEFAULT_FORMAT="$VCS_CHANGESET_PREFIX%F{$VCS_FOREGROUND_COLOR}%b%c%u%m%f"
 zstyle ':vcs_info:git*:*' formats "%F{$VCS_FOREGROUND_COLOR}$VCS_GIT_ICON%f$VCS_DEFAULT_FORMAT"
 zstyle ':vcs_info:hg*:*' formats "%F{$VCS_FOREGROUND_COLOR}$VCS_HG_ICON%f$VCS_DEFAULT_FORMAT"
 
-zstyle ':vcs_info:*' actionformats " %b %F{red}| %a%f"
+zstyle ':vcs_info:*' actionformats "%b %F{red}| %a%f"
 
 zstyle ':vcs_info:*' stagedstr " %F{$VCS_FOREGROUND_COLOR}$VCS_STAGED_ICON%f"
 zstyle ':vcs_info:*' unstagedstr " %F{$VCS_FOREGROUND_COLOR}$VCS_UNSTAGED_ICON%f"
@@ -331,7 +331,7 @@ prompt_vcs() {
       $1_prompt_segment "$0" "green" "$DEFAULT_COLOR"
     fi
 
-    echo -n "%F{$VCS_FOREGROUND_COLOR}%f$vcs_prompt "
+    echo -n "$vcs_prompt "
   fi
 }
 
