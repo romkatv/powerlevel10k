@@ -676,6 +676,14 @@ build_right_prompt() {
 }
 
 powerlevel9k_init() {
+  # Display a warning, if the terminal does not support 256 colors
+  local term_colors
+  term_colors=$(tput colors)
+  if (( $term_colors < 256 )); then
+    print -P "%F{red}WARNING!%f Your terminal supports less than 256 colors!"
+    print "You should set TERM=xterm-256colors in your ~/.zshrc"
+  fi
+
   setopt LOCAL_OPTIONS
   unsetopt XTRACE KSH_ARRAYS
   prompt_opts=(cr percent subst)
