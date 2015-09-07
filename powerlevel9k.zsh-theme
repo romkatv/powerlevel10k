@@ -126,7 +126,7 @@ case $POWERLEVEL9K_MODE in
   'flat'|'awesome-patched')
     # Awesome-Patched Font required!
     # See https://github.com/gabrielelana/awesome-terminal-fonts/tree/patching-strategy/patched
-    local LC_ALL="" LC_CTYPE="en_US.UTF-8"
+    local LC_ALL="" LC_CTYPE="en_US.UTF-8" # Set the right locale to protect special characters
     icons=(
       LEFT_SEGMENT_SEPARATOR         $'\UE0B0' # 
       RIGHT_SEGMENT_SEPARATOR        $'\UE0B2' # 
@@ -218,7 +218,7 @@ case $POWERLEVEL9K_MODE in
     icons[RIGHT_SEGMENT_SEPARATOR]=''
   ;;
   'compatible')
-    local LC_ALL="" LC_CTYPE="en_US.UTF-8"
+    local LC_ALL="" LC_CTYPE="en_US.UTF-8" # Set the right locale to protect special characters
     icons[LEFT_SEGMENT_SEPARATOR]=$'\u2B80' # ⮀
     icons[RIGHT_SEGMENT_SEPARATOR]=$'\u2B82' # ⮂
     icons[VCS_BRANCH_ICON]='@'
@@ -846,7 +846,7 @@ $(print_icon 'MULTILINE_SECOND_PROMPT_PREFIX')"
     # the RPROMPT, we advise it, to go one line up. At the end of RPROMPT, we
     # advise it to go one line down. See:
     # http://superuser.com/questions/357107/zsh-right-justify-in-ps1
-    local LC_ALL="" LC_CTYPE="en_US.UTF-8"
+    local LC_ALL="" LC_CTYPE="en_US.UTF-8" # Set the right locale to protect special characters
     RPROMPT_PREFIX='%{'$'\e[1A''%}' # one line up
     RPROMPT_SUFFIX='%{'$'\e[1B''%}' # one line down
   else
