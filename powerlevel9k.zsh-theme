@@ -372,7 +372,7 @@ left_prompt_segment() {
   local bg fg
   [[ -n $2 ]] && bg="%K{$2}" || bg="%k"
   [[ -n $3 ]] && fg="%F{$3}" || fg="%f"
-  if [[ $CURRENT_BG != 'NONE' && $2 != $CURRENT_BG ]]; then
+  if [[ $CURRENT_BG != 'NONE' ]] && [[ "$2" != "$CURRENT_BG" ]]; then
     # Middle segment
     echo -n "%{$bg%F{$CURRENT_BG}%}$(print_icon 'LEFT_SEGMENT_SEPARATOR')%{$fg%} "
   else
@@ -474,7 +474,7 @@ function +vi-git-remotebranch() {
     # Always show the remote
     #if [[ -n ${remote} ]] ; then
     # Only show the remote if it differs from the local
-    if [[ -n ${remote} && ${remote#*/} != ${branch_name} ]] ; then
+    if [[ -n ${remote} ]] && [[ "${remote#*/}" != "${branch_name}" ]] ; then
         hook_com[branch]+="%F{$POWERLEVEL9K_VCS_FOREGROUND}$(print_icon 'VCS_REMOTE_BRANCH_ICON')%f%F{$POWERLEVEL9K_VCS_FOREGROUND}${remote// /}%f"
     fi
 }
