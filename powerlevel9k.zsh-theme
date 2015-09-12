@@ -661,7 +661,7 @@ prompt_longstatus() {
   symbols=()
 
   if [[ "$RETVAL" -ne 0 ]]; then
-    symbols+="%F{226}%? ↵"
+    symbols+="%F{226}$RETVAL ↵"
     bg="009"
   else
     symbols+="%{%F{046}%}$(print_icon 'OK_ICON')"
@@ -798,8 +798,6 @@ prompt_virtualenv() {
 
 # Main prompt
 build_left_prompt() {
-  RETVAL=$?
-
   defined POWERLEVEL9K_LEFT_PROMPT_ELEMENTS || POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(context dir rbenv vcs)
 
   for element in "${POWERLEVEL9K_LEFT_PROMPT_ELEMENTS[@]}"; do
@@ -811,13 +809,35 @@ build_left_prompt() {
 
 # Right prompt
 build_right_prompt() {
-  RETVAL=$?
-
   defined POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS || POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(longstatus history time)
 
   for element in "${POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS[@]}"; do
     "prompt_$element" "right"
   done
+}
+
+powerlevel9k_prepare_prompts() {
+  RETVAL=$?
+
+  if [[ "$POWERLEVEL9K_PROMPT_ON_NEWLINE" == true ]]; then
+    PROMPT="$(print_icon 'MULTILINE_FIRST_PROMPT_PREFIX')%{%f%b%k%}$(build_left_prompt)
+$(print_icon 'MULTILINE_SECOND_PROMPT_PREFIX')"
+    # The right prompt should be on the same line as the first line of the left
+    # prompt.  To do so, there is just a quite ugly workaround: Before zsh draws
+    # the RPROMPT, we advise it, to go one line up. At the end of RPROMPT, we
+    # advise it to go one line down. See:
+    # http://superuser.com/questions/357107/zsh-right-justify-in-ps1
+    RPROMPT_PREFIX='%{'$'\e[1A''%}' # one line up
+    RPROMPT_SUFFIX='%{'$'\e[1B''%}' # one line down
+  else
+    PROMPT="%{%f%b%k%}$(build_left_prompt)"
+    RPROMPT_PREFIX=''
+    RPROMPT_SUFFIX=''
+  fi
+
+  if [[ "$POWERLEVEL9K_DISABLE_RPROMPT" != true ]]; then
+    RPROMPT="$RPROMPT_PREFIX%{%f%b%k%}$(build_right_prompt)%{$reset_color%}$RPROMPT_SUFFIX"
+  fi
 }
 
 powerlevel9k_init() {
@@ -838,28 +858,10 @@ powerlevel9k_init() {
 
   # initialize VCS
   autoload -Uz add-zsh-hook
-
   add-zsh-hook precmd vcs_info
 
-  if [[ "$POWERLEVEL9K_PROMPT_ON_NEWLINE" == true ]]; then
-    PROMPT="$(print_icon 'MULTILINE_FIRST_PROMPT_PREFIX')%{%f%b%k%}"'$(build_left_prompt)'"
-$(print_icon 'MULTILINE_SECOND_PROMPT_PREFIX')"
-    # The right prompt should be on the same line as the first line of the left
-    # prompt.  To do so, there is just a quite ugly workaround: Before zsh draws
-    # the RPROMPT, we advise it, to go one line up. At the end of RPROMPT, we
-    # advise it to go one line down. See:
-    # http://superuser.com/questions/357107/zsh-right-justify-in-ps1
-    RPROMPT_PREFIX='%{'$'\e[1A''%}' # one line up
-    RPROMPT_SUFFIX='%{'$'\e[1B''%}' # one line down
-  else
-    PROMPT="%{%f%b%k%}"'$(build_left_prompt)'
-    RPROMPT_PREFIX=''
-    RPROMPT_SUFFIX=''
-  fi
-
-  if [[ "$POWERLEVEL9K_DISABLE_RPROMPT" != true ]]; then
-    RPROMPT=$RPROMPT_PREFIX"%{%f%b%k%}"'$(build_right_prompt)'"%{$reset_color%}"$RPROMPT_SUFFIX
-  fi
+  # prepare prompts
+  add-zsh-hook precmd powerlevel9k_prepare_prompts
 }
 
 powerlevel9k_init "$@"
