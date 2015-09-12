@@ -21,97 +21,6 @@
 #set -o xtrace
 
 ################################################################
-# Utility functions
-################################################################
-
-# Exits with 0 if a variable has been previously defined (even if empty)
-# Takes the name of a variable that should be checked.
-function defined() {
-  local varname="$1"
-
-  typeset -p "$varname" > /dev/null 2>&1
-}
-
-# Given the name of a variable and a default value, sets the variable
-# value to the default only if it has not been defined.
-#
-# Typeset cannot set the value for an array, so this will only work
-# for scalar values.
-function set_default() {
-  local varname="$1"
-  local default_value="$2"
-
-  defined "$varname" || typeset -g "$varname"="$default_value"
-}
-
-# Safety function for printing icons
-# Prints the named icon, or if that icon is undefined, the string name.
-function print_icon() {
-  local icon_name=$1
-  local ICON_USER_VARIABLE=POWERLEVEL9K_${icon_name}
-  local USER_ICON=${(P)ICON_USER_VARIABLE}
-  if defined "$ICON_USER_VARIABLE"; then
-    echo -n "$USER_ICON"
-  else
-    echo -n "${icons[$icon_name]}"
-  fi
-}
-
-printSizeHumanReadable() {
-  local size=$1
-  local extension
-  extension=(B K M G T P E Z Y)
-  local index=1
-
-  # if the base is not Bytes
-  if [[ -n $2 ]]; then
-    for idx in "${extension[@]}"; do
-      if [[ "$2" == "$idx" ]]; then
-        break
-      fi
-      index=$(( index + 1 ))
-    done
-  fi
-
-  while (( (size / 1024) > 0 )); do
-    size=$(( size / 1024 ))
-    index=$(( index + 1 ))
-  done
-
-  echo "$size${extension[$index]}"
-}
-
-# Gets the first value out of a list of items that is not empty.
-# The items are examined by a callback-function.
-# Takes two arguments:
-#   * $list - A list of items
-#   * $callback - A callback function to examine if the item is
-#                 worthy. The callback function has access to
-#                 the inner variable $item.
-function getRelevantItem() {
-  setopt shwordsplit # We need to split the words in $interfaces
-
-  local list callback
-  list=$1
-  callback=$2
-
-  for item in $list; do
-    # The first non-empty item wins
-    try=$(eval "$callback")
-    if [[ -n "$try" ]]; then
-      echo "$try"
-      break;
-    fi
-  done
-}
-
-get_icon_names() {
-  for key in ${(@k)icons}; do
-    echo "POWERLEVEL9K_$key: ${icons[$key]}"
-  done
-}
-
-################################################################
 # Icons
 ################################################################
 
@@ -226,6 +135,97 @@ esac
 if [[ "$POWERLEVEL9K_HIDE_BRANCH_ICON" == true ]]; then
     icons[VCS_BRANCH_ICON]=''
 fi
+
+################################################################
+# Utility functions
+################################################################
+
+# Exits with 0 if a variable has been previously defined (even if empty)
+# Takes the name of a variable that should be checked.
+function defined() {
+  local varname="$1"
+
+  typeset -p "$varname" > /dev/null 2>&1
+}
+
+# Given the name of a variable and a default value, sets the variable
+# value to the default only if it has not been defined.
+#
+# Typeset cannot set the value for an array, so this will only work
+# for scalar values.
+function set_default() {
+  local varname="$1"
+  local default_value="$2"
+
+  defined "$varname" || typeset -g "$varname"="$default_value"
+}
+
+# Safety function for printing icons
+# Prints the named icon, or if that icon is undefined, the string name.
+function print_icon() {
+  local icon_name=$1
+  local ICON_USER_VARIABLE=POWERLEVEL9K_${icon_name}
+  local USER_ICON=${(P)ICON_USER_VARIABLE}
+  if defined "$ICON_USER_VARIABLE"; then
+    echo -n "$USER_ICON"
+  else
+    echo -n "${icons[$icon_name]}"
+  fi
+}
+
+printSizeHumanReadable() {
+  local size=$1
+  local extension
+  extension=(B K M G T P E Z Y)
+  local index=1
+
+  # if the base is not Bytes
+  if [[ -n $2 ]]; then
+    for idx in "${extension[@]}"; do
+      if [[ "$2" == "$idx" ]]; then
+        break
+      fi
+      index=$(( index + 1 ))
+    done
+  fi
+
+  while (( (size / 1024) > 0 )); do
+    size=$(( size / 1024 ))
+    index=$(( index + 1 ))
+  done
+
+  echo "$size${extension[$index]}"
+}
+
+# Gets the first value out of a list of items that is not empty.
+# The items are examined by a callback-function.
+# Takes two arguments:
+#   * $list - A list of items
+#   * $callback - A callback function to examine if the item is
+#                 worthy. The callback function has access to
+#                 the inner variable $item.
+function getRelevantItem() {
+  setopt shwordsplit # We need to split the words in $interfaces
+
+  local list callback
+  list=$1
+  callback=$2
+
+  for item in $list; do
+    # The first non-empty item wins
+    try=$(eval "$callback")
+    if [[ -n "$try" ]]; then
+      echo "$try"
+      break;
+    fi
+  done
+}
+
+get_icon_names() {
+  for key in ${(@k)icons}; do
+    echo "POWERLEVEL9K_$key: ${icons[$key]}"
+  done
+}
 
 # OS detection for the `os_icon` segment
 case $(uname) in
