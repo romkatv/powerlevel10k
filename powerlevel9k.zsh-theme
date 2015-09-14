@@ -38,6 +38,8 @@ case $POWERLEVEL9K_MODE in
     icons=(
       LEFT_SEGMENT_SEPARATOR         "\UE0B0" # 
       RIGHT_SEGMENT_SEPARATOR        "\UE0B2" # 
+      LEFT_SUBSEGMENT_SEPARATOR      "\UE0B1" # 
+      RIGHT_SUBSEGMENT_SEPARATOR     "\UE0B3" # 
       ROOT_ICON                      "\UE801" # 
       RUBY_ICON                      "\UE847" # 
       AWS_ICON                       "\UE895" # 
@@ -83,6 +85,8 @@ case $POWERLEVEL9K_MODE in
     icons=(
       LEFT_SEGMENT_SEPARATOR         "\uE0B0" # 
       RIGHT_SEGMENT_SEPARATOR        "\uE0B2" # 
+      LEFT_SUBSEGMENT_SEPARATOR      "\UE0B1" # 
+      RIGHT_SUBSEGMENT_SEPARATOR     "\UE0B3" # 
       ROOT_ICON                      "\u26A1" # ⚡
       RUBY_ICON                      ''
       AWS_ICON                       "AWS:"
@@ -375,6 +379,14 @@ left_prompt_segment() {
   if [[ $CURRENT_BG != 'NONE' ]] && [[ "$2" != "$CURRENT_BG" ]]; then
     # Middle segment
     echo -n "%{$bg%F{$CURRENT_BG}%}$(print_icon 'LEFT_SEGMENT_SEPARATOR')%{$fg%} "
+  elif [[ "$CURRENT_BG" == $2 ]]; then
+    # Middle segment with same color as previous segment
+    # We take the current foreground color as color for our
+    # subsegment (or the default color). This should have
+    # enough contrast.
+    local complement
+    [[ -n $3 ]] && complement=$3 || complement=$DEFAULT_COLOR
+    echo -n "%{$bg%F{$complement}%}$(print_icon 'LEFT_SUBSEGMENT_SEPARATOR')%{$fg%} "
   else
     # First segment
     echo -n "%{$bg%}%{$fg%} "
@@ -393,6 +405,8 @@ left_prompt_end() {
   echo -n "%{%f%} "
   CURRENT_BG=''
 }
+
+CURRENT_RIGHT_BG='NONE'
 
 # Begin a right prompt segment
 # Takes four arguments:
@@ -416,8 +430,21 @@ right_prompt_segment() {
   local bg fg
   [[ -n $2 ]] && bg="%K{$2}" || bg="%k"
   [[ -n $3 ]] && fg="%F{$3}" || fg="%f"
-  echo -n "%f%F{$2}$(print_icon 'RIGHT_SEGMENT_SEPARATOR')%f%{$bg%}%{$fg%} "
+
+  if [[ "$CURRENT_RIGHT_BG" == $2 ]]; then
+    # Middle segment with same color as previous segment
+    # We take the current foreground color as color for our
+    # subsegment (or the default color). This should have
+    # enough contrast.
+    local complement
+    [[ -n $3 ]] && complement=$3 || complement=$DEFAULT_COLOR
+    echo -n "%f%F{$complement}$(print_icon 'RIGHT_SUBSEGMENT_SEPARATOR')%f%{$bg%}%{$fg%} "
+  else
+    echo -n "%f%F{$2}$(print_icon 'RIGHT_SEGMENT_SEPARATOR')%f%{$bg%}%{$fg%} "
+  fi
   [[ -n $4 ]] && echo -n "$4 "
+
+  CURRENT_RIGHT_BG=$2
 }
 
 ################################################################
@@ -671,7 +698,7 @@ prompt_longstatus() {
   [[ "$UID" -eq 0 ]] && symbols+="%{%F{yellow}%} $(print_icon 'ROOT_ICON')"
   [[ $(jobs -l | wc -l) -gt 0 ]] && symbols+="%{%F{cyan}%}$(print_icon 'BACKGROUND_JOBS_ICON')"
 
-  [[ -n "$symbols" ]] && "$1_prompt_segment" "$0" "$bg" "$DEFAULT_COLOR" "$symbols"
+  [[ -n "$symbols" ]] && "$1_prompt_segment" "$0" "$bg" "white" "$symbols"
 }
 
 # Node version
