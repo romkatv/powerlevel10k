@@ -381,7 +381,7 @@ left_prompt_segment() {
   if [[ $CURRENT_BG != 'NONE' ]] && [[ "$2" != "$CURRENT_BG" ]]; then
     # Middle segment
     echo -n "%{$bg%F{$CURRENT_BG}%}$(print_icon 'LEFT_SEGMENT_SEPARATOR')%{$fg%} "
-  elif [[ "$CURRENT_BG" == $2 ]]; then
+  elif [[ "$CURRENT_BG" == "$2" ]]; then
     # Middle segment with same color as previous segment
     # We take the current foreground color as color for our
     # subsegment (or the default color). This should have
@@ -433,7 +433,7 @@ right_prompt_segment() {
   [[ -n $2 ]] && bg="%K{$2}" || bg="%k"
   [[ -n $3 ]] && fg="%F{$3}" || fg="%f"
 
-  if [[ "$CURRENT_RIGHT_BG" == $2 ]]; then
+  if [[ "$CURRENT_RIGHT_BG" == "$2" ]]; then
     # Middle segment with same color as previous segment
     # We take the current foreground color as color for our
     # subsegment (or the default color). This should have
