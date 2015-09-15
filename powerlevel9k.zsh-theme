@@ -881,7 +881,7 @@ powerlevel9k_init() {
 
   setopt LOCAL_OPTIONS
   unsetopt XTRACE KSH_ARRAYS
-  setopt cr percent subst
+  setopt PROMPT_CR PROMPT_PERCENT PROMPT_SUBST MULTIBYTE
 
   # initialize colors
   autoload -U colors && colors
