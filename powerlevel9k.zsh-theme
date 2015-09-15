@@ -126,19 +126,20 @@ case $POWERLEVEL9K_MODE in
   'flat'|'awesome-patched')
     # Awesome-Patched Font required!
     # See https://github.com/gabrielelana/awesome-terminal-fonts/tree/patching-strategy/patched
+    local LC_ALL="" LC_CTYPE="en_US.UTF-8" # Set the right locale to protect special characters
     icons=(
-      LEFT_SEGMENT_SEPARATOR         "\UE0B0" # 
-      RIGHT_SEGMENT_SEPARATOR        "\UE0B2" # 
-      LEFT_SUBSEGMENT_SEPARATOR      "\UE0B1" # 
-      RIGHT_SUBSEGMENT_SEPARATOR     "\UE0B3" # 
-      ROOT_ICON                      "\UE801" # 
-      RUBY_ICON                      "\UE847" # 
-      AWS_ICON                       "\UE895" # 
-      BACKGROUND_JOBS_ICON           "\UE82F " # 
-      TEST_ICON                      "\UE891" # 
-      OK_ICON                        "\U2713" # ✓
-      FAIL_ICON                      "\U2718" # ✘
-      SYMFONY_ICON                   "SF"
+      LEFT_SEGMENT_SEPARATOR         $'\UE0B0' # 
+      RIGHT_SEGMENT_SEPARATOR        $'\UE0B2' # 
+      LEFT_SUBSEGMENT_SEPARATOR      $'\UE0B1' # 
+      RIGHT_SUBSEGMENT_SEPARATOR     $'\UE0B3' # 
+      ROOT_ICON                      $'\UE801' # 
+      RUBY_ICON                      $'\UE847' # 
+      AWS_ICON                       $'\UE895' # 
+      BACKGROUND_JOBS_ICON           $'\UE82F ' # 
+      TEST_ICON                      $'\UE891' # 
+      OK_ICON                        $'\U2713' # ✓
+      FAIL_ICON                      $'\U2718' # ✘
+      SYMFONY_ICON                   'SF'
       NODE_ICON                      $'\U2B22' # ⬢
       MULTILINE_FIRST_PROMPT_PREFIX  $'\U256D'$'\U2500'
       MULTILINE_SECOND_PROMPT_PREFIX $'\U2570'$'\U2500 '
@@ -151,41 +152,41 @@ case $POWERLEVEL9K_MODE in
       LOAD_ICON                      $'\UE190 ' # 
       #RAM_ICON                       $'\UE87D' # 
       RAM_ICON                       $'\UE1E2 ' # 
-      VCS_UNTRACKED_ICON             "\UE16C" # 
-      VCS_UNSTAGED_ICON              "\UE17C" # 
-      VCS_STAGED_ICON                "\UE168" # 
-      VCS_STASH_ICON                 "\UE133 " # 
-      #VCS_INCOMING_CHANGES_ICON     "\UE1EB " # 
-      #VCS_INCOMING_CHANGES_ICON     "\UE80D " # 
-      VCS_INCOMING_CHANGES_ICON      "\UE131 " # 
-      #VCS_OUTGOING_CHANGES_ICON     "\UE1EC " # 
-      #VCS_OUTGOING_CHANGES_ICON     "\UE80E " # 
-      VCS_OUTGOING_CHANGES_ICON      "\UE132 " # 
-      VCS_TAG_ICON                   "\UE817 " # 
-      VCS_BOOKMARK_ICON              "\UE87B" # 
-      VCS_COMMIT_ICON                "\UE821 " # 
+      VCS_UNTRACKED_ICON             $'\UE16C' # 
+      VCS_UNSTAGED_ICON              $'\UE17C' # 
+      VCS_STAGED_ICON                $'\UE168' # 
+      VCS_STASH_ICON                 $'\UE133 ' # 
+      #VCS_INCOMING_CHANGES_ICON     $'\UE1EB ' # 
+      #VCS_INCOMING_CHANGES_ICON     $'\UE80D ' # 
+      VCS_INCOMING_CHANGES_ICON      $'\UE131 ' # 
+      #VCS_OUTGOING_CHANGES_ICON     $'\UE1EC ' # 
+      #VCS_OUTGOING_CHANGES_ICON     $'\UE80E ' # 
+      VCS_OUTGOING_CHANGES_ICON      $'\UE132 ' # 
+      VCS_TAG_ICON                   $'\UE817 ' # 
+      VCS_BOOKMARK_ICON              $'\UE87B' # 
+      VCS_COMMIT_ICON                $'\UE821 ' # 
       VCS_BRANCH_ICON                $'\UE220' # 
-      VCS_REMOTE_BRANCH_ICON         " \UE804 " # 
-      VCS_GIT_ICON                   "\UE20E  " # 
-      VCS_HG_ICON                    "\UE1C3  " # 
+      VCS_REMOTE_BRANCH_ICON         ' '$'\UE804 ' # 
+      VCS_GIT_ICON                   $'\UE20E  ' # 
+      VCS_HG_ICON                    $'\UE1C3  ' # 
     )
   ;;
   *)
     # Powerline-Patched Font required!
     # See https://github.com/Lokaltog/powerline-fonts
     icons=(
-      LEFT_SEGMENT_SEPARATOR         "\uE0B0" # 
-      RIGHT_SEGMENT_SEPARATOR        "\uE0B2" # 
-      LEFT_SUBSEGMENT_SEPARATOR      "\UE0B1" # 
-      RIGHT_SUBSEGMENT_SEPARATOR     "\UE0B3" # 
-      ROOT_ICON                      "\u26A1" # ⚡
+      LEFT_SEGMENT_SEPARATOR         $'\uE0B0' # 
+      RIGHT_SEGMENT_SEPARATOR        $'\uE0B2' # 
+      LEFT_SUBSEGMENT_SEPARATOR      $'\UE0B1' # 
+      RIGHT_SUBSEGMENT_SEPARATOR     $'\UE0B3' # 
+      ROOT_ICON                      $'\u26A1' # ⚡
       RUBY_ICON                      ''
-      AWS_ICON                       "AWS:"
-      BACKGROUND_JOBS_ICON           "\u2699" # ⚙
+      AWS_ICON                       'AWS:'
+      BACKGROUND_JOBS_ICON           $'\u2699' # ⚙
       TEST_ICON                      ''
-      OK_ICON                        "\u2713" # ✓
-      FAIL_ICON                      "\u2718" # ✘
-      SYMFONY_ICON                   "SF"
+      OK_ICON                        $'\u2713' # ✓
+      FAIL_ICON                      $'\u2718' # ✘
+      SYMFONY_ICON                   'SF'
       NODE_ICON                      $'\u2B22' # ⬢
       MULTILINE_FIRST_PROMPT_PREFIX  $'\u256D'$'\u2500'
       MULTILINE_SECOND_PROMPT_PREFIX $'\u2570'$'\u2500 '
@@ -198,18 +199,18 @@ case $POWERLEVEL9K_MODE in
       LOAD_ICON                      'L'
       RAM_ICON                       'RAM'
       VCS_UNTRACKED_ICON             '?'
-      VCS_UNSTAGED_ICON              "\u25CF" # ●
-      VCS_STAGED_ICON                "\u271A" # ✚
-      VCS_STASH_ICON                 "\u235F" # ⍟
-      VCS_INCOMING_CHANGES_ICON      "\u2193" # ↓
-      VCS_OUTGOING_CHANGES_ICON      "\u2191" # ↑
+      VCS_UNSTAGED_ICON              $'\u25CF' # ●
+      VCS_STAGED_ICON                $'\u271A' # ✚
+      VCS_STASH_ICON                 $'\u235F' # ⍟
+      VCS_INCOMING_CHANGES_ICON      $'\u2193' # ↓
+      VCS_OUTGOING_CHANGES_ICON      $'\u2191' # ↑
       VCS_TAG_ICON                   ''
-      VCS_BOOKMARK_ICON              "\u263F" # ☿
+      VCS_BOOKMARK_ICON              $'\u263F' # ☿
       VCS_COMMIT_ICON                ''
-      VCS_BRANCH_ICON                "\uE0A0 " # 
-      VCS_REMOTE_BRANCH_ICON         "\u2192" # →
-      VCS_GIT_ICON                   ""
-      VCS_HG_ICON                    ""
+      VCS_BRANCH_ICON                $'\uE0A0 ' # 
+      VCS_REMOTE_BRANCH_ICON         $'\u2192' # →
+      VCS_GIT_ICON                   ''
+      VCS_HG_ICON                    ''
     )
   ;;
 esac
@@ -221,8 +222,9 @@ case $POWERLEVEL9K_MODE in
     icons[RIGHT_SEGMENT_SEPARATOR]=''
   ;;
   'compatible')
-    icons[LEFT_SEGMENT_SEPARATOR]="\u2B80" # ⮀
-    icons[RIGHT_SEGMENT_SEPARATOR]="\u2B82" # ⮂
+    local LC_ALL="" LC_CTYPE="en_US.UTF-8" # Set the right locale to protect special characters
+    icons[LEFT_SEGMENT_SEPARATOR]=$'\u2B80' # ⮀
+    icons[RIGHT_SEGMENT_SEPARATOR]=$'\u2B82' # ⮂
     icons[VCS_BRANCH_ICON]='@'
   ;;
 esac
@@ -437,11 +439,11 @@ right_prompt_segment() {
     # enough contrast.
     local complement
     [[ -n $3 ]] && complement=$3 || complement=$DEFAULT_COLOR
-    echo -n "%f%F{$complement}$(print_icon 'RIGHT_SUBSEGMENT_SEPARATOR')%f%{$bg%}%{$fg%} "
+    echo -n "%F{$complement}$(print_icon 'RIGHT_SUBSEGMENT_SEPARATOR')%f%{$bg%}%{$fg%} "
   else
-    echo -n "%f%F{$2}$(print_icon 'RIGHT_SEGMENT_SEPARATOR')%f%{$bg%}%{$fg%} "
+    echo -n "%F{$2}$(print_icon 'RIGHT_SEGMENT_SEPARATOR')%f%{$bg%}%{$fg%} "
   fi
-  [[ -n $4 ]] && echo -n "$4 "
+  [[ -n $4 ]] && echo -n "$4 %f"
 
   CURRENT_RIGHT_BG=$2
 }
@@ -687,15 +689,15 @@ prompt_longstatus() {
   symbols=()
 
   if [[ "$RETVAL" -ne 0 ]]; then
-    symbols+="%F{226}%? ↵"
+    symbols+="%F{226}%? ↵%f"
     bg="009"
   else
-    symbols+="%{%F{"046"}%}$(print_icon 'OK_ICON')"
+    symbols+="%F{046}$(print_icon 'OK_ICON')%f"
     bg="008"
   fi
 
-  [[ "$UID" -eq 0 ]] && symbols+="%{%F{yellow}%} $(print_icon 'ROOT_ICON')"
-  [[ $(jobs -l | wc -l) -gt 0 ]] && symbols+="%{%F{cyan}%}$(print_icon 'BACKGROUND_JOBS_ICON')"
+  [[ "$UID" -eq 0 ]] && symbols+="%F{yellow} $(print_icon 'ROOT_ICON')%f"
+  [[ $(jobs -l | wc -l) -gt 0 ]] && symbols+="%F{cyan}$(print_icon 'BACKGROUND_JOBS_ICON')%f"
 
   [[ -n "$symbols" ]] && $1_prompt_segment "$0" "$bg" "white" "$symbols"
 }
@@ -871,6 +873,7 @@ $(print_icon 'MULTILINE_SECOND_PROMPT_PREFIX')"
     # the RPROMPT, we advise it, to go one line up. At the end of RPROMPT, we
     # advise it to go one line down. See:
     # http://superuser.com/questions/357107/zsh-right-justify-in-ps1
+    local LC_ALL="" LC_CTYPE="en_US.UTF-8" # Set the right locale to protect special characters
     RPROMPT_PREFIX='%{'$'\e[1A''%}' # one line up
     RPROMPT_SUFFIX='%{'$'\e[1B''%}' # one line down
   else
