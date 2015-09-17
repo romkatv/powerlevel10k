@@ -118,9 +118,9 @@ case $POWERLEVEL9K_MODE in
     OK_ICON="\u2713" # ✓
     FAIL_ICON="\u2718" # ✘
     SYMFONY_ICON="SF"
-    VCS_UNTRACKED_ICON="\uF059" # 
-    VCS_UNSTAGED_ICON="\uF06A" # 
-    VCS_STAGED_ICON="\uF055" # 
+    VCS_UNTRACKED_ICON="\uE16C" # 
+    VCS_UNSTAGED_ICON="\uE17C" # 
+    VCS_STAGED_ICON="\uE168" # 
     VCS_STASH_ICON="\uE133 " # 
     #VCS_INCOMING_CHANGES="\uE1EB " # 
     #VCS_INCOMING_CHANGES="\uE80D " # 
@@ -131,9 +131,9 @@ case $POWERLEVEL9K_MODE in
     VCS_TAG_ICON="\uE817 " # 
     VCS_BOOKMARK_ICON="\uE87B" # 
     VCS_COMMIT_ICON="\uE821 " # 
-    VCS_BRANCH_ICON="\uF126 " # 
+    VCS_BRANCH_ICON="\uE220" # 
     VCS_REMOTE_BRANCH_ICON=" \uE804 " # 
-    VCS_GIT_ICON="\uF113  " # 
+    VCS_GIT_ICON="\uE20E  " # 
     VCS_HG_ICON="\uE1C3  " # 
   ;;
   *)
