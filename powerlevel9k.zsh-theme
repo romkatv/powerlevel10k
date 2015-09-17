@@ -152,9 +152,9 @@ case $POWERLEVEL9K_MODE in
       LOAD_ICON                      $'\UE190 ' # 
       #RAM_ICON                       $'\UE87D' # 
       RAM_ICON                       $'\UE1E2 ' # 
-      VCS_UNTRACKED_ICON             $'\uF059' # 
-      VCS_UNSTAGED_ICON              $'\uF06A' # 
-      VCS_STAGED_ICON                $'\uF055' # 
+      VCS_UNTRACKED_ICON             $'\UE16C' # 
+      VCS_UNSTAGED_ICON              $'\UE17C' # 
+      VCS_STAGED_ICON                $'\UE168' # 
       VCS_STASH_ICON                 $'\UE133 ' # 
       #VCS_INCOMING_CHANGES_ICON     $'\UE1EB ' # 
       #VCS_INCOMING_CHANGES_ICON     $'\UE80D ' # 
@@ -165,9 +165,9 @@ case $POWERLEVEL9K_MODE in
       VCS_TAG_ICON                   $'\UE817 ' # 
       VCS_BOOKMARK_ICON              $'\UE87B' # 
       VCS_COMMIT_ICON                $'\UE821 ' # 
-      VCS_BRANCH_ICON                $'\uF126 ' # 
+      VCS_BRANCH_ICON                $'\UE220' # 
       VCS_REMOTE_BRANCH_ICON         ' '$'\UE804 ' # 
-      VCS_GIT_ICON                   $'\uF113  ' # 
+      VCS_GIT_ICON                   $'\UE20E  ' # 
       VCS_HG_ICON                    $'\UE1C3  ' # 
     )
   ;;
