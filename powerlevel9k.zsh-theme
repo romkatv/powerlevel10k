@@ -17,7 +17,7 @@
 #
 # Customize which segments appear in which prompts (below is also the default):
 #   POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(context dir rbenv vcs)
-#   POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(status history time)
+#   POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(longstatus history time)
 #
 # Set your Amazon Web Services profile for the `aws` segment:
 #   export AWS_DEFAULT_PROFILE=<profile_name>
