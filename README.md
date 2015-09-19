@@ -236,6 +236,7 @@ currently available are:
 * **rbenv** - Ruby environment information (if one is active).
 * **rspec_stats** - Show a ratio of test classes vs code classes for RSpec.
 * **status** - The return code of the previous command, and status of background jobs.
+* **longstatus** - Same as previous, except this creates a status segment for the *right* prompt.
 * **symfony2_tests** - Show a ratio of test classes vs code classes for Symfony2.
 * **symfony2_version** - Show the current Symfony2 version, if you are in a Symfony2-Project dir.
 * **time** - System time.
@@ -246,7 +247,7 @@ To specify which segments you want, just add the following variables to your
 `~/.zshrc`. If you don't customize this, the below configuration is the default:
 
     POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(context dir rbenv vcs)
-    POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(status history time)
+    POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(longstatus history time)
 
 #### The AWS Profile Segment
 
@@ -278,7 +279,7 @@ to a certain length:
 
 #### The 'time' segment
 
-By default the time is show in 'H:M:S' format. If you want to change it, 
+By default the time is show in 'H:M:S' format. If you want to change it,
 just set another format in your `~/.zshrc`. As an example, this is a reversed
 time format:
 
