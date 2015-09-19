@@ -579,9 +579,9 @@ prompt_context() {
 prompt_vi_mode() {
   local mode="${${KEYMAP/vicmd/NORMAL}/(main|viins)/INSERT}"
   if [[ "$mode" == "NORMAL" ]]; then
-    $1_prompt_segment "$0" "$DEFAULT_COLOR" "default" "$mode"
+    $1_prompt_segment "$0_NORMAL" "$DEFAULT_COLOR" "default" "$mode"
   else
-    $1_prompt_segment "$0" "$DEFAULT_COLOR" "blue" "$mode"
+    $1_prompt_segment "$0_INSERT" "$DEFAULT_COLOR" "blue" "$mode"
   fi
 }
 
