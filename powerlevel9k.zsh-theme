@@ -21,97 +21,6 @@
 #set -o xtrace
 
 ################################################################
-# Utility functions
-################################################################
-
-# Exits with 0 if a variable has been previously defined (even if empty)
-# Takes the name of a variable that should be checked.
-function defined() {
-  local varname="$1"
-
-  typeset -p "$varname" > /dev/null 2>&1
-}
-
-# Given the name of a variable and a default value, sets the variable
-# value to the default only if it has not been defined.
-#
-# Typeset cannot set the value for an array, so this will only work
-# for scalar values.
-function set_default() {
-  local varname="$1"
-  local default_value="$2"
-
-  defined "$varname" || typeset -g "$varname"="$default_value"
-}
-
-# Safety function for printing icons
-# Prints the named icon, or if that icon is undefined, the string name.
-function print_icon() {
-  local icon_name=$1
-  local ICON_USER_VARIABLE=POWERLEVEL9K_${icon_name}
-  local USER_ICON=${(P)ICON_USER_VARIABLE}
-  if defined "$ICON_USER_VARIABLE"; then
-    echo -n $USER_ICON
-  else
-    echo -n ${icons[$icon_name]}
-  fi
-}
-
-printSizeHumanReadable() {
-  local size=$1
-  local extension
-  extension=(B K M G T P E Z Y)
-  local index=1
-
-  # if the base is not Bytes
-  if [[ -n $2 ]]; then
-    for idx in ${extension}; do
-      if [[ "$2" == "$idx" ]]; then
-        break
-      fi
-      index=$(( $index + 1 ))
-    done
-  fi
-
-  while (( ($size / 1024) > 0 )); do
-    size=$(( $size / 1024 ))
-    index=$(( $index + 1 ))
-  done
-
-  echo $size${extension[$index]}
-}
-
-# Gets the first value out of a list of items that is not empty.
-# The items are examined by a callback-function.
-# Takes two arguments:
-#   * $list - A list of items
-#   * $callback - A callback function to examine if the item is
-#                 worthy. The callback function has access to
-#                 the inner variable $item.
-function getRelevantItem() {
-  setopt shwordsplit # We need to split the words in $interfaces
-
-  local list callback
-  list=$1
-  callback=$2
-
-  for item in $list; do
-    # The first non-empty item wins
-    try=$(eval $callback)
-    if [[ -n "$try" ]]; then
-      echo $try
-      break;
-    fi
-  done
-}
-
-get_icon_names() {
-  for key in "${(@k)icons}"; do
-    echo "POWERLEVEL9K_$key: ${icons[$key]}"
-  done
-}
-
-################################################################
 # Icons
 ################################################################
 
@@ -233,6 +142,97 @@ if [[ "$POWERLEVEL9K_HIDE_BRANCH_ICON" == true ]]; then
     icons[VCS_BRANCH_ICON]=''
 fi
 
+################################################################
+# Utility functions
+################################################################
+
+# Exits with 0 if a variable has been previously defined (even if empty)
+# Takes the name of a variable that should be checked.
+function defined() {
+  local varname="$1"
+
+  typeset -p "$varname" > /dev/null 2>&1
+}
+
+# Given the name of a variable and a default value, sets the variable
+# value to the default only if it has not been defined.
+#
+# Typeset cannot set the value for an array, so this will only work
+# for scalar values.
+function set_default() {
+  local varname="$1"
+  local default_value="$2"
+
+  defined "$varname" || typeset -g "$varname"="$default_value"
+}
+
+# Safety function for printing icons
+# Prints the named icon, or if that icon is undefined, the string name.
+function print_icon() {
+  local icon_name=$1
+  local ICON_USER_VARIABLE=POWERLEVEL9K_${icon_name}
+  local USER_ICON=${(P)ICON_USER_VARIABLE}
+  if defined "$ICON_USER_VARIABLE"; then
+    echo -n "$USER_ICON"
+  else
+    echo -n "${icons[$icon_name]}"
+  fi
+}
+
+printSizeHumanReadable() {
+  local size=$1
+  local extension
+  extension=(B K M G T P E Z Y)
+  local index=1
+
+  # if the base is not Bytes
+  if [[ -n $2 ]]; then
+    for idx in "${extension[@]}"; do
+      if [[ "$2" == "$idx" ]]; then
+        break
+      fi
+      index=$(( index + 1 ))
+    done
+  fi
+
+  while (( (size / 1024) > 0 )); do
+    size=$(( size / 1024 ))
+    index=$(( index + 1 ))
+  done
+
+  echo "$size${extension[$index]}"
+}
+
+# Gets the first value out of a list of items that is not empty.
+# The items are examined by a callback-function.
+# Takes two arguments:
+#   * $list - A list of items
+#   * $callback - A callback function to examine if the item is
+#                 worthy. The callback function has access to
+#                 the inner variable $item.
+function getRelevantItem() {
+  setopt shwordsplit # We need to split the words in $interfaces
+
+  local list callback
+  list=$1
+  callback=$2
+
+  for item in $list; do
+    # The first non-empty item wins
+    try=$(eval "$callback")
+    if [[ -n "$try" ]]; then
+      echo "$try"
+      break;
+    fi
+  done
+}
+
+get_icon_names() {
+  for key in ${(@k)icons}; do
+    echo "POWERLEVEL9K_$key: ${icons[$key]}"
+  done
+}
+
 # OS detection for the `os_icon` segment
 case $(uname) in
     Darwin)
@@ -270,7 +270,8 @@ esac
 # `sed` is unfortunately not consistent across OSes when it comes to flags.
 SED_EXTENDED_REGEX_PARAMETER="-r"
 if [[ "$OS" == 'OSX' ]]; then
-  local IS_BSD_SED=$(sed --version &>> /dev/null || echo "BSD sed")
+  local IS_BSD_SED
+  IS_BSD_SED=$(sed --version &>> /dev/null || echo "BSD sed")
   if [[ -n "$IS_BSD_SED" ]]; then
     SED_EXTENDED_REGEX_PARAMETER="-E"
   fi
@@ -367,20 +368,20 @@ left_prompt_segment() {
   # Overwrite given background-color by user defined variable for this segment.
   local BACKGROUND_USER_VARIABLE=POWERLEVEL9K_${(U)1#prompt_}_BACKGROUND
   local BG_COLOR_MODIFIER=${(P)BACKGROUND_USER_VARIABLE}
-  [[ -n $BG_COLOR_MODIFIER ]] && 2=$BG_COLOR_MODIFIER
+  [[ -n $BG_COLOR_MODIFIER ]] && 2="$BG_COLOR_MODIFIER"
 
   # Overwrite given foreground-color by user defined variable for this segment.
   local FOREGROUND_USER_VARIABLE=POWERLEVEL9K_${(U)1#prompt_}_FOREGROUND
   local FG_COLOR_MODIFIER=${(P)FOREGROUND_USER_VARIABLE}
-  [[ -n $FG_COLOR_MODIFIER ]] && 3=$FG_COLOR_MODIFIER
+  [[ -n $FG_COLOR_MODIFIER ]] && 3="$FG_COLOR_MODIFIER"
 
   local bg fg
   [[ -n $2 ]] && bg="%K{$2}" || bg="%k"
   [[ -n $3 ]] && fg="%F{$3}" || fg="%f"
-  if [[ $CURRENT_BG != 'NONE' && $2 != $CURRENT_BG ]]; then
+  if [[ $CURRENT_BG != 'NONE' ]] && [[ "$2" != "$CURRENT_BG" ]]; then
     # Middle segment
     echo -n "%{$bg%F{$CURRENT_BG}%}$(print_icon 'LEFT_SEGMENT_SEPARATOR')%{$fg%} "
-  elif [[ "$CURRENT_BG" == $2 ]]; then
+  elif [[ "$CURRENT_BG" == "$2" ]]; then
     # Middle segment with same color as previous segment
     # We take the current foreground color as color for our
     # subsegment (or the default color). This should have
@@ -421,18 +422,18 @@ right_prompt_segment() {
   # Overwrite given background-color by user defined variable for this segment.
   local BACKGROUND_USER_VARIABLE=POWERLEVEL9K_${(U)1#prompt_}_BACKGROUND
   local BG_COLOR_MODIFIER=${(P)BACKGROUND_USER_VARIABLE}
-  [[ -n $BG_COLOR_MODIFIER ]] && 2=$BG_COLOR_MODIFIER
+  [[ -n $BG_COLOR_MODIFIER ]] && 2="$BG_COLOR_MODIFIER"
 
   # Overwrite given foreground-color by user defined variable for this segment.
   local FOREGROUND_USER_VARIABLE=POWERLEVEL9K_${(U)1#prompt_}_FOREGROUND
   local FG_COLOR_MODIFIER=${(P)FOREGROUND_USER_VARIABLE}
-  [[ -n $FG_COLOR_MODIFIER ]] && 3=$FG_COLOR_MODIFIER
+  [[ -n $FG_COLOR_MODIFIER ]] && 3="$FG_COLOR_MODIFIER"
 
   local bg fg
   [[ -n $2 ]] && bg="%K{$2}" || bg="%k"
   [[ -n $3 ]] && fg="%F{$3}" || fg="%f"
 
-  if [[ "$CURRENT_RIGHT_BG" == $2 ]]; then
+  if [[ "$CURRENT_RIGHT_BG" == "$2" ]]; then
     # Middle segment with same color as previous segment
     # We take the current foreground color as color for our
     # subsegment (or the default color). This should have
@@ -456,9 +457,9 @@ prompt_vcs() {
 
   if [[ -n "$vcs_prompt" ]]; then
     if [[ "$VCS_WORKDIR_DIRTY" == true ]]; then
-      $1_prompt_segment "$0_MODIFIED" "yellow" "$DEFAULT_COLOR"
+      "$1_prompt_segment" "$0_MODIFIED" "yellow" "$DEFAULT_COLOR"
     else
-      $1_prompt_segment "$0" "green" "$DEFAULT_COLOR"
+      "$1_prompt_segment" "$0" "green" "$DEFAULT_COLOR"
     fi
 
     echo -n "$vcs_prompt "
@@ -476,17 +477,17 @@ function +vi-git-aheadbehind() {
     local ahead behind branch_name
     local -a gitstatus
 
-    branch_name=${$(git symbolic-ref --short HEAD 2>/dev/null)}
+    branch_name=$(git symbolic-ref --short HEAD 2>/dev/null)
 
     # for git prior to 1.7
     # ahead=$(git rev-list origin/${branch_name}..HEAD | wc -l)
-    ahead=$(git rev-list ${branch_name}@{upstream}..HEAD 2>/dev/null | wc -l)
-    (( $ahead )) && gitstatus+=( " %F{$POWERLEVEL9K_VCS_FOREGROUND}$(print_icon 'VCS_OUTGOING_CHANGES_ICON')${ahead// /}%f" )
+    ahead=$(git rev-list "${branch_name}"@{upstream}..HEAD 2>/dev/null | wc -l)
+    (( ahead )) && gitstatus+=( " %F{$POWERLEVEL9K_VCS_FOREGROUND}$(print_icon 'VCS_OUTGOING_CHANGES_ICON')${ahead// /}%f" )
 
     # for git prior to 1.7
     # behind=$(git rev-list HEAD..origin/${branch_name} | wc -l)
-    behind=$(git rev-list HEAD..${branch_name}@{upstream} 2>/dev/null | wc -l)
-    (( $behind )) && gitstatus+=( " %F{$POWERLEVEL9K_VCS_FOREGROUND}$(print_icon 'VCS_INCOMING_CHANGES_ICON')${behind// /}%f" )
+    behind=$(git rev-list HEAD.."${branch_name}"@{upstream} 2>/dev/null | wc -l)
+    (( behind )) && gitstatus+=( " %F{$POWERLEVEL9K_VCS_FOREGROUND}$(print_icon 'VCS_INCOMING_CHANGES_ICON')${behind// /}%f" )
 
     hook_com[misc]+=${(j::)gitstatus}
 }
@@ -496,13 +497,13 @@ function +vi-git-remotebranch() {
 
     # Are we on a remote-tracking branch?
     remote=${$(git rev-parse --verify HEAD@{upstream} --symbolic-full-name 2>/dev/null)/refs\/(remotes|heads)\/}
-    branch_name=${$(git symbolic-ref --short HEAD 2>/dev/null)}
+    branch_name=$(git symbolic-ref --short HEAD 2>/dev/null)
 
     hook_com[branch]="%F{$POWERLEVEL9K_VCS_FOREGROUND}$(print_icon 'VCS_BRANCH_ICON')${hook_com[branch]}%f"
     # Always show the remote
     #if [[ -n ${remote} ]] ; then
     # Only show the remote if it differs from the local
-    if [[ -n ${remote} && ${remote#*/} != ${branch_name} ]] ; then
+    if [[ -n ${remote} ]] && [[ "${remote#*/}" != "${branch_name}" ]] ; then
         hook_com[branch]+="%F{$POWERLEVEL9K_VCS_FOREGROUND}$(print_icon 'VCS_REMOTE_BRANCH_ICON')%f%F{$POWERLEVEL9K_VCS_FOREGROUND}${remote// /}%f"
     fi
 }
@@ -558,7 +559,7 @@ prompt_aws() {
   local aws_profile="$AWS_DEFAULT_PROFILE"
   if [[ -n "$aws_profile" ]];
   then
-    $1_prompt_segment "$0" red white "$(print_icon 'AWS_ICON') $aws_profile"
+    "$1_prompt_segment" "$0" red white "$(print_icon 'AWS_ICON') $aws_profile"
   fi
 }
 
@@ -568,9 +569,9 @@ prompt_context() {
   if [[ "$USER" != "$DEFAULT_USER" || -n "$SSH_CLIENT" ]]; then
     if [[ $(print -P "%#") == '#' ]]; then
       # Shell runs as root
-      $1_prompt_segment "$0_ROOT" "$DEFAULT_COLOR" "yellow" "$USER@%m"
+      "$1_prompt_segment" "$0_ROOT" "$DEFAULT_COLOR" "yellow" "$USER@%m"
     else
-      $1_prompt_segment "$0_DEFAULT" "$DEFAULT_COLOR" "011" "$USER@%m"
+      "$1_prompt_segment" "$0_DEFAULT" "$DEFAULT_COLOR" "011" "$USER@%m"
     fi
   fi
 }
@@ -594,21 +595,21 @@ prompt_dir() {
 
   fi
 
-  $1_prompt_segment "$0" "blue" "$DEFAULT_COLOR" "$(print_icon 'HOME_ICON')$current_path"
+  "$1_prompt_segment" "$0" "blue" "$DEFAULT_COLOR" "$(print_icon 'HOME_ICON')$current_path"
 }
 
 # Command number (in local history)
 prompt_history() {
-  $1_prompt_segment "$0" "244" "$DEFAULT_COLOR" '%h'
+  "$1_prompt_segment" "$0" "244" "$DEFAULT_COLOR" '%h'
 }
 
 prompt_icons_test() {
-  for key in "${(@k)icons}"; do
+  for key in ${(@k)icons}; do
     # The lower color spectrum in ZSH makes big steps. Choosing
     # the next color has enough contrast to read.
     local random_color=$((RANDOM % 8))
     local next_color=$((random_color+1))
-    $1_prompt_segment "$0" "$random_color" "$next_color" "$key: ${icons[$key]}"
+    "$1_prompt_segment" "$0" "$random_color" "$next_color" "$key: ${icons[$key]}"
   done
 }
 
@@ -616,30 +617,30 @@ prompt_ip() {
   if [[ "$OS" == "OSX" ]]; then
     if defined POWERLEVEL9K_IP_INTERFACE; then
       # Get the IP address of the specified interface.
-      ip=$(ipconfig getifaddr $POWERLEVEL9K_IP_INTERFACE)
+      ip=$(ipconfig getifaddr "$POWERLEVEL9K_IP_INTERFACE")
     else
       local interfaces callback
       # Get network interface names ordered by service precedence.
       interfaces=$(networksetup -listnetworkserviceorder | grep -o "Device:\s*[a-z0-9]*" | grep -o -E '[a-z0-9]*$')
       callback='ipconfig getifaddr $item'
 
-      ip=$(getRelevantItem $interfaces $callback)
+      ip=$(getRelevantItem "$interfaces" "$callback")
     fi
   else
     if defined POWERLEVEL9K_IP_INTERFACE; then
       # Get the IP address of the specified interface.
-      ip=$(ip -4 a show $POWERLEVEL9K_IP_INTERFACE | grep -o "inet\s*[0-9.]*" | grep -o "[0-9.]*")
+      ip=$(ip -4 a show "$POWERLEVEL9K_IP_INTERFACE" | grep -o "inet\s*[0-9.]*" | grep -o "[0-9.]*")
     else
       local interfaces callback
       # Get all network interface names that are up
       interfaces=$(ip link ls up | grep -o -E ":\s+[a-z0-9]+:" | grep -v "lo" | grep -o "[a-z0-9]*")
       callback='ip -4 a show $item | grep -o "inet\s*[0-9.]*" | grep -o "[0-9.]*"'
 
-      ip=$(getRelevantItem $interfaces $callback)
+      ip=$(getRelevantItem "$interfaces" "$callback")
     fi
   fi
 
-  $1_prompt_segment "$0" "cyan" "$DEFAULT_COLOR" "$(print_icon 'NETWORK_ICON') $ip"
+  "$1_prompt_segment" "$0" "cyan" "$DEFAULT_COLOR" "$(print_icon 'NETWORK_ICON') $ip"
 }
 
 set_default POWERLEVEL9K_LOAD_SHOW_FREE_RAM true
@@ -649,7 +650,7 @@ prompt_load() {
     if [[ "$POWERLEVEL9K_LOAD_SHOW_FREE_RAM" == true ]]; then
       ramfree=$(vm_stat | grep "Pages free" | grep -o -E '[0-9]+')
       # Convert pages into Bytes
-      ramfree=$(( $ramfree * 4096 ))
+      ramfree=$(( ramfree * 4096 ))
       base=''
     fi
   else
@@ -674,10 +675,10 @@ prompt_load() {
     FUNCTION_SUFFIX="_NORMAL"
   fi
 
-  $1_prompt_segment "$0$FUNCTION_SUFFIX" $BACKGROUND_COLOR "$DEFAULT_COLOR" "$(print_icon 'LOAD_ICON') $load_avg_5min"
+  "$1_prompt_segment" "$0$FUNCTION_SUFFIX" "$BACKGROUND_COLOR" "$DEFAULT_COLOR" "$(print_icon 'LOAD_ICON') $load_avg_5min"
 
   if [[ "$POWERLEVEL9K_LOAD_SHOW_FREE_RAM" == true ]]; then
-    echo -n "$(print_icon 'RAM_ICON') $(printSizeHumanReadable $ramfree $base) "
+    echo -n "$(print_icon 'RAM_ICON') $(printSizeHumanReadable "$ramfree" $base) "
   fi
 }
 
@@ -689,7 +690,7 @@ prompt_longstatus() {
   symbols=()
 
   if [[ "$RETVAL" -ne 0 ]]; then
-    symbols+="%F{226}%? ↵%f"
+    symbols+="%F{226}$RETVAL ↵%f"
     bg="009"
   else
     symbols+="%F{046}$(print_icon 'OK_ICON')%f"
@@ -699,20 +700,21 @@ prompt_longstatus() {
   [[ "$UID" -eq 0 ]] && symbols+="%F{yellow} $(print_icon 'ROOT_ICON')%f"
   [[ $(jobs -l | wc -l) -gt 0 ]] && symbols+="%F{cyan}$(print_icon 'BACKGROUND_JOBS_ICON')%f"
 
-  [[ -n "$symbols" ]] && $1_prompt_segment "$0" "$bg" "white" "$symbols"
+  [[ -n "$symbols" ]] && "$1_prompt_segment" "$0" "$bg" "white" "$symbols"
 }
 
 # Node version
 prompt_node_version() {
-  local nvm_prompt=$(node -v 2>/dev/null)
+  local nvm_prompt
+  nvm_prompt=$(node -v 2>/dev/null)
   [[ -z "${nvm_prompt}" ]] && return
 
-  $1_prompt_segment "$0" "green" "white" "${nvm_prompt:1} $(print_icon 'NODE_ICON')"
+  "$1_prompt_segment" "$0" "green" "white" "${nvm_prompt:1} $(print_icon 'NODE_ICON')"
 }
 
 # print a little OS icon
 prompt_os_icon() {
-  $1_prompt_segment "$0" "008" "255" "$OS_ICON"
+  "$1_prompt_segment" "$0" "008" "255" "$OS_ICON"
 }
 
 # print PHP version number
@@ -721,33 +723,34 @@ prompt_php_version() {
   php_version=$(php -v 2>&1 | grep -oe "^PHP\s*[0-9.]*")
 
   if [[ -n "$php_version" ]]; then
-    $1_prompt_segment "$0" "013" "255" "$php_version"
+    "$1_prompt_segment" "$0" "013" "255" "$php_version"
   fi
 }
 
 # rbenv information
 prompt_rbenv() {
   if [[ -n "$RBENV_VERSION" ]]; then
-    $1_prompt_segment "$0" "red" "$DEFAULT_COLOR" "$RBENV_VERSION"
+    "$1_prompt_segment" "$0" "red" "$DEFAULT_COLOR" "$RBENV_VERSION"
   fi
 }
 
 # RSpec test ratio
 prompt_rspec_stats() {
   if [[ (-d app && -d spec) ]]; then
-    local code_amount=$(ls -1 app/**/*.rb | wc -l)
-    local tests_amount=$(ls -1 spec/**/*.rb | wc -l)
+    local code_amount tests_amount
+    code_amount=$(ls -1 app/**/*.rb | wc -l)
+    tests_amount=$(ls -1 spec/**/*.rb | wc -l)
 
-    build_test_stats "$1" $0 "$code_amount" $tests_amount "RSpec $(print_icon 'TEST_ICON')"
+    build_test_stats "$1" "$0" "$code_amount" "$tests_amount" "RSpec $(print_icon 'TEST_ICON')"
   fi
 }
 
 # Ruby Version Manager information
 prompt_rvm() {
   local rvm_prompt
-  rvm_prompt=`rvm-prompt`
+  rvm_prompt=$(rvm-prompt)
   if [ "$rvm_prompt" != "" ]; then
-    $1_prompt_segment "$0" "240" "$DEFAULT_COLOR" "$rvm_prompt $(print_icon 'RUBY_ICON') "
+    "$1_prompt_segment" "$0" "240" "$DEFAULT_COLOR" "$rvm_prompt $(print_icon 'RUBY_ICON') "
   fi
 }
 
@@ -760,14 +763,15 @@ prompt_status() {
   [[ "$UID" -eq 0 ]] && symbols+="%{%F{yellow}%} $(print_icon 'ROOT_ICON')"
   [[ $(jobs -l | wc -l) -gt 0 ]] && symbols+="%{%F{cyan}%}$(print_icon 'BACKGROUND_JOBS_ICON')"
 
-  [[ -n "$symbols" ]] && $1_prompt_segment "$0" "$DEFAULT_COLOR" "default" "$symbols"
+  [[ -n "$symbols" ]] && "$1_prompt_segment" "$0" "$DEFAULT_COLOR" "default" "$symbols"
 }
 
 # Symfony2-PHPUnit test ratio
 prompt_symfony2_tests() {
   if [[ (-d src && -d app && -f app/AppKernel.php) ]]; then
-    local code_amount=$(ls -1 src/**/*.php | grep -v Tests | wc -l)
-    local tests_amount=$(ls -1 src/**/*.php | grep Tests | wc -l)
+    local code_amount tests_amount
+    code_amount=$(ls -1 src/**/*.php | grep -vc Tests)
+    tests_amount=$(ls -1 src/**/*.php | grep -c Tests)
 
     build_test_stats "$1" "$0" "$code_amount" "$tests_amount" "SF2 $(print_icon 'TEST_ICON')"
   fi
@@ -776,8 +780,9 @@ prompt_symfony2_tests() {
 # Symfony2-Version
 prompt_symfony2_version() {
   if [[ -f app/bootstrap.php.cache ]]; then
-    local symfony2_version=$(grep " VERSION " app/bootstrap.php.cache | sed -e 's/[^.0-9]*//g')
-    $1_prompt_segment "$0" "240" "$DEFAULT_COLOR" "$(print_icon 'SYMFONY_ICON') $symfony2_version"
+    local symfony2_version
+    symfony2_version=$(grep " VERSION " app/bootstrap.php.cache | sed -e 's/[^.0-9]*//g')
+    "$1_prompt_segment" "$0" "240" "$DEFAULT_COLOR" "$(print_icon 'SYMFONY_ICON') $symfony2_version"
   fi
 }
 
@@ -791,9 +796,9 @@ build_test_stats() {
   typeset -F 2 ratio
   local ratio=$(( (tests_amount/code_amount) * 100 ))
 
-  [[ ratio -ge 0.75 ]] && $1_prompt_segment "${2}_GOOD" "cyan" "$DEFAULT_COLOR" "$headline: $ratio%%"
-  [[ ratio -ge 0.5 && ratio -lt 0.75 ]] && $1_prompt_segment "$2_AVG" "yellow" "$DEFAULT_COLOR" "$headline: $ratio%%"
-  [[ ratio -lt 0.5 ]] && $1_prompt_segment "$2_BAD" "red" "$DEFAULT_COLOR" "$headline: $ratio%%"
+  (( ratio >= 75 )) && "$1_prompt_segment" "${2}_GOOD" "cyan" "$DEFAULT_COLOR" "$headline: $ratio%%"
+  (( ratio >= 50 && ratio < 75 )) && "$1_prompt_segment" "$2_AVG" "yellow" "$DEFAULT_COLOR" "$headline: $ratio%%"
+  (( ratio < 50 )) && "$1_prompt_segment" "$2_BAD" "red" "$DEFAULT_COLOR" "$headline: $ratio%%"
 }
 
 # System time
@@ -803,7 +808,7 @@ prompt_time() {
     time_format="$POWERLEVEL9K_TIME_FORMAT"
   fi
 
-  $1_prompt_segment "$0" "$DEFAULT_COLOR_INVERTED" "$DEFAULT_COLOR" "$time_format"
+  "$1_prompt_segment" "$0" "$DEFAULT_COLOR_INVERTED" "$DEFAULT_COLOR" "$time_format"
 }
 
 # Virtualenv: current working virtualenv
@@ -812,7 +817,7 @@ prompt_time() {
 prompt_virtualenv() {
   local virtualenv_path="$VIRTUAL_ENV"
   if [[ -n "$virtualenv_path" && -n "$VIRTUAL_ENV_DISABLE_PROMPT" ]]; then
-    $1_prompt_segment "$0" "blue" "$DEFAULT_COLOR" "(`basename $virtualenv_path`)"
+    "$1_prompt_segment" "$0" "blue" "$DEFAULT_COLOR" "($(basename "$virtualenv_path"))"
   fi
 }
 
@@ -822,12 +827,10 @@ prompt_virtualenv() {
 
 # Main prompt
 build_left_prompt() {
-  RETVAL=$?
-
   defined POWERLEVEL9K_LEFT_PROMPT_ELEMENTS || POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(context dir rbenv vcs)
 
-  for element in $POWERLEVEL9K_LEFT_PROMPT_ELEMENTS; do
-    prompt_$element "left"
+  for element in "${POWERLEVEL9K_LEFT_PROMPT_ELEMENTS[@]}"; do
+    "prompt_$element" "left"
   done
 
   left_prompt_end
@@ -835,38 +838,18 @@ build_left_prompt() {
 
 # Right prompt
 build_right_prompt() {
-  RETVAL=$?
-
   defined POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS || POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(longstatus history time)
 
-  for element in $POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS; do
-    prompt_$element "right"
+  for element in "${POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS[@]}"; do
+    "prompt_$element" "right"
   done
 }
 
-powerlevel9k_init() {
-  # Display a warning if the terminal does not support 256 colors
-  local term_colors
-  term_colors=$(tput colors)
-  if (( $term_colors < 256 )); then
-    print -P "%F{red}WARNING!%f Your terminal supports less than 256 colors!"
-    print "You should set TERM=xterm-256colors in your ~/.zshrc"
-  fi
-
-  setopt LOCAL_OPTIONS
-  unsetopt XTRACE KSH_ARRAYS
-  prompt_opts=(cr percent subst)
-
-  # initialize colors
-  autoload -U colors && colors
-
-  # initialize VCS
-  autoload -Uz add-zsh-hook
-
-  add-zsh-hook precmd vcs_info
+powerlevel9k_prepare_prompts() {
+  RETVAL=$?
 
   if [[ "$POWERLEVEL9K_PROMPT_ON_NEWLINE" == true ]]; then
-    PROMPT="$(print_icon 'MULTILINE_FIRST_PROMPT_PREFIX')%{%f%b%k%}"'$(build_left_prompt)'"
+    PROMPT="$(print_icon 'MULTILINE_FIRST_PROMPT_PREFIX')%{%f%b%k%}$(build_left_prompt)
 $(print_icon 'MULTILINE_SECOND_PROMPT_PREFIX')"
     # The right prompt should be on the same line as the first line of the left
     # prompt.  To do so, there is just a quite ugly workaround: Before zsh draws
@@ -877,14 +860,38 @@ $(print_icon 'MULTILINE_SECOND_PROMPT_PREFIX')"
     RPROMPT_PREFIX='%{'$'\e[1A''%}' # one line up
     RPROMPT_SUFFIX='%{'$'\e[1B''%}' # one line down
   else
-    PROMPT="%{%f%b%k%}"'$(build_left_prompt)'
+    PROMPT="%{%f%b%k%}$(build_left_prompt)"
     RPROMPT_PREFIX=''
     RPROMPT_SUFFIX=''
   fi
 
   if [[ "$POWERLEVEL9K_DISABLE_RPROMPT" != true ]]; then
-    RPROMPT=$RPROMPT_PREFIX"%{%f%b%k%}"'$(build_right_prompt)'"%{$reset_color%}"$RPROMPT_SUFFIX
+    RPROMPT="$RPROMPT_PREFIX%{%f%b%k%}$(build_right_prompt)%{$reset_color%}$RPROMPT_SUFFIX"
   fi
+}
+
+powerlevel9k_init() {
+  # Display a warning if the terminal does not support 256 colors
+  local term_colors
+  term_colors=$(tput colors)
+  if (( term_colors < 256 )); then
+    print -P "%F{red}WARNING!%f Your terminal supports less than 256 colors!"
+    print "You should set TERM=xterm-256colors in your ~/.zshrc"
+  fi
+
+  setopt LOCAL_OPTIONS
+  unsetopt XTRACE KSH_ARRAYS
+  setopt PROMPT_CR PROMPT_PERCENT PROMPT_SUBST MULTIBYTE
+
+  # initialize colors
+  autoload -U colors && colors
+
+  # initialize VCS
+  autoload -Uz add-zsh-hook
+  add-zsh-hook precmd vcs_info
+
+  # prepare prompts
+  add-zsh-hook precmd powerlevel9k_prepare_prompts
 }
 
 powerlevel9k_init "$@"
