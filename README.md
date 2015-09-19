@@ -233,6 +233,7 @@ currently available are:
 
 * **aws** - The current AWS profile, if active (more info below)
 * **context** - Your username and host (more info below)
+* **vi_mode** - Vi editing mode (NORMAL|INSERT).
 * **dir** - Your current working directory.
 * **history** - The command number for the current line.
 * **ip** - Shows the current IP address.

@@ -576,6 +576,16 @@ prompt_context() {
   fi
 }
 
+# Vi Mode: show editing mode (NORMAL|INSERT)
+prompt_vi_mode() {
+  local mode="${${KEYMAP/vicmd/NORMAL}/(main|viins)/INSERT}"
+  if [[ "$mode" == "NORMAL" ]]; then
+    $1_prompt_segment "$0_NORMAL" "$DEFAULT_COLOR" "default" "$mode"
+  else
+    $1_prompt_segment "$0_INSERT" "$DEFAULT_COLOR" "blue" "$mode"
+  fi
+}
+
 # Dir: current working directory
 prompt_dir() {
   local current_path='%~'
