@@ -180,7 +180,8 @@ function print_icon() {
 }
 
 printSizeHumanReadable() {
-  local size=$1
+  typeset -F 2 size
+  size="$1"+0.00001
   local extension
   extension=(B K M G T P E Z Y)
   local index=1
@@ -195,7 +196,7 @@ printSizeHumanReadable() {
     done
   fi
 
-  while (( (size / 1024) > 0 )); do
+  while (( (size / 1024) > 0.1 )); do
     size=$(( size / 1024 ))
     index=$(( index + 1 ))
   done
