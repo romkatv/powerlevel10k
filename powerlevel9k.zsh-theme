@@ -129,6 +129,8 @@ case $POWERLEVEL9K_MODE in
   'flat')
     icons[LEFT_SEGMENT_SEPARATOR]=''
     icons[RIGHT_SEGMENT_SEPARATOR]=''
+    icons[LEFT_SUBSEGMENT_SEPARATOR]='|'
+    icons[RIGHT_SUBSEGMENT_SEPARATOR]='|'
   ;;
   'compatible')
     local LC_ALL="" LC_CTYPE="en_US.UTF-8" # Set the right locale to protect special characters
