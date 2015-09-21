@@ -235,6 +235,7 @@ currently available are:
 * **context** - Your username and host (more info below)
 * **vi_mode** - Vi editing mode (NORMAL|INSERT).
 * **dir** - Your current working directory.
+* **go_version** - Show the current GO version.
 * **history** - The command number for the current line.
 * **ip** - Shows the current IP address.
 * **load** - Your machines 5 minute load average and free RAM.
