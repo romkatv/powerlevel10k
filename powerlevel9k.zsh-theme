@@ -880,6 +880,11 @@ $(print_icon 'MULTILINE_SECOND_PROMPT_PREFIX')"
   fi
 }
 
+function zle-line-init zle-keymap-select {
+  powerlevel9k_prepare_prompts
+  zle reset-prompt
+}
+
 powerlevel9k_init() {
   # Display a warning if the terminal does not support 256 colors
   local term_colors
@@ -902,6 +907,9 @@ powerlevel9k_init() {
 
   # prepare prompts
   add-zsh-hook precmd powerlevel9k_prepare_prompts
+
+  zle -N zle-line-init
+  zle -N zle-keymap-select
 }
 
 powerlevel9k_init "$@"
