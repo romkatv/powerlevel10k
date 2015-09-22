@@ -233,7 +233,6 @@ currently available are:
 
 * **aws** - The current AWS profile, if active (more info below)
 * **context** - Your username and host (more info below)
-* **vi_mode** - Vi editing mode (NORMAL|INSERT).
 * **dir** - Your current working directory.
 * **history** - The command number for the current line.
 * **ip** - Shows the current IP address.
@@ -248,6 +247,7 @@ currently available are:
 * **symfony2_tests** - Show a ratio of test classes vs code classes for Symfony2.
 * **symfony2_version** - Show the current Symfony2 version, if you are in a Symfony2-Project dir.
 * **time** - System time.
+* **vi_mode** - Vi editing mode (NORMAL|INSERT).
 * **virtualenv** - Your Python [VirtualEnv](https://virtualenv.pypa.io/en/latest/).
 * **vcs** - Information about this `git` or `hg` repository (if you are in one).
 
@@ -329,6 +329,26 @@ and does not show your code coverage or any sophisticated stats. All this does
 is count your source files and test files, and calculate the ratio between them.
 Just enough to give you a quick overview about the test situation of the project
 you are dealing with.
+
+#### VI-Mode Indicator
+
+This Segment shows the current mode of your ZSH. If you want to use your ZSH in
+VI-Mode, you need to configure it separatly in your `~/.zshrc`:
+
+    # VI-Mode
+    # general activation
+    bindkey -v
+    
+    # set some nice hotkeys
+    bindkey '^P' up-history
+    bindkey '^N' down-history
+    bindkey '^?' backward-delete-char
+    bindkey '^h' backward-delete-char
+    bindkey '^w' backward-kill-word
+    bindkey '^r' history-incremental-search-backward
+
+    # make it more responsive
+    export KEYTIMEOUT=1
 
 #### The 'vcs' Segment
 
