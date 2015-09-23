@@ -882,7 +882,12 @@ $(print_icon 'MULTILINE_SECOND_PROMPT_PREFIX')"
   fi
 }
 
-function zle-line-init zle-keymap-select {
+function zle-line-init {
+  powerlevel9k_prepare_prompts
+  zle reset-prompt
+}
+
+function zle-keymap-select {
   powerlevel9k_prepare_prompts
   zle reset-prompt
 }
