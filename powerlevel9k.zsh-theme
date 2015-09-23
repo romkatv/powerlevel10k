@@ -814,10 +814,10 @@ prompt_time() {
 # Vi Mode: show editing mode (NORMAL|INSERT)
 prompt_vi_mode() {
   case ${KEYMAP} in
-    main)
+    main|viins)
       "$1_prompt_segment" "$0_INSERT" "$DEFAULT_COLOR" "blue" "INSERT"
     ;;
-    *)
+    vicmd)
       "$1_prompt_segment" "$0_NORMAL" "$DEFAULT_COLOR" "default" "NORMAL"
     ;;
   esac
