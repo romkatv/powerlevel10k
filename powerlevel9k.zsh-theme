@@ -709,7 +709,7 @@ prompt_ram() {
         else
           swap_total=$(grep -o -E "SwapTotal:\s+[0-9]+" /proc/meminfo | grep -o "[0-9]*")
           swap_free=$(grep -o -E "SwapFree:\s+[0-9]+" /proc/meminfo | grep -o "[0-9]*")
-          swap_used=$(( swap_free - swap_total ))
+          swap_used=$(( swap_total - swap_free ))
           base=K
         fi
 
