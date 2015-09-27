@@ -192,7 +192,12 @@ a number of additional glyphs.
 You then need to indicate that you wish to use the additional glyphs by defining
 the following in your `~/.zshrc`:
 
+    POWERLEVEL9K_MODE='awesome-fontconfig'
+
+If you chose to use already patched fonts, use instead :
+
     POWERLEVEL9K_MODE='awesome-patched'
+
 
 If you choose to make use of this, your prompt will look something like this:
 

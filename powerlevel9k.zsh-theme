@@ -136,6 +136,34 @@ case $POWERLEVEL9K_MODE in
     VCS_GIT_ICON="\uE20E  " # 
     VCS_HG_ICON="\uE1C3  " # 
   ;;
+  'awesome-fontconfig')
+    # fontconfig with awesome-font required!
+    # See https://github.com/gabrielelana/awesome-terminal-fonts
+
+    LEFT_SEGMENT_SEPARATOR="\uE0B0" # 
+    RIGHT_SEGMENT_SEPARATOR="\uE0B2" # 
+    ROOT_ICON="\u26A1" # ⚡
+    RUBY_ICON="\uf219" # 
+    AWS_ICON="\uf1b2" # 
+    BACKGROUND_JOBS_ICON="\uf013 " #  
+    TEST_ICON="\uE891" # 
+    OK_ICON="\u2713" # ✓
+    FAIL_ICON="\u2718" # ✘
+    SYMFONY_ICON="SF"
+    VCS_UNTRACKED_ICON="\uf059" # 
+    VCS_UNSTAGED_ICON="\uf06a" # 
+    VCS_STAGED_ICON="\uf055" # 
+    VCS_STASH_ICON="\uf01c " # 
+    VCS_INCOMING_CHANGES="\uf01a " # 
+    VCS_OUTGOING_CHANGES="\uf01b " # 
+    VCS_TAG_ICON="\uE817 " # 
+    VCS_BOOKMARK_ICON="\uf001" # 
+    VCS_COMMIT_ICON="\uf01f " # 
+    VCS_BRANCH_ICON="\uf126" # 
+    VCS_REMOTE_BRANCH_ICON=" \uf005 " # 
+    VCS_GIT_ICON="\uf113  " # 
+    VCS_HG_ICON="\uf0c3  " # 
+  ;;
   *)
     # Powerline-Patched Font required!
     # See https://github.com/Lokaltog/powerline-fonts
