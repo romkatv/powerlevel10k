@@ -580,16 +580,6 @@ prompt_context() {
   fi
 }
 
-# Vi Mode: show editing mode (NORMAL|INSERT)
-prompt_vi_mode() {
-  local mode="${${KEYMAP/vicmd/NORMAL}/(main|viins)/INSERT}"
-  if [[ "$mode" == "NORMAL" ]]; then
-    $1_prompt_segment "$0_NORMAL" "$DEFAULT_COLOR" "default" "$mode"
-  else
-    $1_prompt_segment "$0_INSERT" "$DEFAULT_COLOR" "blue" "$mode"
-  fi
-}
-
 # Dir: current working directory
 prompt_dir() {
   local current_path='%~'
@@ -817,6 +807,18 @@ prompt_time() {
   "$1_prompt_segment" "$0" "$DEFAULT_COLOR_INVERTED" "$DEFAULT_COLOR" "$time_format"
 }
 
+# Vi Mode: show editing mode (NORMAL|INSERT)
+prompt_vi_mode() {
+  case ${KEYMAP} in
+    main|viins)
+      "$1_prompt_segment" "$0_INSERT" "$DEFAULT_COLOR" "blue" "INSERT"
+    ;;
+    vicmd)
+      "$1_prompt_segment" "$0_NORMAL" "$DEFAULT_COLOR" "default" "NORMAL"
+    ;;
+  esac
+}
+
 # Virtualenv: current working virtualenv
 # More information on virtualenv (Python):
 # https://virtualenv.pypa.io/en/latest/
@@ -876,6 +878,16 @@ $(print_icon 'MULTILINE_SECOND_PROMPT_PREFIX')"
   fi
 }
 
+function zle-line-init {
+  powerlevel9k_prepare_prompts
+  zle reset-prompt
+}
+
+function zle-keymap-select {
+  powerlevel9k_prepare_prompts
+  zle reset-prompt
+}
+
 powerlevel9k_init() {
   # Display a warning if the terminal does not support 256 colors
   local term_colors
@@ -898,6 +910,9 @@ powerlevel9k_init() {
 
   # prepare prompts
   add-zsh-hook precmd powerlevel9k_prepare_prompts
+
+  zle -N zle-line-init
+  zle -N zle-keymap-select
 }
 
 powerlevel9k_init "$@"
