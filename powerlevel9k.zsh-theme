@@ -209,6 +209,7 @@ function print_icon() {
   fi
 }
 
+# Converts large memory values into a human-readable unit (e.g., bytes --> GB)
 printSizeHumanReadable() {
   local size=$1
   local extension
