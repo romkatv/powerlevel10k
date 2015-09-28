@@ -80,31 +80,47 @@ case $POWERLEVEL9K_MODE in
     )
   ;;
   'awesome-fontconfig')
-    # fontconfig with awesome-font required!
-    # See https://github.com/gabrielelana/awesome-terminal-fonts
-    LEFT_SEGMENT_SEPARATOR="\uE0B0"                         # 
-    RIGHT_SEGMENT_SEPARATOR="\uE0B2"                        # 
-    ROOT_ICON="\u26A1"                                      # ⚡
-    RUBY_ICON="\uf219"                                      # 
-    AWS_ICON="\uf1b2"                                       # 
-    BACKGROUND_JOBS_ICON="\uf013 "                          #  
-    TEST_ICON="\uE891"                                      # 
-    OK_ICON="\u2713"                                        # ✓
-    FAIL_ICON="\u2718"                                      # ✘
-    SYMFONY_ICON="SF"
-    VCS_UNTRACKED_ICON="\uf059"                             # 
-    VCS_UNSTAGED_ICON="\uf06a"                              # 
-    VCS_STAGED_ICON="\uf055"                                # 
-    VCS_STASH_ICON="\uf01c "                                # 
-    VCS_INCOMING_CHANGES="\uf01a "                          # 
-    VCS_OUTGOING_CHANGES="\uf01b "                          # 
-    VCS_TAG_ICON="\uE817 "                                  # 
-    VCS_BOOKMARK_ICON="\uf001"                              # 
-    VCS_COMMIT_ICON="\uf01f "                               # 
-    VCS_BRANCH_ICON="\uf126"                                # 
-    VCS_REMOTE_BRANCH_ICON=" \uf005 "                       # 
-    VCS_GIT_ICON="\uf113  "                                 # 
-    VCS_HG_ICON="\uf0c3  "                                  # 
+    # fontconfig with awesome-font required! See
+    # https://github.com/gabrielelana/awesome-terminal-fonts
+    icons=(
+      LEFT_SEGMENT_SEPARATOR         $'\UE0B0'              # 
+      RIGHT_SEGMENT_SEPARATOR        $'\UE0B2'              # 
+      LEFT_SUBSEGMENT_SEPARATOR      $'\UE0B1'              # 
+      RIGHT_SUBSEGMENT_SEPARATOR     $'\UE0B3'              # 
+      CARRIAGE_RETURN_ICON           $'\U21B5'              # ↵
+      ROOT_ICON                      $'\uF201'              # 
+      RUBY_ICON                      $'\UF247'              # 
+      AWS_ICON                       $'\UF296'              # 
+      BACKGROUND_JOBS_ICON           $'\UF013 '             # 
+      TEST_ICON                      $'\UF291'              # 
+      OK_ICON                        $'\UF23A'              # 
+      FAIL_ICON                      $'\UF281'              # 
+      SYMFONY_ICON                   'SF'
+      NODE_ICON                      $'\U2B22'              # ⬢
+      MULTILINE_FIRST_PROMPT_PREFIX  $'\U256D'$'\U2500'     # ╭─
+      MULTILINE_SECOND_PROMPT_PREFIX $'\U2570'$'\U2500 '    # ╰─
+      APPLE_ICON                     $'\UF179'              # 
+      FREEBSD_ICON                   $'\U1F608 '            # 😈
+      LINUX_ICON                     $'\UF17C'              # 
+      SUNOS_ICON                     $'\UF185 '             # 
+      HOME_ICON                      $'\UF015 '             # 
+      NETWORK_ICON                   $'\UF09E '             # 
+      LOAD_ICON                      $'\UF080 '             # 
+      RAM_ICON                       $'\UF0E4'              # 
+      VCS_UNTRACKED_ICON             $'\UF059'              # 
+      VCS_UNSTAGED_ICON              $'\UF06A'              # 
+      VCS_STAGED_ICON                $'\UF055'              # 
+      VCS_STASH_ICON                 $'\UF01C '             # 
+      VCS_INCOMING_CHANGES_ICON      $'\UF01A '             # 
+      VCS_OUTGOING_CHANGES_ICON      $'\UF01B '             # 
+      VCS_TAG_ICON                   $'\UF217 '             # 
+      VCS_BOOKMARK_ICON              $'\UF27B'              # 
+      VCS_COMMIT_ICON                $'\UF221 '             # 
+      VCS_BRANCH_ICON                $'\UF126'              # 
+      VCS_REMOTE_BRANCH_ICON         ' '$'\UF204 '          # 
+      VCS_GIT_ICON                   $'\UF113  '            # 
+      VCS_HG_ICON                    $'\UF0C3  '            # 
+    )
   ;;
   *)
     # Powerline-Patched Font required!
