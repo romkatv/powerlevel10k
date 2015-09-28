@@ -41,6 +41,7 @@ case $POWERLEVEL9K_MODE in
       RIGHT_SEGMENT_SEPARATOR        $'\UE0B2' # 
       LEFT_SUBSEGMENT_SEPARATOR      $'\UE0B1' # 
       RIGHT_SUBSEGMENT_SEPARATOR     $'\UE0B3' # 
+      CARRIAGE_RETURN_ICON           $'\U21B5' # ↵
       ROOT_ICON                      $'\UE801' # 
       RUBY_ICON                      $'\UE847' # 
       AWS_ICON                       $'\UE895' # 
@@ -88,6 +89,7 @@ case $POWERLEVEL9K_MODE in
       RIGHT_SEGMENT_SEPARATOR        $'\uE0B2' # 
       LEFT_SUBSEGMENT_SEPARATOR      $'\UE0B1' # 
       RIGHT_SUBSEGMENT_SEPARATOR     $'\UE0B3' # 
+      CARRIAGE_RETURN_ICON           $'\U21B5' # ↵
       ROOT_ICON                      $'\u26A1' # ⚡
       RUBY_ICON                      ''
       AWS_ICON                       'AWS:'
@@ -694,27 +696,6 @@ prompt_load() {
   fi
 }
 
-# Right Status: (return code, root status, background jobs)
-# This creates a status segment for the *right* prompt. Exact same thing as
-# above - just other side.
-prompt_longstatus() {
-  local symbols bg
-  symbols=()
-
-  if [[ "$RETVAL" -ne 0 ]]; then
-    symbols+="%F{226}$RETVAL ↵%f"
-    bg="009"
-  else
-    symbols+="%F{046}$(print_icon 'OK_ICON')%f"
-    bg="008"
-  fi
-
-  [[ "$UID" -eq 0 ]] && symbols+="%F{yellow} $(print_icon 'ROOT_ICON')%f"
-  [[ $(jobs -l | wc -l) -gt 0 ]] && symbols+="%F{cyan}$(print_icon 'BACKGROUND_JOBS_ICON')%f"
-
-  [[ -n "$symbols" ]] && "$1_prompt_segment" "$0" "$bg" "white" "$symbols"
-}
-
 # Node version
 prompt_node_version() {
   local nvm_prompt
@@ -726,7 +707,7 @@ prompt_node_version() {
 
 # print a little OS icon
 prompt_os_icon() {
-  "$1_prompt_segment" "$0" "008" "255" "$OS_ICON"
+  "$1_prompt_segment" "$0" "black" "255" "$OS_ICON"
 }
 
 # print PHP version number
@@ -766,16 +747,29 @@ prompt_rvm() {
   fi
 }
 
-# Left Status: (return code, root status, background jobs)
-# This creates a status segment for the *left* prompt
+# Status: (return code, root status, background jobs)
+set_default POWERLEVEL9K_STATUS_VERBOSE true
 prompt_status() {
-  local symbols
+  local symbols bg
   symbols=()
-  [[ "$RETVAL" -ne 0 ]] && symbols+="%{%F{red}%}$(print_icon 'FAIL_ICON')"
-  [[ "$UID" -eq 0 ]] && symbols+="%{%F{yellow}%} $(print_icon 'ROOT_ICON')"
-  [[ $(jobs -l | wc -l) -gt 0 ]] && symbols+="%{%F{cyan}%}$(print_icon 'BACKGROUND_JOBS_ICON')"
 
-  [[ -n "$symbols" ]] && "$1_prompt_segment" "$0" "$DEFAULT_COLOR" "default" "$symbols"
+  if [[ "$POWERLEVEL9K_STATUS_VERBOSE" == true ]]; then
+    if [[ "$RETVAL" -ne 0 ]]; then
+      symbols+="%F{226}$RETVAL $(print_icon 'CARRIAGE_RETURN_ICON')%f"
+      bg="red"
+    else
+      symbols+="%F{046}$(print_icon 'OK_ICON')%f"
+      bg="black"
+    fi
+  else
+    [[ "$RETVAL" -ne 0 ]] && symbols+="%{%F{red}%}$(print_icon 'FAIL_ICON')%f"
+    bg="$DEFAULT_COLOR"
+  fi
+
+  [[ "$UID" -eq 0 ]] && symbols+="%{%F{yellow}%} $(print_icon 'ROOT_ICON')%f"
+  [[ $(jobs -l | wc -l) -gt 0 ]] && symbols+="%{%F{cyan}%}$(print_icon 'BACKGROUND_JOBS_ICON')%f"
+
+  [[ -n "$symbols" ]] && "$1_prompt_segment" "$0" "$bg" "white" "$symbols"
 }
 
 # Symfony2-PHPUnit test ratio
@@ -850,7 +844,7 @@ build_left_prompt() {
 
 # Right prompt
 build_right_prompt() {
-  defined POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS || POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(longstatus history time)
+  defined POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS || POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(status history time)
 
   for element in "${POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS[@]}"; do
     "prompt_$element" "right"
