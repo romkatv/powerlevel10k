@@ -91,7 +91,7 @@ case $POWERLEVEL9K_MODE in
       ROOT_ICON                      $'\uF201'              # 
       RUBY_ICON                      $'\UF247'              # 
       AWS_ICON                       $'\UF296'              # 
-      BACKGROUND_JOBS_ICON           $'\UE82F '             # 
+      BACKGROUND_JOBS_ICON           $'\UF013 '             # 
       TEST_ICON                      $'\UF291'              # 
       OK_ICON                        $'\UF23A'              # 
       FAIL_ICON                      $'\UF281'              # 
@@ -112,7 +112,7 @@ case $POWERLEVEL9K_MODE in
       VCS_STAGED_ICON                $'\UF055'              # 
       VCS_STASH_ICON                 $'\UF01C '             # 
       VCS_INCOMING_CHANGES_ICON      $'\UF01A '             # 
-      VCS_OUTGOING_CHANGES_ICON      $'\UF01V '             # 
+      VCS_OUTGOING_CHANGES_ICON      $'\UF01B '             # 
       VCS_TAG_ICON                   $'\UF217 '             # 
       VCS_BOOKMARK_ICON              $'\UF27B'              # 
       VCS_COMMIT_ICON                $'\UF221 '             # 
