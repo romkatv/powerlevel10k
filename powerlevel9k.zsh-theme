@@ -715,6 +715,31 @@ prompt_load() {
   "$1_prompt_segment" "$0$FUNCTION_SUFFIX" "$BACKGROUND_COLOR" "$DEFAULT_COLOR" "$(print_icon 'LOAD_ICON') $load_avg_5min"
 }
 
+# Node version
+prompt_node_version() {
+  local nvm_prompt
+  nvm_prompt=$(node -v 2>/dev/null)
+  [[ -z "${nvm_prompt}" ]] && return
+
+  "$1_prompt_segment" "$0" "green" "white" "${nvm_prompt:1} $(print_icon 'NODE_ICON')"
+}
+
+# print a little OS icon
+prompt_os_icon() {
+  "$1_prompt_segment" "$0" "black" "255" "$OS_ICON"
+}
+
+# print PHP version number
+prompt_php_version() {
+  local php_version
+  php_version=$(php -v 2>&1 | grep -oe "^PHP\s*[0-9.]*")
+
+  if [[ -n "$php_version" ]]; then
+    "$1_prompt_segment" "$0" "013" "255" "$php_version"
+  fi
+}
+
+# Show free RAM and used Swap
 prompt_ram() {
   defined POWERLEVEL9K_RAM_ELEMENTS || POWERLEVEL9K_RAM_ELEMENTS=(ram_free swap_used)
 
@@ -746,7 +771,7 @@ prompt_ram() {
         else
           swap_total=$(grep -o -E "SwapTotal:\s+[0-9]+" /proc/meminfo | grep -o "[0-9]*")
           swap_free=$(grep -o -E "SwapFree:\s+[0-9]+" /proc/meminfo | grep -o "[0-9]*")
-          swap_used=$(( swap_free - swap_total ))
+          swap_used=$(( swap_total - swap_free ))
           base=K
         fi
 
@@ -756,30 +781,6 @@ prompt_ram() {
   done
 
   "$1_prompt_segment" "$0" "yellow" "$DEFAULT_COLOR" "${rendition% }"
-}
-
-# Node version
-prompt_node_version() {
-  local nvm_prompt
-  nvm_prompt=$(node -v 2>/dev/null)
-  [[ -z "${nvm_prompt}" ]] && return
-
-  "$1_prompt_segment" "$0" "green" "white" "${nvm_prompt:1} $(print_icon 'NODE_ICON')"
-}
-
-# print a little OS icon
-prompt_os_icon() {
-  "$1_prompt_segment" "$0" "black" "255" "$OS_ICON"
-}
-
-# print PHP version number
-prompt_php_version() {
-  local php_version
-  php_version=$(php -v 2>&1 | grep -oe "^PHP\s*[0-9.]*")
-
-  if [[ -n "$php_version" ]]; then
-    "$1_prompt_segment" "$0" "013" "255" "$php_version"
-  fi
 }
 
 # rbenv information
