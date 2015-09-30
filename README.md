@@ -195,7 +195,12 @@ a number of additional glyphs.
 You then need to indicate that you wish to use the additional glyphs by defining
 the following in your `~/.zshrc`:
 
+    POWERLEVEL9K_MODE='awesome-fontconfig'
+
+If you chose to use already patched fonts, use instead :
+
     POWERLEVEL9K_MODE='awesome-patched'
+
 
 If you choose to make use of this, your prompt will look something like this:
 
@@ -233,7 +238,6 @@ currently available are:
 
 * **aws** - The current AWS profile, if active (more info below)
 * **context** - Your username and host (more info below)
-* **vi_mode** - Vi editing mode (NORMAL|INSERT).
 * **dir** - Your current working directory.
 * **go_version** - Show the current GO version.
 * **history** - The command number for the current line.
@@ -245,10 +249,10 @@ currently available are:
 * **rbenv** - Ruby environment information (if one is active).
 * **rspec_stats** - Show a ratio of test classes vs code classes for RSpec.
 * **status** - The return code of the previous command, and status of background jobs.
-* **longstatus** - Same as previous, except this creates a status segment for the *right* prompt.
 * **symfony2_tests** - Show a ratio of test classes vs code classes for Symfony2.
 * **symfony2_version** - Show the current Symfony2 version, if you are in a Symfony2-Project dir.
 * **time** - System time.
+* **vi_mode** - Vi editing mode (NORMAL|INSERT).
 * **virtualenv** - Your Python [VirtualEnv](https://virtualenv.pypa.io/en/latest/).
 * **vcs** - Information about this `git` or `hg` repository (if you are in one).
 
@@ -256,7 +260,7 @@ To specify which segments you want, just add the following variables to your
 `~/.zshrc`. If you don't customize this, the below configuration is the default:
 
     POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(context dir rbenv vcs)
-    POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(longstatus history time)
+    POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(status history time)
 
 #### The AWS Profile Segment
 
@@ -322,6 +326,13 @@ segment, as well:
     # Output time, date, and a symbol from the "Awesome Powerline Font" set
     POWERLEVEL9K_TIME_FORMAT="%D{%H:%M:%S \uE868  %d.%m.%y}"
 
+#### Showing Status
+
+Usually we display always the status, and in case a command failed, the return
+code of the last executed program. In case you want to display the status only
+if something special happend, you can set `POWERLEVEL9K_STATUS_VERBOSE=false`
+in your `~/.zshrc`.
+
 #### Unit Test Ratios
 
 The `symfony2_tests` and `rspec_tests` segments both show a ratio of "real"
@@ -330,6 +341,26 @@ and does not show your code coverage or any sophisticated stats. All this does
 is count your source files and test files, and calculate the ratio between them.
 Just enough to give you a quick overview about the test situation of the project
 you are dealing with.
+
+#### VI-Mode Indicator
+
+This Segment shows the current mode of your ZSH. If you want to use your ZSH in
+VI-Mode, you need to configure it separatly in your `~/.zshrc`:
+
+    # VI-Mode
+    # general activation
+    bindkey -v
+    
+    # set some nice hotkeys
+    bindkey '^P' up-history
+    bindkey '^N' down-history
+    bindkey '^?' backward-delete-char
+    bindkey '^h' backward-delete-char
+    bindkey '^w' backward-kill-word
+    bindkey '^r' history-incremental-search-backward
+
+    # make it more responsive
+    export KEYTIMEOUT=1
 
 #### The 'vcs' Segment
 

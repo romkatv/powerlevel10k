@@ -5,9 +5,6 @@
 #
 # This theme was inspired by agnoster's Theme:
 # https://gist.github.com/3712874
-#
-# The `vcs_info` hooks in this file are from Tom Upton:
-# https://github.com/tupton/dotfiles/blob/master/zsh/zshrc
 ################################################################
 
 ################################################################
@@ -33,70 +30,116 @@
 typeset -gAH icons
 case $POWERLEVEL9K_MODE in
   'flat'|'awesome-patched')
-    # Awesome-Patched Font required!
-    # See https://github.com/gabrielelana/awesome-terminal-fonts/tree/patching-strategy/patched
-    local LC_ALL="" LC_CTYPE="en_US.UTF-8" # Set the right locale to protect special characters
+    # Awesome-Patched Font required! See:
+    # https://github.com/gabrielelana/awesome-terminal-fonts/tree/patching-strategy/patched
+    # Set the right locale to protect special characters
+    local LC_ALL="" LC_CTYPE="en_US.UTF-8"
     icons=(
-      LEFT_SEGMENT_SEPARATOR         $'\UE0B0' # 
-      RIGHT_SEGMENT_SEPARATOR        $'\UE0B2' # 
-      LEFT_SUBSEGMENT_SEPARATOR      $'\UE0B1' # 
-      RIGHT_SUBSEGMENT_SEPARATOR     $'\UE0B3' # 
-      ROOT_ICON                      $'\UE801' # 
-      RUBY_ICON                      $'\UE847' # 
-      AWS_ICON                       $'\UE895' # 
-      BACKGROUND_JOBS_ICON           $'\UE82F ' # 
-      TEST_ICON                      $'\UE891' # 
-      OK_ICON                        $'\U2713' # ✓
-      FAIL_ICON                      $'\U2718' # ✘
+      LEFT_SEGMENT_SEPARATOR         $'\UE0B0'              # 
+      RIGHT_SEGMENT_SEPARATOR        $'\UE0B2'              # 
+      LEFT_SUBSEGMENT_SEPARATOR      $'\UE0B1'              # 
+      RIGHT_SUBSEGMENT_SEPARATOR     $'\UE0B3'              # 
+      CARRIAGE_RETURN_ICON           $'\U21B5'              # ↵
+      ROOT_ICON                      $'\UE801'              # 
+      RUBY_ICON                      $'\UE847'              # 
+      AWS_ICON                       $'\UE895'              # 
+      BACKGROUND_JOBS_ICON           $'\UE82F '             # 
+      TEST_ICON                      $'\UE891'              # 
+      OK_ICON                        $'\U2713'              # ✓
+      FAIL_ICON                      $'\U2718'              # ✘
       SYMFONY_ICON                   'SF'
-      NODE_ICON                      $'\U2B22' # ⬢
+      NODE_ICON                      $'\U2B22'              # ⬢
       MULTILINE_FIRST_PROMPT_PREFIX  $'\U256D'$'\U2500'
       MULTILINE_SECOND_PROMPT_PREFIX $'\U2570'$'\U2500 '
-      APPLE_ICON                     $'\UE26E' # 
-      FREEBSD_ICON                   $'\U1F608 ' # 😈
-      LINUX_ICON                     $'\UE271' # 
-      SUNOS_ICON                     $'\U1F31E ' # 🌞
-      HOME_ICON                      $'\UE12C ' # 
-      NETWORK_ICON                   $'\UE1AD ' # 
-      LOAD_ICON                      $'\UE190 ' # 
-      #RAM_ICON                       $'\UE87D' # 
-      RAM_ICON                       $'\UE1E2 ' # 
-      VCS_UNTRACKED_ICON             $'\UE16C' # 
-      VCS_UNSTAGED_ICON              $'\UE17C' # 
-      VCS_STAGED_ICON                $'\UE168' # 
-      VCS_STASH_ICON                 $'\UE133 ' # 
-      #VCS_INCOMING_CHANGES_ICON     $'\UE1EB ' # 
-      #VCS_INCOMING_CHANGES_ICON     $'\UE80D ' # 
-      VCS_INCOMING_CHANGES_ICON      $'\UE131 ' # 
-      #VCS_OUTGOING_CHANGES_ICON     $'\UE1EC ' # 
-      #VCS_OUTGOING_CHANGES_ICON     $'\UE80E ' # 
-      VCS_OUTGOING_CHANGES_ICON      $'\UE132 ' # 
-      VCS_TAG_ICON                   $'\UE817 ' # 
-      VCS_BOOKMARK_ICON              $'\UE87B' # 
-      VCS_COMMIT_ICON                $'\UE821 ' # 
-      VCS_BRANCH_ICON                $'\UE220' # 
-      VCS_REMOTE_BRANCH_ICON         ' '$'\UE804 ' # 
-      VCS_GIT_ICON                   $'\UE20E  ' # 
-      VCS_HG_ICON                    $'\UE1C3  ' # 
+      APPLE_ICON                     $'\UE26E'              # 
+      FREEBSD_ICON                   $'\U1F608 '            # 😈
+      LINUX_ICON                     $'\UE271'              # 
+      SUNOS_ICON                     $'\U1F31E '            # 🌞
+      HOME_ICON                      $'\UE12C '             # 
+      NETWORK_ICON                   $'\UE1AD '             # 
+      LOAD_ICON                      $'\UE190 '             # 
+      #RAM_ICON                       $'\UE87D'             # 
+      RAM_ICON                       $'\UE1E2 '             # 
+      VCS_UNTRACKED_ICON             $'\UE16C'              # 
+      VCS_UNSTAGED_ICON              $'\UE17C'              # 
+      VCS_STAGED_ICON                $'\UE168'              # 
+      VCS_STASH_ICON                 $'\UE133 '             # 
+      #VCS_INCOMING_CHANGES_ICON     $'\UE1EB '             # 
+      #VCS_INCOMING_CHANGES_ICON     $'\UE80D '             # 
+      VCS_INCOMING_CHANGES_ICON      $'\UE131 '             # 
+      #VCS_OUTGOING_CHANGES_ICON     $'\UE1EC '             # 
+      #VCS_OUTGOING_CHANGES_ICON     $'\UE80E '             # 
+      VCS_OUTGOING_CHANGES_ICON      $'\UE132 '             # 
+      VCS_TAG_ICON                   $'\UE817 '             # 
+      VCS_BOOKMARK_ICON              $'\UE87B'              # 
+      VCS_COMMIT_ICON                $'\UE821 '             # 
+      VCS_BRANCH_ICON                $'\UE220'              # 
+      VCS_REMOTE_BRANCH_ICON         ' '$'\UE804 '          # 
+      VCS_GIT_ICON                   $'\UE20E  '            # 
+      VCS_HG_ICON                    $'\UE1C3  '            # 
+    )
+  ;;
+  'awesome-fontconfig')
+    # fontconfig with awesome-font required! See
+    # https://github.com/gabrielelana/awesome-terminal-fonts
+    icons=(
+      LEFT_SEGMENT_SEPARATOR         $'\UE0B0'              # 
+      RIGHT_SEGMENT_SEPARATOR        $'\UE0B2'              # 
+      LEFT_SUBSEGMENT_SEPARATOR      $'\UE0B1'              # 
+      RIGHT_SUBSEGMENT_SEPARATOR     $'\UE0B3'              # 
+      CARRIAGE_RETURN_ICON           $'\U21B5'              # ↵
+      ROOT_ICON                      $'\uF201'              # 
+      RUBY_ICON                      $'\UF247'              # 
+      AWS_ICON                       $'\UF296'              # 
+      BACKGROUND_JOBS_ICON           $'\UF013 '             # 
+      TEST_ICON                      $'\UF291'              # 
+      OK_ICON                        $'\UF23A'              # 
+      FAIL_ICON                      $'\UF281'              # 
+      SYMFONY_ICON                   'SF'
+      NODE_ICON                      $'\U2B22'              # ⬢
+      MULTILINE_FIRST_PROMPT_PREFIX  $'\U256D'$'\U2500'     # ╭─
+      MULTILINE_SECOND_PROMPT_PREFIX $'\U2570'$'\U2500 '    # ╰─
+      APPLE_ICON                     $'\UF179'              # 
+      FREEBSD_ICON                   $'\U1F608 '            # 😈
+      LINUX_ICON                     $'\UF17C'              # 
+      SUNOS_ICON                     $'\UF185 '             # 
+      HOME_ICON                      $'\UF015 '             # 
+      NETWORK_ICON                   $'\UF09E '             # 
+      LOAD_ICON                      $'\UF080 '             # 
+      RAM_ICON                       $'\UF0E4'              # 
+      VCS_UNTRACKED_ICON             $'\UF059'              # 
+      VCS_UNSTAGED_ICON              $'\UF06A'              # 
+      VCS_STAGED_ICON                $'\UF055'              # 
+      VCS_STASH_ICON                 $'\UF01C '             # 
+      VCS_INCOMING_CHANGES_ICON      $'\UF01A '             # 
+      VCS_OUTGOING_CHANGES_ICON      $'\UF01B '             # 
+      VCS_TAG_ICON                   $'\UF217 '             # 
+      VCS_BOOKMARK_ICON              $'\UF27B'              # 
+      VCS_COMMIT_ICON                $'\UF221 '             # 
+      VCS_BRANCH_ICON                $'\UF126'              # 
+      VCS_REMOTE_BRANCH_ICON         ' '$'\UF204 '          # 
+      VCS_GIT_ICON                   $'\UF113  '            # 
+      VCS_HG_ICON                    $'\UF0C3  '            # 
     )
   ;;
   *)
     # Powerline-Patched Font required!
     # See https://github.com/Lokaltog/powerline-fonts
     icons=(
-      LEFT_SEGMENT_SEPARATOR         $'\uE0B0' # 
-      RIGHT_SEGMENT_SEPARATOR        $'\uE0B2' # 
-      LEFT_SUBSEGMENT_SEPARATOR      $'\UE0B1' # 
-      RIGHT_SUBSEGMENT_SEPARATOR     $'\UE0B3' # 
-      ROOT_ICON                      $'\u26A1' # ⚡
+      LEFT_SEGMENT_SEPARATOR         $'\uE0B0'              # 
+      RIGHT_SEGMENT_SEPARATOR        $'\uE0B2'              # 
+      LEFT_SUBSEGMENT_SEPARATOR      $'\UE0B1'              # 
+      RIGHT_SUBSEGMENT_SEPARATOR     $'\UE0B3'              # 
+      CARRIAGE_RETURN_ICON           $'\U21B5'              # ↵
+      ROOT_ICON                      $'\u26A1'              # ⚡
       RUBY_ICON                      ''
       AWS_ICON                       'AWS:'
-      BACKGROUND_JOBS_ICON           $'\u2699' # ⚙
+      BACKGROUND_JOBS_ICON           $'\u2699'              # ⚙
       TEST_ICON                      ''
-      OK_ICON                        $'\u2713' # ✓
-      FAIL_ICON                      $'\u2718' # ✘
+      OK_ICON                        $'\u2713'              # ✓
+      FAIL_ICON                      $'\u2718'              # ✘
       SYMFONY_ICON                   'SF'
-      NODE_ICON                      $'\u2B22' # ⬢
+      NODE_ICON                      $'\u2B22'              # ⬢
       MULTILINE_FIRST_PROMPT_PREFIX  $'\u256D'$'\u2500'
       MULTILINE_SECOND_PROMPT_PREFIX $'\u2570'$'\u2500 '
       APPLE_ICON                     'OSX'
@@ -108,16 +151,16 @@ case $POWERLEVEL9K_MODE in
       LOAD_ICON                      'L'
       RAM_ICON                       'RAM'
       VCS_UNTRACKED_ICON             '?'
-      VCS_UNSTAGED_ICON              $'\u25CF' # ●
-      VCS_STAGED_ICON                $'\u271A' # ✚
-      VCS_STASH_ICON                 $'\u235F' # ⍟
-      VCS_INCOMING_CHANGES_ICON      $'\u2193' # ↓
-      VCS_OUTGOING_CHANGES_ICON      $'\u2191' # ↑
+      VCS_UNSTAGED_ICON              $'\u25CF'              # ●
+      VCS_STAGED_ICON                $'\u271A'              # ✚
+      VCS_STASH_ICON                 $'\u235F'              # ⍟
+      VCS_INCOMING_CHANGES_ICON      $'\u2193'              # ↓
+      VCS_OUTGOING_CHANGES_ICON      $'\u2191'              # ↑
       VCS_TAG_ICON                   ''
-      VCS_BOOKMARK_ICON              $'\u263F' # ☿
+      VCS_BOOKMARK_ICON              $'\u263F'              # ☿
       VCS_COMMIT_ICON                ''
-      VCS_BRANCH_ICON                $'\uE0A0 ' # 
-      VCS_REMOTE_BRANCH_ICON         $'\u2192' # →
+      VCS_BRANCH_ICON                $'\uE0A0 '             # 
+      VCS_REMOTE_BRANCH_ICON         $'\u2192'              # →
       VCS_GIT_ICON                   ''
       VCS_HG_ICON                    ''
     )
@@ -129,11 +172,14 @@ case $POWERLEVEL9K_MODE in
   'flat')
     icons[LEFT_SEGMENT_SEPARATOR]=''
     icons[RIGHT_SEGMENT_SEPARATOR]=''
+    icons[LEFT_SUBSEGMENT_SEPARATOR]='|'
+    icons[RIGHT_SUBSEGMENT_SEPARATOR]='|'
   ;;
   'compatible')
-    local LC_ALL="" LC_CTYPE="en_US.UTF-8" # Set the right locale to protect special characters
-    icons[LEFT_SEGMENT_SEPARATOR]=$'\u2B80' # ⮀
-    icons[RIGHT_SEGMENT_SEPARATOR]=$'\u2B82' # ⮂
+    # Set the right locale to protect special characters
+    local LC_ALL="" LC_CTYPE="en_US.UTF-8"
+    icons[LEFT_SEGMENT_SEPARATOR]=$'\u2B80'                 # ⮀
+    icons[RIGHT_SEGMENT_SEPARATOR]=$'\u2B82'                # ⮂
     icons[VCS_BRANCH_ICON]='@'
   ;;
 esac
@@ -179,6 +225,7 @@ function print_icon() {
   fi
 }
 
+# Converts large memory values into a human-readable unit (e.g., bytes --> GB)
 printSizeHumanReadable() {
   local size=$1
   local extension
@@ -576,16 +623,6 @@ prompt_context() {
   fi
 }
 
-# Vi Mode: show editing mode (NORMAL|INSERT)
-prompt_vi_mode() {
-  local mode="${${KEYMAP/vicmd/NORMAL}/(main|viins)/INSERT}"
-  if [[ "$mode" == "NORMAL" ]]; then
-    $1_prompt_segment "$0_NORMAL" "$DEFAULT_COLOR" "default" "$mode"
-  else
-    $1_prompt_segment "$0_INSERT" "$DEFAULT_COLOR" "blue" "$mode"
-  fi
-}
-
 # Dir: current working directory
 prompt_dir() {
   local current_path='%~'
@@ -702,27 +739,6 @@ prompt_load() {
   fi
 }
 
-# Right Status: (return code, root status, background jobs)
-# This creates a status segment for the *right* prompt. Exact same thing as
-# above - just other side.
-prompt_longstatus() {
-  local symbols bg
-  symbols=()
-
-  if [[ "$RETVAL" -ne 0 ]]; then
-    symbols+="%F{226}$RETVAL ↵%f"
-    bg="009"
-  else
-    symbols+="%F{046}$(print_icon 'OK_ICON')%f"
-    bg="008"
-  fi
-
-  [[ "$UID" -eq 0 ]] && symbols+="%F{yellow} $(print_icon 'ROOT_ICON')%f"
-  [[ $(jobs -l | wc -l) -gt 0 ]] && symbols+="%F{cyan}$(print_icon 'BACKGROUND_JOBS_ICON')%f"
-
-  [[ -n "$symbols" ]] && "$1_prompt_segment" "$0" "$bg" "white" "$symbols"
-}
-
 # Node version
 prompt_node_version() {
   local nvm_prompt
@@ -734,7 +750,7 @@ prompt_node_version() {
 
 # print a little OS icon
 prompt_os_icon() {
-  "$1_prompt_segment" "$0" "008" "255" "$OS_ICON"
+  "$1_prompt_segment" "$0" "black" "255" "$OS_ICON"
 }
 
 # print PHP version number
@@ -774,16 +790,29 @@ prompt_rvm() {
   fi
 }
 
-# Left Status: (return code, root status, background jobs)
-# This creates a status segment for the *left* prompt
+# Status: (return code, root status, background jobs)
+set_default POWERLEVEL9K_STATUS_VERBOSE true
 prompt_status() {
-  local symbols
+  local symbols bg
   symbols=()
-  [[ "$RETVAL" -ne 0 ]] && symbols+="%{%F{red}%}$(print_icon 'FAIL_ICON')"
-  [[ "$UID" -eq 0 ]] && symbols+="%{%F{yellow}%} $(print_icon 'ROOT_ICON')"
-  [[ $(jobs -l | wc -l) -gt 0 ]] && symbols+="%{%F{cyan}%}$(print_icon 'BACKGROUND_JOBS_ICON')"
 
-  [[ -n "$symbols" ]] && "$1_prompt_segment" "$0" "$DEFAULT_COLOR" "default" "$symbols"
+  if [[ "$POWERLEVEL9K_STATUS_VERBOSE" == true ]]; then
+    if [[ "$RETVAL" -ne 0 ]]; then
+      symbols+="%F{226}$RETVAL $(print_icon 'CARRIAGE_RETURN_ICON')%f"
+      bg="red"
+    else
+      symbols+="%F{046}$(print_icon 'OK_ICON')%f"
+      bg="black"
+    fi
+  else
+    [[ "$RETVAL" -ne 0 ]] && symbols+="%{%F{red}%}$(print_icon 'FAIL_ICON')%f"
+    bg="$DEFAULT_COLOR"
+  fi
+
+  [[ "$UID" -eq 0 ]] && symbols+="%{%F{yellow}%} $(print_icon 'ROOT_ICON')%f"
+  [[ $(jobs -l | wc -l) -gt 0 ]] && symbols+="%{%F{cyan}%}$(print_icon 'BACKGROUND_JOBS_ICON')%f"
+
+  [[ -n "$symbols" ]] && "$1_prompt_segment" "$0" "$bg" "white" "$symbols"
 }
 
 # Symfony2-PHPUnit test ratio
@@ -831,6 +860,18 @@ prompt_time() {
   "$1_prompt_segment" "$0" "$DEFAULT_COLOR_INVERTED" "$DEFAULT_COLOR" "$time_format"
 }
 
+# Vi Mode: show editing mode (NORMAL|INSERT)
+prompt_vi_mode() {
+  case ${KEYMAP} in
+    main|viins)
+      "$1_prompt_segment" "$0_INSERT" "$DEFAULT_COLOR" "blue" "INSERT"
+    ;;
+    vicmd)
+      "$1_prompt_segment" "$0_NORMAL" "$DEFAULT_COLOR" "default" "NORMAL"
+    ;;
+  esac
+}
+
 # Virtualenv: current working virtualenv
 # More information on virtualenv (Python):
 # https://virtualenv.pypa.io/en/latest/
@@ -858,7 +899,7 @@ build_left_prompt() {
 
 # Right prompt
 build_right_prompt() {
-  defined POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS || POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(longstatus history time)
+  defined POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS || POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(status history time)
 
   for element in "${POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS[@]}"; do
     "prompt_$element" "right"
@@ -890,6 +931,16 @@ $(print_icon 'MULTILINE_SECOND_PROMPT_PREFIX')"
   fi
 }
 
+function zle-line-init {
+  powerlevel9k_prepare_prompts
+  zle reset-prompt
+}
+
+function zle-keymap-select {
+  powerlevel9k_prepare_prompts
+  zle reset-prompt
+}
+
 powerlevel9k_init() {
   # Display a warning if the terminal does not support 256 colors
   local term_colors
@@ -912,6 +963,9 @@ powerlevel9k_init() {
 
   # prepare prompts
   add-zsh-hook precmd powerlevel9k_prepare_prompts
+
+  zle -N zle-line-init
+  zle -N zle-keymap-select
 }
 
 powerlevel9k_init "$@"
