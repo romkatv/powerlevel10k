@@ -225,6 +225,52 @@ function print_icon() {
   fi
 }
 
+# Get numerical color codes. That way we translate ANSI codes
+# into ZSH-Style color codes.
+function getColorCode() {
+  # Check if given value is already numerical
+  if [[ "$1" = <-> ]]; then
+    # ANSI color codes distinguish between "foreground"
+    # and "background" colors. We don't need to do that,
+    # as ZSH uses a 256 color space anyway.
+    if [[ "$1" = <8-15> ]]; then
+      echo $(($1 - 8))
+    else
+      echo "$1"
+    fi
+  else
+    typeset -A codes
+    codes=(
+      'black'   '000'
+      'red'     '001'
+      'green'   '002'
+      'yellow'  '003'
+      'blue'    '004'
+      'magenta' '005'
+      'cyan'    '006'
+      'white'   '007'
+    )
+
+    # Strip eventual "bg-" prefixes
+    1=${1#bg-}
+    # Strip eventual "fg-" prefixes
+    1=${1#fg-}
+    echo $codes[$1]
+  fi
+}
+
+# Check if two colors are equal, even if one is specified as ANSI code.
+function isSameColor() {
+  if [[ "$1" == "NONE" || "$2" == "NONE" ]]; then
+    return 1
+  fi
+
+  local color1=$(getColorCode "$1")
+  local color2=$(getColorCode "$2")
+
+  return $(( color1 != color2 ))
+}
+
 # Converts large memory values into a human-readable unit (e.g., bytes --> GB)
 printSizeHumanReadable() {
   local size=$1
@@ -425,10 +471,10 @@ left_prompt_segment() {
   local bg fg
   [[ -n $2 ]] && bg="%K{$2}" || bg="%k"
   [[ -n $3 ]] && fg="%F{$3}" || fg="%f"
-  if [[ $CURRENT_BG != 'NONE' ]] && [[ "$2" != "$CURRENT_BG" ]]; then
+  if [[ $CURRENT_BG != 'NONE' ]] && ! isSameColor "$2" "$CURRENT_BG"; then
     # Middle segment
     echo -n "%{$bg%F{$CURRENT_BG}%}$(print_icon 'LEFT_SEGMENT_SEPARATOR')%{$fg%} "
-  elif [[ "$CURRENT_BG" == "$2" ]]; then
+  elif isSameColor "$CURRENT_BG" "$2"; then
     # Middle segment with same color as previous segment
     # We take the current foreground color as color for our
     # subsegment (or the default color). This should have
@@ -480,7 +526,7 @@ right_prompt_segment() {
   [[ -n $2 ]] && bg="%K{$2}" || bg="%k"
   [[ -n $3 ]] && fg="%F{$3}" || fg="%f"
 
-  if [[ "$CURRENT_RIGHT_BG" == "$2" ]]; then
+  if isSameColor "$CURRENT_RIGHT_BG" "$2"; then
     # Middle segment with same color as previous segment
     # We take the current foreground color as color for our
     # subsegment (or the default color). This should have
