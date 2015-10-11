@@ -495,9 +495,9 @@ left_prompt_end() {
   if [[ -n $CURRENT_BG ]]; then
     echo -n "%{%k%F{$CURRENT_BG}%}$(print_icon 'LEFT_SEGMENT_SEPARATOR')"
   else
-    echo -n "%{%k%}"
+    echo -n "%k"
   fi
-  echo -n "%{%f%} "
+  echo -n "%f "
   CURRENT_BG=''
 }
 
