@@ -10,6 +10,9 @@ Look like a bad-ass. Impress everyone in 'Screenshot Your Desktop' threads. Use 
 
 ![](http://bhilburn.org/content/images/2015/01/pl9k-improved.png)
 
+You can check out some other users' configurations in our wiki: [Show Off Your
+Config](https://github.com/bhilburn/powerlevel9k/wiki/Show-Off-Your-Config).
+
 There are a number of Powerline ZSH themes available, now. The developers of
 this theme focus on four primary goals:
 
@@ -22,8 +25,7 @@ this theme focus on four primary goals:
 4. Optimize the code for execution speed as much as possible. A snappy terminal
    is a happy terminal.
 
-Here is a detailed screenshot showing `powerlevel9k` with default settings and
-varying terminal status indicators:
+Here is a detailed screenshot showing `powerlevel9k` in action, with default settings.
 
 ![](http://bhilburn.org/content/images/2014/12/powerlevel9k.png)
 
@@ -51,9 +53,7 @@ are interested.
 
 #### Customizing Your Prompt
 Be sure to check out the wiki page on the additional prompt customization
-options, including color and icon settings:
-
-[Stylizing Your Prompt](https://github.com/bhilburn/powerlevel9k/wiki/Stylizing-Your-Prompt)
+options, including color and icon settings: [Stylizing Your Prompt](https://github.com/bhilburn/powerlevel9k/wiki/Stylizing-Your-Prompt)
 
 #### Customizing Prompt Segments
 Customizing your prompt is easy! Select the segments you want to have displayed,
