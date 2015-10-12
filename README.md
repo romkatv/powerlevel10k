@@ -22,48 +22,6 @@ this theme focus on four primary goals:
 4. Optimize the code for execution speed as much as possible. A snappy terminal
    is a happy terminal.
 
-<!-- START doctoc generated TOC please keep comment here to allow auto update -->
-<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
-
-- [Features](#features)
-- [Installation](#installation)
-  - [Step 1: Install Powerlevel9k](#step-1-install-powerlevel9k)
-    - [Option 1: Install for Vanilla ZSH](#option-1-install-for-vanilla-zsh)
-    - [Option 2: Install for Oh-My-ZSH](#option-2-install-for-oh-my-zsh)
-    - [Option 3: Install for Prezto](#option-3-install-for-prezto)
-    - [Option 4: Install for antigen](#option-4-install-for-antigen)
-  - [Step 2: Install Powerline Fonts](#step-2-install-powerline-fonts)
-    - [Option 1: Install Powerline Fonts](#option-1-install-powerline-fonts)
-    - [Option 2: Install Awesome Powerline Fonts](#option-2-install-awesome-powerline-fonts)
-    - [Option 3: Compatible Mode](#option-3-compatible-mode)
-- [Segment Customization](#segment-customization)
-  - [The AWS Profile Segment](#the-aws-profile-segment)
-  - [The 'context' Segment](#the-context-segment)
-  - [The 'dir' segment](#the-dir-segment)
-  - [The 'ip' segment](#the-ip-segment)
-  - [The 'time' segment](#the-time-segment)
-  - [Unit Test Ratios](#unit-test-ratios)
-  - [The 'vcs' Segment](#the-vcs-segment)
-    - [Symbols](#symbols)
-- [Styling](#styling)
-  - [Double-Lined Prompt](#double-lined-prompt)
-  - [Disable Right Prompt](#disable-right-prompt)
-  - [Light Color Theme](#light-color-theme)
-  - [Icon Customization](#icon-customization)
-  - [Segment Color Customization](#segment-color-customization)
-  - [Special Segment Colors](#special-segment-colors)
-- [Troubleshooting](#troubleshooting)
-  - [Gaps Between Segments](#gaps-between-segments)
-  - [Segment Colors are Wrong](#segment-colors-are-wrong)
-  - [Strange Characters in prompt](#strange-characters-in-prompt)
-- [Meta](#meta)
-  - [Kudos](#kudos)
-  - [Developing](#developing)
-  - [Contributions / Bugs / Contact](#contributions--bugs--contact)
-
-<!-- END doctoc generated TOC please keep comment here to allow auto update -->
-
 ### Features
 
 * Supports `git` and `mercurial` repo information through ZSH's `VCS_INFO`:
@@ -117,24 +75,24 @@ configuration is the default:
 #### Available Prompt Segments
 The segments that are currently available are:
 
-* **aws** - The current AWS profile, if active (more info below)
-* **context** - Your username and host (more info below)
-* **dir** - Your current working directory.
-* **history** - The command number for the current line.
-* **ip** - Shows the current IP address.
-* **load** - Your machines 5 minute load average and free RAM.
-* **node_version** - Show the version number of the installed Node.js.
-* **os_icon** - Display a nice little icon, depending on your operating system.
-* **php_version** - Show the current PHP version.
-* **rbenv** - Ruby environment information (if one is active).
-* **rspec_stats** - Show a ratio of test classes vs code classes for RSpec.
-* **status** - The return code of the previous command, and status of background jobs.
-* **symfony2_tests** - Show a ratio of test classes vs code classes for Symfony2.
-* **symfony2_version** - Show the current Symfony2 version, if you are in a Symfony2-Project dir.
-* **time** - System time.
-* **vi_mode** - Vi editing mode (NORMAL|INSERT).
-* **virtualenv** - Your Python [VirtualEnv](https://virtualenv.pypa.io/en/latest/).
-* **vcs** - Information about this `git` or `hg` repository (if you are in one).
+* [aws](#aws) - The current AWS profile, if active.
+* [context](#context) - Your username and host.
+* [dir](#dir) - Your current working directory.
+* [history](#history) - The command number for the current line.
+* [ip](#ip) - Shows the current IP address.
+* [load](#load) - Your machines 5 minute load average and free RAM.
+* [node_version](#node_version) - Show the version number of the installed Node.js.
+* [os_icon](#os_icon) - Display a nice little icon, depending on your operating system.
+* [php_version](#php_version) - Show the current PHP version.
+* [rbenv](#rbenv) - Ruby environment information (if one is active).
+* [rspec_stats](#rspec_stats) - Show a ratio of test classes vs code classes for RSpec.
+* [status](#status) - The return code of the previous command, and status of background jobs.
+* [symphony2_tests](#symphony2_tests) - Show a ratio of test classes vs code classes for Symfony2.
+* [symphony2_version](#symphony2_version)- Show the current Symfony2 version, if you are in a Symfony2-Project dir.
+* [time](#time) - System time.
+* [vi_mode](#vi_mode)- Vi editing mode (NORMAL|INSERT).
+* [virtualenv](#virtualenv) - Your Python [VirtualEnv](https://virtualenv.pypa.io/en/latest/).
+* [vcs](#vcs) - Information about this `git` or `hg` repository (if you are in one).
 
 
 ##### aws
