@@ -78,20 +78,20 @@ The segments that are currently available are:
 * [aws](#aws) - The current AWS profile, if active.
 * [context](#context) - Your username and host.
 * [dir](#dir) - Your current working directory.
-* [history](#history) - The command number for the current line.
+* history - The command number for the current line.
 * [ip](#ip) - Shows the current IP address.
-* [load](#load) - Your machines 5 minute load average and free RAM.
-* [node_version](#node_version) - Show the version number of the installed Node.js.
-* [os_icon](#os_icon) - Display a nice little icon, depending on your operating system.
-* [php_version](#php_version) - Show the current PHP version.
+* load - Your machines 5 minute load average and free RAM.
+* node_version - Show the version number of the installed Node.js.
+* os_icon - Display a nice little icon, depending on your operating system.
+* php_version - Show the current PHP version.
 * [rbenv](#rbenv) - Ruby environment information (if one is active).
 * [rspec_stats](#rspec_stats) - Show a ratio of test classes vs code classes for RSpec.
 * [status](#status) - The return code of the previous command, and status of background jobs.
 * [symphony2_tests](#symphony2_tests) - Show a ratio of test classes vs code classes for Symfony2.
-* [symphony2_version](#symphony2_version)- Show the current Symfony2 version, if you are in a Symfony2-Project dir.
+* symphony2_version - Show the current Symfony2 version, if you are in a Symfony2-Project dir.
 * [time](#time) - System time.
 * [vi_mode](#vi_mode)- Vi editing mode (NORMAL|INSERT).
-* [virtualenv](#virtualenv) - Your Python [VirtualEnv](https://virtualenv.pypa.io/en/latest/).
+* virtualenv - Your Python [VirtualEnv](https://virtualenv.pypa.io/en/latest/).
 * [vcs](#vcs) - Information about this `git` or `hg` repository (if you are in one).
 
 
@@ -144,7 +144,7 @@ network interface by setting:
 
     POWERLEVEL9K_IP_INTERFACE="eth0"
 
-##### rspec_tests
+##### rspec_stats
 
 See [Unit Test Ratios](#unit-test-ratios), below.
 
@@ -238,7 +238,7 @@ VI-Mode, you need to configure it separately in your `~/.zshrc`:
 
 #### Unit Test Ratios
 
-The `symfony2_tests` and `rspec_tests` segments both show a ratio of "real"
+The `symfony2_tests` and `rspec_stats` segments both show a ratio of "real"
 classes vs test classes in your source code. This is just a very simple ratio,
 and does not show your code coverage or any sophisticated stats. All this does
 is count your source files and test files, and calculate the ratio between them.
