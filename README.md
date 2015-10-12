@@ -22,28 +22,6 @@ this theme focus on four primary goals:
 4. Optimize the code for execution speed as much as possible. A snappy terminal
    is a happy terminal.
 
-### Features
-
-* Supports `git` and `mercurial` repo information through ZSH's `VCS_INFO`:
-    * branch / tag name
-    * current action status (rebasing, merging, etc.,)
-    * being behind / ahead of your remote by some number of commits
-    * number of stashes (git only)
-    * conditionally shows remote tracking branch if the name differs from local
-    * current active bookmark (mercurial only)
-    * various working tree statuses (e.g., unstaged, staged, etc.,)
-* Shows return-code of the last command if it is an error code
-* Indicates background jobs with a gear icon
-* Can conditionally display the `user@host` string when needed (e.g., SSH)
-* Provides segment for command history (so you can `$ !<num>` to re-run)
-* Plenty of additional segments to choose from (e.g., AWS, ruby)
-* Can be used as a single or double-lined prompt (see screenshots below)
-* Several built-in color configurations to choose from
-
-**If you would like an OMZ theme that provides some of the same features but
-doesn't require Powerline fonts, check out the sister font,
-[hackersaurus](https://github.com/bhilburn/hackersaurus).**
-
 Here is a detailed screenshot showing `powerlevel9k` with default settings and
 varying terminal status indicators:
 
@@ -78,20 +56,20 @@ The segments that are currently available are:
 * [aws](#aws) - The current AWS profile, if active.
 * [context](#context) - Your username and host.
 * [dir](#dir) - Your current working directory.
-* history - The command number for the current line.
+* **history** - The command number for the current line.
 * [ip](#ip) - Shows the current IP address.
-* load - Your machines 5 minute load average and free RAM.
-* node_version - Show the version number of the installed Node.js.
-* os_icon - Display a nice little icon, depending on your operating system.
-* php_version - Show the current PHP version.
+* **load** - Your machines 5 minute load average and free RAM.
+* **node_version** - Show the version number of the installed Node.js.
+* **os_icon** - Display a nice little icon, depending on your operating system.
+* **php_version** - Show the current PHP version.
 * [rbenv](#rbenv) - Ruby environment information (if one is active).
 * [rspec_stats](#rspec_stats) - Show a ratio of test classes vs code classes for RSpec.
 * [status](#status) - The return code of the previous command, and status of background jobs.
 * [symphony2_tests](#symphony2_tests) - Show a ratio of test classes vs code classes for Symfony2.
-* symphony2_version - Show the current Symfony2 version, if you are in a Symfony2-Project dir.
+* **symphony2_version** - Show the current Symfony2 version, if you are in a Symfony2-Project dir.
 * [time](#time) - System time.
 * [vi_mode](#vi_mode)- Vi editing mode (NORMAL|INSERT).
-* virtualenv - Your Python [VirtualEnv](https://virtualenv.pypa.io/en/latest/).
+* **virtualenv** - Your Python [VirtualEnv](https://virtualenv.pypa.io/en/latest/).
 * [vcs](#vcs) - Information about this `git` or `hg` repository (if you are in one).
 
 
