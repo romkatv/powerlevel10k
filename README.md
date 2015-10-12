@@ -32,9 +32,11 @@ Here is a detailed screenshot showing `powerlevel9k` in action, with default set
 ### Table of Contents
 
 1. [Installation](#installation)
-2. [Customization](#customization)
-3. [Stylizing](https://github.com/bhilburn/powerlevel9k/wiki/Stylizing-Your-Prompt)
-4. [Troubleshooting](https://github.com/bhilburn/powerlevel9k/wiki/Troubleshooting)
+2. [Customization](#prompt-customization)
+    1. [Stylizing Your Prompt](https://github.com/bhilburn/powerlevel9k/wiki/Stylizing-Your-Prompt)
+    2. [Customizing Prompt Segments](#customizing-prompt-segments)
+    3. [Available Prompt Segments](#available-prompt-segments)
+3. [Troubleshooting](https://github.com/bhilburn/powerlevel9k/wiki/Troubleshooting)
 
 ### Installation
 There are two installation steps to go from a lame terminal to a "Power Level
@@ -49,9 +51,8 @@ No configuration is necessary post-installation if you like the default
 settings, but there are plenty of segment customization options available if you
 are interested.
 
-### Customization
+### Prompt Customization
 
-#### Customizing Your Prompt
 Be sure to check out the wiki page on the additional prompt customization
 options, including color and icon settings: [Stylizing Your Prompt](https://github.com/bhilburn/powerlevel9k/wiki/Stylizing-Your-Prompt)
 
