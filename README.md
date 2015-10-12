@@ -237,3 +237,9 @@ and does not show your code coverage or any sophisticated stats. All this does
 is count your source files and test files, and calculate the ratio between them.
 Just enough to give you a quick overview about the test situation of the project
 you are dealing with.
+
+### Other
+
+Looking for more information? We put a lot of stuff in our Wiki!
+
+[Head to the Wiki](https://github.com/bhilburn/powerlevel9k/wiki)
