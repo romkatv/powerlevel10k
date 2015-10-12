@@ -27,6 +27,12 @@ varying terminal status indicators:
 
 ![](http://bhilburn.org/content/images/2014/12/powerlevel9k.png)
 
+### Table of Contents
+
+1. (Installation)[#installation]
+2. (Customization)[#customization]
+3. (Styling)[#styling]
+
 ### Installation
 There are two installation steps to go from a lame terminal to a "Power Level
 9000" terminal. Once you are done, you can optionally customize your prompt.
