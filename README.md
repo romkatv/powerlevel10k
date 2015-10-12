@@ -38,6 +38,8 @@ Here is a detailed screenshot showing `powerlevel9k` in action, with default set
     3. [Available Prompt Segments](#available-prompt-segments)
 3. [Troubleshooting](https://github.com/bhilburn/powerlevel9k/wiki/Troubleshooting)
 
+Be sure to also [check out the Wiki](https://github.com/bhilburn/powerlevel9k/wiki)!
+
 ### Installation
 There are two installation steps to go from a lame terminal to a "Power Level
 9000" terminal. Once you are done, you can optionally customize your prompt.
