@@ -92,149 +92,30 @@ varying terminal status indicators:
 ![](http://bhilburn.org/content/images/2014/12/powerlevel9k.png)
 
 ### Installation
-There are two steps to start using this theme:
+There are two installation steps to go from a lame terminal to a "Power Level
+9000" terminal. Once you are done, you can optionally customize your prompt.
 
-1. Install the Powerlevel9k theme.
-2. Install Powerline-patched fonts.
-3. [Optional] Configuration
-
-To get the most out of Powerlevel9k, you need to install both the theme as well
-as Powerline-patched fonts, if you don't have them installed already. If you
-cannot install Powerline-patched fonts for some reason, follow the instructions
-below for a `compatible` install.
+[Installation Instructions](https://github.com/bhilburn/powerlevel9k/wiki/Install-Instructions)
+1. [Install the Powerlevel9k Theme](https://github.com/bhilburn/powerlevel9k/wiki/Install-Instructions#step-1-install-powerlevel9k)
+2. [Install Powerline-Patched Fonts](https://github.com/bhilburn/powerlevel9k/wiki/Install-Instructions#step-2-install-powerline-fonts)
 
 No configuration is necessary post-installation if you like the default
-settings, but there is plenty of segment configuration available if you are
-interested.
+settings, but there are plenty of segment customization options available if you
+are interested.
 
-#### Step 1: Install Powerlevel9k
-There are four ways to install and use the Powerlevel9k theme: vanilla ZSH,
-Oh-My-Zsh, Prezto, and antigen. Do one of the following:
+### Customization
 
-##### Option 1: Install for Vanilla ZSH
-
-If you use just a vanilla ZSH install, simply clone this repository and
-reference it in your `~/.zshrc`:
-
-    $ git clone https://github.com/bhilburn/powerlevel9k.git
-    $ echo 'source  powerlevel9k/powerlevel9k.zsh-theme' >> ~/.zshrc
-
-##### Option 2: Install for Oh-My-ZSH
-
-To install this theme for
-[Oh-My-Zsh](https://github.com/robbyrussell/oh-my-zsh), clone this repository
-into your OMZ `custom/themes` directory.
-
-    $ cd ~/.oh-my-zsh/custom
-    $ git clone https://github.com/bhilburn/powerlevel9k.git themes/powerlevel9k
-
-You then need to select this theme in your `~/.zshrc`:
-
-    ZSH_THEME="powerlevel9k/powerlevel9k"
-
-##### Option 3: Install for Prezto
-
-To install this theme for use in Prezto, clone this repository into your
-[Prezto](https://github.com/sorin-ionescu/prezto) `prompt/external` directory.
-
-    $ cd ~.zprezto/modules/prompt/external
-    $ git clone https://github.com/bhilburn/powerlevel9k.git
-    $ ln -s powerlevel9k/powerlevel9k.zsh-theme ../functions/prompt_powerlevel9k_setup
-
-You then need to select this theme in your `~/.zpreztorc`:
-
-    zstyle ':prezto:module:prompt' theme 'powerlevel9k'
-
-##### Option 4: Install for antigen
-
-If you prefer [antigen](https://github.com/zsh-users/antigen), just add this
-theme to the antigen config in your `~/.zshrc`:
-
-    $ echo 'antigen theme bhilburn/powerlevel9k powerlevel9k' >> ~/.zshrc
-    $ echo 'antigen apply' >> ~/.zshrc
-
-Note that you should define any customizations before calling `antigen theme`
-(i.e. setting the `POWERLEVEL9K_*` variables) in your `.zshrc`.
-
-#### Step 2: Install Powerline Fonts
-Technically, you don't *have* to install Powerline fonts. If you are using
-a font that has some of the basic glyphs we need, you can use the theme in
-`compatible` mode - see the third option, below.
-
-To get the most out of theme, though, you'll want Powerline-patched fonts. There
-are two varieties of these: 'Powerline Fonts' and 'Awesome Powerline
-Fonts'. The latter includes additional glyphs that aren't required for a normal
-install.
-
-Do one of the following:
-
-##### Option 1: Install Powerline Fonts
-
-You can find the [installation instructions for Powerline Fonts here]
-(https://powerline.readthedocs.org/en/latest/installation/linux.html#fonts-installation).
-You can also find the raw font files [in this Github
-repository](https://github.com/powerline/fonts) if you want to manually install
-them for your OS.
-
-After you have installed Powerline fonts, make the default font in your terminal
-emulator the Powerline font you want to use.
-
-This is the default mode for `Powerlevel9k`, and no further configuration is
-necessary.
-
-**N.B.:** If Powerlevel9k is not working properly, it is almost always the case
-that the fonts were not properly installed, or you have not configured your
-terminal to use a Powerline-patched font!
-
-##### Option 2: Install Awesome Powerline Fonts
-
-Alternatively, you can install [Awesome Powerline
-Fonts](https://github.com/gabrielelana/awesome-terminal-fonts), which provide
-a number of additional glyphs.
-
-You then need to indicate that you wish to use the additional glyphs by defining
-the following in your `~/.zshrc`:
-
-    POWERLEVEL9K_MODE='awesome-fontconfig'
-
-If you chose to use already patched fonts, use instead :
-
-    POWERLEVEL9K_MODE='awesome-patched'
-
-
-If you choose to make use of this, your prompt will look something like this:
-
-![](https://cloud.githubusercontent.com/assets/1544760/7959660/67612918-09fb-11e5-9ef2-2308363c3c51.png)
-
-Note that if you prefer flat segment transitions, you can use the following with
-`Awesome Powerline Fonts` installed:
-
-    POWERLEVEL9K_MODE='flat'
-
-Which looks like this:
-
-![](https://cloud.githubusercontent.com/assets/1544760/7981324/76d0eb5a-0aae-11e5-9608-d662123d0b0a.png)
-
-##### Option 3: Compatible Mode
-
-This option is best if you prefer not to install additional fonts. This option
-will work out-of-the-box if your your terminal font supports the segment
-separator characters `\uE0B0` (left segment separator) and `\uE0B2` (right
-segment separator).
-
-All you need to do to in this case is install the `Powerlevel9k` theme itself,
-as explained above, and then define the following in your `~/.zshrc`:
-
-    POWERLEVEL9K_MODE='compatible'
-
-Note that depending on your terminal font, this may still not render
-appropriately. This configuration should be used as a back-up.
-
-### Segment Customization
-
+#### Customizing Prompt Segments
 Customizing your prompt is easy! Select the segments you want to have displayed,
-and then assign them to either the left or right prompt. The segments that are
-currently available are:
+and then assign them to either the left or right prompt by adding the following
+variables to your `~/.zshrc`. If you don't customize this, the below
+configuration is the default:
+
+    POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(context dir rbenv vcs)
+    POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(status history time)
+
+#### Available Prompt Segments
+The segments that are currently available are:
 
 * **aws** - The current AWS profile, if active (more info below)
 * **context** - Your username and host (more info below)
@@ -255,13 +136,8 @@ currently available are:
 * **virtualenv** - Your Python [VirtualEnv](https://virtualenv.pypa.io/en/latest/).
 * **vcs** - Information about this `git` or `hg` repository (if you are in one).
 
-To specify which segments you want, just add the following variables to your
-`~/.zshrc`. If you don't customize this, the below configuration is the default:
 
-    POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(context dir rbenv vcs)
-    POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(status history time)
-
-#### The AWS Profile Segment
+##### aws
 
 If you would like to display the [current AWS
 profile](http://docs.aws.amazon.com/cli/latest/userguide/installing.html), add
@@ -270,7 +146,7 @@ your `~/.zshrc`:
 
     export AWS_DEFAULT_PROFILE=<profile_name>
 
-#### The 'context' Segment
+##### context
 
 The `context` segment (user@host string) is conditional. This lets you enable it, but only display
 it if you are not your normal user or on a remote host (basically, only print it
@@ -281,7 +157,7 @@ elements (it is by default), and define a `DEFAULT_USER` in your `~/.zshrc`:
 
     export DEFAULT_USER=<your username>
 
-#### The 'dir' segment
+##### dir
 
 The `dir` segment shows the current working directory. You can limit the output
 to a certain length:
@@ -301,7 +177,7 @@ In each case you have to specify the length you want to shorten the directory
 to. So in some cases `POWERLEVEL9K_SHORTEN_DIR_LENGTH` means characters, in 
 others whole directories.
 
-#### The 'ip' segment
+##### ip
 
 This segment shows you your current internal IP address. It tries to examine
 all currently used network interfaces and prints the first address it finds.
@@ -310,7 +186,24 @@ network interface by setting:
 
     POWERLEVEL9K_IP_INTERFACE="eth0"
 
-#### The 'time' segment
+##### rspec_tests
+
+See [Unit Test Ratios](#unit-test-ratios), below.
+
+##### status
+
+This segment shows the return code of the last command, and the presence of any
+background jobs. By default, this segment will always print, but you can
+customize it to only print if there is an error or a forked job by setting the
+following variable in your `~/.zshrc`.
+
+    POWERLEVEL9K_STATUS_VERBOSE=false
+
+##### symphony2_tests
+
+See [Unit Test Ratios](#unit-test-ratios), below.
+
+##### time
 
 By default the time is show in 'H:M:S' format. If you want to change it,
 just set another format in your `~/.zshrc`. As an example, this is a reversed
@@ -325,43 +218,7 @@ segment, as well:
     # Output time, date, and a symbol from the "Awesome Powerline Font" set
     POWERLEVEL9K_TIME_FORMAT="%D{%H:%M:%S \uE868  %d.%m.%y}"
 
-#### Showing Status
-
-Usually we display always the status, and in case a command failed, the return
-code of the last executed program. In case you want to display the status only
-if something special happend, you can set `POWERLEVEL9K_STATUS_VERBOSE=false`
-in your `~/.zshrc`.
-
-#### Unit Test Ratios
-
-The `symfony2_tests` and `rspec_tests` segments both show a ratio of "real"
-classes vs test classes in your source code. This is just a very simple ratio,
-and does not show your code coverage or any sophisticated stats. All this does
-is count your source files and test files, and calculate the ratio between them.
-Just enough to give you a quick overview about the test situation of the project
-you are dealing with.
-
-#### VI-Mode Indicator
-
-This Segment shows the current mode of your ZSH. If you want to use your ZSH in
-VI-Mode, you need to configure it separatly in your `~/.zshrc`:
-
-    # VI-Mode
-    # general activation
-    bindkey -v
-    
-    # set some nice hotkeys
-    bindkey '^P' up-history
-    bindkey '^N' down-history
-    bindkey '^?' backward-delete-char
-    bindkey '^h' backward-delete-char
-    bindkey '^w' backward-kill-word
-    bindkey '^r' history-incremental-search-backward
-
-    # make it more responsive
-    export KEYTIMEOUT=1
-
-#### The 'vcs' Segment
+##### vcs
 
 By default, the `vcs` segment will provide quite a bit of information. If you
 would also like for it to display the current hash / changeset, simply define
@@ -380,7 +237,7 @@ You can also disable the branch icon in your prompt by setting
     # Hide the branch icon
     POWERLEVEL9K_HIDE_BRANCH_ICON=true
 
-##### Symbols
+**vcs Symbols**
 
 The `vcs` segment uses various symbols to tell you the state of your repository.
 These symbols depend on your installed font and selected `POWERLEVEL9K_MODE`
@@ -400,6 +257,36 @@ from the [Installation](#Installation) section above.
 | None         |  None               | ![icon_commit](https://cloud.githubusercontent.com/assets/1544760/7976088/b58f4e50-0a76-11e5-9e70-86450d937030.gif)2c3705 | The current commit hash. Here "2c3705"
 | None         |  None               | ![icon_git](https://cloud.githubusercontent.com/assets/1544760/7976092/b5909f80-0a76-11e5-9950-1438b9d72465.gif) | Repository is a git repository
 | None         |  None               | ![icon_mercurial](https://cloud.githubusercontent.com/assets/1544760/7976090/b5908da6-0a76-11e5-8c91-452b6e73f631.gif) | Repository is a Mercurial repository
+
+##### vi_mode
+
+This Segment shows the current mode of your ZSH. If you want to use your ZSH in
+VI-Mode, you need to configure it separately in your `~/.zshrc`:
+
+    # VI-Mode
+    # general activation
+    bindkey -v
+
+    # set some nice hotkeys
+    bindkey '^P' up-history
+    bindkey '^N' down-history
+    bindkey '^?' backward-delete-char
+    bindkey '^h' backward-delete-char
+    bindkey '^w' backward-kill-word
+    bindkey '^r' history-incremental-search-backward
+
+    # make it more responsive
+    export KEYTIMEOUT=1
+
+#### Unit Test Ratios
+
+The `symfony2_tests` and `rspec_tests` segments both show a ratio of "real"
+classes vs test classes in your source code. This is just a very simple ratio,
+and does not show your code coverage or any sophisticated stats. All this does
+is count your source files and test files, and calculate the ratio between them.
+Just enough to give you a quick overview about the test situation of the project
+you are dealing with.
+
 
 ### Styling
 
@@ -519,63 +406,3 @@ your prompt even further. These Segments are `context`, `vcs`, `rspec_stats`,
     # symfony2_tests for poor test coverage
     POWERLEVEL9K_SYMFONY2_TESTS_BAD_FOREGROUND='red'
     POWERLEVEL9K_SYMFONY2_TESTS_BAD_BACKGROUND='white'
-
-### Troubleshooting
-
-Here are some fixes to some common problems.
-
-#### Gaps Between Segments
-
-You can see this issue in the screenshot, below:
-
-![](http://bhilburn.org/content/images/2014/12/font_issue.png)
-
-Thankfully, this is easy to fix. This happens if you have successfully installed
-Powerline fonts, but did not make a Powerline font the default font in your
-terminal emulator (e.g., 'terminator', 'gnome-terminal', 'konsole', etc.,).
-
-#### Segment Colors are Wrong
-
-If the color display within your terminal seems off, it's possible you are using
-a reduced color set. You can check this by invoking `echotc Co` in your
-terminal, which should yield `256`. If you see something different, try setting
-`xterm-256color` in your `~/.zshrc`:
-
-    TERM=xterm-256color
-
-#### Strange Characters in prompt
-
-If your prompt shows strange character like this:
-
-![](https://cloud.githubusercontent.com/assets/1544760/9156161/e0e584e6-3ed0-11e5-897a-2318a8e32d35.png)
-
-it is most likely that you set `POWERLEVEL9K_MODE="awesome-patched"`, but
-did not install an [awesome-font](https://github.com/gabrielelana/awesome-terminal-fonts). For most other modes, you need a [powerline-patched](https://github.com/powerline/fonts) font.
-
-### Meta
-
-#### Kudos
-
-This theme wouldn't have happened without inspiration from the original
-[agnoster](https://github.com/agnoster/agnoster-zsh-theme) ZSH theme.
-
-Before creating this theme, I also tried [jeremyFreeAgent's
-theme](https://github.com/jeremyFreeAgent/oh-my-zsh-powerline-theme) and
-[maverick2000's theme, ZSH2000](https://github.com/maverick2000/zsh2000).
-
-#### Developing
-
-Documentation for developers is kept on the [Powerlevel9k Github
-wiki](https://github.com/bhilburn/powerlevel9k/wiki/Developer's-Guide).
-
-#### Contributions / Bugs / Contact
-
-If you have any requests or bug reports, please use the tracker in this Github
-repository.
-
-I'm happy to accept code contributions from anyone who has a bug fix, new
-feature, or just a general improvement! Please submit your contribution as
-a Github pull-request.
-
-If you would like to contact me directly, you can find my e-mail address on my
-[Github profile page](https://github.com/bhilburn).
