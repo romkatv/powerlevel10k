@@ -31,7 +31,8 @@ varying terminal status indicators:
 
 1. [Installation](#installation)
 2. [Customization](#customization)
-3. [Styling](#styling)
+3. [Stylizing](https://github.com/bhilburn/powerlevel9k/wiki/Stylizing-Your-Prompt)
+4. [Troubleshooting](https://github.com/bhilburn/powerlevel9k/wiki/Troubleshooting)
 
 ### Installation
 There are two installation steps to go from a lame terminal to a "Power Level
@@ -47,6 +48,12 @@ settings, but there are plenty of segment customization options available if you
 are interested.
 
 ### Customization
+
+#### Customizing Your Prompt
+Be sure to check out the wiki page on the additional prompt customization
+options, including color and icon settings:
+
+[Stylizing Your Prompt](https://github.com/bhilburn/powerlevel9k/wiki/Stylizing-Your-Prompt)
 
 #### Customizing Prompt Segments
 Customizing your prompt is easy! Select the segments you want to have displayed,
@@ -229,123 +236,3 @@ and does not show your code coverage or any sophisticated stats. All this does
 is count your source files and test files, and calculate the ratio between them.
 Just enough to give you a quick overview about the test situation of the project
 you are dealing with.
-
-
-### Styling
-
-You can configure the look and feel of your prompt easily with some built-in
-options.
-
-#### Double-Lined Prompt
-
-By default, `powerlevel9k` is a single-lined prompt. If you would like to have
-the segments display on one line, and print the command prompt below it, simply
-define `POWERLEVEL9K_PROMPT_ON_NEWLINE` in your `~/.zshrc`:
-
-    POWERLEVEL9K_PROMPT_ON_NEWLINE=true
-
-Here is what it looks like:
-
-![](http://bhilburn.org/content/images/2015/03/double-line.png)
-
-You can customize the icons used to draw the multiline prompt by setting the
-following variables in your `~/.zshrc`:
-
-    POWERLEVEL9K_MULTILINE_FIRST_PROMPT_PREFIX="↱"
-    POWERLEVEL9K_MULTILINE_SECOND_PROMPT_PREFIX="↳ "
-
-#### Disable Right Prompt
-
-If you do not want a right prompt, you can disable it by setting:
-
-    POWERLEVEL9K_DISABLE_RPROMPT=true
-
-#### Light Color Theme
-
-If you prefer to use "light" colors, simply set `POWERLEVEL9K_COLOR_SCHEME`
-to `light` in your `~/.zshrc`, and you're all set!
-
-    POWERLEVEL9K_COLOR_SCHEME='light'
-
-The 'light' color scheme works well for ['Solarized
-Light'](https://github.com/altercation/solarized) users. Check it out:
-
-![](http://bhilburn.org/content/images/2015/03/solarized-light.png)
-
-#### Icon Customization
-
-Each icon used can be customized too by specifying a variable named like
-the icon and prefixed with 'POWERLEVEL9K'. If you want to use another icon
-as segment separators, you can easily do that:
-
-    POWERLEVEL9K_LEFT_SEGMENT_SEPARATOR=$'\uE0B1'
-    POWERLEVEL9K_RIGHT_SEGMENT_SEPARATOR=$'\uE0B3'
-
-You could get a list of all icons defined in random colors, by adding the 
-special segment `icons_test` to your prompt:
-
-    POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(icons_test)
-
-This special prompt does not work on the right side, as it would be too long,
-and ZSH hides it automatically. Also have in mind, that the output depends on
-your `POWERLEVEL9K_MODE` settings.
-
-You can change any icon by setting a environment variable. To get a full list
-of icons just type `get_icon_names` in your terminal.
-
-#### Segment Color Customization
-
-For each segment in your prompt, you can specify a foreground and background
-color by setting them in your `~/.zshrc`. Use the segment names from the above
-section `Segment Customization`. For example, to change the appearance of the
-`time` segment, you would use:
-
-    POWERLEVEL9K_TIME_FOREGROUND='red'
-    POWERLEVEL9K_TIME_BACKGROUND='blue'
-
-Note that you can also use a colorcode value. Example:
-
-    POWERLEVEL9K_VCS_FOREGROUND='021' # Dark blue
-
-For a full list of supported colors, run the `spectrum_ls` program in your
-terminal.
-
-#### Special Segment Colors
-
-Some segments have additional color options if you want to customize the look of
-your prompt even further. These Segments are `context`, `vcs`, `rspec_stats`,
-`symfony2_tests`:
-
-    # Customizing `context` colors for root and non-root users
-    POWERLEVEL9K_CONTEXT_DEFAULT_BACKGROUND="green"
-    POWERLEVEL9K_CONTEXT_DEFAULT_FOREGROUND="cyan"
-    POWERLEVEL9K_CONTEXT_ROOT_BACKGROUND="red"
-    POWERLEVEL9K_CONTEXT_ROOT_FOREGROUND="blue"
-
-    # Advanced `vcs` color customization
-    POWERLEVEL9K_VCS_FOREGROUND='blue'
-    POWERLEVEL9K_VCS_DARK_FOREGROUND='black'
-    POWERLEVEL9K_VCS_BACKGROUND='green'
-    # If VCS changes are detected:
-    POWERLEVEL9K_VCS_MODIFIED_FOREGROUND='red'
-    POWERLEVEL9K_VCS_MODIFIED_BACKGROUND='cyan'
-
-    # rspec_stats for good test coverage
-    POWERLEVEL9K_RSPEC_STATS_GOOD_FOREGROUND='blue'
-    POWERLEVEL9K_RSPEC_STATS_GOOD_BACKGROUND='green'
-    # rspec_stats for average test coverage
-    POWERLEVEL9K_RSPEC_STATS_AVG_FOREGROUND='black'
-    POWERLEVEL9K_RSPEC_STATS_AVG_BACKGROUND='cyan'
-    # rspec_stats for poor test coverage
-    POWERLEVEL9K_RSPEC_STATS_BAD_FOREGROUND='red'
-    POWERLEVEL9K_RSPEC_STATS_BAD_BACKGROUND='white'
-
-    # symfony2_tests for good test coverage
-    POWERLEVEL9K_SYMFONY2_TESTS_GOOD_FOREGROUND='blue'
-    POWERLEVEL9K_SYMFONY2_TESTS_GOOD_BACKGROUND='green'
-    # symfony2_tests for average test coverage
-    POWERLEVEL9K_SYMFONY2_TESTS_AVG_FOREGROUND='black'
-    POWERLEVEL9K_SYMFONY2_TESTS_AVG_BACKGROUND='cyan'
-    # symfony2_tests for poor test coverage
-    POWERLEVEL9K_SYMFONY2_TESTS_BAD_FOREGROUND='red'
-    POWERLEVEL9K_SYMFONY2_TESTS_BAD_BACKGROUND='white'
