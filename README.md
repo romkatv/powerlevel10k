@@ -29,9 +29,9 @@ varying terminal status indicators:
 
 ### Table of Contents
 
-1. (Installation)[#installation]
-2. (Customization)[#customization]
-3. (Styling)[#styling]
+1. [Installation](#installation)
+2. [Customization](#customization)
+3. [Styling](#styling)
 
 ### Installation
 There are two installation steps to go from a lame terminal to a "Power Level
