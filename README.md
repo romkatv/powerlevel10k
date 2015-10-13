@@ -77,6 +77,7 @@ The segments that are currently available are:
 * [ip](#ip) - Shows the current IP address.
 * **load** - Your machines 5 minute load average and free RAM.
 * **node_version** - Show the version number of the installed Node.js.
+* **nvm** - Show the version of Node that is currently active, if it differs from the version used by NVM
 * **os_icon** - Display a nice little icon, depending on your operating system.
 * **php_version** - Show the current PHP version.
 * [rbenv](#rbenv) - Ruby environment information (if one is active).
