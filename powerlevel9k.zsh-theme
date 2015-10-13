@@ -255,6 +255,8 @@ function getColorCode() {
     1=${1#bg-}
     # Strip eventual "fg-" prefixes
     1=${1#fg-}
+    # Strip eventual "br" prefixes ("bright" colors)
+    1=${1#br}
     echo $codes[$1]
   fi
 }
