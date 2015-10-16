@@ -317,8 +317,7 @@ esac
 # `sed` is unfortunately not consistent across OSes when it comes to flags.
 SED_EXTENDED_REGEX_PARAMETER="-r"
 if [[ "$OS" == 'OSX' ]]; then
-  local IS_BSD_SED
-  IS_BSD_SED=$(sed --version &>> /dev/null || echo "BSD sed")
+  local IS_BSD_SED="$(sed --version &>> /dev/null || echo "BSD sed")"
   if [[ -n "$IS_BSD_SED" ]]; then
     SED_EXTENDED_REGEX_PARAMETER="-E"
   fi
