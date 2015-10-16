@@ -410,6 +410,7 @@ CURRENT_BG='NONE'
 #   * $3: Foreground color
 #   * $4: The segment content
 # The latter three can be omitted,
+set_default POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS " "
 left_prompt_segment() {
   # Overwrite given background-color by user defined variable for this segment.
   local BACKGROUND_USER_VARIABLE=POWERLEVEL9K_${(U)1#prompt_}_BACKGROUND
@@ -426,7 +427,7 @@ left_prompt_segment() {
   [[ -n $3 ]] && fg="%F{$3}" || fg="%f"
   if [[ $CURRENT_BG != 'NONE' ]] && [[ "$2" != "$CURRENT_BG" ]]; then
     # Middle segment
-    echo -n "%{$bg%F{$CURRENT_BG}%}$(print_icon 'LEFT_SEGMENT_SEPARATOR')%{$fg%} "
+    echo -n "%{$bg%F{$CURRENT_BG}%}$(print_icon 'LEFT_SEGMENT_SEPARATOR')%{$fg%}$POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS"
   elif [[ "$CURRENT_BG" == "$2" ]]; then
     # Middle segment with same color as previous segment
     # We take the current foreground color as color for our
@@ -434,13 +435,13 @@ left_prompt_segment() {
     # enough contrast.
     local complement
     [[ -n $3 ]] && complement=$3 || complement=$DEFAULT_COLOR
-    echo -n "%{$bg%F{$complement}%}$(print_icon 'LEFT_SUBSEGMENT_SEPARATOR')%{$fg%} "
+    echo -n "%{$bg%F{$complement}%}$(print_icon 'LEFT_SUBSEGMENT_SEPARATOR')%{$fg%}$POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS"
   else
     # First segment
-    echo -n "%{$bg%}%{$fg%} "
+    echo -n "%{$bg%}%{$fg%}$POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS"
   fi
   CURRENT_BG=$2
-  [[ -n $4 ]] && echo -n "$4 "
+  [[ -n $4 ]] && echo -n "$4$POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS"
 }
 
 # End the left prompt, closes the final segment.
@@ -464,6 +465,7 @@ CURRENT_RIGHT_BG='NONE'
 #   * $3: Foreground color
 #   * $4: The segment content
 # No ending for the right prompt segment is needed (unlike the left prompt, above).
+set_default POWERLEVEL9K_WHITESPACE_BETWEEN_RIGHT_SEGMENTS " "
 right_prompt_segment() {
   # Overwrite given background-color by user defined variable for this segment.
   local BACKGROUND_USER_VARIABLE=POWERLEVEL9K_${(U)1#prompt_}_BACKGROUND
@@ -486,11 +488,11 @@ right_prompt_segment() {
     # enough contrast.
     local complement
     [[ -n $3 ]] && complement=$3 || complement=$DEFAULT_COLOR
-    echo -n "%F{$complement}$(print_icon 'RIGHT_SUBSEGMENT_SEPARATOR')%f%{$bg%}%{$fg%} "
+    echo -n "%F{$complement}$(print_icon 'RIGHT_SUBSEGMENT_SEPARATOR')%f%{$bg%}%{$fg%}$POWERLEVEL9K_WHITESPACE_BETWEEN_RIGHT_SEGMENTS"
   else
-    echo -n "%F{$2}$(print_icon 'RIGHT_SEGMENT_SEPARATOR')%f%{$bg%}%{$fg%} "
+    echo -n "%F{$2}$(print_icon 'RIGHT_SEGMENT_SEPARATOR')%f%{$bg%}%{$fg%}$POWERLEVEL9K_WHITESPACE_BETWEEN_RIGHT_SEGMENTS"
   fi
-  [[ -n $4 ]] && echo -n "$4 %f"
+  [[ -n $4 ]] && echo -n "$4$POWERLEVEL9K_WHITESPACE_BETWEEN_RIGHT_SEGMENTS%f"
 
   CURRENT_RIGHT_BG=$2
 }
