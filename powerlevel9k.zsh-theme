@@ -45,6 +45,7 @@ case $POWERLEVEL9K_MODE in
       AWS_ICON                       $'\UE895'              # 
       BACKGROUND_JOBS_ICON           $'\UE82F '             # 
       TEST_ICON                      $'\UE891'              # 
+      TODO_ICON                      $'\U2611'              # ☑
       OK_ICON                        $'\U2713'              # ✓
       FAIL_ICON                      $'\U2718'              # ✘
       SYMFONY_ICON                   'SF'
@@ -93,6 +94,7 @@ case $POWERLEVEL9K_MODE in
       AWS_ICON                       $'\UF296'              # 
       BACKGROUND_JOBS_ICON           $'\UF013 '             # 
       TEST_ICON                      $'\UF291'              # 
+      TODO_ICON                      $'\U2611'              # ☑
       OK_ICON                        $'\UF23A'              # 
       FAIL_ICON                      $'\UF281'              # 
       SYMFONY_ICON                   'SF'
@@ -136,6 +138,7 @@ case $POWERLEVEL9K_MODE in
       AWS_ICON                       'AWS:'
       BACKGROUND_JOBS_ICON           $'\u2699'              # ⚙
       TEST_ICON                      ''
+      TODO_ICON                      $'\U2611'              # ☑
       OK_ICON                        $'\u2713'              # ✓
       FAIL_ICON                      $'\u2718'              # ✘
       SYMFONY_ICON                   'SF'
@@ -847,6 +850,16 @@ prompt_time() {
   fi
 
   "$1_prompt_segment" "$0" "$DEFAULT_COLOR_INVERTED" "$DEFAULT_COLOR" "$time_format"
+}
+
+# todo.sh: shows the number of tasks in your todo.sh file
+prompt_todo() {
+  if $(hash todo.sh 2>&-); then
+    count=$(todo.sh ls | egrep "TODO: [0-9]+ of ([0-9]+) tasks shown" | awk '{ print $4 }')
+    if [[ "$count" = <-> ]]; then
+      "$1_prompt_segment" "$0" "244" "$DEFAULT_COLOR" "$(print_icon 'TODO_ICON') $count"
+    fi
+  fi
 }
 
 # Vi Mode: show editing mode (NORMAL|INSERT)
