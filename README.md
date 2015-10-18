@@ -71,7 +71,7 @@ configuration is the default:
 The segments that are currently available are:
 
 * [aws](#aws) - The current AWS profile, if active.
-* [battery](#battery) - Current battery status(OS X only).
+* [battery](#battery) - Current battery status.
 * [context](#context) - Your username and host.
 * [dir](#dir) - Your current working directory.
 * **history** - The command number for the current line.
@@ -104,8 +104,8 @@ your `~/.zshrc`:
 
 ##### battery
 
-This segment will display your current battery status on an OS X system(fails gracefully
-on systems without a battery and non OS X systems). It can be customized in your .zshrc
+This segment will display your current battery status (fails gracefully
+on systems without a battery). It can be customized in your .zshrc
 with the environment variables detailed below with their default values.
 
     POWERLEVEL9K_BATTERY_CHARGING="yellow"
@@ -116,6 +116,7 @@ with the environment variables detailed below with their default values.
 
 In addition to the above it supports standard _FOREGROUND value without affecting the icon color
 
+Supports both OS X and Linux(time remaining is only output in OS X)
 
 
 ##### context
@@ -146,7 +147,7 @@ To change the way how the current working directory is truncated, just set:
     # default behaviour is to truncate whole directories
 
 In each case you have to specify the length you want to shorten the directory
-to. So in some cases `POWERLEVEL9K_SHORTEN_DIR_LENGTH` means characters, in 
+to. So in some cases `POWERLEVEL9K_SHORTEN_DIR_LENGTH` means characters, in
 others whole directories.
 
 ##### ip
