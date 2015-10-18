@@ -652,7 +652,7 @@ prompt_battery() {
     fi
 
     # display prompt_segment
-    [[ ! -z $bat_percent ]] && "$1_prompt_segment" "$0" "black" "$DEFAULT_COLOR" "$conn$(print_icon 'BATTERY_ICON'){$fg_color} $bat_percent%% $remain"
+    [[ ! -z $bat_percent ]] && "$1_prompt_segment" "$0" "black" "$DEFAULT_COLOR" "$conn$(print_icon 'BATTERY_ICON')%F{$fg_color} $bat_percent%% $remain"
   fi
 }
 
