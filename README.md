@@ -215,29 +215,17 @@ from the [Installation](#Installation) section above.
 
 ##### vi_mode
 
-This Segment shows the current mode of your ZSH. If you want to use your ZSH in
-VI-Mode, you need to configure it separately in your `~/.zshrc`:
+This segment shows ZSH's current input mode. Note that this is only useful if
+you are using the [ZSH Line Editor](http://zsh.sourceforge.net/Doc/Release/Zsh-Line-Editor.html)
+(VI mode).  You can enable this either by `.zshrc` configuration or using a plugin, like
+[Oh-My-Zsh's vi-mode plugin](https://github.com/robbyrussell/oh-my-zsh/blob/master/plugins/vi-mode/vi-mode.plugin.zsh).
 
-    # VI-Mode
-    # general activation
-    bindkey -v
+If you want to display a string other than "NORMAL" or "INSERT" in `command` and
+`insert-mode`, you can do so by setting the following variables in your
+`~/.zshrc`:
 
-    # set some nice hotkeys
-    bindkey '^P' up-history
-    bindkey '^N' down-history
-    bindkey '^?' backward-delete-char
-    bindkey '^h' backward-delete-char
-    bindkey '^w' backward-kill-word
-    bindkey '^r' history-incremental-search-backward
-
-    # make it more responsive
-    export KEYTIMEOUT=1
-
-If you want to display another string than "NORMAL" or "INSERT" in command or
-insert-mode, you can do that by setting environment variables like:
-
-    POWERLEVEL9K_VI_INSERT_MODE_STRING="INS"
-    POWERLEVEL9K_VI_COMMAND_MODE_STRING="CMD"
+    POWERLEVEL9K_VI_INSERT_MODE_STRING="INSERT"
+    POWERLEVEL9K_VI_COMMAND_MODE_STRING="NORMAL"
 
 #### Unit Test Ratios
 
