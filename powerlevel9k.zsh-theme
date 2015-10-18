@@ -229,7 +229,7 @@ function print_icon() {
 printSizeHumanReadable() {
   local size=$1
   local extension
-  extension=(B K M G T P E Z Y)
+  extension=('B' 'K' 'M' 'G' 'T' 'P' 'E' 'Z' 'Y')
   local index=1
 
   # if the base is not Bytes
