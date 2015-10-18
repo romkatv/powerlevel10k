@@ -45,6 +45,7 @@ case $POWERLEVEL9K_MODE in
       AWS_ICON                       $'\UE895'              # 
       BACKGROUND_JOBS_ICON           $'\UE82F '             # 
       TEST_ICON                      $'\UE891'              # 
+      TODO_ICON                      $'\U2611'              # ☑
       OK_ICON                        $'\U2713'              # ✓
       FAIL_ICON                      $'\U2718'              # ✘
       SYMFONY_ICON                   'SF'
@@ -93,6 +94,7 @@ case $POWERLEVEL9K_MODE in
       AWS_ICON                       $'\UF296'              # 
       BACKGROUND_JOBS_ICON           $'\UF013 '             # 
       TEST_ICON                      $'\UF291'              # 
+      TODO_ICON                      $'\U2611'              # ☑
       OK_ICON                        $'\UF23A'              # 
       FAIL_ICON                      $'\UF281'              # 
       SYMFONY_ICON                   'SF'
@@ -136,6 +138,7 @@ case $POWERLEVEL9K_MODE in
       AWS_ICON                       'AWS:'
       BACKGROUND_JOBS_ICON           $'\u2699'              # ⚙
       TEST_ICON                      ''
+      TODO_ICON                      $'\U2611'              # ☑
       OK_ICON                        $'\u2713'              # ✓
       FAIL_ICON                      $'\u2718'              # ✘
       SYMFONY_ICON                   'SF'
@@ -389,51 +392,6 @@ set_default POWERLEVEL9K_VCS_FOREGROUND "$DEFAULT_COLOR"
 set_default POWERLEVEL9K_VCS_DARK_FOREGROUND "$DEFAULT_COLOR_DARK"
 
 ################################################################
-# VCS Information Settings
-################################################################
-
-setopt prompt_subst
-autoload -Uz vcs_info
-
-VCS_WORKDIR_DIRTY=false
-VCS_CHANGESET_PREFIX=''
-if [[ "$POWERLEVEL9K_SHOW_CHANGESET" == true ]]; then
-  # Default: Just display the first 12 characters of our changeset-ID.
-  local VCS_CHANGESET_HASH_LENGTH=12
-  if [[ -n "$POWERLEVEL9K_CHANGESET_HASH_LENGTH" ]]; then
-    VCS_CHANGESET_HASH_LENGTH="$POWERLEVEL9K_CHANGESET_HASH_LENGTH"
-  fi
-
-  VCS_CHANGESET_PREFIX="%F{$POWERLEVEL9K_VCS_DARK_FOREGROUND}$(print_icon 'VCS_COMMIT_ICON')%0.$VCS_CHANGESET_HASH_LENGTH""i%f "
-fi
-
-zstyle ':vcs_info:*' enable git hg
-zstyle ':vcs_info:*' check-for-changes true
-
-VCS_DEFAULT_FORMAT="$VCS_CHANGESET_PREFIX%F{$POWERLEVEL9K_VCS_FOREGROUND}%b%c%u%m%f"
-zstyle ':vcs_info:git*:*' formats "%F{$POWERLEVEL9K_VCS_FOREGROUND}$(print_icon 'VCS_GIT_ICON')%f$VCS_DEFAULT_FORMAT"
-zstyle ':vcs_info:hg*:*' formats "%F{$POWERLEVEL9K_VCS_FOREGROUND}$(print_icon 'VCS_HG_ICON')%f$VCS_DEFAULT_FORMAT"
-
-zstyle ':vcs_info:*' actionformats "%b %F{red}| %a%f"
-
-zstyle ':vcs_info:*' stagedstr " %F{$POWERLEVEL9K_VCS_FOREGROUND}$(print_icon 'VCS_STAGED_ICON')%f"
-zstyle ':vcs_info:*' unstagedstr " %F{$POWERLEVEL9K_VCS_FOREGROUND}$(print_icon 'VCS_UNSTAGED_ICON')%f"
-
-zstyle ':vcs_info:git*+set-message:*' hooks vcs-detect-changes git-untracked git-aheadbehind git-stash git-remotebranch git-tagname
-zstyle ':vcs_info:hg*+set-message:*' hooks vcs-detect-changes
-
-# For Hg, only show the branch name
-zstyle ':vcs_info:hg*:*' branchformat "$(print_icon 'VCS_BRANCH_ICON')%b"
-# The `get-revision` function must be turned on for dirty-check to work for Hg
-zstyle ':vcs_info:hg*:*' get-revision true
-zstyle ':vcs_info:hg*:*' get-bookmarks true
-zstyle ':vcs_info:hg*+gen-hg-bookmark-string:*' hooks hg-bookmarks
-
-if [[ "$POWERLEVEL9K_SHOW_CHANGESET" == true ]]; then
-  zstyle ':vcs_info:*' get-revision true
-fi
-
-################################################################
 # Prompt Segment Constructors
 #
 # Methodology behind user-defined variables overwriting colors:
@@ -458,6 +416,7 @@ CURRENT_BG='NONE'
 #   * $3: Foreground color
 #   * $4: The segment content
 # The latter three can be omitted,
+set_default POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS " "
 left_prompt_segment() {
   # Overwrite given background-color by user defined variable for this segment.
   local BACKGROUND_USER_VARIABLE=POWERLEVEL9K_${(U)1#prompt_}_BACKGROUND
@@ -474,7 +433,7 @@ left_prompt_segment() {
   [[ -n $3 ]] && fg="%F{$3}" || fg="%f"
   if [[ $CURRENT_BG != 'NONE' ]] && ! isSameColor "$2" "$CURRENT_BG"; then
     # Middle segment
-    echo -n "%{$bg%F{$CURRENT_BG}%}$(print_icon 'LEFT_SEGMENT_SEPARATOR')%{$fg%} "
+    echo -n "%{$bg%F{$CURRENT_BG}%}$(print_icon 'LEFT_SEGMENT_SEPARATOR')%{$fg%}$POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS"
   elif isSameColor "$CURRENT_BG" "$2"; then
     # Middle segment with same color as previous segment
     # We take the current foreground color as color for our
@@ -482,13 +441,13 @@ left_prompt_segment() {
     # enough contrast.
     local complement
     [[ -n $3 ]] && complement=$3 || complement=$DEFAULT_COLOR
-    echo -n "%{$bg%F{$complement}%}$(print_icon 'LEFT_SUBSEGMENT_SEPARATOR')%{$fg%} "
+    echo -n "%{$bg%F{$complement}%}$(print_icon 'LEFT_SUBSEGMENT_SEPARATOR')%{$fg%}$POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS"
   else
     # First segment
-    echo -n "%{$bg%}%{$fg%} "
+    echo -n "%{$bg%}%{$fg%}$POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS"
   fi
   CURRENT_BG=$2
-  [[ -n $4 ]] && echo -n "$4 "
+  [[ -n $4 ]] && echo -n "$4$POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS"
 }
 
 # End the left prompt, closes the final segment.
@@ -512,6 +471,7 @@ CURRENT_RIGHT_BG='NONE'
 #   * $3: Foreground color
 #   * $4: The segment content
 # No ending for the right prompt segment is needed (unlike the left prompt, above).
+set_default POWERLEVEL9K_WHITESPACE_BETWEEN_RIGHT_SEGMENTS " "
 right_prompt_segment() {
   # Overwrite given background-color by user defined variable for this segment.
   local BACKGROUND_USER_VARIABLE=POWERLEVEL9K_${(U)1#prompt_}_BACKGROUND
@@ -534,11 +494,11 @@ right_prompt_segment() {
     # enough contrast.
     local complement
     [[ -n $3 ]] && complement=$3 || complement=$DEFAULT_COLOR
-    echo -n "%F{$complement}$(print_icon 'RIGHT_SUBSEGMENT_SEPARATOR')%f%{$bg%}%{$fg%} "
+    echo -n "%F{$complement}$(print_icon 'RIGHT_SUBSEGMENT_SEPARATOR')%f%{$bg%}%{$fg%}$POWERLEVEL9K_WHITESPACE_BETWEEN_RIGHT_SEGMENTS"
   else
-    echo -n "%F{$2}$(print_icon 'RIGHT_SEGMENT_SEPARATOR')%f%{$bg%}%{$fg%} "
+    echo -n "%F{$2}$(print_icon 'RIGHT_SEGMENT_SEPARATOR')%f%{$bg%}%{$fg%}$POWERLEVEL9K_WHITESPACE_BETWEEN_RIGHT_SEGMENTS"
   fi
-  [[ -n $4 ]] && echo -n "$4 %f"
+  [[ -n $4 ]] && echo -n "$4$POWERLEVEL9K_WHITESPACE_BETWEEN_RIGHT_SEGMENTS%f"
 
   CURRENT_RIGHT_BG=$2
 }
@@ -547,6 +507,48 @@ right_prompt_segment() {
 # The `vcs` Segment and VCS_INFO hooks / helper functions
 ################################################################
 prompt_vcs() {
+  autoload -Uz vcs_info
+
+  VCS_WORKDIR_DIRTY=false
+  VCS_CHANGESET_PREFIX=''
+  if [[ "$POWERLEVEL9K_SHOW_CHANGESET" == true ]]; then
+    # Default: Just display the first 12 characters of our changeset-ID.
+    local VCS_CHANGESET_HASH_LENGTH=12
+    if [[ -n "$POWERLEVEL9K_CHANGESET_HASH_LENGTH" ]]; then
+      VCS_CHANGESET_HASH_LENGTH="$POWERLEVEL9K_CHANGESET_HASH_LENGTH"
+    fi
+
+    VCS_CHANGESET_PREFIX="%F{$POWERLEVEL9K_VCS_DARK_FOREGROUND}$(print_icon 'VCS_COMMIT_ICON')%0.$VCS_CHANGESET_HASH_LENGTH""i%f "
+  fi
+
+  zstyle ':vcs_info:*' enable git hg
+  zstyle ':vcs_info:*' check-for-changes true
+
+  VCS_DEFAULT_FORMAT="$VCS_CHANGESET_PREFIX%F{$POWERLEVEL9K_VCS_FOREGROUND}%b%c%u%m%f"
+  zstyle ':vcs_info:git*:*' formats "%F{$POWERLEVEL9K_VCS_FOREGROUND}$(print_icon 'VCS_GIT_ICON')%f$VCS_DEFAULT_FORMAT"
+  zstyle ':vcs_info:hg*:*' formats "%F{$POWERLEVEL9K_VCS_FOREGROUND}$(print_icon 'VCS_HG_ICON')%f$VCS_DEFAULT_FORMAT"
+
+  zstyle ':vcs_info:*' actionformats "%b %F{red}| %a%f"
+
+  zstyle ':vcs_info:*' stagedstr " %F{$POWERLEVEL9K_VCS_FOREGROUND}$(print_icon 'VCS_STAGED_ICON')%f"
+  zstyle ':vcs_info:*' unstagedstr " %F{$POWERLEVEL9K_VCS_FOREGROUND}$(print_icon 'VCS_UNSTAGED_ICON')%f"
+
+  zstyle ':vcs_info:git*+set-message:*' hooks vcs-detect-changes git-untracked git-aheadbehind git-stash git-remotebranch git-tagname
+  zstyle ':vcs_info:hg*+set-message:*' hooks vcs-detect-changes
+
+  # For Hg, only show the branch name
+  zstyle ':vcs_info:hg*:*' branchformat "$(print_icon 'VCS_BRANCH_ICON')%b"
+  # The `get-revision` function must be turned on for dirty-check to work for Hg
+  zstyle ':vcs_info:hg*:*' get-revision true
+  zstyle ':vcs_info:hg*:*' get-bookmarks true
+  zstyle ':vcs_info:hg*+gen-hg-bookmark-string:*' hooks hg-bookmarks
+
+  if [[ "$POWERLEVEL9K_SHOW_CHANGESET" == true ]]; then
+    zstyle ':vcs_info:*' get-revision true
+  fi
+
+  # Actually invoke vcs_info manually to gather all information.
+  vcs_info
   local vcs_prompt="${vcs_info_msg_0_}"
 
   if [[ -n "$vcs_prompt" ]]; then
@@ -800,6 +802,17 @@ prompt_php_version() {
   fi
 }
 
+# Node version from NVM
+# Only prints the segment if different than the default value
+prompt_nvm() {
+  local node_version=$(nvm current)
+  local nvm_default=$(cat $NVM_DIR/alias/default)
+  [[ -z "${node_version}" ]] && return
+  [[ "$node_version" =~ "$nvm_default" ]] && return
+  NODE_ICON=$'\u2B22' # ⬢
+  $1_prompt_segment "$0" "green" "011" "${node_version:1} $NODE_ICON"
+}
+
 # rbenv information
 prompt_rbenv() {
   if [[ -n "$RBENV_VERSION" ]]; then
@@ -897,14 +910,26 @@ prompt_time() {
   "$1_prompt_segment" "$0" "$DEFAULT_COLOR_INVERTED" "$DEFAULT_COLOR" "$time_format"
 }
 
+# todo.sh: shows the number of tasks in your todo.sh file
+prompt_todo() {
+  if $(hash todo.sh 2>&-); then
+    count=$(todo.sh ls | egrep "TODO: [0-9]+ of ([0-9]+) tasks shown" | awk '{ print $4 }')
+    if [[ "$count" = <-> ]]; then
+      "$1_prompt_segment" "$0" "244" "$DEFAULT_COLOR" "$(print_icon 'TODO_ICON') $count"
+    fi
+  fi
+}
+
 # Vi Mode: show editing mode (NORMAL|INSERT)
+set_default POWERLEVEL9K_VI_INSERT_MODE_STRING "INSERT"
+set_default POWERLEVEL9K_VI_COMMAND_MODE_STRING "NORMAL"
 prompt_vi_mode() {
   case ${KEYMAP} in
     main|viins)
-      "$1_prompt_segment" "$0_INSERT" "$DEFAULT_COLOR" "blue" "INSERT"
+      "$1_prompt_segment" "$0_INSERT" "$DEFAULT_COLOR" "blue" "$POWERLEVEL9K_VI_INSERT_MODE_STRING"
     ;;
     vicmd)
-      "$1_prompt_segment" "$0_NORMAL" "$DEFAULT_COLOR" "default" "NORMAL"
+      "$1_prompt_segment" "$0_NORMAL" "$DEFAULT_COLOR" "default" "$POWERLEVEL9K_VI_COMMAND_MODE_STRING"
     ;;
   esac
 }
@@ -914,7 +939,7 @@ prompt_vi_mode() {
 # https://virtualenv.pypa.io/en/latest/
 prompt_virtualenv() {
   local virtualenv_path="$VIRTUAL_ENV"
-  if [[ -n "$virtualenv_path" && -n "$VIRTUAL_ENV_DISABLE_PROMPT" ]]; then
+  if [[ -n "$virtualenv_path" && "$VIRTUAL_ENV_DISABLE_PROMPT" != true ]]; then
     "$1_prompt_segment" "$0" "blue" "$DEFAULT_COLOR" "($(basename "$virtualenv_path"))"
   fi
 }
@@ -987,6 +1012,8 @@ powerlevel9k_init() {
     print "You should set TERM=xterm-256colors in your ~/.zshrc"
   fi
 
+  setopt prompt_subst
+  
   setopt LOCAL_OPTIONS
   unsetopt XTRACE KSH_ARRAYS
   setopt PROMPT_CR PROMPT_PERCENT PROMPT_SUBST MULTIBYTE
@@ -994,9 +1021,8 @@ powerlevel9k_init() {
   # initialize colors
   autoload -U colors && colors
 
-  # initialize VCS
+  # initialize hooks
   autoload -Uz add-zsh-hook
-  add-zsh-hook precmd vcs_info
 
   # prepare prompts
   add-zsh-hook precmd powerlevel9k_prepare_prompts
