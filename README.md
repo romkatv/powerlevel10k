@@ -25,9 +25,9 @@ this theme focus on four primary goals:
 4. Optimize the code for execution speed as much as possible. A snappy terminal
    is a happy terminal.
 
-Here is a detailed screenshot showing `powerlevel9k` in action, with default settings.
+Here is `powerlevel9k` in action, with [some simple settings](https://github.com/bhilburn/powerlevel9k/wiki/Show-Off-Your-Config#natemccurdys-configuration).
 
-![](http://bhilburn.org/content/images/2014/12/powerlevel9k.png)
+![](https://camo.githubusercontent.com/80ec23fda88d2f445906a3502690f22827336736/687474703a2f2f692e696d6775722e636f6d2f777942565a51792e676966)
 
 ### Table of Contents
 
