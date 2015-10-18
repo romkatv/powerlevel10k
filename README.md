@@ -85,7 +85,7 @@ The segments that are currently available are:
 * [symphony2_tests](#symphony2_tests) - Show a ratio of test classes vs code classes for Symfony2.
 * **symphony2_version** - Show the current Symfony2 version, if you are in a Symfony2-Project dir.
 * [time](#time) - System time.
-* [todo.txt](http://todotxt.com/) - Shows the number of tasks in your todo.txt tasks file.
+* [todo](http://todotxt.com/) - Shows the number of tasks in your todo.txt tasks file.
 * [vi_mode](#vi_mode)- Vi editing mode (NORMAL|INSERT).
 * **virtualenv** - Your Python [VirtualEnv](https://virtualenv.pypa.io/en/latest/).
 * [vcs](#vcs) - Information about this `git` or `hg` repository (if you are in one).
