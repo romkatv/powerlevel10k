@@ -1010,7 +1010,7 @@ powerlevel9k_init() {
   fi
 
   setopt prompt_subst
-
+  
   setopt LOCAL_OPTIONS
   unsetopt XTRACE KSH_ARRAYS
   setopt PROMPT_CR PROMPT_PERCENT PROMPT_SUBST MULTIBYTE
