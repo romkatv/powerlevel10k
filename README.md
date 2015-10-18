@@ -71,6 +71,7 @@ configuration is the default:
 The segments that are currently available are:
 
 * [aws](#aws) - The current AWS profile, if active.
+* [battery](#battery) - Current battery status(OS X only).
 * [context](#context) - Your username and host.
 * [dir](#dir) - Your current working directory.
 * **history** - The command number for the current line.
@@ -100,6 +101,22 @@ the `aws` segment to one of the prompts, and define `AWS_DEFAULT_PROFILE` in
 your `~/.zshrc`:
 
     export AWS_DEFAULT_PROFILE=<profile_name>
+
+##### battery
+
+This segment will display your current battery status on an OS X system(fails gracefully
+on systems without a battery and non OS X systems). It can be customized in your .zshrc
+with the environment variables detailed below with their default values.
+
+    POWERLEVEL9K_BATTERY_CHARGING="yellow"
+    POWERLEVEL9K_BATTERY_CHARGED="green"
+    POWERLEVEL9K_BATTERY_DISCONNECTED=$DEFAULT_COLOR
+    POWERLEVEL9K_BATTERY_LOW_THRESHOLD=10
+    POWERLEVEL9K_BATTERY_LOW_COLOR="red"
+
+In addition to the above it supports standard _FOREGROUND value without affecting the icon color
+
+
 
 ##### context
 
