@@ -233,6 +233,12 @@ VI-Mode, you need to configure it separately in your `~/.zshrc`:
     # make it more responsive
     export KEYTIMEOUT=1
 
+If you want to display another string than "NORMAL" or "INSERT" in command or
+insert-mode, you can do that by setting environment variables like:
+
+    POWERLEVEL9K_VI_INSERT_MODE_STRING="INS"
+    POWERLEVEL9K_VI_COMMAND_MODE_STRING="CMD"
+
 #### Unit Test Ratios
 
 The `symfony2_tests` and `rspec_stats` segments both show a ratio of "real"
