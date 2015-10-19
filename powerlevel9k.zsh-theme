@@ -663,7 +663,7 @@ prompt_battery() {
     # return if no battery found
     [[ -z $bat ]] && return
 
-    local bat_percent=$(cat $bat/capacity)
+    [[ $(cat $bat/capacity) -gt 100 ]] && local bat_percent=100 || local bat_percent=$(cat $bat/capacity)
     [[ $(cat $bat/status) =~ Charging ]] && local connected=true
     [[ $(cat $bat/status) =~ Charging && $bat_percent =~ 100 ]] && local conn="%F{$POWERLEVEL9K_BATTERY_CHARGED}"
     [[ $(cat $bat/status) =~ Charging && $bat_percent -lt 100 ]] && local conn="%F{$POWERLEVEL9K_BATTERY_CHARGING}"
@@ -671,7 +671,12 @@ prompt_battery() {
       [[ $bat_percent -lt $POWERLEVEL9K_BATTERY_LOW_THRESHOLD ]] && local conn="%F{$POWERLEVEL9K_BATTERY_LOW_COLOR}" || local conn="%F{$POWERLEVEL9K_BATTERY_DISCONNECTED}"
     fi
     if [[ -f /usr/bin/acpi ]]; then
-      [[ $(acpi | awk '{ print $5 }') =~ rate ]] && local tstring="..." || local tstring=${(f)$(date -u -d @$(acpi | awk '{ print $5 }' | sed s/://g) +%k:%M)}
+      local time_remaining=$(acpi | awk '{ print $5 }')
+      if [[ $time_remaining =~ rate ]]; then
+        local tstring="..."
+      elif [[ $time_remaining =~ "[:digit:]+" ]]; then
+        local tstring=${(f)$(date -u -d @$(echo $time_remaining | sed s/://g) +%k:%M)}
+      fi
     fi
     [[ ! -z $tstring ]] && local remain=" ($tstring)"
   fi
