@@ -25,9 +25,9 @@ this theme focus on four primary goals:
 4. Optimize the code for execution speed as much as possible. A snappy terminal
    is a happy terminal.
 
-Here is a detailed screenshot showing `powerlevel9k` in action, with default settings.
+Here is `powerlevel9k` in action, with [some simple settings](https://github.com/bhilburn/powerlevel9k/wiki/Show-Off-Your-Config#natemccurdys-configuration).
 
-![](http://bhilburn.org/content/images/2014/12/powerlevel9k.png)
+![](https://camo.githubusercontent.com/80ec23fda88d2f445906a3502690f22827336736/687474703a2f2f692e696d6775722e636f6d2f777942565a51792e676966)
 
 ### Table of Contents
 
@@ -77,6 +77,7 @@ The segments that are currently available are:
 * [ip](#ip) - Shows the current IP address.
 * **load** - Your machines 5 minute load average and free RAM.
 * **node_version** - Show the version number of the installed Node.js.
+* **nvm** - Show the version of Node that is currently active, if it differs from the version used by NVM
 * **os_icon** - Display a nice little icon, depending on your operating system.
 * **php_version** - Show the current PHP version.
 * [rbenv](#rbenv) - Ruby environment information (if one is active).
@@ -85,6 +86,7 @@ The segments that are currently available are:
 * [symphony2_tests](#symphony2_tests) - Show a ratio of test classes vs code classes for Symfony2.
 * **symphony2_version** - Show the current Symfony2 version, if you are in a Symfony2-Project dir.
 * [time](#time) - System time.
+* [todo](http://todotxt.com/) - Shows the number of tasks in your todo.txt tasks file.
 * [vi_mode](#vi_mode)- Vi editing mode (NORMAL|INSERT).
 * **virtualenv** - Your Python [VirtualEnv](https://virtualenv.pypa.io/en/latest/).
 * [vcs](#vcs) - Information about this `git` or `hg` repository (if you are in one).
@@ -213,23 +215,17 @@ from the [Installation](#Installation) section above.
 
 ##### vi_mode
 
-This Segment shows the current mode of your ZSH. If you want to use your ZSH in
-VI-Mode, you need to configure it separately in your `~/.zshrc`:
+This segment shows ZSH's current input mode. Note that this is only useful if
+you are using the [ZSH Line Editor](http://zsh.sourceforge.net/Doc/Release/Zsh-Line-Editor.html)
+(VI mode).  You can enable this either by `.zshrc` configuration or using a plugin, like
+[Oh-My-Zsh's vi-mode plugin](https://github.com/robbyrussell/oh-my-zsh/blob/master/plugins/vi-mode/vi-mode.plugin.zsh).
 
-    # VI-Mode
-    # general activation
-    bindkey -v
+If you want to display a string other than "NORMAL" or "INSERT" in `command` and
+`insert-mode`, you can do so by setting the following variables in your
+`~/.zshrc`:
 
-    # set some nice hotkeys
-    bindkey '^P' up-history
-    bindkey '^N' down-history
-    bindkey '^?' backward-delete-char
-    bindkey '^h' backward-delete-char
-    bindkey '^w' backward-kill-word
-    bindkey '^r' history-incremental-search-backward
-
-    # make it more responsive
-    export KEYTIMEOUT=1
+    POWERLEVEL9K_VI_INSERT_MODE_STRING="INSERT"
+    POWERLEVEL9K_VI_COMMAND_MODE_STRING="NORMAL"
 
 #### Unit Test Ratios
 
