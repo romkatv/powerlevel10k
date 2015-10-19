@@ -670,6 +670,10 @@ prompt_battery() {
     if [[ ! $connected =~ true ]]; then
       [[ $bat_percent -lt $POWERLEVEL9K_BATTERY_LOW_THRESHOLD ]] && local conn="%F{$POWERLEVEL9K_BATTERY_LOW_COLOR}" || local conn="%F{$POWERLEVEL9K_BATTERY_DISCONNECTED}"
     fi
+    if [[ -f /usr/bin/acpi ]]; then
+      [[ $(acpi | awk '{ print $5 }') =~ rate ]] && local tstring="..." || local tstring=${(f)$(date -u -d @$(acpi | awk '{ print $5 }' | sed s/://g) +%k:%M)}
+    fi
+    [[ ! -z $tstring ]] && local remain=" ($tstring)"
   fi
 
   # display prompt_segment

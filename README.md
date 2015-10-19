@@ -116,7 +116,7 @@ with the environment variables detailed below with their default values.
 
 In addition to the above it supports standard _FOREGROUND value without affecting the icon color
 
-Supports both OS X and Linux(time remaining is only output in OS X)
+Supports both OS X and Linux(time remaining requires the acpi program on Linux)
 
 
 ##### context
