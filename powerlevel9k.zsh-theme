@@ -647,6 +647,16 @@ prompt_dir() {
   "$1_prompt_segment" "$0" "blue" "$DEFAULT_COLOR" "$(print_icon 'HOME_ICON')$current_path"
 }
 
+# GO-prompt
+prompt_go_version() {
+  local go_version
+  go_version=$(go version 2>&1 | grep -oe "^go[0-9.]*")
+
+  if [[ -n "$go_version" ]]; then
+    "$1_prompt_segment" "$0" "green" "255" "$go_version"
+  fi
+}
+
 # Command number (in local history)
 prompt_history() {
   "$1_prompt_segment" "$0" "244" "$DEFAULT_COLOR" '%h'

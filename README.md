@@ -73,6 +73,7 @@ The segments that are currently available are:
 * [aws](#aws) - The current AWS profile, if active.
 * [context](#context) - Your username and host.
 * [dir](#dir) - Your current working directory.
+* **go_version** - Show the current GO version.
 * **history** - The command number for the current line.
 * [ip](#ip) - Shows the current IP address.
 * **load** - Your machines 5 minute load average.
