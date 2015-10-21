@@ -230,7 +230,8 @@ function print_icon() {
 
 # Converts large memory values into a human-readable unit (e.g., bytes --> GB)
 printSizeHumanReadable() {
-  local size=$1
+  typeset -F 2 size
+  size="$1"+0.00001
   local extension
   extension=(B K M G T P E Z Y)
   local index=1
@@ -245,7 +246,7 @@ printSizeHumanReadable() {
     done
   fi
 
-  while (( (size / 1024) > 0 )); do
+  while (( (size / 1024) > 0.1 )); do
     size=$(( size / 1024 ))
     index=$(( index + 1 ))
   done
@@ -691,22 +692,11 @@ prompt_ip() {
   "$1_prompt_segment" "$0" "cyan" "$DEFAULT_COLOR" "$(print_icon 'NETWORK_ICON') $ip"
 }
 
-set_default POWERLEVEL9K_LOAD_SHOW_FREE_RAM true
 prompt_load() {
   if [[ "$OS" == "OSX" ]]; then
     load_avg_5min=$(sysctl vm.loadavg | grep -o -E '[0-9]+(\.|,)[0-9]+' | head -n 1)
-    if [[ "$POWERLEVEL9K_LOAD_SHOW_FREE_RAM" == true ]]; then
-      ramfree=$(vm_stat | grep "Pages free" | grep -o -E '[0-9]+')
-      # Convert pages into Bytes
-      ramfree=$(( ramfree * 4096 ))
-      base=''
-    fi
   else
     load_avg_5min=$(grep -o "[0-9.]*" /proc/loadavg | head -n 1)
-    if [[ "$POWERLEVEL9K_LOAD_SHOW_FREE_RAM" == true ]]; then
-      ramfree=$(grep -o -E "MemFree:\s+[0-9]+" /proc/meminfo | grep -o "[0-9]*")
-      base=K
-    fi
   fi
 
   # Replace comma
@@ -724,10 +714,6 @@ prompt_load() {
   fi
 
   "$1_prompt_segment" "$0$FUNCTION_SUFFIX" "$BACKGROUND_COLOR" "$DEFAULT_COLOR" "$(print_icon 'LOAD_ICON') $load_avg_5min"
-
-  if [[ "$POWERLEVEL9K_LOAD_SHOW_FREE_RAM" == true ]]; then
-    echo -n "$(print_icon 'RAM_ICON') $(printSizeHumanReadable "$ramfree" $base) "
-  fi
 }
 
 # Node version
@@ -752,6 +738,50 @@ prompt_php_version() {
   if [[ -n "$php_version" ]]; then
     "$1_prompt_segment" "$0" "013" "255" "$php_version"
   fi
+}
+
+# Show free RAM and used Swap
+prompt_ram() {
+  defined POWERLEVEL9K_RAM_ELEMENTS || POWERLEVEL9K_RAM_ELEMENTS=(ram_free swap_used)
+
+  local rendition base
+  for element in "${POWERLEVEL9K_RAM_ELEMENTS[@]}"; do
+    case $element in
+      ram_free)
+        if [[ "$OS" == "OSX" ]]; then
+          ramfree=$(vm_stat | grep "Pages free" | grep -o -E '[0-9]+')
+          # Convert pages into Bytes
+          ramfree=$(( ramfree * 4096 ))
+          base=''
+        else
+          ramfree=$(grep -o -E "MemFree:\s+[0-9]+" /proc/meminfo | grep -o "[0-9]*")
+          base=K
+        fi
+
+        rendition+="$(print_icon 'RAM_ICON') $(printSizeHumanReadable "$ramfree" $base) "
+      ;;
+      swap_used)
+        if [[ "$OS" == "OSX" ]]; then
+          raw_swap_used=$(sysctl vm.swapusage | grep -o "used\s*=\s*[0-9,.A-Z]*" | grep -o "[0-9,.A-Z]*$")
+          typeset -F 2 swap_used
+          swap_used=${$(echo $raw_swap_used | grep -o "[0-9,.]*")//,/.}
+          # Replace comma
+          swap_used=${swap_used//,/.}
+
+          base=$(echo "$raw_swap_used" | grep -o "[A-Z]*$")
+        else
+          swap_total=$(grep -o -E "SwapTotal:\s+[0-9]+" /proc/meminfo | grep -o "[0-9]*")
+          swap_free=$(grep -o -E "SwapFree:\s+[0-9]+" /proc/meminfo | grep -o "[0-9]*")
+          swap_used=$(( swap_total - swap_free ))
+          base=K
+        fi
+
+        rendition+="$(printSizeHumanReadable "$swap_used" $base) "
+      ;;
+    esac
+  done
+
+  "$1_prompt_segment" "$0" "yellow" "$DEFAULT_COLOR" "${rendition% }"
 }
 
 # Node version from NVM
