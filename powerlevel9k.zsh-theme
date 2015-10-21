@@ -236,7 +236,7 @@ printSizeHumanReadable() {
   typeset -F 2 size
   size="$1"+0.00001
   local extension
-  extension=(B K M G T P E Z Y)
+  extension=('B' 'K' 'M' 'G' 'T' 'P' 'E' 'Z' 'Y')
   local index=1
 
   # if the base is not Bytes
@@ -1075,7 +1075,7 @@ powerlevel9k_init() {
   term_colors=$(tput colors)
   if (( term_colors < 256 )); then
     print -P "%F{red}WARNING!%f Your terminal supports less than 256 colors!"
-    print "You should set TERM=xterm-256colors in your ~/.zshrc"
+    print -P "You should put: %F{blue}export TERM=\"xterm-256color\"%f in your \~\/.zshrc"
   fi
 
   setopt prompt_subst
