@@ -46,6 +46,7 @@ case $POWERLEVEL9K_MODE in
       BACKGROUND_JOBS_ICON           $'\UE82F '             # 
       TEST_ICON                      $'\UE891'              # 
       TODO_ICON                      $'\U2611'              # ☑
+      BATTERY_ICON                   $'\UE894'              # 
       OK_ICON                        $'\U2713'              # ✓
       FAIL_ICON                      $'\U2718'              # ✘
       SYMFONY_ICON                   'SF'
@@ -95,6 +96,7 @@ case $POWERLEVEL9K_MODE in
       BACKGROUND_JOBS_ICON           $'\UF013 '             # 
       TEST_ICON                      $'\UF291'              # 
       TODO_ICON                      $'\U2611'              # ☑
+      BATTERY_ICON                   $'\u1F50B'             # 🔋
       OK_ICON                        $'\UF23A'              # 
       FAIL_ICON                      $'\UF281'              # 
       SYMFONY_ICON                   'SF'
@@ -139,6 +141,7 @@ case $POWERLEVEL9K_MODE in
       BACKGROUND_JOBS_ICON           $'\u2699'              # ⚙
       TEST_ICON                      ''
       TODO_ICON                      $'\U2611'              # ☑
+      BATTERY_ICON                   $'\u1F50B'             # 🔋
       OK_ICON                        $'\u2713'              # ✓
       FAIL_ICON                      $'\u2718'              # ✘
       SYMFONY_ICON                   'SF'
@@ -482,6 +485,77 @@ prompt_aws() {
   fi
 }
 
+prompt_battery() {
+  icons[BATTERY_ICON]=$'\UE894'
+  # set default values of not specified in shell
+  [[ -z $POWERLEVEL9K_BATTERY_CHARGING ]] && POWERLEVEL9K_BATTERY_CHARGING="yellow"
+  [[ -z $POWERLEVEL9K_BATTERY_CHARGED ]] && POWERLEVEL9K_BATTERY_CHARGED="green"
+  [[ -z $POWERLEVEL9K_BATTERY_DISCONNECTED ]] && POWERLEVEL9K_BATTERY_DISCONNECTED="$DEFAULT_COLOR"
+  [[ -z $POWERLEVEL9K_BATTERY_LOW_THRESHOLD ]] && POWERLEVEL9K_BATTERY_LOW_THRESHOLD=10
+  [[ -z $POWERLEVEL9K_BATTERY_LOW_COLOR ]] && POWERLEVEL9K_BATTERY_LOW_COLOR="red"
+  [[ -z $POWERLEVEL9K_BATTERY_FOREGROUND ]] && local fg_color="$DEFAULT_COLOR" || local fg_color=$POWERLEVEL9K_BATTERY_FOREGROUND
+
+  if [[ $OS =~ OSX && -f /usr/sbin/ioreg && -x /usr/sbin/ioreg ]]; then
+    # return if there is no battery on system
+    [[ -z $(ioreg -n AppleSmartBattery | grep MaxCapacity) ]] && return
+
+    # get charge status
+    [[ $(ioreg -n AppleSmartBattery | grep ExternalConnected | awk '{ print $5 }') =~ "Yes" ]] && local connected=true
+    [[ $(ioreg -n AppleSmartBattery | grep IsCharging | awk '{ print $5 }') =~ "Yes" ]] && local charging=true
+
+    # convert time remaining from minutes to hours:minutes date string
+    local time_remaining=$(ioreg -n AppleSmartBattery | grep TimeRemaining | awk '{ print $5 }')
+    if [[ ! -z $time_remaining ]]; then
+      # this value is set to a very high number when the system is calculating
+      [[ $time_remaining -gt 10000 ]] && local tstring="..." || local tstring=${(f)$(date -u -r $(($time_remaining * 60)) +%k:%M)}
+    fi
+
+    # get charge values
+    local max_capacity=$(ioreg -n AppleSmartBattery | grep MaxCapacity | awk '{ print $5 }')
+    local current_capacity=$(ioreg -n AppleSmartBattery | grep CurrentCapacity | awk '{ print $5 }')
+
+    [[ ! -z $max_capacity && ! -z $current_capacity ]] && local bat_percent=$(ruby -e "puts ($current_capacity.to_f / $max_capacity.to_f * 100).round.to_i")
+
+    # logic for string output
+    [[ $charging =~ true && $connected =~ true ]] && local conn="%F{$POWERLEVEL9K_BATTERY_CHARGING}" && local remain=" ($tstring)"
+    [[ ! $charging =~ true && $connected =~ true ]] && local conn="%F{$POWERLEVEL9K_BATTERY_CHARGED}" && local remain=""
+    if [[ ! $connected =~ true ]]; then
+      [[ $bat_percent -lt $POWERLEVEL9K_BATTERY_LOW_THRESHOLD ]] && local conn="%F{$POWERLEVEL9K_BATTERY_LOW_COLOR}" || local conn="%F{$POWERLEVEL9K_BATTERY_DISCONNECTED}"
+      local remain=" ($tstring)"
+    fi
+  fi
+
+  if [[ $OS =~ Linux ]]; then
+    local sysp="/sys/class/power_supply"
+    # reported BAT0 or BAT1 depending on kernel version
+    [[ -a $sysp/BAT0 ]] && local bat=$sysp/BAT0
+    [[ -a $sysp/BAT1 ]] && local bat=$sysp/BAT1
+
+    # return if no battery found
+    [[ -z $bat ]] && return
+
+    [[ $(cat $bat/capacity) -gt 100 ]] && local bat_percent=100 || local bat_percent=$(cat $bat/capacity)
+    [[ $(cat $bat/status) =~ Charging ]] && local connected=true
+    [[ $(cat $bat/status) =~ Charging && $bat_percent =~ 100 ]] && local conn="%F{$POWERLEVEL9K_BATTERY_CHARGED}"
+    [[ $(cat $bat/status) =~ Charging && $bat_percent -lt 100 ]] && local conn="%F{$POWERLEVEL9K_BATTERY_CHARGING}"
+    if [[ ! $connected =~ true ]]; then
+      [[ $bat_percent -lt $POWERLEVEL9K_BATTERY_LOW_THRESHOLD ]] && local conn="%F{$POWERLEVEL9K_BATTERY_LOW_COLOR}" || local conn="%F{$POWERLEVEL9K_BATTERY_DISCONNECTED}"
+    fi
+    if [[ -f /usr/bin/acpi ]]; then
+      local time_remaining=$(acpi | awk '{ print $5 }')
+      if [[ $time_remaining =~ rate ]]; then
+        local tstring="..."
+      elif [[ $time_remaining =~ "[:digit:]+" ]]; then
+        local tstring=${(f)$(date -u -d @$(echo $time_remaining | sed s/://g) +%k:%M)}
+      fi
+    fi
+    [[ ! -z $tstring ]] && local remain=" ($tstring)"
+  fi
+
+  # display prompt_segment
+  [[ ! -z $bat_percent ]] && "$1_prompt_segment" "$0" "black" "$DEFAULT_COLOR" "$conn$(print_icon 'BATTERY_ICON')%F{$fg_color} $bat_percent%%$remain"
+}
+
 # Context: user@hostname (who am I and where am I)
 # Note that if $DEFAULT_USER is not set, this prompt segment will always print
 prompt_context() {
@@ -515,6 +589,16 @@ prompt_dir() {
   fi
 
   "$1_prompt_segment" "$0" "blue" "$DEFAULT_COLOR" "$(print_icon 'HOME_ICON')$current_path"
+}
+
+# GO-prompt
+prompt_go_version() {
+  local go_version
+  go_version=$(go version 2>&1 | grep -oe "^go[0-9.]*")
+
+  if [[ -n "$go_version" ]]; then
+    "$1_prompt_segment" "$0" "green" "255" "$go_version"
+  fi
 }
 
 # Command number (in local history)
@@ -562,22 +646,11 @@ prompt_ip() {
   "$1_prompt_segment" "$0" "cyan" "$DEFAULT_COLOR" "$(print_icon 'NETWORK_ICON') $ip"
 }
 
-set_default POWERLEVEL9K_LOAD_SHOW_FREE_RAM true
 prompt_load() {
   if [[ "$OS" == "OSX" ]]; then
     load_avg_5min=$(sysctl vm.loadavg | grep -o -E '[0-9]+(\.|,)[0-9]+' | head -n 1)
-    if [[ "$POWERLEVEL9K_LOAD_SHOW_FREE_RAM" == true ]]; then
-      ramfree=$(vm_stat | grep "Pages free" | grep -o -E '[0-9]+')
-      # Convert pages into Bytes
-      ramfree=$(( ramfree * 4096 ))
-      base=''
-    fi
   else
     load_avg_5min=$(grep -o "[0-9.]*" /proc/loadavg | head -n 1)
-    if [[ "$POWERLEVEL9K_LOAD_SHOW_FREE_RAM" == true ]]; then
-      ramfree=$(grep -o -E "MemFree:\s+[0-9]+" /proc/meminfo | grep -o "[0-9]*")
-      base=K
-    fi
   fi
 
   # Replace comma
@@ -595,10 +668,6 @@ prompt_load() {
   fi
 
   "$1_prompt_segment" "$0$FUNCTION_SUFFIX" "$BACKGROUND_COLOR" "$DEFAULT_COLOR" "$(print_icon 'LOAD_ICON') $load_avg_5min"
-
-  if [[ "$POWERLEVEL9K_LOAD_SHOW_FREE_RAM" == true ]]; then
-    echo -n "$(print_icon 'RAM_ICON') $(printSizeHumanReadable "$ramfree" $base) "
-  fi
 }
 
 # Node version
@@ -623,6 +692,50 @@ prompt_php_version() {
   if [[ -n "$php_version" ]]; then
     "$1_prompt_segment" "$0" "013" "255" "$php_version"
   fi
+}
+
+# Show free RAM and used Swap
+prompt_ram() {
+  defined POWERLEVEL9K_RAM_ELEMENTS || POWERLEVEL9K_RAM_ELEMENTS=(ram_free swap_used)
+
+  local rendition base
+  for element in "${POWERLEVEL9K_RAM_ELEMENTS[@]}"; do
+    case $element in
+      ram_free)
+        if [[ "$OS" == "OSX" ]]; then
+          ramfree=$(vm_stat | grep "Pages free" | grep -o -E '[0-9]+')
+          # Convert pages into Bytes
+          ramfree=$(( ramfree * 4096 ))
+          base=''
+        else
+          ramfree=$(grep -o -E "MemFree:\s+[0-9]+" /proc/meminfo | grep -o "[0-9]*")
+          base=K
+        fi
+
+        rendition+="$(print_icon 'RAM_ICON') $(printSizeHumanReadable "$ramfree" $base) "
+      ;;
+      swap_used)
+        if [[ "$OS" == "OSX" ]]; then
+          raw_swap_used=$(sysctl vm.swapusage | grep -o "used\s*=\s*[0-9,.A-Z]*" | grep -o "[0-9,.A-Z]*$")
+          typeset -F 2 swap_used
+          swap_used=${$(echo $raw_swap_used | grep -o "[0-9,.]*")//,/.}
+          # Replace comma
+          swap_used=${swap_used//,/.}
+
+          base=$(echo "$raw_swap_used" | grep -o "[A-Z]*$")
+        else
+          swap_total=$(grep -o -E "SwapTotal:\s+[0-9]+" /proc/meminfo | grep -o "[0-9]*")
+          swap_free=$(grep -o -E "SwapFree:\s+[0-9]+" /proc/meminfo | grep -o "[0-9]*")
+          swap_used=$(( swap_total - swap_free ))
+          base=K
+        fi
+
+        rendition+="$(printSizeHumanReadable "$swap_used" $base) "
+      ;;
+    esac
+  done
+
+  "$1_prompt_segment" "$0" "yellow" "$DEFAULT_COLOR" "${rendition% }"
 }
 
 # Node version from NVM
@@ -832,7 +945,7 @@ powerlevel9k_init() {
   term_colors=$(tput colors)
   if (( term_colors < 256 )); then
     print -P "%F{red}WARNING!%f Your terminal supports less than 256 colors!"
-    print "You should set TERM=xterm-256colors in your ~/.zshrc"
+    print -P "You should put: %F{blue}export TERM=\"xterm-256color\"%f in your \~\/.zshrc"
   fi
 
   setopt prompt_subst

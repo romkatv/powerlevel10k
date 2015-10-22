@@ -92,9 +92,10 @@ function isSameColor() {
 
 # Converts large memory values into a human-readable unit (e.g., bytes --> GB)
 printSizeHumanReadable() {
-  local size=$1
+  typeset -F 2 size
+  size="$1"+0.00001
   local extension
-  extension=(B K M G T P E Z Y)
+  extension=('B' 'K' 'M' 'G' 'T' 'P' 'E' 'Z' 'Y')
   local index=1
 
   # if the base is not Bytes
@@ -107,7 +108,7 @@ printSizeHumanReadable() {
     done
   fi
 
-  while (( (size / 1024) > 0 )); do
+  while (( (size / 1024) > 0.1 )); do
     size=$(( size / 1024 ))
     index=$(( index + 1 ))
   done
@@ -187,4 +188,3 @@ if [[ "$OS" == 'OSX' ]]; then
     SED_EXTENDED_REGEX_PARAMETER="-E"
   fi
 fi
-

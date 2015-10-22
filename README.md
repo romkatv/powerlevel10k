@@ -71,15 +71,18 @@ configuration is the default:
 The segments that are currently available are:
 
 * [aws](#aws) - The current AWS profile, if active.
+* [battery](#battery) - Current battery status.
 * [context](#context) - Your username and host.
 * [dir](#dir) - Your current working directory.
+* **go_version** - Show the current GO version.
 * **history** - The command number for the current line.
 * [ip](#ip) - Shows the current IP address.
-* **load** - Your machines 5 minute load average and free RAM.
+* **load** - Your machines 5 minute load average.
 * **node_version** - Show the version number of the installed Node.js.
 * **nvm** - Show the version of Node that is currently active, if it differs from the version used by NVM
 * **os_icon** - Display a nice little icon, depending on your operating system.
 * **php_version** - Show the current PHP version.
+* [ram](#ram) - Show free RAM and used Swap.
 * [rbenv](#rbenv) - Ruby environment information (if one is active).
 * [rspec_stats](#rspec_stats) - Show a ratio of test classes vs code classes for RSpec.
 * [status](#status) - The return code of the previous command, and status of background jobs.
@@ -100,6 +103,23 @@ the `aws` segment to one of the prompts, and define `AWS_DEFAULT_PROFILE` in
 your `~/.zshrc`:
 
     export AWS_DEFAULT_PROFILE=<profile_name>
+
+##### battery
+
+This segment will display your current battery status (fails gracefully
+on systems without a battery). It can be customized in your .zshrc
+with the environment variables detailed below with their default values.
+
+    POWERLEVEL9K_BATTERY_CHARGING="yellow"
+    POWERLEVEL9K_BATTERY_CHARGED="green"
+    POWERLEVEL9K_BATTERY_DISCONNECTED=$DEFAULT_COLOR
+    POWERLEVEL9K_BATTERY_LOW_THRESHOLD=10
+    POWERLEVEL9K_BATTERY_LOW_COLOR="red"
+
+In addition to the above it supports standard _FOREGROUND value without affecting the icon color
+
+Supports both OS X and Linux(time remaining requires the acpi program on Linux)
+
 
 ##### context
 
@@ -153,6 +173,15 @@ customize it to only print if there is an error or a forked job by setting the
 following variable in your `~/.zshrc`.
 
     POWERLEVEL9K_STATUS_VERBOSE=false
+
+##### ram
+
+By default this segment shows you free RAM and used Swap. If you want to show
+only one value, you can specify `POWERLEVEL9K_RAM_ELEMENTS` and set it to either
+`ram_free` or `swap_used`. Full example:
+
+    # Show only used swap:
+    POWERLEVEL9K_RAM_ELEMENTS=(swap_used)
 
 ##### symphony2_tests
 
