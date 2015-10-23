@@ -30,6 +30,12 @@ source $(dirname "$0")/functions/icons.zsh
 source $(dirname "$0")/functions/utilities.zsh
 
 ################################################################
+# Source VCS_INFO hooks / helper functions
+################################################################
+
+source $(dirname "$0")/functions/vcs.zsh
+
+################################################################
 # Color Scheme
 ################################################################
 
@@ -156,144 +162,6 @@ right_prompt_segment() {
   [[ -n $4 ]] && echo -n "$4$POWERLEVEL9K_WHITESPACE_BETWEEN_RIGHT_SEGMENTS%f"
 
   CURRENT_RIGHT_BG=$2
-}
-
-################################################################
-# The `vcs` Segment and VCS_INFO hooks / helper functions
-################################################################
-prompt_vcs() {
-  autoload -Uz vcs_info
-
-  VCS_WORKDIR_DIRTY=false
-  VCS_CHANGESET_PREFIX=''
-  if [[ "$POWERLEVEL9K_SHOW_CHANGESET" == true ]]; then
-    # Default: Just display the first 12 characters of our changeset-ID.
-    local VCS_CHANGESET_HASH_LENGTH=12
-    if [[ -n "$POWERLEVEL9K_CHANGESET_HASH_LENGTH" ]]; then
-      VCS_CHANGESET_HASH_LENGTH="$POWERLEVEL9K_CHANGESET_HASH_LENGTH"
-    fi
-
-    VCS_CHANGESET_PREFIX="%F{$POWERLEVEL9K_VCS_DARK_FOREGROUND}$(print_icon 'VCS_COMMIT_ICON')%0.$VCS_CHANGESET_HASH_LENGTH""i%f "
-  fi
-
-  zstyle ':vcs_info:*' enable git hg
-  zstyle ':vcs_info:*' check-for-changes true
-
-  VCS_DEFAULT_FORMAT="$VCS_CHANGESET_PREFIX%F{$POWERLEVEL9K_VCS_FOREGROUND}%b%c%u%m%f"
-  zstyle ':vcs_info:git*:*' formats "%F{$POWERLEVEL9K_VCS_FOREGROUND}$(print_icon 'VCS_GIT_ICON')%f$VCS_DEFAULT_FORMAT"
-  zstyle ':vcs_info:hg*:*' formats "%F{$POWERLEVEL9K_VCS_FOREGROUND}$(print_icon 'VCS_HG_ICON')%f$VCS_DEFAULT_FORMAT"
-
-  zstyle ':vcs_info:*' actionformats "%b %F{red}| %a%f"
-
-  zstyle ':vcs_info:*' stagedstr " %F{$POWERLEVEL9K_VCS_FOREGROUND}$(print_icon 'VCS_STAGED_ICON')%f"
-  zstyle ':vcs_info:*' unstagedstr " %F{$POWERLEVEL9K_VCS_FOREGROUND}$(print_icon 'VCS_UNSTAGED_ICON')%f"
-
-  zstyle ':vcs_info:git*+set-message:*' hooks vcs-detect-changes git-untracked git-aheadbehind git-stash git-remotebranch git-tagname
-  zstyle ':vcs_info:hg*+set-message:*' hooks vcs-detect-changes
-
-  # For Hg, only show the branch name
-  zstyle ':vcs_info:hg*:*' branchformat "$(print_icon 'VCS_BRANCH_ICON')%b"
-  # The `get-revision` function must be turned on for dirty-check to work for Hg
-  zstyle ':vcs_info:hg*:*' get-revision true
-  zstyle ':vcs_info:hg*:*' get-bookmarks true
-  zstyle ':vcs_info:hg*+gen-hg-bookmark-string:*' hooks hg-bookmarks
-
-  if [[ "$POWERLEVEL9K_SHOW_CHANGESET" == true ]]; then
-    zstyle ':vcs_info:*' get-revision true
-  fi
-
-  # Actually invoke vcs_info manually to gather all information.
-  vcs_info
-  local vcs_prompt="${vcs_info_msg_0_}"
-
-  if [[ -n "$vcs_prompt" ]]; then
-    if [[ "$VCS_WORKDIR_DIRTY" == true ]]; then
-      "$1_prompt_segment" "$0_MODIFIED" "yellow" "$DEFAULT_COLOR"
-    else
-      "$1_prompt_segment" "$0" "green" "$DEFAULT_COLOR"
-    fi
-
-    echo -n "$vcs_prompt "
-  fi
-}
-
-function +vi-git-untracked() {
-    if [[ $(git rev-parse --is-inside-work-tree 2> /dev/null) == 'true' && \
-            -n $(git ls-files --others --exclude-standard | sed q) ]]; then
-        hook_com[unstaged]+=" %F{$POWERLEVEL9K_VCS_FOREGROUND}$(print_icon 'VCS_UNTRACKED_ICON')%f"
-    fi
-}
-
-function +vi-git-aheadbehind() {
-    local ahead behind branch_name
-    local -a gitstatus
-
-    branch_name=$(git symbolic-ref --short HEAD 2>/dev/null)
-
-    # for git prior to 1.7
-    # ahead=$(git rev-list origin/${branch_name}..HEAD | wc -l)
-    ahead=$(git rev-list "${branch_name}"@{upstream}..HEAD 2>/dev/null | wc -l)
-    (( ahead )) && gitstatus+=( " %F{$POWERLEVEL9K_VCS_FOREGROUND}$(print_icon 'VCS_OUTGOING_CHANGES_ICON')${ahead// /}%f" )
-
-    # for git prior to 1.7
-    # behind=$(git rev-list HEAD..origin/${branch_name} | wc -l)
-    behind=$(git rev-list HEAD.."${branch_name}"@{upstream} 2>/dev/null | wc -l)
-    (( behind )) && gitstatus+=( " %F{$POWERLEVEL9K_VCS_FOREGROUND}$(print_icon 'VCS_INCOMING_CHANGES_ICON')${behind// /}%f" )
-
-    hook_com[misc]+=${(j::)gitstatus}
-}
-
-function +vi-git-remotebranch() {
-    local remote branch_name
-
-    # Are we on a remote-tracking branch?
-    remote=${$(git rev-parse --verify HEAD@{upstream} --symbolic-full-name 2>/dev/null)/refs\/(remotes|heads)\/}
-    branch_name=$(git symbolic-ref --short HEAD 2>/dev/null)
-
-    hook_com[branch]="%F{$POWERLEVEL9K_VCS_FOREGROUND}$(print_icon 'VCS_BRANCH_ICON')${hook_com[branch]}%f"
-    # Always show the remote
-    #if [[ -n ${remote} ]] ; then
-    # Only show the remote if it differs from the local
-    if [[ -n ${remote} ]] && [[ "${remote#*/}" != "${branch_name}" ]] ; then
-        hook_com[branch]+="%F{$POWERLEVEL9K_VCS_FOREGROUND}$(print_icon 'VCS_REMOTE_BRANCH_ICON')%f%F{$POWERLEVEL9K_VCS_FOREGROUND}${remote// /}%f"
-    fi
-}
-
-function +vi-git-tagname() {
-    local tag
-
-    tag=$(git describe --tags --exact-match HEAD 2>/dev/null)
-    [[ -n "${tag}" ]] && hook_com[branch]=" %F{$POWERLEVEL9K_VCS_FOREGROUND}$(print_icon 'VCS_TAG_ICON')${tag}%f"
-}
-
-# Show count of stashed changes
-# Port from https://github.com/whiteinge/dotfiles/blob/5dfd08d30f7f2749cfc60bc55564c6ea239624d9/.zsh_shouse_prompt#L268
-function +vi-git-stash() {
-  local -a stashes
-
-  if [[ -s $(git rev-parse --git-dir)/refs/stash ]] ; then
-    stashes=$(git stash list 2>/dev/null | wc -l)
-    hook_com[misc]+=" %F{$POWERLEVEL9K_VCS_FOREGROUND}$(print_icon 'VCS_STASH_ICON')${stashes// /}%f"
-  fi
-}
-
-function +vi-hg-bookmarks() {
-  if [[ -n "${hgbmarks[@]}" ]]; then
-    hook_com[hg-bookmark-string]=" %F{$POWERLEVEL9K_VCS_FOREGROUND}$(print_icon 'VCS_BOOKMARK_ICON')${hgbmarks[@]}%f"
-
-    # To signal that we want to use the sting we just generated, set the special
-    # variable `ret' to something other than the default zero:
-    ret=1
-    return 0
-  fi
-}
-
-function +vi-vcs-detect-changes() {
-  if [[ -n "${hook_com[staged]}" ]] || [[ -n "${hook_com[unstaged]}" ]]; then
-    VCS_WORKDIR_DIRTY=true
-  else
-    VCS_WORKDIR_DIRTY=false
-  fi
 }
 
 ################################################################
@@ -682,6 +550,63 @@ prompt_todo() {
     if [[ "$count" = <-> ]]; then
       "$1_prompt_segment" "$0" "244" "$DEFAULT_COLOR" "$(print_icon 'TODO_ICON') $count"
     fi
+  fi
+}
+
+# VCS segment: shows the state of your repository, if you are in a folder under version control
+prompt_vcs() {
+  autoload -Uz vcs_info
+
+  VCS_WORKDIR_DIRTY=false
+  VCS_CHANGESET_PREFIX=''
+  if [[ "$POWERLEVEL9K_SHOW_CHANGESET" == true ]]; then
+    # Default: Just display the first 12 characters of our changeset-ID.
+    local VCS_CHANGESET_HASH_LENGTH=12
+    if [[ -n "$POWERLEVEL9K_CHANGESET_HASH_LENGTH" ]]; then
+      VCS_CHANGESET_HASH_LENGTH="$POWERLEVEL9K_CHANGESET_HASH_LENGTH"
+    fi
+
+    VCS_CHANGESET_PREFIX="%F{$POWERLEVEL9K_VCS_DARK_FOREGROUND}$(print_icon 'VCS_COMMIT_ICON')%0.$VCS_CHANGESET_HASH_LENGTH""i%f "
+  fi
+
+  zstyle ':vcs_info:*' enable git hg
+  zstyle ':vcs_info:*' check-for-changes true
+
+  VCS_DEFAULT_FORMAT="$VCS_CHANGESET_PREFIX%F{$POWERLEVEL9K_VCS_FOREGROUND}%b%c%u%m%f"
+  zstyle ':vcs_info:git*:*' formats "%F{$POWERLEVEL9K_VCS_FOREGROUND}$(print_icon 'VCS_GIT_ICON')%f$VCS_DEFAULT_FORMAT"
+  zstyle ':vcs_info:hg*:*' formats "%F{$POWERLEVEL9K_VCS_FOREGROUND}$(print_icon 'VCS_HG_ICON')%f$VCS_DEFAULT_FORMAT"
+
+  zstyle ':vcs_info:*' actionformats "%b %F{red}| %a%f"
+
+  zstyle ':vcs_info:*' stagedstr " %F{$POWERLEVEL9K_VCS_FOREGROUND}$(print_icon 'VCS_STAGED_ICON')%f"
+  zstyle ':vcs_info:*' unstagedstr " %F{$POWERLEVEL9K_VCS_FOREGROUND}$(print_icon 'VCS_UNSTAGED_ICON')%f"
+
+  zstyle ':vcs_info:git*+set-message:*' hooks vcs-detect-changes git-untracked git-aheadbehind git-stash git-remotebranch git-tagname
+  zstyle ':vcs_info:hg*+set-message:*' hooks vcs-detect-changes
+
+  # For Hg, only show the branch name
+  zstyle ':vcs_info:hg*:*' branchformat "$(print_icon 'VCS_BRANCH_ICON')%b"
+  # The `get-revision` function must be turned on for dirty-check to work for Hg
+  zstyle ':vcs_info:hg*:*' get-revision true
+  zstyle ':vcs_info:hg*:*' get-bookmarks true
+  zstyle ':vcs_info:hg*+gen-hg-bookmark-string:*' hooks hg-bookmarks
+
+  if [[ "$POWERLEVEL9K_SHOW_CHANGESET" == true ]]; then
+    zstyle ':vcs_info:*' get-revision true
+  fi
+
+  # Actually invoke vcs_info manually to gather all information.
+  vcs_info
+  local vcs_prompt="${vcs_info_msg_0_}"
+
+  if [[ -n "$vcs_prompt" ]]; then
+    if [[ "$VCS_WORKDIR_DIRTY" == true ]]; then
+      "$1_prompt_segment" "$0_MODIFIED" "yellow" "$DEFAULT_COLOR"
+    else
+      "$1_prompt_segment" "$0" "green" "$DEFAULT_COLOR"
+    fi
+
+    echo -n "$vcs_prompt "
   fi
 }
 
