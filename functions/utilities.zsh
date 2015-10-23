@@ -1,12 +1,9 @@
 # vim:ft=zsh ts=2 sw=2 sts=2 et fenc=utf-8
 ################################################################
-# power-functions
+# Utility functions
 # This file holds some utility-functions for
 # the powerlevel9k-ZSH-theme
 # https://github.com/bhilburn/powerlevel9k
-################################################################
-################################################################
-# Utility functions
 ################################################################
 
 # Exits with 0 if a variable has been previously defined (even if empty)
@@ -27,19 +24,6 @@ function set_default() {
   local default_value="$2"
 
   defined "$varname" || typeset -g "$varname"="$default_value"
-}
-
-# Safety function for printing icons
-# Prints the named icon, or if that icon is undefined, the string name.
-function print_icon() {
-  local icon_name=$1
-  local ICON_USER_VARIABLE=POWERLEVEL9K_${icon_name}
-  local USER_ICON=${(P)ICON_USER_VARIABLE}
-  if defined "$ICON_USER_VARIABLE"; then
-    echo -n "$USER_ICON"
-  else
-    echo -n "${icons[$icon_name]}"
-  fi
 }
 
 # Get numerical color codes. That way we translate ANSI codes
@@ -137,12 +121,6 @@ function getRelevantItem() {
       echo "$try"
       break;
     fi
-  done
-}
-
-get_icon_names() {
-  for key in ${(@k)icons}; do
-    echo "POWERLEVEL9K_$key: ${icons[$key]}"
   done
 }
 
