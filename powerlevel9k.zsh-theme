@@ -30,6 +30,12 @@ source $(dirname "$0")/functions/icons.zsh
 source $(dirname "$0")/functions/utilities.zsh
 
 ################################################################
+# Source color functions
+################################################################
+
+source $(dirname "$0")/functions/colors.zsh
+
+################################################################
 # Source VCS_INFO hooks / helper functions
 ################################################################
 
