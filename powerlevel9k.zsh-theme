@@ -198,7 +198,7 @@ fi
 # Source utility functions
 ################################################################
 
-source $(dirname "$0")/functions/power-utilities.zsh
+source $(dirname "$0")/functions/utilities.zsh
 
 ################################################################
 # Color Scheme
