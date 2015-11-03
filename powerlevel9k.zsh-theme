@@ -17,29 +17,37 @@
 #zstyle ':vcs_info:*+*:*' debug true
 #set -o xtrace
 
+# Check if filename is a symlink.
+if [[ -L "$0" ]]; then
+  filename="$(realpath -P $0 2>/dev/null || readlink -f $0 2>/dev/null)"
+else
+  filename="$0"
+fi
+script_location="$(dirname $filename)"
+
 ################################################################
 # Source icon functions
 ################################################################
 
-source $(dirname "$0")/functions/icons.zsh
+source $script_location/functions/icons.zsh
 
 ################################################################
 # Source utility functions
 ################################################################
 
-source $(dirname "$0")/functions/utilities.zsh
+source $script_location/functions/utilities.zsh
 
 ################################################################
 # Source color functions
 ################################################################
 
-source $(dirname "$0")/functions/colors.zsh
+source $script_location/functions/colors.zsh
 
 ################################################################
 # Source VCS_INFO hooks / helper functions
 ################################################################
 
-source $(dirname "$0")/functions/vcs.zsh
+source $script_location/functions/vcs.zsh
 
 ################################################################
 # Color Scheme
