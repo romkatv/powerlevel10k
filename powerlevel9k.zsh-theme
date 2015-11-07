@@ -17,11 +17,23 @@
 #zstyle ':vcs_info:*+*:*' debug true
 #set -o xtrace
 
+# Check if the theme was called as a function.
+if [[ $(whence -w prompt_powerlevel9k_setup) =~ "function" ]]; then
+  # Script is a function! We assume this to happen only in
+  # prezto, as they use the zstyle-builtin to set the theme.
+  0="${ZDOTDIR:-$HOME}/.zprezto/modules/prompt/functions/prompt_powerlevel9k_setup"
+fi
+
 # Check if filename is a symlink.
-if [[ -L "$0" ]]; then
+if [[ -L $0 ]]; then
+  # Script is a symlink
   filename="$(realpath -P $0 2>/dev/null || readlink -f $0 2>/dev/null)"
-else
+elif [[ -f $0 ]]; then
+  # Script is a file
   filename="$0"
+else
+  print -P "%F{red}Script location could not be found!%f"
+  exit 1
 fi
 script_location="$(dirname $filename)"
 
