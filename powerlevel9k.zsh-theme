@@ -922,12 +922,26 @@ $(print_icon 'MULTILINE_SECOND_PROMPT_PREFIX')"
 
 function zle-line-init {
   powerlevel9k_prepare_prompts
+  if (( ${+terminfo[smkx]} )); then
+    printf '%s' ${terminfo[smkx]}
+  fi
   zle reset-prompt
+  zle -R
+}
+
+function zle-line-finish {
+  powerlevel9k_prepare_prompts
+  if (( ${+terminfo[rmkx]} )); then
+    printf '%s' ${terminfo[rmkx]}
+  fi
+  zle reset-prompt
+  zle -R
 }
 
 function zle-keymap-select {
   powerlevel9k_prepare_prompts
   zle reset-prompt
+  zle -R
 }
 
 powerlevel9k_init() {
@@ -954,6 +968,7 @@ powerlevel9k_init() {
   add-zsh-hook precmd powerlevel9k_prepare_prompts
 
   zle -N zle-line-init
+  zle -N zle-line-finish
   zle -N zle-keymap-select
 }
 
