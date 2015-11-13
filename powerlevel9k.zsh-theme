@@ -17,318 +17,49 @@
 #zstyle ':vcs_info:*+*:*' debug true
 #set -o xtrace
 
-################################################################
-# Icons
-################################################################
-
-# These characters require the Powerline fonts to work properly. If you see
-# boxes or bizarre characters below, your fonts are not correctly installed. If
-# you do not want to install a special font, you can set `POWERLEVEL9K_MODE` to
-# `compatible`. This shows all icons in regular symbols.
-
-# Initialize the icon list according to the user's `POWERLEVEL9K_MODE`.
-typeset -gAH icons
-case $POWERLEVEL9K_MODE in
-  'flat'|'awesome-patched')
-    # Awesome-Patched Font required! See:
-    # https://github.com/gabrielelana/awesome-terminal-fonts/tree/patching-strategy/patched
-    # Set the right locale to protect special characters
-    local LC_ALL="" LC_CTYPE="en_US.UTF-8"
-    icons=(
-      LEFT_SEGMENT_SEPARATOR         $'\UE0B0'              # 
-      RIGHT_SEGMENT_SEPARATOR        $'\UE0B2'              # 
-      LEFT_SUBSEGMENT_SEPARATOR      $'\UE0B1'              # 
-      RIGHT_SUBSEGMENT_SEPARATOR     $'\UE0B3'              # 
-      CARRIAGE_RETURN_ICON           $'\U21B5'              # ↵
-      ROOT_ICON                      $'\UE801'              # 
-      RUBY_ICON                      $'\UE847'              # 
-      AWS_ICON                       $'\UE895'              # 
-      BACKGROUND_JOBS_ICON           $'\UE82F '             # 
-      TEST_ICON                      $'\UE891'              # 
-      TODO_ICON                      $'\U2611'              # ☑
-      BATTERY_ICON                   $'\UE894'              # 
-      OK_ICON                        $'\U2713'              # ✓
-      FAIL_ICON                      $'\U2718'              # ✘
-      SYMFONY_ICON                   'SF'
-      NODE_ICON                      $'\U2B22'              # ⬢
-      MULTILINE_FIRST_PROMPT_PREFIX  $'\U256D'$'\U2500'
-      MULTILINE_SECOND_PROMPT_PREFIX $'\U2570'$'\U2500 '
-      APPLE_ICON                     $'\UE26E'              # 
-      FREEBSD_ICON                   $'\U1F608 '            # 😈
-      LINUX_ICON                     $'\UE271'              # 
-      SUNOS_ICON                     $'\U1F31E '            # 🌞
-      HOME_ICON                      $'\UE12C '             # 
-      NETWORK_ICON                   $'\UE1AD '             # 
-      LOAD_ICON                      $'\UE190 '             # 
-      #RAM_ICON                       $'\UE87D'             # 
-      RAM_ICON                       $'\UE1E2 '             # 
-      VCS_UNTRACKED_ICON             $'\UE16C'              # 
-      VCS_UNSTAGED_ICON              $'\UE17C'              # 
-      VCS_STAGED_ICON                $'\UE168'              # 
-      VCS_STASH_ICON                 $'\UE133 '             # 
-      #VCS_INCOMING_CHANGES_ICON     $'\UE1EB '             # 
-      #VCS_INCOMING_CHANGES_ICON     $'\UE80D '             # 
-      VCS_INCOMING_CHANGES_ICON      $'\UE131 '             # 
-      #VCS_OUTGOING_CHANGES_ICON     $'\UE1EC '             # 
-      #VCS_OUTGOING_CHANGES_ICON     $'\UE80E '             # 
-      VCS_OUTGOING_CHANGES_ICON      $'\UE132 '             # 
-      VCS_TAG_ICON                   $'\UE817 '             # 
-      VCS_BOOKMARK_ICON              $'\UE87B'              # 
-      VCS_COMMIT_ICON                $'\UE821 '             # 
-      VCS_BRANCH_ICON                $'\UE220'              # 
-      VCS_REMOTE_BRANCH_ICON         ' '$'\UE804 '          # 
-      VCS_GIT_ICON                   $'\UE20E  '            # 
-      VCS_HG_ICON                    $'\UE1C3  '            # 
-    )
-  ;;
-  'awesome-fontconfig')
-    # fontconfig with awesome-font required! See
-    # https://github.com/gabrielelana/awesome-terminal-fonts
-    icons=(
-      LEFT_SEGMENT_SEPARATOR         $'\UE0B0'              # 
-      RIGHT_SEGMENT_SEPARATOR        $'\UE0B2'              # 
-      LEFT_SUBSEGMENT_SEPARATOR      $'\UE0B1'              # 
-      RIGHT_SUBSEGMENT_SEPARATOR     $'\UE0B3'              # 
-      CARRIAGE_RETURN_ICON           $'\U21B5'              # ↵
-      ROOT_ICON                      $'\uF201'              # 
-      RUBY_ICON                      $'\UF247'              # 
-      AWS_ICON                       $'\UF296'              # 
-      BACKGROUND_JOBS_ICON           $'\UF013 '             # 
-      TEST_ICON                      $'\UF291'              # 
-      TODO_ICON                      $'\U2611'              # ☑
-      BATTERY_ICON                   $'\u1F50B'             # 🔋
-      OK_ICON                        $'\UF23A'              # 
-      FAIL_ICON                      $'\UF281'              # 
-      SYMFONY_ICON                   'SF'
-      NODE_ICON                      $'\U2B22'              # ⬢
-      MULTILINE_FIRST_PROMPT_PREFIX  $'\U256D'$'\U2500'     # ╭─
-      MULTILINE_SECOND_PROMPT_PREFIX $'\U2570'$'\U2500 '    # ╰─
-      APPLE_ICON                     $'\UF179'              # 
-      FREEBSD_ICON                   $'\U1F608 '            # 😈
-      LINUX_ICON                     $'\UF17C'              # 
-      SUNOS_ICON                     $'\UF185 '             # 
-      HOME_ICON                      $'\UF015 '             # 
-      NETWORK_ICON                   $'\UF09E '             # 
-      LOAD_ICON                      $'\UF080 '             # 
-      RAM_ICON                       $'\UF0E4'              # 
-      VCS_UNTRACKED_ICON             $'\UF059'              # 
-      VCS_UNSTAGED_ICON              $'\UF06A'              # 
-      VCS_STAGED_ICON                $'\UF055'              # 
-      VCS_STASH_ICON                 $'\UF01C '             # 
-      VCS_INCOMING_CHANGES_ICON      $'\UF01A '             # 
-      VCS_OUTGOING_CHANGES_ICON      $'\UF01B '             # 
-      VCS_TAG_ICON                   $'\UF217 '             # 
-      VCS_BOOKMARK_ICON              $'\UF27B'              # 
-      VCS_COMMIT_ICON                $'\UF221 '             # 
-      VCS_BRANCH_ICON                $'\UF126'              # 
-      VCS_REMOTE_BRANCH_ICON         ' '$'\UF204 '          # 
-      VCS_GIT_ICON                   $'\UF113  '            # 
-      VCS_HG_ICON                    $'\UF0C3  '            # 
-    )
-  ;;
-  *)
-    # Powerline-Patched Font required!
-    # See https://github.com/Lokaltog/powerline-fonts
-    icons=(
-      LEFT_SEGMENT_SEPARATOR         $'\uE0B0'              # 
-      RIGHT_SEGMENT_SEPARATOR        $'\uE0B2'              # 
-      LEFT_SUBSEGMENT_SEPARATOR      $'\UE0B1'              # 
-      RIGHT_SUBSEGMENT_SEPARATOR     $'\UE0B3'              # 
-      CARRIAGE_RETURN_ICON           $'\U21B5'              # ↵
-      ROOT_ICON                      $'\u26A1'              # ⚡
-      RUBY_ICON                      ''
-      AWS_ICON                       'AWS:'
-      BACKGROUND_JOBS_ICON           $'\u2699'              # ⚙
-      TEST_ICON                      ''
-      TODO_ICON                      $'\U2611'              # ☑
-      BATTERY_ICON                   $'\u1F50B'             # 🔋
-      OK_ICON                        $'\u2713'              # ✓
-      FAIL_ICON                      $'\u2718'              # ✘
-      SYMFONY_ICON                   'SF'
-      NODE_ICON                      $'\u2B22'              # ⬢
-      MULTILINE_FIRST_PROMPT_PREFIX  $'\u256D'$'\u2500'
-      MULTILINE_SECOND_PROMPT_PREFIX $'\u2570'$'\u2500 '
-      APPLE_ICON                     'OSX'
-      FREEBSD_ICON                   'BSD'
-      LINUX_ICON                     'Lx'
-      SUNOS_ICON                     'Sun'
-      HOME_ICON                      ''
-      NETWORK_ICON                   'IP'
-      LOAD_ICON                      'L'
-      RAM_ICON                       'RAM'
-      VCS_UNTRACKED_ICON             '?'
-      VCS_UNSTAGED_ICON              $'\u25CF'              # ●
-      VCS_STAGED_ICON                $'\u271A'              # ✚
-      VCS_STASH_ICON                 $'\u235F'              # ⍟
-      VCS_INCOMING_CHANGES_ICON      $'\u2193'              # ↓
-      VCS_OUTGOING_CHANGES_ICON      $'\u2191'              # ↑
-      VCS_TAG_ICON                   ''
-      VCS_BOOKMARK_ICON              $'\u263F'              # ☿
-      VCS_COMMIT_ICON                ''
-      VCS_BRANCH_ICON                $'\uE0A0 '             # 
-      VCS_REMOTE_BRANCH_ICON         $'\u2192'              # →
-      VCS_GIT_ICON                   ''
-      VCS_HG_ICON                    ''
-    )
-  ;;
-esac
-
-# Override the above icon settings with any user-defined variables.
-case $POWERLEVEL9K_MODE in
-  'flat')
-    icons[LEFT_SEGMENT_SEPARATOR]=''
-    icons[RIGHT_SEGMENT_SEPARATOR]=''
-    icons[LEFT_SUBSEGMENT_SEPARATOR]='|'
-    icons[RIGHT_SUBSEGMENT_SEPARATOR]='|'
-  ;;
-  'compatible')
-    # Set the right locale to protect special characters
-    local LC_ALL="" LC_CTYPE="en_US.UTF-8"
-    icons[LEFT_SEGMENT_SEPARATOR]=$'\u2B80'                 # ⮀
-    icons[RIGHT_SEGMENT_SEPARATOR]=$'\u2B82'                # ⮂
-    icons[VCS_BRANCH_ICON]='@'
-  ;;
-esac
-
-if [[ "$POWERLEVEL9K_HIDE_BRANCH_ICON" == true ]]; then
-    icons[VCS_BRANCH_ICON]=''
+# Check if the theme was called as a function.
+if [[ $(whence -w prompt_powerlevel9k_setup) =~ "function" ]]; then
+  # Script is a function! We assume this to happen only in
+  # prezto, as they use the zstyle-builtin to set the theme.
+  0="${ZDOTDIR:-$HOME}/.zprezto/modules/prompt/functions/prompt_powerlevel9k_setup"
 fi
 
-################################################################
-# Utility functions
-################################################################
-
-# Exits with 0 if a variable has been previously defined (even if empty)
-# Takes the name of a variable that should be checked.
-function defined() {
-  local varname="$1"
-
-  typeset -p "$varname" > /dev/null 2>&1
-}
-
-# Given the name of a variable and a default value, sets the variable
-# value to the default only if it has not been defined.
-#
-# Typeset cannot set the value for an array, so this will only work
-# for scalar values.
-function set_default() {
-  local varname="$1"
-  local default_value="$2"
-
-  defined "$varname" || typeset -g "$varname"="$default_value"
-}
-
-# Safety function for printing icons
-# Prints the named icon, or if that icon is undefined, the string name.
-function print_icon() {
-  local icon_name=$1
-  local ICON_USER_VARIABLE=POWERLEVEL9K_${icon_name}
-  local USER_ICON=${(P)ICON_USER_VARIABLE}
-  if defined "$ICON_USER_VARIABLE"; then
-    echo -n "$USER_ICON"
-  else
-    echo -n "${icons[$icon_name]}"
-  fi
-}
-
-# Converts large memory values into a human-readable unit (e.g., bytes --> GB)
-printSizeHumanReadable() {
-  typeset -F 2 size
-  size="$1"+0.00001
-  local extension
-  extension=('B' 'K' 'M' 'G' 'T' 'P' 'E' 'Z' 'Y')
-  local index=1
-
-  # if the base is not Bytes
-  if [[ -n $2 ]]; then
-    for idx in "${extension[@]}"; do
-      if [[ "$2" == "$idx" ]]; then
-        break
-      fi
-      index=$(( index + 1 ))
-    done
-  fi
-
-  while (( (size / 1024) > 0.1 )); do
-    size=$(( size / 1024 ))
-    index=$(( index + 1 ))
-  done
-
-  echo "$size${extension[$index]}"
-}
-
-# Gets the first value out of a list of items that is not empty.
-# The items are examined by a callback-function.
-# Takes two arguments:
-#   * $list - A list of items
-#   * $callback - A callback function to examine if the item is
-#                 worthy. The callback function has access to
-#                 the inner variable $item.
-function getRelevantItem() {
-  setopt shwordsplit # We need to split the words in $interfaces
-
-  local list callback
-  list=$1
-  callback=$2
-
-  for item in $list; do
-    # The first non-empty item wins
-    try=$(eval "$callback")
-    if [[ -n "$try" ]]; then
-      echo "$try"
-      break;
-    fi
-  done
-}
-
-get_icon_names() {
-  for key in ${(@k)icons}; do
-    echo "POWERLEVEL9K_$key: ${icons[$key]}"
-  done
-}
-
-# OS detection for the `os_icon` segment
-case $(uname) in
-    Darwin)
-      OS='OSX'
-      OS_ICON=$(print_icon 'APPLE_ICON')
-      ;;
-    FreeBSD)
-      OS='BSD'
-      OS_ICON=$(print_icon 'FREEBSD_ICON')
-      ;;
-    OpenBSD)
-      OS='BSD'
-      OS_ICON=$(print_icon 'FREEBSD_ICON')
-      ;;
-    DragonFly)
-      OS='BSD'
-      OS_ICON=$(print_icon 'FREEBSD_ICON')
-      ;;
-    Linux)
-      OS='Linux'
-      OS_ICON=$(print_icon 'LINUX_ICON')
-      ;;
-    SunOS)
-      OS='Solaris'
-      OS_ICON=$(print_icon 'SUNOS_ICON')
-      ;;
-    *)
-      OS=''
-      OS_ICON=''
-      ;;
-esac
-
-# Determine the correct sed parameter.
-#
-# `sed` is unfortunately not consistent across OSes when it comes to flags.
-SED_EXTENDED_REGEX_PARAMETER="-r"
-if [[ "$OS" == 'OSX' ]]; then
-  local IS_BSD_SED="$(sed --version &>> /dev/null || echo "BSD sed")"
-  if [[ -n "$IS_BSD_SED" ]]; then
-    SED_EXTENDED_REGEX_PARAMETER="-E"
-  fi
+# Check if filename is a symlink.
+if [[ -L $0 ]]; then
+  # Script is a symlink
+  filename="$(realpath -P $0 2>/dev/null || readlink -f $0 2>/dev/null)"
+elif [[ -f $0 ]]; then
+  # Script is a file
+  filename="$0"
+else
+  print -P "%F{red}Script location could not be found!%f"
+  exit 1
 fi
+script_location="$(dirname $filename)"
+
+################################################################
+# Source icon functions
+################################################################
+
+source $script_location/functions/icons.zsh
+
+################################################################
+# Source utility functions
+################################################################
+
+source $script_location/functions/utilities.zsh
+
+################################################################
+# Source color functions
+################################################################
+
+source $script_location/functions/colors.zsh
+
+################################################################
+# Source VCS_INFO hooks / helper functions
+################################################################
+
+source $script_location/functions/vcs.zsh
 
 ################################################################
 # Color Scheme
@@ -387,10 +118,10 @@ left_prompt_segment() {
   local bg fg
   [[ -n $2 ]] && bg="%K{$2}" || bg="%k"
   [[ -n $3 ]] && fg="%F{$3}" || fg="%f"
-  if [[ $CURRENT_BG != 'NONE' ]] && [[ "$2" != "$CURRENT_BG" ]]; then
+  if [[ $CURRENT_BG != 'NONE' ]] && ! isSameColor "$2" "$CURRENT_BG"; then
     # Middle segment
     echo -n "%{$bg%F{$CURRENT_BG}%}$(print_icon 'LEFT_SEGMENT_SEPARATOR')%{$fg%}$POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS"
-  elif [[ "$CURRENT_BG" == "$2" ]]; then
+  elif isSameColor "$CURRENT_BG" "$2"; then
     # Middle segment with same color as previous segment
     # We take the current foreground color as color for our
     # subsegment (or the default color). This should have
@@ -411,9 +142,9 @@ left_prompt_end() {
   if [[ -n $CURRENT_BG ]]; then
     echo -n "%{%k%F{$CURRENT_BG}%}$(print_icon 'LEFT_SEGMENT_SEPARATOR')"
   else
-    echo -n "%{%k%}"
+    echo -n "%k"
   fi
-  echo -n "%{%f%} "
+  echo -n "%f "
   CURRENT_BG=''
 }
 
@@ -443,7 +174,7 @@ right_prompt_segment() {
   [[ -n $2 ]] && bg="%K{$2}" || bg="%k"
   [[ -n $3 ]] && fg="%F{$3}" || fg="%f"
 
-  if [[ "$CURRENT_RIGHT_BG" == "$2" ]]; then
+  if isSameColor "$CURRENT_RIGHT_BG" "$2"; then
     # Middle segment with same color as previous segment
     # We take the current foreground color as color for our
     # subsegment (or the default color). This should have
@@ -457,144 +188,6 @@ right_prompt_segment() {
   [[ -n $4 ]] && echo -n "$4$POWERLEVEL9K_WHITESPACE_BETWEEN_RIGHT_SEGMENTS%f"
 
   CURRENT_RIGHT_BG=$2
-}
-
-################################################################
-# The `vcs` Segment and VCS_INFO hooks / helper functions
-################################################################
-prompt_vcs() {
-  autoload -Uz vcs_info
-
-  VCS_WORKDIR_DIRTY=false
-  VCS_CHANGESET_PREFIX=''
-  if [[ "$POWERLEVEL9K_SHOW_CHANGESET" == true ]]; then
-    # Default: Just display the first 12 characters of our changeset-ID.
-    local VCS_CHANGESET_HASH_LENGTH=12
-    if [[ -n "$POWERLEVEL9K_CHANGESET_HASH_LENGTH" ]]; then
-      VCS_CHANGESET_HASH_LENGTH="$POWERLEVEL9K_CHANGESET_HASH_LENGTH"
-    fi
-
-    VCS_CHANGESET_PREFIX="%F{$POWERLEVEL9K_VCS_DARK_FOREGROUND}$(print_icon 'VCS_COMMIT_ICON')%0.$VCS_CHANGESET_HASH_LENGTH""i%f "
-  fi
-
-  zstyle ':vcs_info:*' enable git hg
-  zstyle ':vcs_info:*' check-for-changes true
-
-  VCS_DEFAULT_FORMAT="$VCS_CHANGESET_PREFIX%F{$POWERLEVEL9K_VCS_FOREGROUND}%b%c%u%m%f"
-  zstyle ':vcs_info:git*:*' formats "%F{$POWERLEVEL9K_VCS_FOREGROUND}$(print_icon 'VCS_GIT_ICON')%f$VCS_DEFAULT_FORMAT"
-  zstyle ':vcs_info:hg*:*' formats "%F{$POWERLEVEL9K_VCS_FOREGROUND}$(print_icon 'VCS_HG_ICON')%f$VCS_DEFAULT_FORMAT"
-
-  zstyle ':vcs_info:*' actionformats "%b %F{red}| %a%f"
-
-  zstyle ':vcs_info:*' stagedstr " %F{$POWERLEVEL9K_VCS_FOREGROUND}$(print_icon 'VCS_STAGED_ICON')%f"
-  zstyle ':vcs_info:*' unstagedstr " %F{$POWERLEVEL9K_VCS_FOREGROUND}$(print_icon 'VCS_UNSTAGED_ICON')%f"
-
-  zstyle ':vcs_info:git*+set-message:*' hooks vcs-detect-changes git-untracked git-aheadbehind git-stash git-remotebranch git-tagname
-  zstyle ':vcs_info:hg*+set-message:*' hooks vcs-detect-changes
-
-  # For Hg, only show the branch name
-  zstyle ':vcs_info:hg*:*' branchformat "$(print_icon 'VCS_BRANCH_ICON')%b"
-  # The `get-revision` function must be turned on for dirty-check to work for Hg
-  zstyle ':vcs_info:hg*:*' get-revision true
-  zstyle ':vcs_info:hg*:*' get-bookmarks true
-  zstyle ':vcs_info:hg*+gen-hg-bookmark-string:*' hooks hg-bookmarks
-
-  if [[ "$POWERLEVEL9K_SHOW_CHANGESET" == true ]]; then
-    zstyle ':vcs_info:*' get-revision true
-  fi
-
-  # Actually invoke vcs_info manually to gather all information.
-  vcs_info
-  local vcs_prompt="${vcs_info_msg_0_}"
-
-  if [[ -n "$vcs_prompt" ]]; then
-    if [[ "$VCS_WORKDIR_DIRTY" == true ]]; then
-      "$1_prompt_segment" "$0_MODIFIED" "yellow" "$DEFAULT_COLOR"
-    else
-      "$1_prompt_segment" "$0" "green" "$DEFAULT_COLOR"
-    fi
-
-    echo -n "$vcs_prompt "
-  fi
-}
-
-function +vi-git-untracked() {
-    if [[ $(git rev-parse --is-inside-work-tree 2> /dev/null) == 'true' && \
-            -n $(git ls-files --others --exclude-standard | sed q) ]]; then
-        hook_com[unstaged]+=" %F{$POWERLEVEL9K_VCS_FOREGROUND}$(print_icon 'VCS_UNTRACKED_ICON')%f"
-    fi
-}
-
-function +vi-git-aheadbehind() {
-    local ahead behind branch_name
-    local -a gitstatus
-
-    branch_name=$(git symbolic-ref --short HEAD 2>/dev/null)
-
-    # for git prior to 1.7
-    # ahead=$(git rev-list origin/${branch_name}..HEAD | wc -l)
-    ahead=$(git rev-list "${branch_name}"@{upstream}..HEAD 2>/dev/null | wc -l)
-    (( ahead )) && gitstatus+=( " %F{$POWERLEVEL9K_VCS_FOREGROUND}$(print_icon 'VCS_OUTGOING_CHANGES_ICON')${ahead// /}%f" )
-
-    # for git prior to 1.7
-    # behind=$(git rev-list HEAD..origin/${branch_name} | wc -l)
-    behind=$(git rev-list HEAD.."${branch_name}"@{upstream} 2>/dev/null | wc -l)
-    (( behind )) && gitstatus+=( " %F{$POWERLEVEL9K_VCS_FOREGROUND}$(print_icon 'VCS_INCOMING_CHANGES_ICON')${behind// /}%f" )
-
-    hook_com[misc]+=${(j::)gitstatus}
-}
-
-function +vi-git-remotebranch() {
-    local remote branch_name
-
-    # Are we on a remote-tracking branch?
-    remote=${$(git rev-parse --verify HEAD@{upstream} --symbolic-full-name 2>/dev/null)/refs\/(remotes|heads)\/}
-    branch_name=$(git symbolic-ref --short HEAD 2>/dev/null)
-
-    hook_com[branch]="%F{$POWERLEVEL9K_VCS_FOREGROUND}$(print_icon 'VCS_BRANCH_ICON')${hook_com[branch]}%f"
-    # Always show the remote
-    #if [[ -n ${remote} ]] ; then
-    # Only show the remote if it differs from the local
-    if [[ -n ${remote} ]] && [[ "${remote#*/}" != "${branch_name}" ]] ; then
-        hook_com[branch]+="%F{$POWERLEVEL9K_VCS_FOREGROUND}$(print_icon 'VCS_REMOTE_BRANCH_ICON')%f%F{$POWERLEVEL9K_VCS_FOREGROUND}${remote// /}%f"
-    fi
-}
-
-function +vi-git-tagname() {
-    local tag
-
-    tag=$(git describe --tags --exact-match HEAD 2>/dev/null)
-    [[ -n "${tag}" ]] && hook_com[branch]=" %F{$POWERLEVEL9K_VCS_FOREGROUND}$(print_icon 'VCS_TAG_ICON')${tag}%f"
-}
-
-# Show count of stashed changes
-# Port from https://github.com/whiteinge/dotfiles/blob/5dfd08d30f7f2749cfc60bc55564c6ea239624d9/.zsh_shouse_prompt#L268
-function +vi-git-stash() {
-  local -a stashes
-
-  if [[ -s $(git rev-parse --git-dir)/refs/stash ]] ; then
-    stashes=$(git stash list 2>/dev/null | wc -l)
-    hook_com[misc]+=" %F{$POWERLEVEL9K_VCS_FOREGROUND}$(print_icon 'VCS_STASH_ICON')${stashes// /}%f"
-  fi
-}
-
-function +vi-hg-bookmarks() {
-  if [[ -n "${hgbmarks[@]}" ]]; then
-    hook_com[hg-bookmark-string]=" %F{$POWERLEVEL9K_VCS_FOREGROUND}$(print_icon 'VCS_BOOKMARK_ICON')${hgbmarks[@]}%f"
-
-    # To signal that we want to use the sting we just generated, set the special
-    # variable `ret' to something other than the default zero:
-    ret=1
-    return 0
-  fi
-}
-
-function +vi-vcs-detect-changes() {
-  if [[ -n "${hook_com[staged]}" ]] || [[ -n "${hook_com[unstaged]}" ]]; then
-    VCS_WORKDIR_DIRTY=true
-  else
-    VCS_WORKDIR_DIRTY=false
-  fi
 }
 
 ################################################################
@@ -983,6 +576,63 @@ prompt_todo() {
     if [[ "$count" = <-> ]]; then
       "$1_prompt_segment" "$0" "244" "$DEFAULT_COLOR" "$(print_icon 'TODO_ICON') $count"
     fi
+  fi
+}
+
+# VCS segment: shows the state of your repository, if you are in a folder under version control
+prompt_vcs() {
+  autoload -Uz vcs_info
+
+  VCS_WORKDIR_DIRTY=false
+  VCS_CHANGESET_PREFIX=''
+  if [[ "$POWERLEVEL9K_SHOW_CHANGESET" == true ]]; then
+    # Default: Just display the first 12 characters of our changeset-ID.
+    local VCS_CHANGESET_HASH_LENGTH=12
+    if [[ -n "$POWERLEVEL9K_CHANGESET_HASH_LENGTH" ]]; then
+      VCS_CHANGESET_HASH_LENGTH="$POWERLEVEL9K_CHANGESET_HASH_LENGTH"
+    fi
+
+    VCS_CHANGESET_PREFIX="%F{$POWERLEVEL9K_VCS_DARK_FOREGROUND}$(print_icon 'VCS_COMMIT_ICON')%0.$VCS_CHANGESET_HASH_LENGTH""i%f "
+  fi
+
+  zstyle ':vcs_info:*' enable git hg
+  zstyle ':vcs_info:*' check-for-changes true
+
+  VCS_DEFAULT_FORMAT="$VCS_CHANGESET_PREFIX%F{$POWERLEVEL9K_VCS_FOREGROUND}%b%c%u%m%f"
+  zstyle ':vcs_info:git*:*' formats "%F{$POWERLEVEL9K_VCS_FOREGROUND}$(print_icon 'VCS_GIT_ICON')%f$VCS_DEFAULT_FORMAT"
+  zstyle ':vcs_info:hg*:*' formats "%F{$POWERLEVEL9K_VCS_FOREGROUND}$(print_icon 'VCS_HG_ICON')%f$VCS_DEFAULT_FORMAT"
+
+  zstyle ':vcs_info:*' actionformats "%b %F{red}| %a%f"
+
+  zstyle ':vcs_info:*' stagedstr " %F{$POWERLEVEL9K_VCS_FOREGROUND}$(print_icon 'VCS_STAGED_ICON')%f"
+  zstyle ':vcs_info:*' unstagedstr " %F{$POWERLEVEL9K_VCS_FOREGROUND}$(print_icon 'VCS_UNSTAGED_ICON')%f"
+
+  zstyle ':vcs_info:git*+set-message:*' hooks vcs-detect-changes git-untracked git-aheadbehind git-stash git-remotebranch git-tagname
+  zstyle ':vcs_info:hg*+set-message:*' hooks vcs-detect-changes
+
+  # For Hg, only show the branch name
+  zstyle ':vcs_info:hg*:*' branchformat "$(print_icon 'VCS_BRANCH_ICON')%b"
+  # The `get-revision` function must be turned on for dirty-check to work for Hg
+  zstyle ':vcs_info:hg*:*' get-revision true
+  zstyle ':vcs_info:hg*:*' get-bookmarks true
+  zstyle ':vcs_info:hg*+gen-hg-bookmark-string:*' hooks hg-bookmarks
+
+  if [[ "$POWERLEVEL9K_SHOW_CHANGESET" == true ]]; then
+    zstyle ':vcs_info:*' get-revision true
+  fi
+
+  # Actually invoke vcs_info manually to gather all information.
+  vcs_info
+  local vcs_prompt="${vcs_info_msg_0_}"
+
+  if [[ -n "$vcs_prompt" ]]; then
+    if [[ "$VCS_WORKDIR_DIRTY" == true ]]; then
+      "$1_prompt_segment" "$0_MODIFIED" "yellow" "$DEFAULT_COLOR"
+    else
+      "$1_prompt_segment" "$0" "green" "$DEFAULT_COLOR"
+    fi
+
+    echo -n "$vcs_prompt "
   fi
 }
 
