@@ -711,18 +711,32 @@ $(print_icon 'MULTILINE_SECOND_PROMPT_PREFIX')"
 
 function zle-line-init {
   powerlevel9k_prepare_prompts
+  if (( ${+terminfo[smkx]} )); then
+    printf '%s' ${terminfo[smkx]}
+  fi
   zle reset-prompt
+  zle -R
+}
+
+function zle-line-finish {
+  powerlevel9k_prepare_prompts
+  if (( ${+terminfo[rmkx]} )); then
+    printf '%s' ${terminfo[rmkx]}
+  fi
+  zle reset-prompt
+  zle -R
 }
 
 function zle-keymap-select {
   powerlevel9k_prepare_prompts
   zle reset-prompt
+  zle -R
 }
 
 powerlevel9k_init() {
   # Display a warning if the terminal does not support 256 colors
   local term_colors
-  term_colors=$(tput colors)
+  term_colors=$(echotc Co)
   if (( term_colors < 256 )); then
     print -P "%F{red}WARNING!%f Your terminal supports less than 256 colors!"
     print -P "You should put: %F{blue}export TERM=\"xterm-256color\"%f in your \~\/.zshrc"
@@ -744,6 +758,7 @@ powerlevel9k_init() {
   add-zsh-hook precmd powerlevel9k_prepare_prompts
 
   zle -N zle-line-init
+  zle -N zle-line-finish
   zle -N zle-keymap-select
 }
 
