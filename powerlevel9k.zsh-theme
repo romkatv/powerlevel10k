@@ -492,10 +492,13 @@ prompt_rspec_stats() {
 
 # Ruby Version Manager information
 prompt_rvm() {
-  local rvm_prompt
-  rvm_prompt=$(rvm-prompt)
-  if [ "$rvm_prompt" != "" ]; then
-    "$1_prompt_segment" "$0" "240" "$DEFAULT_COLOR" "$rvm_prompt $(print_icon 'RUBY_ICON') "
+  local gemset=$(echo $GEM_HOME | awk -F'@' '{print $2}')
+  [ "$gemset" != "" ] && gemset="@$gemset"
+
+  local version=$(echo $MY_RUBY_HOME | awk -F'-' '{print $2}')
+
+  if [[ -n "$version$gemset" ]]; then
+    "$1_prompt_segment" "$0" "240" "$DEFAULT_COLOR" "$version$gemset $(print_icon 'RUBY_ICON') "
   fi
 }
 
