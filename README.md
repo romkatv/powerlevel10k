@@ -85,6 +85,7 @@ The segments that are currently available are:
 * [ram](#ram) - Show free RAM and used Swap.
 * [rbenv](#rbenv) - Ruby environment information (if one is active).
 * [rspec_stats](#rspec_stats) - Show a ratio of test classes vs code classes for RSpec.
+* **rust_version** - Display the current rust version.
 * [status](#status) - The return code of the previous command, and status of background jobs.
 * [symphony2_tests](#symphony2_tests) - Show a ratio of test classes vs code classes for Symfony2.
 * **symphony2_version** - Show the current Symfony2 version, if you are in a Symfony2-Project dir.
