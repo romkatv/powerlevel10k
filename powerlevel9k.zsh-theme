@@ -479,6 +479,15 @@ prompt_rbenv() {
   fi
 }
 
+# print Rust version number
+prompt_rust_version() {
+  local rust_version
+  rust_version=$(rustc --version 2>&1 | grep -oe "^rustc\s*[^ ]*" | grep -o '[0-9.a-z\\\-]*$')
+
+  if [[ -n "$rust_version" ]]; then
+    "$1_prompt_segment" "$0" "208" "$DEFAULT_COLOR" "Rust $rust_version"
+  fi
+}
 # RSpec test ratio
 prompt_rspec_stats() {
   if [[ (-d app && -d spec) ]]; then
