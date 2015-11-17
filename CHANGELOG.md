@@ -15,6 +15,12 @@ segment is able to show the free ram and used swap.
 This prompt uses the `VCS_INFO` subsystem by ZSH. From now on this subsystem
 is only invoked if a `vcs` segment was configured. 
 
+### `rvm` changes
+
+This segment now does not invoke RVM directly anymore. Instead, is relys on the
+circumstance that RVM was invoked beforehand and just reads the environment
+variables '$GEM_HOME' and '$MY_RUBY_HOME'. It also now displays the used gemset.
+
 ### New segment `battery` added
 
 A new segment that shows the battery status of your laptop was added.
@@ -30,6 +36,10 @@ This segment shows your NodeJS version by using NVM (and if it is not 'default')
 ### New segment `todo` added
 
 This segment shows your ToDos from [todo.sh](http://todotxt.com/).
+
+### New segment `rust_version` added
+
+This segment shows your local rust version.
 
 ## v0.2.0
 
