@@ -901,14 +901,19 @@ powerlevel9k_prepare_prompts() {
   if [[ "$POWERLEVEL9K_PROMPT_ON_NEWLINE" == true ]]; then
     PROMPT="$(print_icon 'MULTILINE_FIRST_PROMPT_PREFIX')%{%f%b%k%}$(build_left_prompt)
 $(print_icon 'MULTILINE_SECOND_PROMPT_PREFIX')"
-    # The right prompt should be on the same line as the first line of the left
-    # prompt.  To do so, there is just a quite ugly workaround: Before zsh draws
-    # the RPROMPT, we advise it, to go one line up. At the end of RPROMPT, we
-    # advise it to go one line down. See:
-    # http://superuser.com/questions/357107/zsh-right-justify-in-ps1
-    local LC_ALL="" LC_CTYPE="en_US.UTF-8" # Set the right locale to protect special characters
-    RPROMPT_PREFIX='%{'$'\e[1A''%}' # one line up
-    RPROMPT_SUFFIX='%{'$'\e[1B''%}' # one line down
+    if [[ "$POWERLEVEL9K_RPROMPT_ON_NEWLINE" != true ]]; then
+      # The right prompt should be on the same line as the first line of the left
+      # prompt.  To do so, there is just a quite ugly workaround: Before zsh draws
+      # the RPROMPT, we advise it, to go one line up. At the end of RPROMPT, we
+      # advise it to go one line down. See:
+      # http://superuser.com/questions/357107/zsh-right-justify-in-ps1
+      local LC_ALL="" LC_CTYPE="en_US.UTF-8" # Set the right locale to protect special characters
+      RPROMPT_PREFIX='%{'$'\e[1A''%}' # one line up
+      RPROMPT_SUFFIX='%{'$'\e[1B''%}' # one line down
+    else
+      RPROMPT_PREFIX='' 
+      RPROMPT_SUFFIX=''
+    fi
   else
     PROMPT="%{%f%b%k%}$(build_left_prompt)"
     RPROMPT_PREFIX=''
