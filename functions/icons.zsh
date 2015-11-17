@@ -22,6 +22,7 @@ case $POWERLEVEL9K_MODE in
     icons=(
       LEFT_SEGMENT_SEPARATOR         $'\UE0B0'              # 
       RIGHT_SEGMENT_SEPARATOR        $'\UE0B2'              # 
+      LEFT_SEGMENT_END_SEPARATOR     ' '                    # Whitespace
       LEFT_SUBSEGMENT_SEPARATOR      $'\UE0B1'              # 
       RIGHT_SUBSEGMENT_SEPARATOR     $'\UE0B3'              # 
       CARRIAGE_RETURN_ICON           $'\U21B5'              # ↵
@@ -72,6 +73,7 @@ case $POWERLEVEL9K_MODE in
     icons=(
       LEFT_SEGMENT_SEPARATOR         $'\UE0B0'              # 
       RIGHT_SEGMENT_SEPARATOR        $'\UE0B2'              # 
+      LEFT_SEGMENT_END_SEPARATOR     ' '                    # Whitespace
       LEFT_SUBSEGMENT_SEPARATOR      $'\UE0B1'              # 
       RIGHT_SUBSEGMENT_SEPARATOR     $'\UE0B3'              # 
       CARRIAGE_RETURN_ICON           $'\U21B5'              # ↵
@@ -117,6 +119,7 @@ case $POWERLEVEL9K_MODE in
     icons=(
       LEFT_SEGMENT_SEPARATOR         $'\uE0B0'              # 
       RIGHT_SEGMENT_SEPARATOR        $'\uE0B2'              # 
+      LEFT_SEGMENT_END_SEPARATOR     ' '                    # Whitespace
       LEFT_SUBSEGMENT_SEPARATOR      $'\UE0B1'              # 
       RIGHT_SUBSEGMENT_SEPARATOR     $'\UE0B3'              # 
       CARRIAGE_RETURN_ICON           $'\U21B5'              # ↵

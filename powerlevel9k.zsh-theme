@@ -144,7 +144,7 @@ left_prompt_end() {
   else
     echo -n "%k"
   fi
-  echo -n "%f "
+  echo -n "%{%f%}$(print_icon 'LEFT_SEGMENT_END_SEPARATOR')"
   CURRENT_BG=''
 }
 
