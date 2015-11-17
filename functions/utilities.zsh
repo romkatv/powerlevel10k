@@ -118,3 +118,19 @@ if [[ "$OS" == 'OSX' ]]; then
     SED_EXTENDED_REGEX_PARAMETER="-E"
   fi
 fi
+
+# Print a deprecation warning if an old segment is in use.
+# Takes the name of an associative array that contains the
+# deprecated segments as keys, the values contain the new
+# segment names.
+print_deprecation_warning() {
+  typeset -AH raw_deprecated_segments
+  raw_deprecated_segments=(${(kvP@)1})
+
+  for key in ${(@k)raw_deprecated_segments}; do
+    if [[ -n "${POWERLEVEL9K_LEFT_PROMPT_ELEMENTS[(r)$key]}" ]] || [[ -n "${POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS[(r)$key]}" ]]; then
+      # segment is deprecated
+      print -P "%F{yellow}Warning!%f The '$key' segment is deprecated. Use '%F{blue}${raw_deprecated_segments[$key]}%f' instead. For more informations, have a look at the CHANGELOG.md."
+    fi
+  done
+}
