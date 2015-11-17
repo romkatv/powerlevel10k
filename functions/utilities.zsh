@@ -124,7 +124,8 @@ fi
 # deprecated segments as keys, the values contain the new
 # segment names.
 print_deprecation_warning() {
-  local -A raw_deprecated_segments=(${(kvP)1})
+  typeset -AH raw_deprecated_segments
+  raw_deprecated_segments=(${(kvP@)1})
 
   for key in ${(@k)raw_deprecated_segments}; do
     if [[ -n "${POWERLEVEL9K_LEFT_PROMPT_ELEMENTS[(r)$key]}" ]] || [[ -n "${POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS[(r)$key]}" ]]; then

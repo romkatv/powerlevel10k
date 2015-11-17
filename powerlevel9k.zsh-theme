@@ -754,13 +754,13 @@ powerlevel9k_init() {
     print -P "You should put: %F{blue}export TERM=\"xterm-256color\"%f in your \~\/.zshrc"
   fi
 
-  typeset -Ah deprecated_segments
+  # Display a warning if deprecated segments are in use.
+  typeset -AH deprecated_segments
   # old => new
   deprecated_segments=(
     'longstatus'      'status'
   )
   print_deprecation_warning deprecated_segments
-
 
   setopt prompt_subst
   
