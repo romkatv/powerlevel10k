@@ -73,6 +73,7 @@ The segments that are currently available are:
 * [aws](#aws) - The current AWS profile, if active.
 * [battery](#battery) - Current battery status.
 * [context](#context) - Your username and host.
+* [custom_command](#custom_command) - A custom command to display the output of.
 * [dir](#dir) - Your current working directory.
 * **go_version** - Show the current GO version.
 * **history** - The command number for the current line.
@@ -121,6 +122,59 @@ In addition to the above it supports standard _FOREGROUND value without affectin
 
 Supports both OS X and Linux(time remaining requires the acpi program on Linux)
 
+##### custom_command
+
+The `custom_...` segment lets you add a custom command to your prompt, to e.g. display the wifi signal. You choose a name for the segment yourself, (here signal), and then set the appropriate variables, as so (based on the name you chose)
+
+    POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(context time battery dir vcs virtualenv custom_signal)
+    POWERLEVEL9K_CUSTOM_SIGNAL="echo signal: \$(nmcli device wifi | grep yes | awk '{print \$8}')"
+    POWERLEVEL9K_CUSTOM_SIGNAL_BACKGROUND="blue"
+    POWERLEVEL9K_CUSTOM_SIGNAL_FOREGROUND="yellow"
+    POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(aws status load ram)
+
+gives
+
+![simplesignal](http://i.imgur.com/SQmYVFL.png)
+
+Instead of defining the command inline (if it is kinda long or unreadable), one can also add a function to the .zshrc like:
+
+    zsh_signal(){
+            local signal=$(nmcli device wifi | grep yes | awk '{print $8}')
+            local color='%F{yellow}'
+            [[ $signal -gt 75 ]] && color='%F{green}'
+            [[ $signal -lt 50 ]] && color='%F{red}'
+            echo -n "%{$color%}\uf230  $signal%{%f%}" # \uf230 is 
+    }
+
+And then by changing the custom commands array (and rearranging a bit the prompt elements) to read:
+
+    POWERLEVEL9K_CUSTOM_SIGNAL="zsh_signal"
+
+Then this updated command looks like:
+
+![signal](http://i.imgur.com/hviMATC.png)
+
+You can also have multiple custom commands. Say you have
+
+    POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(context time battery custom_signal dir vcs virtualenv custom_time )
+    POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(aws status load ram custom_docker)
+
+    POWERLEVEL9K_CUSTOM_SIGNAL="zsh_signal"
+    POWERLEVEL9K_CUSTOM_SIGNAL_FOREGROUND="white"
+    POWERLEVEL9K_CUSTOM_SIGNAL_BACKGROUND="black"
+
+    POWERLEVEL9K_CUSTOM_DOCKER='echo "\uf299 $(docker ps -a | grep Up | wc -l)"' # \uf299 is 
+    POWERLEVEL9K_CUSTOM_DOCKER_FOREGROUND="white"
+    POWERLEVEL9K_CUSTOM_DOCKER_BACKGROUND="blue"
+
+    POWERLEVEL9K_CUSTOM_TIME='echo "$(date +%s)"'
+    POWERLEVEL9K_CUSTOM_TIME_FOREGROUND="black"
+    POWERLEVEL9K_CUSTOM_TIME_BACKGROUND="yellow"
+
+
+Then you get:
+
+![](http://i.imgur.com/QGGBTqY.png)
 
 ##### context
 

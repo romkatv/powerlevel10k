@@ -1,5 +1,9 @@
 ## v0.3.0 (next)
 
+### New segment `custom_command` added
+
+A new segment that allows users to define a custom command was added.
+
 ### `virtualenv` changes
 
 This segment now respects `VIRTUAL_ENV_DISABLE_PROMPT`. If this variable is set 

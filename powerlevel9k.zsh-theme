@@ -208,6 +208,15 @@ prompt_aws() {
   fi
 }
 
+# Custom: a way for the user to specify custom commands to run,
+# and display the output of.
+#
+prompt_custom() {
+  local command=POWERLEVEL9K_CUSTOM_$2:u
+
+  "$1_prompt_segment" "${0}_${2:u}" $DEFAULT_COLOR_INVERTED $DEFAULT_COLOR "$(eval ${(P)command})"
+}
+
 prompt_battery() {
   icons[BATTERY_ICON]=$'\UE894'
   # set default values of not specified in shell
@@ -681,7 +690,13 @@ build_left_prompt() {
   defined POWERLEVEL9K_LEFT_PROMPT_ELEMENTS || POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(context dir rbenv vcs)
 
   for element in "${POWERLEVEL9K_LEFT_PROMPT_ELEMENTS[@]}"; do
-    "prompt_$element" "left"
+    # Check if it is a custom command, otherwise interpet it as
+    # a prompt.
+    if [[ $element[0,7] =~ "custom_" ]]; then
+      "prompt_custom" "left" $element[8,-1]
+    else
+      "prompt_$element" "left"
+    fi
   done
 
   left_prompt_end
@@ -692,7 +707,13 @@ build_right_prompt() {
   defined POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS || POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(status history time)
 
   for element in "${POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS[@]}"; do
-    "prompt_$element" "right"
+    # Check if it is a custom command, otherwise interpet it as
+    # a prompt.
+    if [[ $element[0,7] =~ "custom_" ]]; then
+      "prompt_custom" "right" $element[8,-1]
+    else
+      "prompt_$element" "right"
+    fi
   done
 }
 
