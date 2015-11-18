@@ -213,10 +213,11 @@ prompt_battery() {
   # set default values of not specified in shell
   [[ -z $POWERLEVEL9K_BATTERY_CHARGING ]] && POWERLEVEL9K_BATTERY_CHARGING="yellow"
   [[ -z $POWERLEVEL9K_BATTERY_CHARGED ]] && POWERLEVEL9K_BATTERY_CHARGED="green"
-  [[ -z $POWERLEVEL9K_BATTERY_DISCONNECTED ]] && POWERLEVEL9K_BATTERY_DISCONNECTED="$DEFAULT_COLOR"
+  [[ -z $POWERLEVEL9K_BATTERY_DISCONNECTED ]] && POWERLEVEL9K_BATTERY_DISCONNECTED="$DEFAULT_COLOR_INVERTED"
   [[ -z $POWERLEVEL9K_BATTERY_LOW_THRESHOLD ]] && POWERLEVEL9K_BATTERY_LOW_THRESHOLD=10
   [[ -z $POWERLEVEL9K_BATTERY_LOW_COLOR ]] && POWERLEVEL9K_BATTERY_LOW_COLOR="red"
-  [[ -z $POWERLEVEL9K_BATTERY_FOREGROUND ]] && local fg_color="$DEFAULT_COLOR" || local fg_color=$POWERLEVEL9K_BATTERY_FOREGROUND
+  [[ -z $POWERLEVEL9K_BATTERY_FOREGROUND ]] && local fg_color="" || local fg_color="%F{$POWERLEVEL9K_BATTERY_FOREGROUND}"
+  [[ -z $POWERLEVEL9K_BATTERY_FOREGROUND ]] && local conn="$DEFAULT_COLOR_INVERTED" || local conn="$POWERLEVEL9K_BATTERY_FOREGROUND"
 
   if [[ $OS =~ OSX && -f /usr/sbin/ioreg && -x /usr/sbin/ioreg ]]; then
     # return if there is no battery on system
@@ -240,10 +241,10 @@ prompt_battery() {
     [[ ! -z $max_capacity && ! -z $current_capacity ]] && local bat_percent=$(ruby -e "puts ($current_capacity.to_f / $max_capacity.to_f * 100).round.to_i")
 
     # logic for string output
-    [[ $charging =~ true && $connected =~ true ]] && local conn="%F{$POWERLEVEL9K_BATTERY_CHARGING}" && local remain=" ($tstring)"
-    [[ ! $charging =~ true && $connected =~ true ]] && local conn="%F{$POWERLEVEL9K_BATTERY_CHARGED}" && local remain=""
+    [[ $charging =~ true && $connected =~ true ]] && local conn="$POWERLEVEL9K_BATTERY_CHARGING" && local remain=" ($tstring)"
+    [[ ! $charging =~ true && $connected =~ true ]] && local conn="$POWERLEVEL9K_BATTERY_CHARGED" && local remain=""
     if [[ ! $connected =~ true ]]; then
-      [[ $bat_percent -lt $POWERLEVEL9K_BATTERY_LOW_THRESHOLD ]] && local conn="%F{$POWERLEVEL9K_BATTERY_LOW_COLOR}" || local conn="%F{$POWERLEVEL9K_BATTERY_DISCONNECTED}"
+      [[ $bat_percent -lt $POWERLEVEL9K_BATTERY_LOW_THRESHOLD ]] && local conn="$POWERLEVEL9K_BATTERY_LOW_COLOR" || local conn="$POWERLEVEL9K_BATTERY_DISCONNECTED"
       local remain=" ($tstring)"
     fi
   fi
@@ -256,27 +257,26 @@ prompt_battery() {
 
     # return if no battery found
     [[ -z $bat ]] && return
-
     [[ $(cat $bat/capacity) -gt 100 ]] && local bat_percent=100 || local bat_percent=$(cat $bat/capacity)
     [[ $(cat $bat/status) =~ Charging ]] && local connected=true
-    [[ $(cat $bat/status) =~ Charging && $bat_percent =~ 100 ]] && local conn="%F{$POWERLEVEL9K_BATTERY_CHARGED}"
-    [[ $(cat $bat/status) =~ Charging && $bat_percent -lt 100 ]] && local conn="%F{$POWERLEVEL9K_BATTERY_CHARGING}"
-    if [[ ! $connected =~ true ]]; then
-      [[ $bat_percent -lt $POWERLEVEL9K_BATTERY_LOW_THRESHOLD ]] && local conn="%F{$POWERLEVEL9K_BATTERY_LOW_COLOR}" || local conn="%F{$POWERLEVEL9K_BATTERY_DISCONNECTED}"
+    [[ $(cat $bat/status) =~ Charging && $bat_percent =~ 100 ]] && local conn="$POWERLEVEL9K_BATTERY_CHARGED"
+    [[ $(cat $bat/status) =~ Charging && $bat_percent -lt 100 ]] && local conn="$POWERLEVEL9K_BATTERY_CHARGING"
+    if [[ -z  $connected ]]; then
+      [[ $bat_percent -lt $POWERLEVEL9K_BATTERY_LOW_THRESHOLD ]] && local conn="$POWERLEVEL9K_BATTERY_LOW_COLOR" || local conn="$POWERLEVEL9K_BATTERY_DISCONNECTED"
     fi
     if [[ -f /usr/bin/acpi ]]; then
       local time_remaining=$(acpi | awk '{ print $5 }')
       if [[ $time_remaining =~ rate ]]; then
         local tstring="..."
       elif [[ $time_remaining =~ "[:digit:]+" ]]; then
-        local tstring=${(f)$(date -u -d @$(echo $time_remaining | sed s/://g) +%k:%M)}
+        local tstring=${(f)$(date -u -d "$(echo $time_remaining)" +%k:%M)}
       fi
     fi
     [[ ! -z $tstring ]] && local remain=" ($tstring)"
   fi
 
   # display prompt_segment
-  [[ ! -z $bat_percent ]] && "$1_prompt_segment" "$0" "black" "$DEFAULT_COLOR" "$conn$(print_icon 'BATTERY_ICON')%F{$fg_color} $bat_percent%%$remain"
+  [[ ! -z $bat_percent ]] && "$1_prompt_segment" "$0" "$DEFAULT_COLOR" "$DEFAULT_COLOR_INVERTED" "%F{$conn}$(print_icon 'BATTERY_ICON')$fg_color $bat_percent%%$remain%f"
 }
 
 # Context: user@hostname (who am I and where am I)
