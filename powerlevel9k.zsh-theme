@@ -26,7 +26,9 @@ if [[ $(whence -w prompt_powerlevel9k_setup) =~ "function" ]]; then
   else
     # Script is a function! We assume this to happen only in
     # prezto, as they use the zstyle-builtin to set the theme.
-    0="${ZDOTDIR:-$HOME}/.zprezto/modules/prompt/functions/prompt_powerlevel9k_setup"
+    [[ -z "$POWERLEVEL9K_INSTALLATION_PATH" ]] && POWERLEVEL9K_INSTALLATION_PATH="${ZDOTDIR:-$HOME}/.zprezto/modules/prompt/functions/prompt_powerlevel9k_setup"
+
+    0=$POWERLEVEL9K_INSTALLATION_PATH
   fi
 fi
 
