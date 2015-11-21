@@ -41,7 +41,7 @@ elif [[ -f $0 ]]; then
   filename="$0"
 else
   print -P "%F{red}Script location could not be found!%f"
-  exit 1
+  return 1
 fi
 script_location="$(dirname $filename)"
 
