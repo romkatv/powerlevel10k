@@ -19,9 +19,15 @@
 
 # Check if the theme was called as a function.
 if [[ $(whence -w prompt_powerlevel9k_setup) =~ "function" ]]; then
-  # Script is a function! We assume this to happen only in
-  # prezto, as they use the zstyle-builtin to set the theme.
-  0="${ZDOTDIR:-$HOME}/.zprezto/modules/prompt/functions/prompt_powerlevel9k_setup"
+  autoload -U is-at-least
+  if is-at-least 5.0.8; then
+    # Try to find the correct path of the script.
+    0=$(whence -v $0 | sed "s/$0 is a shell function from //")
+  else
+    # Script is a function! We assume this to happen only in
+    # prezto, as they use the zstyle-builtin to set the theme.
+    0="${ZDOTDIR:-$HOME}/.zprezto/modules/prompt/functions/prompt_powerlevel9k_setup"
+  fi
 fi
 
 # Check if filename is a symlink.
