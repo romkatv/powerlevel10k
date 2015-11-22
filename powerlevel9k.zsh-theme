@@ -230,7 +230,7 @@ prompt_battery() {
 
     # convert time remaining from minutes to hours:minutes date string
     local time_remaining=$(echo $raw_data | grep TimeRemaining | awk '{ print $5 }')
-    if [[ ! -z $time_remaining ]]; then
+    if [[ -n $time_remaining ]]; then
       # this value is set to a very high number when the system is calculating
       [[ $time_remaining -gt 10000 ]] && local tstring="..." || local tstring=${(f)$(date -u -r $(($time_remaining * 60)) +%k:%M)}
     fi
@@ -278,11 +278,11 @@ prompt_battery() {
         local tstring=${(f)$(date -u -d "$(echo $time_remaining)" +%k:%M)}
       fi
     fi
-    [[ ! -z $tstring ]] && local remain=" ($tstring)"
+    [[ -n $tstring ]] && local remain=" ($tstring)"
   fi
 
   # display prompt_segment
-  [[ ! -z $bat_percent ]] && "$1_prompt_segment" "$0" "$DEFAULT_COLOR" "$DEFAULT_COLOR_INVERTED" "%F{$icon_color}$(print_icon 'BATTERY_ICON')$fg_color $bat_percent%%$remain%f"
+  [[ -n $bat_percent ]] && "$1_prompt_segment" "$0" "$DEFAULT_COLOR" "$DEFAULT_COLOR_INVERTED" "%F{$icon_color}$(print_icon 'BATTERY_ICON')$fg_color $bat_percent%%$remain%f"
 }
 
 # Context: user@hostname (who am I and where am I)
