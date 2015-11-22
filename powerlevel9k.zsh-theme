@@ -238,7 +238,12 @@ prompt_battery() {
     local max_capacity=$(ioreg -n AppleSmartBattery | grep MaxCapacity | awk '{ print $5 }')
     local current_capacity=$(ioreg -n AppleSmartBattery | grep CurrentCapacity | awk '{ print $5 }')
 
-    [[ ! -z $max_capacity && ! -z $current_capacity ]] && local bat_percent=$(ruby -e "puts ($current_capacity.to_f / $max_capacity.to_f * 100).round.to_i")
+    if [[ -n "$max_capacity" && -n "$current_capacity" ]]; then
+      typeset -F 2 current_capacity
+      current_capacity="$current_capacity"+0.00001
+      typeset -i 10 bat_percent
+      bat_percent=$(( (current_capacity / max_capacity) * 100 ))
+    fi
 
     # logic for string output
     [[ $charging =~ true && $connected =~ true ]] && local conn="$POWERLEVEL9K_BATTERY_CHARGING" && local remain=" ($tstring)"
