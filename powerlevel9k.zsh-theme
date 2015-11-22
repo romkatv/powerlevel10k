@@ -220,23 +220,24 @@ prompt_battery() {
   [[ -z $POWERLEVEL9K_BATTERY_FOREGROUND ]] && local conn="$DEFAULT_COLOR_INVERTED" || local conn="$POWERLEVEL9K_BATTERY_FOREGROUND"
 
   if [[ $OS =~ OSX && -f /usr/sbin/ioreg && -x /usr/sbin/ioreg ]]; then
+    local raw_data=$(ioreg -n AppleSmartBattery)
     # return if there is no battery on system
-    [[ -z $(ioreg -n AppleSmartBattery | grep MaxCapacity) ]] && return
+    [[ -z $(echo $raw_data | grep MaxCapacity) ]] && return
 
     # get charge status
-    [[ $(ioreg -n AppleSmartBattery | grep ExternalConnected | awk '{ print $5 }') =~ "Yes" ]] && local connected=true
-    [[ $(ioreg -n AppleSmartBattery | grep IsCharging | awk '{ print $5 }') =~ "Yes" ]] && local charging=true
+    [[ $(echo $raw_data | grep ExternalConnected | awk '{ print $5 }') =~ "Yes" ]] && local connected=true
+    [[ $(echo $raw_data | grep IsCharging | awk '{ print $5 }') =~ "Yes" ]] && local charging=true
 
     # convert time remaining from minutes to hours:minutes date string
-    local time_remaining=$(ioreg -n AppleSmartBattery | grep TimeRemaining | awk '{ print $5 }')
+    local time_remaining=$(echo $raw_data | grep TimeRemaining | awk '{ print $5 }')
     if [[ ! -z $time_remaining ]]; then
       # this value is set to a very high number when the system is calculating
       [[ $time_remaining -gt 10000 ]] && local tstring="..." || local tstring=${(f)$(date -u -r $(($time_remaining * 60)) +%k:%M)}
     fi
 
     # get charge values
-    local max_capacity=$(ioreg -n AppleSmartBattery | grep MaxCapacity | awk '{ print $5 }')
-    local current_capacity=$(ioreg -n AppleSmartBattery | grep CurrentCapacity | awk '{ print $5 }')
+    local max_capacity=$(echo $raw_data | grep MaxCapacity | awk '{ print $5 }')
+    local current_capacity=$(echo $raw_data | grep CurrentCapacity | awk '{ print $5 }')
 
     if [[ -n "$max_capacity" && -n "$current_capacity" ]]; then
       typeset -F 2 current_capacity
