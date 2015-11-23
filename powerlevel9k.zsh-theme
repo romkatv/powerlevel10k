@@ -240,10 +240,8 @@ prompt_battery() {
     local current_capacity=$(echo $raw_data | grep CurrentCapacity | awk '{ print $5 }')
 
     if [[ -n "$max_capacity" && -n "$current_capacity" ]]; then
-      typeset -F 2 current_capacity
-      current_capacity="$current_capacity"+0.00001
       typeset -i 10 bat_percent
-      bat_percent=$(( (current_capacity / max_capacity) * 100 ))
+      bat_percent=$(( (current_capacity * 100) / max_capacity ))
     fi
 
     # logic for string output
