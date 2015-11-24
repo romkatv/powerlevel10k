@@ -220,7 +220,9 @@ prompt_battery() {
   [[ -z $POWERLEVEL9K_BATTERY_FOREGROUND ]] && local icon_color="$DEFAULT_COLOR_INVERTED" || local icon_color="$POWERLEVEL9K_BATTERY_FOREGROUND"
 
   if [[ $OS =~ OSX && -f /usr/sbin/ioreg && -x /usr/sbin/ioreg ]]; then
-    local raw_data=$(ioreg -n AppleSmartBattery)
+    # Pre-Grep all needed informations to save some memory and
+    # as little pollution of the xtrace output as possible.
+    local raw_data=$(ioreg -n AppleSmartBattery | grep -E "MaxCapacity|TimeRemaining|CurrentCapacity|ExternalConnected|IsCharging")
     # return if there is no battery on system
     [[ -z $(echo $raw_data | grep MaxCapacity) ]] && return
 
