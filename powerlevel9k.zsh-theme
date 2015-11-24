@@ -291,6 +291,8 @@ prompt_battery() {
 
   # prepare string
   local message="$(print_icon 'BATTERY_ICON')"
+  # Default behavior: Be verbose!
+  set_default POWERLEVEL9K_BATTERY_VERBOSE true
   if [[ "$POWERLEVEL9K_BATTERY_VERBOSE" == true ]]; then
     message="$message $bat_percent%%$remain"
   fi
