@@ -317,7 +317,7 @@ prompt_dir() {
 # GO-prompt
 prompt_go_version() {
   local go_version
-  go_version=$(go version 2>&1 | grep -oe "^go[0-9.]*")
+  go_version=$(go version 2>&1 | sed -E "s/.*(go[0-9.]*).*/\1/")
 
   if [[ -n "$go_version" ]]; then
     "$1_prompt_segment" "$0" "green" "255" "$go_version"
