@@ -209,7 +209,6 @@ prompt_aws() {
 }
 
 prompt_battery() {
-  icons[BATTERY_ICON]=$'\UE894'
   # set default values of not specified in shell
   set_default POWERLEVEL9K_BATTERY_CHARGING       "yellow"
   set_default POWERLEVEL9K_BATTERY_CHARGED        "green"
