@@ -224,10 +224,6 @@ prompt_battery() {
     # return if there is no battery on system
     [[ -z $(echo $raw_data | grep MaxCapacity) ]] && return
 
-    # get charge status
-    [[ $(echo $raw_data | grep ExternalConnected | awk '{ print $5 }') =~ "Yes" ]] && local connected=true
-    [[ $(echo $raw_data | grep IsCharging | awk '{ print $5 }') =~ "Yes" ]] && local charging=true
-
     # convert time remaining from minutes to hours:minutes date string
     local time_remaining=$(echo $raw_data | grep TimeRemaining | awk '{ print $5 }')
     if [[ -n $time_remaining ]]; then
@@ -244,12 +240,20 @@ prompt_battery() {
       bat_percent=$(( (current_capacity * 100) / max_capacity ))
     fi
 
-    # logic for string output
-    [[ $charging =~ true && $connected =~ true ]] && local icon_color="$POWERLEVEL9K_BATTERY_CHARGING" && local remain=" ($tstring)"
-    [[ ! $charging =~ true && $connected =~ true ]] && local icon_color="$POWERLEVEL9K_BATTERY_CHARGED" && local remain=""
-    if [[ ! $connected =~ true ]]; then
+    local remain=""
+    ## logic for string output
+    # Powerplug connected
+    if [[ $(echo $raw_data | grep ExternalConnected | awk '{ print $5 }') =~ "Yes" ]]; then
+      # Battery is charging
+      if [[ $(echo $raw_data | grep IsCharging | awk '{ print $5 }') =~ "Yes" ]]; then
+        icon_color="$POWERLEVEL9K_BATTERY_CHARGING"
+        remain=" ($tstring)"
+      else
+        icon_color="$POWERLEVEL9K_BATTERY_CHARGED"
+      fi
+    else
       [[ $bat_percent -lt $POWERLEVEL9K_BATTERY_LOW_THRESHOLD ]] && local icon_color="$POWERLEVEL9K_BATTERY_LOW_COLOR" || local icon_color="$POWERLEVEL9K_BATTERY_DISCONNECTED"
-      local remain=" ($tstring)"
+      remain=" ($tstring)"
     fi
   fi
 
@@ -261,6 +265,7 @@ prompt_battery() {
 
     # return if no battery found
     [[ -z $bat ]] && return
+
     [[ $(cat $bat/capacity) -gt 100 ]] && local bat_percent=100 || local bat_percent=$(cat $bat/capacity)
     [[ $(cat $bat/status) =~ Charging ]] && local connected=true
     [[ $(cat $bat/status) =~ Charging && $bat_percent =~ 100 ]] && local icon_color="$POWERLEVEL9K_BATTERY_CHARGED"
