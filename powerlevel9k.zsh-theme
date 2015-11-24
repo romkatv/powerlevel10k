@@ -209,14 +209,18 @@ prompt_aws() {
 }
 
 prompt_battery() {
+  # The battery can have different states.
+  # Default is "unknown"
+  local current_state="unknown"
+  typeset -AH battery_states
+  battery_states=(
+    'low'           'red'
+    'charging'      'yellow'
+    'charged'       'green'
+    'disconnected'  "$DEFAULT_COLOR_INVERTED"
+  )
   # set default values of not specified in shell
-  set_default POWERLEVEL9K_BATTERY_CHARGING       "yellow"
-  set_default POWERLEVEL9K_BATTERY_CHARGED        "green"
-  set_default POWERLEVEL9K_BATTERY_DISCONNECTED   "$DEFAULT_COLOR_INVERTED"
   set_default POWERLEVEL9K_BATTERY_LOW_THRESHOLD  10
-  set_default POWERLEVEL9K_BATTERY_LOW_COLOR      "red"
-  [[ -z $POWERLEVEL9K_BATTERY_FOREGROUND ]] && local fg_color="" || local fg_color="%F{$POWERLEVEL9K_BATTERY_FOREGROUND}"
-  [[ -z $POWERLEVEL9K_BATTERY_FOREGROUND ]] && local icon_color="$DEFAULT_COLOR_INVERTED" || local icon_color="$POWERLEVEL9K_BATTERY_FOREGROUND"
 
   if [[ $OS =~ OSX && -f /usr/sbin/ioreg && -x /usr/sbin/ioreg ]]; then
     # Pre-Grep all needed informations to save some memory and
@@ -247,13 +251,13 @@ prompt_battery() {
     if [[ $(echo $raw_data | grep ExternalConnected | awk '{ print $5 }') =~ "Yes" ]]; then
       # Battery is charging
       if [[ $(echo $raw_data | grep IsCharging | awk '{ print $5 }') =~ "Yes" ]]; then
-        icon_color="$POWERLEVEL9K_BATTERY_CHARGING"
+        current_state="charging"
         remain=" ($tstring)"
       else
-        icon_color="$POWERLEVEL9K_BATTERY_CHARGED"
+        current_state="charged"
       fi
     else
-      [[ $bat_percent -lt $POWERLEVEL9K_BATTERY_LOW_THRESHOLD ]] && local icon_color="$POWERLEVEL9K_BATTERY_LOW_COLOR" || local icon_color="$POWERLEVEL9K_BATTERY_DISCONNECTED"
+      [[ $bat_percent -lt $POWERLEVEL9K_BATTERY_LOW_THRESHOLD ]] && current_state="low" || current_state="disconnected"
       remain=" ($tstring)"
     fi
   fi
@@ -269,10 +273,10 @@ prompt_battery() {
 
     [[ $(cat $bat/capacity) -gt 100 ]] && local bat_percent=100 || local bat_percent=$(cat $bat/capacity)
     [[ $(cat $bat/status) =~ Charging ]] && local connected=true
-    [[ $(cat $bat/status) =~ Charging && $bat_percent =~ 100 ]] && local icon_color="$POWERLEVEL9K_BATTERY_CHARGED"
-    [[ $(cat $bat/status) =~ Charging && $bat_percent -lt 100 ]] && local icon_color="$POWERLEVEL9K_BATTERY_CHARGING"
+    [[ $(cat $bat/status) =~ Charging && $bat_percent =~ 100 ]] && current_state="charged"
+    [[ $(cat $bat/status) =~ Charging && $bat_percent -lt 100 ]] && current_state="charging"
     if [[ -z  $connected ]]; then
-      [[ $bat_percent -lt $POWERLEVEL9K_BATTERY_LOW_THRESHOLD ]] && local icon_color="$POWERLEVEL9K_BATTERY_LOW_COLOR" || local icon_color="$POWERLEVEL9K_BATTERY_DISCONNECTED"
+      [[ $bat_percent -lt $POWERLEVEL9K_BATTERY_LOW_THRESHOLD ]] && current_state="low" || current_state="disconnected"
     fi
     if [[ -f /usr/bin/acpi ]]; then
       local time_remaining=$(acpi | awk '{ print $5 }')
@@ -286,7 +290,7 @@ prompt_battery() {
   fi
 
   # display prompt_segment
-  [[ -n $bat_percent ]] && "$1_prompt_segment" "$0" "$DEFAULT_COLOR" "$DEFAULT_COLOR_INVERTED" "%F{$icon_color}$(print_icon 'BATTERY_ICON')$fg_color $bat_percent%%$remain%f"
+  [[ -n $bat_percent ]] && "$1_prompt_segment" "${0}_${current_state}" "$DEFAULT_COLOR" "${battery_states[$current_state]}" "$(print_icon 'BATTERY_ICON') $bat_percent%%$remain"
 }
 
 # Context: user@hostname (who am I and where am I)
