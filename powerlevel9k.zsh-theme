@@ -320,7 +320,14 @@ prompt_dir() {
 
   fi
 
-  "$1_prompt_segment" "$0" "blue" "$DEFAULT_COLOR" "$(print_icon 'HOME_ICON')$current_path"
+  local current_icon=''
+  if [[ "$current_path" == '~'* ]]; then
+    current_icon=$(print_icon 'HOME_ICON')
+  else
+    current_icon=$(print_icon 'FOLDER_ICON')
+  fi
+
+  "$1_prompt_segment" "$0" "blue" "$DEFAULT_COLOR" "$current_icon$current_path"
 }
 
 # GO-prompt
