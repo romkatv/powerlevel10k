@@ -23,10 +23,16 @@ if [[ $(whence -w prompt_powerlevel9k_setup) =~ "function" ]]; then
   if is-at-least 5.0.8; then
     # Try to find the correct path of the script.
     0=$(whence -v $0 | sed "s/$0 is a shell function from //")
+  elif [[ -f "${ZDOTDIR:-$HOME}/.zprezto/modules/prompt/init.zsh" ]]; then
+    # If there is an prezto installation, we assume that powerlevel9k is linked there.
+    0="${ZDOTDIR:-$HOME}/.zprezto/modules/prompt/functions/prompt_powerlevel9k_setup"
   else
-    # Script is a function! We assume this to happen only in
-    # prezto, as they use the zstyle-builtin to set the theme.
-    [[ -z "$POWERLEVEL9K_INSTALLATION_PATH" ]] && POWERLEVEL9K_INSTALLATION_PATH="${ZDOTDIR:-$HOME}/.zprezto/modules/prompt/functions/prompt_powerlevel9k_setup"
+    # Fallback: specify an installation path!
+    if [[ -z "$POWERLEVEL9K_INSTALLATION_PATH" ]]; then
+      print -P "%F{red}We could not locate the installation path of powerlevel9k.%f"
+      print -P "Please specify by setting %F{blue}POWERLEVEL9K_INSTALLATION_PATH%f (full path incl. file name) at the very beginning of your ~/.zshrc"
+      return 1
+    fi
 
     0=$POWERLEVEL9K_INSTALLATION_PATH
   fi
