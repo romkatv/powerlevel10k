@@ -32,9 +32,14 @@ if [[ $(whence -w prompt_powerlevel9k_setup) =~ "function" ]]; then
       print -P "%F{red}We could not locate the installation path of powerlevel9k.%f"
       print -P "Please specify by setting %F{blue}POWERLEVEL9K_INSTALLATION_PATH%f (full path incl. file name) at the very beginning of your ~/.zshrc"
       return 1
+    elif [[ -L "$POWERLEVEL9K_INSTALLATION_PATH" ]]; then
+      # Symlink
+      0="$POWERLEVEL9K_INSTALLATION_PATH"
     elif [[ -f "$POWERLEVEL9K_INSTALLATION_PATH" ]]; then
+      # File
       0="$POWERLEVEL9K_INSTALLATION_PATH"
     elif [[ -d "$POWERLEVEL9K_INSTALLATION_PATH" ]]; then
+      # Directory
       0="${POWERLEVEL9K_INSTALLATION_PATH}/powerlevel9k.zsh-theme"
     fi
 
