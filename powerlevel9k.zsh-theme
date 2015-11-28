@@ -321,7 +321,7 @@ prompt_dir() {
   fi
 
   local current_icon=''
-  if [[ "$current_path" == '~'* ]]; then
+  if [[ $(print -P "%~") == '~'* ]]; then
     current_icon=$(print_icon 'HOME_ICON')
   else
     current_icon=$(print_icon 'FOLDER_ICON')
