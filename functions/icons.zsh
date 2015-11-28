@@ -96,7 +96,7 @@ case $POWERLEVEL9K_MODE in
       LINUX_ICON                     $'\UF17C'              # 
       SUNOS_ICON                     $'\UF185 '             # 
       HOME_ICON                      $'\UF015 '             # 
-      FOLDER_ICON                    ''
+      FOLDER_ICON                    $'\UF115 '             # 
       NETWORK_ICON                   $'\UF09E '             # 
       LOAD_ICON                      $'\UF080 '             # 
       RAM_ICON                       $'\UF0E4'              # 
