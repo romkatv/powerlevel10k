@@ -42,8 +42,6 @@ if [[ $(whence -w prompt_powerlevel9k_setup) =~ "function" ]]; then
       # Directory
       0="${POWERLEVEL9K_INSTALLATION_PATH}/powerlevel9k.zsh-theme"
     fi
-
-    0=$POWERLEVEL9K_INSTALLATION_PATH
   fi
 fi
 
