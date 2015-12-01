@@ -44,6 +44,7 @@ case $POWERLEVEL9K_MODE in
       LINUX_ICON                     $'\UE271'              # 
       SUNOS_ICON                     $'\U1F31E '            # 🌞
       HOME_ICON                      $'\UE12C '             # 
+      FOLDER_ICON                    $'\UE818 '             # 
       NETWORK_ICON                   $'\UE1AD '             # 
       LOAD_ICON                      $'\UE190 '             # 
       #RAM_ICON                       $'\UE87D'             # 
@@ -95,6 +96,7 @@ case $POWERLEVEL9K_MODE in
       LINUX_ICON                     $'\UF17C'              # 
       SUNOS_ICON                     $'\UF185 '             # 
       HOME_ICON                      $'\UF015 '             # 
+      FOLDER_ICON                    $'\UF115 '             # 
       NETWORK_ICON                   $'\UF09E '             # 
       LOAD_ICON                      $'\UF080 '             # 
       RAM_ICON                       $'\UF0E4'              # 
@@ -141,6 +143,7 @@ case $POWERLEVEL9K_MODE in
       LINUX_ICON                     'Lx'
       SUNOS_ICON                     'Sun'
       HOME_ICON                      ''
+      FOLDER_ICON                    ''
       NETWORK_ICON                   'IP'
       LOAD_ICON                      'L'
       RAM_ICON                       'RAM'
