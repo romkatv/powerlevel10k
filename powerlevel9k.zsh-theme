@@ -238,6 +238,13 @@ prompt_custom() {
   "$1_prompt_segment" "${0}_${2:u}" $DEFAULT_COLOR_INVERTED $DEFAULT_COLOR "$(eval ${(P)command})"
 }
 
+# print an icon, if there are background jobs
+prompt_background_jobs() {
+  if [[ $(jobs -l | wc -l) -gt 0 ]]; then
+    "$1_prompt_segment" "$0" "$DEFAULT_COLOR" "cyan" "$(print_icon 'BACKGROUND_JOBS_ICON')"
+  fi
+}
+
 prompt_battery() {
   # The battery can have different states.
   # Default is "unknown"
@@ -537,6 +544,13 @@ prompt_rbenv() {
   fi
 }
 
+# print an icon if user is root.
+prompt_root_indicator() {
+  if [[ "$UID" -eq 0 ]]; then
+    "$1_prompt_segment" "$0" "$DEFAULT_COLOR" "yellow" "$(print_icon 'ROOT_ICON')"
+  fi
+}
+
 # print Rust version number
 prompt_rust_version() {
   local rust_version
@@ -572,26 +586,17 @@ prompt_rvm() {
 # Status: (return code, root status, background jobs)
 set_default POWERLEVEL9K_STATUS_VERBOSE true
 prompt_status() {
-  local symbols bg
-  symbols=()
-
   if [[ "$POWERLEVEL9K_STATUS_VERBOSE" == true ]]; then
     if [[ "$RETVAL" -ne 0 ]]; then
-      symbols+="%F{226}$RETVAL $(print_icon 'CARRIAGE_RETURN_ICON')%f"
-      bg="red"
+      "$1_prompt_segment" "$0_ERROR" "red" "226" "$RETVAL $(print_icon 'CARRIAGE_RETURN_ICON')"
     else
-      symbols+="%F{046}$(print_icon 'OK_ICON')%f"
-      bg="black"
+      "$1_prompt_segment" "$0_OK" "$DEFAULT_COLOR" "046" "$(print_icon 'OK_ICON')"
     fi
   else
-    [[ "$RETVAL" -ne 0 ]] && symbols+="%{%F{red}%}$(print_icon 'FAIL_ICON')%f"
-    bg="$DEFAULT_COLOR"
+    if [[ "$RETVAL" -ne 0 ]]; then
+      "$1_prompt_segment" "$0_ERROR" "$DEFAULT_COLOR" "red" "$(print_icon 'FAIL_ICON')"
+    fi
   fi
-
-  [[ "$UID" -eq 0 ]] && symbols+="%{%F{yellow}%} $(print_icon 'ROOT_ICON')%f"
-  [[ $(jobs -l | wc -l) -gt 0 ]] && symbols+="%{%F{cyan}%}$(print_icon 'BACKGROUND_JOBS_ICON')%f"
-
-  [[ -n "$symbols" ]] && "$1_prompt_segment" "$0" "$bg" "white" "$symbols"
 }
 
 # Symfony2-PHPUnit test ratio
@@ -753,7 +758,7 @@ build_left_prompt() {
 
 # Right prompt
 build_right_prompt() {
-  defined POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS || POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(status history time)
+  defined POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS || POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(status background_jobs root_indicator history time)
 
   for element in "${POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS[@]}"; do
     # Check if it is a custom command, otherwise interpet it as

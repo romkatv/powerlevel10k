@@ -1,5 +1,11 @@
 ## v0.3.0 (next)
 
+### `status` changes
+
+The `status` segment was split up into three segments. `background_jobs` prints
+an icon if there are background jobs. `root_indicator` prints an icon if the user
+is root. The `status` segment focuses now on the status only.
+
 ### New segment `custom_command` added
 
 A new segment that allows users to define a custom command was added.

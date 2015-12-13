@@ -71,6 +71,7 @@ configuration is the default:
 The segments that are currently available are:
 
 * [aws](#aws) - The current AWS profile, if active.
+* **background_jobs** - INdicator for background jobs.
 * [battery](#battery) - Current battery status.
 * [context](#context) - Your username and host.
 * [custom_command](#custom_command) - A custom command to display the output of.
@@ -85,9 +86,10 @@ The segments that are currently available are:
 * **php_version** - Show the current PHP version.
 * [ram](#ram) - Show free RAM and used Swap.
 * [rbenv](#rbenv) - Ruby environment information (if one is active).
+* **root_indicator** - An indicator if the user is root.
 * [rspec_stats](#rspec_stats) - Show a ratio of test classes vs code classes for RSpec.
 * **rust_version** - Display the current rust version.
-* [status](#status) - The return code of the previous command, and status of background jobs.
+* [status](#status) - The return code of the previous command.
 * [symphony2_tests](#symphony2_tests) - Show a ratio of test classes vs code classes for Symfony2.
 * **symphony2_version** - Show the current Symfony2 version, if you are in a Symfony2-Project dir.
 * [time](#time) - System time.
@@ -222,10 +224,9 @@ See [Unit Test Ratios](#unit-test-ratios), below.
 
 ##### status
 
-This segment shows the return code of the last command, and the presence of any
-background jobs. By default, this segment will always print, but you can
-customize it to only print if there is an error or a forked job by setting the
-following variable in your `~/.zshrc`.
+This segment shows the return code of the last command. By default, this
+segment will always print, but you can customize it to only print if there
+is an error by setting the following variable in your `~/.zshrc`.
 
     POWERLEVEL9K_STATUS_VERBOSE=false
 
