@@ -251,7 +251,7 @@ prompt_aws() {
   local aws_profile="$AWS_DEFAULT_PROFILE"
   if [[ -n "$aws_profile" ]];
   then
-    "$1_prompt_segment" "$0" red white "$(print_icon 'AWS_ICON') $aws_profile"
+    "$1_prompt_segment" "$0" red white "$aws_profile" 'AWS_ICON'
   fi
 }
 
