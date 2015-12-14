@@ -782,7 +782,7 @@ $(print_icon 'MULTILINE_SECOND_PROMPT_PREFIX')"
       RPROMPT_PREFIX='%{'$'\e[1A''%}' # one line up
       RPROMPT_SUFFIX='%{'$'\e[1B''%}' # one line down
     else
-      RPROMPT_PREFIX='' 
+      RPROMPT_PREFIX=''
       RPROMPT_SUFFIX=''
     fi
   else
@@ -838,7 +838,7 @@ powerlevel9k_init() {
   print_deprecation_warning deprecated_segments
 
   setopt prompt_subst
-  
+
   setopt LOCAL_OPTIONS
   unsetopt XTRACE KSH_ARRAYS
   setopt PROMPT_CR PROMPT_PERCENT PROMPT_SUBST MULTIBYTE
