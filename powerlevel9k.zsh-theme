@@ -346,15 +346,15 @@ prompt_battery() {
   fi
 
   # prepare string
-  local message="$(print_icon 'BATTERY_ICON')"
+  local message
   # Default behavior: Be verbose!
   set_default POWERLEVEL9K_BATTERY_VERBOSE true
   if [[ "$POWERLEVEL9K_BATTERY_VERBOSE" == true ]]; then
-    message="$message $bat_percent%%$remain"
+    message="$bat_percent%%$remain"
   fi
 
   # display prompt_segment
-  [[ -n $bat_percent ]] && "$1_prompt_segment" "${0}_${current_state}" "$DEFAULT_COLOR" "${battery_states[$current_state]}" "$message"
+  [[ -n $bat_percent ]] && "$1_prompt_segment" "${0}_${current_state}" "$DEFAULT_COLOR" "${battery_states[$current_state]}" "$message" 'BATTERY_ICON'
 }
 
 # Context: user@hostname (who am I and where am I)
