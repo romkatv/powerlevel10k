@@ -391,12 +391,10 @@ prompt_dir() {
 
   local current_icon=''
   if [[ $(print -P "%~") == '~'* ]]; then
-    current_icon=$(print_icon 'HOME_ICON')
+    "$1_prompt_segment" "$0" "blue" "$DEFAULT_COLOR" "$current_path" 'HOME_ICON'
   else
-    current_icon=$(print_icon 'FOLDER_ICON')
+    "$1_prompt_segment" "$0" "blue" "$DEFAULT_COLOR" "$current_path" 'FOLDER_ICON'
   fi
-
-  "$1_prompt_segment" "$0" "blue" "$DEFAULT_COLOR" "$current_icon$current_path"
 }
 
 # GO-prompt
