@@ -449,7 +449,7 @@ prompt_ip() {
     fi
   fi
 
-  "$1_prompt_segment" "$0" "cyan" "$DEFAULT_COLOR" "$(print_icon 'NETWORK_ICON') $ip"
+  "$1_prompt_segment" "$0" "cyan" "$DEFAULT_COLOR" "$ip" 'NETWORK_ICON'
 }
 
 prompt_load() {
