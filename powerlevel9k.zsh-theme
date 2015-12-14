@@ -123,7 +123,8 @@ CURRENT_BG='NONE'
 #   * $2: Background color
 #   * $3: Foreground color
 #   * $4: The segment content
-# The latter three can be omitted,
+#   * $5: An identifying icon (must be a key of the icons array)
+# The latter four can be omitted,
 set_default POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS " "
 left_prompt_segment() {
   # Overwrite given background-color by user defined variable for this segment.
@@ -154,8 +155,16 @@ left_prompt_segment() {
     # First segment
     echo -n "%{$bg%}%{$fg%}$POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS"
   fi
+
+  local visual_identifier
+  if [[ -n $5 ]]; then
+    visual_identifier="$(print_icon $5)"
+    # Add an whitespace if we print more than just the visual identifier
+    [[ -n $4 ]] && visual_identifier="$visual_identifier "
+  fi
+
+  echo -n "$visual_identifier$4$POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS"
   CURRENT_BG=$2
-  [[ -n $4 ]] && echo -n "$4$POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS"
 }
 
 # End the left prompt, closes the final segment.
@@ -178,6 +187,7 @@ CURRENT_RIGHT_BG='NONE'
 #   * $2: Background color
 #   * $3: Foreground color
 #   * $4: The segment content
+#   * $5: An identifying icon (must be a key of the icons array)
 # No ending for the right prompt segment is needed (unlike the left prompt, above).
 set_default POWERLEVEL9K_WHITESPACE_BETWEEN_RIGHT_SEGMENTS " "
 right_prompt_segment() {
@@ -206,8 +216,16 @@ right_prompt_segment() {
   else
     echo -n "%F{$2}$(print_icon 'RIGHT_SEGMENT_SEPARATOR')%f%{$bg%}%{$fg%}$POWERLEVEL9K_WHITESPACE_BETWEEN_RIGHT_SEGMENTS"
   fi
-  [[ -n $4 ]] && echo -n "$4$POWERLEVEL9K_WHITESPACE_BETWEEN_RIGHT_SEGMENTS%f"
 
+  local visual_identifier
+  if [[ -n $5 ]]; then
+    # Swap the spaces around an icon if the icon is displayed on the right side.
+    visual_identifier=$(print_icon $5 | sed -E "s/( *)([^ ]*)( *)/\3\2\1/")
+    # Add an whitespace if we print more than just the visual identifier
+    [[ -n $4 ]] && visual_identifier=" $visual_identifier"
+  fi
+
+  echo -n "$4$visual_identifier$POWERLEVEL9K_WHITESPACE_BETWEEN_RIGHT_SEGMENTS%f"
   CURRENT_RIGHT_BG=$2
 }
 
