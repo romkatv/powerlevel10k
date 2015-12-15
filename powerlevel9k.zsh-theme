@@ -223,8 +223,7 @@ right_prompt_segment() {
 
   local visual_identifier
   if [[ -n $5 ]]; then
-    # Swap the spaces around an icon if the icon is displayed on the right side.
-    visual_identifier=$(print_icon $5 | sed -E "s/( *)([^ ]*)( *)/\3\2\1/")
+    visual_identifier="$(print_icon $5)"
     # Allow users to overwrite the color for the visual identifier only.
     local visual_identifier_color_variable=POWERLEVEL9K_${(U)1#prompt_}_VISUAL_IDENTIFIER_COLOR
     set_default $visual_identifier_color_variable $fg
