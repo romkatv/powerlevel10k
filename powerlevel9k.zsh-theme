@@ -589,7 +589,7 @@ prompt_rvm() {
   local version=$(echo $MY_RUBY_HOME | awk -F'-' '{print $2}')
 
   if [[ -n "$version$gemset" ]]; then
-    "$1_prompt_segment" "$0" "240" "$DEFAULT_COLOR" "$version$gemset $(print_icon 'RUBY_ICON') "
+    "$1_prompt_segment" "$0" "240" "$DEFAULT_COLOR" "$version$gemset" 'RUBY_ICON'
   fi
 }
 
