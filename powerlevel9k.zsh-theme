@@ -481,7 +481,7 @@ prompt_node_version() {
   local node_version=$(node -v 2>/dev/null)
   [[ -z "${node_version}" ]] && return
 
-  "$1_prompt_segment" "$0" "green" "white" "${node_version:1} $(print_icon 'NODE_ICON')"
+  "$1_prompt_segment" "$0" "green" "white" "${node_version:1}" 'NODE_ICON'
 }
 
 # print a little OS icon
