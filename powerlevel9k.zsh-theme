@@ -473,7 +473,7 @@ prompt_load() {
     FUNCTION_SUFFIX="_NORMAL"
   fi
 
-  "$1_prompt_segment" "$0$FUNCTION_SUFFIX" "$BACKGROUND_COLOR" "$DEFAULT_COLOR" "$(print_icon 'LOAD_ICON') $load_avg_5min"
+  "$1_prompt_segment" "$0$FUNCTION_SUFFIX" "$BACKGROUND_COLOR" "$DEFAULT_COLOR" "$load_avg_5min" 'LOAD_ICON'
 }
 
 # Node version
