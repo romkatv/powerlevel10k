@@ -550,7 +550,7 @@ prompt_nvm() {
   [[ -z "${node_version}" ]] && return
   [[ "$node_version" =~ "$nvm_default" ]] && return
 
-  $1_prompt_segment "$0" "green" "011" "${node_version:1} $(print_icon 'NODE_ICON')"
+  $1_prompt_segment "$0" "green" "011" "${node_version:1}" 'NODE_ICON'
 }
 
 # rbenv information
