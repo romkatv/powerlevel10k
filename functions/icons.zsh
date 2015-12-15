@@ -43,9 +43,9 @@ case $POWERLEVEL9K_MODE in
       FREEBSD_ICON                   $'\U1F608 '            # 😈
       LINUX_ICON                     $'\UE271'              # 
       SUNOS_ICON                     $'\U1F31E '            # 🌞
-      HOME_ICON                      $'\UE12C '             # 
-      FOLDER_ICON                    $'\UE818 '             # 
-      NETWORK_ICON                   $'\UE1AD '             # 
+      HOME_ICON                      $'\UE12C'              # 
+      FOLDER_ICON                    $'\UE818'              # 
+      NETWORK_ICON                   $'\UE1AD'              # 
       LOAD_ICON                      $'\UE190 '             # 
       #RAM_ICON                       $'\UE87D'             # 
       RAM_ICON                       $'\UE1E2 '             # 
@@ -95,9 +95,9 @@ case $POWERLEVEL9K_MODE in
       FREEBSD_ICON                   $'\U1F608 '            # 😈
       LINUX_ICON                     $'\UF17C'              # 
       SUNOS_ICON                     $'\UF185 '             # 
-      HOME_ICON                      $'\UF015 '             # 
-      FOLDER_ICON                    $'\UF115 '             # 
-      NETWORK_ICON                   $'\UF09E '             # 
+      HOME_ICON                      $'\UF015'              # 
+      FOLDER_ICON                    $'\UF115'              # 
+      NETWORK_ICON                   $'\UF09E'              # 
       LOAD_ICON                      $'\UF080 '             # 
       RAM_ICON                       $'\UF0E4'              # 
       VCS_UNTRACKED_ICON             $'\UF059'              # 
