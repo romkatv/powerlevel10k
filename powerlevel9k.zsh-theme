@@ -161,7 +161,7 @@ left_prompt_segment() {
     visual_identifier="$(print_icon $5)"
     # Allow users to overwrite the color for the visual identifier only.
     local visual_identifier_color_variable=POWERLEVEL9K_${(U)1#prompt_}_VISUAL_IDENTIFIER_COLOR
-    set_default $visual_identifier_color_variable $fg
+    set_default $visual_identifier_color_variable $3
     visual_identifier="%F{${(P)visual_identifier_color_variable}%}$visual_identifier%f"
     # Add an whitespace if we print more than just the visual identifier
     [[ -n $4 ]] && visual_identifier="$visual_identifier "
@@ -226,7 +226,7 @@ right_prompt_segment() {
     visual_identifier="$(print_icon $5)"
     # Allow users to overwrite the color for the visual identifier only.
     local visual_identifier_color_variable=POWERLEVEL9K_${(U)1#prompt_}_VISUAL_IDENTIFIER_COLOR
-    set_default $visual_identifier_color_variable $fg
+    set_default $visual_identifier_color_variable $3
     visual_identifier="%F{${(P)visual_identifier_color_variable}%}$visual_identifier%f"
     # Add an whitespace if we print more than just the visual identifier
     [[ -n $4 ]] && visual_identifier=" $visual_identifier"
