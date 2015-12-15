@@ -556,7 +556,7 @@ prompt_nvm() {
 # rbenv information
 prompt_rbenv() {
   if [[ -n "$RBENV_VERSION" ]]; then
-    "$1_prompt_segment" "$0" "red" "$DEFAULT_COLOR" "$RBENV_VERSION"
+    "$1_prompt_segment" "$0" "red" "$DEFAULT_COLOR" "$RBENV_VERSION" 'RUBY_ICON'
   fi
 }
 
