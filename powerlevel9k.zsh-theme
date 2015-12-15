@@ -142,7 +142,7 @@ left_prompt_segment() {
   [[ -n $3 ]] && fg="%F{$3}" || fg="%f"
   if [[ $CURRENT_BG != 'NONE' ]] && ! isSameColor "$2" "$CURRENT_BG"; then
     # Middle segment
-    echo -n "%{$bg%F{$CURRENT_BG}%}$(print_icon 'LEFT_SEGMENT_SEPARATOR')%{$fg%}$POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS"
+    echo -n "%{$bg%F{$CURRENT_BG}%}$(print_icon 'LEFT_SEGMENT_SEPARATOR')$POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS"
   elif isSameColor "$CURRENT_BG" "$2"; then
     # Middle segment with same color as previous segment
     # We take the current foreground color as color for our
@@ -150,10 +150,10 @@ left_prompt_segment() {
     # enough contrast.
     local complement
     [[ -n $3 ]] && complement=$3 || complement=$DEFAULT_COLOR
-    echo -n "%{$bg%F{$complement}%}$(print_icon 'LEFT_SUBSEGMENT_SEPARATOR')%{$fg%}$POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS"
+    echo -n "%{$bg%F{$complement}%}$(print_icon 'LEFT_SUBSEGMENT_SEPARATOR')$POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS"
   else
     # First segment
-    echo -n "%{$bg%}%{$fg%}$POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS"
+    echo -n "%{$bg%}$POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS"
   fi
 
   local visual_identifier
@@ -167,7 +167,7 @@ left_prompt_segment() {
     [[ -n $4 ]] && visual_identifier="$visual_identifier "
   fi
 
-  echo -n "$visual_identifier$4$POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS"
+  echo -n "$visual_identifier%{$fg%}$4$POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS"
   CURRENT_BG=$2
 }
 
