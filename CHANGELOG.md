@@ -1,5 +1,11 @@
 ## v0.3.0 (next)
 
+### Added ability for "joined" segments
+
+You can now merge segments together by suffixing the segment name with "_joined".
+For Developers: Be aware that the order of parameters in left/right_prompt_segment
+has changed. Now a boolean parameter must be set as second parameter (true if joined).
+
 ### `status` changes
 
 The `status` segment was split up into three segments. `background_jobs` prints
