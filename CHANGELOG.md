@@ -1,5 +1,10 @@
 ## v0.3.0 (next)
 
+### Introduced "visual identifiers" to the segments
+
+Now almost every segment can have a visual identifier, which is an
+icon whose color could be adjusted by users.
+
 ### New segment `custom_command` added
 
 A new segment that allows users to define a custom command was added.
