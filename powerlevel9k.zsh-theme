@@ -580,7 +580,7 @@ prompt_rspec_stats() {
     code_amount=$(ls -1 app/**/*.rb | wc -l)
     tests_amount=$(ls -1 spec/**/*.rb | wc -l)
 
-    build_test_stats "$1" "$0" "$code_amount" "$tests_amount" "RSpec $(print_icon 'TEST_ICON')"
+    build_test_stats "$1" "$0" "$code_amount" "$tests_amount" "RSpec" 'TEST_ICON'
   fi
 }
 
@@ -628,7 +628,7 @@ prompt_symfony2_tests() {
     code_amount=$(ls -1 src/**/*.php | grep -vc Tests)
     tests_amount=$(ls -1 src/**/*.php | grep -c Tests)
 
-    build_test_stats "$1" "$0" "$code_amount" "$tests_amount" "SF2 $(print_icon 'TEST_ICON')"
+    build_test_stats "$1" "$0" "$code_amount" "$tests_amount" "SF2" 'TEST_ICON'
   fi
 }
 
@@ -651,9 +651,9 @@ build_test_stats() {
   typeset -F 2 ratio
   local ratio=$(( (tests_amount/code_amount) * 100 ))
 
-  (( ratio >= 75 )) && "$1_prompt_segment" "${2}_GOOD" "cyan" "$DEFAULT_COLOR" "$headline: $ratio%%"
-  (( ratio >= 50 && ratio < 75 )) && "$1_prompt_segment" "$2_AVG" "yellow" "$DEFAULT_COLOR" "$headline: $ratio%%"
-  (( ratio < 50 )) && "$1_prompt_segment" "$2_BAD" "red" "$DEFAULT_COLOR" "$headline: $ratio%%"
+  (( ratio >= 75 )) && "$1_prompt_segment" "${2}_GOOD" "cyan" "$DEFAULT_COLOR" "$headline: $ratio%%" "$6"
+  (( ratio >= 50 && ratio < 75 )) && "$1_prompt_segment" "$2_AVG" "yellow" "$DEFAULT_COLOR" "$headline: $ratio%%" "$6"
+  (( ratio < 50 )) && "$1_prompt_segment" "$2_BAD" "red" "$DEFAULT_COLOR" "$headline: $ratio%%" "$6"
 }
 
 # System time
