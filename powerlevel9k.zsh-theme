@@ -766,7 +766,7 @@ build_left_prompt() {
   defined POWERLEVEL9K_LEFT_PROMPT_ELEMENTS || POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(context dir rbenv vcs)
 
   for element in "${POWERLEVEL9K_LEFT_PROMPT_ELEMENTS[@]}"; do
-    # Check if the segment should be joined with the next one
+    # Check if the segment should be joined with the previous one
     local joined=false
     if [[ ${element[-7,-1]} == '_joined' ]]; then
       element="${element[0,-8]}"
@@ -786,10 +786,10 @@ build_left_prompt() {
 
 # Right prompt
 build_right_prompt() {
-  defined POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS || POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(status background_jobs root_indicator history time)
+  defined POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS || POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(status root_indicator background_jobs history time)
 
   for element in "${POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS[@]}"; do
-    # Check if the segment should be joined with the next one
+    # Check if the segment should be joined with the previous one
     local joined=false
     if [[ ${element[-7,-1]} == '_joined' ]]; then
       element="${element[0,-8]}"
