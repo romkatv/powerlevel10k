@@ -724,12 +724,10 @@ prompt_vcs() {
 
   if [[ -n "$vcs_prompt" ]]; then
     if [[ "$VCS_WORKDIR_DIRTY" == true ]]; then
-      "$1_prompt_segment" "$0_MODIFIED" "$2" "yellow" "$DEFAULT_COLOR"
+      "$1_prompt_segment" "$0_MODIFIED" "$2" "yellow" "$DEFAULT_COLOR" "$vcs_prompt"
     else
-      "$1_prompt_segment" "$0" "$2" "green" "$DEFAULT_COLOR"
+      "$1_prompt_segment" "$0" "$2" "green" "$DEFAULT_COLOR" "$vcs_prompt"
     fi
-
-    echo -n "$vcs_prompt "
   fi
 }
 
