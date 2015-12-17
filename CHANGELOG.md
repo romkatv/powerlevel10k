@@ -5,6 +5,18 @@
 Now almost every segment can have a visual identifier, which is an
 icon whose color could be adjusted by users.
 
+### Added ability for "joined" segments
+
+You can now merge segments together by suffixing the segment name with "_joined".
+For Developers: Be aware that the order of parameters in left/right_prompt_segment
+has changed. Now a boolean parameter must be set as second parameter (true if joined).
+
+### `status` changes
+
+The `status` segment was split up into three segments. `background_jobs` prints
+an icon if there are background jobs. `root_indicator` prints an icon if the user
+is root. The `status` segment focuses now on the status only.
+
 ### New segment `custom_command` added
 
 A new segment that allows users to define a custom command was added.
