@@ -637,7 +637,7 @@ prompt_symfony2_version() {
   if [[ -f app/bootstrap.php.cache ]]; then
     local symfony2_version
     symfony2_version=$(grep " VERSION " app/bootstrap.php.cache | sed -e 's/[^.0-9]*//g')
-    "$1_prompt_segment" "$0" "240" "$DEFAULT_COLOR" "$(print_icon 'SYMFONY_ICON') $symfony2_version"
+    "$1_prompt_segment" "$0" "240" "$DEFAULT_COLOR" "$symfony2_version" 'SYMFONY_ICON'
   fi
 }
 
