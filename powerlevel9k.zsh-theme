@@ -520,7 +520,7 @@ prompt_ram() {
           base=K
         fi
 
-        rendition+="$(print_icon 'RAM_ICON') $(printSizeHumanReadable "$ramfree" $base) "
+        rendition+="$(printSizeHumanReadable "$ramfree" $base) "
       ;;
       swap_used)
         if [[ "$OS" == "OSX" ]]; then
@@ -543,7 +543,7 @@ prompt_ram() {
     esac
   done
 
-  "$1_prompt_segment" "$0" "yellow" "$DEFAULT_COLOR" "${rendition% }"
+  "$1_prompt_segment" "$0" "yellow" "$DEFAULT_COLOR" "${rendition% }" 'RAM_ICON'
 }
 
 # Node version from NVM
