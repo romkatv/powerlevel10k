@@ -78,6 +78,12 @@ function +vi-hg-bookmarks() {
 }
 
 function +vi-vcs-detect-changes() {
+  if [[ "${hook_com[vcs]}" == "git" ]]; then
+    vcs_visual_identifier='VCS_GIT_ICON'
+  elif [[ "${hook_com[vcs]}" == "hg" ]]; then
+    vcs_visual_identifier='VCS_HG_ICON'
+  fi
+
   if [[ -n "${hook_com[staged]}" ]] || [[ -n "${hook_com[unstaged]}" ]]; then
     VCS_WORKDIR_DIRTY=true
   else

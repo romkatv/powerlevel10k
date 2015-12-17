@@ -696,8 +696,7 @@ prompt_vcs() {
   zstyle ':vcs_info:*' check-for-changes true
 
   VCS_DEFAULT_FORMAT="$VCS_CHANGESET_PREFIX%F{$POWERLEVEL9K_VCS_FOREGROUND}%b%c%u%m%f"
-  zstyle ':vcs_info:git*:*' formats "%F{$POWERLEVEL9K_VCS_FOREGROUND}$(print_icon 'VCS_GIT_ICON')%f$VCS_DEFAULT_FORMAT"
-  zstyle ':vcs_info:hg*:*' formats "%F{$POWERLEVEL9K_VCS_FOREGROUND}$(print_icon 'VCS_HG_ICON')%f$VCS_DEFAULT_FORMAT"
+  zstyle ':vcs_info:*' formats "$VCS_DEFAULT_FORMAT"
 
   zstyle ':vcs_info:*' actionformats "%b %F{red}| %a%f"
 
@@ -724,12 +723,12 @@ prompt_vcs() {
 
   if [[ -n "$vcs_prompt" ]]; then
     if [[ "$VCS_WORKDIR_DIRTY" == true ]]; then
-      "$1_prompt_segment" "$0_MODIFIED" "yellow" "$DEFAULT_COLOR"
+      # $vcs_visual_identifier gets set in +vi-vcs-detect-changes in functions/vcs.zsh,
+      # as we have there access to vcs_info internal hooks.
+      "$1_prompt_segment" "$0_MODIFIED" "yellow" "$DEFAULT_COLOR" "$vcs_prompt" "$vcs_visual_identifier"
     else
-      "$1_prompt_segment" "$0" "green" "$DEFAULT_COLOR"
+      "$1_prompt_segment" "$0" "green" "$DEFAULT_COLOR" "$vcs_prompt" "$vcs_visual_identifier"
     fi
-
-    echo -n "$vcs_prompt "
   fi
 }
 
