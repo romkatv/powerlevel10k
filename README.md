@@ -71,7 +71,7 @@ configuration is the default:
 The segments that are currently available are:
 
 * [aws](#aws) - The current AWS profile, if active.
-* **background_jobs** - INdicator for background jobs.
+* **background_jobs** - Indicator for background jobs.
 * [battery](#battery) - Current battery status.
 * [context](#context) - Your username and host.
 * [custom_command](#custom_command) - A custom command to display the output of.
