@@ -549,7 +549,7 @@ prompt_ram() {
           base=K
         fi
 
-        rendition+="$(print_icon 'RAM_ICON') $(printSizeHumanReadable "$ramfree" $base) "
+        rendition+="$(printSizeHumanReadable "$ramfree" $base) "
       ;;
       swap_used)
         if [[ "$OS" == "OSX" ]]; then
@@ -572,7 +572,7 @@ prompt_ram() {
     esac
   done
 
-  "$1_prompt_segment" "$0" "$2" "yellow" "$DEFAULT_COLOR" "${rendition% }"
+  "$1_prompt_segment" "$0" "$2" "yellow" "$DEFAULT_COLOR" "${rendition% }" 'RAM_ICON'
 }
 
 # Node version from NVM
@@ -616,7 +616,7 @@ prompt_rspec_stats() {
     code_amount=$(ls -1 app/**/*.rb | wc -l)
     tests_amount=$(ls -1 spec/**/*.rb | wc -l)
 
-    build_test_stats "$1" "$0" "$2" "$code_amount" "$tests_amount" "RSpec $(print_icon 'TEST_ICON')"
+    build_test_stats "$1" "$0" "$2" "$code_amount" "$tests_amount" "RSpec" 'TEST_ICON'
   fi
 }
 
@@ -655,7 +655,7 @@ prompt_symfony2_tests() {
     code_amount=$(ls -1 src/**/*.php | grep -vc Tests)
     tests_amount=$(ls -1 src/**/*.php | grep -c Tests)
 
-    build_test_stats "$1" "$0" "$2" "$code_amount" "$tests_amount" "SF2 $(print_icon 'TEST_ICON')"
+    build_test_stats "$1" "$0" "$2" "$code_amount" "$tests_amount" "SF2" 'TEST_ICON'
   fi
 }
 
@@ -664,7 +664,7 @@ prompt_symfony2_version() {
   if [[ -f app/bootstrap.php.cache ]]; then
     local symfony2_version
     symfony2_version=$(grep " VERSION " app/bootstrap.php.cache | sed -e 's/[^.0-9]*//g')
-    "$1_prompt_segment" "$0" "$2" "240" "$DEFAULT_COLOR" "$(print_icon 'SYMFONY_ICON') $symfony2_version"
+    "$1_prompt_segment" "$0" "$2" "240" "$DEFAULT_COLOR" "$symfony2_version" 'SYMFONY_ICON'
   fi
 }
 
@@ -678,9 +678,9 @@ build_test_stats() {
   typeset -F 2 ratio
   local ratio=$(( (tests_amount/code_amount) * 100 ))
 
-  (( ratio >= 75 )) && "$1_prompt_segment" "${2}_GOOD" "$3" "cyan" "$DEFAULT_COLOR" "$headline: $ratio%%"
-  (( ratio >= 50 && ratio < 75 )) && "$1_prompt_segment" "${2}_AVG" "$3" "yellow" "$DEFAULT_COLOR" "$headline: $ratio%%"
-  (( ratio < 50 )) && "$1_prompt_segment" "${2}_BAD" "red" "$3" "$DEFAULT_COLOR" "$headline: $ratio%%"
+  (( ratio >= 75 )) && "$1_prompt_segment" "${2}_GOOD" "$3" "cyan" "$DEFAULT_COLOR" "$headline: $ratio%%" "$6"
+  (( ratio >= 50 && ratio < 75 )) && "$1_prompt_segment" "$2_AVG" "$3" "yellow" "$DEFAULT_COLOR" "$headline: $ratio%%" "$6"
+  (( ratio < 50 )) && "$1_prompt_segment" "$2_BAD" "$3" "red" "$DEFAULT_COLOR" "$headline: $ratio%%" "$6"
 }
 
 # System time
@@ -723,8 +723,7 @@ prompt_vcs() {
   zstyle ':vcs_info:*' check-for-changes true
 
   VCS_DEFAULT_FORMAT="$VCS_CHANGESET_PREFIX%F{$POWERLEVEL9K_VCS_FOREGROUND}%b%c%u%m%f"
-  zstyle ':vcs_info:git*:*' formats "%F{$POWERLEVEL9K_VCS_FOREGROUND}$(print_icon 'VCS_GIT_ICON')%f$VCS_DEFAULT_FORMAT"
-  zstyle ':vcs_info:hg*:*' formats "%F{$POWERLEVEL9K_VCS_FOREGROUND}$(print_icon 'VCS_HG_ICON')%f$VCS_DEFAULT_FORMAT"
+  zstyle ':vcs_info:*' formats "$VCS_DEFAULT_FORMAT"
 
   zstyle ':vcs_info:*' actionformats "%b %F{red}| %a%f"
 
@@ -751,9 +750,11 @@ prompt_vcs() {
 
   if [[ -n "$vcs_prompt" ]]; then
     if [[ "$VCS_WORKDIR_DIRTY" == true ]]; then
-      "$1_prompt_segment" "$0_MODIFIED" "$2" "yellow" "$DEFAULT_COLOR" "$vcs_prompt"
+      # $vcs_visual_identifier gets set in +vi-vcs-detect-changes in functions/vcs.zsh,
+      # as we have there access to vcs_info internal hooks.
+      "$1_prompt_segment" "$0_MODIFIED" "$2" "yellow" "$DEFAULT_COLOR" "$vcs_prompt" "$vcs_visual_identifier"
     else
-      "$1_prompt_segment" "$0" "$2" "green" "$DEFAULT_COLOR" "$vcs_prompt"
+      "$1_prompt_segment" "$0" "$2" "green" "$DEFAULT_COLOR" "$vcs_prompt" "$vcs_visual_identifier"
     fi
   fi
 }
