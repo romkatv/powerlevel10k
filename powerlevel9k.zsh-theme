@@ -120,42 +120,53 @@ CURRENT_BG='NONE'
 # Takes four arguments:
 #   * $1: Name of the function that was orginally invoked (mandatory).
 #         Necessary, to make the dynamic color-overwrite mechanism work.
-#   * $2: Background color
-#   * $3: Foreground color
-#   * $4: The segment content
+#   * $2: A flag if the segment should be joined with the previous one.
+#   * $3: Background color
+#   * $4: Foreground color
+#   * $5: The segment content
 # The latter three can be omitted,
 set_default POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS " "
 left_prompt_segment() {
   # Overwrite given background-color by user defined variable for this segment.
   local BACKGROUND_USER_VARIABLE=POWERLEVEL9K_${(U)1#prompt_}_BACKGROUND
   local BG_COLOR_MODIFIER=${(P)BACKGROUND_USER_VARIABLE}
-  [[ -n $BG_COLOR_MODIFIER ]] && 2="$BG_COLOR_MODIFIER"
+  [[ -n $BG_COLOR_MODIFIER ]] && 3="$BG_COLOR_MODIFIER"
 
   # Overwrite given foreground-color by user defined variable for this segment.
   local FOREGROUND_USER_VARIABLE=POWERLEVEL9K_${(U)1#prompt_}_FOREGROUND
   local FG_COLOR_MODIFIER=${(P)FOREGROUND_USER_VARIABLE}
-  [[ -n $FG_COLOR_MODIFIER ]] && 3="$FG_COLOR_MODIFIER"
+  [[ -n $FG_COLOR_MODIFIER ]] && 4="$FG_COLOR_MODIFIER"
 
   local bg fg
-  [[ -n $2 ]] && bg="%K{$2}" || bg="%k"
-  [[ -n $3 ]] && fg="%F{$3}" || fg="%f"
-  if [[ $CURRENT_BG != 'NONE' ]] && ! isSameColor "$2" "$CURRENT_BG"; then
-    # Middle segment
-    echo -n "%{$bg%F{$CURRENT_BG}%}$(print_icon 'LEFT_SEGMENT_SEPARATOR')%{$fg%}$POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS"
-  elif isSameColor "$CURRENT_BG" "$2"; then
+  [[ -n "$3" ]] && bg="%K{$3}" || bg="%k"
+  [[ -n "$4" ]] && fg="%F{$4}" || fg="%f"
+
+  local joined=$2
+  if [[ $CURRENT_BG != 'NONE' ]] && ! isSameColor "$3" "$CURRENT_BG"; then
+    echo -n "%{$bg%F{$CURRENT_BG}%}"
+    if [[ $joined == false ]]; then
+      # Middle segment
+      echo -n "$(print_icon 'LEFT_SEGMENT_SEPARATOR')%{$fg%}$POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS"
+    fi
+  elif isSameColor "$CURRENT_BG" "$3"; then
     # Middle segment with same color as previous segment
     # We take the current foreground color as color for our
     # subsegment (or the default color). This should have
     # enough contrast.
     local complement
-    [[ -n $3 ]] && complement=$3 || complement=$DEFAULT_COLOR
-    echo -n "%{$bg%F{$complement}%}$(print_icon 'LEFT_SUBSEGMENT_SEPARATOR')%{$fg%}$POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS"
+    [[ -n "$4" ]] && complement="$4" || complement=$DEFAULT_COLOR
+    echo -n "%{$bg%F{$complement}%}"
+    if [[ $joined == false ]]; then
+      echo -n "$(print_icon 'LEFT_SUBSEGMENT_SEPARATOR')%{$fg%}$POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS"
+    fi
   else
     # First segment
     echo -n "%{$bg%}%{$fg%}$POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS"
   fi
-  CURRENT_BG=$2
-  [[ -n $4 ]] && echo -n "$4$POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS"
+
+  [[ -n "$5" ]] && echo -n "${5}${POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS}"
+
+  CURRENT_BG=$3
 }
 
 # End the left prompt, closes the final segment.
@@ -175,40 +186,51 @@ CURRENT_RIGHT_BG='NONE'
 # Takes four arguments:
 #   * $1: Name of the function that was orginally invoked (mandatory).
 #         Necessary, to make the dynamic color-overwrite mechanism work.
-#   * $2: Background color
-#   * $3: Foreground color
-#   * $4: The segment content
+#   * $2: A flag if the segment should be joined with the previous one.
+#   * $3: Background color
+#   * $4: Foreground color
+#   * $5: The segment content
 # No ending for the right prompt segment is needed (unlike the left prompt, above).
 set_default POWERLEVEL9K_WHITESPACE_BETWEEN_RIGHT_SEGMENTS " "
 right_prompt_segment() {
   # Overwrite given background-color by user defined variable for this segment.
   local BACKGROUND_USER_VARIABLE=POWERLEVEL9K_${(U)1#prompt_}_BACKGROUND
   local BG_COLOR_MODIFIER=${(P)BACKGROUND_USER_VARIABLE}
-  [[ -n $BG_COLOR_MODIFIER ]] && 2="$BG_COLOR_MODIFIER"
+  [[ -n $BG_COLOR_MODIFIER ]] && 3="$BG_COLOR_MODIFIER"
 
   # Overwrite given foreground-color by user defined variable for this segment.
   local FOREGROUND_USER_VARIABLE=POWERLEVEL9K_${(U)1#prompt_}_FOREGROUND
   local FG_COLOR_MODIFIER=${(P)FOREGROUND_USER_VARIABLE}
-  [[ -n $FG_COLOR_MODIFIER ]] && 3="$FG_COLOR_MODIFIER"
+  [[ -n $FG_COLOR_MODIFIER ]] && 4="$FG_COLOR_MODIFIER"
 
   local bg fg
-  [[ -n $2 ]] && bg="%K{$2}" || bg="%k"
-  [[ -n $3 ]] && fg="%F{$3}" || fg="%f"
+  [[ -n "$3" ]] && bg="%K{$3}" || bg="%k"
+  [[ -n "$4" ]] && fg="%F{$4}" || fg="%f"
 
-  if isSameColor "$CURRENT_RIGHT_BG" "$2"; then
-    # Middle segment with same color as previous segment
-    # We take the current foreground color as color for our
-    # subsegment (or the default color). This should have
-    # enough contrast.
-    local complement
-    [[ -n $3 ]] && complement=$3 || complement=$DEFAULT_COLOR
-    echo -n "%F{$complement}$(print_icon 'RIGHT_SUBSEGMENT_SEPARATOR')%f%{$bg%}%{$fg%}$POWERLEVEL9K_WHITESPACE_BETWEEN_RIGHT_SEGMENTS"
-  else
-    echo -n "%F{$2}$(print_icon 'RIGHT_SEGMENT_SEPARATOR')%f%{$bg%}%{$fg%}$POWERLEVEL9K_WHITESPACE_BETWEEN_RIGHT_SEGMENTS"
+  local joined=$2
+  # If CURRENT_RIGHT_BG is "NONE", we are the first right segment.
+  if [[ $joined == false ]] || [[ "$CURRENT_RIGHT_BG" == "NONE" ]]; then
+    if isSameColor "$CURRENT_RIGHT_BG" "$3"; then
+      # Middle segment with same color as previous segment
+      # We take the current foreground color as color for our
+      # subsegment (or the default color). This should have
+      # enough contrast.
+      local complement
+      [[ -n "$4" ]] && complement="$4" || complement=$DEFAULT_COLOR
+      echo -n "%F{$complement}$(print_icon 'RIGHT_SUBSEGMENT_SEPARATOR')%f"
+    else
+      echo -n "%F{$3}$(print_icon 'RIGHT_SEGMENT_SEPARATOR')%f"
+    fi
   fi
-  [[ -n $4 ]] && echo -n "$4$POWERLEVEL9K_WHITESPACE_BETWEEN_RIGHT_SEGMENTS%f"
+  echo -n "%{$bg%}%{$fg%}"
 
-  CURRENT_RIGHT_BG=$2
+  # Print whitespace only if segment is not joined
+  [[ $joined == false ]] || [[ "$CURRENT_RIGHT_BG" == "NONE" ]] && echo -n "${POWERLEVEL9K_WHITESPACE_BETWEEN_RIGHT_SEGMENTS}"
+
+  # Print segment content
+  [[ -n "$5" ]] && echo -n "${5}${POWERLEVEL9K_WHITESPACE_BETWEEN_RIGHT_SEGMENTS}%f"
+
+  CURRENT_RIGHT_BG=$3
 }
 
 ################################################################
@@ -225,7 +247,7 @@ prompt_aws() {
   local aws_profile="$AWS_DEFAULT_PROFILE"
   if [[ -n "$aws_profile" ]];
   then
-    "$1_prompt_segment" "$0" red white "$(print_icon 'AWS_ICON') $aws_profile"
+    "$1_prompt_segment" "$0" "$2" red white "$(print_icon 'AWS_ICON') $aws_profile"
   fi
 }
 
@@ -233,9 +255,16 @@ prompt_aws() {
 # and display the output of.
 #
 prompt_custom() {
-  local command=POWERLEVEL9K_CUSTOM_$2:u
+  local command=POWERLEVEL9K_CUSTOM_$3:u
 
-  "$1_prompt_segment" "${0}_${2:u}" $DEFAULT_COLOR_INVERTED $DEFAULT_COLOR "$(eval ${(P)command})"
+  "$1_prompt_segment" "${0}_${3:u}" "$2" $DEFAULT_COLOR_INVERTED $DEFAULT_COLOR "$(eval ${(P)command})"
+}
+
+# print an icon, if there are background jobs
+prompt_background_jobs() {
+  if [[ $(jobs -l | wc -l) -gt 0 ]]; then
+    "$1_prompt_segment" "$0" "$2" "$DEFAULT_COLOR" "cyan" "$(print_icon 'BACKGROUND_JOBS_ICON')"
+  fi
 }
 
 prompt_battery() {
@@ -328,7 +357,7 @@ prompt_battery() {
   fi
 
   # display prompt_segment
-  [[ -n $bat_percent ]] && "$1_prompt_segment" "${0}_${current_state}" "$DEFAULT_COLOR" "${battery_states[$current_state]}" "$message"
+  [[ -n $bat_percent ]] && "$1_prompt_segment" "${0}_${current_state}" "$2" "$DEFAULT_COLOR" "${battery_states[$current_state]}" "$message"
 }
 
 # Context: user@hostname (who am I and where am I)
@@ -337,9 +366,9 @@ prompt_context() {
   if [[ "$USER" != "$DEFAULT_USER" || -n "$SSH_CLIENT" ]]; then
     if [[ $(print -P "%#") == '#' ]]; then
       # Shell runs as root
-      "$1_prompt_segment" "$0_ROOT" "$DEFAULT_COLOR" "yellow" "$USER@%m"
+      "$1_prompt_segment" "$0_ROOT" "$2" "$DEFAULT_COLOR" "yellow" "$USER@%m"
     else
-      "$1_prompt_segment" "$0_DEFAULT" "$DEFAULT_COLOR" "011" "$USER@%m"
+      "$1_prompt_segment" "$0_DEFAULT" "$2" "$DEFAULT_COLOR" "011" "$USER@%m"
     fi
   fi
 }
@@ -370,7 +399,7 @@ prompt_dir() {
     current_icon=$(print_icon 'FOLDER_ICON')
   fi
 
-  "$1_prompt_segment" "$0" "blue" "$DEFAULT_COLOR" "$current_icon$current_path"
+  "$1_prompt_segment" "$0" "$2" "blue" "$DEFAULT_COLOR" "$current_icon$current_path"
 }
 
 # GO-prompt
@@ -379,13 +408,13 @@ prompt_go_version() {
   go_version=$(go version 2>&1 | sed -E "s/.*(go[0-9.]*).*/\1/")
 
   if [[ -n "$go_version" ]]; then
-    "$1_prompt_segment" "$0" "green" "255" "$go_version"
+    "$1_prompt_segment" "$0" "$2" "green" "255" "$go_version"
   fi
 }
 
 # Command number (in local history)
 prompt_history() {
-  "$1_prompt_segment" "$0" "244" "$DEFAULT_COLOR" '%h'
+  "$1_prompt_segment" "$0" "$2" "244" "$DEFAULT_COLOR" '%h'
 }
 
 prompt_icons_test() {
@@ -394,7 +423,7 @@ prompt_icons_test() {
     # the next color has enough contrast to read.
     local random_color=$((RANDOM % 8))
     local next_color=$((random_color+1))
-    "$1_prompt_segment" "$0" "$random_color" "$next_color" "$key: ${icons[$key]}"
+    "$1_prompt_segment" "$0" "$2" "$random_color" "$next_color" "$key: ${icons[$key]}"
   done
 }
 
@@ -425,7 +454,7 @@ prompt_ip() {
     fi
   fi
 
-  "$1_prompt_segment" "$0" "cyan" "$DEFAULT_COLOR" "$(print_icon 'NETWORK_ICON') $ip"
+  "$1_prompt_segment" "$0" "$2" "cyan" "$DEFAULT_COLOR" "$(print_icon 'NETWORK_ICON') $ip"
 }
 
 prompt_load() {
@@ -449,7 +478,7 @@ prompt_load() {
     FUNCTION_SUFFIX="_NORMAL"
   fi
 
-  "$1_prompt_segment" "$0$FUNCTION_SUFFIX" "$BACKGROUND_COLOR" "$DEFAULT_COLOR" "$(print_icon 'LOAD_ICON') $load_avg_5min"
+  "$1_prompt_segment" "$0$FUNCTION_SUFFIX" "$2" "$BACKGROUND_COLOR" "$DEFAULT_COLOR" "$(print_icon 'LOAD_ICON') $load_avg_5min"
 }
 
 # Node version
@@ -457,12 +486,12 @@ prompt_node_version() {
   local node_version=$(node -v 2>/dev/null)
   [[ -z "${node_version}" ]] && return
 
-  "$1_prompt_segment" "$0" "green" "white" "${node_version:1} $(print_icon 'NODE_ICON')"
+  "$1_prompt_segment" "$0" "$2" "green" "white" "${node_version:1} $(print_icon 'NODE_ICON')"
 }
 
 # print a little OS icon
 prompt_os_icon() {
-  "$1_prompt_segment" "$0" "black" "255" "$OS_ICON"
+  "$1_prompt_segment" "$0" "$2" "black" "255" "$OS_ICON"
 }
 
 # print PHP version number
@@ -471,7 +500,7 @@ prompt_php_version() {
   php_version=$(php -v 2>&1 | grep -oe "^PHP\s*[0-9.]*")
 
   if [[ -n "$php_version" ]]; then
-    "$1_prompt_segment" "$0" "013" "255" "$php_version"
+    "$1_prompt_segment" "$0" "$2" "013" "255" "$php_version"
   fi
 }
 
@@ -516,7 +545,7 @@ prompt_ram() {
     esac
   done
 
-  "$1_prompt_segment" "$0" "yellow" "$DEFAULT_COLOR" "${rendition% }"
+  "$1_prompt_segment" "$0" "$2" "yellow" "$DEFAULT_COLOR" "${rendition% }"
 }
 
 # Node version from NVM
@@ -527,13 +556,20 @@ prompt_nvm() {
   [[ -z "${node_version}" ]] && return
   [[ "$node_version" =~ "$nvm_default" ]] && return
 
-  $1_prompt_segment "$0" "green" "011" "${node_version:1} $(print_icon 'NODE_ICON')"
+  $1_prompt_segment "$0" "$2" "green" "011" "${node_version:1} $(print_icon 'NODE_ICON')"
 }
 
 # rbenv information
 prompt_rbenv() {
   if [[ -n "$RBENV_VERSION" ]]; then
-    "$1_prompt_segment" "$0" "red" "$DEFAULT_COLOR" "$RBENV_VERSION"
+    "$1_prompt_segment" "$0" "$2" "red" "$DEFAULT_COLOR" "$RBENV_VERSION"
+  fi
+}
+
+# print an icon if user is root.
+prompt_root_indicator() {
+  if [[ "$UID" -eq 0 ]]; then
+    "$1_prompt_segment" "$0" "$2" "$DEFAULT_COLOR" "yellow" "$(print_icon 'ROOT_ICON')"
   fi
 }
 
@@ -543,7 +579,7 @@ prompt_rust_version() {
   rust_version=$(rustc --version 2>&1 | grep -oe "^rustc\s*[^ ]*" | grep -o '[0-9.a-z\\\-]*$')
 
   if [[ -n "$rust_version" ]]; then
-    "$1_prompt_segment" "$0" "208" "$DEFAULT_COLOR" "Rust $rust_version"
+    "$1_prompt_segment" "$0" "$2" "208" "$DEFAULT_COLOR" "Rust $rust_version"
   fi
 }
 # RSpec test ratio
@@ -553,7 +589,7 @@ prompt_rspec_stats() {
     code_amount=$(ls -1 app/**/*.rb | wc -l)
     tests_amount=$(ls -1 spec/**/*.rb | wc -l)
 
-    build_test_stats "$1" "$0" "$code_amount" "$tests_amount" "RSpec $(print_icon 'TEST_ICON')"
+    build_test_stats "$1" "$0" "$2" "$code_amount" "$tests_amount" "RSpec $(print_icon 'TEST_ICON')"
   fi
 }
 
@@ -565,33 +601,24 @@ prompt_rvm() {
   local version=$(echo $MY_RUBY_HOME | awk -F'-' '{print $2}')
 
   if [[ -n "$version$gemset" ]]; then
-    "$1_prompt_segment" "$0" "240" "$DEFAULT_COLOR" "$version$gemset $(print_icon 'RUBY_ICON') "
+    "$1_prompt_segment" "$0" "$2" "240" "$DEFAULT_COLOR" "$version$gemset $(print_icon 'RUBY_ICON') "
   fi
 }
 
 # Status: (return code, root status, background jobs)
 set_default POWERLEVEL9K_STATUS_VERBOSE true
 prompt_status() {
-  local symbols bg
-  symbols=()
-
   if [[ "$POWERLEVEL9K_STATUS_VERBOSE" == true ]]; then
     if [[ "$RETVAL" -ne 0 ]]; then
-      symbols+="%F{226}$RETVAL $(print_icon 'CARRIAGE_RETURN_ICON')%f"
-      bg="red"
+      "$1_prompt_segment" "$0_ERROR" "$2" "red" "226" "$RETVAL $(print_icon 'CARRIAGE_RETURN_ICON')"
     else
-      symbols+="%F{046}$(print_icon 'OK_ICON')%f"
-      bg="black"
+      "$1_prompt_segment" "$0_OK" "$2" "$DEFAULT_COLOR" "046" "$(print_icon 'OK_ICON')"
     fi
   else
-    [[ "$RETVAL" -ne 0 ]] && symbols+="%{%F{red}%}$(print_icon 'FAIL_ICON')%f"
-    bg="$DEFAULT_COLOR"
+    if [[ "$RETVAL" -ne 0 ]]; then
+      "$1_prompt_segment" "$0_ERROR" "$2" "$DEFAULT_COLOR" "red" "$(print_icon 'FAIL_ICON')"
+    fi
   fi
-
-  [[ "$UID" -eq 0 ]] && symbols+="%{%F{yellow}%} $(print_icon 'ROOT_ICON')%f"
-  [[ $(jobs -l | wc -l) -gt 0 ]] && symbols+="%{%F{cyan}%}$(print_icon 'BACKGROUND_JOBS_ICON')%f"
-
-  [[ -n "$symbols" ]] && "$1_prompt_segment" "$0" "$bg" "white" "$symbols"
 }
 
 # Symfony2-PHPUnit test ratio
@@ -601,7 +628,7 @@ prompt_symfony2_tests() {
     code_amount=$(ls -1 src/**/*.php | grep -vc Tests)
     tests_amount=$(ls -1 src/**/*.php | grep -c Tests)
 
-    build_test_stats "$1" "$0" "$code_amount" "$tests_amount" "SF2 $(print_icon 'TEST_ICON')"
+    build_test_stats "$1" "$0" "$2" "$code_amount" "$tests_amount" "SF2 $(print_icon 'TEST_ICON')"
   fi
 }
 
@@ -610,23 +637,23 @@ prompt_symfony2_version() {
   if [[ -f app/bootstrap.php.cache ]]; then
     local symfony2_version
     symfony2_version=$(grep " VERSION " app/bootstrap.php.cache | sed -e 's/[^.0-9]*//g')
-    "$1_prompt_segment" "$0" "240" "$DEFAULT_COLOR" "$(print_icon 'SYMFONY_ICON') $symfony2_version"
+    "$1_prompt_segment" "$0" "$2" "240" "$DEFAULT_COLOR" "$(print_icon 'SYMFONY_ICON') $symfony2_version"
   fi
 }
 
 # Show a ratio of tests vs code
 build_test_stats() {
-  local code_amount="$3"
-  local tests_amount="$4"+0.00001
-  local headline="$5"
+  local code_amount="$4"
+  local tests_amount="$5"+0.00001
+  local headline="$6"
 
   # Set float precision to 2 digits:
   typeset -F 2 ratio
   local ratio=$(( (tests_amount/code_amount) * 100 ))
 
-  (( ratio >= 75 )) && "$1_prompt_segment" "${2}_GOOD" "cyan" "$DEFAULT_COLOR" "$headline: $ratio%%"
-  (( ratio >= 50 && ratio < 75 )) && "$1_prompt_segment" "$2_AVG" "yellow" "$DEFAULT_COLOR" "$headline: $ratio%%"
-  (( ratio < 50 )) && "$1_prompt_segment" "$2_BAD" "red" "$DEFAULT_COLOR" "$headline: $ratio%%"
+  (( ratio >= 75 )) && "$1_prompt_segment" "${2}_GOOD" "$3" "cyan" "$DEFAULT_COLOR" "$headline: $ratio%%"
+  (( ratio >= 50 && ratio < 75 )) && "$1_prompt_segment" "${2}_AVG" "$3" "yellow" "$DEFAULT_COLOR" "$headline: $ratio%%"
+  (( ratio < 50 )) && "$1_prompt_segment" "${2}_BAD" "red" "$3" "$DEFAULT_COLOR" "$headline: $ratio%%"
 }
 
 # System time
@@ -636,7 +663,7 @@ prompt_time() {
     time_format="$POWERLEVEL9K_TIME_FORMAT"
   fi
 
-  "$1_prompt_segment" "$0" "$DEFAULT_COLOR_INVERTED" "$DEFAULT_COLOR" "$time_format"
+  "$1_prompt_segment" "$0" "$2" "$DEFAULT_COLOR_INVERTED" "$DEFAULT_COLOR" "$time_format"
 }
 
 # todo.sh: shows the number of tasks in your todo.sh file
@@ -644,7 +671,7 @@ prompt_todo() {
   if $(hash todo.sh 2>&-); then
     count=$(todo.sh ls | egrep "TODO: [0-9]+ of ([0-9]+) tasks shown" | awk '{ print $4 }')
     if [[ "$count" = <-> ]]; then
-      "$1_prompt_segment" "$0" "244" "$DEFAULT_COLOR" "$(print_icon 'TODO_ICON') $count"
+      "$1_prompt_segment" "$0" "$2" "244" "$DEFAULT_COLOR" "$(print_icon 'TODO_ICON') $count"
     fi
   fi
 }
@@ -697,12 +724,10 @@ prompt_vcs() {
 
   if [[ -n "$vcs_prompt" ]]; then
     if [[ "$VCS_WORKDIR_DIRTY" == true ]]; then
-      "$1_prompt_segment" "$0_MODIFIED" "yellow" "$DEFAULT_COLOR"
+      "$1_prompt_segment" "$0_MODIFIED" "$2" "yellow" "$DEFAULT_COLOR" "$vcs_prompt"
     else
-      "$1_prompt_segment" "$0" "green" "$DEFAULT_COLOR"
+      "$1_prompt_segment" "$0" "$2" "green" "$DEFAULT_COLOR" "$vcs_prompt"
     fi
-
-    echo -n "$vcs_prompt "
   fi
 }
 
@@ -712,10 +737,10 @@ set_default POWERLEVEL9K_VI_COMMAND_MODE_STRING "NORMAL"
 prompt_vi_mode() {
   case ${KEYMAP} in
     main|viins)
-      "$1_prompt_segment" "$0_INSERT" "$DEFAULT_COLOR" "blue" "$POWERLEVEL9K_VI_INSERT_MODE_STRING"
+      "$1_prompt_segment" "$0_INSERT" "$2" "$DEFAULT_COLOR" "blue" "$POWERLEVEL9K_VI_INSERT_MODE_STRING"
     ;;
     vicmd)
-      "$1_prompt_segment" "$0_NORMAL" "$DEFAULT_COLOR" "default" "$POWERLEVEL9K_VI_COMMAND_MODE_STRING"
+      "$1_prompt_segment" "$0_NORMAL" "$2" "$DEFAULT_COLOR" "default" "$POWERLEVEL9K_VI_COMMAND_MODE_STRING"
     ;;
   esac
 }
@@ -726,7 +751,7 @@ prompt_vi_mode() {
 prompt_virtualenv() {
   local virtualenv_path="$VIRTUAL_ENV"
   if [[ -n "$virtualenv_path" && "$VIRTUAL_ENV_DISABLE_PROMPT" != true ]]; then
-    "$1_prompt_segment" "$0" "blue" "$DEFAULT_COLOR" "($(basename "$virtualenv_path"))"
+    "$1_prompt_segment" "$0" "$2" "blue" "$DEFAULT_COLOR" "($(basename "$virtualenv_path"))"
   fi
 }
 
@@ -739,12 +764,18 @@ build_left_prompt() {
   defined POWERLEVEL9K_LEFT_PROMPT_ELEMENTS || POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(context dir rbenv vcs)
 
   for element in "${POWERLEVEL9K_LEFT_PROMPT_ELEMENTS[@]}"; do
+    # Check if the segment should be joined with the previous one
+    local joined=false
+    if [[ ${element[-7,-1]} == '_joined' ]]; then
+      element="${element[0,-8]}"
+      joined=true
+    fi
     # Check if it is a custom command, otherwise interpet it as
     # a prompt.
     if [[ $element[0,7] =~ "custom_" ]]; then
-      "prompt_custom" "left" $element[8,-1]
+      "prompt_custom" "left" "$joined" $element[8,-1]
     else
-      "prompt_$element" "left"
+      "prompt_$element" "left" "$joined"
     fi
   done
 
@@ -753,15 +784,21 @@ build_left_prompt() {
 
 # Right prompt
 build_right_prompt() {
-  defined POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS || POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(status history time)
+  defined POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS || POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(status root_indicator background_jobs history time)
 
   for element in "${POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS[@]}"; do
+    # Check if the segment should be joined with the previous one
+    local joined=false
+    if [[ ${element[-7,-1]} == '_joined' ]]; then
+      element="${element[0,-8]}"
+      joined=true
+    fi
     # Check if it is a custom command, otherwise interpet it as
     # a prompt.
     if [[ $element[0,7] =~ "custom_" ]]; then
-      "prompt_custom" "right" $element[8,-1]
+      "prompt_custom" "right" "$joined" $element[8,-1]
     else
-      "prompt_$element" "right"
+      "prompt_$element" "right" "$joined"
     fi
   done
 }
