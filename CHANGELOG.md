@@ -1,5 +1,10 @@
 ## v0.3.0 (next)
 
+### Introduced "visual identifiers" to the segments
+
+Now almost every segment can have a visual identifier, which is an
+icon whose color could be adjusted by users.
+
 ### Added ability for "joined" segments
 
 You can now merge segments together by suffixing the segment name with "_joined".
@@ -18,7 +23,7 @@ A new segment that allows users to define a custom command was added.
 
 ### `virtualenv` changes
 
-This segment now respects `VIRTUAL_ENV_DISABLE_PROMPT`. If this variable is set 
+This segment now respects `VIRTUAL_ENV_DISABLE_PROMPT`. If this variable is set
 to `true`, the segments does not get rendered.
 
 ### `load` changes
@@ -29,7 +34,7 @@ segment is able to show the free ram and used swap.
 ### `vcs` changes
 
 This prompt uses the `VCS_INFO` subsystem by ZSH. From now on this subsystem
-is only invoked if a `vcs` segment was configured. 
+is only invoked if a `vcs` segment was configured.
 
 ### `rvm` changes
 

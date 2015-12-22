@@ -124,6 +124,7 @@ CURRENT_BG='NONE'
 #   * $3: Background color
 #   * $4: Foreground color
 #   * $5: The segment content
+#   * $6: An identifying icon (must be a key of the icons array)
 # The latter three can be omitted,
 set_default POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS " "
 left_prompt_segment() {
@@ -146,7 +147,7 @@ left_prompt_segment() {
     echo -n "%{$bg%F{$CURRENT_BG}%}"
     if [[ $joined == false ]]; then
       # Middle segment
-      echo -n "$(print_icon 'LEFT_SEGMENT_SEPARATOR')%{$fg%}$POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS"
+      echo -n "$(print_icon 'LEFT_SEGMENT_SEPARATOR')$POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS"
     fi
   elif isSameColor "$CURRENT_BG" "$3"; then
     # Middle segment with same color as previous segment
@@ -157,14 +158,27 @@ left_prompt_segment() {
     [[ -n "$4" ]] && complement="$4" || complement=$DEFAULT_COLOR
     echo -n "%{$bg%F{$complement}%}"
     if [[ $joined == false ]]; then
-      echo -n "$(print_icon 'LEFT_SUBSEGMENT_SEPARATOR')%{$fg%}$POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS"
+      echo -n "$(print_icon 'LEFT_SUBSEGMENT_SEPARATOR')$POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS"
     fi
   else
     # First segment
-    echo -n "%{$bg%}%{$fg%}$POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS"
+    echo -n "%{$bg%}$POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS"
   fi
 
-  [[ -n "$5" ]] && echo -n "${5}${POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS}"
+  local visual_identifier
+  if [[ -n $6 ]]; then
+    visual_identifier="$(print_icon $6)"
+    if [[ -n "$visual_identifier" ]]; then
+      # Allow users to overwrite the color for the visual identifier only.
+      local visual_identifier_color_variable=POWERLEVEL9K_${(U)1#prompt_}_VISUAL_IDENTIFIER_COLOR
+      set_default $visual_identifier_color_variable $4
+      visual_identifier="%F{${(P)visual_identifier_color_variable}%}$visual_identifier%f"
+      # Add an whitespace if we print more than just the visual identifier
+      [[ -n "$5" ]] && visual_identifier="$visual_identifier "
+    fi
+  fi
+
+  [[ -n "$5" ]] && echo -n "${visual_identifier}%{$fg%}${5}${POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS}"
 
   CURRENT_BG=$3
 }
@@ -190,6 +204,7 @@ CURRENT_RIGHT_BG='NONE'
 #   * $3: Background color
 #   * $4: Foreground color
 #   * $5: The segment content
+#   * $6: An identifying icon (must be a key of the icons array)
 # No ending for the right prompt segment is needed (unlike the left prompt, above).
 set_default POWERLEVEL9K_WHITESPACE_BETWEEN_RIGHT_SEGMENTS " "
 right_prompt_segment() {
@@ -222,13 +237,27 @@ right_prompt_segment() {
       echo -n "%F{$3}$(print_icon 'RIGHT_SEGMENT_SEPARATOR')%f"
     fi
   fi
+
+  local visual_identifier
+  if [[ -n "$6" ]]; then
+    visual_identifier="$(print_icon $6)"
+    if [[ -n "$visual_identifier" ]]; then
+      # Allow users to overwrite the color for the visual identifier only.
+      local visual_identifier_color_variable=POWERLEVEL9K_${(U)1#prompt_}_VISUAL_IDENTIFIER_COLOR
+      set_default $visual_identifier_color_variable $4
+      visual_identifier="%F{${(P)visual_identifier_color_variable}%}$visual_identifier%f"
+      # Add an whitespace if we print more than just the visual identifier
+      [[ -n "$5" ]] && visual_identifier=" $visual_identifier"
+    fi
+  fi
+
   echo -n "%{$bg%}%{$fg%}"
 
-  # Print whitespace only if segment is not joined
+  # Print whitespace only if segment is not joined or first right segment
   [[ $joined == false ]] || [[ "$CURRENT_RIGHT_BG" == "NONE" ]] && echo -n "${POWERLEVEL9K_WHITESPACE_BETWEEN_RIGHT_SEGMENTS}"
 
   # Print segment content
-  [[ -n "$5" ]] && echo -n "${5}${POWERLEVEL9K_WHITESPACE_BETWEEN_RIGHT_SEGMENTS}%f"
+  [[ -n "$5" ]] && echo -n "${5}${visual_identifier}${POWERLEVEL9K_WHITESPACE_BETWEEN_RIGHT_SEGMENTS}%f"
 
   CURRENT_RIGHT_BG=$3
 }
@@ -247,7 +276,7 @@ prompt_aws() {
   local aws_profile="$AWS_DEFAULT_PROFILE"
   if [[ -n "$aws_profile" ]];
   then
-    "$1_prompt_segment" "$0" "$2" red white "$(print_icon 'AWS_ICON') $aws_profile"
+    "$1_prompt_segment" "$0" "$2" red white "$aws_profile" 'AWS_ICON'
   fi
 }
 
@@ -349,15 +378,15 @@ prompt_battery() {
   fi
 
   # prepare string
-  local message="$(print_icon 'BATTERY_ICON')"
+  local message
   # Default behavior: Be verbose!
   set_default POWERLEVEL9K_BATTERY_VERBOSE true
   if [[ "$POWERLEVEL9K_BATTERY_VERBOSE" == true ]]; then
-    message="$message $bat_percent%%$remain"
+    message="$bat_percent%%$remain"
   fi
 
   # display prompt_segment
-  [[ -n $bat_percent ]] && "$1_prompt_segment" "${0}_${current_state}" "$2" "$DEFAULT_COLOR" "${battery_states[$current_state]}" "$message"
+  [[ -n $bat_percent ]] && "$1_prompt_segment" "${0}_${current_state}" "$2" "$DEFAULT_COLOR" "${battery_states[$current_state]}" "$message" 'BATTERY_ICON'
 }
 
 # Context: user@hostname (who am I and where am I)
@@ -394,12 +423,10 @@ prompt_dir() {
 
   local current_icon=''
   if [[ $(print -P "%~") == '~'* ]]; then
-    current_icon=$(print_icon 'HOME_ICON')
+    "$1_prompt_segment" "$0_HOME" "$2" "blue" "$DEFAULT_COLOR" "$current_path" 'HOME_ICON'
   else
-    current_icon=$(print_icon 'FOLDER_ICON')
+    "$1_prompt_segment" "$0_DEFAULT" "$2" "blue" "$DEFAULT_COLOR" "$current_path" 'FOLDER_ICON'
   fi
-
-  "$1_prompt_segment" "$0" "$2" "blue" "$DEFAULT_COLOR" "$current_icon$current_path"
 }
 
 # GO-prompt
@@ -454,7 +481,7 @@ prompt_ip() {
     fi
   fi
 
-  "$1_prompt_segment" "$0" "$2" "cyan" "$DEFAULT_COLOR" "$(print_icon 'NETWORK_ICON') $ip"
+  "$1_prompt_segment" "$0" "$2" "cyan" "$DEFAULT_COLOR" "$ip" 'NETWORK_ICON'
 }
 
 prompt_load() {
@@ -478,7 +505,7 @@ prompt_load() {
     FUNCTION_SUFFIX="_NORMAL"
   fi
 
-  "$1_prompt_segment" "$0$FUNCTION_SUFFIX" "$2" "$BACKGROUND_COLOR" "$DEFAULT_COLOR" "$(print_icon 'LOAD_ICON') $load_avg_5min"
+  "$1_prompt_segment" "$0$FUNCTION_SUFFIX" "$2" "$BACKGROUND_COLOR" "$DEFAULT_COLOR" "$load_avg_5min" 'LOAD_ICON'
 }
 
 # Node version
@@ -486,7 +513,7 @@ prompt_node_version() {
   local node_version=$(node -v 2>/dev/null)
   [[ -z "${node_version}" ]] && return
 
-  "$1_prompt_segment" "$0" "$2" "green" "white" "${node_version:1} $(print_icon 'NODE_ICON')"
+  "$1_prompt_segment" "$0" "$2" "green" "white" "${node_version:1}" 'NODE_ICON'
 }
 
 # print a little OS icon
@@ -522,7 +549,7 @@ prompt_ram() {
           base=K
         fi
 
-        rendition+="$(print_icon 'RAM_ICON') $(printSizeHumanReadable "$ramfree" $base) "
+        rendition+="$(printSizeHumanReadable "$ramfree" $base) "
       ;;
       swap_used)
         if [[ "$OS" == "OSX" ]]; then
@@ -545,7 +572,7 @@ prompt_ram() {
     esac
   done
 
-  "$1_prompt_segment" "$0" "$2" "yellow" "$DEFAULT_COLOR" "${rendition% }"
+  "$1_prompt_segment" "$0" "$2" "yellow" "$DEFAULT_COLOR" "${rendition% }" 'RAM_ICON'
 }
 
 # Node version from NVM
@@ -556,13 +583,13 @@ prompt_nvm() {
   [[ -z "${node_version}" ]] && return
   [[ "$node_version" =~ "$nvm_default" ]] && return
 
-  $1_prompt_segment "$0" "$2" "green" "011" "${node_version:1} $(print_icon 'NODE_ICON')"
+  $1_prompt_segment "$0" "$2" "green" "011" "${node_version:1}" 'NODE_ICON'
 }
 
 # rbenv information
 prompt_rbenv() {
   if [[ -n "$RBENV_VERSION" ]]; then
-    "$1_prompt_segment" "$0" "$2" "red" "$DEFAULT_COLOR" "$RBENV_VERSION"
+    "$1_prompt_segment" "$0" "$2" "red" "$DEFAULT_COLOR" "$RBENV_VERSION" 'RUBY_ICON'
   fi
 }
 
@@ -589,7 +616,7 @@ prompt_rspec_stats() {
     code_amount=$(ls -1 app/**/*.rb | wc -l)
     tests_amount=$(ls -1 spec/**/*.rb | wc -l)
 
-    build_test_stats "$1" "$0" "$2" "$code_amount" "$tests_amount" "RSpec $(print_icon 'TEST_ICON')"
+    build_test_stats "$1" "$0" "$2" "$code_amount" "$tests_amount" "RSpec" 'TEST_ICON'
   fi
 }
 
@@ -601,7 +628,7 @@ prompt_rvm() {
   local version=$(echo $MY_RUBY_HOME | awk -F'-' '{print $2}')
 
   if [[ -n "$version$gemset" ]]; then
-    "$1_prompt_segment" "$0" "$2" "240" "$DEFAULT_COLOR" "$version$gemset $(print_icon 'RUBY_ICON') "
+    "$1_prompt_segment" "$0" "$2" "240" "$DEFAULT_COLOR" "$version$gemset" 'RUBY_ICON'
   fi
 }
 
@@ -628,7 +655,7 @@ prompt_symfony2_tests() {
     code_amount=$(ls -1 src/**/*.php | grep -vc Tests)
     tests_amount=$(ls -1 src/**/*.php | grep -c Tests)
 
-    build_test_stats "$1" "$0" "$2" "$code_amount" "$tests_amount" "SF2 $(print_icon 'TEST_ICON')"
+    build_test_stats "$1" "$0" "$2" "$code_amount" "$tests_amount" "SF2" 'TEST_ICON'
   fi
 }
 
@@ -637,7 +664,7 @@ prompt_symfony2_version() {
   if [[ -f app/bootstrap.php.cache ]]; then
     local symfony2_version
     symfony2_version=$(grep " VERSION " app/bootstrap.php.cache | sed -e 's/[^.0-9]*//g')
-    "$1_prompt_segment" "$0" "$2" "240" "$DEFAULT_COLOR" "$(print_icon 'SYMFONY_ICON') $symfony2_version"
+    "$1_prompt_segment" "$0" "$2" "240" "$DEFAULT_COLOR" "$symfony2_version" 'SYMFONY_ICON'
   fi
 }
 
@@ -651,9 +678,9 @@ build_test_stats() {
   typeset -F 2 ratio
   local ratio=$(( (tests_amount/code_amount) * 100 ))
 
-  (( ratio >= 75 )) && "$1_prompt_segment" "${2}_GOOD" "$3" "cyan" "$DEFAULT_COLOR" "$headline: $ratio%%"
-  (( ratio >= 50 && ratio < 75 )) && "$1_prompt_segment" "${2}_AVG" "$3" "yellow" "$DEFAULT_COLOR" "$headline: $ratio%%"
-  (( ratio < 50 )) && "$1_prompt_segment" "${2}_BAD" "red" "$3" "$DEFAULT_COLOR" "$headline: $ratio%%"
+  (( ratio >= 75 )) && "$1_prompt_segment" "${2}_GOOD" "$3" "cyan" "$DEFAULT_COLOR" "$headline: $ratio%%" "$6"
+  (( ratio >= 50 && ratio < 75 )) && "$1_prompt_segment" "$2_AVG" "$3" "yellow" "$DEFAULT_COLOR" "$headline: $ratio%%" "$6"
+  (( ratio < 50 )) && "$1_prompt_segment" "$2_BAD" "$3" "red" "$DEFAULT_COLOR" "$headline: $ratio%%" "$6"
 }
 
 # System time
@@ -671,7 +698,7 @@ prompt_todo() {
   if $(hash todo.sh 2>&-); then
     count=$(todo.sh ls | egrep "TODO: [0-9]+ of ([0-9]+) tasks shown" | awk '{ print $4 }')
     if [[ "$count" = <-> ]]; then
-      "$1_prompt_segment" "$0" "$2" "244" "$DEFAULT_COLOR" "$(print_icon 'TODO_ICON') $count"
+      "$1_prompt_segment" "$0" "$2" "244" "$DEFAULT_COLOR" "$count" 'TODO_ICON'
     fi
   fi
 }
@@ -696,8 +723,7 @@ prompt_vcs() {
   zstyle ':vcs_info:*' check-for-changes true
 
   VCS_DEFAULT_FORMAT="$VCS_CHANGESET_PREFIX%F{$POWERLEVEL9K_VCS_FOREGROUND}%b%c%u%m%f"
-  zstyle ':vcs_info:git*:*' formats "%F{$POWERLEVEL9K_VCS_FOREGROUND}$(print_icon 'VCS_GIT_ICON')%f$VCS_DEFAULT_FORMAT"
-  zstyle ':vcs_info:hg*:*' formats "%F{$POWERLEVEL9K_VCS_FOREGROUND}$(print_icon 'VCS_HG_ICON')%f$VCS_DEFAULT_FORMAT"
+  zstyle ':vcs_info:*' formats "$VCS_DEFAULT_FORMAT"
 
   zstyle ':vcs_info:*' actionformats "%b %F{red}| %a%f"
 
@@ -724,9 +750,11 @@ prompt_vcs() {
 
   if [[ -n "$vcs_prompt" ]]; then
     if [[ "$VCS_WORKDIR_DIRTY" == true ]]; then
-      "$1_prompt_segment" "$0_MODIFIED" "$2" "yellow" "$DEFAULT_COLOR" "$vcs_prompt"
+      # $vcs_visual_identifier gets set in +vi-vcs-detect-changes in functions/vcs.zsh,
+      # as we have there access to vcs_info internal hooks.
+      "$1_prompt_segment" "$0_MODIFIED" "$2" "yellow" "$DEFAULT_COLOR" "$vcs_prompt" "$vcs_visual_identifier"
     else
-      "$1_prompt_segment" "$0" "$2" "green" "$DEFAULT_COLOR" "$vcs_prompt"
+      "$1_prompt_segment" "$0" "$2" "green" "$DEFAULT_COLOR" "$vcs_prompt" "$vcs_visual_identifier"
     fi
   fi
 }
@@ -819,7 +847,7 @@ $(print_icon 'MULTILINE_SECOND_PROMPT_PREFIX')"
       RPROMPT_PREFIX='%{'$'\e[1A''%}' # one line up
       RPROMPT_SUFFIX='%{'$'\e[1B''%}' # one line down
     else
-      RPROMPT_PREFIX='' 
+      RPROMPT_PREFIX=''
       RPROMPT_SUFFIX=''
     fi
   else
@@ -875,7 +903,7 @@ powerlevel9k_init() {
   print_deprecation_warning deprecated_segments
 
   setopt prompt_subst
-  
+
   setopt LOCAL_OPTIONS
   unsetopt XTRACE KSH_ARRAYS
   setopt PROMPT_CR PROMPT_PERCENT PROMPT_SUBST MULTIBYTE

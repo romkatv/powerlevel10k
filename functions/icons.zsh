@@ -43,9 +43,9 @@ case $POWERLEVEL9K_MODE in
       FREEBSD_ICON                   $'\U1F608 '            # 😈
       LINUX_ICON                     $'\UE271'              # 
       SUNOS_ICON                     $'\U1F31E '            # 🌞
-      HOME_ICON                      $'\UE12C '             # 
-      FOLDER_ICON                    $'\UE818 '             # 
-      NETWORK_ICON                   $'\UE1AD '             # 
+      HOME_ICON                      $'\UE12C'              # 
+      FOLDER_ICON                    $'\UE818'              # 
+      NETWORK_ICON                   $'\UE1AD'              # 
       LOAD_ICON                      $'\UE190 '             # 
       #RAM_ICON                       $'\UE87D'             # 
       RAM_ICON                       $'\UE1E2 '             # 
@@ -64,8 +64,8 @@ case $POWERLEVEL9K_MODE in
       VCS_COMMIT_ICON                $'\UE821 '             # 
       VCS_BRANCH_ICON                $'\UE220'              # 
       VCS_REMOTE_BRANCH_ICON         ' '$'\UE804 '          # 
-      VCS_GIT_ICON                   $'\UE20E  '            # 
-      VCS_HG_ICON                    $'\UE1C3  '            # 
+      VCS_GIT_ICON                   $'\UE20E '             # 
+      VCS_HG_ICON                    $'\UE1C3 '             # 
     )
   ;;
   'awesome-fontconfig')
@@ -95,9 +95,9 @@ case $POWERLEVEL9K_MODE in
       FREEBSD_ICON                   $'\U1F608 '            # 😈
       LINUX_ICON                     $'\UF17C'              # 
       SUNOS_ICON                     $'\UF185 '             # 
-      HOME_ICON                      $'\UF015 '             # 
-      FOLDER_ICON                    $'\UF115 '             # 
-      NETWORK_ICON                   $'\UF09E '             # 
+      HOME_ICON                      $'\UF015'              # 
+      FOLDER_ICON                    $'\UF115'              # 
+      NETWORK_ICON                   $'\UF09E'              # 
       LOAD_ICON                      $'\UF080 '             # 
       RAM_ICON                       $'\UF0E4'              # 
       VCS_UNTRACKED_ICON             $'\UF059'              # 
@@ -111,8 +111,8 @@ case $POWERLEVEL9K_MODE in
       VCS_COMMIT_ICON                $'\UF221 '             # 
       VCS_BRANCH_ICON                $'\UF126'              # 
       VCS_REMOTE_BRANCH_ICON         ' '$'\UF204 '          # 
-      VCS_GIT_ICON                   $'\UF113  '            # 
-      VCS_HG_ICON                    $'\UF0C3  '            # 
+      VCS_GIT_ICON                   $'\UF113 '             # 
+      VCS_HG_ICON                    $'\UF0C3 '             # 
     )
   ;;
   *)
@@ -190,9 +190,8 @@ fi
 function print_icon() {
   local icon_name=$1
   local ICON_USER_VARIABLE=POWERLEVEL9K_${icon_name}
-  local USER_ICON=${(P)ICON_USER_VARIABLE}
   if defined "$ICON_USER_VARIABLE"; then
-    echo -n "$USER_ICON"
+    echo -n "${(P)ICON_USER_VARIABLE}"
   else
     echo -n "${icons[$icon_name]}"
   fi

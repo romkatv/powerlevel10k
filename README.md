@@ -206,7 +206,7 @@ To change the way how the current working directory is truncated, just set:
     # default behaviour is to truncate whole directories
 
 In each case you have to specify the length you want to shorten the directory
-to. So in some cases `POWERLEVEL9K_SHORTEN_DIR_LENGTH` means characters, in 
+to. So in some cases `POWERLEVEL9K_SHORTEN_DIR_LENGTH` means characters, in
 others whole directories.
 
 ##### ip
