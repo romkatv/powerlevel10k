@@ -178,7 +178,11 @@ left_prompt_segment() {
     fi
   fi
 
-  [[ -n "$5" ]] && echo -n "${visual_identifier}%{$fg%}${5}${POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS}"
+  # Print the visual identifier
+  echo -n "${visual_identifier}"
+  # Print the content of the segment, if there is any
+  [[ -n "$5" ]] && echo -n "%{$fg%}${5}"
+  echo -n "${POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS}"
 
   CURRENT_BG=$3
 }
@@ -256,8 +260,10 @@ right_prompt_segment() {
   # Print whitespace only if segment is not joined or first right segment
   [[ $joined == false ]] || [[ "$CURRENT_RIGHT_BG" == "NONE" ]] && echo -n "${POWERLEVEL9K_WHITESPACE_BETWEEN_RIGHT_SEGMENTS}"
 
-  # Print segment content
-  [[ -n "$5" ]] && echo -n "${5}${visual_identifier}${POWERLEVEL9K_WHITESPACE_BETWEEN_RIGHT_SEGMENTS}%f"
+  # Print segment content if there is any
+  [[ -n "$5" ]] && echo -n "${5}"
+  # Print the visual identifier
+  echo -n "${visual_identifier}${POWERLEVEL9K_WHITESPACE_BETWEEN_RIGHT_SEGMENTS}%f"
 
   CURRENT_RIGHT_BG=$3
 }
@@ -292,7 +298,7 @@ prompt_custom() {
 # print an icon, if there are background jobs
 prompt_background_jobs() {
   if [[ $(jobs -l | wc -l) -gt 0 ]]; then
-    "$1_prompt_segment" "$0" "$2" "$DEFAULT_COLOR" "cyan" "$(print_icon 'BACKGROUND_JOBS_ICON')"
+    "$1_prompt_segment" "$0" "$2" "$DEFAULT_COLOR" "cyan" "" 'BACKGROUND_JOBS_ICON'
   fi
 }
 
@@ -596,7 +602,7 @@ prompt_rbenv() {
 # print an icon if user is root.
 prompt_root_indicator() {
   if [[ "$UID" -eq 0 ]]; then
-    "$1_prompt_segment" "$0" "$2" "$DEFAULT_COLOR" "yellow" "$(print_icon 'ROOT_ICON')"
+    "$1_prompt_segment" "$0" "$2" "$DEFAULT_COLOR" "yellow" "" 'ROOT_ICON'
   fi
 }
 
@@ -637,13 +643,13 @@ set_default POWERLEVEL9K_STATUS_VERBOSE true
 prompt_status() {
   if [[ "$POWERLEVEL9K_STATUS_VERBOSE" == true ]]; then
     if [[ "$RETVAL" -ne 0 ]]; then
-      "$1_prompt_segment" "$0_ERROR" "$2" "red" "226" "$RETVAL $(print_icon 'CARRIAGE_RETURN_ICON')"
+      "$1_prompt_segment" "$0_ERROR" "$2" "red" "226" "$RETVAL" 'CARRIAGE_RETURN_ICON'
     else
-      "$1_prompt_segment" "$0_OK" "$2" "$DEFAULT_COLOR" "046" "$(print_icon 'OK_ICON')"
+      "$1_prompt_segment" "$0_OK" "$2" "$DEFAULT_COLOR" "046" "" 'OK_ICON'
     fi
   else
     if [[ "$RETVAL" -ne 0 ]]; then
-      "$1_prompt_segment" "$0_ERROR" "$2" "$DEFAULT_COLOR" "red" "$(print_icon 'FAIL_ICON')"
+      "$1_prompt_segment" "$0_ERROR" "$2" "$DEFAULT_COLOR" "red" "" 'FAIL_ICON'
     fi
   fi
 }
