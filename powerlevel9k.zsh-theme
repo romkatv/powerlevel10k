@@ -407,13 +407,7 @@ prompt_dir() {
   local current_path='%~'
   if [[ -n "$POWERLEVEL9K_SHORTEN_DIR_LENGTH" ]]; then
 
-    if [ -z "$POWERLEVEL9K_SHORTEN_DELIMITER" ]
-    then
-      POWERLEVEL9K_SHORTEN_DELIMITER=".."
-    elif [ "$POWERLEVEL9K_SHORTEN_DELIMITER" = false ]
-    then
-      POWERLEVEL9K_SHORTEN_DELIMITER=""
-    fi
+    set_default POWERLEVEL9K_SHORTEN_DELIMITER ".."
 
     case "$POWERLEVEL9K_SHORTEN_STRATEGY" in
       truncate_middle)
