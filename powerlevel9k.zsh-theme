@@ -8,7 +8,10 @@
 ################################################################
 
 ################################################################
-# Please see the README file located in the source repository for full docs.
+# For basic documentation, please refer to the README.md in the top-level
+# directory. For more detailed documentation, refer to the project wiki, hosted
+# on Github: https://github.com/bhilburn/powerlevel9k/wiki
+#
 # There are a lot of easy ways you can customize your prompt segments and
 # theming with simple variables defined in your `~/.zshrc`.
 ################################################################
@@ -17,7 +20,7 @@
 #zstyle ':vcs_info:*+*:*' debug true
 #set -o xtrace
 
-# Check if the theme was called as a function.
+# Check if the theme was called as a function (e.g., from prezto)
 if [[ $(whence -w prompt_powerlevel9k_setup) =~ "function" ]]; then
   autoload -U is-at-least
   if is-at-least 5.0.8; then
@@ -45,7 +48,7 @@ if [[ $(whence -w prompt_powerlevel9k_setup) =~ "function" ]]; then
   fi
 fi
 
-# Check if filename is a symlink.
+# If this theme is sourced as a symlink, we need to locate the true URL
 if [[ -L $0 ]]; then
   # Script is a symlink
   filename="$(realpath -P $0 2>/dev/null || readlink -f $0 2>/dev/null)"
@@ -286,16 +289,15 @@ prompt_aws() {
   fi
 }
 
-# Custom: a way for the user to specify custom commands to run,
-# and display the output of.
-#
+# The 'custom` prompt provides a way for users to invoke commands and display
+# the output in a segment.
 prompt_custom() {
   local command=POWERLEVEL9K_CUSTOM_$3:u
 
   "$1_prompt_segment" "${0}_${3:u}" "$2" $DEFAULT_COLOR_INVERTED $DEFAULT_COLOR "$(eval ${(P)command})"
 }
 
-# print an icon, if there are background jobs
+# Segment to indicate background jobs with an icon.
 prompt_background_jobs() {
   if [[ $(jobs -l | wc -l) -gt 0 ]]; then
     "$1_prompt_segment" "$0" "$2" "$DEFAULT_COLOR" "cyan" "" 'BACKGROUND_JOBS_ICON'
@@ -303,8 +305,7 @@ prompt_background_jobs() {
 }
 
 prompt_battery() {
-  # The battery can have different states.
-  # Default is "unknown"
+  # The battery can have four different states - default to 'unknown'.
   local current_state="unknown"
   typeset -AH battery_states
   battery_states=(
@@ -313,24 +314,24 @@ prompt_battery() {
     'charged'       'green'
     'disconnected'  "$DEFAULT_COLOR_INVERTED"
   )
-  # set default values of not specified in shell
+  # Set default values if the user did not configure them
   set_default POWERLEVEL9K_BATTERY_LOW_THRESHOLD  10
 
   if [[ $OS =~ OSX && -f /usr/sbin/ioreg && -x /usr/sbin/ioreg ]]; then
-    # Pre-Grep all needed informations to save some memory and
-    # as little pollution of the xtrace output as possible.
+    # Pre-Grep as much information as possible to save some memory and
+    # avoid pollution of the xtrace output.
     local raw_data=$(ioreg -n AppleSmartBattery | grep -E "MaxCapacity|TimeRemaining|CurrentCapacity|ExternalConnected|IsCharging")
     # return if there is no battery on system
     [[ -z $(echo $raw_data | grep MaxCapacity) ]] && return
 
-    # convert time remaining from minutes to hours:minutes date string
+    # Convert time remaining from minutes to hours:minutes date string
     local time_remaining=$(echo $raw_data | grep TimeRemaining | awk '{ print $5 }')
     if [[ -n $time_remaining ]]; then
       # this value is set to a very high number when the system is calculating
       [[ $time_remaining -gt 10000 ]] && local tstring="..." || local tstring=${(f)$(date -u -r $(($time_remaining * 60)) +%k:%M)}
     fi
 
-    # get charge values
+    # Get charge values
     local max_capacity=$(echo $raw_data | grep MaxCapacity | awk '{ print $5 }')
     local current_capacity=$(echo $raw_data | grep CurrentCapacity | awk '{ print $5 }')
 
@@ -340,8 +341,7 @@ prompt_battery() {
     fi
 
     local remain=""
-    ## logic for string output
-    # Powerplug connected
+    # Logic for string output
     if [[ $(echo $raw_data | grep ExternalConnected | awk '{ print $5 }') =~ "Yes" ]]; then
       # Battery is charging
       if [[ $(echo $raw_data | grep IsCharging | awk '{ print $5 }') =~ "Yes" ]]; then
@@ -358,11 +358,11 @@ prompt_battery() {
 
   if [[ $OS =~ Linux ]]; then
     local sysp="/sys/class/power_supply"
-    # reported BAT0 or BAT1 depending on kernel version
+    # Reported BAT0 or BAT1 depending on kernel version
     [[ -a $sysp/BAT0 ]] && local bat=$sysp/BAT0
     [[ -a $sysp/BAT1 ]] && local bat=$sysp/BAT1
 
-    # return if no battery found
+    # Return if no battery found
     [[ -z $bat ]] && return
 
     [[ $(cat $bat/capacity) -gt 100 ]] && local bat_percent=100 || local bat_percent=$(cat $bat/capacity)
@@ -383,7 +383,6 @@ prompt_battery() {
     [[ -n $tstring ]] && local remain=" ($tstring)"
   fi
 
-  # prepare string
   local message
   # Default behavior: Be verbose!
   set_default POWERLEVEL9K_BATTERY_VERBOSE true
@@ -391,7 +390,7 @@ prompt_battery() {
     message="$bat_percent%%$remain"
   fi
 
-  # display prompt_segment
+  # Draw the prompt_segment
   [[ -n $bat_percent ]] && "$1_prompt_segment" "${0}_${current_state}" "$2" "$DEFAULT_COLOR" "${battery_states[$current_state]}" "$message" 'BATTERY_ICON'
 }
 
@@ -437,7 +436,7 @@ prompt_dir() {
   fi
 }
 
-# GO-prompt
+# GO prompt
 prompt_go_version() {
   local go_version
   go_version=$(go version 2>&1 | sed -E "s/.*(go[0-9.]*).*/\1/")
@@ -524,6 +523,17 @@ prompt_node_version() {
   "$1_prompt_segment" "$0" "$2" "green" "white" "${node_version:1}" 'NODE_ICON'
 }
 
+# Node version from NVM
+# Only prints the segment if different than the default value
+prompt_nvm() {
+  local node_version=$(nvm current)
+  local nvm_default=$(cat $NVM_DIR/alias/default)
+  [[ -z "${node_version}" ]] && return
+  [[ "$node_version" =~ "$nvm_default" ]] && return
+
+  $1_prompt_segment "$0" "$2" "green" "011" "${node_version:1}" 'NODE_ICON'
+}
+
 # print a little OS icon
 prompt_os_icon() {
   "$1_prompt_segment" "$0" "$2" "black" "255" "$OS_ICON"
@@ -583,17 +593,6 @@ prompt_ram() {
   "$1_prompt_segment" "$0" "$2" "yellow" "$DEFAULT_COLOR" "${rendition% }" 'RAM_ICON'
 }
 
-# Node version from NVM
-# Only prints the segment if different than the default value
-prompt_nvm() {
-  local node_version=$(nvm current)
-  local nvm_default=$(cat $NVM_DIR/alias/default)
-  [[ -z "${node_version}" ]] && return
-  [[ "$node_version" =~ "$nvm_default" ]] && return
-
-  $1_prompt_segment "$0" "$2" "green" "011" "${node_version:1}" 'NODE_ICON'
-}
-
 # rbenv information
 prompt_rbenv() {
   if [[ -n "$RBENV_VERSION" ]]; then
@@ -601,14 +600,14 @@ prompt_rbenv() {
   fi
 }
 
-# print an icon if user is root.
+# Print an icon if user is root.
 prompt_root_indicator() {
   if [[ "$UID" -eq 0 ]]; then
     "$1_prompt_segment" "$0" "$2" "$DEFAULT_COLOR" "yellow" "" 'ROOT_ICON'
   fi
 }
 
-# print Rust version number
+# Print Rust version number
 prompt_rust_version() {
   local rust_version
   rust_version=$(rustc --version 2>&1 | grep -oe "^rustc\s*[^ ]*" | grep -o '[0-9.a-z\\\-]*$')
@@ -711,7 +710,8 @@ prompt_todo() {
   fi
 }
 
-# VCS segment: shows the state of your repository, if you are in a folder under version control
+# VCS segment: shows the state of your repository, if you are in a folder under
+# version control
 prompt_vcs() {
   autoload -Uz vcs_info
 
@@ -898,8 +898,10 @@ powerlevel9k_init() {
   local term_colors
   term_colors=$(echotc Co)
   if (( term_colors < 256 )); then
-    print -P "%F{red}WARNING!%f Your terminal supports less than 256 colors!"
-    print -P "You should put: %F{blue}export TERM=\"xterm-256color\"%f in your \~\/.zshrc"
+    print -P "%F{red}WARNING!%f Your terminal appears to support less than 256 colors!"
+    print -P "If your terminal supports 256 colors, please export the appropriate environment variable"
+    print -P "_before_ loading this theme in your \~\/.zshrc. In most terminal emulators, putting"
+    print -P "%F{blue}export TERM=\"xterm-256color\"%f at the top of your \~\/.zshrc is sufficient."
   fi
 
   # Display a warning if deprecated segments are in use.
