@@ -205,6 +205,19 @@ To change the way how the current working directory is truncated, just set:
     POWERLEVEL9K_SHORTEN_STRATEGY="truncate_from_right"
     # default behaviour is to truncate whole directories
 
+You can also change the delimiter (the dots in between) which is used to truncate the working directory. This setting is optional. The default are 2 dots.
+
+    # set the delimiter to an empty string to hide it
+    POWERLEVEL9K_SHORTEN_DELIMITER=""
+    # or set it to anything else you want (e.g. 3 dots)
+    POWERLEVEL9K_SHORTEN_DELIMITER="..."
+
+With this you could achive the truncate behaviour of the fish shell. Which turncates `/usr/share/plasma` to `/u/s/plasma`
+
+    POWERLEVEL9K_SHORTEN_DIR_LENGTH=1
+    POWERLEVEL9K_SHORTEN_DELIMITER=""
+    POWERLEVEL9K_SHORTEN_STRATEGY="truncate_from_right"
+
 In each case you have to specify the length you want to shorten the directory
 to. So in some cases `POWERLEVEL9K_SHORTEN_DIR_LENGTH` means characters, in
 others whole directories.
