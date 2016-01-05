@@ -6,7 +6,8 @@ ZSH, [Oh-My-Zsh](https://github.com/robbyrussell/oh-my-zsh), or
 [Prezto](https://github.com/sorin-ionescu/prezto), and can also be installed
 using [antigen](https://github.com/zsh-users/antigen).
 
-Look like a bad-ass. Impress everyone in 'Screenshot Your Desktop' threads. Use powerlevel9k.
+Be a badass. Get more out of your terminal. Impress everyone in 'Screenshot Your
+Desktop' threads. Use powerlevel9k.
 
 ![](http://bhilburn.org/content/images/2015/01/pl9k-improved.png)
 
@@ -126,7 +127,10 @@ Supports both OS X and Linux(time remaining requires the acpi program on Linux)
 
 ##### custom_command
 
-The `custom_...` segment lets you add a custom command to your prompt, to e.g. display the wifi signal. You choose a name for the segment yourself, (here signal), and then set the appropriate variables, as so (based on the name you chose)
+The `custom_...` segment allows you to turn the output of a custom command into
+a prompt segment. As an example, if you wanted to create a custom segment to
+display your WiFi signal strength, you might define a custom segment called
+`custom_signal` like this:
 
     POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(context time battery dir vcs virtualenv custom_signal)
     POWERLEVEL9K_CUSTOM_SIGNAL="echo signal: \$(nmcli device wifi | grep yes | awk '{print \$8}')"
@@ -134,11 +138,8 @@ The `custom_...` segment lets you add a custom command to your prompt, to e.g. d
     POWERLEVEL9K_CUSTOM_SIGNAL_FOREGROUND="yellow"
     POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(aws status load ram)
 
-gives
-
-![simplesignal](http://i.imgur.com/SQmYVFL.png)
-
-Instead of defining the command inline (if it is kinda long or unreadable), one can also add a function to the .zshrc like:
+Instead of writing out the command in-line within the environment variable, you
+can also add it as a function in your `.zshrc`:
 
     zsh_signal(){
             local signal=$(nmcli device wifi | grep yes | awk '{print $8}')
@@ -148,41 +149,23 @@ Instead of defining the command inline (if it is kinda long or unreadable), one 
             echo -n "%{$color%}\uf230  $signal%{%f%}" # \uf230 is 
     }
 
-And then by changing the custom commands array (and rearranging a bit the prompt elements) to read:
+You would then invoke the function in your custom segment:
 
     POWERLEVEL9K_CUSTOM_SIGNAL="zsh_signal"
 
-Then this updated command looks like:
+The command, above, gives you the wireless signal segment shown below:
 
 ![signal](http://i.imgur.com/hviMATC.png)
 
-You can also have multiple custom commands. Say you have
-
-    POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(context time battery custom_signal dir vcs virtualenv custom_time )
-    POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(aws status load ram custom_docker)
-
-    POWERLEVEL9K_CUSTOM_SIGNAL="zsh_signal"
-    POWERLEVEL9K_CUSTOM_SIGNAL_FOREGROUND="white"
-    POWERLEVEL9K_CUSTOM_SIGNAL_BACKGROUND="black"
-
-    POWERLEVEL9K_CUSTOM_DOCKER='echo "\uf299 $(docker ps -a | grep Up | wc -l)"' # \uf299 is 
-    POWERLEVEL9K_CUSTOM_DOCKER_FOREGROUND="white"
-    POWERLEVEL9K_CUSTOM_DOCKER_BACKGROUND="blue"
-
-    POWERLEVEL9K_CUSTOM_TIME='echo "$(date +%s)"'
-    POWERLEVEL9K_CUSTOM_TIME_FOREGROUND="black"
-    POWERLEVEL9K_CUSTOM_TIME_BACKGROUND="yellow"
-
-
-Then you get:
-
-![](http://i.imgur.com/QGGBTqY.png)
+You can define as many custom segments as you wish. If you think you have
+a segment that others would find useful, please consider upstreaming it to the
+main theme distribution so that everyone can use it!
 
 ##### context
 
-The `context` segment (user@host string) is conditional. This lets you enable it, but only display
-it if you are not your normal user or on a remote host (basically, only print it
-when it's likely you need it).
+The `context` segment (user@host string) is conditional. This lets you enable
+it, but only display it if you are not your normal user or on a remote host
+(basically, only print it when it's likely you need it).
 
 To use this feature, make sure the `context` segment is enabled in your prompt
 elements (it is by default), and define a `DEFAULT_USER` in your `~/.zshrc`:
@@ -205,14 +188,15 @@ To change the way how the current working directory is truncated, just set:
     POWERLEVEL9K_SHORTEN_STRATEGY="truncate_from_right"
     # default behaviour is to truncate whole directories
 
-You can also change the delimiter (the dots in between) which is used to truncate the working directory. This setting is optional. The default are 2 dots.
+You can also change the delimiter (the dots in between text) from 2 dots to something custom:
 
     # set the delimiter to an empty string to hide it
     POWERLEVEL9K_SHORTEN_DELIMITER=""
     # or set it to anything else you want (e.g. 3 dots)
     POWERLEVEL9K_SHORTEN_DELIMITER="..."
 
-With this you could achive the truncate behaviour of the fish shell. Which turncates `/usr/share/plasma` to `/u/s/plasma`
+For example, if you wanted the truncation behavior of the `fish` shell, which
+truncates `/usr/share/plasma` to `/u/s/plasma`, you would use the following:
 
     POWERLEVEL9K_SHORTEN_DIR_LENGTH=1
     POWERLEVEL9K_SHORTEN_DELIMITER=""
