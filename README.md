@@ -206,6 +206,16 @@ In each case you have to specify the length you want to shorten the directory
 to. So in some cases `POWERLEVEL9K_SHORTEN_DIR_LENGTH` means characters, in
 others whole directories.
 
+You can even show icons if your are within your homefolder or outside of it
+by setting:
+
+    # Greek "alpha" sign
+    POWERLEVEL9K_HOME_ICON='\u03B1'
+    # Greek capital "omega" sign
+    POWERLEVEL9K_FOLDER_ICON='\u03A9'
+
+To turn off these icons you could set these variables to an empty string.
+
 ##### ip
 
 This segment shows you your current internal IP address. It tries to examine
