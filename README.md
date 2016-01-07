@@ -206,15 +206,16 @@ In each case you have to specify the length you want to shorten the directory
 to. So in some cases `POWERLEVEL9K_SHORTEN_DIR_LENGTH` means characters, in
 others whole directories.
 
-You can even show icons if your are within your homefolder or outside of it
-by setting:
 
-    # Greek "alpha" sign
-    POWERLEVEL9K_HOME_ICON='\u03B1'
-    # Greek capital "omega" sign
-    POWERLEVEL9K_FOLDER_ICON='\u03A9'
+| `Compatible` | `Powerline` | `Awesome Powerline` | Situation
+|------------|-----------|-------------------|----------------------------
+| None       | None      | ![home icon](https://cloud.githubusercontent.com/assets/1544760/12183451/40ec4016-b58f-11e5-9b9e-74e2b2f0b8b3.png) | Within Home folder         |
+| None       | None      | ![folder icon](https://cloud.githubusercontent.com/assets/1544760/12183452/40f79286-b58f-11e5-9b8c-ed1343a07b08.png) | Outside of home folder     |
 
 To turn off these icons you could set these variables to an empty string.
+
+    POWERLEVEL9K_HOME_ICON=''
+    POWERLEVEL9K_FOLDER_ICON=''
 
 ##### ip
 
