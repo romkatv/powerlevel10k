@@ -147,7 +147,7 @@ left_prompt_segment() {
 
   local joined=$2
   if [[ $CURRENT_BG != 'NONE' ]] && ! isSameColor "$3" "$CURRENT_BG"; then
-    echo -n "%{$bg%F{$CURRENT_BG}%}"
+    echo -n "$bg%F{$CURRENT_BG}"
     if [[ $joined == false ]]; then
       # Middle segment
       echo -n "$(print_icon 'LEFT_SEGMENT_SEPARATOR')$POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS"
@@ -159,13 +159,13 @@ left_prompt_segment() {
     # enough contrast.
     local complement
     [[ -n "$4" ]] && complement="$4" || complement=$DEFAULT_COLOR
-    echo -n "%{$bg%F{$complement}%}"
+    echo -n "$bg%F{$complement}"
     if [[ $joined == false ]]; then
       echo -n "$(print_icon 'LEFT_SUBSEGMENT_SEPARATOR')$POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS"
     fi
   else
     # First segment
-    echo -n "%{$bg%}$POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS"
+    echo -n "${bg}$POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS"
   fi
 
   local visual_identifier
@@ -184,7 +184,7 @@ left_prompt_segment() {
   # Print the visual identifier
   echo -n "${visual_identifier}"
   # Print the content of the segment, if there is any
-  [[ -n "$5" ]] && echo -n "%{$fg%}${5}"
+  [[ -n "$5" ]] && echo -n "${fg}${5}"
   echo -n "${POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS}"
 
   CURRENT_BG=$3
@@ -193,11 +193,11 @@ left_prompt_segment() {
 # End the left prompt, closes the final segment.
 left_prompt_end() {
   if [[ -n $CURRENT_BG ]]; then
-    echo -n "%{%k%F{$CURRENT_BG}%}$(print_icon 'LEFT_SEGMENT_SEPARATOR')"
+    echo -n "%k%F{$CURRENT_BG}$(print_icon 'LEFT_SEGMENT_SEPARATOR')"
   else
     echo -n "%k"
   fi
-  echo -n "%{%f%}$(print_icon 'LEFT_SEGMENT_END_SEPARATOR')"
+  echo -n "%f$(print_icon 'LEFT_SEGMENT_END_SEPARATOR')"
   CURRENT_BG=''
 }
 
@@ -258,7 +258,7 @@ right_prompt_segment() {
     fi
   fi
 
-  echo -n "%{$bg%}%{$fg%}"
+  echo -n "${bg}${fg}"
 
   # Print whitespace only if segment is not joined or first right segment
   [[ $joined == false ]] || [[ "$CURRENT_RIGHT_BG" == "NONE" ]] && echo -n "${POWERLEVEL9K_WHITESPACE_BETWEEN_RIGHT_SEGMENTS}"
@@ -843,7 +843,7 @@ powerlevel9k_prepare_prompts() {
   RETVAL=$?
 
   if [[ "$POWERLEVEL9K_PROMPT_ON_NEWLINE" == true ]]; then
-    PROMPT="$(print_icon 'MULTILINE_FIRST_PROMPT_PREFIX')%{%f%b%k%}$(build_left_prompt)
+    PROMPT="$(print_icon 'MULTILINE_FIRST_PROMPT_PREFIX')%f%b%k$(build_left_prompt)
 $(print_icon 'MULTILINE_SECOND_PROMPT_PREFIX')"
     if [[ "$POWERLEVEL9K_RPROMPT_ON_NEWLINE" != true ]]; then
       # The right prompt should be on the same line as the first line of the left
@@ -859,13 +859,13 @@ $(print_icon 'MULTILINE_SECOND_PROMPT_PREFIX')"
       RPROMPT_SUFFIX=''
     fi
   else
-    PROMPT="%{%f%b%k%}$(build_left_prompt)"
+    PROMPT="%f%b%k$(build_left_prompt)"
     RPROMPT_PREFIX=''
     RPROMPT_SUFFIX=''
   fi
 
   if [[ "$POWERLEVEL9K_DISABLE_RPROMPT" != true ]]; then
-    RPROMPT="$RPROMPT_PREFIX%{%f%b%k%}$(build_right_prompt)%{$reset_color%}$RPROMPT_SUFFIX"
+    RPROMPT="$RPROMPT_PREFIX%f%b%k$(build_right_prompt)%{$reset_color%}$RPROMPT_SUFFIX"
   fi
 }
 
