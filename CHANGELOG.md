@@ -11,11 +11,31 @@ You can now merge segments together by suffixing the segment name with "_joined"
 For Developers: Be aware that the order of parameters in left/right_prompt_segment
 has changed. Now a boolean parameter must be set as second parameter (true if joined).
 
+### `dir` changes
+
+This segment now has "state", which means you now can change the colors seperatly
+depending if you are in your homefolder or not.
+Your variables for that should now look like:
+```zsh
+POWERLEVEL9K_DIR_HOME_BACKGROUND='green'
+POWERLEVEL9K_DIR_HOME_FOREGROUND='cyan'
+POWERLEVEL9K_DIR_DEFAULT_BACKGROUND='red'
+POWERLEVEL9K_DIR_DEFAULT_FOREGROUND='yellow'
+```
+
 ### `status` changes
 
 The `status` segment was split up into three segments. `background_jobs` prints
 an icon if there are background jobs. `root_indicator` prints an icon if the user
 is root. The `status` segment focuses now on the status only.
+The `status` segment also now has "state". If you want to overwrite the colors,
+you have to add the state to your variables:
+```zsh
+POWERLEVEL9K_STATUS_ERROR_BACKGROUND='green'
+POWERLEVEL9K_STATUS_ERROR_FOREGROUND='cyan'
+POWERLEVEL9K_STATUS_OK_BACKGROUND='red'
+POWERLEVEL9K_STATUS_OK_FOREGROUND='yellow'
+```
 
 ### New segment `custom_command` added
 
