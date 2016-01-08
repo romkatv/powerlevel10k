@@ -1,4 +1,4 @@
-## v0.3.0 (next)
+## v0.3.0
 
 ### Introduced "visual identifiers" to the segments
 
