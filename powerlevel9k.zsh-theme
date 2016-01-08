@@ -644,7 +644,7 @@ prompt_rvm() {
   fi
 }
 
-# Status: (return code, root status, background jobs)
+# Status: return code if verbose, otherwise just an icon if an error occurred
 set_default POWERLEVEL9K_STATUS_VERBOSE true
 prompt_status() {
   if [[ "$POWERLEVEL9K_STATUS_VERBOSE" == true ]]; then
