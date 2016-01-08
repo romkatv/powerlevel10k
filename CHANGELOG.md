@@ -1,3 +1,10 @@
+## v0.4.0 (next)
+
+### `ram` changes
+
+The `ram` segment was split up into `ram` and `swap`. The `POWERLEVEL9K_RAM_ELEMENTS`
+variable is void.
+
 ## v0.3.1
 
 ### `dir` changes

@@ -565,46 +565,18 @@ prompt_php_version() {
 
 # Show free RAM and used Swap
 prompt_ram() {
-  defined POWERLEVEL9K_RAM_ELEMENTS || POWERLEVEL9K_RAM_ELEMENTS=(ram_free swap_used)
+  local base=''
+  local ramfree=0
+  if [[ "$OS" == "OSX" ]]; then
+    ramfree=$(vm_stat | grep "Pages free" | grep -o -E '[0-9]+')
+    # Convert pages into Bytes
+    ramfree=$(( ramfree * 4096 ))
+  else
+    ramfree=$(grep -o -E "MemFree:\s+[0-9]+" /proc/meminfo | grep -o "[0-9]*")
+    base='K'
+  fi
 
-  local rendition base
-  for element in "${POWERLEVEL9K_RAM_ELEMENTS[@]}"; do
-    case $element in
-      ram_free)
-        if [[ "$OS" == "OSX" ]]; then
-          ramfree=$(vm_stat | grep "Pages free" | grep -o -E '[0-9]+')
-          # Convert pages into Bytes
-          ramfree=$(( ramfree * 4096 ))
-          base=''
-        else
-          ramfree=$(grep -o -E "MemFree:\s+[0-9]+" /proc/meminfo | grep -o "[0-9]*")
-          base=K
-        fi
-
-        rendition+="$(printSizeHumanReadable "$ramfree" $base) "
-      ;;
-      swap_used)
-        if [[ "$OS" == "OSX" ]]; then
-          raw_swap_used=$(sysctl vm.swapusage | grep -o "used\s*=\s*[0-9,.A-Z]*" | grep -o "[0-9,.A-Z]*$")
-          typeset -F 2 swap_used
-          swap_used=${$(echo $raw_swap_used | grep -o "[0-9,.]*")//,/.}
-          # Replace comma
-          swap_used=${swap_used//,/.}
-
-          base=$(echo "$raw_swap_used" | grep -o "[A-Z]*$")
-        else
-          swap_total=$(grep -o -E "SwapTotal:\s+[0-9]+" /proc/meminfo | grep -o "[0-9]*")
-          swap_free=$(grep -o -E "SwapFree:\s+[0-9]+" /proc/meminfo | grep -o "[0-9]*")
-          swap_used=$(( swap_total - swap_free ))
-          base=K
-        fi
-
-        rendition+="$(printSizeHumanReadable "$swap_used" $base) "
-      ;;
-    esac
-  done
-
-  "$1_prompt_segment" "$0" "$2" "yellow" "$DEFAULT_COLOR" "${rendition% }" 'RAM_ICON'
+  "$1_prompt_segment" "$0" "$2" "yellow" "$DEFAULT_COLOR" "$(printSizeHumanReadable "$ramfree" $base)" 'RAM_ICON'
 }
 
 # rbenv information
@@ -667,6 +639,30 @@ prompt_status() {
       "$1_prompt_segment" "$0_ERROR" "$2" "$DEFAULT_COLOR" "red" "" 'FAIL_ICON'
     fi
   fi
+}
+
+prompt_swap() {
+  local swap_used=0
+  local base=''
+
+  if [[ "$OS" == "OSX" ]]; then
+    local raw_swap_used
+    raw_swap_used=$(sysctl vm.swapusage | grep -o "used\s*=\s*[0-9,.A-Z]*" | grep -o "[0-9,.A-Z]*$")
+
+    typeset -F 2 swap_used
+    swap_used=${$(echo $raw_swap_used | grep -o "[0-9,.]*")//,/.}
+    # Replace comma
+    swap_used=${swap_used//,/.}
+
+    base=$(echo "$raw_swap_used" | grep -o "[A-Z]*$")
+  else
+    swap_total=$(grep -o -E "SwapTotal:\s+[0-9]+" /proc/meminfo | grep -o "[0-9]*")
+    swap_free=$(grep -o -E "SwapFree:\s+[0-9]+" /proc/meminfo | grep -o "[0-9]*")
+    swap_used=$(( swap_total - swap_free ))
+    base='K'
+  fi
+
+  "$1_prompt_segment" "$0" "$2" "yellow" "$DEFAULT_COLOR" "$(printSizeHumanReadable "$swap_used" $base)" 'SWAP_ICON'
 }
 
 # Symfony2-PHPUnit test ratio
