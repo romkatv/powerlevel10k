@@ -289,14 +289,6 @@ prompt_aws() {
   fi
 }
 
-# The 'custom` prompt provides a way for users to invoke commands and display
-# the output in a segment.
-prompt_custom() {
-  local command=POWERLEVEL9K_CUSTOM_$3:u
-
-  "$1_prompt_segment" "${0}_${3:u}" "$2" $DEFAULT_COLOR_INVERTED $DEFAULT_COLOR "$(eval ${(P)command})"
-}
-
 # Segment to indicate background jobs with an icon.
 prompt_background_jobs() {
   if [[ $(jobs -l | wc -l) -gt 0 ]]; then
@@ -405,6 +397,14 @@ prompt_context() {
       "$1_prompt_segment" "$0_DEFAULT" "$2" "$DEFAULT_COLOR" "011" "$USER@%m"
     fi
   fi
+}
+
+# The 'custom` prompt provides a way for users to invoke commands and display
+# the output in a segment.
+prompt_custom() {
+  local command=POWERLEVEL9K_CUSTOM_$3:u
+
+  "$1_prompt_segment" "${0}_${3:u}" "$2" $DEFAULT_COLOR_INVERTED $DEFAULT_COLOR "$(eval ${(P)command})"
 }
 
 # Dir: current working directory
