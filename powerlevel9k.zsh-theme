@@ -492,6 +492,14 @@ prompt_ip() {
 }
 
 prompt_load() {
+  # The load segment can have three different states
+  local current_state="unknown"
+  typeset -AH load_states
+  load_states=(
+    'critical'      'red'
+    'warning'       'yellow'
+    'normal'        'green'
+  )
   if [[ "$OS" == "OSX" ]]; then
     load_avg_5min=$(sysctl vm.loadavg | grep -o -E '[0-9]+(\.|,)[0-9]+' | head -n 1)
   else
@@ -502,17 +510,14 @@ prompt_load() {
   load_avg_5min=${load_avg_5min//,/.}
 
   if [[ "$load_avg_5min" -gt 10 ]]; then
-    BACKGROUND_COLOR="red"
-    FUNCTION_SUFFIX="_CRITICAL"
+    current_state="critical"
   elif [[ "$load_avg_5min" -gt 3 ]]; then
-    BACKGROUND_COLOR="yellow"
-    FUNCTION_SUFFIX="_WARNING"
+    current_state="warning"
   else
-    BACKGROUND_COLOR="green"
-    FUNCTION_SUFFIX="_NORMAL"
+    current_state="normal"
   fi
 
-  "$1_prompt_segment" "$0$FUNCTION_SUFFIX" "$2" "$BACKGROUND_COLOR" "$DEFAULT_COLOR" "$load_avg_5min" 'LOAD_ICON'
+  "$1_prompt_segment" "${0}${current_state}" "$2" "${load_states[$current_state]}" "$DEFAULT_COLOR" "$load_avg_5min" 'LOAD_ICON'
 }
 
 # Node version
