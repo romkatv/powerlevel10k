@@ -79,7 +79,7 @@ case $POWERLEVEL9K_MODE in
       RIGHT_SUBSEGMENT_SEPARATOR     $'\UE0B3'              # 
       CARRIAGE_RETURN_ICON           $'\U21B5'              # ↵
       ROOT_ICON                      $'\uF201'              # 
-      RUBY_ICON                      $'\UF247'              # 
+      RUBY_ICON                      $'\UF219'              # 
       AWS_ICON                       $'\UF296'              # 
       BACKGROUND_JOBS_ICON           $'\UF013 '             # 
       TEST_ICON                      $'\UF291'              # 
