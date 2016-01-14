@@ -312,7 +312,7 @@ prompt_battery() {
   if [[ $OS =~ OSX && -f /usr/sbin/ioreg && -x /usr/sbin/ioreg ]]; then
     # Pre-Grep as much information as possible to save some memory and
     # avoid pollution of the xtrace output.
-    local raw_data=$(ioreg -n AppleSmartBattery | grep -E "MaxCapacity|TimeRemaining|CurrentCapacity|ExternalConnected|IsCharging")
+    local raw_data="$(ioreg -n AppleSmartBattery | grep -E "MaxCapacity|TimeRemaining|CurrentCapacity|ExternalConnected|IsCharging")"
     # return if there is no battery on system
     [[ -z $(echo $raw_data | grep MaxCapacity) ]] && return
 
