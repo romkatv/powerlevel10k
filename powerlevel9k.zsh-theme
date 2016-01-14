@@ -531,10 +531,12 @@ prompt_node_version() {
 # Node version from NVM
 # Only prints the segment if different than the default value
 prompt_nvm() {
-  local node_version=$(nvm current)
-  local nvm_default=$(cat $NVM_DIR/alias/default)
-  [[ -z "${node_version}" ]] && return
-  [[ "$node_version" =~ "$nvm_default" ]] && return
+  if [[ $(type nvm) =~ 'nvm is a shell function'* ]]; then
+    local node_version=$(nvm current)
+    local nvm_default=$(cat $NVM_DIR/alias/default)
+    [[ -z "${node_version}" ]] && return
+    [[ "$node_version" =~ "$nvm_default" ]] && return
+  fi
 
   $1_prompt_segment "$0" "$2" "green" "011" "${node_version:1}" 'NODE_ICON'
 }
