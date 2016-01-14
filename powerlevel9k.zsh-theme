@@ -538,7 +538,7 @@ prompt_nvm() {
     [[ "$node_version" =~ "$nvm_default" ]] && return
   fi
 
-  $1_prompt_segment "$0" "$2" "green" "011" "${node_version:1}" 'NODE_ICON'
+  [[ -n "${node_version}" ]] && $1_prompt_segment "$0" "$2" "green" "011" "${node_version:1}" 'NODE_ICON'
 }
 
 # print a little OS icon
