@@ -51,7 +51,7 @@ fi
 # If this theme is sourced as a symlink, we need to locate the true URL
 if [[ -L $0 ]]; then
   # Script is a symlink
-  filename="$(realpath -P $0 2>/dev/null || readlink -f $0 2>/dev/null)"
+  filename="$(realpath -P $0 2>/dev/null || readlink -f $0 2>/dev/null || perl -MCwd=abs_path -le 'print abs_path readlink(shift);' $0 2>/dev/null)"
 elif [[ -f $0 ]]; then
   # Script is a file
   filename="$0"
