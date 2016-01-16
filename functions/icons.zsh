@@ -44,6 +44,7 @@ case $POWERLEVEL9K_MODE in
       LINUX_ICON                     $'\UE271'              # 
       SUNOS_ICON                     $'\U1F31E '            # 🌞
       HOME_ICON                      $'\UE12C'              # 
+      HOME_SUB_ICON                  $'\UE18D'              # 
       FOLDER_ICON                    $'\UE818'              # 
       NETWORK_ICON                   $'\UE1AD'              # 
       LOAD_ICON                      $'\UE190 '             # 
@@ -96,6 +97,7 @@ case $POWERLEVEL9K_MODE in
       LINUX_ICON                     $'\UF17C'              # 
       SUNOS_ICON                     $'\UF185 '             # 
       HOME_ICON                      $'\UF015'              # 
+      HOME_SUB_ICON                  $'\UF07C'              # 
       FOLDER_ICON                    $'\UF115'              # 
       NETWORK_ICON                   $'\UF09E'              # 
       LOAD_ICON                      $'\UF080 '             # 
@@ -143,6 +145,7 @@ case $POWERLEVEL9K_MODE in
       LINUX_ICON                     'Lx'
       SUNOS_ICON                     'Sun'
       HOME_ICON                      ''
+      HOME_SUB_ICON                  ''
       FOLDER_ICON                    ''
       NETWORK_ICON                   'IP'
       LOAD_ICON                      'L'
@@ -202,4 +205,3 @@ get_icon_names() {
     echo "POWERLEVEL9K_$key: ${icons[$key]}"
   done
 }
-
