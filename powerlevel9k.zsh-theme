@@ -519,7 +519,7 @@ prompt_load() {
     current_state="normal"
   fi
 
-  "$1_prompt_segment" "${0}${current_state}" "$2" "${load_states[$current_state]}" "$DEFAULT_COLOR" "$load_avg_5min" 'LOAD_ICON'
+  "$1_prompt_segment" "${0}_${current_state}" "$2" "${load_states[$current_state]}" "$DEFAULT_COLOR" "$load_avg_5min" 'LOAD_ICON'
 }
 
 # Node version
