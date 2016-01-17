@@ -6,7 +6,7 @@ ZSH, [Oh-My-Zsh](https://github.com/robbyrussell/oh-my-zsh), or
 [Prezto](https://github.com/sorin-ionescu/prezto), and can also be installed
 using [antigen](https://github.com/zsh-users/antigen).
 
-Be a badass. Get more out of your terminal. Impress everyone in 'Screenshot Your
+Get more out of your terminal. Be a badass. Impress everyone in 'Screenshot Your
 Desktop' threads. Use powerlevel9k.
 
 ![](http://bhilburn.org/content/images/2015/01/pl9k-improved.png)
@@ -62,8 +62,16 @@ options, including color and icon settings: [Stylizing Your Prompt](https://gith
 #### Customizing Prompt Segments
 Customizing your prompt is easy! Select the segments you want to have displayed,
 and then assign them to either the left or right prompt by adding the following
-variables to your `~/.zshrc`. If you don't customize this, the below
-configuration is the default:
+variables to your `~/.zshrc`.
+
+| Variable | Default Value | Description |
+|----------|---------------|-------------|
+|`POWERLEVEL9K_LEFT_PROMPT_ELEMENTS`|`(context dir rbenv vcs)`|Segment list for left prompt|
+|`POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS`|`(status history time)`|Segment list for right prompt|
+
+
+So if you wanted to set these variables manually, you would put the following in
+your `~/.zshrc`:
 
     POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(context dir rbenv vcs)
     POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(status history time)
@@ -107,41 +115,46 @@ profile](http://docs.aws.amazon.com/cli/latest/userguide/installing.html), add
 the `aws` segment to one of the prompts, and define `AWS_DEFAULT_PROFILE` in
 your `~/.zshrc`:
 
-    export AWS_DEFAULT_PROFILE=<profile_name>
+| Variable | Default Value | Description |
+|----------|---------------|-------------|
+|`AWS_DEFAULT_PROFILE`|None|Your AWS profile name|
 
 ##### battery
 
-This segment will display your current battery status (fails gracefully
-on systems without a battery). It can be customized in your .zshrc
-with the environment variables detailed below with their default values.
+This segment will display your current battery status (fails gracefully on
+systems without a battery). It is supported on both OSX and Linux (note that it
+requires `acpi` on Linux).
 
-    POWERLEVEL9K_BATTERY_CHARGING="yellow"
-    POWERLEVEL9K_BATTERY_CHARGED="green"
-    POWERLEVEL9K_BATTERY_DISCONNECTED=$DEFAULT_COLOR
-    POWERLEVEL9K_BATTERY_LOW_THRESHOLD=10
-    POWERLEVEL9K_BATTERY_LOW_COLOR="red"
+| Variable | Default Value | Description |
+|----------|---------------|-------------|
+|`POWERLEVEL9K_BATTERY_CHARGING`|`"yellow"`|Color to indicate a charging battery.|
+|`POWERLEVEL9K_BATTERY_CHARGED`|`"green"`|Color to indicate a charged battery.|
+|`POWERLEVEL9K_BATTERY_DISCONNECTED`|`$DEFAULT_COLOR`|Color to indicate absence of battery.|
+|`POWERLEVEL9K_BATTERY_LOW_THRESHOLD`|`10`|Threshold to consider battery level critical.|
+|`POWERLEVEL9K_BATTERY_LOW_COLOR`|`"red"`|Color to indicate critically low charge level.|
 
-In addition to the above it supports standard _FOREGROUND value without affecting the icon color
-
-Supports both OS X and Linux(time remaining requires the acpi program on Linux)
+Note that you can [modify the `_FOREGROUND`
+color](https://github.com/bhilburn/powerlevel9k/wiki/Stylizing-Your-Prompt#segment-color-customization)
+without affecting the icon color.
 
 ##### custom_command
 
 The `custom_...` segment allows you to turn the output of a custom command into
 a prompt segment. As an example, if you wanted to create a custom segment to
 display your WiFi signal strength, you might define a custom segment called
-`custom_signal` like this:
+`custom_wifi_signal` like this:
 
-    POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(context time battery dir vcs virtualenv custom_signal)
-    POWERLEVEL9K_CUSTOM_SIGNAL="echo signal: \$(nmcli device wifi | grep yes | awk '{print \$8}')"
-    POWERLEVEL9K_CUSTOM_SIGNAL_BACKGROUND="blue"
-    POWERLEVEL9K_CUSTOM_SIGNAL_FOREGROUND="yellow"
-    POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(aws status load ram)
+    POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(context time battery dir vcs virtualenv custom_wifi_signal)
+    POWERLEVEL9K_CUSTOM_WIFI_SIGNAL="echo signal: \$(nmcli device wifi | grep yes | awk '{print \$8}')"
+    POWERLEVEL9K_CUSTOM_WIFI_SIGNAL_BACKGROUND="blue"
+    POWERLEVEL9K_CUSTOM_WIFI_SIGNAL_FOREGROUND="yellow"
 
-Instead of writing out the command in-line within the environment variable, you
-can also add it as a function in your `.zshrc`:
+If you prefer, you can also define the function in your `.zshrc` rather than
+putting it in-line with the variable export, as shown above. Just don't forget
+to invoke your function from your segment! Example code that achieves the same
+result as the above:
 
-    zsh_signal(){
+    zsh_wifi_signal(){
             local signal=$(nmcli device wifi | grep yes | awk '{print $8}')
             local color='%F{yellow}'
             [[ $signal -gt 75 ]] && color='%F{green}'
@@ -149,9 +162,8 @@ can also add it as a function in your `.zshrc`:
             echo -n "%{$color%}\uf230  $signal%{%f%}" # \uf230 is 
     }
 
-You would then invoke the function in your custom segment:
-
-    POWERLEVEL9K_CUSTOM_SIGNAL="zsh_signal"
+    POWERLEVEL9K_CUSTOM_WIFI_SIGNAL="zsh_wifi_signal"
+    POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(context time battery dir vcs virtualenv custom_wifi_signal)
 
 The command, above, gives you the wireless signal segment shown below:
 
@@ -170,42 +182,14 @@ it, but only display it if you are not your normal user or on a remote host
 To use this feature, make sure the `context` segment is enabled in your prompt
 elements (it is by default), and define a `DEFAULT_USER` in your `~/.zshrc`:
 
-    export DEFAULT_USER=<your username>
+| Variable | Default Value | Description |
+|----------|---------------|-------------|
+|`DEFAULT_USER`|None|Username to consider a "default context" (you can also use `$USER`)|
 
 ##### dir
 
-The `dir` segment shows the current working directory. You can limit the output
-to a certain length:
-
-    # Limit to the last two folders
-    POWERLEVEL9K_SHORTEN_DIR_LENGTH=2
-
-To change the way how the current working directory is truncated, just set:
-
-    # truncate the middle part
-    POWERLEVEL9K_SHORTEN_STRATEGY="truncate_middle"
-    # truncate from right, leaving the first X characters untouched
-    POWERLEVEL9K_SHORTEN_STRATEGY="truncate_from_right"
-    # default behaviour is to truncate whole directories
-
-You can also change the delimiter (the dots in between text) from 2 dots to something custom:
-
-    # set the delimiter to an empty string to hide it
-    POWERLEVEL9K_SHORTEN_DELIMITER=""
-    # or set it to anything else you want (e.g. 3 dots)
-    POWERLEVEL9K_SHORTEN_DELIMITER="..."
-
-For example, if you wanted the truncation behavior of the `fish` shell, which
-truncates `/usr/share/plasma` to `/u/s/plasma`, you would use the following:
-
-    POWERLEVEL9K_SHORTEN_DIR_LENGTH=1
-    POWERLEVEL9K_SHORTEN_DELIMITER=""
-    POWERLEVEL9K_SHORTEN_STRATEGY="truncate_from_right"
-
-In each case you have to specify the length you want to shorten the directory
-to. So in some cases `POWERLEVEL9K_SHORTEN_DIR_LENGTH` means characters, in
-others whole directories.
-
+The `dir` segment shows the current working directory. When using the "Awesome
+Powerline" fonts, there are additional glyphs, as well:
 
 | `Compatible` | `Powerline` | `Awesome Powerline` | Situation
 |------------|-----------|-------------------|----------------------------
@@ -219,6 +203,35 @@ To turn off these icons you could set these variables to an empty string.
     POWERLEVEL9K_HOME_SUB_ICON=''
     POWERLEVEL9K_FOLDER_ICON=''
 
+You can limit the output to a certain length by truncating long paths.
+Customizations available are:
+
+| Variable | Default Value | Description |
+|----------|---------------|-------------|
+|`POWERLEVEL9K_SHORTEN_DIR_LENGTH`|`2`|If your shorten strategy, below, is
+entire directories, this field determines how many directories to leave at the
+end. If your shorten strategy is by character count, this field determines how
+many characters to allow per directory string.|
+|`POWERLEVEL9K_SHORTEN_STRATEGY`|None|How the directory strings should be
+truncated. By default, it will truncate whole directories. Other options are
+`truncate_middle`, which leaves the start and end of the directory strings, and
+`truncate_from_right`, which cuts starting from the end of the string.|
+|`POWERLEVEL9K_SHORTEN_DELIMITER`|`..`|Delimiter to replace strings with
+indicating truncation. This can be any string you choose, including an empty
+string if you wish to have no delimiter.|
+
+For example, if you wanted the truncation behavior of the `fish` shell, which
+truncates `/usr/share/plasma` to `/u/s/plasma`, you would use the following:
+
+    POWERLEVEL9K_SHORTEN_DIR_LENGTH=1
+    POWERLEVEL9K_SHORTEN_DELIMITER=""
+    POWERLEVEL9K_SHORTEN_STRATEGY="truncate_from_right"
+
+In each case you have to specify the length you want to shorten the directory
+to. So in some cases `POWERLEVEL9K_SHORTEN_DIR_LENGTH` means characters, in
+others whole directories.
+
+
 ##### ip
 
 This segment shows you your current internal IP address. It tries to examine
@@ -226,7 +239,9 @@ all currently used network interfaces and prints the first address it finds.
 In the case that this is not the right IP address you can specify the correct
 network interface by setting:
 
-    POWERLEVEL9K_IP_INTERFACE="eth0"
+| Variable | Default Value | Description |
+|----------|---------------|-------------|
+|`POWERLEVEL9K_IP_INTERFACE`|None|The NIC for which you wish to display the IP address. Example: `eth0`.|
 
 ##### rspec_stats
 
@@ -234,20 +249,19 @@ See [Unit Test Ratios](#unit-test-ratios), below.
 
 ##### status
 
-This segment shows the return code of the last command. By default, this
-segment will always print, but you can customize it to only print if there
-is an error by setting the following variable in your `~/.zshrc`.
+This segment shows the return code of the last command.
 
-    POWERLEVEL9K_STATUS_VERBOSE=false
+| Variable | Default Value | Description |
+|----------|---------------|-------------|
+|`POWERLEVEL9K_STATUS_VERBOSE`|`true`|Set to false if you wish to hide this
+segment when the last command completed successfully.|
 
 ##### ram
 
-By default this segment shows you free RAM and used Swap. If you want to show
-only one value, you can specify `POWERLEVEL9K_RAM_ELEMENTS` and set it to either
-`ram_free` or `swap_used`. Full example:
-
-    # Show only used swap:
-    POWERLEVEL9K_RAM_ELEMENTS=(swap_used)
+| Variable | Default Value | Description |
+|----------|---------------|-------------|
+|`POWERLEVEL9K_RAM_ELEMENTS`|Both|Specify `ram_free` or `swap_used` to only show
+one or the other rather than both.|
 
 ##### symphony2_tests
 
@@ -255,9 +269,11 @@ See [Unit Test Ratios](#unit-test-ratios), below.
 
 ##### time
 
-By default the time is show in 'H:M:S' format. If you want to change it,
-just set another format in your `~/.zshrc`. As an example, this is a reversed
-time format:
+| Variable | Default Value | Description |
+|----------|---------------|-------------|
+|`POWERLEVEL9K_TIME_FORMAT`|`'H:M:S'`|ZSH time format to use in this segment.|
+
+As an example, if you wanted a reversed time format, you would use this:
 
     # Reversed time format
     POWERLEVEL9K_TIME_FORMAT='%D{%S:%M:%H}'
@@ -270,22 +286,14 @@ segment, as well:
 
 ##### vcs
 
-By default, the `vcs` segment will provide quite a bit of information. If you
-would also like for it to display the current hash / changeset, simply define
-`POWERLEVEL9K_SHOW_CHANGESET` in your `~/.zshrc`. If activated, it will show
-the first 12 characters of the changeset id. To change the amount of characters,
-set `POWERLEVEL9K_CHANGESET_HASH_LENGTH` to any value you want.
+By default, the `vcs` segment will provide quite a bit of information. Further
+customization is provided via:
 
-    # enable the vcs segment in general
-    POWERLEVEL9K_SHOW_CHANGESET=true
-    # just show the 6 first characters of changeset
-    POWERLEVEL9K_CHANGESET_HASH_LENGTH=6
-
-You can also disable the branch icon in your prompt by setting
-`POWERLEVEL9K_HIDE_BRANCH_ICON` to `true`:
-
-    # Hide the branch icon
-    POWERLEVEL9K_HIDE_BRANCH_ICON=true
+| Variable | Default Value | Description |
+|----------|---------------|-------------|
+|`POWERLEVEL9K_HIDE_BRANCH_ICON`|`false`|Set to `true` to hide the branch icon from the segment.|
+|`POWERLEVEL9K_SHOW_CHANGESET`|`false`|Set to `true` to display the hash / changeset in the segment.|
+|`POWERLEVEL9K_CHANGESET_HASH_LENGTH`|`12`|How many characters of the hash / changeset to display in the segment.|
 
 **vcs Symbols**
 
@@ -315,12 +323,10 @@ you are using the [ZSH Line Editor](http://zsh.sourceforge.net/Doc/Release/Zsh-L
 (VI mode).  You can enable this either by `.zshrc` configuration or using a plugin, like
 [Oh-My-Zsh's vi-mode plugin](https://github.com/robbyrussell/oh-my-zsh/blob/master/plugins/vi-mode/vi-mode.plugin.zsh).
 
-If you want to display a string other than "NORMAL" or "INSERT" in `command` and
-`insert-mode`, you can do so by setting the following variables in your
-`~/.zshrc`:
-
-    POWERLEVEL9K_VI_INSERT_MODE_STRING="INSERT"
-    POWERLEVEL9K_VI_COMMAND_MODE_STRING="NORMAL"
+| Variable | Default Value | Description |
+|----------|---------------|-------------|
+|`POWERLEVEL9K_VI_INSERT_MODE_STRING`|`"INSERT"`|String to display while in 'Insert' mode.|
+|`POWERLEVEL9K_VI_COMMAND_MODE_STRING`|`"NORMAL"`|String to display while in 'Command' mode.|
 
 #### Unit Test Ratios
 
