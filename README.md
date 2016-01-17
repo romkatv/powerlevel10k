@@ -2,9 +2,8 @@
 
 Powerlevel9k is a theme for ZSH which uses [Powerline
 Fonts](https://github.com/powerline/fonts). It can be used with vanilla
-ZSH, [Oh-My-Zsh](https://github.com/robbyrussell/oh-my-zsh), or
-[Prezto](https://github.com/sorin-ionescu/prezto), and can also be installed
-using [antigen](https://github.com/zsh-users/antigen).
+ZSH, or zsh frameworks such as [Oh-My-Zsh](https://github.com/robbyrussell/oh-my-zsh),
+[Prezto](https://github.com/sorin-ionescu/prezto), [antigen](https://github.com/zsh-users/antigen), [zplug](https://github.com/b4b4r07/zplug).
 
 Get more out of your terminal. Be a badass. Impress everyone in 'Screenshot Your
 Desktop' threads. Use powerlevel9k.
