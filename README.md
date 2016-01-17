@@ -326,8 +326,11 @@ is count your source files and test files, and calculate the ratio between them.
 Just enough to give you a quick overview about the test situation of the project
 you are dealing with.
 
-### Other
+### tl; dr
 
-Looking for more information? We put a lot of stuff in our Wiki!
+Want to just get a quick start? Check out the [Show Off Your
+Config](https://github.com/bhilburn/powerlevel9k/wiki/Show-Off-Your-Config)
+portion of the wiki to get going.
 
-[Head to the Wiki](https://github.com/bhilburn/powerlevel9k/wiki)
+[The Wiki also has a ton of other useful
+information!](https://github.com/bhilburn/powerlevel9k/wiki)
