@@ -291,9 +291,10 @@ prompt_aws() {
 
 # Current Elastic Beanstalk environment
 prompt_aws_eb_env() {
-  if [ -e .elasticbeanstalk/config.yml ]; then
-    local eb_env=$(cat .elasticbeanstalk/config.yml | grep environment 2> /dev/null | awk '{print $2}')
-    "$1_prompt_segment" "$0" black green "$(print_icon 'AWS_EB_ICON')  $eb_env"
+  local eb_env=$(grep environment .elasticbeanstalk/config.yml 2> /dev/null | awk '{print $2}')
+
+  if [[ -n "$eb_env" ]]; then
+    "$1_prompt_segment" "$0" "$2" black green "$eb_env" 'AWS_EB_ICON'
   fi
 }
 
