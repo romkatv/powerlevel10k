@@ -283,9 +283,11 @@ CURRENT_BG='NONE'
 # AWS Profile
 prompt_aws() {
   local aws_profile="$AWS_DEFAULT_PROFILE"
-  if [[ -n "$aws_profile" ]];
-  then
+
+  if [[ -n "$aws_profile" ]]; then
     "$1_prompt_segment" "$0" "$2" red white "$aws_profile" 'AWS_ICON'
+  else
+    last_had_output=false
   fi
 }
 
@@ -389,7 +391,11 @@ prompt_battery() {
   fi
 
   # Draw the prompt_segment
-  [[ -n $bat_percent ]] && "$1_prompt_segment" "${0}_${current_state}" "$2" "$DEFAULT_COLOR" "${battery_states[$current_state]}" "$message" 'BATTERY_ICON'
+  if [[ -n $bat_percent ]]; then
+    "$1_prompt_segment" "${0}_${current_state}" "$2" "$DEFAULT_COLOR" "${battery_states[$current_state]}" "$message" 'BATTERY_ICON'
+  else
+    last_had_output=false
+  fi
 }
 
 # Context: user@hostname (who am I and where am I)
@@ -402,6 +408,8 @@ prompt_context() {
     else
       "$1_prompt_segment" "$0_DEFAULT" "$2" "$DEFAULT_COLOR" "011" "$USER@%m"
     fi
+  else
+    last_had_output=false
   fi
 }
 
@@ -451,6 +459,8 @@ prompt_go_version() {
 
   if [[ -n "$go_version" ]]; then
     "$1_prompt_segment" "$0" "$2" "green" "255" "$go_version"
+  else
+    last_had_output=false
   fi
 }
 
@@ -618,6 +628,8 @@ prompt_rbenv() {
 prompt_root_indicator() {
   if [[ "$UID" -eq 0 ]]; then
     "$1_prompt_segment" "$0" "$2" "$DEFAULT_COLOR" "yellow" "" 'ROOT_ICON'
+  else
+    last_had_output=false
   fi
 }
 
@@ -628,6 +640,8 @@ prompt_rust_version() {
 
   if [[ -n "$rust_version" ]]; then
     "$1_prompt_segment" "$0" "$2" "208" "$DEFAULT_COLOR" "Rust $rust_version"
+  else
+    last_had_output=false
   fi
 }
 # RSpec test ratio
@@ -665,6 +679,8 @@ prompt_status() {
   else
     if [[ "$RETVAL" -ne 0 ]]; then
       "$1_prompt_segment" "$0_ERROR" "$2" "$DEFAULT_COLOR" "red" "" 'FAIL_ICON'
+    else
+      last_had_ouput=false
     fi
   fi
 }
@@ -813,12 +829,22 @@ prompt_virtualenv() {
 build_left_prompt() {
   defined POWERLEVEL9K_LEFT_PROMPT_ELEMENTS || POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(context dir rbenv vcs)
 
+  # Global variable to check if the last segment had output.
+  typeset -g last_had_output=true
+
   for element in "${POWERLEVEL9K_LEFT_PROMPT_ELEMENTS[@]}"; do
     # Check if the segment should be joined with the previous one
     local joined=false
     if [[ ${element[-7,-1]} == '_joined' ]]; then
       element="${element[0,-8]}"
-      joined=true
+      if [[ "$last_had_output" == false ]]; then
+        joined=false
+
+        # Reset variable
+        last_had_ouput=true
+      else
+        joined=true
+      fi
     fi
     # Check if it is a custom command, otherwise interpet it as
     # a prompt.
