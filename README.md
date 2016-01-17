@@ -208,17 +208,9 @@ Customizations available are:
 
 | Variable | Default Value | Description |
 |----------|---------------|-------------|
-|`POWERLEVEL9K_SHORTEN_DIR_LENGTH`|`2`|If your shorten strategy, below, is
-entire directories, this field determines how many directories to leave at the
-end. If your shorten strategy is by character count, this field determines how
-many characters to allow per directory string.|
-|`POWERLEVEL9K_SHORTEN_STRATEGY`|None|How the directory strings should be
-truncated. By default, it will truncate whole directories. Other options are
-`truncate_middle`, which leaves the start and end of the directory strings, and
-`truncate_from_right`, which cuts starting from the end of the string.|
-|`POWERLEVEL9K_SHORTEN_DELIMITER`|`..`|Delimiter to replace strings with
-indicating truncation. This can be any string you choose, including an empty
-string if you wish to have no delimiter.|
+|`POWERLEVEL9K_SHORTEN_DIR_LENGTH`|`2`|If your shorten strategy, below, is entire directories, this field determines how many directories to leave at the end. If your shorten strategy is by character count, this field determines how many characters to allow per directory string.|
+|`POWERLEVEL9K_SHORTEN_STRATEGY`|None|How the directory strings should be truncated. By default, it will truncate whole directories. Other options are `truncate_middle`, which leaves the start and end of the directory strings, and `truncate_from_right`, which cuts starting from the end of the string.|
+|`POWERLEVEL9K_SHORTEN_DELIMITER`|`..`|Delimiter to replace strings with indicating truncation. This can be any string you choose, including an empty string if you wish to have no delimiter.|
 
 For example, if you wanted the truncation behavior of the `fish` shell, which
 truncates `/usr/share/plasma` to `/u/s/plasma`, you would use the following:
@@ -253,15 +245,13 @@ This segment shows the return code of the last command.
 
 | Variable | Default Value | Description |
 |----------|---------------|-------------|
-|`POWERLEVEL9K_STATUS_VERBOSE`|`true`|Set to false if you wish to hide this
-segment when the last command completed successfully.|
+|`POWERLEVEL9K_STATUS_VERBOSE`|`true`|Set to false if you wish to hide this segment when the last command completed successfully.|
 
 ##### ram
 
 | Variable | Default Value | Description |
 |----------|---------------|-------------|
-|`POWERLEVEL9K_RAM_ELEMENTS`|Both|Specify `ram_free` or `swap_used` to only show
-one or the other rather than both.|
+|`POWERLEVEL9K_RAM_ELEMENTS`|Both|Specify `ram_free` or `swap_used` to only show one or the other rather than both.|
 
 ##### symphony2_tests
 
