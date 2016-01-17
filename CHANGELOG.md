@@ -1,3 +1,14 @@
+## v0.3.1
+
+### `dir` changes
+
+A new state `HOME_SUBFOLDER` was added. So if you want to overwrite
+colors for this segment, also set this variables:
+```zsh
+POWERLEVEL9K_DIR_HOME_SUBFOLDER_BACKGROUND='black'
+POWERLEVEL9K_DIR_HOME_SUBFOLDER_FOREGROUND='white'
+```
+
 ## v0.3.0
 
 ### Introduced "visual identifiers" to the segments
