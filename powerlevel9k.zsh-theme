@@ -459,7 +459,7 @@ prompt_icons_test() {
     # the next color has enough contrast to read.
     local random_color=$((RANDOM % 8))
     local next_color=$((random_color+1))
-    "$1_prompt_segment" "$0" "$2" "$random_color" "$next_color" "$key: ${icons[$key]}"
+    "$1_prompt_segment" "$0" "$2" "$random_color" "$next_color" "$key" "$key"
   done
 }
 
