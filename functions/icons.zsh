@@ -27,7 +27,7 @@ case $POWERLEVEL9K_MODE in
       RIGHT_SUBSEGMENT_SEPARATOR     $'\UE0B3'              # 
       CARRIAGE_RETURN_ICON           $'\U21B5'              # ↵
       ROOT_ICON                      $'\UE801'              # 
-      RUBY_ICON                      $'\UE847'              # 
+      RUBY_ICON                      $'\UE847 '             # 
       AWS_ICON                       $'\UE895'              # 
       BACKGROUND_JOBS_ICON           $'\UE82F '             # 
       TEST_ICON                      $'\UE891'              # 
@@ -80,7 +80,7 @@ case $POWERLEVEL9K_MODE in
       RIGHT_SUBSEGMENT_SEPARATOR     $'\UE0B3'              # 
       CARRIAGE_RETURN_ICON           $'\U21B5'              # ↵
       ROOT_ICON                      $'\uF201'              # 
-      RUBY_ICON                      $'\UF219'              # 
+      RUBY_ICON                      $'\UF219 '             # 
       AWS_ICON                       $'\UF296'              # 
       BACKGROUND_JOBS_ICON           $'\UF013 '             # 
       TEST_ICON                      $'\UF291'              # 
