@@ -210,7 +210,7 @@ Customizations available are:
 |----------|---------------|-------------|
 |`POWERLEVEL9K_SHORTEN_DIR_LENGTH`|`2`|If your shorten strategy, below, is entire directories, this field determines how many directories to leave at the end. If your shorten strategy is by character count, this field determines how many characters to allow per directory string.|
 |`POWERLEVEL9K_SHORTEN_STRATEGY`|None|How the directory strings should be truncated. By default, it will truncate whole directories. Other options are `truncate_middle`, which leaves the start and end of the directory strings, and `truncate_from_right`, which cuts starting from the end of the string.|
-|`POWERLEVEL9K_SHORTEN_DELIMITER`|`..`|Delimiter to replace strings with indicating truncation. This can be any string you choose, including an empty string if you wish to have no delimiter.|
+|`POWERLEVEL9K_SHORTEN_DELIMITER`|`..`|Delimiter to use in truncated strings. This can be any string you choose, including an empty string if you wish to have no delimiter.|
 
 For example, if you wanted the truncation behavior of the `fish` shell, which
 truncates `/usr/share/plasma` to `/u/s/plasma`, you would use the following:
@@ -226,10 +226,9 @@ others whole directories.
 
 ##### ip
 
-This segment shows you your current internal IP address. It tries to examine
-all currently used network interfaces and prints the first address it finds.
-In the case that this is not the right IP address you can specify the correct
-network interface by setting:
+This segment tries to examine all currently used network interfaces and prints
+the first address it finds.  In the case that this is not the right NIC, you can
+specify the correct network interface by setting:
 
 | Variable | Default Value | Description |
 |----------|---------------|-------------|
