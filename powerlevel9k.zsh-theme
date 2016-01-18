@@ -290,9 +290,15 @@ prompt_aws() {
 }
 
 # Segment to indicate background jobs with an icon.
+set_default POWERLEVEL9K_BACKGROUND_JOBS_VERBOSE true
 prompt_background_jobs() {
-  if [[ $(jobs -l | wc -l) -gt 0 ]]; then
-    "$1_prompt_segment" "$0" "$2" "$DEFAULT_COLOR" "cyan" "" 'BACKGROUND_JOBS_ICON'
+  local background_jobs_number=$(jobs -l | wc -l)
+  if [[ background_jobs_number -gt 0 ]]; then
+    local background_jobs_number_print=""
+    if [[ POWERLEVEL9K_BACKGROUND_JOBS_VERBOSE ]] && [[ background_jobs_number -gt 1 ]]; then
+      background_jobs_number_print="$background_jobs_number"
+    fi
+    "$1_prompt_segment" "$0" "$2" "$DEFAULT_COLOR" "cyan" "$background_jobs_number_print" 'BACKGROUND_JOBS_ICON'
   fi
 }
 
