@@ -295,7 +295,7 @@ prompt_background_jobs() {
   local background_jobs_number=${$(jobs -l | wc -l)// /}
   if [[ background_jobs_number -gt 0 ]]; then
     local background_jobs_number_print=""
-    if [[ POWERLEVEL9K_BACKGROUND_JOBS_VERBOSE ]] && [[ background_jobs_number -gt 1 ]]; then
+    if [[ "$POWERLEVEL9K_BACKGROUND_JOBS_VERBOSE" == "true" ]] && [[ "$background_jobs_number" -gt 1 ]]; then
       background_jobs_number_print="$background_jobs_number"
     fi
     "$1_prompt_segment" "$0" "$2" "$DEFAULT_COLOR" "cyan" "$background_jobs_number_print" 'BACKGROUND_JOBS_ICON'
