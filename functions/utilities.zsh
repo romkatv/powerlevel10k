@@ -60,10 +60,10 @@ printSizeHumanReadable() {
 #                 worthy. The callback function has access to
 #                 the inner variable $item.
 function getRelevantItem() {
-  setopt shwordsplit # We need to split the words in $interfaces
-
-  local list callback
-  list=$1
+  local -a list
+  local callback
+  # Explicitly split the elements by whitespace.
+  list=${=1}
   callback=$2
 
   for item in $list; do
