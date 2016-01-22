@@ -9,6 +9,13 @@ POWERLEVEL9K_DIR_HOME_SUBFOLDER_BACKGROUND='black'
 POWERLEVEL9K_DIR_HOME_SUBFOLDER_FOREGROUND='white'
 ```
 
+### `background_jobs` changes
+Now displays the number of background jobs if there's more than 1.
+You can disable it by setting :
+```zsh
+POWERLEVEL9K_BACKGROUND_JOBS_VERBOSE=false
+```
+
 ## v0.3.0
 
 ### Introduced "visual identifiers" to the segments
