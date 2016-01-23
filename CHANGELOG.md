@@ -1,3 +1,9 @@
+## v0.4.0
+
+### New segment `aws_eb_env` added
+
+This segment displays the current Elastic Beanstalk environment.
+
 ## v0.3.1
 
 ### `dir` changes
