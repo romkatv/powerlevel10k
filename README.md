@@ -124,9 +124,7 @@ your `~/.zshrc`:
 
 | Variable | Default Value | Description |
 |----------|---------------|-------------|
-|`POWERLEVEL9K_BACKGROUND_JOBS_VERBOSE`|`true`|If there is more than one
-background job, this segment will show the number of jobs. Set this to `false`
-to turn this feature off.|
+|`POWERLEVEL9K_BACKGROUND_JOBS_VERBOSE`|`true`|If there is more than one background job, this segment will show the number of jobs. Set this to `false` to turn this feature off.|
 
 ##### battery
 
