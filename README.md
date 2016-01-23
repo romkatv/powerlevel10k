@@ -81,7 +81,7 @@ your `~/.zshrc`:
 The segments that are currently available are:
 
 * [aws](#aws) - The current AWS profile, if active.
-* **background_jobs** - Indicator for background jobs.
+* [background_jobs](#background_jobs) - Indicator for background jobs.
 * [battery](#battery) - Current battery status.
 * [context](#context) - Your username and host.
 * [custom_command](#custom_command) - A custom command to display the output of.
@@ -119,6 +119,14 @@ your `~/.zshrc`:
 | Variable | Default Value | Description |
 |----------|---------------|-------------|
 |`AWS_DEFAULT_PROFILE`|None|Your AWS profile name|
+
+##### background_jobs
+
+| Variable | Default Value | Description |
+|----------|---------------|-------------|
+|`POWERLEVEL9K_BACKGROUND_JOBS_VERBOSE`|`true`|If there is more than one
+background job, this segment will show the number of jobs. Set this to `false`
+to turn this feature off.|
 
 ##### battery
 
