@@ -10,6 +10,9 @@ function +vi-git-untracked() {
     if [[ $(git rev-parse --is-inside-work-tree 2> /dev/null) == 'true' && \
             -n $(git ls-files --others --exclude-standard | sed q) ]]; then
         hook_com[unstaged]+=" %F{$POWERLEVEL9K_VCS_FOREGROUND}$(print_icon 'VCS_UNTRACKED_ICON')%f"
+        VCS_WORKDIR_HALF_DIRTY=true
+    else
+        VCS_WORKDIR_HALF_DIRTY=false
     fi
 }
 
@@ -90,4 +93,3 @@ function +vi-vcs-detect-changes() {
     VCS_WORKDIR_DIRTY=false
   fi
 }
-
