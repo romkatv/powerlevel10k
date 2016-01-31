@@ -1,3 +1,22 @@
+## v0.3.2
+
+### `vcs` changes
+
+A new state `UNTRACKED` was added to the `vcs` segment. So we now
+have 3 states for repositories: `UNTRACKED`, `MODIFIED`, and the
+default state. The `UNTRACKED` state is active when there are files
+in the repository directory which have not been added to the repo
+(the same as when the `+` icon appears). The default color for the
+`UNTRACKED` state is now yellow, and the default color for the
+`MODIFIED` state is now read, but those colors can be changed by
+setting these variables, for example:
+```zsh
+POWERLEVEL9K_VCS_MODIFIED_FOREGROUND='black'
+POWERLEVEL9K_VCS_MODIFIED_BACKGROUND='white'
+POWERLEVEL9K_VCS_UNTRACKED_FOREGROUND='green'
+POWERLEVEL9K_VCS_UNTRACKED_BACKGROUND='blue'
+```
+
 ## v0.3.1
 
 ### `dir` changes
