@@ -81,6 +81,7 @@ your `~/.zshrc`:
 The segments that are currently available are:
 
 * [aws](#aws) - The current AWS profile, if active.
+* **aws_eb_env** - The current Elastic Beanstalk Environment.
 * [background_jobs](#background_jobs) - Indicator for background jobs.
 * [battery](#battery) - Current battery status.
 * [context](#context) - Your username and host.
