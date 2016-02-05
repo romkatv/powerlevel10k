@@ -750,6 +750,8 @@ prompt_vcs() {
   autoload -Uz vcs_info
 
   VCS_WORKDIR_DIRTY=false
+  VCS_WORKDIR_HALF_DIRTY=false
+
   VCS_CHANGESET_PREFIX=''
   if [[ "$POWERLEVEL9K_SHOW_CHANGESET" == true ]]; then
     # Default: Just display the first 12 characters of our changeset-ID.
@@ -796,9 +798,13 @@ prompt_vcs() {
     if [[ "$VCS_WORKDIR_DIRTY" == true ]]; then
       # $vcs_visual_identifier gets set in +vi-vcs-detect-changes in functions/vcs.zsh,
       # as we have there access to vcs_info internal hooks.
-      "$1_prompt_segment" "$0_MODIFIED" "$2" "yellow" "$DEFAULT_COLOR" "$vcs_prompt" "$vcs_visual_identifier"
+      "$1_prompt_segment" "$0_MODIFIED" "$2" "red" "$DEFAULT_COLOR" "$vcs_prompt" "$vcs_visual_identifier"
     else
-      "$1_prompt_segment" "$0" "$2" "green" "$DEFAULT_COLOR" "$vcs_prompt" "$vcs_visual_identifier"
+      if [[ "$VCS_WORKDIR_HALF_DIRTY" == true ]]; then
+        "$1_prompt_segment" "$0_UNTRACKED" "$2" "yellow" "$DEFAULT_COLOR" "$vcs_prompt" "$vcs_visual_identifier"
+      else
+        "$1_prompt_segment" "$0" "$2" "green" "$DEFAULT_COLOR" "$vcs_prompt" "$vcs_visual_identifier"
+      fi
     fi
   fi
 }
