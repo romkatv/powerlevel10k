@@ -60,10 +60,10 @@ printSizeHumanReadable() {
 #                 worthy. The callback function has access to
 #                 the inner variable $item.
 function getRelevantItem() {
-  setopt shwordsplit # We need to split the words in $interfaces
-
-  local list callback
-  list=$1
+  local -a list
+  local callback
+  # Explicitly split the elements by whitespace.
+  list=${=1}
   callback=$2
 
   for item in $list; do
@@ -133,4 +133,53 @@ print_deprecation_warning() {
       print -P "%F{yellow}Warning!%f The '$key' segment is deprecated. Use '%F{blue}${raw_deprecated_segments[$key]}%f' instead. For more informations, have a look at the CHANGELOG.md."
     fi
   done
+}
+
+# A helper function to determine if a segment should be
+# joined or promoted to a full one.
+# Takes three arguments:
+#   * $1: The array index of the current segment
+#   * $2: The array index of the last printed segment
+#   * $3: The array of segments of the left or right prompt
+function segmentShouldBeJoined() {
+  local current_index=$1
+  local last_segment_index=$2
+  # Explicitly split the elements by whitespace.
+  local -a elements
+  elements=${=3}
+
+  local current_segment=${elements[$current_index]}
+  local joined=false
+  if [[ ${current_segment[-7,-1]} == '_joined' ]]; then
+    joined=true
+    # promote segment to a full one, if the predecessing full segment
+    # was conditional. So this can only be the case for segments that
+    # are not our direct predecessor.
+    if (( $(($current_index - $last_segment_index)) > 1)); then
+      # Now we have to examine every previous segment, until we reach
+      # the last printed one (found by its index). This is relevant if
+      # all previous segments are joined. Then we want to join our
+      # segment as well.
+      local examined_index=$((current_index - 1))
+      while (( $examined_index > $last_segment_index )); do
+        local previous_segment=${elements[$examined_index]}
+        # If one of the examined segments is not joined, then we know
+        # that the current segment should not be joined, as the target
+        # segment is the wrong one.
+        if [[ ${previous_segment[-7,-1]} != '_joined' ]]; then
+          joined=false
+          break
+        fi
+        examined_index=$((examined_index - 1))
+      done
+    fi
+  fi
+
+  # Return 1 means error; return 0 means no error. So we have
+  # to invert $joined
+  if [[ "$joined" == "true" ]]; then
+    return 0
+  else
+    return 1
+  fi
 }

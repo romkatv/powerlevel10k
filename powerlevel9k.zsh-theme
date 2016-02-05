@@ -123,14 +123,20 @@ CURRENT_BG='NONE'
 # Takes four arguments:
 #   * $1: Name of the function that was orginally invoked (mandatory).
 #         Necessary, to make the dynamic color-overwrite mechanism work.
-#   * $2: A flag if the segment should be joined with the previous one.
+#   * $2: The array index of the current segment
 #   * $3: Background color
 #   * $4: Foreground color
 #   * $5: The segment content
 #   * $6: An identifying icon (must be a key of the icons array)
 # The latter three can be omitted,
+set_default last_left_element_index 1
 set_default POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS " "
 left_prompt_segment() {
+  local current_index=$2
+  # Check if the segment should be joined with the previous one
+  local joined
+  segmentShouldBeJoined $current_index $last_left_element_index "$POWERLEVEL9K_LEFT_PROMPT_ELEMENTS" && joined=true || joined=false
+
   # Overwrite given background-color by user defined variable for this segment.
   local BACKGROUND_USER_VARIABLE=POWERLEVEL9K_${(U)1#prompt_}_BACKGROUND
   local BG_COLOR_MODIFIER=${(P)BACKGROUND_USER_VARIABLE}
@@ -145,7 +151,6 @@ left_prompt_segment() {
   [[ -n "$3" ]] && bg="%K{$3}" || bg="%k"
   [[ -n "$4" ]] && fg="%F{$4}" || fg="%f"
 
-  local joined=$2
   if [[ $CURRENT_BG != 'NONE' ]] && ! isSameColor "$3" "$CURRENT_BG"; then
     echo -n "$bg%F{$CURRENT_BG}"
     if [[ $joined == false ]]; then
@@ -188,6 +193,7 @@ left_prompt_segment() {
   echo -n "${POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS}"
 
   CURRENT_BG=$3
+  last_left_element_index=$current_index
 }
 
 # End the left prompt, closes the final segment.
@@ -207,14 +213,21 @@ CURRENT_RIGHT_BG='NONE'
 # Takes four arguments:
 #   * $1: Name of the function that was orginally invoked (mandatory).
 #         Necessary, to make the dynamic color-overwrite mechanism work.
-#   * $2: A flag if the segment should be joined with the previous one.
+#   * $2: The array index of the current segment
 #   * $3: Background color
 #   * $4: Foreground color
 #   * $5: The segment content
 #   * $6: An identifying icon (must be a key of the icons array)
 # No ending for the right prompt segment is needed (unlike the left prompt, above).
+set_default last_right_element_index 1
 set_default POWERLEVEL9K_WHITESPACE_BETWEEN_RIGHT_SEGMENTS " "
 right_prompt_segment() {
+  local current_index=$2
+
+  # Check if the segment should be joined with the previous one
+  local joined
+  segmentShouldBeJoined $current_index $last_right_element_index "$POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS" && joined=true || joined=false
+
   # Overwrite given background-color by user defined variable for this segment.
   local BACKGROUND_USER_VARIABLE=POWERLEVEL9K_${(U)1#prompt_}_BACKGROUND
   local BG_COLOR_MODIFIER=${(P)BACKGROUND_USER_VARIABLE}
@@ -229,7 +242,6 @@ right_prompt_segment() {
   [[ -n "$3" ]] && bg="%K{$3}" || bg="%k"
   [[ -n "$4" ]] && fg="%F{$4}" || fg="%f"
 
-  local joined=$2
   # If CURRENT_RIGHT_BG is "NONE", we are the first right segment.
   if [[ $joined == false ]] || [[ "$CURRENT_RIGHT_BG" == "NONE" ]]; then
     if isSameColor "$CURRENT_RIGHT_BG" "$3"; then
@@ -269,6 +281,7 @@ right_prompt_segment() {
   echo -n "${visual_identifier}${POWERLEVEL9K_WHITESPACE_BETWEEN_RIGHT_SEGMENTS}%f"
 
   CURRENT_RIGHT_BG=$3
+  last_right_element_index=$current_index
 }
 
 ################################################################
@@ -283,8 +296,8 @@ CURRENT_BG='NONE'
 # AWS Profile
 prompt_aws() {
   local aws_profile="$AWS_DEFAULT_PROFILE"
-  if [[ -n "$aws_profile" ]];
-  then
+
+  if [[ -n "$aws_profile" ]]; then
     "$1_prompt_segment" "$0" "$2" red white "$aws_profile" 'AWS_ICON'
   fi
 }
@@ -389,7 +402,9 @@ prompt_battery() {
   fi
 
   # Draw the prompt_segment
-  [[ -n $bat_percent ]] && "$1_prompt_segment" "${0}_${current_state}" "$2" "$DEFAULT_COLOR" "${battery_states[$current_state]}" "$message" 'BATTERY_ICON'
+  if [[ -n $bat_percent ]]; then
+    "$1_prompt_segment" "${0}_${current_state}" "$2" "$DEFAULT_COLOR" "${battery_states[$current_state]}" "$message" 'BATTERY_ICON'
+  fi
 }
 
 # Context: user@hostname (who am I and where am I)
@@ -813,20 +828,20 @@ prompt_virtualenv() {
 build_left_prompt() {
   defined POWERLEVEL9K_LEFT_PROMPT_ELEMENTS || POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(context dir rbenv vcs)
 
+  local index=1
   for element in "${POWERLEVEL9K_LEFT_PROMPT_ELEMENTS[@]}"; do
-    # Check if the segment should be joined with the previous one
-    local joined=false
-    if [[ ${element[-7,-1]} == '_joined' ]]; then
-      element="${element[0,-8]}"
-      joined=true
-    fi
+    # Remove joined information in direct calls
+    element=${element%_joined}
+
     # Check if it is a custom command, otherwise interpet it as
     # a prompt.
     if [[ $element[0,7] =~ "custom_" ]]; then
-      "prompt_custom" "left" "$joined" $element[8,-1]
+      "prompt_custom" "left" "$index" $element[8,-1]
     else
-      "prompt_$element" "left" "$joined"
+      "prompt_$element" "left" "$index"
     fi
+
+    index=$((index + 1))
   done
 
   left_prompt_end
@@ -836,20 +851,20 @@ build_left_prompt() {
 build_right_prompt() {
   defined POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS || POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(status root_indicator background_jobs history time)
 
+  local index=1
   for element in "${POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS[@]}"; do
-    # Check if the segment should be joined with the previous one
-    local joined=false
-    if [[ ${element[-7,-1]} == '_joined' ]]; then
-      element="${element[0,-8]}"
-      joined=true
-    fi
+    # Remove joined information in direct calls
+    element=${element%_joined}
+
     # Check if it is a custom command, otherwise interpet it as
     # a prompt.
     if [[ $element[0,7] =~ "custom_" ]]; then
-      "prompt_custom" "right" "$joined" $element[8,-1]
+      "prompt_custom" "right" "$index" $element[8,-1]
     else
-      "prompt_$element" "right" "$joined"
+      "prompt_$element" "right" "$index"
     fi
+
+    index=$((index + 1))
   done
 }
 
