@@ -29,6 +29,7 @@ case $POWERLEVEL9K_MODE in
       ROOT_ICON                      $'\UE801'              # 
       RUBY_ICON                      $'\UE847 '             # 
       AWS_ICON                       $'\UE895'              # 
+      AWS_EB_ICON                    $'\U1F331 '            # 🌱
       BACKGROUND_JOBS_ICON           $'\UE82F '             # 
       TEST_ICON                      $'\UE891'              # 
       TODO_ICON                      $'\U2611'              # ☑
@@ -82,6 +83,7 @@ case $POWERLEVEL9K_MODE in
       ROOT_ICON                      $'\uF201'              # 
       RUBY_ICON                      $'\UF219 '             # 
       AWS_ICON                       $'\UF296'              # 
+      AWS_EB_ICON                    $'\U1F331 '            # 🌱
       BACKGROUND_JOBS_ICON           $'\UF013 '             # 
       TEST_ICON                      $'\UF291'              # 
       TODO_ICON                      $'\U2611'              # ☑
@@ -131,6 +133,7 @@ case $POWERLEVEL9K_MODE in
       ROOT_ICON                      $'\u26A1'              # ⚡
       RUBY_ICON                      ''
       AWS_ICON                       'AWS:'
+      AWS_EB_ICON                    $'\U1F331 '            # 🌱
       BACKGROUND_JOBS_ICON           $'\u2699'              # ⚙
       TEST_ICON                      ''
       TODO_ICON                      $'\U2611'              # ☑

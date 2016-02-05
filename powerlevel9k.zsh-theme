@@ -302,6 +302,15 @@ prompt_aws() {
   fi
 }
 
+# Current Elastic Beanstalk environment
+prompt_aws_eb_env() {
+  local eb_env=$(grep environment .elasticbeanstalk/config.yml 2> /dev/null | awk '{print $2}')
+
+  if [[ -n "$eb_env" ]]; then
+    "$1_prompt_segment" "$0" "$2" black green "$eb_env" 'AWS_EB_ICON'
+  fi
+}
+
 # Segment to indicate background jobs with an icon.
 set_default POWERLEVEL9K_BACKGROUND_JOBS_VERBOSE true
 prompt_background_jobs() {

@@ -5,6 +5,10 @@
 The `ram` segment was split up into `ram` and `swap`. The `POWERLEVEL9K_RAM_ELEMENTS`
 variable is void.
 
+### New segment `aws_eb_env` added
+
+This segment displays the current Elastic Beanstalk environment.
+
 ## v0.3.1
 
 ### `dir` changes
