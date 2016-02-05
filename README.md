@@ -1,5 +1,7 @@
 ## powerlevel9k Theme for ZSH
 
+[![Join the chat at https://gitter.im/bhilburn/powerlevel9k](https://badges.gitter.im/bhilburn/powerlevel9k.svg)](https://gitter.im/bhilburn/powerlevel9k?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 Powerlevel9k is a theme for ZSH which uses [Powerline
 Fonts](https://github.com/powerline/fonts). It can be used with vanilla ZSH or
 ZSH frameworks such as [Oh-My-Zsh](https://github.com/robbyrussell/oh-my-zsh),
