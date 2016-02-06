@@ -63,7 +63,7 @@ function getRelevantItem() {
   local -a list
   local callback
   # Explicitly split the elements by whitespace.
-  list=${=1}
+  list=(${=1})
   callback=$2
 
   for item in $list; do
@@ -146,7 +146,7 @@ function segmentShouldBeJoined() {
   local last_segment_index=$2
   # Explicitly split the elements by whitespace.
   local -a elements
-  elements=${=3}
+  elements=(${=3})
 
   local current_segment=${elements[$current_index]}
   local joined=false
