@@ -7,8 +7,12 @@
 ################################################################
 
 function +vi-git-untracked() {
+    local FLAGS
+    FLAGS=('--porcelain')
+    # TODO: check git >= 1.7.2
+    FLAGS+='--ignore-submodules=dirty'
     if [[ $(git rev-parse --is-inside-work-tree 2> /dev/null) == 'true' && \
-            -n $(git ls-files --others --exclude-standard | sed q) ]]; then
+            -n $(git status ${FLAGS} 2> /dev/null | tail -n1) ]]; then
         hook_com[unstaged]+=" %F{$POWERLEVEL9K_VCS_FOREGROUND}$(print_icon 'VCS_UNTRACKED_ICON')%f"
         VCS_WORKDIR_HALF_DIRTY=true
     else
