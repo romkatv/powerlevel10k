@@ -1,9 +1,22 @@
-language: php
-sudo: false
+sudo: true
+language: sh
+addons:
+  apt:
+    packages:
+      - build-essential
 
-php:
-    - '7.0'
+before_script:
+  # Show the git version being used to test.
+  - "git --version"
+  # Show the zsh version being used to test.
+  - "zsh --version"
+
+install:
+  - "sudo apt-add-repository -y ppa:brainpower/testing"
+  - "sudo apt-get update -qq"
+  - "sudo apt-get install zsh"
+  - "sudo chsh -s $(which zsh)"
 
 script:
-    - test/powerlevel9k.spec
+  - test/powerlevel9k.spec
 
