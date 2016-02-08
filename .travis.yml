@@ -1,0 +1,9 @@
+language: php
+sudo: false
+
+php:
+    - '7.0'
+
+script:
+    - test/powerlevel9k.spec
+
