@@ -19,4 +19,5 @@ install:
 
 script:
   - test/powerlevel9k.spec
+  - test/functions/utilities.spec
 
