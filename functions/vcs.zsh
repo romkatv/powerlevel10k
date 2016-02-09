@@ -9,7 +9,7 @@
 function +vi-git-untracked() {
     local FLAGS
     FLAGS=('--porcelain')
-    # TODO: check git >= 1.7.2
+    # TODO: check git >= 1.7.2 - see function git_compare_version()
     FLAGS+='--ignore-submodules=dirty'
     if [[ $(git rev-parse --is-inside-work-tree 2> /dev/null) == 'true' && \
             -n $(git status ${FLAGS} | grep '^??' 2> /dev/null | tail -n1) ]]; then
