@@ -27,6 +27,9 @@ function set_default() {
 }
 
 # Converts large memory values into a human-readable unit (e.g., bytes --> GB)
+# Takes two arguments:
+#   * $size - The number which should be prettified
+#   * $base - The base of the number (default Bytes)
 printSizeHumanReadable() {
   typeset -F 2 size
   size="$1"+0.00001
