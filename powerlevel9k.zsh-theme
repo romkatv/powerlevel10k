@@ -92,11 +92,9 @@ source $script_location/functions/vcs.zsh
 if [[ "$POWERLEVEL9K_COLOR_SCHEME" == "light" ]]; then
   DEFAULT_COLOR=white
   DEFAULT_COLOR_INVERTED=black
-  DEFAULT_COLOR_DARK="252"
 else
   DEFAULT_COLOR=black
   DEFAULT_COLOR_INVERTED=white
-  DEFAULT_COLOR_DARK="236"
 fi
 
 ################################################################
@@ -749,6 +747,15 @@ prompt_vcs() {
   VCS_WORKDIR_DIRTY=false
   VCS_WORKDIR_HALF_DIRTY=false
 
+  # The vcs segment can have three different states - defaults to ''.
+  local current_state=""
+  typeset -AH vcs_states
+  vcs_states=(
+    ''              'green'
+    'modified'      'red'
+    'untracked'     'yellow'
+  )
+
   VCS_CHANGESET_PREFIX=''
   if [[ "$POWERLEVEL9K_SHOW_CHANGESET" == true ]]; then
     # Default: Just display the first 12 characters of our changeset-ID.
@@ -795,14 +802,15 @@ prompt_vcs() {
     if [[ "$VCS_WORKDIR_DIRTY" == true ]]; then
       # $vcs_visual_identifier gets set in +vi-vcs-detect-changes in functions/vcs.zsh,
       # as we have there access to vcs_info internal hooks.
-      "$1_prompt_segment" "$0_MODIFIED" "$2" "red" "$DEFAULT_COLOR" "$vcs_prompt" "$vcs_visual_identifier"
+      current_state='modified'
     else
       if [[ "$VCS_WORKDIR_HALF_DIRTY" == true ]]; then
-        "$1_prompt_segment" "$0_UNTRACKED" "$2" "yellow" "$DEFAULT_COLOR" "$vcs_prompt" "$vcs_visual_identifier"
+        current_state='untracked'
       else
-        "$1_prompt_segment" "$0" "$2" "green" "$DEFAULT_COLOR" "$vcs_prompt" "$vcs_visual_identifier"
+        current_state=''
       fi
     fi
+    "$1_prompt_segment" "${0}_${(U)current_state}" "$2" "${vcs_states[$current_state]}" "$DEFAULT_COLOR" "$vcs_prompt" "$vcs_visual_identifier"
   fi
 }
 
