@@ -245,6 +245,15 @@ specify the correct network interface by setting:
 |----------|---------------|-------------|
 |`POWERLEVEL9K_IP_INTERFACE`|None|The NIC for which you wish to display the IP address. Example: `eth0`.|
 
+##### rbenv
+
+This segment shows the version of Ruby being used when using `rbenv` to change your current Ruby stack.
+
+It figures out the version being used by taking the output of the `rbenv version-name` command.
+
+* If `rbenv` is not in $PATH, nothing will be shown.
+* If the current Ruby version is the same as the global Ruby version, nothing will be shown.
+
 ##### rspec_stats
 
 See [Unit Test Ratios](#unit-test-ratios), below.
