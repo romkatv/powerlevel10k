@@ -81,4 +81,14 @@ function testColoringOfVisualIdentifiersDoesNotOverwriteColoringOfSegment() {
   unset POWERLEVEL9K_DIR_HOME_SUBFOLDER_BACKGROUND
 }
 
+function testOverwritingIconsWork() {
+  POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(dir)
+  POWERLEVEL9K_HOME_SUB_ICON='icon-here'
+
+  assertEquals "%K{blue} %F{black%}icon-here%f %F{black}%~ %k%F{blue}%f " "$(build_left_prompt)"
+
+  unset POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
+  unset POWERLEVEL9K_DIR_HOME_SUB_ICON
+}
+
 source shunit2/source/2.1/src/shunit2
