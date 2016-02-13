@@ -22,4 +22,5 @@ script:
   - test/functions/utilities.spec
   - test/functions/colors.spec
   - test/segments/dir.spec
+  - test/segments/rust_version.spec
 
