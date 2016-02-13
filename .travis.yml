@@ -1,4 +1,5 @@
 sudo: true
+dist: trusty
 language: sh
 addons:
   apt:
@@ -12,7 +13,6 @@ before_script:
   - "zsh --version"
 
 install:
-  - "sudo apt-add-repository -y ppa:brainpower/testing"
   - "sudo apt-get update -qq"
   - "sudo apt-get install zsh"
   - "sudo chsh -s $(which zsh)"
