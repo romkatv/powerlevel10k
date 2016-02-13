@@ -23,4 +23,5 @@ script:
   - test/functions/colors.spec
   - test/segments/dir.spec
   - test/segments/rust_version.spec
+  - test/segments/go_version.spec
 
