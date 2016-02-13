@@ -45,4 +45,40 @@ function testDynamicColoringOfSegmentsWork() {
   unset POWERLEVEL9K_DIR_HOME_SUBFOLDER_BACKGROUND
 }
 
+function testDynamicColoringOfVisualIdentifiersWork() {
+  POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(dir)
+  POWERLEVEL9K_MODE='awesome-patched'
+  POWERLEVEL9K_DIR_HOME_SUBFOLDER_VISUAL_IDENTIFIER_COLOR='green'
+
+  # Re-Source the icons, as the POWERLEVEL9K_MODE is directly
+  # evaluated there.
+  source functions/icons.zsh
+
+  assertEquals "%K{blue} %F{green%}%f %F{black}%~ %k%F{blue}%f " "$(build_left_prompt)"
+
+  unset POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
+  unset POWERLEVEL9K_MODE
+  unset POWERLEVEL9K_DIR_HOME_SUBFOLDER_VISUAL_IDENTIFIER_COLOR
+}
+
+function testColoringOfVisualIdentifiersDoesNotOverwriteColoringOfSegment() {
+  POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(dir)
+  POWERLEVEL9K_MODE='awesome-patched'
+  POWERLEVEL9K_DIR_HOME_SUBFOLDER_VISUAL_IDENTIFIER_COLOR='green'
+  POWERLEVEL9K_DIR_HOME_SUBFOLDER_FOREGROUND='red'
+  POWERLEVEL9K_DIR_HOME_SUBFOLDER_BACKGROUND='yellow'
+
+  # Re-Source the icons, as the POWERLEVEL9K_MODE is directly
+  # evaluated there.
+  source functions/icons.zsh
+
+  assertEquals "%K{yellow} %F{green%}%f %F{red}%~ %k%F{yellow}%f " "$(build_left_prompt)"
+
+  unset POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
+  unset POWERLEVEL9K_MODE
+  unset POWERLEVEL9K_DIR_HOME_SUBFOLDER_VISUAL_IDENTIFIER_COLOR
+  unset POWERLEVEL9K_DIR_HOME_SUBFOLDER_FOREGROUND
+  unset POWERLEVEL9K_DIR_HOME_SUBFOLDER_BACKGROUND
+}
+
 source shunit2/source/2.1/src/shunit2
