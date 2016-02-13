@@ -5,7 +5,7 @@
 setopt shwordsplit
 SHUNIT_PARENT=$0
 
-function oneTimeSetUp() {
+function setUp() {
   # Load Powerlevel9k
   source functions/colors.zsh
 }
