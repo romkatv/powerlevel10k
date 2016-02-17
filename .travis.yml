@@ -1,0 +1,27 @@
+sudo: true
+dist: trusty
+language: sh
+addons:
+  apt:
+    packages:
+      - build-essential
+
+before_script:
+  # Show the git version being used to test.
+  - "git --version"
+  # Show the zsh version being used to test.
+  - "zsh --version"
+
+install:
+  - "sudo apt-get update -qq"
+  - "sudo apt-get install zsh"
+  - "sudo chsh -s $(which zsh)"
+
+script:
+  - test/powerlevel9k.spec
+  - test/functions/utilities.spec
+  - test/functions/colors.spec
+  - test/segments/dir.spec
+  - test/segments/rust_version.spec
+  - test/segments/go_version.spec
+
