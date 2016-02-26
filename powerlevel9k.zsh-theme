@@ -560,9 +560,9 @@ prompt_nvm() {
 # NodeEnv Prompt
 prompt_nodeenv() {
   local nodeenv_path="$NODE_VIRTUAL_ENV"
-  local node_version=$(node -v)
   if [[ -n "$nodeenv_path" && "$NODE_VIRTUAL_ENV_DISABLE_PROMPT" != true ]]; then
-    "$1_prompt_segment" "$0" "$2" "black" "green" "$(node -v)" 'NODE_ICON' "$(basename "$nodeenv_path")"
+    local info="$(node -v)[$(basename "$nodeenv_path")]"
+    "$1_prompt_segment" "$0" "$2" "black" "green" "$info" 'NODE_ICON' 
   fi
 }
 
@@ -819,7 +819,7 @@ prompt_vi_mode() {
 prompt_virtualenv() {
   local virtualenv_path="$VIRTUAL_ENV"
   if [[ -n "$virtualenv_path" && "$VIRTUAL_ENV_DISABLE_PROMPT" != true ]]; then
-    "$1_prompt_segment" "$0" "$2" "blue" "$DEFAULT_COLOR" "$(basename "$virtualenv_path")"
+    "$1_prompt_segment" "$0" "$2" "blue" "$DEFAULT_COLOR" "($(basename "$virtualenv_path"))"
   fi
 }
 
