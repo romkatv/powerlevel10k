@@ -764,11 +764,11 @@ prompt_vcs() {
   VCS_WORKDIR_DIRTY=false
   VCS_WORKDIR_HALF_DIRTY=false
 
-  # The vcs segment can have three different states - defaults to ''.
+  # The vcs segment can have three different states - defaults to 'clean'.
   local current_state=""
   typeset -AH vcs_states
   vcs_states=(
-    ''              'green'
+    'clean'         'green'
     'modified'      'red'
     'untracked'     'yellow'
   )
@@ -824,7 +824,7 @@ prompt_vcs() {
       if [[ "$VCS_WORKDIR_HALF_DIRTY" == true ]]; then
         current_state='untracked'
       else
-        current_state=''
+        current_state='clean'
       fi
     fi
     "$1_prompt_segment" "${0}_${(U)current_state}" "$2" "${vcs_states[$current_state]}" "$DEFAULT_COLOR" "$vcs_prompt" "$vcs_visual_identifier"
