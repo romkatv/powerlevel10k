@@ -556,6 +556,23 @@ prompt_nvm() {
 
   $1_prompt_segment "$0" "$2" "green" "011" "${node_version:1}" 'NODE_ICON'
 }
+# NodeEnv Prompt
+prompt_nodeenv(){
+  export NODE_VIRTUAL_ENV_DISABLE_PROMPT=1
+  ZSH_THEME_NODEENV_PROMPT_PREFIX="("
+  ZSH_THEME_NODEENV_PROMPT_SUFFIX=")"
+      if [ -n "$NODE_VIRTUAL_ENV" ]; then
+
+          if [ "`basename "$NODE_VIRTUAL_ENV"`" = "__" ] ; then
+              # special case for Aspen magic directories
+              # see http://www.zetadev.com/software/aspen/
+              local name="[`basename \`dirname "$NODE_VIRTUAL_ENV"\``]"
+          else
+              local name=`basename "$NODE_VIRTUAL_ENV"`
+          fi
+          echo "$ZSH_THEME_NODEENV_PROMPT_PREFIX$name$ZSH_THEME_NODEENV_PROMPT_SUFFIX"
+      fi
+}
 
 # print a little OS icon
 prompt_os_icon() {
