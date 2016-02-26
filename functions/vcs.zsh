@@ -17,7 +17,7 @@ function +vi-git-untracked() {
     fi
 
     if [[ $(git rev-parse --is-inside-work-tree 2> /dev/null) == 'true' && \
-            -n $(git status ${FLAGS} | grep -E '^??' 2> /dev/null | tail -n1) ]]; then
+            -n $(git status ${FLAGS} | grep -E '^\?\?' 2> /dev/null | tail -n1) ]]; then
         hook_com[unstaged]+=" $(print_icon 'VCS_UNTRACKED_ICON')"
         VCS_WORKDIR_HALF_DIRTY=true
     else
