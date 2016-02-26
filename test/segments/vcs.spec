@@ -40,10 +40,14 @@ function testColorOverridingForModifiedStateWorks() {
   mkdir -p $FOLDER
   cd $FOLDER
   git init 1>/dev/null
+  git config user.email "test@powerlevel9k.theme"
+  git config user.name  "Testing Tester"
   touch testfile
   git add testfile
+  git commit -m "test" 1>/dev/null
+  echo "test" > testfile
 
-  assertEquals "%K{yellow} %F{red} master ✚ %k%F{yellow}%f " "$(build_left_prompt)"
+  assertEquals "%K{yellow} %F{red} master ● %k%F{yellow}%f " "$(build_left_prompt)"
 
   cd -
   rm -fr /tmp/powerlevel9k-test
