@@ -567,6 +567,15 @@ prompt_nvm() {
   $1_prompt_segment "$0" "$2" "green" "011" "${node_version:1}" 'NODE_ICON'
 }
 
+# NodeEnv Prompt
+prompt_nodeenv() {
+  local nodeenv_path="$NODE_VIRTUAL_ENV"
+  if [[ -n "$nodeenv_path" && "$NODE_VIRTUAL_ENV_DISABLE_PROMPT" != true ]]; then
+    local info="$(node -v)[$(basename "$nodeenv_path")]"
+    "$1_prompt_segment" "$0" "$2" "black" "green" "$info" 'NODE_ICON' 
+  fi
+}
+
 # print a little OS icon
 prompt_os_icon() {
   "$1_prompt_segment" "$0" "$2" "black" "255" "$OS_ICON"
