@@ -18,7 +18,7 @@ function +vi-git-untracked() {
 
     if [[ $(git rev-parse --is-inside-work-tree 2> /dev/null) == 'true' && \
             -n $(git status ${FLAGS} | grep -E '^??' 2> /dev/null | tail -n1) ]]; then
-        hook_com[unstaged]+=" %F{$POWERLEVEL9K_VCS_FOREGROUND}$(print_icon 'VCS_UNTRACKED_ICON')%f"
+        hook_com[unstaged]+=" $(print_icon 'VCS_UNTRACKED_ICON')"
         VCS_WORKDIR_HALF_DIRTY=true
     else
         VCS_WORKDIR_HALF_DIRTY=false
@@ -34,12 +34,12 @@ function +vi-git-aheadbehind() {
     # for git prior to 1.7
     # ahead=$(git rev-list origin/${branch_name}..HEAD | wc -l)
     ahead=$(git rev-list "${branch_name}"@{upstream}..HEAD 2>/dev/null | wc -l)
-    (( ahead )) && gitstatus+=( " %F{$POWERLEVEL9K_VCS_FOREGROUND}$(print_icon 'VCS_OUTGOING_CHANGES_ICON')${ahead// /}%f" )
+    (( ahead )) && gitstatus+=( " $(print_icon 'VCS_OUTGOING_CHANGES_ICON')${ahead// /}" )
 
     # for git prior to 1.7
     # behind=$(git rev-list HEAD..origin/${branch_name} | wc -l)
     behind=$(git rev-list HEAD.."${branch_name}"@{upstream} 2>/dev/null | wc -l)
-    (( behind )) && gitstatus+=( " %F{$POWERLEVEL9K_VCS_FOREGROUND}$(print_icon 'VCS_INCOMING_CHANGES_ICON')${behind// /}%f" )
+    (( behind )) && gitstatus+=( " $(print_icon 'VCS_INCOMING_CHANGES_ICON')${behind// /}" )
 
     hook_com[misc]+=${(j::)gitstatus}
 }
@@ -51,12 +51,12 @@ function +vi-git-remotebranch() {
     remote=${$(git rev-parse --verify HEAD@{upstream} --symbolic-full-name 2>/dev/null)/refs\/(remotes|heads)\/}
     branch_name=$(git symbolic-ref --short HEAD 2>/dev/null)
 
-    hook_com[branch]="%F{$POWERLEVEL9K_VCS_FOREGROUND}$(print_icon 'VCS_BRANCH_ICON')${hook_com[branch]}%f"
+    hook_com[branch]="$(print_icon 'VCS_BRANCH_ICON')${hook_com[branch]}"
     # Always show the remote
     #if [[ -n ${remote} ]] ; then
     # Only show the remote if it differs from the local
     if [[ -n ${remote} ]] && [[ "${remote#*/}" != "${branch_name}" ]] ; then
-        hook_com[branch]+="%F{$POWERLEVEL9K_VCS_FOREGROUND}$(print_icon 'VCS_REMOTE_BRANCH_ICON')%f%F{$POWERLEVEL9K_VCS_FOREGROUND}${remote// /}%f"
+        hook_com[branch]+="$(print_icon 'VCS_REMOTE_BRANCH_ICON')${remote// /}"
     fi
 }
 
@@ -64,7 +64,7 @@ function +vi-git-tagname() {
     local tag
 
     tag=$(git describe --tags --exact-match HEAD 2>/dev/null)
-    [[ -n "${tag}" ]] && hook_com[branch]="%F{$POWERLEVEL9K_VCS_FOREGROUND}$(print_icon 'VCS_TAG_ICON')${tag}%f"
+    [[ -n "${tag}" ]] && hook_com[branch]="$(print_icon 'VCS_TAG_ICON')${tag}"
 }
 
 # Show count of stashed changes
@@ -74,13 +74,13 @@ function +vi-git-stash() {
 
   if [[ -s $(git rev-parse --git-dir)/refs/stash ]] ; then
     stashes=$(git stash list 2>/dev/null | wc -l)
-    hook_com[misc]+=" %F{$POWERLEVEL9K_VCS_FOREGROUND}$(print_icon 'VCS_STASH_ICON')${stashes// /}%f"
+    hook_com[misc]+=" $(print_icon 'VCS_STASH_ICON')${stashes// /}"
   fi
 }
 
 function +vi-hg-bookmarks() {
   if [[ -n "${hgbmarks[@]}" ]]; then
-    hook_com[hg-bookmark-string]=" %F{$POWERLEVEL9K_VCS_FOREGROUND}$(print_icon 'VCS_BOOKMARK_ICON')${hgbmarks[@]}%f"
+    hook_com[hg-bookmark-string]=" $(print_icon 'VCS_BOOKMARK_ICON')${hgbmarks[@]}"
 
     # To signal that we want to use the sting we just generated, set the special
     # variable `ret' to something other than the default zero:

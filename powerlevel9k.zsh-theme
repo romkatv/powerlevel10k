@@ -92,15 +92,10 @@ source $script_location/functions/vcs.zsh
 if [[ "$POWERLEVEL9K_COLOR_SCHEME" == "light" ]]; then
   DEFAULT_COLOR=white
   DEFAULT_COLOR_INVERTED=black
-  DEFAULT_COLOR_DARK="252"
 else
   DEFAULT_COLOR=black
   DEFAULT_COLOR_INVERTED=white
-  DEFAULT_COLOR_DARK="236"
 fi
-
-set_default POWERLEVEL9K_VCS_FOREGROUND "$DEFAULT_COLOR"
-set_default POWERLEVEL9K_VCS_DARK_FOREGROUND "$DEFAULT_COLOR_DARK"
 
 ################################################################
 # Prompt Segment Constructors
@@ -760,6 +755,15 @@ prompt_vcs() {
   VCS_WORKDIR_DIRTY=false
   VCS_WORKDIR_HALF_DIRTY=false
 
+  # The vcs segment can have three different states - defaults to ''.
+  local current_state=""
+  typeset -AH vcs_states
+  vcs_states=(
+    ''              'green'
+    'modified'      'red'
+    'untracked'     'yellow'
+  )
+
   VCS_CHANGESET_PREFIX=''
   if [[ "$POWERLEVEL9K_SHOW_CHANGESET" == true ]]; then
     # Default: Just display the first 12 characters of our changeset-ID.
@@ -768,19 +772,19 @@ prompt_vcs() {
       VCS_CHANGESET_HASH_LENGTH="$POWERLEVEL9K_CHANGESET_HASH_LENGTH"
     fi
 
-    VCS_CHANGESET_PREFIX="%F{$POWERLEVEL9K_VCS_DARK_FOREGROUND}$(print_icon 'VCS_COMMIT_ICON')%0.$VCS_CHANGESET_HASH_LENGTH""i%f "
+    VCS_CHANGESET_PREFIX="$(print_icon 'VCS_COMMIT_ICON')%0.$VCS_CHANGESET_HASH_LENGTH""i "
   fi
 
   zstyle ':vcs_info:*' enable git hg
   zstyle ':vcs_info:*' check-for-changes true
 
-  VCS_DEFAULT_FORMAT="$VCS_CHANGESET_PREFIX%F{$POWERLEVEL9K_VCS_FOREGROUND}%b%c%u%m%f"
+  VCS_DEFAULT_FORMAT="$VCS_CHANGESET_PREFIX%b%c%u%m"
   zstyle ':vcs_info:*' formats "$VCS_DEFAULT_FORMAT"
 
   zstyle ':vcs_info:*' actionformats "%b %F{red}| %a%f"
 
-  zstyle ':vcs_info:*' stagedstr " %F{$POWERLEVEL9K_VCS_FOREGROUND}$(print_icon 'VCS_STAGED_ICON')%f"
-  zstyle ':vcs_info:*' unstagedstr " %F{$POWERLEVEL9K_VCS_FOREGROUND}$(print_icon 'VCS_UNSTAGED_ICON')%f"
+  zstyle ':vcs_info:*' stagedstr " $(print_icon 'VCS_STAGED_ICON')"
+  zstyle ':vcs_info:*' unstagedstr " $(print_icon 'VCS_UNSTAGED_ICON')"
 
   defined POWERLEVEL9K_VCS_GIT_HOOKS || POWERLEVEL9K_VCS_GIT_HOOKS=(vcs-detect-changes git-untracked git-aheadbehind git-stash git-remotebranch git-tagname)
   zstyle ':vcs_info:git*+set-message:*' hooks $POWERLEVEL9K_VCS_GIT_HOOKS
@@ -806,14 +810,15 @@ prompt_vcs() {
     if [[ "$VCS_WORKDIR_DIRTY" == true ]]; then
       # $vcs_visual_identifier gets set in +vi-vcs-detect-changes in functions/vcs.zsh,
       # as we have there access to vcs_info internal hooks.
-      "$1_prompt_segment" "$0_MODIFIED" "$2" "red" "$DEFAULT_COLOR" "$vcs_prompt" "$vcs_visual_identifier"
+      current_state='modified'
     else
       if [[ "$VCS_WORKDIR_HALF_DIRTY" == true ]]; then
-        "$1_prompt_segment" "$0_UNTRACKED" "$2" "yellow" "$DEFAULT_COLOR" "$vcs_prompt" "$vcs_visual_identifier"
+        current_state='untracked'
       else
-        "$1_prompt_segment" "$0" "$2" "green" "$DEFAULT_COLOR" "$vcs_prompt" "$vcs_visual_identifier"
+        current_state=''
       fi
     fi
+    "$1_prompt_segment" "${0}_${(U)current_state}" "$2" "${vcs_states[$current_state]}" "$DEFAULT_COLOR" "$vcs_prompt" "$vcs_visual_identifier"
   fi
 }
 
