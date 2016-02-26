@@ -1,5 +1,15 @@
 ## v0.4.0 (next)
 
+### `vcs` changes
+
+The default state was renamed to `clean`. If you overrode foreground
+or background color in the past, you need to rename your variables to:
+
+```zsh
+POWERLEVEL9K_VCS_CLEAN_FOREGROUND='cyan'
+POWERLEVEL9K_VCS_CLEAN_BACKGROUND='white'
+```
+
 ### `aws_eb_env` added
 
 This segment displays the current Elastic Beanstalk environment.
