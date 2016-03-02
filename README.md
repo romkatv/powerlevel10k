@@ -103,8 +103,8 @@ The segments that are currently available are:
 * [rspec_stats](#rspec_stats) - Show a ratio of test classes vs code classes for RSpec.
 * **rust_version** - Display the current rust version.
 * [status](#status) - The return code of the previous command.
-* [symphony2_tests](#symphony2_tests) - Show a ratio of test classes vs code classes for Symfony2.
-* **symphony2_version** - Show the current Symfony2 version, if you are in a Symfony2-Project dir.
+* [symfony2_tests](#symfony2_tests) - Show a ratio of test classes vs code classes for Symfony2.
+* **symfony2_version** - Show the current Symfony2 version, if you are in a Symfony2-Project dir.
 * [time](#time) - System time.
 * [todo](http://todotxt.com/) - Shows the number of tasks in your todo.txt tasks file.
 * [vi_mode](#vi_mode)- Vi editing mode (NORMAL|INSERT).
@@ -262,7 +262,7 @@ This segment shows the return code of the last command.
 |----------|---------------|-------------|
 |`POWERLEVEL9K_RAM_ELEMENTS`|Both|Specify `ram_free` or `swap_used` to only show one or the other rather than both.|
 
-##### symphony2_tests
+##### symfony2_tests
 
 See [Unit Test Ratios](#unit-test-ratios), below.
 
