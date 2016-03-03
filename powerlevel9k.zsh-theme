@@ -791,8 +791,7 @@ prompt_vcs() {
   VCS_DEFAULT_FORMAT="$VCS_CHANGESET_PREFIX%b%c%u%m"
   zstyle ':vcs_info:*' formats "$VCS_DEFAULT_FORMAT"
 
-  zstyle ':vcs_info:*' actionformats "%b %F{${vcs_states['actionformat']}}| %a%f"
-  # zstyle ':vcs_info:*' actionformats "%b %F{red}| %a%f"
+  zstyle ':vcs_info:*' actionformats "%b %F{${vcs_states[actionformat]}}| %a%f"
 
   zstyle ':vcs_info:*' stagedstr " $(print_icon 'VCS_STAGED_ICON')"
   zstyle ':vcs_info:*' unstagedstr " $(print_icon 'VCS_UNSTAGED_ICON')"
