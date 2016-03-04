@@ -622,6 +622,17 @@ prompt_rbenv() {
   fi
 }
 
+# chruby information
+# see https://github.com/postmodern/chruby/issues/245 for chruby_auto issue with ZSH
+prompt_chruby() {
+  local chruby_env
+  chrb_env="$(chruby 2> /dev/null | grep \* | tr -d '* ')"
+  # Don't show anything if the chruby did not change the default ruby
+  if [[ "${chrb_env:-system}" != "system" ]]; then
+    "$1_prompt_segment" "$0" "$2" "red" "$DEFAULT_COLOR" "${chrb_env}" 'RUBY_ICON'
+  fi
+}
+
 # Print an icon if user is root.
 prompt_root_indicator() {
   if [[ "$UID" -eq 0 ]]; then
