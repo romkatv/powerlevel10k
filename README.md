@@ -103,7 +103,8 @@ The segments that are currently available are:
 * [`vcs`](#vcs) - Information about this `git` or `hg` repository (if you are in one).
 
 **Language Segments:**
-* `go_version` - Show the current GO version.
+* **GoLang Segments:**
+    * `go_version` - Show the current GO version.
 * **Javascript / Node.js Segments:**
     * `node_version` - Show the version number of the installed Node.js.
     * `nodeenv` - [nodeenv](https://github.com/ekalinin/nodeenv) prompt for displaying node version and environment name.
@@ -118,7 +119,8 @@ The segments that are currently available are:
     * [`chruby`](#chruby) - Ruby environment information using `chruby` (if one is active).
     * [`rbenv`](#rbenv) - Ruby environment information using `rbenv` (if one is active).
     * [`rspec_stats`](#rspec_stats) - Show a ratio of test classes vs code classes for RSpec.
-* `rust_version` - Display the current rust version.
+* **Rust Segments:**
+    * `rust_version` - Display the current rust version.
 
 **Cloud Segments:**
 * **AWS Segments:**
