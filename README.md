@@ -84,7 +84,7 @@ your `~/.zshrc`:
 The segments that are currently available are:
 
 **System Status Segments:**
-* [background_jobs](#background_jobs) - Indicator for background jobs.
+* [`background_jobs`](#background_jobs) - Indicator for background jobs.
 * [battery](#battery) - Current battery status.
 * [context](#context) - Your username and host.
 * [dir](#dir) - Your current working directory.
@@ -108,7 +108,7 @@ The segments that are currently available are:
     * **node_version** - Show the version number of the installed Node.js.
     * **nodeenv** - [nodeenv](https://github.com/ekalinin/nodeenv) prompt for displaying node version and environment name.
     * **nvm** - Show the version of Node that is currently active, if it differs from the version used by NVM
-* **PHP Segmenst:**
+* **PHP Segments:**
     * **php_version** - Show the current PHP version.
     * [symfony2_tests](#symfony2_tests) - Show a ratio of test classes vs code classes for Symfony2.
     * **symfony2_version** - Show the current Symfony2 version, if you are in a Symfony2-Project dir.
