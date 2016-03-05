@@ -83,37 +83,52 @@ your `~/.zshrc`:
 #### Available Prompt Segments
 The segments that are currently available are:
 
-* [aws](#aws) - The current AWS profile, if active.
-* **aws_eb_env** - The current Elastic Beanstalk Environment.
+**System Status Segments:**
 * [background_jobs](#background_jobs) - Indicator for background jobs.
 * [battery](#battery) - Current battery status.
 * [context](#context) - Your username and host.
-* [custom_command](#custom_command) - A custom command to display the output of.
 * [dir](#dir) - Your current working directory.
-* **go_version** - Show the current GO version.
 * **history** - The command number for the current line.
 * [ip](#ip) - Shows the current IP address.
-* **load** - Your machines 5 minute load average.
-* **node_version** - Show the version number of the installed Node.js.
-* **nodeenv** - [nodeenv](https://github.com/ekalinin/nodeenv) prompt for displaying node version and environment name.
-* **nvm** - Show the version of Node that is currently active, if it differs from the version used by NVM
+* **load** - Your machine's load averages.
 * **os_icon** - Display a nice little icon, depending on your operating system.
-* **php_version** - Show the current PHP version.
-* **ram** - Show free RAM
-* [rbenv](#rbenv) - Ruby environment information using `rbenv` (if one is active).
-* [chruby](#chruby) - Ruby environment information using `chruby` (if one is active; also, see postmodern/chruby#245 for issue with auto switching of ruby).
-* **root_indicator** - An indicator if the user is root.
-* [rspec_stats](#rspec_stats) - Show a ratio of test classes vs code classes for RSpec.
-* **rust_version** - Display the current rust version.
+* **ram** - Show free RAM.
+* **root_indicator** - An indicator if the user has superuser status.
 * [status](#status) - The return code of the previous command.
 * **swap** - Prints the current swap size.
-* [symfony2_tests](#symfony2_tests) - Show a ratio of test classes vs code classes for Symfony2.
-* **symfony2_version** - Show the current Symfony2 version, if you are in a Symfony2-Project dir.
 * [time](#time) - System time.
-* [todo](http://todotxt.com/) - Shows the number of tasks in your todo.txt tasks file.
-* [vi_mode](#vi_mode)- Vi editing mode (NORMAL|INSERT).
-* **virtualenv** - Your Python [VirtualEnv](https://virtualenv.pypa.io/en/latest/).
+* [vi_mode](#vi_mode)- Your prompt's Vi editing mode (NORMAL|INSERT).
+
+**Development Environment Segments:**
 * [vcs](#vcs) - Information about this `git` or `hg` repository (if you are in one).
+
+**Language Segments:**
+* **go_version** - Show the current GO version.
+* **Javascript / Node.js Segments:**
+    * **node_version** - Show the version number of the installed Node.js.
+    * **nodeenv** - [nodeenv](https://github.com/ekalinin/nodeenv) prompt for displaying node version and environment name.
+    * **nvm** - Show the version of Node that is currently active, if it differs from the version used by NVM
+* **PHP Segmenst:**
+    * **php_version** - Show the current PHP version.
+    * [symfony2_tests](#symfony2_tests) - Show a ratio of test classes vs code classes for Symfony2.
+    * **symfony2_version** - Show the current Symfony2 version, if you are in a Symfony2-Project dir.
+* **Python Segments:**
+    * **virtualenv** - Your Python [VirtualEnv](https://virtualenv.pypa.io/en/latest/).
+* **Ruby Segments:**
+    * [chruby](#chruby) - Ruby environment information using `chruby` (if one is active).
+    * [rbenv](#rbenv) - Ruby environment information using `rbenv` (if one is active).
+    * [rspec_stats](#rspec_stats) - Show a ratio of test classes vs code classes for RSpec.
+* **rust_version** - Display the current rust version.
+
+**Cloud Segments:**
+* **AWS Segments:**
+    * [aws](#aws) - The current AWS profile, if active.
+    * **aws_eb_env** - The current Elastic Beanstalk Environment.
+
+**Other:**
+* [custom_command](#custom_command) - Create a custom segment to display the
+  output of an arbitrary command.
+* [todo](http://todotxt.com/) - Shows the number of tasks in your todo.txt tasks file.
 
 
 ##### aws
