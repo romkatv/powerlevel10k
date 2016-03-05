@@ -130,6 +130,8 @@ The segments that are currently available are:
   output of an arbitrary command.
 * [`todo`](http://todotxt.com/) - Shows the number of tasks in your todo.txt tasks file.
 
+---------------------------------------------------------------------------------
+
 
 ##### aws
 
