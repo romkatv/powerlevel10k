@@ -100,7 +100,8 @@ The segments that are currently available are:
 * **os_icon** - Display a nice little icon, depending on your operating system.
 * **php_version** - Show the current PHP version.
 * **ram** - Show free RAM
-* [rbenv](#rbenv) - Ruby environment information (if one is active).
+* [rbenv](#rbenv) - Ruby environment information using `rbenv` (if one is active).
+* [chruby](#chruby) - Ruby environment information using `chruby` (if one is active; also, see postmodern/chruby#245 for issue with auto switching of ruby).
 * **root_indicator** - An indicator if the user is root.
 * [rspec_stats](#rspec_stats) - Show a ratio of test classes vs code classes for RSpec.
 * **rust_version** - Display the current rust version.
