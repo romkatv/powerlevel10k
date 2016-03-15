@@ -560,6 +560,7 @@ prompt_node_version() {
 prompt_nvm() {
   [[ ! $(type nvm) =~ 'nvm is a shell function'* ]] && return
   local node_version=$(nvm current)
+  [[ ${node_version} = "none" ]] && return
   local nvm_default=$(cat $NVM_DIR/alias/default)
   [[ -z "${node_version}" ]] && return
   [[ "$node_version" =~ "$nvm_default" ]] && return
