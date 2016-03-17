@@ -186,3 +186,9 @@ function segmentShouldBeJoined() {
     return 1
   fi
 }
+
+# Given a directory path, truncate it according to the settings for
+# `truncate_from_right`
+function truncatePathFromRight() {
+  echo $1 | sed $SED_EXTENDED_REGEX_PARAMETER "s/([^/]{$POWERLEVEL9K_SHORTEN_DIR_LENGTH})[^/]+\//\1$POWERLEVEL9K_SHORTEN_DELIMITER\//g"
+}

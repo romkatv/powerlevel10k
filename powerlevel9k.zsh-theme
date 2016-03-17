@@ -444,7 +444,7 @@ prompt_dir() {
         current_path=$(pwd | sed -e "s,^$HOME,~," | sed $SED_EXTENDED_REGEX_PARAMETER "s/([^/]{$POWERLEVEL9K_SHORTEN_DIR_LENGTH})[^/]+([^/]{$POWERLEVEL9K_SHORTEN_DIR_LENGTH})\//\1$POWERLEVEL9K_SHORTEN_DELIMITER\2\//g")
       ;;
       truncate_from_right)
-        current_path=$(pwd | sed -e "s,^$HOME,~," | sed $SED_EXTENDED_REGEX_PARAMETER "s/([^/]{$POWERLEVEL9K_SHORTEN_DIR_LENGTH})[^/]+\//\1$POWERLEVEL9K_SHORTEN_DELIMITER\//g")
+        current_path=$(truncatePathFromRight $(pwd | sed -e "s,^$HOME,~,") )
       ;;
       truncate_with_package_name)
         local name repo_path package_path current_dir zero
@@ -466,7 +466,7 @@ prompt_dir() {
             # Then, find the length of the package_path string, and save the
             # subdirectory path as a substring of the current directory's path from 0
             # to the length of the package path's string
-            subdirectory_path="/${current_dir:${#${(S%%)package_path//$~zero/}}}"
+            subdirectory_path=$(truncatePathFromRight "/${current_dir:${#${(S%%)package_path//$~zero/}}}")
           fi
         fi
 
@@ -479,7 +479,7 @@ prompt_dir() {
           # from the package.json and append the current subdirectory
           current_path="`echo $name | tr -d '"'`$subdirectory_path"
         else
-          current_path='%~'
+          current_path=$(truncatePathFromRight $(pwd | sed -e "s,^$HOME,~,") )
         fi
       ;;
       *)
