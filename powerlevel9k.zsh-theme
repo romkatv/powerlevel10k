@@ -463,6 +463,15 @@ prompt_dir() {
   fi
 }
 
+# Docker machine
+prompt_docker_machine() {
+  local docker_machine="$DOCKER_MACHINE_NAME"
+
+  if [[ -n "$docker_machine" ]]; then
+    "$1_prompt_segment" "$0" "$2" "magenta" "$DEFAULT_COLOR" "$docker_machine" 'SERVER_ICON'
+  fi
+}
+
 # GO prompt
 prompt_go_version() {
   local go_version
@@ -572,7 +581,7 @@ prompt_nodeenv() {
   local nodeenv_path="$NODE_VIRTUAL_ENV"
   if [[ -n "$nodeenv_path" && "$NODE_VIRTUAL_ENV_DISABLE_PROMPT" != true ]]; then
     local info="$(node -v)[$(basename "$nodeenv_path")]"
-    "$1_prompt_segment" "$0" "$2" "black" "green" "$info" 'NODE_ICON' 
+    "$1_prompt_segment" "$0" "$2" "black" "green" "$info" 'NODE_ICON'
   fi
 }
 
