@@ -61,10 +61,13 @@ function +vi-git-remotebranch() {
 }
 
 function +vi-git-tagname() {
+  # Only show the tag name if we are not in DETACHED_HEAD state,
+  # since in that case it would already be displayed in the branch segment
   if [[ -n "$(git status | grep 'HEAD detached')" ]] ; then
     local tag
 
     tag=$(git describe --tags --exact-match HEAD 2>/dev/null)
+    # Append the tag segment to the branch one
     [[ -n "${tag}" ]] && hook_com[branch]+=" $(print_icon 'VCS_TAG_ICON')${tag}"
   fi
 }
