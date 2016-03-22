@@ -61,10 +61,12 @@ function +vi-git-remotebranch() {
 }
 
 function +vi-git-tagname() {
+  if [[ -n "$(git status | grep 'HEAD detached')" ]] ; then
     local tag
 
     tag=$(git describe --tags --exact-match HEAD 2>/dev/null)
     [[ -n "${tag}" ]] && hook_com[branch]+=" $(print_icon 'VCS_TAG_ICON')${tag}"
+  fi
 }
 
 # Show count of stashed changes
