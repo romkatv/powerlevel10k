@@ -10,6 +10,11 @@ POWERLEVEL9K_VCS_CLEAN_FOREGROUND='cyan'
 POWERLEVEL9K_VCS_CLEAN_BACKGROUND='white'
 ```
 
+The foreground color of actionformat is now configurable via:
+```zsh
+POWERLEVEL9K_VCS_ACTIONFORMAT_FOREGROUND='green'
+```
+
 ### `aws_eb_env` added
 
 This segment displays the current Elastic Beanstalk environment.
