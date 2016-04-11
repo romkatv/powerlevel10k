@@ -67,8 +67,12 @@ function +vi-git-tagname() {
     local tag
 
     tag=$(git describe --tags --exact-match HEAD 2>/dev/null)
-    # Append the tag segment to the branch one
-    [[ -n "${tag}" ]] && hook_com[branch]+=" $(print_icon 'VCS_TAG_ICON')${tag}"
+    head=$(git describe --all)
+    # Make sure that detached head and tag differ in name
+    if [[ "${head}" != "${tag}" ]]; then
+      # Append the tag segment to the branch one
+      [[ -n "${tag}" ]] && hook_com[branch]+=" $(print_icon 'VCS_TAG_ICON')${tag}"
+    fi
   fi
 }
 
