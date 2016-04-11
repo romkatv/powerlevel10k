@@ -24,6 +24,10 @@ This segment displays the current Elastic Beanstalk environment.
 The `ram` segment was split up into `ram` and `swap`. The `POWERLEVEL9K_RAM_ELEMENTS`
 variable is void.
 
+### `dir` Shortening Strategies
+
+There is now a path shortening strategy that will use the `package.json` file to shorten your directory path. See the documentation for the `dir` segment for more details.
+
 ## v0.3.2
 
 ### `vcs` changes
