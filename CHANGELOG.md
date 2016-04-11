@@ -28,6 +28,18 @@ variable is void.
 
 There is now a path shortening strategy that will use the `package.json` file to shorten your directory path. See the documentation for the `dir` segment for more details.
 
+### `chruby` Segment
+
+Added new `chruby` segment to support this version manager.
+
+### `node`, `nvm` Segments
+
+Improvements to speed / reliability.
+
+### `docker` Segment
+
+Added new `docker` segment that will show your Docker machine.
+
 ## v0.3.2
 
 ### `vcs` changes
