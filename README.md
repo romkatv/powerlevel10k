@@ -243,7 +243,7 @@ Customizations available are:
 | Variable | Default Value | Description |
 |----------|---------------|-------------|
 |`POWERLEVEL9K_SHORTEN_DIR_LENGTH`|`2`|If your shorten strategy, below, is entire directories, this field determines how many directories to leave at the end. If your shorten strategy is by character count, this field determines how many characters to allow per directory string.|
-|`POWERLEVEL9K_SHORTEN_STRATEGY`|None|How the directory strings should be truncated. By default, it will truncate whole directories. Other options are `truncate_middle`, which leaves the start and end of the directory strings, and `truncate_from_right`, which cuts starting from the end of the string.|
+|`POWERLEVEL9K_SHORTEN_STRATEGY`|None|How the directory strings should be truncated. By default, it will truncate whole directories. Other options are `truncate_middle`, which leaves the start and end of the directory strings, and `truncate_from_right`, which cuts starting from the end of the string.  You can also use `truncate_with_package_name` to use the `package.json` `name` field to abbreviate the directory path.|
 |`POWERLEVEL9K_SHORTEN_DELIMITER`|`..`|Delimiter to use in truncated strings. This can be any string you choose, including an empty string if you wish to have no delimiter.|
 
 For example, if you wanted the truncation behavior of the `fish` shell, which
@@ -257,6 +257,15 @@ In each case you have to specify the length you want to shorten the directory
 to. So in some cases `POWERLEVEL9K_SHORTEN_DIR_LENGTH` means characters, in
 others whole directories.
 
+The `truncate_with_package_name` strategy gives your directory path relative to the root of your project.  For example, if you have a project inside `$HOME/projects/my-project` with a `package.json` that looks like:
+
+```json
+{
+  "name": "my-cool-project"
+}
+```
+
+the path shown would be `my-cool-project`.  If you navigate to `$HOME/projects/my-project/src`, then the path shown would be `my-cool-project/src`.  Please note that this currently looks for `.git` directory to determine the root of the project.
 
 ##### ip
 
