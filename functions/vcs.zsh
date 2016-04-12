@@ -61,10 +61,23 @@ function +vi-git-remotebranch() {
 }
 
 function +vi-git-tagname() {
-    local tag
+  # Only show the tag name if we are not in DETACHED_HEAD state,
+  # or if the current branch's HEAD is the same commit as a tag but
+  # doesn't have the same name
+  local tag
+  tag=$(git describe --tags --exact-match HEAD 2>/dev/null)
 
-    tag=$(git describe --tags --exact-match HEAD 2>/dev/null)
-    [[ -n "${tag}" ]] && hook_com[branch]="$(print_icon 'VCS_TAG_ICON')${tag}"
+  if [[ -z "$(git symbolic-ref HEAD 2>/dev/null)" || ! -z "${tag}" ]] ; then
+    head=$(git describe --all)
+    # Make sure that detached head or checked out name differs from tag name
+    if [[ "${head}" != "${tag}" ||
+      "$(git rev-parse --abbrev-ref HEAD)" != "${tag}" &&
+      "$(git rev-parse --abbrev-ref HEAD)" != "HEAD" &&
+      "$(git rev-list -n 1 HEAD)" == "$(git rev-list -n 1 ${tag})" ]]; then
+        # Append the tag segment to the branch one
+        [[ -n "${tag}" ]] && hook_com[branch]+=" $(print_icon 'VCS_TAG_ICON')${tag}"
+    fi
+  fi
 }
 
 # Show count of stashed changes
