@@ -67,7 +67,10 @@ function +vi-git-tagname() {
   local tag
   tag=$(git describe --tags --exact-match HEAD 2>/dev/null)
 
-  if [[ -z "$(git symbolic-ref HEAD 2>/dev/null)" || ! -z "${tag}" ]] ; then
+  # if [[ -z "$(git symbolic-ref HEAD 2>/dev/null)" || ! -z "${tag}" ]] ; then
+  if [[ -n "${tag}" ]] ; then
+    # There is a tag that points to our current commit. Need to determine if we
+    # are also on a branch, or are in a DETACHED_HEAD state.
     head=$(git describe --all)
     # Make sure that detached head or checked out name differs from tag name
     if [[ "${head}" != "${tag}" ||
