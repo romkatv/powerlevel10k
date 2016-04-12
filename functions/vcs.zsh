@@ -67,18 +67,17 @@ function +vi-git-tagname() {
   local tag
   tag=$(git describe --tags --exact-match HEAD 2>/dev/null)
 
-  # if [[ -z "$(git symbolic-ref HEAD 2>/dev/null)" || ! -z "${tag}" ]] ; then
   if [[ -n "${tag}" ]] ; then
     # There is a tag that points to our current commit. Need to determine if we
     # are also on a branch, or are in a DETACHED_HEAD state.
-    head=$(git describe --all)
-    # Make sure that detached head or checked out name differs from tag name
-    if [[ "${head}" != "${tag}" ||
-      "$(git rev-parse --abbrev-ref HEAD)" != "${tag}" &&
-      "$(git rev-parse --abbrev-ref HEAD)" != "HEAD" &&
-      "$(git rev-list -n 1 HEAD)" == "$(git rev-list -n 1 ${tag})" ]]; then
-        # Append the tag segment to the branch one
-        [[ -n "${tag}" ]] && hook_com[branch]+=" $(print_icon 'VCS_TAG_ICON')${tag}"
+    if [[ -z $(git symbolic-ref HEAD 2>/dev/null) ]]; then
+      # DETACHED_HEAD state. Print the commit hash and tag name.
+      local revision
+      revision=$(git rev-list -n 1 --abbrev-commit --abbrev=8 HEAD)
+      hook_com[branch]="$(print_icon 'VCS_BRANCH_ICON')${revision} $(print_icon 'VCS_TAG_ICON')${tag}"
+    else
+      # We are on both a tag and a branch; print both.
+      hook_com[branch]+=" $(print_icon 'VCS_TAG_ICON')${tag}"
     fi
   fi
 }

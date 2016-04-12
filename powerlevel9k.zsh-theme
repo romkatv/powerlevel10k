@@ -832,8 +832,8 @@ prompt_vcs() {
 
   VCS_CHANGESET_PREFIX=''
   if [[ "$POWERLEVEL9K_SHOW_CHANGESET" == true ]]; then
-    # Default: Just display the first 12 characters of our changeset-ID.
-    local VCS_CHANGESET_HASH_LENGTH=12
+    # Default: Just display the first 8 characters of our changeset-ID.
+    local VCS_CHANGESET_HASH_LENGTH=8
     if [[ -n "$POWERLEVEL9K_CHANGESET_HASH_LENGTH" ]]; then
       VCS_CHANGESET_HASH_LENGTH="$POWERLEVEL9K_CHANGESET_HASH_LENGTH"
     fi
