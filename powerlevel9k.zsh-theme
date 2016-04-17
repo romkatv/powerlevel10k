@@ -815,7 +815,14 @@ prompt_todo() {
 # VCS segment: shows the state of your repository, if you are in a folder under
 # version control
 set_default POWERLEVEL9K_VCS_ACTIONFORMAT_FOREGROUND "red"
+# Default: Just display the first 8 characters of our changeset-ID.
+set_default POWERLEVEL9K_VCS_INTERNAL_HASH_LENGTH "8"
 prompt_vcs() {
+  if [[ -n "$POWERLEVEL9K_CHANGESET_HASH_LENGTH" ]]; then
+    POWERLEVEL9K_VCS_INTERNAL_HASH_LENGTH="$POWERLEVEL9K_CHANGESET_HASH_LENGTH"
+  fi
+
+  # Load VCS_INFO
   autoload -Uz vcs_info
 
   VCS_WORKDIR_DIRTY=false
@@ -832,13 +839,7 @@ prompt_vcs() {
 
   VCS_CHANGESET_PREFIX=''
   if [[ "$POWERLEVEL9K_SHOW_CHANGESET" == true ]]; then
-    # Default: Just display the first 8 characters of our changeset-ID.
-    local VCS_CHANGESET_HASH_LENGTH=8
-    if [[ -n "$POWERLEVEL9K_CHANGESET_HASH_LENGTH" ]]; then
-      VCS_CHANGESET_HASH_LENGTH="$POWERLEVEL9K_CHANGESET_HASH_LENGTH"
-    fi
-
-    VCS_CHANGESET_PREFIX="$(print_icon 'VCS_COMMIT_ICON')%0.$VCS_CHANGESET_HASH_LENGTH""i "
+    VCS_CHANGESET_PREFIX="$(print_icon 'VCS_COMMIT_ICON')%0.$POWERLEVEL9K_VCS_INTERNAL_HASH_LENGTH""i "
   fi
 
   zstyle ':vcs_info:*' enable git hg

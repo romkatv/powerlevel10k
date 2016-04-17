@@ -74,7 +74,7 @@ function +vi-git-tagname() {
       # exists, so we have to manually retrieve it and clobber the branch
       # string.
       local revision
-      revision=$(git rev-list -n 1 --abbrev-commit --abbrev=8 HEAD)
+      revision=$(git rev-list -n 1 --abbrev-commit --abbrev=${POWERLEVEL9K_VCS_INTERNAL_HASH_LENGTH} HEAD)
       hook_com[branch]="$(print_icon 'VCS_BRANCH_ICON')${revision} $(print_icon 'VCS_TAG_ICON')${tag}"
     else
       # We are on both a tag and a branch; print both by appending the tag name.
