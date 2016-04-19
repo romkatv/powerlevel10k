@@ -288,6 +288,18 @@ right_prompt_segment() {
 # right-left but reads the opposite, this isn't necessary for the other side.
 CURRENT_BG='NONE'
 
+# Anaconda Environment
+prompt_anaconda() {
+  if $(hash ack 2>/dev/null); then
+    local active_conda_env=$(where conda | ack -o '(?<=envs/)[\w-]+(?=/bin)')
+  else
+    local active_conda_env=$(where conda | grep -o -P '(?<=envs/)[\w-]+(?=/bin)')
+  fi
+  if [[ -n $active_conda_env ]]; then
+    "$1_prompt_segment" "$0" "$2" "green" "black" "($active_conda_env)" ""
+  fi
+}
+
 # AWS Profile
 prompt_aws() {
   local aws_profile="$AWS_DEFAULT_PROFILE"

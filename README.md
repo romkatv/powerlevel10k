@@ -115,6 +115,7 @@ The segments that are currently available are:
     * `symfony2_version` - Show the current Symfony2 version, if you are in a Symfony2-Project dir.
 * **Python Segments:**
     * `virtualenv` - Your Python [VirtualEnv](https://virtualenv.pypa.io/en/latest/).
+    * `anaconda` - Your active [Anaconda](https://www.continuum.io/why-anaconda) environment.
 * **Ruby Segments:**
     * [`chruby`](#chruby) - Ruby environment information using `chruby` (if one is active).
     * [`rbenv`](#rbenv) - Ruby environment information using `rbenv` (if one is active).
@@ -135,6 +136,16 @@ The segments that are currently available are:
 
 ---------------------------------------------------------------------------------
 
+
+##### anaconda
+
+This segment shows your active anaconda environment.
+
+*Note: This segment relies on a perl-regex with lookbehind.
+If `ack` is not available the segment will try to use `grep`.
+Recent versions of grep offer a `-P` option to handle such things.
+On OSX, however, you want to install gnu-grep (e.g. via `brew install grep`)
+and alias the newly installed `ggrep` to `grep`. Alternatively, `brew install ack`.*
 
 ##### aws
 
