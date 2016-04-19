@@ -120,7 +120,7 @@ The segments that are currently available are:
     * [`rbenv`](#rbenv) - Ruby environment information using `rbenv` (if one is active).
     * [`rspec_stats`](#rspec_stats) - Show a ratio of test classes vs code classes for RSpec.
 * **Rust Segments:**
-    * `rust_version` - Display the current rust version.
+    * `rust_version` - Display the current rust version and [logo](https://www.rust-lang.org/logos/rust-logo-blk.svg).
 
 **Cloud Segments:**
 * **AWS Segments:**
