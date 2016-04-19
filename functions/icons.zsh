@@ -122,7 +122,7 @@ case $POWERLEVEL9K_MODE in
       VCS_GIT_ICON                   $'\UF113 '             # 
       VCS_HG_ICON                    $'\UF0C3 '             # 
       RUST_ICON                      $'\UE6A8'              #  
-	  )
+    )
   ;;
   *)
     # Powerline-Patched Font required!
