@@ -69,6 +69,7 @@ case $POWERLEVEL9K_MODE in
       VCS_REMOTE_BRANCH_ICON         ' '$'\UE804 '          # 
       VCS_GIT_ICON                   $'\UE20E '             # 
       VCS_HG_ICON                    $'\UE1C3 '             # 
+	  RUST_ICON                      ''                     
     )
   ;;
   'awesome-fontconfig')
@@ -120,6 +121,7 @@ case $POWERLEVEL9K_MODE in
       VCS_REMOTE_BRANCH_ICON         ' '$'\UF204 '          # 
       VCS_GIT_ICON                   $'\UF113 '             # 
       VCS_HG_ICON                    $'\UF0C3 '             # 
+      RUST_ICON                      $'\UE6A8'              #  
     )
   ;;
   *)
@@ -171,6 +173,7 @@ case $POWERLEVEL9K_MODE in
       VCS_REMOTE_BRANCH_ICON         $'\u2192'              # →
       VCS_GIT_ICON                   ''
       VCS_HG_ICON                    ''
+	  RUST_ICON                      ''
     )
   ;;
 esac
