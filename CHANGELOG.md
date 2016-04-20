@@ -21,7 +21,7 @@ That said, the variables `POWERLEVEL9K_VCS_FOREGROUND` and
 the proper variable `POWERLEVEL9K_VCS_<STATE>_FOREGROUND` to change
 foreground color.
 
-### `aws_eb_env` added
+### New segment `aws_eb_env` added
 
 This segment displays the current Elastic Beanstalk environment.
 
@@ -34,7 +34,7 @@ variable is void.
 
 There is now a path shortening strategy that will use the `package.json` file to shorten your directory path. See the documentation for the `dir` segment for more details.
 
-### `chruby` Segment
+### New segment `chruby` added
 
 Added new `chruby` segment to support this version manager.
 
@@ -42,7 +42,7 @@ Added new `chruby` segment to support this version manager.
 
 Improvements to speed / reliability.
 
-### `docker` Segment
+### New segment `docker` added
 
 Added new `docker` segment that will show your Docker machine.
 
