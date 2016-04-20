@@ -30,6 +30,11 @@ details.
 Also, the shorten delimiter was changed to an unicode ellipsis. It is configurable
 via `POWERLEVEL9K_SHORTEN_DELIMITER`.
 
+### `rbenv` changes
+
+The `rbenv` segment now makes use of the full rbenv command, so the correct
+ruby version is now shown if it differs from the globally one.
+
 ### `node`, `nvm` Segments
 
 Improvements to speed / reliability.
