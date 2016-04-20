@@ -47,9 +47,9 @@ Added new `chruby` segment to support this version manager.
 
 Improvements to speed / reliability.
 
-### New segment `docker` added
+### New segment `docker_machine` added
 
-Added new `docker` segment that will show your Docker machine.
+Added new `docker_machine` segment that will show your Docker machine.
 
 ### New segment `anaconda` added
 
