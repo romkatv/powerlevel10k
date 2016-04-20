@@ -1,5 +1,9 @@
 ## v0.4.0 (next)
 
+### Development changes
+
+From now on, development makes use of a CI system "travis".
+
 ### `vcs` changes
 
 The default state was renamed to `clean`. If you overrode foreground
