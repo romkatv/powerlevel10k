@@ -15,6 +15,12 @@ The foreground color of actionformat is now configurable via:
 POWERLEVEL9K_VCS_ACTIONFORMAT_FOREGROUND='green'
 ```
 
+Also, the vcs segment uses the foreground color it was configured to.
+That said, the variables `POWERLEVEL9K_VCS_FOREGROUND` and
+`POWERLEVEL9K_VCS_DARK_FOREGROUND` are no longer used. Instead use
+the proper variable `POWERLEVEL9K_VCS_<STATE>_FOREGROUND` to change
+foreground color.
+
 ### `aws_eb_env` added
 
 This segment displays the current Elastic Beanstalk environment.
