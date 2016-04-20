@@ -39,10 +39,6 @@ details.
 Also, the shorten delimiter was changed to an unicode ellipsis. It is configurable
 via `POWERLEVEL9K_SHORTEN_DELIMITER`.
 
-### New segment `chruby` added
-
-Added new `chruby` segment to support this version manager.
-
 ### `node`, `nvm` Segments
 
 Improvements to speed / reliability.
@@ -50,6 +46,10 @@ Improvements to speed / reliability.
 ### New segment `nodeenv` added
 
 Added new `nodeenv` segment that shows the currently used node environment.
+
+### New segment `chruby` added
+
+Added new `chruby` segment to support this version manager.
 
 ### New segment `docker_machine` added
 
