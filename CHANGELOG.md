@@ -21,10 +21,6 @@ That said, the variables `POWERLEVEL9K_VCS_FOREGROUND` and
 the proper variable `POWERLEVEL9K_VCS_<STATE>_FOREGROUND` to change
 foreground color.
 
-### New segment `aws_eb_env` added
-
-This segment displays the current Elastic Beanstalk environment.
-
 ### `ram` changes
 
 The `ram` segment was split up into `ram` and `swap`. The `POWERLEVEL9K_RAM_ELEMENTS`
@@ -46,6 +42,10 @@ Improvements to speed / reliability.
 ### New segment `nodeenv` added
 
 Added new `nodeenv` segment that shows the currently used node environment.
+
+### New segment `aws_eb_env` added
+
+This segment displays the current Elastic Beanstalk environment.
 
 ### New segment `chruby` added
 
