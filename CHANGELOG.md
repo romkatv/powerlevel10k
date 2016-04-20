@@ -46,6 +46,11 @@ Improvements to speed / reliability.
 
 Added new `docker` segment that will show your Docker machine.
 
+### New segment `anaconda` added
+
+A new segment `anaconda` was added that shows the current used
+anaconda environment.
+
 ## v0.3.2
 
 ### `vcs` changes
