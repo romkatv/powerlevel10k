@@ -47,6 +47,10 @@ Added new `chruby` segment to support this version manager.
 
 Improvements to speed / reliability.
 
+### New segment `nodeenv` added
+
+Added new `nodeenv` segment that shows the currently used node environment.
+
 ### New segment `docker_machine` added
 
 Added new `docker_machine` segment that will show your Docker machine.
