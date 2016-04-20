@@ -21,11 +21,6 @@ That said, the variables `POWERLEVEL9K_VCS_FOREGROUND` and
 the proper variable `POWERLEVEL9K_VCS_<STATE>_FOREGROUND` to change
 foreground color.
 
-### `ram` changes
-
-The `ram` segment was split up into `ram` and `swap`. The `POWERLEVEL9K_RAM_ELEMENTS`
-variable is void.
-
 ### `dir` Shortening Strategies
 
 There is now a path shortening strategy that will use the `package.json` file to
@@ -38,6 +33,16 @@ via `POWERLEVEL9K_SHORTEN_DELIMITER`.
 ### `node`, `nvm` Segments
 
 Improvements to speed / reliability.
+
+### `ram` changes
+
+The `ram` segment was split up into `ram` and `swap`. The
+`POWERLEVEL9K_RAM_ELEMENTS` variable is obsolete.
+
+### New segment `swap` added
+
+Due to the split up of the ram segment, this one was created. It
+shows the currently used swap size.
 
 ### New segment `nodeenv` added
 
