@@ -32,7 +32,12 @@ variable is void.
 
 ### `dir` Shortening Strategies
 
-There is now a path shortening strategy that will use the `package.json` file to shorten your directory path. See the documentation for the `dir` segment for more details.
+There is now a path shortening strategy that will use the `package.json` file to
+shorten your directory path. See the documentation for the `dir` segment for more
+details.
+
+Also, the shorten delimiter was changed to an unicode ellipsis. It is configurable
+via `POWERLEVEL9K_SHORTEN_DELIMITER`.
 
 ### New segment `chruby` added
 
