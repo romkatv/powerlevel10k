@@ -1,4 +1,4 @@
-## v0.4.0 (next)
+## v0.4.0
 
 ### Development changes
 
