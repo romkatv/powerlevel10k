@@ -580,12 +580,6 @@ prompt_load() {
   local current_state="unknown"
   local cores
 
-  if [[ "$OS" == "OSX" ]]; then
-    cores=$(sysctl -a | grep machdep.cpu)
-  else
-    cores=$(nproc)
-  fi
-
   typeset -AH load_states
   load_states=(
     'critical'      'red'
@@ -595,8 +589,10 @@ prompt_load() {
 
   if [[ "$OS" == "OSX" ]]; then
     load_avg_1min=$(sysctl vm.loadavg | grep -o -E '[0-9]+(\.|,)[0-9]+' | head -n 1)
+    cores=$(sysctl -n hw.physicalcpu)
   else
     load_avg_1min=$(grep -o "[0-9.]*" /proc/loadavg | head -n 1)
+    cores=$(nproc)
   fi
 
   # Replace comma
