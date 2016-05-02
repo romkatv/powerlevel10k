@@ -578,30 +578,35 @@ prompt_ip() {
 prompt_load() {
   # The load segment can have three different states
   local current_state="unknown"
+  local cores
+
   typeset -AH load_states
   load_states=(
     'critical'      'red'
     'warning'       'yellow'
     'normal'        'green'
   )
+
   if [[ "$OS" == "OSX" ]]; then
-    load_avg_5min=$(sysctl vm.loadavg | grep -o -E '[0-9]+(\.|,)[0-9]+' | head -n 1)
+    load_avg_1min=$(sysctl vm.loadavg | grep -o -E '[0-9]+(\.|,)[0-9]+' | head -n 1)
+    cores=$(sysctl -n hw.logicalcpu)
   else
-    load_avg_5min=$(grep -o "[0-9.]*" /proc/loadavg | head -n 1)
+    load_avg_1min=$(grep -o "[0-9.]*" /proc/loadavg | head -n 1)
+    cores=$(nproc)
   fi
 
   # Replace comma
-  load_avg_5min=${load_avg_5min//,/.}
+  load_avg_1min=${load_avg_1min//,/.}
 
-  if [[ "$load_avg_5min" -gt 10 ]]; then
+  if [[ "$load_avg_1min" -gt $(bc -l <<< "${cores} * 0.7") ]]; then
     current_state="critical"
-  elif [[ "$load_avg_5min" -gt 3 ]]; then
+  elif [[ "$load_avg_1min" -gt $(bc -l <<< "${cores} * 0.5") ]]; then
     current_state="warning"
   else
     current_state="normal"
   fi
 
-  "$1_prompt_segment" "${0}_${current_state}" "$2" "${load_states[$current_state]}" "$DEFAULT_COLOR" "$load_avg_5min" 'LOAD_ICON'
+  "$1_prompt_segment" "${0}_${current_state}" "$2" "${load_states[$current_state]}" "$DEFAULT_COLOR" "$load_avg_1min" 'LOAD_ICON'
 }
 
 # Node version
