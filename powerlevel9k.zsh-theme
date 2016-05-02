@@ -589,7 +589,7 @@ prompt_load() {
 
   if [[ "$OS" == "OSX" ]]; then
     load_avg_1min=$(sysctl vm.loadavg | grep -o -E '[0-9]+(\.|,)[0-9]+' | head -n 1)
-    cores=$(sysctl -n hw.physicalcpu)
+    cores=$(sysctl -n hw.logicalcpu)
   else
     load_avg_1min=$(grep -o "[0-9.]*" /proc/loadavg | head -n 1)
     cores=$(nproc)
