@@ -20,43 +20,44 @@
 #zstyle ':vcs_info:*+*:*' debug true
 #set -o xtrace
 
-# Check if the theme was called as a function (e.g., from prezto)
-if [[ $(whence -w prompt_powerlevel9k_setup) =~ "function" ]]; then
+# Try to set the installation path
+if [[ -n "$POWERLEVEL9K_INSTALLATION_PATH" ]]; then
+  # If an installation path was set manually,
+  # it should trump any other location found.
+  # Do nothing. This is all right, as we use the
+  # POWERLEVEL9K_INSTALLATION_PATH for further processing.
+elif [[ $(whence -w prompt_powerlevel9k_setup) =~ "function" ]]; then
+  # Check if the theme was called as a function (e.g., from prezto)
   autoload -U is-at-least
   if is-at-least 5.0.8; then
     # Try to find the correct path of the script.
-    0=$(whence -v $0 | sed "s/$0 is a shell function from //")
+    POWERLEVEL9K_INSTALLATION_PATH=$(whence -v $0 | sed "s/$0 is a shell function from //")
   elif [[ -f "${ZDOTDIR:-$HOME}/.zprezto/modules/prompt/init.zsh" ]]; then
     # If there is an prezto installation, we assume that powerlevel9k is linked there.
-    0="${ZDOTDIR:-$HOME}/.zprezto/modules/prompt/functions/prompt_powerlevel9k_setup"
-  else
-    # Fallback: specify an installation path!
-    if [[ -z "$POWERLEVEL9K_INSTALLATION_PATH" ]]; then
-      print -P "%F{red}We could not locate the installation path of powerlevel9k.%f"
-      print -P "Please specify by setting %F{blue}POWERLEVEL9K_INSTALLATION_PATH%f (full path incl. file name) at the very beginning of your ~/.zshrc"
-      return 1
-    elif [[ -L "$POWERLEVEL9K_INSTALLATION_PATH" ]]; then
-      # Symlink
-      0="$POWERLEVEL9K_INSTALLATION_PATH"
-    elif [[ -f "$POWERLEVEL9K_INSTALLATION_PATH" ]]; then
-      # File
-      0="$POWERLEVEL9K_INSTALLATION_PATH"
-    elif [[ -d "$POWERLEVEL9K_INSTALLATION_PATH" ]]; then
-      # Directory
-      0="${POWERLEVEL9K_INSTALLATION_PATH}/powerlevel9k.zsh-theme"
-    fi
+    POWERLEVEL9K_INSTALLATION_PATH="${ZDOTDIR:-$HOME}/.zprezto/modules/prompt/functions/prompt_powerlevel9k_setup"
   fi
+else
+  # Last resort: Set installation path is script path
+  POWERLEVEL9K_INSTALLATION_PATH="$0"
 fi
 
-# If this theme is sourced as a symlink, we need to locate the true URL
-if [[ -L $0 ]]; then
-  # Script is a symlink
-  filename="$(realpath -P $0 2>/dev/null || readlink -f $0 2>/dev/null || perl -MCwd=abs_path -le 'print abs_path readlink(shift);' $0 2>/dev/null)"
-elif [[ -f $0 ]]; then
+# Resolve the instllation path
+if [[ -L "$POWERLEVEL9K_INSTALLATION_PATH" ]]; then
+  # If this theme is sourced as a symlink, we need to locate the real URL
+  filename="$(realpath -P $POWERLEVEL9K_INSTALLATION_PATH 2>/dev/null || readlink -f $POWERLEVEL9K_INSTALLATION_PATH 2>/dev/null || perl -MCwd=abs_path -le 'print abs_path readlink(shift);' $POWERLEVEL9K_INSTALLATION_PATH 2>/dev/null)"
+elif [[ -d "$POWERLEVEL9K_INSTALLATION_PATH" ]]; then
+  # Directory
+  filename="${POWERLEVEL9K_INSTALLATION_PATH}/powerlevel9k.zsh-theme"
+elif [[ -f "$POWERLEVEL9K_INSTALLATION_PATH" ]]; then
   # Script is a file
-  filename="$0"
+  filename="$POWERLEVEL9K_INSTALLATION_PATH"
+elif [[ -z "$POWERLEVEL9K_INSTALLATION_PATH" ]]; then
+  # Fallback: specify an installation path!
+  print -P "%F{red}We could not locate the installation path of powerlevel9k.%f"
+  print -P "Please specify by setting %F{blue}POWERLEVEL9K_INSTALLATION_PATH%f (full path incl. file name) at the very beginning of your ~/.zshrc"
+  return 1
 else
-  print -P "%F{red}Script location could not be found!%f"
+  print -P "%F{red}Script location could not be found! Maybe your %F{blue}POWERLEVEL9K_INSTALLATION_PATH%F{red} is not correct?%f"
   return 1
 fi
 script_location="$(dirname $filename)"
