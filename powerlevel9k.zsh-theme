@@ -444,8 +444,11 @@ prompt_context() {
 # the output in a segment.
 prompt_custom() {
   local command=POWERLEVEL9K_CUSTOM_$3:u
+  local segment_content="$(eval ${(P)command})"
 
-  "$1_prompt_segment" "${0}_${3:u}" "$2" $DEFAULT_COLOR_INVERTED $DEFAULT_COLOR "$(eval ${(P)command})"
+  if [[ -n $segment_content ]]; then
+    "$1_prompt_segment" "${0}_${3:u}" "$2" $DEFAULT_COLOR_INVERTED $DEFAULT_COLOR "$segment_content"
+  fi
 }
 
 # Dir: current working directory
