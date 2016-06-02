@@ -475,6 +475,10 @@ prompt_dir() {
             package_path="."
             subdirectory_path=""
           else
+            # Handle the edge case where $repo_path is '.' due to the current directory being the .git directory.
+            if [[ "$repo_path" == "." ]]; then
+              repo_path=$(pwd)
+            fi
             # If the current path is something else, get the path to the package.json
             # file by finding the repo path and removing the '.git` from the path
             package_path=${repo_path:0:-4}
