@@ -489,7 +489,7 @@ prompt_dir() {
 
         # Parse the 'name' from the package.json; if there are any problems, just
         # print the file path
-        if name=$( cat "$package_path/package.json" 2> /dev/null | grep "\"name\""); then
+        if name=$( cat "$package_path/package.json" 2> /dev/null | grep -m 1 "\"name\""); then
           name=$(echo $name | awk -F ':' '{print $2}' | awk -F '"' '{print $2}')
 
           # Instead of printing out the full path, print out the name of the package
