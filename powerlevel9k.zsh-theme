@@ -467,30 +467,18 @@ prompt_dir() {
         local name repo_path package_path current_dir zero
 
         # Get the path of the Git repo, which should have the package.json file
-        if repo_path=$(git rev-parse --git-dir 2>/dev/null); then
-          if [[ "$repo_path" == ".git" ]]; then
-            # If the current path is the root of the project, then the package path is
-            # the current directory and we don't want to append anything to represent
-            # the path to a subdirectory
-            package_path="."
-            subdirectory_path=""
-          else
-            # Handle the edge case where $repo_path is '.' due to the current directory being the .git directory.
-            if [[ "$repo_path" == "." ]]; then
-              repo_path=$(pwd)
-            fi
-            # If the current path is something else, get the path to the package.json
-            # file by finding the repo path and removing the '.git` from the path
-            package_path=${repo_path:0:-4}
-            zero='%([BSUbfksu]|([FB]|){*})'
-            current_dir=$(pwd)
-            # Then, find the length of the package_path string, and save the
-            # subdirectory path as a substring of the current directory's path from 0
-            # to the length of the package path's string
-            subdirectory_path=$(truncatePathFromRight "/${current_dir:${#${(S%%)package_path//$~zero/}}}")
-          fi
+        if [[ $(git rev-parse --is-inside-work-tree 2> /dev/null) == "true" ]]; then
+          package_path=$(git rev-parse --show-toplevel)
+        elif [[ $(git rev-parse --is-inside-git-dir 2> /dev/null) == "true" ]]; then
+          package_path=${$(pwd)%%/.git*}
         fi
 
+        zero='%([BSUbfksu]|([FB]|){*})'
+        current_dir=$(pwd)
+        # Then, find the length of the package_path string, and save the
+        # subdirectory path as a substring of the current directory's path from 0
+        # to the length of the package path's string
+        subdirectory_path=$(truncatePathFromRight "${current_dir:${#${(S%%)package_path//$~zero/}}}")
         # Parse the 'name' from the package.json; if there are any problems, just
         # print the file path
         if name=$( cat "$package_path/package.json" 2> /dev/null | grep "\"name\""); then
