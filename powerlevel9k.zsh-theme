@@ -360,7 +360,7 @@ prompt_battery() {
     local time_remaining=$(echo $raw_data | grep TimeRemaining | awk '{ print $5 }')
     if [[ -n $time_remaining ]]; then
       # this value is set to a very high number when the system is calculating
-      [[ $time_remaining -gt 10000 ]] && local tstring="..." || local tstring=${(f)$(date -u -r $(($time_remaining * 60)) +%k:%M)}
+      [[ $time_remaining -gt 10000 ]] && local tstring="..." || local tstring=${(f)$(/bin/date -u -r $(($time_remaining * 60)) +%k:%M)}
     fi
 
     # Get charge values
@@ -1088,3 +1088,4 @@ powerlevel9k_init() {
 }
 
 powerlevel9k_init "$@"
+
