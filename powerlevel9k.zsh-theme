@@ -1052,11 +1052,21 @@ powerlevel9k_init() {
   # Display a warning if the terminal does not support 256 colors
   local term_colors
   term_colors=$(echotc Co)
-  if (( term_colors < 256 )); then
+  if (( $term_colors < 256 )); then
     print -P "%F{red}WARNING!%f Your terminal appears to support less than 256 colors!"
     print -P "If your terminal supports 256 colors, please export the appropriate environment variable"
     print -P "_before_ loading this theme in your \~\/.zshrc. In most terminal emulators, putting"
     print -P "%F{blue}export TERM=\"xterm-256color\"%f at the top of your \~\/.zshrc is sufficient."
+  fi
+
+  # If the terminal `LANG` is set to `C`, this theme will not work at all.
+  local term_lang
+  term_lang=$(echo $LANG)
+  if [[ $term_lang == 'C' ]]; then
+      print -P "\t%F{red}WARNING!%f Your terminal's 'LANG' is set to 'C', which breaks this theme!"
+      print -P "\t%F{red}WARNING!%f Please set your 'LANG' to a UTF-8 language, like 'en_US.UTF-8'"
+      print -P "\t%F{red}WARNING!%f _before_ loading this theme in your \~\.zshrc. Putting"
+      print -P "\t%F{red}WARNING!%f %F{blue}export LANG=\"en_US.UTF-8\"%f at the top of your \~\/.zshrc is sufficient."
   fi
 
   # Display a warning if deprecated segments are in use.
