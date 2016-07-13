@@ -420,6 +420,8 @@ prompt_battery() {
   set_default POWERLEVEL9K_BATTERY_VERBOSE true
   if [[ "$POWERLEVEL9K_BATTERY_VERBOSE" == true ]]; then
     message="$bat_percent%%$remain"
+  else
+    message="$bat_percent%%"
   fi
 
   # Draw the prompt_segment
