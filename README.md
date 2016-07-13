@@ -348,7 +348,7 @@ customization is provided via:
 |`POWERLEVEL9K_SHOW_CHANGESET`|`false`|Set to `true` to display the hash / changeset in the segment.|
 |`POWERLEVEL9K_CHANGESET_HASH_LENGTH`|`12`|How many characters of the hash / changeset to display in the segment.|
 |`POWERLEVEL9K_VCS_SHOW_SUBMODULE_DIRTY`|`true`|Set to `false` to not reflect submodule status in the top-level repository prompt.|
-|`POWERLEVEL9K_VCS_HIDE_TAGS`|unset|Set to `true` to stop tags being displayed in the segment.|
+|`POWERLEVEL9K_VCS_HIDE_TAGS`|`false`|Set to `true` to stop tags being displayed in the segment.|
 
 
 ##### vcs symbols

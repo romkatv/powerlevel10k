@@ -60,29 +60,30 @@ function +vi-git-remotebranch() {
     fi
 }
 
+set_default POWERLEVEL9K_VCS_HIDE_TAGS false
 function +vi-git-tagname() {
-  if [[ -z "${POWERLEVE9K_VCS_HIDE_TAGS}" ]]; then
-    # If we are on a tag, append the tagname to the current branch string.
-    local tag
-    tag=$(git describe --tags --exact-match HEAD 2>/dev/null)
+    if [[ "$POWERLEVE9K_VCS_HIDE_TAGS" == "false" ]]; then
+        # If we are on a tag, append the tagname to the current branch string.
+        local tag
+        tag=$(git describe --tags --exact-match HEAD 2>/dev/null)
 
-    if [[ -n "${tag}" ]] ; then
-      # There is a tag that points to our current commit. Need to determine if we
-      # are also on a branch, or are in a DETACHED_HEAD state.
-      if [[ -z $(git symbolic-ref HEAD 2>/dev/null) ]]; then
-        # DETACHED_HEAD state. We want to append the tag name to the commit hash
-        # and print it. Unfortunately, `vcs_info` blows away the hash when a tag
-        # exists, so we have to manually retrieve it and clobber the branch
-        # string.
-        local revision
-        revision=$(git rev-list -n 1 --abbrev-commit --abbrev=${POWERLEVEL9K_VCS_INTERNAL_HASH_LENGTH} HEAD)
-        hook_com[branch]="$(print_icon 'VCS_BRANCH_ICON')${revision} $(print_icon 'VCS_TAG_ICON')${tag}"
-      else
-        # We are on both a tag and a branch; print both by appending the tag name.
-        hook_com[branch]+=" $(print_icon 'VCS_TAG_ICON')${tag}"
-      fi
+        if [[ -n "${tag}" ]] ; then
+            # There is a tag that points to our current commit. Need to determine if we
+            # are also on a branch, or are in a DETACHED_HEAD state.
+            if [[ -z $(git symbolic-ref HEAD 2>/dev/null) ]]; then
+                # DETACHED_HEAD state. We want to append the tag name to the commit hash
+                # and print it. Unfortunately, `vcs_info` blows away the hash when a tag
+                # exists, so we have to manually retrieve it and clobber the branch
+                # string.
+                local revision
+                revision=$(git rev-list -n 1 --abbrev-commit --abbrev=${POWERLEVEL9K_VCS_INTERNAL_HASH_LENGTH} HEAD)
+                hook_com[branch]="$(print_icon 'VCS_BRANCH_ICON')${revision} $(print_icon 'VCS_TAG_ICON')${tag}"
+            else
+                # We are on both a tag and a branch; print both by appending the tag name.
+                hook_com[branch]+=" $(print_icon 'VCS_TAG_ICON')${tag}"
+            fi
+        fi
     fi
-  fi
 }
 
 # Show count of stashed changes
