@@ -402,3 +402,6 @@ portion of the wiki to get going.
 
 [The Wiki also has a ton of other useful
 information!](https://github.com/bhilburn/powerlevel9k/wiki)
+
+### License
+MIT
