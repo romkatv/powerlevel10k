@@ -140,13 +140,18 @@ The segments that are currently available are:
 
 ##### anaconda
 
-This segment shows your active anaconda environment.
+This segment shows your active anaconda environment. It relies on the
+`CONDA_ENV_PATH` environment variable to be set which happens when you properly
+`source activate` an environment.
 
-*Note: This segment relies on a perl-regex with lookbehind.
-If `ack` is not available the segment will try to use `grep`.
-Recent versions of grep offer a `-P` option to handle such things.
-On OSX, however, you want to install gnu-grep (e.g. via `brew install grep`)
-and alias the newly installed `ggrep` to `grep`. Alternatively, `brew install ack`.*
+
+| Variable | Default Value | Description |
+|----------|---------------|-------------|
+|`POWERLEVEL9K_ANACONDA_BG_COLOR`|"green"|Background color of the segment.|
+|`POWERLEVEL9K_ANACONDA_FG_COLOR`|"black"|Foreground color of the segment.|
+|`POWERLEVEL9K_ANACONDA_PREFIX`|""|Prefix before the environment name.|
+|`POWERLEVEL9K_ANACONDA_LEFT_DELIMITER`|"("|The left delimiter just before the environment name.|
+|`POWERLEVEL9K_ANACONDA_RIGHT_DELIMITER`|")"|The right delimiter just after the environment name.|
 
 ##### aws
 
