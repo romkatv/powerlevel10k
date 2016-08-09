@@ -1114,6 +1114,13 @@ prompt_swift_version() {
   "$1_prompt_segment" "$0" "$2" "magenta" "white" "${swift_version}" 'SWIFT_ICON'
 }
 
+# dir_permision: Display information about the user's permission to write in the current directory
+prompt_dir_permission() {
+  if [[ ! -w "$PWD" ]]; then
+    "$1_prompt_segment" "$0_FORBIDDEN" "$2" "red" "226" "" 'LOCK_ICON'
+  fi
+}
+
 ################################################################
 # Prompt processing and drawing
 ################################################################
@@ -1240,4 +1247,3 @@ prompt_powerlevel9k_setup() {
 }
 
 prompt_powerlevel9k_setup "$@"
-
