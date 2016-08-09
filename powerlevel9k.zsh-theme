@@ -571,8 +571,7 @@ prompt_custom() {
 set_default POWERLEVEL9K_DIR_PATH_SEPARATOR "/"
 prompt_dir() {
   local current_path='%~'
-  if [[ -n "$POWERLEVEL9K_SHORTEN_DIR_LENGTH" ]]; then
-
+  if [[ -n "$POWERLEVEL9K_SHORTEN_DIR_LENGTH" || "$POWERLEVEL9K_SHORTEN_STRATEGY" == "truncate_with_root_marker" ]]; then
     set_default POWERLEVEL9K_SHORTEN_DELIMITER $'\U2026'
 
     case "$POWERLEVEL9K_SHORTEN_STRATEGY" in
@@ -608,6 +607,20 @@ prompt_dir() {
           current_path="`echo $name | tr -d '"'`$subdirectory_path"
         else
           current_path=$(truncatePathFromRight "$(pwd | sed -e "s,^$HOME,~,")" )
+        fi
+      ;;
+      truncate_with_root_marker)
+        local dir_truncate_root
+
+        dir_truncate_root=$(upsearch $POWERLEVEL9K_ROOT_MARKER_FILE)
+        zero='%([BSUbfksu]|([FB]|){*})'
+
+        if [[ "$dir_truncate_root" == "/" || "$dir_truncate_root" == "$HOME" ]]; then
+          current_path='%~'
+        elif [[ "$dir_truncate_root" == "$HOME"* ]]; then
+          current_path="~/$POWERLEVEL9K_SHORTEN_DELIMITER/${dir_truncate_root##*/}${PWD:${#${(S%%)dir_truncate_root//$~zero/}}}"
+        else
+          current_path="/$POWERLEVEL9K_SHORTEN_DELIMITER/${dir_truncate_root##*/}${PWD:${#${(S%%)dir_truncate_root//$~zero/}}}"
         fi
       ;;
       *)

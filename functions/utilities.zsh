@@ -208,3 +208,18 @@ function truncatePathFromRight() {
   echo $1 | sed $SED_EXTENDED_REGEX_PARAMETER \
  "s@(([^/]{$((POWERLEVEL9K_SHORTEN_DIR_LENGTH))})([^/]{$delim_len}))[^/]+/@\2$POWERLEVEL9K_SHORTEN_DELIMITER/@g"
 }
+
+# Search recursively in parent folders for given file.
+function upsearch () {
+  if test -e "$1"; then
+    echo "$PWD"
+  else
+    if [[ "$PWD" == "/" || "$PWD" == "$HOME" ]]; then
+      echo "$PWD";
+    else
+      pushd .. > /dev/null
+      upsearch "$1"
+      popd > /dev/null
+    fi
+  fi
+}
