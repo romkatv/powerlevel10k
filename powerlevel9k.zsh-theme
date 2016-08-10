@@ -571,7 +571,7 @@ prompt_custom() {
 set_default POWERLEVEL9K_DIR_PATH_SEPARATOR "/"
 prompt_dir() {
   local current_path='%~'
-  if [[ -n "$POWERLEVEL9K_SHORTEN_DIR_LENGTH" || "$POWERLEVEL9K_SHORTEN_STRATEGY" == "truncate_with_root_marker" ]]; then
+  if [[ -n "$POWERLEVEL9K_SHORTEN_DIR_LENGTH" || "$POWERLEVEL9K_SHORTEN_STRATEGY" == "truncate_with_folder_marker" ]]; then
     set_default POWERLEVEL9K_SHORTEN_DELIMITER $'\U2026'
 
     case "$POWERLEVEL9K_SHORTEN_STRATEGY" in
@@ -609,19 +609,25 @@ prompt_dir() {
           current_path=$(truncatePathFromRight "$(pwd | sed -e "s,^$HOME,~,")" )
         fi
       ;;
-      truncate_with_root_marker)
-        local dir_truncate_root
+      truncate_with_folder_marker)
+        local last_marked_folder marked_folder zero
+        set_default POWERLEVEL9K_SHORTEN_FOLDER_MARKER ".shorten_folder_marker"
 
-        dir_truncate_root=$(upsearch $POWERLEVEL9K_ROOT_MARKER_FILE)
+        for marked_folder in $(upsearch $POWERLEVEL9K_SHORTEN_FOLDER_MARKER); do
+          if [[ "$marked_folder" == "/" ]]; then
+            current_path="/"
+          elif [[ "$marked_folder" == "$HOME" ]]; then
+            current_path="~"
+          elif [[ "${marked_folder%/*}" == $last_marked_folder ]]; then
+            current_path="${current_path%/}/${marked_folder##*/}"
+          else
+            current_path="${current_path%/}/$POWERLEVEL9K_SHORTEN_DELIMITER/${marked_folder##*/}"
+          fi
+          last_marked_folder=$marked_folder
+        done
+
         zero='%([BSUbfksu]|([FB]|){*})'
-
-        if [[ "$dir_truncate_root" == "/" || "$dir_truncate_root" == "$HOME" || "${dir_truncate_root%/*}" == "$HOME" || ${dir_truncate_root%/*} == "/" ]]; then
-          current_path='%~'
-        elif [[ "$dir_truncate_root" == "$HOME"* ]]; then
-          current_path="~/$POWERLEVEL9K_SHORTEN_DELIMITER/${dir_truncate_root##*/}${PWD:${#${(S%%)dir_truncate_root//$~zero/}}}"
-        else
-          current_path="/$POWERLEVEL9K_SHORTEN_DELIMITER/${dir_truncate_root##*/}${PWD:${#${(S%%)dir_truncate_root//$~zero/}}}"
-        fi
+        current_path=$current_path${PWD:${#${(S%%)last_marked_folder//$~zero/}}}
       ;;
       *)
         current_path="%$((POWERLEVEL9K_SHORTEN_DIR_LENGTH+1))(c:$POWERLEVEL9K_SHORTEN_DELIMITER/:)%${POWERLEVEL9K_SHORTEN_DIR_LENGTH}c"

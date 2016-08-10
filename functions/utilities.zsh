@@ -211,15 +211,16 @@ function truncatePathFromRight() {
 
 # Search recursively in parent folders for given file.
 function upsearch () {
-  if test -e "$1"; then
+  if [[ "$PWD" == "$HOME" || "$PWD" == "/" ]]; then
+    echo "$PWD"
+  elif test -e "$1"; then
+    pushd .. > /dev/null
+    upsearch "$1"
+    popd > /dev/null
     echo "$PWD"
   else
-    if [[ "$PWD" == "/" || "$PWD" == "$HOME" ]]; then
-      echo "$PWD";
-    else
-      pushd .. > /dev/null
-      upsearch "$1"
-      popd > /dev/null
-    fi
+    pushd .. > /dev/null
+    upsearch "$1"
+    popd > /dev/null
   fi
 }
