@@ -615,7 +615,7 @@ prompt_dir() {
         dir_truncate_root=$(upsearch $POWERLEVEL9K_ROOT_MARKER_FILE)
         zero='%([BSUbfksu]|([FB]|){*})'
 
-        if [[ "$dir_truncate_root" == "/" || "$dir_truncate_root" == "$HOME" ]]; then
+        if [[ "$dir_truncate_root" == "/" || "$dir_truncate_root" == "$HOME" || "${dir_truncate_root%/*}" == "$HOME" || ${dir_truncate_root%/*} == "/" ]]; then
           current_path='%~'
         elif [[ "$dir_truncate_root" == "$HOME"* ]]; then
           current_path="~/$POWERLEVEL9K_SHORTEN_DELIMITER/${dir_truncate_root##*/}${PWD:${#${(S%%)dir_truncate_root//$~zero/}}}"
