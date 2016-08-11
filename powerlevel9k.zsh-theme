@@ -861,7 +861,7 @@ prompt_vcs() {
     VCS_CHANGESET_PREFIX="$(print_icon 'VCS_COMMIT_ICON')%0.$POWERLEVEL9K_VCS_INTERNAL_HASH_LENGTH""i "
   fi
 
-  zstyle ':vcs_info:*' enable git hg
+  zstyle ':vcs_info:*' enable git hg svn
   zstyle ':vcs_info:*' check-for-changes true
 
   VCS_DEFAULT_FORMAT="$VCS_CHANGESET_PREFIX%b%c%u%m"
