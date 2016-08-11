@@ -837,7 +837,7 @@ prompt_todo() {
 set_default POWERLEVEL9K_VCS_ACTIONFORMAT_FOREGROUND "red"
 # Default: Just display the first 8 characters of our changeset-ID.
 set_default POWERLEVEL9K_VCS_INTERNAL_HASH_LENGTH "8"
-prompt_vcs() {
+powerlevel9k_vcs_init() {
   if [[ -n "$POWERLEVEL9K_CHANGESET_HASH_LENGTH" ]]; then
     POWERLEVEL9K_VCS_INTERNAL_HASH_LENGTH="$POWERLEVEL9K_CHANGESET_HASH_LENGTH"
   fi
@@ -849,8 +849,7 @@ prompt_vcs() {
   VCS_WORKDIR_HALF_DIRTY=false
 
   # The vcs segment can have three different states - defaults to 'clean'.
-  local current_state=""
-  typeset -AH vcs_states
+  typeset -gAH vcs_states
   vcs_states=(
     'clean'         'green'
     'modified'      'yellow'
@@ -890,6 +889,12 @@ prompt_vcs() {
   if [[ "$POWERLEVEL9K_SHOW_CHANGESET" == true ]]; then
     zstyle ':vcs_info:*' get-revision true
   fi
+}
+
+prompt_vcs() {
+  VCS_WORKDIR_DIRTY=false
+  VCS_WORKDIR_HALF_DIRTY=false
+  current_state=""
 
   # Actually invoke vcs_info manually to gather all information.
   vcs_info
@@ -954,11 +959,8 @@ prompt_pyenv() {
 ################################################################
 # Prompt processing and drawing
 ################################################################
-
 # Main prompt
 build_left_prompt() {
-  defined POWERLEVEL9K_LEFT_PROMPT_ELEMENTS || POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(context dir rbenv vcs)
-
   local index=1
   for element in "${POWERLEVEL9K_LEFT_PROMPT_ELEMENTS[@]}"; do
     # Remove joined information in direct calls
@@ -980,8 +982,6 @@ build_left_prompt() {
 
 # Right prompt
 build_right_prompt() {
-  defined POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS || POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(status root_indicator background_jobs history time)
-
   local index=1
   for element in "${POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS[@]}"; do
     # Remove joined information in direct calls
@@ -1050,6 +1050,9 @@ powerlevel9k_init() {
       print -P "\t%F{red}WARNING!%f %F{blue}export LANG=\"en_US.UTF-8\"%f at the top of your \~\/.zshrc is sufficient."
   fi
 
+  defined POWERLEVEL9K_LEFT_PROMPT_ELEMENTS || POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(context dir rbenv vcs)
+  defined POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS || POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(status root_indicator background_jobs history time)
+
   # Display a warning if deprecated segments are in use.
   typeset -AH deprecated_segments
   # old => new
@@ -1066,6 +1069,10 @@ powerlevel9k_init() {
 
   # initialize colors
   autoload -U colors && colors
+
+  if segment_in_use "vcs"; then
+    powerlevel9k_vcs_init
+  fi
 
   # initialize hooks
   autoload -Uz add-zsh-hook

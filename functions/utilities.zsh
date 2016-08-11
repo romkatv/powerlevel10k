@@ -122,6 +122,20 @@ if [[ "$OS" == 'OSX' ]]; then
   fi
 fi
 
+# Determine if the passed segment is used in the prompt
+#
+# Pass the name of the segment to this function to test for its presence in
+# either the LEFT or RIGHT prompt arrays.
+#    * $1: The segment to be tested.
+segment_in_use() {
+    local key=$1
+    if [[ -n "${POWERLEVEL9K_LEFT_PROMPT_ELEMENTS[(r)$key]}" ]] || [[ -n "${POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS[(r)$key]}" ]]; then
+        return 0
+    else
+        return 1
+    fi
+}
+
 # Print a deprecation warning if an old segment is in use.
 # Takes the name of an associative array that contains the
 # deprecated segments as keys, the values contain the new
@@ -131,7 +145,7 @@ print_deprecation_warning() {
   raw_deprecated_segments=(${(kvP@)1})
 
   for key in ${(@k)raw_deprecated_segments}; do
-    if [[ -n "${POWERLEVEL9K_LEFT_PROMPT_ELEMENTS[(r)$key]}" ]] || [[ -n "${POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS[(r)$key]}" ]]; then
+    if segment_in_use $key; then
       # segment is deprecated
       print -P "%F{yellow}Warning!%f The '$key' segment is deprecated. Use '%F{blue}${raw_deprecated_segments[$key]}%f' instead. For more informations, have a look at the CHANGELOG.md."
     fi
