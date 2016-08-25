@@ -113,11 +113,25 @@ function +vi-vcs-detect-changes() {
     vcs_visual_identifier='VCS_GIT_ICON'
   elif [[ "${hook_com[vcs]}" == "hg" ]]; then
     vcs_visual_identifier='VCS_HG_ICON'
+#  elif [[ "${hook_com[vcs]}" == "svn" ]]; then
+#    vcs_visual_identifier='VCS_SVN_ICON'
   fi
 
   if [[ -n "${hook_com[staged]}" ]] || [[ -n "${hook_com[unstaged]}" ]]; then
     VCS_WORKDIR_DIRTY=true
   else
     VCS_WORKDIR_DIRTY=false
+  fi
+}
+
+function +vi-svn-detect-changes() {
+  local svn_status=$(svn status)
+  if [[ -n "$(echo "$svn_status" | grep \^\?)" ]]; then
+    VCS_WORKDIR_DIRTY=true
+  elif [[ -n "$(echo "$svn_status" | grep \^\A)" ]]; then
+    VCS_WORKDIR_HALF_DIRTY=true
+  else
+    VCS_WORKDIR_DIRTY=false
+    VCS_WORKDIR_HALF_DIRTY=false
   fi
 }
