@@ -127,11 +127,11 @@ function +vi-vcs-detect-changes() {
 function +vi-svn-detect-changes() {
   local svn_status=$(svn status)
   if [[ -n "$(echo "$svn_status" | grep \^\?)" ]]; then
+    hook_com[unstaged]+=" $(print_icon 'VCS_STASH_ICON')"
     VCS_WORKDIR_HALF_DIRTY=true
-  elif [[ -n "$(echo "$svn_status" | grep \^\A)" ]]; then
+  fi
+  if [[ -n "$(echo "$svn_status" | grep \^\A)" ]]; then
     VCS_WORKDIR_DIRTY=true
-  else
-    VCS_WORKDIR_DIRTY=false
-    VCS_WORKDIR_HALF_DIRTY=false
+    hook_com[unstaged]+=" $(print_icon 'VCS_STAGED_ICON')"
   fi
 }
