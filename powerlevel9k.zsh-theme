@@ -296,10 +296,9 @@ prompt_anaconda() {
   _path=$CONDA_ENV_PATH$CONDA_PREFIX
   if ! [ -z "$_path" ]; then
     # config - can be overwritten in users' zshrc file.
-    set_default POWERLEVEL9K_ANACONDA_PREFIX ""
     set_default POWERLEVEL9K_ANACONDA_LEFT_DELIMITER "("
     set_default POWERLEVEL9K_ANACONDA_RIGHT_DELIMITER ")"
-    "$1_prompt_segment" "$0" "$2" "$3" "$4" "$POWERLEVEL9K_ANACONDA_PREFIX$POWERLEVEL9K_ANACONDA_LEFT_DELIMITER$(basename $_path)$POWERLEVEL9K_ANACONDA_RIGHT_DELIMITER" ""
+    "$1_prompt_segment" "$0" "$2" "$3" "$4" "$POWERLEVEL9K_ANACONDA_LEFT_DELIMITER$(basename $_path)$POWERLEVEL9K_ANACONDA_RIGHT_DELIMITER" 'PYTHON_ICON'
   fi
 }
 
