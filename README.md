@@ -147,8 +147,8 @@ This segment shows your active anaconda environment. It relies on the
 
 | Variable | Default Value | Description |
 |----------|---------------|-------------|
-|`POWERLEVEL9K_ANACONDA_BG_COLOR`|"green"|Background color of the segment.|
-|`POWERLEVEL9K_ANACONDA_FG_COLOR`|"black"|Foreground color of the segment.|
+|`POWERLEVEL9K_ANACONDA_BACKGROUND`|"green"|Background color of the segment.|
+|`POWERLEVEL9K_ANACONDA_FOREGROUND`|"black"|Foreground color of the segment.|
 |`POWERLEVEL9K_ANACONDA_PREFIX`|""|Prefix before the environment name.|
 |`POWERLEVEL9K_ANACONDA_LEFT_DELIMITER`|"("|The left delimiter just before the environment name.|
 |`POWERLEVEL9K_ANACONDA_RIGHT_DELIMITER`|")"|The right delimiter just after the environment name.|
