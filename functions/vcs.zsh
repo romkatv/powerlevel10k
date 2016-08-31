@@ -113,8 +113,8 @@ function +vi-vcs-detect-changes() {
     vcs_visual_identifier='VCS_GIT_ICON'
   elif [[ "${hook_com[vcs]}" == "hg" ]]; then
     vcs_visual_identifier='VCS_HG_ICON'
-#  elif [[ "${hook_com[vcs]}" == "svn" ]]; then
-#    vcs_visual_identifier='VCS_SVN_ICON'
+  elif [[ "${hook_com[vcs]}" == "svn" ]]; then
+    vcs_visual_identifier='VCS_SVN_ICON'
   fi
 
   if [[ -n "${hook_com[staged]}" ]] || [[ -n "${hook_com[unstaged]}" ]]; then
@@ -127,11 +127,15 @@ function +vi-vcs-detect-changes() {
 function +vi-svn-detect-changes() {
   local svn_status=$(svn status)
   if [[ -n "$(echo "$svn_status" | grep \^\?)" ]]; then
-    hook_com[unstaged]+=" $(print_icon 'VCS_STASH_ICON')"
+    hook_com[unstaged]+=" $(print_icon 'VCS_UNTRACKED_ICON')"
     VCS_WORKDIR_HALF_DIRTY=true
   fi
-  if [[ -n "$(echo "$svn_status" | grep \^\A)" ]]; then
+  if [[ -n "$(echo "$svn_status" | grep \^\M)" ]]; then
+    hook_com[unstaged]+=" $(print_icon 'VCS_UNSTAGED_ICON')"
     VCS_WORKDIR_DIRTY=true
-    hook_com[unstaged]+=" $(print_icon 'VCS_STAGED_ICON')"
+  fi
+  if [[ -n "$(echo "$svn_status" | grep \^\A)" ]]; then
+    hook_com[staged]+=" $(print_icon 'VCS_STAGED_ICON')"
+    VCS_WORKDIR_DIRTY=true
   fi
 }
