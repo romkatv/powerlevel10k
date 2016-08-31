@@ -291,13 +291,14 @@ CURRENT_BG='NONE'
 
 # Anaconda Environment
 prompt_anaconda() {
-  if $(hash ack 2>/dev/null); then
-    local active_conda_env=$(where conda | ack -o '(?<=envs/)[\w-]+(?=/bin)')
-  else
-    local active_conda_env=$(where conda | grep -o -P '(?<=envs/)[\w-]+(?=/bin)')
-  fi
-  if [[ -n $active_conda_env ]]; then
-    "$1_prompt_segment" "$0" "$2" "green" "black" "($active_conda_env)" ""
+  # Depending on the conda version, either might be set. This
+  # variant works even if both are set.
+  _path=$CONDA_ENV_PATH$CONDA_PREFIX
+  if ! [ -z "$_path" ]; then
+    # config - can be overwritten in users' zshrc file.
+    set_default POWERLEVEL9K_ANACONDA_LEFT_DELIMITER "("
+    set_default POWERLEVEL9K_ANACONDA_RIGHT_DELIMITER ")"
+    "$1_prompt_segment" "$0" "$2" "$3" "$4" "$POWERLEVEL9K_ANACONDA_LEFT_DELIMITER$(basename $_path)$POWERLEVEL9K_ANACONDA_RIGHT_DELIMITER" 'PYTHON_ICON'
   fi
 }
 
