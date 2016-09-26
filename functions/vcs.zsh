@@ -62,7 +62,7 @@ function +vi-git-remotebranch() {
 
 set_default POWERLEVEL9K_VCS_HIDE_TAGS false
 function +vi-git-tagname() {
-    if [[ "$POWERLEVE9K_VCS_HIDE_TAGS" == "false" ]]; then
+    if [[ "$POWERLEVEL9K_VCS_HIDE_TAGS" == "false" ]]; then
         # If we are on a tag, append the tagname to the current branch string.
         local tag
         tag=$(git describe --tags --exact-match HEAD 2>/dev/null)
