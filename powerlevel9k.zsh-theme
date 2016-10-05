@@ -590,9 +590,13 @@ prompt_load() {
     'normal'        'green'
   )
 
-  if [[ "$OS" == "OSX" ]]; then
+  if [[ "$OS" == "OSX" ]] || [[ "$OS" == "BSD" ]]; then
     load_avg_1min=$(sysctl vm.loadavg | grep -o -E '[0-9]+(\.|,)[0-9]+' | head -n 1)
-    cores=$(sysctl -n hw.logicalcpu)
+    if [[ "$OS" == "OSX" ]]; then
+      cores=$(sysctl -n hw.logicalcpu)
+    else
+      cores=$(sysctl -n hw.ncpu)
+    fi
   else
     load_avg_1min=$(grep -o "[0-9.]*" /proc/loadavg | head -n 1)
     cores=$(nproc)
@@ -665,8 +669,13 @@ prompt_ram() {
     # Convert pages into Bytes
     ramfree=$(( ramfree * 4096 ))
   else
-    ramfree=$(grep -o -E "MemFree:\s+[0-9]+" /proc/meminfo | grep -o "[0-9]*")
-    base='K'
+    if [[ "$OS" == "BSD" ]]; then
+      ramfree=$(vmstat | grep -E '([0-9]+\w+)+' | awk '{print $5}')
+      base='M'
+    else
+      ramfree=$(grep -o -E "MemFree:\s+[0-9]+" /proc/meminfo | grep -o "[0-9]*")
+      base='K'
+    fi
   fi
 
   "$1_prompt_segment" "$0" "$2" "yellow" "$DEFAULT_COLOR" "$(printSizeHumanReadable "$ramfree" $base)" 'RAM_ICON'
