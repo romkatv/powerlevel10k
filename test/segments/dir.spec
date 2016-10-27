@@ -60,7 +60,7 @@ function testTruncationFromRightWorks() {
   mkdir -p $FOLDER
   cd $FOLDER
 
-  assertEquals "%K{blue} %F{black}/tm…/po…/1/12/12…/12…/12…/12…/12…/12…/123456789 %k%F{blue}%f " "$(build_left_prompt)"
+  assertEquals "%K{blue} %F{black}/tmp/po…/1/12/123/12…/12…/12…/12…/12…/123456789 %k%F{blue}%f " "$(build_left_prompt)"
 
   cd -
   rm -fr /tmp/powerlevel9k-test
