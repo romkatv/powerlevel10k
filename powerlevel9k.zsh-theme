@@ -748,17 +748,16 @@ prompt_rvm() {
 
 # Status: return code if verbose, otherwise just an icon if an error occurred
 set_default POWERLEVEL9K_STATUS_VERBOSE true
+set_default POWERLEVEL9K_STATUS_OK_IN_NON_VERBOSE false
 prompt_status() {
-  if [[ "$POWERLEVEL9K_STATUS_VERBOSE" == true ]]; then
-    if [[ "$RETVAL" -ne 0 ]]; then
+  if [[ "$RETVAL" -ne 0 ]]; then
+    if [[ "$POWERLEVEL9K_STATUS_VERBOSE" == true ]]; then
       "$1_prompt_segment" "$0_ERROR" "$2" "red" "226" "$RETVAL" 'CARRIAGE_RETURN_ICON'
     else
-      "$1_prompt_segment" "$0_OK" "$2" "$DEFAULT_COLOR" "046" "" 'OK_ICON'
-    fi
-  else
-    if [[ "$RETVAL" -ne 0 ]]; then
       "$1_prompt_segment" "$0_ERROR" "$2" "$DEFAULT_COLOR" "red" "" 'FAIL_ICON'
     fi
+  elif [[ "$POWERLEVEL9K_STATUS_VERBOSE" == true || "$POWERLEVEL9K_STATUS_OK_IN_NON_VERBOSE" == true ]]; then
+    "$1_prompt_segment" "$0_OK" "$2" "$DEFAULT_COLOR" "046" "" 'OK_ICON'
   fi
 }
 
@@ -1091,4 +1090,3 @@ powerlevel9k_init() {
 }
 
 powerlevel9k_init "$@"
-
