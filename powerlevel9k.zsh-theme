@@ -337,6 +337,50 @@ prompt_background_jobs() {
   fi
 }
 
+# Segment to indicate hdd available level.
+prompt_hdd_usage() {
+  local current_state="unknown"
+  typeset -AH hdd_usage_states
+  hdd_usage_states=(
+    'normal'        'green'
+    'warning'       'yellow'
+    'critical'      'red'
+  )
+
+  # local df="$(df -k . | sed -n '2p')"
+  # local size="$(echo $df | awk '{ print $2 }')"
+  # local avail="$(echo $df | awk '{ print $4 }')"
+  # local level="$(printf %.0f $(( avail * 100.0 / size )))"
+  local level="${$(df -k . | sed -n '2p' | awk '{ print $5 }')%%\%}"
+  level="$(( 100 - level ))"
+
+  set_default POWERLEVEL9K_HDD_USAGE_WARNING_LEVEL 10
+  set_default POWERLEVEL9K_HDD_USAGE_CRITICAL_LEVEL 5
+
+  if [ $level -gt $POWERLEVEL9K_HDD_USAGE_WARNING_LEVEL ]; then
+    # Default behavior: Show message always
+    set_default POWERLEVEL9K_HDD_USAGE_ONLY_WARNING false
+    if [[ "$POWERLEVEL9K_HDD_USAGE_ONLY_WARNING" != false ]]; then
+      return
+    fi
+  fi
+
+  current_state='normal'
+  if [ $level -le $POWERLEVEL9K_HDD_USAGE_WARNING_LEVEL ]; then
+    current_state='warning'
+  fi
+  if [ $level -le $POWERLEVEL9K_HDD_USAGE_CRITICAL_LEVEL ]; then
+    current_state='critical'
+  fi
+
+  local message="$level"
+
+  # Draw the prompt_segment
+  if [[ -n $level ]]; then
+    "$1_prompt_segment" "${0}_${current_state}" "$2" "$DEFAULT_COLOR" "${hdd_usage_states[$current_state]}" "$message" 'HDD_ICON'
+  fi
+}
+
 prompt_battery() {
   # The battery can have four different states - default to 'unknown'.
   local current_state='unknown'
