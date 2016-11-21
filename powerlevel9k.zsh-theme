@@ -372,7 +372,7 @@ prompt_hdd_usage() {
   fi
 
   current_state='normal'
-  local message="$level%"
+  local message="$level% "
 
   if [ $level -le $POWERLEVEL9K_HDD_USAGE_WARNING_LEVEL ]; then
     current_state='warning'
