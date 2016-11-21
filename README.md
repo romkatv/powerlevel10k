@@ -83,37 +83,78 @@ your `~/.zshrc`:
 #### Available Prompt Segments
 The segments that are currently available are:
 
-* [aws](#aws) - The current AWS profile, if active.
-* **aws_eb_env** - The current Elastic Beanstalk Environment.
-* [background_jobs](#background_jobs) - Indicator for background jobs.
-* [battery](#battery) - Current battery status.
-* [context](#context) - Your username and host.
-* [custom_command](#custom_command) - A custom command to display the output of.
-* [dir](#dir) - Your current working directory.
-* **go_version** - Show the current GO version.
-* **history** - The command number for the current line.
-* [ip](#ip) - Shows the current IP address.
-* **load** - Your machines 5 minute load average.
-* **node_version** - Show the version number of the installed Node.js.
-* **nodeenv** - [nodeenv](https://github.com/ekalinin/nodeenv) prompt for displaying node version and environment name.
-* **nvm** - Show the version of Node that is currently active, if it differs from the version used by NVM
-* **os_icon** - Display a nice little icon, depending on your operating system.
-* **php_version** - Show the current PHP version.
-* **ram** - Show free RAM
-* [rbenv](#rbenv) - Ruby environment information (if one is active).
-* **root_indicator** - An indicator if the user is root.
-* [rspec_stats](#rspec_stats) - Show a ratio of test classes vs code classes for RSpec.
-* **rust_version** - Display the current rust version.
-* [status](#status) - The return code of the previous command.
-* **swap** - Prints the current swap size.
-* [symphony2_tests](#symphony2_tests) - Show a ratio of test classes vs code classes for Symfony2.
-* **symphony2_version** - Show the current Symfony2 version, if you are in a Symfony2-Project dir.
-* [time](#time) - System time.
-* [todo](http://todotxt.com/) - Shows the number of tasks in your todo.txt tasks file.
-* [vi_mode](#vi_mode)- Vi editing mode (NORMAL|INSERT).
-* **virtualenv** - Your Python [VirtualEnv](https://virtualenv.pypa.io/en/latest/).
-* [vcs](#vcs) - Information about this `git` or `hg` repository (if you are in one).
+**System Status Segments:**
+* [`background_jobs`](#background_jobs) - Indicator for background jobs.
+* [`battery`](#battery) - Current battery status.
+* [`context`](#context) - Your username and host.
+* [`dir`](#dir) - Your current working directory.
+* `history` - The command number for the current line.
+* [`ip`](#ip) - Shows the current IP address.
+* `load` - Your machine's load averages.
+* `os_icon` - Display a nice little icon, depending on your operating system.
+* `ram` - Show free RAM.
+* `root_indicator` - An indicator if the user has superuser status.
+* [`status`](#status) - The return code of the previous command.
+* `swap` - Prints the current swap size.
+* [`time`](#time) - System time.
+* [`vi_mode`](#vi_mode)- Your prompt's Vi editing mode (NORMAL|INSERT).
 
+**Development Environment Segments:**
+* [`vcs`](#vcs) - Information about this `git` or `hg` repository (if you are in one).
+
+**Language Segments:**
+* **GoLang Segments:**
+    * `go_version` - Show the current GO version.
+* **Javascript / Node.js Segments:**
+    * `node_version` - Show the version number of the installed Node.js.
+    * `nodeenv` - [nodeenv](https://github.com/ekalinin/nodeenv) prompt for displaying node version and environment name.
+    * `nvm` - Show the version of Node that is currently active, if it differs from the version used by NVM
+* **PHP Segments:**
+    * `php_version` - Show the current PHP version.
+    * [`symfony2_tests`](#symfony2_tests) - Show a ratio of test classes vs code classes for Symfony2.
+    * `symfony2_version` - Show the current Symfony2 version, if you are in a Symfony2-Project dir.
+* **Python Segments:**
+    * `virtualenv` - Your Python [VirtualEnv](https://virtualenv.pypa.io/en/latest/).
+    * [`anaconda`](#anaconda) - Your active [Anaconda](https://www.continuum.io/why-anaconda) environment.
+    * `pyenv` - Your active python version as reported by the first word of [`pyenv version`](https://github.com/yyuu/pyenv). Note that the segment is not displayed if that word is _system_ i.e. the segment is inactive if you are using system python.
+* **Ruby Segments:**
+    * [`chruby`](#chruby) - Ruby environment information using `chruby` (if one is active).
+    * [`rbenv`](#rbenv) - Ruby environment information using `rbenv` (if one is active).
+    * [`rspec_stats`](#rspec_stats) - Show a ratio of test classes vs code classes for RSpec.
+* **Rust Segments:**
+    * `rust_version` - Display the current rust version and [logo](https://www.rust-lang.org/logos/rust-logo-blk.svg).
+
+**Cloud Segments:**
+* **AWS Segments:**
+    * [`aws`](#aws) - The current AWS profile, if active.
+    * `aws_eb_env` - The current Elastic Beanstalk Environment.
+* `docker_machine` - The current Docker Machine.
+
+**Other:**
+* [`custom_command`](#custom_command) - Create a custom segment to display the
+  output of an arbitrary command.
+* [`todo`](http://todotxt.com/) - Shows the number of tasks in your todo.txt tasks file.
+
+---------------------------------------------------------------------------------
+
+
+##### anaconda
+
+This segment shows your active anaconda environment. It relies on either the
+`CONDA_ENV_PATH` or the `CONDA_PREFIX` (depending on the `conda` version)
+environment variable to be set which happens when you properly `source
+activate` an environment.
+
+Special configuration variables:
+
+| Variable | Default Value | Description |
+|----------|---------------|-------------|
+|`POWERLEVEL9K_ANACONDA_LEFT_DELIMITER`|"("|The left delimiter just before the environment name.|
+|`POWERLEVEL9K_ANACONDA_RIGHT_DELIMITER`|")"|The right delimiter just after the environment name.|
+
+Additionally the following segment specific parameters can be used to customize
+it: `POWERLEVEL9K_PYTHON_ICON`, `POWERLEVEL9K_ANACONDA_BACKGROUND`, and
+`POWERLEVEL9K_ANACONDA_FOREGROUND`.
 
 ##### aws
 
@@ -145,6 +186,7 @@ requires `acpi` on Linux).
 |`POWERLEVEL9K_BATTERY_DISCONNECTED`|`$DEFAULT_COLOR`|Color to indicate absence of battery.|
 |`POWERLEVEL9K_BATTERY_LOW_THRESHOLD`|`10`|Threshold to consider battery level critical.|
 |`POWERLEVEL9K_BATTERY_LOW_COLOR`|`"red"`|Color to indicate critically low charge level.|
+|`POWERLEVEL9K_BATTERY_VERBOSE`|`true`|Display time remaining next to battery level.|
 
 Note that you can [modify the `_FOREGROUND`
 color](https://github.com/bhilburn/powerlevel9k/wiki/Stylizing-Your-Prompt#segment-color-customization)
@@ -222,7 +264,7 @@ Customizations available are:
 | Variable | Default Value | Description |
 |----------|---------------|-------------|
 |`POWERLEVEL9K_SHORTEN_DIR_LENGTH`|`2`|If your shorten strategy, below, is entire directories, this field determines how many directories to leave at the end. If your shorten strategy is by character count, this field determines how many characters to allow per directory string.|
-|`POWERLEVEL9K_SHORTEN_STRATEGY`|None|How the directory strings should be truncated. By default, it will truncate whole directories. Other options are `truncate_middle`, which leaves the start and end of the directory strings, and `truncate_from_right`, which cuts starting from the end of the string.|
+|`POWERLEVEL9K_SHORTEN_STRATEGY`|None|How the directory strings should be truncated. By default, it will truncate whole directories. Other options are `truncate_middle`, which leaves the start and end of the directory strings, and `truncate_from_right`, which cuts starting from the end of the string.  You can also use `truncate_with_package_name` to use the `package.json` `name` field to abbreviate the directory path.|
 |`POWERLEVEL9K_SHORTEN_DELIMITER`|`..`|Delimiter to use in truncated strings. This can be any string you choose, including an empty string if you wish to have no delimiter.|
 
 For example, if you wanted the truncation behavior of the `fish` shell, which
@@ -236,6 +278,15 @@ In each case you have to specify the length you want to shorten the directory
 to. So in some cases `POWERLEVEL9K_SHORTEN_DIR_LENGTH` means characters, in
 others whole directories.
 
+The `truncate_with_package_name` strategy gives your directory path relative to the root of your project.  For example, if you have a project inside `$HOME/projects/my-project` with a `package.json` that looks like:
+
+```json
+{
+  "name": "my-cool-project"
+}
+```
+
+the path shown would be `my-cool-project`.  If you navigate to `$HOME/projects/my-project/src`, then the path shown would be `my-cool-project/src`.  Please note that this currently looks for `.git` directory to determine the root of the project.
 
 ##### ip
 
@@ -266,9 +317,16 @@ This segment shows the return code of the last command.
 
 | Variable | Default Value | Description |
 |----------|---------------|-------------|
-|`POWERLEVEL9K_STATUS_VERBOSE`|`true`|Set to false if you wish to hide this segment when the last command completed successfully.|
+|`POWERLEVEL9K_STATUS_VERBOSE`|`true`|Set to false if you wish to not show the error code when the last command returned an error and optionally hide this segment when the last command completed successfully by setting `POWERLEVEL9K_STATUS_OK_IN_NON_VERBOSE` to false.|
+|`POWERLEVEL9K_STATUS_OK_IN_NON_VERBOSE`|`false`|Set to true if you wish to show this segment when the last command completed successfully in non-verbose mode.|
 
-##### symphony2_tests
+##### ram
+
+| Variable | Default Value | Description |
+|----------|---------------|-------------|
+|`POWERLEVEL9K_RAM_ELEMENTS`|Both|Specify `ram_free` or `swap_used` to only show one or the other rather than both.|
+
+##### symfony2_tests
 
 See [Unit Test Ratios](#unit-test-ratios), below.
 
@@ -300,8 +358,10 @@ customization is provided via:
 |`POWERLEVEL9K_SHOW_CHANGESET`|`false`|Set to `true` to display the hash / changeset in the segment.|
 |`POWERLEVEL9K_CHANGESET_HASH_LENGTH`|`12`|How many characters of the hash / changeset to display in the segment.|
 |`POWERLEVEL9K_VCS_SHOW_SUBMODULE_DIRTY`|`true`|Set to `false` to not reflect submodule status in the top-level repository prompt.|
+|`POWERLEVEL9K_VCS_HIDE_TAGS`|`false`|Set to `true` to stop tags being displayed in the segment.|
 
-**vcs Symbols**
+
+##### vcs symbols
 
 The `vcs` segment uses various symbols to tell you the state of your repository.
 These symbols depend on your installed font and selected `POWERLEVEL9K_MODE`
@@ -351,3 +411,6 @@ portion of the wiki to get going.
 
 [The Wiki also has a ton of other useful
 information!](https://github.com/bhilburn/powerlevel9k/wiki)
+
+### License
+MIT

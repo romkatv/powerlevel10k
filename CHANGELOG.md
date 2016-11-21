@@ -1,4 +1,8 @@
-## v0.4.0 (next)
+## v0.4.0
+
+### Development changes
+
+From now on, development makes use of a CI system "travis".
 
 ### `vcs` changes
 
@@ -10,14 +14,68 @@ POWERLEVEL9K_VCS_CLEAN_FOREGROUND='cyan'
 POWERLEVEL9K_VCS_CLEAN_BACKGROUND='white'
 ```
 
-### `aws_eb_env` added
+Additionaly the vcs segment now has an `untracked` state which
+indicates that you have untracked files in your repository.
 
-This segment displays the current Elastic Beanstalk environment.
+The foreground color of actionformat is now configurable via:
+```zsh
+POWERLEVEL9K_VCS_ACTIONFORMAT_FOREGROUND='green'
+```
+
+Also, the vcs segment uses the foreground color it was configured to.
+That said, the variables `POWERLEVEL9K_VCS_FOREGROUND` and
+`POWERLEVEL9K_VCS_DARK_FOREGROUND` are no longer used. Instead use
+the proper variable `POWERLEVEL9K_VCS_<STATE>_FOREGROUND` to change
+foreground color.
+
+### `dir` Shortening Strategies
+
+There is now a path shortening strategy that will use the `package.json` file to
+shorten your directory path. See the documentation for the `dir` segment for more
+details.
+
+Also, the shorten delimiter was changed to an unicode ellipsis. It is configurable
+via `POWERLEVEL9K_SHORTEN_DELIMITER`.
+
+### `rbenv` changes
+
+The `rbenv` segment now makes use of the full rbenv command, so the correct
+ruby version is now shown if it differs from the globally one.
+
+### `node`, `nvm` Segments
+
+Improvements to speed / reliability.
 
 ### `ram` changes
 
-The `ram` segment was split up into `ram` and `swap`. The `POWERLEVEL9K_RAM_ELEMENTS`
-variable is void.
+The `ram` segment was split up into `ram` and `swap`. The
+`POWERLEVEL9K_RAM_ELEMENTS` variable is obsolete.
+
+### New segment `swap` added
+
+Due to the split up of the ram segment, this one was created. It
+shows the currently used swap size.
+
+### New segment `nodeenv` added
+
+Added new `nodeenv` segment that shows the currently used node environment.
+
+### New segment `aws_eb_env` added
+
+This segment displays the current Elastic Beanstalk environment.
+
+### New segment `chruby` added
+
+Added new `chruby` segment to support this version manager.
+
+### New segment `docker_machine` added
+
+Added new `docker_machine` segment that will show your Docker machine.
+
+### New segment `anaconda` added
+
+A new segment `anaconda` was added that shows the current used
+anaconda environment.
 
 ## v0.3.2
 
