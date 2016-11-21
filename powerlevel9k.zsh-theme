@@ -361,11 +361,8 @@ prompt_hdd_usage() {
   # local avail="$(echo $df | awk '{ print $4 }')"
   # local level="$(printf %.0f $(( avail * 100.0 / size )))"
 
-  # local level="${$(df -k . | sed -n '2p' | awk '{ print $5 }')%%\%}"
-  # level="$(( 100 - level ))"
-  # level="3"
-
-  set_default level 10
+  local level="${$(df -k . | sed -n '2p' | awk '{ print $5 }')%%\%}"
+  level="$(( 100 - level ))"
 
   if [ "$level" -gt "$POWERLEVEL9K_HDD_USAGE_WARNING_LEVEL" ]; then
     # Default behavior: Show message always
