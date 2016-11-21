@@ -377,8 +377,7 @@ prompt_hdd_usage() {
   if [ $level -le $POWERLEVEL9K_HDD_USAGE_WARNING_LEVEL ]; then
     current_state='warning'
     message="$message left"
-  fi
-  if [ $level -le $POWERLEVEL9K_HDD_USAGE_CRITICAL_LEVEL ]; then
+  elif [ $level -le $POWERLEVEL9K_HDD_USAGE_CRITICAL_LEVEL ]; then
     current_state='critical'
     message="$message left"
   fi
