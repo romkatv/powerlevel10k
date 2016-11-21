@@ -340,9 +340,15 @@ prompt_background_jobs() {
 # Segment to indicate hdd available level.
 prompt_hdd_usage() {
   local current_state="unknown"
-  typeset -AH hdd_usage_states
-  hdd_usage_states=(
-    'normal'        'green'
+  typeset -AH hdd_usage_forecolors
+  hdd_usage_forecolors=(
+    'normal'        'yellow'
+    'warning'       "$DEFAULT_COLOR"
+    'critical'      'white'
+  )
+  typeset -AH hdd_usage_backcolors
+  hdd_usage_backcolors=(
+    'normal'        $DEFAULT_COLOR
     'warning'       'yellow'
     'critical'      'red'
   )
@@ -366,18 +372,20 @@ prompt_hdd_usage() {
   fi
 
   current_state='normal'
+  local message="$level%"
+
   if [ $level -le $POWERLEVEL9K_HDD_USAGE_WARNING_LEVEL ]; then
     current_state='warning'
+    message="$message left"
   fi
   if [ $level -le $POWERLEVEL9K_HDD_USAGE_CRITICAL_LEVEL ]; then
     current_state='critical'
+    message="$message left"
   fi
-
-  local message="$level"
 
   # Draw the prompt_segment
   if [[ -n $level ]]; then
-    "$1_prompt_segment" "${0}_${current_state}" "$2" "$DEFAULT_COLOR" "${hdd_usage_states[$current_state]}" "$message" 'HDD_ICON'
+    "$1_prompt_segment" "${0}_${current_state}" "$2" "${hdd_usage_backcolors[$current_state]}" "${hdd_usage_forecolors[$current_state]}" "$message" 'HDD_ICON'
   fi
 }
 
