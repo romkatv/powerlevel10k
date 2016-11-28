@@ -409,7 +409,7 @@ prompt_battery() {
       local time_remaining=$(acpi | awk '{ print $5 }')
       if [[ $time_remaining =~ rate ]]; then
         local tstring="..."
-      elif [[ $time_remaining =~ "[:digit:]+" ]]; then
+      elif [[ $time_remaining =~ "[[:digit:]]+" ]]; then
         local tstring=${(f)$(date -u -d "$(echo $time_remaining)" +%k:%M)}
       fi
     fi
