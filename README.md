@@ -288,6 +288,12 @@ The `truncate_with_package_name` strategy gives your directory path relative to 
 
 the path shown would be `my-cool-project`.  If you navigate to `$HOME/projects/my-project/src`, then the path shown would be `my-cool-project/src`.  Please note that this currently looks for `.git` directory to determine the root of the project.
 
+If you want to customize the directory separator, you could set:
+```zsh
+# You'll need patched awesome-terminal fonts for that example
+POWERLEVEL9K_DIR_PATH_SEPARATOR="%f "$'\uE0B1'" %F"
+```
+
 ##### ip
 
 This segment tries to examine all currently used network interfaces and prints
