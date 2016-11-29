@@ -456,6 +456,7 @@ prompt_custom() {
 }
 
 # Dir: current working directory
+set_default POWERLEVEL9K_DIR_PATH_SEPARATOR "/"
 prompt_dir() {
   local current_path='%~'
   if [[ -n "$POWERLEVEL9K_SHORTEN_DIR_LENGTH" ]]; then
@@ -501,6 +502,10 @@ prompt_dir() {
         current_path="%$((POWERLEVEL9K_SHORTEN_DIR_LENGTH+1))(c:$POWERLEVEL9K_SHORTEN_DELIMITER/:)%${POWERLEVEL9K_SHORTEN_DIR_LENGTH}c"
       ;;
     esac
+  fi
+
+  if [[ "${POWERLEVEL9K_DIR_PATH_SEPARATOR}" != "/" ]]; then
+    current_path=$(echo "${current_path}" | sed "s/\//${POWERLEVEL9K_DIR_PATH_SEPARATOR}/g")
   fi
 
   typeset -AH dir_states
