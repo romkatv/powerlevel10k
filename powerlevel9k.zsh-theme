@@ -965,6 +965,17 @@ prompt_pyenv() {
   fi
 }
 
+# Swift version
+prompt_swift_version() {
+  local swift_version=($(swift --version 2>/dev/null))
+  [[ -z "${swift_version}" ]] && return
+
+  # Extract semantic version
+  swift_version=$(echo ${swift_version} | sed -e 's/[^0-9.]*\([0-9.]*\).*/\1/')
+
+  "$1_prompt_segment" "$0" "$2" "magenta" "white" "${swift_version}" 'SWIFT_ICON'
+}
+
 ################################################################
 # Prompt processing and drawing
 ################################################################
@@ -1091,4 +1102,3 @@ powerlevel9k_init() {
 }
 
 powerlevel9k_init "$@"
-

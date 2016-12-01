@@ -72,6 +72,7 @@ case $POWERLEVEL9K_MODE in
       VCS_SVN_ICON                   '(svn) '
       RUST_ICON                      ''
       PYTHON_ICON                    $'\U1F40D'             # 🐍
+      SWIFT_ICON                     ''
     )
   ;;
   'awesome-fontconfig')
@@ -126,6 +127,7 @@ case $POWERLEVEL9K_MODE in
       VCS_SVN_ICON                   '(svn) '
       RUST_ICON                      $'\uE6A8'              #  
       PYTHON_ICON                    $'\U1F40D'             # 🐍
+      SWIFT_ICON                     ''
     )
   ;;
   *)
@@ -180,6 +182,7 @@ case $POWERLEVEL9K_MODE in
       VCS_SVN_ICON                   ''
 	    RUST_ICON                      ''
       PYTHON_ICON                    ''
+      SWIFT_ICON                     'Swift'
     )
   ;;
 esac
