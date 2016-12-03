@@ -401,10 +401,11 @@ prompt_battery() {
     local battery_status=$(cat $bat/status)
     [[ $capacity -gt 100 ]] && local bat_percent=100 || local bat_percent=$capacity
     [[ $battery_status =~ Charging || $battery_status =~ Full ]] && local connected=true
-    [[ $connected && $bat_percent =~ 100 ]] && current_state="charged"
-    [[ $connected && $bat_percent -lt 100 ]] && current_state="charging"
     if [[ -z  $connected ]]; then
       [[ $bat_percent -lt $POWERLEVEL9K_BATTERY_LOW_THRESHOLD ]] && current_state="low" || current_state="disconnected"
+    else
+      [[ $bat_percent =~ 100 ]] && current_state="charged"
+      [[ $bat_percent -lt 100 ]] && current_state="charging"
     fi
     if [[ -f /usr/bin/acpi ]]; then
       local time_remaining=$(acpi | awk '{ print $5 }')
