@@ -456,6 +456,7 @@ prompt_custom() {
 }
 
 # Dir: current working directory
+set_default POWERLEVEL9K_DIR_PATH_SEPARATOR "/"
 prompt_dir() {
   local current_path='%~'
   if [[ -n "$POWERLEVEL9K_SHORTEN_DIR_LENGTH" ]]; then
@@ -501,17 +502,25 @@ prompt_dir() {
         current_path="%$((POWERLEVEL9K_SHORTEN_DIR_LENGTH+1))(c:$POWERLEVEL9K_SHORTEN_DELIMITER/:)%${POWERLEVEL9K_SHORTEN_DIR_LENGTH}c"
       ;;
     esac
-
   fi
 
-  local current_icon=''
+  if [[ "${POWERLEVEL9K_DIR_PATH_SEPARATOR}" != "/" ]]; then
+    current_path=$(print -P "${current_path}" | sed "s/\//${POWERLEVEL9K_DIR_PATH_SEPARATOR}/g")
+  fi
+
+  typeset -AH dir_states
+  dir_states=(
+    "DEFAULT"         "FOLDER_ICON"
+    "HOME"            "HOME_ICON"
+    "HOME_SUBFOLDER"  "HOME_SUB_ICON"
+  )
+  local current_state="DEFAULT"
   if [[ $(print -P "%~") == '~' ]]; then
-    "$1_prompt_segment" "$0_HOME" "$2" "blue" "$DEFAULT_COLOR" "$current_path" 'HOME_ICON'
+    current_state="HOME"
   elif [[ $(print -P "%~") == '~'* ]]; then
-    "$1_prompt_segment" "$0_HOME_SUBFOLDER" "$2" "blue" "$DEFAULT_COLOR" "$current_path" 'HOME_SUB_ICON'
-  else
-    "$1_prompt_segment" "$0_DEFAULT" "$2" "blue" "$DEFAULT_COLOR" "$current_path" 'FOLDER_ICON'
+    current_state="HOME_SUBFOLDER"
   fi
+  "$1_prompt_segment" "$0_${current_state}" "$2" "blue" "$DEFAULT_COLOR" "${current_path}" "${dir_states[$current_state]}"
 }
 
 # Docker machine

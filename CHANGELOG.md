@@ -1,3 +1,11 @@
+## next
+
+### `dir` changes
+
+Added an option to configure the path separator. If you want something
+else than an ordinary slash, you could set
+`POWERLEVEL9K_DIR_PATH_SEPARATOR` to whatever you want.
+
 ## v0.4.0
 
 ### Development changes
