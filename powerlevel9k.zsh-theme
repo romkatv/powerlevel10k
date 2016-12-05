@@ -41,7 +41,7 @@ else
   POWERLEVEL9K_INSTALLATION_PATH="$0"
 fi
 
-# Resolve the instllation path
+# Resolve the installation path
 if [[ -L "$POWERLEVEL9K_INSTALLATION_PATH" ]]; then
   # If this theme is sourced as a symlink, we need to locate the real URL
   filename="$(realpath -P $POWERLEVEL9K_INSTALLATION_PATH 2>/dev/null || readlink -f $POWERLEVEL9K_INSTALLATION_PATH 2>/dev/null || perl -MCwd=abs_path -le 'print abs_path readlink(shift);' $POWERLEVEL9K_INSTALLATION_PATH 2>/dev/null)"
@@ -103,10 +103,10 @@ fi
 #
 # Methodology behind user-defined variables overwriting colors:
 #     The first parameter to the segment constructors is the calling function's
-#     name.  From this function name, we strip the "prompt_"-prefix and
-#     uppercase it.  This is then prefixed with "POWERLEVEL9K_" and suffixed
+#     name. From this function name, we strip the "prompt_"-prefix and
+#     uppercase it. This is then prefixed with "POWERLEVEL9K_" and suffixed
 #     with either "_BACKGROUND" or "_FOREGROUND", thus giving us the variable
-#     name. So each new segment is user-overwritable by a variable following
+#     name. So each new segment is user-overwritten by a variable following
 #     this naming convention.
 ################################################################
 
@@ -117,7 +117,7 @@ CURRENT_BG='NONE'
 
 # Begin a left prompt segment
 # Takes four arguments:
-#   * $1: Name of the function that was orginally invoked (mandatory).
+#   * $1: Name of the function that was originally invoked (mandatory).
 #         Necessary, to make the dynamic color-overwrite mechanism work.
 #   * $2: The array index of the current segment
 #   * $3: Background color
@@ -207,7 +207,7 @@ CURRENT_RIGHT_BG='NONE'
 
 # Begin a right prompt segment
 # Takes four arguments:
-#   * $1: Name of the function that was orginally invoked (mandatory).
+#   * $1: Name of the function that was originally invoked (mandatory).
 #         Necessary, to make the dynamic color-overwrite mechanism work.
 #   * $2: The array index of the current segment
 #   * $3: Background color
@@ -973,6 +973,17 @@ prompt_pyenv() {
   fi
 }
 
+# Swift version
+prompt_swift_version() {
+  local swift_version=($(swift --version 2>/dev/null))
+  [[ -z "${swift_version}" ]] && return
+
+  # Extract semantic version
+  swift_version=$(echo ${swift_version} | sed -e 's/[^0-9.]*\([0-9.]*\).*/\1/')
+
+  "$1_prompt_segment" "$0" "$2" "magenta" "white" "${swift_version}" 'SWIFT_ICON'
+}
+
 ################################################################
 # Prompt processing and drawing
 ################################################################
@@ -1024,7 +1035,7 @@ powerlevel9k_prepare_prompts() {
 $(print_icon 'MULTILINE_SECOND_PROMPT_PREFIX')"
     if [[ "$POWERLEVEL9K_RPROMPT_ON_NEWLINE" != true ]]; then
       # The right prompt should be on the same line as the first line of the left
-      # prompt.  To do so, there is just a quite ugly workaround: Before zsh draws
+      # prompt. To do so, there is just a quite ugly workaround: Before zsh draws
       # the RPROMPT, we advise it, to go one line up. At the end of RPROMPT, we
       # advise it to go one line down. See:
       # http://superuser.com/questions/357107/zsh-right-justify-in-ps1
