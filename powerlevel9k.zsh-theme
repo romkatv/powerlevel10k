@@ -412,7 +412,7 @@ prompt_battery() {
       if [[ $time_remaining =~ rate ]]; then
         local tstring="..."
       elif [[ $time_remaining =~ "[:digit:]+" ]]; then
-        local tstring=${(f)$(date -u -d "$(echo $time_remaining)" +%k:%M)}
+        local tstring=${(f)$(date -u -d "$(echo $time_remaining)" +%k:%M 2> /dev/null)}
       fi
     fi
     [[ -n $tstring ]] && local remain=" ($tstring)"
