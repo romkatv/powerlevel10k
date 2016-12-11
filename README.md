@@ -241,6 +241,11 @@ elements (it is by default), and define a `DEFAULT_USER` in your `~/.zshrc`:
 |----------|---------------|-------------|
 |`DEFAULT_USER`|None|Username to consider a "default context" (you can also use `$USER`)|
 
+You can use POWERLEVEL9K_HIDE_HOST for hiding the hostname in the prompt
+when you are not in a ssh session. For example:
+
+    POWERLEVEL9K_HIDE_HOST="yes"
+
 ##### dir
 
 The `dir` segment shows the current working directory. When using the "Awesome
