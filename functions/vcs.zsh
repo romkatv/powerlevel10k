@@ -110,7 +110,18 @@ function +vi-hg-bookmarks() {
 
 function +vi-vcs-detect-changes() {
   if [[ "${hook_com[vcs]}" == "git" ]]; then
-    vcs_visual_identifier='VCS_GIT_ICON'
+
+    local remote=`git ls-remote --get-url`
+    if [[ "$remote" =~ "github" ]] then
+      vcs_visual_identifier='VCS_GIT_GITHUB_ICON'
+    elif [[ "$remote" =~ "bitbucket" ]] then
+      vcs_visual_identifier='VCS_GIT_BITBUCKET_ICON'
+    elif [[ "$remote" =~ "gitlab" ]] then
+      vcs_visual_identifier='VCS_GIT_GITLAB_ICON'
+    else
+      vcs_visual_identifier='VCS_GIT_ICON'
+    fi
+
   elif [[ "${hook_com[vcs]}" == "hg" ]]; then
     vcs_visual_identifier='VCS_HG_ICON'
   elif [[ "${hook_com[vcs]}" == "svn" ]]; then
