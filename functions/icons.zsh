@@ -182,9 +182,12 @@ case $POWERLEVEL9K_MODE in
       VCS_BRANCH_ICON                $'\uE0A0 '             # 
       VCS_REMOTE_BRANCH_ICON         $'\u2192'              # →
       VCS_GIT_ICON                   ''
+      VCS_GIT_GITHUB_ICON            ''
+      VCS_GIT_BITBUCKET_ICON         ''
+      VCS_GIT_GITLAB_ICON            ''
       VCS_HG_ICON                    ''
       VCS_SVN_ICON                   ''
-	    RUST_ICON                      ''
+      RUST_ICON                      ''
       PYTHON_ICON                    ''
     )
   ;;
