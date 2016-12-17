@@ -134,6 +134,7 @@ The segments that are currently available are:
 * [`custom_command`](#custom_command) - Create a custom segment to display the
   output of an arbitrary command.
 * [`todo`](http://todotxt.com/) - Shows the number of tasks in your todo.txt tasks file.
+* `detect-virt` - Virtualization detection with systemd
 
 ---------------------------------------------------------------------------------
 
