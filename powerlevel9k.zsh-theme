@@ -350,43 +350,35 @@ prompt_battery() {
   # Set default values if the user did not configure them
   set_default POWERLEVEL9K_BATTERY_LOW_THRESHOLD  10
 
-  if [[ $OS =~ OSX && -f /usr/sbin/ioreg && -x /usr/sbin/ioreg ]]; then
-    # Pre-Grep as much information as possible to save some memory and
-    # avoid pollution of the xtrace output.
-    local raw_data="$(ioreg -n AppleSmartBattery | grep -E "MaxCapacity|TimeRemaining|CurrentCapacity|ExternalConnected|IsCharging")"
+  if [[ $OS =~ OSX && -f /usr/bin/pmset && -x /usr/bin/pmset ]]; then
+    # obtain battery information from system
+    local raw_data="$(pmset -g batt)"
     # return if there is no battery on system
-    [[ -z $(echo $raw_data | grep MaxCapacity) ]] && return
+    [[ -z $(echo $raw_data | grep "InternalBattery") ]] && return
 
-    # Convert time remaining from minutes to hours:minutes date string
-    local time_remaining=$(echo $raw_data | grep TimeRemaining | awk '{ print $5 }')
-    if [[ -n $time_remaining ]]; then
-      # this value is set to a very high number when the system is calculating
-      [[ $time_remaining -gt 10000 ]] && local tstring="..." || local tstring=${(f)$(/bin/date -u -r $(($time_remaining * 60)) +%k:%M)}
-    fi
+    # Time remaining on battery operation (charging/discharging)
+    local tstring=$(echo $raw_data | awk 'FNR==2{print $5}')
+    [[ $tstring =~ '\(no' ]] && tstring="..."
 
-    # Get charge values
-    local max_capacity=$(echo $raw_data | grep MaxCapacity | awk '{ print $5 }')
-    local current_capacity=$(echo $raw_data | grep CurrentCapacity | awk '{ print $5 }')
-
-    if [[ -n "$max_capacity" && -n "$current_capacity" ]]; then
-      typeset -i 10 bat_percent
-      bat_percent=$(( (current_capacity * 100) / max_capacity ))
-    fi
+    # percent of battery charged
+    typeset -i 10 bat_percent
+    bat_percent=$(echo $raw_data | grep -o '[0-9]*%' | sed 's/%//')
 
     local remain=""
     # Logic for string output
-    if [[ $(echo $raw_data | grep ExternalConnected | awk '{ print $5 }') =~ "Yes" ]]; then
-      # Battery is charging
-      if [[ $(echo $raw_data | grep IsCharging | awk '{ print $5 }') =~ "Yes" ]]; then
+    case $(echo $raw_data | awk 'FNR==2{print $4}') in
+      'charging;|finishing charge;')
         current_state="charging"
         remain=" ($tstring)"
-      else
+        ;;
+      'discharging;')
+        [[ $bat_percent -lt $POWERLEVEL9K_BATTERY_LOW_THRESHOLD ]] && current_state="low" || current_state="disconnected"
+        remain=" ($tstring)"
+        ;;
+      *)
         current_state="charged"
-      fi
-    else
-      [[ $bat_percent -lt $POWERLEVEL9K_BATTERY_LOW_THRESHOLD ]] && current_state="low" || current_state="disconnected"
-      remain=" ($tstring)"
-    fi
+        ;;
+    esac
   fi
 
   if [[ $OS =~ Linux ]]; then
