@@ -358,6 +358,7 @@ prompt_battery() {
 
     # Time remaining on battery operation (charging/discharging)
     local tstring=$(echo $raw_data | awk 'FNR==2{print $5}')
+    # If time has not been calculated by system yet
     [[ $tstring =~ '\(no' ]] && tstring="..."
 
     # percent of battery charged
