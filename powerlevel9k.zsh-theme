@@ -547,6 +547,26 @@ prompt_history() {
   "$1_prompt_segment" "$0" "$2" "244" "$DEFAULT_COLOR" '%h'
 }
 
+# Detection for virtualization (systemd based systems only)
+prompt_detect_virt() {
+  if ! command -v systemd-detect-virt;then
+    return
+  fi
+  local virt=$(systemd-detect-virt)
+  local color="yellow"
+  if [[ "$virt" == "none" ]]; then
+    if [[ "$(ls -di / | grep -o 2)" != "2" ]]; then
+      virt="chroot"
+      "$1_prompt_segment" "$0" "$2" "$color" "$DEFAULT_COLOR" "$virt"
+    else
+      ;
+    fi
+  else
+    "$1_prompt_segment" "$0" "$2" "$color" "$DEFAULT_COLOR" "$virt"
+  fi
+}
+
+
 prompt_icons_test() {
   for key in ${(@k)icons}; do
     # The lower color spectrum in ZSH makes big steps. Choosing
