@@ -434,13 +434,25 @@ prompt_battery() {
 # Context: user@hostname (who am I and where am I)
 # Note that if $DEFAULT_USER is not set, this prompt segment will always print
 prompt_context() {
-  if [[ "$USER" != "$DEFAULT_USER" || -n "$SSH_CLIENT" ]]; then
+  local current_state="DEFAULT"
+  declare -A context_states
+  context_states=(
+    "ROOT"      "yellow"
+    "DEFAULT"   "011"
+  )
+  local content="$USER"
+  if [[ "$USER" != "$DEFAULT_USER" ]]; then
     if [[ $(print -P "%#") == '#' ]]; then
-      # Shell runs as root
-      "$1_prompt_segment" "$0_ROOT" "$2" "$DEFAULT_COLOR" "yellow" "$USER@%m"
-    else
-      "$1_prompt_segment" "$0_DEFAULT" "$2" "$DEFAULT_COLOR" "011" "$USER@%m"
+      current_state="ROOT"
     fi
+    if [[ -z "$SSH_CLIENT" && -z "$SSH_TTY" ]]; then
+      if [[ "$POWERLEVEL9K_HIDE_HOST" == "false" || -z "$POWERLEVEL9K_HIDE_HOST"  ]]; then
+        content="${content}@%m"
+      fi
+    else
+      content="${content}@%m"
+    fi
+    "$1_prompt_segment" "${0}_${current_state}" "$2" "$DEFAULT_COLOR" "${context_states[$current_state]}" "${content}"
   fi
 }
 
