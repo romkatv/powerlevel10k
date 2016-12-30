@@ -426,6 +426,51 @@ prompt_battery() {
   fi
 }
 
+prompt_public_ip() {
+  # set default values for segment
+  set_default POWERLEVEL9K_PUBLIC_IP_TIMOUT "300"
+  set_default POWERLEVEL9K_PUBLIC_IP_FILE "/tmp/p9k_public_ip"
+  set_default POWERLEVEL9K_PUBLIC_IP_HOST "http://ident.me"
+
+  # Do we need a fresh IP?
+  local refresh_ip=FALSE
+  if [[ -f $POWERLEVEL9K_PUBLIC_IP_FILE ]]; then
+    typeset -i timediff
+    timediff=$(($(date +%s) - $(date -r $POWERLEVEL9K_PUBLIC_IP_FILE +%s)))
+    [[ $timediff -gt '500' ]] && refresh_ip=TRUE
+    # this will run the IP refresh with each new prompt while disconnected
+    # but will get a new IP immediately once reconnected rather than waiting
+    # for the timeout, not sure if this is ideal behavior or not
+    [[ -z $(cat $POWERLEVEL9K_PUBLIC_IP_FILE) ]] && refresh_ip=TRUE
+  else
+    touch $POWERLEVEL9K_PUBLIC_IP_FILE && refresh_ip=TRUE
+  fi
+
+  # grab a fresh IP if needed
+  if [[ $refresh_ip =~ 'TRUE' && -w $POWERLEVEL9K_PUBLIC_IP_FILE ]]; then
+    if type -p dig >/dev/null; then
+        fresh_ip="$(dig +time=1 +tries=1 +short myip.opendns.com @resolver1.opendns.com 2> /dev/null)"
+        [[ "$fresh_ip" =~ ^\; ]] && unset fresh_ip
+    fi
+
+    if [[ -z "$fresh_ip" ]] && type -p curl >/dev/null; then
+        fresh_ip="$(curl --max-time 10 -w '\n' "$POWERLEVEL9K_PUBLIC_IP_HOST" 2> /dev/null)"
+    fi
+
+    if [[ -z "$fresh_ip" ]] && type -p wget >/dev/null; then
+        fresh_ip="$(wget -T 10 -qO- "$POWERLEVEL9K_PUBLIC_IP_HOST" 2> /dev/null)"
+    fi
+    [[ -n $fresh_ip ]] && echo $fresh_ip > $POWERLEVEL9K_PUBLIC_IP_FILE
+  fi
+
+  # write IP to tmp file
+  local public_ip=$(cat $POWERLEVEL9K_PUBLIC_IP_FILE)
+
+  if [[ -n $public_ip ]]; then
+    $1_prompt_segment "$0" "$2" "black" "249" "${public_ip}" 'PUBLIC_IP_ICON'
+  fi
+}
+
 # Context: user@hostname (who am I and where am I)
 # Note that if $DEFAULT_USER is not set, this prompt segment will always print
 prompt_context() {
