@@ -467,7 +467,7 @@ prompt_public_ip() {
   local public_ip=$(cat $POWERLEVEL9K_PUBLIC_IP_FILE)
 
   if [[ -n $public_ip ]]; then
-    $1_prompt_segment "$0" "$2" "black" "249" "${public_ip}" 'PUBLIC_IP_ICON'
+    $1_prompt_segment "$0" "$2" "$DEFAULT_COLOR" "$DEFAULT_COLOR_INVERTED" "${public_ip}" 'PUBLIC_IP_ICON'
   fi
 }
 
