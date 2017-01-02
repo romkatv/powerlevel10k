@@ -433,21 +433,21 @@ prompt_public_ip() {
   set_default POWERLEVEL9K_PUBLIC_IP_HOST "http://ident.me"
 
   # Do we need a fresh IP?
-  local refresh_ip=FALSE
+  local refresh_ip=false
   if [[ -f $POWERLEVEL9K_PUBLIC_IP_FILE ]]; then
     typeset -i timediff
     timediff=$(($(date +%s) - $(date -r $POWERLEVEL9K_PUBLIC_IP_FILE +%s)))
-    [[ $timediff -gt '500' ]] && refresh_ip=TRUE
+    [[ $timediff -gt '500' ]] && refresh_ip=true
     # this will run the IP refresh with each new prompt while disconnected
     # but will get a new IP immediately once reconnected rather than waiting
     # for the timeout, not sure if this is ideal behavior or not
-    [[ -z $(cat $POWERLEVEL9K_PUBLIC_IP_FILE) ]] && refresh_ip=TRUE
+    [[ -z $(cat $POWERLEVEL9K_PUBLIC_IP_FILE) ]] && refresh_ip=true
   else
-    touch $POWERLEVEL9K_PUBLIC_IP_FILE && refresh_ip=TRUE
+    touch $POWERLEVEL9K_PUBLIC_IP_FILE && refresh_ip=true
   fi
 
   # grab a fresh IP if needed
-  if [[ $refresh_ip =~ 'TRUE' && -w $POWERLEVEL9K_PUBLIC_IP_FILE ]]; then
+  if [[ $refresh_ip =~ true && -w $POWERLEVEL9K_PUBLIC_IP_FILE ]]; then
     if type -p dig >/dev/null; then
         fresh_ip="$(dig +time=1 +tries=1 +short myip.opendns.com @resolver1.opendns.com 2> /dev/null)"
         [[ "$fresh_ip" =~ ^\; ]] && unset fresh_ip
