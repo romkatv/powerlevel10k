@@ -429,12 +429,13 @@ prompt_battery() {
 # Context: user@hostname (who am I and where am I)
 # Note that if $DEFAULT_USER is not set, this prompt segment will always print
 prompt_context() {
+  set_default POWERLEVEL9K_CONTEXT_HOST_DEPTH "%m"
   if [[ "$USER" != "$DEFAULT_USER" || -n "$SSH_CLIENT" ]]; then
     if [[ $(print -P "%#") == '#' ]]; then
       # Shell runs as root
-      "$1_prompt_segment" "$0_ROOT" "$2" "$DEFAULT_COLOR" "yellow" "$USER@%m"
+      "$1_prompt_segment" "$0_ROOT" "$2" "$DEFAULT_COLOR" "yellow" "$USER@$POWERLEVEL9K_CONTEXT_HOST_DEPTH"
     else
-      "$1_prompt_segment" "$0_DEFAULT" "$2" "$DEFAULT_COLOR" "011" "$USER@%m"
+      "$1_prompt_segment" "$0_DEFAULT" "$2" "$DEFAULT_COLOR" "011" "$USER@$POWERLEVEL9K_CONTEXT_HOST_DEPTH"
     fi
   fi
 }

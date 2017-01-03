@@ -240,9 +240,17 @@ it, but only display it if you are not your normal user or on a remote host
 To use this feature, make sure the `context` segment is enabled in your prompt
 elements (it is by default), and define a `DEFAULT_USER` in your `~/.zshrc`:
 
+You can set the `POWERLEVEL9K_CONTEXT_HOST_DEPTH` variable to change how the
+hostname is displayed. See (ZSH Manual)[http://zsh.sourceforge.net/Doc/Release/Prompt-Expansion.html#Login-information]
+for details. Default is set to %m which will show the hostname up to the first ‘.’
+You can set it to %{N}m where N is an integer to show that many segments of system
+hostname. Setting N to a negative integer will show that many segments from the
+end of the hostname.
+
 | Variable | Default Value | Description |
 |----------|---------------|-------------|
 |`DEFAULT_USER`|None|Username to consider a "default context" (you can also use `$USER`)|
+|`POWERLEVEL9K_CONTEXT_HOST_DEPTH`|%m|Customizable host depth on prompt|
 
 ##### dir
 
