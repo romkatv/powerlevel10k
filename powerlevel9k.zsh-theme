@@ -436,11 +436,10 @@ prompt_public_ip() {
   local refresh_ip=false
   if [[ -f $POWERLEVEL9K_PUBLIC_IP_FILE ]]; then
     typeset -i timediff
+    # if saved IP is more than
     timediff=$(($(date +%s) - $(date -r $POWERLEVEL9K_PUBLIC_IP_FILE +%s)))
-    [[ $timediff -gt '500' ]] && refresh_ip=true
-    # this will run the IP refresh with each new prompt while disconnected
-    # but will get a new IP immediately once reconnected rather than waiting
-    # for the timeout, not sure if this is ideal behavior or not
+    [[ $timediff -gt $POWERLEVEL9K_PUBLIC_IP_TIMOUT ]] && refresh_ip=true
+    # If tmp file is empty get a fresh IP
     [[ -z $(cat $POWERLEVEL9K_PUBLIC_IP_FILE) ]] && refresh_ip=true
   else
     touch $POWERLEVEL9K_PUBLIC_IP_FILE && refresh_ip=true
@@ -461,8 +460,8 @@ prompt_public_ip() {
         fresh_ip="$(wget -T 10 -qO- "$POWERLEVEL9K_PUBLIC_IP_HOST" 2> /dev/null)"
     fi
 
-    # write IP to tmp file or touch tmp file if an IP was not retrieved
-    [[ -n $fresh_ip ]] && echo $fresh_ip > $POWERLEVEL9K_PUBLIC_IP_FILE || touch $POWERLEVEL9K_PUBLIC_IP_FILE
+    # write IP to tmp file or clear tmp file if an IP was not retrieved
+    [[ -n $fresh_ip ]] && echo $fresh_ip > $POWERLEVEL9K_PUBLIC_IP_FILE || echo "" > $POWERLEVEL9K_PUBLIC_IP_FILE
   fi
 
   # read public IP saved to tmp file
