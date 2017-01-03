@@ -460,10 +460,11 @@ prompt_public_ip() {
     if [[ -z "$fresh_ip" ]] && type -p wget >/dev/null; then
         fresh_ip="$(wget -T 10 -qO- "$POWERLEVEL9K_PUBLIC_IP_HOST" 2> /dev/null)"
     fi
-    [[ -n $fresh_ip ]] && echo $fresh_ip > $POWERLEVEL9K_PUBLIC_IP_FILE
+    # write IP to tmp file or touch tmp file if an IP was not retrieved
+    [[ -n $fresh_ip ]] && echo $fresh_ip > $POWERLEVEL9K_PUBLIC_IP_FILE || touch $POWERLEVEL9K_PUBLIC_IP_FILE
   fi
 
-  # write IP to tmp file
+  # read public IP saved to tmp file
   local public_ip=$(cat $POWERLEVEL9K_PUBLIC_IP_FILE)
 
   if [[ -n $public_ip ]]; then
