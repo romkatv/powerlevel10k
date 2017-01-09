@@ -429,7 +429,7 @@ prompt_battery() {
 prompt_public_ip() {
   # set default values for segment
   set_default POWERLEVEL9K_PUBLIC_IP_TIMOUT "300"
-  set_default POWERLEVEL9K_PUBLIC_IP_NONE "none"
+  set_default POWERLEVEL9K_PUBLIC_IP_NONE ""
   set_default POWERLEVEL9K_PUBLIC_IP_FILE "/tmp/p9k_public_ip"
   set_default POWERLEVEL9K_PUBLIC_IP_HOST "http://ident.me"
 
