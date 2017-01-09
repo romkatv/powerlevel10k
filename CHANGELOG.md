@@ -1,3 +1,19 @@
+## v0.5.0
+
+### `load` and `ram` changes
+
+These two segments now support BSD.
+
+### `vcs` changes
+
+- We implemented a huge speed improvement for this segment.
+- Now this segment supports Subversion repositories.
+- Add ability to hide tags by setting `POWERLEVEL9K_VCS_HIDE_TAGS` to true.
+
+## `anaconda` changes
+
+Speed improvements for `anaconda` segment.
+
 ## v0.4.0
 
 ### Development changes
@@ -76,6 +92,11 @@ Added new `docker_machine` segment that will show your Docker machine.
 
 A new segment `anaconda` was added that shows the current used
 anaconda environment.
+
+## New segment `pyenv` added
+
+This segment shows your active python version as reported by `pyenv`.
+
 
 ## v0.3.2
 
