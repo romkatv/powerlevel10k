@@ -90,6 +90,7 @@ The segments that are currently available are:
 * [`dir`](#dir) - Your current working directory.
 * `history` - The command number for the current line.
 * [`ip`](#ip) - Shows the current IP address.
+* [`public_ip`](#public_ip) - Shows your public IP address.
 * `load` - Your machine's load averages.
 * `os_icon` - Display a nice little icon, depending on your operating system.
 * `ram` - Show free RAM.
