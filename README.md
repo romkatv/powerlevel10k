@@ -315,6 +315,29 @@ specify the correct network interface by setting:
 |----------|---------------|-------------|
 |`POWERLEVEL9K_IP_INTERFACE`|None|The NIC for which you wish to display the IP address. Example: `eth0`.|
 
+##### public_ip
+
+This segment will display your public IP address. There are several methods of obtaining this
+information and by default it will try all of them starting with the most efficient. You can
+also specify which method you would like it to use. The methods available are dig using opendns,
+curl, or wget. The host used for wget and curl is http://ident.me by default but can be set to
+another host if you prefer.
+
+The public_ip segment will attempt to update your public IP address every 5 minutes by default(also
+configurable by the user). If you lose connection your cached IP address will be displayed until
+your timeout expires at which point every time your prompt is generated a new attempt will be made.
+Until an IP is successfully pulled the value of $POWERLEVEL9K_PUBLIC_IP_NONE will be displayed for
+this segment. If this value is empty(the default)and $POWERLEVEL9K_PUBLIC_IP_FILE is empty the
+segment will not be displayed.
+
+| Variable | Default Value | Description |
+|----------|---------------|-------------|
+|`POWERLEVEL9K_PUBLIC_IP_FILE`|'/tmp/p8k_public_ip'|This is the file your public IP is cached in.|
+|`POWERLEVEL9K_PUBLIC_IP_HOST`|'http://ident.me'|This is the default host to get your public IP.|
+|`POWERLEVEL9K_PUBLIC_IP_TIMOUT`|300|The amount of time in seconds between refreshing your cached IP.|
+|`POWERLEVEL9K_PUBLIC_IP_METHOD`|None|You can set this to any of 'dig', 'curl', or 'wget' to only use that method to refresh your IP.|
+|`POWERLEVEL9K_PUBLIC_IP_NONE`|None|The string displayed when an IP was not obtained|
+
 ##### rbenv
 
 This segment shows the version of Ruby being used when using `rbenv` to change your current Ruby stack.
