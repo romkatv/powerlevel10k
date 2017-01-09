@@ -412,4 +412,5 @@ portion of the wiki to get going.
 information!](https://github.com/bhilburn/powerlevel9k/wiki)
 
 ### License
-MIT
+Project: MIT
+Logo: CC-BY-SA. Source repository: https://github.com/bhilburn/powerlevel9k-logo
