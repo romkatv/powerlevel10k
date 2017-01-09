@@ -428,7 +428,7 @@ prompt_battery() {
 
 prompt_public_ip() {
   # set default values for segment
-  set_default POWERLEVEL9K_PUBLIC_IP_TIMOUT "300"
+  set_default POWERLEVEL9K_PUBLIC_IP_TIMEOUT "300"
   set_default POWERLEVEL9K_PUBLIC_IP_NONE ""
   set_default POWERLEVEL9K_PUBLIC_IP_FILE "/tmp/p9k_public_ip"
   set_default POWERLEVEL9K_PUBLIC_IP_HOST "http://ident.me"
@@ -439,9 +439,10 @@ prompt_public_ip() {
     typeset -i timediff
     # if saved IP is more than
     timediff=$(($(date +%s) - $(date -r $POWERLEVEL9K_PUBLIC_IP_FILE +%s)))
-    [[ $timediff -gt $POWERLEVEL9K_PUBLIC_IP_TIMOUT ]] && refresh_ip=true
+    [[ $timediff -gt $POWERLEVEL9K_PUBLIC_IP_TIMEOUT ]] && refresh_ip=true
     # If tmp file is empty get a fresh IP
-    [[ -z $(cat $POWERLEVEL9K_PUBLIC_IP_FILE) || $(cat $POWERLEVEL9K_PUBLIC_IP_FILE) =~ "$POWERLEVEL9K_PUBLIC_IP_NONE" ]] && refresh_ip=true
+    [[ -z $(cat $POWERLEVEL9K_PUBLIC_IP_FILE) ]] && refresh_ip=true
+    [[ -n $POWERLEVEL9K_PUBLIC_IP_NONE ]] && [[ $(cat $POWERLEVEL9K_PUBLIC_IP_FILE) =~ "$POWERLEVEL9K_PUBLIC_IP_NONE" ]] && refresh_ip=true
   else
     touch $POWERLEVEL9K_PUBLIC_IP_FILE && refresh_ip=true
   fi
