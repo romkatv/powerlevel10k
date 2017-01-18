@@ -339,7 +339,7 @@ prompt_background_jobs() {
 
 prompt_battery() {
   # The battery can have four different states - default to 'unknown'.
-  local current_state="unknown"
+  local current_state='unknown'
   typeset -AH battery_states
   battery_states=(
     'low'           'red'
@@ -352,14 +352,14 @@ prompt_battery() {
 
   if [[ $OS =~ OSX && -f /usr/bin/pmset && -x /usr/bin/pmset ]]; then
     # obtain battery information from system
-    local raw_data="$(pmset -g batt)"
+    local raw_data="$(pmset -g batt | awk 'FNR==2{print}')"
     # return if there is no battery on system
     [[ -z $(echo $raw_data | grep "InternalBattery") ]] && return
 
     # Time remaining on battery operation (charging/discharging)
-    local tstring=$(echo $raw_data | awk 'FNR==2{print $5}')
+    local tstring=$(echo $raw_data | awk -F ';' '{print $3}' | awk '{print $1}')
     # If time has not been calculated by system yet
-    [[ $tstring =~ '\(no' ]] && tstring="..."
+    [[ $tstring =~ '(\(no|not)' ]] && tstring="..."
 
     # percent of battery charged
     typeset -i 10 bat_percent
@@ -367,12 +367,13 @@ prompt_battery() {
 
     local remain=""
     # Logic for string output
-    case $(echo $raw_data | awk 'FNR==2{print $4}') in
-      'charging;|finishing charge;')
+    case $(echo $raw_data | awk -F ';' '{print $2}' | awk '{$1=$1};1') in
+      # for a short time after attaching power, status will be 'AC attached;'
+      'charging'|'finishing charge'|'AC attached')
         current_state="charging"
         remain=" ($tstring)"
         ;;
-      'discharging;')
+      'discharging')
         [[ $bat_percent -lt $POWERLEVEL9K_BATTERY_LOW_THRESHOLD ]] && current_state="low" || current_state="disconnected"
         remain=" ($tstring)"
         ;;
