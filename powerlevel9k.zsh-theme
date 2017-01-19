@@ -1147,7 +1147,7 @@ $(print_icon 'MULTILINE_SECOND_PROMPT_PREFIX')"
   fi
 }
 
-powerlevel9k_init() {
+prompt_powerlevel9k_setup() {
   # Display a warning if the terminal does not support 256 colors
   local term_colors
   term_colors=$(echotc Co)
@@ -1199,4 +1199,5 @@ powerlevel9k_init() {
   add-zsh-hook precmd powerlevel9k_prepare_prompts
 }
 
-powerlevel9k_init "$@"
+prompt_powerlevel9k_setup "$@"
+
