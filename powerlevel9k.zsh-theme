@@ -337,10 +337,10 @@ prompt_background_jobs() {
   fi
 }
 
-# Segment to indicate hdd available level.
+# Segment that indicates usage level of current partition.
 set_default POWERLEVEL9K_HDD_USAGE_ONLY_WARNING false
-set_default POWERLEVEL9K_HDD_USAGE_WARNING_LEVEL 10
-set_default POWERLEVEL9K_HDD_USAGE_CRITICAL_LEVEL 5
+set_default POWERLEVEL9K_HDD_USAGE_WARNING_LEVEL 90
+set_default POWERLEVEL9K_HDD_USAGE_CRITICAL_LEVEL 95
 prompt_hdd_usage() {
   local current_state="unknown"
   typeset -AH hdd_usage_forecolors
@@ -356,28 +356,20 @@ prompt_hdd_usage() {
     'critical'      'red'
   )
 
-  # local df="$(df -k . | sed -n '2p')"
-  # local size="$(echo $df | awk '{ print $2 }')"
-  # local avail="$(echo $df | awk '{ print $4 }')"
-  # local level="$(printf %.0f $(( avail * 100.0 / size )))"
-
   local level="${$(df -k . | sed -n '2p' | awk '{ print $5 }')%%\%}"
-  level="$(( 100 - level ))"
 
-  if [ "$level" -gt "$POWERLEVEL9K_HDD_USAGE_WARNING_LEVEL" ]; then
-    # Default behavior: Show message always
-    if [[ "$POWERLEVEL9K_HDD_USAGE_ONLY_WARNING" != false ]]; then
-      return
-    fi
-  fi
-
-  if [ "$level" -le "$POWERLEVEL9K_HDD_USAGE_CRITICAL_LEVEL" ]; then
-    current_state='critical'
-  elif [ "$level" -le "$POWERLEVEL9K_HDD_USAGE_WARNING_LEVEL" ]; then
+  if [ "$level" -ge "$POWERLEVEL9K_HDD_USAGE_WARNING_LEVEL" ]; then
     current_state='warning'
+    if [ "$level" -ge "$POWERLEVEL9K_HDD_USAGE_CRITICAL_LEVEL" ]; then
+        current_state='critical'
+    fi
   else
+    if [[ "$POWERLEVEL9K_HDD_USAGE_ONLY_WARNING" != false ]]; then
+        return
+    fi
     current_state='normal'
   fi
+
   local message="${level}%%"
 
   # Draw the prompt_segment
