@@ -1,5 +1,5 @@
-## powerlevel9k Theme for ZSH
-
+![](https://raw.githubusercontent.com/bhilburn/powerlevel9k-logo/master/logo-banner.png)
+---
 [![Build Status](https://travis-ci.org/bhilburn/powerlevel9k.svg?branch=next)](https://travis-ci.org/bhilburn/powerlevel9k)
 [![Join the chat at https://gitter.im/bhilburn/powerlevel9k](https://badges.gitter.im/bhilburn/powerlevel9k.svg)](https://gitter.im/bhilburn/powerlevel9k?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
@@ -90,6 +90,7 @@ The segments that are currently available are:
 * [`dir`](#dir) - Your current working directory.
 * `history` - The command number for the current line.
 * [`ip`](#ip) - Shows the current IP address.
+* [`public_ip`](#public_ip) - Shows your public IP address.
 * `load` - Your machine's load averages.
 * `os_icon` - Display a nice little icon, depending on your operating system.
 * `ram` - Show free RAM.
@@ -136,6 +137,7 @@ The segments that are currently available are:
 * [`custom_command`](#custom_command) - Create a custom segment to display the
   output of an arbitrary command.
 * [`todo`](http://todotxt.com/) - Shows the number of tasks in your todo.txt tasks file.
+* `detect-virt` - Virtualization detection with systemd
 
 ---------------------------------------------------------------------------------
 
@@ -239,9 +241,17 @@ it, but only display it if you are not your normal user or on a remote host
 To use this feature, make sure the `context` segment is enabled in your prompt
 elements (it is by default), and define a `DEFAULT_USER` in your `~/.zshrc`:
 
+You can set the `POWERLEVEL9K_CONTEXT_HOST_DEPTH` variable to change how the
+hostname is displayed. See (ZSH Manual)[http://zsh.sourceforge.net/Doc/Release/Prompt-Expansion.html#Login-information]
+for details. Default is set to %m which will show the hostname up to the first ‘.’
+You can set it to %{N}m where N is an integer to show that many segments of system
+hostname. Setting N to a negative integer will show that many segments from the
+end of the hostname.
+
 | Variable | Default Value | Description |
 |----------|---------------|-------------|
 |`DEFAULT_USER`|None|Username to consider a "default context" (you can also use `$USER`)|
+|`POWERLEVEL9K_CONTEXT_HOST_DEPTH`|%m|Customizable host depth on prompt|
 
 ##### dir
 
@@ -305,6 +315,29 @@ specify the correct network interface by setting:
 | Variable | Default Value | Description |
 |----------|---------------|-------------|
 |`POWERLEVEL9K_IP_INTERFACE`|None|The NIC for which you wish to display the IP address. Example: `eth0`.|
+
+##### public_ip
+
+This segment will display your public IP address. There are several methods of obtaining this
+information and by default it will try all of them starting with the most efficient. You can
+also specify which method you would like it to use. The methods available are dig using opendns,
+curl, or wget. The host used for wget and curl is http://ident.me by default but can be set to
+another host if you prefer.
+
+The public_ip segment will attempt to update your public IP address every 5 minutes by default(also
+configurable by the user). If you lose connection your cached IP address will be displayed until
+your timeout expires at which point every time your prompt is generated a new attempt will be made.
+Until an IP is successfully pulled the value of $POWERLEVEL9K_PUBLIC_IP_NONE will be displayed for
+this segment. If this value is empty(the default)and $POWERLEVEL9K_PUBLIC_IP_FILE is empty the
+segment will not be displayed.
+
+| Variable | Default Value | Description |
+|----------|---------------|-------------|
+|`POWERLEVEL9K_PUBLIC_IP_FILE`|'/tmp/p8k_public_ip'|This is the file your public IP is cached in.|
+|`POWERLEVEL9K_PUBLIC_IP_HOST`|'http://ident.me'|This is the default host to get your public IP.|
+|`POWERLEVEL9K_PUBLIC_IP_TIMEOUT`|300|The amount of time in seconds between refreshing your cached IP.|
+|`POWERLEVEL9K_PUBLIC_IP_METHOD`|None|You can set this to any of 'dig', 'curl', or 'wget' to only use that method to refresh your IP.|
+|`POWERLEVEL9K_PUBLIC_IP_NONE`|None|The string displayed when an IP was not obtained|
 
 ##### rbenv
 
@@ -421,4 +454,7 @@ portion of the wiki to get going.
 information!](https://github.com/bhilburn/powerlevel9k/wiki)
 
 ### License
-MIT
+
+Project: MIT
+
+Logo: CC-BY-SA. Source repository: https://github.com/bhilburn/powerlevel9k-logo
