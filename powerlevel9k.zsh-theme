@@ -337,6 +337,48 @@ prompt_background_jobs() {
   fi
 }
 
+# Segment that indicates usage level of current partition.
+set_default POWERLEVEL9K_DISK_USAGE_ONLY_WARNING false
+set_default POWERLEVEL9K_DISK_USAGE_WARNING_LEVEL 90
+set_default POWERLEVEL9K_DISK_USAGE_CRITICAL_LEVEL 95
+prompt_disk_usage() {
+  local current_state="unknown"
+  typeset -AH hdd_usage_forecolors
+  hdd_usage_forecolors=(
+    'normal'        'yellow'
+    'warning'       "$DEFAULT_COLOR"
+    'critical'      'white'
+  )
+  typeset -AH hdd_usage_backcolors
+  hdd_usage_backcolors=(
+    'normal'        $DEFAULT_COLOR
+    'warning'       'yellow'
+    'critical'      'red'
+  )
+
+  local disk_usage="${$(\df -P . | sed -n '2p' | awk '{ print $5 }')%%\%}"
+
+  if [ "$disk_usage" -ge "$POWERLEVEL9K_DISK_USAGE_WARNING_LEVEL" ]; then
+    current_state='warning'
+    if [ "$disk_usage" -ge "$POWERLEVEL9K_DISK_USAGE_CRITICAL_LEVEL" ]; then
+        current_state='critical'
+    fi
+  else
+    if [[ "$POWERLEVEL9K_DISK_USAGE_ONLY_WARNING" == true ]]; then
+        current_state=''
+        return
+    fi
+    current_state='normal'
+  fi
+
+  local message="${disk_usage}%%"
+
+  # Draw the prompt_segment
+  if [[ -n $disk_usage ]]; then
+    "$1_prompt_segment" "${0}_${current_state}" "$2" "${hdd_usage_backcolors[$current_state]}" "${hdd_usage_forecolors[$current_state]}" "$message" 'DISK_ICON'
+  fi
+}
+
 prompt_battery() {
   # The battery can have four different states - default to 'unknown'.
   local current_state='unknown'

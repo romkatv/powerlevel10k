@@ -88,6 +88,7 @@ The segments that are currently available are:
 * [`battery`](#battery) - Current battery status.
 * [`context`](#context) - Your username and host.
 * [`dir`](#dir) - Your current working directory.
+* [`disk_usage`](#disk_usage) - Disk usage of your current partition.
 * `history` - The command number for the current line.
 * [`ip`](#ip) - Shows the current IP address.
 * [`public_ip`](#public_ip) - Shows your public IP address.
@@ -305,6 +306,16 @@ If you want to customize the directory separator, you could set:
 # You'll need patched awesome-terminal fonts for that example
 POWERLEVEL9K_DIR_PATH_SEPARATOR="%f "$'\uE0B1'" %F"
 ```
+
+##### disk_usage
+
+The `disk_usage` segment will show the usage level of the partition that your current working directory resides in. It can be configured with the following variables.
+
+| Variable | Default Value | Description |
+|----------|---------------|-------------|
+|POWERLEVEL9K_DISK_USAGE_ONLY_WARNING|false|Hide the segment except when usage levels have hit warning or critical levels.|
+|POWERLEVEL9K_DISK_USAGE_WARNING_LEVEL|90|The usage level that triggers a warning state.|
+|POWERLEVEL9K_DISK_USAGE_CRITICAL_LEVEL|95|The usage level that triggers a critical state.|
 
 ##### ip
 
