@@ -46,8 +46,8 @@ Here is `powerlevel9k` in action, with [some simple settings](https://github.com
 Be sure to also [check out the Wiki](https://github.com/bhilburn/powerlevel9k/wiki)!
 
 ### Installation
-There are two installation steps to go from a lame terminal to a "Power Level
-9000" terminal. Once you are done, you can optionally customize your prompt.
+There are two installation steps to go from a vanilla terminal to a PL9k
+terminal. Once you are done, you can optionally customize your prompt.
 
 [Installation Instructions](https://github.com/bhilburn/powerlevel9k/wiki/Install-Instructions)
 
@@ -71,14 +71,15 @@ variables to your `~/.zshrc`.
 | Variable | Default Value | Description |
 |----------|---------------|-------------|
 |`POWERLEVEL9K_LEFT_PROMPT_ELEMENTS`|`(context dir rbenv vcs)`|Segment list for left prompt|
-|`POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS`|`(status history time)`|Segment list for right prompt|
+|`POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS`|`(status root_indicator background_jobs history time)`|Segment list for right prompt|
 
 
-So if you wanted to set these variables manually, you would put the following in
+The table above shows the default values, so if you wanted to set these
+variables manually, you would put the following in
 your `~/.zshrc`:
 ```zsh
 POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(context dir rbenv vcs)
-POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(status history time)
+POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(status root_indicator background_jobs history time)
 ```
 #### Available Prompt Segments
 The segments that are currently available are:
