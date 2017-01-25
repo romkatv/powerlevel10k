@@ -587,7 +587,14 @@ prompt_dir() {
 
         # Get the path of the Git repo, which should have the package.json file
         if [[ $(git rev-parse --is-inside-work-tree 2> /dev/null) == "true" ]]; then
-          package_path=$(git rev-parse --show-toplevel)
+          # Get path from the root of the git repository to the current dir
+          local gitPath=$(git rev-parse --show-prefix)
+          # Remove trailing slash from git path, so that we can
+          # remove that git path from the pwd.
+          gitPath=${gitPath%/}
+          package_path=${$(pwd)%%$gitPath}
+          # Remove trailing slash
+          package_path=${package_path%/}
         elif [[ $(git rev-parse --is-inside-git-dir 2> /dev/null) == "true" ]]; then
           package_path=${$(pwd)%%/.git*}
         fi
