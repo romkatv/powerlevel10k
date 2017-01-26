@@ -157,7 +157,7 @@ case $POWERLEVEL9K_MODE in
       BACKGROUND_JOBS_ICON           $'\uF013 '             # 
       TEST_ICON                      $'\uF188'              # 
       TODO_ICON                      $'\u2611'              # ☑
-      BATTERY_ICON                   $'\uF241'              # 
+      BATTERY_ICON                   $'\uF241 '             # 
       OK_ICON                        $'\u2713'              # ✓
       FAIL_ICON                      $'\u2718'              # ✘
       SYMFONY_ICON                   $'\uE757'              # 
