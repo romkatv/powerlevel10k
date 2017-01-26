@@ -257,7 +257,14 @@ only print if you are not your 'normal' user (including if you are root), or if
 you are SSH'd to a remote host.
 
 To use this feature, make sure the `context` segment is enabled in your prompt
-elements (it is by default), and define a `DEFAULT_USER` in your `~/.zshrc`:
+elements (it is by default), and define a `DEFAULT_USER` in your `~/.zshrc`.
+
+You can customize the `context` segment. For example, you can make it to print the
+full hostname by setting
+```
+POWERLEVEL9K_CONTEXT_TEMPLATE="%n@`hostname -f`"
+```
+
 
 You can set the `POWERLEVEL9K_CONTEXT_HOST_DEPTH` variable to change how the
 hostname is displayed. See (ZSH Manual)[http://zsh.sourceforge.net/Doc/Release/Prompt-Expansion.html#Login-information]
@@ -269,9 +276,10 @@ end of the hostname.
 | Variable | Default Value | Description |
 |----------|---------------|-------------|
 |`DEFAULT_USER`|None|Username to consider a "default context".|
-|`POWERLEVEL9K_CONTEXT_HOST_DEPTH`|%m|Customizable host depth on prompt.|
 |`POWERLEVEL9K_ALWAYS_SHOW_CONTEXT`|false|Always show this segment, including $USER and hostname.|
 |`POWERLEVEL9K_ALWAYS_SHOW_USER`|false|Always show the username, but conditionalize the hostname.|
+|`DEFAULT_USER`|None|Username to consider a "default context" (you can also use `$USER`)|
+|`POWERLEVEL9K_CONTEXT_TEMPLATE`|%n@%m|Default context prompt (username@machine). Refer to the [ZSH Documentation](http://zsh.sourceforge.net/Doc/Release/Prompt-Expansion.html) for all possible expansions, including deeper host depths.|
 
 ##### dir
 

@@ -539,7 +539,7 @@ prompt_public_ip() {
 # Note that if $DEFAULT_USER is not set, this prompt segment will always print
 set_default POWERLEVEL9K_ALWAYS_SHOW_CONTEXT false
 set_default POWERLEVEL9K_ALWAYS_SHOW_USER false
-set_default POWERLEVEL9K_CONTEXT_HOST_DEPTH "%m"
+set_default POWERLEVEL9K_CONTEXT_TEMPLATE "%n@%m"
 prompt_context() {
   local current_state="DEFAULT"
   typeset -AH context_states
@@ -556,7 +556,7 @@ prompt_context() {
         current_state="ROOT"
       fi
 
-      content="$USER@${POWERLEVEL9K_CONTEXT_HOST_DEPTH}"
+      content="${POWERLEVEL9K_CONTEXT_TEMPLATE}"
 
   elif [[ "$POWERLEVEL9K_ALWAYS_SHOW_USER" == true ]]; then
       content="$USER"
