@@ -46,8 +46,8 @@ Here is `powerlevel9k` in action, with [some simple settings](https://github.com
 Be sure to also [check out the Wiki](https://github.com/bhilburn/powerlevel9k/wiki)!
 
 ### Installation
-There are two installation steps to go from a lame terminal to a "Power Level
-9000" terminal. Once you are done, you can optionally customize your prompt.
+There are two installation steps to go from a vanilla terminal to a PL9k
+terminal. Once you are done, you can optionally customize your prompt.
 
 [Installation Instructions](https://github.com/bhilburn/powerlevel9k/wiki/Install-Instructions)
 
@@ -71,14 +71,15 @@ variables to your `~/.zshrc`.
 | Variable | Default Value | Description |
 |----------|---------------|-------------|
 |`POWERLEVEL9K_LEFT_PROMPT_ELEMENTS`|`(context dir rbenv vcs)`|Segment list for left prompt|
-|`POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS`|`(status history time)`|Segment list for right prompt|
+|`POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS`|`(status root_indicator background_jobs history time)`|Segment list for right prompt|
 
 
-So if you wanted to set these variables manually, you would put the following in
+The table above shows the default values, so if you wanted to set these
+variables manually, you would put the following in
 your `~/.zshrc`:
 ```zsh
 POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(context dir rbenv vcs)
-POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(status history time)
+POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(status root_indicator background_jobs history time)
 ```
 #### Available Prompt Segments
 The segments that are currently available are:
@@ -88,6 +89,7 @@ The segments that are currently available are:
 * [`battery`](#battery) - Current battery status.
 * [`context`](#context) - Your username and host.
 * [`dir`](#dir) - Your current working directory.
+* [`disk_usage`](#disk_usage) - Disk usage of your current partition.
 * `history` - The command number for the current line.
 * [`ip`](#ip) - Shows the current IP address.
 * [`public_ip`](#public_ip) - Shows your public IP address.
@@ -137,7 +139,7 @@ The segments that are currently available are:
 * [`custom_command`](#custom_command) - Create a custom segment to display the
   output of an arbitrary command.
 * [`todo`](http://todotxt.com/) - Shows the number of tasks in your todo.txt tasks file.
-* `detect-virt` - Virtualization detection with systemd
+* `detect_virt` - Virtualization detection with systemd
 
 ---------------------------------------------------------------------------------
 
@@ -305,6 +307,16 @@ If you want to customize the directory separator, you could set:
 # You'll need patched awesome-terminal fonts for that example
 POWERLEVEL9K_DIR_PATH_SEPARATOR="%f "$'\uE0B1'" %F"
 ```
+
+##### disk_usage
+
+The `disk_usage` segment will show the usage level of the partition that your current working directory resides in. It can be configured with the following variables.
+
+| Variable | Default Value | Description |
+|----------|---------------|-------------|
+|POWERLEVEL9K_DISK_USAGE_ONLY_WARNING|false|Hide the segment except when usage levels have hit warning or critical levels.|
+|POWERLEVEL9K_DISK_USAGE_WARNING_LEVEL|90|The usage level that triggers a warning state.|
+|POWERLEVEL9K_DISK_USAGE_CRITICAL_LEVEL|95|The usage level that triggers a critical state.|
 
 ##### ip
 
