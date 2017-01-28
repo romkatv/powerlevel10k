@@ -475,7 +475,7 @@ prompt_public_ip() {
   set_default POWERLEVEL9K_PUBLIC_IP_NONE ""
   set_default POWERLEVEL9K_PUBLIC_IP_FILE "/tmp/p9k_public_ip"
   set_default POWERLEVEL9K_PUBLIC_IP_HOST "http://ident.me"
-  defined POWERLEVEL9K_PUBLIC_IP_METHODS || POWERLEVEL9K_PUBLIC_IP_METHODS=(wget curl dig)
+  defined POWERLEVEL9K_PUBLIC_IP_METHODS || POWERLEVEL9K_PUBLIC_IP_METHODS=(dig curl wget)
 
   # Do we need a fresh IP?
   local refresh_ip=false
