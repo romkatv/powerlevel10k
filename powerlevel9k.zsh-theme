@@ -616,6 +616,10 @@ prompt_dir() {
     esac
   fi
 
+  if [[ "${POWERLEVEL9K_DIR_OMIT_FIRST_CHARACTER}" == "true" ]]; then
+    current_path="${current_path[2,-1]}"
+  fi
+
   if [[ "${POWERLEVEL9K_DIR_PATH_SEPARATOR}" != "/" ]]; then
     current_path=$(print -P "${current_path}" | sed "s/\//${POWERLEVEL9K_DIR_PATH_SEPARATOR}/g")
   fi
