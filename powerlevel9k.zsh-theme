@@ -1114,8 +1114,8 @@ prompt_swift_version() {
   "$1_prompt_segment" "$0" "$2" "magenta" "white" "${swift_version}" 'SWIFT_ICON'
 }
 
-# dir_permision: Display information about the user's permission to write in the current directory
-prompt_dir_permission() {
+# dir_writable: Display information about the user's permission to write in the current directory
+prompt_dir_writable() {
   if [[ ! -w "$PWD" ]]; then
     "$1_prompt_segment" "$0_FORBIDDEN" "$2" "red" "226" "" 'LOCK_ICON'
   fi

@@ -20,6 +20,10 @@ Added an option to configure the path separator. If you want something
 else than an ordinary slash, you could set
 `POWERLEVEL9K_DIR_PATH_SEPARATOR` to whatever you want.
 
+### New segment 'dir_writable' added
+
+This segment displays a lock icon if your user has no write permissions in the current folder.
+
 ### New segment 'disk_usage' added
 
 This segment will show the usage level of your current partition.
