@@ -615,8 +615,10 @@ prompt_dir() {
 
         for marked_folder in $(upsearch $POWERLEVEL9K_SHORTEN_FOLDER_MARKER); do
           if [[ "$marked_folder" == "/" ]]; then
+            # If we reached root folder, stop upsearch.
             current_path="/"
           elif [[ "$marked_folder" == "$HOME" ]]; then
+            # If we reached home folder, stop upsearch.
             current_path="~"
           elif [[ "${marked_folder%/*}" == $last_marked_folder ]]; then
             current_path="${current_path%/}/${marked_folder##*/}"
