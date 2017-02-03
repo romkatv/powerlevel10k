@@ -570,7 +570,7 @@ prompt_custom() {
 # Dir: current working directory
 set_default POWERLEVEL9K_DIR_PATH_SEPARATOR "/"
 prompt_dir() {
-  local current_path='%~'
+  local current_path="$(print -P "%~")"
   if [[ -n "$POWERLEVEL9K_SHORTEN_DIR_LENGTH" ]]; then
 
     set_default POWERLEVEL9K_SHORTEN_DELIMITER $'\U2026'
@@ -621,7 +621,7 @@ prompt_dir() {
   fi
 
   if [[ "${POWERLEVEL9K_DIR_PATH_SEPARATOR}" != "/" ]]; then
-    current_path=$(print -P "${current_path}" | sed "s/\//${POWERLEVEL9K_DIR_PATH_SEPARATOR}/g")
+    current_path="$( echo "${current_path}" | sed "s/\//${POWERLEVEL9K_DIR_PATH_SEPARATOR}/g")"
   fi
 
   typeset -AH dir_states
