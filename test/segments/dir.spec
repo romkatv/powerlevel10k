@@ -110,4 +110,107 @@ function testOtherFolderDetectionWorks() {
   unset POWERLEVEL9K_FOLDER_ICON
 }
 
+function testChangingDirPathSeparator() {
+  POWERLEVEL9K_DIR_PATH_SEPARATOR='xXx'
+  local FOLDER="/tmp/powerlevel9k-test/1/2"
+  mkdir -p $FOLDER
+  cd $FOLDER
+
+  assertEquals "%K{blue} %F{black}xXxtmpxXxpowerlevel9k-testxXx1xXx2 %k%F{blue}%f " "$(build_left_prompt)"
+
+  cd -
+  unset FOLDER
+  rm -fr /tmp/powerlevel9k-test
+  unset POWERLEVEL9K_DIR_PATH_SEPARATOR
+}
+
+function testOmittingFirstCharacterWorks() {
+  POWERLEVEL9K_DIR_OMIT_FIRST_CHARACTER=true
+  POWERLEVEL9K_FOLDER_ICON='folder-icon'
+  cd /tmp
+
+  assertEquals "%K{blue} %F{black%}folder-icon%f %F{black}tmp %k%F{blue}%f " "$(build_left_prompt)"
+
+  cd -
+  unset POWERLEVEL9K_FOLDER_ICON
+  unset POWERLEVEL9K_DIR_OMIT_FIRST_CHARACTER
+}
+
+function testOmittingFirstCharacterWorksWithChangingPathSeparator() {
+  POWERLEVEL9K_DIR_OMIT_FIRST_CHARACTER=true
+  POWERLEVEL9K_DIR_PATH_SEPARATOR='xXx'
+  POWERLEVEL9K_FOLDER_ICON='folder-icon'
+  mkdir -p /tmp/powerlevel9k-test/1/2
+  cd /tmp/powerlevel9k-test/1/2
+
+  assertEquals "%K{blue} %F{black%}folder-icon%f %F{black}tmpxXxpowerlevel9k-testxXx1xXx2 %k%F{blue}%f " "$(build_left_prompt)"
+
+  cd -
+  rm -fr /tmp/powerlevel9k-test
+  unset POWERLEVEL9K_FOLDER_ICON
+  unset POWERLEVEL9K_DIR_PATH_SEPARATOR
+  unset POWERLEVEL9K_DIR_OMIT_FIRST_CHARACTER
+}
+
+# This test makes it obvious that combining a truncation strategy
+# that cuts off folders from the left and omitting the the first
+# character does not make much sense. The truncation strategy
+# comes first, prints an ellipsis and that gets then cut off by
+# POWERLEVEL9K_DIR_OMIT_FIRST_CHARACTER..
+# But it does more sense in combination with other truncation
+# strategies.
+function testOmittingFirstCharacterWorksWithChangingPathSeparatorAndDefaultTruncation() {
+  POWERLEVEL9K_DIR_OMIT_FIRST_CHARACTER=true
+  POWERLEVEL9K_DIR_PATH_SEPARATOR='xXx'
+  POWERLEVEL9K_SHORTEN_DIR_LENGTH=2
+  POWERLEVEL9K_SHORTEN_STRATEGY='truncate_folders'
+  mkdir -p /tmp/powerlevel9k-test/1/2
+  cd /tmp/powerlevel9k-test/1/2
+
+  assertEquals "%K{blue} %F{black}xXx1xXx2 %k%F{blue}%f " "$(build_left_prompt)"
+
+  cd -
+  rm -fr /tmp/powerlevel9k-test
+  unset POWERLEVEL9K_DIR_PATH_SEPARATOR
+  unset POWERLEVEL9K_DIR_OMIT_FIRST_CHARACTER
+  unset POWERLEVEL9K_SHORTEN_DIR_LENGTH
+  unset POWERLEVEL9K_SHORTEN_STRATEGY
+}
+
+function testOmittingFirstCharacterWorksWithChangingPathSeparatorAndMiddleTruncation() {
+  POWERLEVEL9K_DIR_OMIT_FIRST_CHARACTER=true
+  POWERLEVEL9K_DIR_PATH_SEPARATOR='xXx'
+  POWERLEVEL9K_SHORTEN_DIR_LENGTH=2
+  POWERLEVEL9K_SHORTEN_STRATEGY='truncate_middle'
+  mkdir -p /tmp/powerlevel9k-test/1/2
+  cd /tmp/powerlevel9k-test/1/2
+
+  assertEquals "%K{blue} %F{black}tmpxXxpo…stxXx1xXx2 %k%F{blue}%f " "$(build_left_prompt)"
+
+  cd -
+  rm -fr /tmp/powerlevel9k-test
+  unset POWERLEVEL9K_DIR_PATH_SEPARATOR
+  unset POWERLEVEL9K_DIR_OMIT_FIRST_CHARACTER
+  unset POWERLEVEL9K_SHORTEN_DIR_LENGTH
+  unset POWERLEVEL9K_SHORTEN_STRATEGY
+}
+
+function testOmittingFirstCharacterWorksWithChangingPathSeparatorAndRightTruncation() {
+  POWERLEVEL9K_DIR_OMIT_FIRST_CHARACTER=true
+  POWERLEVEL9K_DIR_PATH_SEPARATOR='xXx'
+  POWERLEVEL9K_SHORTEN_DIR_LENGTH=2
+  POWERLEVEL9K_SHORTEN_STRATEGY='truncate_from_right'
+  mkdir -p /tmp/powerlevel9k-test/1/2
+  cd /tmp/powerlevel9k-test/1/2
+
+  assertEquals "%K{blue} %F{black}tmpxXxpo…xXx1xXx2 %k%F{blue}%f " "$(build_left_prompt)"
+
+  cd -
+  rm -fr /tmp/powerlevel9k-test
+  unset POWERLEVEL9K_DIR_PATH_SEPARATOR
+  unset POWERLEVEL9K_DIR_OMIT_FIRST_CHARACTER
+  unset POWERLEVEL9K_SHORTEN_DIR_LENGTH
+  unset POWERLEVEL9K_SHORTEN_STRATEGY
+}
+
 source shunit2/source/2.1/src/shunit2
