@@ -119,7 +119,7 @@ case $POWERLEVEL9K_MODE in
       LOAD_ICON                      $'\uF080 '             # 
       SWAP_ICON                      $'\uF0E4'              # 
       RAM_ICON                       $'\uF0E4'              # 
-      SERVER_ICON                    $'\uF296'              # 
+      SERVER_ICON                    $'\uF233'              # 
       VCS_UNTRACKED_ICON             $'\uF059'              # 
       VCS_UNSTAGED_ICON              $'\uF06A'              # 
       VCS_STAGED_ICON                $'\uF055'              # 
