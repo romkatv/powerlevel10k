@@ -670,6 +670,13 @@ prompt_history() {
   "$1_prompt_segment" "$0" "$2" "244" "$DEFAULT_COLOR" '%h'
 }
 
+prompt_detect_ssh(){
+  local color="yellow"
+  if [ -n "$SSH_CLIENT" ] || [ -n "$SSH_TTY" ]; then
+    "$1_prompt_segment" "$0" "$2" "$DEFAULT_COLOR" "$color" "ssh"
+  fi
+}
+
 # Detection for virtualization (systemd based systems only)
 prompt_detect_virt() {
   if ! command -v systemd-detect-virt;then
