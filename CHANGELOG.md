@@ -1,10 +1,56 @@
 ## next
 
+- Fixed a bug where the tag display was broken on detached HEADs.
+- Fixed a bug where SVN detection sometimes failed.
+- Fixed the `load` and `ram` segments for BSD.
+- Fixed code-points that changed in Awesome fonts.
+- Fixed display of "OK_ICON" in `status` segment in non-verbose mode.
+- Fixed an issue where dir name truncation that was very short sometimes failed.
+- Speed & accuracy improvements to the battery segment.
+- Added Github syntax highlighting to README.
+- Various documentation cleanup.
+
+### `vcs` changes
+
+The VCS segment can now display icons for remote repo hosting services, including Github, Gitlab, and 'other'.
+
 ### `dir` changes
 
 Added an option to configure the path separator. If you want something
 else than an ordinary slash, you could set
 `POWERLEVEL9K_DIR_PATH_SEPARATOR` to whatever you want.
+
+### New segment 'disk_usage' added
+
+This segment will show the usage level of your current partition.
+
+### New segment 'public_ip' added
+
+Fetches your Public IP (using ident.me) and displays it in your prompt.
+
+### New segment 'swift_version' added
+
+This segment displays the version of Swift that is installed / in your path.
+
+### New segment 'detect_virt' added
+
+Detects and reports if you are in a virtualized session using `systemd`.
+
+## v0.5.0
+
+### `load` and `ram` changes
+
+These two segments now support BSD.
+
+### `vcs` changes
+
+- We implemented a huge speed improvement for this segment.
+- Now this segment supports Subversion repositories.
+- Add ability to hide tags by setting `POWERLEVEL9K_VCS_HIDE_TAGS` to true.
+
+## `anaconda` changes
+
+Speed improvements for `anaconda` segment.
 
 ## v0.4.0
 
@@ -84,6 +130,11 @@ Added new `docker_machine` segment that will show your Docker machine.
 
 A new segment `anaconda` was added that shows the current used
 anaconda environment.
+
+## New segment `pyenv` added
+
+This segment shows your active python version as reported by `pyenv`.
+
 
 ## v0.3.2
 

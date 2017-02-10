@@ -41,7 +41,7 @@ else
   POWERLEVEL9K_INSTALLATION_PATH="$0"
 fi
 
-# Resolve the instllation path
+# Resolve the installation path
 if [[ -L "$POWERLEVEL9K_INSTALLATION_PATH" ]]; then
   # If this theme is sourced as a symlink, we need to locate the real URL
   filename="$(realpath -P $POWERLEVEL9K_INSTALLATION_PATH 2>/dev/null || readlink -f $POWERLEVEL9K_INSTALLATION_PATH 2>/dev/null || perl -MCwd=abs_path -le 'print abs_path readlink(shift);' $POWERLEVEL9K_INSTALLATION_PATH 2>/dev/null)"
@@ -103,10 +103,10 @@ fi
 #
 # Methodology behind user-defined variables overwriting colors:
 #     The first parameter to the segment constructors is the calling function's
-#     name.  From this function name, we strip the "prompt_"-prefix and
-#     uppercase it.  This is then prefixed with "POWERLEVEL9K_" and suffixed
+#     name. From this function name, we strip the "prompt_"-prefix and
+#     uppercase it. This is then prefixed with "POWERLEVEL9K_" and suffixed
 #     with either "_BACKGROUND" or "_FOREGROUND", thus giving us the variable
-#     name. So each new segment is user-overwritable by a variable following
+#     name. So each new segment is user-overwritten by a variable following
 #     this naming convention.
 ################################################################
 
@@ -117,7 +117,7 @@ CURRENT_BG='NONE'
 
 # Begin a left prompt segment
 # Takes four arguments:
-#   * $1: Name of the function that was orginally invoked (mandatory).
+#   * $1: Name of the function that was originally invoked (mandatory).
 #         Necessary, to make the dynamic color-overwrite mechanism work.
 #   * $2: The array index of the current segment
 #   * $3: Background color
@@ -207,7 +207,7 @@ CURRENT_RIGHT_BG='NONE'
 
 # Begin a right prompt segment
 # Takes four arguments:
-#   * $1: Name of the function that was orginally invoked (mandatory).
+#   * $1: Name of the function that was originally invoked (mandatory).
 #         Necessary, to make the dynamic color-overwrite mechanism work.
 #   * $2: The array index of the current segment
 #   * $3: Background color
@@ -337,9 +337,51 @@ prompt_background_jobs() {
   fi
 }
 
+# Segment that indicates usage level of current partition.
+set_default POWERLEVEL9K_DISK_USAGE_ONLY_WARNING false
+set_default POWERLEVEL9K_DISK_USAGE_WARNING_LEVEL 90
+set_default POWERLEVEL9K_DISK_USAGE_CRITICAL_LEVEL 95
+prompt_disk_usage() {
+  local current_state="unknown"
+  typeset -AH hdd_usage_forecolors
+  hdd_usage_forecolors=(
+    'normal'        'yellow'
+    'warning'       "$DEFAULT_COLOR"
+    'critical'      'white'
+  )
+  typeset -AH hdd_usage_backcolors
+  hdd_usage_backcolors=(
+    'normal'        $DEFAULT_COLOR
+    'warning'       'yellow'
+    'critical'      'red'
+  )
+
+  local disk_usage="${$(\df -P . | sed -n '2p' | awk '{ print $5 }')%%\%}"
+
+  if [ "$disk_usage" -ge "$POWERLEVEL9K_DISK_USAGE_WARNING_LEVEL" ]; then
+    current_state='warning'
+    if [ "$disk_usage" -ge "$POWERLEVEL9K_DISK_USAGE_CRITICAL_LEVEL" ]; then
+        current_state='critical'
+    fi
+  else
+    if [[ "$POWERLEVEL9K_DISK_USAGE_ONLY_WARNING" == true ]]; then
+        current_state=''
+        return
+    fi
+    current_state='normal'
+  fi
+
+  local message="${disk_usage}%%"
+
+  # Draw the prompt_segment
+  if [[ -n $disk_usage ]]; then
+    "$1_prompt_segment" "${0}_${current_state}" "$2" "${hdd_usage_backcolors[$current_state]}" "${hdd_usage_forecolors[$current_state]}" "$message" 'DISK_ICON'
+  fi
+}
+
 prompt_battery() {
   # The battery can have four different states - default to 'unknown'.
-  local current_state="unknown"
+  local current_state='unknown'
   typeset -AH battery_states
   battery_states=(
     'low'           'red'
@@ -350,43 +392,37 @@ prompt_battery() {
   # Set default values if the user did not configure them
   set_default POWERLEVEL9K_BATTERY_LOW_THRESHOLD  10
 
-  if [[ $OS =~ OSX && -f /usr/sbin/ioreg && -x /usr/sbin/ioreg ]]; then
-    # Pre-Grep as much information as possible to save some memory and
-    # avoid pollution of the xtrace output.
-    local raw_data="$(ioreg -n AppleSmartBattery | grep -E "MaxCapacity|TimeRemaining|CurrentCapacity|ExternalConnected|IsCharging")"
+  if [[ $OS =~ OSX && -f /usr/bin/pmset && -x /usr/bin/pmset ]]; then
+    # obtain battery information from system
+    local raw_data="$(pmset -g batt | awk 'FNR==2{print}')"
     # return if there is no battery on system
-    [[ -z $(echo $raw_data | grep MaxCapacity) ]] && return
+    [[ -z $(echo $raw_data | grep "InternalBattery") ]] && return
 
-    # Convert time remaining from minutes to hours:minutes date string
-    local time_remaining=$(echo $raw_data | grep TimeRemaining | awk '{ print $5 }')
-    if [[ -n $time_remaining ]]; then
-      # this value is set to a very high number when the system is calculating
-      [[ $time_remaining -gt 10000 ]] && local tstring="..." || local tstring=${(f)$(/bin/date -u -r $(($time_remaining * 60)) +%k:%M)}
-    fi
+    # Time remaining on battery operation (charging/discharging)
+    local tstring=$(echo $raw_data | awk -F ';' '{print $3}' | awk '{print $1}')
+    # If time has not been calculated by system yet
+    [[ $tstring =~ '(\(no|not)' ]] && tstring="..."
 
-    # Get charge values
-    local max_capacity=$(echo $raw_data | grep MaxCapacity | awk '{ print $5 }')
-    local current_capacity=$(echo $raw_data | grep CurrentCapacity | awk '{ print $5 }')
-
-    if [[ -n "$max_capacity" && -n "$current_capacity" ]]; then
-      typeset -i 10 bat_percent
-      bat_percent=$(( (current_capacity * 100) / max_capacity ))
-    fi
+    # percent of battery charged
+    typeset -i 10 bat_percent
+    bat_percent=$(echo $raw_data | grep -o '[0-9]*%' | sed 's/%//')
 
     local remain=""
     # Logic for string output
-    if [[ $(echo $raw_data | grep ExternalConnected | awk '{ print $5 }') =~ "Yes" ]]; then
-      # Battery is charging
-      if [[ $(echo $raw_data | grep IsCharging | awk '{ print $5 }') =~ "Yes" ]]; then
+    case $(echo $raw_data | awk -F ';' '{print $2}' | awk '{$1=$1};1') in
+      # for a short time after attaching power, status will be 'AC attached;'
+      'charging'|'finishing charge'|'AC attached')
         current_state="charging"
         remain=" ($tstring)"
-      else
+        ;;
+      'discharging')
+        [[ $bat_percent -lt $POWERLEVEL9K_BATTERY_LOW_THRESHOLD ]] && current_state="low" || current_state="disconnected"
+        remain=" ($tstring)"
+        ;;
+      *)
         current_state="charged"
-      fi
-    else
-      [[ $bat_percent -lt $POWERLEVEL9K_BATTERY_LOW_THRESHOLD ]] && current_state="low" || current_state="disconnected"
-      remain=" ($tstring)"
-    fi
+        ;;
+    esac
   fi
 
   if [[ $OS =~ Linux ]]; then
@@ -397,20 +433,22 @@ prompt_battery() {
 
     # Return if no battery found
     [[ -z $bat ]] && return
-
-    [[ $(cat $bat/capacity) -gt 100 ]] && local bat_percent=100 || local bat_percent=$(cat $bat/capacity)
-    [[ $(cat $bat/status) =~ Charging ]] && local connected=true
-    [[ $(cat $bat/status) =~ Charging && $bat_percent =~ 100 ]] && current_state="charged"
-    [[ $(cat $bat/status) =~ Charging && $bat_percent -lt 100 ]] && current_state="charging"
+    local capacity=$(cat $bat/capacity)
+    local battery_status=$(cat $bat/status)
+    [[ $capacity -gt 100 ]] && local bat_percent=100 || local bat_percent=$capacity
+    [[ $battery_status =~ Charging || $battery_status =~ Full ]] && local connected=true
     if [[ -z  $connected ]]; then
       [[ $bat_percent -lt $POWERLEVEL9K_BATTERY_LOW_THRESHOLD ]] && current_state="low" || current_state="disconnected"
+    else
+      [[ $bat_percent =~ 100 ]] && current_state="charged"
+      [[ $bat_percent -lt 100 ]] && current_state="charging"
     fi
     if [[ -f /usr/bin/acpi ]]; then
       local time_remaining=$(acpi | awk '{ print $5 }')
       if [[ $time_remaining =~ rate ]]; then
         local tstring="..."
       elif [[ $time_remaining =~ "[[:digit:]]+" ]]; then
-        local tstring=${(f)$(date -u -d "$(echo $time_remaining)" +%k:%M)}
+        local tstring=${(f)$(date -u -d "$(echo $time_remaining)" +%k:%M 2> /dev/null)}
       fi
     fi
     [[ -n $tstring ]] && local remain=" ($tstring)"
@@ -428,6 +466,79 @@ prompt_battery() {
   # Draw the prompt_segment
   if [[ -n $bat_percent ]]; then
     "$1_prompt_segment" "${0}_${current_state}" "$2" "$DEFAULT_COLOR" "${battery_states[$current_state]}" "$message" 'BATTERY_ICON'
+  fi
+}
+
+prompt_public_ip() {
+  # set default values for segment
+  set_default POWERLEVEL9K_PUBLIC_IP_TIMEOUT "300"
+  set_default POWERLEVEL9K_PUBLIC_IP_NONE ""
+  set_default POWERLEVEL9K_PUBLIC_IP_FILE "/tmp/p9k_public_ip"
+  set_default POWERLEVEL9K_PUBLIC_IP_HOST "http://ident.me"
+
+  # Do we need a fresh IP?
+  local refresh_ip=false
+  if [[ -f $POWERLEVEL9K_PUBLIC_IP_FILE ]]; then
+    typeset -i timediff
+    # if saved IP is more than
+    timediff=$(($(date +%s) - $(date -r $POWERLEVEL9K_PUBLIC_IP_FILE +%s)))
+    [[ $timediff -gt $POWERLEVEL9K_PUBLIC_IP_TIMEOUT ]] && refresh_ip=true
+    # If tmp file is empty get a fresh IP
+    [[ -z $(cat $POWERLEVEL9K_PUBLIC_IP_FILE) ]] && refresh_ip=true
+    [[ -n $POWERLEVEL9K_PUBLIC_IP_NONE ]] && [[ $(cat $POWERLEVEL9K_PUBLIC_IP_FILE) =~ "$POWERLEVEL9K_PUBLIC_IP_NONE" ]] && refresh_ip=true
+  else
+    touch $POWERLEVEL9K_PUBLIC_IP_FILE && refresh_ip=true
+  fi
+
+  # grab a fresh IP if needed
+  if [[ $refresh_ip =~ true && -w $POWERLEVEL9K_PUBLIC_IP_FILE ]]; then
+    # if method specified, don't use fallback methods
+    if [[ -n $POWERLEVEL9K_PUBLIC_IP_METHOD ]] && [[ $POWERLEVEL9K_PUBLIC_IP_METHOD =~ 'wget|curl|dig' ]]; then
+      local method=$POWERLEVEL9K_PUBLIC_IP_METHOD
+    fi
+    if [[ -n $method ]]; then
+      case $method in
+        'dig')
+          if type -p dig >/dev/null; then
+              fresh_ip="$(dig +time=1 +tries=1 +short myip.opendns.com @resolver1.opendns.com 2> /dev/null)"
+              [[ "$fresh_ip" =~ ^\; ]] && unset fresh_ip
+          fi
+          ;;
+        'curl')
+          if [[ -z "$fresh_ip" ]] && type -p curl >/dev/null; then
+              fresh_ip="$(curl --max-time 10 -w '\n' "$POWERLEVEL9K_PUBLIC_IP_HOST" 2> /dev/null)"
+          fi
+          ;;
+        'wget')
+          if [[ -z "$fresh_ip" ]] && type -p wget >/dev/null; then
+              fresh_ip="$(wget -T 10 -qO- "$POWERLEVEL9K_PUBLIC_IP_HOST" 2> /dev/null)"
+          fi
+          ;;
+      esac
+    else
+      if type -p dig >/dev/null; then
+          fresh_ip="$(dig +time=1 +tries=1 +short myip.opendns.com @resolver1.opendns.com 2> /dev/null)"
+          [[ "$fresh_ip" =~ ^\; ]] && unset fresh_ip
+      fi
+
+      if [[ -z "$fresh_ip" ]] && type -p curl >/dev/null; then
+          fresh_ip="$(curl --max-time 10 -w '\n' "$POWERLEVEL9K_PUBLIC_IP_HOST" 2> /dev/null)"
+      fi
+
+      if [[ -z "$fresh_ip" ]] && type -p wget >/dev/null; then
+          fresh_ip="$(wget -T 10 -qO- "$POWERLEVEL9K_PUBLIC_IP_HOST" 2> /dev/null)"
+      fi
+    fi
+
+    # write IP to tmp file or clear tmp file if an IP was not retrieved
+    [[ -n $fresh_ip ]] && echo $fresh_ip > $POWERLEVEL9K_PUBLIC_IP_FILE || echo $POWERLEVEL9K_PUBLIC_IP_NONE > $POWERLEVEL9K_PUBLIC_IP_FILE
+  fi
+
+  # read public IP saved to tmp file
+  local public_ip=$(cat $POWERLEVEL9K_PUBLIC_IP_FILE)
+
+  if [[ -n $public_ip ]]; then
+    $1_prompt_segment "$0" "$2" "$DEFAULT_COLOR" "$DEFAULT_COLOR_INVERTED" "${public_ip}" 'PUBLIC_IP_ICON'
   fi
 }
 
@@ -558,6 +669,26 @@ prompt_go_version() {
 prompt_history() {
   "$1_prompt_segment" "$0" "$2" "244" "$DEFAULT_COLOR" '%h'
 }
+
+# Detection for virtualization (systemd based systems only)
+prompt_detect_virt() {
+  if ! command -v systemd-detect-virt;then
+    return
+  fi
+  local virt=$(systemd-detect-virt)
+  local color="yellow"
+  if [[ "$virt" == "none" ]]; then
+    if [[ "$(ls -di / | grep -o 2)" != "2" ]]; then
+      virt="chroot"
+      "$1_prompt_segment" "$0" "$2" "$color" "$DEFAULT_COLOR" "$virt"
+    else
+      ;
+    fi
+  else
+    "$1_prompt_segment" "$0" "$2" "$color" "$DEFAULT_COLOR" "$virt"
+  fi
+}
+
 
 prompt_icons_test() {
   for key in ${(@k)icons}; do
@@ -985,6 +1116,15 @@ prompt_pyenv() {
   fi
 }
 
+# Swift version
+prompt_swift_version() {
+  # Get the first number as this is probably the "main" version number..
+  local swift_version=$(swift --version 2>/dev/null | grep -o -E "[0-9.]+" | head -n 1)
+  [[ -z "${swift_version}" ]] && return
+
+  "$1_prompt_segment" "$0" "$2" "magenta" "white" "${swift_version}" 'SWIFT_ICON'
+}
+
 ################################################################
 # Prompt processing and drawing
 ################################################################
@@ -1036,7 +1176,7 @@ powerlevel9k_prepare_prompts() {
 $(print_icon 'MULTILINE_SECOND_PROMPT_PREFIX')"
     if [[ "$POWERLEVEL9K_RPROMPT_ON_NEWLINE" != true ]]; then
       # The right prompt should be on the same line as the first line of the left
-      # prompt.  To do so, there is just a quite ugly workaround: Before zsh draws
+      # prompt. To do so, there is just a quite ugly workaround: Before zsh draws
       # the RPROMPT, we advise it, to go one line up. At the end of RPROMPT, we
       # advise it to go one line down. See:
       # http://superuser.com/questions/357107/zsh-right-justify-in-ps1
@@ -1058,7 +1198,7 @@ $(print_icon 'MULTILINE_SECOND_PROMPT_PREFIX')"
   fi
 }
 
-powerlevel9k_init() {
+prompt_powerlevel9k_setup() {
   # Display a warning if the terminal does not support 256 colors
   local term_colors
   term_colors=$(echotc Co)
@@ -1110,4 +1250,5 @@ powerlevel9k_init() {
   add-zsh-hook precmd powerlevel9k_prepare_prompts
 }
 
-powerlevel9k_init "$@"
+prompt_powerlevel9k_setup "$@"
+
