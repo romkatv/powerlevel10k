@@ -348,7 +348,7 @@ segment will not be displayed.
 |`POWERLEVEL9K_PUBLIC_IP_FILE`|'/tmp/p8k_public_ip'|This is the file your public IP is cached in.|
 |`POWERLEVEL9K_PUBLIC_IP_HOST`|'http://ident.me'|This is the default host to get your public IP.|
 |`POWERLEVEL9K_PUBLIC_IP_TIMEOUT`|300|The amount of time in seconds between refreshing your cached IP.|
-|`POWERLEVEL9K_PUBLIC_IP_METHOD`|None|You can set this to any of 'dig', 'curl', or 'wget' to only use that method to refresh your IP.|
+|`POWERLEVEL9K_PUBLIC_IP_METHODS`|(dig curl wget)| These methods in that order are used to refresh your IP.|
 |`POWERLEVEL9K_PUBLIC_IP_NONE`|None|The string displayed when an IP was not obtained|
 
 ##### rbenv
