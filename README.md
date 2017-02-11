@@ -89,6 +89,7 @@ The segments that are currently available are:
 * [`battery`](#battery) - Current battery status.
 * [`context`](#context) - Your username and host.
 * [`dir`](#dir) - Your current working directory.
+* `dir_writable` - Displays a lock icon, if you do not have write permissions on the current folder.
 * [`disk_usage`](#disk_usage) - Disk usage of your current partition.
 * `history` - The command number for the current line.
 * [`ip`](#ip) - Shows the current IP address.
