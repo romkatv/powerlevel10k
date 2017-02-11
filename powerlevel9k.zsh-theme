@@ -469,6 +469,11 @@ prompt_battery() {
   fi
 }
 
+# Public IP segment
+# Parameters:
+#   * $1 Alignment: string - left|right
+#   * $2 Index: integer
+#   * $3 Joined: bool - If the segment should be joined
 prompt_public_ip() {
   # set default values for segment
   set_default POWERLEVEL9K_PUBLIC_IP_TIMEOUT "300"
@@ -531,12 +536,17 @@ prompt_public_ip() {
     fi
 
     # write IP to tmp file or clear tmp file if an IP was not retrieved
-    [[ -n $fresh_ip ]] && echo $fresh_ip > $POWERLEVEL9K_PUBLIC_IP_FILE || echo $POWERLEVEL9K_PUBLIC_IP_NONE > $POWERLEVEL9K_PUBLIC_IP_FILE
+    # Redirection with `>!`. From the manpage: Same as >, except that the file
+    #   is truncated to zero length if it exists, even if CLOBBER is unset.
+    # If the file already exists, and a simple `>` redirection and CLOBBER
+    # unset, ZSH will produce an error.
+    [[ -n "${fresh_ip}" ]] && echo $fresh_ip >! $POWERLEVEL9K_PUBLIC_IP_FILE || echo $POWERLEVEL9K_PUBLIC_IP_NONE >! $POWERLEVEL9K_PUBLIC_IP_FILE
   fi
 
   # read public IP saved to tmp file
   local public_ip=$(cat $POWERLEVEL9K_PUBLIC_IP_FILE)
 
+  # Draw the prompt segment
   if [[ -n $public_ip ]]; then
     $1_prompt_segment "$0" "$2" "$DEFAULT_COLOR" "$DEFAULT_COLOR_INVERTED" "${public_ip}" 'PUBLIC_IP_ICON'
   fi
