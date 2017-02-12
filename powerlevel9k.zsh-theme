@@ -469,12 +469,18 @@ prompt_battery() {
   fi
 }
 
+# Public IP segment
+# Parameters:
+#   * $1 Alignment: string - left|right
+#   * $2 Index: integer
+#   * $3 Joined: bool - If the segment should be joined
 prompt_public_ip() {
   # set default values for segment
   set_default POWERLEVEL9K_PUBLIC_IP_TIMEOUT "300"
   set_default POWERLEVEL9K_PUBLIC_IP_NONE ""
   set_default POWERLEVEL9K_PUBLIC_IP_FILE "/tmp/p9k_public_ip"
   set_default POWERLEVEL9K_PUBLIC_IP_HOST "http://ident.me"
+  defined POWERLEVEL9K_PUBLIC_IP_METHODS || POWERLEVEL9K_PUBLIC_IP_METHODS=(dig curl wget)
 
   # Do we need a fresh IP?
   local refresh_ip=false
@@ -491,52 +497,39 @@ prompt_public_ip() {
   fi
 
   # grab a fresh IP if needed
+  local fresh_ip
   if [[ $refresh_ip =~ true && -w $POWERLEVEL9K_PUBLIC_IP_FILE ]]; then
-    # if method specified, don't use fallback methods
-    if [[ -n $POWERLEVEL9K_PUBLIC_IP_METHOD ]] && [[ $POWERLEVEL9K_PUBLIC_IP_METHOD =~ 'wget|curl|dig' ]]; then
-      local method=$POWERLEVEL9K_PUBLIC_IP_METHOD
-    fi
-    if [[ -n $method ]]; then
+    for method in "${POWERLEVEL9K_PUBLIC_IP_METHODS[@]}"; do
       case $method in
         'dig')
-          if type -p dig >/dev/null; then
-              fresh_ip="$(dig +time=1 +tries=1 +short myip.opendns.com @resolver1.opendns.com 2> /dev/null)"
-              [[ "$fresh_ip" =~ ^\; ]] && unset fresh_ip
-          fi
+            fresh_ip="$(dig +time=1 +tries=1 +short myip.opendns.com @resolver1.opendns.com 2> /dev/null)"
+            [[ "$fresh_ip" =~ ^\; ]] && unset fresh_ip
           ;;
         'curl')
-          if [[ -z "$fresh_ip" ]] && type -p curl >/dev/null; then
-              fresh_ip="$(curl --max-time 10 -w '\n' "$POWERLEVEL9K_PUBLIC_IP_HOST" 2> /dev/null)"
-          fi
+            fresh_ip="$(curl --max-time 10 -w '\n' "$POWERLEVEL9K_PUBLIC_IP_HOST" 2> /dev/null)"
           ;;
         'wget')
-          if [[ -z "$fresh_ip" ]] && type -p wget >/dev/null; then
-              fresh_ip="$(wget -T 10 -qO- "$POWERLEVEL9K_PUBLIC_IP_HOST" 2> /dev/null)"
-          fi
+            fresh_ip="$(wget -T 10 -qO- "$POWERLEVEL9K_PUBLIC_IP_HOST" 2> /dev/null)"
           ;;
       esac
-    else
-      if type -p dig >/dev/null; then
-          fresh_ip="$(dig +time=1 +tries=1 +short myip.opendns.com @resolver1.opendns.com 2> /dev/null)"
-          [[ "$fresh_ip" =~ ^\; ]] && unset fresh_ip
+      # If we found a fresh IP, break loop.
+      if [[ -n "${fresh_ip}" ]]; then
+        break;
       fi
-
-      if [[ -z "$fresh_ip" ]] && type -p curl >/dev/null; then
-          fresh_ip="$(curl --max-time 10 -w '\n' "$POWERLEVEL9K_PUBLIC_IP_HOST" 2> /dev/null)"
-      fi
-
-      if [[ -z "$fresh_ip" ]] && type -p wget >/dev/null; then
-          fresh_ip="$(wget -T 10 -qO- "$POWERLEVEL9K_PUBLIC_IP_HOST" 2> /dev/null)"
-      fi
-    fi
+    done
 
     # write IP to tmp file or clear tmp file if an IP was not retrieved
-    [[ -n $fresh_ip ]] && echo $fresh_ip > $POWERLEVEL9K_PUBLIC_IP_FILE || echo $POWERLEVEL9K_PUBLIC_IP_NONE > $POWERLEVEL9K_PUBLIC_IP_FILE
+    # Redirection with `>!`. From the manpage: Same as >, except that the file
+    #   is truncated to zero length if it exists, even if CLOBBER is unset.
+    # If the file already exists, and a simple `>` redirection and CLOBBER
+    # unset, ZSH will produce an error.
+    [[ -n "${fresh_ip}" ]] && echo $fresh_ip >! $POWERLEVEL9K_PUBLIC_IP_FILE || echo $POWERLEVEL9K_PUBLIC_IP_NONE >! $POWERLEVEL9K_PUBLIC_IP_FILE
   fi
 
   # read public IP saved to tmp file
-  local public_ip=$(cat $POWERLEVEL9K_PUBLIC_IP_FILE)
+  local public_ip="$(cat $POWERLEVEL9K_PUBLIC_IP_FILE)"
 
+  # Draw the prompt segment
   if [[ -n $public_ip ]]; then
     $1_prompt_segment "$0" "$2" "$DEFAULT_COLOR" "$DEFAULT_COLOR_INVERTED" "${public_ip}" 'PUBLIC_IP_ICON'
   fi
@@ -586,7 +579,14 @@ prompt_dir() {
 
         # Get the path of the Git repo, which should have the package.json file
         if [[ $(git rev-parse --is-inside-work-tree 2> /dev/null) == "true" ]]; then
-          package_path=$(git rev-parse --show-toplevel)
+          # Get path from the root of the git repository to the current dir
+          local gitPath=$(git rev-parse --show-prefix)
+          # Remove trailing slash from git path, so that we can
+          # remove that git path from the pwd.
+          gitPath=${gitPath%/}
+          package_path=${$(pwd)%%$gitPath}
+          # Remove trailing slash
+          package_path=${package_path%/}
         elif [[ $(git rev-parse --is-inside-git-dir 2> /dev/null) == "true" ]]; then
           package_path=${$(pwd)%%/.git*}
         fi
@@ -1135,6 +1135,13 @@ prompt_swift_version() {
   "$1_prompt_segment" "$0" "$2" "magenta" "white" "${swift_version}" 'SWIFT_ICON'
 }
 
+# dir_writable: Display information about the user's permission to write in the current directory
+prompt_dir_writable() {
+  if [[ ! -w "$PWD" ]]; then
+    "$1_prompt_segment" "$0_FORBIDDEN" "$2" "red" "226" "" 'LOCK_ICON'
+  fi
+}
+
 ################################################################
 # Prompt processing and drawing
 ################################################################
@@ -1261,4 +1268,3 @@ prompt_powerlevel9k_setup() {
 }
 
 prompt_powerlevel9k_setup "$@"
-
