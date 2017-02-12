@@ -591,7 +591,12 @@ prompt_dir() {
           package_path=${$(pwd)%%/.git*}
         fi
 
-        zero='%([BSUbfksu]|([FB]|){*})'
+        # Replace the shortest possible match of the marked folder from
+        # the current path. Remove the amount of characters up to the
+        # folder marker from the left. Count only the visible characters
+        # in the path (this is done by the "zero" pattern; see
+        # http://stackoverflow.com/a/40855342/5586433).
+        local zero='%([BSUbfksu]|([FB]|){*})'
         current_dir=$(pwd)
         # Then, find the length of the package_path string, and save the
         # subdirectory path as a substring of the current directory's path from 0
@@ -613,6 +618,9 @@ prompt_dir() {
         local last_marked_folder marked_folder zero
         set_default POWERLEVEL9K_SHORTEN_FOLDER_MARKER ".shorten_folder_marker"
 
+        # Search for the folder marker in the parent directories and
+        # buildup a pattern that is removed from the current path
+        # later on.
         for marked_folder in $(upsearch $POWERLEVEL9K_SHORTEN_FOLDER_MARKER); do
           if [[ "$marked_folder" == "/" ]]; then
             # If we reached root folder, stop upsearch.
@@ -628,7 +636,12 @@ prompt_dir() {
           last_marked_folder=$marked_folder
         done
 
-        zero='%([BSUbfksu]|([FB]|){*})'
+        # Replace the shortest possible match of the marked folder from
+        # the current path. Remove the amount of characters up to the
+        # folder marker from the left. Count only the visible characters
+        # in the path (this is done by the "zero" pattern; see
+        # http://stackoverflow.com/a/40855342/5586433).
+        local zero='%([BSUbfksu]|([FB]|){*})'
         current_path=$current_path${PWD:${#${(S%%)last_marked_folder//$~zero/}}}
       ;;
       *)
