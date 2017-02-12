@@ -615,7 +615,7 @@ prompt_dir() {
         fi
       ;;
       truncate_with_folder_marker)
-        local last_marked_folder marked_folder zero
+        local last_marked_folder marked_folder
         set_default POWERLEVEL9K_SHORTEN_FOLDER_MARKER ".shorten_folder_marker"
 
         # Search for the folder marker in the parent directories and
@@ -637,12 +637,8 @@ prompt_dir() {
         done
 
         # Replace the shortest possible match of the marked folder from
-        # the current path. Remove the amount of characters up to the
-        # folder marker from the left. Count only the visible characters
-        # in the path (this is done by the "zero" pattern; see
-        # http://stackoverflow.com/a/40855342/5586433).
-        local zero='%([BSUbfksu]|([FB]|){*})'
-        current_path=$current_path${PWD:${#${(S%%)last_marked_folder//$~zero/}}}
+        # the current path.
+        current_path=$current_path${PWD#${last_marked_folder}*}
       ;;
       *)
         current_path="%$((POWERLEVEL9K_SHORTEN_DIR_LENGTH+1))(c:$POWERLEVEL9K_SHORTEN_DELIMITER/:)%${POWERLEVEL9K_SHORTEN_DIR_LENGTH}c"
