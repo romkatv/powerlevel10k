@@ -73,7 +73,6 @@ function testTruncationFromRightWorks() {
 
 function testTruncateWithFolderMarkerWorks() {
   POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(dir)
-  POWERLEVEL9K_SHORTEN_DIR_LENGTH=2
   POWERLEVEL9K_SHORTEN_STRATEGY="truncate_with_folder_marker"
 
   local BASEFOLDER=/tmp/powerlevel9k-test
@@ -89,13 +88,11 @@ function testTruncateWithFolderMarkerWorks() {
   unset BASEFOLDER
   unset FOLDER
   unset POWERLEVEL9K_SHORTEN_STRATEGY
-  unset POWERLEVEL9K_SHORTEN_DIR_LENGTH
   unset POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
 }
 
 function testTruncateWithFolderMarkerWithChangedFolderMarker() {
   POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(dir)
-  POWERLEVEL9K_SHORTEN_DIR_LENGTH=2
   POWERLEVEL9K_SHORTEN_STRATEGY="truncate_with_folder_marker"
   POWERLEVEL9K_SHORTEN_FOLDER_MARKER='.xxx'
 
@@ -113,7 +110,6 @@ function testTruncateWithFolderMarkerWithChangedFolderMarker() {
   unset FOLDER
   unset POWERLEVEL9K_SHORTEN_FOLDER_MARKER
   unset POWERLEVEL9K_SHORTEN_STRATEGY
-  unset POWERLEVEL9K_SHORTEN_DIR_LENGTH
   unset POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
 }
 
