@@ -560,6 +560,16 @@ prompt_custom() {
   fi
 }
 
+# Display the duration the command needed to run.
+prompt_command_execution_time() {
+  set_default POWERLEVEL9K_COMMAND_EXECUTION_TIME_THRESHOLD 3
+
+  local timing=$((EPOCHSECONDS - _P9K_TIMER_START))
+  if [ $timing -ge $POWERLEVEL9K_COMMAND_EXECUTION_TIME_THRESHOLD ]; then
+    "$1_prompt_segment" "$0" "$2" "red" "226" "Dur ${timing}" ''
+  fi
+}
+
 # Dir: current working directory
 set_default POWERLEVEL9K_DIR_PATH_SEPARATOR "/"
 prompt_dir() {
@@ -1164,6 +1174,10 @@ build_right_prompt() {
   done
 }
 
+powerlevel9k_preexec() {
+  _P9K_TIMER_START=$EPOCHSECONDS
+}
+
 powerlevel9k_prepare_prompts() {
   RETVAL=$?
 
@@ -1195,6 +1209,9 @@ $(print_icon 'MULTILINE_SECOND_PROMPT_PREFIX')"
 }
 
 prompt_powerlevel9k_setup() {
+  # Disable false display of command execution time
+  _P9K_TIMER_START=99999999999
+
   # Display a warning if the terminal does not support 256 colors
   local term_colors
   term_colors=$(echotc Co)
@@ -1239,11 +1256,15 @@ prompt_powerlevel9k_setup() {
     powerlevel9k_vcs_init
   fi
 
+  # initialize timing functions
+  zmodload zsh/datetime
+
   # initialize hooks
   autoload -Uz add-zsh-hook
 
   # prepare prompts
   add-zsh-hook precmd powerlevel9k_prepare_prompts
+  add-zsh-hook preexec powerlevel9k_preexec
 }
 
 prompt_powerlevel9k_setup "$@"

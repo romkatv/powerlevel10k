@@ -20,6 +20,11 @@ Added an option to configure the path separator. If you want something
 else than an ordinary slash, you could set
 `POWERLEVEL9K_DIR_PATH_SEPARATOR` to whatever you want.
 
+### New segment 'command_execution_time' added
+
+Shows the duration a command needed to run. By default only durations over 3 seconds
+are shown (can be adjusted by setting POWERLEVEL9K_COMMAND_EXECUTION_TIME_THRESHOLD).
+
 ### New segment 'dir_writable' added
 
 This segment displays a lock icon if your user has no write permissions in the current folder.
