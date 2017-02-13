@@ -139,6 +139,7 @@ The segments that are currently available are:
 **Other:**
 * [`custom_command`](#custom_command) - Create a custom segment to display the
   output of an arbitrary command.
+* [`command_execution_time`] - Display the time the current command took to execute.
 * [`todo`](http://todotxt.com/) - Shows the number of tasks in your todo.txt tasks file.
 * `detect_virt` - Virtualization detection with systemd
 
@@ -198,6 +199,11 @@ requires `acpi` on Linux).
 Note that you can [modify the `_FOREGROUND`
 color](https://github.com/bhilburn/powerlevel9k/wiki/Stylizing-Your-Prompt#segment-color-customization)
 without affecting the icon color.
+
+##### command_execution_time
+
+Display the time the current command took to execute if the time is above
+`POWERLEVEL9K_COMMAND_EXECUTION_TIME_THRESHOLD` (defaults to 3 seconds).
 
 ##### custom_command
 
