@@ -564,8 +564,13 @@ prompt_custom() {
 prompt_command_execution_time() {
   set_default POWERLEVEL9K_COMMAND_EXECUTION_TIME_THRESHOLD 3
 
+  local duration=$_P9K_DURATION_TIME
+
+  [[ $_P9K_COMMAND_DURATION -gt 60 ]] && duration=$(strftime '%M:%S' $_P9K_COMMAND_DURATION)
+  [[ $_P9K_COMMAND_DURATION -gt 3600 ]] && duration=$(strftime '%H:%M:%S' $_P9K_COMMAND_DURATION)
+
   if [ $_P9K_COMMAND_DURATION -ge $POWERLEVEL9K_COMMAND_EXECUTION_TIME_THRESHOLD ]; then
-    "$1_prompt_segment" "$0" "$2" "red" "226" "${_P9K_COMMAND_DURATION}s" 'EXECUTION_TIME_ICON'
+    "$1_prompt_segment" "$0" "$2" "red" "226" "${duration}" 'EXECUTION_TIME_ICON'
   fi
 }
 
