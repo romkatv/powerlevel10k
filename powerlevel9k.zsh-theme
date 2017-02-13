@@ -564,9 +564,8 @@ prompt_custom() {
 prompt_command_execution_time() {
   set_default POWERLEVEL9K_COMMAND_EXECUTION_TIME_THRESHOLD 3
 
-  local timing=$((EPOCHSECONDS - _P9K_TIMER_START))
-  if [ $timing -ge $POWERLEVEL9K_COMMAND_EXECUTION_TIME_THRESHOLD ]; then
-    "$1_prompt_segment" "$0" "$2" "red" "226" "Dur ${timing}" ''
+  if [ $_P9K_COMMAND_DURATION -ge $POWERLEVEL9K_COMMAND_EXECUTION_TIME_THRESHOLD ]; then
+    "$1_prompt_segment" "$0" "$2" "red" "226" "${_P9K_COMMAND_DURATION}s" 'EXECUTION_TIME_ICON'
   fi
 }
 
@@ -1180,6 +1179,10 @@ powerlevel9k_preexec() {
 
 powerlevel9k_prepare_prompts() {
   RETVAL=$?
+
+  _P9K_COMMAND_DURATION=$((EPOCHSECONDS - _P9K_TIMER_START))
+  # Reset start time
+  _P9K_TIMER_START=99999999999
 
   if [[ "$POWERLEVEL9K_PROMPT_ON_NEWLINE" == true ]]; then
     PROMPT="$(print_icon 'MULTILINE_FIRST_PROMPT_PREFIX')%f%b%k$(build_left_prompt)

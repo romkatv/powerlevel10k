@@ -79,6 +79,7 @@ case $POWERLEVEL9K_MODE in
       SWIFT_ICON                     ''
       PUBLIC_IP_ICON                 ''
       LOCK_ICON                      $'\UE138'              # 
+      EXECUTION_TIME_ICON            $'\UE89C'              # 
     )
   ;;
   'awesome-fontconfig')
@@ -140,6 +141,7 @@ case $POWERLEVEL9K_MODE in
       SWIFT_ICON                     ''
       PUBLIC_IP_ICON                 ''
       LOCK_ICON                      $'\UE138'              # 
+      EXECUTION_TIME_ICON            $'\uF253'
     )
   ;;
   *)
@@ -201,6 +203,7 @@ case $POWERLEVEL9K_MODE in
       SWIFT_ICON                     'Swift'
       PUBLIC_IP_ICON                 ''
       LOCK_ICON                      $'\UE0A2'
+      EXECUTION_TIME_ICON            'Dur'
     )
   ;;
 esac
