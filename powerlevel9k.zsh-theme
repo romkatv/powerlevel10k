@@ -538,6 +538,7 @@ prompt_public_ip() {
 # Context: user@hostname (who am I and where am I)
 # Note that if $DEFAULT_USER is not set, this prompt segment will always print
 set_default POWERLEVEL9K_ALWAYS_SHOW_CONTEXT false
+set_default POWERLEVEL9K_ALWAYS_SHOW_USER false
 set_default POWERLEVEL9K_CONTEXT_HOST_DEPTH "%m"
 prompt_context() {
   local current_state="DEFAULT"
@@ -547,7 +548,7 @@ prompt_context() {
     "DEFAULT"   "011"
   )
 
-  local content="$USER"
+  local content=""
 
   if [[ "POWERLEVEL9K_ALWAYS_SHOW_CONTEXT" == true ]] || [[ "$USER" != "$DEFAULT_USER" ]] || [[ -n "$SSH_CLIENT" || -n "$SSH_TTY" ]]; then
 
@@ -555,10 +556,15 @@ prompt_context() {
         current_state="ROOT"
       fi
 
-      content="${content}@${POWERLEVEL9K_CONTEXT_HOST_DEPTH}"
+      content="$USER@${POWERLEVEL9K_CONTEXT_HOST_DEPTH}"
 
-      "$1_prompt_segment" "${0}_${current_state}" "$2" "$DEFAULT_COLOR" "${context_states[$current_state]}" "${content}"
+  elif [[ "POWERLEVEL9K_ALWAYS_SHOW_USER" == true ]]; then
+      content="$USER"
+  else
+      return
   fi
+
+  "$1_prompt_segment" "${0}_${current_state}" "$2" "$DEFAULT_COLOR" "${context_states[$current_state]}" "${content}"
 }
 
 # The 'custom` prompt provides a way for users to invoke commands and display
