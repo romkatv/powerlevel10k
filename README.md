@@ -1,5 +1,5 @@
-## powerlevel9k Theme for ZSH
-
+![](https://raw.githubusercontent.com/bhilburn/powerlevel9k-logo/master/logo-banner.png)
+---
 [![Build Status](https://travis-ci.org/bhilburn/powerlevel9k.svg?branch=next)](https://travis-ci.org/bhilburn/powerlevel9k)
 [![Join the chat at https://gitter.im/bhilburn/powerlevel9k](https://badges.gitter.im/bhilburn/powerlevel9k.svg)](https://gitter.im/bhilburn/powerlevel9k?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
@@ -46,8 +46,8 @@ Here is `powerlevel9k` in action, with [some simple settings](https://github.com
 Be sure to also [check out the Wiki](https://github.com/bhilburn/powerlevel9k/wiki)!
 
 ### Installation
-There are two installation steps to go from a lame terminal to a "Power Level
-9000" terminal. Once you are done, you can optionally customize your prompt.
+There are two installation steps to go from a vanilla terminal to a PL9k
+terminal. Once you are done, you can optionally customize your prompt.
 
 [Installation Instructions](https://github.com/bhilburn/powerlevel9k/wiki/Install-Instructions)
 
@@ -71,14 +71,15 @@ variables to your `~/.zshrc`.
 | Variable | Default Value | Description |
 |----------|---------------|-------------|
 |`POWERLEVEL9K_LEFT_PROMPT_ELEMENTS`|`(context dir rbenv vcs)`|Segment list for left prompt|
-|`POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS`|`(status history time)`|Segment list for right prompt|
+|`POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS`|`(status root_indicator background_jobs history time)`|Segment list for right prompt|
 
 
-So if you wanted to set these variables manually, you would put the following in
+The table above shows the default values, so if you wanted to set these
+variables manually, you would put the following in
 your `~/.zshrc`:
 ```zsh
 POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(context dir rbenv vcs)
-POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(status history time)
+POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(status root_indicator background_jobs history time)
 ```
 #### Available Prompt Segments
 The segments that are currently available are:
@@ -88,8 +89,10 @@ The segments that are currently available are:
 * [`battery`](#battery) - Current battery status.
 * [`context`](#context) - Your username and host.
 * [`dir`](#dir) - Your current working directory.
+* [`disk_usage`](#disk_usage) - Disk usage of your current partition.
 * `history` - The command number for the current line.
 * [`ip`](#ip) - Shows the current IP address.
+* [`public_ip`](#public_ip) - Shows your public IP address.
 * `load` - Your machine's load averages.
 * `os_icon` - Display a nice little icon, depending on your operating system.
 * `ram` - Show free RAM.
@@ -98,6 +101,7 @@ The segments that are currently available are:
 * `swap` - Prints the current swap size.
 * [`time`](#time) - System time.
 * [`vi_mode`](#vi_mode)- Your prompt's Vi editing mode (NORMAL|INSERT).
+* `SSH` - Additional Identifier for SSH Sessions.
 
 **Development Environment Segments:**
 * [`vcs`](#vcs) - Information about this `git` or `hg` repository (if you are in one).
@@ -136,6 +140,7 @@ The segments that are currently available are:
 * [`custom_command`](#custom_command) - Create a custom segment to display the
   output of an arbitrary command.
 * [`todo`](http://todotxt.com/) - Shows the number of tasks in your todo.txt tasks file.
+* `detect_virt` - Virtualization detection with systemd
 
 ---------------------------------------------------------------------------------
 
@@ -239,9 +244,17 @@ it, but only display it if you are not your normal user or on a remote host
 To use this feature, make sure the `context` segment is enabled in your prompt
 elements (it is by default), and define a `DEFAULT_USER` in your `~/.zshrc`:
 
+You can set the `POWERLEVEL9K_CONTEXT_HOST_DEPTH` variable to change how the
+hostname is displayed. See (ZSH Manual)[http://zsh.sourceforge.net/Doc/Release/Prompt-Expansion.html#Login-information]
+for details. Default is set to %m which will show the hostname up to the first ‘.’
+You can set it to %{N}m where N is an integer to show that many segments of system
+hostname. Setting N to a negative integer will show that many segments from the
+end of the hostname.
+
 | Variable | Default Value | Description |
 |----------|---------------|-------------|
 |`DEFAULT_USER`|None|Username to consider a "default context" (you can also use `$USER`)|
+|`POWERLEVEL9K_CONTEXT_HOST_DEPTH`|%m|Customizable host depth on prompt|
 
 You can use POWERLEVEL9K_HIDE_HOST for hiding the hostname in the prompt
 when you are not in a ssh session. For example:
@@ -301,6 +314,16 @@ If you want to customize the directory separator, you could set:
 POWERLEVEL9K_DIR_PATH_SEPARATOR="%f "$'\uE0B1'" %F"
 ```
 
+##### disk_usage
+
+The `disk_usage` segment will show the usage level of the partition that your current working directory resides in. It can be configured with the following variables.
+
+| Variable | Default Value | Description |
+|----------|---------------|-------------|
+|POWERLEVEL9K_DISK_USAGE_ONLY_WARNING|false|Hide the segment except when usage levels have hit warning or critical levels.|
+|POWERLEVEL9K_DISK_USAGE_WARNING_LEVEL|90|The usage level that triggers a warning state.|
+|POWERLEVEL9K_DISK_USAGE_CRITICAL_LEVEL|95|The usage level that triggers a critical state.|
+
 ##### ip
 
 This segment tries to examine all currently used network interfaces and prints
@@ -310,6 +333,29 @@ specify the correct network interface by setting:
 | Variable | Default Value | Description |
 |----------|---------------|-------------|
 |`POWERLEVEL9K_IP_INTERFACE`|None|The NIC for which you wish to display the IP address. Example: `eth0`.|
+
+##### public_ip
+
+This segment will display your public IP address. There are several methods of obtaining this
+information and by default it will try all of them starting with the most efficient. You can
+also specify which method you would like it to use. The methods available are dig using opendns,
+curl, or wget. The host used for wget and curl is http://ident.me by default but can be set to
+another host if you prefer.
+
+The public_ip segment will attempt to update your public IP address every 5 minutes by default(also
+configurable by the user). If you lose connection your cached IP address will be displayed until
+your timeout expires at which point every time your prompt is generated a new attempt will be made.
+Until an IP is successfully pulled the value of $POWERLEVEL9K_PUBLIC_IP_NONE will be displayed for
+this segment. If this value is empty(the default)and $POWERLEVEL9K_PUBLIC_IP_FILE is empty the
+segment will not be displayed.
+
+| Variable | Default Value | Description |
+|----------|---------------|-------------|
+|`POWERLEVEL9K_PUBLIC_IP_FILE`|'/tmp/p8k_public_ip'|This is the file your public IP is cached in.|
+|`POWERLEVEL9K_PUBLIC_IP_HOST`|'http://ident.me'|This is the default host to get your public IP.|
+|`POWERLEVEL9K_PUBLIC_IP_TIMEOUT`|300|The amount of time in seconds between refreshing your cached IP.|
+|`POWERLEVEL9K_PUBLIC_IP_METHOD`|None|You can set this to any of 'dig', 'curl', or 'wget' to only use that method to refresh your IP.|
+|`POWERLEVEL9K_PUBLIC_IP_NONE`|None|The string displayed when an IP was not obtained|
 
 ##### rbenv
 
@@ -426,4 +472,7 @@ portion of the wiki to get going.
 information!](https://github.com/bhilburn/powerlevel9k/wiki)
 
 ### License
-MIT
+
+Project: MIT
+
+Logo: CC-BY-SA. Source repository: https://github.com/bhilburn/powerlevel9k-logo
