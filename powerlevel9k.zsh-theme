@@ -537,26 +537,27 @@ prompt_public_ip() {
 
 # Context: user@hostname (who am I and where am I)
 # Note that if $DEFAULT_USER is not set, this prompt segment will always print
+set_default POWERLEVEL9K_ALWAYS_SHOW_CONTEXT false
+set_default POWERLEVEL9K_CONTEXT_HOST_DEPTH "%m"
 prompt_context() {
   local current_state="DEFAULT"
-  declare -A context_states
+  typeset -AH context_states
   context_states=(
     "ROOT"      "yellow"
     "DEFAULT"   "011"
   )
+
   local content="$USER"
-  if [[ "$USER" != "$DEFAULT_USER" ]]; then
-    if [[ $(print -P "%#") == '#' ]]; then
-      current_state="ROOT"
-    fi
-    if [[ -z "$SSH_CLIENT" && -z "$SSH_TTY" ]]; then
-      if [[ "$POWERLEVEL9K_HIDE_HOST" == "false" || -z "$POWERLEVEL9K_HIDE_HOST"  ]]; then
-        content="${content}@%m"
+
+  if [[ "POWERLEVEL9K_ALWAYS_SHOW_CONTEXT" == true ]] || [[ "$USER" != "$DEFAULT_USER" ]] || [[ -n "$SSH_CLIENT" || -n "$SSH_TTY" ]]; then
+
+      if [[ $(print -P "%#") == '#' ]]; then
+        current_state="ROOT"
       fi
-    else
-      content="${content}@%m"
-    fi
-    "$1_prompt_segment" "${0}_${current_state}" "$2" "$DEFAULT_COLOR" "${context_states[$current_state]}" "${content}"
+
+      content="${content}@${POWERLEVEL9K_CONTEXT_HOST_DEPTH}"
+
+      "$1_prompt_segment" "${0}_${current_state}" "$2" "$DEFAULT_COLOR" "${context_states[$current_state]}" "${content}"
   fi
 }
 
@@ -702,13 +703,6 @@ prompt_go_version() {
 # Command number (in local history)
 prompt_history() {
   "$1_prompt_segment" "$0" "$2" "244" "$DEFAULT_COLOR" '%h'
-}
-
-prompt_detect_ssh(){
-  local color="yellow"
-  if [ -n "$SSH_CLIENT" ] || [ -n "$SSH_TTY" ]; then
-    "$1_prompt_segment" "$0" "$2" "$DEFAULT_COLOR" "$color" "ssh"
-  fi
 }
 
 # Detection for virtualization (systemd based systems only)

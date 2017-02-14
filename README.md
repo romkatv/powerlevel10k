@@ -87,7 +87,7 @@ The segments that are currently available are:
 **System Status Segments:**
 * [`background_jobs`](#background_jobs) - Indicator for background jobs.
 * [`battery`](#battery) - Current battery status.
-* [`context`](#context) - Your username and host.
+* [`context`](#context) - Your username and host, conditionalized based on $USER and SSH status.
 * [`dir`](#dir) - Your current working directory.
 * `dir_writable` - Displays a lock icon, if you do not have write permissions on the current folder.
 * [`disk_usage`](#disk_usage) - Disk usage of your current partition.
@@ -238,29 +238,25 @@ main theme distribution so that everyone can use it!
 
 ##### context
 
-The `context` segment (user@host string) is conditional. This lets you enable
-it, but only display it if you are not your normal user or on a remote host
-(basically, only print it when it's likely you need it).
+The `context` segment (user@host string) is conditional. By default, it will
+only print if you are not your 'normal' user (including if you are root), or if
+you are SSH'd to a remote host.
 
 To use this feature, make sure the `context` segment is enabled in your prompt
 elements (it is by default), and define a `DEFAULT_USER` in your `~/.zshrc`:
 
 You can set the `POWERLEVEL9K_CONTEXT_HOST_DEPTH` variable to change how the
 hostname is displayed. See (ZSH Manual)[http://zsh.sourceforge.net/Doc/Release/Prompt-Expansion.html#Login-information]
-for details. Default is set to %m which will show the hostname up to the first ‘.’
+for details. The default is set to %m which will show the hostname up to the first ‘.’
 You can set it to %{N}m where N is an integer to show that many segments of system
 hostname. Setting N to a negative integer will show that many segments from the
 end of the hostname.
 
 | Variable | Default Value | Description |
 |----------|---------------|-------------|
-|`DEFAULT_USER`|None|Username to consider a "default context" (you can also use `$USER`)|
-|`POWERLEVEL9K_CONTEXT_HOST_DEPTH`|%m|Customizable host depth on prompt|
-
-You can use POWERLEVEL9K_HIDE_HOST for hiding the hostname in the prompt
-when you are not in a ssh session. For example:
-
-    POWERLEVEL9K_HIDE_HOST="yes"
+|`DEFAULT_USER`|None|Username to consider a "default context".|
+|`POWERLEVEL9K_CONTEXT_HOST_DEPTH`|%m|Customizable host depth on prompt.|
+|`POWERLEVEL9K_ALWAYS_SHOW_CONTEXT`|false|Always show this segment.|
 
 ##### dir
 
