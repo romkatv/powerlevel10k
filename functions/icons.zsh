@@ -79,6 +79,7 @@ case $POWERLEVEL9K_MODE in
       SWIFT_ICON                     ''
       PUBLIC_IP_ICON                 ''
       LOCK_ICON                      $'\UE138'              # 
+      SSH_ICON                       '(ssh)'
     )
   ;;
   'awesome-fontconfig')
@@ -140,6 +141,7 @@ case $POWERLEVEL9K_MODE in
       SWIFT_ICON                     ''
       PUBLIC_IP_ICON                 ''
       LOCK_ICON                      $'\UE138'              # 
+      SSH_ICON                       '(ssh)'
     )
   ;;
   *)
@@ -201,6 +203,7 @@ case $POWERLEVEL9K_MODE in
       SWIFT_ICON                     'Swift'
       PUBLIC_IP_ICON                 ''
       LOCK_ICON                      $'\UE0A2'
+      SSH_ICON                       '(ssh)'
     )
   ;;
 esac

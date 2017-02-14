@@ -933,6 +933,12 @@ prompt_rvm() {
   fi
 }
 
+prompt_ssh() {
+  if [[ -n "$SSH_CLIENT" ]] || [[ -n "$SSH_TTY" ]]; then
+    "$1_prompt_segment" "$0" "$2" "$DEFAULT_COLOR" "yellow" "" 'SSH_ICON'
+  fi
+}
+
 # Status: return code if verbose, otherwise just an icon if an error occurred
 set_default POWERLEVEL9K_STATUS_VERBOSE true
 set_default POWERLEVEL9K_STATUS_OK_IN_NON_VERBOSE false

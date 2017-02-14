@@ -102,7 +102,7 @@ The segments that are currently available are:
 * `swap` - Prints the current swap size.
 * [`time`](#time) - System time.
 * [`vi_mode`](#vi_mode)- Your prompt's Vi editing mode (NORMAL|INSERT).
-* `SSH` - Additional Identifier for SSH Sessions.
+* `ssh` - Indicates whether or not you are in an SSH session.
 
 **Development Environment Segments:**
 * [`vcs`](#vcs) - Information about this `git` or `hg` repository (if you are in one).
