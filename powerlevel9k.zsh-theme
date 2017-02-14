@@ -563,14 +563,33 @@ prompt_custom() {
 # Display the duration the command needed to run.
 prompt_command_execution_time() {
   set_default POWERLEVEL9K_COMMAND_EXECUTION_TIME_THRESHOLD 3
+  set_default POWERLEVEL9K_COMMAND_EXECUTION_TIME_PRECISION 2
 
-  local duration=$_P9K_COMMAND_DURATION
+  # Print time in human readable format
+  # For that use `strftime` and convert
+  # the duration (float) to an seconds
+  # (integer).
+  # See http://unix.stackexchange.com/a/89748
+  local humanReadableDuration
+  if (( _P9K_COMMAND_DURATION > 3600 )); then
+    humanReadableDuration=$(strftime '%H:%M:%S' $(( int(rint(_P9K_COMMAND_DURATION)) )))
+  elif (( _P9K_COMMAND_DURATION > 60 )); then
+    humanReadableDuration=$(strftime '%M:%S' $(( int(rint(_P9K_COMMAND_DURATION)) )))
+  else
+    # If the command executed in seconds, print as float.
+    # Convert to float
+    if [[ "${POWERLEVEL9K_COMMAND_EXECUTION_TIME_PRECISION}" == "0" ]]; then
+      # If user does not want microseconds, then we need to convert
+      # the duration to an integer.
+      typeset -i humanReadableDuration
+    else
+      typeset -F ${POWERLEVEL9K_COMMAND_EXECUTION_TIME_PRECISION} humanReadableDuration
+    fi
+    humanReadableDuration=$_P9K_COMMAND_DURATION
+  fi
 
-  [[ $_P9K_COMMAND_DURATION -gt 60 ]] && duration=$(strftime '%M:%S' $_P9K_COMMAND_DURATION)
-  [[ $_P9K_COMMAND_DURATION -gt 3600 ]] && duration=$(strftime '%H:%M:%S' $_P9K_COMMAND_DURATION)
-
-  if [ $_P9K_COMMAND_DURATION -ge $POWERLEVEL9K_COMMAND_EXECUTION_TIME_THRESHOLD ]; then
-    "$1_prompt_segment" "$0" "$2" "red" "226" "${duration}" 'EXECUTION_TIME_ICON'
+  if (( _P9K_COMMAND_DURATION >= POWERLEVEL9K_COMMAND_EXECUTION_TIME_THRESHOLD )); then
+    "$1_prompt_segment" "$0" "$2" "red" "226" "${humanReadableDuration}" 'EXECUTION_TIME_ICON'
   fi
 }
 
@@ -1179,13 +1198,13 @@ build_right_prompt() {
 }
 
 powerlevel9k_preexec() {
-  _P9K_TIMER_START=$EPOCHSECONDS
+  _P9K_TIMER_START=$EPOCHREALTIME
 }
 
 powerlevel9k_prepare_prompts() {
   RETVAL=$?
 
-  _P9K_COMMAND_DURATION=$((EPOCHSECONDS - _P9K_TIMER_START))
+  _P9K_COMMAND_DURATION=$((EPOCHREALTIME - _P9K_TIMER_START))
   # Reset start time
   _P9K_TIMER_START=99999999999
 
@@ -1266,6 +1285,9 @@ prompt_powerlevel9k_setup() {
 
   # initialize timing functions
   zmodload zsh/datetime
+
+  # Initialize math functions
+  zmodload zsh/mathfunc
 
   # initialize hooks
   autoload -Uz add-zsh-hook
