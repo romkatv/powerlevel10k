@@ -564,8 +564,7 @@ prompt_custom() {
 set_default POWERLEVEL9K_DIR_PATH_SEPARATOR "/"
 prompt_dir() {
   local current_path='%~'
-  if [[ -n "$POWERLEVEL9K_SHORTEN_DIR_LENGTH" ]]; then
-
+  if [[ -n "$POWERLEVEL9K_SHORTEN_DIR_LENGTH" || "$POWERLEVEL9K_SHORTEN_STRATEGY" == "truncate_with_folder_marker" ]]; then
     set_default POWERLEVEL9K_SHORTEN_DELIMITER $'\U2026'
 
     case "$POWERLEVEL9K_SHORTEN_STRATEGY" in
@@ -592,7 +591,12 @@ prompt_dir() {
           package_path=${$(pwd)%%/.git*}
         fi
 
-        zero='%([BSUbfksu]|([FB]|){*})'
+        # Replace the shortest possible match of the marked folder from
+        # the current path. Remove the amount of characters up to the
+        # folder marker from the left. Count only the visible characters
+        # in the path (this is done by the "zero" pattern; see
+        # http://stackoverflow.com/a/40855342/5586433).
+        local zero='%([BSUbfksu]|([FB]|){*})'
         current_dir=$(pwd)
         # Then, find the length of the package_path string, and save the
         # subdirectory path as a substring of the current directory's path from 0
@@ -609,6 +613,32 @@ prompt_dir() {
         else
           current_path=$(truncatePathFromRight "$(pwd | sed -e "s,^$HOME,~,")" )
         fi
+      ;;
+      truncate_with_folder_marker)
+        local last_marked_folder marked_folder
+        set_default POWERLEVEL9K_SHORTEN_FOLDER_MARKER ".shorten_folder_marker"
+
+        # Search for the folder marker in the parent directories and
+        # buildup a pattern that is removed from the current path
+        # later on.
+        for marked_folder in $(upsearch $POWERLEVEL9K_SHORTEN_FOLDER_MARKER); do
+          if [[ "$marked_folder" == "/" ]]; then
+            # If we reached root folder, stop upsearch.
+            current_path="/"
+          elif [[ "$marked_folder" == "$HOME" ]]; then
+            # If we reached home folder, stop upsearch.
+            current_path="~"
+          elif [[ "${marked_folder%/*}" == $last_marked_folder ]]; then
+            current_path="${current_path%/}/${marked_folder##*/}"
+          else
+            current_path="${current_path%/}/$POWERLEVEL9K_SHORTEN_DELIMITER/${marked_folder##*/}"
+          fi
+          last_marked_folder=$marked_folder
+        done
+
+        # Replace the shortest possible match of the marked folder from
+        # the current path.
+        current_path=$current_path${PWD#${last_marked_folder}*}
       ;;
       *)
         current_path="%$((POWERLEVEL9K_SHORTEN_DIR_LENGTH+1))(c:$POWERLEVEL9K_SHORTEN_DELIMITER/:)%${POWERLEVEL9K_SHORTEN_DIR_LENGTH}c"

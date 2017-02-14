@@ -279,8 +279,16 @@ Customizations available are:
 | Variable | Default Value | Description |
 |----------|---------------|-------------|
 |`POWERLEVEL9K_SHORTEN_DIR_LENGTH`|`2`|If your shorten strategy, below, is entire directories, this field determines how many directories to leave at the end. If your shorten strategy is by character count, this field determines how many characters to allow per directory string.|
-|`POWERLEVEL9K_SHORTEN_STRATEGY`|None|How the directory strings should be truncated. By default, it will truncate whole directories. Other options are `truncate_middle`, which leaves the start and end of the directory strings, and `truncate_from_right`, which cuts starting from the end of the string.  You can also use `truncate_with_package_name` to use the `package.json` `name` field to abbreviate the directory path.|
+|`POWERLEVEL9K_SHORTEN_STRATEGY`|None|How the directory strings should be truncated. See the table below for more informations.|
 |`POWERLEVEL9K_SHORTEN_DELIMITER`|`..`|Delimiter to use in truncated strings. This can be any string you choose, including an empty string if you wish to have no delimiter.|
+
+| Strategy Name | Description |
+|---------------|-------------|
+|Default|Truncate whole directories from left. How many is defined by `POWERLEVEL9K_SHORTEN_DIR_LENGTH`|
+|`truncate_middle`|Truncates the middle part of a folder. E.g. you are in a folder named "~/MySuperProjects/AwesomeFiles/BoringOffice", then it will truncated to "~/MyS..cts/Awe..les/BoringOffice", if `POWERLEVEL9K_SHORTEN_DIR_LENGTH=3` is also set (controls the amount of characters to be left).|
+|`truncate_from_right`|Just leaves the beginning of a folder name untouched. E.g. your folders will be truncated like so: "/ro../Pr../office". How many characters will be untouched is controlled by `POWERLEVEL9K_SHORTEN_DIR_LENGTH`.|
+|`truncate_with_package_name`|Use the `package.json` `name` field to abbreviate the directory path.|
+|`truncate_with_folder_marker`|Search for a file that is specified by `POWERLEVEL9K_SHORTEN_FOLDER_MARKER` and truncate everything before that (if found, otherwise stop on $HOME and ROOT).|
 
 For example, if you wanted the truncation behavior of the `fish` shell, which
 truncates `/usr/share/plasma` to `/u/s/plasma`, you would use the following:
