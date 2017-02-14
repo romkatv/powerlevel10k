@@ -256,7 +256,8 @@ end of the hostname.
 |----------|---------------|-------------|
 |`DEFAULT_USER`|None|Username to consider a "default context".|
 |`POWERLEVEL9K_CONTEXT_HOST_DEPTH`|%m|Customizable host depth on prompt.|
-|`POWERLEVEL9K_ALWAYS_SHOW_CONTEXT`|false|Always show this segment.|
+|`POWERLEVEL9K_ALWAYS_SHOW_CONTEXT`|false|Always show this segment, including $USER and hostname.|
+|`POWERLEVEL9K_ALWAYS_SHOW_USER`|false|Always show the username, but conditionalize the hostname.|
 
 ##### dir
 
