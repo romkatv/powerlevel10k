@@ -72,6 +72,48 @@ function testTruncationFromRightWorks() {
   unset POWERLEVEL9K_SHORTEN_STRATEGY
 }
 
+function testTruncateWithFolderMarkerWorks() {
+  POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(dir)
+  POWERLEVEL9K_SHORTEN_STRATEGY="truncate_with_folder_marker"
+
+  local BASEFOLDER=/tmp/powerlevel9k-test
+  local FOLDER=$BASEFOLDER/1/12/123/1234/12345/123456/1234567
+  mkdir -p $FOLDER
+  # Setup folder marker
+  touch $BASEFOLDER/1/12/.shorten_folder_marker
+  cd $FOLDER
+  assertEquals "%K{blue} %F{black}/…/12/123/1234/12345/123456/1234567 %k%F{blue}%f " "$(build_left_prompt)"
+
+  cd -
+  rm -fr $BASEFOLDER
+  unset BASEFOLDER
+  unset FOLDER
+  unset POWERLEVEL9K_SHORTEN_STRATEGY
+  unset POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
+}
+
+function testTruncateWithFolderMarkerWithChangedFolderMarker() {
+  POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(dir)
+  POWERLEVEL9K_SHORTEN_STRATEGY="truncate_with_folder_marker"
+  POWERLEVEL9K_SHORTEN_FOLDER_MARKER='.xxx'
+
+  local BASEFOLDER=/tmp/powerlevel9k-test
+  local FOLDER=$BASEFOLDER/1/12/123/1234/12345/123456/1234567
+  mkdir -p $FOLDER
+  # Setup folder marker
+  touch $BASEFOLDER/1/12/.xxx
+  cd $FOLDER
+  assertEquals "%K{blue} %F{black}/…/12/123/1234/12345/123456/1234567 %k%F{blue}%f " "$(build_left_prompt)"
+
+  cd -
+  rm -fr $BASEFOLDER
+  unset BASEFOLDER
+  unset FOLDER
+  unset POWERLEVEL9K_SHORTEN_FOLDER_MARKER
+  unset POWERLEVEL9K_SHORTEN_STRATEGY
+  unset POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
+}
+
 function testHomeFolderDetectionWorks() {
   POWERLEVEL9K_HOME_ICON='home-icon'
 
