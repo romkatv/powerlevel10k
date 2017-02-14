@@ -80,6 +80,7 @@ case $POWERLEVEL9K_MODE in
       PUBLIC_IP_ICON                 ''
       LOCK_ICON                      $'\UE138'              # 
       EXECUTION_TIME_ICON            $'\UE89C'              # 
+      SSH_ICON                       '(ssh)'
     )
   ;;
   'awesome-fontconfig')
@@ -142,6 +143,7 @@ case $POWERLEVEL9K_MODE in
       PUBLIC_IP_ICON                 ''
       LOCK_ICON                      $'\UE138'              # 
       EXECUTION_TIME_ICON            $'\uF253'
+      SSH_ICON                       '(ssh)'
     )
   ;;
   *)
@@ -204,6 +206,7 @@ case $POWERLEVEL9K_MODE in
       PUBLIC_IP_ICON                 ''
       LOCK_ICON                      $'\UE0A2'
       EXECUTION_TIME_ICON            'Dur'
+      SSH_ICON                       '(ssh)'
     )
   ;;
 esac
