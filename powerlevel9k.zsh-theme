@@ -572,9 +572,9 @@ prompt_command_execution_time() {
   # See http://unix.stackexchange.com/a/89748
   local humanReadableDuration
   if (( _P9K_COMMAND_DURATION > 3600 )); then
-    humanReadableDuration=$(strftime '%H:%M:%S' $(( int(rint(_P9K_COMMAND_DURATION)) )))
+    humanReadableDuration=$(TZ=GMT; strftime '%H:%M:%S' $(( int(rint(_P9K_COMMAND_DURATION)) )))
   elif (( _P9K_COMMAND_DURATION > 60 )); then
-    humanReadableDuration=$(strftime '%M:%S' $(( int(rint(_P9K_COMMAND_DURATION)) )))
+    humanReadableDuration=$(TZ=GMT; strftime '%M:%S' $(( int(rint(_P9K_COMMAND_DURATION)) )))
   else
     # If the command executed in seconds, print as float.
     # Convert to float
