@@ -564,7 +564,7 @@ prompt_custom() {
 prompt_command_execution_time() {
   set_default POWERLEVEL9K_COMMAND_EXECUTION_TIME_THRESHOLD 3
 
-  local duration=$_P9K_DURATION_TIME
+  local duration=$_P9K_COMMAND_DURATION
 
   [[ $_P9K_COMMAND_DURATION -gt 60 ]] && duration=$(strftime '%M:%S' $_P9K_COMMAND_DURATION)
   [[ $_P9K_COMMAND_DURATION -gt 3600 ]] && duration=$(strftime '%H:%M:%S' $_P9K_COMMAND_DURATION)
