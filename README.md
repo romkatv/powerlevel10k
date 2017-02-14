@@ -313,9 +313,12 @@ the path shown would be `my-cool-project`.  If you navigate to `$HOME/projects/m
 
 If you want to customize the directory separator, you could set:
 ```zsh
-# You'll need patched awesome-terminal fonts for that example
-POWERLEVEL9K_DIR_PATH_SEPARATOR="%f "$'\uE0B1'" %F"
+# Double quotes are important here!
+POWERLEVEL9K_DIR_PATH_SEPARATOR="%F{red} $(print_icon 'LEFT_SUBSEGMENT_SEPARATOR') %F{black}"
 ```
+To omit the first character (usually a slash that gets replaced if you set `POWERLEVEL9K_DIR_PATH_SEPARATOR`),
+you could set `POWERLEVEL9K_DIR_OMIT_FIRST_CHARACTER=true`.
+
 
 ##### disk_usage
 
