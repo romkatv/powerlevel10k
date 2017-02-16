@@ -140,7 +140,7 @@ The segments that are currently available are:
 **Other:**
 * [`custom_command`](#custom_command) - Create a custom segment to display the
   output of an arbitrary command.
-* [`command_execution_time`] - Display the time the current command took to execute.
+* [`command_execution_time`](#command_execution_time) - Display the time the current command took to execute.
 * [`todo`](http://todotxt.com/) - Shows the number of tasks in your todo.txt tasks file.
 * `detect_virt` - Virtualization detection with systemd
 
@@ -205,6 +205,9 @@ without affecting the icon color.
 
 Display the time the current command took to execute if the time is above
 `POWERLEVEL9K_COMMAND_EXECUTION_TIME_THRESHOLD` (defaults to 3 seconds).
+The time is shown human readable, if it exceeds one minute. If you want more
+precision, just set `POWERLEVEL9K_COMMAND_EXECUTION_TIME_PRECISION=2` (or
+whatever precision you want).
 
 ##### custom_command
 
