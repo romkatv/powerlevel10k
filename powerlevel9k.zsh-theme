@@ -1267,7 +1267,7 @@ powerlevel9k_prepare_prompts() {
   _P9K_TIMER_START=99999999999
 
   if [[ "$POWERLEVEL9K_PROMPT_ON_NEWLINE" == true ]]; then
-    PROMPT="$(print_icon 'MULTILINE_FIRST_PROMPT_PREFIX')%f%b%k$(build_left_prompt)
+    PROMPT="\n$(print_icon 'MULTILINE_FIRST_PROMPT_PREFIX')%f%b%k$(build_left_prompt)
 $(print_icon 'MULTILINE_SECOND_PROMPT_PREFIX')"
     if [[ "$POWERLEVEL9K_RPROMPT_ON_NEWLINE" != true ]]; then
       # The right prompt should be on the same line as the first line of the left
