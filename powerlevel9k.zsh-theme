@@ -1259,6 +1259,7 @@ powerlevel9k_preexec() {
   _P9K_TIMER_START=$EPOCHREALTIME
 }
 
+set_default POWERLEVEL9K_PROMPT_ADD_NEWLINE false
 powerlevel9k_prepare_prompts() {
   RETVAL=$?
 
