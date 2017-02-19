@@ -203,11 +203,16 @@ without affecting the icon color.
 
 ##### command_execution_time
 
-Display the time the current command took to execute if the time is above
-`POWERLEVEL9K_COMMAND_EXECUTION_TIME_THRESHOLD` (defaults to 3 seconds).
-The time is shown human readable, if it exceeds one minute. If you want more
-precision, just set `POWERLEVEL9K_COMMAND_EXECUTION_TIME_PRECISION=2` (or
-whatever precision you want).
+Display the time the previous command took to execute if the time is above
+`POWERLEVEL9K_COMMAND_EXECUTION_TIME_THRESHOLD`. The time is formatted to be
+"human readable", and so scales the units based on the length of execution time.
+If you want more precision, just set the
+`POWERLEVEL9K_COMMAND_EXECUTION_TIME_PRECISION` field.
+
+| Variable | Default Value | Description |
+|----------|---------------|-------------|
+|`POWERLEVEL9K_COMMAND_EXECUTION_TIME_THRESHOLD`|3|Threshold above which to print this segment. Can be set to `0` to always print.|
+|`POWERLEVEL9K_COMMAND_EXECUTION_TIME_PRECISION=2`|2|Number of digits to use in the fractional part of the time value.|
 
 ##### custom_command
 
