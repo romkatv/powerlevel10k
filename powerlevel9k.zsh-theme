@@ -655,12 +655,15 @@ prompt_dir() {
         subdirectory_path=$(truncatePathFromRight "${current_dir:${#${(S%%)package_path//$~zero/}}}")
         # Parse the 'name' from the package.json; if there are any problems, just
         # print the file path
-        if name=$( cat "$package_path/package.json" 2> /dev/null | grep -m 1 "\"name\""); then
-          name=$(echo $name | awk -F ':' '{print $2}' | awk -F '"' '{print $2}')
-
+        local pkgFile="${package_path}/package.json"
+        local packageName=$(jq '.name' ${pkgFile} 2> /dev/null \
+          || node -e 'console.log(require(process.argv[1]).name);' ${pkgFile} 2>/dev/null \
+          || cat "${pkgFile}" 2> /dev/null | grep -m 1 "\"name\"" | awk -F ':' '{print $2}' | awk -F '"' '{print $2}' 2>/dev/null \
+          )
+        if [[ -n "${packageName}" ]]; then
           # Instead of printing out the full path, print out the name of the package
           # from the package.json and append the current subdirectory
-          current_path="`echo $name | tr -d '"'`$subdirectory_path"
+          current_path="`echo $packageName | tr -d '"'`$subdirectory_path"
         else
           current_path=$(truncatePathFromRight "$(pwd | sed -e "s,^$HOME,~,")" )
         fi
