@@ -146,7 +146,7 @@ case $POWERLEVEL9K_MODE in
       SSH_ICON                       '(ssh)'
     )
   ;;
-  'nerd-patched-complete')
+  'nerdfont-fontconfig')
     # nerd-font patched (complete) font required! See
     # https://github.com/ryanoasis/nerd-fonts
     icons=(
