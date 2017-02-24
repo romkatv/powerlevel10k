@@ -20,6 +20,11 @@ Added an option to configure the path separator. If you want something
 else than an ordinary slash, you could set
 `POWERLEVEL9K_DIR_PATH_SEPARATOR` to whatever you want.
 
+#### `truncate_with_package_name` now searches for `composer.json` as well
+
+Now `composer.json` files are searched as well. By default `package.json` still takes
+precedence. If you want to change that, set `POWERLEVEL9K_DIR_PACKAGE_FILES=(composer.json package.json)`.
+
 ### New segment 'command_execution_time' added
 
 Shows the duration a command needed to run. By default only durations over 3 seconds
