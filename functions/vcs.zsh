@@ -111,7 +111,7 @@ function +vi-hg-bookmarks() {
 function +vi-vcs-detect-changes() {
   if [[ "${hook_com[vcs]}" == "git" ]]; then
 
-    local remote=`git ls-remote --get-url`
+    local remote=$(git ls-remote --get-url 2> /dev/null)
     if [[ "$remote" =~ "github" ]] then
       vcs_visual_identifier='VCS_GIT_GITHUB_ICON'
     elif [[ "$remote" =~ "bitbucket" ]] then
