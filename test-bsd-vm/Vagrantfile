@@ -38,6 +38,13 @@ Vagrant.configure("2") do |config|
   # your network.
   #config.vm.network "public_network"
 
+  # The BSD base box does not define a MAC address. Whysoever.
+  config.vm.base_mac = "8AAB4975994A"
+
+  # There is no BASH for root on BSD. We need to set another shell.
+  # See https://www.freebsd.org/doc/en/articles/linux-users/shells.html
+  config.ssh.shell = "/bin/csh"
+
   # Share an additional folder to the guest VM. The first argument is
   # the path on the host to the actual folder. The second argument is
   # the path on the guest to mount the folder. And the optional third
