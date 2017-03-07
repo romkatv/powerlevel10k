@@ -16,7 +16,7 @@ Vagrant.configure(2) do |config|
 
   # Bootstrap
   config.vm.provision :shell, path: "bootstrap.sh", privileged: false
-  config.vm.provision :shell, path: "plain.sh", privileged: false
+  config.vm.provision :shell, path: "../test-vm-providers/plain.sh", privileged: false
   config.vm.provision :shell, path: "antigen.sh"
   config.vm.provision :shell, path: "prezto.sh"
   config.vm.provision :shell, path: "omz.sh"
