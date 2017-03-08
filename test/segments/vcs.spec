@@ -21,7 +21,7 @@ function testColorOverridingForCleanStateWorks() {
   cd $FOLDER
   git init 1>/dev/null
 
-  assertEquals "%K{white} %F{cyan} master %k%F{white}%f " "$(build_left_prompt)"
+  assertEquals "%K{white} %F{cyan}master %k%F{white}%f " "$(build_left_prompt)"
 
   cd -
   rm -fr /tmp/powerlevel9k-test
@@ -47,7 +47,7 @@ function testColorOverridingForModifiedStateWorks() {
   git commit -m "test" 1>/dev/null
   echo "test" > testfile
 
-  assertEquals "%K{yellow} %F{red} master ● %k%F{yellow}%f " "$(build_left_prompt)"
+  assertEquals "%K{yellow} %F{red}master ● %k%F{yellow}%f " "$(build_left_prompt)"
 
   cd -
   rm -fr /tmp/powerlevel9k-test
@@ -68,7 +68,7 @@ function testColorOverridingForUntrackedStateWorks() {
   git init 1>/dev/null
   touch testfile
 
-  assertEquals "%K{yellow} %F{cyan} master ? %k%F{yellow}%f " "$(build_left_prompt)"
+  assertEquals "%K{yellow} %F{cyan}master ? %k%F{yellow}%f " "$(build_left_prompt)"
 
   cd -
   rm -fr /tmp/powerlevel9k-test

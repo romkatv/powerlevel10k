@@ -114,6 +114,112 @@ function testTruncateWithFolderMarkerWithChangedFolderMarker() {
   unset POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
 }
 
+function testTruncateWithPackageNameWorks() {
+  local p9kFolder=$(pwd)
+  local BASEFOLDER=/tmp/powerlevel9k-test
+  local FOLDER=$BASEFOLDER/1/12/123/1234/12345/123456/1234567/12345678/123456789
+  mkdir -p $FOLDER
+
+  cd /tmp/powerlevel9k-test
+  echo '
+{
+  "name": "My_Package"
+}
+' > package.json
+  # Unfortunately: The main folder must be a git repo..
+  git init &>/dev/null
+
+  # Go back to deeper folder
+  cd "${FOLDER}"
+
+  POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(dir)
+  POWERLEVEL9K_SHORTEN_DIR_LENGTH=2
+  POWERLEVEL9K_SHORTEN_STRATEGY='truncate_with_package_name'
+
+  assertEquals "%K{blue} %F{black}My_Package/1/12/123/12…/12…/12…/12…/12…/123456789 %k%F{blue}%f " "$(build_left_prompt)"
+
+  # Go back
+  cd $p9kFolder
+  rm -fr $BASEFOLDER
+  unset POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
+  unset POWERLEVEL9K_SHORTEN_STRATEGY
+  unset POWERLEVEL9K_SHORTEN_DIR_LENGTH
+}
+
+function testTruncateWithPackageNameIfRepoIsSymlinkedInsideDeepFolder() {
+  local p9kFolder=$(pwd)
+  local BASEFOLDER=/tmp/powerlevel9k-test
+  local FOLDER=$BASEFOLDER/1/12/123/1234/12345/123456/1234567/12345678/123456789
+  mkdir -p $FOLDER
+  cd $FOLDER
+
+  # Unfortunately: The main folder must be a git repo..
+  git init &>/dev/null
+
+  echo '
+{
+  "name": "My_Package"
+}
+' > package.json
+
+  # Create a subdir inside the repo
+  mkdir -p asdfasdf/qwerqwer
+
+  cd $BASEFOLDER
+  ln -s ${FOLDER} linked-repo
+
+  # Go to deep folder inside linked repo
+  cd linked-repo/asdfasdf/qwerqwer
+
+  POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(dir)
+  POWERLEVEL9K_SHORTEN_DIR_LENGTH=2
+  POWERLEVEL9K_SHORTEN_STRATEGY='truncate_with_package_name'
+
+  assertEquals "%K{blue} %F{black}My_Package/as…/qwerqwer %k%F{blue}%f " "$(build_left_prompt)"
+
+  # Go back
+  cd $p9kFolder
+  rm -fr $BASEFOLDER
+  unset POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
+  unset POWERLEVEL9K_SHORTEN_STRATEGY
+  unset POWERLEVEL9K_SHORTEN_DIR_LENGTH
+}
+
+function testTruncateWithPackageNameIfRepoIsSymlinkedInsideGitDir() {
+  local p9kFolder=$(pwd)
+  local BASEFOLDER=/tmp/powerlevel9k-test
+  local FOLDER=$BASEFOLDER/1/12/123/1234/12345/123456/1234567/12345678/123456789
+  mkdir -p $FOLDER
+  cd $FOLDER
+
+  # Unfortunately: The main folder must be a git repo..
+  git init &>/dev/null
+
+  echo '
+{
+  "name": "My_Package"
+}
+' > package.json
+
+  cd $BASEFOLDER
+  ln -s ${FOLDER} linked-repo
+
+  cd linked-repo/.git/refs/heads
+
+  POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(dir)
+  POWERLEVEL9K_SHORTEN_DIR_LENGTH=2
+  POWERLEVEL9K_SHORTEN_STRATEGY='truncate_with_package_name'
+
+  assertEquals "%K{blue} %F{black}My_Package/.g…/re…/heads %k%F{blue}%f " "$(build_left_prompt)"
+
+  # Go back
+  cd $p9kFolder
+  rm -fr $BASEFOLDER
+  unset POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
+  unset POWERLEVEL9K_SHORTEN_STRATEGY
+  unset POWERLEVEL9K_SHORTEN_DIR_LENGTH
+}
+
 function testHomeFolderDetectionWorks() {
   POWERLEVEL9K_HOME_ICON='home-icon'
 

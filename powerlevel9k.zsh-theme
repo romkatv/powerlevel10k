@@ -664,7 +664,7 @@ prompt_dir() {
             break;
           fi
         done
-
+        
         local packageName=$(jq '.name' ${pkgFile} 2> /dev/null \
           || node -e 'console.log(require(process.argv[1]).name);' ${pkgFile} 2>/dev/null \
           || cat "${pkgFile}" 2> /dev/null | grep -m 1 "\"name\"" | awk -F ':' '{print $2}' | awk -F '"' '{print $2}' 2>/dev/null \
