@@ -312,7 +312,7 @@ Customizations available are:
 |Default|Truncate whole directories from left. How many is defined by `POWERLEVEL9K_SHORTEN_DIR_LENGTH`|
 |`truncate_middle`|Truncates the middle part of a folder. E.g. you are in a folder named "~/MySuperProjects/AwesomeFiles/BoringOffice", then it will truncated to "~/MyS..cts/Awe..les/BoringOffice", if `POWERLEVEL9K_SHORTEN_DIR_LENGTH=3` is also set (controls the amount of characters to be left).|
 |`truncate_from_right`|Just leaves the beginning of a folder name untouched. E.g. your folders will be truncated like so: "/ro../Pr../office". How many characters will be untouched is controlled by `POWERLEVEL9K_SHORTEN_DIR_LENGTH`.|
-|`truncate_with_package_name`|Use the `package.json` `name` field to abbreviate the directory path.|
+|`truncate_with_package_name`|Use the `package.json` `name` field to abbreviate the directory path. If you have [jq](https://stedolan.github.io/jq/) installed, it will dramatically improve the speed of this strategy.|
 |`truncate_with_folder_marker`|Search for a file that is specified by `POWERLEVEL9K_SHORTEN_FOLDER_MARKER` and truncate everything before that (if found, otherwise stop on $HOME and ROOT).|
 
 For example, if you wanted the truncation behavior of the `fish` shell, which
