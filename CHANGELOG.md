@@ -1,4 +1,4 @@
-## next
+## v0.6.0
 
 - Fixed a bug where the tag display was broken on detached HEADs.
 - Fixed a bug where SVN detection sometimes failed.
@@ -9,6 +9,10 @@
 - Speed & accuracy improvements to the battery segment.
 - Added Github syntax highlighting to README.
 - Various documentation cleanup.
+
+### New Font Option: nerd-fonts
+
+There is now an option to use [nerd-fonts](https://github.com/ryanoasis/nerd-fonts) with P9k. Simply configure the `nerdfont-fontconfig`, and you'll be set!
 
 ### `vcs` changes
 
