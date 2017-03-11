@@ -175,4 +175,6 @@ print -P "You are using %F{blue}${currentTerminal}%f with Font %F{blue}${current
 if [[ $(echo "${currentFont}" | grep -c -E "Powerline|Awesome|Nerd") -eq 0 ]]; then
     print -P "%F{yellow}WARNING%f It does not seem like you use an Powerline-enabled or Awesome Terminal Font!"
     print -P "Please make sure that your font settings are correct!"
+else
+    print -P "Your font settings seem to be all right. If you still have issues, it is more likely to be a font issue than a Powerlevel9k related one."
 fi
