@@ -911,8 +911,7 @@ prompt_ram() {
     ramfree=$(( ramfree * 4096 ))
   else
     if [[ "$OS" == "BSD" ]]; then
-      ramfree=$(vmstat | grep -E '([0-9]+\w+)+' | awk '{print $5}')
-      base='M'
+      ramfree=$(grep 'avail memory' /var/run/dmesg.boot | awk '{print $4}')
     else
       ramfree=$(grep -o -E "MemAvailable:\s+[0-9]+" /proc/meminfo | grep -o "[0-9]*")
       base='K'
