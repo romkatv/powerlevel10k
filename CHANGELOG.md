@@ -1,5 +1,9 @@
 ## next
 
+### Add debug script for iTerm2 issues
+
+A new script `debug/iterm.zsh` was added for easier spotting problems with your iTerm2 configuration.
+
 ### Add debug script for font issues
 
 A new script `debug/font-issues.zsh` was added, so that problems with your font could be spotted easier.
