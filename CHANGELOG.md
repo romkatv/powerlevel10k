@@ -4,6 +4,10 @@
 
 A new script `debug/font-issues.zsh` was added, so that problems with your font could be spotted easier.
 
+### `ram` changes
+
+The `ram` segment now shows the available ram instead of free.
+
 ## v0.6.0
 
 - Fixed a bug where the tag display was broken on detached HEADs.
