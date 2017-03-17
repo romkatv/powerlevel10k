@@ -1,3 +1,9 @@
+## next
+
+### Add debug script for font issues
+
+A new script `debug/font-issues.zsh` was added, so that problems with your font could be spotted easier.
+
 ## v0.6.0
 
 - Fixed a bug where the tag display was broken on detached HEADs.
