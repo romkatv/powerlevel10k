@@ -6,6 +6,11 @@ if [[ "$TERM_PROGRAM" != "iTerm.app" ]]; then
     exit 1
 fi
 
+if [[ ! -x "/usr/libexec/PlistBuddy" ]]; then
+    print "To use this debug script, you need to install XCode!"
+    exit 1
+fi
+
 local normalFont
 local type
 local command
