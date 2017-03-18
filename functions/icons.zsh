@@ -86,6 +86,8 @@ case $POWERLEVEL9K_MODE in
   'awesome-fontconfig')
     # fontconfig with awesome-font required! See
     # https://github.com/gabrielelana/awesome-terminal-fonts
+    # Set the right locale to protect special characters
+    local LC_ALL="" LC_CTYPE="en_US.UTF-8"
     icons=(
       LEFT_SEGMENT_SEPARATOR         $'\uE0B0'              # 
       RIGHT_SEGMENT_SEPARATOR        $'\uE0B2'              # 
@@ -149,6 +151,8 @@ case $POWERLEVEL9K_MODE in
   'nerdfont-fontconfig')
     # nerd-font patched (complete) font required! See
     # https://github.com/ryanoasis/nerd-fonts
+    # Set the right locale to protect special characters
+    local LC_ALL="" LC_CTYPE="en_US.UTF-8"
     icons=(
       LEFT_SEGMENT_SEPARATOR         $'\uE0B0'              # 
       RIGHT_SEGMENT_SEPARATOR        $'\uE0B2'              # 
@@ -205,6 +209,8 @@ case $POWERLEVEL9K_MODE in
   *)
     # Powerline-Patched Font required!
     # See https://github.com/Lokaltog/powerline-fonts
+    # Set the right locale to protect special characters
+    local LC_ALL="" LC_CTYPE="en_US.UTF-8"
     icons=(
       LEFT_SEGMENT_SEPARATOR         $'\uE0B0'              # 
       RIGHT_SEGMENT_SEPARATOR        $'\uE0B2'              # 
@@ -270,6 +276,8 @@ esac
 # Override the above icon settings with any user-defined variables.
 case $POWERLEVEL9K_MODE in
   'flat')
+    # Set the right locale to protect special characters
+    local LC_ALL="" LC_CTYPE="en_US.UTF-8"
     icons[LEFT_SEGMENT_SEPARATOR]=''
     icons[RIGHT_SEGMENT_SEPARATOR]=''
     icons[LEFT_SUBSEGMENT_SEPARATOR]='|'
