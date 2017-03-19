@@ -275,10 +275,9 @@ end of the hostname.
 
 | Variable | Default Value | Description |
 |----------|---------------|-------------|
-|`DEFAULT_USER`|None|Username to consider a "default context".|
+|`DEFAULT_USER`|None|Username to consider a "default context" (you can also set `$USER`).|
 |`POWERLEVEL9K_ALWAYS_SHOW_CONTEXT`|false|Always show this segment, including $USER and hostname.|
 |`POWERLEVEL9K_ALWAYS_SHOW_USER`|false|Always show the username, but conditionalize the hostname.|
-|`DEFAULT_USER`|None|Username to consider a "default context" (you can also use `$USER`)|
 |`POWERLEVEL9K_CONTEXT_TEMPLATE`|%n@%m|Default context prompt (username@machine). Refer to the [ZSH Documentation](http://zsh.sourceforge.net/Doc/Release/Prompt-Expansion.html) for all possible expansions, including deeper host depths.|
 
 ##### dir
