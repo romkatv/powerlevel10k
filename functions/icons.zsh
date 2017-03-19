@@ -301,7 +301,8 @@ function print_icon() {
 }
 
 get_icon_names() {
-  for key in ${(@k)icons}; do
+  # Iterate over a ordered list of keys of the icons array
+  for key in ${(@kon)icons}; do
     echo "POWERLEVEL9K_$key: ${icons[$key]}"
   done
 }
