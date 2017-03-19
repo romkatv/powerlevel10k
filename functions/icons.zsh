@@ -300,9 +300,20 @@ function print_icon() {
   fi
 }
 
+# Get a list of configured icons
+#   * $1 string - If "original", then the original icons are printed,
+#                 otherwise "print_icon" is used, which takes the users
+#                 overrides into account.
 get_icon_names() {
   # Iterate over a ordered list of keys of the icons array
   for key in ${(@kon)icons}; do
-    echo "POWERLEVEL9K_$key: ${icons[$key]}"
+    echo -n "POWERLEVEL9K_$key: "
+    if [[ "${1}" == "original" ]]; then
+      # print the original icons as they are defined in the array above
+      echo "${icons[$key]}"
+    else
+      # print the icons as they are configured by the user
+      echo "$(print_icon "$key")"
+    fi
   done
 }
