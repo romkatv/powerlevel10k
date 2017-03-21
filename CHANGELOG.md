@@ -1,4 +1,10 @@
-## next
+## v0.6.2
+
+- Fixed some issues with the new `nerdfont-fontconfig` option.
+- Fixed typo in README.
+- The `get_icon_names` function can now print sorted output, and show which
+  icons users have overridden.
+- Added a FreeBSD VM for testing.
 
 ### Add debug script for iTerm2 issues
 
