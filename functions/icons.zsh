@@ -164,6 +164,7 @@ case $POWERLEVEL9K_MODE in
       TEST_ICON                      $'\uF188'              # 
       TODO_ICON                      $'\uF133'              # 
       BATTERY_ICON                   $'\UF240 '             # 
+      DISK_ICON                      $'\uF0A0'              #  
       OK_ICON                        $'\uF00C'              # 
       FAIL_ICON                      $'\uF00D'              # 
       SYMFONY_ICON                   $'\uE757'              # 
@@ -194,24 +195,18 @@ case $POWERLEVEL9K_MODE in
       VCS_BRANCH_ICON                $'\uF126 '             # 
       VCS_REMOTE_BRANCH_ICON         $'\uE728 '             # 
       VCS_GIT_ICON                   $'\uF113 '             # 
-      VCS_HG_ICON                    $'\uF0C3 '             # 
-      VCS_SVN_ICON                   $'\uE72D '             # 
       VCS_GIT_GITHUB_ICON            $'\uE709 '             # 
       VCS_GIT_BITBUCKET_ICON         $'\uE703 '             # 
       VCS_GIT_GITLAB_ICON            $'\uF296 '             #  
+      VCS_HG_ICON                    $'\uF0C3 '             # 
+      VCS_SVN_ICON                   $'\uE72D '             # 
       RUST_ICON                      $'\uE7A8 '             # 
       PYTHON_ICON                    $'\UE73C '             # 
       SWIFT_ICON                     $'\uE755'              # 
       PUBLIC_IP_ICON                 $'\UF0AC'              # 
       LOCK_ICON                      $'\UF023'              #  
-      SSH_ICON                       $'\uF489'              #  
-      #SSH_ICON                       $'\uF43D'              #  
       EXECUTION_TIME_ICON            $'\uF252'              #  
-      DISK_ICON                      $'\uF0A0'              #  
-      RUST_ICON                      $'\uE7A8'              # 
-      PYTHON_ICON                    $'\uE73C'              # 
-      SWIFT_ICON                     $'\uE755'              # 
-      PUBLIC_IP_ICON                 ''
+      SSH_ICON                       $'\uF489'              #  
     )
   ;;
   *)
