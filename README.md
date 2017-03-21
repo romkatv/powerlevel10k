@@ -52,7 +52,7 @@ terminal. Once you are done, you can optionally customize your prompt.
 [Installation Instructions](https://github.com/bhilburn/powerlevel9k/wiki/Install-Instructions)
 
 1. [Install the Powerlevel9k Theme](https://github.com/bhilburn/powerlevel9k/wiki/Install-Instructions#step-1-install-powerlevel9k)
-2. [Install Powerline-Patched Fonts](https://github.com/bhilburn/powerlevel9k/wiki/Install-Instructions#step-2-install-powerline-fonts)
+2. [Install Powerline Fonts](https://github.com/bhilburn/powerlevel9k/wiki/Install-Instructions#step-2-install-a-powerline-font)
 
 No configuration is necessary post-installation if you like the default
 settings, but there are plenty of segment customization options available if you
