@@ -16,6 +16,7 @@ install:
   - "sudo apt-get update -qq"
   - "sudo apt-get install -y zsh"
   - "sudo chsh -s $(which zsh)"
+  - "sudo apt-get install -y git mercurial subversion jq node golang ruby python python-virtualenv"
 
 script:
   - test/powerlevel9k.spec
