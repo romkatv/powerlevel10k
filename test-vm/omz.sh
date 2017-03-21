@@ -28,4 +28,6 @@ plugins=(git rake ruby)
 source $ZSH/oh-my-zsh.sh
 ' > $HOME/.zshrc
 
+        # setup environment
+        /vagrant_data/test-vm-providers/setup-environment.sh
 )

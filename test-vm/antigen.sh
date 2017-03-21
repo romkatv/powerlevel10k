@@ -24,4 +24,7 @@ antigen apply
         mkdir ~/antigen
         curl -qL https://raw.githubusercontent.com/zsh-users/antigen/master/antigen.zsh > ~/antigen/antigen.zsh
         source ~/antigen/antigen.zsh
+
+        # setup environment
+        /vagrant_data/test-vm-providers/setup-environment.sh
 )

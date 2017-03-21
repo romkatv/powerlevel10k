@@ -23,4 +23,7 @@ chmod 440 /etc/sudoers.d/$NEW_USER
 
         ln -s /vagrant_data/powerlevel9k.zsh-theme ~/.zprezto/modules/prompt/functions/prompt_powerlevel9k_setup
         sed -i "s/theme\ 'sorin'/theme\ 'powerlevel9k'/g" ~/.zpreztorc
+
+        # setup environment
+        /vagrant_data/test-vm-providers/setup-environment.sh
 )
