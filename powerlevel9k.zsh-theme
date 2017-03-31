@@ -613,6 +613,7 @@ prompt_command_execution_time() {
 
 # Dir: current working directory
 set_default POWERLEVEL9K_DIR_PATH_SEPARATOR "/"
+set_default POWERLEVEL9K_HOME_FOLDER_ABBREVIATION "~"
 prompt_dir() {
   local current_path="$(print -P "%~")"
   if [[ -n "$POWERLEVEL9K_SHORTEN_DIR_LENGTH" || "$POWERLEVEL9K_SHORTEN_STRATEGY" == "truncate_with_folder_marker" ]]; then
@@ -715,6 +716,10 @@ prompt_dir() {
 
   if [[ "${POWERLEVEL9K_DIR_PATH_SEPARATOR}" != "/" ]]; then
     current_path="$( echo "${current_path}" | sed "s/\//${POWERLEVEL9K_DIR_PATH_SEPARATOR}/g")"
+  fi
+
+  if [[ "${POWERLEVEL9K_HOME_FOLDER_ABBREVIATION}" != "~" ]]; then
+    current_path="$( echo "${current_path}" | sed "s/^~/${POWERLEVEL9K_HOME_FOLDER_ABBREVIATION}/")"
   fi
 
   typeset -AH dir_states

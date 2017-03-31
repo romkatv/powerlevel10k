@@ -343,6 +343,12 @@ POWERLEVEL9K_DIR_PATH_SEPARATOR="%F{red} $(print_icon 'LEFT_SUBSEGMENT_SEPARATOR
 To omit the first character (usually a slash that gets replaced if you set `POWERLEVEL9K_DIR_PATH_SEPARATOR`),
 you could set `POWERLEVEL9K_DIR_OMIT_FIRST_CHARACTER=true`.
 
+You can also customize the leading tilde character when you are in `$HOME` using:
+```zsh
+# Double quotes are important here!
+POWERLEVEL9K_HOME_FOLDER_ABBREVIATION="%F{red} $(print_icon 'HOME_ICON') %F{black}"
+```
+
 
 ##### disk_usage
 
