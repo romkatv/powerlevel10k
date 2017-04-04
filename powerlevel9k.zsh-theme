@@ -1317,8 +1317,8 @@ prompt_powerlevel9k_setup() {
 
   # Display a warning if the terminal does not support 256 colors
   local term_colors
-  term_colors=$(echotc Co)
-  if (( $term_colors < 256 )); then
+  term_colors=$(echotc Co 2>/dev/null)
+  if (( ! $? && ${term_colors:-0} < 256 )); then
     print -P "%F{red}WARNING!%f Your terminal appears to support less than 256 colors!"
     print -P "If your terminal supports 256 colors, please export the appropriate environment variable"
     print -P "_before_ loading this theme in your \~\/.zshrc. In most terminal emulators, putting"
