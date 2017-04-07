@@ -148,7 +148,7 @@ case $POWERLEVEL9K_MODE in
       SSH_ICON                       '(ssh)'
     )
   ;;
-  'nerdfont-fontconfig')
+  'nerdfont-complete'|'nerdfont-fontconfig')
     # nerd-font patched (complete) font required! See
     # https://github.com/ryanoasis/nerd-fonts
     # Set the right locale to protect special characters
