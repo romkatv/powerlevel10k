@@ -746,7 +746,7 @@ prompt_go_version() {
   local go_version
   local go_path
   go_version=$(go version 2>/dev/null | sed -E "s/.*(go[0-9.]*).*/\1/")
-  go_path=$(go env GOPATH)
+  go_path=$(go env GOPATH 2>/dev/null)
 
   if [[ -n "$go_version" && "${PWD##$go_path}" != "$PWD" ]]; then
     "$1_prompt_segment" "$0" "$2" "green" "255" "$go_version"
