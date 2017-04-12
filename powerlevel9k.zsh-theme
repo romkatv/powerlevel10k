@@ -1290,6 +1290,7 @@ powerlevel9k_prepare_prompts() {
   _P9K_COMMAND_DURATION=$((EPOCHREALTIME - _P9K_TIMER_START))
 
   # Reset start time
+  # Maximum integer on 32-bit CPUs
   _P9K_TIMER_START=2147483647
 
   if [[ "$POWERLEVEL9K_PROMPT_ON_NEWLINE" == true ]]; then
@@ -1327,6 +1328,7 @@ prompt_powerlevel9k_setup() {
   # We don't have to change that until 19 January of 2038! :)
 
   # Disable false display of command execution time
+  # Maximum integer on 32-bit CPUs
   _P9K_TIMER_START=2147483647
 
   # Display a warning if the terminal does not support 256 colors
