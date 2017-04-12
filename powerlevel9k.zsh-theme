@@ -425,11 +425,16 @@ prompt_battery() {
     esac
   fi
 
-  if [[ $OS =~ Linux ]]; then
+  if [[ "$OS" == 'Linux' ]] || [[ "$OS" == 'Android' ]]; then
     local sysp="/sys/class/power_supply"
+
     # Reported BAT0 or BAT1 depending on kernel version
     [[ -a $sysp/BAT0 ]] && local bat=$sysp/BAT0
     [[ -a $sysp/BAT1 ]] && local bat=$sysp/BAT1
+
+    # Android-related
+    # Tested on: Moto G falcon (CM 13.0)
+    [[ -a $sysp/battery ]] && local bat=$sysp/battery
 
     # Return if no battery found
     [[ -z $bat ]] && return
@@ -1283,8 +1288,9 @@ powerlevel9k_prepare_prompts() {
   RETVAL=$?
 
   _P9K_COMMAND_DURATION=$((EPOCHREALTIME - _P9K_TIMER_START))
+
   # Reset start time
-  _P9K_TIMER_START=99999999999
+  _P9K_TIMER_START=2147483647
 
   if [[ "$POWERLEVEL9K_PROMPT_ON_NEWLINE" == true ]]; then
     PROMPT="$(print_icon 'MULTILINE_FIRST_PROMPT_PREFIX')%f%b%k$(build_left_prompt)
@@ -1317,8 +1323,11 @@ NEWLINE='
 }
 
 prompt_powerlevel9k_setup() {
+  # I decided to use the value below for better supporting 32-bit CPUs, since the previous value "99999999999" was causing issues on my Android phone, which is powered by an armv7l
+  # We don't have to change that until 19 January of 2038! :)
+
   # Disable false display of command execution time
-  _P9K_TIMER_START=99999999999
+  _P9K_TIMER_START=2147483647
 
   # Display a warning if the terminal does not support 256 colors
   local term_colors

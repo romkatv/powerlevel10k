@@ -111,6 +111,15 @@ case $(uname) in
       ;;
 esac
 
+# Not all OSes support the '-o' parameter
+# That's why this second condition is needed 
+case $(uname -o 2>/dev/null) in
+    Android)
+      OS='Android'
+      OS_ICON=$(print_icon 'ANDROID_ICON')
+      ;;
+esac
+
 # Determine the correct sed parameter.
 #
 # `sed` is unfortunately not consistent across OSes when it comes to flags.

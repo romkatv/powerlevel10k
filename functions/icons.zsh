@@ -43,6 +43,7 @@ case $POWERLEVEL9K_MODE in
       MULTILINE_SECOND_PROMPT_PREFIX $'\u2570'$'\U2500 '
       APPLE_ICON                     $'\uE26E'              # 
       FREEBSD_ICON                   $'\U1F608 '            # 😈
+      ANDROID_ICON                   $'\uE270'              # 
       LINUX_ICON                     $'\uE271'              # 
       SUNOS_ICON                     $'\U1F31E '            # 🌞
       HOME_ICON                      $'\uE12C'              # 
@@ -112,6 +113,7 @@ case $POWERLEVEL9K_MODE in
       MULTILINE_SECOND_PROMPT_PREFIX $'\u2570'$'\U2500 '    # ╰─
       APPLE_ICON                     $'\uF179'              # 
       FREEBSD_ICON                   $'\U1F608 '            # 😈
+      ANDROID_ICON                   $'\uE17B'              # 
       LINUX_ICON                     $'\uF17C'              # 
       SUNOS_ICON                     $'\uF185 '             # 
       HOME_ICON                      $'\uF015'              # 
@@ -177,6 +179,7 @@ case $POWERLEVEL9K_MODE in
       MULTILINE_SECOND_PROMPT_PREFIX $'\u2570'$'\U2500 '    # ╰─
       APPLE_ICON                     $'\uF179'              # 
       FREEBSD_ICON                   $'\UF30E '             # 
+      ANDROID_ICON                   $'\uF17B'              # 
       LINUX_ICON                     $'\uF17C'              # 
       SUNOS_ICON                     $'\uF185 '             # 
       HOME_ICON                      $'\uF015'              # 
@@ -242,6 +245,7 @@ case $POWERLEVEL9K_MODE in
       MULTILINE_SECOND_PROMPT_PREFIX $'\u2570'$'\u2500 '
       APPLE_ICON                     'OSX'
       FREEBSD_ICON                   'BSD'
+      ANDROID_ICON                   'And'
       LINUX_ICON                     'Lx'
       SUNOS_ICON                     'Sun'
       HOME_ICON                      ''
