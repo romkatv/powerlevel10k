@@ -1290,8 +1290,7 @@ powerlevel9k_prepare_prompts() {
   _P9K_COMMAND_DURATION=$((EPOCHREALTIME - _P9K_TIMER_START))
 
   # Reset start time
-  # Maximum integer on 32-bit CPUs
-  _P9K_TIMER_START=2147483647
+  _P9K_TIMER_START=0xFFFFFFFF
 
   if [[ "$POWERLEVEL9K_PROMPT_ON_NEWLINE" == true ]]; then
     PROMPT="$(print_icon 'MULTILINE_FIRST_PROMPT_PREFIX')%f%b%k$(build_left_prompt)

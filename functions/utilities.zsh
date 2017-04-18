@@ -79,7 +79,7 @@ function getRelevantItem() {
   done
 }
 
-# OS detection for the `os_icon` segment
+# OS detection
 case $(uname) in
     Darwin)
       OS='OSX'
