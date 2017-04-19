@@ -12,7 +12,14 @@ function setUp() {
 }
 
 function mockGo() {
-  echo 'go version go1.5.3 darwin/amd64'
+  case "$1" in
+  'version')
+    echo 'go version go1.5.3 darwin/amd64'
+    ;;
+  'env')
+    echo "$HOME/go"
+    ;;
+  esac
 }
 
 function testGo() {
