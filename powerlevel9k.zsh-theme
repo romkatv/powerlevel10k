@@ -1336,10 +1336,14 @@ prompt_powerlevel9k_setup() {
   # Maximum integer on 32-bit CPUs
   _P9K_TIMER_START=2147483647
 
+  # The prompt function will set these prompt_* options after the setup function
+  # returns. We need prompt_subst so we can safely run commands in the prompt
+  # without them being double expanded and we need prompt_percent to expand the
+  # common percent escape sequences.
   prompt_opts=(subst percent)
 
-  # borrowed from promptinit, sets the prompt options in case pure was not
-  # initialized via promptinit.
+  # Borrowed from promptinit, sets the prompt options in case the theme was
+  # not initialized via promptinit.
   setopt noprompt{bang,cr,percent,subst} "prompt${^prompt_opts[@]}"
 
   # Display a warning if the terminal does not support 256 colors
@@ -1372,12 +1376,6 @@ prompt_powerlevel9k_setup() {
     'longstatus'      'status'
   )
   print_deprecation_warning deprecated_segments
-
-  setopt prompt_subst
-
-  setopt LOCAL_OPTIONS
-  unsetopt XTRACE KSH_ARRAYS
-  setopt PROMPT_CR PROMPT_PERCENT PROMPT_SUBST MULTIBYTE
 
   # initialize colors
   autoload -U colors && colors
