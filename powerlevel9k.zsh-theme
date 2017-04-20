@@ -1336,6 +1336,12 @@ prompt_powerlevel9k_setup() {
   # Maximum integer on 32-bit CPUs
   _P9K_TIMER_START=2147483647
 
+  prompt_opts=(subst percent)
+
+  # borrowed from promptinit, sets the prompt options in case pure was not
+  # initialized via promptinit.
+  setopt noprompt{bang,cr,percent,subst} "prompt${^prompt_opts[@]}"
+
   # Display a warning if the terminal does not support 256 colors
   local term_colors
   term_colors=$(echotc Co 2>/dev/null)
