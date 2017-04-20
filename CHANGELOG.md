@@ -18,6 +18,11 @@ A new script `debug/font-issues.zsh` was added, so that problems with your font 
 
 The `ram` segment now shows the available ram instead of free.
 
+### Add new segments `host` and `user`
+
+The user and host segments allow you to have different icons and colors for both the user and host segments
+depending on their state.
+
 ## v0.6.0
 
 - Fixed a bug where the tag display was broken on detached HEADs.

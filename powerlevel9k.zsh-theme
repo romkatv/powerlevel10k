@@ -567,6 +567,61 @@ prompt_context() {
   "$1_prompt_segment" "${0}_${current_state}" "$2" "$DEFAULT_COLOR" "${context_states[$current_state]}" "${content}"
 }
 
+################################################################
+# User: user (who am I)
+# Note that if $DEFAULT_USER is not set, this prompt segment will always print
+set_default POWERLEVEL9K_USER_TEMPLATE "%n"
+prompt_user() {
+  local current_state="DEFAULT"
+  typeset -AH user_state
+  if [[ "$POWERLEVEL9K_ALWAYS_SHOW_CONTEXT" == true ]] || [[ "$USER" != "$DEFAULT_USER" ]] || [[ -n "$SSH_CLIENT" || -n "$SSH_TTY" ]]; then
+    if [[ $(print -P "%#") == '#' ]]; then
+      user_state=(
+        "STATE"               "ROOT"
+        "CONTENT"             "${POWERLEVEL9K_USER_TEMPLATE}"
+        "BACKGROUND_COLOR"    "${DEFAULT_COLOR}"
+        "FOREGROUND_COLOR"    "yellow"
+        "VISUAL_IDENTIFIER"   "ROOT_ICON"
+      )
+    elif [[ "$POWERLEVEL9K_ALWAYS_SHOW_USER" == true ]]; then
+      user_state=(
+        "STATE"               "DEFAULT"
+        "CONTENT"             "$USER"
+        "BACKGROUND_COLOR"    "${DEFAULT_COLOR}"
+        "FOREGROUND_COLOR"    "011"
+        "VISUAL_IDENTIFIER"   "USER_ICON"
+      )
+    fi
+  fi
+  "$1_prompt_segment" "${0}_${user_state[STATE]}" "$2" "${user_state[BACKGROUND_COLOR]}" "${user_state[FOREGROUND_COLOR]}" "${user_state[CONTENT]}" "${user_state[VISUAL_IDENTIFIER]}"
+}
+
+################################################################
+# Host: machine (where am I)
+set_default POWERLEVEL9K_HOST_TEMPLATE "%m"
+prompt_host() {
+  local current_state="LOCAL"
+  typeset -AH host_state
+  if [[ -n "$SSH_CLIENT" ]] || [[ -n "$SSH_TTY" ]]; then
+    host_state=(
+      "STATE"               "REMOTE"
+      "CONTENT"             "${POWERLEVEL9K_HOST_TEMPLATE}"
+      "BACKGROUND_COLOR"    "${DEFAULT_COLOR}"
+      "FOREGROUND_COLOR"    "yellow"
+      "VISUAL_IDENTIFIER"   "SSH_ICON"
+    )
+  else
+    host_state=(
+      "STATE"               "LOCAL"
+      "CONTENT"             "${POWERLEVEL9K_HOST_TEMPLATE}"
+      "BACKGROUND_COLOR"    "${DEFAULT_COLOR}"
+      "FOREGROUND_COLOR"    "011"
+      "VISUAL_IDENTIFIER"   "HOST_ICON"
+    )
+  fi
+  "$1_prompt_segment" "$0_${host_state[STATE]}" "$2" "${host_state[BACKGROUND_COLOR]}" "${host_state[FOREGROUND_COLOR]}" "${host_state[CONTENT]}" "${host_state[VISUAL_IDENTIFIER]}"
+}
+
 # The 'custom` prompt provides a way for users to invoke commands and display
 # the output in a segment.
 prompt_custom() {
@@ -664,7 +719,7 @@ prompt_dir() {
             break;
           fi
         done
-        
+
         local packageName=$(jq '.name' ${pkgFile} 2> /dev/null \
           || node -e 'console.log(require(process.argv[1]).name);' ${pkgFile} 2>/dev/null \
           || cat "${pkgFile}" 2> /dev/null | grep -m 1 "\"name\"" | awk -F ':' '{print $2}' | awk -F '"' '{print $2}' 2>/dev/null \
