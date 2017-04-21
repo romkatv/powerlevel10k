@@ -44,7 +44,7 @@ fi
 # Resolve the installation path
 if [[ -L "$POWERLEVEL9K_INSTALLATION_PATH" ]]; then
   # If this theme is sourced as a symlink, we need to locate the real URL
-  filename="$(realpath -P $POWERLEVEL9K_INSTALLATION_PATH 2>/dev/null || readlink -f $POWERLEVEL9K_INSTALLATION_PATH 2>/dev/null || perl -MCwd=abs_path -le 'print abs_path readlink(shift);' $POWERLEVEL9K_INSTALLATION_PATH 2>/dev/null)"
+  filename="${POWERLEVEL9K_INSTALLATION_PATH:A}"
 elif [[ -d "$POWERLEVEL9K_INSTALLATION_PATH" ]]; then
   # Directory
   filename="${POWERLEVEL9K_INSTALLATION_PATH}/powerlevel9k.zsh-theme"
