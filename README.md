@@ -484,6 +484,12 @@ POWERLEVEL9K_USER_ICON="\uF415" # 
 POWERLEVEL9K_ROOT_ICON="#"
 ```
 
+| Variable | Default Value | Description |
+|----------|---------------|-------------|
+|`DEFAULT_USER`|None|Username to consider a "default context" (you can also set `$USER`).|
+|`POWERLEVEL9K_ALWAYS_SHOW_USER`|false|Always show the username, but conditionalize the hostname.|
+|`POWERLEVEL9K_USER_TEMPLATE`|%n|Default username prompt (username). Refer to the [ZSH Documentation](http://zsh.sourceforge.net/Doc/Release/Prompt-Expansion.html) for all possible expansions|
+
 ##### vcs
 
 By default, the `vcs` segment will provide quite a bit of information. Further
