@@ -574,7 +574,7 @@ set_default POWERLEVEL9K_USER_TEMPLATE "%n"
 prompt_user() {
   local current_state="DEFAULT"
   typeset -AH user_state
-  if [[ "$POWERLEVEL9K_ALWAYS_SHOW_CONTEXT" == true ]] || [[ "$USER" != "$DEFAULT_USER" ]] || [[ -n "$SSH_CLIENT" || -n "$SSH_TTY" ]]; then
+  if [[ "$POWERLEVEL9K_ALWAYS_SHOW_USER" == true ]] || [[ "$USER" != "$DEFAULT_USER" ]] || [[ -n "$SSH_CLIENT" || -n "$SSH_TTY" ]]; then
     if [[ $(print -P "%#") == '#' ]]; then
       user_state=(
         "STATE"               "ROOT"
@@ -583,7 +583,7 @@ prompt_user() {
         "FOREGROUND_COLOR"    "yellow"
         "VISUAL_IDENTIFIER"   "ROOT_ICON"
       )
-    elif [[ "$POWERLEVEL9K_ALWAYS_SHOW_USER" == true ]]; then
+    else
       user_state=(
         "STATE"               "DEFAULT"
         "CONTENT"             "$USER"
