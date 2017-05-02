@@ -184,9 +184,8 @@ your `~/.zshrc`:
 
 ##### battery
 
-This segment will display your current battery status (fails gracefully on
-systems without a battery). It is supported on both OSX and Linux (note that it
-requires `acpi` on Linux).
+The default settings for this segment will display your current battery status (fails gracefully on
+systems without a battery). It is supported on both OSX and Linux (note that it requires `acpi` on Linux).
 
 | Variable | Default Value | Description |
 |----------|---------------|-------------|
@@ -200,6 +199,53 @@ requires `acpi` on Linux).
 Note that you can [modify the `_FOREGROUND`
 color](https://github.com/bhilburn/powerlevel9k/wiki/Stylizing-Your-Prompt#segment-color-customization)
 without affecting the icon color.
+
+The battery segment can also be extended to change the icon automatically depending on the battery level.
+This will override the default battery icon. In order to do this, you need to define the 
+`POWERLEVEL9k_BATTERY_STAGES` variable.
+
+| Variable | Default Value | Description |
+| `POWERLEVEL9K_BATTERY_STAGES`|Unset|A string or array to indicate the stages.|
+
+If you want to use a string, you can declare the variable as follows:
+```zsh
+POWERLEVEL9K_BATTERY_STAGES="▁▂▃▄▅▆▇█"
+```
+
+If you require extra spacing after the icon, you will have to set it as an array,
+since spaces in the string will be used as one of the stages and you will get a
+missing icon. To do this, declare the variable as follows:
+```zsh
+POWERLEVEL9K_BATTERY_STAGES=($'\u2581 ' $'\u2582 ' $'\u2583 ' $'\u2584 ' $'\u2585 ' $'\u2586 ' $'\u2587 ' $'\u2588 ')
+```
+
+You can also use a multiple character "icon" if you want a longer battery icon. To do
+this, declare the variable as follows:
+```zsh
+POWERLEVEL9K_BATTERY_STAGES=(
+   $'▏    ▏' $'▎    ▏' $'▍    ▏' $'▌    ▏' $'▋    ▏' $'▊    ▏' $'▉    ▏' $'█    ▏'
+   $'█▏   ▏' $'█▎   ▏' $'█▍   ▏' $'█▌   ▏' $'█▋   ▏' $'█▊   ▏' $'█▉   ▏' $'██   ▏'
+   $'██   ▏' $'██▎  ▏' $'██▍  ▏' $'██▌  ▏' $'██▋  ▏' $'██▊  ▏' $'██▉  ▏' $'███  ▏'
+   $'███  ▏' $'███▎ ▏' $'███▍ ▏' $'███▌ ▏' $'███▋ ▏' $'███▊ ▏' $'███▉ ▏' $'████ ▏'
+   $'████ ▏' $'████▎▏' $'████▍▏' $'████▌▏' $'████▋▏' $'████▊▏' $'████▉▏' $'█████▏' )
+```
+
+It is now also possible to change the background of the segment automatically depending on
+the battery level. This will override the following variables: `POWERLEVEL9K_BATTERY_CHARGING`,
+`POWERLEVEL9K_BATTERY_CHARGED`, `POWERLEVEL9K_BATTERY_DISCONNECTED`, and `POWERLEVEL9K_BATTERY_LOW_COLOR`.
+In order to do this, we define a color array (from low to high) as follows:
+```zsh
+POWERLEVEL9K_BATTERY_LEVEL_BACKGROUND=(196 202 208 214 220 226 190 154 118 82 46)
+```
+
+|Brightness|Possible Array|
+|Bright Colors|(196 202 208 214 220 226 190 154 118  82  46)|
+|Normal Colors|(124 130 136 142 148 112  76  40  34  28  22)|
+|Subdued Colors|( 88  94 100 106  70  34  28  22)|
+
+Please note the following:
+* an array declarations start with `(` and end with `)`.
+* both the icon and background changing levels are automatically calculated, so they can be any length.
 
 ##### command_execution_time
 

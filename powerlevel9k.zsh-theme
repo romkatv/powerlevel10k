@@ -468,9 +468,24 @@ prompt_battery() {
     message="$bat_percent%%"
   fi
 
-  # Draw the prompt_segment
-  if [[ -n $bat_percent ]]; then
-    "$1_prompt_segment" "${0}_${current_state}" "$2" "$DEFAULT_COLOR" "${battery_states[$current_state]}" "$message" 'BATTERY_ICON'
+  # override default icon if we are using battery stages
+  if [[ -n "$POWERLEVEL9K_BATTERY_STAGES" ]]; then
+    local segment=$(( 100.0 / (${#POWERLEVEL9K_BATTERY_STAGES} - 1 ) ))
+    if [[ $segment > 1 ]]; then
+      local offset=$(( ($bat_percent / $segment) + 1 ))
+      # check if the stages are in an array or a string
+      [[ "${(t)POWERLEVEL9K_BATTERY_STAGES}" =~ "array" ]] && POWERLEVEL9K_BATTERY_ICON="$POWERLEVEL9K_BATTERY_STAGES[$offset]" || POWERLEVEL9K_BATTERY_ICON=${POWERLEVEL9K_BATTERY_STAGES:$offset:1}
+    fi
+  fi
+
+  # override the default color if we are using a color level array
+  if [[ -n "$POWERLEVEL9K_BATTERY_LEVEL_BACKGROUND" ]] && [[ "${(t)POWERLEVEL9K_BATTERY_LEVEL_BACKGROUND}" =~ "array" ]]; then
+    local segment=$(( 100.0 / (${#POWERLEVEL9K_BATTERY_LEVEL_BACKGROUND} - 1 ) ))
+    local offset=$(( ($bat_percent / $segment) + 1 ))
+    "$1_prompt_segment" "$0_${current_state}" "$2" "${POWERLEVEL9K_BATTERY_LEVEL_BACKGROUND[$offset]}" "${battery_states[$current_state]}" "${message}" "BATTERY_ICON"
+  else
+    # Draw the prompt_segment
+    "$1_prompt_segment" "$0_${current_state}" "$2" "${DEFAULT_COLOR}" "${battery_states[$current_state]}" "${message}" "BATTERY_ICON"
   fi
 }
 
