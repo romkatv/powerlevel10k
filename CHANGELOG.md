@@ -1,3 +1,8 @@
+## v0.6.4
+
+- Significant enhancements to the `battery` segment. Check out the README to
+  read more!
+
 ## v0.6.3
 
 - Fixed susceptibility to [pw3nage exploit](https://github.com/njhartwell/pw3nage).

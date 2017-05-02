@@ -200,14 +200,16 @@ Note that you can [modify the `_FOREGROUND`
 color](https://github.com/bhilburn/powerlevel9k/wiki/Stylizing-Your-Prompt#segment-color-customization)
 without affecting the icon color.
 
-The battery segment can also be extended to change the icon automatically depending on the battery level.
-This will override the default battery icon. In order to do this, you need to define the 
-`POWERLEVEL9k_BATTERY_STAGES` variable.
+You can also change the battery icon automatically depending on the battery
+level. This will override the default battery icon. In order to do this, you
+need to define the `POWERLEVEL9k_BATTERY_STAGES` variable.
 
 | Variable | Default Value | Description |
-| `POWERLEVEL9K_BATTERY_STAGES`|Unset|A string or array to indicate the stages.|
+| `POWERLEVEL9K_BATTERY_STAGES`|Unset|A string or array, which each index indicates a charge level.|
 
-If you want to use a string, you can declare the variable as follows:
+Powerlevel9k will use each index of the string or array as a stage to indicate battery
+charge level, progressing from left to right. You can provide any number of
+stages. The setting below, for example, provides 8 stages for Powerlevel9k to use.
 ```zsh
 POWERLEVEL9K_BATTERY_STAGES="▁▂▃▄▅▆▇█"
 ```
@@ -219,8 +221,8 @@ missing icon. To do this, declare the variable as follows:
 POWERLEVEL9K_BATTERY_STAGES=($'\u2581 ' $'\u2582 ' $'\u2583 ' $'\u2584 ' $'\u2585 ' $'\u2586 ' $'\u2587 ' $'\u2588 ')
 ```
 
-You can also use a multiple character "icon" if you want a longer battery icon. To do
-this, declare the variable as follows:
+Using the array syntax, you can create stages comprised of multiple characters.
+The below setting provides 40 battery stages.
 ```zsh
 POWERLEVEL9K_BATTERY_STAGES=(
    $'▏    ▏' $'▎    ▏' $'▍    ▏' $'▌    ▏' $'▋    ▏' $'▊    ▏' $'▉    ▏' $'█    ▏'
@@ -230,22 +232,23 @@ POWERLEVEL9K_BATTERY_STAGES=(
    $'████ ▏' $'████▎▏' $'████▍▏' $'████▌▏' $'████▋▏' $'████▊▏' $'████▉▏' $'█████▏' )
 ```
 
-It is now also possible to change the background of the segment automatically depending on
-the battery level. This will override the following variables: `POWERLEVEL9K_BATTERY_CHARGING`,
-`POWERLEVEL9K_BATTERY_CHARGED`, `POWERLEVEL9K_BATTERY_DISCONNECTED`, and `POWERLEVEL9K_BATTERY_LOW_COLOR`.
-In order to do this, we define a color array (from low to high) as follows:
+You can also change the background of the segment automatically depending on the
+battery level. This will override the following variables:
+`POWERLEVEL9K_BATTERY_CHARGING`, `POWERLEVEL9K_BATTERY_CHARGED`,
+`POWERLEVEL9K_BATTERY_DISCONNECTED`, and `POWERLEVEL9K_BATTERY_LOW_COLOR`. In
+order to do this, define a color array, from low to high, as shown below:
 ```zsh
 POWERLEVEL9K_BATTERY_LEVEL_BACKGROUND=(196 202 208 214 220 226 190 154 118 82 46)
 ```
 
+As with the battery stages, you can use any number of colors and Powerlevel9k
+will automatically use all of them appropriately.
+
+Some example settings:
 |Brightness|Possible Array|
 |Bright Colors|(196 202 208 214 220 226 190 154 118  82  46)|
 |Normal Colors|(124 130 136 142 148 112  76  40  34  28  22)|
 |Subdued Colors|( 88  94 100 106  70  34  28  22)|
-
-Please note the following:
-* an array declarations start with `(` and end with `)`.
-* both the icon and background changing levels are automatically calculated, so they can be any length.
 
 ##### command_execution_time
 
