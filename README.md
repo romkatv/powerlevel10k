@@ -447,8 +447,9 @@ segment will not be displayed.
 
 Puts a newline in your prompt so you can continue using segments on the next line.
 
-This allows you to use segments on both lines, unlike `POWERLEVEL9K_PROMPT_ON_NEWLINE` and
-`POWERLEVEL9K_RPROMPT_ON_NEWLINE`.
+This allows you to use segments on both lines, unlike `POWERLEVEL9K_PROMPT_ON_NEWLINE`.
+
+This only works on the left side.  On the right side it does nothing.
 
 ##### rbenv
 
