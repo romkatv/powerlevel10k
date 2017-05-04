@@ -1412,4 +1412,9 @@ prompt_powerlevel9k_setup() {
   add-zsh-hook preexec powerlevel9k_preexec
 }
 
+prompt_powerlevel9k_teardown() {
+  add-zsh-hook -D precmd powerlevel9k_\*
+  add-zsh-hook -D preexec powerlevel9k_\*
+}
+
 prompt_powerlevel9k_setup "$@"
