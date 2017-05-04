@@ -337,6 +337,21 @@ prompt_background_jobs() {
   fi
 }
 
+# A newline in your prompt, so you can segments on multiple lines.
+prompt_newline() {
+  local lws rws
+  lws=$POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS
+  rws=$POWERLEVEL9K_WHITESPACE_BETWEEN_RIGHT_SEGMENTS
+  POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS=
+  POWERLEVEL9K_WHITESPACE_BETWEEN_RIGHT_SEGMENTS=
+  "$1_prompt_segment" \
+    "$0" \
+    "$2" \
+    "NONE" "NONE" $'\n'
+  POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS=$lws
+  POWERLEVEL9K_WHITESPACE_BETWEEN_RIGHT_SEGMENTS=$rws
+}
+
 # Segment that indicates usage level of current partition.
 set_default POWERLEVEL9K_DISK_USAGE_ONLY_WARNING false
 set_default POWERLEVEL9K_DISK_USAGE_WARNING_LEVEL 90
