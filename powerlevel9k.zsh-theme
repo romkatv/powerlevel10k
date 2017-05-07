@@ -1295,7 +1295,7 @@ powerlevel9k_prepare_prompts() {
   _P9K_COMMAND_DURATION=$((EPOCHREALTIME - _P9K_TIMER_START))
 
   # Reset start time
-  _P9K_TIMER_START=0xFFFFFFFF
+  _P9K_TIMER_START=0x7FFFFFFF
 
   if [[ "$POWERLEVEL9K_PROMPT_ON_NEWLINE" == true ]]; then
     PROMPT='$(print_icon 'MULTILINE_FIRST_PROMPT_PREFIX')%f%b%k$(build_left_prompt)
@@ -1328,12 +1328,12 @@ NEWLINE='
 }
 
 prompt_powerlevel9k_setup() {
-  # I decided to use the value below for better supporting 32-bit CPUs, since the previous value "99999999999" was causing issues on my Android phone, which is powered by an armv7l
-  # We don't have to change that until 19 January of 2038! :)
+  # The value below was set to better support 32-bit CPUs.
+  # It's the maximum _signed_ integer value on 32-bit CPUs.
+  # Please don't change it until 19 January of 2038. ;)
 
   # Disable false display of command execution time
-  # Maximum integer on 32-bit CPUs
-  _P9K_TIMER_START=2147483647
+  _P9K_TIMER_START=0x7FFFFFFF
 
   # The prompt function will set these prompt_* options after the setup function
   # returns. We need prompt_subst so we can safely run commands in the prompt
