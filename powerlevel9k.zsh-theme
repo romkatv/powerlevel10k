@@ -1019,7 +1019,7 @@ prompt_ssh() {
 # Status: return code if verbose, otherwise just an icon if an error occurred
 set_default POWERLEVEL9K_STATUS_VERBOSE true
 set_default POWERLEVEL9K_STATUS_OK_IN_NON_VERBOSE false
-set_default POWERLEVEL9K_STATUS_SHOW_PIPESTATUS false
+set_default POWERLEVEL9K_STATUS_SHOW_PIPESTATUS true
 prompt_status() {
   local ec_text
   local ec_sum

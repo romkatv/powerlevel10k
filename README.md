@@ -463,7 +463,7 @@ This segment shows the return code of the last command.
 |----------|---------------|-------------|
 |`POWERLEVEL9K_STATUS_VERBOSE`|`true`|Set to false if you wish to not show the error code when the last command returned an error and optionally hide this segment when the last command completed successfully by setting `POWERLEVEL9K_STATUS_OK_IN_NON_VERBOSE` to false.|
 |`POWERLEVEL9K_STATUS_OK_IN_NON_VERBOSE`|`false`|Set to true if you wish to show this segment when the last command completed successfully in non-verbose mode.|
-|`POWERLEVEL9K_STATUS_SHOW_PIPESTATUS`|`false`|Set to true if you wish to show the exit status for all piped commands.|
+|`POWERLEVEL9K_STATUS_SHOW_PIPESTATUS`|`true`|Set to true if you wish to show the exit status for all piped commands.|
 
 ##### ram
 
