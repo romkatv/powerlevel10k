@@ -790,12 +790,12 @@ prompt_detect_virt() {
   if [[ "$virt" == "none" ]]; then
     if [[ "$(ls -di / | grep -o 2)" != "2" ]]; then
       virt="chroot"
-      "$1_prompt_segment" "$0" "$2" "yellow" "$DEFAULT_COLOR" "$virt"
+      "$1_prompt_segment" "$0" "$2" "$DEFAULT_COLOR" "yellow" "$virt"
     else
       ;
     fi
   else
-    "$1_prompt_segment" "$0" "$2" "yellow" "$DEFAULT_COLOR" "$virt"
+    "$1_prompt_segment" "$0" "$2" "$DEFAULT_COLOR" "yellow" "$virt"
   fi
 }
 
