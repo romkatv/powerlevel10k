@@ -143,6 +143,7 @@ The segments that are currently available are:
 * [`command_execution_time`](#command_execution_time) - Display the time the current command took to execute.
 * [`todo`](http://todotxt.com/) - Shows the number of tasks in your todo.txt tasks file.
 * `detect_virt` - Virtualization detection with systemd
+* `newline` - Continues the prompt on a new line.
 
 ---------------------------------------------------------------------------------
 
@@ -441,6 +442,14 @@ segment will not be displayed.
 |`POWERLEVEL9K_PUBLIC_IP_TIMEOUT`|300|The amount of time in seconds between refreshing your cached IP.|
 |`POWERLEVEL9K_PUBLIC_IP_METHODS`|(dig curl wget)| These methods in that order are used to refresh your IP.|
 |`POWERLEVEL9K_PUBLIC_IP_NONE`|None|The string displayed when an IP was not obtained|
+
+##### newline
+
+Puts a newline in your prompt so you can continue using segments on the next line.
+
+This allows you to use segments on both lines, unlike `POWERLEVEL9K_PROMPT_ON_NEWLINE`.
+
+This only works on the left side.  On the right side it does nothing.
 
 ##### rbenv
 

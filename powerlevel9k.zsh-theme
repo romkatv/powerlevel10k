@@ -337,6 +337,23 @@ prompt_background_jobs() {
   fi
 }
 
+# A newline in your prompt, so you can segments on multiple lines.
+prompt_newline() {
+  local lws newline
+  [[ "$1" == "right" ]] && return
+  newline=$'\n'
+  lws=$POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS
+  if [[ "$POWERLEVEL9K_PROMPT_ON_NEWLINE" == true ]]; then
+    newline="${newline}$(print_icon 'MULTILINE_NEWLINE_PROMPT_PREFIX')"
+  fi
+  POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS=
+  "$1_prompt_segment" \
+    "$0" \
+    "$2" \
+    "NONE" "NONE" "${newline}"
+  POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS=$lws
+}
+
 # Segment that indicates usage level of current partition.
 set_default POWERLEVEL9K_DISK_USAGE_ONLY_WARNING false
 set_default POWERLEVEL9K_DISK_USAGE_WARNING_LEVEL 90
