@@ -906,13 +906,16 @@ prompt_node_version() {
 # Node version from NVM
 # Only prints the segment if different than the default value
 prompt_nvm() {
-  [[ ! $(type nvm) =~ 'nvm is a shell function'* ]] && return
-  local node_version=$(nvm current)
-  [[ -z "${node_version}" ]] || [[ ${node_version} = "none" ]] && return
-  local nvm_default=$(cat $NVM_DIR/alias/default)
+  local node_version nvm_default
+  (( $+functions[nvm_version] )) || return
+
+  node_version=$(nvm_version current)
+  [[ -z "${node_version}" || ${node_version} == "none" ]] && return
+
+  nvm_default=$(nvm_version default)
   [[ "$node_version" =~ "$nvm_default" ]] && return
 
-  $1_prompt_segment "$0" "$2" "green" "011" "${node_version:1}" 'NODE_ICON'
+  $1_prompt_segment "$0" "$2" "magenta" "black" "${node_version:1}" 'NODE_ICON'
 }
 
 # NodeEnv Prompt
