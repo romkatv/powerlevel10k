@@ -92,6 +92,7 @@ The segments that are currently available are:
 * `dir_writable` - Displays a lock icon, if you do not have write permissions on the current folder.
 * [`disk_usage`](#disk_usage) - Disk usage of your current partition.
 * `history` - The command number for the current line.
+* [`host`](#host) - Your current host name
 * [`ip`](#ip) - Shows the current IP address.
 * [`public_ip`](#public_ip) - Shows your public IP address.
 * `load` - Your machine's load averages.
@@ -101,6 +102,7 @@ The segments that are currently available are:
 * [`status`](#status) - The return code of the previous command.
 * `swap` - Prints the current swap size.
 * [`time`](#time) - System time.
+* [`user`](#user) - Your current username
 * [`vi_mode`](#vi_mode)- Your prompt's Vi editing mode (NORMAL|INSERT).
 * `ssh` - Indicates whether or not you are in an SSH session.
 
@@ -410,6 +412,35 @@ The `disk_usage` segment will show the usage level of the partition that your cu
 |POWERLEVEL9K_DISK_USAGE_WARNING_LEVEL|90|The usage level that triggers a warning state.|
 |POWERLEVEL9K_DISK_USAGE_CRITICAL_LEVEL|95|The usage level that triggers a critical state.|
 
+##### host
+
+The `host` segment (host string) will print the hostname. You can customize the `host` segment.
+For example, you can make it to print the full hostname by setting
+```
+POWERLEVEL9K_HOST_TEMPLATE="`hostname -f`"
+```
+
+You can also modify the COLOURS for the two states - LOCAL and REMOTE, by setting
+```
+POWERLEVEL9K_HOST_LOCAL_BACKGROUND="green"
+POWERLEVEL9K_HOST_LOCAL_FOREGROUND="white"
+POWERLEVEL9K_HOST_REMOTE_BACKGROUND="red"
+POWERLEVEL9K_HOST_REMOTE_FOREGROUND="yellow"
+```
+
+Currently, LOCAL hosts will show the host icon and remote hosts will show the SSH icon. You can override them by setting
+```
+POWERLEVEL9K_HOST_ICON="\uF109 "  # 
+POWERLEVEL9K_SSH_ICON="\uF489 "   # 
+```
+
+You can set the `POWERLEVEL9K_HOST_TEMPLATE` variable to change how the hostname is displayed.
+See (ZSH Manual)[http://zsh.sourceforge.net/Doc/Release/Prompt-Expansion.html#Login-information]
+for details. The default is set to %m which will show the hostname up to the first ‘.’
+You can set it to %{N}m where N is an integer to show that many segments of system
+hostname. Setting N to a negative integer will show that many segments from the
+end of the hostname.
+
 ##### ip
 
 This segment tries to examine all currently used network interfaces and prints
@@ -502,6 +533,29 @@ segment, as well:
 # Output time, date, and a symbol from the "Awesome Powerline Font" set
 POWERLEVEL9K_TIME_FORMAT="%D{%H:%M:%S \uE868  %d.%m.%y}"
 ```
+##### user
+
+The `user` segment (user string) will print the username. You can customize the `user` segment.
+For example, you can modify the COLOURS for the two states - DEFAULT and ROOT, by setting
+```
+POWERLEVEL9K_USER_DEFAULT_BACKGROUND="green"
+POWERLEVEL9K_USER_DEFAULT_FOREGROUND="white"
+POWERLEVEL9K_USER_ROOT_BACKGROUND="red"
+POWERLEVEL9K_USER_ROOT_FOREGROUND="yellow"
+```
+
+You can also override the icons by setting
+```
+POWERLEVEL9K_USER_ICON="\uF415" # 
+POWERLEVEL9K_ROOT_ICON="#"
+```
+
+| Variable | Default Value | Description |
+|----------|---------------|-------------|
+|`DEFAULT_USER`|None|Username to consider a "default context" (you can also set `$USER`).|
+|`POWERLEVEL9K_ALWAYS_SHOW_USER`|false|Always show the username, but conditionalize the hostname.|
+|`POWERLEVEL9K_USER_TEMPLATE`|%n|Default username prompt (username). Refer to the [ZSH Documentation](http://zsh.sourceforge.net/Doc/Release/Prompt-Expansion.html) for all possible expansions|
+
 ##### vcs
 
 By default, the `vcs` segment will provide quite a bit of information. Further
