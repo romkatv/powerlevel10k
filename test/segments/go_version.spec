@@ -12,17 +12,61 @@ function setUp() {
 }
 
 function mockGo() {
-  echo 'go version go1.5.3 darwin/amd64'
+  case "$1" in
+  'version')
+    echo 'go version go1.5.3 darwin/amd64'
+    ;;
+  'env')
+    echo "$HOME/go"
+    ;;
+  esac
+}
+
+function mockGoEmptyGopath() {
+  case "$1" in
+  'version')
+    echo 'go version go1.5.3 darwin/amd64'
+    ;;
+  'env')
+    echo ""
+    ;;
+  esac
 }
 
 function testGo() {
   alias go=mockGo
   POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(go_version)
 
+  PWD="$HOME/go/src/github.com/bhilburn/powerlevel9k"
+
   assertEquals "%K{green} %F{255}go1.5.3 %k%F{green}%f " "$(build_left_prompt)"
 
+  unset PWD
   unset POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
   unalias go
+}
+
+function testGoSegmentPrintsNothingIfEmptyGopath() {
+  alias go=mockGoEmptyGopath
+  POWERLEVEL9K_CUSTOM_WORLD='echo world'
+  POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(custom_world go_version)
+
+  assertEquals "%K{white} %F{black}world %k%F{white}%f " "$(build_left_prompt)"
+
+  unset POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
+  unset POWERLEVEL9K_CUSTOM_WORLD
+
+}
+
+function testGoSegmentPrintsNothingIfNotInGopath() {
+  alias go=mockGo
+  POWERLEVEL9K_CUSTOM_WORLD='echo world'
+  POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(custom_world go_version)
+
+  assertEquals "%K{white} %F{black}world %k%F{white}%f " "$(build_left_prompt)"
+
+  unset POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
+  unset POWERLEVEL9K_CUSTOM_WORLD
 }
 
 function testGoSegmentPrintsNothingIfGoIsNotAvailable() {
