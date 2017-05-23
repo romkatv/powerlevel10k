@@ -1019,10 +1019,30 @@ prompt_ssh() {
 # Status: return code if verbose, otherwise just an icon if an error occurred
 set_default POWERLEVEL9K_STATUS_VERBOSE true
 set_default POWERLEVEL9K_STATUS_OK_IN_NON_VERBOSE false
+set_default POWERLEVEL9K_STATUS_SHOW_PIPESTATUS true
 prompt_status() {
-  if [[ "$RETVAL" -ne 0 ]]; then
+  local ec_text
+  local ec_sum
+  local ec
+
+  if [[ $POWERLEVEL9K_STATUS_SHOW_PIPESTATUS == true ]]; then
+    ec_text=${RETVALS[1]}
+    ec_sum=${RETVALS[1]}
+
+    for ec in "${(@)RETVALS[2,-1]}"; do
+      ec_text="${ec_text}|${ec}"
+      ec_sum=$(( $ec_sum + $ec ))
+    done
+  else
+    # We use RETVAL instead of the right-most RETVALS item because
+    # PIPE_FAIL may be set.
+    ec_text=${RETVAL}
+    ec_sum=${RETVAL}
+  fi
+
+  if (( ec_sum > 0 )); then
     if [[ "$POWERLEVEL9K_STATUS_VERBOSE" == true ]]; then
-      "$1_prompt_segment" "$0_ERROR" "$2" "red" "226" "$RETVAL" 'CARRIAGE_RETURN_ICON'
+      "$1_prompt_segment" "$0_ERROR" "$2" "red" "226" "$ec_text" 'CARRIAGE_RETURN_ICON'
     else
       "$1_prompt_segment" "$0_ERROR" "$2" "$DEFAULT_COLOR" "red" "" 'FAIL_ICON'
     fi
@@ -1306,6 +1326,7 @@ powerlevel9k_preexec() {
 set_default POWERLEVEL9K_PROMPT_ADD_NEWLINE false
 powerlevel9k_prepare_prompts() {
   RETVAL=$?
+  RETVALS=( "$pipestatus[@]" )
 
   _P9K_COMMAND_DURATION=$((EPOCHREALTIME - _P9K_TIMER_START))
 
