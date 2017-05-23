@@ -558,6 +558,21 @@ is count your source files and test files, and calculate the ratio between them.
 Just enough to give you a quick overview about the test situation of the project
 you are dealing with.
 
+### Disabling / Enabling Powerlevel9k
+
+You can disable P9k and return to a very basic prompt at any time simply by
+calling:
+
+```zsh
+$ prompt_powerlevel9k_teardown
+```
+
+You can then re-enable it by calling:
+
+```zsh
+$ prompt_powerlevel9k_setup
+```
+
 ### tl; dr
 
 Want to just get a quick start? Check out the [Show Off Your
