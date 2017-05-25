@@ -759,7 +759,7 @@ prompt_go_version() {
   go_path=$(go env GOPATH 2>/dev/null)
 
   if [[ -n "$go_version" && "${PWD##$go_path}" != "$PWD" ]]; then
-    "$1_prompt_segment" "$0" "$2" "green" "255" "$go_version"
+    "$1_prompt_segment" "$0" "$2" "green" "255" "$go_version" "GO_ICON"
   fi
 }
 
