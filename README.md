@@ -313,10 +313,10 @@ elements (it is by default), and define a `DEFAULT_USER` in your `~/.zshrc`.
 
 You can customize the `context` segment. For example, you can make it to print the
 full hostname by setting
+
 ```
 POWERLEVEL9K_CONTEXT_TEMPLATE="%n@`hostname -f`"
 ```
-
 
 You can set the `POWERLEVEL9K_CONTEXT_HOST_DEPTH` variable to change how the
 hostname is displayed. See (ZSH Manual)[http://zsh.sourceforge.net/Doc/Release/Prompt-Expansion.html#Login-information]
@@ -414,32 +414,25 @@ The `disk_usage` segment will show the usage level of the partition that your cu
 
 ##### host
 
-The `host` segment (host string) will print the hostname. You can customize the `host` segment.
-For example, you can make it to print the full hostname by setting
+The `host` segment will print the hostname.
+
+You can set the `POWERLEVEL9K_HOST_TEMPLATE` variable to change how the hostname
+is displayed. See (ZSH Manual)[http://zsh.sourceforge.net/Doc/Release/Prompt-Expansion.html#Login-information]
+for details. The default is set to `%m` which will show the hostname up to the
+first `.`. You can set it to `%{N}m` where N is an integer to show that many
+segments of system hostname. Setting `N` to a negative integer will show that many
+segments from the end of the hostname.
+
 ```
-POWERLEVEL9K_HOST_TEMPLATE="`hostname -f`"
+POWERLEVEL9K_HOST_TEMPLATE="%2m"
 ```
 
-You can also modify the COLOURS for the two states - LOCAL and REMOTE, by setting
-```
-POWERLEVEL9K_HOST_LOCAL_BACKGROUND="green"
-POWERLEVEL9K_HOST_LOCAL_FOREGROUND="white"
-POWERLEVEL9K_HOST_REMOTE_BACKGROUND="red"
-POWERLEVEL9K_HOST_REMOTE_FOREGROUND="yellow"
-```
-
-Currently, LOCAL hosts will show the host icon and remote hosts will show the SSH icon. You can override them by setting
+By default, LOCAL hosts will show the host icon and remote hosts will show the SSH icon. You can override them by setting
 ```
 POWERLEVEL9K_HOST_ICON="\uF109 "  # 
 POWERLEVEL9K_SSH_ICON="\uF489 "   # 
 ```
 
-You can set the `POWERLEVEL9K_HOST_TEMPLATE` variable to change how the hostname is displayed.
-See (ZSH Manual)[http://zsh.sourceforge.net/Doc/Release/Prompt-Expansion.html#Login-information]
-for details. The default is set to %m which will show the hostname up to the first ‘.’
-You can set it to %{N}m where N is an integer to show that many segments of system
-hostname. Setting N to a negative integer will show that many segments from the
-end of the hostname.
 
 ##### ip
 
@@ -535,16 +528,10 @@ POWERLEVEL9K_TIME_FORMAT="%D{%H:%M:%S \uE868  %d.%m.%y}"
 ```
 ##### user
 
-The `user` segment (user string) will print the username. You can customize the `user` segment.
-For example, you can modify the COLOURS for the two states - DEFAULT and ROOT, by setting
-```
-POWERLEVEL9K_USER_DEFAULT_BACKGROUND="green"
-POWERLEVEL9K_USER_DEFAULT_FOREGROUND="white"
-POWERLEVEL9K_USER_ROOT_BACKGROUND="red"
-POWERLEVEL9K_USER_ROOT_FOREGROUND="yellow"
-```
+The `user` segment will print the username.
 
-You can also override the icons by setting
+You can also override the icons by setting:
+
 ```
 POWERLEVEL9K_USER_ICON="\uF415" # 
 POWERLEVEL9K_ROOT_ICON="#"
@@ -552,9 +539,9 @@ POWERLEVEL9K_ROOT_ICON="#"
 
 | Variable | Default Value | Description |
 |----------|---------------|-------------|
-|`DEFAULT_USER`|None|Username to consider a "default context" (you can also set it to `$USER`).|
-|`POWERLEVEL9K_ALWAYS_SHOW_USER`|false|Always show the username.|
-|`POWERLEVEL9K_USER_TEMPLATE`|%n|Default username prompt (username). Refer to the [ZSH Documentation](http://zsh.sourceforge.net/Doc/Release/Prompt-Expansion.html) for all possible expansions|
+|`DEFAULT_USER`|None|Username to consider a "default context".|
+|`POWERLEVEL9K_ALWAYS_SHOW_USER`|`false`|Always print this segment.|
+|`POWERLEVEL9K_USER_TEMPLATE`|`%n`|Default username prompt. Refer to the [ZSH Documentation](http://zsh.sourceforge.net/Doc/Release/Prompt-Expansion.html) for all possible expansions|
 
 ##### vcs
 
