@@ -611,7 +611,7 @@ set_default POWERLEVEL9K_USER_TEMPLATE "%n"
 prompt_user() {
   local current_state="DEFAULT"
   typeset -AH user_state
-  if [[ "$POWERLEVEL9K_ALWAYS_SHOW_USER" == true ]] || [[ "$USER" != "$DEFAULT_USER" ]] || [[ -n "$SSH_CLIENT" || -n "$SSH_TTY" ]]; then
+  if [[ "$POWERLEVEL9K_ALWAYS_SHOW_USER" == true ]] || [[ "$USER" != "$DEFAULT_USER" ]]; then
     if [[ $(print -P "%#") == '#' ]]; then
       user_state=(
         "STATE"               "ROOT"
@@ -629,8 +629,8 @@ prompt_user() {
         "VISUAL_IDENTIFIER"   "USER_ICON"
       )
     fi
+    "$1_prompt_segment" "${0}_${user_state[STATE]}" "$2" "${user_state[BACKGROUND_COLOR]}" "${user_state[FOREGROUND_COLOR]}" "${user_state[CONTENT]}" "${user_state[VISUAL_IDENTIFIER]}"
   fi
-  "$1_prompt_segment" "${0}_${user_state[STATE]}" "$2" "${user_state[BACKGROUND_COLOR]}" "${user_state[FOREGROUND_COLOR]}" "${user_state[CONTENT]}" "${user_state[VISUAL_IDENTIFIER]}"
 }
 
 ################################################################
