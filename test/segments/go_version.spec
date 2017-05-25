@@ -39,7 +39,8 @@ function testGo() {
 
   PWD="$HOME/go/src/github.com/bhilburn/powerlevel9k"
 
-  assertEquals "%K{green} %F{255}go1.5.3 %k%F{green}%f " "$(build_left_prompt)"
+  assertEquals "%K{green} %F{255}go1.5.3 %k%F{green}%f " "$(build_left_prompt)"
+
 
   unset PWD
   unset POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
