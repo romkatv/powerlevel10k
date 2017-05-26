@@ -1362,7 +1362,7 @@ prompt_kubecontext() {
     local k8s_namespace=$(kubectl config get-contexts --no-headers | grep '*' | awk '{print $5}')
     # Get the current Kuberenetes context
     local k8s_context=$(kubectl config current-context)
-    "$1_prompt_segment" "$0" "$2" "magenta" "white" "$k8s_context/$k8s_namespace \u2388"
+    "$1_prompt_segment" "$0" "$2" "magenta" "white" "$k8s_context/$k8s_namespace" "KUBERNETES_ICON"
   fi
 }
 

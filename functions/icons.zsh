@@ -84,6 +84,7 @@ case $POWERLEVEL9K_MODE in
       LOCK_ICON                      $'\UE138'              # 
       EXECUTION_TIME_ICON            $'\UE89C'              # 
       SSH_ICON                       '(ssh)'
+      KUBERNETES_ICON                $'\U2388'              # ⎈
     )
   ;;
   'awesome-fontconfig')
@@ -152,6 +153,7 @@ case $POWERLEVEL9K_MODE in
       LOCK_ICON                      $'\UE138'              # 
       EXECUTION_TIME_ICON            $'\uF253'
       SSH_ICON                       '(ssh)'
+      KUBERNETES_ICON                $'\U2388'              # ⎈
     )
   ;;
   'nerdfont-complete'|'nerdfont-fontconfig')
@@ -220,6 +222,7 @@ case $POWERLEVEL9K_MODE in
       LOCK_ICON                      $'\UF023'              #  
       EXECUTION_TIME_ICON            $'\uF252'              #  
       SSH_ICON                       $'\uF489'              #  
+      KUBERNETES_ICON                $'\U2388'              # ⎈
     )
   ;;
   *)
@@ -288,6 +291,7 @@ case $POWERLEVEL9K_MODE in
       LOCK_ICON                      $'\UE0A2'
       EXECUTION_TIME_ICON            'Dur'
       SSH_ICON                       '(ssh)'
+      KUBERNETES_ICON                $'\U2388'              # ⎈
     )
   ;;
 esac
