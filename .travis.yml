@@ -28,3 +28,4 @@ script:
   - test/segments/rust_version.spec
   - test/segments/go_version.spec
   - test/segments/vcs.spec
+  - test/segments/kubecontext.spec
