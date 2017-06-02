@@ -1,3 +1,25 @@
+## Next
+
+- Added `teardown` command to turn off P9k prompt.
+- Fixes for P9k in Cygwin and 32-bit systems.
+- Better colors in virtualization segments.
+- Added 'Gopher' icon to the `go_version` segment.
+- Improved detection in `nvm`
+- Added option to support command status reading from piped command sequences.
+
+### New Segments: `host` and `user`
+
+Provides two separate segments for `host` and `user` in case you don't wont both
+in one (per the `context` segment).
+
+### New Segment: `newline`
+
+Allows you to split segments across multiple lines.
+
+### New Segment: `kubecontext`
+
+Shows the current context of your `kubectl` configuration.
+
 ## v0.6.4
 
 - Significant enhancements to the `battery` segment. Check out the README to

@@ -1364,6 +1364,24 @@ prompt_dir_writable() {
   fi
 }
 
+# Kubernetes Current Context
+prompt_kubecontext() {
+  local kubectl_version=$(kubectl version 2>/dev/null)
+
+  if [[ -n "$kubectl_version" ]]; then
+    # Get the current Kubernetes config context's namespaece
+    local k8s_namespace=$(kubectl config get-contexts --no-headers | grep '*' | awk '{print $5}')
+    # Get the current Kuberenetes context
+    local k8s_context=$(kubectl config current-context)
+
+    if [[ -z "$k8s_namespace" ]]; then
+      k8s_namespace="default"
+    fi
+    "$1_prompt_segment" "$0" "$2" "magenta" "white" "$k8s_context/$k8s_namespace" "KUBERNETES_ICON"
+  fi
+}
+
+
 ################################################################
 # Prompt processing and drawing
 ################################################################
