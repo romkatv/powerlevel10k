@@ -22,7 +22,7 @@ Shows the current context of your `kubectl` configuration.
 
 ### New Segment: `vpn`
 
-Shows current `vpn` address.
+Shows current `vpn` interface.
 
 ## v0.6.4
 

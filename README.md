@@ -452,7 +452,7 @@ This segment tries to extract the VPN related IP addresses from nmcli, based on 
 
 | Variable | Default Value | Description |
 |----------|---------------|-------------|
-|`POWERLEVEL9K_VPN_IP_INTERFACE`|tun|The VPN NIC type|
+|`POWERLEVEL9K_VPN_IP_INTERFACE`|`tun`|The VPN interface.|
 
 ##### public_ip
 
