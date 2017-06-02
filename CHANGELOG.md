@@ -20,6 +20,10 @@ Allows you to split segments across multiple lines.
 
 Shows the current context of your `kubectl` configuration.
 
+### New Segment: `vpn`
+
+Shows current `vpn` address.
+
 ## v0.6.4
 
 - Significant enhancements to the `battery` segment. Check out the README to
