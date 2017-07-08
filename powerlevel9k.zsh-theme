@@ -17,74 +17,57 @@
 ################################################################
 
 ## Turn on for Debugging
+#PS4='%s%f%b%k%F{blue}%{λ%}%L %F{240}%N:%i%(?.. %F{red}%?) %1(_.%F{yellow}%-1_ .)%s%f%b%k	'
 #zstyle ':vcs_info:*+*:*' debug true
 #set -o xtrace
 
 # Try to set the installation path
-if [[ -n "$POWERLEVEL9K_INSTALLATION_PATH" ]]; then
-  # If an installation path was set manually,
-  # it should trump any other location found.
-  # Do nothing. This is all right, as we use the
-  # POWERLEVEL9K_INSTALLATION_PATH for further processing.
-elif [[ $(whence -w prompt_powerlevel9k_setup) =~ "function" ]]; then
-  # Check if the theme was called as a function (e.g., from prezto)
-  autoload -U is-at-least
-  if is-at-least 5.0.8; then
-    # Try to find the correct path of the script.
-    POWERLEVEL9K_INSTALLATION_PATH=$(whence -v $0 | sed "s/$0 is a shell function from //")
-  elif [[ -f "${ZDOTDIR:-$HOME}/.zprezto/modules/prompt/init.zsh" ]]; then
-    # If there is an prezto installation, we assume that powerlevel9k is linked there.
-    POWERLEVEL9K_INSTALLATION_PATH="${ZDOTDIR:-$HOME}/.zprezto/modules/prompt/functions/prompt_powerlevel9k_setup"
+if [[ -n "$POWERLEVEL9K_INSTALLATION_DIR" ]]; then
+  p9k_directory=${POWERLEVEL9K_INSTALLATION_DIR:A}
+else
+  if [[ "${(%):-%N}" == '(eval)' ]]; then
+    if [[ "$0" == '-antigen-load' ]] && [[ -r "${PWD}/powerlevel9k.zsh-theme" ]]; then
+      # Antigen uses eval to load things so it can change the plugin (!!)
+      # https://github.com/zsh-users/antigen/issues/581
+      p9k_directory=$PWD
+    else
+      print -P "%F{red}You must set POWERLEVEL9K_INSTALLATION_DIR work from within an (eval).%f"
+      return 1
+    fi
+  else
+    # Get the path to file this code is executing in; then
+    # get the absolute path and strip the filename.
+    # See https://stackoverflow.com/a/28336473/108857
+    p9k_directory=${${(%):-%x}:A:h}
   fi
-else
-  # Last resort: Set installation path is script path
-  POWERLEVEL9K_INSTALLATION_PATH="$0"
 fi
-
-# Resolve the installation path
-if [[ -L "$POWERLEVEL9K_INSTALLATION_PATH" ]]; then
-  # If this theme is sourced as a symlink, we need to locate the real URL
-  filename="${POWERLEVEL9K_INSTALLATION_PATH:A}"
-elif [[ -d "$POWERLEVEL9K_INSTALLATION_PATH" ]]; then
-  # Directory
-  filename="${POWERLEVEL9K_INSTALLATION_PATH}/powerlevel9k.zsh-theme"
-elif [[ -f "$POWERLEVEL9K_INSTALLATION_PATH" ]]; then
-  # Script is a file
-  filename="$POWERLEVEL9K_INSTALLATION_PATH"
-elif [[ -z "$POWERLEVEL9K_INSTALLATION_PATH" ]]; then
-  # Fallback: specify an installation path!
-  print -P "%F{red}We could not locate the installation path of powerlevel9k.%f"
-  print -P "Please specify by setting %F{blue}POWERLEVEL9K_INSTALLATION_PATH%f (full path incl. file name) at the very beginning of your ~/.zshrc"
-  return 1
-else
-  print -P "%F{red}Script location could not be found! Maybe your %F{blue}POWERLEVEL9K_INSTALLATION_PATH%F{red} is not correct?%f"
-  return 1
-fi
-script_location="$(dirname $filename)"
 
 ################################################################
 # Source icon functions
 ################################################################
 
-source $script_location/functions/icons.zsh
+source "${p9k_directory}/functions/icons.zsh"
 
 ################################################################
 # Source utility functions
 ################################################################
 
-source $script_location/functions/utilities.zsh
+source "${p9k_directory}/functions/utilities.zsh"
 
 ################################################################
 # Source color functions
 ################################################################
 
-source $script_location/functions/colors.zsh
+source "${p9k_directory}/functions/colors.zsh"
 
 ################################################################
 # Source VCS_INFO hooks / helper functions
 ################################################################
 
-source $script_location/functions/vcs.zsh
+source "${p9k_directory}/functions/vcs.zsh"
+
+# cleanup temporary variables.
+unset p9k_directory
 
 ################################################################
 # Color Scheme
