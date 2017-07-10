@@ -1,0 +1,5 @@
+#!zsh
+
+source ~/.zplug/init.zsh
+zplug "${HOME}/p9k", use:"powerlevel9k.zsh-theme", from:local, as:theme
+zplug load --verbose

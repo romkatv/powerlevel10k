@@ -1,0 +1,85 @@
+#!/usr/bin/env zsh
+
+set -eu
+
+setopt extendedglob
+cd "${${(%):-%x}:A:h}"
+
+# TODO: Crazy Logic to munge TERM to something supported in Ubuntu 14.04
+term=screen-256color
+
+frameworks()
+{
+  for path in docker/*/Dockerfile(N.); do
+    framework=${path:h:t}
+    if [[ "$framework" == base ]]; then continue; fi
+    echo "$framework"
+  done
+}
+
+show-help()
+{
+  echo "Usage: ${(%):-%x} <framework>|--list"
+  echo
+  echo "Loads up a docker image with powershell9k configured in <framework>"
+  echo
+  echo " --list  Lists all available framework containers."
+  echo
+  echo "Framework containers:"
+  for f in $(frameworks); do
+    echo " - $f"
+  done
+}
+
+build-and-run()
+{
+  local framework="$1" ; shift
+
+  print -P "%F{green}Preparing ${framework} container...%f"
+
+  if [[ "$framework" != "base" ]]; then
+    echo -n "p9k:base: "
+    docker build \
+      --quiet \
+      --tag p9k:base \
+      --file docker/base/Dockerfile \
+      .
+  fi
+  echo -n "p9k:${framework}: "
+  docker build \
+    --quiet \
+    --tag "p9k:${framework}" \
+    --file "docker/${framework}/Dockerfile" \
+    .
+
+
+  print -P "%F{green}Starting ${framework} container...%f"
+  exec docker run \
+    --rm \
+    --interactive \
+    --tty \
+    --hostname="${framework}" \
+    --env="TERM=${term}" \
+    "$@" \
+    "p9k:${framework}"
+}
+
+arg1="${1:-}"; if (( $# > 0 )); then shift; fi
+
+if [[ -z "$arg1" ]] || [[ "$arg1" == "help" ]]; then
+  show-help
+  exit 0
+elif [[ "$arg1" == '--list' ]]; then
+  frameworks
+  exit 0
+elif [[ -d "docker/${arg1}" ]]; then
+  build-and-run "$arg1"
+elif [[ -n "docker/${arg1}"*/Dockerfile(#qN) ]]; then
+  # Allow globbing
+  build-and-run "docker/${arg1}"*(Y1:t)
+else
+  show-help
+  exit 1
+fi
+
+# EOF
