@@ -1366,7 +1366,7 @@ prompt_dir_writable() {
 
 # Kubernetes Current Context
 prompt_kubecontext() {
-  local kubectl_version=$(kubectl version 2>/dev/null)
+  local kubectl_version=$(kubectl version --client 2>/dev/null)
 
   if [[ -n "$kubectl_version" ]]; then
     # Get the current Kubernetes config context's namespaece
