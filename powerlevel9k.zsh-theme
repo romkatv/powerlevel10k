@@ -811,7 +811,7 @@ prompt_dir() {
   fi
 
   if [[ "${POWERLEVEL9K_HOME_FOLDER_ABBREVIATION}" != "~" ]]; then
-    current_path="$( echo "${current_path}" | sed "s/^~/${POWERLEVEL9K_HOME_FOLDER_ABBREVIATION}/")"
+    current_path=${current_path/#\~/${POWERLEVEL9K_HOME_FOLDER_ABBREVIATION}}
   fi
 
   typeset -AH dir_states
