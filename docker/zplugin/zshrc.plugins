@@ -1,0 +1,5 @@
+#!zsh
+
+zplugin load psprint zsh-navigation-tools
+zplugin load psprint---zprompts
+zplugin snippet ~/p9k/powerlevel9k.zsh-theme

@@ -1,0 +1,2 @@
+source <(antibody init)
+antibody bundle ~/p9k/

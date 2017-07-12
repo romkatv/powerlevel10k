@@ -1,0 +1,3 @@
+source ~/.zpm/zpm.zsh
+
+zpm load powerlevel9k
