@@ -1,4 +1,4 @@
-FROM ubuntu:trusty
+FROM ubuntu:17.04
 
 RUN \
   apt-get update && \
@@ -11,10 +11,12 @@ RUN \
   subversion \
   golang \
   jq \
-  node \
+  nodejs \
   ruby \
   python \
-  python-virtualenv
+  python-virtualenv \
+  sudo \
+  locales
 
 RUN adduser --shell /bin/zsh --gecos 'fred' --disabled-password fred
 RUN locale-gen "en_US.UTF-8"

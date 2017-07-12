@@ -26,7 +26,21 @@ This is the easiest to use _if_ you have Docker already installed and running.
 The command `./test-in-docker` should make it fairly easy to get into a running
 container with the framework of your choice.
 
+Examples:
+
+``` zsh
+# Test Antigen with the oldest version of ZSH
+$ ./test-in-docker antigen
+```
+
+``` zsh
+# Test Prezto with ZSH version 5.2
+$ ./test-in-docker --zsh 5.2 prezto
+```
+
 You can get Docker at <https://www.docker.com/community-edition>.
+
+**Note:** Not all frameworks work with all versions of ZSH (or the underlying OS).
 
 ## Vagrant
 

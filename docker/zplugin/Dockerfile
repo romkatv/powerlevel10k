@@ -1,4 +1,5 @@
-FROM p9k:base
+ARG base
+FROM p9k:${base}
 
 COPY docker/zplugin/install.zsh /tmp/
 RUN zsh /tmp/install.zsh
