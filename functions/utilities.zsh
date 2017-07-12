@@ -212,7 +212,7 @@ function segmentShouldBeJoined() {
 # Given a directory path, truncate it according to the settings for
 # `truncate_from_right`
 function truncatePathFromRight() {
-  local delim_len=${#POWERLEVEL9K_SHORTEN_DELIMITER}
+  local delim_len=${#POWERLEVEL9K_SHORTEN_DELIMITER:-1}
   echo $1 | sed $SED_EXTENDED_REGEX_PARAMETER \
  "s@(([^/]{$((POWERLEVEL9K_SHORTEN_DIR_LENGTH))})([^/]{$delim_len}))[^/]+/@\2$POWERLEVEL9K_SHORTEN_DELIMITER/@g"
 }
