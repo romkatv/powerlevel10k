@@ -272,6 +272,31 @@ function testChangingDirPathSeparator() {
   unset POWERLEVEL9K_DIR_PATH_SEPARATOR
 }
 
+function testHomeFolderAbbreviation() {
+  local POWERLEVEL9K_HOME_FOLDER_ABBREVIATION
+  local dir=$PWD
+
+  cd ~/
+  # default
+  POWERLEVEL9K_HOME_FOLDER_ABBREVIATION='~'
+  assertEquals "%K{blue} %F{black}~ %k%F{blue}%f " "$(build_left_prompt)"
+
+  # substituted
+  POWERLEVEL9K_HOME_FOLDER_ABBREVIATION='qQq'
+  assertEquals "%K{blue} %F{black}qQq %k%F{blue}%f " "$(build_left_prompt)"
+
+  cd /tmp
+  # default
+  POWERLEVEL9K_HOME_FOLDER_ABBREVIATION='~'
+  assertEquals "%K{blue} %F{black}/tmp %k%F{blue}%f " "$(build_left_prompt)"
+
+  # substituted
+  POWERLEVEL9K_HOME_FOLDER_ABBREVIATION='qQq'
+  assertEquals "%K{blue} %F{black}/tmp %k%F{blue}%f " "$(build_left_prompt)"
+
+  cd "$dir"
+}
+
 function testOmittingFirstCharacterWorks() {
   POWERLEVEL9K_DIR_OMIT_FIRST_CHARACTER=true
   POWERLEVEL9K_FOLDER_ICON='folder-icon'
