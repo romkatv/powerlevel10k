@@ -23,6 +23,14 @@ typeset -a frameworks
 frameworks=( docker/*/Dockerfile(N.on:h:t) )
 frameworks=${(@)frameworks:#base-*}
 
+# Known Issues
+typeset -A known_issues
+known_issues["4.3.11-antigen"]="Antigen commands that need git won't work; it needs a newer version of git."
+known_issues["4.3.11-zim"]="BROKEN: Zim wants ZSH 5.2 or newer."
+known_issues["5.0.3-zim"]="DEPRECATED: Zim wants ZSH 5.2 or newer."
+known_issues["5.1.1-zim"]="DEPRECATED: Zim wants ZSH 5.2 or newer."
+known_issues["4.3.11-zulu"]="Zulu doesn't work; it needs a newer version of git."
+
 err()
 {
   print -P "%F{red}Error:%f $*"
@@ -45,10 +53,24 @@ resolve_version() {
   fi
 }
 
+check_for_known_issues() {
+  local version="$1"
+  local framework="$2"
+  local name="${version}-${framework}"
+
+  if (( ${+known_issues["$name"]} )); then
+    echo
+    print -P "%F{red}Known Issue: %F{yellow}${known_issues["$name"]}%f"
+    echo
+  fi
+}
+
 build_and_run() {
   local version="$1"
   local framework="$2"
   local name="${version}-${framework}"
+
+  check_for_known_issues "$version" "$framework"
 
   print -P "%F{green}Preparing containers...%f"
 
