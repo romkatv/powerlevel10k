@@ -35,12 +35,14 @@ function mockGoEmptyGopath() {
 
 function testGo() {
   alias go=mockGo
+  POWERLEVEL9K_GO_ICON=""
   POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(go_version)
 
   PWD="$HOME/go/src/github.com/bhilburn/powerlevel9k"
 
-  assertEquals "%K{green} %F{255}go1.5.3 %k%F{green}%f " "$(build_left_prompt)"
+  assertEquals "%K{green} %F{255%}%f %F{255}go1.5.3 %k%F{green}%f " "$(build_left_prompt)"
 
+  unset POWERLEVEL9K_GO_ICON
   unset PWD
   unset POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
   unalias go

@@ -80,6 +80,7 @@ case $POWERLEVEL9K_MODE in
       RUST_ICON                      ''
       PYTHON_ICON                    $'\U1F40D'             # 🐍
       SWIFT_ICON                     ''
+      GO_ICON                        ''
       PUBLIC_IP_ICON                 ''
       LOCK_ICON                      $'\UE138'              # 
       EXECUTION_TIME_ICON            $'\UE89C'              # 
@@ -150,6 +151,7 @@ case $POWERLEVEL9K_MODE in
       RUST_ICON                      $'\uE6A8'              # 
       PYTHON_ICON                    $'\U1F40D'             # 🐍
       SWIFT_ICON                     ''
+      GO_ICON                        ''
       PUBLIC_IP_ICON                 ''
       LOCK_ICON                      $'\UE138'              # 
       EXECUTION_TIME_ICON            $'\uF253'
@@ -220,6 +222,7 @@ case $POWERLEVEL9K_MODE in
       RUST_ICON                      $'\uE7A8 '             # 
       PYTHON_ICON                    $'\UE73C '             # 
       SWIFT_ICON                     $'\uE755'              # 
+      GO_ICON                        $'\uE626'              # 
       PUBLIC_IP_ICON                 $'\UF0AC'              # 
       LOCK_ICON                      $'\UF023'              # 
       EXECUTION_TIME_ICON            $'\uF252'              # 
@@ -290,6 +293,7 @@ case $POWERLEVEL9K_MODE in
       RUST_ICON                      ''
       PYTHON_ICON                    ''
       SWIFT_ICON                     'Swift'
+      GO_ICON                        'Go'
       PUBLIC_IP_ICON                 ''
       LOCK_ICON                      $'\UE0A2'
       EXECUTION_TIME_ICON            'Dur'
