@@ -829,7 +829,7 @@ prompt_go_version() {
   go_path=$(go env GOPATH 2>/dev/null)
 
   if [[ -n "$go_version" && "${PWD##$go_path}" != "$PWD" ]]; then
-    "$1_prompt_segment" "$0" "$2" "green" "255" "$go_version"
+    "$1_prompt_segment" "$0" "$2" "green" "255" "$go_version" "GO_ICON"
   fi
 }
 
@@ -1074,7 +1074,7 @@ prompt_rvm() {
   local gemset=$(echo $GEM_HOME | awk -F'@' '{print $2}')
   [ "$gemset" != "" ] && gemset="@$gemset"
 
-  local version=$(echo $MY_RUBY_HOME | awk -F'-' '{print $2}')
+  local version=$(echo $MY_RUBY_HOME | awk -F'-' '{print $NF}')
 
   if [[ -n "$version$gemset" ]]; then
     "$1_prompt_segment" "$0" "$2" "240" "$DEFAULT_COLOR" "$version$gemset" 'RUBY_ICON'
