@@ -72,6 +72,26 @@ function testTruncationFromRightWorks() {
   unset POWERLEVEL9K_SHORTEN_STRATEGY
 }
 
+function testTruncationFromRightWithEmptyDelimiter() {
+  POWERLEVEL9K_SHORTEN_DIR_LENGTH=2
+  POWERLEVEL9K_SHORTEN_DELIMITER=""
+  POWERLEVEL9K_SHORTEN_STRATEGY='truncate_from_right'
+
+  FOLDER=/tmp/powerlevel9k-test/1/12/123/1234/12345/123456/1234567/12345678/123456789
+  mkdir -p $FOLDER
+  cd $FOLDER
+
+  assertEquals "%K{blue} %F{black}/tmp/po/1/12/123/12/12/12/12/12/123456789 %k%F{blue}%f " "$(build_left_prompt)"
+
+  cd -
+  rm -fr /tmp/powerlevel9k-test
+
+  unset FOLDER
+  unset POWERLEVEL9K_SHORTEN_DIR_LENGTH
+  unset POWERLEVEL9K_SHORTEN_DELIMITER
+  unset POWERLEVEL9K_SHORTEN_STRATEGY
+}
+
 function testTruncateWithFolderMarkerWorks() {
   POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(dir)
   POWERLEVEL9K_SHORTEN_STRATEGY="truncate_with_folder_marker"
