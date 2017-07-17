@@ -900,13 +900,12 @@ prompt_ip() {
 set_default POWERLEVEL9K_VPN_IP_INTERFACE "tun"
 # prompt if vpn active
 prompt_vpn_ip() {
-  for vpn_iface in $(ip tuntap | grep -e ^"$POWERLEVEL9K_VPN_IP_INTERFACE" | cut -d":" -f1)
+  for vpn_iface in $(/sbin/ifconfig | grep -e ^"$POWERLEVEL9K_VPN_IP_INTERFACE" | cut -d":" -f1)
   do
-    ip=$(ip -4 a show "$vpn_iface" | grep -o "inet\s*[0-9.]*" | grep -o "[0-9.]*")
+    ip=$(/sbin/ifconfig "$vpn_iface" | grep -o "inet\s.*" | cut -d' ' -f2)
     "$1_prompt_segment" "$0" "$2" "cyan" "$DEFAULT_COLOR" "$ip" 'VPN_ICON'
   done
 }
-
 
 prompt_load() {
   # The load segment can have three different states
