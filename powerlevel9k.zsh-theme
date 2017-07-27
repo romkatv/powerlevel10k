@@ -1086,9 +1086,13 @@ prompt_ssh() {
   fi
 }
 
-# Status: return code if verbose, otherwise just an icon if an error occurred
+# old options, retro compatibility
 set_default POWERLEVEL9K_STATUS_VERBOSE true
 set_default POWERLEVEL9K_STATUS_OK_IN_NON_VERBOSE false
+# Status: When an error occur, return the error code, or a cross icon if option is set
+# Display an ok icon when no error occur, or hide the segment if option is set to false
+set_default POWERLEVEL9K_STATUS_CROSS false
+set_default POWERLEVEL9K_STATUS_OK true
 set_default POWERLEVEL9K_STATUS_SHOW_PIPESTATUS true
 prompt_status() {
   local ec_text
@@ -1111,12 +1115,12 @@ prompt_status() {
   fi
 
   if (( ec_sum > 0 )); then
-    if [[ "$POWERLEVEL9K_STATUS_VERBOSE" == true ]]; then
+    if [[ "$POWERLEVEL9K_STATUS_CROSS" == false && "$POWERLEVEL9K_STATUS_VERBOSE" == true ]]; then
       "$1_prompt_segment" "$0_ERROR" "$2" "red" "226" "$ec_text" 'CARRIAGE_RETURN_ICON'
     else
       "$1_prompt_segment" "$0_ERROR" "$2" "$DEFAULT_COLOR" "red" "" 'FAIL_ICON'
     fi
-  elif [[ "$POWERLEVEL9K_STATUS_VERBOSE" == true || "$POWERLEVEL9K_STATUS_OK_IN_NON_VERBOSE" == true ]]; then
+  elif [[ "$POWERLEVEL9K_STATUS_OK" == true ]] && [[ "$POWERLEVEL9K_STATUS_VERBOSE" == true || "$POWERLEVEL9K_STATUS_OK_IN_NON_VERBOSE" == true ]]; then
     "$1_prompt_segment" "$0_OK" "$2" "$DEFAULT_COLOR" "green" "" 'OK_ICON'
   fi
 }
