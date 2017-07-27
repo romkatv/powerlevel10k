@@ -76,7 +76,7 @@ case $POWERLEVEL9K_MODE in
       VCS_HG_ICON                    $'\uE1C3 '             # 
       VCS_SVN_ICON                   '(svn) '
       RUST_ICON                      ''
-      PYTHON_ICON                    $'\U1F40D'             # 🐍
+      PYTHON_ICON                    $'\ue63c'             # 
       SWIFT_ICON                     ''
       GO_ICON                        ''
       PUBLIC_IP_ICON                 ''
@@ -143,7 +143,7 @@ case $POWERLEVEL9K_MODE in
       VCS_HG_ICON                    $'\uF0C3 '             # 
       VCS_SVN_ICON                   '(svn) '
       RUST_ICON                      $'\uE6A8'              #  
-      PYTHON_ICON                    $'\U1F40D'             # 🐍
+      PYTHON_ICON                    $'\ue63c'             # 
       SWIFT_ICON                     ''
       GO_ICON                        ''
       PUBLIC_IP_ICON                 ''
