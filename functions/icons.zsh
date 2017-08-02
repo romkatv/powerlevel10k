@@ -35,7 +35,7 @@ case $POWERLEVEL9K_MODE in
       TODO_ICON                      $'\u2611'              # ☑
       BATTERY_ICON                   $'\uE894'              # 
       DISK_ICON                      $'\uE1AE '             # 
-      OK_ICON                        $'\u2713'              # ✓
+      OK_ICON                        $'\u2714'              # ✔
       FAIL_ICON                      $'\u2718'              # ✘
       SYMFONY_ICON                   'SF'
       NODE_ICON                      $'\u2B22'              # ⬢
@@ -106,7 +106,7 @@ case $POWERLEVEL9K_MODE in
       TODO_ICON                      $'\u2611'              # ☑
       BATTERY_ICON                   $'\U1F50B'             # 🔋
       DISK_ICON                      $'\uF0A0 '             # 
-      OK_ICON                        $'\u2713'              # ✓
+      OK_ICON                        $'\u2714'              # ✔
       FAIL_ICON                      $'\u2718'              # ✘
       SYMFONY_ICON                   'SF'
       NODE_ICON                      $'\u2B22'              # ⬢
@@ -240,7 +240,7 @@ case $POWERLEVEL9K_MODE in
       TODO_ICON                      $'\u2611'              # ☑
       BATTERY_ICON                   $'\U1F50B'             # 🔋
       DISK_ICON                      $'hdd '
-      OK_ICON                        $'\u2713'              # ✓
+      OK_ICON                        $'\u2714'              # ✔
       FAIL_ICON                      $'\u2718'              # ✘
       SYMFONY_ICON                   'SF'
       NODE_ICON                      $'\u2B22'              # ⬢
