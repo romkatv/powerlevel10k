@@ -1083,31 +1083,47 @@ prompt_ssh() {
   fi
 }
 
-# old options, retro compatibility
-set_default POWERLEVEL9K_STATUS_VERBOSE true
-set_default POWERLEVEL9K_STATUS_OK_IN_NON_VERBOSE false
 # Status: When an error occur, return the error code, or a cross icon if option is set
 # Display an ok icon when no error occur, or hide the segment if option is set to false
+#
 set_default POWERLEVEL9K_STATUS_CROSS false
 set_default POWERLEVEL9K_STATUS_OK true
 set_default POWERLEVEL9K_STATUS_SHOW_PIPESTATUS true
+set_default POWERLEVEL9K_STATUS_HIDE_SIGNAME false
+# old options, retro compatibility
+set_default POWERLEVEL9K_STATUS_VERBOSE true
+set_default POWERLEVEL9K_STATUS_OK_IN_NON_VERBOSE false
+
+exit_code_or_status() {
+  local ec=$1
+  if [[ "$POWERLEVEL9K_STATUS_HIDE_SIGNAME" = true ]]; then
+    echo "$ec"
+  elif (( ec <= 128 )); then
+    echo "$ec"
+  else
+    local sig=$(( ec - 128 ))
+    local idx=$(( sig + 1 ))
+    echo "${signals[$idx]}(-${sig})"
+  fi
+}
+
 prompt_status() {
   local ec_text
   local ec_sum
   local ec
 
   if [[ $POWERLEVEL9K_STATUS_SHOW_PIPESTATUS == true ]]; then
-    ec_text=${RETVALS[1]}
+    ec_text=$(exit_code_or_status "${RETVALS[1]}")
     ec_sum=${RETVALS[1]}
 
     for ec in "${(@)RETVALS[2,-1]}"; do
-      ec_text="${ec_text}|${ec}"
+      ec_text="${ec_text}|$(exit_code_or_status "$ec")"
       ec_sum=$(( $ec_sum + $ec ))
     done
   else
     # We use RETVAL instead of the right-most RETVALS item because
     # PIPE_FAIL may be set.
-    ec_text=${RETVAL}
+    ec_text=$(exit_code_or_status "${RETVAL}")
     ec_sum=${RETVAL}
   fi
 
