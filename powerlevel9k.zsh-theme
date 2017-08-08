@@ -802,9 +802,12 @@ prompt_dir() {
     "DEFAULT"         "FOLDER_ICON"
     "HOME"            "HOME_ICON"
     "HOME_SUBFOLDER"  "HOME_SUB_ICON"
+    "NOT_WRITABLE"    "LOCK_ICON"
   )
   local current_state="DEFAULT"
-  if [[ $(print -P "%~") == '~' ]]; then
+  if [[ "${POWERLEVEL9K_DIR_SHOW_WRITABLE}" == "true" && ! -w "$PWD" ]]; then
+    current_state="NOT_WRITABLE"
+  elif [[ $(print -P "%~") == '~' ]]; then
     current_state="HOME"
   elif [[ $(print -P "%~") == '~'* ]]; then
     current_state="HOME_SUBFOLDER"
