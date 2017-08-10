@@ -1341,11 +1341,11 @@ prompt_powerlevel9k_setup() {
   # returns. We need prompt_subst so we can safely run commands in the prompt
   # without them being double expanded and we need prompt_percent to expand the
   # common percent escape sequences.
-  prompt_opts=(subst percent cr)
+  prompt_opts=(cr percent sp subst)
 
   # Borrowed from promptinit, sets the prompt options in case the theme was
   # not initialized via promptinit.
-  setopt noprompt{bang,cr,percent,subst} "prompt${^prompt_opts[@]}"
+  setopt noprompt{bang,cr,percent,sp,subst} "prompt${^prompt_opts[@]}"
 
   # Display a warning if the terminal does not support 256 colors
   local term_colors
