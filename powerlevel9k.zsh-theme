@@ -689,6 +689,7 @@ prompt_command_execution_time() {
 # Dir: current working directory
 set_default POWERLEVEL9K_DIR_PATH_SEPARATOR "/"
 set_default POWERLEVEL9K_HOME_FOLDER_ABBREVIATION "~"
+set_default POWERLEVEL9K_DIR_SHOW_WRITABLE false
 prompt_dir() {
   local current_path="$(print -P "%~")"
   if [[ -n "$POWERLEVEL9K_SHORTEN_DIR_LENGTH" || "$POWERLEVEL9K_SHORTEN_STRATEGY" == "truncate_with_folder_marker" ]]; then
@@ -805,7 +806,7 @@ prompt_dir() {
     "NOT_WRITABLE"    "LOCK_ICON"
   )
   local current_state="DEFAULT"
-  if [[ "${POWERLEVEL9K_DIR_SHOW_WRITABLE}" == "true" && ! -w "$PWD" ]]; then
+  if [[ "${POWERLEVEL9K_DIR_SHOW_WRITABLE}" == true && ! -w "$PWD" ]]; then
     current_state="NOT_WRITABLE"
   elif [[ $(print -P "%~") == '~' ]]; then
     current_state="HOME"
