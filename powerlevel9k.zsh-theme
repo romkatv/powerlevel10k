@@ -709,6 +709,27 @@ prompt_dir() {
         # the current path.
         current_path=$current_path${PWD#${last_marked_folder}*}
       ;;
+      truncate_to_unique)
+        # for each parent path component find the shortest unique beginning
+        # characters sequence
+        paths=(${(s:/:)PWD})
+        cur_path='/'
+        cur_short_path='/'
+        for directory in ${paths[@]}
+        do
+          cur_dir=''
+          for (( i=0; i<${#directory}; i++ )); do
+            cur_dir+="${directory:$i:1}"
+            matching=("$cur_path"/"$cur_dir"*/)
+            if [[ ${#matching[@]} -eq 1 ]]; then
+              break
+            fi
+          done
+          cur_short_path+="$cur_dir/"
+          cur_path+="$directory/"
+        done
+        current_path="${cur_short_path: : -1}"
+      ;;
       *)
         current_path="$(print -P "%$((POWERLEVEL9K_SHORTEN_DIR_LENGTH+1))(c:$POWERLEVEL9K_SHORTEN_DELIMITER/:)%${POWERLEVEL9K_SHORTEN_DIR_LENGTH}c")"
       ;;
