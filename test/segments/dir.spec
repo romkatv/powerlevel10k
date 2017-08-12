@@ -406,4 +406,25 @@ function testOmittingFirstCharacterWorksWithChangingPathSeparatorAndRightTruncat
   unset POWERLEVEL9K_SHORTEN_STRATEGY
 }
 
+function testTruncateToUniqueWorks() {
+  POWERLEVEL9K_DIR_OMIT_FIRST_CHARACTER=true
+  POWERLEVEL9K_DIR_PATH_SEPARATOR='xXx'
+  POWERLEVEL9K_SHORTEN_DIR_LENGTH=2
+  POWERLEVEL9K_SHORTEN_STRATEGY='truncate_to_unique'
+  mkdir -p /tmp/powerlevel9k-test/adam/devl
+  mkdir -p /tmp/powerlevel9k-test/alice/devl
+  mkdir -p /tmp/powerlevel9k-test/alice/docs
+  mkdir -p /tmp/powerlevel9k-test/bob/docs
+  cd /tmp/powerlevel9k-test/alice/devl
+
+  assertEquals "%K{blue} %F{black}txXxpxXxalxXxde %k%F{blue}%f " "$(build_left_prompt)"
+
+  cd -
+  rm -fr /tmp/powerlevel9k-test
+  unset POWERLEVEL9K_DIR_PATH_SEPARATOR
+  unset POWERLEVEL9K_DIR_OMIT_FIRST_CHARACTER
+  unset POWERLEVEL9K_SHORTEN_DIR_LENGTH
+  unset POWERLEVEL9K_SHORTEN_STRATEGY
+}
+
 source shunit2/source/2.1/src/shunit2
