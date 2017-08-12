@@ -35,7 +35,7 @@ case $POWERLEVEL9K_MODE in
       TODO_ICON                      $'\u2611'              # ☑
       BATTERY_ICON                   $'\uE894'              # 
       DISK_ICON                      $'\uE1AE '             # 
-      OK_ICON                        $'\u2713'              # ✓
+      OK_ICON                        $'\u2714'              # ✔
       FAIL_ICON                      $'\u2718'              # ✘
       SYMFONY_ICON                   'SF'
       NODE_ICON                      $'\u2B22'              # ⬢
@@ -78,7 +78,7 @@ case $POWERLEVEL9K_MODE in
       VCS_HG_ICON                    $'\uE1C3 '             # 
       VCS_SVN_ICON                   '(svn) '
       RUST_ICON                      ''
-      PYTHON_ICON                    $'\U1F40D'             # 🐍
+      PYTHON_ICON                    $'\ue63c'             # 
       SWIFT_ICON                     ''
       GO_ICON                        ''
       PUBLIC_IP_ICON                 ''
@@ -110,7 +110,7 @@ case $POWERLEVEL9K_MODE in
       TODO_ICON                      $'\u2611'              # ☑
       BATTERY_ICON                   $'\U1F50B'             # 🔋
       DISK_ICON                      $'\uF0A0 '             # 
-      OK_ICON                        $'\u2713'              # ✓
+      OK_ICON                        $'\u2714'              # ✔
       FAIL_ICON                      $'\u2718'              # ✘
       SYMFONY_ICON                   'SF'
       NODE_ICON                      $'\u2B22'              # ⬢
@@ -148,8 +148,8 @@ case $POWERLEVEL9K_MODE in
       VCS_GIT_GITLAB_ICON            $'\uF296 '             # 
       VCS_HG_ICON                    $'\uF0C3 '             # 
       VCS_SVN_ICON                   '(svn) '
-      RUST_ICON                      $'\uE6A8'              # 
-      PYTHON_ICON                    $'\U1F40D'             # 🐍
+      RUST_ICON                      $'\uE6A8'              #  
+      PYTHON_ICON                    $'\ue63c'             # 
       SWIFT_ICON                     ''
       GO_ICON                        ''
       PUBLIC_IP_ICON                 ''
@@ -252,7 +252,7 @@ case $POWERLEVEL9K_MODE in
       TODO_ICON                      $'\u2611'              # ☑
       BATTERY_ICON                   $'\U1F50B'             # 🔋
       DISK_ICON                      $'hdd '
-      OK_ICON                        $'\u2713'              # ✓
+      OK_ICON                        $'\u2714'              # ✔
       FAIL_ICON                      $'\u2718'              # ✘
       SYMFONY_ICON                   'SF'
       NODE_ICON                      $'\u2B22'              # ⬢
