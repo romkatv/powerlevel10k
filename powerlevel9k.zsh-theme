@@ -711,7 +711,7 @@ prompt_dir() {
       ;;
       truncate_to_unique)
         # for each parent path component find the shortest unique beginning
-        # characters sequence
+        # characters sequence. Source: https://stackoverflow.com/a/45336078
         paths=(${(s:/:)PWD})
         cur_path='/'
         cur_short_path='/'
