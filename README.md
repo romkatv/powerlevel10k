@@ -402,9 +402,11 @@ You can also customize the leading tilde character when you are in `$HOME` using
 # Double quotes are important here!
 POWERLEVEL9K_HOME_FOLDER_ABBREVIATION="%F{red} $(print_icon 'HOME_ICON') %F{black}"
 ```
-If you want to see, when you do not have write permissions on the current folder, you can set `POWERLEVEL9K_DIR_SHOW_WRITABLE=true`.
-This will set the `dir` segment to a `NOT_WRITABLE` state when current folder is not writable, allowing you to customize the `dir` segment [colors](https://github.com/bhilburn/powerlevel9k/wiki/Stylizing-Your-Prompt#segment-color-customization).
+You can also configure the `dir` segment to show when you are in a directory without write permissions, using the variable below.
 
+| Variable | Default Value | Description |
+|----------|---------------|-------------|
+|`POWERLEVEL9K_DIR_SHOW_WRITABLE`|`false`|If set to `true` and you are in a directory that you do not have write permissions for, this segment will display a lock icon and enter the `NOT_WRITABLE` state (which can be customized per [our usual process](https://github.com/bhilburn/powerlevel9k/wiki/Stylizing-Your-Prompt#segment-color-customization). Note that this functionality is also available in a separate segment, `dir_writable`.|
 
 ##### disk_usage
 
