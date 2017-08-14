@@ -267,7 +267,7 @@ POWERLEVEL9K_CONTEXT_TEMPLATE="%n@`hostname -f`"
 
 
 You can set the `POWERLEVEL9K_CONTEXT_HOST_DEPTH` variable to change how the
-hostname is displayed. See (ZSH Manual)[http://zsh.sourceforge.net/Doc/Release/Prompt-Expansion.html#Login-information]
+hostname is displayed. See [ZSH Manual](http://zsh.sourceforge.net/Doc/Release/Prompt-Expansion.html#Login-information)
 for details. The default is set to %m which will show the hostname up to the first ‘.’
 You can set it to %{N}m where N is an integer to show that many segments of system
 hostname. Setting N to a negative integer will show that many segments from the
