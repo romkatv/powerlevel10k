@@ -1047,11 +1047,15 @@ prompt_rbenv() {
     local rbenv_global="$(rbenv global)"
 
     # Don't show anything if the current Ruby is the same as the global Ruby.
-    if [[ $rbenv_version_name == $rbenv_global ]]; then
-      return
+    # Unless POWERLEVEL_RBENV_ALWAYS is set.
+    set_default POWERLEVEL9K_RBENV_ALWAYS false
+    if [[ $POWERLEVEL9K_RBENV_ALWAYS == true || $rbenv_version_name != $rbenv_global ]];then
+      "$1_prompt_segment" "$0" "$2" "red" "$DEFAULT_COLOR" "$rbenv_version_name" 'RUBY_ICON'
+    #elif [[ $rbenv_version_name != $rbenv_global ]]; then
+    #  "$1_prompt_segment" "$0" "$2" "red" "$DEFAULT_COLOR" "$rbenv_version_name" 'RUBY_ICON'
+    #else
+    #  return  
     fi
-
-    "$1_prompt_segment" "$0" "$2" "red" "$DEFAULT_COLOR" "$rbenv_version_name" 'RUBY_ICON'
   fi
 }
 
