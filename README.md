@@ -96,7 +96,7 @@ The segments that are currently available are:
 * [`ip`](#ip) - Shows the current IP address.
 * [`vpn`](#vpn) - Shows the current VPN IP address.
 * [`public_ip`](#public_ip) - Shows your public IP address.
-* `load` - Your machine's load averages.
+* [`load`](#load) - Your machine's load averages.
 * `os_icon` - Display a nice little icon, depending on your operating system.
 * `ram` - Show free RAM.
 * `root_indicator` - An indicator if the user has superuser status.
@@ -481,6 +481,17 @@ segment will not be displayed.
 |`POWERLEVEL9K_PUBLIC_IP_TIMEOUT`|300|The amount of time in seconds between refreshing your cached IP.|
 |`POWERLEVEL9K_PUBLIC_IP_METHODS`|(dig curl wget)| These methods in that order are used to refresh your IP.|
 |`POWERLEVEL9K_PUBLIC_IP_NONE`|None|The string displayed when an IP was not obtained|
+
+##### load
+
+Displays one of your load averages with appropriate state coloring. The thresholds are:
+- `0.7 * NUM_CORES <`: critical
+- `0.5 * NUM_CORES <`: warning
+- `less`: normal
+
+| Variable | Default Value | Description |
+|----------|---------------|-------------|
+|`POWERLEVEL9K_LOAD_WHICH`|5|Which average to show. Possible values: 1, 5 or 15|
 
 ##### newline
 
