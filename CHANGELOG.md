@@ -1,11 +1,24 @@
-## Next
+## v0.6.4
 
+- `load` segment now has configurable averages.
+- Update to `dir` segment to add `dir_writable` feature.
+- `status` segment can now display POSIX signal name of exit code.
 - Added `teardown` command to turn off P9k prompt.
 - Fixes for P9k in Cygwin and 32-bit systems.
 - Better colors in virtualization segments.
 - Added 'Gopher' icon to the `go_version` segment.
 - Improved detection in `nvm`
 - Added option to support command status reading from piped command sequences.
+- Fixed issue with visual artifacts with quick consecutive commands.
+- Updated 'ananconda' segment for more uniform styling.
+- `rvm` segment can now support usernames with dashes.
+- Fixed Python icon reference in some font configurations.
+- Vi mode indicator fixed.
+- Fixes for Docker segment.
+- Added new Docker-based testing system.
+- Significant enhancements to the `battery` segment. Check out the README to
+  read more!
+- New truncation strategy that truncates until the path becomes unique.
 
 ### New Segments: `host` and `user`
 
@@ -23,11 +36,6 @@ Shows the current context of your `kubectl` configuration.
 ### New Segment: `vpn`
 
 Shows current `vpn` interface.
-
-## v0.6.4
-
-- Significant enhancements to the `battery` segment. Check out the README to
-  read more!
 
 ## v0.6.3
 
