@@ -160,6 +160,77 @@ case $POWERLEVEL9K_MODE in
       KUBERNETES_ICON                $'\U2388'              # ⎈
     )
   ;;
+  'awesome-mapped-fontconfig')
+    # mapped fontconfig with awesome-font required! See
+    # https://github.com/gabrielelana/awesome-terminal-fonts
+    # don't forget to source the font maps in your startup script
+    # Set the right locale to protect special characters
+    local LC_ALL="" LC_CTYPE="en_US.UTF-8"
+
+    if [ -z "$AWESOME_GLYPHS_LOADED" ]; then
+        echo "powerlevel9k warning: awesome font mappings have not been loaded, source during shell startup";
+    fi
+
+    icons=(
+      LEFT_SEGMENT_SEPARATOR         $'\uE0B0'                                      # 
+      RIGHT_SEGMENT_SEPARATOR        $'\uE0B2'                                      # 
+      LEFT_SEGMENT_END_SEPARATOR     ' '                                            # Whitespace
+      LEFT_SUBSEGMENT_SEPARATOR      $'\uE0B1'                                      # 
+      RIGHT_SUBSEGMENT_SEPARATOR     $'\uE0B3'                                      # 
+      CARRIAGE_RETURN_ICON           $'\u21B5'                                      # ↵
+      ROOT_ICON                      '\u'$CODEPOINT_OF_OCTICONS_ZAP                 # 
+      RUBY_ICON                      '\u'$CODEPOINT_OF_OCTICONS_RUBY' '             # 
+      AWS_ICON                       '\u'$CODEPOINT_OF_AWESOME_SERVER               # 
+      AWS_EB_ICON                    $'\U1F331 '                                    # 🌱
+      BACKGROUND_JOBS_ICON           '\u'$CODEPOINT_OF_AWESOME_COG' '               # 
+      TEST_ICON                      '\u'$CODEPOINT_OF_AWESOME_BUG                  # 
+      TODO_ICON                      '\u'$CODEPOINT_OF_AWESOME_CHECK_SQUARE_O       # 
+      BATTERY_ICON                   '\U'$CODEPOINT_OF_AWESOME_BATTERY_FULL         # 
+      DISK_ICON                      '\u'$CODEPOINT_OF_AWESOME_HDD_O' '             # 
+      OK_ICON                        '\u'$CODEPOINT_OF_AWESOME_CHECK                # 
+      FAIL_ICON                      '\u'$CODEPOINT_OF_AWESOME_TIMES                # 
+      SYMFONY_ICON                   'SF'
+      NODE_ICON                      $'\u2B22'                                      # ⬢
+      MULTILINE_FIRST_PROMPT_PREFIX  $'\u256D'$'\U2500'                             # ╭─
+      MULTILINE_SECOND_PROMPT_PREFIX $'\u2570'$'\U2500 '                            # ╰─
+      APPLE_ICON                     '\u'$CODEPOINT_OF_AWESOME_APPLE                # 
+      FREEBSD_ICON                   $'\U1F608 '                                    # 😈
+      LINUX_ICON                     '\u'$CODEPOINT_OF_AWESOME_LINUX                # 
+      SUNOS_ICON                     '\u'$CODEPOINT_OF_AWESOME_SUN_O' '             # 
+      HOME_ICON                      '\u'$CODEPOINT_OF_AWESOME_HOME                 # 
+      HOME_SUB_ICON                  '\u'$CODEPOINT_OF_AWESOME_FOLDER_OPEN          # 
+      FOLDER_ICON                    '\u'$CODEPOINT_OF_AWESOME_FOLDER_O             # 
+      NETWORK_ICON                   '\u'$CODEPOINT_OF_AWESOME_RSS                  # 
+      LOAD_ICON                      '\u'$CODEPOINT_OF_AWESOME_BAR_CHART' '         # 
+      SWAP_ICON                      '\u'$CODEPOINT_OF_AWESOME_DASHBOARD            # 
+      RAM_ICON                       '\u'$CODEPOINT_OF_AWESOME_DASHBOARD            # 
+      SERVER_ICON                    '\u'$CODEPOINT_OF_AWESOME_SERVER               # 
+      VCS_UNTRACKED_ICON             '\u'$CODEPOINT_OF_AWESOME_QUESTION_CIRCLE      # 
+      VCS_UNSTAGED_ICON              '\u'$CODEPOINT_OF_AWESOME_EXCLAMATION_CIRCLE   # 
+      VCS_STAGED_ICON                '\u'$CODEPOINT_OF_AWESOME_PLUS_CIRCLE          # 
+      VCS_STASH_ICON                 '\u'$CODEPOINT_OF_AWESOME_INBOX' '             # 
+      VCS_INCOMING_CHANGES_ICON      '\u'$CODEPOINT_OF_AWESOME_ARROW_CIRCLE_DOWN' ' # 
+      VCS_OUTGOING_CHANGES_ICON      '\u'$CODEPOINT_OF_AWESOME_ARROW_CIRCLE_UP' '   # 
+      VCS_TAG_ICON                   '\u'$CODEPOINT_OF_AWESOME_TAG' '               # 
+      VCS_BOOKMARK_ICON              '\u'$CODEPOINT_OF_OCTICONS_BOOKMARK            # 
+      VCS_COMMIT_ICON                '\u'$CODEPOINT_OF_OCTICONS_GIT_COMMIT' '       # 
+      VCS_BRANCH_ICON                '\u'$CODEPOINT_OF_OCTICONS_GIT_BRANCH' '       # 
+      VCS_REMOTE_BRANCH_ICON         '\u'$CODEPOINT_OF_OCTICONS_REPO_PUSH           # 
+      VCS_GIT_ICON                   '\u'$CODEPOINT_OF_AWESOME_GIT' '               # 
+      VCS_GIT_GITHUB_ICON            '\u'$CODEPOINT_OF_AWESOME_GITHUB_ALT' '        # 
+      VCS_GIT_BITBUCKET_ICON         '\u'$CODEPOINT_OF_AWESOME_BITBUCKET' '         # 
+      VCS_GIT_GITLAB_ICON            '\u'$CODEPOINT_OF_AWESOME_GITLAB' '            # 
+      VCS_HG_ICON                    '\u'$CODEPOINT_OF_AWESOME_FLASK' '             # 
+      VCS_SVN_ICON                   '(svn) '
+      RUST_ICON                      $'\uE6A8'                                      # 
+      PYTHON_ICON                    $'\U1F40D'                                     # 🐍
+      SWIFT_ICON                     $'\uE655'                                      # 
+      PUBLIC_IP_ICON                 '\u'$CODEPOINT_OF_AWESOME_GLOBE                # 
+      LOCK_ICON                      '\u'$CODEPOINT_OF_AWESOME_LOCK                 # 
+      EXECUTION_TIME_ICON            '\u'$CODEPOINT_OF_AWESOME_HOURGLASS_END        # 
+      SSH_ICON                       '(ssh)'
+    )
+  ;;
   'nerdfont-complete'|'nerdfont-fontconfig')
     # nerd-font patched (complete) font required! See
     # https://github.com/ryanoasis/nerd-fonts
