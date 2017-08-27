@@ -168,7 +168,10 @@ case $POWERLEVEL9K_MODE in
     local LC_ALL="" LC_CTYPE="en_US.UTF-8"
 
     if [ -z "$AWESOME_GLYPHS_LOADED" ]; then
-        echo "powerlevel9k warning: awesome font mappings have not been loaded, source during shell startup";
+        echo "Powerlevel9k warning: Awesome-Font mappings have not been loaded.
+        Source a font mapping in your shell config, per the Awesome-Font docs
+        (https://github.com/gabrielelana/awesome-terminal-fonts),
+        Or use a different Powerlevel9k font configuration.";
     fi
 
     icons=(
