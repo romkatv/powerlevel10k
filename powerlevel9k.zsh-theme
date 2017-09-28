@@ -932,12 +932,13 @@ prompt_vpn_ip() {
   done
 }
 
+set_default POWERLEVEL9K_LOAD_WHICH 5
 prompt_load() {
   # The load segment can have three different states
   local current_state="unknown"
+  local load_select=2
+  local load_avg
   local cores
-
-  set_default POWERLEVEL9K_LOAD_WHICH 5
 
   typeset -AH load_states
   load_states=(
@@ -946,32 +947,38 @@ prompt_load() {
     'normal'        'green'
   )
 
-  if [[ "$OS" == "OSX" ]] || [[ "$OS" == "BSD" ]]; then
+  case "$POWERLEVEL9K_LOAD_WHICH" in
+    1)
+      load_select=1
+      ;;
+    5)
+      load_select=2
+      ;;
+    15)
+      load_select=3
+      ;;
+  esac
 
-    if [[ "$POWERLEVEL9K_LOAD_WHICH" -eq 1 ]]; then
-     load_avg=$(sysctl vm.loadavg | grep -o -E '[0-9]+(\.|,)[0-9]+' | head -n 3 | sed -n 1p)
-    elif [[ "$POWERLEVEL9K_LOAD_WHICH" -eq 5 ]]; then
-     load_avg=$(sysctl vm.loadavg | grep -o -E '[0-9]+(\.|,)[0-9]+' | head -n 3 | sed -n 2p)
-    else
-     load_avg=$(sysctl vm.loadavg | grep -o -E '[0-9]+(\.|,)[0-9]+' | head -n 3 | sed -n 3p)
-    fi
-
-    if [[ "$OS" == "OSX" ]]; then
-      cores=$(sysctl -n hw.logicalcpu)
-    else
-      cores=$(sysctl -n hw.ncpu)
-    fi
-  else
-    load_avg=$(grep -o "[0-9.]*" /proc/loadavg | head -n 1)
-    cores=$(nproc)
-  fi
+  case "$OS" in
+    OSX|BSD)
+      load_avg=$(sysctl vm.loadavg | grep -o -E '[0-9]+(\.|,)[0-9]+' | sed -n ${load_select}p)
+      if [[ "$OS" == "OSX" ]]; then
+        cores=$(sysctl -n hw.logicalcpu)
+      else
+        cores=$(sysctl -n hw.ncpu)
+      fi
+      ;;
+    *)
+      load_avg=$(cut -d" " -f${load_select} /proc/loadavg)
+      cores=$(nproc)
+  esac
 
   # Replace comma
   load_avg=${load_avg//,/.}
 
   if [[ "$load_avg" -gt $(bc -l <<< "${cores} * 0.7") ]]; then
     current_state="critical"
-elif [[ "$load_avg" -gt $(bc -l <<< "${cores} * 0.5") ]]; then
+  elif [[ "$load_avg" -gt $(bc -l <<< "${cores} * 0.5") ]]; then
     current_state="warning"
   else
     current_state="normal"
@@ -1401,7 +1408,7 @@ prompt_dir_writable() {
 
 # Kubernetes Current Context
 prompt_kubecontext() {
-  local kubectl_version=$(kubectl version --client 2>/dev/null)
+  local kubectl_version="$(kubectl version --client 2>/dev/null)"
 
   if [[ -n "$kubectl_version" ]]; then
     # Get the current Kubernetes config context's namespaece
@@ -1526,7 +1533,7 @@ prompt_powerlevel9k_setup() {
   local term_colors
   term_colors=$(echotc Co 2>/dev/null)
   if (( ! $? && ${term_colors:-0} < 256 )); then
-    print -P "%F{red}WARNING!%f Your terminal appears to support less than 256 colors!"
+    print -P "%F{red}WARNING!%f Your terminal appears to support fewer than 256 colors!"
     print -P "If your terminal supports 256 colors, please export the appropriate environment variable"
     print -P "_before_ loading this theme in your \~\/.zshrc. In most terminal emulators, putting"
     print -P "%F{blue}export TERM=\"xterm-256color\"%f at the top of your \~\/.zshrc is sufficient."
