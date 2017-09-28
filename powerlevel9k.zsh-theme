@@ -1041,20 +1041,16 @@ prompt_ram() {
 }
 
 # rbenv information
+set_default POWERLEVEL9K_RBENV_ALWAYS false
 prompt_rbenv() {
   if which rbenv 2>/dev/null >&2; then
     local rbenv_version_name="$(rbenv version-name)"
     local rbenv_global="$(rbenv global)"
 
-    # Don't show anything if the current Ruby is the same as the global Ruby.
-    # Unless POWERLEVEL_RBENV_ALWAYS is set.
-    set_default POWERLEVEL9K_RBENV_ALWAYS false
+    # Don't show anything if the current Ruby is the same as the global Ruby
+    # unless `POWERLEVEL9K_RBENV_ALWAYS` is set.
     if [[ $POWERLEVEL9K_RBENV_ALWAYS == true || $rbenv_version_name != $rbenv_global ]];then
       "$1_prompt_segment" "$0" "$2" "red" "$DEFAULT_COLOR" "$rbenv_version_name" 'RUBY_ICON'
-    #elif [[ $rbenv_version_name != $rbenv_global ]]; then
-    #  "$1_prompt_segment" "$0" "$2" "red" "$DEFAULT_COLOR" "$rbenv_version_name" 'RUBY_ICON'
-    #else
-    #  return  
     fi
   fi
 }
