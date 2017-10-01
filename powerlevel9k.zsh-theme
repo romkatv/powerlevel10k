@@ -1423,6 +1423,23 @@ prompt_kubecontext() {
   fi
 }
 
+# Dropbox status
+prompt_dropbox() {
+  # The first column is just the directory, so cut it
+  local dropbox_status="$(dropbox-cli filestatus . | cut -d\  -f2-)"
+
+  # Only show if the folder is tracked
+  if [[ "$dropbox_status" != 'unwatched' ]]; then
+    # If "up to date", only show the icon
+    if [[ "$dropbox_status" =~ 'up to date' ]]; then
+      dropbox_status=""
+    fi
+
+    "$1_prompt_segment" "$0" "$2" "white" "blue" "$dropbox_status" "DROPBOX_ICON"
+  fi
+
+}
+
 
 ################################################################
 # Prompt processing and drawing

@@ -87,6 +87,7 @@ case $POWERLEVEL9K_MODE in
       SSH_ICON                       '(ssh)'
       VPN_ICON                       '(vpn)'
       KUBERNETES_ICON                $'\U2388'              # ⎈
+      DROPBOX_ICON                   $'\UF16B'              # 
     )
   ;;
   'awesome-fontconfig')
@@ -158,6 +159,7 @@ case $POWERLEVEL9K_MODE in
       SSH_ICON                       '(ssh)'
       VPN_ICON                       $'\uF023'
       KUBERNETES_ICON                $'\U2388'              # ⎈
+      DROPBOX_ICON                   $'\UF16B'              # 
     )
   ;;
   'awesome-mapped-fontconfig')
@@ -303,6 +305,7 @@ case $POWERLEVEL9K_MODE in
       SSH_ICON                       $'\uF489'              # 
       VPN_ICON                       '(vpn)'
       KUBERNETES_ICON                $'\U2388'              # ⎈
+      DROPBOX_ICON                   $'\UF16B'              # 
     )
   ;;
   *)
@@ -374,6 +377,7 @@ case $POWERLEVEL9K_MODE in
       SSH_ICON                       '(ssh)'
       VPN_ICON                       '(vpn)'
       KUBERNETES_ICON                $'\U2388'              # ⎈
+      DROPBOX_ICON                   $'\UF16B'              # 
     )
   ;;
 esac
