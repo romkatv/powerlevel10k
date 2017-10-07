@@ -140,6 +140,7 @@ The segments that are currently available are:
     * `aws_eb_env` - The current Elastic Beanstalk Environment.
 * `docker_machine` - The current Docker Machine.
 * `kubecontext` - The current context of your `kubectl` configuration.
+* `dropbox` - Indicates Dropbox directory and syncing status using `dropbox-cli`
 
 **Other:**
 * [`custom_command`](#custom_command) - Create a custom segment to display the
