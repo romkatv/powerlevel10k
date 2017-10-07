@@ -153,7 +153,7 @@ case $POWERLEVEL9K_MODE in
       SWIFT_ICON                     ''
       GO_ICON                        ''
       PUBLIC_IP_ICON                 ''
-      LOCK_ICON                      $'\UE138'              # 
+      LOCK_ICON                      $'\UF023'              # 
       EXECUTION_TIME_ICON            $'\uF253'
       SSH_ICON                       '(ssh)'
       VPN_ICON                       $'\uF023'
