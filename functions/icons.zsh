@@ -234,6 +234,9 @@ case $POWERLEVEL9K_MODE in
       LOCK_ICON                      '\u'$CODEPOINT_OF_AWESOME_LOCK                 # 
       EXECUTION_TIME_ICON            '\u'$CODEPOINT_OF_AWESOME_HOURGLASS_END        # 
       SSH_ICON                       '(ssh)'
+      VPN_ICON                       '\u'$CODEPOINT_OF_AWESOME_LOCK
+      KUBERNETES_ICON                $'\U2388'                                      # ⎈
+      DROPBOX_ICON                   '\u'$CODEPOINT_OF_AWESOME_DROPBOX              # 
     )
   ;;
   'nerdfont-complete'|'nerdfont-fontconfig')
@@ -377,7 +380,7 @@ case $POWERLEVEL9K_MODE in
       SSH_ICON                       '(ssh)'
       VPN_ICON                       '(vpn)'
       KUBERNETES_ICON                $'\U2388'              # ⎈
-      DROPBOX_ICON                   $'\UF16B'              # 
+      DROPBOX_ICON                   'Dropbox'
     )
   ;;
 esac
