@@ -1146,7 +1146,7 @@ exit_code_or_status() {
   else
     local sig=$(( ec - 128 ))
     local idx=$(( sig + 1 ))
-    echo "${signals[$idx]}(-${sig})"
+    echo "SIG${signals[$idx]}(${sig})"
   fi
 }
 
