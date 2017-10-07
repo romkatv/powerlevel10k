@@ -69,7 +69,7 @@ case $POWERLEVEL9K_MODE in
       VCS_TAG_ICON                   $'\uE817 '             # 
       VCS_BOOKMARK_ICON              $'\uE87B'              # 
       VCS_COMMIT_ICON                $'\uE821 '             # 
-      VCS_BRANCH_ICON                $'\uE220'              # 
+      VCS_BRANCH_ICON                $'\uE220 '             # 
       VCS_REMOTE_BRANCH_ICON         $'\u2192'              # →
       VCS_GIT_ICON                   $'\uE20E '             # 
       VCS_GIT_GITHUB_ICON            $'\uE20E '             #
@@ -141,7 +141,7 @@ case $POWERLEVEL9K_MODE in
       VCS_TAG_ICON                   $'\uF217 '             # 
       VCS_BOOKMARK_ICON              $'\uF27B'              # 
       VCS_COMMIT_ICON                $'\uF221 '             # 
-      VCS_BRANCH_ICON                $'\uF126'              # 
+      VCS_BRANCH_ICON                $'\uF126 '             # 
       VCS_REMOTE_BRANCH_ICON         $'\u2192'              # →
       VCS_GIT_ICON                   $'\uF1D3 '             # 
       VCS_GIT_GITHUB_ICON            $'\uF113 '             # 
@@ -154,7 +154,7 @@ case $POWERLEVEL9K_MODE in
       SWIFT_ICON                     ''
       GO_ICON                        ''
       PUBLIC_IP_ICON                 ''
-      LOCK_ICON                      $'\UE138'              # 
+      LOCK_ICON                      $'\UF023'              # 
       EXECUTION_TIME_ICON            $'\uF253'
       SSH_ICON                       '(ssh)'
       VPN_ICON                       $'\uF023'
@@ -362,7 +362,7 @@ case $POWERLEVEL9K_MODE in
       VCS_TAG_ICON                   ''
       VCS_BOOKMARK_ICON              $'\u263F'              # ☿
       VCS_COMMIT_ICON                ''
-      VCS_BRANCH_ICON                $'\uE0A0'              # 
+      VCS_BRANCH_ICON                $'\uE0A0 '             # 
       VCS_REMOTE_BRANCH_ICON         $'\u2192'              # →
       VCS_GIT_ICON                   ''
       VCS_GIT_GITHUB_ICON            ''
