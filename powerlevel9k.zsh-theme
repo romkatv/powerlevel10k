@@ -570,7 +570,7 @@ prompt_context() {
 
   local content=""
 
-  if [[ "$POWERLEVEL9K_ALWAYS_SHOW_CONTEXT" == true ]] || [[ "$USER" != "$DEFAULT_USER" ]] || [[ -n "$SSH_CLIENT" || -n "$SSH_TTY" ]]; then
+  if [[ "$POWERLEVEL9K_ALWAYS_SHOW_CONTEXT" == true ]] || [[ "$(whoami)" != "$DEFAULT_USER" ]] || [[ -n "$SSH_CLIENT" || -n "$SSH_TTY" ]]; then
 
       if [[ $(print -P "%#") == '#' ]]; then
         current_state="ROOT"
@@ -579,7 +579,7 @@ prompt_context() {
       content="${POWERLEVEL9K_CONTEXT_TEMPLATE}"
 
   elif [[ "$POWERLEVEL9K_ALWAYS_SHOW_USER" == true ]]; then
-      content="$USER"
+      content="$(whoami)"
   else
       return
   fi
@@ -594,7 +594,7 @@ set_default POWERLEVEL9K_USER_TEMPLATE "%n"
 prompt_user() {
   local current_state="DEFAULT"
   typeset -AH user_state
-  if [[ "$POWERLEVEL9K_ALWAYS_SHOW_USER" == true ]] || [[ "$USER" != "$DEFAULT_USER" ]]; then
+  if [[ "$POWERLEVEL9K_ALWAYS_SHOW_USER" == true ]] || [[ "$(whoami)" != "$DEFAULT_USER" ]]; then
     if [[ $(print -P "%#") == '#' ]]; then
       user_state=(
         "STATE"               "ROOT"
@@ -606,7 +606,7 @@ prompt_user() {
     else
       user_state=(
         "STATE"               "DEFAULT"
-        "CONTENT"             "$USER"
+        "CONTENT"             "$(whoami)"
         "BACKGROUND_COLOR"    "${DEFAULT_COLOR}"
         "FOREGROUND_COLOR"    "011"
         "VISUAL_IDENTIFIER"   "USER_ICON"
