@@ -507,7 +507,11 @@ prompt_public_ip() {
   if [[ -f $POWERLEVEL9K_PUBLIC_IP_FILE ]]; then
     typeset -i timediff
     # if saved IP is more than
-    timediff=$(($(date +%s) - $(date -r $POWERLEVEL9K_PUBLIC_IP_FILE +%s)))
+    if [[ "$OS" == "OSX" ]]; then
+      timediff=$(($(date +%s) - $(stat -f "%m" $POWERLEVEL9K_PUBLIC_IP_FILE)))
+    else
+      timediff=$(($(date +%s) - $(date -r $POWERLEVEL9K_PUBLIC_IP_FILE +%s)))
+    fi
     [[ $timediff -gt $POWERLEVEL9K_PUBLIC_IP_TIMEOUT ]] && refresh_ip=true
     # If tmp file is empty get a fresh IP
     [[ -z $(cat $POWERLEVEL9K_PUBLIC_IP_FILE) ]] && refresh_ip=true
