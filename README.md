@@ -436,8 +436,8 @@ POWERLEVEL9K_HOST_TEMPLATE="%2m"
 
 By default, LOCAL hosts will show the host icon and remote hosts will show the SSH icon. You can override them by setting
 ```
-POWERLEVEL9K_HOST_ICON="\uF109 "  # 
-POWERLEVEL9K_SSH_ICON="\uF489 "   # 
+POWERLEVEL9K_HOST_ICON="\uF109 "
+POWERLEVEL9K_SSH_ICON="\uF489 "
 ```
 
 
