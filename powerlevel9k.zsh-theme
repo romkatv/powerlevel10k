@@ -1415,15 +1415,13 @@ prompt_kubecontext() {
   local kubectl_version="$(kubectl version --client 2>/dev/null)"
 
   if [[ -n "$kubectl_version" ]]; then
+    # Get the current Kuberenetes context
     local cur_ctx=$(kubectl config view -o=jsonpath='{.current-context}')
     cur_namespace="$(kubectl config view -o=jsonpath="{.contexts[?(@.name==\"${cur_ctx}\")].context.namespace}")"
     # If the namespace comes back empty set it default.
     if [[ -z "${cur_namespace}" ]]; then
       cur_namespace="default"
     fi
-
-    # Get the current Kuberenetes context
-    local cur_ctx=$(kubectl config view -o=jsonpath='{.current-context}')
 
     "$1_prompt_segment" "$0" "$2" "magenta" "white" "$cur_ctx/$cur_namespace" "KUBERNETES_ICON"
   fi
