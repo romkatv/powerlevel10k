@@ -1410,20 +1410,20 @@ prompt_dir_writable() {
   fi
 }
 
-# Kubernetes Current Context
+# Kubernetes Current Context/Namespace
 prompt_kubecontext() {
   local kubectl_version="$(kubectl version --client 2>/dev/null)"
 
   if [[ -n "$kubectl_version" ]]; then
-    # Get the current Kubernetes config context's namespaece
-    local k8s_namespace=$(kubectl config get-contexts --no-headers | grep '*' | awk '{print $5}')
     # Get the current Kuberenetes context
-    local k8s_context=$(kubectl config current-context)
-
-    if [[ -z "$k8s_namespace" ]]; then
-      k8s_namespace="default"
+    local cur_ctx=$(kubectl config view -o=jsonpath='{.current-context}')
+    cur_namespace="$(kubectl config view -o=jsonpath="{.contexts[?(@.name==\"${cur_ctx}\")].context.namespace}")"
+    # If the namespace comes back empty set it default.
+    if [[ -z "${cur_namespace}" ]]; then
+      cur_namespace="default"
     fi
-    "$1_prompt_segment" "$0" "$2" "magenta" "white" "$k8s_context/$k8s_namespace" "KUBERNETES_ICON"
+
+    "$1_prompt_segment" "$0" "$2" "magenta" "white" "$cur_ctx/$cur_namespace" "KUBERNETES_ICON"
   fi
 }
 
