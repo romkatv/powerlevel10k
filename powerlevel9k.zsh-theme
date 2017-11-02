@@ -1332,7 +1332,7 @@ powerlevel9k_vcs_init() {
 prompt_vcs() {
   VCS_WORKDIR_DIRTY=false
   VCS_WORKDIR_HALF_DIRTY=false
-  current_state=""
+  local current_state=""
 
   # Actually invoke vcs_info manually to gather all information.
   vcs_info
@@ -1434,6 +1434,7 @@ prompt_kubecontext() {
 # Main prompt
 build_left_prompt() {
   local index=1
+  local element
   for element in "${POWERLEVEL9K_LEFT_PROMPT_ELEMENTS[@]}"; do
     # Remove joined information in direct calls
     element=${element%_joined}
