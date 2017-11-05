@@ -305,6 +305,7 @@ prompt_aws_eb_env() {
 
 # Segment to indicate background jobs with an icon.
 set_default POWERLEVEL9K_BACKGROUND_JOBS_VERBOSE true
+set_default POWERLEVEL9K_BACKGROUND_JOBS_VERBOSE_EVEN_ONE false
 prompt_background_jobs() {
   local background_jobs_number=${$(jobs -l | wc -l)// /}
   local wrong_lines=`jobs -l | awk '/pwd now/{ count++ } END {print count}'`
@@ -313,7 +314,7 @@ prompt_background_jobs() {
   fi
   if [[ background_jobs_number -gt 0 ]]; then
     local background_jobs_number_print=""
-    if [[ "$POWERLEVEL9K_BACKGROUND_JOBS_VERBOSE" == "true" ]] && [[ "$background_jobs_number" -gt 1 ]]; then
+    if [[ "$POWERLEVEL9K_BACKGROUND_JOBS_VERBOSE" == "true" ]] && ([[ "$background_jobs_number" -gt 1 ]] || [[ "$POWERLEVEL9K_BACKGROUND_JOBS_VERBOSE_EVEN_ONE" == "true" ]]); then
       background_jobs_number_print="$background_jobs_number"
     fi
     "$1_prompt_segment" "$0" "$2" "$DEFAULT_COLOR" "cyan" "$background_jobs_number_print" 'BACKGROUND_JOBS_ICON'
