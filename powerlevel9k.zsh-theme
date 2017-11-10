@@ -287,7 +287,7 @@ prompt_anaconda() {
 
 # AWS Profile
 prompt_aws() {
-  local aws_profile="$AWS_DEFAULT_PROFILE"
+  local aws_profile="${AWS_PROFILE:-$AWS_DEFAULT_PROFILE}"
 
   if [[ -n "$aws_profile" ]]; then
     "$1_prompt_segment" "$0" "$2" red white "$aws_profile" 'AWS_ICON'
