@@ -555,8 +555,16 @@ prompt_public_ip() {
 
   # Draw the prompt segment
   if [[ -n $public_ip ]]; then
-    $1_prompt_segment "$0" "$2" "$DEFAULT_COLOR" "$DEFAULT_COLOR_INVERTED" "${public_ip}" 'PUBLIC_IP_ICON'
-  fi
+    icon='PUBLIC_IP_ICON'
+    # Check VPN is on if VPN interface is set
+    if [[ -n $POWERLEVEL9K_PUBLIC_IP_VPN_INTERFACE ]]; then
+      for vpn_iface in $(/sbin/ifconfig | grep -e ^"$POWERLEVEL9K_PUBLIC_IP_VPN_INTERFACE" | cut -d":" -f1)
+      do
+        icon='VPN_ICON'
+        break
+      done
+    fi
+    $1_prompt_segment "$0" "$2" "$DEFAULT_COLOR" "$DEFAULT_COLOR_INVERTED" "${public_ip}" "$icon"  fi
 }
 
 # Context: user@hostname (who am I and where am I)
