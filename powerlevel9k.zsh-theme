@@ -1563,6 +1563,7 @@ NEWLINE='
   [[ $POWERLEVEL9K_PROMPT_ADD_NEWLINE == true ]] && PROMPT="$NEWLINE$PROMPT"
 }
 
+set_default POWERLEVEL9K_CHECK_TERM_COLORS true
 prompt_powerlevel9k_setup() {
   # The value below was set to better support 32-bit CPUs.
   # It's the maximum _signed_ integer value on 32-bit CPUs.
