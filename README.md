@@ -243,7 +243,7 @@ battery level. This will override the following variables:
 `POWERLEVEL9K_BATTERY_DISCONNECTED`, and `POWERLEVEL9K_BATTERY_LOW_COLOR`. In
 order to do this, define a color array, from low to high, as shown below:
 ```zsh
-POWERLEVEL9K_BATTERY_LEVEL_BACKGROUND=(196 202 208 214 220 226 190 154 118 82 46)
+POWERLEVEL9K_BATTERY_LEVEL_BACKGROUND=(red1 orangered1 darkorange orange1 gold1 yellow1 yellow2 greenyellow chartreuse1 chartreuse2 green1)
 ```
 
 As with the battery stages, you can use any number of colors and Powerlevel9k
@@ -251,9 +251,9 @@ will automatically use all of them appropriately.
 
 Some example settings:
 |Brightness|Possible Array|
-|Bright Colors|(196 202 208 214 220 226 190 154 118  82  46)|
-|Normal Colors|(124 130 136 142 148 112  76  40  34  28  22)|
-|Subdued Colors|( 88  94 100 106  70  34  28  22)|
+|Bright Colors|(red1 orangered1 darkorange orange1 gold1 yellow1 yellow2 greenyellow chartreuse1 chartreuse2 green1)|
+|Normal Colors|(red3 darkorange3 darkgoldenrod gold3 yellow3 chartreuse2 mediumspringgreen green3 green3 green4 darkgreen)|
+|Subdued Colors|(darkred orange4 yellow4 yellow4 chartreuse3 green3 green4 darkgreen)|
 
 ##### command_execution_time
 

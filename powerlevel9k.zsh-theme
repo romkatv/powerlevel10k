@@ -569,7 +569,7 @@ prompt_context() {
   typeset -AH context_states
   context_states=(
     "ROOT"      "yellow"
-    "DEFAULT"   "011"
+    "DEFAULT"   "yellow"
   )
 
   local content=""
@@ -612,7 +612,7 @@ prompt_user() {
         "STATE"               "DEFAULT"
         "CONTENT"             "$(whoami)"
         "BACKGROUND_COLOR"    "${DEFAULT_COLOR}"
-        "FOREGROUND_COLOR"    "011"
+        "FOREGROUND_COLOR"    "yellow"
         "VISUAL_IDENTIFIER"   "USER_ICON"
       )
     fi
@@ -639,7 +639,7 @@ prompt_host() {
       "STATE"               "LOCAL"
       "CONTENT"             "${POWERLEVEL9K_HOST_TEMPLATE}"
       "BACKGROUND_COLOR"    "${DEFAULT_COLOR}"
-      "FOREGROUND_COLOR"    "011"
+      "FOREGROUND_COLOR"    "yellow"
       "VISUAL_IDENTIFIER"   "HOST_ICON"
     )
   fi
@@ -686,7 +686,7 @@ prompt_command_execution_time() {
   fi
 
   if (( _P9K_COMMAND_DURATION >= POWERLEVEL9K_COMMAND_EXECUTION_TIME_THRESHOLD )); then
-    "$1_prompt_segment" "$0" "$2" "red" "226" "${humanReadableDuration}" 'EXECUTION_TIME_ICON'
+    "$1_prompt_segment" "$0" "$2" "red" "yellow1" "${humanReadableDuration}" 'EXECUTION_TIME_ICON'
   fi
 }
 
@@ -701,10 +701,10 @@ prompt_dir() {
 
     case "$POWERLEVEL9K_SHORTEN_STRATEGY" in
       truncate_middle)
-        current_path=$(pwd | sed -e "s,^$HOME,~," | sed $SED_EXTENDED_REGEX_PARAMETER "s/([^/]{$POWERLEVEL9K_SHORTEN_DIR_LENGTH})[^/]+([^/]{$POWERLEVEL9K_SHORTEN_DIR_LENGTH})\//\1$POWERLEVEL9K_SHORTEN_DELIMITER\2\//g")
+        current_path=$(echo "$current_path" | sed $SED_EXTENDED_REGEX_PARAMETER "s/([^/]{$POWERLEVEL9K_SHORTEN_DIR_LENGTH})[^/]+([^/]{$POWERLEVEL9K_SHORTEN_DIR_LENGTH})\//\1$POWERLEVEL9K_SHORTEN_DELIMITER\2\//g")
       ;;
       truncate_from_right)
-        current_path=$(truncatePathFromRight "$(pwd | sed -e "s,^$HOME,~,")" )
+        current_path=$(truncatePathFromRight "$current_path" )
       ;;
       truncate_with_package_name)
         local name repo_path package_path current_dir zero
@@ -754,8 +754,12 @@ prompt_dir() {
           # Instead of printing out the full path, print out the name of the package
           # from the package.json and append the current subdirectory
           current_path="`echo $packageName | tr -d '"'`$subdirectory_path"
+          if [[ "${POWERLEVEL9K_DIR_OMIT_FIRST_CHARACTER}" == "true" ]]; then
+            # add space before the packageName to allow for removing the "first" character, without messing up the package name.
+            current_path=" ${current_path}"
+          fi
         else
-          current_path=$(truncatePathFromRight "$(pwd | sed -e "s,^$HOME,~,")" )
+          current_path=$(truncatePathFromRight "$current_path" )
         fi
       ;;
       truncate_with_folder_marker)
@@ -858,13 +862,13 @@ prompt_go_version() {
   go_path=$(go env GOPATH 2>/dev/null)
 
   if [[ -n "$go_version" && "${PWD##$go_path}" != "$PWD" ]]; then
-    "$1_prompt_segment" "$0" "$2" "green" "255" "$go_version" "GO_ICON"
+    "$1_prompt_segment" "$0" "$2" "green" "grey93" "$go_version" "GO_ICON"
   fi
 }
 
 # Command number (in local history)
 prompt_history() {
-  "$1_prompt_segment" "$0" "$2" "244" "$DEFAULT_COLOR" '%h'
+  "$1_prompt_segment" "$0" "$2" "grey50" "$DEFAULT_COLOR" '%h'
 }
 
 # Detection for virtualization (systemd based systems only)
@@ -1026,7 +1030,7 @@ prompt_nodeenv() {
 
 # print a little OS icon
 prompt_os_icon() {
-  "$1_prompt_segment" "$0" "$2" "black" "255" "$OS_ICON"
+  "$1_prompt_segment" "$0" "$2" "black" "white" "$OS_ICON"
 }
 
 # print PHP version number
@@ -1035,7 +1039,7 @@ prompt_php_version() {
   php_version=$(php -v 2>&1 | grep -oe "^PHP\s*[0-9.]*")
 
   if [[ -n "$php_version" ]]; then
-    "$1_prompt_segment" "$0" "$2" "013" "255" "$php_version"
+    "$1_prompt_segment" "$0" "$2" "fuchsia" "grey93" "$php_version"
   fi
 }
 
@@ -1101,7 +1105,7 @@ prompt_rust_version() {
   rust_version=$(rustc --version 2>&1 | grep -oe "^rustc\s*[^ ]*" | grep -o '[0-9.a-z\\\-]*$')
 
   if [[ -n "$rust_version" ]]; then
-    "$1_prompt_segment" "$0" "$2" "208" "$DEFAULT_COLOR" "Rust $rust_version" 'RUST_ICON'
+    "$1_prompt_segment" "$0" "$2" "darkorange" "$DEFAULT_COLOR" "Rust $rust_version" 'RUST_ICON'
   fi
 }
 # RSpec test ratio
@@ -1120,7 +1124,7 @@ prompt_rvm() {
   local version_and_gemset=${rvm_env_string/ruby-}
 
   if [[ -n "$version_and_gemset" ]]; then
-    "$1_prompt_segment" "$0" "$2" "240" "$DEFAULT_COLOR" "$version_and_gemset" 'RUBY_ICON'
+    "$1_prompt_segment" "$0" "$2" "grey35" "$DEFAULT_COLOR" "$version_and_gemset" 'RUBY_ICON'
   fi
 }
 
@@ -1176,7 +1180,7 @@ prompt_status() {
 
   if (( ec_sum > 0 )); then
     if [[ "$POWERLEVEL9K_STATUS_CROSS" == false && "$POWERLEVEL9K_STATUS_VERBOSE" == true ]]; then
-      "$1_prompt_segment" "$0_ERROR" "$2" "red" "226" "$ec_text" 'CARRIAGE_RETURN_ICON'
+      "$1_prompt_segment" "$0_ERROR" "$2" "red" "yellow1" "$ec_text" 'CARRIAGE_RETURN_ICON'
     else
       "$1_prompt_segment" "$0_ERROR" "$2" "$DEFAULT_COLOR" "red" "" 'FAIL_ICON'
     fi
@@ -1225,7 +1229,7 @@ prompt_symfony2_version() {
   if [[ -f app/bootstrap.php.cache ]]; then
     local symfony2_version
     symfony2_version=$(grep " VERSION " app/bootstrap.php.cache | sed -e 's/[^.0-9]*//g')
-    "$1_prompt_segment" "$0" "$2" "240" "$DEFAULT_COLOR" "$symfony2_version" 'SYMFONY_ICON'
+    "$1_prompt_segment" "$0" "$2" "grey35" "$DEFAULT_COLOR" "$symfony2_version" 'SYMFONY_ICON'
   fi
 }
 
@@ -1259,7 +1263,7 @@ prompt_todo() {
   if $(hash todo.sh 2>&-); then
     count=$(todo.sh ls | egrep "TODO: [0-9]+ of ([0-9]+) tasks shown" | awk '{ print $4 }')
     if [[ "$count" = <-> ]]; then
-      "$1_prompt_segment" "$0" "$2" "244" "$DEFAULT_COLOR" "$count" 'TODO_ICON'
+      "$1_prompt_segment" "$0" "$2" "grey50" "$DEFAULT_COLOR" "$count" 'TODO_ICON'
     fi
   fi
 }
@@ -1406,7 +1410,7 @@ prompt_swift_version() {
 # dir_writable: Display information about the user's permission to write in the current directory
 prompt_dir_writable() {
   if [[ ! -w "$PWD" ]]; then
-    "$1_prompt_segment" "$0_FORBIDDEN" "$2" "red" "226" "" 'LOCK_ICON'
+    "$1_prompt_segment" "$0_FORBIDDEN" "$2" "red" "yellow1" "" 'LOCK_ICON'
   fi
 }
 
