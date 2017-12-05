@@ -1,6 +1,6 @@
 ![](https://raw.githubusercontent.com/bhilburn/powerlevel9k-logo/master/logo-banner.png)
 ---
-[![Build Status](https://travis-ci.org/bhilburn/powerlevel9k.svg?branch=next)](https://travis-ci.org/bhilburn/powerlevel9k)
+[![Build Status](https://travis-ci.org/bhilburn/powerlevel9k.svg?branch=master)](https://travis-ci.org/bhilburn/powerlevel9k)
 [![Join the chat at https://gitter.im/bhilburn/powerlevel9k](https://badges.gitter.im/bhilburn/powerlevel9k.svg)](https://gitter.im/bhilburn/powerlevel9k?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 Powerlevel9k is a theme for ZSH which uses [Powerline
