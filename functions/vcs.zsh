@@ -17,7 +17,7 @@ function +vi-git-untracked() {
     fi
 
     if [[ $(git rev-parse --is-inside-work-tree 2> /dev/null) == 'true' && \
-            -n $(git status ${FLAGS} | grep -E '^\?\?' 2> /dev/null | tail -n1) ]]; then
+            -n $(git status ${FLAGS} | \grep -E '^\?\?' 2> /dev/null | tail -n1) ]]; then
         hook_com[unstaged]+=" $(print_icon 'VCS_UNTRACKED_ICON')"
         VCS_WORKDIR_HALF_DIRTY=true
     else
@@ -137,15 +137,15 @@ function +vi-vcs-detect-changes() {
 
 function +vi-svn-detect-changes() {
   local svn_status="$(svn status)"
-  if [[ -n "$(echo "$svn_status" | grep \^\?)" ]]; then
+  if [[ -n "$(echo "$svn_status" | \grep \^\?)" ]]; then
     hook_com[unstaged]+=" $(print_icon 'VCS_UNTRACKED_ICON')"
     VCS_WORKDIR_HALF_DIRTY=true
   fi
-  if [[ -n "$(echo "$svn_status" | grep \^\M)" ]]; then
+  if [[ -n "$(echo "$svn_status" | \grep \^\M)" ]]; then
     hook_com[unstaged]+=" $(print_icon 'VCS_UNSTAGED_ICON')"
     VCS_WORKDIR_DIRTY=true
   fi
-  if [[ -n "$(echo "$svn_status" | grep \^\A)" ]]; then
+  if [[ -n "$(echo "$svn_status" | \grep \^\A)" ]]; then
     hook_com[staged]+=" $(print_icon 'VCS_STAGED_ICON')"
     VCS_WORKDIR_DIRTY=true
   fi
