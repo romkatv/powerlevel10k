@@ -7,7 +7,7 @@
 ################################################################
 
 function termColors() {
-  if [[ $POWERLEVEL9K_CHECK_TERM_COLORS == false ]]; then
+  if [[ $POWERLEVEL9K_IGNORE_TERM_COLORS == true ]]; then
     return
   fi
 
