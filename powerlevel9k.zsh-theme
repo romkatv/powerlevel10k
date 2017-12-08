@@ -12,7 +12,7 @@
 # directory. For more detailed documentation, refer to the project wiki, hosted
 # on Github: https://github.com/bhilburn/powerlevel9k/wiki
 #
-# There are a lot of easy ways you can customize your prompt segments and
+# There aPOWERLEVEL9K_CHECK_TERM_COLORSre a lot of easy ways you can customize your prompt segments and
 # theming with simple variables defined in your `~/.zshrc`.
 ################################################################
 
@@ -1564,6 +1564,7 @@ NEWLINE='
 }
 
 set_default POWERLEVEL9K_IGNORE_TERM_COLORS false
+set_default POWERLEVEL9K_IGNORE_TERM_LANG false
 prompt_powerlevel9k_setup() {
   # The value below was set to better support 32-bit CPUs.
   # It's the maximum _signed_ integer value on 32-bit CPUs.
@@ -1586,13 +1587,15 @@ prompt_powerlevel9k_setup() {
   termColors
 
   # If the terminal `LANG` is set to `C`, this theme will not work at all.
-  local term_lang
-  term_lang=$(echo $LANG)
-  if [[ $term_lang == 'C' ]]; then
-      print -P "\t%F{red}WARNING!%f Your terminal's 'LANG' is set to 'C', which breaks this theme!"
-      print -P "\t%F{red}WARNING!%f Please set your 'LANG' to a UTF-8 language, like 'en_US.UTF-8'"
-      print -P "\t%F{red}WARNING!%f _before_ loading this theme in your \~\.zshrc. Putting"
-      print -P "\t%F{red}WARNING!%f %F{blue}export LANG=\"en_US.UTF-8\"%f at the top of your \~\/.zshrc is sufficient."
+  if [[ $POWERLEVEL9K_IGNORE_TERM_LANG == false ]]; then
+      local term_lang
+      term_lang=$(echo $LANG)
+      if [[ $term_lang == 'C' ]]; then
+          print -P "\t%F{red}WARNING!%f Your terminal's 'LANG' is set to 'C', which breaks this theme!"
+          print -P "\t%F{red}WARNING!%f Please set your 'LANG' to a UTF-8 language, like 'en_US.UTF-8'"
+          print -P "\t%F{red}WARNING!%f _before_ loading this theme in your \~\.zshrc. Putting"
+          print -P "\t%F{red}WARNING!%f %F{blue}export LANG=\"en_US.UTF-8\"%f at the top of your \~\/.zshrc is sufficient."
+      fi
   fi
 
   defined POWERLEVEL9K_LEFT_PROMPT_ELEMENTS || POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(context dir rbenv vcs)
