@@ -1399,6 +1399,16 @@ prompt_pyenv() {
   fi
 }
 
+prompt_openfoam() {
+  local wm_project_version="$WM_PROJECT_VERSION"
+  local wm_fork="$WM_FORK"
+  if [[ -n "$wm_project_version" ]] &&  [[ -z "$wm_fork" ]] ; then
+	  "$1_prompt_segment" "$0" "$2" "yellow" "$DEFAULT_COLOR" "OF: $(basename "$wm_project_version")"
+	elif [[ -n "$wm_project_version" ]] && [[ -n "$wm_fork" ]] ; then
+	  "$1_prompt_segment" "$0" "$2" "yellow" "$DEFAULT_COLOR" "F-X: $(basename "$wm_project_version")"
+	fi
+}
+
 # Swift version
 prompt_swift_version() {
   # Get the first number as this is probably the "main" version number..
