@@ -149,6 +149,7 @@ The segments that are currently available are:
 * [`todo`](http://todotxt.com/) - Shows the number of tasks in your todo.txt tasks file.
 * `detect_virt` - Virtualization detection with systemd
 * `newline` - Continues the prompt on a new line.
+* `openfoam` - Shows the current sourced [OpenFOAM](https://openfoam.org/) environment.
 
 ---------------------------------------------------------------------------------
 
@@ -503,6 +504,11 @@ line. This allows you to use segments on both lines, unlike
 prompt itself.
 
 This only works on the left side.  On the right side it does nothing.
+
+##### openfoam
+
+This is for all simulation experts, which work with [OpenFOAM](https://openfoam.org/) or with the [foam-extend](https://sourceforge.net/projects/foam-extend/) project. It shows the current sourced environment. So, after specifying someting like `alias of5='source /opt/OpenFOAM/OpenFOAM-5.0/etc/bashrc'` (bashrc works also on zsh) in your `.zshrc` and doing `of5` in the terminal, then on the right prompt it will show "OF:" (for OpenFOAM) or "F-X:" (for foam-extend) with its corresponding version number behind it. To activate this segment just use it with: `openfoam` as normal.
+
 
 ##### rbenv
 
