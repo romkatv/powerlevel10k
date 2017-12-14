@@ -1430,11 +1430,11 @@ prompt_kubecontext() {
 
     local k8s_final_text=""
 
-    if [[ "$k8s_context" == "k8s_namespace" ]]; then
+    if [[ "$cur_ctx" == "cur_namespace" ]]; then
       # No reason to print out the same identificator twice
-      k8s_final_text="$k8s_context"
+      k8s_final_text="$cur_ctx"
     else
-      k8s_final_text="$k8s_context/$k8s_namespace"
+      k8s_final_text="$cur_ctx/$cur_namespace"
     fi
 
     "$1_prompt_segment" "$0" "$2" "magenta" "white" "$k8s_final_text" "KUBERNETES_ICON"
