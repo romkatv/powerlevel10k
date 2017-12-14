@@ -149,6 +149,7 @@ The segments that are currently available are:
 * [`todo`](http://todotxt.com/) - Shows the number of tasks in your todo.txt tasks file.
 * `detect_virt` - Virtualization detection with systemd
 * `newline` - Continues the prompt on a new line.
+* `openfoam` - Shows the currently sourced [OpenFOAM](https://openfoam.org/) environment.
 
 ---------------------------------------------------------------------------------
 
