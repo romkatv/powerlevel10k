@@ -127,8 +127,8 @@ left_prompt_segment() {
   [[ -n $FG_COLOR_MODIFIER ]] && 4="$FG_COLOR_MODIFIER"
 
   local bg fg
-  [[ -n "$3" ]] && bg="%K{$3}" || bg="%k"
-  [[ -n "$4" ]] && fg="%F{$4}" || fg="%f"
+  [[ -n "$3" ]] && bg="$(backgroundColor $3)" || bg="$(backgroundColor)"
+  [[ -n "$4" ]] && fg="$(foregroundColor $4)" || fg="$(foregroundColor)"
 
   if [[ $CURRENT_BG != 'NONE' ]] && ! isSameColor "$3" "$CURRENT_BG"; then
     echo -n "$bg%F{$CURRENT_BG}"
@@ -218,8 +218,8 @@ right_prompt_segment() {
   [[ -n $FG_COLOR_MODIFIER ]] && 4="$FG_COLOR_MODIFIER"
 
   local bg fg
-  [[ -n "$3" ]] && bg="%K{$3}" || bg="%k"
-  [[ -n "$4" ]] && fg="%F{$4}" || fg="%f"
+  [[ -n "$3" ]] && bg="$(backgroundColor $3)" || bg="$(backgroundColor)"
+  [[ -n "$4" ]] && fg="$(foregroundColor $4)" || fg="$(foregroundColor)"
 
   # If CURRENT_RIGHT_BG is "NONE", we are the first right segment.
   if [[ $joined == false ]] || [[ "$CURRENT_RIGHT_BG" == "NONE" ]]; then

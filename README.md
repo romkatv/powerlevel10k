@@ -258,6 +258,17 @@ Some example settings:
 |Normal Colors|(red3 darkorange3 darkgoldenrod gold3 yellow3 chartreuse2 mediumspringgreen green3 green3 green4 darkgreen)|
 |Subdued Colors|(darkred orange4 yellow4 yellow4 chartreuse3 green3 green4 darkgreen)|
 
+###### test your terminal colors
+Some terminals, like iTerm2, allow you to customize some of the colors via the interface.  This is handy for themes and allowing the colors to change via the GUI.
+Use this command to check how all the colors are rendering in your terminal. This is handy for choosing colors and wheter or not you want to use the static color code, or the dynamic named color.
+
+```zsh
+# execute these in your shell to get a look at all 256 colors
+
+getColorCode background
+getColorCode foreground
+```
+
 ##### command_execution_time
 
 Display the time the previous command took to execute if the time is above
