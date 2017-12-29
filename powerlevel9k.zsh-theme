@@ -571,22 +571,23 @@ prompt_context() {
   context_states=(
     "ROOT"      "yellow"
     "DEFAULT"   "yellow"
+    "REMOTE"    "yellow"
   )
 
   local content=""
 
   if [[ "$POWERLEVEL9K_ALWAYS_SHOW_CONTEXT" == true ]] || [[ "$(whoami)" != "$DEFAULT_USER" ]] || [[ -n "$SSH_CLIENT" || -n "$SSH_TTY" ]]; then
-
-      if [[ $(print -P "%#") == '#' ]]; then
-        current_state="ROOT"
-      fi
-
       content="${POWERLEVEL9K_CONTEXT_TEMPLATE}"
-
   elif [[ "$POWERLEVEL9K_ALWAYS_SHOW_USER" == true ]]; then
       content="$(whoami)"
   else
       return
+  fi
+
+  if [[ $(print -P "%#") == '#' ]]; then
+    current_state="ROOT"
+  elif [[ -n "$SSH_CLIENT" || -n "$SSH_TTY" ]]; then
+    current_state="REMOTE"
   fi
 
   "$1_prompt_segment" "${0}_${current_state}" "$2" "$DEFAULT_COLOR" "${context_states[$current_state]}" "${content}"
