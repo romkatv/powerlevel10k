@@ -564,7 +564,8 @@ prompt_public_ip() {
         break
       done
     fi
-    $1_prompt_segment "$0" "$2" "$DEFAULT_COLOR" "$DEFAULT_COLOR_INVERTED" "${public_ip}" "$icon"  fi
+    $1_prompt_segment "$0" "$2" "$DEFAULT_COLOR" "$DEFAULT_COLOR_INVERTED" "${public_ip}" "$icon"
+  fi
 }
 
 # Context: user@hostname (who am I and where am I)
