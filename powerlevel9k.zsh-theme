@@ -142,8 +142,8 @@ left_prompt_segment() {
     # subsegment (or the default color). This should have
     # enough contrast.
     local complement
-    [[ -n "$4" ]] && complement="$4" || complement=$DEFAULT_COLOR
-    echo -n "$bg%F{$complement}"
+    [[ -n "$4" ]] && complement="$fg" || complement="$(foregroundColor $DEFAULT_COLOR)"
+    echo -n "${bg}${complement}"
     if [[ $joined == false ]]; then
       echo -n "$(print_icon 'LEFT_SUBSEGMENT_SEPARATOR')$POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS"
     fi
@@ -229,10 +229,11 @@ right_prompt_segment() {
       # subsegment (or the default color). This should have
       # enough contrast.
       local complement
-      [[ -n "$4" ]] && complement="$4" || complement=$DEFAULT_COLOR
-      echo -n "%F{$complement}$(print_icon 'RIGHT_SUBSEGMENT_SEPARATOR')%f"
+      [[ -n "$4" ]] && complement="$fg" || complement="$(foregroundColor $DEFAULT_COLOR)"
+      echo -n "$complement$(print_icon 'RIGHT_SUBSEGMENT_SEPARATOR')%f"
     else
-      echo -n "%F{$3}$(print_icon 'RIGHT_SEGMENT_SEPARATOR')%f"
+      # Use the new BG color for the foreground with separator
+      echo -n "$(foregroundColor $3)$(print_icon 'RIGHT_SEGMENT_SEPARATOR')%f"
     fi
   fi
 
