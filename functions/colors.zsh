@@ -6,6 +6,22 @@
 # https://github.com/bhilburn/powerlevel9k
 ################################################################
 
+function termColors() {
+  local term_colors
+
+  if which tput &>/dev/null; then
+	term_colors=$(tput colors)
+  else
+	term_colors=$(echotc Co)
+  fi
+  if (( ! $? && ${term_colors:-0} < 256 )); then
+    print -P "%F{red}WARNING!%f Your terminal appears to support fewer than 256 colors!"
+    print -P "If your terminal supports 256 colors, please export the appropriate environment variable"
+    print -P "_before_ loading this theme in your \~\/.zshrc. In most terminal emulators, putting"
+    print -P "%F{blue}export TERM=\"xterm-256color\"%f at the top of your \~\/.zshrc is sufficient."
+  fi
+}
+
 # get the proper color code if it does not exist as a name.
 function getColor() {
   # no need to check numerical values

@@ -1572,14 +1572,7 @@ prompt_powerlevel9k_setup() {
   setopt noprompt{bang,cr,percent,sp,subst} "prompt${^prompt_opts[@]}"
 
   # Display a warning if the terminal does not support 256 colors
-  local term_colors
-  term_colors=$(echotc Co 2>/dev/null)
-  if (( ! $? && ${term_colors:-0} < 256 )); then
-    print -P "%F{red}WARNING!%f Your terminal appears to support fewer than 256 colors!"
-    print -P "If your terminal supports 256 colors, please export the appropriate environment variable"
-    print -P "_before_ loading this theme in your \~\/.zshrc. In most terminal emulators, putting"
-    print -P "%F{blue}export TERM=\"xterm-256color\"%f at the top of your \~\/.zshrc is sufficient."
-  fi
+  termColors
 
   # If the terminal `LANG` is set to `C`, this theme will not work at all.
   local term_lang
