@@ -88,6 +88,8 @@ case $POWERLEVEL9K_MODE in
       VPN_ICON                       '(vpn)'
       KUBERNETES_ICON                $'\U2388'              # ⎈
       DROPBOX_ICON                   $'\UF16B'              # 
+      DATE_ICON                      $'\uE184'              # 
+      TIME_ICON                      $'\uE12E'              # 
     )
   ;;
   'awesome-fontconfig')
@@ -160,6 +162,8 @@ case $POWERLEVEL9K_MODE in
       VPN_ICON                       $'\uF023'
       KUBERNETES_ICON                $'\U2388'              # ⎈
       DROPBOX_ICON                   $'\UF16B'              # 
+      DATE_ICON                      $'\uF073 '             # 
+      TIME_ICON                      $'\uF017 '             # 
     )
   ;;
   'awesome-mapped-fontconfig')
@@ -237,6 +241,8 @@ case $POWERLEVEL9K_MODE in
       VPN_ICON                       '\u'$CODEPOINT_OF_AWESOME_LOCK
       KUBERNETES_ICON                $'\U2388'                                      # ⎈
       DROPBOX_ICON                   '\u'$CODEPOINT_OF_AWESOME_DROPBOX              # 
+      DATE_ICON                      $'\uF073 '                                     # 
+      TIME_ICON                      $'\uF017 '                                     # 
     )
   ;;
   'nerdfont-complete'|'nerdfont-fontconfig')
@@ -309,6 +315,8 @@ case $POWERLEVEL9K_MODE in
       VPN_ICON                       '(vpn)'
       KUBERNETES_ICON                $'\U2388'              # ⎈
       DROPBOX_ICON                   $'\UF16B'              # 
+      DATE_ICON                      $'\uF073 '             # 
+      TIME_ICON                      $'\uF017 '             # 
     )
   ;;
   *)
@@ -381,6 +389,8 @@ case $POWERLEVEL9K_MODE in
       VPN_ICON                       '(vpn)'
       KUBERNETES_ICON                $'\U2388'              # ⎈
       DROPBOX_ICON                   'Dropbox'
+      DATE_ICON                      ''
+      TIME_ICON                      ''
     )
   ;;
 esac
