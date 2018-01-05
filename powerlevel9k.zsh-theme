@@ -17,7 +17,7 @@
 ################################################################
 
 ## Turn on for Debugging
-#PS4='%s%f%b%k%F{blue}%{λ%}%L %F{240}%N:%i%(?.. %F{red}%?) %1(_.%F{yellow}%-1_ .)%s%f%b%k	'
+#PS4='%s%f%b%k%F{blue}%{λ%}%L %F{240}%N:%i%(?.. %F{red}%?) %1(_.%F{yellow}%-1_ .)%s%f%b%k '
 #zstyle ':vcs_info:*+*:*' debug true
 #set -o xtrace
 
@@ -272,6 +272,7 @@ right_prompt_segment() {
 # right-left but reads the opposite, this isn't necessary for the other side.
 CURRENT_BG='NONE'
 
+################################################################
 # Anaconda Environment
 prompt_anaconda() {
   # Depending on the conda version, either might be set. This
@@ -285,6 +286,7 @@ prompt_anaconda() {
   fi
 }
 
+################################################################
 # AWS Profile
 prompt_aws() {
   local aws_profile="${AWS_PROFILE:-$AWS_DEFAULT_PROFILE}"
@@ -294,6 +296,7 @@ prompt_aws() {
   fi
 }
 
+################################################################
 # Current Elastic Beanstalk environment
 prompt_aws_eb_env() {
   local eb_env=$(grep environment .elasticbeanstalk/config.yml 2> /dev/null | awk '{print $2}')
@@ -303,6 +306,7 @@ prompt_aws_eb_env() {
   fi
 }
 
+################################################################
 # Segment to indicate background jobs with an icon.
 set_default POWERLEVEL9K_BACKGROUND_JOBS_VERBOSE true
 set_default POWERLEVEL9K_BACKGROUND_JOBS_VERBOSE_ALWAYS false
@@ -321,6 +325,7 @@ prompt_background_jobs() {
   fi
 }
 
+################################################################
 # A newline in your prompt, so you can segments on multiple lines.
 prompt_newline() {
   local lws newline
@@ -338,6 +343,7 @@ prompt_newline() {
   POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS=$lws
 }
 
+################################################################
 # Segment that indicates usage level of current partition.
 set_default POWERLEVEL9K_DISK_USAGE_ONLY_WARNING false
 set_default POWERLEVEL9K_DISK_USAGE_WARNING_LEVEL 90
@@ -380,6 +386,8 @@ prompt_disk_usage() {
   fi
 }
 
+################################################################
+# Segment that displays the battery status in levels and colors
 prompt_battery() {
   # The battery can have four different states - default to 'unknown'.
   local current_state='unknown'
@@ -490,6 +498,7 @@ prompt_battery() {
   fi
 }
 
+################################################################
 # Public IP segment
 # Parameters:
 #   * $1 Alignment: string - left|right
@@ -560,6 +569,7 @@ prompt_public_ip() {
   fi
 }
 
+################################################################
 # Context: user@hostname (who am I and where am I)
 # Note that if $DEFAULT_USER is not set, this prompt segment will always print
 set_default POWERLEVEL9K_ALWAYS_SHOW_CONTEXT false
@@ -648,6 +658,7 @@ prompt_host() {
   "$1_prompt_segment" "$0_${host_state[STATE]}" "$2" "${host_state[BACKGROUND_COLOR]}" "${host_state[FOREGROUND_COLOR]}" "${host_state[CONTENT]}" "${host_state[VISUAL_IDENTIFIER]}"
 }
 
+################################################################
 # The 'custom` prompt provides a way for users to invoke commands and display
 # the output in a segment.
 prompt_custom() {
@@ -659,6 +670,7 @@ prompt_custom() {
   fi
 }
 
+################################################################
 # Display the duration the command needed to run.
 prompt_command_execution_time() {
   set_default POWERLEVEL9K_COMMAND_EXECUTION_TIME_THRESHOLD 3
@@ -692,6 +704,7 @@ prompt_command_execution_time() {
   fi
 }
 
+################################################################
 # Dir: current working directory
 set_default POWERLEVEL9K_DIR_PATH_SEPARATOR "/"
 set_default POWERLEVEL9K_HOME_FOLDER_ABBREVIATION "~"
@@ -850,6 +863,7 @@ prompt_dir() {
   "$1_prompt_segment" "$0_${current_state}" "$2" "blue" "$DEFAULT_COLOR" "${current_path}" "${dir_states[$current_state]}"
 }
 
+################################################################
 # Docker machine
 prompt_docker_machine() {
   local docker_machine="$DOCKER_MACHINE_NAME"
@@ -859,6 +873,7 @@ prompt_docker_machine() {
   fi
 }
 
+################################################################
 # GO prompt
 prompt_go_version() {
   local go_version
@@ -871,11 +886,13 @@ prompt_go_version() {
   fi
 }
 
+################################################################
 # Command number (in local history)
 prompt_history() {
   "$1_prompt_segment" "$0" "$2" "grey50" "$DEFAULT_COLOR" '%h'
 }
 
+################################################################
 # Detection for virtualization (systemd based systems only)
 prompt_detect_virt() {
   if ! command -v systemd-detect-virt > /dev/null; then
@@ -894,7 +911,8 @@ prompt_detect_virt() {
   fi
 }
 
-
+################################################################
+# Test icons
 prompt_icons_test() {
   for key in ${(@k)icons}; do
     # The lower color spectrum in ZSH makes big steps. Choosing
@@ -905,6 +923,8 @@ prompt_icons_test() {
   done
 }
 
+################################################################
+# Segment to display the current IP address
 prompt_ip() {
   if [[ "$OS" == "OSX" ]]; then
     if defined POWERLEVEL9K_IP_INTERFACE; then
@@ -935,6 +955,8 @@ prompt_ip() {
   "$1_prompt_segment" "$0" "$2" "cyan" "$DEFAULT_COLOR" "$ip" 'NETWORK_ICON'
 }
 
+################################################################
+# Segment to display if VPN is active
 set_default POWERLEVEL9K_VPN_IP_INTERFACE "tun"
 # prompt if vpn active
 prompt_vpn_ip() {
@@ -945,6 +967,8 @@ prompt_vpn_ip() {
   done
 }
 
+################################################################
+# Segment to display load
 set_default POWERLEVEL9K_LOAD_WHICH 5
 prompt_load() {
   # The load segment can have three different states
@@ -1000,8 +1024,8 @@ prompt_load() {
   "$1_prompt_segment" "${0}_${current_state}" "$2" "${load_states[$current_state]}" "$DEFAULT_COLOR" "$load_avg" 'LOAD_ICON'
 }
 
-
-# Node version
+################################################################
+# Segment to diplay Node version
 prompt_node_version() {
   local node_version=$(node -v 2>/dev/null)
   [[ -z "${node_version}" ]] && return
@@ -1009,7 +1033,8 @@ prompt_node_version() {
   "$1_prompt_segment" "$0" "$2" "green" "white" "${node_version:1}" 'NODE_ICON'
 }
 
-# Node version from NVM
+################################################################
+# Segment to display Node version from NVM
 # Only prints the segment if different than the default value
 prompt_nvm() {
   local node_version nvm_default
@@ -1024,7 +1049,8 @@ prompt_nvm() {
   $1_prompt_segment "$0" "$2" "magenta" "black" "${node_version:1}" 'NODE_ICON'
 }
 
-# NodeEnv Prompt
+################################################################
+# Segment to display NodeEnv
 prompt_nodeenv() {
   local nodeenv_path="$NODE_VIRTUAL_ENV"
   if [[ -n "$nodeenv_path" && "$NODE_VIRTUAL_ENV_DISABLE_PROMPT" != true ]]; then
@@ -1033,12 +1059,14 @@ prompt_nodeenv() {
   fi
 }
 
-# print a little OS icon
+################################################################
+# Segment to print a little OS icon
 prompt_os_icon() {
   "$1_prompt_segment" "$0" "$2" "black" "white" "$OS_ICON"
 }
 
-# print PHP version number
+################################################################
+# Segment to display PHP version number
 prompt_php_version() {
   local php_version
   php_version=$(php -v 2>&1 | grep -oe "^PHP\s*[0-9.]*")
@@ -1048,7 +1076,8 @@ prompt_php_version() {
   fi
 }
 
-# Show free RAM and used Swap
+################################################################
+# Segment to display free RAM and used Swap
 prompt_ram() {
   local base=''
   local ramfree=0
@@ -1071,7 +1100,8 @@ prompt_ram() {
   "$1_prompt_segment" "$0" "$2" "yellow" "$DEFAULT_COLOR" "$(printSizeHumanReadable "$ramfree" $base)" 'RAM_ICON'
 }
 
-# rbenv information
+################################################################
+# Segment to display rbenv information
 set_default POWERLEVEL9K_RBENV_ALWAYS false
 prompt_rbenv() {
   if which rbenv 2>/dev/null >&2; then
@@ -1086,7 +1116,8 @@ prompt_rbenv() {
   fi
 }
 
-# chruby information
+################################################################
+# Segment to display chruby information
 # see https://github.com/postmodern/chruby/issues/245 for chruby_auto issue with ZSH
 prompt_chruby() {
   local chruby_env
@@ -1097,14 +1128,16 @@ prompt_chruby() {
   fi
 }
 
-# Print an icon if user is root.
+################################################################
+# Segment to print an icon if user is root.
 prompt_root_indicator() {
   if [[ "$UID" -eq 0 ]]; then
     "$1_prompt_segment" "$0" "$2" "$DEFAULT_COLOR" "yellow" "" 'ROOT_ICON'
   fi
 }
 
-# Print Rust version number
+################################################################
+# Segment to display Rust version number
 prompt_rust_version() {
   local rust_version
   rust_version=$(rustc --version 2>&1 | grep -oe "^rustc\s*[^ ]*" | grep -o '[0-9.a-z\\\-]*$')
@@ -1113,7 +1146,9 @@ prompt_rust_version() {
     "$1_prompt_segment" "$0" "$2" "darkorange" "$DEFAULT_COLOR" "Rust $rust_version" 'RUST_ICON'
   fi
 }
-# RSpec test ratio
+
+################################################################
+# Segment to display RSpec test ratio
 prompt_rspec_stats() {
   if [[ (-d app && -d spec) ]]; then
     local code_amount tests_amount
@@ -1124,7 +1159,8 @@ prompt_rspec_stats() {
   fi
 }
 
-# Ruby Version Manager information
+################################################################
+# Segment to display Ruby Version Manager information
 prompt_rvm() {
   local version_and_gemset=${rvm_env_string/ruby-}
 
@@ -1133,12 +1169,15 @@ prompt_rvm() {
   fi
 }
 
+################################################################
+# Segment to display SSH icon when connected
 prompt_ssh() {
   if [[ -n "$SSH_CLIENT" ]] || [[ -n "$SSH_TTY" ]]; then
     "$1_prompt_segment" "$0" "$2" "$DEFAULT_COLOR" "yellow" "" 'SSH_ICON'
   fi
 }
 
+################################################################
 # Status: When an error occur, return the error code, or a cross icon if option is set
 # Display an ok icon when no error occur, or hide the segment if option is set to false
 #
@@ -1194,6 +1233,8 @@ prompt_status() {
   fi
 }
 
+################################################################
+# Segment to display Swap information
 prompt_swap() {
   local swap_used=0
   local base=''
@@ -1218,6 +1259,7 @@ prompt_swap() {
   "$1_prompt_segment" "$0" "$2" "yellow" "$DEFAULT_COLOR" "$(printSizeHumanReadable "$swap_used" $base)" 'SWAP_ICON'
 }
 
+################################################################
 # Symfony2-PHPUnit test ratio
 prompt_symfony2_tests() {
   if [[ (-d src && -d app && -f app/AppKernel.php) ]]; then
@@ -1229,7 +1271,8 @@ prompt_symfony2_tests() {
   fi
 }
 
-# Symfony2-Version
+################################################################
+# Segment to display Symfony2-Version
 prompt_symfony2_version() {
   if [[ -f app/bootstrap.php.cache ]]; then
     local symfony2_version
@@ -1238,6 +1281,7 @@ prompt_symfony2_version() {
   fi
 }
 
+################################################################
 # Show a ratio of tests vs code
 build_test_stats() {
   local code_amount="$4"
@@ -1253,6 +1297,7 @@ build_test_stats() {
   (( ratio < 50 )) && "$1_prompt_segment" "$2_BAD" "$3" "red" "$DEFAULT_COLOR" "$headline: $ratio%%" "$6"
 }
 
+################################################################
 # System time
 prompt_time() {
   local time_format="%D{%H:%M:%S}"
@@ -1260,9 +1305,21 @@ prompt_time() {
     time_format="$POWERLEVEL9K_TIME_FORMAT"
   fi
 
-  "$1_prompt_segment" "$0" "$2" "$DEFAULT_COLOR_INVERTED" "$DEFAULT_COLOR" "$time_format"
+  "$1_prompt_segment" "$0" "$2" "$DEFAULT_COLOR_INVERTED" "$DEFAULT_COLOR" "$time_format" "TIME_ICON"
 }
 
+################################################################
+# System date
+prompt_date() {
+  local date_format="%D{%d.%m.%y}"
+  if [[ -n "$POWERLEVEL9K_DATE_FORMAT" ]]; then
+    time_format="$POWERLEVEL9K_DATE_FORMAT"
+  fi
+
+  "$1_prompt_segment" "$0" "$2" "$DEFAULT_COLOR_INVERTED" "$DEFAULT_COLOR" "$date_format" "DATE_ICON"
+}
+
+################################################################
 # todo.sh: shows the number of tasks in your todo.sh file
 prompt_todo() {
   if $(hash todo.sh 2>&-); then
@@ -1273,6 +1330,7 @@ prompt_todo() {
   fi
 }
 
+################################################################
 # VCS segment: shows the state of your repository, if you are in a folder under
 # version control
 set_default POWERLEVEL9K_VCS_ACTIONFORMAT_FOREGROUND "red"
@@ -1338,6 +1396,8 @@ powerlevel9k_vcs_init() {
   fi
 }
 
+################################################################
+# Segment to show VCS information
 prompt_vcs() {
   VCS_WORKDIR_DIRTY=false
   VCS_WORKDIR_HALF_DIRTY=false
@@ -1363,6 +1423,7 @@ prompt_vcs() {
   fi
 }
 
+################################################################
 # Vi Mode: show editing mode (NORMAL|INSERT)
 set_default POWERLEVEL9K_VI_INSERT_MODE_STRING "INSERT"
 set_default POWERLEVEL9K_VI_COMMAND_MODE_STRING "NORMAL"
@@ -1377,6 +1438,7 @@ prompt_vi_mode() {
   esac
 }
 
+################################################################
 # Virtualenv: current working virtualenv
 # More information on virtualenv (Python):
 # https://virtualenv.pypa.io/en/latest/
@@ -1387,6 +1449,7 @@ prompt_virtualenv() {
   fi
 }
 
+################################################################
 # pyenv: current active python version (with restrictions)
 # https://github.com/pyenv/pyenv#choosing-the-python-version
 prompt_pyenv() {
@@ -1395,17 +1458,20 @@ prompt_pyenv() {
   fi
 }
 
+################################################################
+# Display openfoam information
 prompt_openfoam() {
   local wm_project_version="$WM_PROJECT_VERSION"
   local wm_fork="$WM_FORK"
   if [[ -n "$wm_project_version" ]] &&  [[ -z "$wm_fork" ]] ; then
-	  "$1_prompt_segment" "$0" "$2" "yellow" "$DEFAULT_COLOR" "OF: $(basename "$wm_project_version")"
-	elif [[ -n "$wm_project_version" ]] && [[ -n "$wm_fork" ]] ; then
-	  "$1_prompt_segment" "$0" "$2" "yellow" "$DEFAULT_COLOR" "F-X: $(basename "$wm_project_version")"
-	fi
+    "$1_prompt_segment" "$0" "$2" "yellow" "$DEFAULT_COLOR" "OF: $(basename "$wm_project_version")"
+  elif [[ -n "$wm_project_version" ]] && [[ -n "$wm_fork" ]] ; then
+    "$1_prompt_segment" "$0" "$2" "yellow" "$DEFAULT_COLOR" "F-X: $(basename "$wm_project_version")"
+  fi
 }
 
-# Swift version
+################################################################
+# Segment to display Swift version
 prompt_swift_version() {
   # Get the first number as this is probably the "main" version number..
   local swift_version=$(swift --version 2>/dev/null | grep -o -E "[0-9.]+" | head -n 1)
@@ -1414,6 +1480,7 @@ prompt_swift_version() {
   "$1_prompt_segment" "$0" "$2" "magenta" "white" "${swift_version}" 'SWIFT_ICON'
 }
 
+################################################################
 # dir_writable: Display information about the user's permission to write in the current directory
 prompt_dir_writable() {
   if [[ ! -w "$PWD" ]]; then
@@ -1421,6 +1488,7 @@ prompt_dir_writable() {
   fi
 }
 
+################################################################
 # Kubernetes Current Context/Namespace
 prompt_kubecontext() {
   local kubectl_version="$(kubectl version --client 2>/dev/null)"
@@ -1447,6 +1515,7 @@ prompt_kubecontext() {
   fi
 }
 
+################################################################
 # Dropbox status
 prompt_dropbox() {
   # The first column is just the directory, so cut it
@@ -1463,7 +1532,6 @@ prompt_dropbox() {
   fi
 
 }
-
 
 ################################################################
 # Prompt processing and drawing
