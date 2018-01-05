@@ -1300,23 +1300,17 @@ build_test_stats() {
 ################################################################
 # System time
 prompt_time() {
-  local time_format="%D{%H:%M:%S}"
-  if [[ -n "$POWERLEVEL9K_TIME_FORMAT" ]]; then
-    time_format="$POWERLEVEL9K_TIME_FORMAT"
-  fi
+  set_default POWERLEVEL9K_TIME_FORMAT "%D{%H:%M:%S}"
 
-  "$1_prompt_segment" "$0" "$2" "$DEFAULT_COLOR_INVERTED" "$DEFAULT_COLOR" "$time_format" "TIME_ICON"
+  "$1_prompt_segment" "$0" "$2" "$DEFAULT_COLOR_INVERTED" "$DEFAULT_COLOR" "$POWERLEVEL9K_TIME_FORMAT" "TIME_ICON"
 }
 
 ################################################################
 # System date
 prompt_date() {
-  local date_format="%D{%d.%m.%y}"
-  if [[ -n "$POWERLEVEL9K_DATE_FORMAT" ]]; then
-    time_format="$POWERLEVEL9K_DATE_FORMAT"
-  fi
+  set_default POWERLEVEL9K_DATE_FORMAT "%D{%d.%m.%y}"
 
-  "$1_prompt_segment" "$0" "$2" "$DEFAULT_COLOR_INVERTED" "$DEFAULT_COLOR" "$date_format" "DATE_ICON"
+  "$1_prompt_segment" "$0" "$2" "$DEFAULT_COLOR_INVERTED" "$DEFAULT_COLOR" "$POWERLEVEL9K_DATE_FORMAT" "DATE_ICON"
 }
 
 ################################################################
