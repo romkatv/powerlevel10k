@@ -127,8 +127,8 @@ left_prompt_segment() {
   [[ -n $FG_COLOR_MODIFIER ]] && 4="$FG_COLOR_MODIFIER"
 
   local bg fg
-  [[ -n "$3" ]] && bg="%K{$3}" || bg="%k"
-  [[ -n "$4" ]] && fg="%F{$4}" || fg="%f"
+  [[ -n "$3" ]] && bg="$(backgroundColor $3)" || bg="$(backgroundColor)"
+  [[ -n "$4" ]] && fg="$(foregroundColor $4)" || fg="$(foregroundColor)"
 
   if [[ $CURRENT_BG != 'NONE' ]] && ! isSameColor "$3" "$CURRENT_BG"; then
     echo -n "$bg%F{$CURRENT_BG}"
@@ -142,8 +142,8 @@ left_prompt_segment() {
     # subsegment (or the default color). This should have
     # enough contrast.
     local complement
-    [[ -n "$4" ]] && complement="$4" || complement=$DEFAULT_COLOR
-    echo -n "$bg%F{$complement}"
+    [[ -n "$4" ]] && complement="$fg" || complement="$(foregroundColor $DEFAULT_COLOR)"
+    echo -n "${bg}${complement}"
     if [[ $joined == false ]]; then
       echo -n "$(print_icon 'LEFT_SUBSEGMENT_SEPARATOR')$POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS"
     fi
@@ -218,8 +218,8 @@ right_prompt_segment() {
   [[ -n $FG_COLOR_MODIFIER ]] && 4="$FG_COLOR_MODIFIER"
 
   local bg fg
-  [[ -n "$3" ]] && bg="%K{$3}" || bg="%k"
-  [[ -n "$4" ]] && fg="%F{$4}" || fg="%f"
+  [[ -n "$3" ]] && bg="$(backgroundColor $3)" || bg="$(backgroundColor)"
+  [[ -n "$4" ]] && fg="$(foregroundColor $4)" || fg="$(foregroundColor)"
 
   # If CURRENT_RIGHT_BG is "NONE", we are the first right segment.
   if [[ $joined == false ]] || [[ "$CURRENT_RIGHT_BG" == "NONE" ]]; then
@@ -229,10 +229,11 @@ right_prompt_segment() {
       # subsegment (or the default color). This should have
       # enough contrast.
       local complement
-      [[ -n "$4" ]] && complement="$4" || complement=$DEFAULT_COLOR
-      echo -n "%F{$complement}$(print_icon 'RIGHT_SUBSEGMENT_SEPARATOR')%f"
+      [[ -n "$4" ]] && complement="$fg" || complement="$(foregroundColor $DEFAULT_COLOR)"
+      echo -n "$complement$(print_icon 'RIGHT_SUBSEGMENT_SEPARATOR')%f"
     else
-      echo -n "%F{$3}$(print_icon 'RIGHT_SEGMENT_SEPARATOR')%f"
+      # Use the new BG color for the foreground with separator
+      echo -n "$(foregroundColor $3)$(print_icon 'RIGHT_SEGMENT_SEPARATOR')%f"
     fi
   fi
 
@@ -1572,14 +1573,7 @@ prompt_powerlevel9k_setup() {
   setopt noprompt{bang,cr,percent,sp,subst} "prompt${^prompt_opts[@]}"
 
   # Display a warning if the terminal does not support 256 colors
-  local term_colors
-  term_colors=$(echotc Co 2>/dev/null)
-  if (( ! $? && ${term_colors:-0} < 256 )); then
-    print -P "%F{red}WARNING!%f Your terminal appears to support fewer than 256 colors!"
-    print -P "If your terminal supports 256 colors, please export the appropriate environment variable"
-    print -P "_before_ loading this theme in your \~\/.zshrc. In most terminal emulators, putting"
-    print -P "%F{blue}export TERM=\"xterm-256color\"%f at the top of your \~\/.zshrc is sufficient."
-  fi
+  termColors
 
   # If the terminal `LANG` is set to `C`, this theme will not work at all.
   local term_lang
