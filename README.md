@@ -258,17 +258,6 @@ Some example settings:
 |Normal Colors|(red3 darkorange3 darkgoldenrod gold3 yellow3 chartreuse2 mediumspringgreen green3 green3 green4 darkgreen)|
 |Subdued Colors|(darkred orange4 yellow4 yellow4 chartreuse3 green3 green4 darkgreen)|
 
-###### test your terminal colors
-Some terminals, like iTerm2, allow you to customize some of the colors via the interface.  This is handy for themes and allowing the colors to change via the GUI.
-Use this command to check how all the colors are rendering in your terminal. This is handy for choosing colors and wheter or not you want to use the static color code, or the dynamic named color.
-
-```zsh
-# execute these in your shell to get a look at all 256 colors
-
-getColorCode background
-getColorCode foreground
-```
-
 ##### command_execution_time
 
 Display the time the previous command took to execute if the time is above
@@ -480,6 +469,8 @@ information and by default it will try all of them starting with the most effici
 also specify which method you would like it to use. The methods available are dig using opendns,
 curl, or wget. The host used for wget and curl is http://ident.me by default but can be set to
 another host if you prefer.
+
+If you activate a VPN, the icon for this segment will change to the defined VPN icon.
 
 The public_ip segment will attempt to update your public IP address every 5 minutes by default(also
 configurable by the user). If you lose connection your cached IP address will be displayed until
