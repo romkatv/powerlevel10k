@@ -94,7 +94,7 @@ The segments that are currently available are:
 * `history` - The command number for the current line.
 * [`host`](#host) - Your current host name
 * [`ip`](#ip) - Shows the current IP address.
-* [`vpn`](#vpn) - Shows the current VPN IP address.
+* [`vpn_ip`](#vpn_ip) - Shows the current VPN IP address.
 * [`public_ip`](#public_ip) - Shows your public IP address.
 * [`load`](#load) - Your machine's load averages.
 * `os_icon` - Display a nice little icon, depending on your operating system.
