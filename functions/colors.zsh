@@ -40,8 +40,8 @@ function getColor() {
         # color not found, so try to get the code
         1=$(getColorCode $1)
     fi
-    echo -n "$1"
   fi
+  echo -n "$1"
 }
 
 # empty paramenter resets (stops) background color
