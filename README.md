@@ -88,6 +88,7 @@ The segments that are currently available are:
 * [`background_jobs`](#background_jobs) - Indicator for background jobs.
 * [`battery`](#battery) - Current battery status.
 * [`context`](#context) - Your username and host, conditionalized based on $USER and SSH status.
+* [`date`](#date) - System date.
 * [`dir`](#dir) - Your current working directory.
 * `dir_writable` - Displays a lock icon, if you do not have write permissions on the current folder.
 * [`disk_usage`](#disk_usage) - Disk usage of your current partition.
@@ -337,6 +338,14 @@ end of the hostname.
 |`POWERLEVEL9K_ALWAYS_SHOW_USER`|false|Always show the username, but conditionalize the hostname.|
 |`POWERLEVEL9K_CONTEXT_TEMPLATE`|%n@%m|Default context prompt (username@machine). Refer to the [ZSH Documentation](http://zsh.sourceforge.net/Doc/Release/Prompt-Expansion.html) for all possible expansions, including deeper host depths.|
 
+##### date
+
+The `date` segment shows the current system date.
+
+| Variable | Default Value | Description |
+|----------|---------------|-------------|
+|`POWERLEVEL9K_DATE_FORMAT`|`%D{%d.%m.%y}`|[ZSH time format](http://zsh.sourceforge.net/Doc/Release Prompt-Expansion.html) to use in this segment.|
+
 ##### dir
 
 The `dir` segment shows the current working directory. When using the "Awesome
@@ -391,7 +400,7 @@ The `truncate_with_package_name` strategy gives your directory path relative to 
 }
 ```
 
-the path shown would be `my-cool-project`.  If you navigate to `$HOME/projects/my-project/src`, then the path shown would be `my-cool-project/src`.  Please note that this currently looks for `.git` directory to determine the root of the project.
+The path shown would be `my-cool-project`.  If you navigate to `$HOME/projects/my-project/src`, then the path shown would be `my-cool-project/src`.  Please note that this currently looks for `.git` directory to determine the root of the project.
 
 If you want to customize the directory separator, you could set:
 ```zsh
