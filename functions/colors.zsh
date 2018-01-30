@@ -7,6 +7,10 @@
 ################################################################
 
 function termColors() {
+  if [[ $POWERLEVEL9K_IGNORE_TERM_COLORS == true ]]; then
+    return
+  fi
+
   local term_colors
 
   if which tput &>/dev/null; then
