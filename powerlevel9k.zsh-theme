@@ -12,7 +12,7 @@
 # directory. For more detailed documentation, refer to the project wiki, hosted
 # on Github: https://github.com/bhilburn/powerlevel9k/wiki
 #
-# There aPOWERLEVEL9K_CHECK_TERM_COLORSre a lot of easy ways you can customize your prompt segments and
+# There are a lot of easy ways you can customize your prompt segments and
 # theming with simple variables defined in your `~/.zshrc`.
 ################################################################
 
