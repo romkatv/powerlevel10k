@@ -1522,6 +1522,11 @@ NEWLINE='
   [[ $POWERLEVEL9K_PROMPT_ADD_NEWLINE == true ]] && PROMPT="$NEWLINE$PROMPT"
 }
 
+zle-keymap-select () {
+	zle reset-prompt
+	zle -R
+}
+
 prompt_powerlevel9k_setup() {
   # The value below was set to better support 32-bit CPUs.
   # It's the maximum _signed_ integer value on 32-bit CPUs.
@@ -1590,6 +1595,8 @@ prompt_powerlevel9k_setup() {
   # prepare prompts
   add-zsh-hook precmd powerlevel9k_prepare_prompts
   add-zsh-hook preexec powerlevel9k_preexec
+
+  zle -N zle-keymap-select
 }
 
 prompt_powerlevel9k_teardown() {
