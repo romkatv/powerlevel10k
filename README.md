@@ -621,6 +621,8 @@ you are using the [ZSH Line Editor](http://zsh.sourceforge.net/Doc/Release/Zsh-L
 |`POWERLEVEL9K_VI_INSERT_MODE_STRING`|`"INSERT"`|String to display while in 'Insert' mode.|
 |`POWERLEVEL9K_VI_COMMAND_MODE_STRING`|`"NORMAL"`|String to display while in 'Command' mode.|
 
+To hide the segment entirely when in `INSERT` mode, set `POWERLEVEL9K_VI_INSERT_MODE_STRING=''`
+
 #### Unit Test Ratios
 
 The `symfony2_tests` and `rspec_stats` segments both show a ratio of "real"

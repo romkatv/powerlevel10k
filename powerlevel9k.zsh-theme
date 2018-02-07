@@ -1366,6 +1366,7 @@ prompt_vi_mode() {
       "$1_prompt_segment" "$0_NORMAL" "$2" "$DEFAULT_COLOR" "default" "$POWERLEVEL9K_VI_COMMAND_MODE_STRING"
     ;;
     main|viins|*)
+      if [[ -z $POWERLEVEL9K_VI_INSERT_MODE_STRING ]]; then return; fi
       "$1_prompt_segment" "$0_INSERT" "$2" "$DEFAULT_COLOR" "blue" "$POWERLEVEL9K_VI_INSERT_MODE_STRING"
     ;;
   esac
