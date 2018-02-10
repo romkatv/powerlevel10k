@@ -1623,6 +1623,9 @@ $(print_icon 'MULTILINE_LAST_PROMPT_PREFIX')'
 NEWLINE='
 '
   [[ $POWERLEVEL9K_PROMPT_ADD_NEWLINE == true ]] && PROMPT="$NEWLINE$PROMPT"
+
+  # Allow iTerm integration to work
+  [[ $ITERM_SHELL_INTEGRATION_INSTALLED == "Yes" ]] && PROMPT="%{$(iterm2_prompt_mark)%}$PROMPT"
 }
 
 set_default POWERLEVEL9K_IGNORE_TERM_COLORS false
