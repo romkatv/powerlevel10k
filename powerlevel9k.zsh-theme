@@ -610,7 +610,7 @@ prompt_context() {
   elif [[ -n "$SSH_CLIENT" || -n "$SSH_TTY" ]]; then
     current_state="REMOTE"
   elif sudo -n true 2>/dev/null; then
-    current_statue="SUDO"
+    current_state="SUDO"
   fi
 
   "$1_prompt_segment" "${0}_${current_state}" "$2" "$DEFAULT_COLOR" "${context_states[$current_state]}" "${content}"
