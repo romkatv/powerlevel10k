@@ -421,6 +421,10 @@ You can also configure the `dir` segment to show when you are in a directory wit
 |----------|---------------|-------------|
 |`POWERLEVEL9K_DIR_SHOW_WRITABLE`|`false`|If set to `true` and you are in a directory that you do not have write permissions for, this segment will display a lock icon and enter the `NOT_WRITABLE` state (which can be customized per [our usual process](https://github.com/bhilburn/powerlevel9k/wiki/Stylizing-Your-Prompt#segment-color-customization)). Note that this functionality is also available in a separate segment, `dir_writable`.|
 
+If you want to customize the last directory of the path, you can now set `POWERLEVEL9K_DIR_PATH_HIGHLIGHT_FOREGROUND` to a custom color and/or `POWERLEVEL9K_DIR_PATH_HIGHLIGHT_BOLD=true` to display that part in bold.
+
+You can also color the separator separately by setting the color using `POWERLEVEL9K_DIR_PATH_SEPARATOR_FOREGROUND`.
+
 ##### disk_usage
 
 The `disk_usage` segment will show the usage level of the partition that your current working directory resides in. It can be configured with the following variables.

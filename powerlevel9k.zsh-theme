@@ -838,16 +838,10 @@ prompt_dir() {
     esac
   fi
 
+  local path_opt=$current_path # save state of path for highlighting and bold options
+
   if [[ "${POWERLEVEL9K_DIR_OMIT_FIRST_CHARACTER}" == "true" ]]; then
     current_path="${current_path[2,-1]}"
-  fi
-
-  if [[ "${POWERLEVEL9K_DIR_PATH_SEPARATOR}" != "/" ]]; then
-    current_path="$( echo "${current_path}" | sed "s/\//${POWERLEVEL9K_DIR_PATH_SEPARATOR}/g")"
-  fi
-
-  if [[ "${POWERLEVEL9K_HOME_FOLDER_ABBREVIATION}" != "~" ]]; then
-    current_path="$( echo "${current_path}" | sed "s/^~/${POWERLEVEL9K_HOME_FOLDER_ABBREVIATION}/")"
   fi
 
   typeset -AH dir_states
@@ -865,6 +859,34 @@ prompt_dir() {
   elif [[ $(print -P "%~") == '~'* ]]; then
     current_state="HOME_SUBFOLDER"
   fi
+
+  local bd dir_state_foreground dir_state_user_foreground
+  [[ -n "${POWERLEVEL9K_DIR_PATH_HIGHLIGHT_BOLD}" ]] && bd="%B" || bd=""
+
+  local dir_state_user_foreground="POWERLEVEL9K_DIR_${current_state}_FOREGROUND"
+  local dir_state_foreground="${(P)dir_state_user_foreground}"
+  [[ -z "${dir_state_foreground}" ]] && dir_state_foreground="${DEFAULT_COLOR}"
+
+  if [[ -n "${POWERLEVEL9K_DIR_PATH_HIGHLIGHT_FOREGROUND}" ]]; then
+    if [[ $path_opt == "/" || $path_opt == "~" || $(dirname $path_opt) == "/" || ${POWERLEVEL9K_DIR_OMIT_FIRST_CHARACTER} ]]; then
+      current_path="$bd%F{$POWERLEVEL9K_DIR_PATH_HIGHLIGHT_FOREGROUND}$current_path%F{$dir_state_foreground}"
+    else
+      current_path="$(dirname $current_path)/$bd%F{$POWERLEVEL9K_DIR_PATH_HIGHLIGHT_FOREGROUND}$(basename $current_path)%F{$dir_state_foreground}"
+    fi
+  fi
+
+  if [[ -n "${POWERLEVEL9K_DIR_PATH_SEPARATOR_FOREGROUND}" && $path_opt != "/" ]]; then
+    current_path="$( echo "${current_path}" | sed "s/\//%F{$POWERLEVEL9K_DIR_PATH_SEPARATOR_FOREGROUND}\/%F{$dir_state_foreground}/g")"
+  fi
+
+  if [[ "${POWERLEVEL9K_DIR_PATH_SEPARATOR}" != "/" && $path_opt != "/" ]]; then
+    current_path="$( echo "${current_path}" | sed "s/\//${POWERLEVEL9K_DIR_PATH_SEPARATOR}/g")"
+  fi
+
+  if [[ "${POWERLEVEL9K_HOME_FOLDER_ABBREVIATION}" != "~" && ! ${POWERLEVEL9K_DIR_OMIT_FIRST_CHARACTER} ]]; then
+    current_path="$( echo "${current_path}" | sed "s/~/${POWERLEVEL9K_HOME_FOLDER_ABBREVIATION}/1")"
+  fi
+
   "$1_prompt_segment" "$0_${current_state}" "$2" "blue" "$DEFAULT_COLOR" "${current_path}" "${dir_states[$current_state]}"
 }
 
