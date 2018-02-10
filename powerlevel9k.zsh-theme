@@ -609,7 +609,7 @@ prompt_context() {
     current_state="ROOT"
   elif [[ -n "$SSH_CLIENT" || -n "$SSH_TTY" ]]; then
     current_state="REMOTE"
-  elif sudo -n uptime >/dev/null 2>&1; then
+  elif sudo -n true 2>/dev/null; then
     current_statue="SUDO"
   fi
 
@@ -632,7 +632,7 @@ prompt_user() {
         "FOREGROUND_COLOR"    "yellow"
         "VISUAL_IDENTIFIER"   "ROOT_ICON"
       )
-    elif sudo -n uptime >/dev/null 2>&1; then 
+    elif sudo -n true 2>/dev/null; then 
       user_state=( 
         "STATE"               "SUDO" 
         "CONTENT"             "${POWERLEVEL9K_USER_TEMPLATE}" 
