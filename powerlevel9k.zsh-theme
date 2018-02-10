@@ -638,7 +638,7 @@ prompt_user() {
         "CONTENT"             "${POWERLEVEL9K_USER_TEMPLATE}" 
         "BACKGROUND_COLOR"    "${DEFAULT_COLOR}" 
         "FOREGROUND_COLOR"    "yellow" 
-        "VISUAL_IDENTIFIER"   "ROOT_ICON" 
+        "VISUAL_IDENTIFIER"   "SUDO_ICON" 
       ) 
     else
       user_state=(
