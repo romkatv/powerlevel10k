@@ -590,6 +590,7 @@ prompt_context() {
   typeset -AH context_states
   context_states=(
     "ROOT"      "yellow"
+    "SUDO"      "yellow"
     "DEFAULT"   "yellow"
     "REMOTE"    "yellow"
   )
@@ -608,6 +609,8 @@ prompt_context() {
     current_state="ROOT"
   elif [[ -n "$SSH_CLIENT" || -n "$SSH_TTY" ]]; then
     current_state="REMOTE"
+  elif sudo -n uptime >/dev/null 2>&1; then
+    current_statue="SUDO"
   fi
 
   "$1_prompt_segment" "${0}_${current_state}" "$2" "$DEFAULT_COLOR" "${context_states[$current_state]}" "${content}"
@@ -629,6 +632,14 @@ prompt_user() {
         "FOREGROUND_COLOR"    "yellow"
         "VISUAL_IDENTIFIER"   "ROOT_ICON"
       )
+    elif sudo -n uptime >/dev/null 2>&1; then 
+      user_state=( 
+        "STATE"               "SUDO" 
+        "CONTENT"             "${POWERLEVEL9K_USER_TEMPLATE}" 
+        "BACKGROUND_COLOR"    "${DEFAULT_COLOR}" 
+        "FOREGROUND_COLOR"    "yellow" 
+        "VISUAL_IDENTIFIER"   "ROOT_ICON" 
+      ) 
     else
       user_state=(
         "STATE"               "DEFAULT"
