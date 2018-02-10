@@ -718,21 +718,20 @@ prompt_command_execution_time() {
 # Dir: current working directory
 set_default POWERLEVEL9K_DIR_PATH_SEPARATOR "/"
 set_default POWERLEVEL9K_HOME_FOLDER_ABBREVIATION "~"
-set_default POWERLEVEL9K_DIR_SHOW_WRITABLE false
+# Parameters:
+#   * $1 Alignment: string - left|right
+#   * $2 Index: integer
 prompt_dir() {
-  local tmp="$IFS"
-  local IFS=""
-  local current_path=$(pwd | sed -e "s,^$HOME,~,")
-  local IFS="$tmp"
+  local current_path="$(print -P "%~")"
   if [[ -n "$POWERLEVEL9K_SHORTEN_DIR_LENGTH" || "$POWERLEVEL9K_SHORTEN_STRATEGY" == "truncate_with_folder_marker" ]]; then
     set_default POWERLEVEL9K_SHORTEN_DELIMITER $'\U2026'
 
     case "$POWERLEVEL9K_SHORTEN_STRATEGY" in
       truncate_middle)
-        current_path=$(echo "$current_path" | sed $SED_EXTENDED_REGEX_PARAMETER "s/([^/]{$POWERLEVEL9K_SHORTEN_DIR_LENGTH})[^/]+([^/]{$POWERLEVEL9K_SHORTEN_DIR_LENGTH})\//\1$POWERLEVEL9K_SHORTEN_DELIMITER\2\//g")
+        current_path=$(pwd | sed -e "s,^$HOME,~," | sed $SED_EXTENDED_REGEX_PARAMETER "s/([^/]{$POWERLEVEL9K_SHORTEN_DIR_LENGTH})[^/]+([^/]{$POWERLEVEL9K_SHORTEN_DIR_LENGTH})\//\1$POWERLEVEL9K_SHORTEN_DELIMITER\2\//g")
       ;;
       truncate_from_right)
-        current_path=$(truncatePathFromRight "$current_path" )
+        current_path=$(truncatePathFromRight "$(pwd | sed -e "s,^$HOME,~,")" )
       ;;
       truncate_with_package_name)
         local name repo_path package_path current_dir zero
@@ -782,12 +781,8 @@ prompt_dir() {
           # Instead of printing out the full path, print out the name of the package
           # from the package.json and append the current subdirectory
           current_path="`echo $packageName | tr -d '"'`$subdirectory_path"
-          if [[ "${POWERLEVEL9K_DIR_OMIT_FIRST_CHARACTER}" == "true" ]]; then
-            # add space before the packageName to allow for removing the "first" character, without messing up the package name.
-            current_path=" ${current_path}"
-          fi
         else
-          current_path=$(truncatePathFromRight "$current_path" )
+          current_path=$(truncatePathFromRight "$(pwd | sed -e "s,^$HOME,~,")" )
         fi
       ;;
       truncate_with_folder_marker)
@@ -816,27 +811,6 @@ prompt_dir() {
         # the current path.
         current_path=$current_path${PWD#${last_marked_folder}*}
       ;;
-      truncate_to_unique)
-        # for each parent path component find the shortest unique beginning
-        # characters sequence. Source: https://stackoverflow.com/a/45336078
-        paths=(${(s:/:)PWD})
-        cur_path='/'
-        cur_short_path='/'
-        for directory in ${paths[@]}
-        do
-          cur_dir=''
-          for (( i=0; i<${#directory}; i++ )); do
-            cur_dir+="${directory:$i:1}"
-            matching=("$cur_path"/"$cur_dir"*/)
-            if [[ ${#matching[@]} -eq 1 ]]; then
-              break
-            fi
-          done
-          cur_short_path+="$cur_dir/"
-          cur_path+="$directory/"
-        done
-        current_path="${cur_short_path: : -1}"
-      ;;
       *)
         current_path="$(print -P "%$((POWERLEVEL9K_SHORTEN_DIR_LENGTH+1))(c:$POWERLEVEL9K_SHORTEN_DELIMITER/:)%${POWERLEVEL9K_SHORTEN_DIR_LENGTH}c")"
       ;;
@@ -852,7 +826,7 @@ prompt_dir() {
   fi
 
   if [[ "${POWERLEVEL9K_HOME_FOLDER_ABBREVIATION}" != "~" ]]; then
-    current_path=${current_path/#\~/${POWERLEVEL9K_HOME_FOLDER_ABBREVIATION}}
+    current_path="$( echo "${current_path}" | sed "s/^~/${POWERLEVEL9K_HOME_FOLDER_ABBREVIATION}/")"
   fi
 
   typeset -AH dir_states
@@ -860,12 +834,9 @@ prompt_dir() {
     "DEFAULT"         "FOLDER_ICON"
     "HOME"            "HOME_ICON"
     "HOME_SUBFOLDER"  "HOME_SUB_ICON"
-    "NOT_WRITABLE"    "LOCK_ICON"
   )
   local current_state="DEFAULT"
-  if [[ "${POWERLEVEL9K_DIR_SHOW_WRITABLE}" == true && ! -w "$PWD" ]]; then
-    current_state="NOT_WRITABLE"
-  elif [[ $(print -P "%~") == '~' ]]; then
+  if [[ $(print -P "%~") == '~' ]]; then
     current_state="HOME"
   elif [[ $(print -P "%~") == '~'* ]]; then
     current_state="HOME_SUBFOLDER"
