@@ -718,6 +718,7 @@ prompt_command_execution_time() {
 # Dir: current working directory
 set_default POWERLEVEL9K_DIR_PATH_SEPARATOR "/"
 set_default POWERLEVEL9K_HOME_FOLDER_ABBREVIATION "~"
+set_default POWERLEVEL9K_DIR_PATH_HIGHLIGHT_BOLD false
 # Parameters:
 #   * $1 Alignment: string - left|right
 #   * $2 Index: integer
