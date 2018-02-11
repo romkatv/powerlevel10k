@@ -861,8 +861,8 @@ prompt_dir() {
     current_state="HOME_SUBFOLDER"
   fi
 
-  local bd dir_state_foreground dir_state_user_foreground
-  [[ "${(L)POWERLEVEL9K_DIR_PATH_HIGHLIGHT_BOLD}" = "true" ]] && bd="%B" || bd=""
+  local bld dir_state_foreground dir_state_user_foreground
+  [[ "${(L)POWERLEVEL9K_DIR_PATH_HIGHLIGHT_BOLD}" = "true" ]] && bld="%B" || bld=""
 
   local dir_state_user_foreground=POWERLEVEL9K_DIR_${current_state}_FOREGROUND
   local dir_state_foreground=${(P)dir_state_user_foreground}
@@ -870,9 +870,9 @@ prompt_dir() {
 
   if [[ -n ${POWERLEVEL9K_DIR_PATH_HIGHLIGHT_FOREGROUND} ]]; then
     if [[ $path_opt == "/" || $path_opt == "~" || $(dirname $path_opt) == "/" || ${POWERLEVEL9K_DIR_OMIT_FIRST_CHARACTER} ]]; then
-      current_path="$bd%F{$POWERLEVEL9K_DIR_PATH_HIGHLIGHT_FOREGROUND}$current_path%F{$dir_state_foreground}%b"
+      current_path="$bld%F{$POWERLEVEL9K_DIR_PATH_HIGHLIGHT_FOREGROUND}$current_path%F{$dir_state_foreground}%b"
     else
-      current_path="$(dirname $current_path)/$bd%F{$POWERLEVEL9K_DIR_PATH_HIGHLIGHT_FOREGROUND}$(basename $current_path)%F{$dir_state_foreground}%b"
+      current_path="$(dirname $current_path)/$bld%F{$POWERLEVEL9K_DIR_PATH_HIGHLIGHT_FOREGROUND}$(basename $current_path)%F{$dir_state_foreground}%b"
     fi
   fi
 
