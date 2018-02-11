@@ -26,7 +26,7 @@ function testTruncateFoldersWorks() {
   mkdir -p $FOLDER
   cd $FOLDER
 
-  assertEquals "%K{blue} %F{black}…/12345678/123456789 %k%F{blue}%f " "$(build_left_prompt)"
+  assertEquals "%K{blue} %F{black}…/12345678/123456789%b%K{blue}%F{black} %k%F{blue}%f " "$(build_left_prompt)"
 
   cd -
   rm -fr /tmp/powerlevel9k-test
@@ -44,7 +44,7 @@ function testTruncateMiddleWorks() {
   mkdir -p $FOLDER
   cd $FOLDER
 
-  assertEquals "%K{blue} %F{black}/tmp/po…st/1/12/123/1234/12…45/12…56/12…67/12…78/123456789 %k%F{blue}%f " "$(build_left_prompt)"
+  assertEquals "%K{blue} %F{black}/tmp/po…st/1/12/123/1234/12…45/12…56/12…67/12…78/123456789%b%K{blue}%F{black} %k%F{blue}%f " "$(build_left_prompt)"
 
   cd -
   rm -fr /tmp/powerlevel9k-test
@@ -62,7 +62,7 @@ function testTruncationFromRightWorks() {
   mkdir -p $FOLDER
   cd $FOLDER
 
-  assertEquals "%K{blue} %F{black}/tmp/po…/1/12/123/12…/12…/12…/12…/12…/123456789 %k%F{blue}%f " "$(build_left_prompt)"
+  assertEquals "%K{blue} %F{black}/tmp/po…/1/12/123/12…/12…/12…/12…/12…/123456789%b%K{blue}%F{black} %k%F{blue}%f " "$(build_left_prompt)"
 
   cd -
   rm -fr /tmp/powerlevel9k-test
@@ -81,7 +81,7 @@ function testTruncationFromRightWithEmptyDelimiter() {
   mkdir -p $FOLDER
   cd $FOLDER
 
-  assertEquals "%K{blue} %F{black}/tmp/po/1/12/123/12/12/12/12/12/123456789 %k%F{blue}%f " "$(build_left_prompt)"
+  assertEquals "%K{blue} %F{black}/tmp/po/1/12/123/12/12/12/12/12/123456789%b%K{blue}%F{black} %k%F{blue}%f " "$(build_left_prompt)"
 
   cd -
   rm -fr /tmp/powerlevel9k-test
@@ -102,7 +102,7 @@ function testTruncateWithFolderMarkerWorks() {
   # Setup folder marker
   touch $BASEFOLDER/1/12/.shorten_folder_marker
   cd $FOLDER
-  assertEquals "%K{blue} %F{black}/…/12/123/1234/12345/123456/1234567 %k%F{blue}%f " "$(build_left_prompt)"
+  assertEquals "%K{blue} %F{black}/…/12/123/1234/12345/123456/1234567%b%K{blue}%F{black} %k%F{blue}%f " "$(build_left_prompt)"
 
   cd -
   rm -fr $BASEFOLDER
@@ -123,7 +123,7 @@ function testTruncateWithFolderMarkerWithChangedFolderMarker() {
   # Setup folder marker
   touch $BASEFOLDER/1/12/.xxx
   cd $FOLDER
-  assertEquals "%K{blue} %F{black}/…/12/123/1234/12345/123456/1234567 %k%F{blue}%f " "$(build_left_prompt)"
+  assertEquals "%K{blue} %F{black}/…/12/123/1234/12345/123456/1234567%b%K{blue}%F{black} %k%F{blue}%f " "$(build_left_prompt)"
 
   cd -
   rm -fr $BASEFOLDER
@@ -156,7 +156,7 @@ function testTruncateWithPackageNameWorks() {
   POWERLEVEL9K_SHORTEN_DIR_LENGTH=2
   POWERLEVEL9K_SHORTEN_STRATEGY='truncate_with_package_name'
 
-  assertEquals "%K{blue} %F{black}My_Package/1/12/123/12…/12…/12…/12…/12…/123456789 %k%F{blue}%f " "$(build_left_prompt)"
+  assertEquals "%K{blue} %F{black}My_Package/1/12/123/12…/12…/12…/12…/12…/123456789%b%K{blue}%F{black} %k%F{blue}%f " "$(build_left_prompt)"
 
   # Go back
   cd $p9kFolder
@@ -195,7 +195,7 @@ function testTruncateWithPackageNameIfRepoIsSymlinkedInsideDeepFolder() {
   POWERLEVEL9K_SHORTEN_DIR_LENGTH=2
   POWERLEVEL9K_SHORTEN_STRATEGY='truncate_with_package_name'
 
-  assertEquals "%K{blue} %F{black}My_Package/as…/qwerqwer %k%F{blue}%f " "$(build_left_prompt)"
+  assertEquals "%K{blue} %F{black}My_Package/as…/qwerqwer%b%K{blue}%F{black} %k%F{blue}%f " "$(build_left_prompt)"
 
   # Go back
   cd $p9kFolder
@@ -230,7 +230,7 @@ function testTruncateWithPackageNameIfRepoIsSymlinkedInsideGitDir() {
   POWERLEVEL9K_SHORTEN_DIR_LENGTH=2
   POWERLEVEL9K_SHORTEN_STRATEGY='truncate_with_package_name'
 
-  assertEquals "%K{blue} %F{black}My_Package/.g…/re…/heads %k%F{blue}%f " "$(build_left_prompt)"
+  assertEquals "%K{blue} %F{black}My_Package/.g…/re…/heads%b%K{blue}%F{black} %k%F{blue}%f " "$(build_left_prompt)"
 
   # Go back
   cd $p9kFolder
@@ -256,7 +256,7 @@ function testHomeSubfolderDetectionWorks() {
   FOLDER=~/powerlevel9k-test
   mkdir $FOLDER
   cd $FOLDER
-  assertEquals "%K{blue} %F{black%}sub-icon%f %F{black}~/powerlevel9k-test %k%F{blue}%f " "$(build_left_prompt)"
+  assertEquals "%K{blue} %F{black%}sub-icon%f %F{black}~/powerlevel9k-test%b%K{blue}%F{black} %k%F{blue}%f " "$(build_left_prompt)"
 
   cd -
   rm -fr $FOLDER
@@ -270,7 +270,7 @@ function testOtherFolderDetectionWorks() {
   FOLDER=/tmp/powerlevel9k-test
   mkdir $FOLDER
   cd $FOLDER
-  assertEquals "%K{blue} %F{black%}folder-icon%f %F{black}/tmp/powerlevel9k-test %k%F{blue}%f " "$(build_left_prompt)"
+  assertEquals "%K{blue} %F{black%}folder-icon%f %F{black}/tmp/powerlevel9k-test%b%K{blue}%F{black} %k%F{blue}%f " "$(build_left_prompt)"
 
   cd -
   rm -fr $FOLDER
@@ -284,7 +284,7 @@ function testChangingDirPathSeparator() {
   mkdir -p $FOLDER
   cd $FOLDER
 
-  assertEquals "%K{blue} %F{black}xXxtmpxXxpowerlevel9k-testxXx1xXx2 %k%F{blue}%f " "$(build_left_prompt)"
+  assertEquals "%K{blue} %F{black}xXxtmpxXxpowerlevel9k-testxXx1xXx2%b%K{blue}%F{black} %k%F{blue}%f " "$(build_left_prompt)"
 
   cd -
   unset FOLDER
@@ -299,20 +299,20 @@ function testHomeFolderAbbreviation() {
   cd ~/
   # default
   POWERLEVEL9K_HOME_FOLDER_ABBREVIATION='~'
-  assertEquals "%K{blue} %F{black}~ %k%F{blue}%f " "$(build_left_prompt)"
+  assertEquals "%K{blue} %F{black}~%b%K{blue}%F{black} %k%F{blue}%f " "$(build_left_prompt)"
 
   # substituted
   POWERLEVEL9K_HOME_FOLDER_ABBREVIATION='qQq'
-  assertEquals "%K{blue} %F{black}qQq %k%F{blue}%f " "$(build_left_prompt)"
+  assertEquals "%K{blue} %F{black}qQq%b%K{blue}%F{black} %k%F{blue}%f " "$(build_left_prompt)"
 
   cd /tmp
   # default
   POWERLEVEL9K_HOME_FOLDER_ABBREVIATION='~'
-  assertEquals "%K{blue} %F{black}/tmp %k%F{blue}%f " "$(build_left_prompt)"
+  assertEquals "%K{blue} %F{black}/tmp%b%K{blue}%F{black} %k%F{blue}%f " "$(build_left_prompt)"
 
   # substituted
   POWERLEVEL9K_HOME_FOLDER_ABBREVIATION='qQq'
-  assertEquals "%K{blue} %F{black}/tmp %k%F{blue}%f " "$(build_left_prompt)"
+  assertEquals "%K{blue} %F{black}/tmp%b%K{blue}%F{black} %k%F{blue}%f " "$(build_left_prompt)"
 
   cd "$dir"
 }
@@ -322,7 +322,7 @@ function testOmittingFirstCharacterWorks() {
   POWERLEVEL9K_FOLDER_ICON='folder-icon'
   cd /tmp
 
-  assertEquals "%K{blue} %F{black%}folder-icon%f %F{black}tmp %k%F{blue}%f " "$(build_left_prompt)"
+  assertEquals "%K{blue} %F{black%}folder-icon%f %F{black}tmp%b%K{blue}%F{black} %k%F{blue}%f " "$(build_left_prompt)"
 
   cd -
   unset POWERLEVEL9K_FOLDER_ICON
@@ -336,7 +336,7 @@ function testOmittingFirstCharacterWorksWithChangingPathSeparator() {
   mkdir -p /tmp/powerlevel9k-test/1/2
   cd /tmp/powerlevel9k-test/1/2
 
-  assertEquals "%K{blue} %F{black%}folder-icon%f %F{black}tmpxXxpowerlevel9k-testxXx1xXx2 %k%F{blue}%f " "$(build_left_prompt)"
+  assertEquals "%K{blue} %F{black%}folder-icon%f %F{black}tmpxXxpowerlevel9k-testxXx1xXx2%b%K{blue}%F{black} %k%F{blue}%f " "$(build_left_prompt)"
 
   cd -
   rm -fr /tmp/powerlevel9k-test
@@ -360,7 +360,7 @@ function testOmittingFirstCharacterWorksWithChangingPathSeparatorAndDefaultTrunc
   mkdir -p /tmp/powerlevel9k-test/1/2
   cd /tmp/powerlevel9k-test/1/2
 
-  assertEquals "%K{blue} %F{black}xXx1xXx2 %k%F{blue}%f " "$(build_left_prompt)"
+  assertEquals "%K{blue} %F{black}xXx1xXx2%b%K{blue}%F{black} %k%F{blue}%f " "$(build_left_prompt)"
 
   cd -
   rm -fr /tmp/powerlevel9k-test
@@ -378,7 +378,7 @@ function testOmittingFirstCharacterWorksWithChangingPathSeparatorAndMiddleTrunca
   mkdir -p /tmp/powerlevel9k-test/1/2
   cd /tmp/powerlevel9k-test/1/2
 
-  assertEquals "%K{blue} %F{black}tmpxXxpo…stxXx1xXx2 %k%F{blue}%f " "$(build_left_prompt)"
+  assertEquals "%K{blue} %F{black}tmpxXxpo…stxXx1xXx2%b%K{blue}%F{black} %k%F{blue}%f " "$(build_left_prompt)"
 
   cd -
   rm -fr /tmp/powerlevel9k-test
@@ -396,7 +396,7 @@ function testOmittingFirstCharacterWorksWithChangingPathSeparatorAndRightTruncat
   mkdir -p /tmp/powerlevel9k-test/1/2
   cd /tmp/powerlevel9k-test/1/2
 
-  assertEquals "%K{blue} %F{black}tmpxXxpo…xXx1xXx2 %k%F{blue}%f " "$(build_left_prompt)"
+  assertEquals "%K{blue} %F{black}tmpxXxpo…xXx1xXx2%b%K{blue}%F{black} %k%F{blue}%f " "$(build_left_prompt)"
 
   cd -
   rm -fr /tmp/powerlevel9k-test
@@ -417,7 +417,7 @@ function testTruncateToUniqueWorks() {
   mkdir -p /tmp/powerlevel9k-test/bob/docs
   cd /tmp/powerlevel9k-test/alice/devl
 
-  assertEquals "%K{blue} %F{black}txXxpxXxalxXxde %k%F{blue}%f " "$(build_left_prompt)"
+  assertEquals "%K{blue} %F{black}txXxpxXxalxXxde%b%K{blue}%F{black} %k%F{blue}%f " "$(build_left_prompt)"
 
   cd -
   rm -fr /tmp/powerlevel9k-test
