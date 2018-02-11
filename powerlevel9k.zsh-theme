@@ -871,7 +871,7 @@ prompt_dir() {
     if [[ $path_opt == "/" || $path_opt == "~" || $(dirname $path_opt) == "/" || ${POWERLEVEL9K_DIR_OMIT_FIRST_CHARACTER} ]]; then
       current_path="$bd%F{$POWERLEVEL9K_DIR_PATH_HIGHLIGHT_FOREGROUND}$current_path%F{$dir_state_foreground}%b"
     else
-      current_path="$(dirname $current_path)/$bd%F{$POWERLEVEL9K_DIR_PATH_HIGHLIGHT_FOREGROUND}$(basename $current_path)%F{$dir_state_foreground}"
+      current_path="$(dirname $current_path)/$bd%F{$POWERLEVEL9K_DIR_PATH_HIGHLIGHT_FOREGROUND}$(basename $current_path)%F{$dir_state_foreground}%b"
     fi
   fi
 
