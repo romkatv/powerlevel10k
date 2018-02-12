@@ -312,7 +312,7 @@ main theme distribution so that everyone can use it!
 
 The `context` segment (user@host string) is conditional. By default, it will
 only print if you are not your 'normal' user (including if you are root), or if
-you are SSH'd to a remote host.
+you are SSH'd to a remote host. `SUDO` and `REMOTE_SUDO` states are also available to show whether the current user or remote user has superuser privileges.
 
 To use this feature, make sure the `context` segment is enabled in your prompt
 elements (it is by default), and define a `DEFAULT_USER` in your `~/.zshrc`.
@@ -580,6 +580,7 @@ You can also override the icons by setting:
 ```
 POWERLEVEL9K_USER_ICON="\uF415" # 
 POWERLEVEL9K_ROOT_ICON="#"
+POWERLEVEL9K_SUDO_ICON=$'\uF09C' # 
 ```
 
 | Variable | Default Value | Description |
