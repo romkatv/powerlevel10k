@@ -589,10 +589,11 @@ prompt_context() {
   local current_state="DEFAULT"
   typeset -AH context_states
   context_states=(
-    "ROOT"      "yellow"
-    "SUDO"      "yellow"
-    "DEFAULT"   "yellow"
-    "REMOTE"    "yellow"
+    "ROOT"        "yellow"
+    "SUDO"        "yellow"
+    "DEFAULT"     "yellow"
+    "REMOTE"      "yellow"
+    "REMOTE_SUDO" "yellow"
   )
 
   local content=""
@@ -608,7 +609,11 @@ prompt_context() {
   if [[ $(print -P "%#") == '#' ]]; then
     current_state="ROOT"
   elif [[ -n "$SSH_CLIENT" || -n "$SSH_TTY" ]]; then
-    current_state="REMOTE"
+    if sudo -n true 2>/dev/null; then
+      current_state="REMOTE_SUDO"
+    else
+      current_state="REMOTE"
+    fi
   elif sudo -n true 2>/dev/null; then
     current_state="SUDO"
   fi
