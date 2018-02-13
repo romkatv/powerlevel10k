@@ -375,7 +375,7 @@ Customizations available are:
 | Strategy Name | Description |
 |---------------|-------------|
 |Default|Truncate whole directories from left. How many is defined by `POWERLEVEL9K_SHORTEN_DIR_LENGTH`|
-|`truncate_absolute_chars`|Truncates an absolute number of characters from the left such that the number of characters that your path displays (including `POWERLEVEL9K_SHORTEN_DELIMITER`) is no more than `POWERLEVEL9K_SHORTEN_DIR_LENGTH`.|
+|`truncate_absolute_chars`|Truncates an absolute number of characters from the left such that the number of characters that your path displays (with or without `POWERLEVEL9K_SHORTEN_DELIMITER`) is no more than `POWERLEVEL9K_SHORTEN_DIR_LENGTH` + the length of `POWERLEVEL9K_SHORTEN_DELIMITER` |
 |`truncate_middle`|Truncates the middle part of a folder. E.g. you are in a folder named `~/MySuperProjects/AwesomeFiles/BoringOffice`, then it will truncated to `~/MyS..cts/Awe..les/BoringOffice`, if `POWERLEVEL9K_SHORTEN_DIR_LENGTH=3` is also set (controls the amount of characters to be left).|
 |`truncate_from_right`|Just leaves the beginning of a folder name untouched. E.g. your folders will be truncated like so: "/ro../Pr../office". How many characters will be untouched is controlled by `POWERLEVEL9K_SHORTEN_DIR_LENGTH`.|
 |`truncate_with_package_name`|Search for a `package.json` or `composer.json` and prints the `name` field to abbreviate the directory path. The precedence and/or files could be set by `POWERLEVEL9K_DIR_PACKAGE_FILES=(package.json composer.json)`. If you have [jq](https://stedolan.github.io/jq/) installed, it will dramatically improve the speed of this strategy.|
