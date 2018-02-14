@@ -862,7 +862,7 @@ prompt_dir() {
   fi
 
   local bld dir_state_foreground dir_state_user_foreground
-  [[ "${(L)POWERLEVEL9K_DIR_PATH_HIGHLIGHT_BOLD}" = "true" ]] && bld="%B" || bld=""
+  [[ "${(L)POWERLEVEL9K_DIR_PATH_HIGHLIGHT_BOLD}" == "true" ]] && bld="%B" || bld=""
 
   local dir_state_user_foreground=POWERLEVEL9K_DIR_${current_state}_FOREGROUND
   local dir_state_foreground=${(P)dir_state_user_foreground}
