@@ -427,7 +427,7 @@ function testTruncateToUniqueWorks() {
   unset POWERLEVEL9K_SHORTEN_STRATEGY
 }
 
-function testBoldHomeDirectoryWorks() {
+function testBoldHomeDirWorks() {
   POWERLEVEL9K_DIR_PATH_HIGHLIGHT_BOLD=true
   cd ~
 
@@ -449,7 +449,7 @@ function testBoldHomeSubdirWorks() {
   unset POWERLEVEL9K_DIR_PATH_HIGHLIGHT_BOLD
 }
 
-function testBoldRootDirectoryWorks() {
+function testBoldRootDirWorks() {
   POWERLEVEL9K_DIR_PATH_HIGHLIGHT_BOLD=true
   cd /
 
@@ -469,7 +469,7 @@ function testBoldRootSubdirWorks() {
   unset POWERLEVEL9K_DIR_PATH_HIGHLIGHT_BOLD
 }
 
-function testBoldRootSubsubdirWorks() {
+function testBoldRootSubSubdirWorks() {
   POWERLEVEL9K_DIR_PATH_HIGHLIGHT_BOLD=true
   mkdir -p /tmp/powerlevel9k-test
   cd /tmp/powerlevel9k-test
@@ -513,7 +513,7 @@ function testHighlightRootWorks() {
   unset POWERLEVEL9K_DIR_PATH_HIGHLIGHT_FOREGROUND
 }
 
-function testHighlightRootSubdirDirectoryWorks() {
+function testHighlightRootSubdirWorks() {
   POWERLEVEL9K_DIR_PATH_HIGHLIGHT_FOREGROUND='red'
   cd /tmp
 
@@ -523,7 +523,7 @@ function testHighlightRootSubdirDirectoryWorks() {
   unset POWERLEVEL9K_DIR_PATH_HIGHLIGHT_FOREGROUND
 }
 
-function testHighlightRootSubdirDirectoryWorks() {
+function testHighlightRootSubSubdirWorks() {
   POWERLEVEL9K_DIR_PATH_HIGHLIGHT_FOREGROUND='red'
   mkdir /tmp/powerlevel9k-test
   cd /tmp/powerlevel9k-test
@@ -533,6 +533,30 @@ function testHighlightRootSubdirDirectoryWorks() {
   cd -
   rm -fr /tmp/powerlevel9k-test
   unset POWERLEVEL9K_DIR_PATH_HIGHLIGHT_FOREGROUND
+}
+
+function testDirSeparatorColorHomeSubdirWorks() {
+  POWERLEVEL9K_DIR_PATH_SEPARATOR_FOREGROUND='red'
+  mkdir -p ~/powerlevel9k-test
+  cd ~/powerlevel9k-test
+
+  assertEquals "%K{blue} %F{black}~%F{red}/%F{black}powerlevel9k-test%b %k%F{blue}%f " "$(build_left_prompt)"
+
+  cd -
+  rm -fr ~/powerlevel9k-test
+  unset POWERLEVEL9K_DIR_PATH_SEPARATOR_FOREGROUND
+}
+
+function testDirSeparatorColorRootSubSubdirWorks() {
+  POWERLEVEL9K_DIR_PATH_SEPARATOR_FOREGROUND='red'
+  mkdir -p /tmp/powerlevel9k-test
+  cd /tmp/powerlevel9k-test
+
+  assertEquals "%K{blue} %F{black}%F{red}/%F{black}tmp%F{red}/%F{black}powerlevel9k-test%b %k%F{blue}%f " "$(build_left_prompt)"
+
+  cd -
+  rm -fr /tmp/powerlevel9k-test
+  unset POWERLEVEL9K_DIR_PATH_SEPARATOR_FOREGROUND
 }
 
 source shunit2/source/2.1/src/shunit2
