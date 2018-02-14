@@ -874,15 +874,15 @@ prompt_dir() {
 
   if [[ -n ${POWERLEVEL9K_DIR_PATH_HIGHLIGHT_FOREGROUND} ]]; then
     if [[ $path_opt == "/" || $path_opt == "~" || "${(L)POWERLEVEL9K_DIR_OMIT_FIRST_CHARACTER}" == "true" ]]; then
-      current_path="${bld}%F{$POWERLEVEL9K_DIR_PATH_HIGHLIGHT_FOREGROUND}${current_path}%b%F{$dir_state_foreground}"
+      current_path="${bld}%F{$POWERLEVEL9K_DIR_PATH_HIGHLIGHT_FOREGROUND}${current_path}%b"
     else
-      current_path="${dir_name}/${bld}%F{$POWERLEVEL9K_DIR_PATH_HIGHLIGHT_FOREGROUND}${base_name}%b%F{$dir_state_foreground}"
+      current_path="${dir_name}/${bld}%F{$POWERLEVEL9K_DIR_PATH_HIGHLIGHT_FOREGROUND}${base_name}%b"
     fi
   else
     if [[ $path_opt == "/" || $path_opt == "~" || "${(L)POWERLEVEL9K_DIR_OMIT_FIRST_CHARACTER}" == "true" ]]; then
-      current_path="${bld}${current_path}%b%F{$dir_state_foreground}"
+      current_path="${bld}${current_path}%b"
     else
-      current_path="${dir_name}/${bld}${base_name}%b%F{$dir_state_foreground}"
+      current_path="${dir_name}/${bld}${base_name}%b"
     fi
   fi
 
