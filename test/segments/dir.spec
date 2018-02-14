@@ -429,9 +429,11 @@ function testTruncateToUniqueWorks() {
 
 function testBoldHomeDirectoryWorks() {
   POWERLEVEL9K_DIR_PATH_HIGHLIGHT_BOLD=true
+  cd ~
 
   assertEquals "%K{blue} %F{black}%B~%b %k%F{blue}%f " "$(build_left_prompt)"
 
+  cd -
   unset POWERLEVEL9K_DIR_PATH_HIGHLIGHT_BOLD
 }
 
@@ -443,6 +445,16 @@ function testBoldOtherDirectoryWorks() {
 
   cd -
   unset POWERLEVEL9K_DIR_PATH_HIGHLIGHT_BOLD
+}
+
+function testDirHighlightHomeWorks() {
+  POWERLEVEL9K_DIR_PATH_HIGHLIGHT_FOREGROUND='red'
+  cd ~
+
+  assertEquals "%K{blue} %F{black}%F{red}~%b %k%F{blue}%f " "$(build_left_prompt)"
+
+  cd -
+  unset POWERLEVEL9K_DIR_PATH_HIGHLIGHT_FOREGROUND
 }
 
 source shunit2/source/2.1/src/shunit2
