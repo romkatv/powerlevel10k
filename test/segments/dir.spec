@@ -470,6 +470,7 @@ function testBoldRootSubdirWorks() {
 }
 
 function testBoldRootSubsubdirWorks() {
+  POWERLEVEL9K_DIR_PATH_HIGHLIGHT_BOLD=true
   mkdir -p /tmp/powerlevel9k-test
   cd /tmp/powerlevel9k-test
 
@@ -477,6 +478,7 @@ function testBoldRootSubsubdirWorks() {
 
   cd -
   rm -fr /tmp/powerlevel9k-test
+  unset POWERLEVEL9K_DIR_PATH_HIGHLIGHT_BOLD
 }
 
 function testHighlightHomeWorks() {
