@@ -873,13 +873,13 @@ prompt_dir() {
   base_name=${path_opt##*/}
 
   if [[ -n ${POWERLEVEL9K_DIR_PATH_HIGHLIGHT_FOREGROUND} ]]; then
-    if [[ $path_opt == "/" || $path_opt == "~" || ${POWERLEVEL9K_DIR_OMIT_FIRST_CHARACTER} ]]; then
+    if [[ $path_opt == "/" || $path_opt == "~" || "${(L)POWERLEVEL9K_DIR_OMIT_FIRST_CHARACTER}" == "true" ]]; then
       current_path="$bld%F{$POWERLEVEL9K_DIR_PATH_HIGHLIGHT_FOREGROUND}$current_path%F{$dir_state_foreground}%b%F{$dir_state_foreground}"
     else
       current_path="${dir_name}/$bld%F{$POWERLEVEL9K_DIR_PATH_HIGHLIGHT_FOREGROUND}${base_name}%b%F{$dir_state_foreground}"
     fi
   else
-    if [[ $path_opt == "/" || $path_opt == "~" || ${POWERLEVEL9K_DIR_OMIT_FIRST_CHARACTER} ]]; then
+    if [[ $path_opt == "/" || $path_opt == "~" || "${(L)POWERLEVEL9K_DIR_OMIT_FIRST_CHARACTER}" == "true" ]]; then
       current_path="$bld%F{$dir_state_foreground}$current_path%b%F{$dir_state_foreground}"
     else
       current_path="%F{$dir_state_foreground}${dir_name}/$bld${base_name}%b%F{$dir_state_foreground}"
@@ -894,7 +894,7 @@ prompt_dir() {
     current_path="$( echo "${current_path}" | sed "s/\//${POWERLEVEL9K_DIR_PATH_SEPARATOR}/g")"
   fi
 
-  if [[ "${POWERLEVEL9K_HOME_FOLDER_ABBREVIATION}" != "~" && ! ${POWERLEVEL9K_DIR_OMIT_FIRST_CHARACTER} ]]; then
+  if [[ "${POWERLEVEL9K_HOME_FOLDER_ABBREVIATION}" != "~" && ! "${(L)POWERLEVEL9K_DIR_OMIT_FIRST_CHARACTER}" == "true" ]]; then
     current_path="$( echo "${current_path}" | sed "s/~/${POWERLEVEL9K_HOME_FOLDER_ABBREVIATION}/1")"
   fi
 
