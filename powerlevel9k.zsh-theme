@@ -868,17 +868,21 @@ prompt_dir() {
   local dir_state_foreground=${(P)dir_state_user_foreground}
   [[ -z ${dir_state_foreground} ]] && dir_state_foreground="${DEFAULT_COLOR}"
 
+  local dir_name base_name
+  dir_name=${path_opt%/*}
+  base_name=${path_opt##*/}
+
   if [[ -n ${POWERLEVEL9K_DIR_PATH_HIGHLIGHT_FOREGROUND} ]]; then
-    if [[ $path_opt == "/" || $path_opt == "~" || $(dirname $path_opt) == "/" || ${POWERLEVEL9K_DIR_OMIT_FIRST_CHARACTER} ]]; then
+    if [[ $path_opt == "/" || $path_opt == "~" || ${POWERLEVEL9K_DIR_OMIT_FIRST_CHARACTER} ]]; then
       current_path="$bld%F{$POWERLEVEL9K_DIR_PATH_HIGHLIGHT_FOREGROUND}$current_path%F{$dir_state_foreground}%b%F{$dir_state_foreground}"
     else
-      current_path="$(dirname $current_path)/$bld%F{$POWERLEVEL9K_DIR_PATH_HIGHLIGHT_FOREGROUND}$(basename $current_path)%b%F{$dir_state_foreground}"
+      current_path="${dir_name}/$bld%F{$POWERLEVEL9K_DIR_PATH_HIGHLIGHT_FOREGROUND}${base_name}%b%F{$dir_state_foreground}"
     fi
   else
-    if [[ $path_opt == "/" || $path_opt == "~" || $(dirname $path_opt) == "/" || ${POWERLEVEL9K_DIR_OMIT_FIRST_CHARACTER} ]]; then
+    if [[ $path_opt == "/" || $path_opt == "~" || ${POWERLEVEL9K_DIR_OMIT_FIRST_CHARACTER} ]]; then
       current_path="$bld%F{$dir_state_foreground}$current_path%b%F{$dir_state_foreground}"
     else
-      current_path="%F{$dir_state_foreground}$(dirname $current_path)/$bld$(basename $current_path)%b%F{$dir_state_foreground}"
+      current_path="%F{$dir_state_foreground}${dir_name}/$bld${base_name}%b%F{$dir_state_foreground}"
     fi
   fi
 
