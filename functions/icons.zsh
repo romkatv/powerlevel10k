@@ -47,6 +47,7 @@ case $POWERLEVEL9K_MODE in
       FREEBSD_ICON                   $'\U1F608 '            # 😈
       ANDROID_ICON                   $'\uE270'              # 
       LINUX_ICON                     $'\uE271'              # 
+      LINUX_ARCH_ICON                'Arc'
       LINUX_DEBIAN_ICON              'Deb'
       LINUX_UBUNTU_ICON              'Ubu'
       LINUX_CENTOS_ICON              'Cen'
@@ -137,6 +138,7 @@ case $POWERLEVEL9K_MODE in
       FREEBSD_ICON                   $'\U1F608 '            # 😈
       ANDROID_ICON                   $'\uE17B'              # 
       LINUX_ICON                     $'\uF17C'              # 
+      LINUX_ARCH_ICON                'Arc'
       LINUX_DEBIAN_ICON              'Deb'
       LINUX_UBUNTU_ICON              'Ubu'
       LINUX_CENTOS_ICON              'Cen'
@@ -229,6 +231,7 @@ case $POWERLEVEL9K_MODE in
       APPLE_ICON                     '\u'$CODEPOINT_OF_AWESOME_APPLE                # 
       FREEBSD_ICON                   $'\U1F608 '                                    # 😈
       LINUX_ICON                     '\u'$CODEPOINT_OF_AWESOME_LINUX                # 
+      LINUX_ARCH_ICON                'Arc'
       LINUX_DEBIAN_ICON              'Deb'
       LINUX_UBUNTU_ICON              'Ubu'
       LINUX_CENTOS_ICON              'Cen'
@@ -401,6 +404,7 @@ case $POWERLEVEL9K_MODE in
       FREEBSD_ICON                   'BSD'
       ANDROID_ICON                   'And'
       LINUX_ICON                     'Lx'
+      LINUX_ARCH_ICON                'Arc'
       LINUX_DEBIAN_ICON              'Deb'
       LINUX_UBUNTU_ICON              'Ubu'
       LINUX_CENTOS_ICON              'Cen'
