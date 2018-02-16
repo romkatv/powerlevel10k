@@ -151,7 +151,7 @@ case $POWERLEVEL9K_MODE in
       VCS_GIT_GITLAB_ICON            $'\uF296 '             # 
       VCS_HG_ICON                    $'\uF0C3 '             # 
       VCS_SVN_ICON                   '(svn) '
-      RUST_ICON                      $'\uE6A8'              #  
+      RUST_ICON                      $'\uE6A8'              # 
       PYTHON_ICON                    $'\ue63c'             # 
       SWIFT_ICON                     ''
       GO_ICON                        ''
@@ -277,6 +277,21 @@ case $POWERLEVEL9K_MODE in
       WINDOWS_ICON                   $'\uF17A'              # 
       FREEBSD_ICON                   $'\UF30E '             # 
       ANDROID_ICON                   $'\uF17B'              # 
+      LINUX_ARCH_ICON                $'\uF300'              # 
+      LINUX_DEBIAN_ICON              $'\uF302'              # 
+      LINUX_UBUNTU_ICON              $'\uF30C'              # 
+      LINUX_CENTOS_ICON              $'\uF301'              # 
+      LINUX_COREOS_ICON              $'\uF30F'              # 
+      LINUX_ELEMENTARY_ICON          $'\uF311'              # 
+      LINUX_FEDORA_ICON              $'\uF303'              # 
+      LINUX_GENTOO_ICON              $'\uF310'              # 
+      LINUX_MINT_ICON                $'\uF304'              # 
+      LINUX_MAGEIA_ICON              $'\uF306'              # 
+      LINUX_MANDRIVA_ICON            $'\uF307'              # 
+      LINUX_OPENSUSE_ICON            $'\uF308'              # 
+      LINUX_REDHAT_ICON              $'\uF309'              # 
+      LINUX_SABAYON_ICON             $'\uF313'              # 
+      LINUX_SLACKWARE_ICON           $'\uF30A'              # 
       LINUX_ICON                     $'\uF17C'              # 
       SUNOS_ICON                     $'\uF185 '             # 
       HOME_ICON                      $'\uF015'              # 

@@ -105,6 +105,22 @@ case $(uname) in
       OS='Linux'
       OS_ICON=$(print_icon 'LINUX_ICON')
 
+      # Check if the OS is debian
+      if [ `lsb_release -si`="Debian" ]; then
+        OS='Debian'
+        OS_ICON=$(print_icon 'LINUX_DEBIAN_ICON')
+      fi
+      # Check if the OS is ubuntu
+      if [ `lsb_release -si`="Ubuntu" ]; then
+        OS='Ubuntu'
+        OS_ICON=$(print_icon 'LINUX_Ubuntu_ICON')
+      fi
+      # Check if the OS is mint
+      if [ `lsb_release -si`="Mint" ]; then
+        OS='Mint'
+        OS_ICON=$(print_icon 'LINUX_MINT_ICON')
+      fi
+
       # Check if we're running on Android
       case $(uname -o 2>/dev/null) in
         Android)
