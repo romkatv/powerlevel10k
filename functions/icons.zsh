@@ -47,6 +47,18 @@ case $POWERLEVEL9K_MODE in
       FREEBSD_ICON                   $'\U1F608 '            # 😈
       ANDROID_ICON                   $'\uE270'              # 
       LINUX_ICON                     $'\uE271'              # 
+      LINUX_DEBIAN_ICON              'Deb'
+      LINUX_UBUNTU_ICON              'Ubu'
+      LINUX_CENTOS_ICON              'Cen'
+      LINUX_COREOS_ICON              'Cor'
+      LINUX_ELEMENTARY_ICON          'Elm'
+      LINUX_MINT_ICON                'LMi'
+      LINUX_FEDORA_ICON              'Fed'
+      LINUX_GENTOO_ICON              'Gen'
+      LINUX_MAGEIA_ICON              'Mag'
+      LINUX_OPENSUSE_ICON            'OSu'
+      LINUX_SABAYON_ICON             'Sab'
+      LINUX_SLACKWARE_ICON           'Sla'
       SUNOS_ICON                     $'\U1F31E '            # 🌞
       HOME_ICON                      $'\uE12C'              # 
       HOME_SUB_ICON                  $'\uE18D'              # 
@@ -125,6 +137,18 @@ case $POWERLEVEL9K_MODE in
       FREEBSD_ICON                   $'\U1F608 '            # 😈
       ANDROID_ICON                   $'\uE17B'              # 
       LINUX_ICON                     $'\uF17C'              # 
+      LINUX_DEBIAN_ICON              'Deb'
+      LINUX_UBUNTU_ICON              'Ubu'
+      LINUX_CENTOS_ICON              'Cen'
+      LINUX_COREOS_ICON              'Cor'
+      LINUX_ELEMENTARY_ICON          'Elm'
+      LINUX_MINT_ICON                'LMi'
+      LINUX_FEDORA_ICON              'Fed'
+      LINUX_GENTOO_ICON              'Gen'
+      LINUX_MAGEIA_ICON              'Mag'
+      LINUX_OPENSUSE_ICON            'OSu'
+      LINUX_SABAYON_ICON             'Sab'
+      LINUX_SLACKWARE_ICON           'Sla'
       SUNOS_ICON                     $'\uF185 '             # 
       HOME_ICON                      $'\uF015'              # 
       HOME_SUB_ICON                  $'\uF07C'              # 
@@ -205,6 +229,18 @@ case $POWERLEVEL9K_MODE in
       APPLE_ICON                     '\u'$CODEPOINT_OF_AWESOME_APPLE                # 
       FREEBSD_ICON                   $'\U1F608 '                                    # 😈
       LINUX_ICON                     '\u'$CODEPOINT_OF_AWESOME_LINUX                # 
+      LINUX_DEBIAN_ICON              'Deb'
+      LINUX_UBUNTU_ICON              'Ubu'
+      LINUX_CENTOS_ICON              'Cen'
+      LINUX_COREOS_ICON              'Cor'
+      LINUX_ELEMENTARY_ICON          'Elm'
+      LINUX_MINT_ICON                'LMi'
+      LINUX_FEDORA_ICON              'Fed'
+      LINUX_GENTOO_ICON              'Gen'
+      LINUX_MAGEIA_ICON              'Mag'
+      LINUX_OPENSUSE_ICON            'OSu'
+      LINUX_SABAYON_ICON             'Sab'
+      LINUX_SLACKWARE_ICON           'Sla'
       SUNOS_ICON                     '\u'$CODEPOINT_OF_AWESOME_SUN_O' '             # 
       HOME_ICON                      '\u'$CODEPOINT_OF_AWESOME_HOME                 # 
       HOME_SUB_ICON                  '\u'$CODEPOINT_OF_AWESOME_FOLDER_OPEN          # 
@@ -365,6 +401,18 @@ case $POWERLEVEL9K_MODE in
       FREEBSD_ICON                   'BSD'
       ANDROID_ICON                   'And'
       LINUX_ICON                     'Lx'
+      LINUX_DEBIAN_ICON              'Deb'
+      LINUX_UBUNTU_ICON              'Ubu'
+      LINUX_CENTOS_ICON              'Cen'
+      LINUX_COREOS_ICON              'Cor'
+      LINUX_ELEMENTARY_ICON          'Elm'
+      LINUX_MINT_ICON                'LMi'
+      LINUX_FEDORA_ICON              'Fed'
+      LINUX_GENTOO_ICON              'Gen'
+      LINUX_MAGEIA_ICON              'Mag'
+      LINUX_OPENSUSE_ICON            'OSu'
+      LINUX_SABAYON_ICON             'Sab'
+      LINUX_SLACKWARE_ICON           'Sla'
       SUNOS_ICON                     'Sun'
       HOME_ICON                      ''
       HOME_SUB_ICON                  ''
