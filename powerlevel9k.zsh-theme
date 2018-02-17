@@ -758,7 +758,7 @@ prompt_dir() {
           for directory in ${paths[@]}
           do
             cur_dir=$directory
-            if (( ${#cur_dir} > $POWERLEVEL9K_SHORTEN_DIR_LENGTH && [[ $cur_dir != $paths[${#paths}] ]]; then
+            if (( ${#cur_dir} > $POWERLEVEL9K_SHORTEN_DIR_LENGTH )) && [[ $cur_dir != $paths[${#paths}] ]]; then
               cur_dir=${cur_dir:0:$POWERLEVEL9K_SHORTEN_DIR_LENGTH}$POWERLEVEL9K_SHORTEN_DELIMITER
             fi
             cur_short_path+="$cur_dir/"
