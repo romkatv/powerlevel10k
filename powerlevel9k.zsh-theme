@@ -725,7 +725,7 @@ set_default POWERLEVEL9K_DIR_PATH_HIGHLIGHT_BOLD false
 prompt_dir() {
   local current_dir="$(print -P "%~")"
   local paths
-  [[ current_dir != "/" ]] && paths=(${(s:/:)current_dir})
+  [[ current_dir != "/" ]] && paths=(${(s:/:)current_dir}) # only split if not root folder
   local cur_path cur_short_path directory dir_length cur_dir
 
   if [[ -n "$POWERLEVEL9K_SHORTEN_DIR_LENGTH" || "$POWERLEVEL9K_SHORTEN_STRATEGY" == "truncate_with_folder_marker" ]]; then
@@ -733,37 +733,37 @@ prompt_dir() {
 
     case "$POWERLEVEL9K_SHORTEN_STRATEGY" in
       truncate_middle)
-        if [[ $current_dir != "/" ]]; then
-          [[ $current_dir == '~'* ]] && cur_short_path='' || cur_short_path='/'
+        if [[ $current_dir != "/" ]]; then # root is an exception and won't have paths
+          [[ $current_dir == '~'* ]] && cur_short_path='' || cur_short_path='/' # if we are in the $HOME folder, we don't need starting /
           local last_pos
-          local max_length=$(( $POWERLEVEL9K_SHORTEN_DIR_LENGTH * 2 ))
-          for directory in ${paths[@]}
+          local max_length=$(( $POWERLEVEL9K_SHORTEN_DIR_LENGTH * 2 )) # has to be double the length for beginning / end count
+          for directory in ${paths[@]} # go through all the paths
           do
             cur_dir=$directory
             dir_length=${#cur_dir}
-            if (( $dir_length > $max_length )) && [[ $cur_dir != $paths[${#paths}] ]]; then
+            if (( $dir_length > $max_length )) && [[ $cur_dir != $paths[${#paths}] ]]; then # only shorten if long enough and not last path
               last_pos=$(( $dir_length - $POWERLEVEL9K_SHORTEN_DIR_LENGTH ))
               cur_dir=${cur_dir:0:$POWERLEVEL9K_SHORTEN_DIR_LENGTH}$POWERLEVEL9K_SHORTEN_DELIMITER${cur_dir:$last_pos:$dir_length}
             fi
             cur_short_path+="$cur_dir/"
           done
-          current_path="${cur_short_path: : -1}"
+          current_path="${cur_short_path: : -1}" # remove trailing slash
         else
           current_path="/"
         fi
       ;;
       truncate_from_right)
-        if [[ $current_dir != "/" ]]; then
-          [[ $current_dir == '~'* ]] && cur_short_path='' || cur_short_path='/'
+        if [[ $current_dir != "/" ]]; then # root is an exception and won't have paths
+          [[ $current_dir == '~'* ]] && cur_short_path='' || cur_short_path='/' # if we are in the $HOME folder, we don't need starting /
           for directory in ${paths[@]}
           do
             cur_dir=$directory
-            if (( ${#cur_dir} > $POWERLEVEL9K_SHORTEN_DIR_LENGTH )) && [[ $cur_dir != $paths[${#paths}] ]]; then
+            if (( ${#cur_dir} > $POWERLEVEL9K_SHORTEN_DIR_LENGTH + ${#POWERLEVEL9K_SHORTEN_DELIMITER} )) && [[ $cur_dir != $paths[${#paths}] ]]; then # only shorten if long enough and not last path
               cur_dir=${cur_dir:0:$POWERLEVEL9K_SHORTEN_DIR_LENGTH}$POWERLEVEL9K_SHORTEN_DELIMITER
             fi
             cur_short_path+="$cur_dir/"
           done
-          current_path="${cur_short_path: : -1}"
+          current_path="${cur_short_path: : -1}" # remove trailing slash
         else
           current_path="/"
         fi
