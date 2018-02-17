@@ -723,8 +723,9 @@ set_default POWERLEVEL9K_DIR_PATH_HIGHLIGHT_BOLD false
 #   * $1 Alignment: string - left|right
 #   * $2 Index: integer
 prompt_dir() {
-  local current_path="$(print -P "%~")"
-  local paths=(${(s:/:)PWD})
+  local current_dir="$(print -P "%~")"
+  local paths
+  [[ current_dir != "/" ]] && paths=(${(s:/:)current_dir}) || paths[0] = "/"
   local cur_path cur_short_path directory dir_length cur_dir
 
   if [[ -n "$POWERLEVEL9K_SHORTEN_DIR_LENGTH" || "$POWERLEVEL9K_SHORTEN_STRATEGY" == "truncate_with_folder_marker" ]]; then
@@ -732,32 +733,40 @@ prompt_dir() {
 
     case "$POWERLEVEL9K_SHORTEN_STRATEGY" in
       truncate_middle)
-        cur_short_path='/'
-        local last_pos
-        local max_length=$(( $POWERLEVEL9K_SHORTEN_DIR_LENGTH * 2 ))
-        for directory in ${paths[@]}
-        do
-          cur_dir=$directory
-          dir_length=${#cur_dir}
-          if (( $dir_length > $max_length )); then
-            last_pos=$(( $dir_length - $POWERLEVEL9K_SHORTEN_DIR_LENGTH ))
-            cur_dir=${cur_dir:0:$POWERLEVEL9K_SHORTEN_DIR_LENGTH}$POWERLEVEL9K_SHORTEN_DELIMITER${cur_dir:$last_pos:$dir_length}
-          fi
-          cur_short_path+="$cur_dir/"
-        done
-        current_path="${cur_short_path: : -1}"
+        if [[ $current_dir != "/" ]]; then
+          [[ $current_dir == '~'* ]] && cur_short_path='' || cur_short_path='/'
+          local last_pos
+          local max_length=$(( $POWERLEVEL9K_SHORTEN_DIR_LENGTH * 2 ))
+          for directory in ${paths[@]}
+          do
+            cur_dir=$directory
+            dir_length=${#cur_dir}
+            if (( $dir_length > $max_length )); then
+              last_pos=$(( $dir_length - $POWERLEVEL9K_SHORTEN_DIR_LENGTH ))
+              cur_dir=${cur_dir:0:$POWERLEVEL9K_SHORTEN_DIR_LENGTH}$POWERLEVEL9K_SHORTEN_DELIMITER${cur_dir:$last_pos:$dir_length}
+            fi
+            cur_short_path+="$cur_dir/"
+          done
+          current_path="${cur_short_path: : -1}"
+        else
+          current_path="/"
+        fi
       ;;
       truncate_from_right)
-        cur_short_path='/'
-        for directory in ${paths[@]}
-        do
-          cur_dir=$directory
-          if (( ${#cur_dir} > $POWERLEVEL9K_SHORTEN_DIR_LENGTH )); then
-            cur_dir=${cur_dir:0:$POWERLEVEL9K_SHORTEN_DIR_LENGTH}$POWERLEVEL9K_SHORTEN_DELIMITER
-          fi
-          cur_short_path+="$cur_dir/"
-        done
-        current_path="${cur_short_path: : -1}"
+        if [[ $current_dir != "/" ]]; then
+          [[ $current_dir == '~'* ]] && cur_short_path='' || cur_short_path='/'
+          for directory in ${paths[@]}
+          do
+            cur_dir=$directory
+            if (( ${#cur_dir} > $POWERLEVEL9K_SHORTEN_DIR_LENGTH )); then
+              cur_dir=${cur_dir:0:$POWERLEVEL9K_SHORTEN_DIR_LENGTH}$POWERLEVEL9K_SHORTEN_DELIMITER
+            fi
+            cur_short_path+="$cur_dir/"
+          done
+          current_path="${cur_short_path: : -1}"
+        else
+          current_path="/"
+        fi
       ;;
       truncate_with_package_name)
         local name repo_path package_path current_dir zero
@@ -769,11 +778,11 @@ prompt_dir() {
           # Remove trailing slash from git path, so that we can
           # remove that git path from the pwd.
           gitPath=${gitPath%/}
-          package_path=${$current_path%%$gitPath}
+          package_path=${current_dir%%$gitPath}
           # Remove trailing slash
-          package_path=${package_path%/}
+          package_path=${package_dir%/}
         elif [[ $(git rev-parse --is-inside-git-dir 2> /dev/null) == "true" ]]; then
-          package_path=${$current_path%%/.git*}
+          package_path=${current_dir%%/.git*}
         fi
 
         # Replace the shortest possible match of the marked folder from
@@ -785,7 +794,7 @@ prompt_dir() {
         # Then, find the length of the package_path string, and save the
         # subdirectory path as a substring of the current directory's path from 0
         # to the length of the package path's string
-        subdirectory_path=$(truncatePathFromRight "${current_path:${#${(S%%)package_path//$~zero/}}}")
+        subdirectory_path=$(truncatePathFromRight "${current_dir:${#${(S%%)package_path//$~zero/}}}")
         # Parse the 'name' from the package.json; if there are any problems, just
         # print the file path
         defined POWERLEVEL9K_DIR_PACKAGE_FILES || POWERLEVEL9K_DIR_PACKAGE_FILES=(package.json composer.json)
@@ -807,7 +816,7 @@ prompt_dir() {
           # from the package.json and append the current subdirectory
           current_path="`echo $packageName | tr -d '"'`$subdirectory_path"
         else
-          current_path=$(truncatePathFromRight "$(pwd | sed -e "s,^$HOME,~,")" )
+          current_path=$(truncatePathFromRight ${current_path//$HOME/"~"} )
         fi
       ;;
       truncate_with_folder_marker)
@@ -834,7 +843,7 @@ prompt_dir() {
 
         # Replace the shortest possible match of the marked folder from
         # the current path.
-        current_path=$current_path${PWD#${last_marked_folder}*}
+        current_path=$current_path${current_dir#${last_marked_folder}*}
       ;;
       truncate_to_unique)
         # for each parent path component find the shortest unique beginning
@@ -878,9 +887,9 @@ prompt_dir() {
   local current_state="DEFAULT"
   if [[ "${POWERLEVEL9K_DIR_SHOW_WRITABLE}" == true && ! -w "$PWD" ]]; then
     current_state="NOT_WRITABLE"
-  elif [[ $(print -P "%~") == '~' ]]; then
+  elif [[ $current_dir == '~' ]]; then
     current_state="HOME"
-  elif [[ $(print -P "%~") == '~'* ]]; then
+  elif [[ $current_dir == '~'* ]]; then
     current_state="HOME_SUBFOLDER"
   fi
 
