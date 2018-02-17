@@ -724,15 +724,40 @@ set_default POWERLEVEL9K_DIR_PATH_HIGHLIGHT_BOLD false
 #   * $2 Index: integer
 prompt_dir() {
   local current_path="$(print -P "%~")"
+  local paths=(${(s:/:)PWD})
+  local cur_path cur_short_path directory dir_length cur_dir
+
   if [[ -n "$POWERLEVEL9K_SHORTEN_DIR_LENGTH" || "$POWERLEVEL9K_SHORTEN_STRATEGY" == "truncate_with_folder_marker" ]]; then
-    set_default POWERLEVEL9K_SHORTEN_DELIMITER $'\U2026'
+    set_default POWERLEVEL9K_SHORTEN_DELIMITER $'\u2026'
 
     case "$POWERLEVEL9K_SHORTEN_STRATEGY" in
       truncate_middle)
-        current_path=$(pwd | sed -e "s,^$HOME,~," | sed $SED_EXTENDED_REGEX_PARAMETER "s/([^/]{$POWERLEVEL9K_SHORTEN_DIR_LENGTH})[^/]+([^/]{$POWERLEVEL9K_SHORTEN_DIR_LENGTH})\//\1$POWERLEVEL9K_SHORTEN_DELIMITER\2\//g")
+        cur_short_path='/'
+        local last_pos
+        local max_length=$(( $POWERLEVEL9K_SHORTEN_DIR_LENGTH * 2 ))
+        for directory in ${paths[@]}
+        do
+          cur_dir=$directory
+          dir_length=${#cur_dir}
+          if (( $dir_length > $max_length )); then
+            last_pos=$(( $dir_length - $POWERLEVEL9K_SHORTEN_DIR_LENGTH ))
+            cur_dir=${cur_dir:0:$POWERLEVEL9K_SHORTEN_DIR_LENGTH}$POWERLEVEL9K_SHORTEN_DELIMITER${cur_dir:$last_pos:$dir_length}
+          fi
+          cur_short_path+="$cur_dir/"
+        done
+        current_path="${cur_short_path: : -1}"
       ;;
       truncate_from_right)
-        current_path=$(truncatePathFromRight "$(pwd | sed -e "s,^$HOME,~,")" )
+        cur_short_path='/'
+        for directory in ${paths[@]}
+        do
+          cur_dir=$directory
+          if (( ${#cur_dir} > $POWERLEVEL9K_SHORTEN_DIR_LENGTH )); then
+            cur_dir=${cur_dir:0:$POWERLEVEL9K_SHORTEN_DIR_LENGTH}$POWERLEVEL9K_SHORTEN_DELIMITER
+          fi
+          cur_short_path+="$cur_dir/"
+        done
+        current_path="${cur_short_path: : -1}"
       ;;
       truncate_with_package_name)
         local name repo_path package_path current_dir zero
@@ -744,11 +769,11 @@ prompt_dir() {
           # Remove trailing slash from git path, so that we can
           # remove that git path from the pwd.
           gitPath=${gitPath%/}
-          package_path=${$(pwd)%%$gitPath}
+          package_path=${$current_path%%$gitPath}
           # Remove trailing slash
           package_path=${package_path%/}
         elif [[ $(git rev-parse --is-inside-git-dir 2> /dev/null) == "true" ]]; then
-          package_path=${$(pwd)%%/.git*}
+          package_path=${$current_path%%/.git*}
         fi
 
         # Replace the shortest possible match of the marked folder from
@@ -757,11 +782,10 @@ prompt_dir() {
         # in the path (this is done by the "zero" pattern; see
         # http://stackoverflow.com/a/40855342/5586433).
         local zero='%([BSUbfksu]|([FB]|){*})'
-        current_dir=$(pwd)
         # Then, find the length of the package_path string, and save the
         # subdirectory path as a substring of the current directory's path from 0
         # to the length of the package path's string
-        subdirectory_path=$(truncatePathFromRight "${current_dir:${#${(S%%)package_path//$~zero/}}}")
+        subdirectory_path=$(truncatePathFromRight "${current_path:${#${(S%%)package_path//$~zero/}}}")
         # Parse the 'name' from the package.json; if there are any problems, just
         # print the file path
         defined POWERLEVEL9K_DIR_PACKAGE_FILES || POWERLEVEL9K_DIR_PACKAGE_FILES=(package.json composer.json)
@@ -815,7 +839,6 @@ prompt_dir() {
       truncate_to_unique)
         # for each parent path component find the shortest unique beginning
         # characters sequence. Source: https://stackoverflow.com/a/45336078
-        paths=(${(s:/:)PWD})
         cur_path='/'
         cur_short_path='/'
         for directory in ${paths[@]}
