@@ -730,6 +730,7 @@ prompt_dir() {
 
   if [[ -n "$POWERLEVEL9K_SHORTEN_DIR_LENGTH" || "$POWERLEVEL9K_SHORTEN_STRATEGY" == "truncate_with_folder_marker" ]]; then
     set_default POWERLEVEL9K_SHORTEN_DELIMITER $'\u2026'
+    local delim=$(echo -n $POWERLEVEL9K_SHORTEN_DELIMITER) # convert delimiter from unicode to literal character if required
 
     case "$POWERLEVEL9K_SHORTEN_STRATEGY" in
       truncate_middle)
@@ -743,7 +744,7 @@ prompt_dir() {
             dir_length=${#cur_dir}
             if (( $dir_length > $max_length )) && [[ $cur_dir != $paths[${#paths}] ]]; then # only shorten if long enough and not last path
               last_pos=$(( $dir_length - $POWERLEVEL9K_SHORTEN_DIR_LENGTH ))
-              cur_dir=${cur_dir:0:$POWERLEVEL9K_SHORTEN_DIR_LENGTH}$POWERLEVEL9K_SHORTEN_DELIMITER${cur_dir:$last_pos:$dir_length}
+              cur_dir=${cur_dir:0:$POWERLEVEL9K_SHORTEN_DIR_LENGTH}$delim${cur_dir:$last_pos:$dir_length}
             fi
             cur_short_path+="$cur_dir/"
           done
@@ -758,8 +759,10 @@ prompt_dir() {
           for directory in ${paths[@]}
           do
             cur_dir=$directory
-            if (( ${#cur_dir} > ( $POWERLEVEL9K_SHORTEN_DIR_LENGTH + ${#POWERLEVEL9K_SHORTEN_DELIMITER} ) )) && [[ $cur_dir != $paths[${#paths}] ]]; then # only shorten if long enough and not last path
-              cur_dir=${cur_dir:0:$POWERLEVEL9K_SHORTEN_DIR_LENGTH}$POWERLEVEL9K_SHORTEN_DELIMITER
+            dir_length=${#cur_dir}
+            local threshhold=$(( $POWERLEVEL9K_SHORTEN_DIR_LENGTH + ${#delim} ))
+            if (( $dir_length > $threshhold )) && [[ $cur_dir != $paths[${#paths}] ]]; then # only shorten if long enough and not last path
+              cur_dir=${cur_dir:0:$POWERLEVEL9K_SHORTEN_DIR_LENGTH}$delim
             fi
             cur_short_path+="$cur_dir/"
           done
