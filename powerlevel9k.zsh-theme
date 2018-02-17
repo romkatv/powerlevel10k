@@ -725,7 +725,7 @@ set_default POWERLEVEL9K_DIR_PATH_HIGHLIGHT_BOLD false
 prompt_dir() {
   local current_dir="$(print -P "%~")"
   local paths
-  [[ current_dir != "/" ]] && paths=(${(s:/:)current_dir}) || paths[0] = "/"
+  [[ current_dir != "/" ]] && paths=(${(s:/:)current_dir})
   local cur_path cur_short_path directory dir_length cur_dir
 
   if [[ -n "$POWERLEVEL9K_SHORTEN_DIR_LENGTH" || "$POWERLEVEL9K_SHORTEN_STRATEGY" == "truncate_with_folder_marker" ]]; then
@@ -741,7 +741,7 @@ prompt_dir() {
           do
             cur_dir=$directory
             dir_length=${#cur_dir}
-            if (( $dir_length > $max_length )); then
+            if (( $dir_length > $max_length )) && [[ $cur_dir != $paths[${#paths}] ]]; then
               last_pos=$(( $dir_length - $POWERLEVEL9K_SHORTEN_DIR_LENGTH ))
               cur_dir=${cur_dir:0:$POWERLEVEL9K_SHORTEN_DIR_LENGTH}$POWERLEVEL9K_SHORTEN_DELIMITER${cur_dir:$last_pos:$dir_length}
             fi
@@ -758,7 +758,7 @@ prompt_dir() {
           for directory in ${paths[@]}
           do
             cur_dir=$directory
-            if (( ${#cur_dir} > $POWERLEVEL9K_SHORTEN_DIR_LENGTH )); then
+            if (( ${#cur_dir} > $POWERLEVEL9K_SHORTEN_DIR_LENGTH && [[ $cur_dir != $paths[${#paths}] ]]; then
               cur_dir=${cur_dir:0:$POWERLEVEL9K_SHORTEN_DIR_LENGTH}$POWERLEVEL9K_SHORTEN_DELIMITER
             fi
             cur_short_path+="$cur_dir/"
