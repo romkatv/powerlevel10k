@@ -723,13 +723,14 @@ set_default POWERLEVEL9K_DIR_PATH_HIGHLIGHT_BOLD false
 #   * $1 Alignment: string - left|right
 #   * $2 Index: integer
 prompt_dir() {
-  local current_dir="$(print -P "%~")"
+  local current_dir="$(echo $PWD)"
+  current_dir=${current_dir//$HOME/"~"}
   local paths
   [[ current_dir != "/" ]] && paths=(${(s:/:)current_dir}) # only split if not root folder
   local cur_path cur_short_path directory dir_length cur_dir
 
   if [[ -n "$POWERLEVEL9K_SHORTEN_DIR_LENGTH" || "$POWERLEVEL9K_SHORTEN_STRATEGY" == "truncate_with_folder_marker" ]]; then
-    set_default POWERLEVEL9K_SHORTEN_DELIMITER $'\u2026'
+    set_default POWERLEVEL9K_SHORTEN_DELIMITER "\u2026"
     local delim=$(echo -n $POWERLEVEL9K_SHORTEN_DELIMITER) # convert delimiter from unicode to literal character if required
 
     case "$POWERLEVEL9K_SHORTEN_STRATEGY" in
