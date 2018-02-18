@@ -723,8 +723,7 @@ set_default POWERLEVEL9K_DIR_PATH_HIGHLIGHT_BOLD false
 #   * $1 Alignment: string - left|right
 #   * $2 Index: integer
 prompt_dir() {
-  local current_dir="$(echo $PWD)"
-  current_dir=${current_dir//$HOME/"~"}
+  local current_dir="$(print -P '%~')"
   local paths
   [[ current_dir != "/" ]] && paths=(${(s:/:)current_dir}) # only split if not root folder
   local cur_path cur_short_path directory dir_length cur_dir
@@ -762,7 +761,7 @@ prompt_dir() {
             cur_dir=$directory
             dir_length=${#cur_dir}
             local threshhold=$(( $POWERLEVEL9K_SHORTEN_DIR_LENGTH + ${#delim} ))
-            if (( $dir_length > $threshhold )) && [[ $cur_dir != $paths[${#paths}] ]]; then # only shorten if long enough and not last path
+            if (( ( $dir_length + 1) > $threshhold )) && [[ $cur_dir != $paths[${#paths}] ]]; then # only shorten if long enough and not last path
               cur_dir=${cur_dir:0:$POWERLEVEL9K_SHORTEN_DIR_LENGTH}$delim
             fi
             cur_short_path+="$cur_dir/"
