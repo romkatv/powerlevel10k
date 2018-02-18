@@ -732,6 +732,7 @@ prompt_dir() {
 
     case "$POWERLEVEL9K_SHORTEN_STRATEGY" in
       truncate_middle)
+        [[ $current_path != "~"* ]] && trunc_path='/' || trunc_path=''
         if (( ${#paths} > 0 )); then # root is an exception and won't have paths
           local max_length=$(( $POWERLEVEL9K_SHORTEN_DIR_LENGTH * 2 )) # has to be double the length for beginning / end count
           local last_pos
@@ -749,6 +750,7 @@ prompt_dir() {
         fi
       ;;
       truncate_from_right)
+        [[ $current_path != "~"* ]] && trunc_path='/' || trunc_path=''
         if (( ${#paths} > 0 )); then # root is an exception and won't have paths
           for (( i=1; i<${#paths}; i++ )); do
             test_dir="$paths[$i]"
