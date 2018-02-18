@@ -756,64 +756,13 @@ prompt_dir() {
             test_dir="$paths[$i]"
             test_dir_length=${#test_dir}
             threshhold=$(( $POWERLEVEL9K_SHORTEN_DIR_LENGTH + ${#delim} ))
-            if (( $test_dir_length > $threshhold )); then # only shorten if long enough
+            if (( $test_dir_length > $threshhold && $test_dir_length > 3 )); then # only shorten if long enough
               trunc_path+="${test_dir:0:$POWERLEVEL9K_SHORTEN_DIR_LENGTH}$delim/"
             else
               trunc_path+="${test_dir}/"
             fi
           done
           current_path=$trunc_path${current_path:t}
-        fi
-      ;;
-      truncate_with_package_name)
-        local name repo_path package_path current_dir zero
-
-        # Get the path of the Git repo, which should have the package.json file
-        if [[ $(git rev-parse --is-inside-work-tree 2> /dev/null) == "true" ]]; then
-          # Get path from the root of the git repository to the current dir
-          local gitPath=$(git rev-parse --show-prefix)
-          # Remove trailing slash from git path, so that we can
-          # remove that git path from the pwd.
-          gitPath=${gitPath%/}
-          package_path=${current_dir%%$gitPath}
-          # Remove trailing slash
-          package_path=${package_dir%/}
-        elif [[ $(git rev-parse --is-inside-git-dir 2> /dev/null) == "true" ]]; then
-          package_path=${current_dir%%/.git*}
-        fi
-
-        # Replace the shortest possible match of the marked folder from
-        # the current path. Remove the amount of characters up to the
-        # folder marker from the left. Count only the visible characters
-        # in the path (this is done by the "zero" pattern; see
-        # http://stackoverflow.com/a/40855342/5586433).
-        local zero='%([BSUbfksu]|([FB]|){*})'
-        # Then, find the length of the package_path string, and save the
-        # subdirectory path as a substring of the current directory's path from 0
-        # to the length of the package path's string
-        subdirectory_path=$(truncatePathFromRight "${current_dir:${#${(S%%)package_path//$~zero/}}}")
-        # Parse the 'name' from the package.json; if there are any problems, just
-        # print the file path
-        defined POWERLEVEL9K_DIR_PACKAGE_FILES || POWERLEVEL9K_DIR_PACKAGE_FILES=(package.json composer.json)
-
-        local pkgFile="unknown"
-        for file in "${POWERLEVEL9K_DIR_PACKAGE_FILES[@]}"; do
-          if [[ -f "${package_path}/${file}" ]]; then
-            pkgFile="${package_path}/${file}"
-            break;
-          fi
-        done
-
-        local packageName=$(jq '.name' ${pkgFile} 2> /dev/null \
-          || node -e 'console.log(require(process.argv[1]).name);' ${pkgFile} 2>/dev/null \
-          || cat "${pkgFile}" 2> /dev/null | grep -m 1 "\"name\"" | awk -F ':' '{print $2}' | awk -F '"' '{print $2}' 2>/dev/null \
-          )
-        if [[ -n "${packageName}" ]]; then
-          # Instead of printing out the full path, print out the name of the package
-          # from the package.json and append the current subdirectory
-          current_path="`echo $packageName | tr -d '"'`$subdirectory_path"
-        else
-          current_path=$(truncatePathFromRight ${current_path//$HOME/"~"} )
         fi
       ;;
       truncate_with_folder_marker)
@@ -840,7 +789,58 @@ prompt_dir() {
 
         # Replace the shortest possible match of the marked folder from
         # the current path.
-        current_path=$current_path${current_dir#${last_marked_folder}*}
+        current_path=$current_path${current_path#${last_marked_folder}*}
+      ;;
+      truncate_with_package_name)
+        local name repo_path package_path current_dir zero
+
+        # Get the path of the Git repo, which should have the package.json file
+        if [[ $(git rev-parse --is-inside-work-tree 2> /dev/null) == "true" ]]; then
+          # Get path from the root of the git repository to the current dir
+          local gitPath=$(git rev-parse --show-prefix)
+          # Remove trailing slash from git path, so that we can
+          # remove that git path from the pwd.
+          gitPath=${gitPath%/}
+          package_path=${current_path%%$gitPath}
+          # Remove trailing slash
+          package_path=${package_dir%/}
+        elif [[ $(git rev-parse --is-inside-git-dir 2> /dev/null) == "true" ]]; then
+          package_path=${current_path%%/.git*}
+        fi
+
+        # Replace the shortest possible match of the marked folder from
+        # the current path. Remove the amount of characters up to the
+        # folder marker from the left. Count only the visible characters
+        # in the path (this is done by the "zero" pattern; see
+        # http://stackoverflow.com/a/40855342/5586433).
+        local zero='%([BSUbfksu]|([FB]|){*})'
+        # Then, find the length of the package_path string, and save the
+        # subdirectory path as a substring of the current directory's path from 0
+        # to the length of the package path's string
+        subdirectory_path=$(truncatePathFromRight "${current_path:${#${(S%%)package_path//$~zero/}}}")
+        # Parse the 'name' from the package.json; if there are any problems, just
+        # print the file path
+        defined POWERLEVEL9K_DIR_PACKAGE_FILES || POWERLEVEL9K_DIR_PACKAGE_FILES=(package.json composer.json)
+
+        local pkgFile="unknown"
+        for file in "${POWERLEVEL9K_DIR_PACKAGE_FILES[@]}"; do
+          if [[ -f "${package_path}/${file}" ]]; then
+            pkgFile="${package_path}/${file}"
+            break;
+          fi
+        done
+
+        local packageName=$(jq '.name' ${pkgFile} 2> /dev/null \
+          || node -e 'console.log(require(process.argv[1]).name);' ${pkgFile} 2>/dev/null \
+          || cat "${pkgFile}" 2> /dev/null | grep -m 1 "\"name\"" | awk -F ':' '{print $2}' | awk -F '"' '{print $2}' 2>/dev/null \
+          )
+        if [[ -n "${packageName}" ]]; then
+          # Instead of printing out the full path, print out the name of the package
+          # from the package.json and append the current subdirectory
+          current_path="`echo $packageName | tr -d '"'`$subdirectory_path"
+        else
+          current_path=$(truncatePathFromRight ${current_path//$HOME/"~"} )
+        fi
       ;;
       truncate_to_unique)
         # for each parent path component find the shortest unique beginning
