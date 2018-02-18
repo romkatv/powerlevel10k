@@ -248,6 +248,7 @@ case $POWERLEVEL9K_MODE in
   'nerdfont-complete'|'nerdfont-fontconfig')
     # nerd-font patched (complete) font required! See
     # https://github.com/ryanoasis/nerd-fonts
+    # http://nerdfonts.com/#cheat-sheet
     # Set the right locale to protect special characters
     local LC_ALL="" LC_CTYPE="en_US.UTF-8"
     icons=(
@@ -298,8 +299,8 @@ case $POWERLEVEL9K_MODE in
       VCS_COMMIT_ICON                $'\uE729 '             # 
       VCS_BRANCH_ICON                $'\uF126 '             # 
       VCS_REMOTE_BRANCH_ICON         $'\uE728 '             # 
-      VCS_GIT_ICON                   $'\uF113 '             # 
-      VCS_GIT_GITHUB_ICON            $'\uE709 '             # 
+      VCS_GIT_ICON                   $'\uF1D3 '             # 
+      VCS_GIT_GITHUB_ICON            $'\uF113 '             # 
       VCS_GIT_BITBUCKET_ICON         $'\uE703 '             # 
       VCS_GIT_GITLAB_ICON            $'\uF296 '             # 
       VCS_HG_ICON                    $'\uF0C3 '             # 
