@@ -761,7 +761,7 @@ prompt_dir() {
             cur_dir=$directory
             dir_length=${#cur_dir}
             local threshhold=$(( $POWERLEVEL9K_SHORTEN_DIR_LENGTH + ${#delim} ))
-            if (( ( $dir_length > $threshhold )) && [[ !c $dir_length == $POWERLEVEL9K_SHORTEN_DIR_LENGTH && $cur_dir != $paths[${#paths}] ]]; then # only shorten if long enough and not last path
+            if (( ( $dir_length > $threshhold )) && [[ ! $dir_length == $POWERLEVEL9K_SHORTEN_DIR_LENGTH && $cur_dir != $paths[${#paths}] ]]; then # only shorten if long enough and not last path
               cur_dir=${cur_dir:0:$POWERLEVEL9K_SHORTEN_DIR_LENGTH}$delim
             fi
             cur_short_path+="$cur_dir/"
