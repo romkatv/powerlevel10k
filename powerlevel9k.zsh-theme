@@ -723,52 +723,44 @@ set_default POWERLEVEL9K_DIR_PATH_HIGHLIGHT_BOLD false
 #   * $1 Alignment: string - left|right
 #   * $2 Index: integer
 prompt_dir() {
-  local current_dir="$(print -P '%~')"
-  local paths
-  [[ current_dir != "/" ]] && paths=(${(s:/:)current_dir}) # only split if not root folder
-  local cur_path cur_short_path directory dir_length cur_dir
-
+  local current_path="$(print -P '%~')"
+  local paths directory test_dir test_dir_length trunc_path threshhold
+  (( ${#current_path} > 1 )) && paths=(${(s:/:)current_path}) || paths=() # only split if not root/home folder
   if [[ -n "$POWERLEVEL9K_SHORTEN_DIR_LENGTH" || "$POWERLEVEL9K_SHORTEN_STRATEGY" == "truncate_with_folder_marker" ]]; then
     set_default POWERLEVEL9K_SHORTEN_DELIMITER "\u2026"
-    local delim=$(echo -n $POWERLEVEL9K_SHORTEN_DELIMITER) # convert delimiter from unicode to literal character if required
+    local delim=$(echo -n $POWERLEVEL9K_SHORTEN_DELIMITER) # convert delimiter from unicode to literal character
 
     case "$POWERLEVEL9K_SHORTEN_STRATEGY" in
       truncate_middle)
-        if [[ $current_dir != "/" ]]; then # root is an exception and won't have paths
-          [[ $current_dir == '~'* ]] && cur_short_path='' || cur_short_path='/' # if we are in the $HOME folder, we don't need starting /
-          local last_pos
+        if (( ${#paths} > 0 )); then # root is an exception and won't have paths
           local max_length=$(( $POWERLEVEL9K_SHORTEN_DIR_LENGTH * 2 )) # has to be double the length for beginning / end count
-          for directory in ${paths[@]} # go through all the paths
-          do
-            cur_dir=$directory
-            dir_length=${#cur_dir}
-            if (( $dir_length > $max_length )) && [[ $cur_dir != $paths[${#paths}] ]]; then # only shorten if long enough and not last path
+          local last_pos
+          for (( i=1; i<${#paths}; i++ )); do
+            test_dir=$paths[$i]
+            test_dir_length=${#test_dir}
+            if (( $test_dir_length > $max_length )); then # only shorten if long enough
               last_pos=$(( $dir_length - $POWERLEVEL9K_SHORTEN_DIR_LENGTH ))
-              cur_dir=${cur_dir:0:$POWERLEVEL9K_SHORTEN_DIR_LENGTH}$delim${cur_dir:$last_pos:$dir_length}
+              trunc_path+="${test_dir:0:$POWERLEVEL9K_SHORTEN_DIR_LENGTH}$delim${test_dir:$last_pos:$test_dir_length}/"
+            else
+              trunc_path+="${test_dir}/"
             fi
-            cur_short_path+="$cur_dir/"
           done
-          current_path="${cur_short_path: : -1}" # remove trailing slash
-        else
-          current_path="/"
+          current_path=$trunc_path${current_path:t}
         fi
       ;;
       truncate_from_right)
-        if [[ $current_dir != "/" ]]; then # root is an exception and won't have paths
-          [[ $current_dir == '~'* ]] && cur_short_path='' || cur_short_path='/' # if we are in the $HOME folder, we don't need starting /
-          for directory in ${paths[@]}
-          do
-            cur_dir=$directory
-            dir_length=${#cur_dir}
-            local threshhold=$(( $POWERLEVEL9K_SHORTEN_DIR_LENGTH + ${#delim} ))
-            if (( $dir_length > $threshhold )) && [[ $dir_length != $POWERLEVEL9K_SHORTEN_DIR_LENGTH && $cur_dir != $paths[${#paths}] ]]; then # only shorten if long enough and not last path
-              cur_dir=${cur_dir:0:$POWERLEVEL9K_SHORTEN_DIR_LENGTH}$delim
+        if (( ${#paths} > 0 )); then # root is an exception and won't have paths
+          for (( i=1; i<${#paths}; i++ )); do
+            test_dir="$paths[$i]"
+            test_dir_length=${#test_dir}
+            threshhold=$(( $POWERLEVEL9K_SHORTEN_DIR_LENGTH + ${#delim} ))
+            if (( $test_dir_length > $threshhold )); then # only shorten if long enough
+              trunc_path+="${test_dir:0:$POWERLEVEL9K_SHORTEN_DIR_LENGTH}$delim/"
+            else
+              trunc_path+="${test_dir}/"
             fi
-            cur_short_path+="$cur_dir/"
           done
-          current_path="${cur_short_path: : -1}" # remove trailing slash
-        else
-          current_path="/"
+          current_path=$trunc_path${current_path:t}
         fi
       ;;
       truncate_with_package_name)
@@ -851,22 +843,24 @@ prompt_dir() {
       truncate_to_unique)
         # for each parent path component find the shortest unique beginning
         # characters sequence. Source: https://stackoverflow.com/a/45336078
-        cur_path='/'
-        cur_short_path='/'
-        for directory in ${paths[@]}
-        do
-          cur_dir=''
-          for (( i=0; i<${#directory}; i++ )); do
-            cur_dir+="${directory:$i:1}"
-            matching=("$cur_path"/"$cur_dir"*/)
-            if [[ ${#matching[@]} -eq 1 ]]; then
-              break
-            fi
+        if (( ${#paths} > 0 )); then # root is an exception and won't have paths
+          local matching
+          local cur_path='/'
+          [[ $current_path != "~"* ]] && trunc_path='/' || trunc_path=''
+          for directory in ${paths[@]}; do
+            test_dir=''
+            for (( i=0; i<${#directory}; i++ )); do
+              test_dir+="${directory:$i:1}"
+              matching=("$cur_path"/"$test_dir"*/)
+              if [[ ${#matching[@]} -eq 1 ]]; then
+                break
+              fi
+            done
+            trunc_path+="$test_dir/"
+            cur_path+="$directory/"
           done
-          cur_short_path+="$cur_dir/"
-          cur_path+="$directory/"
-        done
-        current_path="${cur_short_path: : -1}"
+          current_path="${trunc_path: : -1}"
+        fi
       ;;
       *)
         current_path="$(print -P "%$((POWERLEVEL9K_SHORTEN_DIR_LENGTH+1))(c:$POWERLEVEL9K_SHORTEN_DELIMITER/:)%${POWERLEVEL9K_SHORTEN_DIR_LENGTH}c")"
