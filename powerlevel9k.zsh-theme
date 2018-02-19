@@ -861,8 +861,8 @@ prompt_dir() {
             trunc_path+="$test_dir/"
             cur_path+="$directory/"
           done
-          [[ $current_path == "~"* ]] && current_path="~/" || current_path=""
-          current_path+="${trunc_path: : -1}"
+          [[ $current_path == "~"* ]] && trunc_path="~/$trunc_path"
+          current_path="${trunc_path: : -1}"
         fi
       ;;
       *)
