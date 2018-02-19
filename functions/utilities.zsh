@@ -231,10 +231,10 @@ function truncatePath() {
     [[ -z $4 ]] && 4="right"
     # create a variable for the truncated path.
     local trunc_path
-    # if the path is in the home folder, don't add a "/" to the start
-    [[ $1 == "~"* ]] && trunc_path='' || trunc_path='/'
+    # if the path is in the home folder, add "~/" to the start otherwise "/"
+    [[ $1 == "~"* ]] && trunc_path='~/' || trunc_path='/'
     # split the path into an array using "/" as the delimiter
-    local paths=(${(s:/:)1})
+    local paths=(${(s:/:)${1//"~\/"/}})
     # declare locals for the directory being tested and its length
     local test_dir test_dir_length
     # do the needed truncation
