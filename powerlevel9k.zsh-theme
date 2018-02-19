@@ -716,12 +716,12 @@ prompt_command_execution_time() {
 
 ################################################################
 # Dir: current working directory
-set_default POWERLEVEL9K_DIR_PATH_SEPARATOR "/"
-set_default POWERLEVEL9K_HOME_FOLDER_ABBREVIATION "~"
-set_default POWERLEVEL9K_DIR_PATH_HIGHLIGHT_BOLD false
 # Parameters:
 #   * $1 Alignment: string - left|right
 #   * $2 Index: integer
+set_default POWERLEVEL9K_DIR_PATH_SEPARATOR "/"
+set_default POWERLEVEL9K_HOME_FOLDER_ABBREVIATION "~"
+set_default POWERLEVEL9K_DIR_PATH_HIGHLIGHT_BOLD false
 prompt_dir() {
   local current_path="$(print -P '%~')"
   local paths directory test_dir test_dir_length trunc_path threshhold
@@ -732,64 +732,38 @@ prompt_dir() {
 
     case "$POWERLEVEL9K_SHORTEN_STRATEGY" in
       truncate_middle)
-        [[ $current_path != "~"* ]] && trunc_path='/' || trunc_path=''
-        if (( ${#paths} > 0 )); then # root is an exception and won't have paths
-          local max_length=$(( $POWERLEVEL9K_SHORTEN_DIR_LENGTH * 2 )) # has to be double the length for beginning / end count
-          local last_pos
-          for (( i=1; i<${#paths}; i++ )); do
-            test_dir=$paths[$i]
-            test_dir_length=${#test_dir}
-            if (( $test_dir_length > $max_length )); then # only shorten if long enough
-              last_pos=$(( $dir_length - $POWERLEVEL9K_SHORTEN_DIR_LENGTH ))
-              trunc_path+="${test_dir:0:$POWERLEVEL9K_SHORTEN_DIR_LENGTH}$delim${test_dir:$last_pos:$test_dir_length}/"
-            else
-              trunc_path+="${test_dir}/"
-            fi
-          done
-          current_path=$trunc_path${current_path:t}
-        fi
+        current_path=$(truncatePath $current_path $POWERLEVEL9K_SHORTEN_DIR_LENGTH $POWERLEVEL9K_SHORTEN_DELIMITER "middle")
       ;;
       truncate_from_right)
-        [[ $current_path != "~"* ]] && trunc_path='/' || trunc_path=''
-        if (( ${#paths} > 0 )); then # root is an exception and won't have paths
-          for (( i=1; i<${#paths}; i++ )); do
-            test_dir="$paths[$i]"
-            test_dir_length=${#test_dir}
-            threshhold=$(( $POWERLEVEL9K_SHORTEN_DIR_LENGTH + ${#delim} ))
-            if (( $test_dir_length > $threshhold && $test_dir_length > 3 )); then # only shorten if long enough
-              trunc_path+="${test_dir:0:$POWERLEVEL9K_SHORTEN_DIR_LENGTH}$delim/"
-            else
-              trunc_path+="${test_dir}/"
-            fi
-          done
-          current_path=$trunc_path${current_path:t}
-        fi
+        current_path=$(truncatePath "$current_path" $POWERLEVEL9K_SHORTEN_DIR_LENGTH $POWERLEVEL9K_SHORTEN_DELIMITER)
       ;;
       truncate_with_folder_marker)
-        local last_marked_folder marked_folder
-        set_default POWERLEVEL9K_SHORTEN_FOLDER_MARKER ".shorten_folder_marker"
+        if (( ${#paths} > 0 )); then # root is an exception and won't have paths
+          local last_marked_folder marked_folder
+          set_default POWERLEVEL9K_SHORTEN_FOLDER_MARKER ".shorten_folder_marker"
 
-        # Search for the folder marker in the parent directories and
-        # buildup a pattern that is removed from the current path
-        # later on.
-        for marked_folder in $(upsearch $POWERLEVEL9K_SHORTEN_FOLDER_MARKER); do
-          if [[ "$marked_folder" == "/" ]]; then
-            # If we reached root folder, stop upsearch.
-            current_path="/"
-          elif [[ "$marked_folder" == "$HOME" ]]; then
-            # If we reached home folder, stop upsearch.
-            current_path="~"
-          elif [[ "${marked_folder%/*}" == $last_marked_folder ]]; then
-            current_path="${current_path%/}/${marked_folder##*/}"
-          else
-            current_path="${current_path%/}/$POWERLEVEL9K_SHORTEN_DELIMITER/${marked_folder##*/}"
-          fi
-          last_marked_folder=$marked_folder
-        done
+          # Search for the folder marker in the parent directories and
+          # buildup a pattern that is removed from the current path
+          # later on.
+          for marked_folder in $(upsearch $POWERLEVEL9K_SHORTEN_FOLDER_MARKER); do
+            if [[ "$marked_folder" == "/" ]]; then
+              # If we reached root folder, stop upsearch.
+              trunc_path="/"
+            elif [[ "$marked_folder" == "$HOME" ]]; then
+              # If we reached home folder, stop upsearch.
+              trunc_path="~"
+            elif [[ "${marked_folder%/*}" == $last_marked_folder ]]; then
+              trunc_path="${trunc_path%/}/${marked_folder##*/}"
+            else
+              trunc_path="${trunc_path%/}/$POWERLEVEL9K_SHORTEN_DELIMITER/${marked_folder##*/}"
+            fi
+            last_marked_folder=$marked_folder
+          done
 
-        # Replace the shortest possible match of the marked folder from
-        # the current path.
-        current_path=$current_path${current_path#${last_marked_folder}*}
+          # Replace the shortest possible match of the marked folder from
+          # the current path.
+          current_path=$trunc_path${current_path#${last_marked_folder}*}
+        fi
       ;;
       truncate_with_package_name)
         local name repo_path package_path current_dir zero
@@ -801,11 +775,11 @@ prompt_dir() {
           # Remove trailing slash from git path, so that we can
           # remove that git path from the pwd.
           gitPath=${gitPath%/}
-          package_path=${current_path%%$gitPath}
+          package_path=${$(pwd)%%$gitPath}
           # Remove trailing slash
-          package_path=${package_dir%/}
+          package_path=${package_path%/}
         elif [[ $(git rev-parse --is-inside-git-dir 2> /dev/null) == "true" ]]; then
-          package_path=${current_path%%/.git*}
+          package_path=${$(pwd)%%/.git*}
         fi
 
         # Replace the shortest possible match of the marked folder from
@@ -814,10 +788,11 @@ prompt_dir() {
         # in the path (this is done by the "zero" pattern; see
         # http://stackoverflow.com/a/40855342/5586433).
         local zero='%([BSUbfksu]|([FB]|){*})'
+        trunc_path=$(pwd)
         # Then, find the length of the package_path string, and save the
         # subdirectory path as a substring of the current directory's path from 0
         # to the length of the package path's string
-        subdirectory_path=$(truncatePathFromRight "${current_path:${#${(S%%)package_path//$~zero/}}}")
+        subdirectory_path=$(truncatePath "${trunc_path:${#${(S%%)package_path//$~zero/}}}" $POWERLEVEL9K_SHORTEN_DIR_LENGTH $POWERLEVEL9K_SHORTEN_DELIMITER)
         # Parse the 'name' from the package.json; if there are any problems, just
         # print the file path
         defined POWERLEVEL9K_DIR_PACKAGE_FILES || POWERLEVEL9K_DIR_PACKAGE_FILES=(package.json composer.json)
@@ -838,8 +813,6 @@ prompt_dir() {
           # Instead of printing out the full path, print out the name of the package
           # from the package.json and append the current subdirectory
           current_path="`echo $packageName | tr -d '"'`$subdirectory_path"
-        else
-          current_path=$(truncatePathFromRight ${current_path//$HOME/"~"} )
         fi
       ;;
       truncate_to_unique)
