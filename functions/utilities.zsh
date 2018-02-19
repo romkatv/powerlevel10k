@@ -102,58 +102,46 @@ case $(uname) in
       OS_ICON=$(print_icon 'FREEBSD_ICON')
       ;;
     Linux)
+      OS='Linux'
       os_release_id="$(grep -E '^ID=([a-zA-Z]*)' /etc/os-release | cut -d '=' -f 2)"
       case "$os_release_id" in
         "arch")
-        OS='Arch'
         OS_ICON=$(print_icon 'LINUX_ARCH_ICON')
         ;;
         "debian")
-        OS='Debian'
         OS_ICON=$(print_icon 'LINUX_DEBIAN_ICON')
         ;;
        "ubuntu")
-        OS='Ubuntu'
         OS_ICON=$(print_icon 'LINUX_UBUNTU_ICON')
         ;;
        "elementary")
-        OS='Elementary'
         OS_ICON=$(print_icon 'LINUX_ELEMENTARY_ICON')
         ;;
        "fedora")
-        OS='Fedora'
         OS_ICON=$(print_icon 'LINUX_FEDORA_ICON')
         ;;
        "coreos")
-        OS='CoreOS'
         OS_ICON=$(print_icon 'LINUX_COREOS_ICON')
         ;;
        "gentoo")
-        OS='Gentoo'
         OS_ICON=$(print_icon 'LINUX_GENTOO_ICON')
         ;;
        "mageia")
-        OS='Mageia'
         OS_ICON=$(print_icon 'LINUX_MAGEIA_ICON')
         ;;
        "centos")
-        OS='CentOS'
         OS_ICON=$(print_icon 'LINUX_CENTOS_ICON')
         ;;
        "opensuse"|"tumbleweed")
-        OS='OpenSUSE'
         OS_ICON=$(print_icon 'LINUX_OPENSUSE_ICON')
         ;;
        "sabayon")
-        OS='Sabayon'
         OS_ICON=$(print_icon 'LINUX_SABAYON_ICON')
         ;;
        "slackware")
-        OS='Slackware'
         OS_ICON=$(print_icon 'LINUX_SLACKWARE_ICON')
         ;;
        "linuxmint")
-        OS='Mint'
         OS_ICON=$(print_icon 'LINUX_MINT_ICON')
         ;;
         *)
