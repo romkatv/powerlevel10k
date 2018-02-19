@@ -724,6 +724,7 @@ set_default POWERLEVEL9K_HOME_FOLDER_ABBREVIATION "~"
 set_default POWERLEVEL9K_DIR_PATH_HIGHLIGHT_BOLD false
 prompt_dir() {
   local current_path="$(print -P '%~')"
+  local num_paths=(${(s:/:)current_path})
   local paths directory test_dir test_dir_length trunc_path threshhold
   (( ${#current_path} > 1 )) && paths=(${(s:/:)${current_path//"~\/"/}}) || paths=() # only split if not root/home folder
   if [[ -n "$POWERLEVEL9K_SHORTEN_DIR_LENGTH" || "$POWERLEVEL9K_SHORTEN_STRATEGY" == "truncate_with_folder_marker" ]]; then
@@ -738,7 +739,7 @@ prompt_dir() {
         current_path=$(truncatePath "$current_path" $POWERLEVEL9K_SHORTEN_DIR_LENGTH $POWERLEVEL9K_SHORTEN_DELIMITER)
       ;;
       truncate_with_folder_marker)
-        if (( ${#paths} > 0 )); then # root is an exception and won't have paths
+        if (( ${#num_paths} > 0 )); then # root is an exception and won't have paths
           local last_marked_folder marked_folder
           set_default POWERLEVEL9K_SHORTEN_FOLDER_MARKER ".shorten_folder_marker"
 
@@ -818,7 +819,7 @@ prompt_dir() {
       truncate_to_unique)
         # for each parent path component find the shortest unique beginning
         # characters sequence. Source: https://stackoverflow.com/a/45336078
-        if (( ${#paths} > 0 )); then # root is an exception and won't have paths
+        if (( ${#num_paths} > 0 )); then # root is an exception and won't have paths
           local matching
           local cur_path='/'
           [[ $current_path != "~"* ]] && trunc_path='/' || trunc_path=''
