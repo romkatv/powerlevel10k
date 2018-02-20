@@ -63,6 +63,15 @@ are interested.
 Be sure to check out the wiki page on the additional prompt customization
 options, including color and icon settings: [Stylizing Your Prompt](https://github.com/bhilburn/powerlevel9k/wiki/Stylizing-Your-Prompt)
 
+##### Adding Newline After Prompt
+
+To add a newline after each prompt / print loop, set the following:
+
+| Variable | Default Value | Description |
+|----------|---------------|-------------|
+|`POWERLEVEL9K_PROMPT_ADD_NEWLINE`|`false`|Adds spacing between each prompt / print loop|
+|`POWERLEVEL9K_PROMPT_ADD_NEWLINE_COUNT`|`1`|Sets the number of lines between each prompt / print loop|
+
 #### Customizing Prompt Segments
 Customizing your prompt is easy! Select the segments you want to have displayed,
 and then assign them to either the left or right prompt by adding the following
