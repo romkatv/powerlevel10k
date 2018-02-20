@@ -1620,9 +1620,14 @@ $(print_icon 'MULTILINE_LAST_PROMPT_PREFIX')'
   if [[ "$POWERLEVEL9K_DISABLE_RPROMPT" != true ]]; then
     RPROMPT='$RPROMPT_PREFIX%f%b%k$(build_right_prompt)%{$reset_color%}$RPROMPT_SUFFIX'
   fi
+
 NEWLINE='
 '
-  [[ $POWERLEVEL9K_PROMPT_ADD_NEWLINE == true ]] && PROMPT="$NEWLINE$PROMPT"
+  if [[ $POWERLEVEL9K_PROMPT_ADD_NEWLINE == true ]]; then
+    NEWLINES=""
+    repeat ${POWERLEVEL9K_PROMPT_ADD_NEWLINE_COUNT:-1} { NEWLINES+=$NEWLINE }
+    PROMPT="$NEWLINES$PROMPT"
+  fi
 }
 
 set_default POWERLEVEL9K_IGNORE_TERM_COLORS false
