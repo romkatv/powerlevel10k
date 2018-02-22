@@ -724,21 +724,39 @@ set_default POWERLEVEL9K_HOME_FOLDER_ABBREVIATION "~"
 set_default POWERLEVEL9K_DIR_PATH_HIGHLIGHT_BOLD false
 prompt_dir() {
   local current_path="$(print -P '%~')"
+  # save this path so that we can use the pure path for STATE icons and colors later.
+  local state_path=$current_path
+  # declare all local variables
   local paths directory test_dir test_dir_length trunc_path threshhold
-  (( ${#current_path} > 1 )) && paths=(${(s:/:)${current_path//"~\/"/}}) || paths=() # only split if not root/home folder
-  if [[ -n "$POWERLEVEL9K_SHORTEN_DIR_LENGTH" || "$POWERLEVEL9K_SHORTEN_STRATEGY" == "truncate_with_folder_marker" ]]; then
+  # if we are not in "~" or "/", split the paths into an array
+  (( ${#current_path} > 1 )) && paths=(${(s:/:)${current_path//"~\/"/}}) || paths=()
+  # only run the code if SHORTEN_DIR_LENGTH is set, or we are using the two strategies that don't rely on it.
+  if [[ -n "$POWERLEVEL9K_SHORTEN_DIR_LENGTH" || "$POWERLEVEL9K_SHORTEN_STRATEGY" == "truncate_with_folder_marker" || "$POWERLEVEL9K_SHORTEN_STRATEGY" == "truncate_to_last" ]]; then
     set_default POWERLEVEL9K_SHORTEN_DELIMITER "\u2026"
-    local delim=$(echo -n $POWERLEVEL9K_SHORTEN_DELIMITER) # convert delimiter from unicode to literal character
+    # convert delimiter from unicode to literal character, so that we can get the correct length later
+    local delim=$(echo -n $POWERLEVEL9K_SHORTEN_DELIMITER)
 
     case "$POWERLEVEL9K_SHORTEN_STRATEGY" in
       truncate_middle)
+        # truncate characters from the middle of the path
         current_path=$(truncatePath $current_path $POWERLEVEL9K_SHORTEN_DIR_LENGTH $POWERLEVEL9K_SHORTEN_DELIMITER "middle")
       ;;
       truncate_from_right)
+        # truncate characters from the right of the path
         current_path=$(truncatePath "$current_path" $POWERLEVEL9K_SHORTEN_DIR_LENGTH $POWERLEVEL9K_SHORTEN_DELIMITER)
       ;;
+      truncate_to_last)
+        # truncate all characters before the current directory
+        current_path=${current_path##*/}
+      ;;
+      truncate_absolute)
+        # truncate all characters except the last POWERLEVEL9K_SHORTEN_DIR_LENGTH characters
+        if [ ${#current_path} -gt $(( $POWERLEVEL9K_SHORTEN_DIR_LENGTH + ${#POWERLEVEL9K_SHORTEN_DELIMITER} )) ]; then
+          current_path=$POWERLEVEL9K_SHORTEN_DELIMITER${current_path:(-$POWERLEVEL9K_SHORTEN_DIR_LENGTH)}
+        fi
+      ;;
       truncate_with_folder_marker)
-        if (( ${#paths} > 0 )); then # root is an exception and won't have paths
+        if (( ${#paths} > 0 )); then # root and home are exceptions and won't have paths, so skip this
           local last_marked_folder marked_folder
           set_default POWERLEVEL9K_SHORTEN_FOLDER_MARKER ".shorten_folder_marker"
 
@@ -844,7 +862,8 @@ prompt_dir() {
     esac
   fi
 
-  local path_opt=$current_path # save state of path for highlighting and bold options
+  # save state of path for highlighting and bold options
+  local path_opt=$current_path
 
   if [[ "${POWERLEVEL9K_DIR_OMIT_FIRST_CHARACTER}" == "true" ]]; then
     current_path="${current_path[2,-1]}"
@@ -860,14 +879,15 @@ prompt_dir() {
   local current_state="DEFAULT"
   if [[ "${POWERLEVEL9K_DIR_SHOW_WRITABLE}" == true && ! -w "$PWD" ]]; then
     current_state="NOT_WRITABLE"
-  elif [[ $current_path == '~' ]]; then
+  elif [[ $state_path == '~' ]]; then
     current_state="HOME"
-  elif [[ $current_path == '~'* ]]; then
+  elif [[ $state_path == '~'* ]]; then
     current_state="HOME_SUBFOLDER"
   fi
 
+  # declare variables used for bold and state colors
   local bld dir_state_foreground dir_state_user_foreground
-  [[ "${(L)POWERLEVEL9K_DIR_PATH_HIGHLIGHT_BOLD}" == "true" ]] && bld="%B" || bld=""
+  [[ "${(L)POWERLEVEL9K_DIR_PATH_HIGHLIGHT_BOLD}" == "true" ]] && bld_on="%B"; bld_off="%b" || bld_on=""; bld_off=""
 
   local dir_state_user_foreground=POWERLEVEL9K_DIR_${current_state}_FOREGROUND
   local dir_state_foreground=${(P)dir_state_user_foreground}
@@ -879,15 +899,23 @@ prompt_dir() {
 
   if [[ -n ${POWERLEVEL9K_DIR_PATH_HIGHLIGHT_FOREGROUND} ]]; then
     if [[ $path_opt == "/" || $path_opt == "~" || "${(L)POWERLEVEL9K_DIR_OMIT_FIRST_CHARACTER}" == "true" ]]; then
-      current_path="${bld}%F{$POWERLEVEL9K_DIR_PATH_HIGHLIGHT_FOREGROUND}${current_path}%b"
+      current_path="${bld_on}%F{$POWERLEVEL9K_DIR_PATH_HIGHLIGHT_FOREGROUND}${current_path}${bld_off}"
     else
-      current_path="${dir_name}/${bld}%F{$POWERLEVEL9K_DIR_PATH_HIGHLIGHT_FOREGROUND}${base_name}%b"
+      if [[ $dir_name != $base_name ]]; then
+        current_path="${dir_name}/${bld_on}%F{$POWERLEVEL9K_DIR_PATH_HIGHLIGHT_FOREGROUND}${base_name}${bld_off}"
+      else
+        current_path="${bld_on}%F{$POWERLEVEL9K_DIR_PATH_HIGHLIGHT_FOREGROUND}${base_name}${bld_off}"
+      fi
     fi
   else
     if [[ $path_opt == "/" || $path_opt == "~" || "${(L)POWERLEVEL9K_DIR_OMIT_FIRST_CHARACTER}" == "true" ]]; then
-      current_path="${bld}${current_path}%b"
+      current_path="${bld_on}${current_path}${bld_off}"
     else
-      current_path="${dir_name}/${bld}${base_name}%b"
+      if [[ $dir_name != $base_name ]]; then
+        current_path="${dir_name}/${bld_on}${base_name}${bld_off}"
+      else
+        current_path="${bld_on}${base_name}${bld_off}"
+      fi
     fi
   fi
 
