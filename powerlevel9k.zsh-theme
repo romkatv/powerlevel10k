@@ -725,7 +725,7 @@ set_default POWERLEVEL9K_DIR_PATH_HIGHLIGHT_BOLD false
 prompt_dir() {
   local current_path="$(print -P '%~')"
   local paths directory test_dir test_dir_length trunc_path threshhold
-  (( ${#current_path} > 1 )) && num_paths=(${(s:/:)${current_path//"~\/"/}}) || paths=() # only split if not root/home folder
+  (( ${#current_path} > 1 )) && num_paths=(${(s:/:)${current_path//"~\/"/}}) || num_paths=() # only split if not root/home folder
   if [[ -n "$POWERLEVEL9K_SHORTEN_DIR_LENGTH" || "$POWERLEVEL9K_SHORTEN_STRATEGY" == "truncate_with_folder_marker" ]]; then
     set_default POWERLEVEL9K_SHORTEN_DELIMITER "\u2026"
     local delim=$(echo -n $POWERLEVEL9K_SHORTEN_DELIMITER) # convert delimiter from unicode to literal character
@@ -818,7 +818,7 @@ prompt_dir() {
       truncate_to_unique)
         # for each parent path component find the shortest unique beginning
         # characters sequence. Source: https://stackoverflow.com/a/45336078
-        if (( ${#num_paths} > 0 )); then # root is an exception and won't have paths
+        if (( ${#current_path} > 1 )); then # root and home are exceptions and won't have paths
           local matching
           local cur_path='/'
           [[ $current_path != "~"* ]] && trunc_path='/' || trunc_path=''
@@ -860,9 +860,9 @@ prompt_dir() {
   local current_state="DEFAULT"
   if [[ "${POWERLEVEL9K_DIR_SHOW_WRITABLE}" == true && ! -w "$PWD" ]]; then
     current_state="NOT_WRITABLE"
-  elif [[ $current_dir == '~' ]]; then
+  elif [[ $current_path == '~' ]]; then
     current_state="HOME"
-  elif [[ $current_dir == '~'* ]]; then
+  elif [[ $current_path == '~'* ]]; then
     current_state="HOME_SUBFOLDER"
   fi
 
