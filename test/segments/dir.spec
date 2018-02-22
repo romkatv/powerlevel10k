@@ -92,7 +92,7 @@ function testTruncateToLastWorks() {
 
 function testTruncateAbsoluteWorks() {
   POWERLEVEL9K_SHORTEN_DIR_LENGTH=2
-  POWERLEVEL9K_SHORTEN_STRATEGY="truncate_to_last"
+  POWERLEVEL9K_SHORTEN_STRATEGY="truncate_absolute"
 
   FOLDER=/tmp/powerlevel9k-test/1/12/123/1234/12345/123456/1234567/12345678/123456789
   mkdir -p $FOLDER
