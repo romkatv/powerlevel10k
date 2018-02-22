@@ -234,7 +234,8 @@ function truncatePath() {
     # if the path is in the home folder, add "~/" to the start otherwise "/"
     [[ $1 == "~"* ]] && trunc_path='~/' || trunc_path='/'
     # split the path into an array using "/" as the delimiter
-    local paths=(${(s:/:)${1//"~\/"/}})
+    local paths=$1
+    paths=(${(s:/:)${paths//"~\/"/}})
     # declare locals for the directory being tested and its length
     local test_dir test_dir_length delim_len
     # do the needed truncation
