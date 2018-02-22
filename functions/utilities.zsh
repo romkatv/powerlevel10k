@@ -226,7 +226,7 @@ function truncatePath() {
     # convert $2 from string to integer
     2=$(( $2 ))
     # set $3 to "" if not defined
-    [[ -z $3 ]] && local 3="" || 3=$(echo -n $3)
+    [[ -z $3 ]] && 3="" || 3=$(echo -n $3)
     # set $4 to "right" if not defined
     [[ -z $4 ]] && 4="right"
     # create a variable for the truncated path.
@@ -237,14 +237,12 @@ function truncatePath() {
     local paths=$1
     paths=(${(s:/:)${paths//"~\/"/}})
     # declare locals for the directory being tested and its length
-    local test_dir test_dir_length delim_len
+    local test_dir test_dir_length
     # do the needed truncation
     case $4 in
       right)
-        # check the length of the delimiter
-        [[ -z $3 ]] && delim_len=${#3} || delim_len=0
         # include the delimiter length in the threshhold
-        local threshhold=$(( $2 + $delim_len ))
+        local threshhold=$(( $2 + ${#3} ))
         # loop through the paths
         for (( i=1; i<${#paths}; i++ )); do
           # get the current directory value
