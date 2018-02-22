@@ -234,15 +234,16 @@ function truncatePath() {
     # if the path is in the home folder, add "~/" to the start otherwise "/"
     [[ $1 == "~"* ]] && trunc_path='~/' || trunc_path='/'
     # split the path into an array using "/" as the delimiter
-    local paths=$1
-    paths=(${(s:/:)${paths//"~\/"/}})
+    local paths=(${(s:/:)${1//"~\/"/}})
     # declare locals for the directory being tested and its length
-    local test_dir test_dir_length
+    local test_dir test_dir_length delim_len
     # do the needed truncation
     case $4 in
       right)
+        # check the length of the delimiter
+        [[ -z $3 ]] && delim_len=${#3} || delim_len=0
         # include the delimiter length in the threshhold
-        local threshhold=$(( $2 + ${#3} ))
+        local threshhold=$(( $2 + $delim_len ))
         # loop through the paths
         for (( i=1; i<${#paths}; i++ )); do
           # get the current directory value
@@ -261,7 +262,7 @@ function truncatePath() {
       ;;
       middle)
         # we need double the length for start and end truncation + delimiter length
-        local threshhold=$(( $2 * 2 + ${#3} ))
+        local threshhold=$(( $2 * 2 ))
         # create a variable for the start of the end truncation
         local last_pos
         # loop through the paths
@@ -271,7 +272,7 @@ function truncatePath() {
           test_dir_length=${#test_dir}
           # only truncate if the resulting truncation will be shorter than
           # the truncation + delimiter length
-          if (( $test_dir_length > $threshhold + ${#3} )); then
+          if (( $test_dir_length > $threshhold )); then
             # use the first $2 characters, the delimiter and the last $2 characters
             last_pos=$(( $test_dir_length - $2 ))
             trunc_path+="${test_dir:0:$2}$3${test_dir:$last_pos:$test_dir_length}/"
