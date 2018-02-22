@@ -865,10 +865,6 @@ prompt_dir() {
   # save state of path for highlighting and bold options
   local path_opt=$current_path
 
-  if [[ "${POWERLEVEL9K_DIR_OMIT_FIRST_CHARACTER}" == "true" ]]; then
-    current_path="${current_path[2,-1]}"
-  fi
-
   typeset -AH dir_states
   dir_states=(
     "DEFAULT"         "FOLDER_ICON"
@@ -887,30 +883,43 @@ prompt_dir() {
 
   # declare variables used for bold and state colors
   local bld dir_state_foreground dir_state_user_foreground
-  [[ "${(L)POWERLEVEL9K_DIR_PATH_HIGHLIGHT_BOLD}" == "true" ]] && bld_on="%B"; bld_off="%b" || bld_on=""; bld_off=""
-
+  # test if user wants the last directory printed in bold
+  if [[ "${(L)POWERLEVEL9K_DIR_PATH_HIGHLIGHT_BOLD}" == "true" ]]; then
+    bld_on="%B"
+    bld_off="%b"
+  else
+    bld_on=""
+    bld_off=""
+  fi
+  # determine is the user has set a last directory color
   local dir_state_user_foreground=POWERLEVEL9K_DIR_${current_state}_FOREGROUND
   local dir_state_foreground=${(P)dir_state_user_foreground}
   [[ -z ${dir_state_foreground} ]] && dir_state_foreground="${DEFAULT_COLOR}"
 
   local dir_name base_name
+  # use ZSH substitution to get the dirname and basename instead of calling external functions
   dir_name=${path_opt%/*}
   base_name=${path_opt##*/}
 
+  # if the user wants the last directory colored...
   if [[ -n ${POWERLEVEL9K_DIR_PATH_HIGHLIGHT_FOREGROUND} ]]; then
-    if [[ $path_opt == "/" || $path_opt == "~" || "${(L)POWERLEVEL9K_DIR_OMIT_FIRST_CHARACTER}" == "true" ]]; then
+    # it the path is "/" or "~"
+    if [[ $path_opt == "/" || $path_opt == "~" ]]; then
       current_path="${bld_on}%F{$POWERLEVEL9K_DIR_PATH_HIGHLIGHT_FOREGROUND}${current_path}${bld_off}"
-    else
+    else # has a subfolder
+      # test if dirname != basename - they are equal if we use truncate_to_last or truncate_absolute
       if [[ $dir_name != $base_name ]]; then
         current_path="${dir_name}/${bld_on}%F{$POWERLEVEL9K_DIR_PATH_HIGHLIGHT_FOREGROUND}${base_name}${bld_off}"
       else
         current_path="${bld_on}%F{$POWERLEVEL9K_DIR_PATH_HIGHLIGHT_FOREGROUND}${base_name}${bld_off}"
       fi
     fi
-  else
-    if [[ $path_opt == "/" || $path_opt == "~" || "${(L)POWERLEVEL9K_DIR_OMIT_FIRST_CHARACTER}" == "true" ]]; then
+  else # no coloring
+    # it the path is "/" or "~"
+    if [[ $path_opt == "/" || $path_opt == "~" ]]; then
       current_path="${bld_on}${current_path}${bld_off}"
-    else
+    else # has a subfolder
+      # test if dirname != basename - they are equal if we use truncate_to_last or truncate_absolute
       if [[ $dir_name != $base_name ]]; then
         current_path="${dir_name}/${bld_on}${base_name}${bld_off}"
       else
@@ -919,16 +928,26 @@ prompt_dir() {
     fi
   fi
 
+  # check if we need to omit the first character and only do it if we are not in "~" or "/"
+  if [[ "${POWERLEVEL9K_DIR_OMIT_FIRST_CHARACTER}" == "true" && $path_opt != "/" && $path_opt != "~" ]]; then
+    current_path="${current_path[2,-1]}"
+  fi
+
+  # check if the user wants the separator colored.
   if [[ -n ${POWERLEVEL9K_DIR_PATH_SEPARATOR_FOREGROUND} && $path_opt != "/" ]]; then
-    current_path="$( echo "${current_path}" | sed "s/\//%F{$POWERLEVEL9K_DIR_PATH_SEPARATOR_FOREGROUND}\/%F{$dir_state_foreground}/g")"
+    # because this contains color changing codes, it is easier to set a variable for what should be replaced
+    local repl="%F{$POWERLEVEL9K_DIR_PATH_SEPARATOR_FOREGROUND}/%F{$dir_state_foreground}"
+    # escape the / with a \
+    current_path=${current_path//\//$repl}
   fi
 
   if [[ "${POWERLEVEL9K_DIR_PATH_SEPARATOR}" != "/" && $path_opt != "/" ]]; then
-    current_path="$( echo "${current_path}" | sed "s/\//${POWERLEVEL9K_DIR_PATH_SEPARATOR}/g")"
+    current_path=${current_path//\//$POWERLEVEL9K_DIR_PATH_SEPARATOR}
   fi
 
   if [[ "${POWERLEVEL9K_HOME_FOLDER_ABBREVIATION}" != "~" && ! "${(L)POWERLEVEL9K_DIR_OMIT_FIRST_CHARACTER}" == "true" ]]; then
-    current_path="$( echo "${current_path}" | sed "s/~/${POWERLEVEL9K_HOME_FOLDER_ABBREVIATION}/1")"
+    # use :s to only replace the first occurance
+    current_path=${current_path:s/~/$POWERLEVEL9K_HOME_FOLDER_ABBREVIATION}
   fi
 
   "$1_prompt_segment" "$0_${current_state}" "$2" "blue" "$DEFAULT_COLOR" "${current_path}" "${dir_states[$current_state]}"

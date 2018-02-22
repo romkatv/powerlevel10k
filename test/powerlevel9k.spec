@@ -20,7 +20,7 @@ function testJoinedSegments() {
   POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(dir dir_joined)
   cd /tmp
 
-  assertEquals "%K{blue} %F{black}/tmp%b %K{blue}%F{black}%F{black}/tmp%b %k%F{blue}%f " "$(build_left_prompt)"
+  assertEquals "%K{blue} %F{black}/tmp %K{blue}%F{black}%F{black}/tmp %k%F{blue}%f " "$(build_left_prompt)"
 
   unset POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
   cd -
@@ -30,7 +30,7 @@ function testTransitiveJoinedSegments() {
   POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(dir root_indicator_joined dir_joined)
   cd /tmp
 
-  assertEquals "%K{blue} %F{black}/tmp%b %K{blue}%F{black}%F{black}/tmp%b %k%F{blue}%f " "$(build_left_prompt)"
+  assertEquals "%K{blue} %F{black}/tmp %K{blue}%F{black}%F{black}/tmp %k%F{blue}%f " "$(build_left_prompt)"
 
   unset POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
   cd -
@@ -40,7 +40,7 @@ function testJoiningWithConditionalSegment() {
   POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(dir background_jobs dir_joined)
   cd /tmp
 
-  assertEquals "%K{blue} %F{black}/tmp%b %K{blue}%F{black} %F{black}/tmp%b %k%F{blue}%f " "$(build_left_prompt)"
+  assertEquals "%K{blue} %F{black}/tmp %K{blue}%F{black} %F{black}/tmp %k%F{blue}%f " "$(build_left_prompt)"
 
   unset POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
   cd -
@@ -51,7 +51,7 @@ function testDynamicColoringOfSegmentsWork() {
   POWERLEVEL9K_DIR_DEFAULT_BACKGROUND='red'
   cd /tmp
 
-  assertEquals "%K{red} %F{black}/tmp%b %k%F{red}%f " "$(build_left_prompt)"
+  assertEquals "%K{red} %F{black}/tmp %k%F{red}%f " "$(build_left_prompt)"
 
   unset POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
   unset POWERLEVEL9K_DIR_DEFAULT_BACKGROUND
@@ -65,7 +65,7 @@ function testDynamicColoringOfVisualIdentifiersWork() {
 
   cd /tmp
 
-  assertEquals "%K{blue} %F{green%}icon-here%f %F{black}/tmp%b %k%F{blue}%f " "$(build_left_prompt)"
+  assertEquals "%K{blue} %F{green%}icon-here%f %F{black}/tmp %k%F{blue}%f " "$(build_left_prompt)"
 
   unset POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
   unset POWERLEVEL9K_DIR_DEFAULT_VISUAL_IDENTIFIER_COLOR
@@ -86,7 +86,7 @@ function testColoringOfVisualIdentifiersDoesNotOverwriteColoringOfSegment() {
 
   cd /tmp
 
-  assertEquals "%K{yellow} %F{green%}icon-here%f %F{red}/tmp%b %k%F{yellow}%f " "$(build_left_prompt)"
+  assertEquals "%K{yellow} %F{green%}icon-here%f %F{red}/tmp %k%F{yellow}%f " "$(build_left_prompt)"
 
   unset POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
   unset POWERLEVEL9K_DIR_DEFAULT_VISUAL_IDENTIFIER_COLOR
@@ -106,7 +106,7 @@ function testOverwritingIconsWork() {
   #cd ~/$testFolder
 
   cd /tmp
-  assertEquals "%K{blue} %F{black%}icon-here%f %F{black}/tmp%b %k%F{blue}%f " "$(build_left_prompt)"
+  assertEquals "%K{blue} %F{black%}icon-here%f %F{black}/tmp %k%F{blue}%f " "$(build_left_prompt)"
 
   unset POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
   unset POWERLEVEL9K_DIR_FOLDER_ICON
