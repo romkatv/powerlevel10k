@@ -752,7 +752,7 @@ prompt_dir() {
       truncate_absolute)
         # truncate all characters except the last POWERLEVEL9K_SHORTEN_DIR_LENGTH characters
         if [ ${#current_path} -gt $(( $POWERLEVEL9K_SHORTEN_DIR_LENGTH + ${#POWERLEVEL9K_SHORTEN_DELIMITER} )) ]; then
-          current_path=$POWERLEVEL9K_SHORTEN_DELIMITER${current_path:(-$POWERLEVEL9K_SHORTEN_DIR_LENGTH)}
+          current_path=$POWERLEVEL9K_SHORTEN_DELIMITER${current_path:(-POWERLEVEL9K_SHORTEN_DIR_LENGTH)}
         fi
       ;;
       truncate_with_folder_marker)
