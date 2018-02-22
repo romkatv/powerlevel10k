@@ -738,7 +738,7 @@ prompt_dir() {
         current_path=$(truncatePath "$current_path" $POWERLEVEL9K_SHORTEN_DIR_LENGTH $POWERLEVEL9K_SHORTEN_DELIMITER)
       ;;
       truncate_with_folder_marker)
-        if (( ${#num_paths} > 0 )); then # root is an exception and won't have paths
+        if (( ${#paths} > 0 )); then # root is an exception and won't have paths
           local last_marked_folder marked_folder
           set_default POWERLEVEL9K_SHORTEN_FOLDER_MARKER ".shorten_folder_marker"
 
