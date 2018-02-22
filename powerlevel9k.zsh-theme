@@ -725,7 +725,7 @@ set_default POWERLEVEL9K_DIR_PATH_HIGHLIGHT_BOLD false
 prompt_dir() {
   local current_path="$(print -P '%~')"
   local paths directory test_dir test_dir_length trunc_path threshhold
-  (( ${#current_path} > 1 )) && num_paths=(${(s:/:)${current_path//"~\/"/}}) || num_paths=() # only split if not root/home folder
+  (( ${#current_path} > 1 )) && paths=(${(s:/:)${current_path//"~\/"/}}) || paths=() # only split if not root/home folder
   if [[ -n "$POWERLEVEL9K_SHORTEN_DIR_LENGTH" || "$POWERLEVEL9K_SHORTEN_STRATEGY" == "truncate_with_folder_marker" ]]; then
     set_default POWERLEVEL9K_SHORTEN_DELIMITER "\u2026"
     local delim=$(echo -n $POWERLEVEL9K_SHORTEN_DELIMITER) # convert delimiter from unicode to literal character
