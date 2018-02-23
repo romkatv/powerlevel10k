@@ -766,7 +766,7 @@ prompt_dir() {
             for (( i=$POWERLEVEL9K_SHORTEN_DIR_LENGTH; i<$num; i++ )); do
               paths[$i+1]=$POWERLEVEL9K_SHORTEN_DELIMITER
             done
-            [[ $current_path ~= '~'* ]] && current_path="/" || current_path=""
+            [[ $current_path != '~'* ]] && current_path="/" || current_path=""
             current_path+="${(j:/:)paths}"
           fi
         fi
