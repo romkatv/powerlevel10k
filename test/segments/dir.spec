@@ -90,6 +90,24 @@ function testTruncateToLastWorks() {
   unset POWERLEVEL9K_SHORTEN_STRATEGY
 }
 
+function testTruncateToFirstAndLastWorks() {
+  POWERLEVEL9K_SHORTEN_DIR_LENGTH=2
+  POWERLEVEL9K_SHORTEN_STRATEGY="truncate_to_first_and_last"
+
+  FOLDER=/tmp/powerlevel9k-test/1/12/123/1234/12345/123456/1234567/12345678/123456789
+  mkdir -p $FOLDER
+  cd $FOLDER
+
+  assertEquals "%K{blue} %F{black}/tmp/12/…/12345678/123456789 %k%F{blue}%f " "$(build_left_prompt)"
+
+  cd -
+  rm -fr /tmp/powerlevel9k-test
+
+  unset FOLDER
+  unset POWERLEVEL9K_SHORTEN_DIR_LENGTH
+  unset POWERLEVEL9K_SHORTEN_STRATEGY
+}
+
 function testTruncateAbsoluteWorks() {
   POWERLEVEL9K_SHORTEN_DIR_LENGTH=2
   POWERLEVEL9K_SHORTEN_STRATEGY="truncate_absolute"

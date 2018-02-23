@@ -728,7 +728,7 @@ prompt_dir() {
   local state_path=$current_path
   # declare all local variables
   local paths directory test_dir test_dir_length trunc_path threshhold
-  # if we are not in "~" or "/", split the paths into an array
+  # if we are not in "~" or "/", split the paths into an array and exclude "~"
   (( ${#current_path} > 1 )) && paths=(${(s:/:)${current_path//"~\/"/}}) || paths=()
   # only run the code if SHORTEN_DIR_LENGTH is set, or we are using the two strategies that don't rely on it.
   if [[ -n "$POWERLEVEL9K_SHORTEN_DIR_LENGTH" || "$POWERLEVEL9K_SHORTEN_STRATEGY" == "truncate_with_folder_marker" || "$POWERLEVEL9K_SHORTEN_STRATEGY" == "truncate_to_last" ]]; then
@@ -745,14 +745,52 @@ prompt_dir() {
         # truncate characters from the right of the path
         current_path=$(truncatePath "$current_path" $POWERLEVEL9K_SHORTEN_DIR_LENGTH $POWERLEVEL9K_SHORTEN_DELIMITER)
       ;;
-      truncate_to_last)
-        # truncate all characters before the current directory
-        current_path=${current_path##*/}
-      ;;
       truncate_absolute)
         # truncate all characters except the last POWERLEVEL9K_SHORTEN_DIR_LENGTH characters
         if [ ${#current_path} -gt $(( $POWERLEVEL9K_SHORTEN_DIR_LENGTH + ${#POWERLEVEL9K_SHORTEN_DELIMITER} )) ]; then
           current_path=$POWERLEVEL9K_SHORTEN_DELIMITER${current_path:(-POWERLEVEL9K_SHORTEN_DIR_LENGTH)}
+        fi
+      ;;
+      truncate_to_last)
+        # truncate all characters before the current directory
+        current_path=${current_path##*/}
+      ;;
+      truncate_to_first_and_last)
+        if (( ${#current_path} > 1 )) && (( ${POWERLEVEL9K_SHORTEN_DIR_LENGTH} > 0 )); then
+          threshhold=$(( ${POWERLEVEL9K_SHORTEN_DIR_LENGTH} * 2))
+          # if we are in "~", add it back into the paths array
+          [[ $current_path == '~'* ]] && paths=("~" "${paths[@]}")
+          if (( ${#paths} > $threshhold )); then
+            local num=$(( ${#paths} - ${POWERLEVEL9K_SHORTEN_DIR_LENGTH} ))
+            # repace the middle elements
+            for (( i=$POWERLEVEL9K_SHORTEN_DIR_LENGTH; i<$num; i++ )); do
+              paths[$i+1]=$POWERLEVEL9K_SHORTEN_DELIMITER
+            done
+            current_path="${(j:/:)paths}"
+          fi
+        fi
+      ;;
+      truncate_to_unique)
+        # for each parent path component find the shortest unique beginning
+        # characters sequence. Source: https://stackoverflow.com/a/45336078
+        if (( ${#current_path} > 1 )); then # root and home are exceptions and won't have paths
+          local matching
+          local cur_path='/'
+          [[ $current_path != "~"* ]] && trunc_path='/' || trunc_path=''
+          for directory in ${paths[@]}; do
+            test_dir=''
+            for (( i=0; i<${#directory}; i++ )); do
+              test_dir+="${directory:$i:1}"
+              matching=("$cur_path"/"$test_dir"*/)
+              if [[ ${#matching[@]} -eq 1 ]]; then
+                break
+              fi
+            done
+            trunc_path+="$test_dir/"
+            cur_path+="$directory/"
+          done
+          [[ $current_path == "~"* ]] && trunc_path="~/$trunc_path"
+          current_path="${trunc_path: : -1}"
         fi
       ;;
       truncate_with_folder_marker)
@@ -831,29 +869,6 @@ prompt_dir() {
           # Instead of printing out the full path, print out the name of the package
           # from the package.json and append the current subdirectory
           current_path="`echo $packageName | tr -d '"'`$subdirectory_path"
-        fi
-      ;;
-      truncate_to_unique)
-        # for each parent path component find the shortest unique beginning
-        # characters sequence. Source: https://stackoverflow.com/a/45336078
-        if (( ${#current_path} > 1 )); then # root and home are exceptions and won't have paths
-          local matching
-          local cur_path='/'
-          [[ $current_path != "~"* ]] && trunc_path='/' || trunc_path=''
-          for directory in ${paths[@]}; do
-            test_dir=''
-            for (( i=0; i<${#directory}; i++ )); do
-              test_dir+="${directory:$i:1}"
-              matching=("$cur_path"/"$test_dir"*/)
-              if [[ ${#matching[@]} -eq 1 ]]; then
-                break
-              fi
-            done
-            trunc_path+="$test_dir/"
-            cur_path+="$directory/"
-          done
-          [[ $current_path == "~"* ]] && trunc_path="~/$trunc_path"
-          current_path="${trunc_path: : -1}"
         fi
       ;;
       *)
