@@ -727,8 +727,6 @@ prompt_dir() {
   local current_path=$PWD # WAS: local current_path="$(print -P '%~')"
   # check if the user wants to use absolute paths or "~" paths
   [[ ${(L)POWERLEVEL9K_DIR_PATH_ABSOLUTE} != "true" ]] && current_path=${current_path//$HOME/"~"}
-  # save this path so that we can use the pure path for STATE icons and colors later.
-  local state_path=$current_path
   # declare all local variables
   local paths directory test_dir test_dir_length trunc_path threshhold
   # if we are not in "~" or "/", split the paths into an array and exclude "~"
@@ -891,12 +889,13 @@ prompt_dir() {
     "HOME_SUBFOLDER"  "HOME_SUB_ICON"
     "NOT_WRITABLE"    "LOCK_ICON"
   )
+  local state_path="$(print -P '%~')"
   local current_state="DEFAULT"
   if [[ "${POWERLEVEL9K_DIR_SHOW_WRITABLE}" == true && ! -w "$PWD" ]]; then
     current_state="NOT_WRITABLE"
-  elif [[ "$state_path" == "$HOME" ]]; then # changed '~' to $HOME for compatibility with POWERLEVEL9K_DIR_PATH_ABSOLUTE
+  elif [[ $state_path == '~' ]]; then
     current_state="HOME"
-  elif [[ "$state_path" == "$HOME"* ]]; then # changed '~'* to $HOME* for compatibility with POWERLEVEL9K_DIR_PATH_ABSOLUTE
+  elif [[ $state_path == '~'* ]]; then
     current_state="HOME_SUBFOLDER"
   fi
 
