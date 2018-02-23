@@ -98,7 +98,7 @@ function testTruncateToFirstAndLastWorks() {
   mkdir -p $FOLDER
   cd $FOLDER
 
-  assertEquals "%K{blue} %F{black}/tmp/12/…/12345678/123456789 %k%F{blue}%f " "$(build_left_prompt)"
+  assertEquals "%K{blue} %F{black}/tmp/powerlevel9k-test/…/…/…/…/…/…/…/12345678/123456789 %k%F{blue}%f " "$(build_left_prompt)"
 
   cd -
   rm -fr /tmp/powerlevel9k-test
