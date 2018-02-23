@@ -18,6 +18,16 @@ function tearDown() {
   unset POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
 }
 
+function testAbsolutePathWorks() {
+  POWERLEVEL9K_DIR_PATH_ABSOLUTE=true
+
+  cd ~
+  assertEquals "%K{blue} %F{black}…/12345678/123456789 %k%F{blue}%f " "$(build_left_prompt)"
+
+  cd -
+  unset POWERLEVEL9K_DIR_PATH_ABSOLUTE
+}
+
 function testTruncateFoldersWorks() {
   POWERLEVEL9K_SHORTEN_DIR_LENGTH=2
   POWERLEVEL9K_SHORTEN_STRATEGY='truncate_folders'

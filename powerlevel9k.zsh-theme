@@ -723,7 +723,10 @@ set_default POWERLEVEL9K_DIR_PATH_SEPARATOR "/"
 set_default POWERLEVEL9K_HOME_FOLDER_ABBREVIATION "~"
 set_default POWERLEVEL9K_DIR_PATH_HIGHLIGHT_BOLD false
 prompt_dir() {
-  local current_path="$(print -P '%~')"
+  # using $PWD instead of "$(print -P '%~')" to allow use of POWERLEVEL9K_DIR_PATH_ABSOLUTE
+  local current_path=$PWD # WAS: local current_path="$(print -P '%~')"
+  # check if the user wants to use absolute paths or "~" paths
+  [[ ${(L)POWERLEVEL9K_DIR_PATH_ABSOLUTE} != "true" ]] && current_path=${current_path//$HOME/"~"}
   # save this path so that we can use the pure path for STATE icons and colors later.
   local state_path=$current_path
   # declare all local variables
@@ -891,9 +894,9 @@ prompt_dir() {
   local current_state="DEFAULT"
   if [[ "${POWERLEVEL9K_DIR_SHOW_WRITABLE}" == true && ! -w "$PWD" ]]; then
     current_state="NOT_WRITABLE"
-  elif [[ $state_path == '~' ]]; then
+  elif [[ $state_path == $HOME ]]; then # changed '~' to $HOME for compatibility with POWERLEVEL9K_DIR_PATH_ABSOLUTE
     current_state="HOME"
-  elif [[ $state_path == '~'* ]]; then
+  elif [[ $state_path == $HOME* ]]; then # changed '~'* to $HOME* for compatibility with POWERLEVEL9K_DIR_PATH_ABSOLUTE
     current_state="HOME_SUBFOLDER"
   fi
 
