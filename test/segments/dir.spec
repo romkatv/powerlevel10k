@@ -18,11 +18,11 @@ function tearDown() {
   unset POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
 }
 
-function testAbsolutePathWorks() {
+function testDirPathAbsoluteWorks() {
   POWERLEVEL9K_DIR_PATH_ABSOLUTE=true
 
   cd ~
-  assertEquals "%K{blue} %F{black}…/12345678/123456789 %k%F{blue}%f " "$(build_left_prompt)"
+  assertEquals "%K{blue} %F{black}/home/travis %k%F{blue}%f " "$(build_left_prompt)"
 
   cd -
   unset POWERLEVEL9K_DIR_PATH_ABSOLUTE
