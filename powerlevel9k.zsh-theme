@@ -894,9 +894,9 @@ prompt_dir() {
   local current_state="DEFAULT"
   if [[ "${POWERLEVEL9K_DIR_SHOW_WRITABLE}" == true && ! -w "$PWD" ]]; then
     current_state="NOT_WRITABLE"
-  elif [[ $state_path == $HOME ]]; then # changed '~' to $HOME for compatibility with POWERLEVEL9K_DIR_PATH_ABSOLUTE
+  elif [[ "$state_path" == "$HOME" ]]; then # changed '~' to $HOME for compatibility with POWERLEVEL9K_DIR_PATH_ABSOLUTE
     current_state="HOME"
-  elif [[ $state_path == $HOME* ]]; then # changed '~'* to $HOME* for compatibility with POWERLEVEL9K_DIR_PATH_ABSOLUTE
+  elif [[ "$state_path" == "$HOME"* ]]; then # changed '~'* to $HOME* for compatibility with POWERLEVEL9K_DIR_PATH_ABSOLUTE
     current_state="HOME_SUBFOLDER"
   fi
 
