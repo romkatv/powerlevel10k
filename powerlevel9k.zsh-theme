@@ -1023,9 +1023,9 @@ prompt_load() {
   # Replace comma
   load_avg=${load_avg//,/.}
 
-  if [[ "$load_avg" -gt $(bc -l <<< "${cores} * 0.7") ]]; then
+  if [[ "$load_avg" -gt $((${cores} * 0.7)) ]]; then
     current_state="critical"
-  elif [[ "$load_avg" -gt $(bc -l <<< "${cores} * 0.5") ]]; then
+  elif [[ "$load_avg" -gt $((${cores} * 0.5)) ]]; then
     current_state="warning"
   else
     current_state="normal"
