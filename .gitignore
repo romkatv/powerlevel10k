@@ -1,2 +1,3 @@
 test-vm/.vagrant
 *.swp
+.idea

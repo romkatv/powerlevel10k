@@ -18,11 +18,19 @@ function mockKubectl() {
       ;;
     'config')
       case "$2" in
-        'current-context')
-          echo 'minikube'
-          ;;
-        'get-contexts')
-          echo '* minikube minikube minikube '
+        'view')
+          case "$3" in
+            '-o=jsonpath={.current-context}')
+              echo 'minikube'
+              ;;
+            '-o=jsonpath={.contexts'*)
+              echo ''
+              ;;
+            *)
+              echo "Mock value missed"
+              exit 1
+              ;;
+          esac
           ;;
       esac
       ;;
@@ -36,11 +44,21 @@ function mockKubectlOtherNamespace() {
       ;;
     'config')
       case "$2" in
-        'current-context')
-          echo 'minikube'
-          ;;
-        'get-contexts')
-          echo '* minikube minikube minikube kube-system'
+        'view')
+          case "$3" in
+            # Get Current Context
+            '-o=jsonpath={.current-context}')
+              echo 'minikube'
+              ;;
+            # Get current namespace
+            '-o=jsonpath={.contexts'*)
+              echo 'kube-system'
+              ;;
+            *)
+              echo "Mock value missed"
+              exit 1
+              ;;
+          esac
           ;;
       esac
       ;;

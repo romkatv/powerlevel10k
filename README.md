@@ -88,6 +88,7 @@ The segments that are currently available are:
 * [`background_jobs`](#background_jobs) - Indicator for background jobs.
 * [`battery`](#battery) - Current battery status.
 * [`context`](#context) - Your username and host, conditionalized based on $USER and SSH status.
+* [`date`](#date) - System date.
 * [`dir`](#dir) - Your current working directory.
 * `dir_writable` - Displays a lock icon, if you do not have write permissions on the current folder.
 * [`disk_usage`](#disk_usage) - Disk usage of your current partition.
@@ -140,6 +141,7 @@ The segments that are currently available are:
     * `aws_eb_env` - The current Elastic Beanstalk Environment.
 * `docker_machine` - The current Docker Machine.
 * `kubecontext` - The current context of your `kubectl` configuration.
+* `dropbox` - Indicates Dropbox directory and syncing status using `dropbox-cli`
 
 **Other:**
 * [`custom_command`](#custom_command) - Create a custom segment to display the
@@ -148,6 +150,7 @@ The segments that are currently available are:
 * [`todo`](http://todotxt.com/) - Shows the number of tasks in your todo.txt tasks file.
 * `detect_virt` - Virtualization detection with systemd
 * `newline` - Continues the prompt on a new line.
+* `openfoam` - Shows the currently sourced [OpenFOAM](https://openfoam.org/) environment.
 
 ---------------------------------------------------------------------------------
 
@@ -186,6 +189,7 @@ your `~/.zshrc`:
 | Variable | Default Value | Description |
 |----------|---------------|-------------|
 |`POWERLEVEL9K_BACKGROUND_JOBS_VERBOSE`|`true`|If there is more than one background job, this segment will show the number of jobs. Set this to `false` to turn this feature off.|
+`POWERLEVEL9K_BACKGROUND_JOBS_VERBOSE_ALWAYS`|`false`|Always show the jobs count (even if it's zero).|
 
 ##### battery
 
@@ -243,7 +247,7 @@ battery level. This will override the following variables:
 `POWERLEVEL9K_BATTERY_DISCONNECTED`, and `POWERLEVEL9K_BATTERY_LOW_COLOR`. In
 order to do this, define a color array, from low to high, as shown below:
 ```zsh
-POWERLEVEL9K_BATTERY_LEVEL_BACKGROUND=(196 202 208 214 220 226 190 154 118 82 46)
+POWERLEVEL9K_BATTERY_LEVEL_BACKGROUND=(red1 orangered1 darkorange orange1 gold1 yellow1 yellow2 greenyellow chartreuse1 chartreuse2 green1)
 ```
 
 As with the battery stages, you can use any number of colors and Powerlevel9k
@@ -251,9 +255,9 @@ will automatically use all of them appropriately.
 
 Some example settings:
 |Brightness|Possible Array|
-|Bright Colors|(196 202 208 214 220 226 190 154 118  82  46)|
-|Normal Colors|(124 130 136 142 148 112  76  40  34  28  22)|
-|Subdued Colors|( 88  94 100 106  70  34  28  22)|
+|Bright Colors|(red1 orangered1 darkorange orange1 gold1 yellow1 yellow2 greenyellow chartreuse1 chartreuse2 green1)|
+|Normal Colors|(red3 darkorange3 darkgoldenrod gold3 yellow3 chartreuse2 mediumspringgreen green3 green3 green4 darkgreen)|
+|Subdued Colors|(darkred orange4 yellow4 yellow4 chartreuse3 green3 green4 darkgreen)|
 
 ##### command_execution_time
 
@@ -334,6 +338,14 @@ end of the hostname.
 |`POWERLEVEL9K_ALWAYS_SHOW_USER`|false|Always show the username, but conditionalize the hostname.|
 |`POWERLEVEL9K_CONTEXT_TEMPLATE`|%n@%m|Default context prompt (username@machine). Refer to the [ZSH Documentation](http://zsh.sourceforge.net/Doc/Release/Prompt-Expansion.html) for all possible expansions, including deeper host depths.|
 
+##### date
+
+The `date` segment shows the current system date.
+
+| Variable | Default Value | Description |
+|----------|---------------|-------------|
+|`POWERLEVEL9K_DATE_FORMAT`|`%D{%d.%m.%y}`|[ZSH time format](http://zsh.sourceforge.net/Doc/Release Prompt-Expansion.html) to use in this segment.|
+
 ##### dir
 
 The `dir` segment shows the current working directory. When using the "Awesome
@@ -388,7 +400,7 @@ The `truncate_with_package_name` strategy gives your directory path relative to 
 }
 ```
 
-the path shown would be `my-cool-project`.  If you navigate to `$HOME/projects/my-project/src`, then the path shown would be `my-cool-project/src`.  Please note that this currently looks for `.git` directory to determine the root of the project.
+The path shown would be `my-cool-project`.  If you navigate to `$HOME/projects/my-project/src`, then the path shown would be `my-cool-project/src`.  Please note that this currently looks for `.git` directory to determine the root of the project.
 
 If you want to customize the directory separator, you could set:
 ```zsh
@@ -467,6 +479,8 @@ also specify which method you would like it to use. The methods available are di
 curl, or wget. The host used for wget and curl is http://ident.me by default but can be set to
 another host if you prefer.
 
+If you activate a VPN, the icon for this segment will change to the defined VPN icon.
+
 The public_ip segment will attempt to update your public IP address every 5 minutes by default(also
 configurable by the user). If you lose connection your cached IP address will be displayed until
 your timeout expires at which point every time your prompt is generated a new attempt will be made.
@@ -509,7 +523,11 @@ This segment shows the version of Ruby being used when using `rbenv` to change y
 It figures out the version being used by taking the output of the `rbenv version-name` command.
 
 * If `rbenv` is not in $PATH, nothing will be shown.
-* If the current Ruby version is the same as the global Ruby version, nothing will be shown.
+* By default, if the current local Ruby version is the same as the global Ruby version, nothing will be shown. See the configuration variable, below, to modify this behavior.
+
+Variable | Default Value | Description |
+|----------|---------------|-------------|
+|`POWERLEVEL9K_RBENV_ALWAYS`|'false'|Always show the `rbenv` segment, even if the local version matches the global.|
 
 ##### rspec_stats
 

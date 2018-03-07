@@ -17,7 +17,7 @@
 ################################################################
 
 ## Turn on for Debugging
-#PS4='%s%f%b%k%F{blue}%{λ%}%L %F{240}%N:%i%(?.. %F{red}%?) %1(_.%F{yellow}%-1_ .)%s%f%b%k	'
+#PS4='%s%f%b%k%F{blue}%{λ%}%L %F{240}%N:%i%(?.. %F{red}%?) %1(_.%F{yellow}%-1_ .)%s%f%b%k '
 #zstyle ':vcs_info:*+*:*' debug true
 #set -o xtrace
 
@@ -127,8 +127,8 @@ left_prompt_segment() {
   [[ -n $FG_COLOR_MODIFIER ]] && 4="$FG_COLOR_MODIFIER"
 
   local bg fg
-  [[ -n "$3" ]] && bg="%K{$3}" || bg="%k"
-  [[ -n "$4" ]] && fg="%F{$4}" || fg="%f"
+  [[ -n "$3" ]] && bg="$(backgroundColor $3)" || bg="$(backgroundColor)"
+  [[ -n "$4" ]] && fg="$(foregroundColor $4)" || fg="$(foregroundColor)"
 
   if [[ $CURRENT_BG != 'NONE' ]] && ! isSameColor "$3" "$CURRENT_BG"; then
     echo -n "$bg%F{$CURRENT_BG}"
@@ -142,8 +142,8 @@ left_prompt_segment() {
     # subsegment (or the default color). This should have
     # enough contrast.
     local complement
-    [[ -n "$4" ]] && complement="$4" || complement=$DEFAULT_COLOR
-    echo -n "$bg%F{$complement}"
+    [[ -n "$4" ]] && complement="$fg" || complement="$(foregroundColor $DEFAULT_COLOR)"
+    echo -n "${bg}${complement}"
     if [[ $joined == false ]]; then
       echo -n "$(print_icon 'LEFT_SUBSEGMENT_SEPARATOR')$POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS"
     fi
@@ -218,8 +218,8 @@ right_prompt_segment() {
   [[ -n $FG_COLOR_MODIFIER ]] && 4="$FG_COLOR_MODIFIER"
 
   local bg fg
-  [[ -n "$3" ]] && bg="%K{$3}" || bg="%k"
-  [[ -n "$4" ]] && fg="%F{$4}" || fg="%f"
+  [[ -n "$3" ]] && bg="$(backgroundColor $3)" || bg="$(backgroundColor)"
+  [[ -n "$4" ]] && fg="$(foregroundColor $4)" || fg="$(foregroundColor)"
 
   # If CURRENT_RIGHT_BG is "NONE", we are the first right segment.
   if [[ $joined == false ]] || [[ "$CURRENT_RIGHT_BG" == "NONE" ]]; then
@@ -229,10 +229,11 @@ right_prompt_segment() {
       # subsegment (or the default color). This should have
       # enough contrast.
       local complement
-      [[ -n "$4" ]] && complement="$4" || complement=$DEFAULT_COLOR
-      echo -n "%F{$complement}$(print_icon 'RIGHT_SUBSEGMENT_SEPARATOR')%f"
+      [[ -n "$4" ]] && complement="$fg" || complement="$(foregroundColor $DEFAULT_COLOR)"
+      echo -n "$complement$(print_icon 'RIGHT_SUBSEGMENT_SEPARATOR')%f"
     else
-      echo -n "%F{$3}$(print_icon 'RIGHT_SEGMENT_SEPARATOR')%f"
+      # Use the new BG color for the foreground with separator
+      echo -n "$(foregroundColor $3)$(print_icon 'RIGHT_SEGMENT_SEPARATOR')%f"
     fi
   fi
 
@@ -272,6 +273,7 @@ right_prompt_segment() {
 # right-left but reads the opposite, this isn't necessary for the other side.
 CURRENT_BG='NONE'
 
+################################################################
 # Anaconda Environment
 prompt_anaconda() {
   # Depending on the conda version, either might be set. This
@@ -285,6 +287,7 @@ prompt_anaconda() {
   fi
 }
 
+################################################################
 # AWS Profile
 prompt_aws() {
   local aws_profile="${AWS_PROFILE:-$AWS_DEFAULT_PROFILE}"
@@ -294,6 +297,7 @@ prompt_aws() {
   fi
 }
 
+################################################################
 # Current Elastic Beanstalk environment
 prompt_aws_eb_env() {
   local eb_env=$(grep environment .elasticbeanstalk/config.yml 2> /dev/null | awk '{print $2}')
@@ -303,8 +307,10 @@ prompt_aws_eb_env() {
   fi
 }
 
+################################################################
 # Segment to indicate background jobs with an icon.
 set_default POWERLEVEL9K_BACKGROUND_JOBS_VERBOSE true
+set_default POWERLEVEL9K_BACKGROUND_JOBS_VERBOSE_ALWAYS false
 prompt_background_jobs() {
   local background_jobs_number=${$(jobs -l | wc -l)// /}
   local wrong_lines=`jobs -l | awk '/pwd now/{ count++ } END {print count}'`
@@ -313,13 +319,14 @@ prompt_background_jobs() {
   fi
   if [[ background_jobs_number -gt 0 ]]; then
     local background_jobs_number_print=""
-    if [[ "$POWERLEVEL9K_BACKGROUND_JOBS_VERBOSE" == "true" ]] && [[ "$background_jobs_number" -gt 1 ]]; then
+    if [[ "$POWERLEVEL9K_BACKGROUND_JOBS_VERBOSE" == "true" ]] && ([[ "$background_jobs_number" -gt 1 ]] || [[ "$POWERLEVEL9K_BACKGROUND_JOBS_VERBOSE_ALWAYS" == "true" ]]); then
       background_jobs_number_print="$background_jobs_number"
     fi
     "$1_prompt_segment" "$0" "$2" "$DEFAULT_COLOR" "cyan" "$background_jobs_number_print" 'BACKGROUND_JOBS_ICON'
   fi
 }
 
+################################################################
 # A newline in your prompt, so you can segments on multiple lines.
 prompt_newline() {
   local lws newline
@@ -337,6 +344,7 @@ prompt_newline() {
   POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS=$lws
 }
 
+################################################################
 # Segment that indicates usage level of current partition.
 set_default POWERLEVEL9K_DISK_USAGE_ONLY_WARNING false
 set_default POWERLEVEL9K_DISK_USAGE_WARNING_LEVEL 90
@@ -379,6 +387,8 @@ prompt_disk_usage() {
   fi
 }
 
+################################################################
+# Segment that displays the battery status in levels and colors
 prompt_battery() {
   # The battery can have four different states - default to 'unknown'.
   local current_state='unknown'
@@ -489,6 +499,7 @@ prompt_battery() {
   fi
 }
 
+################################################################
 # Public IP segment
 # Parameters:
 #   * $1 Alignment: string - left|right
@@ -555,10 +566,20 @@ prompt_public_ip() {
 
   # Draw the prompt segment
   if [[ -n $public_ip ]]; then
-    $1_prompt_segment "$0" "$2" "$DEFAULT_COLOR" "$DEFAULT_COLOR_INVERTED" "${public_ip}" 'PUBLIC_IP_ICON'
+    icon='PUBLIC_IP_ICON'
+    # Check VPN is on if VPN interface is set
+    if [[ -n $POWERLEVEL9K_PUBLIC_IP_VPN_INTERFACE ]]; then
+      for vpn_iface in $(/sbin/ifconfig | grep -e ^"$POWERLEVEL9K_PUBLIC_IP_VPN_INTERFACE" | cut -d":" -f1)
+      do
+        icon='VPN_ICON'
+        break
+      done
+    fi
+    $1_prompt_segment "$0" "$2" "$DEFAULT_COLOR" "$DEFAULT_COLOR_INVERTED" "${public_ip}" "$icon"
   fi
 }
 
+################################################################
 # Context: user@hostname (who am I and where am I)
 # Note that if $DEFAULT_USER is not set, this prompt segment will always print
 set_default POWERLEVEL9K_ALWAYS_SHOW_CONTEXT false
@@ -569,23 +590,24 @@ prompt_context() {
   typeset -AH context_states
   context_states=(
     "ROOT"      "yellow"
-    "DEFAULT"   "011"
+    "DEFAULT"   "yellow"
+    "REMOTE"    "yellow"
   )
 
   local content=""
 
   if [[ "$POWERLEVEL9K_ALWAYS_SHOW_CONTEXT" == true ]] || [[ "$(whoami)" != "$DEFAULT_USER" ]] || [[ -n "$SSH_CLIENT" || -n "$SSH_TTY" ]]; then
-
-      if [[ $(print -P "%#") == '#' ]]; then
-        current_state="ROOT"
-      fi
-
       content="${POWERLEVEL9K_CONTEXT_TEMPLATE}"
-
   elif [[ "$POWERLEVEL9K_ALWAYS_SHOW_USER" == true ]]; then
       content="$(whoami)"
   else
       return
+  fi
+
+  if [[ $(print -P "%#") == '#' ]]; then
+    current_state="ROOT"
+  elif [[ -n "$SSH_CLIENT" || -n "$SSH_TTY" ]]; then
+    current_state="REMOTE"
   fi
 
   "$1_prompt_segment" "${0}_${current_state}" "$2" "$DEFAULT_COLOR" "${context_states[$current_state]}" "${content}"
@@ -612,7 +634,7 @@ prompt_user() {
         "STATE"               "DEFAULT"
         "CONTENT"             "$(whoami)"
         "BACKGROUND_COLOR"    "${DEFAULT_COLOR}"
-        "FOREGROUND_COLOR"    "011"
+        "FOREGROUND_COLOR"    "yellow"
         "VISUAL_IDENTIFIER"   "USER_ICON"
       )
     fi
@@ -639,13 +661,14 @@ prompt_host() {
       "STATE"               "LOCAL"
       "CONTENT"             "${POWERLEVEL9K_HOST_TEMPLATE}"
       "BACKGROUND_COLOR"    "${DEFAULT_COLOR}"
-      "FOREGROUND_COLOR"    "011"
+      "FOREGROUND_COLOR"    "yellow"
       "VISUAL_IDENTIFIER"   "HOST_ICON"
     )
   fi
   "$1_prompt_segment" "$0_${host_state[STATE]}" "$2" "${host_state[BACKGROUND_COLOR]}" "${host_state[FOREGROUND_COLOR]}" "${host_state[CONTENT]}" "${host_state[VISUAL_IDENTIFIER]}"
 }
 
+################################################################
 # The 'custom` prompt provides a way for users to invoke commands and display
 # the output in a segment.
 prompt_custom() {
@@ -657,6 +680,7 @@ prompt_custom() {
   fi
 }
 
+################################################################
 # Display the duration the command needed to run.
 prompt_command_execution_time() {
   set_default POWERLEVEL9K_COMMAND_EXECUTION_TIME_THRESHOLD 3
@@ -686,10 +710,11 @@ prompt_command_execution_time() {
   fi
 
   if (( _P9K_COMMAND_DURATION >= POWERLEVEL9K_COMMAND_EXECUTION_TIME_THRESHOLD )); then
-    "$1_prompt_segment" "$0" "$2" "red" "226" "${humanReadableDuration}" 'EXECUTION_TIME_ICON'
+    "$1_prompt_segment" "$0" "$2" "red" "yellow1" "${humanReadableDuration}" 'EXECUTION_TIME_ICON'
   fi
 }
 
+################################################################
 # Dir: current working directory
 set_default POWERLEVEL9K_DIR_PATH_SEPARATOR "/"
 set_default POWERLEVEL9K_HOME_FOLDER_ABBREVIATION "~"
@@ -704,10 +729,10 @@ prompt_dir() {
 
     case "$POWERLEVEL9K_SHORTEN_STRATEGY" in
       truncate_middle)
-        current_path=$(pwd | sed -e "s,^$HOME,~," | sed $SED_EXTENDED_REGEX_PARAMETER "s/([^/]{$POWERLEVEL9K_SHORTEN_DIR_LENGTH})[^/]+([^/]{$POWERLEVEL9K_SHORTEN_DIR_LENGTH})\//\1$POWERLEVEL9K_SHORTEN_DELIMITER\2\//g")
+        current_path=$(echo "$current_path" | sed $SED_EXTENDED_REGEX_PARAMETER "s/([^/]{$POWERLEVEL9K_SHORTEN_DIR_LENGTH})[^/]+([^/]{$POWERLEVEL9K_SHORTEN_DIR_LENGTH})\//\1$POWERLEVEL9K_SHORTEN_DELIMITER\2\//g")
       ;;
       truncate_from_right)
-        current_path=$(truncatePathFromRight "$(pwd | sed -e "s,^$HOME,~,")" )
+        current_path=$(truncatePathFromRight "$current_path" )
       ;;
       truncate_with_package_name)
         local name repo_path package_path current_dir zero
@@ -757,8 +782,12 @@ prompt_dir() {
           # Instead of printing out the full path, print out the name of the package
           # from the package.json and append the current subdirectory
           current_path="`echo $packageName | tr -d '"'`$subdirectory_path"
+          if [[ "${POWERLEVEL9K_DIR_OMIT_FIRST_CHARACTER}" == "true" ]]; then
+            # add space before the packageName to allow for removing the "first" character, without messing up the package name.
+            current_path=" ${current_path}"
+          fi
         else
-          current_path=$(truncatePathFromRight "$(pwd | sed -e "s,^$HOME,~,")" )
+          current_path=$(truncatePathFromRight "$current_path" )
         fi
       ;;
       truncate_with_folder_marker)
@@ -844,6 +873,7 @@ prompt_dir() {
   "$1_prompt_segment" "$0_${current_state}" "$2" "blue" "$DEFAULT_COLOR" "${current_path}" "${dir_states[$current_state]}"
 }
 
+################################################################
 # Docker machine
 prompt_docker_machine() {
   local docker_machine="$DOCKER_MACHINE_NAME"
@@ -853,6 +883,7 @@ prompt_docker_machine() {
   fi
 }
 
+################################################################
 # GO prompt
 prompt_go_version() {
   local go_version
@@ -861,15 +892,17 @@ prompt_go_version() {
   go_path=$(go env GOPATH 2>/dev/null)
 
   if [[ -n "$go_version" && "${PWD##$go_path}" != "$PWD" ]]; then
-    "$1_prompt_segment" "$0" "$2" "green" "255" "$go_version" "GO_ICON"
+    "$1_prompt_segment" "$0" "$2" "green" "grey93" "$go_version" "GO_ICON"
   fi
 }
 
+################################################################
 # Command number (in local history)
 prompt_history() {
-  "$1_prompt_segment" "$0" "$2" "244" "$DEFAULT_COLOR" '%h'
+  "$1_prompt_segment" "$0" "$2" "grey50" "$DEFAULT_COLOR" '%h'
 }
 
+################################################################
 # Detection for virtualization (systemd based systems only)
 prompt_detect_virt() {
   if ! command -v systemd-detect-virt > /dev/null; then
@@ -888,7 +921,8 @@ prompt_detect_virt() {
   fi
 }
 
-
+################################################################
+# Test icons
 prompt_icons_test() {
   for key in ${(@k)icons}; do
     # The lower color spectrum in ZSH makes big steps. Choosing
@@ -899,6 +933,8 @@ prompt_icons_test() {
   done
 }
 
+################################################################
+# Segment to display the current IP address
 prompt_ip() {
   if [[ "$OS" == "OSX" ]]; then
     if defined POWERLEVEL9K_IP_INTERFACE; then
@@ -929,6 +965,8 @@ prompt_ip() {
   "$1_prompt_segment" "$0" "$2" "cyan" "$DEFAULT_COLOR" "$ip" 'NETWORK_ICON'
 }
 
+################################################################
+# Segment to display if VPN is active
 set_default POWERLEVEL9K_VPN_IP_INTERFACE "tun"
 # prompt if vpn active
 prompt_vpn_ip() {
@@ -939,6 +977,8 @@ prompt_vpn_ip() {
   done
 }
 
+################################################################
+# Segment to display load
 set_default POWERLEVEL9K_LOAD_WHICH 5
 prompt_load() {
   # The load segment can have three different states
@@ -994,8 +1034,8 @@ prompt_load() {
   "$1_prompt_segment" "${0}_${current_state}" "$2" "${load_states[$current_state]}" "$DEFAULT_COLOR" "$load_avg" 'LOAD_ICON'
 }
 
-
-# Node version
+################################################################
+# Segment to diplay Node version
 prompt_node_version() {
   local node_version=$(node -v 2>/dev/null)
   [[ -z "${node_version}" ]] && return
@@ -1003,7 +1043,8 @@ prompt_node_version() {
   "$1_prompt_segment" "$0" "$2" "green" "white" "${node_version:1}" 'NODE_ICON'
 }
 
-# Node version from NVM
+################################################################
+# Segment to display Node version from NVM
 # Only prints the segment if different than the default value
 prompt_nvm() {
   local node_version nvm_default
@@ -1018,7 +1059,8 @@ prompt_nvm() {
   $1_prompt_segment "$0" "$2" "magenta" "black" "${node_version:1}" 'NODE_ICON'
 }
 
-# NodeEnv Prompt
+################################################################
+# Segment to display NodeEnv
 prompt_nodeenv() {
   local nodeenv_path="$NODE_VIRTUAL_ENV"
   if [[ -n "$nodeenv_path" && "$NODE_VIRTUAL_ENV_DISABLE_PROMPT" != true ]]; then
@@ -1027,22 +1069,25 @@ prompt_nodeenv() {
   fi
 }
 
-# print a little OS icon
+################################################################
+# Segment to print a little OS icon
 prompt_os_icon() {
-  "$1_prompt_segment" "$0" "$2" "black" "255" "$OS_ICON"
+  "$1_prompt_segment" "$0" "$2" "black" "white" "$OS_ICON"
 }
 
-# print PHP version number
+################################################################
+# Segment to display PHP version number
 prompt_php_version() {
   local php_version
   php_version=$(php -v 2>&1 | grep -oe "^PHP\s*[0-9.]*")
 
   if [[ -n "$php_version" ]]; then
-    "$1_prompt_segment" "$0" "$2" "013" "255" "$php_version"
+    "$1_prompt_segment" "$0" "$2" "fuchsia" "grey93" "$php_version"
   fi
 }
 
-# Show free RAM and used Swap
+################################################################
+# Segment to display free RAM and used Swap
 prompt_ram() {
   local base=''
   local ramfree=0
@@ -1065,22 +1110,24 @@ prompt_ram() {
   "$1_prompt_segment" "$0" "$2" "yellow" "$DEFAULT_COLOR" "$(printSizeHumanReadable "$ramfree" $base)" 'RAM_ICON'
 }
 
-# rbenv information
+################################################################
+# Segment to display rbenv information
+set_default POWERLEVEL9K_RBENV_ALWAYS false
 prompt_rbenv() {
   if which rbenv 2>/dev/null >&2; then
     local rbenv_version_name="$(rbenv version-name)"
     local rbenv_global="$(rbenv global)"
 
-    # Don't show anything if the current Ruby is the same as the global Ruby.
-    if [[ $rbenv_version_name == $rbenv_global ]]; then
-      return
+    # Don't show anything if the current Ruby is the same as the global Ruby
+    # unless `POWERLEVEL9K_RBENV_ALWAYS` is set.
+    if [[ $POWERLEVEL9K_RBENV_ALWAYS == true || $rbenv_version_name != $rbenv_global ]];then
+      "$1_prompt_segment" "$0" "$2" "red" "$DEFAULT_COLOR" "$rbenv_version_name" 'RUBY_ICON'
     fi
-
-    "$1_prompt_segment" "$0" "$2" "red" "$DEFAULT_COLOR" "$rbenv_version_name" 'RUBY_ICON'
   fi
 }
 
-# chruby information
+################################################################
+# Segment to display chruby information
 # see https://github.com/postmodern/chruby/issues/245 for chruby_auto issue with ZSH
 prompt_chruby() {
   local chruby_env
@@ -1091,23 +1138,27 @@ prompt_chruby() {
   fi
 }
 
-# Print an icon if user is root.
+################################################################
+# Segment to print an icon if user is root.
 prompt_root_indicator() {
   if [[ "$UID" -eq 0 ]]; then
     "$1_prompt_segment" "$0" "$2" "$DEFAULT_COLOR" "yellow" "" 'ROOT_ICON'
   fi
 }
 
-# Print Rust version number
+################################################################
+# Segment to display Rust version number
 prompt_rust_version() {
   local rust_version
   rust_version=$(rustc --version 2>&1 | grep -oe "^rustc\s*[^ ]*" | grep -o '[0-9.a-z\\\-]*$')
 
   if [[ -n "$rust_version" ]]; then
-    "$1_prompt_segment" "$0" "$2" "208" "$DEFAULT_COLOR" "Rust $rust_version" 'RUST_ICON'
+    "$1_prompt_segment" "$0" "$2" "darkorange" "$DEFAULT_COLOR" "Rust $rust_version" 'RUST_ICON'
   fi
 }
-# RSpec test ratio
+
+################################################################
+# Segment to display RSpec test ratio
 prompt_rspec_stats() {
   if [[ (-d app && -d spec) ]]; then
     local code_amount tests_amount
@@ -1118,21 +1169,25 @@ prompt_rspec_stats() {
   fi
 }
 
-# Ruby Version Manager information
+################################################################
+# Segment to display Ruby Version Manager information
 prompt_rvm() {
   local version_and_gemset=${rvm_env_string/ruby-}
 
   if [[ -n "$version_and_gemset" ]]; then
-    "$1_prompt_segment" "$0" "$2" "240" "$DEFAULT_COLOR" "$version_and_gemset" 'RUBY_ICON'
+    "$1_prompt_segment" "$0" "$2" "grey35" "$DEFAULT_COLOR" "$version_and_gemset" 'RUBY_ICON'
   fi
 }
 
+################################################################
+# Segment to display SSH icon when connected
 prompt_ssh() {
   if [[ -n "$SSH_CLIENT" ]] || [[ -n "$SSH_TTY" ]]; then
     "$1_prompt_segment" "$0" "$2" "$DEFAULT_COLOR" "yellow" "" 'SSH_ICON'
   fi
 }
 
+################################################################
 # Status: When an error occur, return the error code, or a cross icon if option is set
 # Display an ok icon when no error occur, or hide the segment if option is set to false
 #
@@ -1153,7 +1208,7 @@ exit_code_or_status() {
   else
     local sig=$(( ec - 128 ))
     local idx=$(( sig + 1 ))
-    echo "${signals[$idx]}(-${sig})"
+    echo "SIG${signals[$idx]}(${sig})"
   fi
 }
 
@@ -1179,7 +1234,7 @@ prompt_status() {
 
   if (( ec_sum > 0 )); then
     if [[ "$POWERLEVEL9K_STATUS_CROSS" == false && "$POWERLEVEL9K_STATUS_VERBOSE" == true ]]; then
-      "$1_prompt_segment" "$0_ERROR" "$2" "red" "226" "$ec_text" 'CARRIAGE_RETURN_ICON'
+      "$1_prompt_segment" "$0_ERROR" "$2" "red" "yellow1" "$ec_text" 'CARRIAGE_RETURN_ICON'
     else
       "$1_prompt_segment" "$0_ERROR" "$2" "$DEFAULT_COLOR" "red" "" 'FAIL_ICON'
     fi
@@ -1188,6 +1243,8 @@ prompt_status() {
   fi
 }
 
+################################################################
+# Segment to display Swap information
 prompt_swap() {
   local swap_used=0
   local base=''
@@ -1212,6 +1269,7 @@ prompt_swap() {
   "$1_prompt_segment" "$0" "$2" "yellow" "$DEFAULT_COLOR" "$(printSizeHumanReadable "$swap_used" $base)" 'SWAP_ICON'
 }
 
+################################################################
 # Symfony2-PHPUnit test ratio
 prompt_symfony2_tests() {
   if [[ (-d src && -d app && -f app/AppKernel.php) ]]; then
@@ -1223,15 +1281,17 @@ prompt_symfony2_tests() {
   fi
 }
 
-# Symfony2-Version
+################################################################
+# Segment to display Symfony2-Version
 prompt_symfony2_version() {
   if [[ -f app/bootstrap.php.cache ]]; then
     local symfony2_version
     symfony2_version=$(grep " VERSION " app/bootstrap.php.cache | sed -e 's/[^.0-9]*//g')
-    "$1_prompt_segment" "$0" "$2" "240" "$DEFAULT_COLOR" "$symfony2_version" 'SYMFONY_ICON'
+    "$1_prompt_segment" "$0" "$2" "grey35" "$DEFAULT_COLOR" "$symfony2_version" 'SYMFONY_ICON'
   fi
 }
 
+################################################################
 # Show a ratio of tests vs code
 build_test_stats() {
   local code_amount="$4"
@@ -1247,26 +1307,34 @@ build_test_stats() {
   (( ratio < 50 )) && "$1_prompt_segment" "$2_BAD" "$3" "red" "$DEFAULT_COLOR" "$headline: $ratio%%" "$6"
 }
 
+################################################################
 # System time
 prompt_time() {
-  local time_format="%D{%H:%M:%S}"
-  if [[ -n "$POWERLEVEL9K_TIME_FORMAT" ]]; then
-    time_format="$POWERLEVEL9K_TIME_FORMAT"
-  fi
+  set_default POWERLEVEL9K_TIME_FORMAT "%D{%H:%M:%S}"
 
-  "$1_prompt_segment" "$0" "$2" "$DEFAULT_COLOR_INVERTED" "$DEFAULT_COLOR" "$time_format"
+  "$1_prompt_segment" "$0" "$2" "$DEFAULT_COLOR_INVERTED" "$DEFAULT_COLOR" "$POWERLEVEL9K_TIME_FORMAT" "TIME_ICON"
 }
 
+################################################################
+# System date
+prompt_date() {
+  set_default POWERLEVEL9K_DATE_FORMAT "%D{%d.%m.%y}"
+
+  "$1_prompt_segment" "$0" "$2" "$DEFAULT_COLOR_INVERTED" "$DEFAULT_COLOR" "$POWERLEVEL9K_DATE_FORMAT" "DATE_ICON"
+}
+
+################################################################
 # todo.sh: shows the number of tasks in your todo.sh file
 prompt_todo() {
   if $(hash todo.sh 2>&-); then
     count=$(todo.sh ls | egrep "TODO: [0-9]+ of ([0-9]+) tasks shown" | awk '{ print $4 }')
     if [[ "$count" = <-> ]]; then
-      "$1_prompt_segment" "$0" "$2" "244" "$DEFAULT_COLOR" "$count" 'TODO_ICON'
+      "$1_prompt_segment" "$0" "$2" "grey50" "$DEFAULT_COLOR" "$count" 'TODO_ICON'
     fi
   fi
 }
 
+################################################################
 # VCS segment: shows the state of your repository, if you are in a folder under
 # version control
 set_default POWERLEVEL9K_VCS_ACTIONFORMAT_FOREGROUND "red"
@@ -1332,6 +1400,8 @@ powerlevel9k_vcs_init() {
   fi
 }
 
+################################################################
+# Segment to show VCS information
 prompt_vcs() {
   VCS_WORKDIR_DIRTY=false
   VCS_WORKDIR_HALF_DIRTY=false
@@ -1357,6 +1427,7 @@ prompt_vcs() {
   fi
 }
 
+################################################################
 # Vi Mode: show editing mode (NORMAL|INSERT)
 set_default POWERLEVEL9K_VI_INSERT_MODE_STRING "INSERT"
 set_default POWERLEVEL9K_VI_COMMAND_MODE_STRING "NORMAL"
@@ -1372,6 +1443,7 @@ prompt_vi_mode() {
   esac
 }
 
+################################################################
 # Virtualenv: current working virtualenv
 # More information on virtualenv (Python):
 # https://virtualenv.pypa.io/en/latest/
@@ -1382,6 +1454,7 @@ prompt_virtualenv() {
   fi
 }
 
+################################################################
 # pyenv: current active python version (with restrictions)
 # https://github.com/pyenv/pyenv#choosing-the-python-version
 prompt_pyenv() {
@@ -1390,7 +1463,20 @@ prompt_pyenv() {
   fi
 }
 
-# Swift version
+################################################################
+# Display openfoam information
+prompt_openfoam() {
+  local wm_project_version="$WM_PROJECT_VERSION"
+  local wm_fork="$WM_FORK"
+  if [[ -n "$wm_project_version" ]] &&  [[ -z "$wm_fork" ]] ; then
+    "$1_prompt_segment" "$0" "$2" "yellow" "$DEFAULT_COLOR" "OF: $(basename "$wm_project_version")"
+  elif [[ -n "$wm_project_version" ]] && [[ -n "$wm_fork" ]] ; then
+    "$1_prompt_segment" "$0" "$2" "yellow" "$DEFAULT_COLOR" "F-X: $(basename "$wm_project_version")"
+  fi
+}
+
+################################################################
+# Segment to display Swift version
 prompt_swift_version() {
   # Get the first number as this is probably the "main" version number..
   local swift_version=$(swift --version 2>/dev/null | grep -o -E "[0-9.]+" | head -n 1)
@@ -1399,41 +1485,58 @@ prompt_swift_version() {
   "$1_prompt_segment" "$0" "$2" "magenta" "white" "${swift_version}" 'SWIFT_ICON'
 }
 
+################################################################
 # dir_writable: Display information about the user's permission to write in the current directory
 prompt_dir_writable() {
   if [[ ! -w "$PWD" ]]; then
-    "$1_prompt_segment" "$0_FORBIDDEN" "$2" "red" "226" "" 'LOCK_ICON'
+    "$1_prompt_segment" "$0_FORBIDDEN" "$2" "red" "yellow1" "" 'LOCK_ICON'
   fi
 }
 
-# Kubernetes Current Context
+################################################################
+# Kubernetes Current Context/Namespace
 prompt_kubecontext() {
   local kubectl_version="$(kubectl version --client 2>/dev/null)"
 
   if [[ -n "$kubectl_version" ]]; then
-    # Get the current Kubernetes config context's namespaece
-    local k8s_namespace=$(kubectl config get-contexts --no-headers | grep '*' | awk '{print $5}')
     # Get the current Kuberenetes context
-    local k8s_context=$(kubectl config current-context)
-
-    if [[ -z "$k8s_namespace" ]]; then
-      k8s_namespace="default"
+    local cur_ctx=$(kubectl config view -o=jsonpath='{.current-context}')
+    cur_namespace="$(kubectl config view -o=jsonpath="{.contexts[?(@.name==\"${cur_ctx}\")].context.namespace}")"
+    # If the namespace comes back empty set it default.
+    if [[ -z "${cur_namespace}" ]]; then
+      cur_namespace="default"
     fi
-  
+
     local k8s_final_text=""
 
-    if [[ "$k8s_context" == "k8s_namespace" ]]; then
+    if [[ "$cur_ctx" == "cur_namespace" ]]; then
       # No reason to print out the same identificator twice
-      k8s_final_text="$k8s_context"
+      k8s_final_text="$cur_ctx"
     else
-      k8s_final_text="$k8s_context/$k8s_namespace"
+      k8s_final_text="$cur_ctx/$cur_namespace"
     fi
-  
-    
+
     "$1_prompt_segment" "$0" "$2" "magenta" "white" "$k8s_final_text" "KUBERNETES_ICON"
   fi
 }
 
+################################################################
+# Dropbox status
+prompt_dropbox() {
+  # The first column is just the directory, so cut it
+  local dropbox_status="$(dropbox-cli filestatus . | cut -d\  -f2-)"
+
+  # Only show if the folder is tracked and dropbox is running
+  if [[ "$dropbox_status" != 'unwatched' && "$dropbox_status" != "isn't running!" ]]; then
+    # If "up to date", only show the icon
+    if [[ "$dropbox_status" =~ 'up to date' ]]; then
+      dropbox_status=""
+    fi
+
+    "$1_prompt_segment" "$0" "$2" "white" "blue" "$dropbox_status" "DROPBOX_ICON"
+  fi
+
+}
 
 ################################################################
 # Prompt processing and drawing
@@ -1523,10 +1626,14 @@ NEWLINE='
   [[ $POWERLEVEL9K_PROMPT_ADD_NEWLINE == true ]] && PROMPT="$NEWLINE$PROMPT"
 }
 
+
 zle-keymap-select () {
 	zle reset-prompt
 	zle -R
 }
+
+set_default POWERLEVEL9K_IGNORE_TERM_COLORS false
+set_default POWERLEVEL9K_IGNORE_TERM_LANG false
 
 prompt_powerlevel9k_setup() {
   # The value below was set to better support 32-bit CPUs.
@@ -1547,23 +1654,18 @@ prompt_powerlevel9k_setup() {
   setopt noprompt{bang,cr,percent,sp,subst} "prompt${^prompt_opts[@]}"
 
   # Display a warning if the terminal does not support 256 colors
-  local term_colors
-  term_colors=$(echotc Co 2>/dev/null)
-  if (( ! $? && ${term_colors:-0} < 256 )); then
-    print -P "%F{red}WARNING!%f Your terminal appears to support fewer than 256 colors!"
-    print -P "If your terminal supports 256 colors, please export the appropriate environment variable"
-    print -P "_before_ loading this theme in your \~\/.zshrc. In most terminal emulators, putting"
-    print -P "%F{blue}export TERM=\"xterm-256color\"%f at the top of your \~\/.zshrc is sufficient."
-  fi
+  termColors
 
   # If the terminal `LANG` is set to `C`, this theme will not work at all.
-  local term_lang
-  term_lang=$(echo $LANG)
-  if [[ $term_lang == 'C' ]]; then
-      print -P "\t%F{red}WARNING!%f Your terminal's 'LANG' is set to 'C', which breaks this theme!"
-      print -P "\t%F{red}WARNING!%f Please set your 'LANG' to a UTF-8 language, like 'en_US.UTF-8'"
-      print -P "\t%F{red}WARNING!%f _before_ loading this theme in your \~\.zshrc. Putting"
-      print -P "\t%F{red}WARNING!%f %F{blue}export LANG=\"en_US.UTF-8\"%f at the top of your \~\/.zshrc is sufficient."
+  if [[ $POWERLEVEL9K_IGNORE_TERM_LANG == false ]]; then
+      local term_lang
+      term_lang=$(echo $LANG)
+      if [[ $term_lang == 'C' ]]; then
+          print -P "\t%F{red}WARNING!%f Your terminal's 'LANG' is set to 'C', which breaks this theme!"
+          print -P "\t%F{red}WARNING!%f Please set your 'LANG' to a UTF-8 language, like 'en_US.UTF-8'"
+          print -P "\t%F{red}WARNING!%f _before_ loading this theme in your \~\.zshrc. Putting"
+          print -P "\t%F{red}WARNING!%f %F{blue}export LANG=\"en_US.UTF-8\"%f at the top of your \~\/.zshrc is sufficient."
+      fi
   fi
 
   defined POWERLEVEL9K_LEFT_PROMPT_ELEMENTS || POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(context dir rbenv vcs)
