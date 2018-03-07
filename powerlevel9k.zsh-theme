@@ -1437,6 +1437,7 @@ prompt_vi_mode() {
       "$1_prompt_segment" "$0_NORMAL" "$2" "$DEFAULT_COLOR" "default" "$POWERLEVEL9K_VI_COMMAND_MODE_STRING"
     ;;
     main|viins|*)
+      if [[ -z $POWERLEVEL9K_VI_INSERT_MODE_STRING ]]; then return; fi
       "$1_prompt_segment" "$0_INSERT" "$2" "$DEFAULT_COLOR" "blue" "$POWERLEVEL9K_VI_INSERT_MODE_STRING"
     ;;
   esac
@@ -1625,8 +1626,15 @@ NEWLINE='
   [[ $POWERLEVEL9K_PROMPT_ADD_NEWLINE == true ]] && PROMPT="$NEWLINE$PROMPT"
 }
 
+
+zle-keymap-select () {
+	zle reset-prompt
+	zle -R
+}
+
 set_default POWERLEVEL9K_IGNORE_TERM_COLORS false
 set_default POWERLEVEL9K_IGNORE_TERM_LANG false
+
 prompt_powerlevel9k_setup() {
   # The value below was set to better support 32-bit CPUs.
   # It's the maximum _signed_ integer value on 32-bit CPUs.
@@ -1690,6 +1698,8 @@ prompt_powerlevel9k_setup() {
   # prepare prompts
   add-zsh-hook precmd powerlevel9k_prepare_prompts
   add-zsh-hook preexec powerlevel9k_preexec
+
+  zle -N zle-keymap-select
 }
 
 prompt_powerlevel9k_teardown() {
