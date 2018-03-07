@@ -27,6 +27,7 @@ case $POWERLEVEL9K_MODE in
       RIGHT_SUBSEGMENT_SEPARATOR     $'\uE0B3'              # 
       CARRIAGE_RETURN_ICON           $'\u21B5'              # ↵
       ROOT_ICON                      $'\uE801'              # 
+      SUDO_ICON                      $'\uF09C'              # 
       RUBY_ICON                      $'\uE847 '             # 
       AWS_ICON                       $'\uE895'              # 
       AWS_EB_ICON                    $'\U1F331 '            # 🌱
@@ -118,6 +119,7 @@ case $POWERLEVEL9K_MODE in
       RIGHT_SUBSEGMENT_SEPARATOR     $'\uE0B3'              # 
       CARRIAGE_RETURN_ICON           $'\u21B5'              # ↵
       ROOT_ICON                      $'\uF201'              # 
+      SUDO_ICON                      $'\uF09C'              # 
       RUBY_ICON                      $'\uF219 '             # 
       AWS_ICON                       $'\uF270'              # 
       AWS_EB_ICON                    $'\U1F331 '            # 🌱
@@ -214,6 +216,7 @@ case $POWERLEVEL9K_MODE in
       RIGHT_SUBSEGMENT_SEPARATOR     $'\uE0B3'                                      # 
       CARRIAGE_RETURN_ICON           $'\u21B5'                                      # ↵
       ROOT_ICON                      '\u'$CODEPOINT_OF_OCTICONS_ZAP                 # 
+      SUDO_ICON                      '\u'$CODEPOINT_OF_AWESOME_UNLOCK               # 
       RUBY_ICON                      '\u'$CODEPOINT_OF_OCTICONS_RUBY' '             # 
       AWS_ICON                       '\u'$CODEPOINT_OF_AWESOME_SERVER               # 
       AWS_EB_ICON                    $'\U1F331 '                                    # 🌱
@@ -298,6 +301,7 @@ case $POWERLEVEL9K_MODE in
       RIGHT_SUBSEGMENT_SEPARATOR     $'\uE0B3'              # 
       CARRIAGE_RETURN_ICON           $'\u21B5'              # ↵
       ROOT_ICON                      $'\uE614 '             # 
+      SUDO_ICON                      $'\uF09C'              # 
       RUBY_ICON                      $'\uF219 '             # 
       AWS_ICON                       $'\uF270'              # 
       AWS_EB_ICON                    $'\UF1BD  '            # 
@@ -385,6 +389,7 @@ case $POWERLEVEL9K_MODE in
       RIGHT_SUBSEGMENT_SEPARATOR     $'\uE0B3'              # 
       CARRIAGE_RETURN_ICON           $'\u21B5'              # ↵
       ROOT_ICON                      $'\u26A1'              # ⚡
+      SUDO_ICON                      $'\uE0A2'              # 
       RUBY_ICON                      ''
       AWS_ICON                       'AWS:'
       AWS_EB_ICON                    $'\U1F331 '            # 🌱
