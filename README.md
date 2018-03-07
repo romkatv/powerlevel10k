@@ -368,6 +368,7 @@ Customizations available are:
 
 | Variable | Default Value | Description |
 |----------|---------------|-------------|
+|`POWERLEVEL9K_DIR_PATH_ABSOLUTE`|None|If set to `true`, will use absolute paths instead of home folder abbreviation `~`|
 |`POWERLEVEL9K_SHORTEN_DIR_LENGTH`|`2`|If your shorten strategy, below, is entire directories, this field determines how many directories to leave at the end. If your shorten strategy is by character count, this field determines how many characters to allow per directory string.|
 |`POWERLEVEL9K_SHORTEN_STRATEGY`|None|How the directory strings should be truncated. See the table below for more informations.|
 |`POWERLEVEL9K_SHORTEN_DELIMITER`|`..`|Delimiter to use in truncated strings. This can be any string you choose, including an empty string if you wish to have no delimiter.|
@@ -377,9 +378,12 @@ Customizations available are:
 |Default|Truncate whole directories from left. How many is defined by `POWERLEVEL9K_SHORTEN_DIR_LENGTH`|
 |`truncate_middle`|Truncates the middle part of a folder. E.g. you are in a folder named `~/MySuperProjects/AwesomeFiles/BoringOffice`, then it will truncated to `~/MyS..cts/Awe..les/BoringOffice`, if `POWERLEVEL9K_SHORTEN_DIR_LENGTH=3` is also set (controls the amount of characters to be left).|
 |`truncate_from_right`|Just leaves the beginning of a folder name untouched. E.g. your folders will be truncated like so: "/ro../Pr../office". How many characters will be untouched is controlled by `POWERLEVEL9K_SHORTEN_DIR_LENGTH`.|
+|`truncate_absolute`|Truncates everything exept the last few characters in the path. E.g. if you are in a folder named "~/Projects/powerlevel9k" and you have set `POWERLEVEL9K_SHORTEN_DIR_LENGTH=3`, you will get "..l9k".|
+|`truncate_to_last`|Truncates everything before the last folder in the path.|
+|`truncate_to_first_and_last|Truncate middle directories from the path. How many directories will be untouched is controlled by POWERLEVEL9K_SHORTER_DIR_LENGTH. E.g. if you are in a folder named "~/Projects/powerlevel9k" and you have set `POWERLEVEL9K_SHORTEN_DIR_LENGTH=1`, you will get "~/../powerlevel9k".||
+|`truncate_to_unique`|Parse all parent path components and truncate them to the shortest unique length. If you copy & paste the result to a shell, after hitting `TAB` it should expand to the original path unambiguously.|
 |`truncate_with_package_name`|Search for a `package.json` or `composer.json` and prints the `name` field to abbreviate the directory path. The precedence and/or files could be set by `POWERLEVEL9K_DIR_PACKAGE_FILES=(package.json composer.json)`. If you have [jq](https://stedolan.github.io/jq/) installed, it will dramatically improve the speed of this strategy.|
 |`truncate_with_folder_marker`|Search for a file that is specified by `POWERLEVEL9K_SHORTEN_FOLDER_MARKER` and truncate everything before that (if found, otherwise stop on $HOME and ROOT).|
-|`truncate_to_unique`|Parse all parent path components and truncate them to the shortest unique length. If you copy & paste the result to a shell, after hitting `TAB` it should expand to the original path unambiguously.|
 
 For example, if you wanted the truncation behavior of the `fish` shell, which
 truncates `/usr/share/plasma` to `/u/s/plasma`, you would use the following:
@@ -420,6 +424,10 @@ You can also configure the `dir` segment to show when you are in a directory wit
 | Variable | Default Value | Description |
 |----------|---------------|-------------|
 |`POWERLEVEL9K_DIR_SHOW_WRITABLE`|`false`|If set to `true` and you are in a directory that you do not have write permissions for, this segment will display a lock icon and enter the `NOT_WRITABLE` state (which can be customized per [our usual process](https://github.com/bhilburn/powerlevel9k/wiki/Stylizing-Your-Prompt#segment-color-customization)). Note that this functionality is also available in a separate segment, `dir_writable`.|
+
+If you want to customize the last directory of the path, you can now set `POWERLEVEL9K_DIR_PATH_HIGHLIGHT_FOREGROUND` to a custom color and/or `POWERLEVEL9K_DIR_PATH_HIGHLIGHT_BOLD=true` to display that part in bold.
+
+You can also color the separator separately by setting the color using `POWERLEVEL9K_DIR_PATH_SEPARATOR_FOREGROUND`.
 
 ##### disk_usage
 
