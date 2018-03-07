@@ -732,16 +732,26 @@ prompt_command_execution_time() {
 
 ################################################################
 # Dir: current working directory
+# Parameters:
+#   * $1 Alignment: string - left|right
+#   * $2 Index: integer
 set_default POWERLEVEL9K_DIR_PATH_SEPARATOR "/"
 set_default POWERLEVEL9K_HOME_FOLDER_ABBREVIATION "~"
-set_default POWERLEVEL9K_DIR_SHOW_WRITABLE false
+set_default POWERLEVEL9K_DIR_PATH_HIGHLIGHT_BOLD false
 prompt_dir() {
-  local tmp="$IFS"
-  local IFS=""
-  local current_path=$(pwd | sed -e "s,^$HOME,~,")
-  local IFS="$tmp"
-  if [[ -n "$POWERLEVEL9K_SHORTEN_DIR_LENGTH" || "$POWERLEVEL9K_SHORTEN_STRATEGY" == "truncate_with_folder_marker" ]]; then
-    set_default POWERLEVEL9K_SHORTEN_DELIMITER $'\U2026'
+  # using $PWD instead of "$(print -P '%~')" to allow use of POWERLEVEL9K_DIR_PATH_ABSOLUTE
+  local current_path=$PWD # WAS: local current_path="$(print -P '%~')"
+  # check if the user wants to use absolute paths or "~" paths
+  [[ ${(L)POWERLEVEL9K_DIR_PATH_ABSOLUTE} != "true" ]] && current_path=${current_path//$HOME/"~"}
+  # declare all local variables
+  local paths directory test_dir test_dir_length trunc_path threshhold
+  # if we are not in "~" or "/", split the paths into an array and exclude "~"
+  (( ${#current_path} > 1 )) && paths=(${(s:/:)${current_path//"~\/"/}}) || paths=()
+  # only run the code if SHORTEN_DIR_LENGTH is set, or we are using the two strategies that don't rely on it.
+  if [[ -n "$POWERLEVEL9K_SHORTEN_DIR_LENGTH" || "$POWERLEVEL9K_SHORTEN_STRATEGY" == "truncate_with_folder_marker" || "$POWERLEVEL9K_SHORTEN_STRATEGY" == "truncate_to_last" ]]; then
+    set_default POWERLEVEL9K_SHORTEN_DELIMITER "\u2026"
+    # convert delimiter from unicode to literal character, so that we can get the correct length later
+    local delim=$(echo -n $POWERLEVEL9K_SHORTEN_DELIMITER)
 
     case "$POWERLEVEL9K_SHORTEN_STRATEGY" in
       truncate_absolute_chars)
@@ -750,10 +760,89 @@ prompt_dir() {
         fi
       ;;
       truncate_middle)
-        current_path=$(echo "$current_path" | sed $SED_EXTENDED_REGEX_PARAMETER "s/([^/]{$POWERLEVEL9K_SHORTEN_DIR_LENGTH})[^/]+([^/]{$POWERLEVEL9K_SHORTEN_DIR_LENGTH})\//\1$POWERLEVEL9K_SHORTEN_DELIMITER\2\//g")
+        # truncate characters from the middle of the path
+        current_path=$(truncatePath $current_path $POWERLEVEL9K_SHORTEN_DIR_LENGTH $POWERLEVEL9K_SHORTEN_DELIMITER "middle")
       ;;
       truncate_from_right)
-        current_path=$(truncatePathFromRight "$current_path" )
+        # truncate characters from the right of the path
+        current_path=$(truncatePath "$current_path" $POWERLEVEL9K_SHORTEN_DIR_LENGTH $POWERLEVEL9K_SHORTEN_DELIMITER)
+      ;;
+      truncate_absolute)
+        # truncate all characters except the last POWERLEVEL9K_SHORTEN_DIR_LENGTH characters
+        if [ ${#current_path} -gt $(( $POWERLEVEL9K_SHORTEN_DIR_LENGTH + ${#POWERLEVEL9K_SHORTEN_DELIMITER} )) ]; then
+          current_path=$POWERLEVEL9K_SHORTEN_DELIMITER${current_path:(-POWERLEVEL9K_SHORTEN_DIR_LENGTH)}
+        fi
+      ;;
+      truncate_to_last)
+        # truncate all characters before the current directory
+        current_path=${current_path##*/}
+      ;;
+      truncate_to_first_and_last)
+        if (( ${#current_path} > 1 )) && (( ${POWERLEVEL9K_SHORTEN_DIR_LENGTH} > 0 )); then
+          threshhold=$(( ${POWERLEVEL9K_SHORTEN_DIR_LENGTH} * 2))
+          # if we are in "~", add it back into the paths array
+          [[ $current_path == '~'* ]] && paths=("~" "${paths[@]}")
+          if (( ${#paths} > $threshhold )); then
+            local num=$(( ${#paths} - ${POWERLEVEL9K_SHORTEN_DIR_LENGTH} ))
+            # repace the middle elements
+            for (( i=$POWERLEVEL9K_SHORTEN_DIR_LENGTH; i<$num; i++ )); do
+              paths[$i+1]=$POWERLEVEL9K_SHORTEN_DELIMITER
+            done
+            [[ $current_path != '~'* ]] && current_path="/" || current_path=""
+            current_path+="${(j:/:)paths}"
+          fi
+        fi
+      ;;
+      truncate_to_unique)
+        # for each parent path component find the shortest unique beginning
+        # characters sequence. Source: https://stackoverflow.com/a/45336078
+        if (( ${#current_path} > 1 )); then # root and home are exceptions and won't have paths
+          local matching
+          local cur_path='/'
+          [[ $current_path != "~"* ]] && trunc_path='/' || trunc_path=''
+          for directory in ${paths[@]}; do
+            test_dir=''
+            for (( i=0; i<${#directory}; i++ )); do
+              test_dir+="${directory:$i:1}"
+              matching=("$cur_path"/"$test_dir"*/)
+              if [[ ${#matching[@]} -eq 1 ]]; then
+                break
+              fi
+            done
+            trunc_path+="$test_dir/"
+            cur_path+="$directory/"
+          done
+          [[ $current_path == "~"* ]] && trunc_path="~/$trunc_path"
+          current_path="${trunc_path: : -1}"
+        fi
+      ;;
+      truncate_with_folder_marker)
+        if (( ${#paths} > 0 )); then # root and home are exceptions and won't have paths, so skip this
+          local last_marked_folder marked_folder
+          set_default POWERLEVEL9K_SHORTEN_FOLDER_MARKER ".shorten_folder_marker"
+
+          # Search for the folder marker in the parent directories and
+          # buildup a pattern that is removed from the current path
+          # later on.
+          for marked_folder in $(upsearch $POWERLEVEL9K_SHORTEN_FOLDER_MARKER); do
+            if [[ "$marked_folder" == "/" ]]; then
+              # If we reached root folder, stop upsearch.
+              trunc_path="/"
+            elif [[ "$marked_folder" == "$HOME" ]]; then
+              # If we reached home folder, stop upsearch.
+              trunc_path="~"
+            elif [[ "${marked_folder%/*}" == $last_marked_folder ]]; then
+              trunc_path="${trunc_path%/}/${marked_folder##*/}"
+            else
+              trunc_path="${trunc_path%/}/$POWERLEVEL9K_SHORTEN_DELIMITER/${marked_folder##*/}"
+            fi
+            last_marked_folder=$marked_folder
+          done
+
+          # Replace the shortest possible match of the marked folder from
+          # the current path.
+          current_path=$trunc_path${current_path#${last_marked_folder}*}
+        fi
       ;;
       truncate_with_package_name)
         local name repo_path package_path current_dir zero
@@ -778,11 +867,11 @@ prompt_dir() {
         # in the path (this is done by the "zero" pattern; see
         # http://stackoverflow.com/a/40855342/5586433).
         local zero='%([BSUbfksu]|([FB]|){*})'
-        current_dir=$(pwd)
+        trunc_path=$(pwd)
         # Then, find the length of the package_path string, and save the
         # subdirectory path as a substring of the current directory's path from 0
         # to the length of the package path's string
-        subdirectory_path=$(truncatePathFromRight "${current_dir:${#${(S%%)package_path//$~zero/}}}")
+        subdirectory_path=$(truncatePath "${trunc_path:${#${(S%%)package_path//$~zero/}}}" $POWERLEVEL9K_SHORTEN_DIR_LENGTH $POWERLEVEL9K_SHORTEN_DELIMITER)
         # Parse the 'name' from the package.json; if there are any problems, just
         # print the file path
         defined POWERLEVEL9K_DIR_PACKAGE_FILES || POWERLEVEL9K_DIR_PACKAGE_FILES=(package.json composer.json)
@@ -803,60 +892,7 @@ prompt_dir() {
           # Instead of printing out the full path, print out the name of the package
           # from the package.json and append the current subdirectory
           current_path="`echo $packageName | tr -d '"'`$subdirectory_path"
-          if [[ "${POWERLEVEL9K_DIR_OMIT_FIRST_CHARACTER}" == "true" ]]; then
-            # add space before the packageName to allow for removing the "first" character, without messing up the package name.
-            current_path=" ${current_path}"
-          fi
-        else
-          current_path=$(truncatePathFromRight "$current_path" )
         fi
-      ;;
-      truncate_with_folder_marker)
-        local last_marked_folder marked_folder
-        set_default POWERLEVEL9K_SHORTEN_FOLDER_MARKER ".shorten_folder_marker"
-
-        # Search for the folder marker in the parent directories and
-        # buildup a pattern that is removed from the current path
-        # later on.
-        for marked_folder in $(upsearch $POWERLEVEL9K_SHORTEN_FOLDER_MARKER); do
-          if [[ "$marked_folder" == "/" ]]; then
-            # If we reached root folder, stop upsearch.
-            current_path="/"
-          elif [[ "$marked_folder" == "$HOME" ]]; then
-            # If we reached home folder, stop upsearch.
-            current_path="~"
-          elif [[ "${marked_folder%/*}" == $last_marked_folder ]]; then
-            current_path="${current_path%/}/${marked_folder##*/}"
-          else
-            current_path="${current_path%/}/$POWERLEVEL9K_SHORTEN_DELIMITER/${marked_folder##*/}"
-          fi
-          last_marked_folder=$marked_folder
-        done
-
-        # Replace the shortest possible match of the marked folder from
-        # the current path.
-        current_path=$current_path${PWD#${last_marked_folder}*}
-      ;;
-      truncate_to_unique)
-        # for each parent path component find the shortest unique beginning
-        # characters sequence. Source: https://stackoverflow.com/a/45336078
-        paths=(${(s:/:)PWD})
-        cur_path='/'
-        cur_short_path='/'
-        for directory in ${paths[@]}
-        do
-          cur_dir=''
-          for (( i=0; i<${#directory}; i++ )); do
-            cur_dir+="${directory:$i:1}"
-            matching=("$cur_path"/"$cur_dir"*/)
-            if [[ ${#matching[@]} -eq 1 ]]; then
-              break
-            fi
-          done
-          cur_short_path+="$cur_dir/"
-          cur_path+="$directory/"
-        done
-        current_path="${cur_short_path: : -1}"
       ;;
       *)
         current_path="$(print -P "%$((POWERLEVEL9K_SHORTEN_DIR_LENGTH+1))(c:$POWERLEVEL9K_SHORTEN_DELIMITER/:)%${POWERLEVEL9K_SHORTEN_DIR_LENGTH}c")"
@@ -864,17 +900,8 @@ prompt_dir() {
     esac
   fi
 
-  if [[ "${POWERLEVEL9K_DIR_OMIT_FIRST_CHARACTER}" == "true" ]]; then
-    current_path="${current_path[2,-1]}"
-  fi
-
-  if [[ "${POWERLEVEL9K_DIR_PATH_SEPARATOR}" != "/" ]]; then
-    current_path="$( echo "${current_path}" | sed "s/\//${POWERLEVEL9K_DIR_PATH_SEPARATOR}/g")"
-  fi
-
-  if [[ "${POWERLEVEL9K_HOME_FOLDER_ABBREVIATION}" != "~" ]]; then
-    current_path=${current_path/#\~/${POWERLEVEL9K_HOME_FOLDER_ABBREVIATION}}
-  fi
+  # save state of path for highlighting and bold options
+  local path_opt=$current_path
 
   typeset -AH dir_states
   dir_states=(
@@ -883,14 +910,85 @@ prompt_dir() {
     "HOME_SUBFOLDER"  "HOME_SUB_ICON"
     "NOT_WRITABLE"    "LOCK_ICON"
   )
+  local state_path="$(print -P '%~')"
   local current_state="DEFAULT"
   if [[ "${POWERLEVEL9K_DIR_SHOW_WRITABLE}" == true && ! -w "$PWD" ]]; then
     current_state="NOT_WRITABLE"
-  elif [[ $(print -P "%~") == '~' ]]; then
+  elif [[ $state_path == '~' ]]; then
     current_state="HOME"
-  elif [[ $(print -P "%~") == '~'* ]]; then
+  elif [[ $state_path == '~'* ]]; then
     current_state="HOME_SUBFOLDER"
   fi
+
+  # declare variables used for bold and state colors
+  local bld dir_state_foreground dir_state_user_foreground
+  # test if user wants the last directory printed in bold
+  if [[ "${(L)POWERLEVEL9K_DIR_PATH_HIGHLIGHT_BOLD}" == "true" ]]; then
+    bld_on="%B"
+    bld_off="%b"
+  else
+    bld_on=""
+    bld_off=""
+  fi
+  # determine is the user has set a last directory color
+  local dir_state_user_foreground=POWERLEVEL9K_DIR_${current_state}_FOREGROUND
+  local dir_state_foreground=${(P)dir_state_user_foreground}
+  [[ -z ${dir_state_foreground} ]] && dir_state_foreground="${DEFAULT_COLOR}"
+
+  local dir_name base_name
+  # use ZSH substitution to get the dirname and basename instead of calling external functions
+  dir_name=${path_opt%/*}
+  base_name=${path_opt##*/}
+
+  # if the user wants the last directory colored...
+  if [[ -n ${POWERLEVEL9K_DIR_PATH_HIGHLIGHT_FOREGROUND} ]]; then
+    # it the path is "/" or "~"
+    if [[ $path_opt == "/" || $path_opt == "~" ]]; then
+      current_path="${bld_on}%F{$POWERLEVEL9K_DIR_PATH_HIGHLIGHT_FOREGROUND}${current_path}${bld_off}"
+    else # has a subfolder
+      # test if dirname != basename - they are equal if we use truncate_to_last or truncate_absolute
+      if [[ $dir_name != $base_name ]]; then
+        current_path="${dir_name}/${bld_on}%F{$POWERLEVEL9K_DIR_PATH_HIGHLIGHT_FOREGROUND}${base_name}${bld_off}"
+      else
+        current_path="${bld_on}%F{$POWERLEVEL9K_DIR_PATH_HIGHLIGHT_FOREGROUND}${base_name}${bld_off}"
+      fi
+    fi
+  else # no coloring
+    # it the path is "/" or "~"
+    if [[ $path_opt == "/" || $path_opt == "~" ]]; then
+      current_path="${bld_on}${current_path}${bld_off}"
+    else # has a subfolder
+      # test if dirname != basename - they are equal if we use truncate_to_last or truncate_absolute
+      if [[ $dir_name != $base_name ]]; then
+        current_path="${dir_name}/${bld_on}${base_name}${bld_off}"
+      else
+        current_path="${bld_on}${base_name}${bld_off}"
+      fi
+    fi
+  fi
+
+  # check if we need to omit the first character and only do it if we are not in "~" or "/"
+  if [[ "${POWERLEVEL9K_DIR_OMIT_FIRST_CHARACTER}" == "true" && $path_opt != "/" && $path_opt != "~" ]]; then
+    current_path="${current_path[2,-1]}"
+  fi
+
+  # check if the user wants the separator colored.
+  if [[ -n ${POWERLEVEL9K_DIR_PATH_SEPARATOR_FOREGROUND} && $path_opt != "/" ]]; then
+    # because this contains color changing codes, it is easier to set a variable for what should be replaced
+    local repl="%F{$POWERLEVEL9K_DIR_PATH_SEPARATOR_FOREGROUND}/%F{$dir_state_foreground}"
+    # escape the / with a \
+    current_path=${current_path//\//$repl}
+  fi
+
+  if [[ "${POWERLEVEL9K_DIR_PATH_SEPARATOR}" != "/" && $path_opt != "/" ]]; then
+    current_path=${current_path//\//$POWERLEVEL9K_DIR_PATH_SEPARATOR}
+  fi
+
+  if [[ "${POWERLEVEL9K_HOME_FOLDER_ABBREVIATION}" != "~" && ! "${(L)POWERLEVEL9K_DIR_OMIT_FIRST_CHARACTER}" == "true" ]]; then
+    # use :s to only replace the first occurance
+    current_path=${current_path:s/~/$POWERLEVEL9K_HOME_FOLDER_ABBREVIATION}
+  fi
+
   "$1_prompt_segment" "$0_${current_state}" "$2" "blue" "$DEFAULT_COLOR" "${current_path}" "${dir_states[$current_state]}"
 }
 

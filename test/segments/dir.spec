@@ -18,6 +18,16 @@ function tearDown() {
   unset POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
 }
 
+function testDirPathAbsoluteWorks() {
+  POWERLEVEL9K_DIR_PATH_ABSOLUTE=true
+
+  cd ~
+  assertEquals "%K{blue} %F{black}/home/travis %k%F{blue}%f " "$(build_left_prompt)"
+
+  cd -
+  unset POWERLEVEL9K_DIR_PATH_ABSOLUTE
+}
+
 function testTruncateFoldersWorks() {
   POWERLEVEL9K_SHORTEN_DIR_LENGTH=2
   POWERLEVEL9K_SHORTEN_STRATEGY='truncate_folders'
@@ -63,6 +73,60 @@ function testTruncationFromRightWorks() {
   cd $FOLDER
 
   assertEquals "%K{blue} %F{black}/tmp/po…/1/12/123/12…/12…/12…/12…/12…/123456789 %k%F{blue}%f " "$(build_left_prompt)"
+
+  cd -
+  rm -fr /tmp/powerlevel9k-test
+
+  unset FOLDER
+  unset POWERLEVEL9K_SHORTEN_DIR_LENGTH
+  unset POWERLEVEL9K_SHORTEN_STRATEGY
+}
+
+function testTruncateToLastWorks() {
+  POWERLEVEL9K_SHORTEN_DIR_LENGTH=2
+  POWERLEVEL9K_SHORTEN_STRATEGY="truncate_to_last"
+
+  FOLDER=/tmp/powerlevel9k-test/1/12/123/1234/12345/123456/1234567/12345678/123456789
+  mkdir -p $FOLDER
+  cd $FOLDER
+
+  assertEquals "%K{blue} %F{black}123456789 %k%F{blue}%f " "$(build_left_prompt)"
+
+  cd -
+  rm -fr /tmp/powerlevel9k-test
+
+  unset FOLDER
+  unset POWERLEVEL9K_SHORTEN_DIR_LENGTH
+  unset POWERLEVEL9K_SHORTEN_STRATEGY
+}
+
+function testTruncateToFirstAndLastWorks() {
+  POWERLEVEL9K_SHORTEN_DIR_LENGTH=2
+  POWERLEVEL9K_SHORTEN_STRATEGY="truncate_to_first_and_last"
+
+  FOLDER=/tmp/powerlevel9k-test/1/12/123/1234/12345/123456/1234567/12345678/123456789
+  mkdir -p $FOLDER
+  cd $FOLDER
+
+  assertEquals "%K{blue} %F{black}/tmp/powerlevel9k-test/…/…/…/…/…/…/…/12345678/123456789 %k%F{blue}%f " "$(build_left_prompt)"
+
+  cd -
+  rm -fr /tmp/powerlevel9k-test
+
+  unset FOLDER
+  unset POWERLEVEL9K_SHORTEN_DIR_LENGTH
+  unset POWERLEVEL9K_SHORTEN_STRATEGY
+}
+
+function testTruncateAbsoluteWorks() {
+  POWERLEVEL9K_SHORTEN_DIR_LENGTH=2
+  POWERLEVEL9K_SHORTEN_STRATEGY="truncate_absolute"
+
+  FOLDER=/tmp/powerlevel9k-test/1/12/123/1234/12345/123456/1234567/12345678/123456789
+  mkdir -p $FOLDER
+  cd $FOLDER
+
+  assertEquals "%K{blue} %F{black}…89 %k%F{blue}%f " "$(build_left_prompt)"
 
   cd -
   rm -fr /tmp/powerlevel9k-test
@@ -425,6 +489,138 @@ function testTruncateToUniqueWorks() {
   unset POWERLEVEL9K_DIR_OMIT_FIRST_CHARACTER
   unset POWERLEVEL9K_SHORTEN_DIR_LENGTH
   unset POWERLEVEL9K_SHORTEN_STRATEGY
+}
+
+function testBoldHomeDirWorks() {
+  POWERLEVEL9K_DIR_PATH_HIGHLIGHT_BOLD=true
+  cd ~
+
+  assertEquals "%K{blue} %F{black}%B~%b %k%F{blue}%f " "$(build_left_prompt)"
+
+  cd -
+  unset POWERLEVEL9K_DIR_PATH_HIGHLIGHT_BOLD
+}
+
+function testBoldHomeSubdirWorks() {
+  POWERLEVEL9K_DIR_PATH_HIGHLIGHT_BOLD=true
+  mkdir -p ~/powerlevel9k-test
+  cd ~/powerlevel9k-test
+
+  assertEquals "%K{blue} %F{black}~/%Bpowerlevel9k-test%b %k%F{blue}%f " "$(build_left_prompt)"
+
+  cd -
+  rm -fr ~/powerlevel9k-test
+  unset POWERLEVEL9K_DIR_PATH_HIGHLIGHT_BOLD
+}
+
+function testBoldRootDirWorks() {
+  POWERLEVEL9K_DIR_PATH_HIGHLIGHT_BOLD=true
+  cd /
+
+  assertEquals "%K{blue} %F{black}%B/%b %k%F{blue}%f " "$(build_left_prompt)"
+
+  cd -
+  unset POWERLEVEL9K_DIR_PATH_HIGHLIGHT_BOLD
+}
+
+function testBoldRootSubdirWorks() {
+  POWERLEVEL9K_DIR_PATH_HIGHLIGHT_BOLD=true
+  cd /tmp
+
+  assertEquals "%K{blue} %F{black}/%Btmp%b %k%F{blue}%f " "$(build_left_prompt)"
+
+  cd -
+  unset POWERLEVEL9K_DIR_PATH_HIGHLIGHT_BOLD
+}
+
+function testBoldRootSubSubdirWorks() {
+  POWERLEVEL9K_DIR_PATH_HIGHLIGHT_BOLD=true
+  mkdir -p /tmp/powerlevel9k-test
+  cd /tmp/powerlevel9k-test
+
+  assertEquals "%K{blue} %F{black}/tmp/%Bpowerlevel9k-test%b %k%F{blue}%f " "$(build_left_prompt)"
+
+  cd -
+  rm -fr /tmp/powerlevel9k-test
+  unset POWERLEVEL9K_DIR_PATH_HIGHLIGHT_BOLD
+}
+
+function testHighlightHomeWorks() {
+  POWERLEVEL9K_DIR_PATH_HIGHLIGHT_FOREGROUND='red'
+  cd ~
+
+  assertEquals "%K{blue} %F{black}%F{red}~ %k%F{blue}%f " "$(build_left_prompt)"
+
+  cd -
+  unset POWERLEVEL9K_DIR_PATH_HIGHLIGHT_FOREGROUND
+}
+
+function testHighlightHomeSubdirWorks() {
+  POWERLEVEL9K_DIR_PATH_HIGHLIGHT_FOREGROUND='red'
+  mkdir -p ~/powerlevel9k-test
+  cd ~/powerlevel9k-test
+
+  assertEquals "%K{blue} %F{black}~/%F{red}powerlevel9k-test %k%F{blue}%f " "$(build_left_prompt)"
+
+  cd -
+  rm -fr ~/powerlevel9k-test
+  unset POWERLEVEL9K_DIR_PATH_HIGHLIGHT_FOREGROUND
+}
+
+function testHighlightRootWorks() {
+  POWERLEVEL9K_DIR_PATH_HIGHLIGHT_FOREGROUND='red'
+  cd /
+
+  assertEquals "%K{blue} %F{black}%F{red}/ %k%F{blue}%f " "$(build_left_prompt)"
+
+  cd -
+  unset POWERLEVEL9K_DIR_PATH_HIGHLIGHT_FOREGROUND
+}
+
+function testHighlightRootSubdirWorks() {
+  POWERLEVEL9K_DIR_PATH_HIGHLIGHT_FOREGROUND='red'
+  cd /tmp
+
+  assertEquals "%K{blue} %F{black}/%F{red}tmp %k%F{blue}%f " "$(build_left_prompt)"
+
+  cd -
+  unset POWERLEVEL9K_DIR_PATH_HIGHLIGHT_FOREGROUND
+}
+
+function testHighlightRootSubSubdirWorks() {
+  POWERLEVEL9K_DIR_PATH_HIGHLIGHT_FOREGROUND='red'
+  mkdir /tmp/powerlevel9k-test
+  cd /tmp/powerlevel9k-test
+
+  assertEquals "%K{blue} %F{black}/tmp/%F{red}powerlevel9k-test %k%F{blue}%f " "$(build_left_prompt)"
+
+  cd -
+  rm -fr /tmp/powerlevel9k-test
+  unset POWERLEVEL9K_DIR_PATH_HIGHLIGHT_FOREGROUND
+}
+
+function testDirSeparatorColorHomeSubdirWorks() {
+  POWERLEVEL9K_DIR_PATH_SEPARATOR_FOREGROUND='red'
+  mkdir -p ~/powerlevel9k-test
+  cd ~/powerlevel9k-test
+
+  assertEquals "%K{blue} %F{black}~%F{red}/%F{black}powerlevel9k-test %k%F{blue}%f " "$(build_left_prompt)"
+
+  cd -
+  rm -fr ~/powerlevel9k-test
+  unset POWERLEVEL9K_DIR_PATH_SEPARATOR_FOREGROUND
+}
+
+function testDirSeparatorColorRootSubSubdirWorks() {
+  POWERLEVEL9K_DIR_PATH_SEPARATOR_FOREGROUND='red'
+  mkdir -p /tmp/powerlevel9k-test
+  cd /tmp/powerlevel9k-test
+
+  assertEquals "%K{blue} %F{black}%F{red}/%F{black}tmp%F{red}/%F{black}powerlevel9k-test %k%F{blue}%f " "$(build_left_prompt)"
+
+  cd -
+  rm -fr /tmp/powerlevel9k-test
+  unset POWERLEVEL9K_DIR_PATH_SEPARATOR_FOREGROUND
 }
 
 source shunit2/source/2.1/src/shunit2
