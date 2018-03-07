@@ -728,6 +728,11 @@ prompt_dir() {
     set_default POWERLEVEL9K_SHORTEN_DELIMITER $'\U2026'
 
     case "$POWERLEVEL9K_SHORTEN_STRATEGY" in
+      truncate_absolute_chars)
+        if [ ${#current_path} -gt $(( $POWERLEVEL9K_SHORTEN_DIR_LENGTH + ${#POWERLEVEL9K_SHORTEN_DELIMITER} )) ]; then
+          current_path=$POWERLEVEL9K_SHORTEN_DELIMITER${current_path:(-POWERLEVEL9K_SHORTEN_DIR_LENGTH)}
+        fi
+      ;;
       truncate_middle)
         current_path=$(echo "$current_path" | sed $SED_EXTENDED_REGEX_PARAMETER "s/([^/]{$POWERLEVEL9K_SHORTEN_DIR_LENGTH})[^/]+([^/]{$POWERLEVEL9K_SHORTEN_DIR_LENGTH})\//\1$POWERLEVEL9K_SHORTEN_DELIMITER\2\//g")
       ;;
