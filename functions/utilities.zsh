@@ -103,7 +103,52 @@ case $(uname) in
       ;;
     Linux)
       OS='Linux'
-      OS_ICON=$(print_icon 'LINUX_ICON')
+      os_release_id="$(grep -E '^ID=([a-zA-Z]*)' /etc/os-release | cut -d '=' -f 2)"
+      case "$os_release_id" in
+        "arch")
+        OS_ICON=$(print_icon 'LINUX_ARCH_ICON')
+        ;;
+        "debian")
+        OS_ICON=$(print_icon 'LINUX_DEBIAN_ICON')
+        ;;
+       "ubuntu")
+        OS_ICON=$(print_icon 'LINUX_UBUNTU_ICON')
+        ;;
+       "elementary")
+        OS_ICON=$(print_icon 'LINUX_ELEMENTARY_ICON')
+        ;;
+       "fedora")
+        OS_ICON=$(print_icon 'LINUX_FEDORA_ICON')
+        ;;
+       "coreos")
+        OS_ICON=$(print_icon 'LINUX_COREOS_ICON')
+        ;;
+       "gentoo")
+        OS_ICON=$(print_icon 'LINUX_GENTOO_ICON')
+        ;;
+       "mageia")
+        OS_ICON=$(print_icon 'LINUX_MAGEIA_ICON')
+        ;;
+       "centos")
+        OS_ICON=$(print_icon 'LINUX_CENTOS_ICON')
+        ;;
+       "opensuse"|"tumbleweed")
+        OS_ICON=$(print_icon 'LINUX_OPENSUSE_ICON')
+        ;;
+       "sabayon")
+        OS_ICON=$(print_icon 'LINUX_SABAYON_ICON')
+        ;;
+       "slackware")
+        OS_ICON=$(print_icon 'LINUX_SLACKWARE_ICON')
+        ;;
+       "linuxmint")
+        OS_ICON=$(print_icon 'LINUX_MINT_ICON')
+        ;;
+        *)
+        OS='Linux'
+        OS_ICON=$(print_icon 'LINUX_ICON')
+        ;;
+      esac
 
       # Check if we're running on Android
       case $(uname -o 2>/dev/null) in

@@ -27,6 +27,7 @@ case $POWERLEVEL9K_MODE in
       RIGHT_SUBSEGMENT_SEPARATOR     $'\uE0B3'              # 
       CARRIAGE_RETURN_ICON           $'\u21B5'              # ↵
       ROOT_ICON                      $'\uE801'              # 
+      SUDO_ICON                      $'\uF09C'              # 
       RUBY_ICON                      $'\uE847 '             # 
       AWS_ICON                       $'\uE895'              # 
       AWS_EB_ICON                    $'\U1F331 '            # 🌱
@@ -47,6 +48,19 @@ case $POWERLEVEL9K_MODE in
       FREEBSD_ICON                   $'\U1F608 '            # 😈
       ANDROID_ICON                   $'\uE270'              # 
       LINUX_ICON                     $'\uE271'              # 
+      LINUX_ARCH_ICON                'Arc'
+      LINUX_DEBIAN_ICON              'Deb'
+      LINUX_UBUNTU_ICON              'Ubu'
+      LINUX_CENTOS_ICON              'Cen'
+      LINUX_COREOS_ICON              'Cor'
+      LINUX_ELEMENTARY_ICON          'Elm'
+      LINUX_MINT_ICON                'LMi'
+      LINUX_FEDORA_ICON              'Fed'
+      LINUX_GENTOO_ICON              'Gen'
+      LINUX_MAGEIA_ICON              'Mag'
+      LINUX_OPENSUSE_ICON            'OSu'
+      LINUX_SABAYON_ICON             'Sab'
+      LINUX_SLACKWARE_ICON           'Sla'
       SUNOS_ICON                     $'\U1F31E '            # 🌞
       HOME_ICON                      $'\uE12C'              # 
       HOME_SUB_ICON                  $'\uE18D'              # 
@@ -105,6 +119,7 @@ case $POWERLEVEL9K_MODE in
       RIGHT_SUBSEGMENT_SEPARATOR     $'\uE0B3'              # 
       CARRIAGE_RETURN_ICON           $'\u21B5'              # ↵
       ROOT_ICON                      $'\uF201'              # 
+      SUDO_ICON                      $'\uF09C'              # 
       RUBY_ICON                      $'\uF219 '             # 
       AWS_ICON                       $'\uF270'              # 
       AWS_EB_ICON                    $'\U1F331 '            # 🌱
@@ -125,6 +140,19 @@ case $POWERLEVEL9K_MODE in
       FREEBSD_ICON                   $'\U1F608 '            # 😈
       ANDROID_ICON                   $'\uE17B'              # 
       LINUX_ICON                     $'\uF17C'              # 
+      LINUX_ARCH_ICON                'Arc'
+      LINUX_DEBIAN_ICON              'Deb'
+      LINUX_UBUNTU_ICON              'Ubu'
+      LINUX_CENTOS_ICON              'Cen'
+      LINUX_COREOS_ICON              'Cor'
+      LINUX_ELEMENTARY_ICON          'Elm'
+      LINUX_MINT_ICON                'LMi'
+      LINUX_FEDORA_ICON              'Fed'
+      LINUX_GENTOO_ICON              'Gen'
+      LINUX_MAGEIA_ICON              'Mag'
+      LINUX_OPENSUSE_ICON            'OSu'
+      LINUX_SABAYON_ICON             'Sab'
+      LINUX_SLACKWARE_ICON           'Sla'
       SUNOS_ICON                     $'\uF185 '             # 
       HOME_ICON                      $'\uF015'              # 
       HOME_SUB_ICON                  $'\uF07C'              # 
@@ -151,7 +179,7 @@ case $POWERLEVEL9K_MODE in
       VCS_GIT_GITLAB_ICON            $'\uF296 '             # 
       VCS_HG_ICON                    $'\uF0C3 '             # 
       VCS_SVN_ICON                   '(svn) '
-      RUST_ICON                      $'\uE6A8'              #  
+      RUST_ICON                      $'\uE6A8'              # 
       PYTHON_ICON                    $'\ue63c'             # 
       SWIFT_ICON                     ''
       GO_ICON                        ''
@@ -188,6 +216,7 @@ case $POWERLEVEL9K_MODE in
       RIGHT_SUBSEGMENT_SEPARATOR     $'\uE0B3'                                      # 
       CARRIAGE_RETURN_ICON           $'\u21B5'                                      # ↵
       ROOT_ICON                      '\u'$CODEPOINT_OF_OCTICONS_ZAP                 # 
+      SUDO_ICON                      '\u'$CODEPOINT_OF_AWESOME_UNLOCK               # 
       RUBY_ICON                      '\u'$CODEPOINT_OF_OCTICONS_RUBY' '             # 
       AWS_ICON                       '\u'$CODEPOINT_OF_AWESOME_SERVER               # 
       AWS_EB_ICON                    $'\U1F331 '                                    # 🌱
@@ -205,6 +234,19 @@ case $POWERLEVEL9K_MODE in
       APPLE_ICON                     '\u'$CODEPOINT_OF_AWESOME_APPLE                # 
       FREEBSD_ICON                   $'\U1F608 '                                    # 😈
       LINUX_ICON                     '\u'$CODEPOINT_OF_AWESOME_LINUX                # 
+      LINUX_ARCH_ICON                'Arc'
+      LINUX_DEBIAN_ICON              'Deb'
+      LINUX_UBUNTU_ICON              'Ubu'
+      LINUX_CENTOS_ICON              'Cen'
+      LINUX_COREOS_ICON              'Cor'
+      LINUX_ELEMENTARY_ICON          'Elm'
+      LINUX_MINT_ICON                'LMi'
+      LINUX_FEDORA_ICON              'Fed'
+      LINUX_GENTOO_ICON              'Gen'
+      LINUX_MAGEIA_ICON              'Mag'
+      LINUX_OPENSUSE_ICON            'OSu'
+      LINUX_SABAYON_ICON             'Sab'
+      LINUX_SLACKWARE_ICON           'Sla'
       SUNOS_ICON                     '\u'$CODEPOINT_OF_AWESOME_SUN_O' '             # 
       HOME_ICON                      '\u'$CODEPOINT_OF_AWESOME_HOME                 # 
       HOME_SUB_ICON                  '\u'$CODEPOINT_OF_AWESOME_FOLDER_OPEN          # 
@@ -259,6 +301,7 @@ case $POWERLEVEL9K_MODE in
       RIGHT_SUBSEGMENT_SEPARATOR     $'\uE0B3'              # 
       CARRIAGE_RETURN_ICON           $'\u21B5'              # ↵
       ROOT_ICON                      $'\uE614 '             # 
+      SUDO_ICON                      $'\uF09C'              # 
       RUBY_ICON                      $'\uF219 '             # 
       AWS_ICON                       $'\uF270'              # 
       AWS_EB_ICON                    $'\UF1BD  '            # 
@@ -278,6 +321,19 @@ case $POWERLEVEL9K_MODE in
       WINDOWS_ICON                   $'\uF17A'              # 
       FREEBSD_ICON                   $'\UF30E '             # 
       ANDROID_ICON                   $'\uF17B'              # 
+      LINUX_ARCH_ICON                $'\uF300'              # 
+      LINUX_DEBIAN_ICON              $'\uF302'              # 
+      LINUX_UBUNTU_ICON              $'\uF30C'              # 
+      LINUX_CENTOS_ICON              $'\uF301'              # 
+      LINUX_COREOS_ICON              $'\uF30F'              # 
+      LINUX_ELEMENTARY_ICON          $'\uF311'              # 
+      LINUX_FEDORA_ICON              $'\uF303'              # 
+      LINUX_GENTOO_ICON              $'\uF310'              # 
+      LINUX_MINT_ICON                $'\uF304'              # 
+      LINUX_MAGEIA_ICON              $'\uF306'              # 
+      LINUX_OPENSUSE_ICON            $'\uF308'              # 
+      LINUX_SABAYON_ICON             $'\uF313'              # 
+      LINUX_SLACKWARE_ICON           $'\uF30A'              # 
       LINUX_ICON                     $'\uF17C'              # 
       SUNOS_ICON                     $'\uF185 '             # 
       HOME_ICON                      $'\uF015'              # 
@@ -333,6 +389,7 @@ case $POWERLEVEL9K_MODE in
       RIGHT_SUBSEGMENT_SEPARATOR     $'\uE0B3'              # 
       CARRIAGE_RETURN_ICON           $'\u21B5'              # ↵
       ROOT_ICON                      $'\u26A1'              # ⚡
+      SUDO_ICON                      $'\uE0A2'              # 
       RUBY_ICON                      ''
       AWS_ICON                       'AWS:'
       AWS_EB_ICON                    $'\U1F331 '            # 🌱
@@ -353,6 +410,19 @@ case $POWERLEVEL9K_MODE in
       FREEBSD_ICON                   'BSD'
       ANDROID_ICON                   'And'
       LINUX_ICON                     'Lx'
+      LINUX_ARCH_ICON                'Arc'
+      LINUX_DEBIAN_ICON              'Deb'
+      LINUX_UBUNTU_ICON              'Ubu'
+      LINUX_CENTOS_ICON              'Cen'
+      LINUX_COREOS_ICON              'Cor'
+      LINUX_ELEMENTARY_ICON          'Elm'
+      LINUX_MINT_ICON                'LMi'
+      LINUX_FEDORA_ICON              'Fed'
+      LINUX_GENTOO_ICON              'Gen'
+      LINUX_MAGEIA_ICON              'Mag'
+      LINUX_OPENSUSE_ICON            'OSu'
+      LINUX_SABAYON_ICON             'Sab'
+      LINUX_SLACKWARE_ICON           'Sla'
       SUNOS_ICON                     'Sun'
       HOME_ICON                      ''
       HOME_SUB_ICON                  ''

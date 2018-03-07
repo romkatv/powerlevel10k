@@ -589,9 +589,11 @@ prompt_context() {
   local current_state="DEFAULT"
   typeset -AH context_states
   context_states=(
-    "ROOT"      "yellow"
-    "DEFAULT"   "yellow"
-    "REMOTE"    "yellow"
+    "ROOT"        "yellow"
+    "SUDO"        "yellow"
+    "DEFAULT"     "yellow"
+    "REMOTE"      "yellow"
+    "REMOTE_SUDO" "yellow"
   )
 
   local content=""
@@ -607,7 +609,13 @@ prompt_context() {
   if [[ $(print -P "%#") == '#' ]]; then
     current_state="ROOT"
   elif [[ -n "$SSH_CLIENT" || -n "$SSH_TTY" ]]; then
-    current_state="REMOTE"
+    if sudo -n true 2>/dev/null; then
+      current_state="REMOTE_SUDO"
+    else
+      current_state="REMOTE"
+    fi
+  elif sudo -n true 2>/dev/null; then
+    current_state="SUDO"
   fi
 
   "$1_prompt_segment" "${0}_${current_state}" "$2" "$DEFAULT_COLOR" "${context_states[$current_state]}" "${content}"
@@ -629,6 +637,14 @@ prompt_user() {
         "FOREGROUND_COLOR"    "yellow"
         "VISUAL_IDENTIFIER"   "ROOT_ICON"
       )
+    elif sudo -n true 2>/dev/null; then 
+      user_state=( 
+        "STATE"               "SUDO" 
+        "CONTENT"             "${POWERLEVEL9K_USER_TEMPLATE}" 
+        "BACKGROUND_COLOR"    "${DEFAULT_COLOR}" 
+        "FOREGROUND_COLOR"    "yellow" 
+        "VISUAL_IDENTIFIER"   "SUDO_ICON" 
+      ) 
     else
       user_state=(
         "STATE"               "DEFAULT"
@@ -728,6 +744,11 @@ prompt_dir() {
     set_default POWERLEVEL9K_SHORTEN_DELIMITER $'\U2026'
 
     case "$POWERLEVEL9K_SHORTEN_STRATEGY" in
+      truncate_absolute_chars)
+        if [ ${#current_path} -gt $(( $POWERLEVEL9K_SHORTEN_DIR_LENGTH + ${#POWERLEVEL9K_SHORTEN_DELIMITER} )) ]; then
+          current_path=$POWERLEVEL9K_SHORTEN_DELIMITER${current_path:(-POWERLEVEL9K_SHORTEN_DIR_LENGTH)}
+        fi
+      ;;
       truncate_middle)
         current_path=$(echo "$current_path" | sed $SED_EXTENDED_REGEX_PARAMETER "s/([^/]{$POWERLEVEL9K_SHORTEN_DIR_LENGTH})[^/]+([^/]{$POWERLEVEL9K_SHORTEN_DIR_LENGTH})\//\1$POWERLEVEL9K_SHORTEN_DELIMITER\2\//g")
       ;;
@@ -1023,9 +1044,9 @@ prompt_load() {
   # Replace comma
   load_avg=${load_avg//,/.}
 
-  if [[ "$load_avg" -gt $(bc -l <<< "${cores} * 0.7") ]]; then
+  if [[ "$load_avg" -gt $((${cores} * 0.7)) ]]; then
     current_state="critical"
-  elif [[ "$load_avg" -gt $(bc -l <<< "${cores} * 0.5") ]]; then
+  elif [[ "$load_avg" -gt $((${cores} * 0.5)) ]]; then
     current_state="warning"
   else
     current_state="normal"
@@ -1437,6 +1458,7 @@ prompt_vi_mode() {
       "$1_prompt_segment" "$0_NORMAL" "$2" "$DEFAULT_COLOR" "default" "$POWERLEVEL9K_VI_COMMAND_MODE_STRING"
     ;;
     main|viins|*)
+      if [[ -z $POWERLEVEL9K_VI_INSERT_MODE_STRING ]]; then return; fi
       "$1_prompt_segment" "$0_INSERT" "$2" "$DEFAULT_COLOR" "blue" "$POWERLEVEL9K_VI_INSERT_MODE_STRING"
     ;;
   esac
@@ -1623,15 +1645,25 @@ $(print_icon 'MULTILINE_LAST_PROMPT_PREFIX')'
 
 NEWLINE='
 '
+
   if [[ $POWERLEVEL9K_PROMPT_ADD_NEWLINE == true ]]; then
     NEWLINES=""
     repeat ${POWERLEVEL9K_PROMPT_ADD_NEWLINE_COUNT:-1} { NEWLINES+=$NEWLINE }
     PROMPT="$NEWLINES$PROMPT"
   fi
+
+  # Allow iTerm integration to work
+  [[ $ITERM_SHELL_INTEGRATION_INSTALLED == "Yes" ]] && PROMPT="%{$(iterm2_prompt_mark)%}$PROMPT"
+}
+
+zle-keymap-select () {
+	zle reset-prompt
+	zle -R
 }
 
 set_default POWERLEVEL9K_IGNORE_TERM_COLORS false
 set_default POWERLEVEL9K_IGNORE_TERM_LANG false
+
 prompt_powerlevel9k_setup() {
   # The value below was set to better support 32-bit CPUs.
   # It's the maximum _signed_ integer value on 32-bit CPUs.
@@ -1695,6 +1727,8 @@ prompt_powerlevel9k_setup() {
   # prepare prompts
   add-zsh-hook precmd powerlevel9k_prepare_prompts
   add-zsh-hook preexec powerlevel9k_preexec
+
+  zle -N zle-keymap-select
 }
 
 prompt_powerlevel9k_teardown() {

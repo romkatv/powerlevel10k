@@ -321,7 +321,7 @@ main theme distribution so that everyone can use it!
 
 The `context` segment (user@host string) is conditional. By default, it will
 only print if you are not your 'normal' user (including if you are root), or if
-you are SSH'd to a remote host.
+you are SSH'd to a remote host. `SUDO` and `REMOTE_SUDO` states are also available to show whether the current user or remote user has superuser privileges.
 
 To use this feature, make sure the `context` segment is enabled in your prompt
 elements (it is by default), and define a `DEFAULT_USER` in your `~/.zshrc`.
@@ -384,6 +384,7 @@ Customizations available are:
 | Strategy Name | Description |
 |---------------|-------------|
 |Default|Truncate whole directories from left. How many is defined by `POWERLEVEL9K_SHORTEN_DIR_LENGTH`|
+|`truncate_absolute_chars`|Truncates an absolute number of characters from the left such that the number of characters that your path displays (with or without `POWERLEVEL9K_SHORTEN_DELIMITER`) is no more than `POWERLEVEL9K_SHORTEN_DIR_LENGTH` + the length of `POWERLEVEL9K_SHORTEN_DELIMITER` |
 |`truncate_middle`|Truncates the middle part of a folder. E.g. you are in a folder named `~/MySuperProjects/AwesomeFiles/BoringOffice`, then it will truncated to `~/MyS..cts/Awe..les/BoringOffice`, if `POWERLEVEL9K_SHORTEN_DIR_LENGTH=3` is also set (controls the amount of characters to be left).|
 |`truncate_from_right`|Just leaves the beginning of a folder name untouched. E.g. your folders will be truncated like so: "/ro../Pr../office". How many characters will be untouched is controlled by `POWERLEVEL9K_SHORTEN_DIR_LENGTH`.|
 |`truncate_with_package_name`|Search for a `package.json` or `composer.json` and prints the `name` field to abbreviate the directory path. The precedence and/or files could be set by `POWERLEVEL9K_DIR_PACKAGE_FILES=(package.json composer.json)`. If you have [jq](https://stedolan.github.io/jq/) installed, it will dramatically improve the speed of this strategy.|
@@ -589,6 +590,7 @@ You can also override the icons by setting:
 ```
 POWERLEVEL9K_USER_ICON="\uF415" # 
 POWERLEVEL9K_ROOT_ICON="#"
+POWERLEVEL9K_SUDO_ICON=$'\uF09C' # 
 ```
 
 | Variable | Default Value | Description |
@@ -612,6 +614,7 @@ customization is provided via:
 |`POWERLEVEL9K_VCS_GIT_HOOKS`|`(vcs-detect-changes git-untracked git-aheadbehind git-stash git-remotebranch git-tagname)`|Layout of the segment for git repositories.|
 |`POWERLEVEL9K_VCS_HG_HOOKS`|`(vcs-detect-changes)`|Layout of the segment for Mercurial repositories.|
 |`POWERLEVEL9K_VCS_SVN_HOOKS`|`(vcs-detect-changes svn-detect-changes)`|Layout of the segment for SVN repositories.|
+|`POWERLEVEL9K_VCS_ACTIONFORMAT_FOREGROUND`|`red`|The color of the foreground font during actions (e.g., `REBASE`).|
 
 
 ##### vcs symbols
@@ -646,6 +649,8 @@ you are using the [ZSH Line Editor](http://zsh.sourceforge.net/Doc/Release/Zsh-L
 |----------|---------------|-------------|
 |`POWERLEVEL9K_VI_INSERT_MODE_STRING`|`"INSERT"`|String to display while in 'Insert' mode.|
 |`POWERLEVEL9K_VI_COMMAND_MODE_STRING`|`"NORMAL"`|String to display while in 'Command' mode.|
+
+To hide the segment entirely when in `INSERT` mode, set `POWERLEVEL9K_VI_INSERT_MODE_STRING=''`
 
 #### Unit Test Ratios
 
