@@ -809,7 +809,9 @@ prompt_dir() {
         current_path="${cur_short_path: : -1}"
       ;;
       *)
-        current_path="$(print -P "%$((POWERLEVEL9K_SHORTEN_DIR_LENGTH+1))(c:$POWERLEVEL9K_SHORTEN_DELIMITER/:)%${POWERLEVEL9K_SHORTEN_DIR_LENGTH}c")"
+        if [[ $current_path != "~" ]]; then
+          current_path="$(print -P "%$((POWERLEVEL9K_SHORTEN_DIR_LENGTH+1))(c:$POWERLEVEL9K_SHORTEN_DELIMITER/:)%${POWERLEVEL9K_SHORTEN_DIR_LENGTH}c")"
+        fi
       ;;
     esac
   fi
