@@ -144,6 +144,21 @@ case $(uname) in
        "linuxmint")
         OS_ICON=$(print_icon 'LINUX_MINT_ICON')
         ;;
+       "alpine")
+        OS_ICON=$(print_icon 'LINUX_ALPINE_ICON')
+        ;;
+       "aosc")
+        OS_ICON=$(print_icon 'LINUX_AOSC_ICON')
+        ;;
+       "nixos")
+        OS_ICON=$(print_icon 'LINUX_NIXOS_ICON')
+        ;;
+       "devuan")
+        OS_ICON=$(print_icon 'LINUX_DEVUAN_ICON')
+        ;;
+       "manjaro")
+        OS_ICON=$(print_icon 'LINUX_MANJARO_ICON')
+        ;;
         *)
         OS='Linux'
         OS_ICON=$(print_icon 'LINUX_ICON')
