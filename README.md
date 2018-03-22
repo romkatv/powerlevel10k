@@ -209,8 +209,9 @@ You can also change the battery icon automatically depending on the battery
 level. This will override the default battery icon. In order to do this, you
 need to define the `POWERLEVEL9k_BATTERY_STAGES` variable.
 
-| Variable | Default Value | Description |
-| `POWERLEVEL9K_BATTERY_STAGES`|Unset|A string or array, which each index indicates a charge level.|
+| Variable                      | Default Value | Description                                                   |
+|-------------------------------|---------------|---------------------------------------------------------------|
+| `POWERLEVEL9K_BATTERY_STAGES` | Unset         | A string or array, which each index indicates a charge level. |
 
 Powerlevel9k will use each index of the string or array as a stage to indicate battery
 charge level, progressing from left to right. You can provide any number of
