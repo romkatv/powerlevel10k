@@ -87,6 +87,7 @@ case $POWERLEVEL9K_MODE in
       SSH_ICON                       '(ssh)'
       VPN_ICON                       '(vpn)'
       KUBERNETES_ICON                $'\U2388'              # ⎈
+      JAVA_ICON                      $'\U2615'              # ☕︎
     )
   ;;
   'awesome-fontconfig')
@@ -158,6 +159,7 @@ case $POWERLEVEL9K_MODE in
       SSH_ICON                       '(ssh)'
       VPN_ICON                       $'\uF023'
       KUBERNETES_ICON                $'\U2388'              # ⎈
+      JAVA_ICON                      $'\U2615'              # ☕︎
     )
   ;;
   'nerdfont-complete'|'nerdfont-fontconfig')
@@ -229,6 +231,7 @@ case $POWERLEVEL9K_MODE in
       SSH_ICON                       $'\uF489'              # 
       VPN_ICON                       '(vpn)'
       KUBERNETES_ICON                $'\U2388'              # ⎈
+      JAVA_ICON                      $'\U2615'              # ☕︎
     )
   ;;
   *)
@@ -300,6 +303,7 @@ case $POWERLEVEL9K_MODE in
       SSH_ICON                       '(ssh)'
       VPN_ICON                       '(vpn)'
       KUBERNETES_ICON                $'\U2388'              # ⎈
+      JAVA_ICON                      $'\U2615'              # ☕︎
     )
   ;;
 esac
