@@ -58,6 +58,11 @@ case $POWERLEVEL9K_MODE in
       LINUX_FEDORA_ICON              'Fed'
       LINUX_GENTOO_ICON              'Gen'
       LINUX_MAGEIA_ICON              'Mag'
+      LINUX_NIXOS_ICON               'Nix'
+      LINUX_MANJARO_ICON             'Man'
+      LINUX_DEVUAN_ICON              'Dev'
+      LINUX_ALPINE_ICON              'Alp'
+      LINUX_AOSC_ICON                'Aos'
       LINUX_OPENSUSE_ICON            'OSu'
       LINUX_SABAYON_ICON             'Sab'
       LINUX_SLACKWARE_ICON           'Sla'
@@ -150,6 +155,11 @@ case $POWERLEVEL9K_MODE in
       LINUX_FEDORA_ICON              'Fed'
       LINUX_GENTOO_ICON              'Gen'
       LINUX_MAGEIA_ICON              'Mag'
+      LINUX_NIXOS_ICON               'Nix'
+      LINUX_MANJARO_ICON             'Man'
+      LINUX_DEVUAN_ICON              'Dev'
+      LINUX_ALPINE_ICON              'Alp'
+      LINUX_AOSC_ICON                'Aos'
       LINUX_OPENSUSE_ICON            'OSu'
       LINUX_SABAYON_ICON             'Sab'
       LINUX_SLACKWARE_ICON           'Sla'
@@ -244,6 +254,11 @@ case $POWERLEVEL9K_MODE in
       LINUX_FEDORA_ICON              'Fed'
       LINUX_GENTOO_ICON              'Gen'
       LINUX_MAGEIA_ICON              'Mag'
+      LINUX_NIXOS_ICON               'Nix'
+      LINUX_MANJARO_ICON             'Man'
+      LINUX_DEVUAN_ICON              'Dev'
+      LINUX_ALPINE_ICON              'Alp'
+      LINUX_AOSC_ICON                'Aos'
       LINUX_OPENSUSE_ICON            'OSu'
       LINUX_SABAYON_ICON             'Sab'
       LINUX_SLACKWARE_ICON           'Sla'
@@ -319,21 +334,26 @@ case $POWERLEVEL9K_MODE in
       MULTILINE_LAST_PROMPT_PREFIX   $'\u2570'$'\U2500 '    # ╰─
       APPLE_ICON                     $'\uF179'              # 
       WINDOWS_ICON                   $'\uF17A'              # 
-      FREEBSD_ICON                   $'\UF30E '             # 
+      FREEBSD_ICON                   $'\UF30C '             # 
       ANDROID_ICON                   $'\uF17B'              # 
-      LINUX_ARCH_ICON                $'\uF300'              # 
-      LINUX_DEBIAN_ICON              $'\uF302'              # 
-      LINUX_UBUNTU_ICON              $'\uF30C'              # 
-      LINUX_CENTOS_ICON              $'\uF301'              # 
-      LINUX_COREOS_ICON              $'\uF30F'              # 
-      LINUX_ELEMENTARY_ICON          $'\uF311'              # 
-      LINUX_FEDORA_ICON              $'\uF303'              # 
-      LINUX_GENTOO_ICON              $'\uF310'              # 
-      LINUX_MINT_ICON                $'\uF304'              # 
-      LINUX_MAGEIA_ICON              $'\uF306'              # 
-      LINUX_OPENSUSE_ICON            $'\uF308'              # 
-      LINUX_SABAYON_ICON             $'\uF313'              # 
-      LINUX_SLACKWARE_ICON           $'\uF30A'              # 
+      LINUX_ARCH_ICON                $'\uF303'              # 
+      LINUX_CENTOS_ICON              $'\uF304'              # 
+      LINUX_COREOS_ICON              $'\uF305'              # 
+      LINUX_DEBIAN_ICON              $'\uF306'              # 
+      LINUX_ELEMENTARY_ICON          $'\uF309'              # 
+      LINUX_FEDORA_ICON              $'\uF30a'              # 
+      LINUX_GENTOO_ICON              $'\uF30d'              # 
+      LINUX_MAGEIA_ICON              $'\uF310'              # 
+      LINUX_MINT_ICON                $'\uF30e'              # 
+      LINUX_NIXOS_ICON               $'\uF313'              # 
+      LINUX_MANJARO_ICON             $'\uF312'              # 
+      LINUX_DEVUAN_ICON              $'\uF307'              # 
+      LINUX_ALPINE_ICON              $'\uF300'              # 
+      LINUX_AOSC_ICON                $'\uF301'              # 
+      LINUX_OPENSUSE_ICON            $'\uF314'              # 
+      LINUX_SABAYON_ICON             $'\uF317'              # 
+      LINUX_SLACKWARE_ICON           $'\uF319'              # 
+      LINUX_UBUNTU_ICON              $'\uF31b'              # 
       LINUX_ICON                     $'\uF17C'              # 
       SUNOS_ICON                     $'\uF185 '             # 
       HOME_ICON                      $'\uF015'              # 
@@ -420,6 +440,11 @@ case $POWERLEVEL9K_MODE in
       LINUX_FEDORA_ICON              'Fed'
       LINUX_GENTOO_ICON              'Gen'
       LINUX_MAGEIA_ICON              'Mag'
+      LINUX_NIXOS_ICON               'Nix'
+      LINUX_MANJARO_ICON             'Man'
+      LINUX_DEVUAN_ICON              'Dev'
+      LINUX_ALPINE_ICON              'Alp'
+      LINUX_AOSC_ICON                'Aos'
       LINUX_OPENSUSE_ICON            'OSu'
       LINUX_SABAYON_ICON             'Sab'
       LINUX_SLACKWARE_ICON           'Sla'
