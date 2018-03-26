@@ -921,7 +921,7 @@ prompt_dir() {
   fi
 
   # declare variables used for bold and state colors
-  local bld dir_state_foreground dir_state_user_foreground
+  local bld_on bld_off dir_state_foreground dir_state_user_foreground
   # test if user wants the last directory printed in bold
   if [[ "${(L)POWERLEVEL9K_DIR_PATH_HIGHLIGHT_BOLD}" == "true" ]]; then
     bld_on="%B"
@@ -1685,6 +1685,7 @@ build_left_prompt() {
 # Right prompt
 build_right_prompt() {
   local index=1
+  local element
   for element in "${POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS[@]}"; do
     # Remove joined information in direct calls
     element=${element%_joined}
@@ -1707,6 +1708,7 @@ powerlevel9k_preexec() {
 
 set_default POWERLEVEL9K_PROMPT_ADD_NEWLINE false
 powerlevel9k_prepare_prompts() {
+  local RETVAL RPROMPT_PREFIX RPROMPT_SUFFIX
   RETVAL=$?
   RETVALS=( "$pipestatus[@]" )
 
@@ -1741,7 +1743,7 @@ $(print_icon 'MULTILINE_LAST_PROMPT_PREFIX')'
     RPROMPT='$RPROMPT_PREFIX%f%b%k$(build_right_prompt)%{$reset_color%}$RPROMPT_SUFFIX'
   fi
 
-NEWLINE='
+local NEWLINE='
 '
 
   if [[ $POWERLEVEL9K_PROMPT_ADD_NEWLINE == true ]]; then
