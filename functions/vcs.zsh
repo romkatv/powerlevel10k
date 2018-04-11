@@ -16,8 +16,8 @@ function +vi-git-untracked() {
       FLAGS+='--ignore-submodules=dirty'
     fi
 
-    if [[ $(git rev-parse --is-inside-work-tree 2> /dev/null) == 'true' && \
-            -n $(git status ${FLAGS} | grep -E '^\?\?' 2> /dev/null | tail -n1) ]]; then
+    if [[ $(command git rev-parse --is-inside-work-tree 2> /dev/null) == 'true' && \
+            -n $(command git status ${FLAGS} | grep -E '^\?\?' 2> /dev/null | tail -n1) ]]; then
         hook_com[unstaged]+=" $(print_icon 'VCS_UNTRACKED_ICON')"
         VCS_WORKDIR_HALF_DIRTY=true
     else
@@ -29,16 +29,16 @@ function +vi-git-aheadbehind() {
     local ahead behind branch_name
     local -a gitstatus
 
-    branch_name=$(git symbolic-ref --short HEAD 2>/dev/null)
+    branch_name=$(command git symbolic-ref --short HEAD 2>/dev/null)
 
     # for git prior to 1.7
-    # ahead=$(git rev-list origin/${branch_name}..HEAD | wc -l)
-    ahead=$(git rev-list "${branch_name}"@{upstream}..HEAD 2>/dev/null | wc -l)
+    # ahead=$(command git rev-list origin/${branch_name}..HEAD | wc -l)
+    ahead=$(command git rev-list "${branch_name}"@{upstream}..HEAD 2>/dev/null | wc -l)
     (( ahead )) && gitstatus+=( " $(print_icon 'VCS_OUTGOING_CHANGES_ICON')${ahead// /}" )
 
     # for git prior to 1.7
-    # behind=$(git rev-list HEAD..origin/${branch_name} | wc -l)
-    behind=$(git rev-list HEAD.."${branch_name}"@{upstream} 2>/dev/null | wc -l)
+    # behind=$(command git rev-list HEAD..origin/${branch_name} | wc -l)
+    behind=$(command git rev-list HEAD.."${branch_name}"@{upstream} 2>/dev/null | wc -l)
     (( behind )) && gitstatus+=( " $(print_icon 'VCS_INCOMING_CHANGES_ICON')${behind// /}" )
 
     hook_com[misc]+=${(j::)gitstatus}
@@ -48,8 +48,8 @@ function +vi-git-remotebranch() {
     local remote branch_name
 
     # Are we on a remote-tracking branch?
-    remote=${$(git rev-parse --verify HEAD@{upstream} --symbolic-full-name 2>/dev/null)/refs\/(remotes|heads)\/}
-    branch_name=$(git symbolic-ref --short HEAD 2>/dev/null)
+    remote=${$(command git rev-parse --verify HEAD@{upstream} --symbolic-full-name 2>/dev/null)/refs\/(remotes|heads)\/}
+    branch_name=$(command git symbolic-ref --short HEAD 2>/dev/null)
 
     hook_com[branch]="$(print_icon 'VCS_BRANCH_ICON')${hook_com[branch]}"
     # Always show the remote
@@ -65,18 +65,18 @@ function +vi-git-tagname() {
     if [[ "$POWERLEVEL9K_VCS_HIDE_TAGS" == "false" ]]; then
         # If we are on a tag, append the tagname to the current branch string.
         local tag
-        tag=$(git describe --tags --exact-match HEAD 2>/dev/null)
+        tag=$(command git describe --tags --exact-match HEAD 2>/dev/null)
 
         if [[ -n "${tag}" ]] ; then
             # There is a tag that points to our current commit. Need to determine if we
             # are also on a branch, or are in a DETACHED_HEAD state.
-            if [[ -z $(git symbolic-ref HEAD 2>/dev/null) ]]; then
+            if [[ -z $(command git symbolic-ref HEAD 2>/dev/null) ]]; then
                 # DETACHED_HEAD state. We want to append the tag name to the commit hash
                 # and print it. Unfortunately, `vcs_info` blows away the hash when a tag
                 # exists, so we have to manually retrieve it and clobber the branch
                 # string.
                 local revision
-                revision=$(git rev-list -n 1 --abbrev-commit --abbrev=${POWERLEVEL9K_VCS_INTERNAL_HASH_LENGTH} HEAD)
+                revision=$(command git rev-list -n 1 --abbrev-commit --abbrev=${POWERLEVEL9K_VCS_INTERNAL_HASH_LENGTH} HEAD)
                 hook_com[branch]="$(print_icon 'VCS_BRANCH_ICON')${revision} $(print_icon 'VCS_TAG_ICON')${tag}"
             else
                 # We are on both a tag and a branch; print both by appending the tag name.
@@ -91,8 +91,8 @@ function +vi-git-tagname() {
 function +vi-git-stash() {
   local -a stashes
 
-  if [[ -s $(git rev-parse --git-dir)/refs/stash ]] ; then
-    stashes=$(git stash list 2>/dev/null | wc -l)
+  if [[ -s $(command git rev-parse --git-dir)/refs/stash ]] ; then
+    stashes=$(command git stash list 2>/dev/null | wc -l)
     hook_com[misc]+=" $(print_icon 'VCS_STASH_ICON')${stashes// /}"
   fi
 }
@@ -111,7 +111,7 @@ function +vi-hg-bookmarks() {
 function +vi-vcs-detect-changes() {
   if [[ "${hook_com[vcs]}" == "git" ]]; then
 
-    local remote=$(git ls-remote --get-url 2> /dev/null)
+    local remote=$(command git ls-remote --get-url 2> /dev/null)
     if [[ "$remote" =~ "github" ]] then
       vcs_visual_identifier='VCS_GIT_GITHUB_ICON'
     elif [[ "$remote" =~ "bitbucket" ]] then
