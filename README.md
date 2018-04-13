@@ -251,7 +251,9 @@ As with the battery stages, you can use any number of colors and Powerlevel9k
 will automatically use all of them appropriately.
 
 Some example settings:
+
 |Brightness|Possible Array|
+|----------|--------------|
 |Bright Colors|(196 202 208 214 220 226 190 154 118  82  46)|
 |Normal Colors|(124 130 136 142 148 112  76  40  34  28  22)|
 |Subdued Colors|( 88  94 100 106  70  34  28  22)|
