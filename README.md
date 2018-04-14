@@ -129,6 +129,7 @@ The segments that are currently available are:
     * [`chruby`](#chruby) - Ruby environment information using `chruby` (if one is active).
     * [`rbenv`](#rbenv) - Ruby environment information using `rbenv` (if one is active).
     * [`rspec_stats`](#rspec_stats) - Show a ratio of test classes vs code classes for RSpec.
+    * `rvm` - Ruby environment information using `$GEM_HOME` and `$MY_RUBY_HOME` (if one is active).
 * **Rust Segments:**
     * `rust_version` - Display the current rust version and [logo](https://www.rust-lang.org/logos/rust-logo-blk.svg).
 * **Swift Segments:**
@@ -208,6 +209,7 @@ without affecting the icon color.
 You can also change the battery icon automatically depending on the battery
 level. This will override the default battery icon. In order to do this, you
 need to define the `POWERLEVEL9k_BATTERY_STAGES` variable.
+
 
 | Variable                      | Default Value | Description                                                   |
 |-------------------------------|---------------|---------------------------------------------------------------|
