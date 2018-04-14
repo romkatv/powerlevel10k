@@ -36,6 +36,27 @@ function testTruncateFoldersWorks() {
   unset POWERLEVEL9K_SHORTEN_STRATEGY
 }
 
+function testTruncateFolderWithHomeDirWorks() {
+  POWERLEVEL9K_SHORTEN_DIR_LENGTH=1
+  CURRENT_DIR=$(pwd)
+
+  cd ~
+  FOLDER="powerlevel9k-test-${RANDOM}"
+  mkdir -p $FOLDER
+  cd $FOLDER
+  # Switch back to home folder as this causes the problem.
+  cd ..
+
+  assertEquals "%K{blue} %F{black}~ %k%F{blue}%f " "$(build_left_prompt)"
+
+  rmdir $FOLDER
+  cd ${CURRENT_DIR}
+
+  unset CURRENT_DIR
+  unset FOLDER
+  unset POWERLEVEL9K_SHORTEN_DIR_LENGTH
+}
+
 function testTruncateMiddleWorks() {
   POWERLEVEL9K_SHORTEN_DIR_LENGTH=2
   POWERLEVEL9K_SHORTEN_STRATEGY='truncate_middle'
