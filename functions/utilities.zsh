@@ -39,6 +39,7 @@ printSizeHumanReadable() {
 
   # if the base is not Bytes
   if [[ -n $2 ]]; then
+    local idx
     for idx in "${extension[@]}"; do
       if [[ "$2" == "$idx" ]]; then
         break
