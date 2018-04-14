@@ -1067,14 +1067,15 @@ prompt_ram() {
   "$1_prompt_segment" "$0" "$2" "yellow" "$DEFAULT_COLOR" "$(printSizeHumanReadable "$ramfree" $base)" 'RAM_ICON'
 }
 
+set_default POWERLEVEL9K_RBENV_PROMPT_ALWAYS_SHOW false
 # rbenv information
 prompt_rbenv() {
-  if which rbenv 2>/dev/null >&2; then
+  if command which rbenv 2>/dev/null >&2; then
     local rbenv_version_name="$(rbenv version-name)"
     local rbenv_global="$(rbenv global)"
 
     # Don't show anything if the current Ruby is the same as the global Ruby.
-    if [[ $rbenv_version_name == $rbenv_global ]]; then
+    if [[ $rbenv_version_name == $rbenv_global && "$POWERLEVEL9K_RBENV_PROMPT_ALWAYS_SHOW" = false ]]; then
       return
     fi
 
@@ -1425,7 +1426,7 @@ prompt_kubecontext() {
     if [[ -z "$k8s_namespace" ]]; then
       k8s_namespace="default"
     fi
-  
+
     local k8s_final_text=""
 
     if [[ "$k8s_context" == "k8s_namespace" ]]; then
@@ -1434,8 +1435,8 @@ prompt_kubecontext() {
     else
       k8s_final_text="$k8s_context/$k8s_namespace"
     fi
-  
-    
+
+
     "$1_prompt_segment" "$0" "$2" "magenta" "white" "$k8s_final_text" "KUBERNETES_ICON"
   fi
 }
