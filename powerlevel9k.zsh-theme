@@ -1163,8 +1163,13 @@ prompt_status() {
   local ec
 
   if [[ $POWERLEVEL9K_STATUS_SHOW_PIPESTATUS == true ]]; then
-    ec_text=$(exit_code_or_status "${RETVALS[1]}")
-    ec_sum=${RETVALS[1]}
+    if (( $#RETVALS > 1 )); then
+      ec_text=$(exit_code_or_status "${RETVALS[1]}")
+      ec_sum=${RETVALS[1]}
+    else
+      ec_text=$(exit_code_or_status "${RETVAL}")
+      ec_sum=${RETVAL}
+    fi
 
     for ec in "${(@)RETVALS[2,-1]}"; do
       ec_text="${ec_text}|$(exit_code_or_status "$ec")"
