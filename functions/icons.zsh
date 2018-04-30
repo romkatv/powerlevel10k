@@ -35,13 +35,15 @@ case $POWERLEVEL9K_MODE in
       TODO_ICON                      $'\u2611'              # ☑
       BATTERY_ICON                   $'\uE894'              # 
       DISK_ICON                      $'\uE1AE '             # 
-      OK_ICON                        $'\u2713'              # ✓
+      OK_ICON                        $'\u2714'              # ✔
       FAIL_ICON                      $'\u2718'              # ✘
       SYMFONY_ICON                   'SF'
       NODE_ICON                      $'\u2B22'              # ⬢
-      MULTILINE_FIRST_PROMPT_PREFIX  $'\u256D'$'\U2500'
-      MULTILINE_SECOND_PROMPT_PREFIX $'\u2570'$'\U2500 '
+      MULTILINE_FIRST_PROMPT_PREFIX  $'\u256D'$'\U2500'     # ╭─
+      MULTILINE_NEWLINE_PROMPT_PREFIX  $'\u251C'$'\U2500'   # ├─
+      MULTILINE_LAST_PROMPT_PREFIX   $'\u2570'$'\U2500 '    # ╰─
       APPLE_ICON                     $'\uE26E'              # 
+      WINDOWS_ICON                   $'\uE26F'              # 
       FREEBSD_ICON                   $'\U1F608 '            # 😈
       ANDROID_ICON                   $'\uE270'              # 
       LINUX_ICON                     $'\uE271'              # 
@@ -67,7 +69,7 @@ case $POWERLEVEL9K_MODE in
       VCS_TAG_ICON                   $'\uE817 '             # 
       VCS_BOOKMARK_ICON              $'\uE87B'              # 
       VCS_COMMIT_ICON                $'\uE821 '             # 
-      VCS_BRANCH_ICON                $'\uE220'              # 
+      VCS_BRANCH_ICON                $'\uE220 '             # 
       VCS_REMOTE_BRANCH_ICON         $'\u2192'              # →
       VCS_GIT_ICON                   $'\uE20E '             # 
       VCS_GIT_GITHUB_ICON            $'\uE20E '             #
@@ -76,13 +78,15 @@ case $POWERLEVEL9K_MODE in
       VCS_HG_ICON                    $'\uE1C3 '             # 
       VCS_SVN_ICON                   '(svn) '
       RUST_ICON                      ''
-      PYTHON_ICON                    $'\U1F40D'             # 🐍
+      PYTHON_ICON                    $'\ue63c'             # 
       SWIFT_ICON                     ''
       GO_ICON                        ''
       PUBLIC_IP_ICON                 ''
       LOCK_ICON                      $'\UE138'              # 
       EXECUTION_TIME_ICON            $'\UE89C'              # 
       SSH_ICON                       '(ssh)'
+      VPN_ICON                       '(vpn)'
+      KUBERNETES_ICON                $'\U2388'              # ⎈
     )
   ;;
   'awesome-fontconfig')
@@ -106,13 +110,15 @@ case $POWERLEVEL9K_MODE in
       TODO_ICON                      $'\u2611'              # ☑
       BATTERY_ICON                   $'\U1F50B'             # 🔋
       DISK_ICON                      $'\uF0A0 '             # 
-      OK_ICON                        $'\u2713'              # ✓
+      OK_ICON                        $'\u2714'              # ✔
       FAIL_ICON                      $'\u2718'              # ✘
       SYMFONY_ICON                   'SF'
       NODE_ICON                      $'\u2B22'              # ⬢
       MULTILINE_FIRST_PROMPT_PREFIX  $'\u256D'$'\U2500'     # ╭─
-      MULTILINE_SECOND_PROMPT_PREFIX $'\u2570'$'\U2500 '    # ╰─
+      MULTILINE_NEWLINE_PROMPT_PREFIX  $'\u251C'$'\U2500'   # ├─
+      MULTILINE_LAST_PROMPT_PREFIX   $'\u2570'$'\U2500 '    # ╰─
       APPLE_ICON                     $'\uF179'              # 
+      WINDOWS_ICON                   $'\uF17A'              # 
       FREEBSD_ICON                   $'\U1F608 '            # 😈
       ANDROID_ICON                   $'\uE17B'              # 
       LINUX_ICON                     $'\uF17C'              # 
@@ -134,7 +140,7 @@ case $POWERLEVEL9K_MODE in
       VCS_TAG_ICON                   $'\uF217 '             # 
       VCS_BOOKMARK_ICON              $'\uF27B'              # 
       VCS_COMMIT_ICON                $'\uF221 '             # 
-      VCS_BRANCH_ICON                $'\uF126'              # 
+      VCS_BRANCH_ICON                $'\uF126 '             # 
       VCS_REMOTE_BRANCH_ICON         $'\u2192'              # →
       VCS_GIT_ICON                   $'\uF1D3 '             # 
       VCS_GIT_GITHUB_ICON            $'\uF113 '             # 
@@ -143,13 +149,15 @@ case $POWERLEVEL9K_MODE in
       VCS_HG_ICON                    $'\uF0C3 '             # 
       VCS_SVN_ICON                   '(svn) '
       RUST_ICON                      $'\uE6A8'              #  
-      PYTHON_ICON                    $'\U1F40D'             # 🐍
+      PYTHON_ICON                    $'\ue63c'             # 
       SWIFT_ICON                     ''
       GO_ICON                        ''
       PUBLIC_IP_ICON                 ''
-      LOCK_ICON                      $'\UE138'              # 
+      LOCK_ICON                      $'\UF023'              # 
       EXECUTION_TIME_ICON            $'\uF253'
       SSH_ICON                       '(ssh)'
+      VPN_ICON                       $'\uF023'
+      KUBERNETES_ICON                $'\U2388'              # ⎈
     )
   ;;
   'nerdfont-complete'|'nerdfont-fontconfig')
@@ -172,14 +180,16 @@ case $POWERLEVEL9K_MODE in
       TEST_ICON                      $'\uF188'              # 
       TODO_ICON                      $'\uF133'              # 
       BATTERY_ICON                   $'\UF240 '             # 
-      DISK_ICON                      $'\uF0A0'              #  
+      DISK_ICON                      $'\uF0A0'              # 
       OK_ICON                        $'\uF00C'              # 
       FAIL_ICON                      $'\uF00D'              # 
       SYMFONY_ICON                   $'\uE757'              # 
       NODE_ICON                      $'\uE617 '             # 
       MULTILINE_FIRST_PROMPT_PREFIX  $'\u256D'$'\U2500'     # ╭─
-      MULTILINE_SECOND_PROMPT_PREFIX $'\u2570'$'\U2500 '    # ╰─
+      MULTILINE_NEWLINE_PROMPT_PREFIX  $'\u251C'$'\U2500'   # ├─
+      MULTILINE_LAST_PROMPT_PREFIX   $'\u2570'$'\U2500 '    # ╰─
       APPLE_ICON                     $'\uF179'              # 
+      WINDOWS_ICON                   $'\uF17A'              # 
       FREEBSD_ICON                   $'\UF30E '             # 
       ANDROID_ICON                   $'\uF17B'              # 
       LINUX_ICON                     $'\uF17C'              # 
@@ -206,7 +216,7 @@ case $POWERLEVEL9K_MODE in
       VCS_GIT_ICON                   $'\uF113 '             # 
       VCS_GIT_GITHUB_ICON            $'\uE709 '             # 
       VCS_GIT_BITBUCKET_ICON         $'\uE703 '             # 
-      VCS_GIT_GITLAB_ICON            $'\uF296 '             #  
+      VCS_GIT_GITLAB_ICON            $'\uF296 '             # 
       VCS_HG_ICON                    $'\uF0C3 '             # 
       VCS_SVN_ICON                   $'\uE72D '             # 
       RUST_ICON                      $'\uE7A8 '             # 
@@ -214,9 +224,11 @@ case $POWERLEVEL9K_MODE in
       SWIFT_ICON                     $'\uE755'              # 
       GO_ICON                        $'\uE626'              # 
       PUBLIC_IP_ICON                 $'\UF0AC'              # 
-      LOCK_ICON                      $'\UF023'              #  
-      EXECUTION_TIME_ICON            $'\uF252'              #  
-      SSH_ICON                       $'\uF489'              #  
+      LOCK_ICON                      $'\UF023'              # 
+      EXECUTION_TIME_ICON            $'\uF252'              # 
+      SSH_ICON                       $'\uF489'              # 
+      VPN_ICON                       '(vpn)'
+      KUBERNETES_ICON                $'\U2388'              # ⎈
     )
   ;;
   *)
@@ -240,13 +252,15 @@ case $POWERLEVEL9K_MODE in
       TODO_ICON                      $'\u2611'              # ☑
       BATTERY_ICON                   $'\U1F50B'             # 🔋
       DISK_ICON                      $'hdd '
-      OK_ICON                        $'\u2713'              # ✓
+      OK_ICON                        $'\u2714'              # ✔
       FAIL_ICON                      $'\u2718'              # ✘
       SYMFONY_ICON                   'SF'
       NODE_ICON                      $'\u2B22'              # ⬢
-      MULTILINE_FIRST_PROMPT_PREFIX  $'\u256D'$'\u2500'
-      MULTILINE_SECOND_PROMPT_PREFIX $'\u2570'$'\u2500 '
+      MULTILINE_FIRST_PROMPT_PREFIX  $'\u256D'$'\U2500'     # ╭─
+      MULTILINE_NEWLINE_PROMPT_PREFIX  $'\u251C'$'\U2500'   # ├─
+      MULTILINE_LAST_PROMPT_PREFIX   $'\u2570'$'\U2500 '    # ╰─
       APPLE_ICON                     'OSX'
+      WINDOWS_ICON                   'WIN'
       FREEBSD_ICON                   'BSD'
       ANDROID_ICON                   'And'
       LINUX_ICON                     'Lx'
@@ -268,7 +282,7 @@ case $POWERLEVEL9K_MODE in
       VCS_TAG_ICON                   ''
       VCS_BOOKMARK_ICON              $'\u263F'              # ☿
       VCS_COMMIT_ICON                ''
-      VCS_BRANCH_ICON                $'\uE0A0'              # 
+      VCS_BRANCH_ICON                $'\uE0A0 '             # 
       VCS_REMOTE_BRANCH_ICON         $'\u2192'              # →
       VCS_GIT_ICON                   ''
       VCS_GIT_GITHUB_ICON            ''
@@ -284,6 +298,8 @@ case $POWERLEVEL9K_MODE in
       LOCK_ICON                      $'\UE0A2'
       EXECUTION_TIME_ICON            'Dur'
       SSH_ICON                       '(ssh)'
+      VPN_ICON                       '(vpn)'
+      KUBERNETES_ICON                $'\U2388'              # ⎈
     )
   ;;
 esac

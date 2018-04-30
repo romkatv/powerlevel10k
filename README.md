@@ -1,6 +1,6 @@
 ![](https://raw.githubusercontent.com/bhilburn/powerlevel9k-logo/master/logo-banner.png)
 ---
-[![Build Status](https://travis-ci.org/bhilburn/powerlevel9k.svg?branch=next)](https://travis-ci.org/bhilburn/powerlevel9k)
+[![Build Status](https://travis-ci.org/bhilburn/powerlevel9k.svg?branch=master)](https://travis-ci.org/bhilburn/powerlevel9k)
 [![Join the chat at https://gitter.im/bhilburn/powerlevel9k](https://badges.gitter.im/bhilburn/powerlevel9k.svg)](https://gitter.im/bhilburn/powerlevel9k?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 Powerlevel9k is a theme for ZSH which uses [Powerline
@@ -92,15 +92,18 @@ The segments that are currently available are:
 * `dir_writable` - Displays a lock icon, if you do not have write permissions on the current folder.
 * [`disk_usage`](#disk_usage) - Disk usage of your current partition.
 * `history` - The command number for the current line.
+* [`host`](#host) - Your current host name
 * [`ip`](#ip) - Shows the current IP address.
+* [`vpn_ip`](#vpn_ip) - Shows the current VPN IP address.
 * [`public_ip`](#public_ip) - Shows your public IP address.
-* `load` - Your machine's load averages.
+* [`load`](#load) - Your machine's load averages.
 * `os_icon` - Display a nice little icon, depending on your operating system.
 * `ram` - Show free RAM.
 * `root_indicator` - An indicator if the user has superuser status.
 * [`status`](#status) - The return code of the previous command.
 * `swap` - Prints the current swap size.
 * [`time`](#time) - System time.
+* [`user`](#user) - Your current username
 * [`vi_mode`](#vi_mode)- Your prompt's Vi editing mode (NORMAL|INSERT).
 * `ssh` - Indicates whether or not you are in an SSH session.
 
@@ -126,6 +129,7 @@ The segments that are currently available are:
     * [`chruby`](#chruby) - Ruby environment information using `chruby` (if one is active).
     * [`rbenv`](#rbenv) - Ruby environment information using `rbenv` (if one is active).
     * [`rspec_stats`](#rspec_stats) - Show a ratio of test classes vs code classes for RSpec.
+    * `rvm` - Ruby environment information using `$GEM_HOME` and `$MY_RUBY_HOME` (if one is active).
 * **Rust Segments:**
     * `rust_version` - Display the current rust version and [logo](https://www.rust-lang.org/logos/rust-logo-blk.svg).
 * **Swift Segments:**
@@ -136,6 +140,7 @@ The segments that are currently available are:
     * [`aws`](#aws) - The current AWS profile, if active.
     * `aws_eb_env` - The current Elastic Beanstalk Environment.
 * `docker_machine` - The current Docker Machine.
+* `kubecontext` - The current context of your `kubectl` configuration.
 
 **Other:**
 * [`custom_command`](#custom_command) - Create a custom segment to display the
@@ -143,6 +148,7 @@ The segments that are currently available are:
 * [`command_execution_time`](#command_execution_time) - Display the time the current command took to execute.
 * [`todo`](http://todotxt.com/) - Shows the number of tasks in your todo.txt tasks file.
 * `detect_virt` - Virtualization detection with systemd
+* `newline` - Continues the prompt on a new line.
 
 ---------------------------------------------------------------------------------
 
@@ -184,9 +190,8 @@ your `~/.zshrc`:
 
 ##### battery
 
-This segment will display your current battery status (fails gracefully on
-systems without a battery). It is supported on both OSX and Linux (note that it
-requires `acpi` on Linux).
+The default settings for this segment will display your current battery status (fails gracefully on
+systems without a battery). It is supported on both OSX and Linux (note that it requires `acpi` on Linux).
 
 | Variable | Default Value | Description |
 |----------|---------------|-------------|
@@ -200,6 +205,60 @@ requires `acpi` on Linux).
 Note that you can [modify the `_FOREGROUND`
 color](https://github.com/bhilburn/powerlevel9k/wiki/Stylizing-Your-Prompt#segment-color-customization)
 without affecting the icon color.
+
+You can also change the battery icon automatically depending on the battery
+level. This will override the default battery icon. In order to do this, you
+need to define the `POWERLEVEL9k_BATTERY_STAGES` variable.
+
+
+| Variable                      | Default Value | Description                                                   |
+|-------------------------------|---------------|---------------------------------------------------------------|
+| `POWERLEVEL9K_BATTERY_STAGES` | Unset         | A string or array, which each index indicates a charge level. |
+
+Powerlevel9k will use each index of the string or array as a stage to indicate battery
+charge level, progressing from left to right. You can provide any number of
+stages. The setting below, for example, provides 8 stages for Powerlevel9k to use.
+```zsh
+POWERLEVEL9K_BATTERY_STAGES="▁▂▃▄▅▆▇█"
+```
+
+If you require extra spacing after the icon, you will have to set it as an array,
+since spaces in the string will be used as one of the stages and you will get a
+missing icon. To do this, declare the variable as follows:
+```zsh
+POWERLEVEL9K_BATTERY_STAGES=($'\u2581 ' $'\u2582 ' $'\u2583 ' $'\u2584 ' $'\u2585 ' $'\u2586 ' $'\u2587 ' $'\u2588 ')
+```
+
+Using the array syntax, you can create stages comprised of multiple characters.
+The below setting provides 40 battery stages.
+```zsh
+POWERLEVEL9K_BATTERY_STAGES=(
+   $'▏    ▏' $'▎    ▏' $'▍    ▏' $'▌    ▏' $'▋    ▏' $'▊    ▏' $'▉    ▏' $'█    ▏'
+   $'█▏   ▏' $'█▎   ▏' $'█▍   ▏' $'█▌   ▏' $'█▋   ▏' $'█▊   ▏' $'█▉   ▏' $'██   ▏'
+   $'██   ▏' $'██▎  ▏' $'██▍  ▏' $'██▌  ▏' $'██▋  ▏' $'██▊  ▏' $'██▉  ▏' $'███  ▏'
+   $'███  ▏' $'███▎ ▏' $'███▍ ▏' $'███▌ ▏' $'███▋ ▏' $'███▊ ▏' $'███▉ ▏' $'████ ▏'
+   $'████ ▏' $'████▎▏' $'████▍▏' $'████▌▏' $'████▋▏' $'████▊▏' $'████▉▏' $'█████▏' )
+```
+
+You can also change the background of the segment automatically depending on the
+battery level. This will override the following variables:
+`POWERLEVEL9K_BATTERY_CHARGING`, `POWERLEVEL9K_BATTERY_CHARGED`,
+`POWERLEVEL9K_BATTERY_DISCONNECTED`, and `POWERLEVEL9K_BATTERY_LOW_COLOR`. In
+order to do this, define a color array, from low to high, as shown below:
+```zsh
+POWERLEVEL9K_BATTERY_LEVEL_BACKGROUND=(196 202 208 214 220 226 190 154 118 82 46)
+```
+
+As with the battery stages, you can use any number of colors and Powerlevel9k
+will automatically use all of them appropriately.
+
+Some example settings:
+
+| Brightness     | Possible Array                                  |
+|----------------|-------------------------------------------------|
+| Bright Colors  | `(196 202 208 214 220 226 190 154 118  82  46)` |
+| Normal Colors  | `(124 130 136 142 148 112  76  40  34  28  22)` |
+| Subdued Colors | `( 88  94 100 106  70  34  28  22)`             |
 
 ##### chruby
 
@@ -272,13 +331,13 @@ elements (it is by default), and define a `DEFAULT_USER` in your `~/.zshrc`.
 
 You can customize the `context` segment. For example, you can make it to print the
 full hostname by setting
+
 ```
 POWERLEVEL9K_CONTEXT_TEMPLATE="%n@`hostname -f`"
 ```
 
-
 You can set the `POWERLEVEL9K_CONTEXT_HOST_DEPTH` variable to change how the
-hostname is displayed. See (ZSH Manual)[http://zsh.sourceforge.net/Doc/Release/Prompt-Expansion.html#Login-information]
+hostname is displayed. See [ZSH Manual](http://zsh.sourceforge.net/Doc/Release/Prompt-Expansion.html#Login-information)
 for details. The default is set to %m which will show the hostname up to the first ‘.’
 You can set it to %{N}m where N is an integer to show that many segments of system
 hostname. Setting N to a negative integer will show that many segments from the
@@ -320,10 +379,11 @@ Customizations available are:
 | Strategy Name | Description |
 |---------------|-------------|
 |Default|Truncate whole directories from left. How many is defined by `POWERLEVEL9K_SHORTEN_DIR_LENGTH`|
-|`truncate_middle`|Truncates the middle part of a folder. E.g. you are in a folder named "~/MySuperProjects/AwesomeFiles/BoringOffice", then it will truncated to "~/MyS..cts/Awe..les/BoringOffice", if `POWERLEVEL9K_SHORTEN_DIR_LENGTH=3` is also set (controls the amount of characters to be left).|
+|`truncate_middle`|Truncates the middle part of a folder. E.g. you are in a folder named `~/MySuperProjects/AwesomeFiles/BoringOffice`, then it will truncated to `~/MyS..cts/Awe..les/BoringOffice`, if `POWERLEVEL9K_SHORTEN_DIR_LENGTH=3` is also set (controls the amount of characters to be left).|
 |`truncate_from_right`|Just leaves the beginning of a folder name untouched. E.g. your folders will be truncated like so: "/ro../Pr../office". How many characters will be untouched is controlled by `POWERLEVEL9K_SHORTEN_DIR_LENGTH`.|
 |`truncate_with_package_name`|Search for a `package.json` or `composer.json` and prints the `name` field to abbreviate the directory path. The precedence and/or files could be set by `POWERLEVEL9K_DIR_PACKAGE_FILES=(package.json composer.json)`. If you have [jq](https://stedolan.github.io/jq/) installed, it will dramatically improve the speed of this strategy.|
 |`truncate_with_folder_marker`|Search for a file that is specified by `POWERLEVEL9K_SHORTEN_FOLDER_MARKER` and truncate everything before that (if found, otherwise stop on $HOME and ROOT).|
+|`truncate_to_unique`|Parse all parent path components and truncate them to the shortest unique length. If you copy & paste the result to a shell, after hitting `TAB` it should expand to the original path unambiguously.|
 
 For example, if you wanted the truncation behavior of the `fish` shell, which
 truncates `/usr/share/plasma` to `/u/s/plasma`, you would use the following:
@@ -359,7 +419,11 @@ You can also customize the leading tilde character when you are in `$HOME` using
 # Double quotes are important here!
 POWERLEVEL9K_HOME_FOLDER_ABBREVIATION="%F{red} $(print_icon 'HOME_ICON') %F{black}"
 ```
+You can also configure the `dir` segment to show when you are in a directory without write permissions, using the variable below.
 
+| Variable | Default Value | Description |
+|----------|---------------|-------------|
+|`POWERLEVEL9K_DIR_SHOW_WRITABLE`|`false`|If set to `true` and you are in a directory that you do not have write permissions for, this segment will display a lock icon and enter the `NOT_WRITABLE` state (which can be customized per [our usual process](https://github.com/bhilburn/powerlevel9k/wiki/Stylizing-Your-Prompt#segment-color-customization)). Note that this functionality is also available in a separate segment, `dir_writable`.|
 
 ##### disk_usage
 
@@ -371,6 +435,28 @@ The `disk_usage` segment will show the usage level of the partition that your cu
 |POWERLEVEL9K_DISK_USAGE_WARNING_LEVEL|90|The usage level that triggers a warning state.|
 |POWERLEVEL9K_DISK_USAGE_CRITICAL_LEVEL|95|The usage level that triggers a critical state.|
 
+##### host
+
+The `host` segment will print the hostname.
+
+You can set the `POWERLEVEL9K_HOST_TEMPLATE` variable to change how the hostname
+is displayed. See (ZSH Manual)[http://zsh.sourceforge.net/Doc/Release/Prompt-Expansion.html#Login-information]
+for details. The default is set to `%m` which will show the hostname up to the
+first `.`. You can set it to `%{N}m` where N is an integer to show that many
+segments of system hostname. Setting `N` to a negative integer will show that many
+segments from the end of the hostname.
+
+```
+POWERLEVEL9K_HOST_TEMPLATE="%2m"
+```
+
+By default, LOCAL hosts will show the host icon and remote hosts will show the SSH icon. You can override them by setting
+```
+POWERLEVEL9K_HOST_ICON="\uF109 "
+POWERLEVEL9K_SSH_ICON="\uF489 "
+```
+
+
 ##### ip
 
 This segment tries to examine all currently used network interfaces and prints
@@ -380,6 +466,14 @@ specify the correct network interface by setting:
 | Variable | Default Value | Description |
 |----------|---------------|-------------|
 |`POWERLEVEL9K_IP_INTERFACE`|None|The NIC for which you wish to display the IP address. Example: `eth0`.|
+
+##### vpn_ip
+
+This segment tries to extract the VPN related IP addresses from nmcli, based on the NIC type:
+
+| Variable | Default Value | Description |
+|----------|---------------|-------------|
+|`POWERLEVEL9K_VPN_IP_INTERFACE`|`tun`|The VPN interface.|
 
 ##### public_ip
 
@@ -404,6 +498,26 @@ segment will not be displayed.
 |`POWERLEVEL9K_PUBLIC_IP_METHODS`|(dig curl wget)| These methods in that order are used to refresh your IP.|
 |`POWERLEVEL9K_PUBLIC_IP_NONE`|None|The string displayed when an IP was not obtained|
 
+##### load
+
+Displays one of your load averages with appropriate state coloring. The thresholds are:
+- `0.7 * NUM_CORES <`: critical
+- `0.5 * NUM_CORES <`: warning
+- `less`: normal
+
+| Variable | Default Value | Description |
+|----------|---------------|-------------|
+|`POWERLEVEL9K_LOAD_WHICH`|5|Which average to show. Possible values: 1, 5 or 15|
+
+##### newline
+
+Puts a newline in your prompt so you can continue using segments on the next
+line. This allows you to use segments on both lines, unlike
+`POWERLEVEL9K_PROMPT_ON_NEWLINE`, which simply separates segments from the
+prompt itself.
+
+This only works on the left side.  On the right side it does nothing.
+
 ##### rbenv
 
 This segment shows the version of Ruby being used when using `rbenv` to change your current Ruby stack.
@@ -412,6 +526,10 @@ It figures out the version being used by taking the output of the `rbenv version
 
 * If `rbenv` is not in $PATH, nothing will be shown.
 * If the current Ruby version is the same as the global Ruby version, nothing will be shown.
+
+| Variable | Default Value | Description |
+|----------|---------------|-------------|
+|`POWERLEVEL9K_RBENV_PROMPT_ALWAYS_SHOW`|`false`|Set to true if you wish to show the rbenv segment even if the current Ruby version is the same as the global Ruby version|
 
 ##### rspec_stats
 
@@ -423,8 +541,10 @@ This segment shows the return code of the last command.
 
 | Variable | Default Value | Description |
 |----------|---------------|-------------|
-|`POWERLEVEL9K_STATUS_VERBOSE`|`true`|Set to false if you wish to not show the error code when the last command returned an error and optionally hide this segment when the last command completed successfully by setting `POWERLEVEL9K_STATUS_OK_IN_NON_VERBOSE` to false.|
-|`POWERLEVEL9K_STATUS_OK_IN_NON_VERBOSE`|`false`|Set to true if you wish to show this segment when the last command completed successfully in non-verbose mode.|
+|`POWERLEVEL9K_STATUS_CROSS`|`false`|Set to true if you wish not to show the error code when the last command returned an error and optionally hide this segment when the last command completed successfully by setting `POWERLEVEL9K_STATUS_OK` to false.|
+|`POWERLEVEL9K_STATUS_OK`|`true`|Set to true if you wish to show this segment when the last command completed successfully, false to hide it.|
+|`POWERLEVEL9K_STATUS_SHOW_PIPESTATUS`|`true`|Set to true if you wish to show the exit status for all piped commands.|
+|`POWERLEVEL9K_STATUS_HIDE_SIGNAME`|`false`|Set to true return the raw exit code (`1-255`).  When set to false, values over 128 are shown as `SIGNAME(-n)` (e.g. `KILL(-9)`)|
 
 ##### ram
 
@@ -453,6 +573,23 @@ segment, as well:
 # Output time, date, and a symbol from the "Awesome Powerline Font" set
 POWERLEVEL9K_TIME_FORMAT="%D{%H:%M:%S \uE868  %d.%m.%y}"
 ```
+##### user
+
+The `user` segment will print the username.
+
+You can also override the icons by setting:
+
+```
+POWERLEVEL9K_USER_ICON="\uF415" # 
+POWERLEVEL9K_ROOT_ICON="#"
+```
+
+| Variable | Default Value | Description |
+|----------|---------------|-------------|
+|`DEFAULT_USER`|None|Username to consider a "default context".|
+|`POWERLEVEL9K_ALWAYS_SHOW_USER`|`false`|Always print this segment.|
+|`POWERLEVEL9K_USER_TEMPLATE`|`%n`|Default username prompt. Refer to the [ZSH Documentation](http://zsh.sourceforge.net/Doc/Release/Prompt-Expansion.html) for all possible expansions|
+
 ##### vcs
 
 By default, the `vcs` segment will provide quite a bit of information. Further
@@ -465,6 +602,10 @@ customization is provided via:
 |`POWERLEVEL9K_CHANGESET_HASH_LENGTH`|`12`|How many characters of the hash / changeset to display in the segment.|
 |`POWERLEVEL9K_VCS_SHOW_SUBMODULE_DIRTY`|`true`|Set to `false` to not reflect submodule status in the top-level repository prompt.|
 |`POWERLEVEL9K_VCS_HIDE_TAGS`|`false`|Set to `true` to stop tags being displayed in the segment.|
+|`POWERLEVEL9K_VCS_GIT_HOOKS`|`(vcs-detect-changes git-untracked git-aheadbehind git-stash git-remotebranch git-tagname)`|Layout of the segment for git repositories.|
+|`POWERLEVEL9K_VCS_HG_HOOKS`|`(vcs-detect-changes)`|Layout of the segment for Mercurial repositories.|
+|`POWERLEVEL9K_VCS_SVN_HOOKS`|`(vcs-detect-changes svn-detect-changes)`|Layout of the segment for SVN repositories.|
+|`POWERLEVEL9K_VCS_ACTIONFORMAT_FOREGROUND`|`red`|The color of the foreground font during actions (e.g., `REBASE`).|
 
 
 ##### vcs symbols
@@ -508,6 +649,21 @@ and does not show your code coverage or any sophisticated stats. All this does
 is count your source files and test files, and calculate the ratio between them.
 Just enough to give you a quick overview about the test situation of the project
 you are dealing with.
+
+### Disabling / Enabling Powerlevel9k
+
+You can disable P9k and return to a very basic prompt at any time simply by
+calling:
+
+```zsh
+$ prompt_powerlevel9k_teardown
+```
+
+You can then re-enable it by calling:
+
+```zsh
+$ prompt_powerlevel9k_setup
+```
 
 ### tl; dr
 

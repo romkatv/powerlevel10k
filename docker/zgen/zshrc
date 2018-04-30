@@ -1,0 +1,10 @@
+# load zgen
+source ~/.zgen/zgen.zsh
+
+# if the init scipt doesn't exist
+if ! zgen saved; then
+  zgen load ~/p9k/powerlevel9k.zsh-theme
+
+  # generate the init script from plugins above
+  zgen save
+fi

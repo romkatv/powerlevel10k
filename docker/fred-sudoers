@@ -1,0 +1,2 @@
+Defaults:fred !requiretty
+fred ALL=(ALL) NOPASSWD: ALL

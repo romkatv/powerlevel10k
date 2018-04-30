@@ -1,0 +1,179 @@
+#!/usr/bin/env zsh
+
+set -eu
+
+# The default ZSH to use.
+default_version='4.3.11'
+
+setopt extended_glob glob_subst numeric_glob_sort
+cd "${${(%):-%x}:A:h}"
+
+# TODO: Crazy Logic to munge TERM to something supported in Ubuntu 14.04
+term=screen-256color
+
+# Note: If versions and frameworks looks complicated, it isn't that bad...
+# ...see Modifiers in zshexpn(1) for details.
+
+# List of ZSH versions
+typeset -a versions
+versions=( docker/base-*/Dockerfile(N.on:h:t:s/base-//) )
+
+# List of frameworks
+typeset -a frameworks
+frameworks=( docker/*/Dockerfile(N.on:h:t) )
+frameworks=${(@)frameworks:#base-*}
+
+# Known Issues
+typeset -A known_issues
+known_issues["4.3.11-antigen"]="Antigen commands that need git won't work; it needs a newer version of git."
+known_issues["4.3.11-zim"]="BROKEN: Zim wants ZSH 5.2 or newer."
+known_issues["5.0.3-zim"]="DEPRECATED: Zim wants ZSH 5.2 or newer."
+known_issues["5.1.1-zim"]="DEPRECATED: Zim wants ZSH 5.2 or newer."
+known_issues["4.3.11-zulu"]="Zulu doesn't work; it needs a newer version of git."
+
+err()
+{
+  print -P "%F{red}Error:%f $*"
+  exit 2
+}
+
+resolve_framework() {
+  local f=$1 found
+  found=${frameworks[(In:-1:)$f*]}
+  if (( found <= $#frameworks )); then
+    echo "${frameworks[$found]}"
+  fi
+}
+
+resolve_version() {
+  local v=$1 found
+  found=${versions[(In:-1:)$v*]}
+  if (( found <= $#versions )); then
+    echo "${versions[$found]}"
+  fi
+}
+
+check_for_known_issues() {
+  local version="$1"
+  local framework="$2"
+  local name="${version}-${framework}"
+
+  if (( ${+known_issues["$name"]} )); then
+    echo
+    print -P "%F{red}Known Issue: %F{yellow}${known_issues["$name"]}%f"
+    echo
+  fi
+}
+
+build_and_run() {
+  local version="$1"
+  local framework="$2"
+  local name="${version}-${framework}"
+
+  check_for_known_issues "$version" "$framework"
+
+  print -P "%F{green}Preparing containers...%f"
+
+  echo -n "p9k:base-${version}: "
+  docker build \
+    --quiet \
+    --tag "p9k:base-${version}" \
+    --file "docker/base-${version}/Dockerfile" \
+    .
+
+  echo -n "p9k:${version}-${framework}: "
+  docker build \
+    --quiet \
+    --build-arg="base=base-${version}" \
+    --tag "p9k:${version}-${framework}" \
+    --file "docker/${framework}/Dockerfile" \
+    .
+
+  print -P "%F{green}Starting ${name} container...%f"
+  exec docker run \
+    --rm \
+    --interactive \
+    --tty \
+    --hostname="${name//./_}" \
+    --env="TERM=${term}" \
+    "p9k:${version}-${framework}"
+}
+
+show_help() {
+  local f v
+  echo "Usage: ${(%):-%x} <framework>|--list"
+  echo
+  echo "Loads up a docker image with powershell9k configured in <framework>"
+  echo
+  echo "  --frameworks  Lists all available frameworks, newline separated."
+  echo "  --versions    Lists all available ZSH versions, newline separated."
+  echo "  --zsh VER     Uses ZSH with version VER."
+  echo "  --help        You're soaking in it."
+  echo
+  echo "ZSH versions:"
+  for v in "${(@)versions}"; do
+    echo "  $v"
+  done
+  echo
+  echo "Framework containers:"
+  for f in "${(@)frameworks}"; do
+    echo "  $f"
+  done
+}
+
+# No arguments
+if (( $# == 0 )); then
+  show_help
+  exit
+fi
+
+# Parse flags and such.
+use_version=$default_version
+use_framework=
+while (( $# > 0 )); do
+  case "$1" in
+    -f | --frameworks )
+      print -l "${(@)frameworks}"
+      exit
+      ;;
+    -v | --versions )
+      print -l "${(@)versions}"
+      exit
+      ;;
+    -z | --zsh )
+      shift
+      local v="$(resolve_version "$1")"
+      if [[ -n "$v" ]]; then
+        use_version=$v
+      else
+        err "No such ZSH version '${1}'"
+      fi
+      ;;
+    -h | --help )
+      show_help
+      exit
+      ;;;
+    -* )
+      err "Unknown option ${1}"
+      show_help
+      exit 1
+      ;;
+    * )
+      if [[ -z "$use_framework" ]]; then
+        local f="$(resolve_framework "$1")"
+        if [[ -n "$f" ]]; then
+          use_framework=$f
+        else
+          err "No such framework '${1}'"
+        fi
+      else
+        err "You can only specify one framework at a time; you already specified '${use_framework}'"
+      fi
+      ;;
+  esac
+  shift
+done
+
+build_and_run "$use_version" "$use_framework"
+
+# EOF

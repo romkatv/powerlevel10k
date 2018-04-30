@@ -17,74 +17,57 @@
 ################################################################
 
 ## Turn on for Debugging
+#PS4='%s%f%b%k%F{blue}%{λ%}%L %F{240}%N:%i%(?.. %F{red}%?) %1(_.%F{yellow}%-1_ .)%s%f%b%k	'
 #zstyle ':vcs_info:*+*:*' debug true
 #set -o xtrace
 
 # Try to set the installation path
-if [[ -n "$POWERLEVEL9K_INSTALLATION_PATH" ]]; then
-  # If an installation path was set manually,
-  # it should trump any other location found.
-  # Do nothing. This is all right, as we use the
-  # POWERLEVEL9K_INSTALLATION_PATH for further processing.
-elif [[ $(whence -w prompt_powerlevel9k_setup) =~ "function" ]]; then
-  # Check if the theme was called as a function (e.g., from prezto)
-  autoload -U is-at-least
-  if is-at-least 5.0.8; then
-    # Try to find the correct path of the script.
-    POWERLEVEL9K_INSTALLATION_PATH=$(whence -v $0 | sed "s/$0 is a shell function from //")
-  elif [[ -f "${ZDOTDIR:-$HOME}/.zprezto/modules/prompt/init.zsh" ]]; then
-    # If there is an prezto installation, we assume that powerlevel9k is linked there.
-    POWERLEVEL9K_INSTALLATION_PATH="${ZDOTDIR:-$HOME}/.zprezto/modules/prompt/functions/prompt_powerlevel9k_setup"
+if [[ -n "$POWERLEVEL9K_INSTALLATION_DIR" ]]; then
+  p9k_directory=${POWERLEVEL9K_INSTALLATION_DIR:A}
+else
+  if [[ "${(%):-%N}" == '(eval)' ]]; then
+    if [[ "$0" == '-antigen-load' ]] && [[ -r "${PWD}/powerlevel9k.zsh-theme" ]]; then
+      # Antigen uses eval to load things so it can change the plugin (!!)
+      # https://github.com/zsh-users/antigen/issues/581
+      p9k_directory=$PWD
+    else
+      print -P "%F{red}You must set POWERLEVEL9K_INSTALLATION_DIR work from within an (eval).%f"
+      return 1
+    fi
+  else
+    # Get the path to file this code is executing in; then
+    # get the absolute path and strip the filename.
+    # See https://stackoverflow.com/a/28336473/108857
+    p9k_directory=${${(%):-%x}:A:h}
   fi
-else
-  # Last resort: Set installation path is script path
-  POWERLEVEL9K_INSTALLATION_PATH="$0"
 fi
-
-# Resolve the installation path
-if [[ -L "$POWERLEVEL9K_INSTALLATION_PATH" ]]; then
-  # If this theme is sourced as a symlink, we need to locate the real URL
-  filename="${POWERLEVEL9K_INSTALLATION_PATH:A}"
-elif [[ -d "$POWERLEVEL9K_INSTALLATION_PATH" ]]; then
-  # Directory
-  filename="${POWERLEVEL9K_INSTALLATION_PATH}/powerlevel9k.zsh-theme"
-elif [[ -f "$POWERLEVEL9K_INSTALLATION_PATH" ]]; then
-  # Script is a file
-  filename="$POWERLEVEL9K_INSTALLATION_PATH"
-elif [[ -z "$POWERLEVEL9K_INSTALLATION_PATH" ]]; then
-  # Fallback: specify an installation path!
-  print -P "%F{red}We could not locate the installation path of powerlevel9k.%f"
-  print -P "Please specify by setting %F{blue}POWERLEVEL9K_INSTALLATION_PATH%f (full path incl. file name) at the very beginning of your ~/.zshrc"
-  return 1
-else
-  print -P "%F{red}Script location could not be found! Maybe your %F{blue}POWERLEVEL9K_INSTALLATION_PATH%F{red} is not correct?%f"
-  return 1
-fi
-script_location="$(dirname $filename)"
 
 ################################################################
 # Source icon functions
 ################################################################
 
-source $script_location/functions/icons.zsh
+source "${p9k_directory}/functions/icons.zsh"
 
 ################################################################
 # Source utility functions
 ################################################################
 
-source $script_location/functions/utilities.zsh
+source "${p9k_directory}/functions/utilities.zsh"
 
 ################################################################
 # Source color functions
 ################################################################
 
-source $script_location/functions/colors.zsh
+source "${p9k_directory}/functions/colors.zsh"
 
 ################################################################
 # Source VCS_INFO hooks / helper functions
 ################################################################
 
-source $script_location/functions/vcs.zsh
+source "${p9k_directory}/functions/vcs.zsh"
+
+# cleanup temporary variables.
+unset p9k_directory
 
 ################################################################
 # Color Scheme
@@ -304,7 +287,7 @@ prompt_anaconda() {
 
 # AWS Profile
 prompt_aws() {
-  local aws_profile="$AWS_DEFAULT_PROFILE"
+  local aws_profile="${AWS_PROFILE:-$AWS_DEFAULT_PROFILE}"
 
   if [[ -n "$aws_profile" ]]; then
     "$1_prompt_segment" "$0" "$2" red white "$aws_profile" 'AWS_ICON'
@@ -335,6 +318,23 @@ prompt_background_jobs() {
     fi
     "$1_prompt_segment" "$0" "$2" "$DEFAULT_COLOR" "cyan" "$background_jobs_number_print" 'BACKGROUND_JOBS_ICON'
   fi
+}
+
+# A newline in your prompt, so you can segments on multiple lines.
+prompt_newline() {
+  local lws newline
+  [[ "$1" == "right" ]] && return
+  newline=$'\n'
+  lws=$POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS
+  if [[ "$POWERLEVEL9K_PROMPT_ON_NEWLINE" == true ]]; then
+    newline="${newline}$(print_icon 'MULTILINE_NEWLINE_PROMPT_PREFIX')"
+  fi
+  POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS=
+  "$1_prompt_segment" \
+    "$0" \
+    "$2" \
+    "NONE" "NONE" "${newline}"
+  POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS=$lws
 }
 
 # Segment that indicates usage level of current partition.
@@ -468,9 +468,24 @@ prompt_battery() {
     message="$bat_percent%%"
   fi
 
-  # Draw the prompt_segment
-  if [[ -n $bat_percent ]]; then
-    "$1_prompt_segment" "${0}_${current_state}" "$2" "$DEFAULT_COLOR" "${battery_states[$current_state]}" "$message" 'BATTERY_ICON'
+  # override default icon if we are using battery stages
+  if [[ -n "$POWERLEVEL9K_BATTERY_STAGES" ]]; then
+    local segment=$(( 100.0 / (${#POWERLEVEL9K_BATTERY_STAGES} - 1 ) ))
+    if [[ $segment > 1 ]]; then
+      local offset=$(( ($bat_percent / $segment) + 1 ))
+      # check if the stages are in an array or a string
+      [[ "${(t)POWERLEVEL9K_BATTERY_STAGES}" =~ "array" ]] && POWERLEVEL9K_BATTERY_ICON="$POWERLEVEL9K_BATTERY_STAGES[$offset]" || POWERLEVEL9K_BATTERY_ICON=${POWERLEVEL9K_BATTERY_STAGES:$offset:1}
+    fi
+  fi
+
+  # override the default color if we are using a color level array
+  if [[ -n "$POWERLEVEL9K_BATTERY_LEVEL_BACKGROUND" ]] && [[ "${(t)POWERLEVEL9K_BATTERY_LEVEL_BACKGROUND}" =~ "array" ]]; then
+    local segment=$(( 100.0 / (${#POWERLEVEL9K_BATTERY_LEVEL_BACKGROUND} - 1 ) ))
+    local offset=$(( ($bat_percent / $segment) + 1 ))
+    "$1_prompt_segment" "$0_${current_state}" "$2" "${POWERLEVEL9K_BATTERY_LEVEL_BACKGROUND[$offset]}" "${battery_states[$current_state]}" "${message}" "BATTERY_ICON"
+  else
+    # Draw the prompt_segment
+    "$1_prompt_segment" "$0_${current_state}" "$2" "${DEFAULT_COLOR}" "${battery_states[$current_state]}" "${message}" "BATTERY_ICON"
   fi
 }
 
@@ -492,7 +507,11 @@ prompt_public_ip() {
   if [[ -f $POWERLEVEL9K_PUBLIC_IP_FILE ]]; then
     typeset -i timediff
     # if saved IP is more than
-    timediff=$(($(date +%s) - $(date -r $POWERLEVEL9K_PUBLIC_IP_FILE +%s)))
+    if [[ "$OS" == "OSX" ]]; then
+      timediff=$(($(date +%s) - $(stat -f "%m" $POWERLEVEL9K_PUBLIC_IP_FILE)))
+    else
+      timediff=$(($(date +%s) - $(date -r $POWERLEVEL9K_PUBLIC_IP_FILE +%s)))
+    fi
     [[ $timediff -gt $POWERLEVEL9K_PUBLIC_IP_TIMEOUT ]] && refresh_ip=true
     # If tmp file is empty get a fresh IP
     [[ -z $(cat $POWERLEVEL9K_PUBLIC_IP_FILE) ]] && refresh_ip=true
@@ -555,7 +574,7 @@ prompt_context() {
 
   local content=""
 
-  if [[ "$POWERLEVEL9K_ALWAYS_SHOW_CONTEXT" == true ]] || [[ "$USER" != "$DEFAULT_USER" ]] || [[ -n "$SSH_CLIENT" || -n "$SSH_TTY" ]]; then
+  if [[ "$POWERLEVEL9K_ALWAYS_SHOW_CONTEXT" == true ]] || [[ "$(whoami)" != "$DEFAULT_USER" ]] || [[ -n "$SSH_CLIENT" || -n "$SSH_TTY" ]]; then
 
       if [[ $(print -P "%#") == '#' ]]; then
         current_state="ROOT"
@@ -564,12 +583,67 @@ prompt_context() {
       content="${POWERLEVEL9K_CONTEXT_TEMPLATE}"
 
   elif [[ "$POWERLEVEL9K_ALWAYS_SHOW_USER" == true ]]; then
-      content="$USER"
+      content="$(whoami)"
   else
       return
   fi
 
   "$1_prompt_segment" "${0}_${current_state}" "$2" "$DEFAULT_COLOR" "${context_states[$current_state]}" "${content}"
+}
+
+################################################################
+# User: user (who am I)
+# Note that if $DEFAULT_USER is not set, this prompt segment will always print
+set_default POWERLEVEL9K_USER_TEMPLATE "%n"
+prompt_user() {
+  local current_state="DEFAULT"
+  typeset -AH user_state
+  if [[ "$POWERLEVEL9K_ALWAYS_SHOW_USER" == true ]] || [[ "$(whoami)" != "$DEFAULT_USER" ]]; then
+    if [[ $(print -P "%#") == '#' ]]; then
+      user_state=(
+        "STATE"               "ROOT"
+        "CONTENT"             "${POWERLEVEL9K_USER_TEMPLATE}"
+        "BACKGROUND_COLOR"    "${DEFAULT_COLOR}"
+        "FOREGROUND_COLOR"    "yellow"
+        "VISUAL_IDENTIFIER"   "ROOT_ICON"
+      )
+    else
+      user_state=(
+        "STATE"               "DEFAULT"
+        "CONTENT"             "$(whoami)"
+        "BACKGROUND_COLOR"    "${DEFAULT_COLOR}"
+        "FOREGROUND_COLOR"    "011"
+        "VISUAL_IDENTIFIER"   "USER_ICON"
+      )
+    fi
+    "$1_prompt_segment" "${0}_${user_state[STATE]}" "$2" "${user_state[BACKGROUND_COLOR]}" "${user_state[FOREGROUND_COLOR]}" "${user_state[CONTENT]}" "${user_state[VISUAL_IDENTIFIER]}"
+  fi
+}
+
+################################################################
+# Host: machine (where am I)
+set_default POWERLEVEL9K_HOST_TEMPLATE "%m"
+prompt_host() {
+  local current_state="LOCAL"
+  typeset -AH host_state
+  if [[ -n "$SSH_CLIENT" ]] || [[ -n "$SSH_TTY" ]]; then
+    host_state=(
+      "STATE"               "REMOTE"
+      "CONTENT"             "${POWERLEVEL9K_HOST_TEMPLATE}"
+      "BACKGROUND_COLOR"    "${DEFAULT_COLOR}"
+      "FOREGROUND_COLOR"    "yellow"
+      "VISUAL_IDENTIFIER"   "SSH_ICON"
+    )
+  else
+    host_state=(
+      "STATE"               "LOCAL"
+      "CONTENT"             "${POWERLEVEL9K_HOST_TEMPLATE}"
+      "BACKGROUND_COLOR"    "${DEFAULT_COLOR}"
+      "FOREGROUND_COLOR"    "011"
+      "VISUAL_IDENTIFIER"   "HOST_ICON"
+    )
+  fi
+  "$1_prompt_segment" "$0_${host_state[STATE]}" "$2" "${host_state[BACKGROUND_COLOR]}" "${host_state[FOREGROUND_COLOR]}" "${host_state[CONTENT]}" "${host_state[VISUAL_IDENTIFIER]}"
 }
 
 # The 'custom` prompt provides a way for users to invoke commands and display
@@ -619,8 +693,12 @@ prompt_command_execution_time() {
 # Dir: current working directory
 set_default POWERLEVEL9K_DIR_PATH_SEPARATOR "/"
 set_default POWERLEVEL9K_HOME_FOLDER_ABBREVIATION "~"
+set_default POWERLEVEL9K_DIR_SHOW_WRITABLE false
 prompt_dir() {
-  local current_path="$(print -P "%~")"
+  local tmp="$IFS"
+  local IFS=""
+  local current_path=$(pwd | sed -e "s,^$HOME,~,")
+  local IFS="$tmp"
   if [[ -n "$POWERLEVEL9K_SHORTEN_DIR_LENGTH" || "$POWERLEVEL9K_SHORTEN_STRATEGY" == "truncate_with_folder_marker" ]]; then
     set_default POWERLEVEL9K_SHORTEN_DELIMITER $'\U2026'
 
@@ -709,8 +787,31 @@ prompt_dir() {
         # the current path.
         current_path=$current_path${PWD#${last_marked_folder}*}
       ;;
+      truncate_to_unique)
+        # for each parent path component find the shortest unique beginning
+        # characters sequence. Source: https://stackoverflow.com/a/45336078
+        paths=(${(s:/:)PWD})
+        cur_path='/'
+        cur_short_path='/'
+        for directory in ${paths[@]}
+        do
+          cur_dir=''
+          for (( i=0; i<${#directory}; i++ )); do
+            cur_dir+="${directory:$i:1}"
+            matching=("$cur_path"/"$cur_dir"*/)
+            if [[ ${#matching[@]} -eq 1 ]]; then
+              break
+            fi
+          done
+          cur_short_path+="$cur_dir/"
+          cur_path+="$directory/"
+        done
+        current_path="${cur_short_path: : -1}"
+      ;;
       *)
-        current_path="$(print -P "%$((POWERLEVEL9K_SHORTEN_DIR_LENGTH+1))(c:$POWERLEVEL9K_SHORTEN_DELIMITER/:)%${POWERLEVEL9K_SHORTEN_DIR_LENGTH}c")"
+        if [[ $current_path != "~" ]]; then
+          current_path="$(print -P "%$((POWERLEVEL9K_SHORTEN_DIR_LENGTH+1))(c:$POWERLEVEL9K_SHORTEN_DELIMITER/:)%${POWERLEVEL9K_SHORTEN_DIR_LENGTH}c")"
+        fi
       ;;
     esac
   fi
@@ -724,7 +825,7 @@ prompt_dir() {
   fi
 
   if [[ "${POWERLEVEL9K_HOME_FOLDER_ABBREVIATION}" != "~" ]]; then
-    current_path="$( echo "${current_path}" | sed "s/^~/${POWERLEVEL9K_HOME_FOLDER_ABBREVIATION}/")"
+    current_path=${current_path/#\~/${POWERLEVEL9K_HOME_FOLDER_ABBREVIATION}}
   fi
 
   typeset -AH dir_states
@@ -732,9 +833,12 @@ prompt_dir() {
     "DEFAULT"         "FOLDER_ICON"
     "HOME"            "HOME_ICON"
     "HOME_SUBFOLDER"  "HOME_SUB_ICON"
+    "NOT_WRITABLE"    "LOCK_ICON"
   )
   local current_state="DEFAULT"
-  if [[ $(print -P "%~") == '~' ]]; then
+  if [[ "${POWERLEVEL9K_DIR_SHOW_WRITABLE}" == true && ! -w "$PWD" ]]; then
+    current_state="NOT_WRITABLE"
+  elif [[ $(print -P "%~") == '~' ]]; then
     current_state="HOME"
   elif [[ $(print -P "%~") == '~'* ]]; then
     current_state="HOME_SUBFOLDER"
@@ -777,12 +881,12 @@ prompt_detect_virt() {
   if [[ "$virt" == "none" ]]; then
     if [[ "$(ls -di / | grep -o 2)" != "2" ]]; then
       virt="chroot"
-      "$1_prompt_segment" "$0" "$2" "yellow" "$DEFAULT_COLOR" "$virt"
+      "$1_prompt_segment" "$0" "$2" "$DEFAULT_COLOR" "yellow" "$virt"
     else
       ;
     fi
   else
-    "$1_prompt_segment" "$0" "$2" "yellow" "$DEFAULT_COLOR" "$virt"
+    "$1_prompt_segment" "$0" "$2" "$DEFAULT_COLOR" "yellow" "$virt"
   fi
 }
 
@@ -827,9 +931,22 @@ prompt_ip() {
   "$1_prompt_segment" "$0" "$2" "cyan" "$DEFAULT_COLOR" "$ip" 'NETWORK_ICON'
 }
 
+set_default POWERLEVEL9K_VPN_IP_INTERFACE "tun"
+# prompt if vpn active
+prompt_vpn_ip() {
+  for vpn_iface in $(/sbin/ifconfig | grep -e ^"$POWERLEVEL9K_VPN_IP_INTERFACE" | cut -d":" -f1)
+  do
+    ip=$(/sbin/ifconfig "$vpn_iface" | grep -o "inet\s.*" | cut -d' ' -f2)
+    "$1_prompt_segment" "$0" "$2" "cyan" "$DEFAULT_COLOR" "$ip" 'VPN_ICON'
+  done
+}
+
+set_default POWERLEVEL9K_LOAD_WHICH 5
 prompt_load() {
   # The load segment can have three different states
   local current_state="unknown"
+  local load_select=2
+  local load_avg
   local cores
 
   typeset -AH load_states
@@ -839,31 +956,46 @@ prompt_load() {
     'normal'        'green'
   )
 
-  if [[ "$OS" == "OSX" ]] || [[ "$OS" == "BSD" ]]; then
-    load_avg_1min=$(sysctl vm.loadavg | grep -o -E '[0-9]+(\.|,)[0-9]+' | head -n 1)
-    if [[ "$OS" == "OSX" ]]; then
-      cores=$(sysctl -n hw.logicalcpu)
-    else
-      cores=$(sysctl -n hw.ncpu)
-    fi
-  else
-    load_avg_1min=$(grep -o "[0-9.]*" /proc/loadavg | head -n 1)
-    cores=$(nproc)
-  fi
+  case "$POWERLEVEL9K_LOAD_WHICH" in
+    1)
+      load_select=1
+      ;;
+    5)
+      load_select=2
+      ;;
+    15)
+      load_select=3
+      ;;
+  esac
+
+  case "$OS" in
+    OSX|BSD)
+      load_avg=$(sysctl vm.loadavg | grep -o -E '[0-9]+(\.|,)[0-9]+' | sed -n ${load_select}p)
+      if [[ "$OS" == "OSX" ]]; then
+        cores=$(sysctl -n hw.logicalcpu)
+      else
+        cores=$(sysctl -n hw.ncpu)
+      fi
+      ;;
+    *)
+      load_avg=$(cut -d" " -f${load_select} /proc/loadavg)
+      cores=$(nproc)
+  esac
 
   # Replace comma
-  load_avg_1min=${load_avg_1min//,/.}
+  load_avg=${load_avg//,/.}
 
-  if [[ "$load_avg_1min" -gt $(bc -l <<< "${cores} * 0.7") ]]; then
+  if [[ "$load_avg" -gt $((${cores} * 0.7)) ]]; then
     current_state="critical"
-  elif [[ "$load_avg_1min" -gt $(bc -l <<< "${cores} * 0.5") ]]; then
+  elif [[ "$load_avg" -gt $((${cores} * 0.5)) ]]; then
     current_state="warning"
   else
     current_state="normal"
   fi
 
-  "$1_prompt_segment" "${0}_${current_state}" "$2" "${load_states[$current_state]}" "$DEFAULT_COLOR" "$load_avg_1min" 'LOAD_ICON'
+  "$1_prompt_segment" "${0}_${current_state}" "$2" "${load_states[$current_state]}" "$DEFAULT_COLOR" "$load_avg" 'LOAD_ICON'
 }
+
 
 # Node version
 prompt_node_version() {
@@ -876,13 +1008,16 @@ prompt_node_version() {
 # Node version from NVM
 # Only prints the segment if different than the default value
 prompt_nvm() {
-  [[ ! $(type nvm) =~ 'nvm is a shell function'* ]] && return
-  local node_version=$(nvm current)
-  [[ -z "${node_version}" ]] || [[ ${node_version} = "none" ]] && return
-  local nvm_default=$(cat $NVM_DIR/alias/default)
+  local node_version nvm_default
+  (( $+functions[nvm_version] )) || return
+
+  node_version=$(nvm_version current)
+  [[ -z "${node_version}" || ${node_version} == "none" ]] && return
+
+  nvm_default=$(nvm_version default)
   [[ "$node_version" =~ "$nvm_default" ]] && return
 
-  $1_prompt_segment "$0" "$2" "green" "011" "${node_version:1}" 'NODE_ICON'
+  $1_prompt_segment "$0" "$2" "magenta" "black" "${node_version:1}" 'NODE_ICON'
 }
 
 # NodeEnv Prompt
@@ -932,14 +1067,15 @@ prompt_ram() {
   "$1_prompt_segment" "$0" "$2" "yellow" "$DEFAULT_COLOR" "$(printSizeHumanReadable "$ramfree" $base)" 'RAM_ICON'
 }
 
+set_default POWERLEVEL9K_RBENV_PROMPT_ALWAYS_SHOW false
 # rbenv information
 prompt_rbenv() {
-  if which rbenv 2>/dev/null >&2; then
+  if command which rbenv 2>/dev/null >&2; then
     local rbenv_version_name="$(rbenv version-name)"
     local rbenv_global="$(rbenv global)"
 
     # Don't show anything if the current Ruby is the same as the global Ruby.
-    if [[ $rbenv_version_name == $rbenv_global ]]; then
+    if [[ $rbenv_version_name == $rbenv_global && "$POWERLEVEL9K_RBENV_PROMPT_ALWAYS_SHOW" = false ]]; then
       return
     fi
 
@@ -1000,13 +1136,10 @@ prompt_rspec_stats() {
 
 # Ruby Version Manager information
 prompt_rvm() {
-  local gemset=$(echo $GEM_HOME | awk -F'@' '{print $2}')
-  [ "$gemset" != "" ] && gemset="@$gemset"
+  local version_and_gemset=${rvm_env_string/ruby-}
 
-  local version=$(echo $MY_RUBY_HOME | awk -F'-' '{print $2}')
-
-  if [[ -n "$version$gemset" ]]; then
-    "$1_prompt_segment" "$0" "$2" "240" "$DEFAULT_COLOR" "$version$gemset" 'RUBY_ICON'
+  if [[ -n "$version_and_gemset" ]]; then
+    "$1_prompt_segment" "$0" "$2" "240" "$DEFAULT_COLOR" "$version_and_gemset" 'RUBY_ICON'
   fi
 }
 
@@ -1016,17 +1149,62 @@ prompt_ssh() {
   fi
 }
 
-# Status: return code if verbose, otherwise just an icon if an error occurred
+# Status: When an error occur, return the error code, or a cross icon if option is set
+# Display an ok icon when no error occur, or hide the segment if option is set to false
+#
+set_default POWERLEVEL9K_STATUS_CROSS false
+set_default POWERLEVEL9K_STATUS_OK true
+set_default POWERLEVEL9K_STATUS_SHOW_PIPESTATUS true
+set_default POWERLEVEL9K_STATUS_HIDE_SIGNAME false
+# old options, retro compatibility
 set_default POWERLEVEL9K_STATUS_VERBOSE true
 set_default POWERLEVEL9K_STATUS_OK_IN_NON_VERBOSE false
+
+exit_code_or_status() {
+  local ec=$1
+  if [[ "$POWERLEVEL9K_STATUS_HIDE_SIGNAME" = true ]]; then
+    echo "$ec"
+  elif (( ec <= 128 )); then
+    echo "$ec"
+  else
+    local sig=$(( ec - 128 ))
+    local idx=$(( sig + 1 ))
+    echo "${signals[$idx]}(-${sig})"
+  fi
+}
+
 prompt_status() {
-  if [[ "$RETVAL" -ne 0 ]]; then
-    if [[ "$POWERLEVEL9K_STATUS_VERBOSE" == true ]]; then
-      "$1_prompt_segment" "$0_ERROR" "$2" "red" "226" "$RETVAL" 'CARRIAGE_RETURN_ICON'
+  local ec_text
+  local ec_sum
+  local ec
+
+  if [[ $POWERLEVEL9K_STATUS_SHOW_PIPESTATUS == true ]]; then
+    if (( $#RETVALS > 1 )); then
+      ec_text=$(exit_code_or_status "${RETVALS[1]}")
+      ec_sum=${RETVALS[1]}
+    else
+      ec_text=$(exit_code_or_status "${RETVAL}")
+      ec_sum=${RETVAL}
+    fi
+
+    for ec in "${(@)RETVALS[2,-1]}"; do
+      ec_text="${ec_text}|$(exit_code_or_status "$ec")"
+      ec_sum=$(( $ec_sum + $ec ))
+    done
+  else
+    # We use RETVAL instead of the right-most RETVALS item because
+    # PIPE_FAIL may be set.
+    ec_text=$(exit_code_or_status "${RETVAL}")
+    ec_sum=${RETVAL}
+  fi
+
+  if (( ec_sum > 0 )); then
+    if [[ "$POWERLEVEL9K_STATUS_CROSS" == false && "$POWERLEVEL9K_STATUS_VERBOSE" == true ]]; then
+      "$1_prompt_segment" "$0_ERROR" "$2" "red" "226" "$ec_text" 'CARRIAGE_RETURN_ICON'
     else
       "$1_prompt_segment" "$0_ERROR" "$2" "$DEFAULT_COLOR" "red" "" 'FAIL_ICON'
     fi
-  elif [[ "$POWERLEVEL9K_STATUS_VERBOSE" == true || "$POWERLEVEL9K_STATUS_OK_IN_NON_VERBOSE" == true ]]; then
+  elif [[ "$POWERLEVEL9K_STATUS_OK" == true ]] && [[ "$POWERLEVEL9K_STATUS_VERBOSE" == true || "$POWERLEVEL9K_STATUS_OK_IN_NON_VERBOSE" == true ]]; then
     "$1_prompt_segment" "$0_OK" "$2" "$DEFAULT_COLOR" "green" "" 'OK_ICON'
   fi
 }
@@ -1178,7 +1356,7 @@ powerlevel9k_vcs_init() {
 prompt_vcs() {
   VCS_WORKDIR_DIRTY=false
   VCS_WORKDIR_HALF_DIRTY=false
-  current_state=""
+  local current_state=""
 
   # Actually invoke vcs_info manually to gather all information.
   vcs_info
@@ -1205,11 +1383,11 @@ set_default POWERLEVEL9K_VI_INSERT_MODE_STRING "INSERT"
 set_default POWERLEVEL9K_VI_COMMAND_MODE_STRING "NORMAL"
 prompt_vi_mode() {
   case ${KEYMAP} in
-    main|viins)
-      "$1_prompt_segment" "$0_INSERT" "$2" "$DEFAULT_COLOR" "blue" "$POWERLEVEL9K_VI_INSERT_MODE_STRING"
-    ;;
     vicmd)
       "$1_prompt_segment" "$0_NORMAL" "$2" "$DEFAULT_COLOR" "default" "$POWERLEVEL9K_VI_COMMAND_MODE_STRING"
+    ;;
+    main|viins|*)
+      "$1_prompt_segment" "$0_INSERT" "$2" "$DEFAULT_COLOR" "blue" "$POWERLEVEL9K_VI_INSERT_MODE_STRING"
     ;;
   esac
 }
@@ -1225,18 +1403,10 @@ prompt_virtualenv() {
 }
 
 # pyenv: current active python version (with restrictions)
-# More information on pyenv (Python version manager like rbenv and rvm):
-# https://github.com/yyuu/pyenv
-# the prompt parses output of pyenv version and only displays the first word
+# https://github.com/pyenv/pyenv#choosing-the-python-version
 prompt_pyenv() {
-  local pyenv_version="$(pyenv version 2>/dev/null)"
-  pyenv_version="${pyenv_version%% *}"
-  # XXX: The following should return the same as above.
-  # This reads better for devs familiar with sed/awk/grep/cut utilities
-  # Using shell expansion/substitution may hamper future maintainability
-  #local pyenv_version="$(pyenv version 2>/dev/null | head -n1 | cut -d' ' -f1)"
-  if [[ -n "$pyenv_version" && "$pyenv_version" != "system" ]]; then
-    "$1_prompt_segment" "$0" "$2" "blue" "$DEFAULT_COLOR" "$pyenv_version" 'PYTHON_ICON'
+  if [[ -n "$PYENV_VERSION" ]]; then
+    "$1_prompt_segment" "$0" "$2" "blue" "$DEFAULT_COLOR" "$PYENV_VERSION" 'PYTHON_ICON'
   fi
 }
 
@@ -1256,12 +1426,42 @@ prompt_dir_writable() {
   fi
 }
 
+# Kubernetes Current Context
+prompt_kubecontext() {
+  local kubectl_version="$(kubectl version --client 2>/dev/null)"
+
+  if [[ -n "$kubectl_version" ]]; then
+    # Get the current Kubernetes config context's namespaece
+    local k8s_namespace=$(kubectl config get-contexts --no-headers | grep '*' | awk '{print $5}')
+    # Get the current Kuberenetes context
+    local k8s_context=$(kubectl config current-context)
+
+    if [[ -z "$k8s_namespace" ]]; then
+      k8s_namespace="default"
+    fi
+
+    local k8s_final_text=""
+
+    if [[ "$k8s_context" == "k8s_namespace" ]]; then
+      # No reason to print out the same identificator twice
+      k8s_final_text="$k8s_context"
+    else
+      k8s_final_text="$k8s_context/$k8s_namespace"
+    fi
+
+
+    "$1_prompt_segment" "$0" "$2" "magenta" "white" "$k8s_final_text" "KUBERNETES_ICON"
+  fi
+}
+
+
 ################################################################
 # Prompt processing and drawing
 ################################################################
 # Main prompt
 build_left_prompt() {
   local index=1
+  local element
   for element in "${POWERLEVEL9K_LEFT_PROMPT_ELEMENTS[@]}"; do
     # Remove joined information in direct calls
     element=${element%_joined}
@@ -1306,15 +1506,16 @@ powerlevel9k_preexec() {
 set_default POWERLEVEL9K_PROMPT_ADD_NEWLINE false
 powerlevel9k_prepare_prompts() {
   RETVAL=$?
+  RETVALS=( "$pipestatus[@]" )
 
   _P9K_COMMAND_DURATION=$((EPOCHREALTIME - _P9K_TIMER_START))
 
   # Reset start time
-  _P9K_TIMER_START=0xFFFFFFFF
+  _P9K_TIMER_START=0x7FFFFFFF
 
   if [[ "$POWERLEVEL9K_PROMPT_ON_NEWLINE" == true ]]; then
     PROMPT='$(print_icon 'MULTILINE_FIRST_PROMPT_PREFIX')%f%b%k$(build_left_prompt)
-$(print_icon 'MULTILINE_SECOND_PROMPT_PREFIX')'
+$(print_icon 'MULTILINE_LAST_PROMPT_PREFIX')'
     if [[ "$POWERLEVEL9K_RPROMPT_ON_NEWLINE" != true ]]; then
       # The right prompt should be on the same line as the first line of the left
       # prompt. To do so, there is just a quite ugly workaround: Before zsh draws
@@ -1343,28 +1544,28 @@ NEWLINE='
 }
 
 prompt_powerlevel9k_setup() {
-  # I decided to use the value below for better supporting 32-bit CPUs, since the previous value "99999999999" was causing issues on my Android phone, which is powered by an armv7l
-  # We don't have to change that until 19 January of 2038! :)
+  # The value below was set to better support 32-bit CPUs.
+  # It's the maximum _signed_ integer value on 32-bit CPUs.
+  # Please don't change it until 19 January of 2038. ;)
 
   # Disable false display of command execution time
-  # Maximum integer on 32-bit CPUs
-  _P9K_TIMER_START=2147483647
+  _P9K_TIMER_START=0x7FFFFFFF
 
   # The prompt function will set these prompt_* options after the setup function
   # returns. We need prompt_subst so we can safely run commands in the prompt
   # without them being double expanded and we need prompt_percent to expand the
   # common percent escape sequences.
-  prompt_opts=(subst percent cr)
+  prompt_opts=(cr percent sp subst)
 
   # Borrowed from promptinit, sets the prompt options in case the theme was
   # not initialized via promptinit.
-  setopt noprompt{bang,cr,percent,subst} "prompt${^prompt_opts[@]}"
+  setopt noprompt{bang,cr,percent,sp,subst} "prompt${^prompt_opts[@]}"
 
   # Display a warning if the terminal does not support 256 colors
   local term_colors
   term_colors=$(echotc Co 2>/dev/null)
   if (( ! $? && ${term_colors:-0} < 256 )); then
-    print -P "%F{red}WARNING!%f Your terminal appears to support less than 256 colors!"
+    print -P "%F{red}WARNING!%f Your terminal appears to support fewer than 256 colors!"
     print -P "If your terminal supports 256 colors, please export the appropriate environment variable"
     print -P "_before_ loading this theme in your \~\/.zshrc. In most terminal emulators, putting"
     print -P "%F{blue}export TERM=\"xterm-256color\"%f at the top of your \~\/.zshrc is sufficient."
@@ -1410,6 +1611,13 @@ prompt_powerlevel9k_setup() {
   # prepare prompts
   add-zsh-hook precmd powerlevel9k_prepare_prompts
   add-zsh-hook preexec powerlevel9k_preexec
+}
+
+prompt_powerlevel9k_teardown() {
+  add-zsh-hook -D precmd powerlevel9k_\*
+  add-zsh-hook -D preexec powerlevel9k_\*
+  PROMPT='%m%# '
+  RPROMPT=
 }
 
 prompt_powerlevel9k_setup "$@"
