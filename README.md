@@ -393,6 +393,17 @@ segment will not be displayed.
 |`POWERLEVEL9K_PUBLIC_IP_METHODS`|(dig curl wget)| These methods in that order are used to refresh your IP.|
 |`POWERLEVEL9K_PUBLIC_IP_NONE`|None|The string displayed when an IP was not obtained|
 
+##### chruby
+
+This segment shows the version of Ruby being used when using `chruby` to change your current Ruby stack.
+
+It uses `$RUBY_ENGINE` and `$RUBY_VERSION` as set by `chruby`.
+
+| Variable | Default Value | Description |
+|----------|---------------|-------------|
+|`POWERLEVEL9K_CHRUBY_SHOW_ENGINE`|true|Show the currently selected Ruby engine (e.g. `ruby`, `jruby`, `rbx`, etc)
+|`POWERLEVEL9K_CHRUBY_SHOW_VERSION`|true|Shows the currently selected engine's version (e.g. `2.5.1`)
+
 ##### rbenv
 
 This segment shows the version of Ruby being used when using `rbenv` to change your current Ruby stack.
