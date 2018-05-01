@@ -111,6 +111,7 @@ case $POWERLEVEL9K_MODE in
       DATE_ICON                      $'\uE184'              # 
       TIME_ICON                      $'\uE12E'              # 
       JAVA_ICON                      $'\U2615'              # ☕︎
+      LARAVEL_ICON                   ''
     )
   ;;
   'awesome-fontconfig')
@@ -206,6 +207,7 @@ case $POWERLEVEL9K_MODE in
       DATE_ICON                      $'\uF073 '             # 
       TIME_ICON                      $'\uF017 '             # 
       JAVA_ICON                      $'\U2615'              # ☕︎
+      LARAVEL_ICON                   ''
     )
   ;;
   'awesome-mapped-fontconfig')
@@ -306,6 +308,7 @@ case $POWERLEVEL9K_MODE in
       DATE_ICON                      $'\uF073 '                                     # 
       TIME_ICON                      $'\uF017 '                                     # 
       JAVA_ICON                      $'\U2615'              # ☕︎
+      LARAVEL_ICON                   ''
     )
   ;;
   'nerdfont-complete'|'nerdfont-fontconfig')
@@ -402,6 +405,7 @@ case $POWERLEVEL9K_MODE in
       DATE_ICON                      $'\uF073 '             # 
       TIME_ICON                      $'\uF017 '             # 
       JAVA_ICON                      $'\U2615'              # ☕︎
+      LARAVEL_ICON                   $'\ue73f '             # 
     )
   ;;
   *)
@@ -497,6 +501,7 @@ case $POWERLEVEL9K_MODE in
       DATE_ICON                      ''
       TIME_ICON                      ''
       JAVA_ICON                      $'\U2615'              # ☕︎
+      LARAVEL_ICON                   ''
     )
   ;;
 esac

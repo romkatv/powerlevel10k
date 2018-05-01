@@ -120,6 +120,7 @@ The segments that are currently available are:
     * `nvm` - Show the version of Node that is currently active, if it differs from the version used by NVM
 * **PHP Segments:**
     * `php_version` - Show the current PHP version.
+    * `laravel_version` - Show the current Laravel version.
     * [`symfony2_tests`](#symfony2_tests) - Show a ratio of test classes vs code classes for Symfony2.
     * `symfony2_version` - Show the current Symfony2 version, if you are in a Symfony2-Project dir.
 * **Python Segments:**

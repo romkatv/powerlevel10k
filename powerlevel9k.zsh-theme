@@ -1110,6 +1110,18 @@ prompt_vpn_ip() {
 }
 
 ################################################################
+# Segment to display laravel version
+prompt_laravel_version() {
+  local laravel_version="$(php artisan --version 2>/dev/null)"
+  if [[ -n "${laravel_version}" ]]; then
+    # Remove unrelevant infos
+    laravel_version="${laravel_version//Laravel Framework version /}"
+
+    "$1_prompt_segment" "$0" "$2" "maroon" "white" "${laravel_version}" 'LARAVEL_ICON'
+  fi
+}
+
+################################################################
 # Segment to display load
 set_default POWERLEVEL9K_LOAD_WHICH 5
 prompt_load() {
