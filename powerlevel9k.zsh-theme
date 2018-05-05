@@ -1104,10 +1104,14 @@ prompt_root_indicator() {
 # Print Rust version number
 prompt_rust_version() {
   local rust_version
-  rust_version=$(rustc --version 2>&1 | grep -oe "^rustc\s*[^ ]*" | grep -o '[0-9.a-z\\\-]*$')
+  rust_version=$(command rustc --version 2>&1)
+  # Remove "rustc " (including the whitespace) from the beginning
+  # of the version string and remove everything after the next
+  # whitespace. This way we'll end up with only the version.
+  rust_version=${${rust_version/rustc /}%% *}
 
   if [[ -n "$rust_version" ]]; then
-    "$1_prompt_segment" "$0" "$2" "208" "$DEFAULT_COLOR" "Rust $rust_version" 'RUST_ICON'
+    "$1_prompt_segment" "$0" "$2" "208" "$DEFAULT_COLOR" "$rust_version" 'RUST_ICON'
   fi
 }
 # RSpec test ratio
