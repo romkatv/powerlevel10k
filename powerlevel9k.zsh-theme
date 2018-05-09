@@ -488,7 +488,7 @@ prompt_battery() {
     fi
   fi
 
-  if [[ "${POWERLEVEL9K_BATTERY_HIDE_FULL}" == "true" && "${bat_percent}" = 100 ]]; then
+  if [[ -v "POWERLEVEL9K_BATTERY_HIDE_ABOVE_THRESHOLD" && "${bat_percent}" -ge $POWERLEVEL9K_BATTERY_HIDE_ABOVE_THRESHOLD ]]; then
     return
   fi
 
