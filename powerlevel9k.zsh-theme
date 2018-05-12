@@ -1114,6 +1114,7 @@ prompt_rust_version() {
     "$1_prompt_segment" "$0" "$2" "208" "$DEFAULT_COLOR" "$rust_version" 'RUST_ICON'
   fi
 }
+
 # RSpec test ratio
 prompt_rspec_stats() {
   if [[ (-d app && -d spec) ]]; then
