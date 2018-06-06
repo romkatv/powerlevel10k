@@ -51,6 +51,21 @@ function +vi-git-remotebranch() {
     remote=${$(command git rev-parse --verify HEAD@{upstream} --symbolic-full-name 2>/dev/null)/refs\/(remotes|heads)\/}
     branch_name=$(command git symbolic-ref --short HEAD 2>/dev/null)
 
+    if [[ -n "$POWERLEVEL9K_VCS_SHORTEN_LENGTH" ]] && [[ -n "$POWERLEVEL9K_VCS_SHORTEN_MIN_LENGTH" ]]; then
+     set_default POWERLEVEL9K_VCS_SHORTEN_DELIMITER $'\U2026'
+
+     if [ ${#hook_com[branch]} -gt $POWERLEVEL9K_VCS_SHORTEN_MIN_LENGTH ] && [ ${#hook_com[branch]} -gt $POWERLEVEL9K_VCS_SHORTEN_LENGTH ]; then
+       case "$POWERLEVEL9K_VCS_SHORTEN_STRATEGY" in
+         truncate_middle)
+           hook_com[branch]="$(echo "${branch_name:0:$POWERLEVEL9K_VCS_SHORTEN_LENGTH}")$POWERLEVEL9K_VCS_SHORTEN_DELIMITER$(echo "${branch_name: -$POWERLEVEL9K_VCS_SHORTEN_LENGTH}")"
+         ;;
+         truncate_from_right)
+           hook_com[branch]="$(echo "${branch_name:0:$POWERLEVEL9K_VCS_SHORTEN_LENGTH}")$POWERLEVEL9K_VCS_SHORTEN_DELIMITER"
+         ;;
+       esac
+     fi
+    fi
+
     hook_com[branch]="$(print_icon 'VCS_BRANCH_ICON')${hook_com[branch]}"
     # Always show the remote
     #if [[ -n ${remote} ]] ; then
