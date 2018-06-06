@@ -1662,7 +1662,16 @@ prompt_dropbox() {
 
     "$1_prompt_segment" "$0" "$2" "white" "blue" "$dropbox_status" "DROPBOX_ICON"
   fi
+}
 
+# print Java version number
+prompt_java_version() {
+  local java_version
+  java_version=$(java -fullversion 2>&1 | cut -d '"' -f 2)
+
+  if [[ -n "$java_version" ]]; then
+    "$1_prompt_segment" "$0" "$2" "red" "white" "$java_version" "JAVA_ICON"
+  fi
 }
 
 ################################################################

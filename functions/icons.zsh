@@ -109,6 +109,7 @@ case $POWERLEVEL9K_MODE in
       DROPBOX_ICON                   $'\UF16B'              # 
       DATE_ICON                      $'\uE184'              # 
       TIME_ICON                      $'\uE12E'              # 
+      JAVA_ICON                      $'\U2615'              # ☕︎
     )
   ;;
   'awesome-fontconfig')
@@ -202,6 +203,7 @@ case $POWERLEVEL9K_MODE in
       DROPBOX_ICON                   $'\UF16B'              # 
       DATE_ICON                      $'\uF073 '             # 
       TIME_ICON                      $'\uF017 '             # 
+      JAVA_ICON                      $'\U2615'              # ☕︎
     )
   ;;
   'awesome-mapped-fontconfig')
@@ -300,6 +302,7 @@ case $POWERLEVEL9K_MODE in
       DROPBOX_ICON                   '\u'$CODEPOINT_OF_AWESOME_DROPBOX              # 
       DATE_ICON                      $'\uF073 '                                     # 
       TIME_ICON                      $'\uF017 '                                     # 
+      JAVA_ICON                      $'\U2615'              # ☕︎
     )
   ;;
   'nerdfont-complete'|'nerdfont-fontconfig')
@@ -394,6 +397,7 @@ case $POWERLEVEL9K_MODE in
       DROPBOX_ICON                   $'\UF16B'              # 
       DATE_ICON                      $'\uF073 '             # 
       TIME_ICON                      $'\uF017 '             # 
+      JAVA_ICON                      $'\U2615'              # ☕︎
     )
   ;;
   *)
@@ -487,6 +491,7 @@ case $POWERLEVEL9K_MODE in
       DROPBOX_ICON                   'Dropbox'
       DATE_ICON                      ''
       TIME_ICON                      ''
+      JAVA_ICON                      $'\U2615'              # ☕︎
     )
   ;;
 esac

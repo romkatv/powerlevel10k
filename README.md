@@ -135,6 +135,8 @@ The segments that are currently available are:
     * `rust_version` - Display the current rust version and [logo](https://www.rust-lang.org/logos/rust-logo-blk.svg).
 * **Swift Segments:**
     * `swift_version` - Show the version number of the installed Swift.
+* **Java Segments:**
+    * `java_version` - Show the current Java version.
 
 **Cloud Segments:**
 * **AWS Segments:**
