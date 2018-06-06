@@ -156,12 +156,14 @@ left_prompt_segment() {
   if [[ -n $6 ]]; then
     visual_identifier="$(print_icon $6)"
     if [[ -n "$visual_identifier" ]]; then
+      # Add an whitespace if we print more than just the visual identifier.
+      # To avoid cutting off the visual identifier in some terminal emulators (e.g., Konsole, st),
+      # we need to color both the visual identifier and the whitespace.
+      [[ -n "$5" ]] && visual_identifier="$visual_identifier "
       # Allow users to overwrite the color for the visual identifier only.
       local visual_identifier_color_variable=POWERLEVEL9K_${(U)1#prompt_}_VISUAL_IDENTIFIER_COLOR
       set_default $visual_identifier_color_variable $4
       visual_identifier="%F{${(P)visual_identifier_color_variable}%}$visual_identifier%f"
-      # Add an whitespace if we print more than just the visual identifier
-      [[ -n "$5" ]] && visual_identifier="$visual_identifier "
     fi
   fi
 
@@ -241,12 +243,14 @@ right_prompt_segment() {
   if [[ -n "$6" ]]; then
     visual_identifier="$(print_icon $6)"
     if [[ -n "$visual_identifier" ]]; then
+      # Add an whitespace if we print more than just the visual identifier.
+      # To avoid cutting off the visual identifier in some terminal emulators (e.g., Konsole, st),
+      # we need to color both the visual identifier and the whitespace.
+      [[ -n "$5" ]] && visual_identifier=" $visual_identifier"
       # Allow users to overwrite the color for the visual identifier only.
       local visual_identifier_color_variable=POWERLEVEL9K_${(U)1#prompt_}_VISUAL_IDENTIFIER_COLOR
       set_default $visual_identifier_color_variable $4
       visual_identifier="%F{${(P)visual_identifier_color_variable}%}$visual_identifier%f"
-      # Add an whitespace if we print more than just the visual identifier
-      [[ -n "$5" ]] && visual_identifier=" $visual_identifier"
     fi
   fi
 

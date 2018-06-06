@@ -69,7 +69,7 @@ function testKubeContext() {
   alias kubectl=mockKubectl
   POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(kubecontext)
 
-  assertEquals "%K{magenta} %F{white%}⎈%f %F{white}minikube/default %k%F{magenta}%f " "$(build_left_prompt)"
+  assertEquals "%K{magenta} %F{white%}⎈ %f%F{white}minikube/default %k%F{magenta}%f " "$(build_left_prompt)"
 
   unset POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
   unalias kubectl
@@ -78,7 +78,7 @@ function testKubeContextOtherNamespace() {
   alias kubectl=mockKubectlOtherNamespace
   POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(kubecontext)
 
-  assertEquals "%K{magenta} %F{white%}⎈%f %F{white}minikube/kube-system %k%F{magenta}%f " "$(build_left_prompt)"
+  assertEquals "%K{magenta} %F{white%}⎈ %f%F{white}minikube/kube-system %k%F{magenta}%f " "$(build_left_prompt)"
 
   unset POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
   unalias kubectl

@@ -329,7 +329,7 @@ function testHomeFolderDetectionWorks() {
   POWERLEVEL9K_HOME_ICON='home-icon'
 
   cd ~
-  assertEquals "%K{blue} %F{black%}home-icon%f %F{black}~ %k%F{blue}%f " "$(build_left_prompt)"
+  assertEquals "%K{blue} %F{black%}home-icon %f%F{black}~ %k%F{blue}%f " "$(build_left_prompt)"
 
   cd -
   unset POWERLEVEL9K_HOME_ICON
@@ -341,7 +341,7 @@ function testHomeSubfolderDetectionWorks() {
   FOLDER=~/powerlevel9k-test
   mkdir $FOLDER
   cd $FOLDER
-  assertEquals "%K{blue} %F{black%}sub-icon%f %F{black}~/powerlevel9k-test %k%F{blue}%f " "$(build_left_prompt)"
+  assertEquals "%K{blue} %F{black%}sub-icon %f%F{black}~/powerlevel9k-test %k%F{blue}%f " "$(build_left_prompt)"
 
   cd -
   rm -fr $FOLDER
@@ -355,7 +355,7 @@ function testOtherFolderDetectionWorks() {
   FOLDER=/tmp/powerlevel9k-test
   mkdir $FOLDER
   cd $FOLDER
-  assertEquals "%K{blue} %F{black%}folder-icon%f %F{black}/tmp/powerlevel9k-test %k%F{blue}%f " "$(build_left_prompt)"
+  assertEquals "%K{blue} %F{black%}folder-icon %f%F{black}/tmp/powerlevel9k-test %k%F{blue}%f " "$(build_left_prompt)"
 
   cd -
   rm -fr $FOLDER
@@ -407,7 +407,7 @@ function testOmittingFirstCharacterWorks() {
   POWERLEVEL9K_FOLDER_ICON='folder-icon'
   cd /tmp
 
-  assertEquals "%K{blue} %F{black%}folder-icon%f %F{black}tmp %k%F{blue}%f " "$(build_left_prompt)"
+  assertEquals "%K{blue} %F{black%}folder-icon %f%F{black}tmp %k%F{blue}%f " "$(build_left_prompt)"
 
   cd -
   unset POWERLEVEL9K_FOLDER_ICON
@@ -421,7 +421,7 @@ function testOmittingFirstCharacterWorksWithChangingPathSeparator() {
   mkdir -p /tmp/powerlevel9k-test/1/2
   cd /tmp/powerlevel9k-test/1/2
 
-  assertEquals "%K{blue} %F{black%}folder-icon%f %F{black}tmpxXxpowerlevel9k-testxXx1xXx2 %k%F{blue}%f " "$(build_left_prompt)"
+  assertEquals "%K{blue} %F{black%}folder-icon %f%F{black}tmpxXxpowerlevel9k-testxXx1xXx2 %k%F{blue}%f " "$(build_left_prompt)"
 
   cd -
   rm -fr /tmp/powerlevel9k-test
