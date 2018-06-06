@@ -1252,11 +1252,24 @@ prompt_rbenv() {
 # Segment to display chruby information
 # see https://github.com/postmodern/chruby/issues/245 for chruby_auto issue with ZSH
 prompt_chruby() {
-  local chruby_env
-  chrb_env="$(chruby 2> /dev/null | grep \* | tr -d '* ')"
+  # Uses $RUBY_VERSION and $RUBY_ENGINE set by chruby
+  set_default POWERLEVEL9K_CHRUBY_SHOW_VERSION true
+  set_default POWERLEVEL9K_CHRUBY_SHOW_ENGINE true
+  local chruby_label=""
+
+  if [[ "$POWERLEVEL9K_CHRUBY_SHOW_ENGINE" == true ]]; then
+    chruby_label+="$RUBY_ENGINE "
+  fi
+  if [[ "$POWERLEVEL9K_CHRUBY_SHOW_VERSION" == true ]]; then
+    chruby_label+="$RUBY_VERSION"
+  fi
+
+  # Truncate trailing spaces
+  chruby_label="${chruby_label%"${chruby_label##*[![:space:]]}"}"
+
   # Don't show anything if the chruby did not change the default ruby
-  if [[ "${chrb_env:-system}" != "system" ]]; then
-    "$1_prompt_segment" "$0" "$2" "red" "$DEFAULT_COLOR" "${chrb_env}" 'RUBY_ICON'
+  if [[ "$RUBY_ENGINE" != "" ]]; then
+    "$1_prompt_segment" "$0" "$2" "red" "$DEFAULT_COLOR" "${chruby_label}" 'RUBY_ICON'
   fi
 }
 

@@ -266,6 +266,17 @@ Some example settings:
 | Normal Colors  | `(red3 darkorange3 darkgoldenrod gold3 yellow3 chartreuse2 mediumspringgreen green3 green3 green4 darkgreen)` |
 | Subdued Colors | `(darkred orange4 yellow4 yellow4 chartreuse3 green3 green4 darkgreen)`                                       |
 
+##### chruby
+
+This segment shows the version of Ruby being used when using `chruby` to change your current Ruby stack.
+
+It uses `$RUBY_ENGINE` and `$RUBY_VERSION` as set by `chruby`.
+
+| Variable | Default Value | Description |
+|----------|---------------|-------------|
+|`POWERLEVEL9K_CHRUBY_SHOW_ENGINE`|true|Show the currently selected Ruby engine (e.g. `ruby`, `jruby`, `rbx`, etc)
+|`POWERLEVEL9K_CHRUBY_SHOW_VERSION`|true|Shows the currently selected engine's version (e.g. `2.5.1`)
+
 ##### command_execution_time
 
 Display the time the previous command took to execute if the time is above
