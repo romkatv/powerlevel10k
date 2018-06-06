@@ -915,10 +915,13 @@ prompt_dir() {
     "HOME"            "HOME_ICON"
     "HOME_SUBFOLDER"  "HOME_SUB_ICON"
     "NOT_WRITABLE"    "LOCK_ICON"
+    "ETC"             "ETC_ICON"
   )
   local state_path="$(print -P '%~')"
   local current_state="DEFAULT"
-  if [[ "${POWERLEVEL9K_DIR_SHOW_WRITABLE}" == true && ! -w "$PWD" ]]; then
+  if [[ $state_path == '/etc'* ]]; then
+    current_state='ETC'
+  elif [[ "${POWERLEVEL9K_DIR_SHOW_WRITABLE}" == true && ! -w "$PWD" ]]; then
     current_state="NOT_WRITABLE"
   elif [[ $state_path == '~' ]]; then
     current_state="HOME"
