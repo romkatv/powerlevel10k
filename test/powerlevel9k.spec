@@ -114,4 +114,23 @@ function testOverwritingIconsWork() {
   # rm -fr ~/$testFolder
 }
 
+function testNewlineOnRpromptCanBeDisabled() {
+  POWERLEVEL9K_PROMPT_ON_NEWLINE=true
+  POWERLEVEL9K_RPROMPT_ON_NEWLINE=false
+  POWERLEVEL9K_CUSTOM_WORLD='echo world'
+  POWERLEVEL9K_CUSTOM_RWORLD='echo rworld'
+  POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(custom_world)
+  POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(custom_rworld)
+
+  powerlevel9k_prepare_prompts
+  assertEquals '$(print_icon MULTILINE_FIRST_PROMPT_PREFIX)[39m[0m[49m[47m [30mworld [49m[37m[39m  $(print_icon MULTILINE_LAST_PROMPT_PREFIX)[1A[39m[0m[49m[37m[39m[47m[30m rworld [39m[00m[1B' "$(print -P ${PROMPT}${RPROMPT})"
+
+  unset POWERLEVEL9K_PROMPT_ON_NEWLINE
+  unset POWERLEVEL9K_RPROMPT_ON_NEWLINE
+  unset POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
+  unset POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS
+  unset POWERLEVEL9K_CUSTOM_WORLD
+  unset POWERLEVEL9K_CUSTOM_RWORLD
+}
+
 source shunit2/source/2.1/src/shunit2
