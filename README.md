@@ -130,6 +130,7 @@ The segments that are currently available are:
     * [`chruby`](#chruby) - Ruby environment information using `chruby` (if one is active).
     * [`rbenv`](#rbenv) - Ruby environment information using `rbenv` (if one is active).
     * [`rspec_stats`](#rspec_stats) - Show a ratio of test classes vs code classes for RSpec.
+    * `rvm` - Ruby environment information using `$GEM_HOME` and `$MY_RUBY_HOME` (if one is active).
 * **Rust Segments:**
     * `rust_version` - Display the current rust version and [logo](https://www.rust-lang.org/logos/rust-logo-blk.svg).
 * **Swift Segments:**
@@ -213,8 +214,10 @@ You can also change the battery icon automatically depending on the battery
 level. This will override the default battery icon. In order to do this, you
 need to define the `POWERLEVEL9k_BATTERY_STAGES` variable.
 
-| Variable | Default Value | Description |
-| `POWERLEVEL9K_BATTERY_STAGES`|Unset|A string or array, which each index indicates a charge level.|
+
+| Variable                      | Default Value | Description                                                   |
+|-------------------------------|---------------|---------------------------------------------------------------|
+| `POWERLEVEL9K_BATTERY_STAGES` | Unset         | A string or array, which each index indicates a charge level. |
 
 Powerlevel9k will use each index of the string or array as a stage to indicate battery
 charge level, progressing from left to right. You can provide any number of
@@ -254,10 +257,12 @@ As with the battery stages, you can use any number of colors and Powerlevel9k
 will automatically use all of them appropriately.
 
 Some example settings:
-|Brightness|Possible Array|
-|Bright Colors|(red1 orangered1 darkorange orange1 gold1 yellow1 yellow2 greenyellow chartreuse1 chartreuse2 green1)|
-|Normal Colors|(red3 darkorange3 darkgoldenrod gold3 yellow3 chartreuse2 mediumspringgreen green3 green3 green4 darkgreen)|
-|Subdued Colors|(darkred orange4 yellow4 yellow4 chartreuse3 green3 green4 darkgreen)|
+
+| Brightness     | Possible Array                                                                                                |
+|----------------|---------------------------------------------------------------------------------------------------------------|
+| Bright Colors  | `(red1 orangered1 darkorange orange1 gold1 yellow1 yellow2 greenyellow chartreuse1 chartreuse2 green1)`       |
+| Normal Colors  | `(red3 darkorange3 darkgoldenrod gold3 yellow3 chartreuse2 mediumspringgreen green3 green3 green4 darkgreen)` |
+| Subdued Colors | `(darkred orange4 yellow4 yellow4 chartreuse3 green3 green4 darkgreen)`                                       |
 
 ##### command_execution_time
 
@@ -537,6 +542,10 @@ It figures out the version being used by taking the output of the `rbenv version
 Variable | Default Value | Description |
 |----------|---------------|-------------|
 |`POWERLEVEL9K_RBENV_ALWAYS`|'false'|Always show the `rbenv` segment, even if the local version matches the global.|
+
+| Variable | Default Value | Description |
+|----------|---------------|-------------|
+|`POWERLEVEL9K_RBENV_PROMPT_ALWAYS_SHOW`|`false`|Set to true if you wish to show the rbenv segment even if the current Ruby version is the same as the global Ruby version|
 
 ##### rspec_stats
 

@@ -895,7 +895,9 @@ prompt_dir() {
         fi
       ;;
       *)
-        current_path="$(print -P "%$((POWERLEVEL9K_SHORTEN_DIR_LENGTH+1))(c:$POWERLEVEL9K_SHORTEN_DELIMITER/:)%${POWERLEVEL9K_SHORTEN_DIR_LENGTH}c")"
+        if [[ $current_path != "~" ]]; then
+          current_path="$(print -P "%$((POWERLEVEL9K_SHORTEN_DIR_LENGTH+1))(c:$POWERLEVEL9K_SHORTEN_DELIMITER/:)%${POWERLEVEL9K_SHORTEN_DIR_LENGTH}c")"
+        fi
       ;;
     esac
   fi
@@ -1229,18 +1231,19 @@ prompt_ram() {
   "$1_prompt_segment" "$0" "$2" "yellow" "$DEFAULT_COLOR" "$(printSizeHumanReadable "$ramfree" $base)" 'RAM_ICON'
 }
 
-################################################################
-# Segment to display rbenv information
-set_default POWERLEVEL9K_RBENV_ALWAYS false
+
+set_default POWERLEVEL9K_RBENV_PROMPT_ALWAYS_SHOW false
+# rbenv information
 prompt_rbenv() {
-  if which rbenv 2>/dev/null >&2; then
+  if command which rbenv 2>/dev/null >&2; then
     local rbenv_version_name="$(rbenv version-name)"
     local rbenv_global="$(rbenv global)"
 
+
     # Don't show anything if the current Ruby is the same as the global Ruby
-    # unless `POWERLEVEL9K_RBENV_ALWAYS` is set.
-    if [[ $POWERLEVEL9K_RBENV_ALWAYS == true || $rbenv_version_name != $rbenv_global ]];then
-      "$1_prompt_segment" "$0" "$2" "red" "$DEFAULT_COLOR" "$rbenv_version_name" 'RUBY_ICON'
+    # unless `POWERLEVEL9K_RBENV_PROMPT_ALWAYS_SHOW` is set.
+    if [[ $rbenv_version_name == $rbenv_global && "$POWERLEVEL9K_RBENV_PROMPT_ALWAYS_SHOW" = false ]]; then
+      return
     fi
   fi
 }
@@ -1337,8 +1340,13 @@ prompt_status() {
   local ec
 
   if [[ $POWERLEVEL9K_STATUS_SHOW_PIPESTATUS == true ]]; then
-    ec_text=$(exit_code_or_status "${RETVALS[1]}")
-    ec_sum=${RETVALS[1]}
+    if (( $#RETVALS > 1 )); then
+      ec_text=$(exit_code_or_status "${RETVALS[1]}")
+      ec_sum=${RETVALS[1]}
+    else
+      ec_text=$(exit_code_or_status "${RETVAL}")
+      ec_sum=${RETVAL}
+    fi
 
     for ec in "${(@)RETVALS[2,-1]}"; do
       ec_text="${ec_text}|$(exit_code_or_status "$ec")"
