@@ -32,7 +32,7 @@ function testRust() {
   mockRust
   POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(rust_version)
 
-  assertEquals "%K{208} %F{black%}Rust%f %F{black}0.4.1a-alpha %k%F{darkorange}%f " "$(build_left_prompt)"
+  assertEquals "%K{208} %F{black%}Rust %f%F{black}0.4.1a-alpha %k%F{darkorange}%f " "$(build_left_prompt)"
 
   unset POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
 }
