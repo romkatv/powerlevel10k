@@ -71,7 +71,7 @@ case $POWERLEVEL9K_MODE in
       HOME_SUB_ICON                  $'\uE18D'              # 
       FOLDER_ICON                    $'\uE818'              # 
       NETWORK_ICON                   $'\uE1AD'              # 
-      ETC_ICON                       $'\uE818'              # 
+      ETC_ICON                       $'\uE82F'              # 
       LOAD_ICON                      $'\uE190 '             # 
       SWAP_ICON                      $'\uE87D'              # 
       RAM_ICON                       $'\uE1E2 '             # 
@@ -170,7 +170,7 @@ case $POWERLEVEL9K_MODE in
       HOME_ICON                      $'\uF015'              # 
       HOME_SUB_ICON                  $'\uF07C'              # 
       FOLDER_ICON                    $'\uF115'              # 
-      ETC_ICON                       $'\uF013'              # 
+      ETC_ICON                       $'\uF013 '             # 
       NETWORK_ICON                   $'\uF09E'              # 
       LOAD_ICON                      $'\uF080 '             # 
       SWAP_ICON                      $'\uF0E4'              # 
@@ -272,7 +272,7 @@ case $POWERLEVEL9K_MODE in
       HOME_ICON                      '\u'$CODEPOINT_OF_AWESOME_HOME                 # 
       HOME_SUB_ICON                  '\u'$CODEPOINT_OF_AWESOME_FOLDER_OPEN          # 
       FOLDER_ICON                    '\u'$CODEPOINT_OF_AWESOME_FOLDER_O             # 
-      ETC_ICON                       $'\uF013'              # 
+      ETC_ICON                       '\u'$CODEPOINT_OF_AWESOME_COG' '               # 
       NETWORK_ICON                   '\u'$CODEPOINT_OF_AWESOME_RSS                  # 
       LOAD_ICON                      '\u'$CODEPOINT_OF_AWESOME_BAR_CHART' '         # 
       SWAP_ICON                      '\u'$CODEPOINT_OF_AWESOME_DASHBOARD            # 
@@ -464,7 +464,7 @@ case $POWERLEVEL9K_MODE in
       HOME_ICON                      ''
       HOME_SUB_ICON                  ''
       FOLDER_ICON                    ''
-      ETC_ICON                       $'\uF013'              # 
+      ETC_ICON                       $'\u2699'              # ⚙
       NETWORK_ICON                   'IP'
       LOAD_ICON                      'L'
       SWAP_ICON                      'SWP'
