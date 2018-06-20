@@ -224,6 +224,12 @@ right_prompt_segment() {
   [[ -n "$4" ]] && fg="$(foregroundColor $4)" || fg="$(foregroundColor)"
 
   # If CURRENT_RIGHT_BG is "NONE", we are the first right segment.
+
+  if [[ "$CURRENT_RIGHT_BG" != "NONE" ]]; then
+    # This is the closing whitespace for the previous segment
+    echo -n "${POWERLEVEL9K_WHITESPACE_BETWEEN_RIGHT_SEGMENTS}%f"
+  fi
+
   if [[ $joined == false ]] || [[ "$CURRENT_RIGHT_BG" == "NONE" ]]; then
     if isSameColor "$CURRENT_RIGHT_BG" "$3"; then
       # Middle segment with same color as previous segment
@@ -262,7 +268,7 @@ right_prompt_segment() {
   # Print segment content if there is any
   [[ -n "$5" ]] && echo -n "${5}"
   # Print the visual identifier
-  echo -n "${visual_identifier}${POWERLEVEL9K_WHITESPACE_BETWEEN_RIGHT_SEGMENTS}%f"
+  echo -n "${visual_identifier}"
 
   CURRENT_RIGHT_BG=$3
   last_right_element_index=$current_index
@@ -1757,6 +1763,9 @@ build_right_prompt() {
 
     index=$((index + 1))
   done
+
+  # Clear to the end of the line
+  echo -n "%E"
 }
 
 powerlevel9k_preexec() {
