@@ -120,6 +120,7 @@ The segments that are currently available are:
     * `nvm` - Show the version of Node that is currently active, if it differs from the version used by NVM
 * **PHP Segments:**
     * `php_version` - Show the current PHP version.
+    * `laravel_version` - Show the current Laravel version.
     * [`symfony2_tests`](#symfony2_tests) - Show a ratio of test classes vs code classes for Symfony2.
     * `symfony2_version` - Show the current Symfony2 version, if you are in a Symfony2-Project dir.
 * **Python Segments:**
@@ -130,10 +131,13 @@ The segments that are currently available are:
     * [`chruby`](#chruby) - Ruby environment information using `chruby` (if one is active).
     * [`rbenv`](#rbenv) - Ruby environment information using `rbenv` (if one is active).
     * [`rspec_stats`](#rspec_stats) - Show a ratio of test classes vs code classes for RSpec.
+    * `rvm` - Ruby environment information using `$GEM_HOME` and `$MY_RUBY_HOME` (if one is active).
 * **Rust Segments:**
     * `rust_version` - Display the current rust version and [logo](https://www.rust-lang.org/logos/rust-logo-blk.svg).
 * **Swift Segments:**
     * `swift_version` - Show the version number of the installed Swift.
+* **Java Segments:**
+    * `java_version` - Show the current Java version.
 
 **Cloud Segments:**
 * **AWS Segments:**
@@ -213,8 +217,10 @@ You can also change the battery icon automatically depending on the battery
 level. This will override the default battery icon. In order to do this, you
 need to define the `POWERLEVEL9k_BATTERY_STAGES` variable.
 
-| Variable | Default Value | Description |
-| `POWERLEVEL9K_BATTERY_STAGES`|Unset|A string or array, which each index indicates a charge level.|
+
+| Variable                      | Default Value | Description                                                   |
+|-------------------------------|---------------|---------------------------------------------------------------|
+| `POWERLEVEL9K_BATTERY_STAGES` | Unset         | A string or array, which each index indicates a charge level. |
 
 Powerlevel9k will use each index of the string or array as a stage to indicate battery
 charge level, progressing from left to right. You can provide any number of
@@ -254,10 +260,23 @@ As with the battery stages, you can use any number of colors and Powerlevel9k
 will automatically use all of them appropriately.
 
 Some example settings:
-|Brightness|Possible Array|
-|Bright Colors|(red1 orangered1 darkorange orange1 gold1 yellow1 yellow2 greenyellow chartreuse1 chartreuse2 green1)|
-|Normal Colors|(red3 darkorange3 darkgoldenrod gold3 yellow3 chartreuse2 mediumspringgreen green3 green3 green4 darkgreen)|
-|Subdued Colors|(darkred orange4 yellow4 yellow4 chartreuse3 green3 green4 darkgreen)|
+
+| Brightness     | Possible Array                                                                                                |
+|----------------|---------------------------------------------------------------------------------------------------------------|
+| Bright Colors  | `(red1 orangered1 darkorange orange1 gold1 yellow1 yellow2 greenyellow chartreuse1 chartreuse2 green1)`       |
+| Normal Colors  | `(red3 darkorange3 darkgoldenrod gold3 yellow3 chartreuse2 mediumspringgreen green3 green3 green4 darkgreen)` |
+| Subdued Colors | `(darkred orange4 yellow4 yellow4 chartreuse3 green3 green4 darkgreen)`                                       |
+
+##### chruby
+
+This segment shows the version of Ruby being used when using `chruby` to change your current Ruby stack.
+
+It uses `$RUBY_ENGINE` and `$RUBY_VERSION` as set by `chruby`.
+
+| Variable | Default Value | Description |
+|----------|---------------|-------------|
+|`POWERLEVEL9K_CHRUBY_SHOW_ENGINE`|true|Show the currently selected Ruby engine (e.g. `ruby`, `jruby`, `rbx`, etc)
+|`POWERLEVEL9K_CHRUBY_SHOW_VERSION`|true|Shows the currently selected engine's version (e.g. `2.5.1`)
 
 ##### command_execution_time
 
@@ -499,7 +518,7 @@ segment will not be displayed.
 
 | Variable | Default Value | Description |
 |----------|---------------|-------------|
-|`POWERLEVEL9K_PUBLIC_IP_FILE`|'/tmp/p8k_public_ip'|This is the file your public IP is cached in.|
+|`POWERLEVEL9K_PUBLIC_IP_FILE`|'/tmp/p9k_public_ip'|This is the file your public IP is cached in.|
 |`POWERLEVEL9K_PUBLIC_IP_HOST`|'http://ident.me'|This is the default host to get your public IP.|
 |`POWERLEVEL9K_PUBLIC_IP_TIMEOUT`|300|The amount of time in seconds between refreshing your cached IP.|
 |`POWERLEVEL9K_PUBLIC_IP_METHODS`|(dig curl wget)| These methods in that order are used to refresh your IP.|
@@ -537,6 +556,10 @@ It figures out the version being used by taking the output of the `rbenv version
 Variable | Default Value | Description |
 |----------|---------------|-------------|
 |`POWERLEVEL9K_RBENV_ALWAYS`|'false'|Always show the `rbenv` segment, even if the local version matches the global.|
+
+| Variable | Default Value | Description |
+|----------|---------------|-------------|
+|`POWERLEVEL9K_RBENV_PROMPT_ALWAYS_SHOW`|`false`|Set to true if you wish to show the rbenv segment even if the current Ruby version is the same as the global Ruby version|
 
 ##### rspec_stats
 
@@ -636,6 +659,31 @@ from the [Installation](#Installation) section above.
 | None         |  None               | ![icon_commit](https://cloud.githubusercontent.com/assets/1544760/7976088/b58f4e50-0a76-11e5-9e70-86450d937030.gif)2c3705 | The current commit hash. Here "2c3705"
 | None         |  None               | ![icon_git](https://cloud.githubusercontent.com/assets/1544760/7976092/b5909f80-0a76-11e5-9950-1438b9d72465.gif) | Repository is a git repository
 | None         |  None               | ![icon_mercurial](https://cloud.githubusercontent.com/assets/1544760/7976090/b5908da6-0a76-11e5-8c91-452b6e73f631.gif) | Repository is a Mercurial repository
+
+##### vcs truncation
+
+You can limit the branch name to a certain length by truncating long names.
+Customizations available are:
+
+| Variable | Default Value | Description |
+|----------|---------------|-------------|
+|`POWERLEVEL9K_VCS_SHORTEN_LENGTH`|None|This field determines how many characters to show.|
+|`POWERLEVEL9K_VCS_SHORTEN_MIN_LENGTH`|None|This field determines minimum branch length. Branch name will be truncated if its length greater than this field.|
+|`POWERLEVEL9K_VCS_SHORTEN_STRATEGY`|None|This field determines how branch name should be truncated. See the table below for more information.|
+|`POWERLEVEL9K_SHORTEN_DELIMITER`|`...`|Delimiter to use in truncated strings. This can be any string you choose, including an empty string if you wish to have no delimiter.|
+
+| Strategy Name | Description |
+|---------------|-------------|
+|`truncate_middle`|Truncates the middle part of a branch. E.g. branch name is `1234-super_super_long_branch_name`, then it will truncated to `1234-..._name`, if `POWERLEVEL9K_VCS_SHORTEN_LENGTH=5` is also set (controls the amount of characters to be left).|
+|`truncate_from_right`|Just leaves the beginning of a branch name untouched. E.g. branch name will be truncated like so: `1234-...`. How many characters will be untouched is controlled by `POWERLEVEL9K_VCS_SHORTEN_LENGTH`.|
+
+For example, if you want to truncate `1234-super_super_long_branch_name` to `1234-..` and don't do it with `development`:
+```zsh
+POWERLEVEL9K_VCS_SHORTEN_LENGTH=4
+POWERLEVEL9K_VCS_SHORTEN_MIN_LENGTH=11
+POWERLEVEL9K_VCS_SHORTEN_STRATEGY="truncate_from_right"
+POWERLEVEL9K_VCS_SHORTEN_DELIMITER=".."
+```
 
 ##### vi_mode
 

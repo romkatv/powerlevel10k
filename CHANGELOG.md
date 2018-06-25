@@ -1,3 +1,9 @@
+## next
+
+### New Segment: `laravel_version`
+
+Displays the current laravel version.
+
 ## v0.6.4
 
 - `load` segment now has configurable averages.

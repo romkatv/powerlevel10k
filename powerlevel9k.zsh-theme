@@ -156,12 +156,14 @@ left_prompt_segment() {
   if [[ -n $6 ]]; then
     visual_identifier="$(print_icon $6)"
     if [[ -n "$visual_identifier" ]]; then
+      # Add an whitespace if we print more than just the visual identifier.
+      # To avoid cutting off the visual identifier in some terminal emulators (e.g., Konsole, st),
+      # we need to color both the visual identifier and the whitespace.
+      [[ -n "$5" ]] && visual_identifier="$visual_identifier "
       # Allow users to overwrite the color for the visual identifier only.
       local visual_identifier_color_variable=POWERLEVEL9K_${(U)1#prompt_}_VISUAL_IDENTIFIER_COLOR
       set_default $visual_identifier_color_variable $4
       visual_identifier="%F{${(P)visual_identifier_color_variable}%}$visual_identifier%f"
-      # Add an whitespace if we print more than just the visual identifier
-      [[ -n "$5" ]] && visual_identifier="$visual_identifier "
     fi
   fi
 
@@ -222,6 +224,12 @@ right_prompt_segment() {
   [[ -n "$4" ]] && fg="$(foregroundColor $4)" || fg="$(foregroundColor)"
 
   # If CURRENT_RIGHT_BG is "NONE", we are the first right segment.
+
+  if [[ "$CURRENT_RIGHT_BG" != "NONE" ]]; then
+    # This is the closing whitespace for the previous segment
+    echo -n "${POWERLEVEL9K_WHITESPACE_BETWEEN_RIGHT_SEGMENTS}%f"
+  fi
+
   if [[ $joined == false ]] || [[ "$CURRENT_RIGHT_BG" == "NONE" ]]; then
     if isSameColor "$CURRENT_RIGHT_BG" "$3"; then
       # Middle segment with same color as previous segment
@@ -241,12 +249,14 @@ right_prompt_segment() {
   if [[ -n "$6" ]]; then
     visual_identifier="$(print_icon $6)"
     if [[ -n "$visual_identifier" ]]; then
+      # Add an whitespace if we print more than just the visual identifier.
+      # To avoid cutting off the visual identifier in some terminal emulators (e.g., Konsole, st),
+      # we need to color both the visual identifier and the whitespace.
+      [[ -n "$5" ]] && visual_identifier=" $visual_identifier"
       # Allow users to overwrite the color for the visual identifier only.
       local visual_identifier_color_variable=POWERLEVEL9K_${(U)1#prompt_}_VISUAL_IDENTIFIER_COLOR
       set_default $visual_identifier_color_variable $4
       visual_identifier="%F{${(P)visual_identifier_color_variable}%}$visual_identifier%f"
-      # Add an whitespace if we print more than just the visual identifier
-      [[ -n "$5" ]] && visual_identifier=" $visual_identifier"
     fi
   fi
 
@@ -258,7 +268,7 @@ right_prompt_segment() {
   # Print segment content if there is any
   [[ -n "$5" ]] && echo -n "${5}"
   # Print the visual identifier
-  echo -n "${visual_identifier}${POWERLEVEL9K_WHITESPACE_BETWEEN_RIGHT_SEGMENTS}%f"
+  echo -n "${visual_identifier}"
 
   CURRENT_RIGHT_BG=$3
   last_right_element_index=$current_index
@@ -487,16 +497,20 @@ prompt_battery() {
       [[ "${(t)POWERLEVEL9K_BATTERY_STAGES}" =~ "array" ]] && POWERLEVEL9K_BATTERY_ICON="$POWERLEVEL9K_BATTERY_STAGES[$offset]" || POWERLEVEL9K_BATTERY_ICON=${POWERLEVEL9K_BATTERY_STAGES:$offset:1}
     fi
   fi
-
-  # override the default color if we are using a color level array
-  if [[ -n "$POWERLEVEL9K_BATTERY_LEVEL_BACKGROUND" ]] && [[ "${(t)POWERLEVEL9K_BATTERY_LEVEL_BACKGROUND}" =~ "array" ]]; then
-    local segment=$(( 100.0 / (${#POWERLEVEL9K_BATTERY_LEVEL_BACKGROUND} - 1 ) ))
-    local offset=$(( ($bat_percent / $segment) + 1 ))
-    "$1_prompt_segment" "$0_${current_state}" "$2" "${POWERLEVEL9K_BATTERY_LEVEL_BACKGROUND[$offset]}" "${battery_states[$current_state]}" "${message}" "BATTERY_ICON"
-  else
-    # Draw the prompt_segment
-    "$1_prompt_segment" "$0_${current_state}" "$2" "${DEFAULT_COLOR}" "${battery_states[$current_state]}" "${message}" "BATTERY_ICON"
+  # return if POWERLEVEL9K_BATTERY_HIDE_ABOVE_THRESHOLD is set and the battery percentage is greater or equal
+  if [[ -v "POWERLEVEL9K_BATTERY_HIDE_ABOVE_THRESHOLD" && "${bat_percent}" -ge $POWERLEVEL9K_BATTERY_HIDE_ABOVE_THRESHOLD ]]; then
+    return
   fi
+
+    # override the default color if we are using a color level array
+    if [[ -n "$POWERLEVEL9K_BATTERY_LEVEL_BACKGROUND" ]] && [[ "${(t)POWERLEVEL9K_BATTERY_LEVEL_BACKGROUND}" =~ "array" ]]; then
+      local segment=$(( 100.0 / (${#POWERLEVEL9K_BATTERY_LEVEL_BACKGROUND} - 1 ) ))
+      local offset=$(( ($bat_percent / $segment) + 1 ))
+      "$1_prompt_segment" "$0_${current_state}" "$2" "${POWERLEVEL9K_BATTERY_LEVEL_BACKGROUND[$offset]}" "${battery_states[$current_state]}" "${message}" "BATTERY_ICON"
+    else
+      # Draw the prompt_segment
+      "$1_prompt_segment" "$0_${current_state}" "$2" "${DEFAULT_COLOR}" "${battery_states[$current_state]}" "${message}" "BATTERY_ICON"
+    fi
 }
 
 ################################################################
@@ -637,14 +651,14 @@ prompt_user() {
         "FOREGROUND_COLOR"    "yellow"
         "VISUAL_IDENTIFIER"   "ROOT_ICON"
       )
-    elif sudo -n true 2>/dev/null; then 
-      user_state=( 
-        "STATE"               "SUDO" 
-        "CONTENT"             "${POWERLEVEL9K_USER_TEMPLATE}" 
-        "BACKGROUND_COLOR"    "${DEFAULT_COLOR}" 
-        "FOREGROUND_COLOR"    "yellow" 
-        "VISUAL_IDENTIFIER"   "SUDO_ICON" 
-      ) 
+    elif sudo -n true 2>/dev/null; then
+      user_state=(
+        "STATE"               "SUDO"
+        "CONTENT"             "${POWERLEVEL9K_USER_TEMPLATE}"
+        "BACKGROUND_COLOR"    "${DEFAULT_COLOR}"
+        "FOREGROUND_COLOR"    "yellow"
+        "VISUAL_IDENTIFIER"   "SUDO_ICON"
+      )
     else
       user_state=(
         "STATE"               "DEFAULT"
@@ -895,7 +909,9 @@ prompt_dir() {
         fi
       ;;
       *)
-        current_path="$(print -P "%$((POWERLEVEL9K_SHORTEN_DIR_LENGTH+1))(c:$POWERLEVEL9K_SHORTEN_DELIMITER/:)%${POWERLEVEL9K_SHORTEN_DIR_LENGTH}c")"
+        if [[ $current_path != "~" ]]; then
+          current_path="$(print -P "%$((POWERLEVEL9K_SHORTEN_DIR_LENGTH+1))(c:$POWERLEVEL9K_SHORTEN_DELIMITER/:)%${POWERLEVEL9K_SHORTEN_DIR_LENGTH}c")"
+        fi
       ;;
     esac
   fi
@@ -909,10 +925,13 @@ prompt_dir() {
     "HOME"            "HOME_ICON"
     "HOME_SUBFOLDER"  "HOME_SUB_ICON"
     "NOT_WRITABLE"    "LOCK_ICON"
+    "ETC"             "ETC_ICON"
   )
   local state_path="$(print -P '%~')"
   local current_state="DEFAULT"
-  if [[ "${POWERLEVEL9K_DIR_SHOW_WRITABLE}" == true && ! -w "$PWD" ]]; then
+  if [[ $state_path == '/etc'* ]]; then
+    current_state='ETC'
+  elif [[ "${POWERLEVEL9K_DIR_SHOW_WRITABLE}" == true && ! -w "$PWD" ]]; then
     current_state="NOT_WRITABLE"
   elif [[ $state_path == '~' ]]; then
     current_state="HOME"
@@ -1097,6 +1116,18 @@ prompt_vpn_ip() {
 }
 
 ################################################################
+# Segment to display laravel version
+prompt_laravel_version() {
+  local laravel_version="$(php artisan --version 2>/dev/null)"
+  if [[ -n "${laravel_version}" ]]; then
+    # Remove unrelevant infos
+    laravel_version="${laravel_version//Laravel Framework version /}"
+
+    "$1_prompt_segment" "$0" "$2" "maroon" "white" "${laravel_version}" 'LARAVEL_ICON'
+  fi
+}
+
+################################################################
 # Segment to display load
 set_default POWERLEVEL9K_LOAD_WHICH 5
 prompt_load() {
@@ -1229,19 +1260,21 @@ prompt_ram() {
   "$1_prompt_segment" "$0" "$2" "yellow" "$DEFAULT_COLOR" "$(printSizeHumanReadable "$ramfree" $base)" 'RAM_ICON'
 }
 
-################################################################
-# Segment to display rbenv information
-set_default POWERLEVEL9K_RBENV_ALWAYS false
+
+set_default POWERLEVEL9K_RBENV_PROMPT_ALWAYS_SHOW false
+# rbenv information
 prompt_rbenv() {
-  if which rbenv 2>/dev/null >&2; then
+  if command which rbenv 2>/dev/null >&2; then
     local rbenv_version_name="$(rbenv version-name)"
     local rbenv_global="$(rbenv global)"
 
     # Don't show anything if the current Ruby is the same as the global Ruby
-    # unless `POWERLEVEL9K_RBENV_ALWAYS` is set.
-    if [[ $POWERLEVEL9K_RBENV_ALWAYS == true || $rbenv_version_name != $rbenv_global ]];then
-      "$1_prompt_segment" "$0" "$2" "red" "$DEFAULT_COLOR" "$rbenv_version_name" 'RUBY_ICON'
+    # unless `POWERLEVEL9K_RBENV_PROMPT_ALWAYS_SHOW` is set.
+    if [[ $rbenv_version_name == $rbenv_global && "$POWERLEVEL9K_RBENV_PROMPT_ALWAYS_SHOW" = false ]]; then
+      return
     fi
+
+    "$1_prompt_segment" "$0" "$2" "red" "$DEFAULT_COLOR" "$rbenv_version_name" 'RUBY_ICON'
   fi
 }
 
@@ -1249,11 +1282,24 @@ prompt_rbenv() {
 # Segment to display chruby information
 # see https://github.com/postmodern/chruby/issues/245 for chruby_auto issue with ZSH
 prompt_chruby() {
-  local chruby_env
-  chrb_env="$(chruby 2> /dev/null | grep \* | tr -d '* ')"
+  # Uses $RUBY_VERSION and $RUBY_ENGINE set by chruby
+  set_default POWERLEVEL9K_CHRUBY_SHOW_VERSION true
+  set_default POWERLEVEL9K_CHRUBY_SHOW_ENGINE true
+  local chruby_label=""
+
+  if [[ "$POWERLEVEL9K_CHRUBY_SHOW_ENGINE" == true ]]; then
+    chruby_label+="$RUBY_ENGINE "
+  fi
+  if [[ "$POWERLEVEL9K_CHRUBY_SHOW_VERSION" == true ]]; then
+    chruby_label+="$RUBY_VERSION"
+  fi
+
+  # Truncate trailing spaces
+  chruby_label="${chruby_label%"${chruby_label##*[![:space:]]}"}"
+
   # Don't show anything if the chruby did not change the default ruby
-  if [[ "${chrb_env:-system}" != "system" ]]; then
-    "$1_prompt_segment" "$0" "$2" "red" "$DEFAULT_COLOR" "${chrb_env}" 'RUBY_ICON'
+  if [[ "$RUBY_ENGINE" != "" ]]; then
+    "$1_prompt_segment" "$0" "$2" "red" "$DEFAULT_COLOR" "${chruby_label}" 'RUBY_ICON'
   fi
 }
 
@@ -1269,15 +1315,18 @@ prompt_root_indicator() {
 # Segment to display Rust version number
 prompt_rust_version() {
   local rust_version
-  rust_version=$(rustc --version 2>&1 | grep -oe "^rustc\s*[^ ]*" | grep -o '[0-9.a-z\\\-]*$')
+  rust_version=$(command rustc --version 2>/dev/null)
+  # Remove "rustc " (including the whitespace) from the beginning
+  # of the version string and remove everything after the next
+  # whitespace. This way we'll end up with only the version.
+  rust_version=${${rust_version/rustc /}%% *}
 
   if [[ -n "$rust_version" ]]; then
-    "$1_prompt_segment" "$0" "$2" "darkorange" "$DEFAULT_COLOR" "Rust $rust_version" 'RUST_ICON'
+    "$1_prompt_segment" "$0" "$2" "darkorange" "$DEFAULT_COLOR" "$rust_version" 'RUST_ICON'
   fi
 }
 
-################################################################
-# Segment to display RSpec test ratio
+# RSpec test ratio
 prompt_rspec_stats() {
   if [[ (-d app && -d spec) ]]; then
     local code_amount tests_amount
@@ -1337,8 +1386,13 @@ prompt_status() {
   local ec
 
   if [[ $POWERLEVEL9K_STATUS_SHOW_PIPESTATUS == true ]]; then
-    ec_text=$(exit_code_or_status "${RETVALS[1]}")
-    ec_sum=${RETVALS[1]}
+    if (( $#RETVALS > 1 )); then
+      ec_text=$(exit_code_or_status "${RETVALS[1]}")
+      ec_sum=${RETVALS[1]}
+    else
+      ec_text=$(exit_code_or_status "${RETVAL}")
+      ec_sum=${RETVAL}
+    fi
 
     for ec in "${(@)RETVALS[2,-1]}"; do
       ec_text="${ec_text}|$(exit_code_or_status "$ec")"
@@ -1654,7 +1708,21 @@ prompt_dropbox() {
 
     "$1_prompt_segment" "$0" "$2" "white" "blue" "$dropbox_status" "DROPBOX_ICON"
   fi
+}
 
+# print Java version number
+prompt_java_version() {
+  local java_version
+  # Stupid: Java prints its version on STDERR.
+  # The first version ouput will print nothing, we just
+  # use it to transport whether the command was successful.
+  # If yes, we parse the version string (and need to
+  # redirect the stderr to stdout to make the pipe work).
+  java_version=$(java -version 2>/dev/null && java -fullversion 2>&1 | cut -d '"' -f 2)
+
+  if [[ -n "$java_version" ]]; then
+    "$1_prompt_segment" "$0" "$2" "red" "white" "$java_version" "JAVA_ICON"
+  fi
 }
 
 ################################################################
@@ -1700,6 +1768,9 @@ build_right_prompt() {
 
     index=$((index + 1))
   done
+
+  # Clear to the end of the line
+  echo -n "%E"
 }
 
 powerlevel9k_preexec() {
@@ -1740,7 +1811,7 @@ $(print_icon 'MULTILINE_LAST_PROMPT_PREFIX')'
   fi
 
   if [[ "$POWERLEVEL9K_DISABLE_RPROMPT" != true ]]; then
-    RPROMPT='$RPROMPT_PREFIX%f%b%k$(build_right_prompt)%{$reset_color%}$RPROMPT_SUFFIX'
+    RPROMPT="${RPROMPT_PREFIX}"'%f%b%k$(build_right_prompt)%{$reset_color%}'"${RPROMPT_SUFFIX}"
   fi
 
 local NEWLINE='
