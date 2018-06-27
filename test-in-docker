@@ -25,7 +25,7 @@ typeset -aU frameworks
 frameworks=( docker/*/Dockerfile(N.on:h:t) )
 for i in {$#frameworks..1}; do
   # Remove all base entries
-  [[ "${frameworks[$i]}" = base-* ]] && frameworks[$i]=()
+  [[ "${frameworks[$i]}" == base-* ]] && frameworks[$i]=()
 done
 typeset -r frameworks
 
