@@ -16,16 +16,18 @@ term=screen-256color
 # ...see Modifiers in zshexpn(1) for details.
 
 # List of ZSH versions
-typeset -a versions
+typeset -aU versions
 versions=( docker/base-*/Dockerfile(N.on:h:t:s/base-//) )
+typeset -r versions
 
 # List of frameworks
-typeset -a frameworks
+typeset -aU frameworks
 frameworks=( docker/*/Dockerfile(N.on:h:t) )
 for i in {$#frameworks..1}; do
   # Remove all base entries
   [[ "${frameworks[$i]}" = base-* ]] && frameworks[$i]=()
 done
+typeset -r frameworks
 
 # Known Issues
 typeset -A known_issues
@@ -34,6 +36,7 @@ known_issues["4.3.11-zim"]="BROKEN: Zim wants ZSH 5.2 or newer."
 known_issues["5.0.3-zim"]="DEPRECATED: Zim wants ZSH 5.2 or newer."
 known_issues["5.1.1-zim"]="DEPRECATED: Zim wants ZSH 5.2 or newer."
 known_issues["4.3.11-zulu"]="Zulu doesn't work; it needs a newer version of git."
+typeset -r known_issues
 
 err()
 {
@@ -177,6 +180,8 @@ while (( $# > 0 )); do
   esac
   shift
 done
+
+typeset -r use_version use_framework
 
 build_and_run "$use_version" "$use_framework"
 
