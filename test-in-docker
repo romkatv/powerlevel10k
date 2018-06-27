@@ -21,7 +21,10 @@ versions=( docker/base-*/Dockerfile(N.on:h:t:s/base-//) )
 # List of frameworks
 typeset -a frameworks
 frameworks=( docker/*/Dockerfile(N.on:h:t) )
-frameworks=${(@)frameworks:#base-*}
+for i in {$#frameworks..1}; do
+  # Remove all base entries
+  [[ "${frameworks[$i]}" = base-* ]] && frameworks[$i]=()
+done
 
 # Known Issues
 typeset -A known_issues
