@@ -72,6 +72,14 @@ check_for_known_issues() {
   fi
 }
 
+cmd() {
+  if (( dry_run )); then
+    echo "${(@q)*}" 1>&2
+  else
+    "${(@)*}"
+  fi
+}
+
 build_and_run() {
   local version="$1"
   local framework="$2"
@@ -82,14 +90,14 @@ build_and_run() {
   print -P "%F{green}Preparing containers...%f"
 
   echo -n "p9k:base-${version}: "
-  docker build \
+  cmd docker build \
     --quiet \
     --tag "p9k:base-${version}" \
     --file "docker/base-${version}/Dockerfile" \
     .
 
   echo -n "p9k:${version}-${framework}: "
-  docker build \
+  cmd docker build \
     --quiet \
     --build-arg="base=base-${version}" \
     --tag "p9k:${version}-${framework}" \
@@ -97,7 +105,7 @@ build_and_run() {
     .
 
   print -P "%F{green}Starting ${name} container...%f"
-  exec docker run \
+  cmd docker run \
     --rm \
     --interactive \
     --tty \
@@ -112,9 +120,10 @@ show_help() {
   echo
   echo "Loads up a docker image with powershell9k configured in <framework>"
   echo
-  echo "  --frameworks  Lists all available frameworks, newline separated."
-  echo "  --versions    Lists all available ZSH versions, newline separated."
-  echo "  --zsh VER     Uses ZSH with version VER."
+  echo "  -f --frameworks  Lists all available frameworks, newline separated."
+  echo "  -v --versions    Lists all available ZSH versions, newline separated."
+  echo "  -z --zsh VER     Uses ZSH with version VER."
+  echo "  -n --dry-run     Just prints the docker commands that would be run."
   echo "  --help        You're soaking in it."
   echo
   echo "ZSH versions:"
@@ -137,6 +146,7 @@ fi
 # Parse flags and such.
 use_version=$default_version
 use_framework=
+dry_run=0
 while (( $# > 0 )); do
   case "$1" in
     -f | --frameworks )
@@ -156,6 +166,7 @@ while (( $# > 0 )); do
         err "No such ZSH version '${1}'"
       fi
       ;;
+    -n | --dry-run ) dry_run=1 ;;
     -h | --help )
       show_help
       exit
@@ -181,7 +192,7 @@ while (( $# > 0 )); do
   shift
 done
 
-typeset -r use_version use_framework
+typeset -r use_version use_framework dry_run
 
 build_and_run "$use_version" "$use_framework"
 
