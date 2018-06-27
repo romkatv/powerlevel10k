@@ -6,6 +6,7 @@ set -eu
 default_version='4.3.11'
 
 setopt extended_glob glob_subst numeric_glob_sort
+setopt warn_create_global warn_nested_var 2> /dev/null
 cd "${${(%):-%x}:A:h}"
 
 # TODO: Crazy Logic to munge TERM to something supported in Ubuntu 14.04
