@@ -2,8 +2,9 @@
 
 set -eu
 
-# The default ZSH to use.
-default_version='4.3.11'
+# The default ZSH to use; it can just be the first few characters.
+# This should be the oldest version we support.
+default_version='4.'
 
 setopt extended_glob glob_subst numeric_glob_sort
 setopt warn_create_global warn_nested_var 2> /dev/null
@@ -144,8 +145,8 @@ if (( $# == 0 )); then
 fi
 
 # Parse flags and such.
-use_version=$default_version
-use_framework=
+asked_for_version=$default_version
+asked_for_framework=
 dry_run=0
 while (( $# > 0 )); do
   case "$1" in
@@ -159,12 +160,7 @@ while (( $# > 0 )); do
       ;;
     -z | --zsh )
       shift
-      local v="$(resolve_version "$1")"
-      if [[ -n "$v" ]]; then
-        use_version=$v
-      else
-        err "No such ZSH version '${1}'"
-      fi
+      asked_for_version=$1
       ;;
     -n | --dry-run ) dry_run=1 ;;
     -h | --help )
@@ -177,22 +173,27 @@ while (( $# > 0 )); do
       exit 1
       ;;
     * )
-      if [[ -z "$use_framework" ]]; then
-        local f="$(resolve_framework "$1")"
-        if [[ -n "$f" ]]; then
-          use_framework=$f
-        else
-          err "No such framework '${1}'"
-        fi
+      if [[ -z "$asked_for_framework" ]]; then
+        asked_for_framework=$1
       else
-        err "You can only specify one framework at a time; you already specified '${use_framework}'"
+        err "You can only specify one framework at a time; you already specified '${asked_for_framework}'"
       fi
       ;;
   esac
   shift
 done
 
-typeset -r use_version use_framework dry_run
+typeset -r asked_for_version asked_for_framework
+
+typeset -r use_version="$(resolve_version "${asked_for_version}")"
+if [[ -z "$use_version" ]]; then
+  err "No such ZSH version '${asked_for_version}'"
+fi
+
+typeset -r use_framework="$(resolve_framework "${asked_for_framework}")"
+if [[ -z "$use_framework" ]]; then
+  err "No such framework '${asked_for_framework}'"
+fi
 
 build_and_run "$use_version" "$use_framework"
 
