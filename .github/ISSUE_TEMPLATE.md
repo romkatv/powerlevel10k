@@ -12,3 +12,6 @@ questions:
   - Which font do you use (for font related issues)?
   - Which powerlevel9k mode do you use (`echo $POWERLEVEL9K_MODE`)?
   - For font issues: Could you post the output of `debug/font-issues.zsh`?
+
+Please also have a look at the [troubleshooting guide](https://github.com/bhilburn/powerlevel9k/wiki/Troubleshooting)
+which solves the most common problems.
