@@ -1,4 +1,24 @@
-## next
+## v0.6.5
+
+- Multiple PRs: General fixes to README, improved documentation.
+- Multiple PRs: Improvements to icons / glyphs.
+- PR #777: now possible to always show the Ruby env segment.
+- PR #773: Fixed issue with home abbreviation in directory segment.
+- PR #789: Now properly working around some odd ZSH status return codes.
+- PR #716: Now possible to configure the colors of the VCS segment in rebase mode.
+- PR #722: Removed dependency on `bc` for `load` segment.
+- PR #686: Fixed issue where whitespaces in path occasionally broke `dir` segment.
+- PR #685: No longer accidentally invoking user `grep` aliases.
+- PR #680: Using env variable for `PYENV` properly, now.
+- PR #676, #611: Fixes for Kubernetes segment.
+- PR #667: Supporting multiple AWS profiles.
+- PR #660: Fixing directory parsing issue with PYTHONPATH.
+- PR #663: Fixed silly issues causing ZSH warnings.
+- PR #647: Fixing `public_ip` segment for macOS.
+- PR #643: Fixing `vpn_ip` segment naming.
+- PR #636: `context` segment now grabs user with command rather than env.
+- PR #618: Fix issue where `su -` didn't change context segment.
+- PR #608: Load average selection in `load` segment.
 
 ### New Segment: `laravel_version`
 
