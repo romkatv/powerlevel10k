@@ -86,7 +86,7 @@ case $(uname) in
       OS='OSX'
       OS_ICON=$(print_icon 'APPLE_ICON')
       ;;
-    CYGWIN_NT-*)
+    CYGWIN_NT-* | MSYS_NT-*)
       OS='Windows'
       OS_ICON=$(print_icon 'WINDOWS_ICON')
       ;;
