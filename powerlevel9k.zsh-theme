@@ -1429,7 +1429,7 @@ prompt_kubecontext() {
 
     local k8s_final_text=""
 
-    if [[ "$k8s_context" == "k8s_namespace" ]]; then
+    if [[ "$k8s_context" == "$k8s_namespace" ]]; then
       # No reason to print out the same identificator twice
       k8s_final_text="$k8s_context"
     else
