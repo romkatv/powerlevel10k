@@ -1260,11 +1260,11 @@ prompt_ram() {
   "$1_prompt_segment" "$0" "$2" "yellow" "$DEFAULT_COLOR" "$(printSizeHumanReadable "$ramfree" $base)" 'RAM_ICON'
 }
 
-
+################################################################
+# Segment to display rbenv information
 set_default POWERLEVEL9K_RBENV_PROMPT_ALWAYS_SHOW false
-# rbenv information
 prompt_rbenv() {
-  if command which rbenv 2>/dev/null >&2; then
+  if ! [ -x "$(command -v rbenv)" ]; then
     local rbenv_version_name="$(rbenv version-name)"
     local rbenv_global="$(rbenv global)"
 
@@ -1628,11 +1628,21 @@ prompt_virtualenv() {
 }
 
 ################################################################
-# pyenv: current active python version (with restrictions)
+# Segment to display pyenv information
 # https://github.com/pyenv/pyenv#choosing-the-python-version
+set_default POWERLEVEL9K_PYENV_PROMPT_ALWAYS_SHOW false
 prompt_pyenv() {
-  if [[ -n "$PYENV_VERSION" ]]; then
-    "$1_prompt_segment" "$0" "$2" "blue" "$DEFAULT_COLOR" "$PYENV_VERSION" 'PYTHON_ICON'
+  if ! [ -x "$(command -v pyenv)" ]; then
+    if [[ -n "$PYENV_VERSION" ]]; then
+      "$1_prompt_segment" "$0" "$2" "blue" "$DEFAULT_COLOR" "$PYENV_VERSION" 'PYTHON_ICON'
+    else
+      local pyenv_version_name="$(pyenv version-name)"
+      local pyenv_global="$(pyenv version-file-read $(pyenv root)/version)"
+      if [[ $pyenv_version_name == $pyenv_global && "$POWERLEVEL9K_PYENV_PROMPT_ALWAYS_SHOW" = false ]]; then
+        return
+      fi
+      "$1_prompt_segment" "$0" "$2" "blue" "$DEFAULT_COLOR" "$pyenv_version_name" 'PYTHON_ICON'
+    fi
   fi
 }
 
