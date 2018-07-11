@@ -357,6 +357,17 @@ end of the hostname.
 |`POWERLEVEL9K_ALWAYS_SHOW_USER`|false|Always show the username, but conditionalize the hostname.|
 |`POWERLEVEL9K_CONTEXT_TEMPLATE`|%n@%m|Default context prompt (username@machine). Refer to the [ZSH Documentation](http://zsh.sourceforge.net/Doc/Release/Prompt-Expansion.html) for all possible expansions, including deeper host depths.|
 
+This segment can have different states. They might help you to visualize your
+different priviledges. Read more about styling with states [here](https://github.com/bhilburn/powerlevel9k/wiki/Stylizing-Your-Prompt#special-segment-colors).
+
+| State         | Meaning                                                  |
+|---------------|----------------------------------------------------------|
+| `DEFAULT`     |                                                          |
+| `ROOT`        | You are logged in as root                                |
+| `SUDO`        | You still have elevated rights                           |
+| `REMOTE_SUDO` | You are SSH'ed in vour machine and have elevated rights  |
+| `REMOTE`      | You SSH'ed in your machine                               |
+
 ##### date
 
 The `date` segment shows the current system date.
