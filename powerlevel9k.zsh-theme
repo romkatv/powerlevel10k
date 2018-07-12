@@ -1779,10 +1779,16 @@ powerlevel9k_preexec() {
 
 set_default POWERLEVEL9K_PROMPT_ADD_NEWLINE false
 powerlevel9k_prepare_prompts() {
-  local RETVAL RPROMPT_PREFIX RPROMPT_SUFFIX
+  # Return values. These need to be global, because
+  # they are used in prompt_status. Also, we need
+  # to get the return value of the last command at
+  # very first in this function. Do not move the
+  # lines down, otherwise the last command is not
+  # what you expected it to be.
   RETVAL=$?
   RETVALS=( "$pipestatus[@]" )
 
+  local RPROMPT_SUFFIX RPROMPT_PREFIX
   _P9K_COMMAND_DURATION=$((EPOCHREALTIME - _P9K_TIMER_START))
 
   # Reset start time
