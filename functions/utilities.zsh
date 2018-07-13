@@ -9,9 +9,7 @@
 # Exits with 0 if a variable has been previously defined (even if empty)
 # Takes the name of a variable that should be checked.
 function defined() {
-  local varname="$1"
-
-  typeset -p "$varname" > /dev/null 2>&1
+  [[ ! -z "${(tP)1}" ]]
 }
 
 # Given the name of a variable and a default value, sets the variable
