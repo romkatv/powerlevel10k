@@ -1264,7 +1264,7 @@ prompt_ram() {
 # Segment to display rbenv information
 set_default POWERLEVEL9K_RBENV_PROMPT_ALWAYS_SHOW false
 prompt_rbenv() {
-  if ! [ -x "$(command -v rbenv)" ]; then
+  if [ $commands[rbenv] ]; then
     local rbenv_version_name="$(rbenv version-name)"
     local rbenv_global="$(rbenv global)"
 
@@ -1632,7 +1632,7 @@ prompt_virtualenv() {
 # https://github.com/pyenv/pyenv#choosing-the-python-version
 set_default POWERLEVEL9K_PYENV_PROMPT_ALWAYS_SHOW false
 prompt_pyenv() {
-  if ! [ -x "$(command -v pyenv)" ]; then
+  if [ $commands[pyenv] ]; then
     if [[ -n "$PYENV_VERSION" ]]; then
       "$1_prompt_segment" "$0" "$2" "blue" "$DEFAULT_COLOR" "$PYENV_VERSION" 'PYTHON_ICON'
     else
