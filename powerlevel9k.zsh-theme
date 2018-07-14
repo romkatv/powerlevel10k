@@ -1270,7 +1270,7 @@ prompt_rbenv() {
   elif [ $commands[rbenv] ]; then
     local rbenv_version_name="$(rbenv version-name)"
     local rbenv_global="$(rbenv global)"
-    if ! [[ $rbenv_version_name == $rbenv_global && "$POWERLEVEL9K_RBENV_PROMPT_ALWAYS_SHOW" = false ]]; then
+    if [[ "${rbenv_version_name}" != "${rbenv_global}" || "${POWERLEVEL9K_RBENV_PROMPT_ALWAYS_SHOW}" == "true" ]]; then
       "$1_prompt_segment" "$0" "$2" "red" "$DEFAULT_COLOR" "$rbenv_version_name" 'RUBY_ICON'
     fi
   fi
@@ -1635,7 +1635,7 @@ prompt_pyenv() {
   elif [ $commands[pyenv] ]; then
     local pyenv_version_name="$(pyenv version-name)"
     local pyenv_global="$(pyenv version-file-read $(pyenv root)/version)"
-    if ! [[ $pyenv_version_name == $pyenv_global && "$POWERLEVEL9K_PYENV_PROMPT_ALWAYS_SHOW" = false ]]; then
+    if [[ "${pyenv_version_name}" != "${pyenv_global}" || "${POWERLEVEL9K_PYENV_PROMPT_ALWAYS_SHOW}" == "true" ]]; then
       "$1_prompt_segment" "$0" "$2" "blue" "$DEFAULT_COLOR" "$pyenv_version_name" 'PYTHON_ICON'
     fi
   fi
