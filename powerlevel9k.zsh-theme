@@ -1118,11 +1118,10 @@ prompt_vpn_ip() {
 ################################################################
 # Segment to display laravel version
 prompt_laravel_version() {
-  local laravel_version="$(php artisan --version 2>/dev/null)"
+  local laravel_version="$(php artisan --version 2>&1 | grep -oe '^Laravel Framework [0-9.]*')"
   if [[ -n "${laravel_version}" ]]; then
-    # Remove unrelevant infos
-    laravel_version="${laravel_version//Laravel Framework version /}"
-
+    # Strip out everything but the version
+    laravel_version="${laravel_version//Laravel Framework /}"
     "$1_prompt_segment" "$0" "$2" "maroon" "white" "${laravel_version}" 'LARAVEL_ICON'
   fi
 }
