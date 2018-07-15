@@ -74,14 +74,4 @@ before_script:
   - "zsh --version"
 
 script:
-  - test/powerlevel9k.spec
-  - test/functions/utilities.spec
-  - test/functions/colors.spec
-  - test/functions/icons.spec
-  - test/segments/command_execution_time.spec
-  - test/segments/dir.spec
-  - test/segments/rust_version.spec
-  - test/segments/go_version.spec
-  - test/segments/vcs.spec
-  - test/segments/kubecontext.spec
-  - test/segments/laravel_version.spec
+  - test/suite.spec
