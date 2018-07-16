@@ -4,6 +4,8 @@
 local failed=false
 
 for test in **/*.spec; do
+    echo
+    echo "Now executing ${test}"
     if [[ "${test}" == "test/suite.spec" ]]; then
         continue;
     fi
