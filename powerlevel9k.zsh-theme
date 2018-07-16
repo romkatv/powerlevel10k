@@ -409,12 +409,13 @@ prompt_battery() {
     'charged'       'green'
     'disconnected'  "$DEFAULT_COLOR_INVERTED"
   )
+  local ROOT_PREFIX="${4}"
   # Set default values if the user did not configure them
   set_default POWERLEVEL9K_BATTERY_LOW_THRESHOLD  10
 
-  if [[ $OS =~ OSX && -f /usr/bin/pmset && -x /usr/bin/pmset ]]; then
+  if [[ $OS =~ OSX && -f "${ROOT_PREFIX}"/usr/bin/pmset && -x "${ROOT_PREFIX}"/usr/bin/pmset ]]; then
     # obtain battery information from system
-    local raw_data="$(pmset -g batt | awk 'FNR==2{print}')"
+    local raw_data="$(${ROOT_PREFIX}/usr/bin/pmset -g batt | awk 'FNR==2{print}')"
     # return if there is no battery on system
     [[ -z $(echo $raw_data | grep "InternalBattery") ]] && return
 
@@ -446,7 +447,7 @@ prompt_battery() {
   fi
 
   if [[ "$OS" == 'Linux' ]] || [[ "$OS" == 'Android' ]]; then
-    local sysp="/sys/class/power_supply"
+    local sysp="${ROOT_PREFIX}/sys/class/power_supply"
 
     # Reported BAT0 or BAT1 depending on kernel version
     [[ -a $sysp/BAT0 ]] && local bat=$sysp/BAT0
@@ -468,8 +469,8 @@ prompt_battery() {
       [[ $bat_percent =~ 100 ]] && current_state="charged"
       [[ $bat_percent -lt 100 ]] && current_state="charging"
     fi
-    if [[ -f /usr/bin/acpi ]]; then
-      local time_remaining=$(acpi | awk '{ print $5 }')
+    if [[ -f ${ROOT_PREFIX}/usr/bin/acpi ]]; then
+      local time_remaining=$(${ROOT_PREFIX}/usr/bin/acpi | awk '{ print $5 }')
       if [[ $time_remaining =~ rate ]]; then
         local tstring="..."
       elif [[ $time_remaining =~ "[[:digit:]]+" ]]; then
