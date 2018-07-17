@@ -745,6 +745,38 @@ prompt_command_execution_time() {
 }
 
 ################################################################
+# Determine the home folder unique path - this is needed for
+# truncate_to_unique to work when P9K_DIR_PATH_ABSOLUTE is not
+# set the true.
+#
+local home_path=""
+getUniqueHomeFolder() {
+  if [[ "$home_path" == "" ]]; then
+    local trunc_path directory test_dir test_dir_length
+    local -a matching
+    local -a paths
+    local cur_path='/'
+    # the first time we run the script, the working directory *should* be the home folder
+    [[ -z $HOME ]] && paths=${PWD} || paths=$HOME
+    paths=(${(s:/:)paths})
+    for directory in ${paths[@]}; do
+      test_dir=''
+      for (( i=0; i < ${#directory}; i++ )); do
+        test_dir+="${directory:$i:1}"
+        matching=("$cur_path"/"$test_dir"*/)
+        if [[ ${#matching[@]} -eq 1 ]]; then
+          break
+        fi
+      done
+      trunc_path+="$test_dir/"
+      cur_path+="$directory/"
+    done
+    home_path="${trunc_path: : -1}"
+  fi
+}
+getUniqueHomeFolder
+
+################################################################
 # Dir: current working directory
 # Parameters:
 #   * $1 Alignment: string - left|right
@@ -811,12 +843,13 @@ prompt_dir() {
         # for each parent path component find the shortest unique beginning
         # characters sequence. Source: https://stackoverflow.com/a/45336078
         if (( ${#current_path} > 1 )); then # root and home are exceptions and won't have paths
-          local matching
+          local -a matching
           local cur_path='/'
-          [[ $current_path != "~"* ]] && trunc_path='/' || trunc_path=''
+          # we need to use absolute paths for this strategy to work correctly
+          paths=(${(s:/:)PWD})
           for directory in ${paths[@]}; do
             test_dir=''
-            for (( i=0; i<${#directory}; i++ )); do
+            for (( i=0; i < ${#directory}; i++ )); do
               test_dir+="${directory:$i:1}"
               matching=("$cur_path"/"$test_dir"*/)
               if [[ ${#matching[@]} -eq 1 ]]; then
@@ -826,7 +859,8 @@ prompt_dir() {
             trunc_path+="$test_dir/"
             cur_path+="$directory/"
           done
-          [[ $current_path == "~"* ]] && trunc_path="~/$trunc_path"
+          # cheating here to retain ~ as home folder
+          [[ $current_path == "~"* ]] && trunc_path="~${trunc_path//${home_path}/}" || trunc_path="/${trunc_path}"
           current_path="${trunc_path: : -1}"
         fi
       ;;
