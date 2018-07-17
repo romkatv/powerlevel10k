@@ -1634,7 +1634,11 @@ prompt_pyenv() {
     "$1_prompt_segment" "$0" "$2" "blue" "$DEFAULT_COLOR" "$PYENV_VERSION" 'PYTHON_ICON'
   elif [ $commands[pyenv] ]; then
     local pyenv_version_name="$(pyenv version-name)"
-    local pyenv_global="$(pyenv version-file-read $(pyenv root)/version)"
+    local pyenv_global="system"
+    local pyenv_root="$(pyenv root)"
+    if [[ -f "${pyenv_root}/version" ]]; then
+      pyenv_global="$(pyenv version-file-read ${pyenv_root}/version)"
+    fi
     if [[ "${pyenv_version_name}" != "${pyenv_global}" || "${POWERLEVEL9K_PYENV_PROMPT_ALWAYS_SHOW}" == "true" ]]; then
       "$1_prompt_segment" "$0" "$2" "blue" "$DEFAULT_COLOR" "$pyenv_version_name" 'PYTHON_ICON'
     fi
