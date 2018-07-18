@@ -703,11 +703,13 @@ prompt_host() {
 # The 'custom` prompt provides a way for users to invoke commands and display
 # the output in a segment.
 prompt_custom() {
-  local command=POWERLEVEL9K_CUSTOM_$3:u
+  local segment_name="${3:u}"
+  # Get content of custom segment
+  local command="POWERLEVEL9K_CUSTOM_${segment_name}"
   local segment_content="$(eval ${(P)command})"
 
   if [[ -n $segment_content ]]; then
-    "$1_prompt_segment" "${0}_${3:u}" "$2" $DEFAULT_COLOR_INVERTED $DEFAULT_COLOR "$segment_content"
+    "$1_prompt_segment" "${0}_${3:u}" "$2" $DEFAULT_COLOR_INVERTED $DEFAULT_COLOR "$segment_content" "CUSTOM_${segment_name}_ICON"
   fi
 }
 
