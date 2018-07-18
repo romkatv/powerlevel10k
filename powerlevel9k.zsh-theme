@@ -1046,18 +1046,14 @@ prompt_history() {
 ################################################################
 # Detection for virtualization (systemd based systems only)
 prompt_detect_virt() {
-  if ! command -v systemd-detect-virt > /dev/null; then
-    return
-  fi
-  local virt=$(systemd-detect-virt)
+  local virt=$(systemd-detect-virt 2> /dev/null)
   if [[ "$virt" == "none" ]]; then
     if [[ "$(ls -di / | grep -o 2)" != "2" ]]; then
       virt="chroot"
-      "$1_prompt_segment" "$0" "$2" "$DEFAULT_COLOR" "yellow" "$virt"
-    else
-      ;
     fi
-  else
+  fi
+
+  if [[ -n "${virt}" ]]; then
     "$1_prompt_segment" "$0" "$2" "$DEFAULT_COLOR" "yellow" "$virt"
   fi
 }
