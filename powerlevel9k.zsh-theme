@@ -756,9 +756,8 @@ getUniqueHomeFolder() {
     local -a matching
     local -a paths
     local cur_path='/'
-    # the first time we run the script, the working directory *should* be the home folder
-    [[ -z $HOME ]] && paths=${PWD} || paths=$HOME
-    paths=(${(s:/:)paths})
+    # all users have the $HOME variable set automatically... see http://pubs.opengroup.org/onlinepubs/009695399/basedefs/xbd_chap08.html
+    paths=(${(s:/:)HOME})
     for directory in ${paths[@]}; do
       test_dir=''
       for (( i=0; i < ${#directory}; i++ )); do
