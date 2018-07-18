@@ -1241,6 +1241,7 @@ prompt_php_version() {
 ################################################################
 # Segment to display free RAM and used Swap
 prompt_ram() {
+  local ROOT_PREFIX="${4}"
   local base=''
   local ramfree=0
   if [[ "$OS" == "OSX" ]]; then
@@ -1252,9 +1253,9 @@ prompt_ram() {
     ramfree=$(( ramfree * 4096 ))
   else
     if [[ "$OS" == "BSD" ]]; then
-      ramfree=$(grep 'avail memory' /var/run/dmesg.boot | awk '{print $4}')
+      ramfree=$(grep 'avail memory' ${ROOT_PREFIX}/var/run/dmesg.boot | awk '{print $4}')
     else
-      ramfree=$(grep -o -E "MemAvailable:\s+[0-9]+" /proc/meminfo | grep -o "[0-9]*")
+      ramfree=$(grep -o -E "MemAvailable:\s+[0-9]+" ${ROOT_PREFIX}/proc/meminfo | grep -o -E "[0-9]+")
       base='K'
     fi
   fi
