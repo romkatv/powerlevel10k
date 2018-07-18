@@ -1422,6 +1422,7 @@ prompt_status() {
 ################################################################
 # Segment to display Swap information
 prompt_swap() {
+  local ROOT_PREFIX="${4}"
   local swap_used=0
   local base=''
 
@@ -1436,8 +1437,8 @@ prompt_swap() {
 
     base=$(echo "$raw_swap_used" | grep -o "[A-Z]*$")
   else
-    swap_total=$(grep -o -E "SwapTotal:\s+[0-9]+" /proc/meminfo | grep -o "[0-9]*")
-    swap_free=$(grep -o -E "SwapFree:\s+[0-9]+" /proc/meminfo | grep -o "[0-9]*")
+    swap_total=$(grep -o -E "SwapTotal:\s+[0-9]+" ${ROOT_PREFIX}/proc/meminfo | grep -o -E "[0-9]+")
+    swap_free=$(grep -o -E "SwapFree:\s+[0-9]+" ${ROOT_PREFIX}/proc/meminfo | grep -o -E "[0-9]+")
     swap_used=$(( swap_total - swap_free ))
     base='K'
   fi
