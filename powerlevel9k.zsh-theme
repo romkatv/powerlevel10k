@@ -1132,6 +1132,7 @@ prompt_laravel_version() {
 # Segment to display load
 set_default POWERLEVEL9K_LOAD_WHICH 5
 prompt_load() {
+  local ROOT_PREFIX="${4}"
   # The load segment can have three different states
   local current_state="unknown"
   local load_select=2
@@ -1167,7 +1168,7 @@ prompt_load() {
       fi
       ;;
     *)
-      load_avg=$(cut -d" " -f${load_select} /proc/loadavg)
+      load_avg=$(cut -d" " -f${load_select} ${ROOT_PREFIX}/proc/loadavg)
       cores=$(nproc)
   esac
 
