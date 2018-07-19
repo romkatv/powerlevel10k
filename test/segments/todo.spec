@@ -33,7 +33,8 @@ function tearDown() {
 }
 
 function testTodoSegmentPrintsNothingIfTodoShIsNotInstalled() {
-    local POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(todo custom_world)
+    local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
+    POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(todo custom_world)
     local POWERLEVEL9K_CUSTOM_WORLD='echo world'
 
     assertEquals "%K{white} %F{black}world %k%F{white}%f " "$(build_left_prompt)"
@@ -41,7 +42,8 @@ function testTodoSegmentPrintsNothingIfTodoShIsNotInstalled() {
 
 function testTodoSegmentWorksAsExpected() {
     # TODO: Skript in den PATH legen!
-    local POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(todo)
+    local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
+    POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(todo)
     echo '#!/bin/sh' > ${FOLDER}/bin/todo.sh
     echo 'echo "TODO: 34 of 100 tasks shown";' >> ${FOLDER}/bin/todo.sh
     chmod +x ${FOLDER}/bin/todo.sh

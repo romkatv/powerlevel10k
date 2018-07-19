@@ -28,7 +28,8 @@ function tearDown() {
 }
 
 function testSymfonyVersionSegmentPrintsNothingIfPhpIsNotAvailable() {
-    local POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(symfony2_version custom_world)
+    local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
+    POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(symfony2_version custom_world)
     local POWERLEVEL9K_CUSTOM_WORLD='echo world'
     alias php="nophp"
 
@@ -38,7 +39,8 @@ function testSymfonyVersionSegmentPrintsNothingIfPhpIsNotAvailable() {
 }
 
 function testSymfonyVersionSegmentPrintsNothingIfSymfonyIsNotAvailable() {
-    local POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(symfony2_version custom_world)
+    local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
+    POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(symfony2_version custom_world)
     # "Symfony" is not a command, but rather a framework.
     # To sucessfully execute this test, we just need to
     # navigate into a folder that does not contain symfony.
@@ -48,7 +50,8 @@ function testSymfonyVersionSegmentPrintsNothingIfSymfonyIsNotAvailable() {
 }
 
 function testSymfonyVersionPrintsNothingIfPhpThrowsAnError() {
-    local POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(symfony2_version custom_world)
+    local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
+    POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(symfony2_version custom_world)
     local POWERLEVEL9K_CUSTOM_WORLD='echo world'
     mkdir app
     touch app/AppKernel.php
@@ -65,7 +68,8 @@ function testSymfonyVersionPrintsNothingIfPhpThrowsAnError() {
 
 function testSymfonyVersionSegmentWorks() {
     startSkipping # Skip test
-    local POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(symfony2_version)
+    local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
+    POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(symfony2_version)
     mkdir app
     touch app/AppKernel.php
 
@@ -80,7 +84,8 @@ function testSymfonyVersionSegmentWorks() {
 
 function testSymfonyVersionSegmentWorksInNestedFolder() {
     startSkipping # Skip test
-    local POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(symfony2_version)
+    local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
+    POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(symfony2_version)
     mkdir app
     touch app/AppKernel.php
 

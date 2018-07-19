@@ -12,7 +12,8 @@ function setUp() {
 }
 
 function testNodeVersionSegmentPrintsNothingWithoutNode() {
-    local POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(node_version custom_world)
+    local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
+    POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(node_version custom_world)
     local POWERLEVEL9K_CUSTOM_WORLD='echo world'
     alias node="nonode 2>/dev/null"
 
@@ -23,7 +24,8 @@ function testNodeVersionSegmentPrintsNothingWithoutNode() {
 }
 
 function testNodeVersionSegmentWorks() {
-    local POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(node_version)
+    local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
+    POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(node_version)
     node() {
         echo "v1.2.3"
     }

@@ -17,7 +17,8 @@ function setUp() {
 }
 
 function testNodeenvSegmentPrintsNothingWithoutNode() {
-    local POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(nodeenv custom_world)
+    local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
+    POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(nodeenv custom_world)
     local POWERLEVEL9K_CUSTOM_WORLD='echo world'
     alias node="nonode 2>/dev/null"
 
@@ -27,7 +28,8 @@ function testNodeenvSegmentPrintsNothingWithoutNode() {
 }
 
 function testNodeenvSegmentPrintsNothingIfNodeVirtualEnvIsNotSet() {
-    local POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(nodeenv custom_world)
+    local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
+    POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(nodeenv custom_world)
     local POWERLEVEL9K_CUSTOM_WORLD='echo world'
     node() {
         echo "v1.2.3"
@@ -39,7 +41,8 @@ function testNodeenvSegmentPrintsNothingIfNodeVirtualEnvIsNotSet() {
 }
 
 function testNodeenvSegmentPrintsNothingIfNodeVirtualEnvDisablePromptIsSet() {
-    local POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(nodeenv custom_world)
+    local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
+    POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(nodeenv custom_world)
     local POWERLEVEL9K_CUSTOM_WORLD='echo world'
     node() {
         echo "v1.2.3"
@@ -55,7 +58,8 @@ function testNodeenvSegmentPrintsNothingIfNodeVirtualEnvDisablePromptIsSet() {
 }
 
 function testNodeenvSegmentPrintsAtLeastNodeEnvWithoutNode() {
-    local POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(nodeenv)
+    local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
+    POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(nodeenv)
     alias node="nonode 2>/dev/null"
     NODE_VIRTUAL_ENV="node-env"
 
@@ -66,7 +70,8 @@ function testNodeenvSegmentPrintsAtLeastNodeEnvWithoutNode() {
 }
 
 function testNodeenvSegmentWorks() {
-    local POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(nodeenv)
+    local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
+    POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(nodeenv)
     node() {
         echo "v1.2.3"
     }

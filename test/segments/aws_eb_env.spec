@@ -23,7 +23,7 @@ function testAwsEbEnvSegmentWorksIfElasticBeanstalkEnvironmentIsSet() {
     echo "test:\n    environment: test" > /tmp/powerlevel9k-test/.elasticbeanstalk/config.yml
     cd /tmp/powerlevel9k-test
 
-    local POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(aws_eb_env)
+    local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(aws_eb_env)
 
     assertEquals "%K{black} %F{green%}🌱  %f%F{green}test %k%F{black}%f " "$(build_left_prompt)"
 
@@ -40,7 +40,8 @@ function testAwsEbEnvSegmentWorksIfElasticBeanstalkEnvironmentIsSetInParentDirec
     echo "test:\n    environment: test" > /tmp/powerlevel9k-test/.elasticbeanstalk/config.yml
     cd /tmp/powerlevel9k-test/1/12/123/1234/12345
 
-    local POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(aws_eb_env)
+    local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
+    POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(aws_eb_env)
 
     assertEquals "%K{black} %F{green%}🌱  %f%F{green}test %k%F{black}%f " "$(build_left_prompt)"
 

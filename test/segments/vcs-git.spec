@@ -70,7 +70,8 @@ function tearDown() {
 }
 
 function testColorOverridingForCleanStateWorks() {
-  local POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(vcs)
+  local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
+  POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(vcs)
   local POWERLEVEL9K_VCS_CLEAN_FOREGROUND='cyan'
   local POWERLEVEL9K_VCS_CLEAN_BACKGROUND='white'
 
@@ -78,7 +79,8 @@ function testColorOverridingForCleanStateWorks() {
 }
 
 function testColorOverridingForModifiedStateWorks() {
-  local POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(vcs)
+  local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
+  POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(vcs)
   local POWERLEVEL9K_VCS_MODIFIED_FOREGROUND='red'
   local POWERLEVEL9K_VCS_MODIFIED_BACKGROUND='yellow'
 
@@ -91,7 +93,8 @@ function testColorOverridingForModifiedStateWorks() {
 }
 
 function testColorOverridingForUntrackedStateWorks() {
-  local POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(vcs)
+  local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
+  POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(vcs)
   local POWERLEVEL9K_VCS_UNTRACKED_FOREGROUND='cyan'
   local POWERLEVEL9K_VCS_UNTRACKED_BACKGROUND='yellow'
 
@@ -108,7 +111,8 @@ function testGitIconWorks() {
 }
 
 function testGitlabIconWorks() {
-  local POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(vcs)
+  local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
+  POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(vcs)
   local POWERLEVEL9K_VCS_GIT_GITLAB_ICON='GL-Icon'
 
   # Add a GitLab project as remote origin. This is
@@ -119,7 +123,8 @@ function testGitlabIconWorks() {
 }
 
 function testBitbucketIconWorks() {
-  local POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(vcs)
+  local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
+  POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(vcs)
   local POWERLEVEL9K_VCS_GIT_BITBUCKET_ICON='BB-Icon'
 
   # Add a BitBucket project as remote origin. This is
@@ -130,7 +135,8 @@ function testBitbucketIconWorks() {
 }
 
 function testGitHubIconWorks() {
-  local POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(vcs)
+  local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
+  POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(vcs)
   local POWERLEVEL9K_VCS_GIT_GITHUB_ICON='GH-Icon'
 
   # Add a GitHub project as remote origin. This is
@@ -141,7 +147,8 @@ function testGitHubIconWorks() {
 }
 
 function testUntrackedFilesIconWorks() {
-  local POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(vcs)
+  local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
+  POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(vcs)
   local POWERLEVEL9K_VCS_UNTRACKED_ICON='?'
 
   # Create untracked file
@@ -151,7 +158,8 @@ function testUntrackedFilesIconWorks() {
 }
 
 function testStagedFilesIconWorks() {
-  local POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(vcs)
+  local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
+  POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(vcs)
   local POWERLEVEL9K_VCS_STAGED_ICON='+'
 
   # Create staged file
@@ -165,7 +173,8 @@ function testStagedFilesIconWorks() {
 }
 
 function testUnstagedFilesIconWorks() {
-  local POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(vcs)
+  local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
+  POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(vcs)
   local POWERLEVEL9K_VCS_UNSTAGED_ICON='M'
 
   # Create unstaged (modified, but not added to index) file
@@ -178,7 +187,8 @@ function testUnstagedFilesIconWorks() {
 }
 
 function testStashIconWorks() {
-  local POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(vcs)
+  local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
+  POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(vcs)
   local POWERLEVEL9K_VCS_STASH_ICON='S'
 
   # Create modified file
@@ -192,7 +202,8 @@ function testStashIconWorks() {
 }
 
 function testTagIconWorks() {
-  local POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(vcs)
+  local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
+  POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(vcs)
   local POWERLEVEL9K_VCS_TAG_ICON='T'
 
   touch "file.txt"
@@ -204,7 +215,8 @@ function testTagIconWorks() {
 }
 
 function testTagIconInDetachedHeadState() {
-  local POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(vcs)
+  local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
+  POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(vcs)
   local POWERLEVEL9K_VCS_TAG_ICON='T'
 
   touch "file.txt"
@@ -221,7 +233,8 @@ function testTagIconInDetachedHeadState() {
 }
 
 function testActionHintWorks() {
-  local POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(vcs)
+  local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
+  POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(vcs)
 
   touch "i-am-modified.txt"
   git add i-am-modified.txt
@@ -240,7 +253,8 @@ function testActionHintWorks() {
 }
 
 function testIncomingHintWorks() {
-  local POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(vcs)
+  local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
+  POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(vcs)
   local POWERLEVEL9K_VCS_INCOMING_CHANGES_ICON='I'
 
   touch "i-am-modified.txt"
@@ -258,7 +272,8 @@ function testIncomingHintWorks() {
 }
 
 function testOutgoingHintWorks() {
-  local POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(vcs)
+  local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
+  POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(vcs)
   local POWERLEVEL9K_VCS_OUTGOING_CHANGES_ICON='o'
 
   touch "i-am-modified.txt"
@@ -276,7 +291,8 @@ function testOutgoingHintWorks() {
 }
 
 function testShorteningCommitHashWorks() {
-  local POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(vcs)
+  local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
+  POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(vcs)
   local POWERLEVEL9K_SHOW_CHANGESET=true
   local POWERLEVEL9K_CHANGESET_HASH_LENGTH='4'
 
@@ -292,7 +308,8 @@ function testShorteningCommitHashWorks() {
 }
 
 function testShorteningCommitHashIsNotShownIfShowChangesetIsFalse() {
-  local POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(vcs)
+  local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
+  POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(vcs)
   local POWERLEVEL9K_SHOW_CHANGESET=false
   local POWERLEVEL9K_CHANGESET_HASH_LENGTH='4'
 

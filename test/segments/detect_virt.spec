@@ -12,10 +12,11 @@ function setUp() {
 }
 
 function testDetectVirtSegmentPrintsNothingIfSystemdIsNotAvailable() {
+    local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
+    POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(detect_virt custom_world)
+    local POWERLEVEL9K_CUSTOM_WORLD='echo world'
     alias systemd-detect-virt="novirt"
 
-    local POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(detect_virt custom_world)
-    local POWERLEVEL9K_CUSTOM_WORLD='echo world'
 
     assertEquals "%K{white} %F{black}world %k%F{white}%f " "$(build_left_prompt)"
 
@@ -23,7 +24,8 @@ function testDetectVirtSegmentPrintsNothingIfSystemdIsNotAvailable() {
 }
 
 function testDetectVirtSegmentIfSystemdReturnsPlainName() {
-    local POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(detect_virt)
+    local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
+    POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(detect_virt)
     alias systemd-detect-virt="echo 'xxx'"
 
     assertEquals "%K{black} %F{yellow}xxx %k%F{black}%f " "$(build_left_prompt)"
@@ -32,7 +34,8 @@ function testDetectVirtSegmentIfSystemdReturnsPlainName() {
 }
 
 function testDetectVirtSegmentIfRootFsIsOnExpectedInode() {
-    local POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(detect_virt)
+    local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
+    POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(detect_virt)
     # Well. This is a weak test, as it fixates the implementation,
     # but it is necessary, as the implementation relys on the root
     # directory having the inode number "2"..
@@ -49,7 +52,8 @@ function testDetectVirtSegmentIfRootFsIsOnExpectedInode() {
 }
 
 function testDetectVirtSegmentIfRootFsIsNotOnExpectedInode() {
-    local POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(detect_virt)
+    local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
+    POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(detect_virt)
     # Well. This is a weak test, as it fixates the implementation,
     # but it is necessary, as the implementation relys on the root
     # directory having the inode number "2"..

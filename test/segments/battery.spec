@@ -65,7 +65,6 @@ function makeBatterySay() {
 
 function testBatterySegmentIfBatteryIsLowWhileDischargingOnOSX() {
   local OS='OSX' # Fake OSX
-  local POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(battery)
   makeBatterySay "Now drawing from 'Battery Power'
  -InternalBattery-0 (id=1234567)	4%; discharging; 0:05 remaining present: true"
 
@@ -74,7 +73,6 @@ function testBatterySegmentIfBatteryIsLowWhileDischargingOnOSX() {
 
 function testBatterySegmentIfBatteryIsLowWhileChargingOnOSX() {
   local OS='OSX' # Fake OSX
-  local POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(battery)
   makeBatterySay "Now drawing from 'Battery Power'
  -InternalBattery-0 (id=1234567)	4%; charging; 0:05 remaining present: true"
 
@@ -83,7 +81,6 @@ function testBatterySegmentIfBatteryIsLowWhileChargingOnOSX() {
 
 function testBatterySegmentIfBatteryIsAlmostFullWhileDischargingOnOSX() {
   local OS='OSX' # Fake OSX
-  local POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(battery)
   makeBatterySay "Now drawing from 'Battery Power'
  -InternalBattery-0 (id=1234567)	98%; discharging; 3:57 remaining present: true"
 
@@ -92,7 +89,6 @@ function testBatterySegmentIfBatteryIsAlmostFullWhileDischargingOnOSX() {
 
 function testBatterySegmentIfBatteryIsAlmostFullWhileChargingOnOSX() {
   local OS='OSX' # Fake OSX
-  local POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(battery)
   makeBatterySay "Now drawing from 'Battery Power'
  -InternalBattery-0 (id=1234567)	98%; charging; 3:57 remaining present: true"
 
@@ -109,7 +105,6 @@ function testBatterySegmentIfBatteryIsFullOnOSX() {
 
 function testBatterySegmentIfBatteryIsCalculatingOnOSX() {
   local OS='OSX' # Fake OSX
-  local POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(battery)
   makeBatterySay "Now drawing from 'Battery Power'
  -InternalBattery-0 (id=1234567)	99%; discharging; (no estimate) present: true"
 
@@ -118,7 +113,6 @@ function testBatterySegmentIfBatteryIsCalculatingOnOSX() {
 
 function testBatterySegmentIfBatteryIsLowWhileDischargingOnLinux() {
   local OS='Linux' # Fake Linux
-  local POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(battery)
   makeBatterySay "4" "Discharging"
 
   assertEquals "%K{black} %F{red%}🔋 %f%F{red}4%% " "$(prompt_battery left 1 false ${FOLDER})"
@@ -126,7 +120,6 @@ function testBatterySegmentIfBatteryIsLowWhileDischargingOnLinux() {
 
 function testBatterySegmentIfBatteryIsLowWhileChargingOnLinux() {
   local OS='Linux' # Fake Linux
-  local POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(battery)
   makeBatterySay "4" "Charging"
 
   assertEquals "%K{black} %F{yellow%}🔋 %f%F{yellow}4%% " "$(prompt_battery left 1 false ${FOLDER})"
@@ -134,7 +127,6 @@ function testBatterySegmentIfBatteryIsLowWhileChargingOnLinux() {
 
 function testBatterySegmentIfBatteryIsNormalWhileDischargingOnLinux() {
   local OS='Linux' # Fake Linux
-  local POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(battery)
   makeBatterySay "10" "Discharging"
 
   assertEquals "%K{black} %F{white%}🔋 %f%F{white}10%% " "$(prompt_battery left 1 false ${FOLDER})"
@@ -142,7 +134,6 @@ function testBatterySegmentIfBatteryIsNormalWhileDischargingOnLinux() {
 
 function testBatterySegmentIfBatteryIsNormalWhileChargingOnLinux() {
   local OS='Linux' # Fake Linux
-  local POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(battery)
   makeBatterySay "10" "Charging"
 
   assertEquals "%K{black} %F{yellow%}🔋 %f%F{yellow}10%% " "$(prompt_battery left 1 false ${FOLDER})"
@@ -150,7 +141,6 @@ function testBatterySegmentIfBatteryIsNormalWhileChargingOnLinux() {
 
 function testBatterySegmentIfBatteryIsFullOnLinux() {
   local OS='Linux' # Fake Linux
-  local POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(battery)
   makeBatterySay "100" "Full"
 
   assertEquals "%K{black} %F{green%}🔋 %f%F{green}100%% " "$(prompt_battery left 1 false ${FOLDER})"
@@ -158,7 +148,6 @@ function testBatterySegmentIfBatteryIsFullOnLinux() {
 
 function testBatterySegmentIfBatteryIsNormalWithAcpiEnabledOnLinux() {
   local OS='Linux' # Fake Linux
-  local POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(battery)
   makeBatterySay "50" "Discharging"
   echo "echo 'Batter 0: Discharging, 50%, 01:38:54 remaining'" > ${FOLDER}/usr/bin/acpi
   chmod +x ${FOLDER}/usr/bin/acpi
@@ -172,7 +161,6 @@ function testBatterySegmentIfBatteryIsNormalWithAcpiEnabledOnLinux() {
 
 function testBatterySegmentIfBatteryIsCalculatingWithAcpiEnabledOnLinux() {
   local OS='Linux' # Fake Linux
-  local POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(battery)
   makeBatterySay "50" "Discharging"
   # Todo: Include real acpi output!
   echo "echo 'Batter 0: Discharging, 50%, rate remaining'" > ${FOLDER}/usr/bin/acpi

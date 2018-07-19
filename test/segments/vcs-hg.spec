@@ -34,7 +34,8 @@ function tearDown() {
 }
 
 function testColorOverridingForCleanStateWorks() {
-  local POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(vcs)
+  local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
+  POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(vcs)
   local POWERLEVEL9K_VCS_CLEAN_FOREGROUND='cyan'
   local POWERLEVEL9K_VCS_CLEAN_BACKGROUND='white'
 
@@ -42,7 +43,8 @@ function testColorOverridingForCleanStateWorks() {
 }
 
 function testColorOverridingForModifiedStateWorks() {
-  local POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(vcs)
+  local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
+  POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(vcs)
   local POWERLEVEL9K_VCS_MODIFIED_FOREGROUND='red'
   local POWERLEVEL9K_VCS_MODIFIED_BACKGROUND='yellow'
 
@@ -60,7 +62,8 @@ function testColorOverridingForModifiedStateWorks() {
 # This may be improved in future versions, to be a bit more consistent with
 # the git part.
 function testAddedFilesIconWorks() {
-  local POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(vcs)
+  local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
+  POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(vcs)
   touch "myfile.txt"
   hg add myfile.txt
 
@@ -70,7 +73,8 @@ function testAddedFilesIconWorks() {
 # We don't support tagging in mercurial right now..
 function testTagIconWorks() {
   startSkipping # Skip test
-  local POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(vcs)
+  local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
+  POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(vcs)
   local POWERLEVEL9K_VCS_TAG_ICON='T'
 
   touch "file.txt"
@@ -83,7 +87,8 @@ function testTagIconWorks() {
 
 function testTagIconInDetachedHeadState() {
   startSkipping # Skip test
-  local POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(vcs)
+  local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
+  POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(vcs)
   local POWERLEVEL9K_VCS_TAG_ICON='T'
 
   touch "file.txt"
@@ -100,7 +105,8 @@ function testTagIconInDetachedHeadState() {
 }
 
 function testActionHintWorks() {
-  local POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(vcs)
+  local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
+  POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(vcs)
   touch "i-am-modified.txt"
   hg add i-am-modified.txt
   hg commit -m "Add File" &>/dev/null
@@ -119,7 +125,8 @@ function testActionHintWorks() {
 }
 
 function testShorteningCommitHashWorks() {
-  local POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(vcs)
+  local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
+  POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(vcs)
   local POWERLEVEL9K_SHOW_CHANGESET=true
   local POWERLEVEL9K_CHANGESET_HASH_LENGTH='4'
 
@@ -136,7 +143,8 @@ function testShorteningCommitHashWorks() {
 }
 
 function testShorteningCommitHashIsNotShownIfShowChangesetIsFalse() {
-  local POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(vcs)
+  local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
+  POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(vcs)
   local POWERLEVEL9K_SHOW_CHANGESET=false
   local POWERLEVEL9K_CHANGESET_HASH_LENGTH='4'
 
@@ -152,14 +160,16 @@ function testShorteningCommitHashIsNotShownIfShowChangesetIsFalse() {
 }
 
 function testMercurialIconWorks() {
-  local POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(vcs)
+  local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
+  POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(vcs)
   local POWERLEVEL9K_VCS_HG_ICON='HG-Icon'
 
   assertEquals "%K{green} %F{black%}HG-Icon %f%F{black} default %k%F{green}%f " "$(build_left_prompt)"
 }
 
 function testBookmarkIconWorks() {
-  local POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(vcs)
+  local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
+  POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(vcs)
   local POWERLEVEL9K_VCS_BOOKMARK_ICON='B'
   hg bookmark "initial"
 

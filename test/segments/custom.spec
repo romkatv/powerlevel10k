@@ -12,14 +12,16 @@ function setUp() {
 }
 
 function testCustomDirectOutputSegment() {
+    local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
+    POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(custom_world)
     local POWERLEVEL9K_CUSTOM_WORLD="echo world"
-    local POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(custom_world)
 
     assertEquals "%K{white} %F{black}world %k%F{white}%f " "$(build_left_prompt)"
 }
 
 function testCustomClosureSegment() {
-    local POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(custom_world)
+    local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
+    POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(custom_world)
     function p9k_hello_world() {
         echo "world"
     }
@@ -29,7 +31,8 @@ function testCustomClosureSegment() {
 }
 
 function testSettingBackgroundForCustomSegment() {
-    local POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(custom_world)
+    local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
+    POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(custom_world)
     local POWERLEVEL9K_CUSTOM_WORLD="echo world"
     local POWERLEVEL9K_CUSTOM_WORLD_BACKGROUND="yellow"
 
@@ -37,7 +40,8 @@ function testSettingBackgroundForCustomSegment() {
 }
 
 function testSettingForegroundForCustomSegment() {
-    local POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(custom_world)
+    local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
+    POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(custom_world)
     local POWERLEVEL9K_CUSTOM_WORLD="echo world"
     local POWERLEVEL9K_CUSTOM_WORLD_FOREGROUND="red"
 
@@ -45,7 +49,8 @@ function testSettingForegroundForCustomSegment() {
 }
 
 function testSettingVisualIdentifierForCustomSegment() {
-    local POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(custom_world)
+    local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
+    POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(custom_world)
     local POWERLEVEL9K_CUSTOM_WORLD="echo world"
     local POWERLEVEL9K_CUSTOM_WORLD_ICON="hw"
 
@@ -53,7 +58,8 @@ function testSettingVisualIdentifierForCustomSegment() {
 }
 
 function testSettingVisualIdentifierForegroundColorForCustomSegment() {
-    local POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(custom_world)
+    local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
+    POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(custom_world)
     local POWERLEVEL9K_CUSTOM_WORLD="echo world"
     local POWERLEVEL9K_CUSTOM_WORLD_ICON="hw"
     local POWERLEVEL9K_CUSTOM_WORLD_VISUAL_IDENTIFIER_COLOR="red"

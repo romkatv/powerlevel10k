@@ -12,8 +12,9 @@ function setUp() {
 }
 
 function testIpSegmentPrintsNothingOnOsxIfNotConnected() {
+  local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
+  POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(ip custom_world)
   alias networksetup='echo "not connected"'
-  local POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(ip custom_world)
   local OS="OSX" # Fake OSX
   local POWERLEVEL9K_CUSTOM_WORLD='echo world'
 
@@ -23,8 +24,9 @@ function testIpSegmentPrintsNothingOnOsxIfNotConnected() {
 }
 
 function testIpSegmentPrintsNothingOnLinuxIfNotConnected() {
+  local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
+  POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(ip custom_world)
   alias ip='echo "not connected"'
-  local POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(ip custom_world)
   local OS="Linux" # Fake Linux
   local POWERLEVEL9K_CUSTOM_WORLD='echo world'
 
@@ -34,7 +36,8 @@ function testIpSegmentPrintsNothingOnLinuxIfNotConnected() {
 }
 
 function testIpSegmentWorksOnOsxWithNoInterfaceSpecified() {
-  local POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(ip)
+  local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
+  POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(ip)
   local OS='OSX' # Fake OSX
   alias networksetup="echo 'An asterisk (*) denotes that a network service is disabled.
 (1) Ethernet
@@ -69,7 +72,8 @@ function testIpSegmentWorksOnOsxWithNoInterfaceSpecified() {
 # in hierarchical order, but from outside this is not obvious
 # (implementation detail). So we need a test for this case.
 function testIpSegmentWorksOnOsxWithMultipleInterfacesSpecified() {
-  local POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(ip)
+  local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
+  POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(ip)
   local OS='OSX' # Fake OSX
   alias networksetup="echo 'An asterisk (*) denotes that a network service is disabled.
 (1) Ethernet
@@ -116,7 +120,8 @@ function testIpSegmentWorksOnOsxWithMultipleInterfacesSpecified() {
 }
 
 function testIpSegmentWorksOnOsxWithInterfaceSpecified() {
-  local POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(ip)
+  local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
+  POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(ip)
   local OS='OSX' # Fake OSX
   local POWERLEVEL9K_IP_INTERFACE='xxx'
   alias ipconfig="_(){ echo '1.2.3.4'; };_"
@@ -155,7 +160,8 @@ function testIpSegmentWorksOnLinuxWithNoInterfaceSpecified() {
 
 function testIpSegmentWorksOnLinuxWithMultipleInterfacesSpecified() {
     setopt aliases
-    local POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(ip)
+    local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
+    POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(ip)
     local OS='Linux' # Fake Linux
     # That command is harder to test, as it is used at first
     # to get all relevant network interfaces and then for
@@ -185,7 +191,8 @@ function testIpSegmentWorksOnLinuxWithMultipleInterfacesSpecified() {
 }
 
 function testIpSegmentWorksOnLinuxWithInterfaceSpecified() {
-  local POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(ip)
+  local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
+  POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(ip)
   local OS='Linux' # Fake Linux
   local POWERLEVEL9K_IP_INTERFACE='xxx'
   ip(){

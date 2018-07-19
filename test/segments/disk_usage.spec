@@ -32,11 +32,12 @@ function tearDown() {
 }
 
 function testDiskUsageSegmentWhenDiskIsAlmostFull() {
+  local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
+  POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(disk_usage)
   df() {
       echo "Filesystem     1K-blocks      Used Available Use% Mounted on
 /dev/disk1     487219288 471466944  15496344  97% /"
   }
-  local POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(disk_usage)
 
   assertEquals "%K{red} %F{white%}hdd  %f%F{white}97%% %k%F{red}%f " "$(build_left_prompt)"
 
@@ -44,11 +45,12 @@ function testDiskUsageSegmentWhenDiskIsAlmostFull() {
 }
 
 function testDiskUsageSegmentWhenDiskIsVeryFull() {
+  local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
+  POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(disk_usage)
   df() {
       echo "Filesystem     1K-blocks      Used Available Use% Mounted on
 /dev/disk1     487219288 471466944  15496344  94% /"
   }
-  local POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(disk_usage)
 
   assertEquals "%K{yellow} %F{black%}hdd  %f%F{black}94%% %k%F{yellow}%f " "$(build_left_prompt)"
 
@@ -56,11 +58,12 @@ function testDiskUsageSegmentWhenDiskIsVeryFull() {
 }
 
 function testDiskUsageSegmentWhenDiskIsQuiteEmpty() {
+  local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
+  POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(disk_usage)
   df() {
       echo "Filesystem     1K-blocks      Used Available Use% Mounted on
 /dev/disk1     487219288 471466944  15496344  4% /"
   }
-  local POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(disk_usage)
 
   assertEquals "%K{black} %F{yellow%}hdd  %f%F{yellow}4%% %k%F{black}%f " "$(build_left_prompt)"
 
@@ -68,12 +71,13 @@ function testDiskUsageSegmentWhenDiskIsQuiteEmpty() {
 }
 
 function testDiskUsageSegmentPrintsNothingIfDiskIsQuiteEmptyAndOnlyWarningsShouldBeDisplayed() {
+  local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
+  POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(disk_usage custom_world)
   df() {
       echo "Filesystem     1K-blocks      Used Available Use% Mounted on
 /dev/disk1     487219288 471466944  15496344  4% /"
   }
 
-  local POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(disk_usage custom_world)
   local POWERLEVEL9K_DISK_USAGE_ONLY_WARNING=true
   local POWERLEVEL9K_CUSTOM_WORLD='echo world'
 
@@ -83,11 +87,12 @@ function testDiskUsageSegmentPrintsNothingIfDiskIsQuiteEmptyAndOnlyWarningsShoul
 }
 
 function testDiskUsageSegmentWarningLevelCouldBeAdjusted() {
+  local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
+  POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(disk_usage)
   df() {
     echo "Filesystem     1K-blocks      Used Available Use% Mounted on
 /dev/disk1     487219288 471466944  15496344  11% /"
   }
-  local POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(disk_usage)
   local POWERLEVEL9K_DISK_USAGE_WARNING_LEVEL=10
 
   assertEquals "%K{yellow} %F{black%}hdd  %f%F{black}11%% %k%F{yellow}%f " "$(build_left_prompt)"
@@ -96,11 +101,12 @@ function testDiskUsageSegmentWarningLevelCouldBeAdjusted() {
 }
 
 function testDiskUsageSegmentCriticalLevelCouldBeAdjusted() {
+  local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
+  POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(disk_usage)
   df() {
     echo "Filesystem     1K-blocks      Used Available Use% Mounted on
 /dev/disk1     487219288 471466944  15496344  11% /"
   }
-  local POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(disk_usage)
   local POWERLEVEL9K_DISK_USAGE_WARNING_LEVEL=5
   local POWERLEVEL9K_DISK_USAGE_CRITICAL_LEVEL=10
 

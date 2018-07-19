@@ -13,7 +13,8 @@ function setUp() {
 
 function testAnacondaSegmentPrintsNothingIfNoAnacondaPathIsSet() {
     local POWERLEVEL9K_CUSTOM_WORLD='echo world'
-    local POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(anaconda custom_world)
+    local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
+    POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(anaconda custom_world)
     # Unset anacona variables
     unset CONDA_ENV_PATH
     unset CONDA_PREFIX
@@ -24,7 +25,8 @@ function testAnacondaSegmentPrintsNothingIfNoAnacondaPathIsSet() {
 function testAnacondaSegmentWorksIfOnlyAnacondaPathIsSet() {
     CONDA_ENV_PATH=/tmp
     unset CONDA_PREFIX
-    local POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(anaconda)
+    local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
+    POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(anaconda)
     local POWERLEVEL9K_PYTHON_ICON="icon-here"
 
     assertEquals "%K{blue} %F{black%}icon-here %f%F{black}(tmp) %k%F{blue}%f " "$(build_left_prompt)"
@@ -33,7 +35,8 @@ function testAnacondaSegmentWorksIfOnlyAnacondaPathIsSet() {
 function testAnacondaSegmentWorksIfOnlyAnacondaPrefixIsSet() {
     unset CONDA_ENV_PATH
     local CONDA_PREFIX="test"
-    local POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(anaconda)
+    local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
+    POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(anaconda)
     local POWERLEVEL9K_PYTHON_ICON="icon-here"
 
     assertEquals "%K{blue} %F{black%}icon-here %f%F{black}(test) %k%F{blue}%f " "$(build_left_prompt)"
@@ -42,7 +45,8 @@ function testAnacondaSegmentWorksIfOnlyAnacondaPrefixIsSet() {
 function testAnacondaSegmentWorks() {
     local CONDA_ENV_PATH=/tmp
     local CONDA_PREFIX="test"
-    local POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(anaconda)
+    local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
+    POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(anaconda)
     local POWERLEVEL9K_PYTHON_ICON="icon-here"
 
     assertEquals "%K{blue} %F{black%}icon-here %f%F{black}(tmptest) %k%F{blue}%f " "$(build_left_prompt)"

@@ -28,7 +28,6 @@ function tearDown() {
 }
 
 function testRamSegmentWorksOnOsx() {
-    local POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(ram)
     local OS="OSX" # Fake OSX
     alias vm_stat="echo 'Mach Virtual Memory Statistics: (page size of 4096 bytes)
 Pages free:                              299687.
@@ -42,7 +41,6 @@ Pages inactive:                         1313411.
 }
 
 function testRamSegmentWorksOnBsd() {
-    local POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(ram)
     local OS="BSD" # Fake BSD
     mkdir -p var/run
     echo "avail memory 5678B 299687 4444G 299" > var/run/dmesg.boot
@@ -51,7 +49,6 @@ function testRamSegmentWorksOnBsd() {
 }
 
 function testRamSegmentWorksOnLinux() {
-    local POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(ram)
     local OS="Linux" # Fake Linux
     mkdir proc
     echo "MemAvailable: 299687" > proc/meminfo

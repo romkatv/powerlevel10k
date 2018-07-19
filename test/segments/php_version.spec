@@ -12,7 +12,8 @@ function setUp() {
 }
 
 function testPhpVersionSegmentPrintsNothingIfPhpIsNotAvailable() {
-  local POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(php_version custom_world)
+  local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
+  POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(php_version custom_world)
   local POWERLEVEL9K_CUSTOM_WORLD='echo world'
   alias php="nophp"
 
@@ -22,7 +23,8 @@ function testPhpVersionSegmentPrintsNothingIfPhpIsNotAvailable() {
 }
 
 function testPhpVersionSegmentWorks() {
-  local POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(php_version)
+  local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
+  POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(php_version)
   alias php="echo 'PHP 5.6.27 (cli) (built: Oct 23 2016 11:47:58)
 Copyright (c) 1997-2016 The PHP Group
 Zend Engine v2.6.0, Copyright (c) 1998-2016 Zend Technologies

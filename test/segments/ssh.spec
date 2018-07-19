@@ -16,7 +16,8 @@ function mockRust() {
 }
 
 function testSshSegmentPrintsNothingIfNoSshConnection() {
-  local POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(ssh custom_world)
+  local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
+  POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(ssh custom_world)
   local POWERLEVEL9K_CUSTOM_WORLD='echo "world"'
   local POWERLEVEL9K_SSH_ICON="ssh-icon"
   # Weak test: Emulate No SSH connection by unsetting
@@ -28,7 +29,8 @@ function testSshSegmentPrintsNothingIfNoSshConnection() {
 }
 
 function testSshSegmentWorksIfOnlySshClientIsSet() {
-  local POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(ssh)
+  local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
+  POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(ssh)
   local POWERLEVEL9K_SSH_ICON="ssh-icon"
   # Weak test: Emulate No SSH connection by unsetting
   # $SSH_CLIENT and $SSH_TTY
@@ -41,7 +43,8 @@ function testSshSegmentWorksIfOnlySshClientIsSet() {
 }
 
 function testSshSegmentWorksIfOnlySshTtyIsSet() {
-  local POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(ssh)
+  local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
+  POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(ssh)
   local POWERLEVEL9K_SSH_ICON="ssh-icon"
   # Weak test: Emulate No SSH connection by unsetting
   # $SSH_CLIENT and $SSH_TTY
@@ -54,7 +57,8 @@ function testSshSegmentWorksIfOnlySshTtyIsSet() {
 }
 
 function testSshSegmentWorksIfAllNecessaryVariablesAreSet() {
-  local POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(ssh)
+  local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
+  POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(ssh)
   local POWERLEVEL9K_SSH_ICON="ssh-icon"
   # Weak test: Emulate No SSH connection by unsetting
   # $SSH_CLIENT and $SSH_TTY

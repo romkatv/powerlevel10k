@@ -36,7 +36,8 @@ function tearDown() {
 }
 
 function testPublicIpSegmentPrintsNothingByDefaultIfHostIsNotAvailable() {
-  local POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(public_ip custom_world)
+  local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
+  POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(public_ip custom_world)
   local POWERLEVEL9K_PUBLIC_IP_HOST='http://unknown.xyz'
   local POWERLEVEL9K_CUSTOM_WORLD='echo world'
   # We need to overwrite dig, as this is a fallback method that
@@ -49,7 +50,8 @@ function testPublicIpSegmentPrintsNothingByDefaultIfHostIsNotAvailable() {
 }
 
 function testPublicIpSegmentPrintsNoticeIfNotConnected() {
-  local POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(public_ip)
+  local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
+  POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(public_ip)
   local POWERLEVEL9K_PUBLIC_IP_HOST='http://unknown.xyz'
   local POWERLEVEL9K_PUBLIC_IP_NONE="disconnected"
   # We need to overwrite dig, as this is a fallback method that
@@ -62,7 +64,8 @@ function testPublicIpSegmentPrintsNoticeIfNotConnected() {
 }
 
 function testPublicIpSegmentWorksWithWget() {
-  local POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(public_ip)
+  local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
+  POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(public_ip)
   alias dig='nodig'
   alias curl='nocurl'
   wget() {
@@ -77,7 +80,8 @@ function testPublicIpSegmentWorksWithWget() {
 }
 
 function testPublicIpSegmentUsesCurlAsFallbackMethodIfWgetIsNotAvailable() {
-  local POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(public_ip)
+  local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
+  POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(public_ip)
   alias dig='nodig'
   alias wget='nowget'
   curl() {
@@ -92,7 +96,8 @@ function testPublicIpSegmentUsesCurlAsFallbackMethodIfWgetIsNotAvailable() {
 }
 
 function testPublicIpSegmentUsesDigAsFallbackMethodIfWgetAndCurlAreNotAvailable() {
-  local POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(public_ip)
+  local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
+  POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(public_ip)
   alias curl='nocurl'
   alias wget='nowget'
   dig() {
@@ -107,7 +112,8 @@ function testPublicIpSegmentUsesDigAsFallbackMethodIfWgetAndCurlAreNotAvailable(
 }
 
 function testPublicIpSegmentCachesFile() {
-  local POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(public_ip)
+  local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
+  POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(public_ip)
   dig() {
       echo "first"
   }
@@ -125,7 +131,8 @@ function testPublicIpSegmentCachesFile() {
 }
 
 function testPublicIpSegmentRefreshesCachesFileAfterTimeout() {
-  local POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(public_ip)
+  local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
+  POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(public_ip)
   local POWERLEVEL9K_PUBLIC_IP_TIMEOUT=2
   dig() {
       echo "first"
@@ -145,7 +152,8 @@ function testPublicIpSegmentRefreshesCachesFileAfterTimeout() {
 }
 
 function testPublicIpSegmentRefreshesCachesFileIfEmpty() {
-  local POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(public_ip)
+  local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
+  POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(public_ip)
   dig() {
       echo "first"
   }
@@ -166,7 +174,8 @@ function testPublicIpSegmentRefreshesCachesFileIfEmpty() {
 }
 
 function testPublicIpSegmentWhenGoingOnline() {
-  local POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(public_ip)
+  local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
+  POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(public_ip)
   local POWERLEVEL9K_PUBLIC_IP_METHODS="dig"
   local POWERLEVEL9K_PUBLIC_IP_NONE="disconnected"
   alias dig="nodig"

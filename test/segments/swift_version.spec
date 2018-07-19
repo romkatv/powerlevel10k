@@ -28,7 +28,8 @@ function tearDown() {
 }
 
 function testSwiftSegmentPrintsNothingIfSwiftIsNotAvailable() {
-    local POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(swift_version custom_world)
+    local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
+    POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(swift_version custom_world)
     local POWERLEVEL9K_CUSTOM_WORLD='echo world'
     alias swift="noswift"
 
@@ -39,7 +40,8 @@ function testSwiftSegmentPrintsNothingIfSwiftIsNotAvailable() {
 }
 
 function testSwiftSegmentWorks() {
-    local POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(swift_version)
+    local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
+    POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(swift_version)
     function swift() {
         echo "Apple Swift version 3.0.1 (swiftlang-800.0.58.6 clang-800.0.42.1)\nTarget: x86_64-apple-macosx10.9"
     }

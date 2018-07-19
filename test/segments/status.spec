@@ -17,8 +17,9 @@ function setUp() {
 }
 
 function testStatusPrintsNothingIfReturnCodeIsZeroAndVerboseIsUnset() {
+    local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
+    POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(status custom_world)
     local POWERLEVEL9K_CUSTOM_WORLD='echo world'
-    local POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(status custom_world)
     local POWERLEVEL9K_STATUS_VERBOSE=false
     local POWERLEVEL9K_STATUS_SHOW_PIPESTATUS=false
 
@@ -26,56 +27,63 @@ function testStatusPrintsNothingIfReturnCodeIsZeroAndVerboseIsUnset() {
 }
 
 function testStatusWorksAsExpectedIfReturnCodeIsZeroAndVerboseIsSet() {
+    local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
+    POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(status)
     local POWERLEVEL9K_STATUS_VERBOSE=true
     local POWERLEVEL9K_STATUS_SHOW_PIPESTATUS=false
     local POWERLEVEL9K_STATUS_HIDE_SIGNAME=true
-    local POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(status)
 
     assertEquals "%K{black} %F{green%}✔%f %k%F{black}%f " "$(build_left_prompt)"
 }
 
 function testStatusInGeneralErrorCase() {
-    local RETVAL=1
-    local POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(status)
+    local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
+    POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(status)
     local POWERLEVEL9K_STATUS_VERBOSE=true
     local POWERLEVEL9K_STATUS_SHOW_PIPESTATUS=false
+    local RETVAL=1
 
     assertEquals "%K{red} %F{yellow1%}↵ %f%F{yellow1}1 %k%F{red}%f " "$(build_left_prompt)"
 }
 
 function testPipestatusInErrorCase() {
-    local -a RETVALS
-    RETVALS=(0 0 1 0)
-    local POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(status)
+    local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
+    POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(status)
     local POWERLEVEL9K_STATUS_VERBOSE=true
     local POWERLEVEL9K_STATUS_SHOW_PIPESTATUS=true
+    local -a RETVALS
+    RETVALS=(0 0 1 0)
 
     assertEquals "%K{red} %F{yellow1%}↵ %f%F{yellow1}0|0|1|0 %k%F{red}%f " "$(build_left_prompt)"
 }
 
 function testStatusCrossWinsOverVerbose() {
-    local RETVAL=1
-    local POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(status)
+    local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
+    POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(status)
     local POWERLEVEL9K_STATUS_SHOW_PIPESTATUS=false
     local POWERLEVEL9K_STATUS_VERBOSE=true
     local POWERLEVEL9K_STATUS_CROSS=true
+    local RETVAL=1
 
     assertEquals "%K{black} %F{red%}✘%f %k%F{black}%f " "$(build_left_prompt)"
 }
 
 function testStatusShowsSignalNameInErrorCase() {
-    local RETVAL=132
-    local POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(status)
+    local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
+    POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(status)
     local POWERLEVEL9K_STATUS_SHOW_PIPESTATUS=false
     local POWERLEVEL9K_STATUS_VERBOSE=true
     local POWERLEVEL9K_STATUS_HIDE_SIGNAME=false
+    local RETVAL=132
 
     assertEquals "%K{red} %F{yellow1%}↵ %f%F{yellow1}SIGILL(4) %k%F{red}%f " "$(build_left_prompt)"
 }
 
 function testStatusSegmentIntegrated() {
-    local POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(status)
-    local POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=()
+    local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
+    POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(status)
+    local -a POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS
+    POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=()
 
     false; powerlevel9k_prepare_prompts
 

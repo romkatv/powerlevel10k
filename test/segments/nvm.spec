@@ -32,14 +32,16 @@ function tearDown() {
 }
 
 function testNvmSegmentPrintsNothingIfNvmIsNotAvailable() {
-  local POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(nvm custom_world)
+  local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
+  POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(nvm custom_world)
   local POWERLEVEL9K_CUSTOM_WORLD='echo world'
 
   assertEquals "%K{white} %F{black}world %k%F{white}%f " "$(build_left_prompt)"
 }
 
 function testNvmSegmentWorksWithoutHavingADefaultAlias() {
-  local POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(nvm)
+  local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
+  POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(nvm)
 
   function nvm_version() {
     [[ ${1} == 'current' ]] && echo 'v4.6.0' || echo 'v1.4.0'
@@ -49,7 +51,8 @@ function testNvmSegmentWorksWithoutHavingADefaultAlias() {
 }
 
 function testNvmSegmentPrintsNothingWhenOnDefaultVersion() {
-  local POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(nvm custom_world)
+  local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
+  POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(nvm custom_world)
   local POWERLEVEL9K_CUSTOM_WORLD='echo world'
 
   function nvm_version() {

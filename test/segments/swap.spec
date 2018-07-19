@@ -28,7 +28,8 @@ function tearDown() {
 }
 
 function testSwapSegmentWorksOnOsx() {
-    local POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(swap)
+    local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
+    POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(swap)
     local OS="OSX" # Fake OSX
     sysctl() {
         echo "vm.swapusage: total = 3072,00M  used = 1620,50M  free = 1451,50M  (encrypted)"
@@ -40,7 +41,8 @@ function testSwapSegmentWorksOnOsx() {
 }
 
 function testSwapSegmentWorksOnLinux() {
-    local POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(swap)
+    local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
+    POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(swap)
     local OS="Linux" # Fake Linux
     mkdir proc
     echo "SwapTotal: 1000000" > proc/meminfo

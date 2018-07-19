@@ -13,7 +13,8 @@ function setUp() {
 
 function testBackgroundJobsSegmentPrintsNothingWithoutBackgroundJobs() {
     local POWERLEVEL9K_CUSTOM_WORLD='echo world'
-    local POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(background_jobs custom_world)
+    local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
+    POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(background_jobs custom_world)
     alias jobs="nojobs 2>/dev/null"
 
     assertEquals "%K{white} %F{black}world %k%F{white}%f " "$(build_left_prompt)"
@@ -23,7 +24,8 @@ function testBackgroundJobsSegmentPrintsNothingWithoutBackgroundJobs() {
 
 function testBackgroundJobsSegmentWorksWithOneBackgroundJob() {
     unset POWERLEVEL9K_BACKGROUND_JOBS_VERBOSE
-    local POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(background_jobs)
+    local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
+    POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(background_jobs)
     jobs() {
         echo '[1]  + 30444 suspended  nvim xx'
     }
@@ -35,7 +37,8 @@ function testBackgroundJobsSegmentWorksWithOneBackgroundJob() {
 
 function testBackgroundJobsSegmentWorksWithMultipleBackgroundJobs() {
     unset POWERLEVEL9K_BACKGROUND_JOBS_VERBOSE
-    local POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(background_jobs)
+    local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
+    POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(background_jobs)
     jobs() {
         echo "[1]    31190 suspended  nvim xx"
         echo "[2]  - 31194 suspended  nvim xx2"
@@ -49,7 +52,8 @@ function testBackgroundJobsSegmentWorksWithMultipleBackgroundJobs() {
 
 function testBackgroundJobsSegmentWithVerboseMode() {
     local POWERLEVEL9K_BACKGROUND_JOBS_VERBOSE=true
-    local POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(background_jobs)
+    local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
+    POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(background_jobs)
     jobs() {
         echo "[1]    31190 suspended  nvim xx"
         echo "[2]  - 31194 suspended  nvim xx2"
