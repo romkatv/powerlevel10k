@@ -357,6 +357,17 @@ end of the hostname.
 |`POWERLEVEL9K_ALWAYS_SHOW_USER`|false|Always show the username, but conditionalize the hostname.|
 |`POWERLEVEL9K_CONTEXT_TEMPLATE`|%n@%m|Default context prompt (username@machine). Refer to the [ZSH Documentation](http://zsh.sourceforge.net/Doc/Release/Prompt-Expansion.html) for all possible expansions, including deeper host depths.|
 
+This segment can have different states. They might help you to visualize your
+different privileges. Read more about styling with states [here](https://github.com/bhilburn/powerlevel9k/wiki/Stylizing-Your-Prompt#special-segment-colors).
+
+| State         | Meaning                                                  |
+|---------------|----------------------------------------------------------|
+| `DEFAULT`     | You are a normal user                                    |
+| `ROOT`        | You are the root user                                    |
+| `SUDO`        | You are using elevated rights                            |
+| `REMOTE_SUDO` | You are SSH'ed into the machine and have elevated rights |
+| `REMOTE`      | You are SSH'ed into the machine                          |
+
 ##### date
 
 The `date` segment shows the current system date.
@@ -560,6 +571,19 @@ Variable | Default Value | Description |
 | Variable | Default Value | Description |
 |----------|---------------|-------------|
 |`POWERLEVEL9K_RBENV_PROMPT_ALWAYS_SHOW`|`false`|Set to true if you wish to show the rbenv segment even if the current Ruby version is the same as the global Ruby version|
+
+##### pyenv
+
+This segment shows the version of Python being used when using `pyenv` to change your current Python stack.
+
+The `PYENV_VERSION` environment variable will be used if specified. Otherwise it figures out the version being used by taking the output of the `pyenv version-name` command.
+
+* If `pyenv` is not in $PATH, nothing will be shown.
+* If the current Python version is the same as the global Python version, nothing will be shown.
+
+| Variable | Default Value | Description |
+|----------|---------------|-------------|
+|`POWERLEVEL9K_PYENV_PROMPT_ALWAYS_SHOW`|`false`|Set to true if you wish to show the pyenv segment even if the current Python version is the same as the global Python version|
 
 ##### rspec_stats
 

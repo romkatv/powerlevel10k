@@ -499,7 +499,7 @@ prompt_battery() {
     fi
   fi
   # return if POWERLEVEL9K_BATTERY_HIDE_ABOVE_THRESHOLD is set and the battery percentage is greater or equal
-  if [[ -v "POWERLEVEL9K_BATTERY_HIDE_ABOVE_THRESHOLD" && "${bat_percent}" -ge $POWERLEVEL9K_BATTERY_HIDE_ABOVE_THRESHOLD ]]; then
+  if defined POWERLEVEL9K_BATTERY_HIDE_ABOVE_THRESHOLD && [[ "${bat_percent}" -ge $POWERLEVEL9K_BATTERY_HIDE_ABOVE_THRESHOLD ]]; then
     return
   fi
 
@@ -1263,21 +1263,19 @@ prompt_ram() {
   "$1_prompt_segment" "$0" "$2" "yellow" "$DEFAULT_COLOR" "$(printSizeHumanReadable "$ramfree" $base)" 'RAM_ICON'
 }
 
-
+################################################################
+# Segment to display rbenv information
+# https://github.com/rbenv/rbenv#choosing-the-ruby-version
 set_default POWERLEVEL9K_RBENV_PROMPT_ALWAYS_SHOW false
-# rbenv information
 prompt_rbenv() {
-  if command which rbenv 2>/dev/null >&2; then
+  if [[ -n "$RBENV_VERSION" ]]; then
+    "$1_prompt_segment" "$0" "$2" "red" "$DEFAULT_COLOR" "$RBENV_VERSION" 'RUBY_ICON'
+  elif [ $commands[rbenv] ]; then
     local rbenv_version_name="$(rbenv version-name)"
     local rbenv_global="$(rbenv global)"
-
-    # Don't show anything if the current Ruby is the same as the global Ruby
-    # unless `POWERLEVEL9K_RBENV_PROMPT_ALWAYS_SHOW` is set.
-    if [[ $rbenv_version_name == $rbenv_global && "$POWERLEVEL9K_RBENV_PROMPT_ALWAYS_SHOW" = false ]]; then
-      return
+    if [[ "${rbenv_version_name}" != "${rbenv_global}" || "${POWERLEVEL9K_RBENV_PROMPT_ALWAYS_SHOW}" == "true" ]]; then
+      "$1_prompt_segment" "$0" "$2" "red" "$DEFAULT_COLOR" "$rbenv_version_name" 'RUBY_ICON'
     fi
-
-    "$1_prompt_segment" "$0" "$2" "red" "$DEFAULT_COLOR" "$rbenv_version_name" 'RUBY_ICON'
   fi
 }
 
@@ -1632,11 +1630,18 @@ prompt_virtualenv() {
 }
 
 ################################################################
-# pyenv: current active python version (with restrictions)
+# Segment to display pyenv information
 # https://github.com/pyenv/pyenv#choosing-the-python-version
+set_default POWERLEVEL9K_PYENV_PROMPT_ALWAYS_SHOW false
 prompt_pyenv() {
   if [[ -n "$PYENV_VERSION" ]]; then
     "$1_prompt_segment" "$0" "$2" "blue" "$DEFAULT_COLOR" "$PYENV_VERSION" 'PYTHON_ICON'
+  elif [ $commands[pyenv] ]; then
+    local pyenv_version_name="$(pyenv version-name)"
+    local pyenv_global="$(pyenv version-file-read $(pyenv root)/version)"
+    if [[ "${pyenv_version_name}" != "${pyenv_global}" || "${POWERLEVEL9K_PYENV_PROMPT_ALWAYS_SHOW}" == "true" ]]; then
+      "$1_prompt_segment" "$0" "$2" "blue" "$DEFAULT_COLOR" "$pyenv_version_name" 'PYTHON_ICON'
+    fi
   fi
 }
 
@@ -1783,10 +1788,16 @@ powerlevel9k_preexec() {
 
 set_default POWERLEVEL9K_PROMPT_ADD_NEWLINE false
 powerlevel9k_prepare_prompts() {
-  local RETVAL RPROMPT_PREFIX RPROMPT_SUFFIX
+  # Return values. These need to be global, because
+  # they are used in prompt_status. Also, we need
+  # to get the return value of the last command at
+  # very first in this function. Do not move the
+  # lines down, otherwise the last command is not
+  # what you expected it to be.
   RETVAL=$?
   RETVALS=( "$pipestatus[@]" )
 
+  local RPROMPT_SUFFIX RPROMPT_PREFIX
   _P9K_COMMAND_DURATION=$((EPOCHREALTIME - _P9K_TIMER_START))
 
   # Reset start time
