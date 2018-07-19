@@ -14,11 +14,15 @@ function setUp() {
   ### Test specific
   # Create default folder and git init it.
   FOLDER=/tmp/powerlevel9k-test/nvm-test
-  mkdir -p "${FOLDER}"
+  mkdir -p "${FOLDER}/bin"
+  OLD_PATH=$PATH
+  PATH=${FOLDER}/bin:$PATH
   cd $FOLDER
 }
 
 function tearDown() {
+  # Restore old path
+  PATH="${OLD_PATH}"
   # Go back to powerlevel9k folder
   cd "${P9K_HOME}"
   # Remove eventually created test-specific folder
@@ -30,37 +34,29 @@ function tearDown() {
 function testNvmSegmentPrintsNothingIfNvmIsNotAvailable() {
   local POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(nvm custom_world)
   local POWERLEVEL9K_CUSTOM_WORLD='echo world'
-  alias nvm=nonvm
 
   assertEquals "%K{white} %F{black}world %k%F{white}%f " "$(build_left_prompt)"
-
-  unset POWERLEVEL9K_CUSTOM_WORLD
-  unalias nvm
 }
 
 function testNvmSegmentWorksWithoutHavingADefaultAlias() {
   local POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(nvm)
-  nvm() { echo 'v4.6.0'; }
 
-  assertEquals "%K{green} %F{011%}⬢ %f%F{011}4.6.0 %k%F{green}%f " "$(build_left_prompt)"
+  function nvm_version() {
+    [[ ${1} == 'current' ]] && echo 'v4.6.0' || echo 'v1.4.0'
+  }
 
-  unfunction nvm
+  assertEquals "%K{magenta} %F{black%}⬢ %f%F{black}4.6.0 %k%F{magenta}%f " "$(build_left_prompt)"
 }
 
 function testNvmSegmentPrintsNothingWhenOnDefaultVersion() {
   local POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(nvm custom_world)
   local POWERLEVEL9K_CUSTOM_WORLD='echo world'
-  nvm() { echo 'v4.6.0'; }
 
-  export NVM_DIR="${FOLDER}"
-  mkdir alias
-  echo 'v4.6.0' > alias/default
+  function nvm_version() {
+    [[ ${1} == 'current' ]] && echo 'v4.6.0' || echo 'v4.6.0'
+  }
 
   assertEquals "%K{white} %F{black}world %k%F{white}%f " "$(build_left_prompt)"
-
-  unfunction nvm
-  unset POWERLEVEL9K_CUSTOM_WORLD
-  unset NVM_DIR
 }
 
 source shunit2/source/2.1/src/shunit2
