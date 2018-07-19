@@ -22,7 +22,15 @@ function testDirPathAbsoluteWorks() {
   POWERLEVEL9K_DIR_PATH_ABSOLUTE=true
 
   cd ~
-  assertEquals "%K{blue} %F{black}/home/travis %k%F{blue}%f " "$(build_left_prompt)"
+
+  # Unfortunately, we cannot fake Linux or OSX here, because
+  # of /home or /Users path.. That is why we change the test
+  # according to the OS of the host.
+  if [[ "${OS}" == 'Linux' ]]; then
+    assertEquals "%K{blue} %F{black}/home/${USER} %k%F{blue}%f " "$(build_left_prompt)"
+  elif [[ "${OS}" == 'OSX' ]]; then
+    assertEquals "%K{blue} %F{black}/Users/${USER} %k%F{blue}%f " "$(build_left_prompt)"
+  fi
 
   cd -
   unset POWERLEVEL9K_DIR_PATH_ABSOLUTE
