@@ -35,8 +35,6 @@ env:
     - _ZSH_VERSION=5.3
     - _ZSH_VERSION=5.2
     - _ZSH_VERSION=5.1.1
-    - _ZSH_VERSION=5.0.8
-    - _ZSH_VERSION=5.0.2
 
 cache:
   directories:
