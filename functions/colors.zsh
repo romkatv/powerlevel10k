@@ -79,6 +79,10 @@ function getColorCode() {
     else
       echo -n "$1"
     fi
+  # Check if value is none with any case.
+  elif [[ $1 = [nN][oO][nN][eE] ]]
+  then
+    echo -n 'none'
   else
     typeset -A codes
     # https://jonasjacek.github.io/colors/
