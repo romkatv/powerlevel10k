@@ -80,7 +80,7 @@ function getColorCode() {
       echo -n "$1"
     fi
   # Check if value is none with any case.
-  elif [[ $1 = [nN][oO][nN][eE] ]]
+  elif [[ "${(L)1}" == "none" ]]
   then
     echo -n 'none'
   else
