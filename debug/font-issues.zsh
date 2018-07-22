@@ -1,6 +1,21 @@
 #!/usr/bin/env zsh
 #vim:ft=zsh ts=2 sw=2 sts=2 et fenc=utf-8
 
+source functions/colors.zsh
+source functions/icons.zsh
+source functions/utilities.zsh
+# Map our $OS to neofetch $os
+os="$OS"
+
+
+trim() {
+    set -f
+    # shellcheck disable=2048,2086
+    set -- $*
+    printf '%s\n' "${*//[[:space:]]/ }"
+    set +f
+}
+
 get_ppid() {
     # Get parent process ID of PID.
     case "$os" in
