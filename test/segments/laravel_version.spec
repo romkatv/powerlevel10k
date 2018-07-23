@@ -14,16 +14,17 @@ function setUp() {
 function mockLaravelVersion() {
   case "$1" in
     "artisan")
-      echo "Laravel Framework version 5.4.23"
+      # artisan --version follows the format Laravel Framework <version>
+      echo "Laravel Framework 5.4.23"
       ;;
     default)
   esac
 }
 
 function mockNoLaravelVersion() {
-  # This should output some error
-  >&2 echo "Artisan not available"
-  return 1
+  # When php can't find a file it will output a message
+  echo "Could not open input file: artisan"
+  return 0
 }
 
 function testLaravelVersionSegment() {
