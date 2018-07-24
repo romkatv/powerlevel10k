@@ -17,7 +17,6 @@ function testDetectVirtSegmentPrintsNothingIfSystemdIsNotAvailable() {
     local POWERLEVEL9K_CUSTOM_WORLD='echo world'
     alias systemd-detect-virt="novirt"
 
-
     assertEquals "%K{white} %F{black}world %k%F{white}%f " "$(build_left_prompt)"
 
     unalias systemd-detect-virt

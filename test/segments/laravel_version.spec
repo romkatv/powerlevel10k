@@ -27,42 +27,37 @@ function mockNoLaravelVersion() {
 }
 
 function testLaravelVersionSegment() {
-  alias php=mockLaravelVersion
-  POWERLEVEL9K_LARAVEL_ICON='x'
+  local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
   POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(laravel_version)
+  local POWERLEVEL9K_LARAVEL_ICON='x'
+  alias php=mockLaravelVersion
 
   assertEquals "%K{001} %F{white%}x %f%F{white}5.4.23 %k%F{maroon}%f " "$(build_left_prompt)"
 
-  unset POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
-  unset POWERLEVEL9K_LARAVEL_ICON
   unalias php
 }
 
 function testLaravelVersionSegmentIfArtisanIsNotAvailable() {
-  alias php=mockNoLaravelVersion
-  POWERLEVEL9K_CUSTOM_WORLD='echo world'
-  POWERLEVEL9K_LARAVEL_ICON='x'
+  local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
   POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(custom_world laravel_version)
+  local POWERLEVEL9K_CUSTOM_WORLD='echo world'
+  local POWERLEVEL9K_LARAVEL_ICON='x'
+  alias php=mockNoLaravelVersion
 
   assertEquals "%K{white} %F{black}world %k%F{white}%f " "$(build_left_prompt)"
 
-  unset POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
-  unset POWERLEVEL9K_LARAVEL_ICON
-  unset POWERLEVEL9K_CUSTOM_WORLD
   unalias php
 }
 
 function testLaravelVersionSegmentPrintsNothingIfPhpIsNotAvailable() {
-  alias php=noPhp
-  POWERLEVEL9K_CUSTOM_WORLD='echo world'
-  POWERLEVEL9K_LARAVEL_ICON='x'
+  local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
   POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(custom_world laravel_version)
+  local POWERLEVEL9K_CUSTOM_WORLD='echo world'
+  local POWERLEVEL9K_LARAVEL_ICON='x'
+  alias php=noPhp
 
   assertEquals "%K{white} %F{black}world %k%F{white}%f " "$(build_left_prompt)"
 
-  unset POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
-  unset POWERLEVEL9K_LARAVEL_ICON
-  unset POWERLEVEL9K_CUSTOM_WORLD
   unalias php
 }
 

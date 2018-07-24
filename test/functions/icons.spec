@@ -10,21 +10,15 @@ function setUp() {
     _OLD_LC_CTYPE="${LC_CTYPE}"
     # Reset actual LC_CTYPE
     unset LC_CTYPE
-
-    # Store old P9K mode
-    _OLD_P9K_MODE="${POWERLEVEL9K_MODE}"
 }
 
 function tearDown() {
     # Restore LC_CTYPE
     LC_CTYPE="${_OLD_LC_CTYPE}"
-
-    # Restore old P9K mode
-    POWERLEVEL9K_MODE="${_OLD_P9K_MODE}"
 }
 
 function testLcCtypeIsSetCorrectlyInDefaultMode() {
-  POWERLEVEL9K_MODE="default"
+  local POWERLEVEL9K_MODE="default"
   # Load Powerlevel9k
   source functions/icons.zsh
 
@@ -32,7 +26,7 @@ function testLcCtypeIsSetCorrectlyInDefaultMode() {
 }
 
 function testLcCtypeIsSetCorrectlyInAwesomePatchedMode() {
-  POWERLEVEL9K_MODE="awesome-patched"
+  local POWERLEVEL9K_MODE="awesome-patched"
   # Load Powerlevel9k
   source functions/icons.zsh
 
@@ -40,7 +34,7 @@ function testLcCtypeIsSetCorrectlyInAwesomePatchedMode() {
 }
 
 function testLcCtypeIsSetCorrectlyInAwesomeFontconfigMode() {
-  POWERLEVEL9K_MODE="awesome-fontconfig"
+  local POWERLEVEL9K_MODE="awesome-fontconfig"
   # Load Powerlevel9k
   source functions/icons.zsh
 
@@ -48,7 +42,7 @@ function testLcCtypeIsSetCorrectlyInAwesomeFontconfigMode() {
 }
 
 function testLcCtypeIsSetCorrectlyInNerdfontFontconfigMode() {
-  POWERLEVEL9K_MODE="nerdfont-fontconfig"
+  local POWERLEVEL9K_MODE="nerdfont-fontconfig"
   # Load Powerlevel9k
   source functions/icons.zsh
 
@@ -56,7 +50,7 @@ function testLcCtypeIsSetCorrectlyInNerdfontFontconfigMode() {
 }
 
 function testLcCtypeIsSetCorrectlyInFlatMode() {
-  POWERLEVEL9K_MODE="flat"
+  local POWERLEVEL9K_MODE="flat"
   # Load Powerlevel9k
   source functions/icons.zsh
 
@@ -64,7 +58,7 @@ function testLcCtypeIsSetCorrectlyInFlatMode() {
 }
 
 function testLcCtypeIsSetCorrectlyInCompatibleMode() {
-  POWERLEVEL9K_MODE="compatible"
+  local POWERLEVEL9K_MODE="compatible"
   # Load Powerlevel9k
   source functions/icons.zsh
 
@@ -76,7 +70,7 @@ function testLcCtypeIsSetCorrectlyInCompatibleMode() {
 function testAllIconsAreDefinedLikeInDefaultMode() {
   # Always compare against this mode
   local _P9K_TEST_MODE="default"
-  POWERLEVEL9K_MODE="${_P9K_TEST_MODE}"
+  local POWERLEVEL9K_MODE="${_P9K_TEST_MODE}"
   source functions/icons.zsh
   # _ICONS_UNDER_TEST is an array of just the keys of $icons.
   # We later check via (r) "subscript" flag that our key
@@ -148,7 +142,7 @@ function testAllIconsAreDefinedLikeInDefaultMode() {
 function testAllIconsAreDefinedLikeInAwesomePatchedMode() {
   # Always compare against this mode
   local _P9K_TEST_MODE="awesome-patched"
-  POWERLEVEL9K_MODE="$_P9K_TEST_MODE"
+  local POWERLEVEL9K_MODE="$_P9K_TEST_MODE"
   source functions/icons.zsh
   # _ICONS_UNDER_TEST is an array of just the keys of $icons.
   # We later check via (r) "subscript" flag that our key
@@ -220,7 +214,7 @@ function testAllIconsAreDefinedLikeInAwesomePatchedMode() {
 function testAllIconsAreDefinedLikeInAwesomeFontconfigMode() {
   # Always compare against this mode
   local _P9K_TEST_MODE="awesome-fontconfig"
-  POWERLEVEL9K_MODE="$_P9K_TEST_MODE"
+  local POWERLEVEL9K_MODE="$_P9K_TEST_MODE"
   source functions/icons.zsh
   # _ICONS_UNDER_TEST is an array of just the keys of $icons.
   # We later check via (r) "subscript" flag that our key
@@ -292,7 +286,7 @@ function testAllIconsAreDefinedLikeInAwesomeFontconfigMode() {
 function testAllIconsAreDefinedLikeInNerdfontFontconfigMode() {
   # Always compare against this mode
   local _P9K_TEST_MODE="nerdfont-fontconfig"
-  POWERLEVEL9K_MODE="$_P9K_TEST_MODE"
+  local POWERLEVEL9K_MODE="$_P9K_TEST_MODE"
   source functions/icons.zsh
   # _ICONS_UNDER_TEST is an array of just the keys of $icons.
   # We later check via (r) "subscript" flag that our key
