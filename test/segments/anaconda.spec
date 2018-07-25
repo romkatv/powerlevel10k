@@ -7,14 +7,16 @@ SHUNIT_PARENT=$0
 
 function setUp() {
   export TERM="xterm-256color"
-  # Load Powerlevel9k
-  source powerlevel9k.zsh-theme
 }
 
 function testAnacondaSegmentPrintsNothingIfNoAnacondaPathIsSet() {
     local POWERLEVEL9K_CUSTOM_WORLD='echo world'
     local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
     POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(anaconda custom_world)
+
+    # Load Powerlevel9k
+    source powerlevel9k.zsh-theme
+
     # Unset anacona variables
     unset CONDA_ENV_PATH
     unset CONDA_PREFIX
@@ -23,34 +25,45 @@ function testAnacondaSegmentPrintsNothingIfNoAnacondaPathIsSet() {
 }
 
 function testAnacondaSegmentWorksIfOnlyAnacondaPathIsSet() {
-    CONDA_ENV_PATH=/tmp
-    unset CONDA_PREFIX
     local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
     POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(anaconda)
     local POWERLEVEL9K_PYTHON_ICON="icon-here"
+
+    # Load Powerlevel9k
+    source powerlevel9k.zsh-theme
+
+    CONDA_ENV_PATH=/tmp
+    unset CONDA_PREFIX
 
     assertEquals "%K{blue} %F{black%}icon-here %f%F{black}(tmp) %k%F{blue}%f " "$(build_left_prompt)"
 }
 
 function testAnacondaSegmentWorksIfOnlyAnacondaPrefixIsSet() {
-    unset CONDA_ENV_PATH
-    local CONDA_PREFIX="test"
     local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
     POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(anaconda)
     local POWERLEVEL9K_PYTHON_ICON="icon-here"
+
+    # Load Powerlevel9k
+    source powerlevel9k.zsh-theme
+
+    unset CONDA_ENV_PATH
+    local CONDA_PREFIX="test"
 
     assertEquals "%K{blue} %F{black%}icon-here %f%F{black}(test) %k%F{blue}%f " "$(build_left_prompt)"
 }
 
 function testAnacondaSegmentWorks() {
-    local CONDA_ENV_PATH=/tmp
-    local CONDA_PREFIX="test"
     local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
     POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(anaconda)
     local POWERLEVEL9K_PYTHON_ICON="icon-here"
 
-    assertEquals "%K{blue} %F{black%}icon-here %f%F{black}(tmptest) %k%F{blue}%f " "$(build_left_prompt)"
+    # Load Powerlevel9k
+    source powerlevel9k.zsh-theme
 
+    local CONDA_ENV_PATH=/tmp
+    local CONDA_PREFIX="test"
+
+    assertEquals "%K{blue} %F{black%}icon-here %f%F{black}(tmptest) %k%F{blue}%f " "$(build_left_prompt)"
 }
 
 source shunit2/source/2.1/src/shunit2

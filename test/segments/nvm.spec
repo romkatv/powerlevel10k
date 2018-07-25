@@ -7,8 +7,6 @@ SHUNIT_PARENT=$0
 
 function setUp() {
   export TERM="xterm-256color"
-  # Load Powerlevel9k
-  source powerlevel9k.zsh-theme
 
   P9K_HOME=$(pwd)
   ### Test specific
@@ -36,12 +34,18 @@ function testNvmSegmentPrintsNothingIfNvmIsNotAvailable() {
   POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(nvm custom_world)
   local POWERLEVEL9K_CUSTOM_WORLD='echo world'
 
+  # Load Powerlevel9k
+  source ${P9K_HOME}/powerlevel9k.zsh-theme
+
   assertEquals "%K{white} %F{black}world %k%F{white}%f " "$(build_left_prompt)"
 }
 
 function testNvmSegmentWorksWithoutHavingADefaultAlias() {
   local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
   POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(nvm)
+
+  # Load Powerlevel9k
+  source ${P9K_HOME}/powerlevel9k.zsh-theme
 
   function nvm_version() {
     [[ ${1} == 'current' ]] && echo 'v4.6.0' || echo 'v1.4.0'
@@ -54,6 +58,9 @@ function testNvmSegmentPrintsNothingWhenOnDefaultVersion() {
   local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
   POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(nvm custom_world)
   local POWERLEVEL9K_CUSTOM_WORLD='echo world'
+
+  # Load Powerlevel9k
+  source ${P9K_HOME}/powerlevel9k.zsh-theme
 
   function nvm_version() {
     [[ ${1} == 'current' ]] && echo 'v4.6.0' || echo 'v4.6.0'

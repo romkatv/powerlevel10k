@@ -7,8 +7,6 @@ SHUNIT_PARENT=$0
 
 function setUp() {
   export TERM="xterm-256color"
-  # Load Powerlevel9k
-  source powerlevel9k.zsh-theme
 }
 
 function mockLaravelVersion() {
@@ -32,6 +30,9 @@ function testLaravelVersionSegment() {
   local POWERLEVEL9K_LARAVEL_ICON='x'
   alias php=mockLaravelVersion
 
+  # Load Powerlevel9k
+  source powerlevel9k.zsh-theme
+
   assertEquals "%K{001} %F{white%}x %f%F{white}5.4.23 %k%F{maroon}%f " "$(build_left_prompt)"
 
   unalias php
@@ -44,6 +45,9 @@ function testLaravelVersionSegmentIfArtisanIsNotAvailable() {
   local POWERLEVEL9K_LARAVEL_ICON='x'
   alias php=mockNoLaravelVersion
 
+  # Load Powerlevel9k
+  source powerlevel9k.zsh-theme
+
   assertEquals "%K{white} %F{black}world %k%F{white}%f " "$(build_left_prompt)"
 
   unalias php
@@ -55,6 +59,9 @@ function testLaravelVersionSegmentPrintsNothingIfPhpIsNotAvailable() {
   local POWERLEVEL9K_CUSTOM_WORLD='echo world'
   local POWERLEVEL9K_LARAVEL_ICON='x'
   alias php=noPhp
+
+  # Load Powerlevel9k
+  source powerlevel9k.zsh-theme
 
   assertEquals "%K{white} %F{black}world %k%F{white}%f " "$(build_left_prompt)"
 

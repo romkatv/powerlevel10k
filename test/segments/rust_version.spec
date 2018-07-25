@@ -14,8 +14,6 @@ function setUp() {
   PATH="${RUST_TEST_FOLDER}:${PATH}"
 
   export TERM="xterm-256color"
-  # Load Powerlevel9k
-  source powerlevel9k.zsh-theme
 }
 
 function tearDown() {
@@ -33,6 +31,9 @@ function testRust() {
   POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(rust_version)
   mockRust
 
+  # Load Powerlevel9k
+  source powerlevel9k.zsh-theme
+
   assertEquals "%K{208} %F{black%}Rust %f%F{black}0.4.1a-alpha %k%F{darkorange}%f " "$(build_left_prompt)"
 }
 
@@ -40,6 +41,9 @@ function testRustPrintsNothingIfRustIsNotAvailable() {
   local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
   POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(custom_world rust_version)
   local POWERLEVEL9K_CUSTOM_WORLD='echo world'
+
+  # Load Powerlevel9k
+  source powerlevel9k.zsh-theme
 
   assertEquals "%K{white} %F{black}world %k%F{white}%f " "$(build_left_prompt)"
 }

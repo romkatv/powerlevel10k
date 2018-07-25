@@ -7,16 +7,17 @@ SHUNIT_PARENT=$0
 
 function setUp() {
   export TERM="xterm-256color"
-  # Load Powerlevel9k
-  source powerlevel9k.zsh-theme
 }
 
 function testIpSegmentPrintsNothingOnOsxIfNotConnected() {
   local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
   POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(ip custom_world)
   alias networksetup='echo "not connected"'
-  local OS="OSX" # Fake OSX
   local POWERLEVEL9K_CUSTOM_WORLD='echo world'
+
+  # Load Powerlevel9k
+  source powerlevel9k.zsh-theme
+  local OS="OSX" # Fake OSX
 
   assertEquals "%K{white} %F{black}world %k%F{white}%f " "$(build_left_prompt)"
 
@@ -27,8 +28,11 @@ function testIpSegmentPrintsNothingOnLinuxIfNotConnected() {
   local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
   POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(ip custom_world)
   alias ip='echo "not connected"'
-  local OS="Linux" # Fake Linux
   local POWERLEVEL9K_CUSTOM_WORLD='echo world'
+
+  # Load Powerlevel9k
+  source powerlevel9k.zsh-theme
+  local OS="Linux" # Fake Linux
 
   assertEquals "%K{white} %F{black}world %k%F{white}%f " "$(build_left_prompt)"
 
@@ -38,7 +42,6 @@ function testIpSegmentPrintsNothingOnLinuxIfNotConnected() {
 function testIpSegmentWorksOnOsxWithNoInterfaceSpecified() {
   local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
   POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(ip)
-  local OS='OSX' # Fake OSX
   alias networksetup="echo 'An asterisk (*) denotes that a network service is disabled.
 (1) Ethernet
 (Hardware Port: Ethernet, Device: en0)
@@ -61,6 +64,10 @@ function testIpSegmentWorksOnOsxWithNoInterfaceSpecified() {
 
   alias ipconfig="_(){ echo '1.2.3.4'; };_"
 
+  # Load Powerlevel9k
+  source powerlevel9k.zsh-theme
+  local OS='OSX' # Fake OSX
+
   assertEquals "%K{cyan} %F{black%}IP %f%F{black}1.2.3.4 %k%F{cyan}%f " "$(build_left_prompt)"
 
   unalias ipconfig
@@ -74,7 +81,6 @@ function testIpSegmentWorksOnOsxWithNoInterfaceSpecified() {
 function testIpSegmentWorksOnOsxWithMultipleInterfacesSpecified() {
   local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
   POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(ip)
-  local OS='OSX' # Fake OSX
   alias networksetup="echo 'An asterisk (*) denotes that a network service is disabled.
 (1) Ethernet
 (Hardware Port: Ethernet, Device: en0)
@@ -113,6 +119,10 @@ function testIpSegmentWorksOnOsxWithMultipleInterfacesSpecified() {
       }
   }
 
+  # Load Powerlevel9k
+  source powerlevel9k.zsh-theme
+  local OS='OSX' # Fake OSX
+
   assertEquals "%K{cyan} %F{black%}IP %f%F{black}1.2.3.4 %k%F{cyan}%f " "$(build_left_prompt)"
 
   unfunction ipconfig
@@ -122,9 +132,12 @@ function testIpSegmentWorksOnOsxWithMultipleInterfacesSpecified() {
 function testIpSegmentWorksOnOsxWithInterfaceSpecified() {
   local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
   POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(ip)
-  local OS='OSX' # Fake OSX
   local POWERLEVEL9K_IP_INTERFACE='xxx'
   alias ipconfig="_(){ echo '1.2.3.4'; };_"
+
+  # Load Powerlevel9k
+  source powerlevel9k.zsh-theme
+  local OS='OSX' # Fake OSX
 
   assertEquals "%K{cyan} %F{black%}IP %f%F{black}1.2.3.4 %k%F{cyan}%f " "$(build_left_prompt)"
 
@@ -134,7 +147,6 @@ function testIpSegmentWorksOnOsxWithInterfaceSpecified() {
 function testIpSegmentWorksOnLinuxWithNoInterfaceSpecified() {
     setopt aliases
     local POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(ip)
-    local OS='Linux' # Fake Linux
     # That command is harder to test, as it is used at first
     # to get all relevant network interfaces and then for
     # getting the configuration of that segment..
@@ -151,18 +163,21 @@ function testIpSegmentWorksOnLinuxWithNoInterfaceSpecified() {
     inet 10.0.2.15/24 brd 10.0.2.255 scope global eth0
        valid_lft forever preferred_lft forever';
       fi
-   }
+    }
 
-  assertEquals "%K{cyan} %F{black%}IP %f%F{black}10.0.2.15 %k%F{cyan}%f " "$(build_left_prompt)"
+    # Load Powerlevel9k
+    source powerlevel9k.zsh-theme
+    local OS='Linux' # Fake Linux
 
-  unfunction ip
+    assertEquals "%K{cyan} %F{black%}IP %f%F{black}10.0.2.15 %k%F{cyan}%f " "$(build_left_prompt)"
+
+    unfunction ip
 }
 
 function testIpSegmentWorksOnLinuxWithMultipleInterfacesSpecified() {
     setopt aliases
     local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
     POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(ip)
-    local OS='Linux' # Fake Linux
     # That command is harder to test, as it is used at first
     # to get all relevant network interfaces and then for
     # getting the configuration of that segment..
@@ -183,23 +198,30 @@ function testIpSegmentWorksOnLinuxWithMultipleInterfacesSpecified() {
     inet 10.0.2.15/24 brd 10.0.2.255 scope global eth0
        valid_lft forever preferred_lft forever';
       fi
-   }
+    }
 
-  assertEquals "%K{cyan} %F{black%}IP %f%F{black}10.0.2.15 %k%F{cyan}%f " "$(build_left_prompt)"
+    # Load Powerlevel9k
+    source powerlevel9k.zsh-theme
+    local OS='Linux' # Fake Linux
 
-  unfunction ip
+    assertEquals "%K{cyan} %F{black%}IP %f%F{black}10.0.2.15 %k%F{cyan}%f " "$(build_left_prompt)"
+
+    unfunction ip
 }
 
 function testIpSegmentWorksOnLinuxWithInterfaceSpecified() {
   local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
   POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(ip)
-  local OS='Linux' # Fake Linux
   local POWERLEVEL9K_IP_INTERFACE='xxx'
   ip(){
     echo '2: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast state UP group default qlen 1000
 inet 10.0.2.15/24 brd 10.0.2.255 scope global eth0
     valid_lft forever preferred_lft forever';
-   }
+  }
+
+  # Load Powerlevel9k
+  source powerlevel9k.zsh-theme
+  local OS='Linux' # Fake Linux
 
   assertEquals "%K{cyan} %F{black%}IP %f%F{black}10.0.2.15 %k%F{cyan}%f " "$(build_left_prompt)"
 

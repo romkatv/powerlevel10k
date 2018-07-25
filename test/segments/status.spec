@@ -7,8 +7,6 @@ SHUNIT_PARENT=$0
 
 function setUp() {
   export TERM="xterm-256color"
-  # Load Powerlevel9k
-  source powerlevel9k.zsh-theme
 
   ### Test specific
   # Resets if someone has set these in his/hers env
@@ -23,6 +21,9 @@ function testStatusPrintsNothingIfReturnCodeIsZeroAndVerboseIsUnset() {
     local POWERLEVEL9K_STATUS_VERBOSE=false
     local POWERLEVEL9K_STATUS_SHOW_PIPESTATUS=false
 
+    # Load Powerlevel9k
+    source powerlevel9k.zsh-theme
+
     assertEquals "%K{white} %F{black}world %k%F{white}%f " "$(build_left_prompt)"
 }
 
@@ -33,6 +34,9 @@ function testStatusWorksAsExpectedIfReturnCodeIsZeroAndVerboseIsSet() {
     local POWERLEVEL9K_STATUS_SHOW_PIPESTATUS=false
     local POWERLEVEL9K_STATUS_HIDE_SIGNAME=true
 
+    # Load Powerlevel9k
+    source powerlevel9k.zsh-theme
+
     assertEquals "%K{black} %F{green%}✔%f %k%F{black}%f " "$(build_left_prompt)"
 }
 
@@ -41,6 +45,9 @@ function testStatusInGeneralErrorCase() {
     POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(status)
     local POWERLEVEL9K_STATUS_VERBOSE=true
     local POWERLEVEL9K_STATUS_SHOW_PIPESTATUS=false
+
+    # Load Powerlevel9k
+    source powerlevel9k.zsh-theme
     local RETVAL=1
 
     assertEquals "%K{red} %F{yellow1%}↵ %f%F{yellow1}1 %k%F{red}%f " "$(build_left_prompt)"
@@ -51,6 +58,9 @@ function testPipestatusInErrorCase() {
     POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(status)
     local POWERLEVEL9K_STATUS_VERBOSE=true
     local POWERLEVEL9K_STATUS_SHOW_PIPESTATUS=true
+
+    # Load Powerlevel9k
+    source powerlevel9k.zsh-theme
     local -a RETVALS
     RETVALS=(0 0 1 0)
 
@@ -63,6 +73,9 @@ function testStatusCrossWinsOverVerbose() {
     local POWERLEVEL9K_STATUS_SHOW_PIPESTATUS=false
     local POWERLEVEL9K_STATUS_VERBOSE=true
     local POWERLEVEL9K_STATUS_CROSS=true
+
+    # Load Powerlevel9k
+    source powerlevel9k.zsh-theme
     local RETVAL=1
 
     assertEquals "%K{black} %F{red%}✘%f %k%F{black}%f " "$(build_left_prompt)"
@@ -74,6 +87,9 @@ function testStatusShowsSignalNameInErrorCase() {
     local POWERLEVEL9K_STATUS_SHOW_PIPESTATUS=false
     local POWERLEVEL9K_STATUS_VERBOSE=true
     local POWERLEVEL9K_STATUS_HIDE_SIGNAME=false
+
+    # Load Powerlevel9k
+    source powerlevel9k.zsh-theme
     local RETVAL=132
 
     assertEquals "%K{red} %F{yellow1%}↵ %f%F{yellow1}SIGILL(4) %k%F{red}%f " "$(build_left_prompt)"
@@ -84,6 +100,10 @@ function testStatusSegmentIntegrated() {
     POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(status)
     local -a POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS
     POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=()
+    local POWERLEVEL9K_STATUS_CROSS=true
+    
+    # Load Powerlevel9k
+    source powerlevel9k.zsh-theme
 
     false; powerlevel9k_prepare_prompts
 

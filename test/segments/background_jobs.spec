@@ -7,8 +7,6 @@ SHUNIT_PARENT=$0
 
 function setUp() {
   export TERM="xterm-256color"
-  # Load Powerlevel9k
-  source powerlevel9k.zsh-theme
 }
 
 function testBackgroundJobsSegmentPrintsNothingWithoutBackgroundJobs() {
@@ -16,6 +14,9 @@ function testBackgroundJobsSegmentPrintsNothingWithoutBackgroundJobs() {
     local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
     POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(background_jobs custom_world)
     alias jobs="nojobs 2>/dev/null"
+
+    # Load Powerlevel9k
+    source powerlevel9k.zsh-theme
 
     assertEquals "%K{white} %F{black}world %k%F{white}%f " "$(build_left_prompt)"
 
@@ -29,6 +30,9 @@ function testBackgroundJobsSegmentWorksWithOneBackgroundJob() {
     jobs() {
         echo '[1]  + 30444 suspended  nvim xx'
     }
+
+    # Load Powerlevel9k
+    source powerlevel9k.zsh-theme
 
     assertEquals "%K{black} %F{cyan%}⚙%f %k%F{black}%f " "$(build_left_prompt)"
 
@@ -45,6 +49,9 @@ function testBackgroundJobsSegmentWorksWithMultipleBackgroundJobs() {
         echo "[3]  + 31206 suspended  nvim xx3"
     }
 
+    # Load Powerlevel9k
+    source powerlevel9k.zsh-theme
+
     assertEquals "%K{black} %F{cyan%}⚙%f %k%F{black}%f " "$(build_left_prompt)"
 
     unfunction jobs
@@ -59,6 +66,9 @@ function testBackgroundJobsSegmentWithVerboseMode() {
         echo "[2]  - 31194 suspended  nvim xx2"
         echo "[3]  + 31206 suspended  nvim xx3"
     }
+
+    # Load Powerlevel9k
+    source powerlevel9k.zsh-theme
 
     assertEquals "%K{black} %F{cyan%}⚙ %f%F{cyan}3 %k%F{black}%f " "$(build_left_prompt)"
 

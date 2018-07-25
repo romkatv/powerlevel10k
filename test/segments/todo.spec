@@ -7,8 +7,6 @@ SHUNIT_PARENT=$0
 
 function setUp() {
   export TERM="xterm-256color"
-  # Load Powerlevel9k
-  source powerlevel9k.zsh-theme
 
   P9K_HOME=$(pwd)
   ### Test specific
@@ -37,6 +35,9 @@ function testTodoSegmentPrintsNothingIfTodoShIsNotInstalled() {
     POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(todo custom_world)
     local POWERLEVEL9K_CUSTOM_WORLD='echo world'
 
+    # Load Powerlevel9k
+    source ${P9K_HOME}/powerlevel9k.zsh-theme
+
     assertEquals "%K{white} %F{black}world %k%F{white}%f " "$(build_left_prompt)"
 }
 
@@ -47,6 +48,9 @@ function testTodoSegmentWorksAsExpected() {
     echo '#!/bin/sh' > ${FOLDER}/bin/todo.sh
     echo 'echo "TODO: 34 of 100 tasks shown";' >> ${FOLDER}/bin/todo.sh
     chmod +x ${FOLDER}/bin/todo.sh
+
+    # Load Powerlevel9k
+    source ${P9K_HOME}/powerlevel9k.zsh-theme
 
     assertEquals "%K{244} %F{black%}☑ %f%F{black}100 %k%F{grey50}%f " "$(build_left_prompt)"
 }

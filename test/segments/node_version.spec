@@ -7,8 +7,6 @@ SHUNIT_PARENT=$0
 
 function setUp() {
   export TERM="xterm-256color"
-  # Load Powerlevel9k
-  source powerlevel9k.zsh-theme
 }
 
 function testNodeVersionSegmentPrintsNothingWithoutNode() {
@@ -17,9 +15,11 @@ function testNodeVersionSegmentPrintsNothingWithoutNode() {
     local POWERLEVEL9K_CUSTOM_WORLD='echo world'
     alias node="nonode 2>/dev/null"
 
+    # Load Powerlevel9k
+    source powerlevel9k.zsh-theme
+
     assertEquals "%K{white} %F{black}world %k%F{white}%f " "$(build_left_prompt)"
 
-    unset POWERLEVEL9K_CUSTOM_WORLD
     unalias node
 }
 
@@ -29,6 +29,9 @@ function testNodeVersionSegmentWorks() {
     node() {
         echo "v1.2.3"
     }
+
+    # Load Powerlevel9k
+    source powerlevel9k.zsh-theme
 
     assertEquals "%K{green} %F{white%}⬢ %f%F{white}1.2.3 %k%F{green}%f " "$(build_left_prompt)"
 

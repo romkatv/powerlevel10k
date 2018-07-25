@@ -7,8 +7,6 @@ SHUNIT_PARENT=$0
 
 function setUp() {
   export TERM="xterm-256color"
-  # Load Powerlevel9k
-  source powerlevel9k.zsh-theme
 
   P9K_HOME=$(pwd)
   ### Test specific
@@ -38,8 +36,11 @@ function testLoadSegmentWorksOnOsx() {
         fi
     }
 
-    local OS="OSX" # Fake OSX
     local POWERLEVEL9K_LOAD_WHICH=1
+
+    # Load Powerlevel9k
+    source ${P9K_HOME}/powerlevel9k.zsh-theme
+    local OS="OSX" # Fake OSX
 
     assertEquals "%K{green} %F{black%}L %f%F{black}1.38 " "$(prompt_load left 1 false ${FOLDER})"
 
@@ -57,8 +58,11 @@ function testLoadSegmentWorksOnBsd() {
         fi
     }
 
-    local OS="BSD" # Fake BSD
     local POWERLEVEL9K_LOAD_WHICH=1
+    
+    # Load Powerlevel9k
+    source ${P9K_HOME}/powerlevel9k.zsh-theme
+    local OS="BSD" # Fake BSD
 
     assertEquals "%K{green} %F{black%}L %f%F{black}1.38 " "$(prompt_load left 1 false ${FOLDER})"
 
@@ -71,9 +75,11 @@ function testLoadSegmentWorksOnLinux() {
     echo "1.38 0.01 0.05 1/87 8641" > proc/loadavg
 
     alias nproc="echo 4"
-
-    local OS="Linux" # Fake Linux
     local POWERLEVEL9K_LOAD_WHICH=1
+
+    # Load Powerlevel9k
+    source ${P9K_HOME}/powerlevel9k.zsh-theme
+    local OS="Linux" # Fake Linux
 
     assertEquals "%K{green} %F{black%}L %f%F{black}1.38 " "$(prompt_load left 1 false ${FOLDER})"
 
@@ -89,9 +95,11 @@ function testLoadSegmentNormalState() {
     echo "1.00 0.01 0.05 1/87 8641" > proc/loadavg
 
     alias nproc="echo 4"
-
-    local OS="Linux" # Fake Linux
     local POWERLEVEL9K_LOAD_WHICH=1
+
+    # Load Powerlevel9k
+    source ${P9K_HOME}/powerlevel9k.zsh-theme
+    local OS="Linux" # Fake Linux
 
     assertEquals "%K{green} %F{black%}L %f%F{black}1.00 " "$(prompt_load left 1 false ${FOLDER})"
 
@@ -107,9 +115,11 @@ function testLoadSegmentWarningState() {
     echo "2.01 0.01 0.05 1/87 8641" > proc/loadavg
 
     alias nproc="echo 4"
-
-    local OS="Linux" # Fake Linux
     local POWERLEVEL9K_LOAD_WHICH=1
+
+    # Load Powerlevel9k
+    source ${P9K_HOME}/powerlevel9k.zsh-theme
+    local OS="Linux" # Fake Linux
 
     assertEquals "%K{yellow} %F{black%}L %f%F{black}2.01 " "$(prompt_load left 1 false ${FOLDER})"
 
@@ -125,9 +135,11 @@ function testLoadSegmentCriticalState() {
     echo "2.81 0.01 0.05 1/87 8641" > proc/loadavg
 
     alias nproc="echo 4"
-
-    local OS="Linux" # Fake Linux
     local POWERLEVEL9K_LOAD_WHICH=1
+
+    # Load Powerlevel9k
+    source ${P9K_HOME}/powerlevel9k.zsh-theme
+    local OS="Linux" # Fake Linux
 
     assertEquals "%K{red} %F{black%}L %f%F{black}2.81 " "$(prompt_load left 1 false ${FOLDER})"
 

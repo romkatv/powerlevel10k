@@ -7,8 +7,6 @@ SHUNIT_PARENT=$0
 
 function setUp() {
   export TERM="xterm-256color"
-  # Load Powerlevel9k
-  source powerlevel9k.zsh-theme
 
   P9K_HOME=$(pwd)
   ### Test specific
@@ -75,6 +73,9 @@ function testColorOverridingForCleanStateWorks() {
   local POWERLEVEL9K_VCS_CLEAN_FOREGROUND='cyan'
   local POWERLEVEL9K_VCS_CLEAN_BACKGROUND='white'
 
+  # Load Powerlevel9k
+  source ${P9K_HOME}/powerlevel9k.zsh-theme
+
   assertEquals "%K{white} %F{cyan} master %k%F{white}%f " "$(build_left_prompt)"
 }
 
@@ -88,6 +89,9 @@ function testColorOverridingForModifiedStateWorks() {
   git add testfile
   git commit -m "test" 1>/dev/null
   echo "test" > testfile
+  
+  # Load Powerlevel9k
+  source ${P9K_HOME}/powerlevel9k.zsh-theme
 
   assertEquals "%K{yellow} %F{red} master ● %k%F{yellow}%f " "$(build_left_prompt)"
 }
@@ -100,12 +104,18 @@ function testColorOverridingForUntrackedStateWorks() {
 
   touch testfile
 
+  # Load Powerlevel9k
+  source ${P9K_HOME}/powerlevel9k.zsh-theme
+
   assertEquals "%K{yellow} %F{cyan} master ? %k%F{yellow}%f " "$(build_left_prompt)"
 }
 
 function testGitIconWorks() {
   local POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(vcs)
   local POWERLEVEL9K_VCS_GIT_ICON='Git-Icon'
+
+  # Load Powerlevel9k
+  source ${P9K_HOME}/powerlevel9k.zsh-theme
 
   assertEquals "%K{green} %F{black%}Git-Icon %f%F{black} master %k%F{green}%f " "$(build_left_prompt)"
 }
@@ -119,6 +129,9 @@ function testGitlabIconWorks() {
   # sufficient to show the GitLab-specific icon.
   git remote add origin https://gitlab.com/dritter/gitlab-test-project.git
 
+  # Load Powerlevel9k
+  source ${P9K_HOME}/powerlevel9k.zsh-theme
+
   assertEquals "%K{green} %F{black%}GL-Icon %f%F{black} master %k%F{green}%f " "$(build_left_prompt)"
 }
 
@@ -130,6 +143,9 @@ function testBitbucketIconWorks() {
   # Add a BitBucket project as remote origin. This is
   # sufficient to show the BitBucket-specific icon.
   git remote add origin https://dritter@bitbucket.org/dritter/dr-test.git
+
+  # Load Powerlevel9k
+  source ${P9K_HOME}/powerlevel9k.zsh-theme
 
   assertEquals "%K{green} %F{black%}BB-Icon %f%F{black} master %k%F{green}%f " "$(build_left_prompt)"
 }
@@ -143,6 +159,9 @@ function testGitHubIconWorks() {
   # sufficient to show the GitHub-specific icon.
   git remote add origin https://github.com/dritter/test.git
 
+  # Load Powerlevel9k
+  source ${P9K_HOME}/powerlevel9k.zsh-theme
+
   assertEquals "%K{green} %F{black%}GH-Icon %f%F{black} master %k%F{green}%f " "$(build_left_prompt)"
 }
 
@@ -153,6 +172,9 @@ function testUntrackedFilesIconWorks() {
 
   # Create untracked file
   touch "i-am-untracked.txt"
+
+  # Load Powerlevel9k
+  source ${P9K_HOME}/powerlevel9k.zsh-theme
 
   assertEquals "%K{green} %F{black} master ? %k%F{green}%f " "$(build_left_prompt)"
 }
@@ -169,7 +191,10 @@ function testStagedFilesIconWorks() {
   echo "xx" >> i-am-added.txt
   git add i-am-added.txt &>/dev/null
 
-  assertEquals "%K{yellow} %F{black} master ✚ %k%F{yellow}%f " "$(build_left_prompt)"
+  # Load Powerlevel9k
+  source ${P9K_HOME}/powerlevel9k.zsh-theme
+
+  assertEquals "%K{yellow} %F{black} master + %k%F{yellow}%f " "$(build_left_prompt)"
 }
 
 function testUnstagedFilesIconWorks() {
@@ -183,7 +208,10 @@ function testUnstagedFilesIconWorks() {
   git commit -m "Add File" 1>/dev/null
   echo "xx" > i-am-modified.txt
 
-  assertEquals "%K{yellow} %F{black} master ● %k%F{yellow}%f " "$(build_left_prompt)"
+  # Load Powerlevel9k
+  source ${P9K_HOME}/powerlevel9k.zsh-theme
+
+  assertEquals "%K{yellow} %F{black} master M %k%F{yellow}%f " "$(build_left_prompt)"
 }
 
 function testStashIconWorks() {
@@ -198,6 +226,9 @@ function testStashIconWorks() {
   echo "xx" > i-am-modified.txt
   git stash 1>/dev/null
 
+  # Load Powerlevel9k
+  source ${P9K_HOME}/powerlevel9k.zsh-theme
+
   assertEquals "%K{green} %F{black} master S1 %k%F{green}%f " "$(build_left_prompt)"
 }
 
@@ -210,6 +241,9 @@ function testTagIconWorks() {
   git add file.txt
   git commit -m "Add File" 1>/dev/null
   git tag "v0.0.1"
+
+  # Load Powerlevel9k
+  source ${P9K_HOME}/powerlevel9k.zsh-theme
 
   assertEquals "%K{green} %F{black} master Tv0.0.1 %k%F{green}%f " "$(build_left_prompt)"
 }
@@ -228,6 +262,9 @@ function testTagIconInDetachedHeadState() {
   git commit -m "Add File2" &>/dev/null
   git checkout v0.0.1 &>/dev/null
   local hash=$(git rev-list -n 1 --abbrev-commit --abbrev=8 HEAD)
+
+  # Load Powerlevel9k
+  source ${P9K_HOME}/powerlevel9k.zsh-theme
 
   assertEquals "%K{green} %F{black} ${hash} Tv0.0.1 %k%F{green}%f " "$(build_left_prompt)"
 }
@@ -249,6 +286,9 @@ function testActionHintWorks() {
   git commit -a -m "Provoke conflict" &>/dev/null
   git pull &>/dev/null
 
+  # Load Powerlevel9k
+  source ${P9K_HOME}/powerlevel9k.zsh-theme
+
   assertEquals "%K{yellow} %F{black} master %F{red}| merge%f %k%F{yellow}%f " "$(build_left_prompt)"
 }
 
@@ -267,6 +307,9 @@ function testIncomingHintWorks() {
 
   cd ../vcs-test2
   git fetch &>/dev/null
+
+  # Load Powerlevel9k
+  source ${P9K_HOME}/powerlevel9k.zsh-theme
 
   assertEquals "%K{green} %F{black} master I1 %k%F{green}%f " "$(build_left_prompt)"
 }
@@ -287,6 +330,9 @@ function testOutgoingHintWorks() {
   echo "xx" >> i-am-modified.txt
   git commit -a -m "Modified file" &>/dev/null
 
+  # Load Powerlevel9k
+  source ${P9K_HOME}/powerlevel9k.zsh-theme
+
   assertEquals "%K{green} %F{black} master o1 %k%F{green}%f " "$(build_left_prompt)"
 }
 
@@ -300,6 +346,9 @@ function testShorteningCommitHashWorks() {
   git add file.txt
   git commit -m "Add File" 1>/dev/null
   local hash=$(git rev-list -n 1 --abbrev-commit --abbrev=3 HEAD)
+
+  # Load Powerlevel9k
+  source ${P9K_HOME}/powerlevel9k.zsh-theme
 
   # This test needs to call powerlevel9k_vcs_init, where
   # the changeset is truncated.
@@ -316,6 +365,9 @@ function testShorteningCommitHashIsNotShownIfShowChangesetIsFalse() {
   touch "file.txt"
   git add file.txt
   git commit -m "Add File" 1>/dev/null
+
+  # Load Powerlevel9k
+  source ${P9K_HOME}/powerlevel9k.zsh-theme
 
   # This test needs to call powerlevel9k_vcs_init, where
   # the changeset is truncated.

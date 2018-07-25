@@ -7,8 +7,6 @@ SHUNIT_PARENT=$0
 
 function setUp() {
   export TERM="xterm-256color"
-  # Load Powerlevel9k
-  source powerlevel9k.zsh-theme
 
   P9K_HOME=$(pwd)
   ### Test specific
@@ -33,6 +31,8 @@ function testSwiftSegmentPrintsNothingIfSwiftIsNotAvailable() {
     local POWERLEVEL9K_CUSTOM_WORLD='echo world'
     alias swift="noswift"
 
+    # Load Powerlevel9k
+    source ${P9K_HOME}/powerlevel9k.zsh-theme
 
     assertEquals "%K{white} %F{black}world %k%F{white}%f " "$(build_left_prompt)"
 
@@ -45,6 +45,9 @@ function testSwiftSegmentWorks() {
     function swift() {
         echo "Apple Swift version 3.0.1 (swiftlang-800.0.58.6 clang-800.0.42.1)\nTarget: x86_64-apple-macosx10.9"
     }
+
+    # Load Powerlevel9k
+    source ${P9K_HOME}/powerlevel9k.zsh-theme
 
     assertEquals "%K{magenta} %F{white%}Swift %f%F{white}3.0.1 %k%F{magenta}%f " "$(build_left_prompt)"
 

@@ -7,14 +7,21 @@ SHUNIT_PARENT=$0
 
 function setUp() {
   export TERM="xterm-256color"
-  # Load Powerlevel9k
-  source powerlevel9k.zsh-theme
+
+  P9K_HOME="${PWD}"
+}
+
+function tearDown() {
+  unset P9K_HOME
 }
 
 function testDirPathAbsoluteWorks() {
   local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
   POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(dir)
   local POWERLEVEL9K_DIR_PATH_ABSOLUTE=true
+
+  # Load Powerlevel9k
+  source ${P9K_HOME}/powerlevel9k.zsh-theme
 
   cd ~
 
@@ -36,6 +43,9 @@ function testTruncateFoldersWorks() {
   local POWERLEVEL9K_SHORTEN_DIR_LENGTH=2
   local POWERLEVEL9K_SHORTEN_STRATEGY='truncate_folders'
 
+  # Load Powerlevel9k
+  source ${P9K_HOME}/powerlevel9k.zsh-theme
+
   local FOLDER=/tmp/powerlevel9k-test/1/12/123/1234/12345/123456/1234567/12345678/123456789
   mkdir -p $FOLDER
   cd $FOLDER
@@ -51,6 +61,9 @@ function testTruncateFolderWithHomeDirWorks() {
   POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(dir)
   local POWERLEVEL9K_SHORTEN_DIR_LENGTH=1
   local CURRENT_DIR=$(pwd)
+
+  # Load Powerlevel9k
+  source ${P9K_HOME}/powerlevel9k.zsh-theme
 
   cd ~
   local FOLDER="powerlevel9k-test-${RANDOM}"
@@ -71,6 +84,9 @@ function testTruncateMiddleWorks() {
   local POWERLEVEL9K_SHORTEN_DIR_LENGTH=2
   local POWERLEVEL9K_SHORTEN_STRATEGY='truncate_middle'
 
+  # Load Powerlevel9k
+  source ${P9K_HOME}/powerlevel9k.zsh-theme
+
   local FOLDER=/tmp/powerlevel9k-test/1/12/123/1234/12345/123456/1234567/12345678/123456789
   mkdir -p $FOLDER
   cd $FOLDER
@@ -86,6 +102,9 @@ function testTruncationFromRightWorks() {
   POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(dir)
   local POWERLEVEL9K_SHORTEN_DIR_LENGTH=2
   local POWERLEVEL9K_SHORTEN_STRATEGY='truncate_from_right'
+
+  # Load Powerlevel9k
+  source ${P9K_HOME}/powerlevel9k.zsh-theme
 
   local FOLDER=/tmp/powerlevel9k-test/1/12/123/1234/12345/123456/1234567/12345678/123456789
   mkdir -p $FOLDER
@@ -103,6 +122,9 @@ function testTruncateToLastWorks() {
   local POWERLEVEL9K_SHORTEN_DIR_LENGTH=2
   local POWERLEVEL9K_SHORTEN_STRATEGY="truncate_to_last"
 
+  # Load Powerlevel9k
+  source ${P9K_HOME}/powerlevel9k.zsh-theme
+
   local FOLDER=/tmp/powerlevel9k-test/1/12/123/1234/12345/123456/1234567/12345678/123456789
   mkdir -p $FOLDER
   cd $FOLDER
@@ -119,6 +141,9 @@ function testTruncateToFirstAndLastWorks() {
   local POWERLEVEL9K_SHORTEN_DIR_LENGTH=2
   local POWERLEVEL9K_SHORTEN_STRATEGY="truncate_to_first_and_last"
 
+  # Load Powerlevel9k
+  source ${P9K_HOME}/powerlevel9k.zsh-theme
+
   local FOLDER=/tmp/powerlevel9k-test/1/12/123/1234/12345/123456/1234567/12345678/123456789
   mkdir -p $FOLDER
   cd $FOLDER
@@ -134,6 +159,9 @@ function testTruncateAbsoluteWorks() {
   POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(dir)
   local POWERLEVEL9K_SHORTEN_DIR_LENGTH=2
   local POWERLEVEL9K_SHORTEN_STRATEGY="truncate_absolute"
+
+  # Load Powerlevel9k
+  source ${P9K_HOME}/powerlevel9k.zsh-theme
 
   local FOLDER=/tmp/powerlevel9k-test/1/12/123/1234/12345/123456/1234567/12345678/123456789
   mkdir -p $FOLDER
@@ -152,6 +180,9 @@ function testTruncationFromRightWithEmptyDelimiter() {
   local POWERLEVEL9K_SHORTEN_DELIMITER=""
   local POWERLEVEL9K_SHORTEN_STRATEGY='truncate_from_right'
 
+  # Load Powerlevel9k
+  source ${P9K_HOME}/powerlevel9k.zsh-theme
+
   local FOLDER=/tmp/powerlevel9k-test/1/12/123/1234/12345/123456/1234567/12345678/123456789
   mkdir -p $FOLDER
   cd $FOLDER
@@ -166,6 +197,9 @@ function testTruncateWithFolderMarkerWorks() {
   local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
   POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(dir)
   local POWERLEVEL9K_SHORTEN_STRATEGY="truncate_with_folder_marker"
+
+  # Load Powerlevel9k
+  source ${P9K_HOME}/powerlevel9k.zsh-theme
 
   local BASEFOLDER=/tmp/powerlevel9k-test
   local FOLDER=$BASEFOLDER/1/12/123/1234/12345/123456/1234567
@@ -184,6 +218,9 @@ function testTruncateWithFolderMarkerWithChangedFolderMarker() {
   POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(dir)
   local POWERLEVEL9K_SHORTEN_STRATEGY="truncate_with_folder_marker"
   local POWERLEVEL9K_SHORTEN_FOLDER_MARKER='.xxx'
+
+  # Load Powerlevel9k
+  source ${P9K_HOME}/powerlevel9k.zsh-theme
 
   local BASEFOLDER=/tmp/powerlevel9k-test
   local FOLDER=$BASEFOLDER/1/12/123/1234/12345/123456/1234567
@@ -219,6 +256,9 @@ function testTruncateWithPackageNameWorks() {
   POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(dir)
   local POWERLEVEL9K_SHORTEN_DIR_LENGTH=2
   local POWERLEVEL9K_SHORTEN_STRATEGY='truncate_with_package_name'
+
+  # Load Powerlevel9k
+  source ${P9K_HOME}/powerlevel9k.zsh-theme
 
   assertEquals "%K{blue} %F{black}My_Package/1/12/123/12…/12…/12…/12…/12…/123456789 %k%F{blue}%f " "$(build_left_prompt)"
 
@@ -257,6 +297,9 @@ function testTruncateWithPackageNameIfRepoIsSymlinkedInsideDeepFolder() {
   local POWERLEVEL9K_SHORTEN_DIR_LENGTH=2
   local POWERLEVEL9K_SHORTEN_STRATEGY='truncate_with_package_name'
 
+  # Load Powerlevel9k
+  source ${P9K_HOME}/powerlevel9k.zsh-theme
+
   assertEquals "%K{blue} %F{black}My_Package/as…/qwerqwer %k%F{blue}%f " "$(build_left_prompt)"
 
   # Go back
@@ -290,6 +333,9 @@ function testTruncateWithPackageNameIfRepoIsSymlinkedInsideGitDir() {
   local POWERLEVEL9K_SHORTEN_DIR_LENGTH=2
   local POWERLEVEL9K_SHORTEN_STRATEGY='truncate_with_package_name'
 
+  # Load Powerlevel9k
+  source ${P9K_HOME}/powerlevel9k.zsh-theme
+
   assertEquals "%K{blue} %F{black}My_Package/.g…/re…/heads %k%F{blue}%f " "$(build_left_prompt)"
 
   # Go back
@@ -302,6 +348,9 @@ function testHomeFolderDetectionWorks() {
   POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(dir)
   local POWERLEVEL9K_HOME_ICON='home-icon'
 
+  # Load Powerlevel9k
+  source ${P9K_HOME}/powerlevel9k.zsh-theme
+
   cd ~
   assertEquals "%K{blue} %F{black%}home-icon %f%F{black}~ %k%F{blue}%f " "$(build_left_prompt)"
 
@@ -312,6 +361,9 @@ function testHomeSubfolderDetectionWorks() {
   local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
   POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(dir)
   local POWERLEVEL9K_HOME_SUB_ICON='sub-icon'
+
+  # Load Powerlevel9k
+  source ${P9K_HOME}/powerlevel9k.zsh-theme
 
   local FOLDER=~/powerlevel9k-test
   mkdir $FOLDER
@@ -327,6 +379,9 @@ function testOtherFolderDetectionWorks() {
   POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(dir)
   local POWERLEVEL9K_FOLDER_ICON='folder-icon'
 
+  # Load Powerlevel9k
+  source ${P9K_HOME}/powerlevel9k.zsh-theme
+
   local FOLDER=/tmp/powerlevel9k-test
   mkdir $FOLDER
   cd $FOLDER
@@ -340,6 +395,10 @@ function testChangingDirPathSeparator() {
   local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
   POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(dir)
   local POWERLEVEL9K_DIR_PATH_SEPARATOR='xXx'
+
+  # Load Powerlevel9k
+  source ${P9K_HOME}/powerlevel9k.zsh-theme
+
   local FOLDER="/tmp/powerlevel9k-test/1/2"
   mkdir -p $FOLDER
   cd $FOLDER
@@ -353,25 +412,40 @@ function testChangingDirPathSeparator() {
 function testHomeFolderAbbreviation() {
   local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
   POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(dir)
-  local POWERLEVEL9K_HOME_FOLDER_ABBREVIATION
   local dir=$PWD
 
   cd ~/
   # default
-  POWERLEVEL9K_HOME_FOLDER_ABBREVIATION='~'
+  local POWERLEVEL9K_HOME_FOLDER_ABBREVIATION='~'
+  
+  # Load Powerlevel9k
+  source ${P9K_HOME}/powerlevel9k.zsh-theme
+
   assertEquals "%K{blue} %F{black}~ %k%F{blue}%f " "$(build_left_prompt)"
 
   # substituted
-  POWERLEVEL9K_HOME_FOLDER_ABBREVIATION='qQq'
+  local POWERLEVEL9K_HOME_FOLDER_ABBREVIATION='qQq'
+
+  # Load Powerlevel9k
+  source ${P9K_HOME}/powerlevel9k.zsh-theme
+
   assertEquals "%K{blue} %F{black}qQq %k%F{blue}%f " "$(build_left_prompt)"
 
   cd /tmp
   # default
-  POWERLEVEL9K_HOME_FOLDER_ABBREVIATION='~'
+  local POWERLEVEL9K_HOME_FOLDER_ABBREVIATION='~'
+
+  # Load Powerlevel9k
+  source ${P9K_HOME}/powerlevel9k.zsh-theme
+
   assertEquals "%K{blue} %F{black}/tmp %k%F{blue}%f " "$(build_left_prompt)"
 
   # substituted
-  POWERLEVEL9K_HOME_FOLDER_ABBREVIATION='qQq'
+  local POWERLEVEL9K_HOME_FOLDER_ABBREVIATION='qQq'
+
+  # Load Powerlevel9k
+  source ${P9K_HOME}/powerlevel9k.zsh-theme
+
   assertEquals "%K{blue} %F{black}/tmp %k%F{blue}%f " "$(build_left_prompt)"
 
   cd "$dir"
@@ -382,6 +456,10 @@ function testOmittingFirstCharacterWorks() {
   POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(dir)
   local POWERLEVEL9K_DIR_OMIT_FIRST_CHARACTER=true
   local POWERLEVEL9K_FOLDER_ICON='folder-icon'
+
+  # Load Powerlevel9k
+  source ${P9K_HOME}/powerlevel9k.zsh-theme
+
   cd /tmp
 
   assertEquals "%K{blue} %F{black%}folder-icon %f%F{black}tmp %k%F{blue}%f " "$(build_left_prompt)"
@@ -395,6 +473,10 @@ function testOmittingFirstCharacterWorksWithChangingPathSeparator() {
   local POWERLEVEL9K_DIR_OMIT_FIRST_CHARACTER=true
   local POWERLEVEL9K_DIR_PATH_SEPARATOR='xXx'
   local POWERLEVEL9K_FOLDER_ICON='folder-icon'
+
+  # Load Powerlevel9k
+  source ${P9K_HOME}/powerlevel9k.zsh-theme
+
   mkdir -p /tmp/powerlevel9k-test/1/2
   cd /tmp/powerlevel9k-test/1/2
 
@@ -418,6 +500,10 @@ function testOmittingFirstCharacterWorksWithChangingPathSeparatorAndDefaultTrunc
   local POWERLEVEL9K_DIR_PATH_SEPARATOR='xXx'
   local POWERLEVEL9K_SHORTEN_DIR_LENGTH=2
   local POWERLEVEL9K_SHORTEN_STRATEGY='truncate_folders'
+
+  # Load Powerlevel9k
+  source ${P9K_HOME}/powerlevel9k.zsh-theme
+
   mkdir -p /tmp/powerlevel9k-test/1/2
   cd /tmp/powerlevel9k-test/1/2
 
@@ -434,6 +520,10 @@ function testOmittingFirstCharacterWorksWithChangingPathSeparatorAndMiddleTrunca
   local POWERLEVEL9K_DIR_PATH_SEPARATOR='xXx'
   local POWERLEVEL9K_SHORTEN_DIR_LENGTH=2
   local POWERLEVEL9K_SHORTEN_STRATEGY='truncate_middle'
+
+  # Load Powerlevel9k
+  source ${P9K_HOME}/powerlevel9k.zsh-theme
+
   mkdir -p /tmp/powerlevel9k-test/1/2
   cd /tmp/powerlevel9k-test/1/2
 
@@ -450,6 +540,10 @@ function testOmittingFirstCharacterWorksWithChangingPathSeparatorAndRightTruncat
   local POWERLEVEL9K_DIR_PATH_SEPARATOR='xXx'
   local POWERLEVEL9K_SHORTEN_DIR_LENGTH=2
   local POWERLEVEL9K_SHORTEN_STRATEGY='truncate_from_right'
+
+  # Load Powerlevel9k
+  source ${P9K_HOME}/powerlevel9k.zsh-theme
+
   mkdir -p /tmp/powerlevel9k-test/1/2
   cd /tmp/powerlevel9k-test/1/2
 
@@ -466,6 +560,10 @@ function testTruncateToUniqueWorks() {
   local POWERLEVEL9K_DIR_PATH_SEPARATOR='xXx'
   local POWERLEVEL9K_SHORTEN_DIR_LENGTH=2
   local POWERLEVEL9K_SHORTEN_STRATEGY='truncate_to_unique'
+
+  # Load Powerlevel9k
+  source ${P9K_HOME}/powerlevel9k.zsh-theme
+
   mkdir -p /tmp/powerlevel9k-test/adam/devl
   mkdir -p /tmp/powerlevel9k-test/alice/devl
   mkdir -p /tmp/powerlevel9k-test/alice/docs
@@ -482,6 +580,10 @@ function testBoldHomeDirWorks() {
   local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
   POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(dir)
   local POWERLEVEL9K_DIR_PATH_HIGHLIGHT_BOLD=true
+
+  # Load Powerlevel9k
+  source ${P9K_HOME}/powerlevel9k.zsh-theme
+
   cd ~
 
   assertEquals "%K{blue} %F{black}%B~%b %k%F{blue}%f " "$(build_left_prompt)"
@@ -493,6 +595,10 @@ function testBoldHomeSubdirWorks() {
   local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
   POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(dir)
   local POWERLEVEL9K_DIR_PATH_HIGHLIGHT_BOLD=true
+
+  # Load Powerlevel9k
+  source ${P9K_HOME}/powerlevel9k.zsh-theme
+
   mkdir -p ~/powerlevel9k-test
   cd ~/powerlevel9k-test
 
@@ -506,6 +612,10 @@ function testBoldRootDirWorks() {
   local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
   POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(dir)
   local POWERLEVEL9K_DIR_PATH_HIGHLIGHT_BOLD=true
+
+  # Load Powerlevel9k
+  source ${P9K_HOME}/powerlevel9k.zsh-theme
+
   cd /
 
   assertEquals "%K{blue} %F{black}%B/%b %k%F{blue}%f " "$(build_left_prompt)"
@@ -517,6 +627,10 @@ function testBoldRootSubdirWorks() {
   local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
   POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(dir)
   local POWERLEVEL9K_DIR_PATH_HIGHLIGHT_BOLD=true
+
+  # Load Powerlevel9k
+  source ${P9K_HOME}/powerlevel9k.zsh-theme
+
   cd /tmp
 
   assertEquals "%K{blue} %F{black}/%Btmp%b %k%F{blue}%f " "$(build_left_prompt)"
@@ -528,6 +642,10 @@ function testBoldRootSubSubdirWorks() {
   local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
   POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(dir)
   local POWERLEVEL9K_DIR_PATH_HIGHLIGHT_BOLD=true
+
+  # Load Powerlevel9k
+  source ${P9K_HOME}/powerlevel9k.zsh-theme
+
   mkdir -p /tmp/powerlevel9k-test
   cd /tmp/powerlevel9k-test
 
@@ -541,6 +659,10 @@ function testHighlightHomeWorks() {
   local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
   POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(dir)
   local POWERLEVEL9K_DIR_PATH_HIGHLIGHT_FOREGROUND='red'
+
+  # Load Powerlevel9k
+  source ${P9K_HOME}/powerlevel9k.zsh-theme
+
   cd ~
 
   assertEquals "%K{blue} %F{black}%F{red}~ %k%F{blue}%f " "$(build_left_prompt)"
@@ -552,6 +674,10 @@ function testHighlightHomeSubdirWorks() {
   local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
   POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(dir)
   local POWERLEVEL9K_DIR_PATH_HIGHLIGHT_FOREGROUND='red'
+
+  # Load Powerlevel9k
+  source ${P9K_HOME}/powerlevel9k.zsh-theme
+
   mkdir -p ~/powerlevel9k-test
   cd ~/powerlevel9k-test
 
@@ -565,6 +691,10 @@ function testHighlightRootWorks() {
   local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
   POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(dir)
   local POWERLEVEL9K_DIR_PATH_HIGHLIGHT_FOREGROUND='red'
+
+  # Load Powerlevel9k
+  source ${P9K_HOME}/powerlevel9k.zsh-theme
+
   cd /
 
   assertEquals "%K{blue} %F{black}%F{red}/ %k%F{blue}%f " "$(build_left_prompt)"
@@ -576,6 +706,10 @@ function testHighlightRootSubdirWorks() {
   local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
   POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(dir)
   local POWERLEVEL9K_DIR_PATH_HIGHLIGHT_FOREGROUND='red'
+
+  # Load Powerlevel9k
+  source ${P9K_HOME}/powerlevel9k.zsh-theme
+
   cd /tmp
 
   assertEquals "%K{blue} %F{black}/%F{red}tmp %k%F{blue}%f " "$(build_left_prompt)"
@@ -587,6 +721,10 @@ function testHighlightRootSubSubdirWorks() {
   local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
   POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(dir)
   local POWERLEVEL9K_DIR_PATH_HIGHLIGHT_FOREGROUND='red'
+
+  # Load Powerlevel9k
+  source ${P9K_HOME}/powerlevel9k.zsh-theme
+
   mkdir /tmp/powerlevel9k-test
   cd /tmp/powerlevel9k-test
 
@@ -600,6 +738,10 @@ function testDirSeparatorColorHomeSubdirWorks() {
   local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
   POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(dir)
   local POWERLEVEL9K_DIR_PATH_SEPARATOR_FOREGROUND='red'
+
+  # Load Powerlevel9k
+  source ${P9K_HOME}/powerlevel9k.zsh-theme
+
   mkdir -p ~/powerlevel9k-test
   cd ~/powerlevel9k-test
 
@@ -613,6 +755,10 @@ function testDirSeparatorColorRootSubSubdirWorks() {
   local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
   POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(dir)
   local POWERLEVEL9K_DIR_PATH_SEPARATOR_FOREGROUND='red'
+
+  # Load Powerlevel9k
+  source ${P9K_HOME}/powerlevel9k.zsh-theme
+
   mkdir -p /tmp/powerlevel9k-test
   cd /tmp/powerlevel9k-test
 

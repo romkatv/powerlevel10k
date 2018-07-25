@@ -7,8 +7,6 @@ SHUNIT_PARENT=$0
 
 function setUp() {
   export TERM="xterm-256color"
-  # Load Powerlevel9k
-  source powerlevel9k.zsh-theme
 
   # Test specfic
   # unset all possible user specified variables
@@ -22,6 +20,9 @@ function testNodeenvSegmentPrintsNothingWithoutNode() {
     local POWERLEVEL9K_CUSTOM_WORLD='echo world'
     alias node="nonode 2>/dev/null"
 
+    # Load Powerlevel9k
+    source powerlevel9k.zsh-theme
+
     assertEquals "%K{white} %F{black}world %k%F{white}%f " "$(build_left_prompt)"
 
     unalias node
@@ -34,6 +35,9 @@ function testNodeenvSegmentPrintsNothingIfNodeVirtualEnvIsNotSet() {
     node() {
         echo "v1.2.3"
     }
+
+    # Load Powerlevel9k
+    source powerlevel9k.zsh-theme
 
     assertEquals "%K{white} %F{black}world %k%F{white}%f " "$(build_left_prompt)"
 
@@ -50,6 +54,9 @@ function testNodeenvSegmentPrintsNothingIfNodeVirtualEnvDisablePromptIsSet() {
     NODE_VIRTUAL_ENV="node-env"
     NODE_VIRTUAL_ENV_DISABLE_PROMPT=true
 
+    # Load Powerlevel9k
+    source powerlevel9k.zsh-theme
+
     assertEquals "%K{white} %F{black}world %k%F{white}%f " "$(build_left_prompt)"
 
     unset NODE_VIRTUAL_ENV_DISABLE_PROMPT
@@ -62,6 +69,9 @@ function testNodeenvSegmentPrintsAtLeastNodeEnvWithoutNode() {
     POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(nodeenv)
     alias node="nonode 2>/dev/null"
     NODE_VIRTUAL_ENV="node-env"
+
+    # Load Powerlevel9k
+    source powerlevel9k.zsh-theme
 
     assertEquals "%K{black} %F{green%}⬢ %f%F{green}[node-env] %k%F{black}%f " "$(build_left_prompt)"
 
@@ -76,6 +86,9 @@ function testNodeenvSegmentWorks() {
         echo "v1.2.3"
     }
     NODE_VIRTUAL_ENV="node-env"
+
+    # Load Powerlevel9k
+    source powerlevel9k.zsh-theme
 
     assertEquals "%K{black} %F{green%}⬢ %f%F{green}v1.2.3[node-env] %k%F{black}%f " "$(build_left_prompt)"
 

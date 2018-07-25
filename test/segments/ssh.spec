@@ -7,12 +7,6 @@ SHUNIT_PARENT=$0
 
 function setUp() {
   export TERM="xterm-256color"
-  # Load Powerlevel9k
-  source powerlevel9k.zsh-theme
-}
-
-function mockRust() {
-  echo 'rustc  0.4.1a-alpha'
 }
 
 function testSshSegmentPrintsNothingIfNoSshConnection() {
@@ -25,6 +19,9 @@ function testSshSegmentPrintsNothingIfNoSshConnection() {
   unset SSH_CLIENT
   unset SSH_TTY
 
+  # Load Powerlevel9k
+  source powerlevel9k.zsh-theme
+
   assertEquals "%K{white} %F{black}world %k%F{white}%f " "$(build_left_prompt)"
 }
 
@@ -36,6 +33,9 @@ function testSshSegmentWorksIfOnlySshClientIsSet() {
   # $SSH_CLIENT and $SSH_TTY
   SSH_CLIENT='ssh-client'
   unset SSH_TTY
+
+  # Load Powerlevel9k
+  source powerlevel9k.zsh-theme
 
   assertEquals "%K{black} %F{yellow%}ssh-icon%f %k%F{black}%f " "$(build_left_prompt)"
 
@@ -51,6 +51,9 @@ function testSshSegmentWorksIfOnlySshTtyIsSet() {
   SSH_TTY='ssh-tty'
   unset SSH_CLIENT
 
+  # Load Powerlevel9k
+  source powerlevel9k.zsh-theme
+
   assertEquals "%K{black} %F{yellow%}ssh-icon%f %k%F{black}%f " "$(build_left_prompt)"
 
   unset SSH_TTY
@@ -64,6 +67,9 @@ function testSshSegmentWorksIfAllNecessaryVariablesAreSet() {
   # $SSH_CLIENT and $SSH_TTY
   SSH_CLIENT='ssh-client'
   SSH_TTY='ssh-tty'
+
+  # Load Powerlevel9k
+  source powerlevel9k.zsh-theme
 
   assertEquals "%K{black} %F{yellow%}ssh-icon%f %k%F{black}%f " "$(build_left_prompt)"
 

@@ -7,14 +7,15 @@ SHUNIT_PARENT=$0
 
 function setUp() {
   export TERM="xterm-256color"
-  # Load Powerlevel9k
-  source powerlevel9k.zsh-theme
 }
 
 function testCustomDirectOutputSegment() {
     local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
     POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(custom_world)
     local POWERLEVEL9K_CUSTOM_WORLD="echo world"
+
+    # Load Powerlevel9k
+    source powerlevel9k.zsh-theme
 
     assertEquals "%K{white} %F{black}world %k%F{white}%f " "$(build_left_prompt)"
 }
@@ -26,6 +27,9 @@ function testCustomClosureSegment() {
         echo "world"
     }
     local POWERLEVEL9K_CUSTOM_WORLD='p9k_hello_world'
+    
+    # Load Powerlevel9k
+    source powerlevel9k.zsh-theme
 
     assertEquals "%K{white} %F{black}world %k%F{white}%f " "$(build_left_prompt)"
 }
@@ -36,6 +40,9 @@ function testSettingBackgroundForCustomSegment() {
     local POWERLEVEL9K_CUSTOM_WORLD="echo world"
     local POWERLEVEL9K_CUSTOM_WORLD_BACKGROUND="yellow"
 
+    # Load Powerlevel9k
+    source powerlevel9k.zsh-theme
+
     assertEquals "%K{yellow} %F{black}world %k%F{yellow}%f " "$(build_left_prompt)"
 }
 
@@ -44,6 +51,9 @@ function testSettingForegroundForCustomSegment() {
     POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(custom_world)
     local POWERLEVEL9K_CUSTOM_WORLD="echo world"
     local POWERLEVEL9K_CUSTOM_WORLD_FOREGROUND="red"
+
+    # Load Powerlevel9k
+    source powerlevel9k.zsh-theme
 
     assertEquals "%K{white} %F{red}world %k%F{white}%f " "$(build_left_prompt)"
 }
@@ -54,6 +64,9 @@ function testSettingVisualIdentifierForCustomSegment() {
     local POWERLEVEL9K_CUSTOM_WORLD="echo world"
     local POWERLEVEL9K_CUSTOM_WORLD_ICON="hw"
 
+    # Load Powerlevel9k
+    source powerlevel9k.zsh-theme
+
     assertEquals "%K{white} %F{black%}hw %f%F{black}world %k%F{white}%f " "$(build_left_prompt)"
 }
 
@@ -63,6 +76,9 @@ function testSettingVisualIdentifierForegroundColorForCustomSegment() {
     local POWERLEVEL9K_CUSTOM_WORLD="echo world"
     local POWERLEVEL9K_CUSTOM_WORLD_ICON="hw"
     local POWERLEVEL9K_CUSTOM_WORLD_VISUAL_IDENTIFIER_COLOR="red"
+
+    # Load Powerlevel9k
+    source powerlevel9k.zsh-theme
 
     assertEquals "%K{white} %F{red%}hw %f%F{black}world %k%F{white}%f " "$(build_left_prompt)"
 }

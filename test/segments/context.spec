@@ -7,8 +7,6 @@ SHUNIT_PARENT=$0
 
 function setUp() {
   export TERM="xterm-256color"
-  # Load Powerlevel9k
-  source powerlevel9k.zsh-theme
 
   # Test specific settings
   OLD_DEFAULT_USER=$DEFAULT_USER
@@ -26,6 +24,9 @@ function testContextSegmentDoesNotGetRenderedWithDefaultUser() {
     local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
     POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(context custom_world)
 
+    # Load Powerlevel9k
+    source powerlevel9k.zsh-theme
+
     assertEquals "%K{white} %F{black}world %k%F{white}%f " "$(build_left_prompt)"
 }
 
@@ -34,6 +35,9 @@ function testContextSegmentDoesGetRenderedWhenSshConnectionIsOpen() {
     local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
     POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(context)
 
+    # Load Powerlevel9k
+    source powerlevel9k.zsh-theme
+
     assertEquals "%K{black} %F{yellow}%n@%m %k%F{black}%f " "$(build_left_prompt)"
 }
 
@@ -41,14 +45,20 @@ function testContextSegmentWithForeignUser() {
     local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
     POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(context)
 
+    # Load Powerlevel9k
+    source powerlevel9k.zsh-theme
+
     assertEquals "%K{black} %F{yellow}%n@%m %k%F{black}%f " "$(build_left_prompt)"
 }
 
 # TODO: How to test root?
 function testContextSegmentWithRootUser() {
+    startSkipping # Skip test
     local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
     POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(context)
-    startSkipping # Skip test
+
+    # Load Powerlevel9k
+    source powerlevel9k.zsh-theme
 
     assertEquals "%K{black} %F{yellow}%n@%m %k%F{black}%f " "$(build_left_prompt)"
 }
@@ -57,6 +67,9 @@ function testOverridingContextTemplate() {
     local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
     POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(context)
     local POWERLEVEL9K_CONTEXT_TEMPLATE=xx
+
+    # Load Powerlevel9k
+    source powerlevel9k.zsh-theme
 
     assertEquals "%K{black} %F{yellow}xx %k%F{black}%f " "$(build_left_prompt)"
 }
@@ -67,6 +80,9 @@ function testContextSegmentIsShownIfDefaultUserIsSetWhenForced() {
     local POWERLEVEL9K_ALWAYS_SHOW_CONTEXT=true
     local DEFAULT_USER=$(whoami)
 
+    # Load Powerlevel9k
+    source powerlevel9k.zsh-theme
+
     assertEquals "%K{black} %F{yellow}%n@%m %k%F{black}%f " "$(build_left_prompt)"
 }
 
@@ -75,6 +91,9 @@ function testContextSegmentIsShownIfForced() {
     POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(context)
     local POWERLEVEL9K_ALWAYS_SHOW_USER=true
     local DEFAULT_USER=$(whoami)
+
+    # Load Powerlevel9k
+    source powerlevel9k.zsh-theme
 
     assertEquals "%K{black} %F{yellow}$(whoami) %k%F{black}%f " "$(build_left_prompt)"
 }

@@ -7,8 +7,6 @@ SHUNIT_PARENT=$0
 
 function setUp() {
   export TERM="xterm-256color"
-  # Load Powerlevel9k
-  source powerlevel9k.zsh-theme
 
   # Test specific
   P9K_HOME=$(pwd)
@@ -39,6 +37,9 @@ function testDiskUsageSegmentWhenDiskIsAlmostFull() {
 /dev/disk1     487219288 471466944  15496344  97% /"
   }
 
+  # Load Powerlevel9k
+  source ${P9K_HOME}/powerlevel9k.zsh-theme
+
   assertEquals "%K{red} %F{white%}hdd  %f%F{white}97%% %k%F{red}%f " "$(build_left_prompt)"
 
   unfunction df
@@ -52,6 +53,9 @@ function testDiskUsageSegmentWhenDiskIsVeryFull() {
 /dev/disk1     487219288 471466944  15496344  94% /"
   }
 
+  # Load Powerlevel9k
+  source ${P9K_HOME}/powerlevel9k.zsh-theme
+
   assertEquals "%K{yellow} %F{black%}hdd  %f%F{black}94%% %k%F{yellow}%f " "$(build_left_prompt)"
 
   unfunction df
@@ -64,6 +68,9 @@ function testDiskUsageSegmentWhenDiskIsQuiteEmpty() {
       echo "Filesystem     1K-blocks      Used Available Use% Mounted on
 /dev/disk1     487219288 471466944  15496344  4% /"
   }
+
+  # Load Powerlevel9k
+  source ${P9K_HOME}/powerlevel9k.zsh-theme
 
   assertEquals "%K{black} %F{yellow%}hdd  %f%F{yellow}4%% %k%F{black}%f " "$(build_left_prompt)"
 
@@ -89,11 +96,14 @@ function testDiskUsageSegmentPrintsNothingIfDiskIsQuiteEmptyAndOnlyWarningsShoul
 function testDiskUsageSegmentWarningLevelCouldBeAdjusted() {
   local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
   POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(disk_usage)
+  local POWERLEVEL9K_DISK_USAGE_WARNING_LEVEL=10
   df() {
     echo "Filesystem     1K-blocks      Used Available Use% Mounted on
 /dev/disk1     487219288 471466944  15496344  11% /"
   }
-  local POWERLEVEL9K_DISK_USAGE_WARNING_LEVEL=10
+
+  # Load Powerlevel9k
+  source ${P9K_HOME}/powerlevel9k.zsh-theme
 
   assertEquals "%K{yellow} %F{black%}hdd  %f%F{black}11%% %k%F{yellow}%f " "$(build_left_prompt)"
 
@@ -103,12 +113,15 @@ function testDiskUsageSegmentWarningLevelCouldBeAdjusted() {
 function testDiskUsageSegmentCriticalLevelCouldBeAdjusted() {
   local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
   POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(disk_usage)
+  local POWERLEVEL9K_DISK_USAGE_WARNING_LEVEL=5
+  local POWERLEVEL9K_DISK_USAGE_CRITICAL_LEVEL=10
   df() {
     echo "Filesystem     1K-blocks      Used Available Use% Mounted on
 /dev/disk1     487219288 471466944  15496344  11% /"
   }
-  local POWERLEVEL9K_DISK_USAGE_WARNING_LEVEL=5
-  local POWERLEVEL9K_DISK_USAGE_CRITICAL_LEVEL=10
+
+  # Load Powerlevel9k
+  source ${P9K_HOME}/powerlevel9k.zsh-theme
 
   assertEquals "%K{red} %F{white%}hdd  %f%F{white}11%% %k%F{red}%f " "$(build_left_prompt)"
 

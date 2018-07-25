@@ -37,6 +37,7 @@ function tearDown() {
   unset PMSET_PATH
   unset BATTERY_PATH
   unset FOLDER
+  unset P9K_HOME
 }
 
 # Mock Battery

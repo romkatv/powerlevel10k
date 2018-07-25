@@ -7,8 +7,6 @@ SHUNIT_PARENT=$0
 
 function setUp() {
   export TERM="xterm-256color"
-  # Load Powerlevel9k
-  source powerlevel9k.zsh-theme
 
   P9K_HOME=$(pwd)
   ### Test specific
@@ -30,10 +28,13 @@ function tearDown() {
 function testSwapSegmentWorksOnOsx() {
     local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
     POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(swap)
-    local OS="OSX" # Fake OSX
     sysctl() {
         echo "vm.swapusage: total = 3072,00M  used = 1620,50M  free = 1451,50M  (encrypted)"
     }
+
+    # Load Powerlevel9k
+    source ${P9K_HOME}/powerlevel9k.zsh-theme
+    local OS="OSX" # Fake OSX
 
     assertEquals "%K{yellow} %F{black%}SWP %f%F{black}1.58G " "$(prompt_swap left 1 false ${FOLDER})"
 
@@ -43,10 +44,13 @@ function testSwapSegmentWorksOnOsx() {
 function testSwapSegmentWorksOnLinux() {
     local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
     POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(swap)
-    local OS="Linux" # Fake Linux
     mkdir proc
     echo "SwapTotal: 1000000" > proc/meminfo
     echo "SwapFree: 1000" >> proc/meminfo
+
+    # Load Powerlevel9k
+    source ${P9K_HOME}/powerlevel9k.zsh-theme
+    local OS="Linux" # Fake Linux
 
     assertEquals "%K{yellow} %F{black%}SWP %f%F{black}0.95G " "$(prompt_swap left 1 false ${FOLDER})"
 }
