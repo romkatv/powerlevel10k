@@ -40,7 +40,7 @@ function testBackgroundJobsSegmentWorksWithOneBackgroundJob() {
 }
 
 function testBackgroundJobsSegmentWorksWithMultipleBackgroundJobs() {
-    unset POWERLEVEL9K_BACKGROUND_JOBS_VERBOSE
+    local POWERLEVEL9K_BACKGROUND_JOBS_VERBOSE=false
     local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
     POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(background_jobs)
     jobs() {
