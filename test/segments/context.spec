@@ -31,6 +31,9 @@ function testContextSegmentDoesNotGetRenderedWithDefaultUser() {
 }
 
 function testContextSegmentDoesGetRenderedWhenSshConnectionIsOpen() {
+    function sudo() {
+        return 0
+    }
     local SSH_CLIENT="putty"
     local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
     POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(context)
@@ -39,6 +42,8 @@ function testContextSegmentDoesGetRenderedWhenSshConnectionIsOpen() {
     source powerlevel9k.zsh-theme
 
     assertEquals "%K{black} %F{yellow}%n@%m %k%F{black}%f " "$(build_left_prompt)"
+
+    unfunction sudo
 }
 
 function testContextSegmentWithForeignUser() {
