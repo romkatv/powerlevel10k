@@ -623,12 +623,12 @@ prompt_context() {
   if [[ $(print -P "%#") == '#' ]]; then
     current_state="ROOT"
   elif [[ -n "$SSH_CLIENT" || -n "$SSH_TTY" ]]; then
-    if sudo -n true 2>/dev/null; then
+    if [[ -n "$SUDO_COMMAND" ]]; then
       current_state="REMOTE_SUDO"
     else
       current_state="REMOTE"
     fi
-  elif sudo -n true 2>/dev/null; then
+  elif [[ -n "$SUDO_COMMAND" ]]; then
     current_state="SUDO"
   fi
 
@@ -651,7 +651,7 @@ prompt_user() {
         "FOREGROUND_COLOR"    "yellow"
         "VISUAL_IDENTIFIER"   "ROOT_ICON"
       )
-    elif sudo -n true 2>/dev/null; then
+    elif [[ -n "$SUDO_COMMAND" ]]; then
       user_state=(
         "STATE"               "SUDO"
         "CONTENT"             "${POWERLEVEL9K_USER_TEMPLATE}"
