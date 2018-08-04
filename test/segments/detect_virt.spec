@@ -80,4 +80,4 @@ function testDetectVirtSegmentIfRootFsIsNotOnExpectedInode() {
     unalias systemd-detect-virt
 }
 
-source shunit2/source/2.1/src/shunit2
+source shunit2/shunit2

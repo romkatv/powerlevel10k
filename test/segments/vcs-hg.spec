@@ -204,4 +204,4 @@ function testBookmarkIconWorks() {
   assertEquals "%K{green} %F{black} default Binitial %k%F{green}%f " "$(build_left_prompt)"
 }
 
-source shunit2/source/2.1/src/shunit2
+source shunit2/shunit2

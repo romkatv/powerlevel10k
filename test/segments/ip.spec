@@ -228,4 +228,4 @@ inet 10.0.2.15/24 brd 10.0.2.255 scope global eth0
   unfunction ip
 }
 
-source shunit2/source/2.1/src/shunit2
+source shunit2/shunit2

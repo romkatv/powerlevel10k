@@ -55,4 +55,4 @@ function testTodoSegmentWorksAsExpected() {
     assertEquals "%K{244} %F{black%}☑ %f%F{black}100 %k%F{grey50}%f " "$(build_left_prompt)"
 }
 
-source shunit2/source/2.1/src/shunit2
+source shunit2/shunit2

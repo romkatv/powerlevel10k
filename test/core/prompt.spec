@@ -101,4 +101,4 @@ function testPrefixingSecondLineOnLeftPrompt() {
     assertEquals "╭─%f%b%k%K{white} %F{black}world1 %k%F{white}%f ${nl}XXX" "${(e)PROMPT}"
 }
 
-source shunit2/source/2.1/src/shunit2
+source shunit2/shunit2

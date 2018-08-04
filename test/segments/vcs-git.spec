@@ -375,4 +375,4 @@ function testShorteningCommitHashIsNotShownIfShowChangesetIsFalse() {
   assertEquals "%K{green} %F{black} master %k%F{green}%f " "$(build_left_prompt)"
 }
 
-source shunit2/source/2.1/src/shunit2
+source shunit2/shunit2

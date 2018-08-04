@@ -110,4 +110,4 @@ function testStatusSegmentIntegrated() {
     assertEquals "%f%b%k%K{black} %F{red%}✘%f %k%F{black}%f " "${(e)PROMPT}"
 }
 
-source shunit2/source/2.1/src/shunit2
+source shunit2/shunit2

@@ -66,4 +66,4 @@ function testAnacondaSegmentWorks() {
     assertEquals "%K{blue} %F{black%}icon-here %f%F{black}(tmptest) %k%F{blue}%f " "$(build_left_prompt)"
 }
 
-source shunit2/source/2.1/src/shunit2
+source shunit2/shunit2

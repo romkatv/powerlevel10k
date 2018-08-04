@@ -63,4 +63,4 @@ function testRamSegmentWorksOnLinux() {
     assertEquals "%K{yellow} %F{black%}RAM %f%F{black}0.29G " "$(prompt_ram left 1 false ${FOLDER})"
 }
 
-source shunit2/source/2.1/src/shunit2
+source shunit2/shunit2

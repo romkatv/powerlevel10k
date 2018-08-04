@@ -120,4 +120,4 @@ function testNewlineOnRpromptCanBeDisabled() {
   assertEquals '$(print_icon MULTILINE_FIRST_PROMPT_PREFIX)[39m[0m[49m[47m [30mworld [49m[37m[39m  $(print_icon MULTILINE_LAST_PROMPT_PREFIX)[1A[39m[0m[49m[37m[39m[47m[30m rworld[K[00m[1B' "$(print -P ${PROMPT}${RPROMPT})"
 }
 
-source shunit2/source/2.1/src/shunit2
+source shunit2/shunit2

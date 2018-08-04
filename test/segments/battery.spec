@@ -170,4 +170,4 @@ function testBatterySegmentIfBatteryIsCalculatingWithAcpiEnabledOnLinux() {
   assertEquals "%K{black} %F{white%}🔋 %f%F{white}50%% (...) " "$(prompt_battery left 1 false ${FOLDER})"
 }
 
-source shunit2/source/2.1/src/shunit2
+source shunit2/shunit2

@@ -59,4 +59,4 @@ function testColorOverridingOfCustomSegment() {
   assertEquals "%K{red} %F{green%}CW %f%F{red}world %k%F{red}%f " "$(build_left_prompt)"
 }
 
-source shunit2/source/2.1/src/shunit2
+source shunit2/shunit2

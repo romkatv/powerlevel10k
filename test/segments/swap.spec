@@ -55,4 +55,4 @@ function testSwapSegmentWorksOnLinux() {
     assertEquals "%K{yellow} %F{black%}SWP %f%F{black}0.95G " "$(prompt_swap left 1 false ${FOLDER})"
 }
 
-source shunit2/source/2.1/src/shunit2
+source shunit2/shunit2
