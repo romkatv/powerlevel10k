@@ -16,6 +16,8 @@ function setUp() {
 function tearDown() {
   # Restore old variables
   [[ -n "$OLD_DEFAULT_USER" ]] && DEFAULT_USER=$OLD_DEFAULT_USER
+
+  return 0
 }
 
 function testContextSegmentDoesNotGetRenderedWithDefaultUser() {

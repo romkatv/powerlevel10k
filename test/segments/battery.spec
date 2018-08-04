@@ -158,6 +158,10 @@ function testBatterySegmentIfBatteryIsNormalWithAcpiEnabledOnLinux() {
   assertEquals "%K{black} %F{white%}🔋 %f%F{white}50%% (1:38) " "$(prompt_battery left 1 false ${FOLDER})"
 
   unalias date &>/dev/null
+  # unaliasing date fails where it was never aliased (e.g. on Linux).
+  # This causes the whole test to fail, because the return code is
+  # non-zero.
+  return 0
 }
 
 function testBatterySegmentIfBatteryIsCalculatingWithAcpiEnabledOnLinux() {
