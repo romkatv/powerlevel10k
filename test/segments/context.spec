@@ -49,6 +49,9 @@ function testContextSegmentDoesGetRenderedWhenSshConnectionIsOpen() {
 }
 
 function testContextSegmentWithForeignUser() {
+    function sudo() {
+        return 0
+    }
     local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
     POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(context)
 
@@ -56,6 +59,8 @@ function testContextSegmentWithForeignUser() {
     source powerlevel9k.zsh-theme
 
     assertEquals "%K{black} %F{yellow}%n@%m %k%F{black}%f " "$(build_left_prompt)"
+
+    unfunction sudo
 }
 
 # TODO: How to test root?
