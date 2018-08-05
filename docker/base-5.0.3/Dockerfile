@@ -6,7 +6,7 @@ RUN \
   DEBIAN_FRONTEND=noninteractive apt-get install -y \
   curl \
   git \
-  zsh \
+  zsh=5.0.2-3ubuntu6.2 \
   mercurial \
   subversion \
   golang \
