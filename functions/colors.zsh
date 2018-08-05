@@ -79,6 +79,10 @@ function getColorCode() {
     else
       echo -n "$1"
     fi
+  # Check if value is none with any case.
+  elif [[ "${(L)1}" == "none" ]]
+  then
+    echo -n 'none'
   else
     typeset -A codes
     # https://jonasjacek.github.io/colors/
