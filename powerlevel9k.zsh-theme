@@ -409,12 +409,13 @@ prompt_battery() {
     'charged'       'green'
     'disconnected'  "$DEFAULT_COLOR_INVERTED"
   )
+  local ROOT_PREFIX="${4}"
   # Set default values if the user did not configure them
   set_default POWERLEVEL9K_BATTERY_LOW_THRESHOLD  10
 
-  if [[ $OS =~ OSX && -f /usr/bin/pmset && -x /usr/bin/pmset ]]; then
+  if [[ $OS =~ OSX && -f "${ROOT_PREFIX}"/usr/bin/pmset && -x "${ROOT_PREFIX}"/usr/bin/pmset ]]; then
     # obtain battery information from system
-    local raw_data="$(pmset -g batt | awk 'FNR==2{print}')"
+    local raw_data="$(${ROOT_PREFIX}/usr/bin/pmset -g batt | awk 'FNR==2{print}')"
     # return if there is no battery on system
     [[ -z $(echo $raw_data | grep "InternalBattery") ]] && return
 
@@ -446,7 +447,7 @@ prompt_battery() {
   fi
 
   if [[ "$OS" == 'Linux' ]] || [[ "$OS" == 'Android' ]]; then
-    local sysp="/sys/class/power_supply"
+    local sysp="${ROOT_PREFIX}/sys/class/power_supply"
 
     # Reported BAT0 or BAT1 depending on kernel version
     [[ -a $sysp/BAT0 ]] && local bat=$sysp/BAT0
@@ -468,8 +469,8 @@ prompt_battery() {
       [[ $bat_percent =~ 100 ]] && current_state="charged"
       [[ $bat_percent -lt 100 ]] && current_state="charging"
     fi
-    if [[ -f /usr/bin/acpi ]]; then
-      local time_remaining=$(acpi | awk '{ print $5 }')
+    if [[ -f ${ROOT_PREFIX}/usr/bin/acpi ]]; then
+      local time_remaining=$(${ROOT_PREFIX}/usr/bin/acpi | awk '{ print $5 }')
       if [[ $time_remaining =~ rate ]]; then
         local tstring="..."
       elif [[ $time_remaining =~ "[[:digit:]]+" ]]; then
@@ -702,11 +703,13 @@ prompt_host() {
 # The 'custom` prompt provides a way for users to invoke commands and display
 # the output in a segment.
 prompt_custom() {
-  local command=POWERLEVEL9K_CUSTOM_$3:u
+  local segment_name="${3:u}"
+  # Get content of custom segment
+  local command="POWERLEVEL9K_CUSTOM_${segment_name}"
   local segment_content="$(eval ${(P)command})"
 
   if [[ -n $segment_content ]]; then
-    "$1_prompt_segment" "${0}_${3:u}" "$2" $DEFAULT_COLOR_INVERTED $DEFAULT_COLOR "$segment_content"
+    "$1_prompt_segment" "${0}_${3:u}" "$2" $DEFAULT_COLOR_INVERTED $DEFAULT_COLOR "$segment_content" "CUSTOM_${segment_name}_ICON"
   fi
 }
 
@@ -1055,18 +1058,14 @@ prompt_history() {
 ################################################################
 # Detection for virtualization (systemd based systems only)
 prompt_detect_virt() {
-  if ! command -v systemd-detect-virt > /dev/null; then
-    return
-  fi
-  local virt=$(systemd-detect-virt)
+  local virt=$(systemd-detect-virt 2> /dev/null)
   if [[ "$virt" == "none" ]]; then
     if [[ "$(ls -di / | grep -o 2)" != "2" ]]; then
       virt="chroot"
-      "$1_prompt_segment" "$0" "$2" "$DEFAULT_COLOR" "yellow" "$virt"
-    else
-      ;
     fi
-  else
+  fi
+
+  if [[ -n "${virt}" ]]; then
     "$1_prompt_segment" "$0" "$2" "$DEFAULT_COLOR" "yellow" "$virt"
   fi
 }
@@ -1101,18 +1100,20 @@ prompt_ip() {
   else
     if defined POWERLEVEL9K_IP_INTERFACE; then
       # Get the IP address of the specified interface.
-      ip=$(ip -4 a show "$POWERLEVEL9K_IP_INTERFACE" | grep -o "inet\s*[0-9.]*" | grep -o "[0-9.]*")
+      ip=$(ip -4 a show "$POWERLEVEL9K_IP_INTERFACE" | grep -o "inet\s*[0-9.]*" | grep -o -E "[0-9.]+")
     else
       local interfaces callback
       # Get all network interface names that are up
-      interfaces=$(ip link ls up | grep -o -E ":\s+[a-z0-9]+:" | grep -v "lo" | grep -o "[a-z0-9]*")
-      callback='ip -4 a show $item | grep -o "inet\s*[0-9.]*" | grep -o "[0-9.]*"'
+      interfaces=$(ip link ls up | grep -o -E ":\s+[a-z0-9]+:" | grep -v "lo" | grep -o -E "[a-z0-9]+")
+      callback='ip -4 a show $item | grep -o "inet\s*[0-9.]*" | grep -o -E "[0-9.]+"'
 
       ip=$(getRelevantItem "$interfaces" "$callback")
     fi
   fi
 
-  "$1_prompt_segment" "$0" "$2" "cyan" "$DEFAULT_COLOR" "$ip" 'NETWORK_ICON'
+  if [[ -n "$ip" ]]; then
+    "$1_prompt_segment" "$0" "$2" "cyan" "$DEFAULT_COLOR" "$ip" 'NETWORK_ICON'
+  fi
 }
 
 ################################################################
@@ -1142,6 +1143,7 @@ prompt_laravel_version() {
 # Segment to display load
 set_default POWERLEVEL9K_LOAD_WHICH 5
 prompt_load() {
+  local ROOT_PREFIX="${4}"
   # The load segment can have three different states
   local current_state="unknown"
   local load_select=2
@@ -1177,7 +1179,7 @@ prompt_load() {
       fi
       ;;
     *)
-      load_avg=$(cut -d" " -f${load_select} /proc/loadavg)
+      load_avg=$(cut -d" " -f${load_select} ${ROOT_PREFIX}/proc/loadavg)
       cores=$(nproc)
   esac
 
@@ -1250,6 +1252,7 @@ prompt_php_version() {
 ################################################################
 # Segment to display free RAM and used Swap
 prompt_ram() {
+  local ROOT_PREFIX="${4}"
   local base=''
   local ramfree=0
   if [[ "$OS" == "OSX" ]]; then
@@ -1261,9 +1264,9 @@ prompt_ram() {
     ramfree=$(( ramfree * 4096 ))
   else
     if [[ "$OS" == "BSD" ]]; then
-      ramfree=$(grep 'avail memory' /var/run/dmesg.boot | awk '{print $4}')
+      ramfree=$(grep 'avail memory' ${ROOT_PREFIX}/var/run/dmesg.boot | awk '{print $4}')
     else
-      ramfree=$(grep -o -E "MemAvailable:\s+[0-9]+" /proc/meminfo | grep -o "[0-9]*")
+      ramfree=$(grep -o -E "MemAvailable:\s+[0-9]+" ${ROOT_PREFIX}/proc/meminfo | grep -o -E "[0-9]+")
       base='K'
     fi
   fi
@@ -1428,6 +1431,7 @@ prompt_status() {
 ################################################################
 # Segment to display Swap information
 prompt_swap() {
+  local ROOT_PREFIX="${4}"
   local swap_used=0
   local base=''
 
@@ -1442,8 +1446,8 @@ prompt_swap() {
 
     base=$(echo "$raw_swap_used" | grep -o "[A-Z]*$")
   else
-    swap_total=$(grep -o -E "SwapTotal:\s+[0-9]+" /proc/meminfo | grep -o "[0-9]*")
-    swap_free=$(grep -o -E "SwapFree:\s+[0-9]+" /proc/meminfo | grep -o "[0-9]*")
+    swap_total=$(grep -o -E "SwapTotal:\s+[0-9]+" ${ROOT_PREFIX}/proc/meminfo | grep -o -E "[0-9]+")
+    swap_free=$(grep -o -E "SwapFree:\s+[0-9]+" ${ROOT_PREFIX}/proc/meminfo | grep -o -E "[0-9]+")
     swap_used=$(( swap_total - swap_free ))
     base='K'
   fi
@@ -1616,7 +1620,7 @@ set_default POWERLEVEL9K_VI_COMMAND_MODE_STRING "NORMAL"
 prompt_vi_mode() {
   case ${KEYMAP} in
     vicmd)
-      "$1_prompt_segment" "$0_NORMAL" "$2" "$DEFAULT_COLOR" "default" "$POWERLEVEL9K_VI_COMMAND_MODE_STRING"
+      "$1_prompt_segment" "$0_NORMAL" "$2" "$DEFAULT_COLOR" "white" "$POWERLEVEL9K_VI_COMMAND_MODE_STRING"
     ;;
     main|viins|*)
       if [[ -z $POWERLEVEL9K_VI_INSERT_MODE_STRING ]]; then return; fi

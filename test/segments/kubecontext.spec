@@ -7,8 +7,6 @@ SHUNIT_PARENT=$0
 
 function setUp() {
   export TERM="xterm-256color"
-  # Load Powerlevel9k
-  source powerlevel9k.zsh-theme
 }
 
 function mockKubectl() {
@@ -66,33 +64,41 @@ function mockKubectlOtherNamespace() {
 }
 
 function testKubeContext() {
-  alias kubectl=mockKubectl
+  local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
   POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(kubecontext)
+  alias kubectl=mockKubectl
+
+  # Load Powerlevel9k
+  source powerlevel9k.zsh-theme
 
   assertEquals "%K{magenta} %F{white%}⎈ %f%F{white}minikube/default %k%F{magenta}%f " "$(build_left_prompt)"
 
-  unset POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
   unalias kubectl
 }
 function testKubeContextOtherNamespace() {
-  alias kubectl=mockKubectlOtherNamespace
+  local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
   POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(kubecontext)
+  alias kubectl=mockKubectlOtherNamespace
+
+  # Load Powerlevel9k
+  source powerlevel9k.zsh-theme
 
   assertEquals "%K{magenta} %F{white%}⎈ %f%F{white}minikube/kube-system %k%F{magenta}%f " "$(build_left_prompt)"
 
-  unset POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
   unalias kubectl
 }
 function testKubeContextPrintsNothingIfKubectlNotAvailable() {
-  alias kubectl=noKubectl
-  POWERLEVEL9K_CUSTOM_WORLD='echo world'
+  local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
   POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(custom_world kubecontext)
+  local POWERLEVEL9K_CUSTOM_WORLD='echo world'
+  alias kubectl=noKubectl
+
+  # Load Powerlevel9k
+  source powerlevel9k.zsh-theme
 
   assertEquals "%K{white} %F{black}world %k%F{white}%f " "$(build_left_prompt)"
 
-  unset POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
-  unset POWERLEVEL9K_CUSTOM_WORLD
   unalias kubectl
 }
 
-source shunit2/source/2.1/src/shunit2
+source shunit2/shunit2
