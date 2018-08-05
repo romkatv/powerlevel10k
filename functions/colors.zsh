@@ -101,7 +101,9 @@ function getColorCode() {
     codes[yellow]=011
     codes[blue]=012
     codes[fuchsia]=013
+    codes[magenta]=013
     codes[aqua]=014
+    codes[cyan]=014
     codes[white]=015
     codes[grey0]=016
     codes[navyblue]=017
