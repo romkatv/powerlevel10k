@@ -278,11 +278,6 @@ right_prompt_segment() {
 # Prompt Segment Definitions
 ################################################################
 
-# The `CURRENT_BG` variable is used to remember what the last BG color used was
-# when building the left-hand prompt. Because the RPROMPT is created from
-# right-left but reads the opposite, this isn't necessary for the other side.
-CURRENT_BG='NONE'
-
 ################################################################
 # Anaconda Environment
 prompt_anaconda() {
