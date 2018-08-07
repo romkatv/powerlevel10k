@@ -313,7 +313,7 @@ function foregroundColor() {
 # into ZSH-Style color codes.
 function getColorCode() {
   # Early exit: Check if given value is already numerical
-  if [[ "$1" = <-> ]]; then
+  if [[ "$1" == <-> ]]; then
     # Pad color with zeroes
     echo -n "${(l:3::0:)1}"
     return
