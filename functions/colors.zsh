@@ -294,16 +294,7 @@ function termColors() {
 function getColor() {
   # If Color is not numerical, try to get the color code.
   if [[ "$1" != <-> ]]; then
-    # named color added to parameter expansion print -P to test if the name exists in terminal
-    local named="%K{$1}"
-    # https://misc.flogisoft.com/bash/tip_colors_and_formatting
-    local default="$'\033'\[49m"
-    # http://zsh.sourceforge.net/Doc/Release/Prompt-Expansion.html
-    local quoted=$(printf "%q" $(print -P "$named"))
-    if [[ $quoted == "$'\033'\[49m" && $1 != "black" ]]; then
-        # color not found, so try to get the code
-        1=$(getColorCode $1)
-    fi
+    1=$(getColorCode $1)
   fi
   echo -n "$1"
 }
@@ -321,32 +312,32 @@ function foregroundColor() {
 # Get numerical color codes. That way we translate ANSI codes
 # into ZSH-Style color codes.
 function getColorCode() {
-  # Check if given value is already numerical
+  # Early exit: Check if given value is already numerical
   if [[ "$1" = <-> ]]; then
-      echo -n "$1"
-    fi
+    echo -n "$1"
+    return
+  fi
+
+  local colorName="${1}"
+  # for testing purposes in terminal
+  if [[ "${colorName}" == "foreground"  ]]; then
+      # call via `getColorCode foreground`
+      for i in "${(k@)__P9K_COLORS}"; do
+          print -P "$(foregroundColor $i)$(getColor $i) - $i%f"
+      done
+  elif [[ "${colorName}" == "background"  ]]; then
+      # call via `getColorCode background`
+      for i in "${(k@)__P9K_COLORS}"; do
+          print -P "$(backgroundColor $i)$(getColor $i) - $i%k"
+      done
   else
-    # for testing purposes in terminal
-    if [[ "$1" == "foreground"  ]]; then
-        # call via `getColorCode foreground`
-        for i in "${(k@)__P9K_COLORS}"; do
-            print -P "$(foregroundColor $i)$(getColor $i) - $i%f"
-        done
-    elif [[ "$1" == "background"  ]]; then
-        # call via `getColorCode background`
-        for i in "${(k@)__P9K_COLORS}"; do
-            print -P "$(backgroundColor $i)$(getColor $i) - $i%k"
-        done
-    else
-        #[[ -n "$1" ]] bg="%K{$1}" || bg="%k"
-        # Strip eventual "bg-" prefixes
-        1=${1#bg-}
-        # Strip eventual "fg-" prefixes
-        1=${1#fg-}
-        # Strip eventual "br" prefixes ("bright" colors)
-        1=${1#br}
-        echo -n $__P9K_COLORS[$1]
-    fi
+      # Strip eventual "bg-" prefixes
+      colorName=${colorName#bg-}
+      # Strip eventual "fg-" prefixes
+      colorName=${colorName#fg-}
+      # Strip eventual "br" prefixes ("bright" colors)
+      colorName=${colorName#br}
+      echo -n $__P9K_COLORS[$colorName]
   fi
 }
 
