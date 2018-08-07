@@ -323,12 +323,6 @@ function foregroundColor() {
 function getColorCode() {
   # Check if given value is already numerical
   if [[ "$1" = <-> ]]; then
-    # ANSI color codes distinguish between "foreground"
-    # and "background" colors. We don't need to do that,
-    # as ZSH uses a 256 color space anyway.
-    if [[ "$1" = <8-15> ]]; then
-      echo -n $(($1 - 8))
-    else
       echo -n "$1"
     fi
   else
