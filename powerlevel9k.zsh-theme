@@ -173,7 +173,7 @@ left_prompt_segment() {
   [[ -n "$5" ]] && echo -n "${fg}${5}"
   echo -n "${POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS}"
 
-  CURRENT_BG=$3
+  CURRENT_BG="$(getColorCode ${3})"
   last_left_element_index=$current_index
 }
 
