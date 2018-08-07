@@ -28,12 +28,8 @@ function termColors() {
 
 # get the proper color code if it does not exist as a name.
 function getColor() {
-  # no need to check numerical values
-  if [[ "$1" = <-> ]]; then
-    if [[ "$1" = <8-15> ]]; then
-      1=$(($1 - 8))
-    fi
-  else
+  # If Color is not numerical, try to get the color code.
+  if [[ "$1" != <-> ]]; then
     # named color added to parameter expansion print -P to test if the name exists in terminal
     local named="%K{$1}"
     # https://misc.flogisoft.com/bash/tip_colors_and_formatting
