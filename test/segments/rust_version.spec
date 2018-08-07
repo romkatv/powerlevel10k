@@ -32,7 +32,7 @@ function testRust() {
   mockRust
   POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(rust_version)
 
-  assertEquals "%K{208} %F{black%}Rust %f%F{black}0.4.1a-alpha %k%F{darkorange}%f " "$(build_left_prompt)"
+  assertEquals "%K{208} %F{000%}Rust %f%F{000}0.4.1a-alpha %k%F{208}%f " "$(build_left_prompt)"
 
   unset POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
 }
@@ -41,7 +41,7 @@ function testRustPrintsNothingIfRustIsNotAvailable() {
   POWERLEVEL9K_CUSTOM_WORLD='echo world'
   POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(custom_world rust_version)
 
-  assertEquals "%K{white} %F{black}world %k%F{white}%f " "$(build_left_prompt)"
+  assertEquals "%K{015} %F{000}world %k%F{015}%f " "$(build_left_prompt)"
 
   unset POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
   unset POWERLEVEL9K_CUSTOM_WORLD

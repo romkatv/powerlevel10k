@@ -31,7 +31,7 @@ function testLaravelVersionSegment() {
   POWERLEVEL9K_LARAVEL_ICON='x'
   POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(laravel_version)
 
-  assertEquals "%K{001} %F{white%}x %f%F{white}5.4.23 %k%F{maroon}%f " "$(build_left_prompt)"
+  assertEquals "%K{001} %F{015%}x %f%F{015}5.4.23 %k%F{001}%f " "$(build_left_prompt)"
 
   unset POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
   unset POWERLEVEL9K_LARAVEL_ICON
@@ -44,7 +44,7 @@ function testLaravelVersionSegmentIfArtisanIsNotAvailable() {
   POWERLEVEL9K_LARAVEL_ICON='x'
   POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(custom_world laravel_version)
 
-  assertEquals "%K{white} %F{black}world %k%F{white}%f " "$(build_left_prompt)"
+  assertEquals "%K{015} %F{000}world %k%F{015}%f " "$(build_left_prompt)"
 
   unset POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
   unset POWERLEVEL9K_LARAVEL_ICON
@@ -58,7 +58,7 @@ function testLaravelVersionSegmentPrintsNothingIfPhpIsNotAvailable() {
   POWERLEVEL9K_LARAVEL_ICON='x'
   POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(custom_world laravel_version)
 
-  assertEquals "%K{white} %F{black}world %k%F{white}%f " "$(build_left_prompt)"
+  assertEquals "%K{015} %F{000}world %k%F{015}%f " "$(build_left_prompt)"
 
   unset POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
   unset POWERLEVEL9K_LARAVEL_ICON

@@ -40,7 +40,7 @@ function testGo() {
 
   PWD="$HOME/go/src/github.com/bhilburn/powerlevel9k"
 
-  assertEquals "%K{green} %F{grey93%} %f%F{grey93}go1.5.3 %k%F{green}%f " "$(build_left_prompt)"
+  assertEquals "%K{002} %F{255%} %f%F{255}go1.5.3 %k%F{002}%f " "$(build_left_prompt)"
 
   unset POWERLEVEL9K_GO_ICON
   unset PWD
@@ -53,7 +53,7 @@ function testGoSegmentPrintsNothingIfEmptyGopath() {
   POWERLEVEL9K_CUSTOM_WORLD='echo world'
   POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(custom_world go_version)
 
-  assertEquals "%K{white} %F{black}world %k%F{white}%f " "$(build_left_prompt)"
+  assertEquals "%K{015} %F{000}world %k%F{015}%f " "$(build_left_prompt)"
 
   unset POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
   unset POWERLEVEL9K_CUSTOM_WORLD
@@ -65,7 +65,7 @@ function testGoSegmentPrintsNothingIfNotInGopath() {
   POWERLEVEL9K_CUSTOM_WORLD='echo world'
   POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(custom_world go_version)
 
-  assertEquals "%K{white} %F{black}world %k%F{white}%f " "$(build_left_prompt)"
+  assertEquals "%K{015} %F{000}world %k%F{015}%f " "$(build_left_prompt)"
 
   unset POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
   unset POWERLEVEL9K_CUSTOM_WORLD
@@ -76,7 +76,7 @@ function testGoSegmentPrintsNothingIfGoIsNotAvailable() {
   POWERLEVEL9K_CUSTOM_WORLD='echo world'
   POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(custom_world go_version)
 
-  assertEquals "%K{white} %F{black}world %k%F{white}%f " "$(build_left_prompt)"
+  assertEquals "%K{015} %F{000}world %k%F{015}%f " "$(build_left_prompt)"
 
   unset POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
   unset POWERLEVEL9K_CUSTOM_WORLD
