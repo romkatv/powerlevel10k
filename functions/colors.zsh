@@ -50,20 +50,12 @@ function getColor() {
 
 # empty paramenter resets (stops) background color
 function backgroundColor() {
-  if [[ -z $1 ]]; then
-    echo -n "%k"
-  else
-    echo -n "%K{$(getColor $1)}"
-  fi
+  echo -n "%K{$(getColor $1)}"
 }
 
 # empty paramenter resets (stops) foreground color
 function foregroundColor() {
-  if [[ -z $1 ]]; then
-    echo -n "%f"
-  else
-    echo -n "%F{$(getColor $1)}"
-  fi
+  echo -n "%F{$(getColor $1)}"
 }
 
 # Get numerical color codes. That way we translate ANSI codes
@@ -346,12 +338,12 @@ function getColorCode() {
     if [[ "$1" == "foreground"  ]]; then
         # call via `getColorCode foreground`
         for i in "${(k@)codes}"; do
-            print -P "$(foregroundColor $i)$(getColor $i) - $i$(foregroundColor)"
+            print -P "$(foregroundColor $i)$(getColor $i) - $i%f"
         done
     elif [[ "$1" == "background"  ]]; then
         # call via `getColorCode background`
         for i in "${(k@)codes}"; do
-            print -P "$(backgroundColor $i)$(getColor $i) - $i$(backgroundColor)"
+            print -P "$(backgroundColor $i)$(getColor $i) - $i%k"
         done
     else
         #[[ -n "$1" ]] bg="%K{$1}" || bg="%k"
