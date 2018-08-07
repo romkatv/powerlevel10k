@@ -42,7 +42,7 @@ function testGo() {
 
   local PWD="$HOME/go/src/github.com/bhilburn/powerlevel9k"
 
-  assertEquals "%K{green} %F{grey93%} %f%F{255}go1.5.3 %k%F{green}%f " "$(build_left_prompt)"
+  assertEquals "%K{002} %F{255%} %f%F{255}go1.5.3 %k%F{002}%f " "$(build_left_prompt)"
 
   unalias go
 }
@@ -56,7 +56,7 @@ function testGoSegmentPrintsNothingIfEmptyGopath() {
   # Load Powerlevel9k
   source powerlevel9k.zsh-theme
 
-  assertEquals "%K{white} %F{black}world %k%F{white}%f " "$(build_left_prompt)"
+  assertEquals "%K{015} %F{000}world %k%F{015}%f " "$(build_left_prompt)"
 }
 
 function testGoSegmentPrintsNothingIfNotInGopath() {
@@ -68,7 +68,7 @@ function testGoSegmentPrintsNothingIfNotInGopath() {
   # Load Powerlevel9k
   source powerlevel9k.zsh-theme
 
-  assertEquals "%K{white} %F{black}world %k%F{white}%f " "$(build_left_prompt)"
+  assertEquals "%K{015} %F{000}world %k%F{015}%f " "$(build_left_prompt)"
 }
 
 function testGoSegmentPrintsNothingIfGoIsNotAvailable() {
@@ -80,7 +80,7 @@ function testGoSegmentPrintsNothingIfGoIsNotAvailable() {
   # Load Powerlevel9k
   source powerlevel9k.zsh-theme
 
-  assertEquals "%K{white} %F{black}world %k%F{white}%f " "$(build_left_prompt)"
+  assertEquals "%K{015} %F{000}world %k%F{015}%f " "$(build_left_prompt)"
 
   unalias go
 }

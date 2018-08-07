@@ -20,7 +20,7 @@ function testDetectVirtSegmentPrintsNothingIfSystemdIsNotAvailable() {
     # Load Powerlevel9k
     source powerlevel9k.zsh-theme
 
-    assertEquals "%K{white} %F{black}world %k%F{white}%f " "$(build_left_prompt)"
+    assertEquals "%K{015} %F{000}world %k%F{015}%f " "$(build_left_prompt)"
 
     unalias systemd-detect-virt
 }
@@ -33,7 +33,7 @@ function testDetectVirtSegmentIfSystemdReturnsPlainName() {
     # Load Powerlevel9k
     source powerlevel9k.zsh-theme
 
-    assertEquals "%K{black} %F{yellow}xxx %k%F{black}%f " "$(build_left_prompt)"
+    assertEquals "%K{000} %F{011}xxx %k%F{000}%f " "$(build_left_prompt)"
 
     unalias systemd-detect-virt
 }
@@ -53,7 +53,7 @@ function testDetectVirtSegmentIfRootFsIsOnExpectedInode() {
     # which translates to: Show the inode number of "/" and test if it is "2".
     alias ls="echo '2'"
 
-    assertEquals "%K{black} %F{yellow}none %k%F{black}%f " "$(build_left_prompt)"
+    assertEquals "%K{000} %F{011}none %k%F{000}%f " "$(build_left_prompt)"
 
     unalias ls
     unalias systemd-detect-virt
@@ -74,7 +74,7 @@ function testDetectVirtSegmentIfRootFsIsNotOnExpectedInode() {
     # which translates to: Show the inode number of "/" and test if it is "2".
     alias ls="echo '3'"
 
-    assertEquals "%K{black} %F{yellow}chroot %k%F{black}%f " "$(build_left_prompt)"
+    assertEquals "%K{000} %F{011}chroot %k%F{000}%f " "$(build_left_prompt)"
 
     unalias ls
     unalias systemd-detect-virt

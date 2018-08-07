@@ -18,7 +18,7 @@ function testBackgroundJobsSegmentPrintsNothingWithoutBackgroundJobs() {
     # Load Powerlevel9k
     source powerlevel9k.zsh-theme
 
-    assertEquals "%K{white} %F{black}world %k%F{white}%f " "$(build_left_prompt)"
+    assertEquals "%K{015} %F{000}world %k%F{015}%f " "$(build_left_prompt)"
 
     unalias jobs
 }
@@ -34,7 +34,7 @@ function testBackgroundJobsSegmentWorksWithOneBackgroundJob() {
     # Load Powerlevel9k
     source powerlevel9k.zsh-theme
 
-    assertEquals "%K{black} %F{cyan%}⚙%f %k%F{black}%f " "$(build_left_prompt)"
+    assertEquals "%K{000} %F{014%}⚙%f %k%F{000}%f " "$(build_left_prompt)"
 
     unfunction jobs
 }
@@ -52,7 +52,7 @@ function testBackgroundJobsSegmentWorksWithMultipleBackgroundJobs() {
     # Load Powerlevel9k
     source powerlevel9k.zsh-theme
 
-    assertEquals "%K{black} %F{cyan%}⚙%f %k%F{black}%f " "$(build_left_prompt)"
+    assertEquals "%K{000} %F{014%}⚙%f %k%F{000}%f " "$(build_left_prompt)"
 
     unfunction jobs
 }
@@ -70,7 +70,7 @@ function testBackgroundJobsSegmentWithVerboseMode() {
     # Load Powerlevel9k
     source powerlevel9k.zsh-theme
 
-    assertEquals "%K{black} %F{cyan%}⚙ %f%F{cyan}3 %k%F{black}%f " "$(build_left_prompt)"
+    assertEquals "%K{000} %F{014%}⚙ %f%F{014}3 %k%F{000}%f " "$(build_left_prompt)"
 
     unfunction jobs
 }

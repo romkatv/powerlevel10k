@@ -34,7 +34,7 @@ function testLaravelVersionSegment() {
   # Load Powerlevel9k
   source powerlevel9k.zsh-theme
 
-  assertEquals "%K{001} %F{white%}x %f%F{white}5.4.23 %k%F{maroon}%f " "$(build_left_prompt)"
+  assertEquals "%K{001} %F{015%}x %f%F{015}5.4.23 %k%F{001}%f " "$(build_left_prompt)"
 
   unalias php
 }
@@ -49,7 +49,7 @@ function testLaravelVersionSegmentIfArtisanIsNotAvailable() {
   # Load Powerlevel9k
   source powerlevel9k.zsh-theme
 
-  assertEquals "%K{white} %F{black}world %k%F{white}%f " "$(build_left_prompt)"
+  assertEquals "%K{015} %F{000}world %k%F{015}%f " "$(build_left_prompt)"
 
   unalias php
 }
@@ -64,7 +64,7 @@ function testLaravelVersionSegmentPrintsNothingIfPhpIsNotAvailable() {
   # Load Powerlevel9k
   source powerlevel9k.zsh-theme
 
-  assertEquals "%K{white} %F{black}world %k%F{white}%f " "$(build_left_prompt)"
+  assertEquals "%K{015} %F{000}world %k%F{015}%f " "$(build_left_prompt)"
 
   unalias php
 }

@@ -111,45 +111,54 @@ CURRENT_BG='NONE'
 set_default last_left_element_index 1
 set_default POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS " "
 left_prompt_segment() {
+  local segment_name="${1}"
   local current_index=$2
   # Check if the segment should be joined with the previous one
   local joined
   segmentShouldBeJoined $current_index $last_left_element_index "$POWERLEVEL9K_LEFT_PROMPT_ELEMENTS" && joined=true || joined=false
 
+  # Colors
+  local backgroundColor="${3}"
+  local foregroundColor="${4}"
+
   # Overwrite given background-color by user defined variable for this segment.
-  local BACKGROUND_USER_VARIABLE=POWERLEVEL9K_${(U)1#prompt_}_BACKGROUND
+  local BACKGROUND_USER_VARIABLE=POWERLEVEL9K_${(U)${segment_name}#prompt_}_BACKGROUND
   local BG_COLOR_MODIFIER=${(P)BACKGROUND_USER_VARIABLE}
-  [[ -n $BG_COLOR_MODIFIER ]] && 3="$BG_COLOR_MODIFIER"
+  [[ -n $BG_COLOR_MODIFIER ]] && backgroundColor="$BG_COLOR_MODIFIER"
 
   # Overwrite given foreground-color by user defined variable for this segment.
-  local FOREGROUND_USER_VARIABLE=POWERLEVEL9K_${(U)1#prompt_}_FOREGROUND
+  local FOREGROUND_USER_VARIABLE=POWERLEVEL9K_${(U)${segment_name}#prompt_}_FOREGROUND
   local FG_COLOR_MODIFIER=${(P)FOREGROUND_USER_VARIABLE}
-  [[ -n $FG_COLOR_MODIFIER ]] && 4="$FG_COLOR_MODIFIER"
+  [[ -n $FG_COLOR_MODIFIER ]] && foregroundColor="$FG_COLOR_MODIFIER"
 
-  local bg fg
-  [[ -n "$3" ]] && bg="$(backgroundColor $3)" || bg="$(backgroundColor)"
-  [[ -n "$4" ]] && fg="$(foregroundColor $4)" || fg="$(foregroundColor)"
+  # Get color codes here to save some calls later on
+  backgroundColor="$(getColorCode ${backgroundColor})"
+  foregroundColor="$(getColorCode ${foregroundColor})"
 
-  if [[ $CURRENT_BG != 'NONE' ]] && ! isSameColor "$3" "$CURRENT_BG"; then
-    echo -n "$bg%F{$CURRENT_BG}"
+  local background foreground
+  [[ -n "${backgroundColor}" ]] && background="$(backgroundColor ${backgroundColor})" || background="%k"
+  [[ -n "${foregroundColor}" ]] && foreground="$(foregroundColor ${foregroundColor})" || foreground="%f"
+
+  if [[ $CURRENT_BG != 'NONE' ]] && ! isSameColor "${backgroundColor}" "$CURRENT_BG"; then
+    echo -n "${background}%F{$CURRENT_BG}"
     if [[ $joined == false ]]; then
       # Middle segment
       echo -n "$(print_icon 'LEFT_SEGMENT_SEPARATOR')$POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS"
     fi
-  elif isSameColor "$CURRENT_BG" "$3"; then
+  elif isSameColor "$CURRENT_BG" "${backgroundColor}"; then
     # Middle segment with same color as previous segment
     # We take the current foreground color as color for our
     # subsegment (or the default color). This should have
     # enough contrast.
     local complement
-    [[ -n "$4" ]] && complement="$fg" || complement="$(foregroundColor $DEFAULT_COLOR)"
-    echo -n "${bg}${complement}"
+    [[ -n "${foregroundColor}" ]] && complement="${foreground}" || complement="$(foregroundColor $DEFAULT_COLOR)"
+    echo -n "${background}${complement}"
     if [[ $joined == false ]]; then
       echo -n "$(print_icon 'LEFT_SUBSEGMENT_SEPARATOR')$POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS"
     fi
   else
     # First segment
-    echo -n "${bg}$POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS"
+    echo -n "${background}$POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS"
   fi
 
   local visual_identifier
@@ -161,8 +170,8 @@ left_prompt_segment() {
       # we need to color both the visual identifier and the whitespace.
       [[ -n "$5" ]] && visual_identifier="$visual_identifier "
       # Allow users to overwrite the color for the visual identifier only.
-      local visual_identifier_color_variable=POWERLEVEL9K_${(U)1#prompt_}_VISUAL_IDENTIFIER_COLOR
-      set_default $visual_identifier_color_variable $4
+      local visual_identifier_color_variable=POWERLEVEL9K_${(U)${segment_name}#prompt_}_VISUAL_IDENTIFIER_COLOR
+      set_default $visual_identifier_color_variable "${foregroundColor}"
       visual_identifier="%F{${(P)visual_identifier_color_variable}%}$visual_identifier%f"
     fi
   fi
@@ -170,10 +179,10 @@ left_prompt_segment() {
   # Print the visual identifier
   echo -n "${visual_identifier}"
   # Print the content of the segment, if there is any
-  [[ -n "$5" ]] && echo -n "${fg}${5}"
+  [[ -n "$5" ]] && echo -n "${foreground}${5}"
   echo -n "${POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS}"
 
-  CURRENT_BG=$3
+  CURRENT_BG="${backgroundColor}"
   last_left_element_index=$current_index
 }
 
@@ -203,25 +212,34 @@ CURRENT_RIGHT_BG='NONE'
 set_default last_right_element_index 1
 set_default POWERLEVEL9K_WHITESPACE_BETWEEN_RIGHT_SEGMENTS " "
 right_prompt_segment() {
+  local segment_name="${1}"
   local current_index=$2
 
   # Check if the segment should be joined with the previous one
   local joined
   segmentShouldBeJoined $current_index $last_right_element_index "$POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS" && joined=true || joined=false
 
+  # Colors
+  local backgroundColor="${3}"
+  local foregroundColor="${4}"
+
   # Overwrite given background-color by user defined variable for this segment.
-  local BACKGROUND_USER_VARIABLE=POWERLEVEL9K_${(U)1#prompt_}_BACKGROUND
+  local BACKGROUND_USER_VARIABLE=POWERLEVEL9K_${(U)${segment_name}#prompt_}_BACKGROUND
   local BG_COLOR_MODIFIER=${(P)BACKGROUND_USER_VARIABLE}
-  [[ -n $BG_COLOR_MODIFIER ]] && 3="$BG_COLOR_MODIFIER"
+  [[ -n $BG_COLOR_MODIFIER ]] && backgroundColor="$BG_COLOR_MODIFIER"
 
   # Overwrite given foreground-color by user defined variable for this segment.
-  local FOREGROUND_USER_VARIABLE=POWERLEVEL9K_${(U)1#prompt_}_FOREGROUND
+  local FOREGROUND_USER_VARIABLE=POWERLEVEL9K_${(U)${segment_name}#prompt_}_FOREGROUND
   local FG_COLOR_MODIFIER=${(P)FOREGROUND_USER_VARIABLE}
   [[ -n $FG_COLOR_MODIFIER ]] && 4="$FG_COLOR_MODIFIER"
 
-  local bg fg
-  [[ -n "$3" ]] && bg="$(backgroundColor $3)" || bg="$(backgroundColor)"
-  [[ -n "$4" ]] && fg="$(foregroundColor $4)" || fg="$(foregroundColor)"
+  # Get color codes here to save some calls later on
+  backgroundColor="$(getColorCode ${backgroundColor})"
+  foregroundColor="$(getColorCode ${foregroundColor})"
+
+  local background foreground
+  [[ -n "${backgroundColor}" ]] && background="$(backgroundColor ${backgroundColor})" || background="%k"
+  [[ -n "${foregroundColor}" ]] && foreground="$(foregroundColor ${foregroundColor})" || foreground="%f"
 
   # If CURRENT_RIGHT_BG is "NONE", we are the first right segment.
 
@@ -231,17 +249,17 @@ right_prompt_segment() {
   fi
 
   if [[ $joined == false ]] || [[ "$CURRENT_RIGHT_BG" == "NONE" ]]; then
-    if isSameColor "$CURRENT_RIGHT_BG" "$3"; then
+    if isSameColor "$CURRENT_RIGHT_BG" "${backgroundColor}"; then
       # Middle segment with same color as previous segment
       # We take the current foreground color as color for our
       # subsegment (or the default color). This should have
       # enough contrast.
       local complement
-      [[ -n "$4" ]] && complement="$fg" || complement="$(foregroundColor $DEFAULT_COLOR)"
+      [[ -n "${foregroundColor}" ]] && complement="${foreground}" || complement="$(foregroundColor $DEFAULT_COLOR)"
       echo -n "$complement$(print_icon 'RIGHT_SUBSEGMENT_SEPARATOR')%f"
     else
-      # Use the new BG color for the foreground with separator
-      echo -n "$(foregroundColor $3)$(print_icon 'RIGHT_SEGMENT_SEPARATOR')%f"
+      # Use the new Background Color as the foreground of the segment separator
+      echo -n "$(foregroundColor ${backgroundColor})$(print_icon 'RIGHT_SEGMENT_SEPARATOR')%f"
     fi
   fi
 
@@ -254,13 +272,13 @@ right_prompt_segment() {
       # we need to color both the visual identifier and the whitespace.
       [[ -n "$5" ]] && visual_identifier=" $visual_identifier"
       # Allow users to overwrite the color for the visual identifier only.
-      local visual_identifier_color_variable=POWERLEVEL9K_${(U)1#prompt_}_VISUAL_IDENTIFIER_COLOR
-      set_default $visual_identifier_color_variable $4
+      local visual_identifier_color_variable=POWERLEVEL9K_${(U)${segment_name}#prompt_}_VISUAL_IDENTIFIER_COLOR
+      set_default $visual_identifier_color_variable "${foregroundColor}"
       visual_identifier="%F{${(P)visual_identifier_color_variable}%}$visual_identifier%f"
     fi
   fi
 
-  echo -n "${bg}${fg}"
+  echo -n "${background}${foreground}"
 
   # Print whitespace only if segment is not joined or first right segment
   [[ $joined == false ]] || [[ "$CURRENT_RIGHT_BG" == "NONE" ]] && echo -n "${POWERLEVEL9K_WHITESPACE_BETWEEN_RIGHT_SEGMENTS}"
@@ -270,18 +288,13 @@ right_prompt_segment() {
   # Print the visual identifier
   echo -n "${visual_identifier}"
 
-  CURRENT_RIGHT_BG=$3
+  CURRENT_RIGHT_BG="${backgroundColor}"
   last_right_element_index=$current_index
 }
 
 ################################################################
 # Prompt Segment Definitions
 ################################################################
-
-# The `CURRENT_BG` variable is used to remember what the last BG color used was
-# when building the left-hand prompt. Because the RPROMPT is created from
-# right-left but reads the opposite, this isn't necessary for the other side.
-CURRENT_BG='NONE'
 
 ################################################################
 # Anaconda Environment

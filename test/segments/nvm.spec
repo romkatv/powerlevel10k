@@ -37,7 +37,7 @@ function testNvmSegmentPrintsNothingIfNvmIsNotAvailable() {
   # Load Powerlevel9k
   source ${P9K_HOME}/powerlevel9k.zsh-theme
 
-  assertEquals "%K{white} %F{black}world %k%F{white}%f " "$(build_left_prompt)"
+  assertEquals "%K{015} %F{000}world %k%F{015}%f " "$(build_left_prompt)"
 }
 
 function testNvmSegmentWorksWithoutHavingADefaultAlias() {
@@ -51,7 +51,7 @@ function testNvmSegmentWorksWithoutHavingADefaultAlias() {
     [[ ${1} == 'current' ]] && echo 'v4.6.0' || echo 'v1.4.0'
   }
 
-  assertEquals "%K{magenta} %F{black%}⬢ %f%F{black}4.6.0 %k%F{magenta}%f " "$(build_left_prompt)"
+  assertEquals "%K{013} %F{000%}⬢ %f%F{000}4.6.0 %k%F{013}%f " "$(build_left_prompt)"
 }
 
 function testNvmSegmentPrintsNothingWhenOnDefaultVersion() {
@@ -66,7 +66,7 @@ function testNvmSegmentPrintsNothingWhenOnDefaultVersion() {
     [[ ${1} == 'current' ]] && echo 'v4.6.0' || echo 'v4.6.0'
   }
 
-  assertEquals "%K{white} %F{black}world %k%F{white}%f " "$(build_left_prompt)"
+  assertEquals "%K{015} %F{000}world %k%F{015}%f " "$(build_left_prompt)"
 }
 
 source shunit2/shunit2

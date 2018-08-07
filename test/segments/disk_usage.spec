@@ -40,7 +40,7 @@ function testDiskUsageSegmentWhenDiskIsAlmostFull() {
   # Load Powerlevel9k
   source ${P9K_HOME}/powerlevel9k.zsh-theme
 
-  assertEquals "%K{red} %F{white%}hdd  %f%F{white}97%% %k%F{red}%f " "$(build_left_prompt)"
+  assertEquals "%K{009} %F{015%}hdd  %f%F{015}97%% %k%F{009}%f " "$(build_left_prompt)"
 
   unfunction df
 }
@@ -56,7 +56,7 @@ function testDiskUsageSegmentWhenDiskIsVeryFull() {
   # Load Powerlevel9k
   source ${P9K_HOME}/powerlevel9k.zsh-theme
 
-  assertEquals "%K{yellow} %F{black%}hdd  %f%F{black}94%% %k%F{yellow}%f " "$(build_left_prompt)"
+  assertEquals "%K{011} %F{000%}hdd  %f%F{000}94%% %k%F{011}%f " "$(build_left_prompt)"
 
   unfunction df
 }
@@ -72,7 +72,7 @@ function testDiskUsageSegmentWhenDiskIsQuiteEmpty() {
   # Load Powerlevel9k
   source ${P9K_HOME}/powerlevel9k.zsh-theme
 
-  assertEquals "%K{black} %F{yellow%}hdd  %f%F{yellow}4%% %k%F{black}%f " "$(build_left_prompt)"
+  assertEquals "%K{000} %F{011%}hdd  %f%F{011}4%% %k%F{000}%f " "$(build_left_prompt)"
 
   unfunction df
 }
@@ -88,7 +88,7 @@ function testDiskUsageSegmentPrintsNothingIfDiskIsQuiteEmptyAndOnlyWarningsShoul
   local POWERLEVEL9K_DISK_USAGE_ONLY_WARNING=true
   local POWERLEVEL9K_CUSTOM_WORLD='echo world'
 
-  assertEquals "%K{white} %F{black}world %k%F{white}%f " "$(build_left_prompt)"
+  assertEquals "%K{015} %F{000}world %k%F{015}%f " "$(build_left_prompt)"
 
   unfunction df
 }
@@ -105,7 +105,7 @@ function testDiskUsageSegmentWarningLevelCouldBeAdjusted() {
   # Load Powerlevel9k
   source ${P9K_HOME}/powerlevel9k.zsh-theme
 
-  assertEquals "%K{yellow} %F{black%}hdd  %f%F{black}11%% %k%F{yellow}%f " "$(build_left_prompt)"
+  assertEquals "%K{011} %F{000%}hdd  %f%F{000}11%% %k%F{011}%f " "$(build_left_prompt)"
 
   unfunction df
 }
@@ -123,7 +123,7 @@ function testDiskUsageSegmentCriticalLevelCouldBeAdjusted() {
   # Load Powerlevel9k
   source ${P9K_HOME}/powerlevel9k.zsh-theme
 
-  assertEquals "%K{red} %F{white%}hdd  %f%F{white}11%% %k%F{red}%f " "$(build_left_prompt)"
+  assertEquals "%K{009} %F{015%}hdd  %f%F{015}11%% %k%F{009}%f " "$(build_left_prompt)"
 
   unfunction df
 }

@@ -18,7 +18,7 @@ function testOverwritingIconsWork() {
   local POWERLEVEL9K_CUSTOM_WORLD1='echo world1'
   local POWERLEVEL9K_CUSTOM_WORLD1_ICON='icon-here'
 
-  assertEquals "%K{white} %F{black%}icon-here %f%F{black}world1 %k%F{white}%f " "$(build_left_prompt)"
+  assertEquals "%K{015} %F{000%}icon-here %f%F{000}world1 %k%F{015}%f " "$(build_left_prompt)"
 }
 
 function testVisualIdentifierAppearsBeforeSegmentContentOnLeftSegments() {
@@ -27,7 +27,7 @@ function testVisualIdentifierAppearsBeforeSegmentContentOnLeftSegments() {
   local POWERLEVEL9K_CUSTOM_WORLD1='echo world1'
   local POWERLEVEL9K_CUSTOM_WORLD1_ICON='icon-here'
 
-  assertEquals "%K{white} %F{black%}icon-here %f%F{black}world1 %k%F{white}%f " "$(build_left_prompt)"
+  assertEquals "%K{015} %F{000%}icon-here %f%F{000}world1 %k%F{015}%f " "$(build_left_prompt)"
 }
 
 function testVisualIdentifierAppearsAfterSegmentContentOnRightSegments() {
@@ -36,7 +36,7 @@ function testVisualIdentifierAppearsAfterSegmentContentOnRightSegments() {
   local POWERLEVEL9K_CUSTOM_WORLD1='echo world1'
   local POWERLEVEL9K_CUSTOM_WORLD1_ICON='icon-here'
 
-  assertEquals "%F{white}%f%K{white}%F{black} world1%F{black%} icon-here%f%E" "$(build_right_prompt)"
+  assertEquals "%F{015}%f%K{015}%F{000} world1%F{000%} icon-here%f%E" "$(build_right_prompt)"
 }
 
 function testVisualIdentifierPrintsNothingIfNotAvailable() {
@@ -44,7 +44,7 @@ function testVisualIdentifierPrintsNothingIfNotAvailable() {
   POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(custom_world1)
   local POWERLEVEL9K_CUSTOM_WORLD1='echo world1'
 
-  assertEquals "%K{white} %F{black}world1 %k%F{white}%f " "$(build_left_prompt)"
+  assertEquals "%K{015} %F{000}world1 %k%F{015}%f " "$(build_left_prompt)"
 }
 
 source shunit2/shunit2

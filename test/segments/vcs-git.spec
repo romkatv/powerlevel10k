@@ -76,7 +76,7 @@ function testColorOverridingForCleanStateWorks() {
   # Load Powerlevel9k
   source ${P9K_HOME}/powerlevel9k.zsh-theme
 
-  assertEquals "%K{white} %F{cyan} master %k%F{white}%f " "$(build_left_prompt)"
+  assertEquals "%K{015} %F{014} master %k%F{015}%f " "$(build_left_prompt)"
 }
 
 function testColorOverridingForModifiedStateWorks() {
@@ -93,7 +93,7 @@ function testColorOverridingForModifiedStateWorks() {
   # Load Powerlevel9k
   source ${P9K_HOME}/powerlevel9k.zsh-theme
 
-  assertEquals "%K{yellow} %F{red} master ● %k%F{yellow}%f " "$(build_left_prompt)"
+  assertEquals "%K{011} %F{009} master ● %k%F{011}%f " "$(build_left_prompt)"
 }
 
 function testColorOverridingForUntrackedStateWorks() {
@@ -107,7 +107,7 @@ function testColorOverridingForUntrackedStateWorks() {
   # Load Powerlevel9k
   source ${P9K_HOME}/powerlevel9k.zsh-theme
 
-  assertEquals "%K{yellow} %F{cyan} master ? %k%F{yellow}%f " "$(build_left_prompt)"
+  assertEquals "%K{011} %F{014} master ? %k%F{011}%f " "$(build_left_prompt)"
 }
 
 function testGitIconWorks() {
@@ -117,7 +117,7 @@ function testGitIconWorks() {
   # Load Powerlevel9k
   source ${P9K_HOME}/powerlevel9k.zsh-theme
 
-  assertEquals "%K{green} %F{black%}Git-Icon %f%F{black} master %k%F{green}%f " "$(build_left_prompt)"
+  assertEquals "%K{002} %F{000%}Git-Icon %f%F{000} master %k%F{002}%f " "$(build_left_prompt)"
 }
 
 function testGitlabIconWorks() {
@@ -132,7 +132,7 @@ function testGitlabIconWorks() {
   # Load Powerlevel9k
   source ${P9K_HOME}/powerlevel9k.zsh-theme
 
-  assertEquals "%K{green} %F{black%}GL-Icon %f%F{black} master %k%F{green}%f " "$(build_left_prompt)"
+  assertEquals "%K{002} %F{000%}GL-Icon %f%F{000} master %k%F{002}%f " "$(build_left_prompt)"
 }
 
 function testBitbucketIconWorks() {
@@ -147,7 +147,7 @@ function testBitbucketIconWorks() {
   # Load Powerlevel9k
   source ${P9K_HOME}/powerlevel9k.zsh-theme
 
-  assertEquals "%K{green} %F{black%}BB-Icon %f%F{black} master %k%F{green}%f " "$(build_left_prompt)"
+  assertEquals "%K{002} %F{000%}BB-Icon %f%F{000} master %k%F{002}%f " "$(build_left_prompt)"
 }
 
 function testGitHubIconWorks() {
@@ -162,7 +162,7 @@ function testGitHubIconWorks() {
   # Load Powerlevel9k
   source ${P9K_HOME}/powerlevel9k.zsh-theme
 
-  assertEquals "%K{green} %F{black%}GH-Icon %f%F{black} master %k%F{green}%f " "$(build_left_prompt)"
+  assertEquals "%K{002} %F{000%}GH-Icon %f%F{000} master %k%F{002}%f " "$(build_left_prompt)"
 }
 
 function testUntrackedFilesIconWorks() {
@@ -176,7 +176,7 @@ function testUntrackedFilesIconWorks() {
   # Load Powerlevel9k
   source ${P9K_HOME}/powerlevel9k.zsh-theme
 
-  assertEquals "%K{green} %F{black} master ? %k%F{green}%f " "$(build_left_prompt)"
+  assertEquals "%K{002} %F{000} master ? %k%F{002}%f " "$(build_left_prompt)"
 }
 
 function testStagedFilesIconWorks() {
@@ -194,7 +194,7 @@ function testStagedFilesIconWorks() {
   # Load Powerlevel9k
   source ${P9K_HOME}/powerlevel9k.zsh-theme
 
-  assertEquals "%K{yellow} %F{black} master + %k%F{yellow}%f " "$(build_left_prompt)"
+  assertEquals "%K{011} %F{000} master + %k%F{011}%f " "$(build_left_prompt)"
 }
 
 function testUnstagedFilesIconWorks() {
@@ -211,7 +211,7 @@ function testUnstagedFilesIconWorks() {
   # Load Powerlevel9k
   source ${P9K_HOME}/powerlevel9k.zsh-theme
 
-  assertEquals "%K{yellow} %F{black} master M %k%F{yellow}%f " "$(build_left_prompt)"
+  assertEquals "%K{011} %F{000} master M %k%F{011}%f " "$(build_left_prompt)"
 }
 
 function testStashIconWorks() {
@@ -229,7 +229,7 @@ function testStashIconWorks() {
   # Load Powerlevel9k
   source ${P9K_HOME}/powerlevel9k.zsh-theme
 
-  assertEquals "%K{green} %F{black} master S1 %k%F{green}%f " "$(build_left_prompt)"
+  assertEquals "%K{002} %F{000} master S1 %k%F{002}%f " "$(build_left_prompt)"
 }
 
 function testTagIconWorks() {
@@ -245,7 +245,7 @@ function testTagIconWorks() {
   # Load Powerlevel9k
   source ${P9K_HOME}/powerlevel9k.zsh-theme
 
-  assertEquals "%K{green} %F{black} master Tv0.0.1 %k%F{green}%f " "$(build_left_prompt)"
+  assertEquals "%K{002} %F{000} master Tv0.0.1 %k%F{002}%f " "$(build_left_prompt)"
 }
 
 function testTagIconInDetachedHeadState() {
@@ -266,7 +266,7 @@ function testTagIconInDetachedHeadState() {
   # Load Powerlevel9k
   source ${P9K_HOME}/powerlevel9k.zsh-theme
 
-  assertEquals "%K{green} %F{black} ${hash} Tv0.0.1 %k%F{green}%f " "$(build_left_prompt)"
+  assertEquals "%K{002} %F{000} ${hash} Tv0.0.1 %k%F{002}%f " "$(build_left_prompt)"
 }
 
 function testActionHintWorks() {
@@ -289,7 +289,7 @@ function testActionHintWorks() {
   # Load Powerlevel9k
   source ${P9K_HOME}/powerlevel9k.zsh-theme
 
-  assertEquals "%K{yellow} %F{black} master %F{red}| merge%f %k%F{yellow}%f " "$(build_left_prompt)"
+  assertEquals "%K{011} %F{000} master %F{red}| merge%f %k%F{011}%f " "$(build_left_prompt)"
 }
 
 function testIncomingHintWorks() {
@@ -311,7 +311,7 @@ function testIncomingHintWorks() {
   # Load Powerlevel9k
   source ${P9K_HOME}/powerlevel9k.zsh-theme
 
-  assertEquals "%K{green} %F{black} master I1 %k%F{green}%f " "$(build_left_prompt)"
+  assertEquals "%K{002} %F{000} master I1 %k%F{002}%f " "$(build_left_prompt)"
 }
 
 function testOutgoingHintWorks() {
@@ -333,7 +333,7 @@ function testOutgoingHintWorks() {
   # Load Powerlevel9k
   source ${P9K_HOME}/powerlevel9k.zsh-theme
 
-  assertEquals "%K{green} %F{black} master o1 %k%F{green}%f " "$(build_left_prompt)"
+  assertEquals "%K{002} %F{000} master o1 %k%F{002}%f " "$(build_left_prompt)"
 }
 
 function testShorteningCommitHashWorks() {
@@ -353,7 +353,7 @@ function testShorteningCommitHashWorks() {
   # This test needs to call powerlevel9k_vcs_init, where
   # the changeset is truncated.
   powerlevel9k_vcs_init
-  assertEquals "%K{green} %F{black}${hash}  master %k%F{green}%f " "$(build_left_prompt)"
+  assertEquals "%K{002} %F{000}${hash}  master %k%F{002}%f " "$(build_left_prompt)"
 }
 
 function testShorteningCommitHashIsNotShownIfShowChangesetIsFalse() {
@@ -372,7 +372,7 @@ function testShorteningCommitHashIsNotShownIfShowChangesetIsFalse() {
   # This test needs to call powerlevel9k_vcs_init, where
   # the changeset is truncated.
   powerlevel9k_vcs_init
-  assertEquals "%K{green} %F{black} master %k%F{green}%f " "$(build_left_prompt)"
+  assertEquals "%K{002} %F{000} master %k%F{002}%f " "$(build_left_prompt)"
 }
 
 source shunit2/shunit2

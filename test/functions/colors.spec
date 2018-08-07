@@ -30,8 +30,8 @@ function testIsSameColorComparesAnsiBackgroundAndNumericalColorCorrectly() {
   assertTrue "isSameColor 'bg-green' '002'"
 }
 
-function testIsSameColorComparesNumericalBackgroundAndNumericalColorCorrectly() {
-  assertTrue "isSameColor '010' '2'"
+function testIsSameColorComparesShortCodesCorrectly() {
+  assertTrue "isSameColor '002' '2'"
 }
 
 function testIsSameColorDoesNotYieldNotEqualColorsTruthy() {

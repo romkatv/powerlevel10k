@@ -45,7 +45,7 @@ function testPublicIpSegmentPrintsNothingByDefaultIfHostIsNotAvailable() {
   # Load Powerlevel9k
   source ${P9K_HOME}/powerlevel9k.zsh-theme
 
-  assertEquals "%K{white} %F{black}world %k%F{white}%f " "$(build_left_prompt)"
+  assertEquals "%K{015} %F{000}world %k%F{015}%f " "$(build_left_prompt)"
 
   unalias dig
 }
@@ -62,7 +62,7 @@ function testPublicIpSegmentPrintsNoticeIfNotConnected() {
   # Load Powerlevel9k
   source ${P9K_HOME}/powerlevel9k.zsh-theme
 
-  assertEquals "%K{black} %F{white}disconnected %k%F{black}%f " "$(build_left_prompt)"
+  assertEquals "%K{000} %F{015}disconnected %k%F{000}%f " "$(build_left_prompt)"
 
   unalias dig
 }
@@ -79,7 +79,7 @@ function testPublicIpSegmentWorksWithWget() {
   # Load Powerlevel9k
   source ${P9K_HOME}/powerlevel9k.zsh-theme
 
-  assertEquals "%K{black} %F{white}wget 1.2.3.4 %k%F{black}%f " "$(build_left_prompt)"
+  assertEquals "%K{000} %F{015}wget 1.2.3.4 %k%F{000}%f " "$(build_left_prompt)"
 
   unfunction wget
   unalias dig
@@ -98,7 +98,7 @@ function testPublicIpSegmentUsesCurlAsFallbackMethodIfWgetIsNotAvailable() {
   # Load Powerlevel9k
   source ${P9K_HOME}/powerlevel9k.zsh-theme
 
-  assertEquals "%K{black} %F{white}curl 1.2.3.4 %k%F{black}%f " "$(build_left_prompt)"
+  assertEquals "%K{000} %F{015}curl 1.2.3.4 %k%F{000}%f " "$(build_left_prompt)"
 
   unfunction curl
   unalias dig
@@ -117,7 +117,7 @@ function testPublicIpSegmentUsesDigAsFallbackMethodIfWgetAndCurlAreNotAvailable(
   # Load Powerlevel9k
   source ${P9K_HOME}/powerlevel9k.zsh-theme
 
-  assertEquals "%K{black} %F{white}dig 1.2.3.4 %k%F{black}%f " "$(build_left_prompt)"
+  assertEquals "%K{000} %F{015}dig 1.2.3.4 %k%F{000}%f " "$(build_left_prompt)"
 
   unfunction dig
   unalias curl
@@ -134,14 +134,14 @@ function testPublicIpSegmentCachesFile() {
   # Load Powerlevel9k
   source ${P9K_HOME}/powerlevel9k.zsh-theme
 
-  assertEquals "%K{black} %F{white}first %k%F{black}%f " "$(build_left_prompt)"
+  assertEquals "%K{000} %F{015}first %k%F{000}%f " "$(build_left_prompt)"
 
   dig() {
       echo "second"
   }
 
   # Segment should not have changed!
-  assertEquals "%K{black} %F{white}first %k%F{black}%f " "$(build_left_prompt)"
+  assertEquals "%K{000} %F{015}first %k%F{000}%f " "$(build_left_prompt)"
 
   unfunction dig
 }
@@ -157,7 +157,7 @@ function testPublicIpSegmentRefreshesCachesFileAfterTimeout() {
   # Load Powerlevel9k
   source ${P9K_HOME}/powerlevel9k.zsh-theme
 
-  assertEquals "%K{black} %F{white}first %k%F{black}%f " "$(build_left_prompt)"
+  assertEquals "%K{000} %F{015}first %k%F{000}%f " "$(build_left_prompt)"
 
   sleep 3
   dig() {
@@ -165,7 +165,7 @@ function testPublicIpSegmentRefreshesCachesFileAfterTimeout() {
   }
 
   # Segment should not have changed!
-  assertEquals "%K{black} %F{white}second %k%F{black}%f " "$(build_left_prompt)"
+  assertEquals "%K{000} %F{015}second %k%F{000}%f " "$(build_left_prompt)"
 
   unfunction dig
 }
@@ -180,7 +180,7 @@ function testPublicIpSegmentRefreshesCachesFileIfEmpty() {
   # Load Powerlevel9k
   source ${P9K_HOME}/powerlevel9k.zsh-theme
 
-  assertEquals "%K{black} %F{white}first %k%F{black}%f " "$(build_left_prompt)"
+  assertEquals "%K{000} %F{015}first %k%F{000}%f " "$(build_left_prompt)"
 
   # Truncate cache file
   echo "" >! $POWERLEVEL9K_PUBLIC_IP_FILE
@@ -190,7 +190,7 @@ function testPublicIpSegmentRefreshesCachesFileIfEmpty() {
   }
 
   # Segment should not have changed!
-  assertEquals "%K{black} %F{white}second %k%F{black}%f " "$(build_left_prompt)"
+  assertEquals "%K{000} %F{015}second %k%F{000}%f " "$(build_left_prompt)"
 
   unfunction dig
 }
@@ -205,7 +205,7 @@ function testPublicIpSegmentWhenGoingOnline() {
   # Load Powerlevel9k
   source ${P9K_HOME}/powerlevel9k.zsh-theme
 
-  assertEquals "%K{black} %F{white}disconnected %k%F{black}%f " "$(build_left_prompt)"
+  assertEquals "%K{000} %F{015}disconnected %k%F{000}%f " "$(build_left_prompt)"
 
   unalias dig
 
@@ -214,7 +214,7 @@ function testPublicIpSegmentWhenGoingOnline() {
   }
 
   # Segment should not have changed!
-  assertEquals "%K{black} %F{white}second %k%F{black}%f " "$(build_left_prompt)"
+  assertEquals "%K{000} %F{015}second %k%F{000}%f " "$(build_left_prompt)"
 
   unfunction dig
 }

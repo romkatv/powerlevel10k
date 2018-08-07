@@ -23,7 +23,7 @@ function testNodeenvSegmentPrintsNothingWithoutNode() {
     # Load Powerlevel9k
     source powerlevel9k.zsh-theme
 
-    assertEquals "%K{white} %F{black}world %k%F{white}%f " "$(build_left_prompt)"
+    assertEquals "%K{015} %F{000}world %k%F{015}%f " "$(build_left_prompt)"
 
     unalias node
 }
@@ -39,7 +39,7 @@ function testNodeenvSegmentPrintsNothingIfNodeVirtualEnvIsNotSet() {
     # Load Powerlevel9k
     source powerlevel9k.zsh-theme
 
-    assertEquals "%K{white} %F{black}world %k%F{white}%f " "$(build_left_prompt)"
+    assertEquals "%K{015} %F{000}world %k%F{015}%f " "$(build_left_prompt)"
 
     unfunction node
 }
@@ -57,7 +57,7 @@ function testNodeenvSegmentPrintsNothingIfNodeVirtualEnvDisablePromptIsSet() {
     # Load Powerlevel9k
     source powerlevel9k.zsh-theme
 
-    assertEquals "%K{white} %F{black}world %k%F{white}%f " "$(build_left_prompt)"
+    assertEquals "%K{015} %F{000}world %k%F{015}%f " "$(build_left_prompt)"
 
     unset NODE_VIRTUAL_ENV_DISABLE_PROMPT
     unset NODE_VIRTUAL_ENV
@@ -73,7 +73,7 @@ function testNodeenvSegmentPrintsAtLeastNodeEnvWithoutNode() {
     # Load Powerlevel9k
     source powerlevel9k.zsh-theme
 
-    assertEquals "%K{black} %F{green%}⬢ %f%F{green}[node-env] %k%F{black}%f " "$(build_left_prompt)"
+    assertEquals "%K{000} %F{002%}⬢ %f%F{002}[node-env] %k%F{000}%f " "$(build_left_prompt)"
 
     unset NODE_VIRTUAL_ENV
     unalias node
@@ -90,7 +90,7 @@ function testNodeenvSegmentWorks() {
     # Load Powerlevel9k
     source powerlevel9k.zsh-theme
 
-    assertEquals "%K{black} %F{green%}⬢ %f%F{green}v1.2.3[node-env] %k%F{black}%f " "$(build_left_prompt)"
+    assertEquals "%K{000} %F{002%}⬢ %f%F{002}v1.2.3[node-env] %k%F{000}%f " "$(build_left_prompt)"
 
     unfunction node
     unset NODE_VIRTUAL_ENV

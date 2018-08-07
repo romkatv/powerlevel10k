@@ -34,7 +34,7 @@ function testSwiftSegmentPrintsNothingIfSwiftIsNotAvailable() {
     # Load Powerlevel9k
     source ${P9K_HOME}/powerlevel9k.zsh-theme
 
-    assertEquals "%K{white} %F{black}world %k%F{white}%f " "$(build_left_prompt)"
+    assertEquals "%K{015} %F{000}world %k%F{015}%f " "$(build_left_prompt)"
 
     unalias swift
 }
@@ -49,7 +49,7 @@ function testSwiftSegmentWorks() {
     # Load Powerlevel9k
     source ${P9K_HOME}/powerlevel9k.zsh-theme
 
-    assertEquals "%K{magenta} %F{white%}Swift %f%F{white}3.0.1 %k%F{magenta}%f " "$(build_left_prompt)"
+    assertEquals "%K{013} %F{015%}Swift %f%F{015}3.0.1 %k%F{013}%f " "$(build_left_prompt)"
 
     unfunction swift
 }

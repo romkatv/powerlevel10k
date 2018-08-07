@@ -17,7 +17,7 @@ function testAwsEbEnvSegmentPrintsNothingIfNoElasticBeanstalkEnvironmentIsSet() 
     # Load Powerlevel9k
     source powerlevel9k.zsh-theme
 
-    assertEquals "%K{white} %F{black}world %k%F{white}%f " "$(build_left_prompt)"
+    assertEquals "%K{015} %F{000}world %k%F{015}%f " "$(build_left_prompt)"
 }
 
 function testAwsEbEnvSegmentWorksIfElasticBeanstalkEnvironmentIsSet() {
@@ -31,7 +31,7 @@ function testAwsEbEnvSegmentWorksIfElasticBeanstalkEnvironmentIsSet() {
     echo "test:\n    environment: test" > /tmp/powerlevel9k-test/.elasticbeanstalk/config.yml
     cd /tmp/powerlevel9k-test
 
-    assertEquals "%K{black} %F{green%}🌱  %f%F{green}test %k%F{black}%f " "$(build_left_prompt)"
+    assertEquals "%K{000} %F{002%}🌱  %f%F{002}test %k%F{000}%f " "$(build_left_prompt)"
 
     rm -fr /tmp/powerlevel9k-test
     cd -
@@ -52,7 +52,7 @@ function testAwsEbEnvSegmentWorksIfElasticBeanstalkEnvironmentIsSetInParentDirec
     echo "test:\n    environment: test" > /tmp/powerlevel9k-test/.elasticbeanstalk/config.yml
     cd /tmp/powerlevel9k-test/1/12/123/1234/12345
 
-    assertEquals "%K{black} %F{green%}🌱  %f%F{green}test %k%F{black}%f " "$(build_left_prompt)"
+    assertEquals "%K{000} %F{002%}🌱  %f%F{002}test %k%F{000}%f " "$(build_left_prompt)"
 
     rm -fr /tmp/powerlevel9k-test
     cd -

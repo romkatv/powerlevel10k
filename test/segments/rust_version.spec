@@ -34,7 +34,7 @@ function testRust() {
   # Load Powerlevel9k
   source powerlevel9k.zsh-theme
 
-  assertEquals "%K{208} %F{black%}Rust %f%F{black}0.4.1a-alpha %k%F{darkorange}%f " "$(build_left_prompt)"
+  assertEquals "%K{208} %F{000%}Rust %f%F{000}0.4.1a-alpha %k%F{208}%f " "$(build_left_prompt)"
 }
 
 function testRustPrintsNothingIfRustIsNotAvailable() {
@@ -45,7 +45,7 @@ function testRustPrintsNothingIfRustIsNotAvailable() {
   # Load Powerlevel9k
   source powerlevel9k.zsh-theme
 
-  assertEquals "%K{white} %F{black}world %k%F{white}%f " "$(build_left_prompt)"
+  assertEquals "%K{015} %F{000}world %k%F{015}%f " "$(build_left_prompt)"
 }
 
 source shunit2/shunit2

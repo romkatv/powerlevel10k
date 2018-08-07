@@ -29,7 +29,7 @@ function testContextSegmentDoesNotGetRenderedWithDefaultUser() {
     # Load Powerlevel9k
     source powerlevel9k.zsh-theme
 
-    assertEquals "%K{white} %F{black}world %k%F{white}%f " "$(build_left_prompt)"
+    assertEquals "%K{015} %F{000}world %k%F{015}%f " "$(build_left_prompt)"
 }
 
 function testContextSegmentDoesGetRenderedWhenSshConnectionIsOpen() {
@@ -43,7 +43,7 @@ function testContextSegmentDoesGetRenderedWhenSshConnectionIsOpen() {
     # Load Powerlevel9k
     source powerlevel9k.zsh-theme
 
-    assertEquals "%K{black} %F{yellow}%n@%m %k%F{black}%f " "$(build_left_prompt)"
+    assertEquals "%K{000} %F{011}%n@%m %k%F{000}%f " "$(build_left_prompt)"
 
     unfunction sudo
 }
@@ -58,7 +58,7 @@ function testContextSegmentWithForeignUser() {
     # Load Powerlevel9k
     source powerlevel9k.zsh-theme
 
-    assertEquals "%K{black} %F{yellow}%n@%m %k%F{black}%f " "$(build_left_prompt)"
+    assertEquals "%K{000} %F{011}%n@%m %k%F{000}%f " "$(build_left_prompt)"
 
     unfunction sudo
 }
@@ -72,7 +72,7 @@ function testContextSegmentWithRootUser() {
     # Load Powerlevel9k
     source powerlevel9k.zsh-theme
 
-    assertEquals "%K{black} %F{yellow}%n@%m %k%F{black}%f " "$(build_left_prompt)"
+    assertEquals "%K{000} %F{011}%n@%m %k%F{000}%f " "$(build_left_prompt)"
 }
 
 function testOverridingContextTemplate() {
@@ -83,7 +83,7 @@ function testOverridingContextTemplate() {
     # Load Powerlevel9k
     source powerlevel9k.zsh-theme
 
-    assertEquals "%K{black} %F{yellow}xx %k%F{black}%f " "$(build_left_prompt)"
+    assertEquals "%K{000} %F{011}xx %k%F{000}%f " "$(build_left_prompt)"
 }
 
 function testContextSegmentIsShownIfDefaultUserIsSetWhenForced() {
@@ -95,7 +95,7 @@ function testContextSegmentIsShownIfDefaultUserIsSetWhenForced() {
     # Load Powerlevel9k
     source powerlevel9k.zsh-theme
 
-    assertEquals "%K{black} %F{yellow}%n@%m %k%F{black}%f " "$(build_left_prompt)"
+    assertEquals "%K{000} %F{011}%n@%m %k%F{000}%f " "$(build_left_prompt)"
 }
 
 function testContextSegmentIsShownIfForced() {
@@ -107,7 +107,7 @@ function testContextSegmentIsShownIfForced() {
     # Load Powerlevel9k
     source powerlevel9k.zsh-theme
 
-    assertEquals "%K{black} %F{yellow}$(whoami) %k%F{black}%f " "$(build_left_prompt)"
+    assertEquals "%K{000} %F{011}$(whoami) %k%F{000}%f " "$(build_left_prompt)"
 }
 
 source shunit2/shunit2

@@ -34,7 +34,7 @@ function testSymfonyVersionSegmentPrintsNothingIfPhpIsNotAvailable() {
     # Load Powerlevel9k
     source ${P9K_HOME}/powerlevel9k.zsh-theme
 
-    assertEquals "%K{white} %F{black}world %k%F{white}%f " "$(build_left_prompt)"
+    assertEquals "%K{015} %F{000}world %k%F{015}%f " "$(build_left_prompt)"
 
     unalias php
 }
@@ -50,7 +50,7 @@ function testSymfonyVersionSegmentPrintsNothingIfSymfonyIsNotAvailable() {
     # Load Powerlevel9k
     source ${P9K_HOME}/powerlevel9k.zsh-theme
 
-    assertEquals "%K{white} %F{black}world %k%F{white}%f " "$(build_left_prompt)"
+    assertEquals "%K{015} %F{000}world %k%F{015}%f " "$(build_left_prompt)"
 }
 
 function testSymfonyVersionPrintsNothingIfPhpThrowsAnError() {
@@ -68,7 +68,7 @@ function testSymfonyVersionPrintsNothingIfPhpThrowsAnError() {
     # Load Powerlevel9k
     source ${P9K_HOME}/powerlevel9k.zsh-theme
 
-    assertEquals "%K{white} %F{black}world %k%F{white}%f " "$(build_left_prompt)"
+    assertEquals "%K{015} %F{000}world %k%F{015}%f " "$(build_left_prompt)"
 
     unfunction php
 }
@@ -87,7 +87,7 @@ function testSymfonyVersionSegmentWorks() {
     # Load Powerlevel9k
     source ${P9K_HOME}/powerlevel9k.zsh-theme
 
-    assertEquals "%K{240} %F{black%}SF %f%F{black}3.1.4 %k%F{240}%f " "$(build_left_prompt)"
+    assertEquals "%K{240} %F{000%}SF %f%F{000}3.1.4 %k%F{240}%f " "$(build_left_prompt)"
 
     unfunction php
 }
@@ -109,7 +109,7 @@ function testSymfonyVersionSegmentWorksInNestedFolder() {
     # Load Powerlevel9k
     source ${P9K_HOME}/powerlevel9k.zsh-theme
 
-    assertEquals "%K{240} %F{black%}SF %f%F{black}3.1.4 %k%F{240}%f " "$(build_left_prompt)"
+    assertEquals "%K{240} %F{000%}SF %f%F{000}3.1.4 %k%F{240}%f " "$(build_left_prompt)"
 
     unfunction php
 }

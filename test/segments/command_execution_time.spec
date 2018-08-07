@@ -20,7 +20,7 @@ function testCommandExecutionTimeIsNotShownIfTimeIsBelowThreshold() {
   # Override payload
   local _P9K_COMMAND_DURATION=2
 
-  assertEquals "%K{white} %F{black}world %k%F{white}%f " "$(build_left_prompt)"
+  assertEquals "%K{015} %F{000}world %k%F{015}%f " "$(build_left_prompt)"
 }
 
 function testCommandExecutionTimeThresholdCouldBeChanged() {
@@ -34,7 +34,7 @@ function testCommandExecutionTimeThresholdCouldBeChanged() {
   # Override payload
   local _P9K_COMMAND_DURATION=2.03
 
-  assertEquals "%K{red} %F{yellow1%}Dur %f%F{yellow1}2.03 %k%F{red}%f " "$(build_left_prompt)"
+  assertEquals "%K{009} %F{226%}Dur %f%F{226}2.03 %k%F{009}%f " "$(build_left_prompt)"
 }
 
 function testCommandExecutionTimeThresholdCouldBeSetToZero() {
@@ -43,7 +43,7 @@ function testCommandExecutionTimeThresholdCouldBeSetToZero() {
   local POWERLEVEL9K_COMMAND_EXECUTION_TIME_THRESHOLD=0
   local _P9K_COMMAND_DURATION=0.03
 
-  assertEquals "%K{red} %F{yellow1%}Dur %f%F{yellow1}0.03 %k%F{red}%f " "$(build_left_prompt)"
+  assertEquals "%K{009} %F{226%}Dur %f%F{226}0.03 %k%F{009}%f " "$(build_left_prompt)"
 }
 
 function testCommandExecutionTimePrecisionCouldBeChanged() {
@@ -58,7 +58,7 @@ function testCommandExecutionTimePrecisionCouldBeChanged() {
   # Override payload
   local _P9K_COMMAND_DURATION=0.0001
 
-  assertEquals "%K{red} %F{yellow1%}Dur %f%F{yellow1}0.0001 %k%F{red}%f " "$(build_left_prompt)"
+  assertEquals "%K{009} %F{226%}Dur %f%F{226}0.0001 %k%F{009}%f " "$(build_left_prompt)"
 }
 
 function testCommandExecutionTimePrecisionCouldBeSetToZero() {
@@ -72,7 +72,7 @@ function testCommandExecutionTimePrecisionCouldBeSetToZero() {
   # Override payload
   local _P9K_COMMAND_DURATION=23.5001
 
-  assertEquals "%K{red} %F{yellow1%}Dur %f%F{yellow1}23 %k%F{red}%f " "$(build_left_prompt)"
+  assertEquals "%K{009} %F{226%}Dur %f%F{226}23 %k%F{009}%f " "$(build_left_prompt)"
 }
 
 function testCommandExecutionTimeIsFormattedHumandReadbleForMinuteLongCommand() {
@@ -85,7 +85,7 @@ function testCommandExecutionTimeIsFormattedHumandReadbleForMinuteLongCommand() 
   # Override payload
   local _P9K_COMMAND_DURATION=180
 
-  assertEquals "%K{red} %F{yellow1%}Dur %f%F{yellow1}03:00 %k%F{red}%f " "$(build_left_prompt)"
+  assertEquals "%K{009} %F{226%}Dur %f%F{226}03:00 %k%F{009}%f " "$(build_left_prompt)"
 }
 
 function testCommandExecutionTimeIsFormattedHumandReadbleForHourLongCommand() {
@@ -98,7 +98,7 @@ function testCommandExecutionTimeIsFormattedHumandReadbleForHourLongCommand() {
   # Override payload
   local _P9K_COMMAND_DURATION=7200
 
-  assertEquals "%K{red} %F{yellow1%}Dur %f%F{yellow1}02:00:00 %k%F{red}%f " "$(build_left_prompt)"
+  assertEquals "%K{009} %F{226%}Dur %f%F{226}02:00:00 %k%F{009}%f " "$(build_left_prompt)"
 }
 
 source shunit2/shunit2

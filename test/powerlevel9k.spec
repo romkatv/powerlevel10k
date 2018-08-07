@@ -21,7 +21,7 @@ function testJoinedSegments() {
   POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(dir dir_joined)
   cd /tmp
 
-  assertEquals "%K{blue} %F{black}/tmp %K{blue}%F{black}%F{black}/tmp %k%F{blue}%f " "$(build_left_prompt)"
+  assertEquals "%K{012} %F{000}/tmp %K{012}%F{000}%F{000}/tmp %k%F{012}%f " "$(build_left_prompt)"
 
   cd -
 }
@@ -31,7 +31,7 @@ function testTransitiveJoinedSegments() {
   POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(dir root_indicator_joined dir_joined)
   cd /tmp
 
-  assertEquals "%K{blue} %F{black}/tmp %K{blue}%F{black}%F{black}/tmp %k%F{blue}%f " "$(build_left_prompt)"
+  assertEquals "%K{012} %F{000}/tmp %K{012}%F{000}%F{000}/tmp %k%F{012}%f " "$(build_left_prompt)"
 
   cd -
 }
@@ -41,7 +41,7 @@ function testJoiningWithConditionalSegment() {
   POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(dir background_jobs dir_joined)
   cd /tmp
 
-  assertEquals "%K{blue} %F{black}/tmp %K{blue}%F{black} %F{black}/tmp %k%F{blue}%f " "$(build_left_prompt)"
+  assertEquals "%K{012} %F{000}/tmp %K{012}%F{000} %F{000}/tmp %k%F{012}%f " "$(build_left_prompt)"
 
   cd -
 }
@@ -52,7 +52,7 @@ function testDynamicColoringOfSegmentsWork() {
   local POWERLEVEL9K_DIR_DEFAULT_BACKGROUND='red'
   cd /tmp
 
-  assertEquals "%K{red} %F{black}/tmp %k%F{red}%f " "$(build_left_prompt)"
+  assertEquals "%K{009} %F{000}/tmp %k%F{009}%f " "$(build_left_prompt)"
 
   cd -
 }
@@ -65,7 +65,7 @@ function testDynamicColoringOfVisualIdentifiersWork() {
 
   cd /tmp
 
-  assertEquals "%K{blue} %F{green%}icon-here %f%F{black}/tmp %k%F{blue}%f " "$(build_left_prompt)"
+  assertEquals "%K{012} %F{green%}icon-here %f%F{000}/tmp %k%F{012}%f " "$(build_left_prompt)"
 
   cd -
 }
@@ -84,7 +84,7 @@ function testColoringOfVisualIdentifiersDoesNotOverwriteColoringOfSegment() {
 
   cd /tmp
 
-  assertEquals "%K{yellow} %F{green%}icon-here %f%F{red}/tmp %k%F{yellow}%f " "$(build_left_prompt)"
+  assertEquals "%K{011} %F{green%}icon-here %f%F{009}/tmp %k%F{011}%f " "$(build_left_prompt)"
 
   cd -
 }
@@ -100,7 +100,7 @@ function testOverwritingIconsWork() {
   #cd ~/$testFolder
 
   cd /tmp
-  assertEquals "%K{blue} %F{black%}icon-here %f%F{black}/tmp %k%F{blue}%f " "$(build_left_prompt)"
+  assertEquals "%K{012} %F{000%}icon-here %f%F{000}/tmp %k%F{012}%f " "$(build_left_prompt)"
 
   cd -
   # rm -fr ~/$testFolder
@@ -117,7 +117,7 @@ function testNewlineOnRpromptCanBeDisabled() {
   POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(custom_rworld)
 
   powerlevel9k_prepare_prompts
-  assertEquals '$(print_icon MULTILINE_FIRST_PROMPT_PREFIX)[39m[0m[49m[47m [30mworld [49m[37m[39m  $(print_icon MULTILINE_LAST_PROMPT_PREFIX)[1A[39m[0m[49m[37m[39m[47m[30m rworld[K[00m[1B' "$(print -P ${PROMPT}${RPROMPT})"
+  assertEquals '$(print_icon MULTILINE_FIRST_PROMPT_PREFIX)[39m[0m[49m[107m [30mworld [49m[97m[39m  $(print_icon MULTILINE_LAST_PROMPT_PREFIX)[1A[39m[0m[49m[97m[39m[107m[30m rworld[K[00m[1B' "$(print -P ${PROMPT}${RPROMPT})"
 }
 
 source shunit2/shunit2

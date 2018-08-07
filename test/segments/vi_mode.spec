@@ -15,7 +15,7 @@ function testViInsertModeWorks() {
   # Load Powerlevel9k
   source powerlevel9k.zsh-theme
 
-  assertEquals "%K{black} %F{blue}INSERT " "$(prompt_vi_mode left 1 false)"
+  assertEquals "%K{000} %F{012}INSERT " "$(prompt_vi_mode left 1 false)"
 }
 
 function testViInsertModeWorksWhenLabeledAsMain() {
@@ -24,7 +24,7 @@ function testViInsertModeWorksWhenLabeledAsMain() {
   # Load Powerlevel9k
   source powerlevel9k.zsh-theme
 
-  assertEquals "%K{black} %F{blue}INSERT " "$(prompt_vi_mode left 1 false)"
+  assertEquals "%K{000} %F{012}INSERT " "$(prompt_vi_mode left 1 false)"
 }
 
 function testViCommandModeWorks() {
@@ -33,7 +33,7 @@ function testViCommandModeWorks() {
   # Load Powerlevel9k
   source powerlevel9k.zsh-theme
 
-  assertEquals "%K{black} %F{white}NORMAL " "$(prompt_vi_mode left 1 false)"
+  assertEquals "%K{000} %F{015}NORMAL " "$(prompt_vi_mode left 1 false)"
 }
 
 function testViInsertModeStringIsCustomizable() {
@@ -42,7 +42,7 @@ function testViInsertModeStringIsCustomizable() {
   # Load Powerlevel9k
   source powerlevel9k.zsh-theme
 
-  assertEquals "%K{black} %F{blue}INSERT " "$(prompt_vi_mode left 1 false)"
+  assertEquals "%K{000} %F{012}INSERT " "$(prompt_vi_mode left 1 false)"
 }
 
 source shunit2/shunit2

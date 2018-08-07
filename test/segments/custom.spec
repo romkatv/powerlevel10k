@@ -17,7 +17,7 @@ function testCustomDirectOutputSegment() {
     # Load Powerlevel9k
     source powerlevel9k.zsh-theme
 
-    assertEquals "%K{white} %F{black}world %k%F{white}%f " "$(build_left_prompt)"
+    assertEquals "%K{015} %F{000}world %k%F{015}%f " "$(build_left_prompt)"
 }
 
 function testCustomClosureSegment() {
@@ -31,7 +31,7 @@ function testCustomClosureSegment() {
     # Load Powerlevel9k
     source powerlevel9k.zsh-theme
 
-    assertEquals "%K{white} %F{black}world %k%F{white}%f " "$(build_left_prompt)"
+    assertEquals "%K{015} %F{000}world %k%F{015}%f " "$(build_left_prompt)"
 }
 
 function testSettingBackgroundForCustomSegment() {
@@ -43,7 +43,7 @@ function testSettingBackgroundForCustomSegment() {
     # Load Powerlevel9k
     source powerlevel9k.zsh-theme
 
-    assertEquals "%K{yellow} %F{black}world %k%F{yellow}%f " "$(build_left_prompt)"
+    assertEquals "%K{011} %F{000}world %k%F{011}%f " "$(build_left_prompt)"
 }
 
 function testSettingForegroundForCustomSegment() {
@@ -55,7 +55,7 @@ function testSettingForegroundForCustomSegment() {
     # Load Powerlevel9k
     source powerlevel9k.zsh-theme
 
-    assertEquals "%K{white} %F{red}world %k%F{white}%f " "$(build_left_prompt)"
+    assertEquals "%K{015} %F{009}world %k%F{015}%f " "$(build_left_prompt)"
 }
 
 function testSettingVisualIdentifierForCustomSegment() {
@@ -67,7 +67,7 @@ function testSettingVisualIdentifierForCustomSegment() {
     # Load Powerlevel9k
     source powerlevel9k.zsh-theme
 
-    assertEquals "%K{white} %F{black%}hw %f%F{black}world %k%F{white}%f " "$(build_left_prompt)"
+    assertEquals "%K{015} %F{000%}hw %f%F{000}world %k%F{015}%f " "$(build_left_prompt)"
 }
 
 function testSettingVisualIdentifierForegroundColorForCustomSegment() {
@@ -80,7 +80,7 @@ function testSettingVisualIdentifierForegroundColorForCustomSegment() {
     # Load Powerlevel9k
     source powerlevel9k.zsh-theme
 
-    assertEquals "%K{white} %F{red%}hw %f%F{black}world %k%F{white}%f " "$(build_left_prompt)"
+    assertEquals "%K{015} %F{red%}hw %f%F{000}world %k%F{015}%f " "$(build_left_prompt)"
 }
 
 source shunit2/shunit2
