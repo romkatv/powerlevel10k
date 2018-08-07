@@ -314,7 +314,8 @@ function foregroundColor() {
 function getColorCode() {
   # Early exit: Check if given value is already numerical
   if [[ "$1" = <-> ]]; then
-    echo -n "$1"
+    # Pad color with zeroes
+    echo -n "${(l:3::0:)1}"
     return
   fi
 
