@@ -36,7 +36,7 @@ function getColor() {
     local default="$'\033'\[49m"
     # http://zsh.sourceforge.net/Doc/Release/Prompt-Expansion.html
     local quoted=$(printf "%q" $(print -P "$named"))
-    if [[ $quoted = "$'\033'\[49m" && $1 != "black" ]]; then
+    if [[ $quoted == "$'\033'\[49m" && $1 != "black" ]]; then
         # color not found, so try to get the code
         1=$(getColorCode $1)
     fi
