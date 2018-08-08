@@ -31,7 +31,7 @@ function testLaravelVersionSegment() {
   POWERLEVEL9K_LARAVEL_ICON='x'
   POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(laravel_version)
 
-  assertEquals "%K{001} %F{015%}x %f%F{015}5.4.23 %k%F{001}%f " "$(build_left_prompt)"
+  assertEquals "%K{001} %F{015}x %f%F{015}5.4.23 %k%F{001}%f " "$(build_left_prompt)"
 
   unset POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
   unset POWERLEVEL9K_LARAVEL_ICON
