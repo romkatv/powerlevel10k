@@ -65,7 +65,7 @@ function testDynamicColoringOfVisualIdentifiersWork() {
 
   cd /tmp
 
-  assertEquals "%K{012} %F{green%}icon-here %f%F{000}/tmp %k%F{012}%f " "$(build_left_prompt)"
+  assertEquals "%K{012} %F{002}icon-here %f%F{000}/tmp %k%F{012}%f " "$(build_left_prompt)"
 
   cd -
 }
@@ -84,7 +84,7 @@ function testColoringOfVisualIdentifiersDoesNotOverwriteColoringOfSegment() {
 
   cd /tmp
 
-  assertEquals "%K{011} %F{green%}icon-here %f%F{009}/tmp %k%F{011}%f " "$(build_left_prompt)"
+  assertEquals "%K{011} %F{002}icon-here %f%F{009}/tmp %k%F{011}%f " "$(build_left_prompt)"
 
   cd -
 }
@@ -100,7 +100,7 @@ function testOverwritingIconsWork() {
   #cd ~/$testFolder
 
   cd /tmp
-  assertEquals "%K{012} %F{000%}icon-here %f%F{000}/tmp %k%F{012}%f " "$(build_left_prompt)"
+  assertEquals "%K{012} %F{000}icon-here %f%F{000}/tmp %k%F{012}%f " "$(build_left_prompt)"
 
   cd -
   # rm -fr ~/$testFolder

@@ -172,7 +172,7 @@ left_prompt_segment() {
       # Allow users to overwrite the color for the visual identifier only.
       local visual_identifier_color_variable=POWERLEVEL9K_${(U)${segment_name}#prompt_}_VISUAL_IDENTIFIER_COLOR
       set_default $visual_identifier_color_variable "${foregroundColor}"
-      visual_identifier="%F{${(P)visual_identifier_color_variable}%}$visual_identifier%f"
+      visual_identifier="$(foregroundColor ${(P)visual_identifier_color_variable})${visual_identifier}%f"
     fi
   fi
 
@@ -189,7 +189,7 @@ left_prompt_segment() {
 # End the left prompt, closes the final segment.
 left_prompt_end() {
   if [[ -n $CURRENT_BG ]]; then
-    echo -n "%k%F{$CURRENT_BG}$(print_icon 'LEFT_SEGMENT_SEPARATOR')"
+    echo -n "%k$(foregroundColor ${CURRENT_BG})$(print_icon 'LEFT_SEGMENT_SEPARATOR')"
   else
     echo -n "%k"
   fi
@@ -274,7 +274,7 @@ right_prompt_segment() {
       # Allow users to overwrite the color for the visual identifier only.
       local visual_identifier_color_variable=POWERLEVEL9K_${(U)${segment_name}#prompt_}_VISUAL_IDENTIFIER_COLOR
       set_default $visual_identifier_color_variable "${foregroundColor}"
-      visual_identifier="%F{${(P)visual_identifier_color_variable}%}$visual_identifier%f"
+      visual_identifier="$(foregroundColor ${(P)visual_identifier_color_variable})${visual_identifier}%f"
     fi
   fi
 

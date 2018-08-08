@@ -49,7 +49,7 @@ function testSwiftSegmentWorks() {
     # Load Powerlevel9k
     source ${P9K_HOME}/powerlevel9k.zsh-theme
 
-    assertEquals "%K{013} %F{015%}Swift %f%F{015}3.0.1 %k%F{013}%f " "$(build_left_prompt)"
+    assertEquals "%K{013} %F{015}Swift %f%F{015}3.0.1 %k%F{013}%f " "$(build_left_prompt)"
 
     unfunction swift
 }

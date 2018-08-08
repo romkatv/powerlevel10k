@@ -87,7 +87,7 @@ function testSymfonyVersionSegmentWorks() {
     # Load Powerlevel9k
     source ${P9K_HOME}/powerlevel9k.zsh-theme
 
-    assertEquals "%K{240} %F{000%}SF %f%F{000}3.1.4 %k%F{240}%f " "$(build_left_prompt)"
+    assertEquals "%K{240} %F{000}SF %f%F{000}3.1.4 %k%F{240}%f " "$(build_left_prompt)"
 
     unfunction php
 }
@@ -109,7 +109,7 @@ function testSymfonyVersionSegmentWorksInNestedFolder() {
     # Load Powerlevel9k
     source ${P9K_HOME}/powerlevel9k.zsh-theme
 
-    assertEquals "%K{240} %F{000%}SF %f%F{000}3.1.4 %k%F{240}%f " "$(build_left_prompt)"
+    assertEquals "%K{240} %F{000}SF %f%F{000}3.1.4 %k%F{240}%f " "$(build_left_prompt)"
 
     unfunction php
 }

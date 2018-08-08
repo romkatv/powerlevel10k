@@ -67,7 +67,7 @@ function testSettingVisualIdentifierForCustomSegment() {
     # Load Powerlevel9k
     source powerlevel9k.zsh-theme
 
-    assertEquals "%K{015} %F{000%}hw %f%F{000}world %k%F{015}%f " "$(build_left_prompt)"
+    assertEquals "%K{015} %F{000}hw %f%F{000}world %k%F{015}%f " "$(build_left_prompt)"
 }
 
 function testSettingVisualIdentifierForegroundColorForCustomSegment() {
@@ -80,7 +80,7 @@ function testSettingVisualIdentifierForegroundColorForCustomSegment() {
     # Load Powerlevel9k
     source powerlevel9k.zsh-theme
 
-    assertEquals "%K{015} %F{red%}hw %f%F{000}world %k%F{015}%f " "$(build_left_prompt)"
+    assertEquals "%K{015} %F{009}hw %f%F{000}world %k%F{015}%f " "$(build_left_prompt)"
 }
 
 source shunit2/shunit2

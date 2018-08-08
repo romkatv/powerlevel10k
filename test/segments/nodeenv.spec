@@ -73,7 +73,7 @@ function testNodeenvSegmentPrintsAtLeastNodeEnvWithoutNode() {
     # Load Powerlevel9k
     source powerlevel9k.zsh-theme
 
-    assertEquals "%K{000} %F{002%}⬢ %f%F{002}[node-env] %k%F{000}%f " "$(build_left_prompt)"
+    assertEquals "%K{000} %F{002}⬢ %f%F{002}[node-env] %k%F{000}%f " "$(build_left_prompt)"
 
     unset NODE_VIRTUAL_ENV
     unalias node
@@ -90,7 +90,7 @@ function testNodeenvSegmentWorks() {
     # Load Powerlevel9k
     source powerlevel9k.zsh-theme
 
-    assertEquals "%K{000} %F{002%}⬢ %f%F{002}v1.2.3[node-env] %k%F{000}%f " "$(build_left_prompt)"
+    assertEquals "%K{000} %F{002}⬢ %f%F{002}v1.2.3[node-env] %k%F{000}%f " "$(build_left_prompt)"
 
     unfunction node
     unset NODE_VIRTUAL_ENV
