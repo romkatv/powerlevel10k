@@ -38,5 +38,14 @@ function testIsSameColorDoesNotYieldNotEqualColorsTruthy() {
   assertFalse "isSameColor 'green' '003'"
 }
 
+function testBrightColorsWork() {
+  # We had some code in the past that equalized bright colors
+  # with normal ones. This code is now gone, and this test should
+  # ensure that all input channels for bright colors are handled
+  # correctly.
+  assertTrue "isSameColor 'cyan' '014'"
+  assertEquals '014' "$(getColorCode 'cyan')"
+  assertEquals '014' "$(getColor 'cyan')"
+}
 
 source shunit2/shunit2
