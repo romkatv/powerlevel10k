@@ -231,7 +231,7 @@ right_prompt_segment() {
   # Overwrite given foreground-color by user defined variable for this segment.
   local FOREGROUND_USER_VARIABLE=POWERLEVEL9K_${(U)${segment_name}#prompt_}_FOREGROUND
   local FG_COLOR_MODIFIER=${(P)FOREGROUND_USER_VARIABLE}
-  [[ -n $FG_COLOR_MODIFIER ]] && 4="$FG_COLOR_MODIFIER"
+  [[ -n $FG_COLOR_MODIFIER ]] && foregroundColor="$FG_COLOR_MODIFIER"
 
   # Get color codes here to save some calls later on
   backgroundColor="$(getColorCode ${backgroundColor})"
