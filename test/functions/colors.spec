@@ -22,6 +22,10 @@ function testGetColorCodeWithNumericalColor() {
   assertEquals '002' "$(getColorCode '002')"
 }
 
+function testGetColorCodeWithNoneColor() {
+  assertEquals 'none' "$(getColorCode 'NONE')"
+}
+
 function testIsSameColorComparesAnsiForegroundAndNumericalColorCorrectly() {
   assertTrue "isSameColor 'green' '002'"
 }
@@ -36,6 +40,18 @@ function testIsSameColorComparesShortCodesCorrectly() {
 
 function testIsSameColorDoesNotYieldNotEqualColorsTruthy() {
   assertFalse "isSameColor 'green' '003'"
+}
+
+function testIsSameColorHandlesNoneCorrectly() {
+  assertTrue "isSameColor 'none' 'NOnE'"
+}
+
+function testIsSameColorCompareTwoNoneColorsCorrectly() {
+  assertTrue "isSameColor 'none' 'none'"
+}
+
+function testIsSameColorComparesColorWithNoneCorrectly() {
+  assertFalse "isSameColor 'green' 'none'"
 }
 
 function testBrightColorsWork() {
