@@ -38,7 +38,7 @@ function testTodoSegmentPrintsNothingIfTodoShIsNotInstalled() {
     # Load Powerlevel9k
     source ${P9K_HOME}/powerlevel9k.zsh-theme
 
-    assertEquals "%K{015} %F{000}world %k%F{015}%f " "$(build_left_prompt)"
+    assertEquals "%K{007} %F{000}world %k%F{007}%f " "$(build_left_prompt)"
 }
 
 function testTodoSegmentWorksAsExpected() {

@@ -21,7 +21,7 @@ function testLeftNormalSegmentsShouldNotBeJoined() {
   local POWERLEVEL9K_CUSTOM_WORLD5="echo " # Print nothing to simulate unmet conditions
   local POWERLEVEL9K_CUSTOM_WORLD6="echo world6"
   
-  assertEquals "%K{015} %F{000}world1 %K{015}%F{000} %F{000}world2 %K{015}%F{000} %F{000}world4 %K{015}%F{000} %F{000}world6 %k%F{015}%f " "$(build_left_prompt)"
+  assertEquals "%K{007} %F{000}world1 %K{007}%F{000} %F{000}world2 %K{007}%F{000} %F{000}world4 %K{007}%F{000} %F{000}world6 %k%F{007}%f " "$(build_left_prompt)"
 }
 
 function testLeftJoinedSegments() {
@@ -30,7 +30,7 @@ function testLeftJoinedSegments() {
   local POWERLEVEL9K_CUSTOM_WORLD1="echo world1"
   local POWERLEVEL9K_CUSTOM_WORLD2="echo world2"
 
-  assertEquals "%K{015} %F{000}world1 %K{015}%F{000}%F{000}world2 %k%F{015}%f " "$(build_left_prompt)"
+  assertEquals "%K{007} %F{000}world1 %K{007}%F{000}%F{000}world2 %k%F{007}%f " "$(build_left_prompt)"
 }
 
 function testLeftTransitiveJoinedSegments() {
@@ -40,7 +40,7 @@ function testLeftTransitiveJoinedSegments() {
   local POWERLEVEL9K_CUSTOM_WORLD2="echo world2"
   local POWERLEVEL9K_CUSTOM_WORLD3="echo world3"
 
-  assertEquals "%K{015} %F{000}world1 %K{015}%F{000}%F{000}world2 %K{015}%F{000}%F{000}world3 %k%F{015}%f " "$(build_left_prompt)"
+  assertEquals "%K{007} %F{000}world1 %K{007}%F{000}%F{000}world2 %K{007}%F{000}%F{000}world3 %k%F{007}%f " "$(build_left_prompt)"
 }
 
 function testLeftTransitiveJoiningWithConditionalJoinedSegment() {
@@ -51,7 +51,7 @@ function testLeftTransitiveJoiningWithConditionalJoinedSegment() {
   local POWERLEVEL9K_CUSTOM_WORLD3="echo " # Print nothing to simulate unmet conditions
   local POWERLEVEL9K_CUSTOM_WORLD4="echo world4"
 
-  assertEquals "%K{015} %F{000}world1 %K{015}%F{000}%F{000}world2 %K{015}%F{000}%F{000}world4 %k%F{015}%f " "$(build_left_prompt)"
+  assertEquals "%K{007} %F{000}world1 %K{007}%F{000}%F{000}world2 %K{007}%F{000}%F{000}world4 %k%F{007}%f " "$(build_left_prompt)"
 }
 
 function testLeftPromotingSegmentWithConditionalPredecessor() {
@@ -61,7 +61,7 @@ function testLeftPromotingSegmentWithConditionalPredecessor() {
   local POWERLEVEL9K_CUSTOM_WORLD2="echo " # Print nothing to simulate unmet conditions
   local POWERLEVEL9K_CUSTOM_WORLD3="echo world3"
 
-  assertEquals "%K{015} %F{000}world1 %K{015}%F{000} %F{000}world3 %k%F{015}%f " "$(build_left_prompt)"
+  assertEquals "%K{007} %F{000}world1 %K{007}%F{000} %F{000}world3 %k%F{007}%f " "$(build_left_prompt)"
 }
 
 function testLeftPromotingSegmentWithJoinedConditionalPredecessor() {
@@ -72,7 +72,7 @@ function testLeftPromotingSegmentWithJoinedConditionalPredecessor() {
   local POWERLEVEL9K_CUSTOM_WORLD3="echo " # Print nothing to simulate unmet conditions
   local POWERLEVEL9K_CUSTOM_WORLD4="echo world4"
 
-  assertEquals "%K{015} %F{000}world1 %K{015}%F{000} %F{000}world4 %k%F{015}%f " "$(build_left_prompt)"
+  assertEquals "%K{007} %F{000}world1 %K{007}%F{000} %F{000}world4 %k%F{007}%f " "$(build_left_prompt)"
 }
 
 function testLeftPromotingSegmentWithDeepJoinedConditionalPredecessor() {
@@ -85,7 +85,7 @@ function testLeftPromotingSegmentWithDeepJoinedConditionalPredecessor() {
   local POWERLEVEL9K_CUSTOM_WORLD5="echo " # Print nothing to simulate unmet conditions
   local POWERLEVEL9K_CUSTOM_WORLD6="echo world6"
 
-  assertEquals "%K{015} %F{000}world1 %K{015}%F{000} %F{000}world4 %K{015}%F{000}%F{000}world6 %k%F{015}%f " "$(build_left_prompt)"
+  assertEquals "%K{007} %F{000}world1 %K{007}%F{000} %F{000}world4 %K{007}%F{000}%F{000}world6 %k%F{007}%f " "$(build_left_prompt)"
 }
 
 function testLeftJoiningBuiltinSegmentWorks() {
@@ -108,7 +108,7 @@ function testRightNormalSegmentsShouldNotBeJoined() {
   local POWERLEVEL9K_CUSTOM_WORLD5="echo " # Print nothing to simulate unmet conditions
   local POWERLEVEL9K_CUSTOM_WORLD6="echo world6"
 
-  assertEquals "%F{015}%f%K{015}%F{000} world1 %f%F{000}%f%K{015}%F{000} world2 %f%F{000}%f%K{015}%F{000} world4 %f%F{000}%f%K{015}%F{000} world6%E" "$(build_right_prompt)"
+  assertEquals "%F{007}%f%K{007}%F{000} world1 %f%F{000}%f%K{007}%F{000} world2 %f%F{000}%f%K{007}%F{000} world4 %f%F{000}%f%K{007}%F{000} world6%E" "$(build_right_prompt)"
 }
 
 function testRightJoinedSegments() {
@@ -117,7 +117,7 @@ function testRightJoinedSegments() {
   local POWERLEVEL9K_CUSTOM_WORLD1="echo world1"
   local POWERLEVEL9K_CUSTOM_WORLD2="echo world2"
 
-  assertEquals "%F{015}%f%K{015}%F{000} world1 %f%K{015}%F{000}world2%E" "$(build_right_prompt)"
+  assertEquals "%F{007}%f%K{007}%F{000} world1 %f%K{007}%F{000}world2%E" "$(build_right_prompt)"
 }
 
 function testRightTransitiveJoinedSegments() {
@@ -127,7 +127,7 @@ function testRightTransitiveJoinedSegments() {
   local POWERLEVEL9K_CUSTOM_WORLD2="echo world2"
   local POWERLEVEL9K_CUSTOM_WORLD3="echo world3"
 
-  assertEquals "%F{015}%f%K{015}%F{000} world1 %f%K{015}%F{000}world2 %f%K{015}%F{000}world3%E" "$(build_right_prompt)"
+  assertEquals "%F{007}%f%K{007}%F{000} world1 %f%K{007}%F{000}world2 %f%K{007}%F{000}world3%E" "$(build_right_prompt)"
 }
 
 function testRightTransitiveJoiningWithConditionalJoinedSegment() {
@@ -138,7 +138,7 @@ function testRightTransitiveJoiningWithConditionalJoinedSegment() {
   local POWERLEVEL9K_CUSTOM_WORLD3="echo " # Print nothing to simulate unmet conditions
   local POWERLEVEL9K_CUSTOM_WORLD4="echo world4"
 
-  assertEquals "%F{015}%f%K{015}%F{000} world1 %f%K{015}%F{000}world2 %f%K{015}%F{000}world4%E" "$(build_right_prompt)"
+  assertEquals "%F{007}%f%K{007}%F{000} world1 %f%K{007}%F{000}world2 %f%K{007}%F{000}world4%E" "$(build_right_prompt)"
 }
 
 function testRightPromotingSegmentWithConditionalPredecessor() {
@@ -148,7 +148,7 @@ function testRightPromotingSegmentWithConditionalPredecessor() {
   local POWERLEVEL9K_CUSTOM_WORLD2="echo " # Print nothing to simulate unmet conditions
   local POWERLEVEL9K_CUSTOM_WORLD3="echo world3"
 
-  assertEquals "%F{015}%f%K{015}%F{000} world1 %f%F{000}%f%K{015}%F{000} world3%E" "$(build_right_prompt)"
+  assertEquals "%F{007}%f%K{007}%F{000} world1 %f%F{000}%f%K{007}%F{000} world3%E" "$(build_right_prompt)"
 }
 
 function testRightPromotingSegmentWithJoinedConditionalPredecessor() {
@@ -159,7 +159,7 @@ function testRightPromotingSegmentWithJoinedConditionalPredecessor() {
   local POWERLEVEL9K_CUSTOM_WORLD3="echo " # Print nothing to simulate unmet conditions
   local POWERLEVEL9K_CUSTOM_WORLD4="echo world4"
 
-  assertEquals "%F{015}%f%K{015}%F{000} world1 %f%F{000}%f%K{015}%F{000} world4%E" "$(build_right_prompt)"
+  assertEquals "%F{007}%f%K{007}%F{000} world1 %f%F{000}%f%K{007}%F{000} world4%E" "$(build_right_prompt)"
 }
 
 function testRightPromotingSegmentWithDeepJoinedConditionalPredecessor() {
@@ -172,7 +172,7 @@ function testRightPromotingSegmentWithDeepJoinedConditionalPredecessor() {
   local POWERLEVEL9K_CUSTOM_WORLD5="echo " # Print nothing to simulate unmet conditions
   local POWERLEVEL9K_CUSTOM_WORLD6="echo world6"
 
-  assertEquals "%F{015}%f%K{015}%F{000} world1 %f%F{000}%f%K{015}%F{000} world4 %f%K{015}%F{000}world6%E" "$(build_right_prompt)"
+  assertEquals "%F{007}%f%K{007}%F{000} world1 %f%F{000}%f%K{007}%F{000} world4 %f%K{007}%F{000}world6%E" "$(build_right_prompt)"
 }
 
 function testRightJoiningBuiltinSegmentWorks() {

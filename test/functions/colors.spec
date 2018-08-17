@@ -59,9 +59,9 @@ function testBrightColorsWork() {
   # with normal ones. This code is now gone, and this test should
   # ensure that all input channels for bright colors are handled
   # correctly.
-  assertTrue "isSameColor 'cyan' '014'"
-  assertEquals '014' "$(getColorCode 'cyan')"
-  assertEquals '014' "$(getColor 'cyan')"
+  assertTrue "isSameColor 'cyan' '006'"
+  assertEquals '006' "$(getColorCode 'cyan')"
+  assertEquals '006' "$(getColor 'cyan')"
 }
 
 source shunit2/shunit2

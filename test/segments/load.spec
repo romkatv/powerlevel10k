@@ -121,7 +121,7 @@ function testLoadSegmentWarningState() {
     source ${P9K_HOME}/powerlevel9k.zsh-theme
     local OS="Linux" # Fake Linux
 
-    assertEquals "%K{011} %F{000}L %f%F{000}2.01 " "$(prompt_load left 1 false ${FOLDER})"
+    assertEquals "%K{003} %F{000}L %f%F{000}2.01 " "$(prompt_load left 1 false ${FOLDER})"
 
     unalias nproc
 }
@@ -141,7 +141,7 @@ function testLoadSegmentCriticalState() {
     source ${P9K_HOME}/powerlevel9k.zsh-theme
     local OS="Linux" # Fake Linux
 
-    assertEquals "%K{009} %F{000}L %f%F{000}2.81 " "$(prompt_load left 1 false ${FOLDER})"
+    assertEquals "%K{001} %F{000}L %f%F{000}2.81 " "$(prompt_load left 1 false ${FOLDER})"
 
     unalias nproc
 }

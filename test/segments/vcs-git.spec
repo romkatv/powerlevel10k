@@ -76,7 +76,7 @@ function testColorOverridingForCleanStateWorks() {
   # Load Powerlevel9k
   source ${P9K_HOME}/powerlevel9k.zsh-theme
 
-  assertEquals "%K{015} %F{014} master %k%F{015}%f " "$(build_left_prompt)"
+  assertEquals "%K{007} %F{006} master %k%F{007}%f " "$(build_left_prompt)"
 }
 
 function testColorOverridingForModifiedStateWorks() {
@@ -93,7 +93,7 @@ function testColorOverridingForModifiedStateWorks() {
   # Load Powerlevel9k
   source ${P9K_HOME}/powerlevel9k.zsh-theme
 
-  assertEquals "%K{011} %F{009} master ● %k%F{011}%f " "$(build_left_prompt)"
+  assertEquals "%K{003} %F{001} master ● %k%F{003}%f " "$(build_left_prompt)"
 }
 
 function testColorOverridingForUntrackedStateWorks() {
@@ -107,7 +107,7 @@ function testColorOverridingForUntrackedStateWorks() {
   # Load Powerlevel9k
   source ${P9K_HOME}/powerlevel9k.zsh-theme
 
-  assertEquals "%K{011} %F{014} master ? %k%F{011}%f " "$(build_left_prompt)"
+  assertEquals "%K{003} %F{006} master ? %k%F{003}%f " "$(build_left_prompt)"
 }
 
 function testGitIconWorks() {
@@ -194,7 +194,7 @@ function testStagedFilesIconWorks() {
   # Load Powerlevel9k
   source ${P9K_HOME}/powerlevel9k.zsh-theme
 
-  assertEquals "%K{011} %F{000} master + %k%F{011}%f " "$(build_left_prompt)"
+  assertEquals "%K{003} %F{000} master + %k%F{003}%f " "$(build_left_prompt)"
 }
 
 function testUnstagedFilesIconWorks() {
@@ -211,7 +211,7 @@ function testUnstagedFilesIconWorks() {
   # Load Powerlevel9k
   source ${P9K_HOME}/powerlevel9k.zsh-theme
 
-  assertEquals "%K{011} %F{000} master M %k%F{011}%f " "$(build_left_prompt)"
+  assertEquals "%K{003} %F{000} master M %k%F{003}%f " "$(build_left_prompt)"
 }
 
 function testStashIconWorks() {
@@ -289,7 +289,7 @@ function testActionHintWorks() {
   # Load Powerlevel9k
   source ${P9K_HOME}/powerlevel9k.zsh-theme
 
-  assertEquals "%K{011} %F{000} master %F{red}| merge%f %k%F{011}%f " "$(build_left_prompt)"
+  assertEquals "%K{003} %F{000} master %F{red}| merge%f %k%F{003}%f " "$(build_left_prompt)"
 }
 
 function testIncomingHintWorks() {

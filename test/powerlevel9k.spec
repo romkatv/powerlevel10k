@@ -21,7 +21,7 @@ function testJoinedSegments() {
   POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(dir dir_joined)
   cd /tmp
 
-  assertEquals "%K{012} %F{000}/tmp %K{012}%F{000}%F{000}/tmp %k%F{012}%f " "$(build_left_prompt)"
+  assertEquals "%K{004} %F{000}/tmp %K{004}%F{000}%F{000}/tmp %k%F{004}%f " "$(build_left_prompt)"
 
   cd -
 }
@@ -31,7 +31,7 @@ function testTransitiveJoinedSegments() {
   POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(dir root_indicator_joined dir_joined)
   cd /tmp
 
-  assertEquals "%K{012} %F{000}/tmp %K{012}%F{000}%F{000}/tmp %k%F{012}%f " "$(build_left_prompt)"
+  assertEquals "%K{004} %F{000}/tmp %K{004}%F{000}%F{000}/tmp %k%F{004}%f " "$(build_left_prompt)"
 
   cd -
 }
@@ -41,7 +41,7 @@ function testJoiningWithConditionalSegment() {
   POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(dir background_jobs dir_joined)
   cd /tmp
 
-  assertEquals "%K{012} %F{000}/tmp %K{012}%F{000} %F{000}/tmp %k%F{012}%f " "$(build_left_prompt)"
+  assertEquals "%K{004} %F{000}/tmp %K{004}%F{000} %F{000}/tmp %k%F{004}%f " "$(build_left_prompt)"
 
   cd -
 }
@@ -52,7 +52,7 @@ function testDynamicColoringOfSegmentsWork() {
   local POWERLEVEL9K_DIR_DEFAULT_BACKGROUND='red'
   cd /tmp
 
-  assertEquals "%K{009} %F{000}/tmp %k%F{009}%f " "$(build_left_prompt)"
+  assertEquals "%K{001} %F{000}/tmp %k%F{001}%f " "$(build_left_prompt)"
 
   cd -
 }
@@ -65,7 +65,7 @@ function testDynamicColoringOfVisualIdentifiersWork() {
 
   cd /tmp
 
-  assertEquals "%K{012} %F{002}icon-here %f%F{000}/tmp %k%F{012}%f " "$(build_left_prompt)"
+  assertEquals "%K{004} %F{002}icon-here %f%F{000}/tmp %k%F{004}%f " "$(build_left_prompt)"
 
   cd -
 }
@@ -84,7 +84,7 @@ function testColoringOfVisualIdentifiersDoesNotOverwriteColoringOfSegment() {
 
   cd /tmp
 
-  assertEquals "%K{011} %F{002}icon-here %f%F{009}/tmp %k%F{011}%f " "$(build_left_prompt)"
+  assertEquals "%K{003} %F{002}icon-here %f%F{001}/tmp %k%F{003}%f " "$(build_left_prompt)"
 
   cd -
 }
@@ -100,7 +100,7 @@ function testOverwritingIconsWork() {
   #cd ~/$testFolder
 
   cd /tmp
-  assertEquals "%K{012} %F{000}icon-here %f%F{000}/tmp %k%F{012}%f " "$(build_left_prompt)"
+  assertEquals "%K{004} %F{000}icon-here %f%F{000}/tmp %k%F{004}%f " "$(build_left_prompt)"
 
   cd -
   # rm -fr ~/$testFolder

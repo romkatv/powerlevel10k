@@ -22,7 +22,7 @@ function testSegmentOnRightSide() {
     powerlevel9k_prepare_prompts
 
     local reset_attributes=$'\e[00m'
-    assertEquals "%f%b%k%F{015}%f%K{015}%F{000} world1 %f%F{000}%f%K{015}%F{000} world2%E%{${reset_attributes}%}" "${(e)RPROMPT}"
+    assertEquals "%f%b%k%F{007}%f%K{007}%F{000} world1 %f%F{000}%f%K{007}%F{000} world2%E%{${reset_attributes}%}" "${(e)RPROMPT}"
 }
 
 function testDisablingRightPrompt() {
@@ -48,7 +48,7 @@ function testLeftMultilinePrompt() {
     powerlevel9k_prepare_prompts
 
     local nl=$'\n'
-    assertEquals "╭─%f%b%k%K{015} %F{000}world1 %k%F{015}%f ${nl}╰─ " "${(e)PROMPT}"
+    assertEquals "╭─%f%b%k%K{007} %F{000}world1 %k%F{007}%f ${nl}╰─ " "${(e)PROMPT}"
 }
 
 function testRightPromptOnSameLine() {
@@ -70,7 +70,7 @@ function testRightPromptOnSameLine() {
     startSkipping
 
     powerlevel9k_prepare_prompts
-    assertEquals "%{\e[1A%}%F{015}%f%K{015}%F{000} world1 %f%{\e[1B%}" "${(e)RPROMPT}"
+    assertEquals "%{\e[1A%}%F{007}%f%K{007}%F{000} world1 %f%{\e[1B%}" "${(e)RPROMPT}"
 }
 
 function testPrefixingFirstLineOnLeftPrompt() {
@@ -84,7 +84,7 @@ function testPrefixingFirstLineOnLeftPrompt() {
     powerlevel9k_prepare_prompts
 
     local nl=$'\n'
-    assertEquals "XXX%f%b%k%K{015} %F{000}world1 %k%F{015}%f ${nl}╰─ " "${(e)PROMPT}"
+    assertEquals "XXX%f%b%k%K{007} %F{000}world1 %k%F{007}%f ${nl}╰─ " "${(e)PROMPT}"
 }
 
 function testPrefixingSecondLineOnLeftPrompt() {
@@ -98,7 +98,7 @@ function testPrefixingSecondLineOnLeftPrompt() {
     powerlevel9k_prepare_prompts
 
     local nl=$'\n'
-    assertEquals "╭─%f%b%k%K{015} %F{000}world1 %k%F{015}%f ${nl}XXX" "${(e)PROMPT}"
+    assertEquals "╭─%f%b%k%K{007} %F{000}world1 %k%F{007}%f ${nl}XXX" "${(e)PROMPT}"
 }
 
 source shunit2/shunit2

@@ -24,7 +24,7 @@ function testStatusPrintsNothingIfReturnCodeIsZeroAndVerboseIsUnset() {
     # Load Powerlevel9k
     source powerlevel9k.zsh-theme
 
-    assertEquals "%K{015} %F{000}world %k%F{015}%f " "$(build_left_prompt)"
+    assertEquals "%K{007} %F{000}world %k%F{007}%f " "$(build_left_prompt)"
 }
 
 function testStatusWorksAsExpectedIfReturnCodeIsZeroAndVerboseIsSet() {
@@ -50,7 +50,7 @@ function testStatusInGeneralErrorCase() {
     source powerlevel9k.zsh-theme
     local RETVAL=1
 
-    assertEquals "%K{009} %F{226}↵ %f%F{226}1 %k%F{009}%f " "$(build_left_prompt)"
+    assertEquals "%K{001} %F{226}↵ %f%F{226}1 %k%F{001}%f " "$(build_left_prompt)"
 }
 
 function testPipestatusInErrorCase() {
@@ -64,7 +64,7 @@ function testPipestatusInErrorCase() {
     local -a RETVALS
     RETVALS=(0 0 1 0)
 
-    assertEquals "%K{009} %F{226}↵ %f%F{226}0|0|1|0 %k%F{009}%f " "$(build_left_prompt)"
+    assertEquals "%K{001} %F{226}↵ %f%F{226}0|0|1|0 %k%F{001}%f " "$(build_left_prompt)"
 }
 
 function testStatusCrossWinsOverVerbose() {
@@ -78,7 +78,7 @@ function testStatusCrossWinsOverVerbose() {
     source powerlevel9k.zsh-theme
     local RETVAL=1
 
-    assertEquals "%K{000} %F{009}✘%f %k%F{000}%f " "$(build_left_prompt)"
+    assertEquals "%K{000} %F{001}✘%f %k%F{000}%f " "$(build_left_prompt)"
 }
 
 function testStatusShowsSignalNameInErrorCase() {
@@ -92,7 +92,7 @@ function testStatusShowsSignalNameInErrorCase() {
     source powerlevel9k.zsh-theme
     local RETVAL=132
 
-    assertEquals "%K{009} %F{226}↵ %f%F{226}SIGILL(4) %k%F{009}%f " "$(build_left_prompt)"
+    assertEquals "%K{001} %F{226}↵ %f%F{226}SIGILL(4) %k%F{001}%f " "$(build_left_prompt)"
 }
 
 function testStatusSegmentIntegrated() {
@@ -107,7 +107,7 @@ function testStatusSegmentIntegrated() {
 
     false; powerlevel9k_prepare_prompts
 
-    assertEquals "%f%b%k%K{000} %F{009}✘%f %k%F{000}%f " "${(e)PROMPT}"
+    assertEquals "%f%b%k%K{000} %F{001}✘%f %k%F{000}%f " "${(e)PROMPT}"
 }
 
 source shunit2/shunit2

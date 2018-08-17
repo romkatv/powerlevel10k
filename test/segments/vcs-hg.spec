@@ -40,7 +40,7 @@ function testColorOverridingForCleanStateWorks() {
   # Load Powerlevel9k
   source ${P9K_HOME}/powerlevel9k.zsh-theme
 
-  assertEquals "%K{015} %F{014} default %k%F{015}%f " "$(build_left_prompt)"
+  assertEquals "%K{007} %F{006} default %k%F{007}%f " "$(build_left_prompt)"
 }
 
 function testColorOverridingForModifiedStateWorks() {
@@ -57,7 +57,7 @@ function testColorOverridingForModifiedStateWorks() {
   # Load Powerlevel9k
   source ${P9K_HOME}/powerlevel9k.zsh-theme
 
-  assertEquals "%K{011} %F{009} default ● %k%F{011}%f " "$(build_left_prompt)"
+  assertEquals "%K{003} %F{001} default ● %k%F{003}%f " "$(build_left_prompt)"
 }
 
 # There is no staging area in mercurial, therefore there are no "untracked"
@@ -74,7 +74,7 @@ function testAddedFilesIconWorks() {
   # Load Powerlevel9k
   source ${P9K_HOME}/powerlevel9k.zsh-theme
 
-  assertEquals "%K{011} %F{000} default ● %k%F{011}%f " "$(build_left_prompt)"
+  assertEquals "%K{003} %F{000} default ● %k%F{003}%f " "$(build_left_prompt)"
 }
 
 # We don't support tagging in mercurial right now..
@@ -137,7 +137,7 @@ function testActionHintWorks() {
   # Load Powerlevel9k
   source ${P9K_HOME}/powerlevel9k.zsh-theme
 
-  assertEquals "%K{011} %F{000} default %F{red}| merging%f %k%F{011}%f " "$(build_left_prompt)"
+  assertEquals "%K{003} %F{000} default %F{red}| merging%f %k%F{003}%f " "$(build_left_prompt)"
 }
 
 function testShorteningCommitHashWorks() {
