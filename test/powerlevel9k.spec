@@ -65,7 +65,7 @@ function testDynamicColoringOfVisualIdentifiersWork() {
 
   cd /tmp
 
-  assertEquals "%K{blue} %F{green%}icon-here %f%F{black}/tmp %k%F{blue}%f " "$(build_left_prompt)"
+  assertEquals "%K{blue} %F{green%}icon-here %F{black}/tmp %k%F{blue}%f " "$(build_left_prompt)"
 
   unset POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
   unset POWERLEVEL9K_DIR_DEFAULT_VISUAL_IDENTIFIER_COLOR
@@ -86,7 +86,7 @@ function testColoringOfVisualIdentifiersDoesNotOverwriteColoringOfSegment() {
 
   cd /tmp
 
-  assertEquals "%K{yellow} %F{green%}icon-here %f%F{red}/tmp %k%F{yellow}%f " "$(build_left_prompt)"
+  assertEquals "%K{yellow} %F{green%}icon-here %F{red}/tmp %k%F{yellow}%f " "$(build_left_prompt)"
 
   unset POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
   unset POWERLEVEL9K_DIR_DEFAULT_VISUAL_IDENTIFIER_COLOR
@@ -106,7 +106,7 @@ function testOverwritingIconsWork() {
   #cd ~/$testFolder
 
   cd /tmp
-  assertEquals "%K{blue} %F{black%}icon-here %f%F{black}/tmp %k%F{blue}%f " "$(build_left_prompt)"
+  assertEquals "%K{blue} %F{black%}icon-here %F{black}/tmp %k%F{blue}%f " "$(build_left_prompt)"
 
   unset POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
   unset POWERLEVEL9K_DIR_FOLDER_ICON
