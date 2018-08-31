@@ -1,4 +1,4 @@
-FROM ubuntu:17.10
+FROM ubuntu:18.10
 
 RUN \
   apt-get update && \
@@ -6,7 +6,7 @@ RUN \
   DEBIAN_FRONTEND=noninteractive apt-get install -y \
   curl \
   git \
-  zsh=5.2-5ubuntu1.2 \
+  zsh=5.5.1-1ubuntu1 \
   mercurial \
   subversion \
   golang \

@@ -14,8 +14,6 @@ function setUp() {
   PATH="${RUST_TEST_FOLDER}:${PATH}"
 
   export TERM="xterm-256color"
-  # Load Powerlevel9k
-  source powerlevel9k.zsh-theme
 }
 
 function tearDown() {
@@ -29,22 +27,25 @@ function mockRust() {
 }
 
 function testRust() {
-  mockRust
+  local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
   POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(rust_version)
+  mockRust
 
-  assertEquals "%K{208} %F{black%}Rust %f%F{black}0.4.1a-alpha %k%F{darkorange}%f " "$(build_left_prompt)"
+  # Load Powerlevel9k
+  source powerlevel9k.zsh-theme
 
-  unset POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
+  assertEquals "%K{208} %F{000}Rust %f%F{000}0.4.1a-alpha %k%F{208}%f " "$(build_left_prompt)"
 }
 
 function testRustPrintsNothingIfRustIsNotAvailable() {
-  POWERLEVEL9K_CUSTOM_WORLD='echo world'
+  local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
   POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(custom_world rust_version)
+  local POWERLEVEL9K_CUSTOM_WORLD='echo world'
 
-  assertEquals "%K{white} %F{black}world %k%F{white}%f " "$(build_left_prompt)"
+  # Load Powerlevel9k
+  source powerlevel9k.zsh-theme
 
-  unset POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
-  unset POWERLEVEL9K_CUSTOM_WORLD
+  assertEquals "%K{015} %F{000}world %k%F{015}%f " "$(build_left_prompt)"
 }
 
-source shunit2/source/2.1/src/shunit2
+source shunit2/shunit2
