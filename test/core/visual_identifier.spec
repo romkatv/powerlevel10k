@@ -18,7 +18,7 @@ function testOverwritingIconsWork() {
   local POWERLEVEL9K_CUSTOM_WORLD1='echo world1'
   local POWERLEVEL9K_CUSTOM_WORLD1_ICON='icon-here'
 
-  assertEquals "%K{015} %F{000}icon-here %f%F{000}world1 %k%F{015}%f " "$(build_left_prompt)"
+  assertEquals "%K{007} %F{000}icon-here %f%F{000}world1 %k%F{007}%f " "$(build_left_prompt)"
 }
 
 function testVisualIdentifierAppearsBeforeSegmentContentOnLeftSegments() {
@@ -27,7 +27,7 @@ function testVisualIdentifierAppearsBeforeSegmentContentOnLeftSegments() {
   local POWERLEVEL9K_CUSTOM_WORLD1='echo world1'
   local POWERLEVEL9K_CUSTOM_WORLD1_ICON='icon-here'
 
-  assertEquals "%K{015} %F{000}icon-here %f%F{000}world1 %k%F{015}%f " "$(build_left_prompt)"
+  assertEquals "%K{007} %F{000}icon-here %f%F{000}world1 %k%F{007}%f " "$(build_left_prompt)"
 }
 
 function testVisualIdentifierAppearsAfterSegmentContentOnRightSegments() {
@@ -36,7 +36,7 @@ function testVisualIdentifierAppearsAfterSegmentContentOnRightSegments() {
   local POWERLEVEL9K_CUSTOM_WORLD1='echo world1'
   local POWERLEVEL9K_CUSTOM_WORLD1_ICON='icon-here'
 
-  assertEquals "%F{015}%f%K{015}%F{000} world1%F{000} icon-here%f%E" "$(build_right_prompt)"
+  assertEquals "%F{007}%f%K{007}%F{000} world1%F{000} icon-here%f%E" "$(build_right_prompt)"
 }
 
 function testVisualIdentifierPrintsNothingIfNotAvailable() {
@@ -44,7 +44,7 @@ function testVisualIdentifierPrintsNothingIfNotAvailable() {
   POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(custom_world1)
   local POWERLEVEL9K_CUSTOM_WORLD1='echo world1'
 
-  assertEquals "%K{015} %F{000}world1 %k%F{015}%f " "$(build_left_prompt)"
+  assertEquals "%K{007} %F{000}world1 %k%F{007}%f " "$(build_left_prompt)"
 }
 
 function testVisualIdentifierIsPrintedInNumericalColorCode() {
@@ -54,7 +54,7 @@ function testVisualIdentifierIsPrintedInNumericalColorCode() {
   local POWERLEVEL9K_CUSTOM_WORLD1_ICON="xxx"
   local POWERLEVEL9K_CUSTOM_WORLD1_VISUAL_IDENTIFIER_COLOR="purple3"
 
-  assertEquals "%K{015} %F{056}xxx %f%F{000}world1 %k%F{015}%f " "$(build_left_prompt)"
+  assertEquals "%K{007} %F{056}xxx %f%F{000}world1 %k%F{007}%f " "$(build_left_prompt)"
 }
 
 source shunit2/shunit2

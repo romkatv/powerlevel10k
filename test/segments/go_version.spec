@@ -56,7 +56,7 @@ function testGoSegmentPrintsNothingIfEmptyGopath() {
   # Load Powerlevel9k
   source powerlevel9k.zsh-theme
 
-  assertEquals "%K{015} %F{000}world %k%F{015}%f " "$(build_left_prompt)"
+  assertEquals "%K{007} %F{000}world %k%F{007}%f " "$(build_left_prompt)"
 }
 
 function testGoSegmentPrintsNothingIfNotInGopath() {
@@ -68,7 +68,7 @@ function testGoSegmentPrintsNothingIfNotInGopath() {
   # Load Powerlevel9k
   source powerlevel9k.zsh-theme
 
-  assertEquals "%K{015} %F{000}world %k%F{015}%f " "$(build_left_prompt)"
+  assertEquals "%K{007} %F{000}world %k%F{007}%f " "$(build_left_prompt)"
 }
 
 function testGoSegmentPrintsNothingIfGoIsNotAvailable() {
@@ -80,7 +80,7 @@ function testGoSegmentPrintsNothingIfGoIsNotAvailable() {
   # Load Powerlevel9k
   source powerlevel9k.zsh-theme
 
-  assertEquals "%K{015} %F{000}world %k%F{015}%f " "$(build_left_prompt)"
+  assertEquals "%K{007} %F{000}world %k%F{007}%f " "$(build_left_prompt)"
 
   unalias go
 }

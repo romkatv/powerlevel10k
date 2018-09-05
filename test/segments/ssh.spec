@@ -22,7 +22,7 @@ function testSshSegmentPrintsNothingIfNoSshConnection() {
   # Load Powerlevel9k
   source powerlevel9k.zsh-theme
 
-  assertEquals "%K{015} %F{000}world %k%F{015}%f " "$(build_left_prompt)"
+  assertEquals "%K{007} %F{000}world %k%F{007}%f " "$(build_left_prompt)"
 }
 
 function testSshSegmentWorksIfOnlySshClientIsSet() {
@@ -37,7 +37,7 @@ function testSshSegmentWorksIfOnlySshClientIsSet() {
   # Load Powerlevel9k
   source powerlevel9k.zsh-theme
 
-  assertEquals "%K{000} %F{011}ssh-icon%f %k%F{000}%f " "$(build_left_prompt)"
+  assertEquals "%K{000} %F{003}ssh-icon%f %k%F{000}%f " "$(build_left_prompt)"
 
   unset SSH_CLIENT
 }
@@ -54,7 +54,7 @@ function testSshSegmentWorksIfOnlySshTtyIsSet() {
   # Load Powerlevel9k
   source powerlevel9k.zsh-theme
 
-  assertEquals "%K{000} %F{011}ssh-icon%f %k%F{000}%f " "$(build_left_prompt)"
+  assertEquals "%K{000} %F{003}ssh-icon%f %k%F{000}%f " "$(build_left_prompt)"
 
   unset SSH_TTY
 }
@@ -71,7 +71,7 @@ function testSshSegmentWorksIfAllNecessaryVariablesAreSet() {
   # Load Powerlevel9k
   source powerlevel9k.zsh-theme
 
-  assertEquals "%K{000} %F{011}ssh-icon%f %k%F{000}%f " "$(build_left_prompt)"
+  assertEquals "%K{000} %F{003}ssh-icon%f %k%F{000}%f " "$(build_left_prompt)"
 
   unset SSH_TTY
   unset SSH_CLIENT

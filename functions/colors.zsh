@@ -11,23 +11,23 @@ typeset -gAh __P9K_COLORS
 # use color names by default to allow dark/light themes to adjust colors based on names
 __P9K_COLORS=(
   black 000
-  maroon 001
+  red 001
   green 002
-  olive 003
-  navy 004
-  purple 005
-  teal 006
-  silver 007
+  yellow 003
+  blue 004
+  magenta 005
+  cyan 006
+  white 007
   grey 008
-  red 009
+  maroon 009
   lime 010
-  yellow 011
-  blue 012
+  olive 011
+  navy 012
   fuchsia 013
-  magenta 013
+  purple 013
   aqua 014
-  cyan 014
-  white 015
+  teal 014
+  silver 015
   grey0 016
   navyblue 017
   darkblue 018
