@@ -117,7 +117,7 @@ function testNewlineOnRpromptCanBeDisabled() {
   POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(custom_rworld)
 
   powerlevel9k_prepare_prompts
-  assertEquals '$(print_icon MULTILINE_FIRST_PROMPT_PREFIX)[39m[0m[49m[107m [30mworld [49m[97m[39m  $(print_icon MULTILINE_LAST_PROMPT_PREFIX)[1A[39m[0m[49m[97m[39m[107m[30m rworld[K[00m[1B' "$(print -P ${PROMPT}${RPROMPT})"
+  assertEquals '$(print_icon MULTILINE_FIRST_PROMPT_PREFIX)[39m[0m[49m[47m [30mworld [49m[37m[39m  $(print_icon MULTILINE_LAST_PROMPT_PREFIX)[1A[39m[0m[49m[37m[39m[47m[30m rworld[K[00m[1B' "$(print -P ${PROMPT}${RPROMPT})"
 }
 
 source shunit2/shunit2
