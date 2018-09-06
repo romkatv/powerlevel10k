@@ -1,5 +1,6 @@
 ## v0.6.6
 
+- The `rbenv` segment is no longer a default segment in the LPROMPT.
 - PR #959 - Fixing issue in v0.6.5 where we changed some color codes.
 - PR #934 - Add Tests
 - PR #884 - test-in-docker: fix with newer ZSH versions
