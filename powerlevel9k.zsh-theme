@@ -364,6 +364,7 @@ prompt_newline() {
     "$0" \
     "$2" \
     "NONE" "NONE" "${newline}"
+  CURRENT_BG='NONE'
   POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS=$lws
 }
 
