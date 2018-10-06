@@ -21,6 +21,11 @@ function tearDown() {
 }
 
 function testContextSegmentDoesNotGetRenderedWithDefaultUser() {
+    # Fix leaked state for travis
+    unset POWERLEVEL9K_CONTEXT_ALWAYS_SHOW
+    unset SSH_CLIENT
+    unset SSH_TTY
+
     local DEFAULT_USER=$(whoami)
     local POWERLEVEL9K_CUSTOM_WORLD='echo world'
     local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
@@ -99,6 +104,11 @@ function testContextSegmentIsShownIfDefaultUserIsSetWhenForced() {
 }
 
 function testContextSegmentIsShownIfForced() {
+    # Fix leaked state for travis
+    unset POWERLEVEL9K_CONTEXT_ALWAYS_SHOW
+    unset SSH_CLIENT
+    unset SSH_TTY
+
     local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
     POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(context)
     local POWERLEVEL9K_ALWAYS_SHOW_USER=true
