@@ -118,13 +118,13 @@ get_term_font() {
 
     case "$term" in
         "alacritty"*)
-            shopt -s nullglob
+            setopt nullglob
             confs=({$XDG_CONFIG_HOME,$HOME}/{alacritty,}/{.,}alacritty.ym?)
-            shopt -u nullglob
+            unsetopt nullglob
 
-            [[ -f "${confs[0]}" ]] || return
+            [[ -f "${confs[1]}" ]] || return
 
-            term_font="$(awk -F ':|#' '/normal:/ {getline; print}' "${confs[0]}")"
+            term_font="$(awk -F ':|#' '/normal:/ {getline; print}' "${confs[1]}")"
             term_font="${term_font/*family:}"
             term_font="${term_font/$'\n'*}"
             term_font="${term_font/\#*}"
