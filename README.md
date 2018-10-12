@@ -70,7 +70,7 @@ variables to your `~/.zshrc`.
 
 | Variable | Default Value | Description |
 |----------|---------------|-------------|
-|`POWERLEVEL9K_LEFT_PROMPT_ELEMENTS`|`(context dir rbenv vcs)`|Segment list for left prompt|
+|`POWERLEVEL9K_LEFT_PROMPT_ELEMENTS`|`(context dir vcs)`|Segment list for left prompt|
 |`POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS`|`(status root_indicator background_jobs history time)`|Segment list for right prompt|
 
 
@@ -78,7 +78,7 @@ The table above shows the default values, so if you wanted to set these
 variables manually, you would put the following in
 your `~/.zshrc`:
 ```zsh
-POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(context dir rbenv vcs)
+POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(context dir vcs)
 POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(status root_indicator background_jobs history time)
 ```
 #### Available Prompt Segments
@@ -374,7 +374,7 @@ The `date` segment shows the current system date.
 
 | Variable | Default Value | Description |
 |----------|---------------|-------------|
-|`POWERLEVEL9K_DATE_FORMAT`|`%D{%d.%m.%y}`|[ZSH time format](http://zsh.sourceforge.net/Doc/Release Prompt-Expansion.html) to use in this segment.|
+|`POWERLEVEL9K_DATE_FORMAT`|`%D{%d.%m.%y}`|[ZSH time format](http://zsh.sourceforge.net/Doc/Release/Prompt-Expansion.html#Date-and-time) to use in this segment.|
 
 ##### dir
 
@@ -386,12 +386,14 @@ Powerline" fonts, there are additional glyphs, as well:
 | None       | None      | ![](https://cloud.githubusercontent.com/assets/1544760/12183451/40ec4016-b58f-11e5-9b9e-74e2b2f0b8b3.png) | At the root of your home folder |
 | None       | None      | ![](https://cloud.githubusercontent.com/assets/1544760/12369315/8a5d762c-bbf5-11e5-8a20-ca1179f48d6c.png) | Within a subfolder of your home directory |
 | None       | None      | ![](https://cloud.githubusercontent.com/assets/1544760/12183452/40f79286-b58f-11e5-9b8c-ed1343a07b08.png) | Outside of your home folder |
+| None       | None      | ⚙ | Within the `/etc` directory |
 
 To turn off these icons you could set these variables to an empty string.
 ```zsh
 POWERLEVEL9K_HOME_ICON=''
 POWERLEVEL9K_HOME_SUB_ICON=''
 POWERLEVEL9K_FOLDER_ICON=''
+POWERLEVEL9K_ETC_ICON=''
 ```
 You can limit the output to a certain length by truncating long paths.
 Customizations available are:
@@ -411,7 +413,7 @@ Customizations available are:
 |`truncate_from_right`|Just leaves the beginning of a folder name untouched. E.g. your folders will be truncated like so: "/ro../Pr../office". How many characters will be untouched is controlled by `POWERLEVEL9K_SHORTEN_DIR_LENGTH`.|
 |`truncate_absolute`|Truncates everything exept the last few characters in the path. E.g. if you are in a folder named "~/Projects/powerlevel9k" and you have set `POWERLEVEL9K_SHORTEN_DIR_LENGTH=3`, you will get "..l9k".|
 |`truncate_to_last`|Truncates everything before the last folder in the path.|
-|`truncate_to_first_and_last|Truncate middle directories from the path. How many directories will be untouched is controlled by POWERLEVEL9K_SHORTER_DIR_LENGTH. E.g. if you are in a folder named "~/Projects/powerlevel9k" and you have set `POWERLEVEL9K_SHORTEN_DIR_LENGTH=1`, you will get "~/../powerlevel9k".||
+|`truncate_to_first_and_last`|Truncate middle directories from the path. How many directories will be untouched is controlled by POWERLEVEL9K_SHORTER_DIR_LENGTH. E.g. if you are in a folder named "~/Projects/powerlevel9k" and you have set `POWERLEVEL9K_SHORTEN_DIR_LENGTH=1`, you will get "~/../powerlevel9k".||
 |`truncate_to_unique`|Parse all parent path components and truncate them to the shortest unique length. If you copy & paste the result to a shell, after hitting `TAB` it should expand to the original path unambiguously.|
 |`truncate_with_package_name`|Search for a `package.json` or `composer.json` and prints the `name` field to abbreviate the directory path. The precedence and/or files could be set by `POWERLEVEL9K_DIR_PACKAGE_FILES=(package.json composer.json)`. If you have [jq](https://stedolan.github.io/jq/) installed, it will dramatically improve the speed of this strategy.|
 |`truncate_with_folder_marker`|Search for a file that is specified by `POWERLEVEL9K_SHORTEN_FOLDER_MARKER` and truncate everything before that (if found, otherwise stop on $HOME and ROOT).|

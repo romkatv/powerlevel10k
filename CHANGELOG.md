@@ -1,3 +1,21 @@
+## v0.6.6
+
+- The `rbenv` segment is no longer a default segment in the LPROMPT.
+- PR #959 - Fixing issue in v0.6.5 where we changed some color codes.
+- PR #934 - Add Tests
+- PR #884 - test-in-docker: fix with newer ZSH versions
+- PR #928 - [Docs] Add etc state description in dir docs
+- PR #937 - Use SUDO_COMMAND to check for sudo
+- PR #925 - [Bugfix] Resolve #918 Transparent background
+- PR #923 - Fix font issue debugging script
+- PR #921 - Add missing colors to fix color comparison
+- PR #951 - Add fallback icon for missing linux distro icons
+- PR #956 - Fix broken link in readme
+- Fixed #936 - fallback icons for Linux distros
+- Fixed #926 - `etc` state for `dir` segment in docs
+- Fixed #852 - `sudo` detection got crazy, there. sorry, everyone.
+- Fixed #927 - more default color issues.
+
 ## v0.6.5
 
 - Multiple PRs: General fixes to README, improved documentation.

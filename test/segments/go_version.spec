@@ -7,8 +7,6 @@ SHUNIT_PARENT=$0
 
 function setUp() {
   export TERM="xterm-256color"
-  # Load Powerlevel9k
-  source powerlevel9k.zsh-theme
 }
 
 function mockGo() {
@@ -35,52 +33,56 @@ function mockGoEmptyGopath() {
 
 function testGo() {
   alias go=mockGo
-  POWERLEVEL9K_GO_ICON=""
+  local POWERLEVEL9K_GO_ICON=""
+  local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
   POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(go_version)
 
-  PWD="$HOME/go/src/github.com/bhilburn/powerlevel9k"
+  # Load Powerlevel9k
+  source powerlevel9k.zsh-theme
 
-  assertEquals "%K{green} %F{grey93%} %F{grey93}go1.5.3 %k%F{green}%f " "$(build_left_prompt)"
+  local PWD="$HOME/go/src/github.com/bhilburn/powerlevel9k"
 
-  unset POWERLEVEL9K_GO_ICON
-  unset PWD
-  unset POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
+  assertEquals "%K{002} %F{255} %F{255}go1.5.3 %k%F{002}%f " "$(build_left_prompt)"
+
   unalias go
 }
 
 function testGoSegmentPrintsNothingIfEmptyGopath() {
-  alias go=mockGoEmptyGopath
-  POWERLEVEL9K_CUSTOM_WORLD='echo world'
+  local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
   POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(custom_world go_version)
+  local POWERLEVEL9K_CUSTOM_WORLD='echo world'
+  alias go=mockGoEmptyGopath
 
-  assertEquals "%K{white} %F{black}world %k%F{white}%f " "$(build_left_prompt)"
+  # Load Powerlevel9k
+  source powerlevel9k.zsh-theme
 
-  unset POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
-  unset POWERLEVEL9K_CUSTOM_WORLD
-
+  assertEquals "%K{007} %F{000}world %k%F{007}%f " "$(build_left_prompt)"
 }
 
 function testGoSegmentPrintsNothingIfNotInGopath() {
-  alias go=mockGo
-  POWERLEVEL9K_CUSTOM_WORLD='echo world'
+  local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
   POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(custom_world go_version)
+  local POWERLEVEL9K_CUSTOM_WORLD='echo world'
+  alias go=mockGo
 
-  assertEquals "%K{white} %F{black}world %k%F{white}%f " "$(build_left_prompt)"
+  # Load Powerlevel9k
+  source powerlevel9k.zsh-theme
 
-  unset POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
-  unset POWERLEVEL9K_CUSTOM_WORLD
+  assertEquals "%K{007} %F{000}world %k%F{007}%f " "$(build_left_prompt)"
 }
 
 function testGoSegmentPrintsNothingIfGoIsNotAvailable() {
-  alias go=noGo
-  POWERLEVEL9K_CUSTOM_WORLD='echo world'
+  local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
   POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(custom_world go_version)
+  local POWERLEVEL9K_CUSTOM_WORLD='echo world'
+  alias go=noGo
 
-  assertEquals "%K{white} %F{black}world %k%F{white}%f " "$(build_left_prompt)"
+  # Load Powerlevel9k
+  source powerlevel9k.zsh-theme
 
-  unset POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
-  unset POWERLEVEL9K_CUSTOM_WORLD
+  assertEquals "%K{007} %F{000}world %k%F{007}%f " "$(build_left_prompt)"
+
   unalias go
 }
 
-source shunit2/source/2.1/src/shunit2
+source shunit2/shunit2

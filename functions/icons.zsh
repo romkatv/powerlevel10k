@@ -48,24 +48,24 @@ case $POWERLEVEL9K_MODE in
       FREEBSD_ICON                   $'\U1F608 '            # 😈
       ANDROID_ICON                   $'\uE270'              # 
       LINUX_ICON                     $'\uE271'              # 
-      LINUX_ARCH_ICON                'Arc'
-      LINUX_DEBIAN_ICON              'Deb'
-      LINUX_UBUNTU_ICON              'Ubu'
-      LINUX_CENTOS_ICON              'Cen'
-      LINUX_COREOS_ICON              'Cor'
-      LINUX_ELEMENTARY_ICON          'Elm'
-      LINUX_MINT_ICON                'LMi'
-      LINUX_FEDORA_ICON              'Fed'
-      LINUX_GENTOO_ICON              'Gen'
-      LINUX_MAGEIA_ICON              'Mag'
-      LINUX_NIXOS_ICON               'Nix'
-      LINUX_MANJARO_ICON             'Man'
-      LINUX_DEVUAN_ICON              'Dev'
-      LINUX_ALPINE_ICON              'Alp'
-      LINUX_AOSC_ICON                'Aos'
-      LINUX_OPENSUSE_ICON            'OSu'
-      LINUX_SABAYON_ICON             'Sab'
-      LINUX_SLACKWARE_ICON           'Sla'
+      LINUX_ARCH_ICON                $'\uE271'              # 
+      LINUX_DEBIAN_ICON              $'\uE271'              # 
+      LINUX_UBUNTU_ICON              $'\uE271'              # 
+      LINUX_CENTOS_ICON              $'\uE271'              # 
+      LINUX_COREOS_ICON              $'\uE271'              # 
+      LINUX_ELEMENTARY_ICON          $'\uE271'              # 
+      LINUX_MINT_ICON                $'\uE271'              # 
+      LINUX_FEDORA_ICON              $'\uE271'              # 
+      LINUX_GENTOO_ICON              $'\uE271'              # 
+      LINUX_MAGEIA_ICON              $'\uE271'              # 
+      LINUX_NIXOS_ICON               $'\uE271'              # 
+      LINUX_MANJARO_ICON             $'\uE271'              # 
+      LINUX_DEVUAN_ICON              $'\uE271'              # 
+      LINUX_ALPINE_ICON              $'\uE271'              # 
+      LINUX_AOSC_ICON                $'\uE271'              # 
+      LINUX_OPENSUSE_ICON            $'\uE271'              # 
+      LINUX_SABAYON_ICON             $'\uE271'              # 
+      LINUX_SLACKWARE_ICON           $'\uE271'              # 
       SUNOS_ICON                     $'\U1F31E '            # 🌞
       HOME_ICON                      $'\uE12C'              # 
       HOME_SUB_ICON                  $'\uE18D'              # 
@@ -148,24 +148,24 @@ case $POWERLEVEL9K_MODE in
       FREEBSD_ICON                   $'\U1F608 '            # 😈
       ANDROID_ICON                   $'\uE17B'              # 
       LINUX_ICON                     $'\uF17C'              # 
-      LINUX_ARCH_ICON                'Arc'
-      LINUX_DEBIAN_ICON              'Deb'
-      LINUX_UBUNTU_ICON              'Ubu'
-      LINUX_CENTOS_ICON              'Cen'
-      LINUX_COREOS_ICON              'Cor'
-      LINUX_ELEMENTARY_ICON          'Elm'
-      LINUX_MINT_ICON                'LMi'
-      LINUX_FEDORA_ICON              'Fed'
-      LINUX_GENTOO_ICON              'Gen'
-      LINUX_MAGEIA_ICON              'Mag'
-      LINUX_NIXOS_ICON               'Nix'
-      LINUX_MANJARO_ICON             'Man'
-      LINUX_DEVUAN_ICON              'Dev'
-      LINUX_ALPINE_ICON              'Alp'
-      LINUX_AOSC_ICON                'Aos'
-      LINUX_OPENSUSE_ICON            'OSu'
-      LINUX_SABAYON_ICON             'Sab'
-      LINUX_SLACKWARE_ICON           'Sla'
+      LINUX_ARCH_ICON                $'\uF17C'              # 
+      LINUX_DEBIAN_ICON              $'\uF17C'              # 
+      LINUX_UBUNTU_ICON              $'\uF17C'              # 
+      LINUX_CENTOS_ICON              $'\uF17C'              # 
+      LINUX_COREOS_ICON              $'\uF17C'              # 
+      LINUX_ELEMENTARY_ICON          $'\uF17C'              # 
+      LINUX_MINT_ICON                $'\uF17C'              # 
+      LINUX_FEDORA_ICON              $'\uF17C'              # 
+      LINUX_GENTOO_ICON              $'\uF17C'              # 
+      LINUX_MAGEIA_ICON              $'\uF17C'              # 
+      LINUX_NIXOS_ICON               $'\uF17C'              # 
+      LINUX_MANJARO_ICON             $'\uF17C'              # 
+      LINUX_DEVUAN_ICON              $'\uF17C'              # 
+      LINUX_ALPINE_ICON              $'\uF17C'              # 
+      LINUX_AOSC_ICON                $'\uF17C'              # 
+      LINUX_OPENSUSE_ICON            $'\uF17C'              # 
+      LINUX_SABAYON_ICON             $'\uF17C'              # 
+      LINUX_SLACKWARE_ICON           $'\uF17C'              # 
       SUNOS_ICON                     $'\uF185 '             # 
       HOME_ICON                      $'\uF015'              # 
       HOME_SUB_ICON                  $'\uF07C'              # 
@@ -250,24 +250,24 @@ case $POWERLEVEL9K_MODE in
       APPLE_ICON                     '\u'$CODEPOINT_OF_AWESOME_APPLE                # 
       FREEBSD_ICON                   $'\U1F608 '                                    # 😈
       LINUX_ICON                     '\u'$CODEPOINT_OF_AWESOME_LINUX                # 
-      LINUX_ARCH_ICON                'Arc'
-      LINUX_DEBIAN_ICON              'Deb'
-      LINUX_UBUNTU_ICON              'Ubu'
-      LINUX_CENTOS_ICON              'Cen'
-      LINUX_COREOS_ICON              'Cor'
-      LINUX_ELEMENTARY_ICON          'Elm'
-      LINUX_MINT_ICON                'LMi'
-      LINUX_FEDORA_ICON              'Fed'
-      LINUX_GENTOO_ICON              'Gen'
-      LINUX_MAGEIA_ICON              'Mag'
-      LINUX_NIXOS_ICON               'Nix'
-      LINUX_MANJARO_ICON             'Man'
-      LINUX_DEVUAN_ICON              'Dev'
-      LINUX_ALPINE_ICON              'Alp'
-      LINUX_AOSC_ICON                'Aos'
-      LINUX_OPENSUSE_ICON            'OSu'
-      LINUX_SABAYON_ICON             'Sab'
-      LINUX_SLACKWARE_ICON           'Sla'
+      LINUX_ARCH_ICON                '\u'$CODEPOINT_OF_AWESOME_LINUX                # 
+      LINUX_DEBIAN_ICON              '\u'$CODEPOINT_OF_AWESOME_LINUX                # 
+      LINUX_UBUNTU_ICON              '\u'$CODEPOINT_OF_AWESOME_LINUX                # 
+      LINUX_CENTOS_ICON              '\u'$CODEPOINT_OF_AWESOME_LINUX                # 
+      LINUX_COREOS_ICON              '\u'$CODEPOINT_OF_AWESOME_LINUX                # 
+      LINUX_ELEMENTARY_ICON          '\u'$CODEPOINT_OF_AWESOME_LINUX                # 
+      LINUX_MINT_ICON                '\u'$CODEPOINT_OF_AWESOME_LINUX                # 
+      LINUX_FEDORA_ICON              '\u'$CODEPOINT_OF_AWESOME_LINUX                # 
+      LINUX_GENTOO_ICON              '\u'$CODEPOINT_OF_AWESOME_LINUX                # 
+      LINUX_MAGEIA_ICON              '\u'$CODEPOINT_OF_AWESOME_LINUX                # 
+      LINUX_NIXOS_ICON               '\u'$CODEPOINT_OF_AWESOME_LINUX                # 
+      LINUX_MANJARO_ICON             '\u'$CODEPOINT_OF_AWESOME_LINUX                # 
+      LINUX_DEVUAN_ICON              '\u'$CODEPOINT_OF_AWESOME_LINUX                # 
+      LINUX_ALPINE_ICON              '\u'$CODEPOINT_OF_AWESOME_LINUX                # 
+      LINUX_AOSC_ICON                '\u'$CODEPOINT_OF_AWESOME_LINUX                # 
+      LINUX_OPENSUSE_ICON            '\u'$CODEPOINT_OF_AWESOME_LINUX                # 
+      LINUX_SABAYON_ICON             '\u'$CODEPOINT_OF_AWESOME_LINUX                # 
+      LINUX_SLACKWARE_ICON           '\u'$CODEPOINT_OF_AWESOME_LINUX                # 
       SUNOS_ICON                     '\u'$CODEPOINT_OF_AWESOME_SUN_O' '             # 
       HOME_ICON                      '\u'$CODEPOINT_OF_AWESOME_HOME                 # 
       HOME_SUB_ICON                  '\u'$CODEPOINT_OF_AWESOME_FOLDER_OPEN          # 

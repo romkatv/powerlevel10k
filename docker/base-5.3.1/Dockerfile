@@ -1,4 +1,6 @@
-FROM ubuntu:17.10
+FROM debian:stretch
+
+# We switched here to debian, as there seems no ZSH 5.3 in ubuntu.
 
 RUN \
   apt-get update && \
@@ -6,7 +8,7 @@ RUN \
   DEBIAN_FRONTEND=noninteractive apt-get install -y \
   curl \
   git \
-  zsh=5.2-5ubuntu1.2 \
+  zsh=5.3.1-4+b2 \
   mercurial \
   subversion \
   golang \
@@ -19,6 +21,9 @@ RUN \
   locales
 
 RUN adduser --shell /bin/zsh --gecos 'fred' --disabled-password fred
+# Locale generation is different in debian. We need to enable en_US
+# locale and then regenerate locales.
+RUN echo "en_US.UTF-8 UTF-8" > /etc/locale.gen
 RUN locale-gen "en_US.UTF-8"
 
 COPY docker/fred-sudoers /etc/sudoers.d/fred

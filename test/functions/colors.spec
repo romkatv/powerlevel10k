@@ -22,6 +22,10 @@ function testGetColorCodeWithNumericalColor() {
   assertEquals '002' "$(getColorCode '002')"
 }
 
+function testGetColorCodeWithNoneColor() {
+  assertEquals 'none' "$(getColorCode 'NONE')"
+}
+
 function testIsSameColorComparesAnsiForegroundAndNumericalColorCorrectly() {
   assertTrue "isSameColor 'green' '002'"
 }
@@ -30,13 +34,34 @@ function testIsSameColorComparesAnsiBackgroundAndNumericalColorCorrectly() {
   assertTrue "isSameColor 'bg-green' '002'"
 }
 
-function testIsSameColorComparesNumericalBackgroundAndNumericalColorCorrectly() {
-  assertTrue "isSameColor '010' '2'"
+function testIsSameColorComparesShortCodesCorrectly() {
+  assertTrue "isSameColor '002' '2'"
 }
 
 function testIsSameColorDoesNotYieldNotEqualColorsTruthy() {
   assertFalse "isSameColor 'green' '003'"
 }
 
+function testIsSameColorHandlesNoneCorrectly() {
+  assertTrue "isSameColor 'none' 'NOnE'"
+}
 
-source shunit2/source/2.1/src/shunit2
+function testIsSameColorCompareTwoNoneColorsCorrectly() {
+  assertTrue "isSameColor 'none' 'none'"
+}
+
+function testIsSameColorComparesColorWithNoneCorrectly() {
+  assertFalse "isSameColor 'green' 'none'"
+}
+
+function testBrightColorsWork() {
+  # We had some code in the past that equalized bright colors
+  # with normal ones. This code is now gone, and this test should
+  # ensure that all input channels for bright colors are handled
+  # correctly.
+  assertTrue "isSameColor 'cyan' '006'"
+  assertEquals '006' "$(getColorCode 'cyan')"
+  assertEquals '006' "$(getColor 'cyan')"
+}
+
+source shunit2/shunit2
