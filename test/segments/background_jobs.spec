@@ -34,7 +34,7 @@ function testBackgroundJobsSegmentWorksWithOneBackgroundJob() {
     # Load Powerlevel9k
     source powerlevel9k.zsh-theme
 
-    assertEquals "%K{000} %F{006}⚙%f %k%F{000}%f " "$(build_left_prompt)"
+    assertEquals "%K{000} %F{006}⚙ %k%F{000}%f " "$(build_left_prompt)"
 
     unfunction jobs
 }
@@ -52,7 +52,7 @@ function testBackgroundJobsSegmentWorksWithMultipleBackgroundJobs() {
     # Load Powerlevel9k
     source powerlevel9k.zsh-theme
 
-    assertEquals "%K{000} %F{006}⚙%f %k%F{000}%f " "$(build_left_prompt)"
+    assertEquals "%K{000} %F{006}⚙ %k%F{000}%f " "$(build_left_prompt)"
 
     unfunction jobs
 }
@@ -70,7 +70,7 @@ function testBackgroundJobsSegmentWithVerboseMode() {
     # Load Powerlevel9k
     source powerlevel9k.zsh-theme
 
-    assertEquals "%K{000} %F{006}⚙ %f%F{006}3 %k%F{000}%f " "$(build_left_prompt)"
+    assertEquals "%K{000} %F{006}⚙ %F{006}3 %k%F{000}%f " "$(build_left_prompt)"
 
     unfunction jobs
 }

@@ -16,7 +16,7 @@ function testDynamicColoringOfSegmentsWork() {
   local POWERLEVEL9K_DATE_ICON="date-icon"
   local POWERLEVEL9K_DATE_BACKGROUND='red'
 
-  assertEquals "%K{001} %F{000}date-icon %f%F{000}%D{%d.%m.%y} %k%F{001}%f " "$(build_left_prompt)"
+  assertEquals "%K{001} %F{000}date-icon %F{000}%D{%d.%m.%y} %k%F{001}%f " "$(build_left_prompt)"
 }
 
 function testDynamicColoringOfVisualIdentifiersWork() {
@@ -24,7 +24,7 @@ function testDynamicColoringOfVisualIdentifiersWork() {
   local POWERLEVEL9K_DATE_ICON="date-icon"
   local POWERLEVEL9K_DATE_VISUAL_IDENTIFIER_COLOR='green'
 
-  assertEquals "%K{007} %F{002}date-icon %f%F{000}%D{%d.%m.%y} %k%F{007}%f " "$(build_left_prompt)"
+  assertEquals "%K{007} %F{002}date-icon %F{000}%D{%d.%m.%y} %k%F{007}%f " "$(build_left_prompt)"
 }
 
 function testColoringOfVisualIdentifiersDoesNotOverwriteColoringOfSegment() {
@@ -34,7 +34,7 @@ function testColoringOfVisualIdentifiersDoesNotOverwriteColoringOfSegment() {
   local POWERLEVEL9K_DATE_FOREGROUND='red'
   local POWERLEVEL9K_DATE_BACKGROUND='yellow'
 
-  assertEquals "%K{003} %F{002}date-icon %f%F{001}%D{%d.%m.%y} %k%F{003}%f " "$(build_left_prompt)"
+  assertEquals "%K{003} %F{002}date-icon %F{001}%D{%d.%m.%y} %k%F{003}%f " "$(build_left_prompt)"
 }
 
 function testColorOverridingOfStatefulSegment() {
@@ -45,7 +45,7 @@ function testColorOverridingOfStatefulSegment() {
   # Provoke state
   local SSH_CLIENT="x"
 
-  assertEquals "%K{001} %F{002}ssh-icon %f%F{002}%m %k%F{001}%f " "$(build_left_prompt)"
+  assertEquals "%K{001} %F{002}ssh-icon %F{002}%m %k%F{001}%f " "$(build_left_prompt)"
 }
 
 function testColorOverridingOfCustomSegment() {
@@ -56,7 +56,7 @@ function testColorOverridingOfCustomSegment() {
   local POWERLEVEL9K_CUSTOM_WORLD_FOREGROUND='red'
   local POWERLEVEL9K_CUSTOM_WORLD_BACKGROUND='red'
 
-  assertEquals "%K{001} %F{002}CW %f%F{001}world %k%F{001}%f " "$(build_left_prompt)"
+  assertEquals "%K{001} %F{002}CW %F{001}world %k%F{001}%f " "$(build_left_prompt)"
 }
 
 source shunit2/shunit2

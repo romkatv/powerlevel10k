@@ -35,7 +35,7 @@ function testAnacondaSegmentWorksIfOnlyAnacondaPathIsSet() {
     CONDA_ENV_PATH=/tmp
     unset CONDA_PREFIX
 
-    assertEquals "%K{004} %F{000}icon-here %f%F{000}(tmp) %k%F{004}%f " "$(build_left_prompt)"
+    assertEquals "%K{004} %F{000}icon-here %F{000}(tmp) %k%F{004}%f " "$(build_left_prompt)"
 }
 
 function testAnacondaSegmentWorksIfOnlyAnacondaPrefixIsSet() {
@@ -49,7 +49,7 @@ function testAnacondaSegmentWorksIfOnlyAnacondaPrefixIsSet() {
     unset CONDA_ENV_PATH
     local CONDA_PREFIX="test"
 
-    assertEquals "%K{004} %F{000}icon-here %f%F{000}(test) %k%F{004}%f " "$(build_left_prompt)"
+    assertEquals "%K{004} %F{000}icon-here %F{000}(test) %k%F{004}%f " "$(build_left_prompt)"
 }
 
 function testAnacondaSegmentWorks() {
@@ -63,7 +63,7 @@ function testAnacondaSegmentWorks() {
     local CONDA_ENV_PATH=/tmp
     local CONDA_PREFIX="test"
 
-    assertEquals "%K{004} %F{000}icon-here %f%F{000}(tmptest) %k%F{004}%f " "$(build_left_prompt)"
+    assertEquals "%K{004} %F{000}icon-here %F{000}(tmptest) %k%F{004}%f " "$(build_left_prompt)"
 }
 
 source shunit2/shunit2

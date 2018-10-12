@@ -42,7 +42,7 @@ function testLoadSegmentWorksOnOsx() {
     source ${P9K_HOME}/powerlevel9k.zsh-theme
     local OS="OSX" # Fake OSX
 
-    assertEquals "%K{002} %F{000}L %f%F{000}1.38 " "$(prompt_load left 1 false ${FOLDER})"
+    assertEquals "%K{002} %F{000}L %F{000}1.38 " "$(prompt_load left 1 false ${FOLDER})"
 
     unfunction sysctl
 }
@@ -64,7 +64,7 @@ function testLoadSegmentWorksOnBsd() {
     source ${P9K_HOME}/powerlevel9k.zsh-theme
     local OS="BSD" # Fake BSD
 
-    assertEquals "%K{002} %F{000}L %f%F{000}1.38 " "$(prompt_load left 1 false ${FOLDER})"
+    assertEquals "%K{002} %F{000}L %F{000}1.38 " "$(prompt_load left 1 false ${FOLDER})"
 
     unfunction sysctl
 }
@@ -81,7 +81,7 @@ function testLoadSegmentWorksOnLinux() {
     source ${P9K_HOME}/powerlevel9k.zsh-theme
     local OS="Linux" # Fake Linux
 
-    assertEquals "%K{002} %F{000}L %f%F{000}1.38 " "$(prompt_load left 1 false ${FOLDER})"
+    assertEquals "%K{002} %F{000}L %F{000}1.38 " "$(prompt_load left 1 false ${FOLDER})"
 
     unalias nproc
 }
@@ -101,7 +101,7 @@ function testLoadSegmentNormalState() {
     source ${P9K_HOME}/powerlevel9k.zsh-theme
     local OS="Linux" # Fake Linux
 
-    assertEquals "%K{002} %F{000}L %f%F{000}1.00 " "$(prompt_load left 1 false ${FOLDER})"
+    assertEquals "%K{002} %F{000}L %F{000}1.00 " "$(prompt_load left 1 false ${FOLDER})"
 
     unalias nproc
 }
@@ -121,7 +121,7 @@ function testLoadSegmentWarningState() {
     source ${P9K_HOME}/powerlevel9k.zsh-theme
     local OS="Linux" # Fake Linux
 
-    assertEquals "%K{003} %F{000}L %f%F{000}2.01 " "$(prompt_load left 1 false ${FOLDER})"
+    assertEquals "%K{003} %F{000}L %F{000}2.01 " "$(prompt_load left 1 false ${FOLDER})"
 
     unalias nproc
 }
@@ -141,7 +141,7 @@ function testLoadSegmentCriticalState() {
     source ${P9K_HOME}/powerlevel9k.zsh-theme
     local OS="Linux" # Fake Linux
 
-    assertEquals "%K{001} %F{000}L %f%F{000}2.81 " "$(prompt_load left 1 false ${FOLDER})"
+    assertEquals "%K{001} %F{000}L %F{000}2.81 " "$(prompt_load left 1 false ${FOLDER})"
 
     unalias nproc
 }

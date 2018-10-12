@@ -68,7 +68,7 @@ function testIpSegmentWorksOnOsxWithNoInterfaceSpecified() {
   source powerlevel9k.zsh-theme
   local OS='OSX' # Fake OSX
 
-  assertEquals "%K{006} %F{000}IP %f%F{000}1.2.3.4 %k%F{006}%f " "$(build_left_prompt)"
+  assertEquals "%K{006} %F{000}IP %F{000}1.2.3.4 %k%F{006}%f " "$(build_left_prompt)"
 
   unalias ipconfig
   unalias networksetup
@@ -123,7 +123,7 @@ function testIpSegmentWorksOnOsxWithMultipleInterfacesSpecified() {
   source powerlevel9k.zsh-theme
   local OS='OSX' # Fake OSX
 
-  assertEquals "%K{006} %F{000}IP %f%F{000}1.2.3.4 %k%F{006}%f " "$(build_left_prompt)"
+  assertEquals "%K{006} %F{000}IP %F{000}1.2.3.4 %k%F{006}%f " "$(build_left_prompt)"
 
   unfunction ipconfig
   unalias networksetup
@@ -139,7 +139,7 @@ function testIpSegmentWorksOnOsxWithInterfaceSpecified() {
   source powerlevel9k.zsh-theme
   local OS='OSX' # Fake OSX
 
-  assertEquals "%K{006} %F{000}IP %f%F{000}1.2.3.4 %k%F{006}%f " "$(build_left_prompt)"
+  assertEquals "%K{006} %F{000}IP %F{000}1.2.3.4 %k%F{006}%f " "$(build_left_prompt)"
 
   unalias ipconfig
 }
@@ -169,7 +169,7 @@ function testIpSegmentWorksOnLinuxWithNoInterfaceSpecified() {
     source powerlevel9k.zsh-theme
     local OS='Linux' # Fake Linux
 
-    assertEquals "%K{006} %F{000}IP %f%F{000}10.0.2.15 %k%F{006}%f " "$(build_left_prompt)"
+    assertEquals "%K{006} %F{000}IP %F{000}10.0.2.15 %k%F{006}%f " "$(build_left_prompt)"
 
     unfunction ip
 }
@@ -204,7 +204,7 @@ function testIpSegmentWorksOnLinuxWithMultipleInterfacesSpecified() {
     source powerlevel9k.zsh-theme
     local OS='Linux' # Fake Linux
 
-    assertEquals "%K{006} %F{000}IP %f%F{000}10.0.2.15 %k%F{006}%f " "$(build_left_prompt)"
+    assertEquals "%K{006} %F{000}IP %F{000}10.0.2.15 %k%F{006}%f " "$(build_left_prompt)"
 
     unfunction ip
 }
@@ -223,7 +223,7 @@ inet 10.0.2.15/24 brd 10.0.2.255 scope global eth0
   source powerlevel9k.zsh-theme
   local OS='Linux' # Fake Linux
 
-  assertEquals "%K{006} %F{000}IP %f%F{000}10.0.2.15 %k%F{006}%f " "$(build_left_prompt)"
+  assertEquals "%K{006} %F{000}IP %F{000}10.0.2.15 %k%F{006}%f " "$(build_left_prompt)"
 
   unfunction ip
 }
