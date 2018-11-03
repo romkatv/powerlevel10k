@@ -43,11 +43,11 @@ function +vi-git-aheadbehind() {
 }
 
 function +vi-git-remotebranch() {
-    local remote branch_name
+    local remote
+    local branch_name="${hook_com[branch]}"
 
     # Are we on a remote-tracking branch?
     remote=${$(command git rev-parse --verify HEAD@{upstream} --symbolic-full-name 2>/dev/null)/refs\/(remotes|heads)\/}
-    branch_name=$(command git symbolic-ref --short HEAD 2>/dev/null)
 
     if [[ -n "$POWERLEVEL9K_VCS_SHORTEN_LENGTH" ]] && [[ -n "$POWERLEVEL9K_VCS_SHORTEN_MIN_LENGTH" ]]; then
      set_default POWERLEVEL9K_VCS_SHORTEN_DELIMITER $'\U2026'
