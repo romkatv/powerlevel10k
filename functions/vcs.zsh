@@ -104,7 +104,7 @@ function +vi-git-tagname() {
 function +vi-git-stash() {
   local -a stashes
 
-  if [[ -s $(command git rev-parse --git-dir)/refs/stash ]] ; then
+  if [[ -s "${vcs_comm[gitdir]}/refs/stash" ]] ; then
     stashes=$(command git stash list 2>/dev/null | wc -l)
     hook_com[misc]+=" $(print_icon 'VCS_STASH_ICON')${stashes// /}"
   fi
