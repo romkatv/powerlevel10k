@@ -6,18 +6,12 @@
 # https://github.com/bhilburn/powerlevel9k
 ################################################################
 
-set_default POWERLEVEL9K_VCS_SHOW_SUBMODULE_DIRTY true
+set_default POWERLEVEL9K_VCS_SHOW_SUBMODULE_DIRTY false
 function +vi-git-untracked() {
-    # TODO: check git >= 1.7.2 - see function git_compare_version()
-    local FLAGS
-    FLAGS=('--porcelain')
-
-    if [[ "$POWERLEVEL9K_VCS_SHOW_SUBMODULE_DIRTY" == "false" ]]; then
-      FLAGS+='--ignore-submodules=dirty'
-    fi
-
-    if [[ $(command git rev-parse --is-inside-work-tree 2> /dev/null) == 'true' && \
-            -n $(command git status ${FLAGS} | \grep -E '^\?\?' 2> /dev/null | tail -n1) ]]; then
+    if [[ "$POWERLEVEL9K_VCS_SHOW_SUBMODULE_DIRTY" == "true" && "$(command git submodule foreach 'git ls-files --others --exclude-standard')" != "" ]]; then
+        hook_com[unstaged]+=" $(print_icon 'VCS_UNTRACKED_ICON')"
+        VCS_WORKDIR_HALF_DIRTY=true
+    elif [[ "$(command git ls-files --others --exclude-standard)" != "" ]]; then
         hook_com[unstaged]+=" $(print_icon 'VCS_UNTRACKED_ICON')"
         VCS_WORKDIR_HALF_DIRTY=true
     else

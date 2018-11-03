@@ -375,4 +375,29 @@ function testShorteningCommitHashIsNotShownIfShowChangesetIsFalse() {
   assertEquals "%K{002} %F{000} master %k%F{002}%f " "$(build_left_prompt)"
 }
 
+function testDetectingUntrackedFilesInSubmodulesWork() {
+  local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
+  POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(vcs)
+  local POWERLEVEL9K_VCS_SHOW_SUBMODULE_DIRTY="true"
+  unset POWERLEVEL9K_VCS_UNTRACKED_BACKGROUND
+
+  mkdir ../submodule
+  cd ../submodule
+  git init 1>/dev/null
+  touch "i-am-tracked.txt"
+  git add . 1>/dev/null && git commit -m "Initial Commit" 1>/dev/null
+  # Create untracked file
+  touch "i-am-untracked.txt"
+
+  local submodulePath="${PWD}"
+
+  cd -
+  git submodule add "${submodulePath}" 2>/dev/null
+  git commit -m "Add submodule" 1>/dev/null
+
+  source ${P9K_HOME}/powerlevel9k.zsh-theme
+
+  assertEquals "%K{002} %F{000} master ? %k%F{002}%f " "$(build_left_prompt)"
+}
+
 source shunit2/shunit2
