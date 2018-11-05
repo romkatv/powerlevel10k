@@ -13,6 +13,7 @@
 
 # Initialize the icon list according to the user's `POWERLEVEL9K_MODE`.
 typeset -gAH icons
+() { # add scope to protect the users locale and not overwrite LC_CTYPE!
 case $POWERLEVEL9K_MODE in
   'flat'|'awesome-patched')
     # Awesome-Patched Font required! See:
@@ -528,6 +529,7 @@ esac
 if [[ "$POWERLEVEL9K_HIDE_BRANCH_ICON" == true ]]; then
     icons[VCS_BRANCH_ICON]=''
 fi
+}
 
 # Safety function for printing icons
 # Prints the named icon, or if that icon is undefined, the string name.
