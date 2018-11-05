@@ -6,18 +6,12 @@
 # https://github.com/bhilburn/powerlevel9k
 ################################################################
 
-set_default POWERLEVEL9K_VCS_SHOW_SUBMODULE_DIRTY true
+set_default POWERLEVEL9K_VCS_SHOW_SUBMODULE_DIRTY false
 function +vi-git-untracked() {
-    # TODO: check git >= 1.7.2 - see function git_compare_version()
-    local FLAGS
-    FLAGS=('--porcelain')
-
-    if [[ "$POWERLEVEL9K_VCS_SHOW_SUBMODULE_DIRTY" == "false" ]]; then
-      FLAGS+='--ignore-submodules=dirty'
-    fi
-
-    if [[ $(command git rev-parse --is-inside-work-tree 2> /dev/null) == 'true' && \
-            -n $(command git status ${FLAGS} | \grep -E '^\?\?' 2> /dev/null | tail -n1) ]]; then
+    if [[ "$POWERLEVEL9K_VCS_SHOW_SUBMODULE_DIRTY" == "true" && "$(command git submodule foreach --quiet --recursive 'git ls-files --others --exclude-standard')" != "" ]]; then
+        hook_com[unstaged]+=" $(print_icon 'VCS_UNTRACKED_ICON')"
+        VCS_WORKDIR_HALF_DIRTY=true
+    elif [[ "$(command git ls-files --others --exclude-standard)" != "" ]]; then
         hook_com[unstaged]+=" $(print_icon 'VCS_UNTRACKED_ICON')"
         VCS_WORKDIR_HALF_DIRTY=true
     else
@@ -26,30 +20,28 @@ function +vi-git-untracked() {
 }
 
 function +vi-git-aheadbehind() {
-    local ahead behind branch_name
+    local ahead behind
     local -a gitstatus
 
-    branch_name=$(command git symbolic-ref --short HEAD 2>/dev/null)
-
     # for git prior to 1.7
-    # ahead=$(command git rev-list origin/${branch_name}..HEAD | wc -l)
-    ahead=$(command git rev-list "${branch_name}"@{upstream}..HEAD 2>/dev/null | wc -l)
+    # ahead=$(command git rev-list origin/${hook_com[branch]}..HEAD | wc -l)
+    ahead=$(command git rev-list --count "${hook_com[branch]}"@{upstream}..HEAD 2>/dev/null)
     (( ahead )) && gitstatus+=( " $(print_icon 'VCS_OUTGOING_CHANGES_ICON')${ahead// /}" )
 
     # for git prior to 1.7
-    # behind=$(command git rev-list HEAD..origin/${branch_name} | wc -l)
-    behind=$(command git rev-list HEAD.."${branch_name}"@{upstream} 2>/dev/null | wc -l)
+    # behind=$(command git rev-list HEAD..origin/${hook_com[branch]} | wc -l)
+    behind=$(command git rev-list --count HEAD.."${hook_com[branch]}"@{upstream} 2>/dev/null)
     (( behind )) && gitstatus+=( " $(print_icon 'VCS_INCOMING_CHANGES_ICON')${behind// /}" )
 
     hook_com[misc]+=${(j::)gitstatus}
 }
 
 function +vi-git-remotebranch() {
-    local remote branch_name
+    local remote
+    local branch_name="${hook_com[branch]}"
 
     # Are we on a remote-tracking branch?
     remote=${$(command git rev-parse --verify HEAD@{upstream} --symbolic-full-name 2>/dev/null)/refs\/(remotes|heads)\/}
-    branch_name=$(command git symbolic-ref --short HEAD 2>/dev/null)
 
     if [[ -n "$POWERLEVEL9K_VCS_SHORTEN_LENGTH" ]] && [[ -n "$POWERLEVEL9K_VCS_SHORTEN_MIN_LENGTH" ]]; then
      set_default POWERLEVEL9K_VCS_SHORTEN_DELIMITER $'\U2026'
@@ -106,7 +98,7 @@ function +vi-git-tagname() {
 function +vi-git-stash() {
   local -a stashes
 
-  if [[ -s $(command git rev-parse --git-dir)/refs/stash ]] ; then
+  if [[ -s "${vcs_comm[gitdir]}/refs/stash" ]] ; then
     stashes=$(command git stash list 2>/dev/null | wc -l)
     hook_com[misc]+=" $(print_icon 'VCS_STASH_ICON')${stashes// /}"
   fi
