@@ -8,7 +8,7 @@
 
 set_default POWERLEVEL9K_VCS_SHOW_SUBMODULE_DIRTY false
 function +vi-git-untracked() {
-    if [[ "$POWERLEVEL9K_VCS_SHOW_SUBMODULE_DIRTY" == "true" && "$(command git submodule foreach --quiet --recursive 'git ls-files --others --exclude-standard')" != "" ]]; then
+    if [[ "$POWERLEVEL9K_VCS_SHOW_SUBMODULE_DIRTY" == "true" && "$(command git submodule foreach --quiet --recursive 'command git ls-files --others --exclude-standard')" != "" ]]; then
         hook_com[unstaged]+=" $(print_icon 'VCS_UNTRACKED_ICON')"
         VCS_WORKDIR_HALF_DIRTY=true
     elif [[ "$(command git ls-files --others --exclude-standard)" != "" ]]; then
@@ -46,13 +46,13 @@ function +vi-git-remotebranch() {
     if [[ -n "$POWERLEVEL9K_VCS_SHORTEN_LENGTH" ]] && [[ -n "$POWERLEVEL9K_VCS_SHORTEN_MIN_LENGTH" ]]; then
      set_default POWERLEVEL9K_VCS_SHORTEN_DELIMITER $'\U2026'
 
-     if [ ${#hook_com[branch]} -gt $POWERLEVEL9K_VCS_SHORTEN_MIN_LENGTH ] && [ ${#hook_com[branch]} -gt $POWERLEVEL9K_VCS_SHORTEN_LENGTH ]; then
+     if [ ${#hook_com[branch]} -gt ${POWERLEVEL9K_VCS_SHORTEN_MIN_LENGTH} ] && [ ${#hook_com[branch]} -gt ${POWERLEVEL9K_VCS_SHORTEN_LENGTH} ]; then
        case "$POWERLEVEL9K_VCS_SHORTEN_STRATEGY" in
          truncate_middle)
-           hook_com[branch]="$(echo "${branch_name:0:$POWERLEVEL9K_VCS_SHORTEN_LENGTH}")$POWERLEVEL9K_VCS_SHORTEN_DELIMITER$(echo "${branch_name: -$POWERLEVEL9K_VCS_SHORTEN_LENGTH}")"
+           hook_com[branch]="${branch_name:0:$POWERLEVEL9K_VCS_SHORTEN_LENGTH}${POWERLEVEL9K_VCS_SHORTEN_DELIMITER}${branch_name: -$POWERLEVEL9K_VCS_SHORTEN_LENGTH}"
          ;;
          truncate_from_right)
-           hook_com[branch]="$(echo "${branch_name:0:$POWERLEVEL9K_VCS_SHORTEN_LENGTH}")$POWERLEVEL9K_VCS_SHORTEN_DELIMITER"
+           hook_com[branch]="${branch_name:0:$POWERLEVEL9K_VCS_SHORTEN_LENGTH}${POWERLEVEL9K_VCS_SHORTEN_DELIMITER}"
          ;;
        esac
      fi
