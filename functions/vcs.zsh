@@ -96,11 +96,9 @@ function +vi-git-tagname() {
 # Show count of stashed changes
 # Port from https://github.com/whiteinge/dotfiles/blob/5dfd08d30f7f2749cfc60bc55564c6ea239624d9/.zsh_shouse_prompt#L268
 function +vi-git-stash() {
-  local -a stashes
-
-  if [[ -s "${vcs_comm[gitdir]}/refs/stash" ]] ; then
-    stashes=$(command git stash list 2>/dev/null | wc -l)
-    hook_com[misc]+=" $(print_icon 'VCS_STASH_ICON')${stashes// /}"
+  if [[ -s "${vcs_comm[gitdir]}/logs/refs/stash" ]] ; then
+    local -a stashes=( "${(@f)"$(<${vcs_comm[gitdir]}/logs/refs/stash)"}" )
+    hook_com[misc]+=" $(print_icon 'VCS_STASH_ICON')${#stashes}"
   fi
 }
 
