@@ -473,4 +473,21 @@ function testDetectingUntrackedFilesInNestedSubmodulesWork() {
   assertEquals "%K{002} %F{000} master ? %k%F{002}%f " "$(build_left_prompt)"
 }
 
+function testDetectingUntrackedFilesInCleanSubdirectoryWorks() {
+  local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
+  POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(vcs)
+  local POWERLEVEL9K_VCS_SHOW_SUBMODULE_DIRTY="true"
+  unset POWERLEVEL9K_VCS_UNTRACKED_BACKGROUND
+   mkdir clean-folder
+  touch clean-folder/file.txt
+   mkdir dirty-folder
+  touch dirty-folder/file.txt
+   git add . 2>/dev/null
+  git commit -m "Initial commit" >/dev/null
+   touch dirty-folder/new-file.txt
+  cd clean-folder
+   source ${P9K_HOME}/powerlevel9k.zsh-theme
+   assertEquals "%K{002} %F{000} master ? %k%F{002}%f " "$(build_left_prompt)"
+}
+
 source shunit2/shunit2
