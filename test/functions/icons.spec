@@ -17,52 +17,58 @@ function tearDown() {
     LC_CTYPE="${_OLD_LC_CTYPE}"
 }
 
-function testLcCtypeIsSetCorrectlyInDefaultMode() {
+function testLcCtypeIsNotOverwrittenInDefaultMode() {
   local POWERLEVEL9K_MODE="default"
+  local LC_CTYPE="my-locale"
   # Load Powerlevel9k
   source functions/icons.zsh
 
-  assertEquals 'en_US.UTF-8' "${LC_CTYPE}"
+  assertEquals 'my-locale' "${LC_CTYPE}"
 }
 
-function testLcCtypeIsSetCorrectlyInAwesomePatchedMode() {
+function testLcCtypeIsNotOverwrittenInAwesomePatchedMode() {
   local POWERLEVEL9K_MODE="awesome-patched"
+  local LC_CTYPE="my-locale"
   # Load Powerlevel9k
   source functions/icons.zsh
 
-  assertEquals 'en_US.UTF-8' "${LC_CTYPE}"
+  assertEquals 'my-locale' "${LC_CTYPE}"
 }
 
-function testLcCtypeIsSetCorrectlyInAwesomeFontconfigMode() {
+function testLcCtypeIsNotOverwrittenInAwesomeFontconfigMode() {
   local POWERLEVEL9K_MODE="awesome-fontconfig"
+  local LC_CTYPE="my-locale"
   # Load Powerlevel9k
   source functions/icons.zsh
 
-  assertEquals 'en_US.UTF-8' "${LC_CTYPE}"
+  assertEquals 'my-locale' "${LC_CTYPE}"
 }
 
-function testLcCtypeIsSetCorrectlyInNerdfontFontconfigMode() {
+function testLcCtypeIsNotOverwrittenInNerdfontFontconfigMode() {
   local POWERLEVEL9K_MODE="nerdfont-fontconfig"
+  local LC_CTYPE="my-locale"
   # Load Powerlevel9k
   source functions/icons.zsh
 
-  assertEquals 'en_US.UTF-8' "${LC_CTYPE}"
+  assertEquals 'my-locale' "${LC_CTYPE}"
 }
 
-function testLcCtypeIsSetCorrectlyInFlatMode() {
+function testLcCtypeIsNotOverwrittenInFlatMode() {
   local POWERLEVEL9K_MODE="flat"
+  local LC_CTYPE="my-locale"
   # Load Powerlevel9k
   source functions/icons.zsh
 
-  assertEquals 'en_US.UTF-8' "${LC_CTYPE}"
+  assertEquals 'my-locale' "${LC_CTYPE}"
 }
 
-function testLcCtypeIsSetCorrectlyInCompatibleMode() {
+function testLcCtypeIsNotOverwrittenInCompatibleMode() {
   local POWERLEVEL9K_MODE="compatible"
+  local LC_CTYPE="my-locale"
   # Load Powerlevel9k
   source functions/icons.zsh
 
-  assertEquals 'en_US.UTF-8' "${LC_CTYPE}"
+  assertEquals 'my-locale' "${LC_CTYPE}"
 }
 
 # Go through all icons defined in default mode, and
