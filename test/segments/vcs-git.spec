@@ -496,7 +496,7 @@ function testBranchNameScriptingVulnerability() {
   echo "#!/bin/sh\n\necho 'hacked'\n" > evil_script.sh
   chmod +x evil_script.sh
 
-  git checkout -b "$(./evil_script.sh)" 2>/dev/null
+  git checkout -b '$(./evil_script.sh)' 2>/dev/null
   git add . 2>/dev/null
   git commit -m "Initial commit" >/dev/null
 
