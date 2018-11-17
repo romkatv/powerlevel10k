@@ -1648,7 +1648,7 @@ prompt_vi_mode() {
 # https://virtualenv.pypa.io/en/latest/
 prompt_virtualenv() {
   local virtualenv_path="$VIRTUAL_ENV"
-  if [[ -n "$virtualenv_path" && "$VIRTUAL_ENV_DISABLE_PROMPT" != true ]]; then
+  if [[ -n "$virtualenv_path" && -z "$VIRTUAL_ENV_DISABLE_PROMPT" ]]; then
     "$1_prompt_segment" "$0" "$2" "blue" "$DEFAULT_COLOR" "$(basename "$virtualenv_path")" 'PYTHON_ICON'
   fi
 }
