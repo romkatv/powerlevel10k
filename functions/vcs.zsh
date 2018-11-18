@@ -8,33 +8,23 @@
 
 set_default POWERLEVEL9K_VCS_SHOW_SUBMODULE_DIRTY false
 function +vi-git-untracked() {
-    [[ -z "${vcs_comm[gitdir]}" || "${vcs_comm[gitdir]}" == "." ]] && return
-    # If we are in a .git folder, do not check for untracked files.
-    [[ "${PWD:A}" =~ "\.git/" ]] && return
+  [[ -z "${vcs_comm[gitdir]}" || "${vcs_comm[gitdir]}" == "." ]] && return
 
-    # If we are in a repos root folder, vcs_comm[gitdir] yields ".git".
-    # Inside the .git dir itself (and not a subdir of it) the variable
-    # yields ".". In any other case (either a subdirectory of .git or
-    # the repo itself), the value of vcs_comm[gitdir] is the absolute
-    # path to the .git directory.
-    # Therefore we can step up a directory, if we are inside the .git
-    # folder. And in any other case, use the parent directory of the
-    # gitdir.
-    local repoDir="."
-    # Getting the parent dir of the current dir "." is still ".", so
-    # is is safe to do this always.
-    [[ "${vcs_comm[gitdir]}" != ".git" ]] && repoDir="${vcs_comm[gitdir]:A:h}"
-    [[ "${vcs_comm[gitdir]}" == "." ]] && repoDir="${PWD:A:h}"
+  # get the root for the current repo or submodule
+  local repoTopLevel="$(command git rev-parse --show-toplevel 2> /dev/null)"
+  # dump out if we're outside a git repository (which includes being in the .git folder)
+  [[ $? != 0 || -z $repoTopLevel ]] && return
 
-    if [[ "$POWERLEVEL9K_VCS_SHOW_SUBMODULE_DIRTY" == "true" && "$(command git submodule foreach --quiet --recursive 'command git ls-files --others --exclude-standard')" != "" ]]; then
-        hook_com[unstaged]+=" $(print_icon 'VCS_UNTRACKED_ICON')"
-        VCS_WORKDIR_HALF_DIRTY=true
-    elif [[ "$(command git ls-files --others --exclude-standard "${repoDir}")" != "" ]]; then
-        hook_com[unstaged]+=" $(print_icon 'VCS_UNTRACKED_ICON')"
-        VCS_WORKDIR_HALF_DIRTY=true
-    else
-        VCS_WORKDIR_HALF_DIRTY=false
-    fi
+  local untrackedFiles=$(command git ls-files --others --exclude-standard "${repoTopLevel}")
+
+  if [[ -z $untrackedFiles && "$POWERLEVEL9K_VCS_SHOW_SUBMODULE_DIRTY" == "true" ]]; then
+    untrackedFiles+=$(command git submodule foreach --quiet --recursive 'command git ls-files --others --exclude-standard')
+  fi
+
+  [[ -z $untrackedFiles ]] && return
+
+  hook_com[unstaged]+=" $(print_icon 'VCS_UNTRACKED_ICON')"
+  VCS_WORKDIR_HALF_DIRTY=true
 }
 
 function +vi-git-aheadbehind() {
