@@ -16,6 +16,12 @@ trim() {
     set +f
 }
 
+trim_quotes() {
+    trim_output="${1//\'}"
+    trim_output="${trim_output//\"}"
+    printf "%s" "$trim_output"
+}
+
 get_ppid() {
     # Get parent process ID of PID.
     case "$os" in
