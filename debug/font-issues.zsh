@@ -119,6 +119,7 @@ get_term() {
 }
 
 get_term_font() {
+    local confs term_font mateterm_config role profile xrdb child profile_filename
     local term="${1}"
     # ((term_run != 1)) && get_term
 
