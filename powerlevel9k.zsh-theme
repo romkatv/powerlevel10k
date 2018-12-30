@@ -597,11 +597,19 @@ prompt_public_ip() {
     icon='PUBLIC_IP_ICON'
     # Check VPN is on if VPN interface is set
     if [[ -n $POWERLEVEL9K_PUBLIC_IP_VPN_INTERFACE ]]; then
-      for vpn_iface in $(/sbin/ifconfig | grep -e ^"$POWERLEVEL9K_PUBLIC_IP_VPN_INTERFACE" | cut -d":" -f1)
-      do
-        icon='VPN_ICON'
-        break
-      done
+      if [[ "$OS" == "OSX" ]]; then
+        for vpn_iface in $(/sbin/ifconfig | grep -e ^"$POWERLEVEL9K_PUBLIC_IP_VPN_INTERFACE" | cut -d":" -f1)
+        do
+          icon='VPN_ICON'
+          break
+        done
+      else
+        for vpn_iface in $(ip link ls up | grep -o -E ":\s+[a-z0-9]+:" | grep -v "lo" | grep -o -E "[a-z0-9]+" | grep -o -E "^$POWERLEVEL9K_PUBLIC_IP_VPN_INTERFACE.*")
+        do
+          icon='VPN_ICON'
+          break
+        done
+      fi
     fi
     $1_prompt_segment "$0" "$2" "$DEFAULT_COLOR" "$DEFAULT_COLOR_INVERTED" "${public_ip}" "$icon"
   fi
@@ -1134,11 +1142,19 @@ prompt_ip() {
 set_default POWERLEVEL9K_VPN_IP_INTERFACE "tun"
 # prompt if vpn active
 prompt_vpn_ip() {
-  for vpn_iface in $(/sbin/ifconfig | grep -e "^${POWERLEVEL9K_VPN_IP_INTERFACE}" | cut -d":" -f1)
-  do
-    ip=$(/sbin/ifconfig "$vpn_iface" | grep -o "inet\s.*" | cut -d' ' -f2)
-    "$1_prompt_segment" "$0" "$2" "cyan" "$DEFAULT_COLOR" "$ip" 'VPN_ICON'
-  done
+  if [[ "$OS" == "OSX" ]]; then
+    for vpn_iface in $(/sbin/ifconfig | grep -e "^${POWERLEVEL9K_VPN_IP_INTERFACE}" | cut -d":" -f1)
+    do
+      ip=$(/sbin/ifconfig "$vpn_iface" | grep -o "inet\s.*" | cut -d' ' -f2)
+      "$1_prompt_segment" "$0" "$2" "cyan" "$DEFAULT_COLOR" "$ip" 'VPN_ICON'
+    done
+  else
+    for vpn_iface in $(ip link ls up | grep -o -E ":\s+[a-z0-9]+:" | grep -v "lo" | grep -o -E "[a-z0-9]+" | grep -o -E "^${POWERLEVEL9K_VPN_IP_INTERFACE}.*")
+    do
+      ip=$(/sbin/ip -4 a show "$vpn_iface" | grep -o "inet\s*[0-9.]*" | grep -o -E "[0-9.]+")
+      "$1_prompt_segment" "$0" "$2" "cyan" "$DEFAULT_COLOR" "$ip" 'VPN_ICON'
+    done
+  fi
 }
 
 ################################################################
