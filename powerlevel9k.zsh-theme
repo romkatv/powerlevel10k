@@ -1652,10 +1652,7 @@ prompt_virtualenv() {
   # Early exit; $virtualenv_path must always be set.
   [[ -z "$virtualenv_path" ]] && return
 
-  # Check if VIRTUAL_ENV_DISABLE_PROMPT is set to false, or is a numerical value
-  if [[ "$VIRTUAL_ENV_DISABLE_PROMPT" == "false" ]] || (( VIRTUAL_ENV_DISABLE_PROMPT )); then
-    "$1_prompt_segment" "$0" "$2" "blue" "$DEFAULT_COLOR" "$(basename "$virtualenv_path")" 'PYTHON_ICON'
-  fi
+  "$1_prompt_segment" "$0" "$2" "blue" "$DEFAULT_COLOR" "$(basename "$virtualenv_path")" 'PYTHON_ICON'
 }
 
 ################################################################
