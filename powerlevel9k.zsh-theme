@@ -600,7 +600,7 @@ prompt_public_ip() {
     # Check VPN is on if VPN interface is set
     if [[ -n $POWERLEVEL9K_PUBLIC_IP_VPN_INTERFACE ]]; then
       if [[ "$OS" == "OSX" ]]; then
-        for vpn_iface in $(${ROOT_PREFIX}/sbin/ifconfig | grep -e ^"$POWERLEVEL9K_PUBLIC_IP_VPN_INTERFACE" | cut -d":" -f1)
+        for vpn_iface in $(${ROOT_PREFIX}/sbin/ifconfig | grep -e "^$POWERLEVEL9K_PUBLIC_IP_VPN_INTERFACE" | cut -d":" -f1)
         do
           icon='VPN_ICON'
           break
