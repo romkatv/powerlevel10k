@@ -12,6 +12,8 @@ function setUp() {
   P9K_HOME=$(pwd)
   FOLDER=/tmp/powerlevel9k-test
   mkdir -p $FOLDER
+  mkdir $FOLDER/bin
+  mkdir $FOLDER/sbin
   cd $FOLDER
 
   # Change cache file, so that the users environment don't
@@ -217,6 +219,87 @@ function testPublicIpSegmentWhenGoingOnline() {
   assertEquals "%K{000} %F{007}second %k%F{000}%f " "$(build_left_prompt)"
 
   unfunction dig
+}
+
+function testPublicIpSegmentWithVPNTurnedOnLinux() {
+  local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
+  POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(public_ip)
+  local OS='linux'
+
+  echo "1.2.3.4" > $POWERLEVEL9K_PUBLIC_IP_FILE
+  local POWERLEVEL9K_PUBLIC_IP_VPN_INTERFACE="tun1"
+
+  ip() {
+      cat <<EOF
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN mode DEFAULT group default qlen 1000
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+2: enp0s31f6: <NO-CARRIER,BROADCAST,MULTICAST,UP> mtu 1500 qdisc fq_codel state DOWN mode DEFAULT group default qlen 1000
+    link/ether 8c:16:45:7d:0c:9a brd ff:ff:ff:ff:ff:ff
+3: tun1: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc mq state UP mode DORMANT group default qlen 1000
+    link/ether b4:6b:fc:9d:c6:bc brd ff:ff:ff:ff:ff:ff
+5: docker0: <NO-CARRIER,BROADCAST,MULTICAST,UP> mtu 1500 qdisc noqueue state DOWN mode DEFAULT group default
+    link/ether 02:42:8f:5c:ed:39 brd ff:ff:ff:ff:ff:ff
+EOF
+  }
+
+  assertEquals "%K{000} %F{007}(vpn) %f%F{007}1.2.3.4 " "$(prompt_public_ip left 1 false "$FOLDER")"
+
+  unfunction ip
+  rm -f $POWERLEVEL9K_PUBLIC_IP_FILE
+}
+
+function testPublicIpSegmentWithVPNTurnedOnOsx() {
+  typeset -F now
+  now=$(date +%s)
+
+  local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
+  POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(public_ip)
+  local OS='OSX'
+
+  echo "1.2.3.4" > $POWERLEVEL9K_PUBLIC_IP_FILE
+  local POWERLEVEL9K_PUBLIC_IP_VPN_INTERFACE="tun1"
+
+  # Fake stat call
+  function stat() {
+    echo $now
+  }
+
+  # Fake ifconfig
+  cat > $FOLDER/sbin/ifconfig <<EOF
+#!/bin/sh
+  cat <<INNER
+docker0: flags=4099<UP,BROADCAST,MULTICAST>  mtu 1500
+        inet 172.17.0.1  netmask 255.255.0.0  broadcast 172.17.255.255
+        ether 02:42:8f:5c:ed:51  txqueuelen 0  (Ethernet)
+        RX packets 0  bytes 0 (0.0 B)
+        RX errors 0  dropped 0  overruns 0  frame 0
+        TX packets 0  bytes 0 (0.0 B)
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+
+tun1: flags=4099<UP,BROADCAST,MULTICAST>  mtu 1500
+        ether 8c:16:45:7d:0c:9a  txqueuelen 1000  (Ethernet)
+        RX packets 0  bytes 0 (0.0 B)
+        RX errors 0  dropped 0  overruns 0  frame 0
+        TX packets 0  bytes 0 (0.0 B)
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+        device interrupt 16  memory 0xe8200000-e8220000
+
+lo: flags=73<UP,LOOPBACK,RUNNING>  mtu 65536
+        inet 127.0.0.1  netmask 255.0.0.0
+        inet6 ::1  prefixlen 128  scopeid 0x10<host>
+        loop  txqueuelen 1000  (Local Loopback)
+        RX packets 5136  bytes 328651 (320.9 KiB)
+        RX errors 0  dropped 0  overruns 0  frame 0
+        TX packets 5136  bytes 328651 (320.9 KiB)
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+INNER
+EOF
+  chmod +x $FOLDER/sbin/ifconfig
+
+  assertEquals "%K{000} %F{007}(vpn) %f%F{007}1.2.3.4 " "$(prompt_public_ip left 1 false "$FOLDER")"
+
+  rm -f $POWERLEVEL9K_PUBLIC_IP_FILE
+  unfunction stat
 }
 
 source shunit2/shunit2

@@ -533,7 +533,9 @@ prompt_battery() {
 #   * $1 Alignment: string - left|right
 #   * $2 Index: integer
 #   * $3 Joined: bool - If the segment should be joined
+#   * $4 Root Prefix: string - Root prefix for testing purposes
 prompt_public_ip() {
+  local ROOT_PREFIX="${4}"
   # set default values for segment
   set_default POWERLEVEL9K_PUBLIC_IP_TIMEOUT "300"
   set_default POWERLEVEL9K_PUBLIC_IP_NONE ""
@@ -561,7 +563,7 @@ prompt_public_ip() {
 
   # grab a fresh IP if needed
   local fresh_ip
-  if [[ $refresh_ip =~ true && -w $POWERLEVEL9K_PUBLIC_IP_FILE ]]; then
+  if [[ $refresh_ip == true && -w $POWERLEVEL9K_PUBLIC_IP_FILE ]]; then
     for method in "${POWERLEVEL9K_PUBLIC_IP_METHODS[@]}"; do
       case $method in
         'dig')
@@ -598,7 +600,7 @@ prompt_public_ip() {
     # Check VPN is on if VPN interface is set
     if [[ -n $POWERLEVEL9K_PUBLIC_IP_VPN_INTERFACE ]]; then
       if [[ "$OS" == "OSX" ]]; then
-        for vpn_iface in $(/sbin/ifconfig | grep -e ^"$POWERLEVEL9K_PUBLIC_IP_VPN_INTERFACE" | cut -d":" -f1)
+        for vpn_iface in $(${ROOT_PREFIX}/sbin/ifconfig | grep -e ^"$POWERLEVEL9K_PUBLIC_IP_VPN_INTERFACE" | cut -d":" -f1)
         do
           icon='VPN_ICON'
           break
@@ -1142,16 +1144,17 @@ prompt_ip() {
 set_default POWERLEVEL9K_VPN_IP_INTERFACE "tun"
 # prompt if vpn active
 prompt_vpn_ip() {
+  local ROOT_PREFIX="${4}"
   if [[ "$OS" == "OSX" ]]; then
-    for vpn_iface in $(/sbin/ifconfig | grep -e "^${POWERLEVEL9K_VPN_IP_INTERFACE}" | cut -d":" -f1)
+    for vpn_iface in $(${ROOT_PREFIX}/sbin/ifconfig | grep -e "^${POWERLEVEL9K_VPN_IP_INTERFACE}" | cut -d":" -f1)
     do
-      ip=$(/sbin/ifconfig "$vpn_iface" | grep -o "inet\s.*" | cut -d' ' -f2)
+      ip=$(${ROOT_PREFIX}/sbin/ifconfig "$vpn_iface" | grep -o "inet\s.*" | cut -d' ' -f2)
       "$1_prompt_segment" "$0" "$2" "cyan" "$DEFAULT_COLOR" "$ip" 'VPN_ICON'
     done
   else
-    for vpn_iface in $(ip link ls up | grep -o -E ":\s+[a-z0-9]+:" | grep -v "lo" | grep -o -E "[a-z0-9]+" | grep -o -E "^${POWERLEVEL9K_VPN_IP_INTERFACE}.*")
+    for vpn_iface in $(${ROOT_PREFIX}/sbin/ip link ls up | grep -o -E ":\s+[a-z0-9]+:" | grep -v "lo" | grep -o -E "[a-z0-9]+" | grep -o -E "^${POWERLEVEL9K_VPN_IP_INTERFACE}.*")
     do
-      ip=$(/sbin/ip -4 a show "$vpn_iface" | grep -o "inet\s*[0-9.]*" | grep -o -E "[0-9.]+")
+      ip=$(${ROOT_PREFIX}/sbin/ip -4 a show "$vpn_iface" | grep -o "inet\s*[0-9.]*" | grep -o -E "[0-9.]+")
       "$1_prompt_segment" "$0" "$2" "cyan" "$DEFAULT_COLOR" "$ip" 'VPN_ICON'
     done
   fi
