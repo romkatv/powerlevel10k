@@ -29,7 +29,7 @@ function tearDown() {
 function fakeIfconfig() {
     # Fake ifconfig
   cat > $FOLDER/sbin/ifconfig <<EOF
-#!/bin/sh
+#!/usr/bin/env zsh
 
 if [[ "\$#" -gt 0 ]]; then
   cat <<INNER
@@ -80,7 +80,7 @@ function fakeIp() {
   local INTERFACE2="${2}"
   [[ -z "${INTERFACE2}" ]] && INTERFACE2="disabled-if2"
   cat > $FOLDER/sbin/ip <<EOF
-#!/bin/sh
+#!/usr/bin/env zsh
 
   if [[ "\$*" == 'link ls up' ]]; then
     cat <<INNER
