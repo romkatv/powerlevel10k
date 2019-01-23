@@ -103,7 +103,7 @@ case $(uname) in
     Linux)
       OS='Linux'
       if [ -f /etc/os-release ]; then
-        os_release_id="$(grep -E '^ID=([a-zA-Z]*)' /etc/os-release | cut -d '=' -f 2)"
+        [[ ${(f)"$((</etc/os-release) 2>/dev/null)"} =~ "ID=([A-Za-z]+)" ]] && os_release_id="${match[1]}"
       fi
       case "$os_release_id" in
         *arch*)
