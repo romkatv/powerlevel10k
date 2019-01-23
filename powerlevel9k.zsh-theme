@@ -600,9 +600,25 @@ prompt_public_ip() {
     # Check VPN is on if VPN interface is set
     if [[ -n $POWERLEVEL9K_PUBLIC_IP_VPN_INTERFACE ]]; then
       if [[ "$OS" == "OSX" ]]; then
-        local interface="$(${ROOT_PREFIX}/sbin/ifconfig $POWERLEVEL9K_PUBLIC_IP_VPN_INTERFACE)"
-        # Check if interface is UP.
-        [[ "$interface" =~ "<UP," ]] && icon='VPN_ICON'
+        # Get a plain list of all interfaces
+        local rawInterfaces="$(${ROOT_PREFIX}/sbin/ifconfig -l)"
+        # Parse into array (split by whitespace)
+        local -a interfaces
+        interfaces=(${=rawInterfaces})
+        # Parse only relevant interface names
+        local pattern="${POWERLEVEL9K_PUBLIC_IP_VPN_INTERFACE}[^ ]?"
+        local -a relevantInterfaces
+        for rawInterface in $interfaces; do
+          [[ "$rawInterface" =~ $pattern ]] && relevantInterfaces+=( $MATCH )
+        done
+        for interfaceName in $relevantInterfaces; do
+          local interface="$(${ROOT_PREFIX}/sbin/ifconfig $interfaceName)"
+          # Check if interface is UP.
+          if [[ "$interface" =~ "<UP," ]]; then
+            icon='VPN_ICON'
+            break
+          fi
+        done
       else
         local interface=$(${ROOT_PREFIX}/sbin/ip -brief -4 a show "${POWERLEVEL9K_PUBLIC_IP_VPN_INTERFACE}")
         [[ -n "$interface" ]] && icon='VPN_ICON'

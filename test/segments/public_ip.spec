@@ -42,7 +42,12 @@ function fakeIfconfig() {
   cat > $FOLDER/sbin/ifconfig <<EOF
 #!/usr/bin/env zsh
 
-if [[ "\$#" -gt 0 ]]; then
+if [[ "\$*" == "-l" ]]; then
+  echo "lo0 gif0 stf0 EHC250 EHC253 tun1 tun0 ${INTERFACE} fw0 en0 en2 en1 p2p0 bridge0 utun0"
+  exit 0
+fi
+
+if [[ "\$*" == "${INTERFACE}" ]]; then
   cat <<INNER
 ${INTERFACE}: flags=4099<UP,BROADCAST,MULTICAST>  mtu 1500
         inet 1.2.3.4  txqueuelen 1000  (Ethernet)
@@ -55,6 +60,7 @@ INNER
   exit 0
 fi
 
+if [[ "\$#" == "0" ]]; then
   cat <<INNER
 docker0: flags=4099<UP,BROADCAST,MULTICAST>  mtu 1500
         inet 172.17.0.1  netmask 255.255.0.0  broadcast 172.17.255.255
@@ -81,6 +87,7 @@ lo: flags=73<UP,LOOPBACK,RUNNING>  mtu 65536
         TX packets 5136  bytes 328651 (320.9 KiB)
         TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
 INNER
+fi
 EOF
   chmod +x $FOLDER/sbin/ifconfig
 }
@@ -340,6 +347,28 @@ function testPublicIpSegmentWithVPNTurnedOnOsx() {
 
   # Fake ifconfig
   fakeIfconfig "tun1"
+
+  assertEquals "%K{000} %F{007}(vpn) %f%F{007}1.2.3.4 " "$(prompt_public_ip left 1 false "$FOLDER")"
+
+  unfunction stat
+}
+
+function testPublicIpSegmentWithVPNTurnedOnAndFuzzyMatchingOnOsx() {
+  typeset -F now
+  now=$(date +%s)
+
+  local OS='OSX'
+
+  echo "1.2.3.4" > $POWERLEVEL9K_PUBLIC_IP_FILE
+  local POWERLEVEL9K_PUBLIC_IP_VPN_INTERFACE="tun"
+
+  # Fake stat call
+  function stat() {
+    echo $now
+  }
+
+  # Fake ifconfig
+  fakeIfconfig "tun3"
 
   assertEquals "%K{000} %F{007}(vpn) %f%F{007}1.2.3.4 " "$(prompt_public_ip left 1 false "$FOLDER")"
 
