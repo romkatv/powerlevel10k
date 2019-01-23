@@ -620,8 +620,15 @@ prompt_public_ip() {
           fi
         done
       else
-        local interface=$(${ROOT_PREFIX}/sbin/ip -brief -4 a show "${POWERLEVEL9K_PUBLIC_IP_VPN_INTERFACE}")
-        [[ -n "$interface" ]] && icon='VPN_ICON'
+        local -a interfaces
+        interfaces=( "${(f)$(${ROOT_PREFIX}/sbin/ip -brief -4 a show)}" )
+        local pattern="^${POWERLEVEL9K_PUBLIC_IP_VPN_INTERFACE}[ ]+UP[ ]+"
+        for interface in "${(@)interfaces}"; do
+          if [[ "$interface" =~ $pattern ]]; then
+            icon='VPN_ICON'
+            break
+          fi
+        done
       fi
     fi
     $1_prompt_segment "$0" "$2" "$DEFAULT_COLOR" "$DEFAULT_COLOR_INVERTED" "${public_ip}" "$icon"

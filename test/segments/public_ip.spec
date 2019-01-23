@@ -113,6 +113,15 @@ function fakeIp() {
 INNER
   fi
 
+  if [[ "\$*" =~ '-brief.*show' ]]; then
+    cat <<INNER
+lo               UNKNOWN        127.0.0.1/8
+${INTERFACE1}    UP             1.2.3.4/24
+${INTERFACE2}    UP             5.4.3.2/16
+docker0          DOWN           172.17.0.1/16
+INNER
+  fi
+
   if [[ "\$*" =~ 'show ${INTERFACE1}' ]]; then
     cat <<INNER
 3: ${INTERFACE1}: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast state UP group default qlen 1000
