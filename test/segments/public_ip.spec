@@ -35,6 +35,95 @@ function tearDown() {
   unset POWERLEVEL9K_PUBLIC_IP_FILE
 }
 
+function fakeIfconfig() {
+    # Fake ifconfig
+  cat > $FOLDER/sbin/ifconfig <<EOF
+#!/usr/bin/env zsh
+
+if [[ "\$#" -gt 0 ]]; then
+  cat <<INNER
+tun1: flags=4099<UP,BROADCAST,MULTICAST>  mtu 1500
+        inet 1.2.3.4  txqueuelen 1000  (Ethernet)
+        RX packets 0  bytes 0 (0.0 B)
+        RX errors 0  dropped 0  overruns 0  frame 0
+        TX packets 0  bytes 0 (0.0 B)
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+        device interrupt 16  memory 0xe8200000-e8220000
+INNER
+  exit 0
+fi
+
+  cat <<INNER
+docker0: flags=4099<UP,BROADCAST,MULTICAST>  mtu 1500
+        inet 172.17.0.1  netmask 255.255.0.0  broadcast 172.17.255.255
+        ether 02:42:8f:5c:ed:51  txqueuelen 0  (Ethernet)
+        RX packets 0  bytes 0 (0.0 B)
+        RX errors 0  dropped 0  overruns 0  frame 0
+        TX packets 0  bytes 0 (0.0 B)
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+
+tun1: flags=4099<UP,BROADCAST,MULTICAST>  mtu 1500
+        inet 1.2.3.4  txqueuelen 1000  (Ethernet)
+        RX packets 0  bytes 0 (0.0 B)
+        RX errors 0  dropped 0  overruns 0  frame 0
+        TX packets 0  bytes 0 (0.0 B)
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+        device interrupt 16  memory 0xe8200000-e8220000
+
+lo: flags=73<UP,LOOPBACK,RUNNING>  mtu 65536
+        inet 127.0.0.1  netmask 255.0.0.0
+        inet6 ::1  prefixlen 128  scopeid 0x10<host>
+        loop  txqueuelen 1000  (Local Loopback)
+        RX packets 5136  bytes 328651 (320.9 KiB)
+        RX errors 0  dropped 0  overruns 0  frame 0
+        TX packets 5136  bytes 328651 (320.9 KiB)
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+INNER
+EOF
+  chmod +x $FOLDER/sbin/ifconfig
+}
+
+function fakeIp() {
+  local INTERFACE1="${1}"
+  [[ -z "${INTERFACE1}" ]] && INTERFACE1="tun0"
+  local INTERFACE2="${2}"
+  [[ -z "${INTERFACE2}" ]] && INTERFACE2="disabled-if2"
+  cat > $FOLDER/sbin/ip <<EOF
+#!/usr/bin/env zsh
+
+  if [[ "\$*" == 'link ls up' ]]; then
+    cat <<INNER
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN mode DEFAULT group default
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+2: ${INTERFACE1}: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast state UP mode DEFAULT group default qlen 1000
+    link/ether 08:00:27:7e:84:45 brd ff:ff:ff:ff:ff:ff
+3: ${INTERFACE2}: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast state UP mode DEFAULT group default qlen 1000
+    link/ether 08:00:27:7e:84:45 brd ff:ff:ff:ff:ff:ff
+4: wlan0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast state UP mode DEFAULT group default qlen 1000
+    link/ether 08:00:27:7e:84:45 brd ff:ff:ff:ff:ff:ff
+INNER
+  fi
+
+  if [[ "\$*" =~ 'show ${INTERFACE1}' ]]; then
+    cat <<INNER
+3: ${INTERFACE1}: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast state UP group default qlen 1000
+  inet 10.0.2.15/24 brd 10.0.2.255 scope global eth0
+  valid_lft forever preferred_lft forever
+INNER
+  fi
+
+  if [[ "\$*" =~ 'show ${INTERFACE2}' ]]; then
+    cat <<INNER
+3: ${INTERFACE2}: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast state UP group default qlen 1000
+  inet 1.2.3.4 brd 10.0.2.255 scope global eth0
+  valid_lft forever preferred_lft forever
+INNER
+  fi
+EOF
+
+  chmod +x $FOLDER/sbin/ip
+}
+
 function testPublicIpSegmentPrintsNothingByDefaultIfHostIsNotAvailable() {
   local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
   POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(public_ip custom_world)
@@ -222,38 +311,21 @@ function testPublicIpSegmentWhenGoingOnline() {
 }
 
 function testPublicIpSegmentWithVPNTurnedOnLinux() {
-  local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
-  POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(public_ip)
   local OS='linux'
 
   echo "1.2.3.4" > $POWERLEVEL9K_PUBLIC_IP_FILE
   local POWERLEVEL9K_PUBLIC_IP_VPN_INTERFACE="tun1"
 
-  ip() {
-      cat <<EOF
-1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN mode DEFAULT group default qlen 1000
-    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
-2: enp0s31f6: <NO-CARRIER,BROADCAST,MULTICAST,UP> mtu 1500 qdisc fq_codel state DOWN mode DEFAULT group default qlen 1000
-    link/ether 8c:16:45:7d:0c:9a brd ff:ff:ff:ff:ff:ff
-3: tun1: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc mq state UP mode DORMANT group default qlen 1000
-    link/ether b4:6b:fc:9d:c6:bc brd ff:ff:ff:ff:ff:ff
-5: docker0: <NO-CARRIER,BROADCAST,MULTICAST,UP> mtu 1500 qdisc noqueue state DOWN mode DEFAULT group default
-    link/ether 02:42:8f:5c:ed:39 brd ff:ff:ff:ff:ff:ff
-EOF
-  }
+  # Fake ip command
+  fakeIp "tun1"
 
   assertEquals "%K{000} %F{007}(vpn) %f%F{007}1.2.3.4 " "$(prompt_public_ip left 1 false "$FOLDER")"
-
-  unfunction ip
-  rm -f $POWERLEVEL9K_PUBLIC_IP_FILE
 }
 
 function testPublicIpSegmentWithVPNTurnedOnOsx() {
   typeset -F now
   now=$(date +%s)
 
-  local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
-  POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(public_ip)
   local OS='OSX'
 
   echo "1.2.3.4" > $POWERLEVEL9K_PUBLIC_IP_FILE
@@ -265,40 +337,10 @@ function testPublicIpSegmentWithVPNTurnedOnOsx() {
   }
 
   # Fake ifconfig
-  cat > $FOLDER/sbin/ifconfig <<EOF
-#!/usr/bin/env zsh
-  cat <<INNER
-docker0: flags=4099<UP,BROADCAST,MULTICAST>  mtu 1500
-        inet 172.17.0.1  netmask 255.255.0.0  broadcast 172.17.255.255
-        ether 02:42:8f:5c:ed:51  txqueuelen 0  (Ethernet)
-        RX packets 0  bytes 0 (0.0 B)
-        RX errors 0  dropped 0  overruns 0  frame 0
-        TX packets 0  bytes 0 (0.0 B)
-        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
-
-tun1: flags=4099<UP,BROADCAST,MULTICAST>  mtu 1500
-        ether 8c:16:45:7d:0c:9a  txqueuelen 1000  (Ethernet)
-        RX packets 0  bytes 0 (0.0 B)
-        RX errors 0  dropped 0  overruns 0  frame 0
-        TX packets 0  bytes 0 (0.0 B)
-        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
-        device interrupt 16  memory 0xe8200000-e8220000
-
-lo: flags=73<UP,LOOPBACK,RUNNING>  mtu 65536
-        inet 127.0.0.1  netmask 255.0.0.0
-        inet6 ::1  prefixlen 128  scopeid 0x10<host>
-        loop  txqueuelen 1000  (Local Loopback)
-        RX packets 5136  bytes 328651 (320.9 KiB)
-        RX errors 0  dropped 0  overruns 0  frame 0
-        TX packets 5136  bytes 328651 (320.9 KiB)
-        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
-INNER
-EOF
-  chmod +x $FOLDER/sbin/ifconfig
+  fakeIfconfig
 
   assertEquals "%K{000} %F{007}(vpn) %f%F{007}1.2.3.4 " "$(prompt_public_ip left 1 false "$FOLDER")"
 
-  rm -f $POWERLEVEL9K_PUBLIC_IP_FILE
   unfunction stat
 }
 

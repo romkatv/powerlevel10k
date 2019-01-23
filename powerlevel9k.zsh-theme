@@ -606,7 +606,7 @@ prompt_public_ip() {
           break
         done
       else
-        for vpn_iface in $(ip link ls up | grep -o -E ":\s+[a-z0-9]+:" | grep -v "lo" | grep -o -E "[a-z0-9]+" | grep -o -E "^$POWERLEVEL9K_PUBLIC_IP_VPN_INTERFACE.*")
+        for vpn_iface in $(${ROOT_PREFIX}/sbin/ip link ls up | grep -o -E ":\s+[a-z0-9]+:" | grep -v "lo" | grep -o -E "[a-z0-9]+" | grep -o -E "^$POWERLEVEL9K_PUBLIC_IP_VPN_INTERFACE.*")
         do
           icon='VPN_ICON'
           break
