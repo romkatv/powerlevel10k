@@ -124,7 +124,7 @@ The segments that are currently available are:
     * [`symfony2_tests`](#symfony2_tests) - Show a ratio of test classes vs code classes for Symfony2.
     * `symfony2_version` - Show the current Symfony2 version, if you are in a Symfony2-Project dir.
 * **Python Segments:**
-    * `virtualenv` - Your Python [VirtualEnv](https://virtualenv.pypa.io/en/latest/).
+    * [`virtualenv`](#virtualenv) - Your Python [VirtualEnv](https://virtualenv.pypa.io/en/latest/).
     * [`anaconda`](#anaconda) - Your active [Anaconda](https://www.continuum.io/why-anaconda) environment.
     * `pyenv` - Your active python version as reported by the first word of [`pyenv version`](https://github.com/yyuu/pyenv). Note that the segment is not displayed if that word is _system_ i.e. the segment is inactive if you are using system python.
 * **Ruby Segments:**
@@ -724,6 +724,12 @@ you are using the [ZSH Line Editor](http://zsh.sourceforge.net/Doc/Release/Zsh-L
 |`POWERLEVEL9K_VI_COMMAND_MODE_STRING`|`"NORMAL"`|String to display while in 'Command' mode.|
 
 To hide the segment entirely when in `INSERT` mode, set `POWERLEVEL9K_VI_INSERT_MODE_STRING=''`
+
+##### virtualenv
+
+This segment shows your Python [VirtualEnv](https://virtualenv.pypa.io/en/latest/). To avoid
+VirtualEnvs activate command from interfering with Powerlevel9k, you should set
+`VIRTUAL_ENV_DISABLE_PROMPT=1` in your `~/.zshrc`.
 
 #### Unit Test Ratios
 
