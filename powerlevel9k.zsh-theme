@@ -1652,7 +1652,7 @@ prompt_virtualenv() {
   # Early exit; $virtualenv_path must always be set.
   [[ -z "$virtualenv_path" ]] && return
 
-  "$1_prompt_segment" "$0" "$2" "blue" "$DEFAULT_COLOR" "$(basename "$virtualenv_path")" 'PYTHON_ICON'
+  "$1_prompt_segment" "$0" "$2" "blue" "$DEFAULT_COLOR" "${virtualenv_path:t}" 'PYTHON_ICON'
 }
 
 ################################################################
