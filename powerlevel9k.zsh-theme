@@ -600,17 +600,12 @@ prompt_public_ip() {
     # Check VPN is on if VPN interface is set
     if [[ -n $POWERLEVEL9K_PUBLIC_IP_VPN_INTERFACE ]]; then
       if [[ "$OS" == "OSX" ]]; then
-        for vpn_iface in $(${ROOT_PREFIX}/sbin/ifconfig | grep -e "^$POWERLEVEL9K_PUBLIC_IP_VPN_INTERFACE" | cut -d":" -f1)
-        do
-          icon='VPN_ICON'
-          break
-        done
+        local interface="$(${ROOT_PREFIX}/sbin/ifconfig $POWERLEVEL9K_PUBLIC_IP_VPN_INTERFACE)"
+        # Check if interface is UP.
+        [[ "$interface" =~ "<UP," ]] && icon='VPN_ICON'
       else
-        for vpn_iface in $(${ROOT_PREFIX}/sbin/ip link ls up | grep -o -E ":\s+[a-z0-9]+:" | grep -v "lo" | grep -o -E "[a-z0-9]+" | grep -o -E "^$POWERLEVEL9K_PUBLIC_IP_VPN_INTERFACE.*")
-        do
-          icon='VPN_ICON'
-          break
-        done
+        local interface=$(${ROOT_PREFIX}/sbin/ip -brief -4 a show "${POWERLEVEL9K_PUBLIC_IP_VPN_INTERFACE}")
+        [[ -n "$interface" ]] && icon='VPN_ICON'
       fi
     fi
     $1_prompt_segment "$0" "$2" "$DEFAULT_COLOR" "$DEFAULT_COLOR_INVERTED" "${public_ip}" "$icon"

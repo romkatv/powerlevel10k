@@ -36,13 +36,15 @@ function tearDown() {
 }
 
 function fakeIfconfig() {
+  local INTERFACE="${1}"
+  [[ -z "${INTERFACE}" ]] && INTERFACE="tun0"
     # Fake ifconfig
   cat > $FOLDER/sbin/ifconfig <<EOF
 #!/usr/bin/env zsh
 
 if [[ "\$#" -gt 0 ]]; then
   cat <<INNER
-tun1: flags=4099<UP,BROADCAST,MULTICAST>  mtu 1500
+${INTERFACE}: flags=4099<UP,BROADCAST,MULTICAST>  mtu 1500
         inet 1.2.3.4  txqueuelen 1000  (Ethernet)
         RX packets 0  bytes 0 (0.0 B)
         RX errors 0  dropped 0  overruns 0  frame 0
@@ -62,7 +64,7 @@ docker0: flags=4099<UP,BROADCAST,MULTICAST>  mtu 1500
         TX packets 0  bytes 0 (0.0 B)
         TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
 
-tun1: flags=4099<UP,BROADCAST,MULTICAST>  mtu 1500
+${INTERFACE}: flags=4099<UP,BROADCAST,MULTICAST>  mtu 1500
         inet 1.2.3.4  txqueuelen 1000  (Ethernet)
         RX packets 0  bytes 0 (0.0 B)
         RX errors 0  dropped 0  overruns 0  frame 0
@@ -337,7 +339,7 @@ function testPublicIpSegmentWithVPNTurnedOnOsx() {
   }
 
   # Fake ifconfig
-  fakeIfconfig
+  fakeIfconfig "tun1"
 
   assertEquals "%K{000} %F{007}(vpn) %f%F{007}1.2.3.4 " "$(prompt_public_ip left 1 false "$FOLDER")"
 
