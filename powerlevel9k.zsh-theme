@@ -363,7 +363,8 @@ prompt_newline() {
   "$1_prompt_segment" \
     "$0" \
     "$2" \
-    "NONE" "NONE" "${newline}"
+    "" "" "${newline}"
+  CURRENT_BG='NONE'
   POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS=$lws
 }
 
