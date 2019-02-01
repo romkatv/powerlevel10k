@@ -768,4 +768,22 @@ function testDirSeparatorColorRootSubSubdirWorks() {
   rm -fr /tmp/powerlevel9k-test
 }
 
+function testDirHomeTruncationWorksOnlyAtTheBeginning() {
+  local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
+  POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(dir)
+
+  local FOLDER=/tmp/p9ktest
+  local SAVED_HOME="${HOME}"
+  HOME="/p9ktest"
+
+  mkdir -p $FOLDER
+  # Setup folder marker
+  cd $FOLDER
+  assertEquals "%K{004} %F{000}/tmp/p9ktest %k%F{004}%f " "$(build_left_prompt)"
+
+  cd -
+  rm -fr $FOLDER
+  HOME="${SAVED_HOME}"
+}
+
 source shunit2/shunit2
