@@ -1238,9 +1238,8 @@ prompt_nvm() {
 ################################################################
 # Segment to display NodeEnv
 prompt_nodeenv() {
-  local nodeenv_path="$NODE_VIRTUAL_ENV"
-  if [[ -n "$nodeenv_path" && "$NODE_VIRTUAL_ENV_DISABLE_PROMPT" != true ]]; then
-    local info="$(node -v)[$(basename "$nodeenv_path")]"
+  if [[ -n "$NODE_VIRTUAL_ENV" ]]; then
+    local info="$(node -v)[${NODE_VIRTUAL_ENV:t}]"
     "$1_prompt_segment" "$0" "$2" "black" "green" "$info" 'NODE_ICON'
   fi
 }
