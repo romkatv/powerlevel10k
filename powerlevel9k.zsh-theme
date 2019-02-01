@@ -172,7 +172,7 @@ left_prompt_segment() {
       # Allow users to overwrite the color for the visual identifier only.
       local visual_identifier_color_variable=POWERLEVEL9K_${(U)${segment_name}#prompt_}_VISUAL_IDENTIFIER_COLOR
       set_default $visual_identifier_color_variable "${foregroundColor}"
-      visual_identifier="$(foregroundColor ${(P)visual_identifier_color_variable})${visual_identifier}%f"
+      visual_identifier="$(foregroundColor ${(P)visual_identifier_color_variable})${visual_identifier}"
     fi
   fi
 
@@ -274,7 +274,7 @@ right_prompt_segment() {
       # Allow users to overwrite the color for the visual identifier only.
       local visual_identifier_color_variable=POWERLEVEL9K_${(U)${segment_name}#prompt_}_VISUAL_IDENTIFIER_COLOR
       set_default $visual_identifier_color_variable "${foregroundColor}"
-      visual_identifier="$(foregroundColor ${(P)visual_identifier_color_variable})${visual_identifier}%f"
+      visual_identifier="$(foregroundColor ${(P)visual_identifier_color_variable})${visual_identifier}"
     fi
   fi
 

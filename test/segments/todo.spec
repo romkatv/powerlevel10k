@@ -52,7 +52,7 @@ function testTodoSegmentWorksAsExpected() {
     # Load Powerlevel9k
     source ${P9K_HOME}/powerlevel9k.zsh-theme
 
-    assertEquals "%K{244} %F{000}☑ %f%F{000}100 %k%F{244}%f " "$(build_left_prompt)"
+    assertEquals "%K{244} %F{000}☑ %F{000}100 %k%F{244}%f " "$(build_left_prompt)"
 }
 
 source shunit2/shunit2

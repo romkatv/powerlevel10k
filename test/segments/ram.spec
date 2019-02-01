@@ -36,7 +36,7 @@ Pages inactive:                         1313411.
     source ${P9K_HOME}/powerlevel9k.zsh-theme
     local OS="OSX" # Fake OSX
 
-    assertEquals "%K{003} %F{000}RAM %f%F{000}6.15G " "$(prompt_ram left 1 false ${FOLDER})"
+    assertEquals "%K{003} %F{000}RAM %F{000}6.15G " "$(prompt_ram left 1 false ${FOLDER})"
 
     unalias vm_stat
 }
@@ -49,7 +49,7 @@ function testRamSegmentWorksOnBsd() {
     source ${P9K_HOME}/powerlevel9k.zsh-theme
     local OS="BSD" # Fake BSD
 
-    assertEquals "%K{003} %F{000}RAM %f%F{000}0.29M " "$(prompt_ram left 1 false ${FOLDER})"
+    assertEquals "%K{003} %F{000}RAM %F{000}0.29M " "$(prompt_ram left 1 false ${FOLDER})"
 }
 
 function testRamSegmentWorksOnLinux() {
@@ -60,7 +60,7 @@ function testRamSegmentWorksOnLinux() {
     source ${P9K_HOME}/powerlevel9k.zsh-theme
     local OS="Linux" # Fake Linux
 
-    assertEquals "%K{003} %F{000}RAM %f%F{000}0.29G " "$(prompt_ram left 1 false ${FOLDER})"
+    assertEquals "%K{003} %F{000}RAM %F{000}0.29G " "$(prompt_ram left 1 false ${FOLDER})"
 }
 
 source shunit2/shunit2

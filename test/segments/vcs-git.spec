@@ -117,7 +117,7 @@ function testGitIconWorks() {
   # Load Powerlevel9k
   source ${P9K_HOME}/powerlevel9k.zsh-theme
 
-  assertEquals "%K{002} %F{000}Git-Icon %f%F{000} master %k%F{002}%f " "$(build_left_prompt)"
+  assertEquals "%K{002} %F{000}Git-Icon %F{000} master %k%F{002}%f " "$(build_left_prompt)"
 }
 
 function testGitlabIconWorks() {
@@ -132,7 +132,7 @@ function testGitlabIconWorks() {
   # Load Powerlevel9k
   source ${P9K_HOME}/powerlevel9k.zsh-theme
 
-  assertEquals "%K{002} %F{000}GL-Icon %f%F{000} master %k%F{002}%f " "$(build_left_prompt)"
+  assertEquals "%K{002} %F{000}GL-Icon %F{000} master %k%F{002}%f " "$(build_left_prompt)"
 }
 
 function testBitbucketIconWorks() {
@@ -147,7 +147,7 @@ function testBitbucketIconWorks() {
   # Load Powerlevel9k
   source ${P9K_HOME}/powerlevel9k.zsh-theme
 
-  assertEquals "%K{002} %F{000}BB-Icon %f%F{000} master %k%F{002}%f " "$(build_left_prompt)"
+  assertEquals "%K{002} %F{000}BB-Icon %F{000} master %k%F{002}%f " "$(build_left_prompt)"
 }
 
 function testGitHubIconWorks() {
@@ -162,7 +162,7 @@ function testGitHubIconWorks() {
   # Load Powerlevel9k
   source ${P9K_HOME}/powerlevel9k.zsh-theme
 
-  assertEquals "%K{002} %F{000}GH-Icon %f%F{000} master %k%F{002}%f " "$(build_left_prompt)"
+  assertEquals "%K{002} %F{000}GH-Icon %F{000} master %k%F{002}%f " "$(build_left_prompt)"
 }
 
 function testUntrackedFilesIconWorks() {

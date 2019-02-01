@@ -189,7 +189,7 @@ function testMercurialIconWorks() {
   # Load Powerlevel9k
   source ${P9K_HOME}/powerlevel9k.zsh-theme
 
-  assertEquals "%K{002} %F{000}HG-Icon %f%F{000} default %k%F{002}%f " "$(build_left_prompt)"
+  assertEquals "%K{002} %F{000}HG-Icon %F{000} default %k%F{002}%f " "$(build_left_prompt)"
 }
 
 function testBookmarkIconWorks() {

@@ -36,7 +36,7 @@ function testSwapSegmentWorksOnOsx() {
     source ${P9K_HOME}/powerlevel9k.zsh-theme
     local OS="OSX" # Fake OSX
 
-    assertEquals "%K{003} %F{000}SWP %f%F{000}1.58G " "$(prompt_swap left 1 false ${FOLDER})"
+    assertEquals "%K{003} %F{000}SWP %F{000}1.58G " "$(prompt_swap left 1 false ${FOLDER})"
 
     unfunction sysctl
 }
@@ -52,7 +52,7 @@ function testSwapSegmentWorksOnLinux() {
     source ${P9K_HOME}/powerlevel9k.zsh-theme
     local OS="Linux" # Fake Linux
 
-    assertEquals "%K{003} %F{000}SWP %f%F{000}0.95G " "$(prompt_swap left 1 false ${FOLDER})"
+    assertEquals "%K{003} %F{000}SWP %F{000}0.95G " "$(prompt_swap left 1 false ${FOLDER})"
 }
 
 source shunit2/shunit2
