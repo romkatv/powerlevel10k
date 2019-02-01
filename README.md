@@ -116,7 +116,7 @@ The segments that are currently available are:
     * `go_version` - Show the current GO version.
 * **Javascript / Node.js Segments:**
     * `node_version` - Show the version number of the installed Node.js.
-    * `nodeenv` - [nodeenv](https://github.com/ekalinin/nodeenv) prompt for displaying node version and environment name.
+    * [`nodeenv`](#nodeenv) - [nodeenv](https://github.com/ekalinin/nodeenv) prompt for displaying node version and environment name.
     * `nvm` - Show the version of Node that is currently active, if it differs from the version used by NVM
 * **PHP Segments:**
     * `php_version` - Show the current PHP version.
@@ -556,6 +556,12 @@ line. This allows you to use segments on both lines, unlike
 prompt itself.
 
 This only works on the left side.  On the right side it does nothing.
+
+##### nodeenv
+
+Shows the currently used [nodeenv](https://github.com/ekalinin/nodeenv). To avoid
+Nodeenvs activate command from interfering with Powerlevel9k, you should set
+`NODE_VIRTUAL_ENV_DISABLE_PROMPT=1` in your `~/.zshrc`.
 
 ##### rbenv
 
