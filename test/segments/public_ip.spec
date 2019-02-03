@@ -337,7 +337,7 @@ function testPublicIpSegmentWithVPNTurnedOnLinux() {
   # Fake ip command
   fakeIp "tun1"
 
-  assertEquals "%K{000} %F{007}(vpn) %f%F{007}1.2.3.4 " "$(prompt_public_ip left 1 false "$FOLDER")"
+  assertEquals "%K{000} %F{007}(vpn) %F{007}1.2.3.4 " "$(prompt_public_ip left 1 false "$FOLDER")"
 }
 
 function testPublicIpSegmentWithVPNTurnedOnOsx() {
@@ -357,7 +357,7 @@ function testPublicIpSegmentWithVPNTurnedOnOsx() {
   # Fake ifconfig
   fakeIfconfig "tun1"
 
-  assertEquals "%K{000} %F{007}(vpn) %f%F{007}1.2.3.4 " "$(prompt_public_ip left 1 false "$FOLDER")"
+  assertEquals "%K{000} %F{007}(vpn) %F{007}1.2.3.4 " "$(prompt_public_ip left 1 false "$FOLDER")"
 
   unfunction stat
 }
@@ -379,7 +379,7 @@ function testPublicIpSegmentWithVPNTurnedOnAndFuzzyMatchingOnOsx() {
   # Fake ifconfig
   fakeIfconfig "tun3"
 
-  assertEquals "%K{000} %F{007}(vpn) %f%F{007}1.2.3.4 " "$(prompt_public_ip left 1 false "$FOLDER")"
+  assertEquals "%K{000} %F{007}(vpn) %F{007}1.2.3.4 " "$(prompt_public_ip left 1 false "$FOLDER")"
 
   unfunction stat
 }

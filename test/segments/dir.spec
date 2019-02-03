@@ -352,7 +352,7 @@ function testHomeFolderDetectionWorks() {
   source ${P9K_HOME}/powerlevel9k.zsh-theme
 
   cd ~
-  assertEquals "%K{004} %F{000}home-icon %f%F{000}~ %k%F{004}%f " "$(build_left_prompt)"
+  assertEquals "%K{004} %F{000}home-icon %F{000}~ %k%F{004}%f " "$(build_left_prompt)"
 
   cd -
 }
@@ -368,7 +368,7 @@ function testHomeSubfolderDetectionWorks() {
   local FOLDER=~/powerlevel9k-test
   mkdir $FOLDER
   cd $FOLDER
-  assertEquals "%K{004} %F{000}sub-icon %f%F{000}~/powerlevel9k-test %k%F{004}%f " "$(build_left_prompt)"
+  assertEquals "%K{004} %F{000}sub-icon %F{000}~/powerlevel9k-test %k%F{004}%f " "$(build_left_prompt)"
 
   cd -
   rm -fr $FOLDER
@@ -385,7 +385,7 @@ function testOtherFolderDetectionWorks() {
   local FOLDER=/tmp/powerlevel9k-test
   mkdir $FOLDER
   cd $FOLDER
-  assertEquals "%K{004} %F{000}folder-icon %f%F{000}/tmp/powerlevel9k-test %k%F{004}%f " "$(build_left_prompt)"
+  assertEquals "%K{004} %F{000}folder-icon %F{000}/tmp/powerlevel9k-test %k%F{004}%f " "$(build_left_prompt)"
 
   cd -
   rm -fr $FOLDER
@@ -462,7 +462,7 @@ function testOmittingFirstCharacterWorks() {
 
   cd /tmp
 
-  assertEquals "%K{004} %F{000}folder-icon %f%F{000}tmp %k%F{004}%f " "$(build_left_prompt)"
+  assertEquals "%K{004} %F{000}folder-icon %F{000}tmp %k%F{004}%f " "$(build_left_prompt)"
 
   cd -
 }
@@ -480,7 +480,7 @@ function testOmittingFirstCharacterWorksWithChangingPathSeparator() {
   mkdir -p /tmp/powerlevel9k-test/1/2
   cd /tmp/powerlevel9k-test/1/2
 
-  assertEquals "%K{004} %F{000}folder-icon %f%F{000}tmpxXxpowerlevel9k-testxXx1xXx2 %k%F{004}%f " "$(build_left_prompt)"
+  assertEquals "%K{004} %F{000}folder-icon %F{000}tmpxXxpowerlevel9k-testxXx1xXx2 %k%F{004}%f " "$(build_left_prompt)"
 
   cd -
   rm -fr /tmp/powerlevel9k-test
@@ -766,6 +766,24 @@ function testDirSeparatorColorRootSubSubdirWorks() {
 
   cd -
   rm -fr /tmp/powerlevel9k-test
+}
+
+function testDirHomeTruncationWorksOnlyAtTheBeginning() {
+  local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
+  POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(dir)
+
+  local FOLDER=/tmp/p9ktest
+  local SAVED_HOME="${HOME}"
+  HOME="/p9ktest"
+
+  mkdir -p $FOLDER
+  # Setup folder marker
+  cd $FOLDER
+  assertEquals "%K{004} %F{000}/tmp/p9ktest %k%F{004}%f " "$(build_left_prompt)"
+
+  cd -
+  rm -fr $FOLDER
+  HOME="${SAVED_HOME}"
 }
 
 source shunit2/shunit2

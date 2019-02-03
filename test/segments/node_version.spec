@@ -33,7 +33,7 @@ function testNodeVersionSegmentWorks() {
     # Load Powerlevel9k
     source powerlevel9k.zsh-theme
 
-    assertEquals "%K{002} %F{007}⬢ %f%F{007}1.2.3 %k%F{002}%f " "$(build_left_prompt)"
+    assertEquals "%K{002} %F{007}⬢ %F{007}1.2.3 %k%F{002}%f " "$(build_left_prompt)"
 
     unfunction node
 }

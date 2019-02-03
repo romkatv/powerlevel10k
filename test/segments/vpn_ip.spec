@@ -163,7 +163,7 @@ function testVpnIpSegmentWorksOnOsxWithInterfaceSpecified() {
   source powerlevel9k.zsh-theme
   local OS='OSX' # Fake OSX
 
-  assertEquals "%K{006} %F{000}(vpn) %f%F{000}1.2.3.4 " "$(prompt_vpn_ip left 1 false "$FOLDER")"
+  assertEquals "%K{006} %F{000}(vpn) %F{000}1.2.3.4 " "$(prompt_vpn_ip left 1 false "$FOLDER")"
 }
 
 function testVpnIpSegmentWorksOnLinuxWithInterfaceSpecified() {
@@ -175,7 +175,7 @@ function testVpnIpSegmentWorksOnLinuxWithInterfaceSpecified() {
     source powerlevel9k.zsh-theme
     local OS='Linux' # Fake Linux
 
-    assertEquals "%K{006} %F{000}(vpn) %f%F{000}1.2.3.4 " "$(prompt_vpn_ip left 1 false "$FOLDER")"
+    assertEquals "%K{006} %F{000}(vpn) %F{000}1.2.3.4 " "$(prompt_vpn_ip left 1 false "$FOLDER")"
 }
 
 # vpn_ip is not capable of handling multiple vpn interfaces ATM.
@@ -189,7 +189,7 @@ function testVpnIpSegmentWorksOnLinuxWithInterfaceSpecified() {
 #     local OS='Linux' # Fake Linux
 
 # setopt xtrace
-#     assertEquals "%K{006} %F{000}(vpn) %f%F{000}10.0.2.15 " "$(prompt_vpn_ip left 1 false "$FOLDER")"
+#     assertEquals "%K{006} %F{000}(vpn) %F{000}10.0.2.15 " "$(prompt_vpn_ip left 1 false "$FOLDER")"
 #     unsetopt xtrace
 # }
 

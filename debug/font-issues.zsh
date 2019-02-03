@@ -16,6 +16,12 @@ trim() {
     set +f
 }
 
+trim_quotes() {
+    trim_output="${1//\'}"
+    trim_output="${trim_output//\"}"
+    printf "%s" "$trim_output"
+}
+
 get_ppid() {
     # Get parent process ID of PID.
     case "$os" in
@@ -113,18 +119,19 @@ get_term() {
 }
 
 get_term_font() {
+    local confs term_font mateterm_config role profile xrdb child profile_filename
     local term="${1}"
     # ((term_run != 1)) && get_term
 
     case "$term" in
         "alacritty"*)
-            shopt -s nullglob
+            setopt nullglob
             confs=({$XDG_CONFIG_HOME,$HOME}/{alacritty,}/{.,}alacritty.ym?)
-            shopt -u nullglob
+            unsetopt nullglob
 
-            [[ -f "${confs[0]}" ]] || return
+            [[ -f "${confs[1]}" ]] || return
 
-            term_font="$(awk -F ':|#' '/normal:/ {getline; print}' "${confs[0]}")"
+            term_font="$(awk -F ':|#' '/normal:/ {getline; print}' "${confs[1]}")"
             term_font="${term_font/*family:}"
             term_font="${term_font/$'\n'*}"
             term_font="${term_font/\#*}"
@@ -156,26 +163,26 @@ END
             font_file="${HOME}/Library/Preferences/com.googlecode.iterm2.plist"
 
             # Count Guids in "New Bookmarks"; they should be unique
-            profiles_count="$(/usr/libexec/PlistBuddy -c "Print ':New Bookmarks:'" "$font_file" | \
+            profiles_count="$(/usr/libexec/PlistBuddy -c "Print ':New Bookmarks:'" "$font_file" 2>/dev/null | \
                               grep -w -c "Guid")"
 
             for ((i=0; i<profiles_count; i++)); do
-                profile_name="$(/usr/libexec/PlistBuddy -c "Print ':New Bookmarks:${i}:Name:'" "$font_file")"
+                profile_name="$(/usr/libexec/PlistBuddy -c "Print ':New Bookmarks:${i}:Name:'" "$font_file" 2>/dev/null)"
 
                 if [[ "$profile_name" == "$current_profile_name" ]]; then
                     # "Normal Font"
                     term_font="$(/usr/libexec/PlistBuddy -c "Print ':New Bookmarks:${i}:Normal Font:'" \
-                                 "$font_file")"
+                                 "$font_file" 2>/dev/null)"
 
                     # Font for non-ascii characters
                     # Only check for a different non-ascii font, if the user checked
                     # the "use a different font for non-ascii text" switch.
                     diff_font="$(/usr/libexec/PlistBuddy -c "Print ':New Bookmarks:${i}:Use Non-ASCII Font:'" \
-                                 "$font_file")"
+                                 "$font_file" 2>/dev/null)"
 
                     if [[ "$diff_font" == "true" ]]; then
                         non_ascii="$(/usr/libexec/PlistBuddy -c "Print ':New Bookmarks:${i}:Non Ascii Font:'" \
-                                     "$font_file")"
+                                     "$font_file" 2>/dev/null)"
 
                         [[ "$term_font" != "$non_ascii" ]] && \
                             term_font="$term_font (normal) / $non_ascii (non-ascii)"
@@ -185,13 +192,13 @@ END
         ;;
 
         "deepin-terminal"*)
-            term_font="$(awk -F '=' '/font=/ {a=$2} /font_size/ {b=$2} END {print a " " b}' \
+            term_font="$(awk -F '=' '/font=/ {a=$2} /font_size/ {b=$2} END {print a,b}' \
                          "${XDG_CONFIG_HOME}/deepin/deepin-terminal/config.conf")"
         ;;
 
         "GNUstep_Terminal")
              term_font="$(awk -F '>|<' '/>TerminalFont</ {getline; f=$3}
-                          />TerminalFontSize</ {getline; s=$3} END {print f " " s}' \
+                          />TerminalFontSize</ {getline; s=$3} END {print f,s}' \
                           "${HOME}/GNUstep/Defaults/Terminal.plist")"
         ;;
 
@@ -201,34 +208,26 @@ END
         ;;
 
         "kitty"*)
-            shopt -s nullglob
-            confs=({$KITTY_CONFIG_DIRECTORY,$XDG_CONFIG_HOME,~/Library/Preferences}/kitty/kitty.con?)
-            shopt -u nullglob
+            kitty_config="$(kitty --debug-config)"
+            [[ "$kitty_config" != *font_family* ]] && return
 
-            [[ -f "${confs[0]}" ]] || return
-
-            term_font="$(awk '/^([[:space:]]*|[^#_])font_family[[:space:]]+/ {
-                                  $1 = "";
-                                  gsub(/^[[:space:]]/, "");
-                                  font = $0
-                              }
-                              /^([[:space:]]*|[^#_])font_size[[:space:]]+/ {
-                                  size = $2
-                              }
-                              END { print font " " size}' "${confs[0]}")"
+            term_font_size="${kitty_config/*font_size}"
+            term_font_size="${term_font_size/$'\n'*}"
+            term_font="${kitty_config/*font_family}"
+            term_font="${term_font/$'\n'*} $term_font_size"
         ;;
 
-        "konsole"*)
+        "konsole" | "yakuake")
             # Get Process ID of current konsole window / tab
             child="$(get_ppid "$$")"
 
-            IFS=$'\n' read -d "" -ra konsole_instances < <(qdbus | grep -F 'org.kde.konsole')
+            declare -a konsole_instances; konsole_instances=( "${(@f)"$(qdbus | grep -F 'org.kde.konsole')"/ /}" )
 
             for i in "${konsole_instances[@]}"; do
-                IFS=$'\n' read -d "" -ra konsole_sessions < <(qdbus "$i" | grep -F '/Sessions/')
+                declare -a konsole_sessions; konsole_sessions=( "${(@f)"$(qdbus "$i" | grep -F '/Sessions/')"}" )
 
                 for session in "${konsole_sessions[@]}"; do
-                    if ((child == "$(qdbus "$i" "$session" processId)")); then
+                    if ((child == $(qdbus "$i" "$session" processId))); then
                         profile="$(qdbus "$i" "$session" environment |\
                                    awk -F '=' '/KONSOLE_PROFILE_NAME/ {print $2}')"
                         break
@@ -242,7 +241,7 @@ END
             profile_filename="${profile_filename/$'\n'*}"
 
             [[ "$profile_filename" ]] && \
-                term_font="$(awk -F '=|,' '/Font=/ {print $2 " " $3}' "$profile_filename")"
+                term_font="$(awk -F '=|,' '/Font=/ {print $2,$3}' "$profile_filename")"
         ;;
 
         "lxterminal"*)
@@ -256,7 +255,7 @@ END
             mateterm_config="/tmp/mateterm.cfg"
 
             # Ensure /tmp exists and we do not overwrite anything.
-            if [[ -d /tmp && ! -f "$mateterm_config" ]]; then
+            if [[ -d "/tmp" && ! -f "$mateterm_config" ]]; then
                 mate-terminal --save-config="$mateterm_config"
 
                 role="$(xprop -id "${WINDOWID}" WM_WINDOW_ROLE)"
@@ -301,7 +300,7 @@ END
         ;;
 
         "qterminal")
-            term_font="$(awk -F '=' '/fontFamily=/ {a=$2} /fontSize=/ {b=$2} END {print a " " b}' \
+            term_font="$(awk -F '=' '/fontFamily=/ {a=$2} /fontSize=/ {b=$2} END {print a,b}' \
                          "${XDG_CONFIG_HOME}/qterminal.org/qterminal.ini")"
         ;;
 
@@ -321,7 +320,7 @@ END
                 # On Linux we can get the exact path to the running binary through the procfs
                 # (in case `st` is launched from outside of $PATH) on other systems we just
                 # have to guess and assume `st` is invoked from somewhere in the users $PATH
-                [[ -L /proc/$parent/exe ]] && binary="/proc/$parent/exe" || binary="$(type -p st)"
+                [[ -L "/proc/$parent/exe" ]] && binary="/proc/$parent/exe" || binary="$(type -p st)"
 
                 # Grep the output of strings on the `st` binary for anything that looks vaguely
                 # like a font definition. NOTE: There is a slight limitation in this approach.
@@ -374,8 +373,7 @@ END
             term_font="$(trim "${term_font/*"faceName:"}")"
 
             # xft: isn't required at the beginning so we prepend it if it's missing
-            [[ "${term_font:0:1}" != "-" && \
-               "${term_font:0:4}" != "xft:" ]] && \
+            [[ "${term_font:0:1}" != "-" && "${term_font:0:4}" != "xft:" ]] && \
                 term_font="xft:$term_font"
 
             # Xresources has two different font formats, this checks which

@@ -206,7 +206,7 @@ function testIpSegmentWorksOnOsxWithNoInterfaceSpecified() {
 
   fakeIfconfig "eth1" "eth2"
 
-  assertEquals "%K{006} %F{000}IP %f%F{000}1.2.3.4 " "$(prompt_ip left 1 false "$FOLDER")"
+  assertEquals "%K{006} %F{000}IP %F{000}1.2.3.4 " "$(prompt_ip left 1 false "$FOLDER")"
 }
 
 function testIpSegmentWorksOnOsxWithInterfaceSpecified() {
@@ -216,7 +216,7 @@ function testIpSegmentWorksOnOsxWithInterfaceSpecified() {
   source powerlevel9k.zsh-theme
   local OS='OSX' # Fake OSX
 
-  assertEquals "%K{006} %F{000}IP %f%F{000}1.2.3.4 " "$(prompt_ip left 1 false "$FOLDER")"
+  assertEquals "%K{006} %F{000}IP %F{000}1.2.3.4 " "$(prompt_ip left 1 false "$FOLDER")"
 }
 
 function testIpSegmentWorksOnLinuxWithNoInterfaceSpecified() {
@@ -226,7 +226,7 @@ function testIpSegmentWorksOnLinuxWithNoInterfaceSpecified() {
 
     fakeIp "eth0"
 
-    assertEquals "%K{006} %F{000}IP %f%F{000}1.2.3.4 " "$(prompt_ip left 1 false "$FOLDER")"
+    assertEquals "%K{006} %F{000}IP %F{000}1.2.3.4 " "$(prompt_ip left 1 false "$FOLDER")"
 }
 
 function testIpSegmentWorksOnLinuxWithInterfaceSpecified() {
@@ -236,7 +236,7 @@ function testIpSegmentWorksOnLinuxWithInterfaceSpecified() {
   source powerlevel9k.zsh-theme
   local OS='Linux' # Fake Linux
 
-  assertEquals "%K{006} %F{000}IP %f%F{000}1.2.3.4 " "$(prompt_ip left 1 false "$FOLDER")"
+  assertEquals "%K{006} %F{000}IP %F{000}1.2.3.4 " "$(prompt_ip left 1 false "$FOLDER")"
 }
 
 source shunit2/shunit2

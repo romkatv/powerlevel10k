@@ -34,7 +34,7 @@ function testLaravelVersionSegment() {
   # Load Powerlevel9k
   source powerlevel9k.zsh-theme
 
-  assertEquals "%K{009} %F{007}x %f%F{007}5.4.23 %k%F{009}%f " "$(build_left_prompt)"
+  assertEquals "%K{009} %F{007}x %F{007}5.4.23 %k%F{009}%f " "$(build_left_prompt)"
 
   unalias php
 }

@@ -71,7 +71,7 @@ function testKubeContext() {
   # Load Powerlevel9k
   source powerlevel9k.zsh-theme
 
-  assertEquals "%K{005} %F{007}⎈ %f%F{007}minikube/default %k%F{005}%f " "$(build_left_prompt)"
+  assertEquals "%K{005} %F{007}⎈ %F{007}minikube/default %k%F{005}%f " "$(build_left_prompt)"
 
   unalias kubectl
 }
@@ -83,7 +83,7 @@ function testKubeContextOtherNamespace() {
   # Load Powerlevel9k
   source powerlevel9k.zsh-theme
 
-  assertEquals "%K{005} %F{007}⎈ %f%F{007}minikube/kube-system %k%F{005}%f " "$(build_left_prompt)"
+  assertEquals "%K{005} %F{007}⎈ %F{007}minikube/kube-system %k%F{005}%f " "$(build_left_prompt)"
 
   unalias kubectl
 }

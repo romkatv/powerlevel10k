@@ -172,7 +172,7 @@ left_prompt_segment() {
       # Allow users to overwrite the color for the visual identifier only.
       local visual_identifier_color_variable=POWERLEVEL9K_${(U)${segment_name}#prompt_}_VISUAL_IDENTIFIER_COLOR
       set_default $visual_identifier_color_variable "${foregroundColor}"
-      visual_identifier="$(foregroundColor ${(P)visual_identifier_color_variable})${visual_identifier}%f"
+      visual_identifier="$(foregroundColor ${(P)visual_identifier_color_variable})${visual_identifier}"
     fi
   fi
 
@@ -274,7 +274,7 @@ right_prompt_segment() {
       # Allow users to overwrite the color for the visual identifier only.
       local visual_identifier_color_variable=POWERLEVEL9K_${(U)${segment_name}#prompt_}_VISUAL_IDENTIFIER_COLOR
       set_default $visual_identifier_color_variable "${foregroundColor}"
-      visual_identifier="$(foregroundColor ${(P)visual_identifier_color_variable})${visual_identifier}%f"
+      visual_identifier="$(foregroundColor ${(P)visual_identifier_color_variable})${visual_identifier}"
     fi
   fi
 
@@ -363,7 +363,8 @@ prompt_newline() {
   "$1_prompt_segment" \
     "$0" \
     "$2" \
-    "NONE" "NONE" "${newline}"
+    "" "" "${newline}"
+  CURRENT_BG='NONE'
   POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS=$lws
 }
 
@@ -798,7 +799,7 @@ prompt_dir() {
   # using $PWD instead of "$(print -P '%~')" to allow use of POWERLEVEL9K_DIR_PATH_ABSOLUTE
   local current_path=$PWD # WAS: local current_path="$(print -P '%~')"
   # check if the user wants to use absolute paths or "~" paths
-  [[ ${(L)POWERLEVEL9K_DIR_PATH_ABSOLUTE} != "true" ]] && current_path=${current_path//$HOME/"~"}
+  [[ ${(L)POWERLEVEL9K_DIR_PATH_ABSOLUTE} != "true" ]] && current_path=${current_path/#$HOME/"~"}
   # declare all local variables
   local paths directory test_dir test_dir_length trunc_path threshhold
   # if we are not in "~" or "/", split the paths into an array and exclude "~"
@@ -1217,9 +1218,8 @@ prompt_nvm() {
 ################################################################
 # Segment to display NodeEnv
 prompt_nodeenv() {
-  local nodeenv_path="$NODE_VIRTUAL_ENV"
-  if [[ -n "$nodeenv_path" && "$NODE_VIRTUAL_ENV_DISABLE_PROMPT" != true ]]; then
-    local info="$(node -v)[$(basename "$nodeenv_path")]"
+  if [[ -n "$NODE_VIRTUAL_ENV" ]]; then
+    local info="$(node -v)[${NODE_VIRTUAL_ENV:t}]"
     "$1_prompt_segment" "$0" "$2" "black" "green" "$info" 'NODE_ICON'
   fi
 }
@@ -1627,9 +1627,11 @@ prompt_vi_mode() {
 # https://virtualenv.pypa.io/en/latest/
 prompt_virtualenv() {
   local virtualenv_path="$VIRTUAL_ENV"
-  if [[ -n "$virtualenv_path" && -z "$VIRTUAL_ENV_DISABLE_PROMPT" ]]; then
-    "$1_prompt_segment" "$0" "$2" "blue" "$DEFAULT_COLOR" "$(basename "$virtualenv_path")" 'PYTHON_ICON'
-  fi
+
+  # Early exit; $virtualenv_path must always be set.
+  [[ -z "$virtualenv_path" ]] && return
+
+  "$1_prompt_segment" "$0" "$2" "blue" "$DEFAULT_COLOR" "${virtualenv_path:t}" 'PYTHON_ICON'
 }
 
 ################################################################
