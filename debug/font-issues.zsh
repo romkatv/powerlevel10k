@@ -192,13 +192,13 @@ END
         ;;
 
         "deepin-terminal"*)
-            term_font="$(awk -F '=' '/font=/ {a=$2} /font_size/ {b=$2} END {print a " " b}' \
+            term_font="$(awk -F '=' '/font=/ {a=$2} /font_size/ {b=$2} END {print a,b}' \
                          "${XDG_CONFIG_HOME}/deepin/deepin-terminal/config.conf")"
         ;;
 
         "GNUstep_Terminal")
              term_font="$(awk -F '>|<' '/>TerminalFont</ {getline; f=$3}
-                          />TerminalFontSize</ {getline; s=$3} END {print f " " s}' \
+                          />TerminalFontSize</ {getline; s=$3} END {print f,s}' \
                           "${HOME}/GNUstep/Defaults/Terminal.plist")"
         ;;
 
@@ -255,7 +255,7 @@ END
             mateterm_config="/tmp/mateterm.cfg"
 
             # Ensure /tmp exists and we do not overwrite anything.
-            if [[ -d /tmp && ! -f "$mateterm_config" ]]; then
+            if [[ -d "/tmp" && ! -f "$mateterm_config" ]]; then
                 mate-terminal --save-config="$mateterm_config"
 
                 role="$(xprop -id "${WINDOWID}" WM_WINDOW_ROLE)"
@@ -300,7 +300,7 @@ END
         ;;
 
         "qterminal")
-            term_font="$(awk -F '=' '/fontFamily=/ {a=$2} /fontSize=/ {b=$2} END {print a " " b}' \
+            term_font="$(awk -F '=' '/fontFamily=/ {a=$2} /fontSize=/ {b=$2} END {print a,b}' \
                          "${XDG_CONFIG_HOME}/qterminal.org/qterminal.ini")"
         ;;
 
@@ -320,7 +320,7 @@ END
                 # On Linux we can get the exact path to the running binary through the procfs
                 # (in case `st` is launched from outside of $PATH) on other systems we just
                 # have to guess and assume `st` is invoked from somewhere in the users $PATH
-                [[ -L /proc/$parent/exe ]] && binary="/proc/$parent/exe" || binary="$(type -p st)"
+                [[ -L "/proc/$parent/exe" ]] && binary="/proc/$parent/exe" || binary="$(type -p st)"
 
                 # Grep the output of strings on the `st` binary for anything that looks vaguely
                 # like a font definition. NOTE: There is a slight limitation in this approach.
@@ -373,8 +373,7 @@ END
             term_font="$(trim "${term_font/*"faceName:"}")"
 
             # xft: isn't required at the beginning so we prepend it if it's missing
-            [[ "${term_font:0:1}" != "-" && \
-               "${term_font:0:4}" != "xft:" ]] && \
+            [[ "${term_font:0:1}" != "-" && "${term_font:0:4}" != "xft:" ]] && \
                 term_font="xft:$term_font"
 
             # Xresources has two different font formats, this checks which
