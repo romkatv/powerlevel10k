@@ -95,6 +95,15 @@ function fakeIp() {
 INNER
   fi
 
+  if [[ "\$*" =~ '-brief.*show' ]]; then
+    cat <<INNER
+lo               UNKNOWN        127.0.0.1/8
+${INTERFACE1}    UP             1.2.3.4/24
+${INTERFACE2}    UP             5.4.3.2/16
+docker0          DOWN           172.17.0.1/16
+INNER
+  fi
+
   if [[ "\$*" =~ 'show ${INTERFACE1}' ]]; then
     cat <<INNER
 3: ${INTERFACE1}: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast state UP group default qlen 1000
@@ -116,27 +125,33 @@ EOF
 }
 
 function testVpnIpSegmentPrintsNothingOnOsxIfNotConnected() {
-  alias ifconfig='echo "not connected"'
-
   # Load Powerlevel9k
   source powerlevel9k.zsh-theme
   local OS="OSX" # Fake OSX
 
-  assertEquals "" "$(prompt_vpn_ip left 1 false "$FOLDER")"
+  cat > $FOLDER/sbin/ifconfig <<EOF
+#!/usr/bin/env zsh
 
-  unalias ifconfig
+echo "not connected"
+EOF
+  chmod +x $FOLDER/sbin/ifconfig
+
+  assertEquals "" "$(prompt_vpn_ip left 1 false "$FOLDER")"
 }
 
 function testVpnIpSegmentPrintsNothingOnLinuxIfNotConnected() {
-  alias ip='echo "not connected"'
-
   # Load Powerlevel9k
   source powerlevel9k.zsh-theme
   local OS="Linux" # Fake Linux
 
-  assertEquals "" "$(prompt_vpn_ip left 1 false "$FOLDER")"
+  cat > $FOLDER/sbin/ip <<EOF
+#!/usr/bin/env zsh
 
-  unalias ip
+echo "not connected"
+EOF
+  chmod +x $FOLDER/sbin/ip
+
+  assertEquals "" "$(prompt_vpn_ip left 1 false "$FOLDER")"
 }
 
 function testVpnIpSegmentWorksOnOsxWithInterfaceSpecified() {
@@ -160,7 +175,7 @@ function testVpnIpSegmentWorksOnLinuxWithInterfaceSpecified() {
     source powerlevel9k.zsh-theme
     local OS='Linux' # Fake Linux
 
-    assertEquals "%K{006} %F{000}(vpn) %f%F{000}10.0.2.15 " "$(prompt_vpn_ip left 1 false "$FOLDER")"
+    assertEquals "%K{006} %F{000}(vpn) %f%F{000}1.2.3.4 " "$(prompt_vpn_ip left 1 false "$FOLDER")"
 }
 
 # vpn_ip is not capable of handling multiple vpn interfaces ATM.

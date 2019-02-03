@@ -371,3 +371,51 @@ function upsearch () {
     popd > /dev/null
   fi
 }
+
+# Parse IP address from ifconfig on OSX and from IP on Linux
+# Parameters:
+#  $1 - string The desired Interface
+#  $2 - string A root prefix for testing purposes
+function p9k::parseIp() {
+  local desiredInterface="${1}"
+
+  if [[ -z "${desiredInterface}" ]]; then
+    desiredInterface="^[^ ]+"
+  fi
+
+  local ROOT_PREFIX="${2}"
+  if [[ "$OS" == "OSX" ]]; then
+    # Get a plain list of all interfaces
+    local rawInterfaces="$(${ROOT_PREFIX}/sbin/ifconfig -l 2>/dev/null)"
+    # Parse into array (split by whitespace)
+    local -a interfaces
+    interfaces=(${=rawInterfaces})
+    # Parse only relevant interface names
+    local pattern="${desiredInterface}[^ ]?"
+    local -a relevantInterfaces
+    for rawInterface in $interfaces; do
+      [[ "$rawInterface" =~ $pattern ]] && relevantInterfaces+=( $MATCH )
+    done
+    local newline=$'\n'
+    for interfaceName in $relevantInterfaces; do
+      local interface="$(${ROOT_PREFIX}/sbin/ifconfig $interfaceName 2>/dev/null)"
+      # Check if interface is UP.
+      if [[ "${interface/${newline}/}" =~ "<UP(,)?[^>]*>(.*?)inet[ ]*([^ ]*)" ]]; then
+        echo "${match[3]}"
+        return 0
+      fi
+    done
+  else
+    local -a interfaces
+    interfaces=( "${(f)$(${ROOT_PREFIX}/sbin/ip -brief -4 a show 2>/dev/null)}" )
+    local pattern="^${desiredInterface}[ ]+UP[ ]+([^/ ]+)"
+    for interface in "${(@)interfaces}"; do
+      if [[ "$interface" =~ $pattern ]]; then
+        echo "${match[1]}"
+        return 0
+      fi
+    done
+  fi
+
+  return 1
+}

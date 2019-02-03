@@ -599,36 +599,9 @@ prompt_public_ip() {
     icon='PUBLIC_IP_ICON'
     # Check VPN is on if VPN interface is set
     if [[ -n $POWERLEVEL9K_PUBLIC_IP_VPN_INTERFACE ]]; then
-      if [[ "$OS" == "OSX" ]]; then
-        # Get a plain list of all interfaces
-        local rawInterfaces="$(${ROOT_PREFIX}/sbin/ifconfig -l)"
-        # Parse into array (split by whitespace)
-        local -a interfaces
-        interfaces=(${=rawInterfaces})
-        # Parse only relevant interface names
-        local pattern="${POWERLEVEL9K_PUBLIC_IP_VPN_INTERFACE}[^ ]?"
-        local -a relevantInterfaces
-        for rawInterface in $interfaces; do
-          [[ "$rawInterface" =~ $pattern ]] && relevantInterfaces+=( $MATCH )
-        done
-        for interfaceName in $relevantInterfaces; do
-          local interface="$(${ROOT_PREFIX}/sbin/ifconfig $interfaceName)"
-          # Check if interface is UP.
-          if [[ "$interface" =~ "<UP," ]]; then
-            icon='VPN_ICON'
-            break
-          fi
-        done
-      else
-        local -a interfaces
-        interfaces=( "${(f)$(${ROOT_PREFIX}/sbin/ip -brief -4 a show)}" )
-        local pattern="^${POWERLEVEL9K_PUBLIC_IP_VPN_INTERFACE}[ ]+UP[ ]+"
-        for interface in "${(@)interfaces}"; do
-          if [[ "$interface" =~ $pattern ]]; then
-            icon='VPN_ICON'
-            break
-          fi
-        done
+      local vpnIp="$(p9k::parseIp "${POWERLEVEL9K_PUBLIC_IP_VPN_INTERFACE}" "${ROOT_PREFIX}")"
+      if [[ -n "$vpnIp" ]]; then
+        icon='VPN_ICON'
       fi
     fi
     $1_prompt_segment "$0" "$2" "$DEFAULT_COLOR" "$DEFAULT_COLOR_INVERTED" "${public_ip}" "$icon"
@@ -1126,31 +1099,8 @@ prompt_icons_test() {
 ################################################################
 # Segment to display the current IP address
 prompt_ip() {
-  if [[ "$OS" == "OSX" ]]; then
-    if defined POWERLEVEL9K_IP_INTERFACE; then
-      # Get the IP address of the specified interface.
-      ip=$(ipconfig getifaddr "$POWERLEVEL9K_IP_INTERFACE")
-    else
-      local interfaces callback
-      # Get network interface names ordered by service precedence.
-      interfaces=$(networksetup -listnetworkserviceorder | grep -o "Device:\s*[a-z0-9]*" | grep -o -E '[a-z0-9]*$')
-      callback='ipconfig getifaddr $item'
-
-      ip=$(getRelevantItem "$interfaces" "$callback")
-    fi
-  else
-    if defined POWERLEVEL9K_IP_INTERFACE; then
-      # Get the IP address of the specified interface.
-      ip=$(ip -4 a show "$POWERLEVEL9K_IP_INTERFACE" | grep -o "inet\s*[0-9.]*" | grep -o -E "[0-9.]+")
-    else
-      local interfaces callback
-      # Get all network interface names that are up
-      interfaces=$(ip link ls up | grep -o -E ":\s+[a-z0-9]+:" | grep -v "lo" | grep -o -E "[a-z0-9]+")
-      callback='ip -4 a show $item | grep -o "inet\s*[0-9.]*" | grep -o -E "[0-9.]+"'
-
-      ip=$(getRelevantItem "$interfaces" "$callback")
-    fi
-  fi
+  local ROOT_PREFIX="${4}"
+  local ip=$(p9k::parseIp "${POWERLEVEL9K_IP_INTERFACE}" "${ROOT_PREFIX}")
 
   if [[ -n "$ip" ]]; then
     "$1_prompt_segment" "$0" "$2" "cyan" "$DEFAULT_COLOR" "$ip" 'NETWORK_ICON'
@@ -1163,18 +1113,10 @@ set_default POWERLEVEL9K_VPN_IP_INTERFACE "tun"
 # prompt if vpn active
 prompt_vpn_ip() {
   local ROOT_PREFIX="${4}"
-  if [[ "$OS" == "OSX" ]]; then
-    for vpn_iface in $(${ROOT_PREFIX}/sbin/ifconfig | grep -e "^${POWERLEVEL9K_VPN_IP_INTERFACE}" | cut -d":" -f1)
-    do
-      ip=$(${ROOT_PREFIX}/sbin/ifconfig "$vpn_iface" | grep -o "inet\s.*" | cut -d' ' -f2)
-      "$1_prompt_segment" "$0" "$2" "cyan" "$DEFAULT_COLOR" "$ip" 'VPN_ICON'
-    done
-  else
-    for vpn_iface in $(${ROOT_PREFIX}/sbin/ip link ls up | grep -o -E ":\s+[a-z0-9]+:" | grep -v "lo" | grep -o -E "[a-z0-9]+" | grep -o -E "^${POWERLEVEL9K_VPN_IP_INTERFACE}.*")
-    do
-      ip=$(${ROOT_PREFIX}/sbin/ip -4 a show "$vpn_iface" | grep -o "inet\s*[0-9.]*" | grep -o -E "[0-9.]+")
-      "$1_prompt_segment" "$0" "$2" "cyan" "$DEFAULT_COLOR" "$ip" 'VPN_ICON'
-    done
+  local ip=$(p9k::parseIp "${POWERLEVEL9K_VPN_IP_INTERFACE}" "${ROOT_PREFIX}")
+
+  if [[ -n "${ip}" ]]; then
+    "$1_prompt_segment" "$0" "$2" "cyan" "$DEFAULT_COLOR" "$ip" 'VPN_ICON'
   fi
 }
 
