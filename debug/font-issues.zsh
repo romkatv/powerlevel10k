@@ -201,21 +201,13 @@ END
         ;;
 
         "kitty"*)
-            shopt -s nullglob
-            confs=({$KITTY_CONFIG_DIRECTORY,$XDG_CONFIG_HOME,~/Library/Preferences}/kitty/kitty.con?)
-            shopt -u nullglob
+            kitty_config="$(kitty --debug-config)"
+            [[ "$kitty_config" != *font_family* ]] && return
 
-            [[ -f "${confs[0]}" ]] || return
-
-            term_font="$(awk '/^([[:space:]]*|[^#_])font_family[[:space:]]+/ {
-                                  $1 = "";
-                                  gsub(/^[[:space:]]/, "");
-                                  font = $0
-                              }
-                              /^([[:space:]]*|[^#_])font_size[[:space:]]+/ {
-                                  size = $2
-                              }
-                              END { print font " " size}' "${confs[0]}")"
+            term_font_size="${kitty_config/*font_size}"
+            term_font_size="${term_font_size/$'\n'*}"
+            term_font="${kitty_config/*font_family}"
+            term_font="${term_font/$'\n'*} $term_font_size"
         ;;
 
         "konsole"*)
