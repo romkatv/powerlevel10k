@@ -210,7 +210,7 @@ END
             term_font="${term_font/$'\n'*} $term_font_size"
         ;;
 
-        "konsole"*)
+        "konsole" | "yakuake")
             # Get Process ID of current konsole window / tab
             child="$(get_ppid "$$")"
 
@@ -234,7 +234,7 @@ END
             profile_filename="${profile_filename/$'\n'*}"
 
             [[ "$profile_filename" ]] && \
-                term_font="$(awk -F '=|,' '/Font=/ {print $2 " " $3}' "$profile_filename")"
+                term_font="$(awk -F '=|,' '/Font=/ {print $2,$3}' "$profile_filename")"
         ;;
 
         "lxterminal"*)
