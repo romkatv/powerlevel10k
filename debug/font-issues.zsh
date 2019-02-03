@@ -222,13 +222,13 @@ END
             # Get Process ID of current konsole window / tab
             child="$(get_ppid "$$")"
 
-            IFS=$'\n' read -d "" -ra konsole_instances < <(qdbus | grep -F 'org.kde.konsole')
+            declare -a konsole_instances; konsole_instances=( "${(@f)"$(qdbus | grep -F 'org.kde.konsole')"/ /}" )
 
             for i in "${konsole_instances[@]}"; do
-                IFS=$'\n' read -d "" -ra konsole_sessions < <(qdbus "$i" | grep -F '/Sessions/')
+                declare -a konsole_sessions; konsole_sessions=( "${(@f)"$(qdbus "$i" | grep -F '/Sessions/')"}" )
 
                 for session in "${konsole_sessions[@]}"; do
-                    if ((child == "$(qdbus "$i" "$session" processId)")); then
+                    if ((child == $(qdbus "$i" "$session" processId))); then
                         profile="$(qdbus "$i" "$session" environment |\
                                    awk -F '=' '/KONSOLE_PROFILE_NAME/ {print $2}')"
                         break
