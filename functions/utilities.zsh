@@ -402,7 +402,7 @@ function p9k::parseIp() {
     for interfaceName in $relevantInterfaces; do
       local interface="$(${ROOT_PREFIX}/sbin/ifconfig $interfaceName 2>/dev/null)"
       # Check if interface is UP.
-      if [[ "${interface/${newline}/}" =~ "<UP(,)?[^>]*>(.*?)inet[ ]*([^ ]*)" ]]; then
+      if [[ "${interface/${newline}/}" =~ "<UP(,)?[^>]*>(.*)inet[ ]*([^ ]*)" ]]; then
         echo "${match[3]}"
         return 0
       fi

@@ -212,6 +212,8 @@ function testIpSegmentWorksOnOsxWithNoInterfaceSpecified() {
 function testIpSegmentWorksOnOsxWithInterfaceSpecified() {
   fakeIfconfig "eth1"
 
+  local POWERLEVEL9K_IP_INTERFACE="eth1"
+
   # Load Powerlevel9k
   source powerlevel9k.zsh-theme
   local OS='OSX' # Fake OSX
@@ -231,6 +233,8 @@ function testIpSegmentWorksOnLinuxWithNoInterfaceSpecified() {
 
 function testIpSegmentWorksOnLinuxWithInterfaceSpecified() {
   fakeIp "eth3"
+
+  local POWERLEVEL9K_IP_INTERFACE="eth3"
 
   # Load Powerlevel9k
   source powerlevel9k.zsh-theme
