@@ -15,10 +15,10 @@ function +vi-git-untracked() {
   # dump out if we're outside a git repository (which includes being in the .git folder)
   [[ $? != 0 || -z $repoTopLevel ]] && return
 
-  local untrackedFiles=$(command git ls-files --others --exclude-standard "${repoTopLevel}")
+  local untrackedFiles=$(command git ls-files --others --exclude-standard "${repoTopLevel}" 2> /dev/null)
 
   if [[ -z $untrackedFiles && "$POWERLEVEL9K_VCS_SHOW_SUBMODULE_DIRTY" == "true" ]]; then
-    untrackedFiles+=$(command git submodule foreach --quiet --recursive 'command git ls-files --others --exclude-standard')
+    untrackedFiles+=$(command git submodule foreach --quiet --recursive 'command git ls-files --others --exclude-standard' 2> /dev/null)
   fi
 
   [[ -z $untrackedFiles ]] && return
