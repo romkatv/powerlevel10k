@@ -401,8 +401,11 @@ function p9k::parseIp() {
     local newline=$'\n'
     for interfaceName in $relevantInterfaces; do
       local interface="$(${ROOT_PREFIX}/sbin/ifconfig $interfaceName 2>/dev/null)"
+      if [[ "${interface}" =~ "lo[0-9]*" ]]; then
+        continue
+      fi
       # Check if interface is UP.
-      if [[ "${interface/${newline}/}" =~ "<UP(,)?[^>]*>(.*)inet[ ]*([^ ]*)" ]]; then
+      if [[ "${interface/${newline}/}" =~ "<UP(,)?[^>]*>(.*)inet[ ]+([^ ]*)" ]]; then
         echo "${match[3]}"
         return 0
       fi
