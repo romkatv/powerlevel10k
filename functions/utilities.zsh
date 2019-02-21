@@ -405,9 +405,13 @@ function p9k::parseIp() {
         continue
       fi
       # Check if interface is UP.
-      if [[ "${interface/${newline}/}" =~ "<UP(,)?[^>]*>(.*)inet[ ]+([^ ]*)" ]]; then
-        echo "${match[3]}"
-        return 0
+      if [[ "${interface/${newline}/}" =~ "<([^>]*)>(.*?)inet[ ]+([^ ]*)" ]]; then
+        local ipFound="${match[3]}"
+        local -a interfaceStates=(${(s:,:)match[1]})
+        if [[ "${interfaceStates[(r)UP]}" == "UP" ]]; then
+          echo "${ipFound}"
+          return 0
+        fi
       fi
     done
   else
