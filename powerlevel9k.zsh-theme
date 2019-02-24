@@ -98,6 +98,54 @@ fi
 # right-left but reads the opposite, this isn't necessary for the other side.
 CURRENT_BG='NONE'
 
+# Cache the results of expensive computations to avoid avoid recomputing them on every prompt.
+# Setting this option to 'true' can greatly speed up prompt generation. However, any changes
+# to the configuration will require re-sourcing powerlevel9k. For example, if you change
+# POWERLEVEL9K_TIME_BACKGROUND in an interactive shell, your next prompt will reflect the change
+# only if caching is disabled.
+set_default POWERLEVEL9K_USE_CACHE false
+
+# Meaningless unless POWERLEVEL9K_USE_CACHE is 'true'.
+#
+# Specifies the maximum number of elements in the cache. When the cache grows over this limit,
+# it gets cleared. This is meant to avoid memory leaks when a rogue prompt is filling the cache
+# with data.
+set_default POWERLEVEL9K_MAX_CACHE_SIZE 10000
+
+# Functions producing left and right prompts are called from subshells, so any
+# changes to the environment variables they do get wiped out after the prompt is
+# printed. In order to cache the results of expensive computations in these functions,
+# we use a temporary file to communicate with the parent shell and to ask it to
+# change environment variables.
+typeset -AH p9k_cache_data=()
+typeset P9K_CACHE_CHANNEL=${$(mktemp -u)%/*}/p9k_cache_channel.$$
+
+# Store a key-value pair in the cache.
+#
+#   * $1: Key.
+#   * $2: Value. Can be empty.
+#
+# Note that an attempt to retrieve the value right away won't succeed. All requested
+# cache update get batched and flushed together after a prompt is built.
+p9k_cache_set() {
+  if [[ $POWERLEVEL9K_USE_CACHE == true ]]; then
+    # Prepend dot to the value so that we can easily tell apart empty
+    # values from missing in p9k_cache_get.
+    echo -E "p9k_cache_data+=(${(qq)1} .${(qq)2})" >>$P9K_CACHE_CHANNEL
+  fi
+}
+
+# Retrieve a value from the cache.
+#
+#   * $1: Key.
+#
+# Returns 1 if there is no value with the specified key.
+p9k_cache_get() {
+  local V=${p9k_cache_data[$1]}
+  [[ -n $V ]] || return 1
+  echo -E ${V:1}
+}
+
 # Begin a left prompt segment
 # Takes four arguments:
 #   * $1: Name of the function that was originally invoked (mandatory).
@@ -111,89 +159,107 @@ CURRENT_BG='NONE'
 set_default last_left_element_index 1
 set_default POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS " "
 left_prompt_segment() {
-  local segment_name="${1}"
-  local current_index=$2
-  # Check if the segment should be joined with the previous one
-  local joined
-  segmentShouldBeJoined $current_index $last_left_element_index "$POWERLEVEL9K_LEFT_PROMPT_ELEMENTS" && joined=true || joined=false
+  local cache_key="${(q)0} ${(q)1} ${(q)2} ${(q)3} ${(q)4} ${(q)5:+1} ${(q)6}"
+  local cached
 
-  # Colors
-  local backgroundColor="${3}"
-  local foregroundColor="${4}"
+  if ! cached=$(p9k_cache_get $cache_key); then
+    local output=''
+    local segment_name=$1
+    local current_index=$2
+    # Check if the segment should be joined with the previous one
+    local joined
+    segmentShouldBeJoined $current_index $last_left_element_index "$POWERLEVEL9K_LEFT_PROMPT_ELEMENTS" && joined=true || joined=false
 
-  # Overwrite given background-color by user defined variable for this segment.
-  local BACKGROUND_USER_VARIABLE=POWERLEVEL9K_${(U)${segment_name}#prompt_}_BACKGROUND
-  local BG_COLOR_MODIFIER=${(P)BACKGROUND_USER_VARIABLE}
-  [[ -n $BG_COLOR_MODIFIER ]] && backgroundColor="$BG_COLOR_MODIFIER"
+    # Colors
+    local backgroundColor="${3}"
+    local foregroundColor="${4}"
 
-  # Overwrite given foreground-color by user defined variable for this segment.
-  local FOREGROUND_USER_VARIABLE=POWERLEVEL9K_${(U)${segment_name}#prompt_}_FOREGROUND
-  local FG_COLOR_MODIFIER=${(P)FOREGROUND_USER_VARIABLE}
-  [[ -n $FG_COLOR_MODIFIER ]] && foregroundColor="$FG_COLOR_MODIFIER"
+    # Overwrite given background-color by user defined variable for this segment.
+    local BACKGROUND_USER_VARIABLE=POWERLEVEL9K_${(U)${segment_name}#prompt_}_BACKGROUND
+    local BG_COLOR_MODIFIER=${(P)BACKGROUND_USER_VARIABLE}
+    [[ -n $BG_COLOR_MODIFIER ]] && backgroundColor="$BG_COLOR_MODIFIER"
 
-  # Get color codes here to save some calls later on
-  backgroundColor="$(getColorCode ${backgroundColor})"
-  foregroundColor="$(getColorCode ${foregroundColor})"
+    # Overwrite given foreground-color by user defined variable for this segment.
+    local FOREGROUND_USER_VARIABLE=POWERLEVEL9K_${(U)${segment_name}#prompt_}_FOREGROUND
+    local FG_COLOR_MODIFIER=${(P)FOREGROUND_USER_VARIABLE}
+    [[ -n $FG_COLOR_MODIFIER ]] && foregroundColor="$FG_COLOR_MODIFIER"
 
-  local background foreground
-  [[ -n "${backgroundColor}" ]] && background="$(backgroundColor ${backgroundColor})" || background="%k"
-  [[ -n "${foregroundColor}" ]] && foreground="$(foregroundColor ${foregroundColor})" || foreground="%f"
+    # Get color codes here to save some calls later on
+    backgroundColor="$(getColorCode ${backgroundColor})"
+    foregroundColor="$(getColorCode ${foregroundColor})"
 
-  if [[ $CURRENT_BG != 'NONE' ]] && ! isSameColor "${backgroundColor}" "$CURRENT_BG"; then
-    echo -n "${background}%F{$CURRENT_BG}"
-    if [[ $joined == false ]]; then
-      # Middle segment
-      echo -n "$(print_icon 'LEFT_SEGMENT_SEPARATOR')$POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS"
+    local background foreground
+    [[ -n "${backgroundColor}" ]] && background="$(backgroundColor ${backgroundColor})" || background="%k"
+    [[ -n "${foregroundColor}" ]] && foreground="$(foregroundColor ${foregroundColor})" || foreground="%f"
+
+    if [[ $CURRENT_BG != 'NONE' ]] && ! isSameColor "${backgroundColor}" "$CURRENT_BG"; then
+      output+="${background}%F{$CURRENT_BG}"
+      if [[ $joined == false ]]; then
+        # Middle segment
+        output+="$(print_icon 'LEFT_SEGMENT_SEPARATOR')$POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS"
+      fi
+    elif isSameColor "$CURRENT_BG" "${backgroundColor}"; then
+      # Middle segment with same color as previous segment
+      # We take the current foreground color as color for our
+      # subsegment (or the default color). This should have
+      # enough contrast.
+      local complement
+      [[ -n "${foregroundColor}" ]] && complement="${foreground}" || complement="$(foregroundColor $DEFAULT_COLOR)"
+      output+="${background}${complement}"
+      if [[ $joined == false ]]; then
+        output+="$(print_icon 'LEFT_SUBSEGMENT_SEPARATOR')$POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS"
+      fi
+    else
+      # First segment
+      output+="${background}$POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS"
     fi
-  elif isSameColor "$CURRENT_BG" "${backgroundColor}"; then
-    # Middle segment with same color as previous segment
-    # We take the current foreground color as color for our
-    # subsegment (or the default color). This should have
-    # enough contrast.
-    local complement
-    [[ -n "${foregroundColor}" ]] && complement="${foreground}" || complement="$(foregroundColor $DEFAULT_COLOR)"
-    echo -n "${background}${complement}"
-    if [[ $joined == false ]]; then
-      echo -n "$(print_icon 'LEFT_SUBSEGMENT_SEPARATOR')$POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS"
+
+    local visual_identifier
+    if [[ -n $6 ]]; then
+      visual_identifier="$(print_icon $6)"
+      if [[ -n "$visual_identifier" ]]; then
+        # Add an whitespace if we print more than just the visual identifier.
+        # To avoid cutting off the visual identifier in some terminal emulators (e.g., Konsole, st),
+        # we need to color both the visual identifier and the whitespace.
+        [[ -n "$5" ]] && visual_identifier="$visual_identifier "
+        # Allow users to overwrite the color for the visual identifier only.
+        local visual_identifier_color_variable=POWERLEVEL9K_${(U)${segment_name}#prompt_}_VISUAL_IDENTIFIER_COLOR
+        set_default $visual_identifier_color_variable "${foregroundColor}"
+        visual_identifier="$(foregroundColor ${(P)visual_identifier_color_variable})${visual_identifier}"
+      fi
     fi
-  else
-    # First segment
-    echo -n "${background}$POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS"
+
+    # Print the visual identifier
+    output+="${visual_identifier}"
+
+    cached="${(qq)output} ${(qq)backgroundColor} ${(qq)foreground}"
+    p9k_cache_set $cache_key $cached
   fi
 
-  local visual_identifier
-  if [[ -n $6 ]]; then
-    visual_identifier="$(print_icon $6)"
-    if [[ -n "$visual_identifier" ]]; then
-      # Add an whitespace if we print more than just the visual identifier.
-      # To avoid cutting off the visual identifier in some terminal emulators (e.g., Konsole, st),
-      # we need to color both the visual identifier and the whitespace.
-      [[ -n "$5" ]] && visual_identifier="$visual_identifier "
-      # Allow users to overwrite the color for the visual identifier only.
-      local visual_identifier_color_variable=POWERLEVEL9K_${(U)${segment_name}#prompt_}_VISUAL_IDENTIFIER_COLOR
-      set_default $visual_identifier_color_variable "${foregroundColor}"
-      visual_identifier="$(foregroundColor ${(P)visual_identifier_color_variable})${visual_identifier}"
-    fi
-  fi
+  # output backgroundColor foreground
+  local tuple=("${(@Q)${(z)cached}}")
+  echo -n $tuple[1]
+  CURRENT_BG=$tuple[2]
 
-  # Print the visual identifier
-  echo -n "${visual_identifier}"
-  # Print the content of the segment, if there is any
-  [[ -n "$5" ]] && echo -n "${foreground}${5}"
+  [[ -n "$5" ]] && echo -n "${tuple[3]}${5}"
   echo -n "${POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS}"
-
-  CURRENT_BG="${backgroundColor}"
-  last_left_element_index=$current_index
+  last_left_element_index=$2
 }
 
 # End the left prompt, closes the final segment.
 left_prompt_end() {
-  if [[ -n $CURRENT_BG ]]; then
-    echo -n "%k$(foregroundColor ${CURRENT_BG})$(print_icon 'LEFT_SEGMENT_SEPARATOR')"
-  else
-    echo -n "%k"
+  local cache_key="$0 ${(q)CURRENT_BG}"
+  local cached
+  if ! cached=$(p9k_cache_get $cache_key); then
+    if [[ -n $CURRENT_BG ]]; then
+      cached+="%k$(foregroundColor ${CURRENT_BG})$(print_icon 'LEFT_SEGMENT_SEPARATOR')"
+    else
+      cached+="%k"
+    fi
+    cached+="%f$(print_icon 'LEFT_SEGMENT_END_SEPARATOR')"
+    p9k_cache_set $cache_key $cached
   fi
-  echo -n "%f$(print_icon 'LEFT_SEGMENT_END_SEPARATOR')"
+  echo -n $cached
   CURRENT_BG=''
 }
 
@@ -212,84 +278,97 @@ CURRENT_RIGHT_BG='NONE'
 set_default last_right_element_index 1
 set_default POWERLEVEL9K_WHITESPACE_BETWEEN_RIGHT_SEGMENTS " "
 right_prompt_segment() {
-  local segment_name="${1}"
-  local current_index=$2
+  local cache_key="${(q)0} ${(q)1} ${(q)2} ${(q)3} ${(q)4} ${(q)5:+1} ${(q)6}"
+  local cached
 
-  # Check if the segment should be joined with the previous one
-  local joined
-  segmentShouldBeJoined $current_index $last_right_element_index "$POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS" && joined=true || joined=false
+  if ! cached=$(p9k_cache_get $cache_key); then
+    local output=''
+    local segment_name="${1}"
+    local current_index=$2
 
-  # Colors
-  local backgroundColor="${3}"
-  local foregroundColor="${4}"
+    # Check if the segment should be joined with the previous one
+    local joined
+    segmentShouldBeJoined $current_index $last_right_element_index "$POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS" && joined=true || joined=false
 
-  # Overwrite given background-color by user defined variable for this segment.
-  local BACKGROUND_USER_VARIABLE=POWERLEVEL9K_${(U)${segment_name}#prompt_}_BACKGROUND
-  local BG_COLOR_MODIFIER=${(P)BACKGROUND_USER_VARIABLE}
-  [[ -n $BG_COLOR_MODIFIER ]] && backgroundColor="$BG_COLOR_MODIFIER"
+    # Colors
+    local backgroundColor="${3}"
+    local foregroundColor="${4}"
 
-  # Overwrite given foreground-color by user defined variable for this segment.
-  local FOREGROUND_USER_VARIABLE=POWERLEVEL9K_${(U)${segment_name}#prompt_}_FOREGROUND
-  local FG_COLOR_MODIFIER=${(P)FOREGROUND_USER_VARIABLE}
-  [[ -n $FG_COLOR_MODIFIER ]] && foregroundColor="$FG_COLOR_MODIFIER"
+    # Overwrite given background-color by user defined variable for this segment.
+    local BACKGROUND_USER_VARIABLE=POWERLEVEL9K_${(U)${segment_name}#prompt_}_BACKGROUND
+    local BG_COLOR_MODIFIER=${(P)BACKGROUND_USER_VARIABLE}
+    [[ -n $BG_COLOR_MODIFIER ]] && backgroundColor="$BG_COLOR_MODIFIER"
 
-  # Get color codes here to save some calls later on
-  backgroundColor="$(getColorCode ${backgroundColor})"
-  foregroundColor="$(getColorCode ${foregroundColor})"
+    # Overwrite given foreground-color by user defined variable for this segment.
+    local FOREGROUND_USER_VARIABLE=POWERLEVEL9K_${(U)${segment_name}#prompt_}_FOREGROUND
+    local FG_COLOR_MODIFIER=${(P)FOREGROUND_USER_VARIABLE}
+    [[ -n $FG_COLOR_MODIFIER ]] && foregroundColor="$FG_COLOR_MODIFIER"
 
-  local background foreground
-  [[ -n "${backgroundColor}" ]] && background="$(backgroundColor ${backgroundColor})" || background="%k"
-  [[ -n "${foregroundColor}" ]] && foreground="$(foregroundColor ${foregroundColor})" || foreground="%f"
+    # Get color codes here to save some calls later on
+    backgroundColor="$(getColorCode ${backgroundColor})"
+    foregroundColor="$(getColorCode ${foregroundColor})"
 
-  # If CURRENT_RIGHT_BG is "NONE", we are the first right segment.
+    local background foreground
+    [[ -n "${backgroundColor}" ]] && background="$(backgroundColor ${backgroundColor})" || background="%k"
+    [[ -n "${foregroundColor}" ]] && foreground="$(foregroundColor ${foregroundColor})" || foreground="%f"
 
-  if [[ "$CURRENT_RIGHT_BG" != "NONE" ]]; then
-    # This is the closing whitespace for the previous segment
-    echo -n "${POWERLEVEL9K_WHITESPACE_BETWEEN_RIGHT_SEGMENTS}%f"
-  fi
+    # If CURRENT_RIGHT_BG is "NONE", we are the first right segment.
 
-  if [[ $joined == false ]] || [[ "$CURRENT_RIGHT_BG" == "NONE" ]]; then
-    if isSameColor "$CURRENT_RIGHT_BG" "${backgroundColor}"; then
-      # Middle segment with same color as previous segment
-      # We take the current foreground color as color for our
-      # subsegment (or the default color). This should have
-      # enough contrast.
-      local complement
-      [[ -n "${foregroundColor}" ]] && complement="${foreground}" || complement="$(foregroundColor $DEFAULT_COLOR)"
-      echo -n "$complement$(print_icon 'RIGHT_SUBSEGMENT_SEPARATOR')%f"
-    else
-      # Use the new Background Color as the foreground of the segment separator
-      echo -n "$(foregroundColor ${backgroundColor})$(print_icon 'RIGHT_SEGMENT_SEPARATOR')%f"
+    if [[ "$CURRENT_RIGHT_BG" != "NONE" ]]; then
+      # This is the closing whitespace for the previous segment
+      output+="${POWERLEVEL9K_WHITESPACE_BETWEEN_RIGHT_SEGMENTS}%f"
     fi
-  fi
 
-  local visual_identifier
-  if [[ -n "$6" ]]; then
-    visual_identifier="$(print_icon $6)"
-    if [[ -n "$visual_identifier" ]]; then
-      # Add an whitespace if we print more than just the visual identifier.
-      # To avoid cutting off the visual identifier in some terminal emulators (e.g., Konsole, st),
-      # we need to color both the visual identifier and the whitespace.
-      [[ -n "$5" ]] && visual_identifier=" $visual_identifier"
-      # Allow users to overwrite the color for the visual identifier only.
-      local visual_identifier_color_variable=POWERLEVEL9K_${(U)${segment_name}#prompt_}_VISUAL_IDENTIFIER_COLOR
-      set_default $visual_identifier_color_variable "${foregroundColor}"
-      visual_identifier="$(foregroundColor ${(P)visual_identifier_color_variable})${visual_identifier}"
+    if [[ $joined == false ]] || [[ "$CURRENT_RIGHT_BG" == "NONE" ]]; then
+      if isSameColor "$CURRENT_RIGHT_BG" "${backgroundColor}"; then
+        # Middle segment with same color as previous segment
+        # We take the current foreground color as color for our
+        # subsegment (or the default color). This should have
+        # enough contrast.
+        local complement
+        [[ -n "${foregroundColor}" ]] && complement="${foreground}" || complement="$(foregroundColor $DEFAULT_COLOR)"
+        output+="$complement$(print_icon 'RIGHT_SUBSEGMENT_SEPARATOR')%f"
+      else
+        # Use the new Background Color as the foreground of the segment separator
+        output+="$(foregroundColor ${backgroundColor})$(print_icon 'RIGHT_SEGMENT_SEPARATOR')%f"
+      fi
     fi
+
+    local visual_identifier
+    if [[ -n "$6" ]]; then
+      visual_identifier="$(print_icon $6)"
+      if [[ -n "$visual_identifier" ]]; then
+        # Add an whitespace if we print more than just the visual identifier.
+        # To avoid cutting off the visual identifier in some terminal emulators (e.g., Konsole, st),
+        # we need to color both the visual identifier and the whitespace.
+        [[ -n "$5" ]] && visual_identifier=" $visual_identifier"
+        # Allow users to overwrite the color for the visual identifier only.
+        local visual_identifier_color_variable=POWERLEVEL9K_${(U)${segment_name}#prompt_}_VISUAL_IDENTIFIER_COLOR
+        set_default $visual_identifier_color_variable "${foregroundColor}"
+        visual_identifier="$(foregroundColor ${(P)visual_identifier_color_variable})${visual_identifier}"
+      fi
+    fi
+
+    output+="${background}${foreground}"
+
+    # Print whitespace only if segment is not joined or first right segment
+    [[ $joined == false ]] || [[ "$CURRENT_RIGHT_BG" == "NONE" ]] && output+="${POWERLEVEL9K_WHITESPACE_BETWEEN_RIGHT_SEGMENTS}"
+
+    cached="${(qq)output} ${(qq)backgroundColor} ${(qq)visual_identifier}"
+    p9k_cache_set $cache_key $cached
   fi
 
-  echo -n "${background}${foreground}"
-
-  # Print whitespace only if segment is not joined or first right segment
-  [[ $joined == false ]] || [[ "$CURRENT_RIGHT_BG" == "NONE" ]] && echo -n "${POWERLEVEL9K_WHITESPACE_BETWEEN_RIGHT_SEGMENTS}"
+  # output backgroundColor visual_identifier
+  local tuple=("${(@Q)${(z)cached}}")
+  echo -n $tuple[1]
+  CURRENT_RIGHT_BG=$tuple[2]
 
   # Print segment content if there is any
   [[ -n "$5" ]] && echo -n "${5}"
   # Print the visual identifier
-  echo -n "${visual_identifier}"
+  echo -n "${tuple[3]}"
 
-  CURRENT_RIGHT_BG="${backgroundColor}"
-  last_right_element_index=$current_index
+  last_right_element_index=$2
 }
 
 ################################################################
@@ -335,18 +414,22 @@ prompt_aws_eb_env() {
 set_default POWERLEVEL9K_BACKGROUND_JOBS_VERBOSE true
 set_default POWERLEVEL9K_BACKGROUND_JOBS_VERBOSE_ALWAYS false
 prompt_background_jobs() {
-  local background_jobs_number=${$(jobs -l | wc -l)// /}
-  local wrong_lines=`jobs -l | awk '/pwd now/{ count++ } END {print count}'`
-  if [[ wrong_lines -gt 0 ]]; then
-     background_jobs_number=$(( $background_jobs_number - $wrong_lines ))
-  fi
-  if [[ background_jobs_number -gt 0 ]]; then
-    local background_jobs_number_print=""
-    if [[ "$POWERLEVEL9K_BACKGROUND_JOBS_VERBOSE" == "true" ]] && ([[ "$background_jobs_number" -gt 1 ]] || [[ "$POWERLEVEL9K_BACKGROUND_JOBS_VERBOSE_ALWAYS" == "true" ]]); then
-      background_jobs_number_print="$background_jobs_number"
+  local job_lines=("${(@f)$(jobs -lr)}")
+  [[ ${(c)#job_lines} == 0 ]] && return
+  
+  local num_jobs=$#job_lines
+  local cache_key="$0 $num_jobs"
+  local cached
+
+  if ! cached=$(p9k_cache_get $cache_key); then
+    cached=""
+    if [[ "$POWERLEVEL9K_BACKGROUND_JOBS_VERBOSE" == "true" ]] && ([[ "$num_jobs" -gt 1 ]] || [[ "$POWERLEVEL9K_BACKGROUND_JOBS_VERBOSE_ALWAYS" == "true" ]]); then
+      cached=$num_jobs
     fi
-    "$1_prompt_segment" "$0" "$2" "$DEFAULT_COLOR" "cyan" "$background_jobs_number_print" 'BACKGROUND_JOBS_ICON'
+    p9k_cache_set $cache_key $cached
   fi
+
+  "$1_prompt_segment" "$0" "$2" "$DEFAULT_COLOR" "cyan" "$cached" 'BACKGROUND_JOBS_ICON'
 }
 
 ################################################################
@@ -797,247 +880,254 @@ set_default POWERLEVEL9K_DIR_PATH_HIGHLIGHT_BOLD false
 prompt_dir() {
   # using $PWD instead of "$(print -P '%~')" to allow use of POWERLEVEL9K_DIR_PATH_ABSOLUTE
   local current_path=$PWD # WAS: local current_path="$(print -P '%~')"
-  # check if the user wants to use absolute paths or "~" paths
-  [[ ${(L)POWERLEVEL9K_DIR_PATH_ABSOLUTE} != "true" ]] && current_path=${current_path/#$HOME/"~"}
-  # declare all local variables
-  local paths directory test_dir test_dir_length trunc_path threshhold
-  # if we are not in "~" or "/", split the paths into an array and exclude "~"
-  (( ${#current_path} > 1 )) && paths=(${(s:/:)${current_path//"~\/"/}}) || paths=()
-  # only run the code if SHORTEN_DIR_LENGTH is set, or we are using the two strategies that don't rely on it.
-  if [[ -n "$POWERLEVEL9K_SHORTEN_DIR_LENGTH" || "$POWERLEVEL9K_SHORTEN_STRATEGY" == "truncate_with_folder_marker" || "$POWERLEVEL9K_SHORTEN_STRATEGY" == "truncate_to_last" || "$POWERLEVEL9K_SHORTEN_STRATEGY" == "truncate_with_package_name" ]]; then
-    set_default POWERLEVEL9K_SHORTEN_DELIMITER "\u2026"
-    # convert delimiter from unicode to literal character, so that we can get the correct length later
-    local delim=$(echo -n $POWERLEVEL9K_SHORTEN_DELIMITER)
+  local cache_key="$0 $2 ${(q)current_path}"
+  local cached
+  if ! cached=$(p9k_cache_get $cache_key); then
+    # check if the user wants to use absolute paths or "~" paths
+    [[ ${(L)POWERLEVEL9K_DIR_PATH_ABSOLUTE} != "true" ]] && current_path=${current_path/#$HOME/"~"}
+    # declare all local variables
+    local paths directory test_dir test_dir_length trunc_path threshhold
+    # if we are not in "~" or "/", split the paths into an array and exclude "~"
+    (( ${#current_path} > 1 )) && paths=(${(s:/:)${current_path//"~\/"/}}) || paths=()
+    # only run the code if SHORTEN_DIR_LENGTH is set, or we are using the two strategies that don't rely on it.
+    if [[ -n "$POWERLEVEL9K_SHORTEN_DIR_LENGTH" || "$POWERLEVEL9K_SHORTEN_STRATEGY" == "truncate_with_folder_marker" || "$POWERLEVEL9K_SHORTEN_STRATEGY" == "truncate_to_last" || "$POWERLEVEL9K_SHORTEN_STRATEGY" == "truncate_with_package_name" ]]; then
+      set_default POWERLEVEL9K_SHORTEN_DELIMITER "\u2026"
+      # convert delimiter from unicode to literal character, so that we can get the correct length later
+      local delim=$(echo -n $POWERLEVEL9K_SHORTEN_DELIMITER)
 
-    case "$POWERLEVEL9K_SHORTEN_STRATEGY" in
-      truncate_absolute_chars)
-        if [ ${#current_path} -gt $(( $POWERLEVEL9K_SHORTEN_DIR_LENGTH + ${#POWERLEVEL9K_SHORTEN_DELIMITER} )) ]; then
-          current_path=$POWERLEVEL9K_SHORTEN_DELIMITER${current_path:(-POWERLEVEL9K_SHORTEN_DIR_LENGTH)}
-        fi
-      ;;
-      truncate_middle)
-        # truncate characters from the middle of the path
-        current_path=$(truncatePath $current_path $POWERLEVEL9K_SHORTEN_DIR_LENGTH $POWERLEVEL9K_SHORTEN_DELIMITER "middle")
-      ;;
-      truncate_from_right)
-        # truncate characters from the right of the path
-        current_path=$(truncatePath "$current_path" $POWERLEVEL9K_SHORTEN_DIR_LENGTH $POWERLEVEL9K_SHORTEN_DELIMITER)
-      ;;
-      truncate_absolute)
-        # truncate all characters except the last POWERLEVEL9K_SHORTEN_DIR_LENGTH characters
-        if [ ${#current_path} -gt $(( $POWERLEVEL9K_SHORTEN_DIR_LENGTH + ${#POWERLEVEL9K_SHORTEN_DELIMITER} )) ]; then
-          current_path=$POWERLEVEL9K_SHORTEN_DELIMITER${current_path:(-POWERLEVEL9K_SHORTEN_DIR_LENGTH)}
-        fi
-      ;;
-      truncate_to_last)
-        # truncate all characters before the current directory
-        current_path=${current_path##*/}
-      ;;
-      truncate_to_first_and_last)
-        if (( ${#current_path} > 1 )) && (( ${POWERLEVEL9K_SHORTEN_DIR_LENGTH} > 0 )); then
-          threshhold=$(( ${POWERLEVEL9K_SHORTEN_DIR_LENGTH} * 2))
-          # if we are in "~", add it back into the paths array
-          [[ $current_path == '~'* ]] && paths=("~" "${paths[@]}")
-          if (( ${#paths} > $threshhold )); then
-            local num=$(( ${#paths} - ${POWERLEVEL9K_SHORTEN_DIR_LENGTH} ))
-            # repace the middle elements
-            for (( i=$POWERLEVEL9K_SHORTEN_DIR_LENGTH; i<$num; i++ )); do
-              paths[$i+1]=$POWERLEVEL9K_SHORTEN_DELIMITER
-            done
-            [[ $current_path != '~'* ]] && current_path="/" || current_path=""
-            current_path+="${(j:/:)paths}"
+      case "$POWERLEVEL9K_SHORTEN_STRATEGY" in
+        truncate_absolute_chars)
+          if [ ${#current_path} -gt $(( $POWERLEVEL9K_SHORTEN_DIR_LENGTH + ${#POWERLEVEL9K_SHORTEN_DELIMITER} )) ]; then
+            current_path=$POWERLEVEL9K_SHORTEN_DELIMITER${current_path:(-POWERLEVEL9K_SHORTEN_DIR_LENGTH)}
           fi
-        fi
-      ;;
-      truncate_to_unique)
-        # for each parent path component find the shortest unique beginning
-        # characters sequence. Source: https://stackoverflow.com/a/45336078
-        if (( ${#current_path} > 1 )); then # root and home are exceptions and won't have paths
-          # cheating here to retain ~ as home folder
-          local home_path="$(getUniqueFolder $HOME)"
-          trunc_path="$(getUniqueFolder $PWD)"
-          [[ $current_path == "~"* ]] && current_path="~${trunc_path//${home_path}/}" || current_path="/${trunc_path}"
-        fi
-      ;;
-      truncate_with_folder_marker)
-        if (( ${#paths} > 0 )); then # root and home are exceptions and won't have paths, so skip this
-          local last_marked_folder marked_folder
-          set_default POWERLEVEL9K_SHORTEN_FOLDER_MARKER ".shorten_folder_marker"
-
-          # Search for the folder marker in the parent directories and
-          # buildup a pattern that is removed from the current path
-          # later on.
-          for marked_folder in $(upsearch $POWERLEVEL9K_SHORTEN_FOLDER_MARKER); do
-            if [[ "$marked_folder" == "/" ]]; then
-              # If we reached root folder, stop upsearch.
-              trunc_path="/"
-            elif [[ "$marked_folder" == "$HOME" ]]; then
-              # If we reached home folder, stop upsearch.
-              trunc_path="~"
-            elif [[ "${marked_folder%/*}" == $last_marked_folder ]]; then
-              trunc_path="${trunc_path%/}/${marked_folder##*/}"
-            else
-              trunc_path="${trunc_path%/}/$POWERLEVEL9K_SHORTEN_DELIMITER/${marked_folder##*/}"
+        ;;
+        truncate_middle)
+          # truncate characters from the middle of the path
+          current_path=$(truncatePath $current_path $POWERLEVEL9K_SHORTEN_DIR_LENGTH $POWERLEVEL9K_SHORTEN_DELIMITER "middle")
+        ;;
+        truncate_from_right)
+          # truncate characters from the right of the path
+          current_path=$(truncatePath "$current_path" $POWERLEVEL9K_SHORTEN_DIR_LENGTH $POWERLEVEL9K_SHORTEN_DELIMITER)
+        ;;
+        truncate_absolute)
+          # truncate all characters except the last POWERLEVEL9K_SHORTEN_DIR_LENGTH characters
+          if [ ${#current_path} -gt $(( $POWERLEVEL9K_SHORTEN_DIR_LENGTH + ${#POWERLEVEL9K_SHORTEN_DELIMITER} )) ]; then
+            current_path=$POWERLEVEL9K_SHORTEN_DELIMITER${current_path:(-POWERLEVEL9K_SHORTEN_DIR_LENGTH)}
+          fi
+        ;;
+        truncate_to_last)
+          # truncate all characters before the current directory
+          current_path=${current_path##*/}
+        ;;
+        truncate_to_first_and_last)
+          if (( ${#current_path} > 1 )) && (( ${POWERLEVEL9K_SHORTEN_DIR_LENGTH} > 0 )); then
+            threshhold=$(( ${POWERLEVEL9K_SHORTEN_DIR_LENGTH} * 2))
+            # if we are in "~", add it back into the paths array
+            [[ $current_path == '~'* ]] && paths=("~" "${paths[@]}")
+            if (( ${#paths} > $threshhold )); then
+              local num=$(( ${#paths} - ${POWERLEVEL9K_SHORTEN_DIR_LENGTH} ))
+              # repace the middle elements
+              for (( i=$POWERLEVEL9K_SHORTEN_DIR_LENGTH; i<$num; i++ )); do
+                paths[$i+1]=$POWERLEVEL9K_SHORTEN_DELIMITER
+              done
+              [[ $current_path != '~'* ]] && current_path="/" || current_path=""
+              current_path+="${(j:/:)paths}"
             fi
-            last_marked_folder=$marked_folder
-          done
+          fi
+        ;;
+        truncate_to_unique)
+          # for each parent path component find the shortest unique beginning
+          # characters sequence. Source: https://stackoverflow.com/a/45336078
+          if (( ${#current_path} > 1 )); then # root and home are exceptions and won't have paths
+            # cheating here to retain ~ as home folder
+            local home_path="$(getUniqueFolder $HOME)"
+            trunc_path="$(getUniqueFolder $PWD)"
+            [[ $current_path == "~"* ]] && current_path="~${trunc_path//${home_path}/}" || current_path="/${trunc_path}"
+          fi
+        ;;
+        truncate_with_folder_marker)
+          if (( ${#paths} > 0 )); then # root and home are exceptions and won't have paths, so skip this
+            local last_marked_folder marked_folder
+            set_default POWERLEVEL9K_SHORTEN_FOLDER_MARKER ".shorten_folder_marker"
+
+            # Search for the folder marker in the parent directories and
+            # buildup a pattern that is removed from the current path
+            # later on.
+            for marked_folder in $(upsearch $POWERLEVEL9K_SHORTEN_FOLDER_MARKER); do
+              if [[ "$marked_folder" == "/" ]]; then
+                # If we reached root folder, stop upsearch.
+                trunc_path="/"
+              elif [[ "$marked_folder" == "$HOME" ]]; then
+                # If we reached home folder, stop upsearch.
+                trunc_path="~"
+              elif [[ "${marked_folder%/*}" == $last_marked_folder ]]; then
+                trunc_path="${trunc_path%/}/${marked_folder##*/}"
+              else
+                trunc_path="${trunc_path%/}/$POWERLEVEL9K_SHORTEN_DELIMITER/${marked_folder##*/}"
+              fi
+              last_marked_folder=$marked_folder
+            done
+
+            # Replace the shortest possible match of the marked folder from
+            # the current path.
+            current_path=$trunc_path${current_path#${last_marked_folder}*}
+          fi
+        ;;
+        truncate_with_package_name)
+          local name repo_path package_path current_dir zero
+
+          # Get the path of the Git repo, which should have the package.json file
+          if [[ $(git rev-parse --is-inside-work-tree 2> /dev/null) == "true" ]]; then
+            # Get path from the root of the git repository to the current dir
+            local gitPath=$(git rev-parse --show-prefix)
+            # Remove trailing slash from git path, so that we can
+            # remove that git path from the pwd.
+            gitPath=${gitPath%/}
+            package_path=${$(pwd)%%$gitPath}
+            # Remove trailing slash
+            package_path=${package_path%/}
+          elif [[ $(git rev-parse --is-inside-git-dir 2> /dev/null) == "true" ]]; then
+            package_path=${$(pwd)%%/.git*}
+          fi
 
           # Replace the shortest possible match of the marked folder from
-          # the current path.
-          current_path=$trunc_path${current_path#${last_marked_folder}*}
-        fi
-      ;;
-      truncate_with_package_name)
-        local name repo_path package_path current_dir zero
+          # the current path. Remove the amount of characters up to the
+          # folder marker from the left. Count only the visible characters
+          # in the path (this is done by the "zero" pattern; see
+          # http://stackoverflow.com/a/40855342/5586433).
+          local zero='%([BSUbfksu]|([FB]|){*})'
+          trunc_path=$(pwd)
+          # Then, find the length of the package_path string, and save the
+          # subdirectory path as a substring of the current directory's path from 0
+          # to the length of the package path's string
+          subdirectory_path=$(truncatePath "${trunc_path:${#${(S%%)package_path//$~zero/}}}" $POWERLEVEL9K_SHORTEN_DIR_LENGTH $POWERLEVEL9K_SHORTEN_DELIMITER)
+          # Parse the 'name' from the package.json; if there are any problems, just
+          # print the file path
+          defined POWERLEVEL9K_DIR_PACKAGE_FILES || POWERLEVEL9K_DIR_PACKAGE_FILES=(package.json composer.json)
 
-        # Get the path of the Git repo, which should have the package.json file
-        if [[ $(git rev-parse --is-inside-work-tree 2> /dev/null) == "true" ]]; then
-          # Get path from the root of the git repository to the current dir
-          local gitPath=$(git rev-parse --show-prefix)
-          # Remove trailing slash from git path, so that we can
-          # remove that git path from the pwd.
-          gitPath=${gitPath%/}
-          package_path=${$(pwd)%%$gitPath}
-          # Remove trailing slash
-          package_path=${package_path%/}
-        elif [[ $(git rev-parse --is-inside-git-dir 2> /dev/null) == "true" ]]; then
-          package_path=${$(pwd)%%/.git*}
-        fi
+          local pkgFile="unknown"
+          for file in "${POWERLEVEL9K_DIR_PACKAGE_FILES[@]}"; do
+            if [[ -f "${package_path}/${file}" ]]; then
+              pkgFile="${package_path}/${file}"
+              break;
+            fi
+          done
 
-        # Replace the shortest possible match of the marked folder from
-        # the current path. Remove the amount of characters up to the
-        # folder marker from the left. Count only the visible characters
-        # in the path (this is done by the "zero" pattern; see
-        # http://stackoverflow.com/a/40855342/5586433).
-        local zero='%([BSUbfksu]|([FB]|){*})'
-        trunc_path=$(pwd)
-        # Then, find the length of the package_path string, and save the
-        # subdirectory path as a substring of the current directory's path from 0
-        # to the length of the package path's string
-        subdirectory_path=$(truncatePath "${trunc_path:${#${(S%%)package_path//$~zero/}}}" $POWERLEVEL9K_SHORTEN_DIR_LENGTH $POWERLEVEL9K_SHORTEN_DELIMITER)
-        # Parse the 'name' from the package.json; if there are any problems, just
-        # print the file path
-        defined POWERLEVEL9K_DIR_PACKAGE_FILES || POWERLEVEL9K_DIR_PACKAGE_FILES=(package.json composer.json)
-
-        local pkgFile="unknown"
-        for file in "${POWERLEVEL9K_DIR_PACKAGE_FILES[@]}"; do
-          if [[ -f "${package_path}/${file}" ]]; then
-            pkgFile="${package_path}/${file}"
-            break;
+          local packageName=$(jq '.name' ${pkgFile} 2> /dev/null \
+            || node -e 'console.log(require(process.argv[1]).name);' ${pkgFile} 2>/dev/null \
+            || cat "${pkgFile}" 2> /dev/null | grep -m 1 "\"name\"" | awk -F ':' '{print $2}' | awk -F '"' '{print $2}' 2>/dev/null \
+            )
+          if [[ -n "${packageName}" ]]; then
+            # Instead of printing out the full path, print out the name of the package
+            # from the package.json and append the current subdirectory
+            current_path="`echo $packageName | tr -d '"'`$subdirectory_path"
           fi
-        done
+        ;;
+        *)
+          if [[ $current_path != "~" ]]; then
+            current_path="$(print -P "%$((POWERLEVEL9K_SHORTEN_DIR_LENGTH+1))(c:$POWERLEVEL9K_SHORTEN_DELIMITER/:)%${POWERLEVEL9K_SHORTEN_DIR_LENGTH}c")"
+          fi
+        ;;
+      esac
+    fi
 
-        local packageName=$(jq '.name' ${pkgFile} 2> /dev/null \
-          || node -e 'console.log(require(process.argv[1]).name);' ${pkgFile} 2>/dev/null \
-          || cat "${pkgFile}" 2> /dev/null | grep -m 1 "\"name\"" | awk -F ':' '{print $2}' | awk -F '"' '{print $2}' 2>/dev/null \
-          )
-        if [[ -n "${packageName}" ]]; then
-          # Instead of printing out the full path, print out the name of the package
-          # from the package.json and append the current subdirectory
-          current_path="`echo $packageName | tr -d '"'`$subdirectory_path"
+    # save state of path for highlighting and bold options
+    local path_opt=$current_path
+
+    typeset -AH dir_states
+    dir_states=(
+      "DEFAULT"         "FOLDER_ICON"
+      "HOME"            "HOME_ICON"
+      "HOME_SUBFOLDER"  "HOME_SUB_ICON"
+      "NOT_WRITABLE"    "LOCK_ICON"
+      "ETC"             "ETC_ICON"
+    )
+    local state_path="$(print -P '%~')"
+    local current_state="DEFAULT"
+    if [[ $state_path == '/etc'* ]]; then
+      current_state='ETC'
+    elif [[ "${POWERLEVEL9K_DIR_SHOW_WRITABLE}" == true && ! -w "$PWD" ]]; then
+      current_state="NOT_WRITABLE"
+    elif [[ $state_path == '~' ]]; then
+      current_state="HOME"
+    elif [[ $state_path == '~'* ]]; then
+      current_state="HOME_SUBFOLDER"
+    fi
+
+    # declare variables used for bold and state colors
+    local bld_on bld_off dir_state_foreground dir_state_user_foreground
+    # test if user wants the last directory printed in bold
+    if [[ "${(L)POWERLEVEL9K_DIR_PATH_HIGHLIGHT_BOLD}" == "true" ]]; then
+      bld_on="%B"
+      bld_off="%b"
+    else
+      bld_on=""
+      bld_off=""
+    fi
+    # determine is the user has set a last directory color
+    local dir_state_user_foreground=POWERLEVEL9K_DIR_${current_state}_FOREGROUND
+    local dir_state_foreground=${(P)dir_state_user_foreground}
+    [[ -z ${dir_state_foreground} ]] && dir_state_foreground="${DEFAULT_COLOR}"
+
+    local dir_name base_name
+    # use ZSH substitution to get the dirname and basename instead of calling external functions
+    dir_name=${path_opt%/*}
+    base_name=${path_opt##*/}
+
+    # if the user wants the last directory colored...
+    if [[ -n ${POWERLEVEL9K_DIR_PATH_HIGHLIGHT_FOREGROUND} ]]; then
+      # it the path is "/" or "~"
+      if [[ $path_opt == "/" || $path_opt == "~" ]]; then
+        current_path="${bld_on}%F{$POWERLEVEL9K_DIR_PATH_HIGHLIGHT_FOREGROUND}${current_path}${bld_off}"
+      else # has a subfolder
+        # test if dirname != basename - they are equal if we use truncate_to_last or truncate_absolute
+        if [[ $dir_name != $base_name ]]; then
+          current_path="${dir_name}/${bld_on}%F{$POWERLEVEL9K_DIR_PATH_HIGHLIGHT_FOREGROUND}${base_name}${bld_off}"
+        else
+          current_path="${bld_on}%F{$POWERLEVEL9K_DIR_PATH_HIGHLIGHT_FOREGROUND}${base_name}${bld_off}"
         fi
-      ;;
-      *)
-        if [[ $current_path != "~" ]]; then
-          current_path="$(print -P "%$((POWERLEVEL9K_SHORTEN_DIR_LENGTH+1))(c:$POWERLEVEL9K_SHORTEN_DELIMITER/:)%${POWERLEVEL9K_SHORTEN_DIR_LENGTH}c")"
+      fi
+    else # no coloring
+      # it the path is "/" or "~"
+      if [[ $path_opt == "/" || $path_opt == "~" ]]; then
+        current_path="${bld_on}${current_path}${bld_off}"
+      else # has a subfolder
+        # test if dirname != basename - they are equal if we use truncate_to_last or truncate_absolute
+        if [[ $dir_name != $base_name ]]; then
+          current_path="${dir_name}/${bld_on}${base_name}${bld_off}"
+        else
+          current_path="${bld_on}${base_name}${bld_off}"
         fi
-      ;;
-    esac
-  fi
-
-  # save state of path for highlighting and bold options
-  local path_opt=$current_path
-
-  typeset -AH dir_states
-  dir_states=(
-    "DEFAULT"         "FOLDER_ICON"
-    "HOME"            "HOME_ICON"
-    "HOME_SUBFOLDER"  "HOME_SUB_ICON"
-    "NOT_WRITABLE"    "LOCK_ICON"
-    "ETC"             "ETC_ICON"
-  )
-  local state_path="$(print -P '%~')"
-  local current_state="DEFAULT"
-  if [[ $state_path == '/etc'* ]]; then
-    current_state='ETC'
-  elif [[ "${POWERLEVEL9K_DIR_SHOW_WRITABLE}" == true && ! -w "$PWD" ]]; then
-    current_state="NOT_WRITABLE"
-  elif [[ $state_path == '~' ]]; then
-    current_state="HOME"
-  elif [[ $state_path == '~'* ]]; then
-    current_state="HOME_SUBFOLDER"
-  fi
-
-  # declare variables used for bold and state colors
-  local bld_on bld_off dir_state_foreground dir_state_user_foreground
-  # test if user wants the last directory printed in bold
-  if [[ "${(L)POWERLEVEL9K_DIR_PATH_HIGHLIGHT_BOLD}" == "true" ]]; then
-    bld_on="%B"
-    bld_off="%b"
-  else
-    bld_on=""
-    bld_off=""
-  fi
-  # determine is the user has set a last directory color
-  local dir_state_user_foreground=POWERLEVEL9K_DIR_${current_state}_FOREGROUND
-  local dir_state_foreground=${(P)dir_state_user_foreground}
-  [[ -z ${dir_state_foreground} ]] && dir_state_foreground="${DEFAULT_COLOR}"
-
-  local dir_name base_name
-  # use ZSH substitution to get the dirname and basename instead of calling external functions
-  dir_name=${path_opt%/*}
-  base_name=${path_opt##*/}
-
-  # if the user wants the last directory colored...
-  if [[ -n ${POWERLEVEL9K_DIR_PATH_HIGHLIGHT_FOREGROUND} ]]; then
-    # it the path is "/" or "~"
-    if [[ $path_opt == "/" || $path_opt == "~" ]]; then
-      current_path="${bld_on}%F{$POWERLEVEL9K_DIR_PATH_HIGHLIGHT_FOREGROUND}${current_path}${bld_off}"
-    else # has a subfolder
-      # test if dirname != basename - they are equal if we use truncate_to_last or truncate_absolute
-      if [[ $dir_name != $base_name ]]; then
-        current_path="${dir_name}/${bld_on}%F{$POWERLEVEL9K_DIR_PATH_HIGHLIGHT_FOREGROUND}${base_name}${bld_off}"
-      else
-        current_path="${bld_on}%F{$POWERLEVEL9K_DIR_PATH_HIGHLIGHT_FOREGROUND}${base_name}${bld_off}"
       fi
     fi
-  else # no coloring
-    # it the path is "/" or "~"
-    if [[ $path_opt == "/" || $path_opt == "~" ]]; then
-      current_path="${bld_on}${current_path}${bld_off}"
-    else # has a subfolder
-      # test if dirname != basename - they are equal if we use truncate_to_last or truncate_absolute
-      if [[ $dir_name != $base_name ]]; then
-        current_path="${dir_name}/${bld_on}${base_name}${bld_off}"
-      else
-        current_path="${bld_on}${base_name}${bld_off}"
-      fi
+
+    # check if we need to omit the first character and only do it if we are not in "~" or "/"
+    if [[ "${POWERLEVEL9K_DIR_OMIT_FIRST_CHARACTER}" == "true" && $path_opt != "/" && $path_opt != "~" ]]; then
+      current_path="${current_path[2,-1]}"
     fi
+
+    # check if the user wants the separator colored.
+    if [[ -n ${POWERLEVEL9K_DIR_PATH_SEPARATOR_FOREGROUND} && $path_opt != "/" ]]; then
+      # because this contains color changing codes, it is easier to set a variable for what should be replaced
+      local repl="%F{$POWERLEVEL9K_DIR_PATH_SEPARATOR_FOREGROUND}/%F{$dir_state_foreground}"
+      # escape the / with a \
+      current_path=${current_path//\//$repl}
+    fi
+
+    if [[ "${POWERLEVEL9K_DIR_PATH_SEPARATOR}" != "/" && $path_opt != "/" ]]; then
+      current_path=${current_path//\//$POWERLEVEL9K_DIR_PATH_SEPARATOR}
+    fi
+
+    if [[ "${POWERLEVEL9K_HOME_FOLDER_ABBREVIATION}" != "~" && ! "${(L)POWERLEVEL9K_DIR_OMIT_FIRST_CHARACTER}" == "true" ]]; then
+      # use :s to only replace the first occurance
+      current_path=${current_path:s/~/$POWERLEVEL9K_HOME_FOLDER_ABBREVIATION}
+    fi
+
+    cached="$0_$current_state ${(qq)2} blue ${(qq)DEFAULT_COLOR} ${(qq)current_path} ${(qq)dir_states[$current_state]}"
+    p9k_cache_set $cache_key $cached
   fi
 
-  # check if we need to omit the first character and only do it if we are not in "~" or "/"
-  if [[ "${POWERLEVEL9K_DIR_OMIT_FIRST_CHARACTER}" == "true" && $path_opt != "/" && $path_opt != "~" ]]; then
-    current_path="${current_path[2,-1]}"
-  fi
-
-  # check if the user wants the separator colored.
-  if [[ -n ${POWERLEVEL9K_DIR_PATH_SEPARATOR_FOREGROUND} && $path_opt != "/" ]]; then
-    # because this contains color changing codes, it is easier to set a variable for what should be replaced
-    local repl="%F{$POWERLEVEL9K_DIR_PATH_SEPARATOR_FOREGROUND}/%F{$dir_state_foreground}"
-    # escape the / with a \
-    current_path=${current_path//\//$repl}
-  fi
-
-  if [[ "${POWERLEVEL9K_DIR_PATH_SEPARATOR}" != "/" && $path_opt != "/" ]]; then
-    current_path=${current_path//\//$POWERLEVEL9K_DIR_PATH_SEPARATOR}
-  fi
-
-  if [[ "${POWERLEVEL9K_HOME_FOLDER_ABBREVIATION}" != "~" && ! "${(L)POWERLEVEL9K_DIR_OMIT_FIRST_CHARACTER}" == "true" ]]; then
-    # use :s to only replace the first occurance
-    current_path=${current_path:s/~/$POWERLEVEL9K_HOME_FOLDER_ABBREVIATION}
-  fi
-
-  "$1_prompt_segment" "$0_${current_state}" "$2" "blue" "$DEFAULT_COLOR" "${current_path}" "${dir_states[$current_state]}"
+  "$1_prompt_segment" "${(@Q)${(z)cached}}"
 }
 
 ################################################################
@@ -1408,39 +1498,47 @@ exit_code_or_status() {
 }
 
 prompt_status() {
-  local ec_text
-  local ec_sum
-  local ec
+  local cache_key="$0 $2 $RETVAL $RETVALS"
+  local cached
+  if ! cached=$(p9k_cache_get $cache_key); then
+    local ec_text
+    local ec_sum
+    local ec
 
-  if [[ $POWERLEVEL9K_STATUS_SHOW_PIPESTATUS == true ]]; then
-    if (( $#RETVALS > 1 )); then
-      ec_text=$(exit_code_or_status "${RETVALS[1]}")
-      ec_sum=${RETVALS[1]}
+    if [[ $POWERLEVEL9K_STATUS_SHOW_PIPESTATUS == true ]]; then
+      if (( $#RETVALS > 1 )); then
+        ec_text=$(exit_code_or_status "${RETVALS[1]}")
+        ec_sum=${RETVALS[1]}
+      else
+        ec_text=$(exit_code_or_status "${RETVAL}")
+        ec_sum=${RETVAL}
+      fi
+
+      for ec in "${(@)RETVALS[2,-1]}"; do
+        ec_text="${ec_text}|$(exit_code_or_status "$ec")"
+        ec_sum=$(( $ec_sum + $ec ))
+      done
     else
+      # We use RETVAL instead of the right-most RETVALS item because
+      # PIPE_FAIL may be set.
       ec_text=$(exit_code_or_status "${RETVAL}")
       ec_sum=${RETVAL}
     fi
 
-    for ec in "${(@)RETVALS[2,-1]}"; do
-      ec_text="${ec_text}|$(exit_code_or_status "$ec")"
-      ec_sum=$(( $ec_sum + $ec ))
-    done
-  else
-    # We use RETVAL instead of the right-most RETVALS item because
-    # PIPE_FAIL may be set.
-    ec_text=$(exit_code_or_status "${RETVAL}")
-    ec_sum=${RETVAL}
-  fi
-
-  if (( ec_sum > 0 )); then
-    if [[ "$POWERLEVEL9K_STATUS_CROSS" == false && "$POWERLEVEL9K_STATUS_VERBOSE" == true ]]; then
-      "$1_prompt_segment" "$0_ERROR" "$2" "red" "yellow1" "$ec_text" 'CARRIAGE_RETURN_ICON'
-    else
-      "$1_prompt_segment" "$0_ERROR" "$2" "$DEFAULT_COLOR" "red" "" 'FAIL_ICON'
+    if (( ec_sum > 0 )); then
+      if [[ "$POWERLEVEL9K_STATUS_CROSS" == false && "$POWERLEVEL9K_STATUS_VERBOSE" == true ]]; then
+        cached="$0_ERROR ${(qq)2} red yellow1 ${(qq)ec_text} CARRIAGE_RETURN_ICON"
+      else
+        cached="$0_ERROR ${(qq)2} ${(qq)DEFAULT_COLOR} red '' FAIL_ICON"
+      fi
+    elif [[ "$POWERLEVEL9K_STATUS_OK" == true ]] && [[ "$POWERLEVEL9K_STATUS_VERBOSE" == true || "$POWERLEVEL9K_STATUS_OK_IN_NON_VERBOSE" == true ]]; then
+      cached="$0_OK ${(qq)2} ${(qq)DEFAULT_COLOR} green '' OK_ICON"
     fi
-  elif [[ "$POWERLEVEL9K_STATUS_OK" == true ]] && [[ "$POWERLEVEL9K_STATUS_VERBOSE" == true || "$POWERLEVEL9K_STATUS_OK_IN_NON_VERBOSE" == true ]]; then
-    "$1_prompt_segment" "$0_OK" "$2" "$DEFAULT_COLOR" "green" "" 'OK_ICON'
+    if (( $#RETVALS < 3 )); then
+      p9k_cache_set $cache_key $cached
+    fi
   fi
+  "$1_prompt_segment" "${(@Q)${(z)cached}}"
 }
 
 ################################################################
@@ -1834,6 +1932,14 @@ powerlevel9k_prepare_prompts() {
 
   # Reset start time
   _P9K_TIMER_START=0x7FFFFFFF
+
+  if [[ -s $P9K_CACHE_CHANNEL ]]; then
+    eval $(<$P9K_CACHE_CHANNEL)
+    rm -f $P9K_CACHE_CHANNEL
+    if [[ -n $POWERLEVEL9K_MAX_CACHE_SIZE && $#p9k_cache_data -gt $POWERLEVEL9K_MAX_CACHE_SIZE ]]; then
+      p9k_cache_data=()
+    fi
+  fi
 
   if [[ "$POWERLEVEL9K_PROMPT_ON_NEWLINE" == true ]]; then
     PROMPT='$(print_icon 'MULTILINE_FIRST_PROMPT_PREFIX')%f%b%k$(build_left_prompt)
