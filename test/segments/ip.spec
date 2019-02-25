@@ -7,225 +7,239 @@ SHUNIT_PARENT=$0
 
 function setUp() {
   export TERM="xterm-256color"
+
+  # Test specific
+  P9K_HOME=$(pwd)
+  FOLDER=/tmp/powerlevel9k-test
+  mkdir -p $FOLDER
+  mkdir $FOLDER/sbin
+}
+
+function tearDown() {
+  # Go back to powerlevel9k folder
+  cd "${P9K_HOME}"
+  # Remove eventually created test-specific folder
+  rm -fr "${FOLDER}"
+
+  unset FOLDER
+  unset P9K_HOME
+}
+
+function fakeIfconfig() {
+  local INTERFACE1="${1}"
+  [[ -z "${INTERFACE1}" ]] && INTERFACE1="eth0"
+  local INTERFACE1_IP="1.2.3.4"
+  local INTERFACE2="${2}"
+  [[ -z "${INTERFACE2}" ]] && INTERFACE2="disabled-if2"
+  local INTERFACE2_IP="5.6.7.8"
+    # Fake ifconfig
+  cat > $FOLDER/sbin/ifconfig <<EOF
+#!/usr/bin/env zsh
+
+if [[ "\$*" =~ '-l' ]]; then
+  echo "docker0 tun1 ${INTERFACE1} ${INTERFACE2} lo"
+  exit 0
+fi
+
+if [[ "\$*" =~ '${INTERFACE1}' ]]; then
+  cat <<INNER
+tun1: flags=4099<UP,BROADCAST,MULTICAST>  mtu 1500
+        inet ${INTERFACE1_IP}  txqueuelen 1000  (Ethernet)
+        RX packets 0  bytes 0 (0.0 B)
+        RX errors 0  dropped 0  overruns 0  frame 0
+        TX packets 0  bytes 0 (0.0 B)
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+        device interrupt 16  memory 0xe8200000-e8220000
+INNER
+  exit 0
+fi
+
+if [[ "\$*" =~ '${INTERFACE2}' ]]; then
+  cat <<INNER
+tun1: flags=4099<UP,BROADCAST,MULTICAST>  mtu 1500
+        inet ${INTERFACE2_IP}  txqueuelen 1000  (Ethernet)
+        RX packets 0  bytes 0 (0.0 B)
+        RX errors 0  dropped 0  overruns 0  frame 0
+        TX packets 0  bytes 0 (0.0 B)
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+        device interrupt 16  memory 0xe8200000-e8220000
+INNER
+  exit 0
+fi
+
+
+# If neither INTERFACE1 nor INTERFACE2 is queried, fake a offline (DOWN) interface.
+# We assume if there is at least one argument, we queried for a specific interface.
+if [[ "\$#" -gt 0 ]]; then
+  cat <<INNER
+tun1: flags=4099<DOWN,BROADCAST,MULTICAST>  mtu 1500
+        inet 5.5.5.5  txqueuelen 1000  (Ethernet)
+        RX packets 0  bytes 0 (0.0 B)
+        RX errors 0  dropped 0  overruns 0  frame 0
+        TX packets 0  bytes 0 (0.0 B)
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+        device interrupt 16  memory 0xe8200000-e8220000
+INNER
+  exit 0
+fi
+
+if [[ "\$#" -eq 0 ]]; then
+  cat <<INNER
+docker0: flags=4099<DOWN,BROADCAST,MULTICAST>  mtu 1500
+        inet 172.17.0.1  netmask 255.255.0.0  broadcast 172.17.255.255
+        ether 02:42:8f:5c:ed:51  txqueuelen 0  (Ethernet)
+        RX packets 0  bytes 0 (0.0 B)
+        RX errors 0  dropped 0  overruns 0  frame 0
+        TX packets 0  bytes 0 (0.0 B)
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+
+tun1: flags=4099<DOWN,BROADCAST,MULTICAST>  mtu 1500
+        inet 10.20.30.40  txqueuelen 1000  (Ethernet)
+        RX packets 0  bytes 0 (0.0 B)
+        RX errors 0  dropped 0  overruns 0  frame 0
+        TX packets 0  bytes 0 (0.0 B)
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+        device interrupt 16  memory 0xe8200000-e8220000
+
+${INTERFACE1}: flags=4099<UP,BROADCAST,MULTICAST>  mtu 1500
+        inet ${INTERFACE1_IP}  txqueuelen 1000  (Ethernet)
+        RX packets 0  bytes 0 (0.0 B)
+        RX errors 0  dropped 0  overruns 0  frame 0
+        TX packets 0  bytes 0 (0.0 B)
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+        device interrupt 16  memory 0xe8200000-e8220000
+
+${INTERFACE2}: flags=4099<UP,BROADCAST,MULTICAST>  mtu 1500
+        inet ${INTERFACE2_IP}  txqueuelen 1000  (Ethernet)
+        RX packets 0  bytes 0 (0.0 B)
+        RX errors 0  dropped 0  overruns 0  frame 0
+        TX packets 0  bytes 0 (0.0 B)
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+        device interrupt 16  memory 0xe8200000-e8220000
+
+lo: flags=73<UP,LOOPBACK,RUNNING>  mtu 65536
+        inet 127.0.0.1  netmask 255.0.0.0
+        inet6 ::1  prefixlen 128  scopeid 0x10<host>
+        loop  txqueuelen 1000  (Local Loopback)
+        RX packets 5136  bytes 328651 (320.9 KiB)
+        RX errors 0  dropped 0  overruns 0  frame 0
+        TX packets 5136  bytes 328651 (320.9 KiB)
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+INNER
+exit 0
+fi
+EOF
+  chmod +x $FOLDER/sbin/ifconfig
+}
+
+function fakeIp() {
+  local INTERFACE1="${1}"
+  [[ -z "${INTERFACE1}" ]] && INTERFACE1="eth0"
+  local INTERFACE2="${2}"
+  [[ -z "${INTERFACE2}" ]] && INTERFACE2="disabled-if2"
+  cat > $FOLDER/sbin/ip <<EOF
+#!/usr/bin/env zsh
+
+  if [[ "\$*" =~ '-brief.*show' ]]; then
+    cat <<INNER
+lo               UNKNOWN        127.0.0.1/8
+${INTERFACE1}    UP             1.2.3.4/24
+${INTERFACE2}    UP             5.4.3.2/16
+docker0          DOWN           172.17.0.1/16
+INNER
+  fi
+
+  if [[ "\$*" =~ 'show ${INTERFACE1}' ]]; then
+    cat <<INNER
+2: ${INTERFACE1}: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast state UP group default qlen 1000
+  inet 10.0.2.15/24 brd 10.0.2.255 scope global eth0
+  valid_lft forever preferred_lft forever
+INNER
+  fi
+
+  if [[ "\$*" =~ 'show ${INTERFACE2}' ]]; then
+    cat <<INNER
+3: ${INTERFACE2}: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast state UP group default qlen 1000
+  inet 1.2.3.4 brd 10.0.2.255 scope global eth0
+  valid_lft forever preferred_lft forever
+INNER
+  fi
+EOF
+
+  chmod +x $FOLDER/sbin/ip
 }
 
 function testIpSegmentPrintsNothingOnOsxIfNotConnected() {
-  local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
-  POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(ip custom_world)
-  alias networksetup='echo "not connected"'
-  local POWERLEVEL9K_CUSTOM_WORLD='echo world'
+  cat > $FOLDER/sbin/ifconfig <<EOF
+#!/usr/bin/env zsh
+
+echo "not connected"
+EOF
 
   # Load Powerlevel9k
   source powerlevel9k.zsh-theme
   local OS="OSX" # Fake OSX
 
-  assertEquals "%K{007} %F{000}world %k%F{007}%f " "$(build_left_prompt)"
-
-  unalias networksetup
+  assertEquals "" "$(prompt_ip left 1 false "$FOLDER")"
 }
 
 function testIpSegmentPrintsNothingOnLinuxIfNotConnected() {
-  local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
-  POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(ip custom_world)
-  alias ip='echo "not connected"'
-  local POWERLEVEL9K_CUSTOM_WORLD='echo world'
-
   # Load Powerlevel9k
   source powerlevel9k.zsh-theme
   local OS="Linux" # Fake Linux
 
-  assertEquals "%K{007} %F{000}world %k%F{007}%f " "$(build_left_prompt)"
+  cat > $FOLDER/sbin/ip <<EOF
+#!/usr/bin/env zsh
 
-  unalias ip
+echo "not connected"
+EOF
+  chmod +x $FOLDER/sbin/ip
+
+  assertEquals "" "$(prompt_ip left 1 false "$FOLDER")"
 }
 
 function testIpSegmentWorksOnOsxWithNoInterfaceSpecified() {
-  local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
-  POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(ip)
-  alias networksetup="echo 'An asterisk (*) denotes that a network service is disabled.
-(1) Ethernet
-(Hardware Port: Ethernet, Device: en0)
-
-(2) FireWire
-(Hardware Port: FireWire, Device: fw0)
-
-(3) Wi-Fi
-(Hardware Port: Wi-Fi, Device: en1)
-
-(4) Bluetooth PAN
-(Hardware Port: Bluetooth PAN, Device: en3)
-
-(5) Thunderbolt Bridge
-(Hardware Port: Thunderbolt Bridge, Device: bridge0)
-
-(6) Apple USB Ethernet Adapter
-(Hardware Port: Apple USB Ethernet Adapter, Device: en4)
-'"
-
-  alias ipconfig="_(){ echo '1.2.3.4'; };_"
-
   # Load Powerlevel9k
   source powerlevel9k.zsh-theme
   local OS='OSX' # Fake OSX
 
-  assertEquals "%K{006} %F{000}IP %F{000}1.2.3.4 %k%F{006}%f " "$(build_left_prompt)"
+  fakeIfconfig "eth1" "eth2"
 
-  unalias ipconfig
-  unalias networksetup
-}
-
-# There could be more than one confiured network interfaces.
-# `networksetup -listnetworkserviceorder` lists the interfaces
-# in hierarchical order, but from outside this is not obvious
-# (implementation detail). So we need a test for this case.
-function testIpSegmentWorksOnOsxWithMultipleInterfacesSpecified() {
-  local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
-  POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(ip)
-  alias networksetup="echo 'An asterisk (*) denotes that a network service is disabled.
-(1) Ethernet
-(Hardware Port: Ethernet, Device: en0)
-
-(2) FireWire
-(Hardware Port: FireWire, Device: fw0)
-
-(3) Wi-Fi
-(Hardware Port: Wi-Fi, Device: en1)
-
-(4) Bluetooth PAN
-(Hardware Port: Bluetooth PAN, Device: en3)
-
-(5) Thunderbolt Bridge
-(Hardware Port: Thunderbolt Bridge, Device: bridge0)
-
-(6) Apple USB Ethernet Adapter
-(Hardware Port: Apple USB Ethernet Adapter, Device: en4)
-'"
-
-  # Return a unique IP address for every interface
-  ipconfig() {
-      case "${2}" {
-          en0)
-            echo 1.2.3.4
-          ;;
-          fw0)
-            echo 2.3.4.5
-          ;;
-          en1)
-            echo 3.4.5.6
-          ;;
-          en3)
-            echo 4.5.6.7
-          ;;
-      }
-  }
-
-  # Load Powerlevel9k
-  source powerlevel9k.zsh-theme
-  local OS='OSX' # Fake OSX
-
-  assertEquals "%K{006} %F{000}IP %F{000}1.2.3.4 %k%F{006}%f " "$(build_left_prompt)"
-
-  unfunction ipconfig
-  unalias networksetup
+  assertEquals "%K{006} %F{000}IP %F{000}1.2.3.4 " "$(prompt_ip left 1 false "$FOLDER")"
 }
 
 function testIpSegmentWorksOnOsxWithInterfaceSpecified() {
-  local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
-  POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(ip)
-  local POWERLEVEL9K_IP_INTERFACE='xxx'
-  alias ipconfig="_(){ echo '1.2.3.4'; };_"
+  fakeIfconfig "eth1"
+
+  local POWERLEVEL9K_IP_INTERFACE="eth1"
 
   # Load Powerlevel9k
   source powerlevel9k.zsh-theme
   local OS='OSX' # Fake OSX
 
-  assertEquals "%K{006} %F{000}IP %F{000}1.2.3.4 %k%F{006}%f " "$(build_left_prompt)"
-
-  unalias ipconfig
+  assertEquals "%K{006} %F{000}IP %F{000}1.2.3.4 " "$(prompt_ip left 1 false "$FOLDER")"
 }
 
 function testIpSegmentWorksOnLinuxWithNoInterfaceSpecified() {
-    setopt aliases
-    local POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(ip)
-    # That command is harder to test, as it is used at first
-    # to get all relevant network interfaces and then for
-    # getting the configuration of that segment..
-    ip(){
-      if [[ "$*" == 'link ls up' ]]; then
-        echo "1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN mode DEFAULT group default
-    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
-2: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast state UP mode DEFAULT group default qlen 1000
-    link/ether 08:00:27:7e:84:45 brd ff:ff:ff:ff:ff:ff";
-      fi
-
-      if [[ "$*" == '-4 a show eth0' ]]; then
-        echo '2: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast state UP group default qlen 1000
-    inet 10.0.2.15/24 brd 10.0.2.255 scope global eth0
-       valid_lft forever preferred_lft forever';
-      fi
-    }
-
     # Load Powerlevel9k
     source powerlevel9k.zsh-theme
     local OS='Linux' # Fake Linux
 
-    assertEquals "%K{006} %F{000}IP %F{000}10.0.2.15 %k%F{006}%f " "$(build_left_prompt)"
+    fakeIp "eth0"
 
-    unfunction ip
-}
-
-function testIpSegmentWorksOnLinuxWithMultipleInterfacesSpecified() {
-    setopt aliases
-    local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
-    POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(ip)
-    # That command is harder to test, as it is used at first
-    # to get all relevant network interfaces and then for
-    # getting the configuration of that segment..
-    ip(){
-      if [[ "$*" == 'link ls up' ]]; then
-        echo "1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN mode DEFAULT group default
-    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
-2: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast state UP mode DEFAULT group default qlen 1000
-    link/ether 08:00:27:7e:84:45 brd ff:ff:ff:ff:ff:ff
-3: eth1: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast state UP mode DEFAULT group default qlen 1000
-    link/ether 08:00:27:7e:84:45 brd ff:ff:ff:ff:ff:ff
-4: wlan0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast state UP mode DEFAULT group default qlen 1000
-    link/ether 08:00:27:7e:84:45 brd ff:ff:ff:ff:ff:ff";
-      fi
-
-      if [[ "$*" == '-4 a show eth1' ]]; then
-        echo '3: eth1: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast state UP group default qlen 1000
-    inet 10.0.2.15/24 brd 10.0.2.255 scope global eth0
-       valid_lft forever preferred_lft forever';
-      fi
-    }
-
-    # Load Powerlevel9k
-    source powerlevel9k.zsh-theme
-    local OS='Linux' # Fake Linux
-
-    assertEquals "%K{006} %F{000}IP %F{000}10.0.2.15 %k%F{006}%f " "$(build_left_prompt)"
-
-    unfunction ip
+    assertEquals "%K{006} %F{000}IP %F{000}1.2.3.4 " "$(prompt_ip left 1 false "$FOLDER")"
 }
 
 function testIpSegmentWorksOnLinuxWithInterfaceSpecified() {
-  local -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS
-  POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(ip)
-  local POWERLEVEL9K_IP_INTERFACE='xxx'
-  ip(){
-    echo '2: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast state UP group default qlen 1000
-inet 10.0.2.15/24 brd 10.0.2.255 scope global eth0
-    valid_lft forever preferred_lft forever';
-  }
+  fakeIp "eth3"
+
+  local POWERLEVEL9K_IP_INTERFACE="eth3"
 
   # Load Powerlevel9k
   source powerlevel9k.zsh-theme
   local OS='Linux' # Fake Linux
 
-  assertEquals "%K{006} %F{000}IP %F{000}10.0.2.15 %k%F{006}%f " "$(build_left_prompt)"
-
-  unfunction ip
+  assertEquals "%K{006} %F{000}IP %F{000}1.2.3.4 " "$(prompt_ip left 1 false "$FOLDER")"
 }
 
 source shunit2/shunit2

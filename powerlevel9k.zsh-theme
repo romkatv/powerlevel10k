@@ -534,7 +534,9 @@ prompt_battery() {
 #   * $1 Alignment: string - left|right
 #   * $2 Index: integer
 #   * $3 Joined: bool - If the segment should be joined
+#   * $4 Root Prefix: string - Root prefix for testing purposes
 prompt_public_ip() {
+  local ROOT_PREFIX="${4}"
   # set default values for segment
   set_default POWERLEVEL9K_PUBLIC_IP_TIMEOUT "300"
   set_default POWERLEVEL9K_PUBLIC_IP_NONE ""
@@ -562,7 +564,7 @@ prompt_public_ip() {
 
   # grab a fresh IP if needed
   local fresh_ip
-  if [[ $refresh_ip =~ true && -w $POWERLEVEL9K_PUBLIC_IP_FILE ]]; then
+  if [[ $refresh_ip == true && -w $POWERLEVEL9K_PUBLIC_IP_FILE ]]; then
     for method in "${POWERLEVEL9K_PUBLIC_IP_METHODS[@]}"; do
       case $method in
         'dig')
@@ -598,11 +600,10 @@ prompt_public_ip() {
     icon='PUBLIC_IP_ICON'
     # Check VPN is on if VPN interface is set
     if [[ -n $POWERLEVEL9K_PUBLIC_IP_VPN_INTERFACE ]]; then
-      for vpn_iface in $(/sbin/ifconfig | grep -e ^"$POWERLEVEL9K_PUBLIC_IP_VPN_INTERFACE" | cut -d":" -f1)
-      do
+      local vpnIp="$(p9k::parseIp "${POWERLEVEL9K_PUBLIC_IP_VPN_INTERFACE}" "${ROOT_PREFIX}")"
+      if [[ -n "$vpnIp" ]]; then
         icon='VPN_ICON'
-        break
-      done
+      fi
     fi
     $1_prompt_segment "$0" "$2" "$DEFAULT_COLOR" "$DEFAULT_COLOR_INVERTED" "${public_ip}" "$icon"
   fi
@@ -1099,31 +1100,8 @@ prompt_icons_test() {
 ################################################################
 # Segment to display the current IP address
 prompt_ip() {
-  if [[ "$OS" == "OSX" ]]; then
-    if defined POWERLEVEL9K_IP_INTERFACE; then
-      # Get the IP address of the specified interface.
-      ip=$(ipconfig getifaddr "$POWERLEVEL9K_IP_INTERFACE")
-    else
-      local interfaces callback
-      # Get network interface names ordered by service precedence.
-      interfaces=$(networksetup -listnetworkserviceorder | grep -o "Device:\s*[a-z0-9]*" | grep -o -E '[a-z0-9]*$')
-      callback='ipconfig getifaddr $item'
-
-      ip=$(getRelevantItem "$interfaces" "$callback")
-    fi
-  else
-    if defined POWERLEVEL9K_IP_INTERFACE; then
-      # Get the IP address of the specified interface.
-      ip=$(ip -4 a show "$POWERLEVEL9K_IP_INTERFACE" | grep -o "inet\s*[0-9.]*" | grep -o -E "[0-9.]+")
-    else
-      local interfaces callback
-      # Get all network interface names that are up
-      interfaces=$(ip link ls up | grep -o -E ":\s+[a-z0-9]+:" | grep -v "lo" | grep -o -E "[a-z0-9]+")
-      callback='ip -4 a show $item | grep -o "inet\s*[0-9.]*" | grep -o -E "[0-9.]+"'
-
-      ip=$(getRelevantItem "$interfaces" "$callback")
-    fi
-  fi
+  local ROOT_PREFIX="${4}"
+  local ip=$(p9k::parseIp "${POWERLEVEL9K_IP_INTERFACE}" "${ROOT_PREFIX}")
 
   if [[ -n "$ip" ]]; then
     "$1_prompt_segment" "$0" "$2" "cyan" "$DEFAULT_COLOR" "$ip" 'NETWORK_ICON'
@@ -1135,11 +1113,12 @@ prompt_ip() {
 set_default POWERLEVEL9K_VPN_IP_INTERFACE "tun"
 # prompt if vpn active
 prompt_vpn_ip() {
-  for vpn_iface in $(/sbin/ifconfig | grep -e "^${POWERLEVEL9K_VPN_IP_INTERFACE}" | cut -d":" -f1)
-  do
-    ip=$(/sbin/ifconfig "$vpn_iface" | grep -o "inet\s.*" | cut -d' ' -f2)
+  local ROOT_PREFIX="${4}"
+  local ip=$(p9k::parseIp "${POWERLEVEL9K_VPN_IP_INTERFACE}" "${ROOT_PREFIX}")
+
+  if [[ -n "${ip}" ]]; then
     "$1_prompt_segment" "$0" "$2" "cyan" "$DEFAULT_COLOR" "$ip" 'VPN_ICON'
-  done
+  fi
 }
 
 ################################################################
