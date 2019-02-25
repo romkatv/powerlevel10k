@@ -117,8 +117,8 @@ set_default POWERLEVEL9K_MAX_CACHE_SIZE 10000
 # printed. In order to cache the results of expensive computations in these functions,
 # we use a temporary file to communicate with the parent shell and to ask it to
 # change environment variables.
-typeset -AH p9k_cache_data=()
-typeset P9K_CACHE_CHANNEL=${$(mktemp -u)%/*}/p9k_cache_channel.$$
+typeset -AH _p9k_cache_data=()
+typeset _P9K_CACHE_CHANNEL=${$(mktemp -u)%/*}/p9k_cache_channel.$$
 
 # Store a key-value pair in the cache.
 #
@@ -131,7 +131,7 @@ p9k_cache_set() {
   if [[ $POWERLEVEL9K_USE_CACHE == true ]]; then
     # Prepend dot to the value so that we can easily tell apart empty
     # values from missing in p9k_cache_get.
-    echo -E "p9k_cache_data+=(${(qq)1} .${(qq)2})" >>$P9K_CACHE_CHANNEL
+    echo -E "_p9k_cache_data+=(${(qq)1} .${(qq)2})" >>$_P9K_CACHE_CHANNEL
   fi
 }
 
@@ -139,11 +139,19 @@ p9k_cache_set() {
 #
 #   * $1: Key.
 #
-# Returns 1 if there is no value with the specified key.
+# If there is value associated with the specified key, sets _P9K_CACHE_VALUE and returns 0.
+# Otherwise unsets _P9K_CACHE_VALUE and returns 1.
+#
+# Note: The value is returned to the caller via a global variable rather than stdout for
+# better performance.
 p9k_cache_get() {
-  local V=${p9k_cache_data[$1]}
-  [[ -n $V ]] || return 1
-  echo -E ${V:1}
+  local V=${_p9k_cache_data[$1]}
+  if [[ -n $V ]]; then
+    _P9K_CACHE_VALUE=${V:1}
+  else
+    unset _P9K_CACHE_VALUE
+    return 1
+  fi
 }
 
 # Begin a left prompt segment
@@ -160,9 +168,7 @@ set_default last_left_element_index 1
 set_default POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS " "
 left_prompt_segment() {
   local cache_key="${(q)0} ${(q)1} ${(q)2} ${(q)3} ${(q)4} ${(q)5:+1} ${(q)6} ${(q)CURRENT_BG}"
-  local cached
-
-  if ! cached=$(p9k_cache_get $cache_key); then
+  if ! p9k_cache_get $cache_key; then
     local output=''
     local segment_name=$1
     local current_index=$2
@@ -232,12 +238,12 @@ left_prompt_segment() {
     # Print the visual identifier
     output+="${visual_identifier}"
 
-    cached="${(qq)output} ${(qq)backgroundColor} ${(qq)foreground}"
-    p9k_cache_set $cache_key $cached
+    _P9K_CACHE_VALUE="${(qq)output} ${(qq)backgroundColor} ${(qq)foreground}"
+    p9k_cache_set $cache_key $_P9K_CACHE_VALUE
   fi
 
   # output backgroundColor foreground
-  local tuple=("${(@Q)${(z)cached}}")
+  local tuple=("${(@Q)${(z)_P9K_CACHE_VALUE}}")
   echo -n $tuple[1]
   CURRENT_BG=$tuple[2]
 
@@ -249,17 +255,16 @@ left_prompt_segment() {
 # End the left prompt, closes the final segment.
 left_prompt_end() {
   local cache_key="$0 ${(q)CURRENT_BG}"
-  local cached
-  if ! cached=$(p9k_cache_get $cache_key); then
+  if ! p9k_cache_get $cache_key; then
     if [[ -n $CURRENT_BG ]]; then
-      cached+="%k$(foregroundColor ${CURRENT_BG})$(print_icon 'LEFT_SEGMENT_SEPARATOR')"
+      _P9K_CACHE_VALUE="%k$(foregroundColor ${CURRENT_BG})$(print_icon 'LEFT_SEGMENT_SEPARATOR')"
     else
-      cached+="%k"
+      _P9K_CACHE_VALUE="%k"
     fi
-    cached+="%f$(print_icon 'LEFT_SEGMENT_END_SEPARATOR')"
-    p9k_cache_set $cache_key $cached
+    _P9K_CACHE_VALUE+="%f$(print_icon 'LEFT_SEGMENT_END_SEPARATOR')"
+    p9k_cache_set $cache_key $_P9K_CACHE_VALUE
   fi
-  echo -n $cached
+  echo -n $_P9K_CACHE_VALUE
   CURRENT_BG=''
 }
 
@@ -279,9 +284,8 @@ set_default last_right_element_index 1
 set_default POWERLEVEL9K_WHITESPACE_BETWEEN_RIGHT_SEGMENTS " "
 right_prompt_segment() {
   local cache_key="${(q)0} ${(q)1} ${(q)2} ${(q)3} ${(q)4} ${(q)5:+1} ${(q)6} ${(q)CURRENT_RIGHT_BG}"
-  local cached
 
-  if ! cached=$(p9k_cache_get $cache_key); then
+  if ! p9k_cache_get $cache_key; then
     local output=''
     local segment_name="${1}"
     local current_index=$2
@@ -354,12 +358,12 @@ right_prompt_segment() {
     # Print whitespace only if segment is not joined or first right segment
     [[ $joined == false ]] || [[ "$CURRENT_RIGHT_BG" == "NONE" ]] && output+="${POWERLEVEL9K_WHITESPACE_BETWEEN_RIGHT_SEGMENTS}"
 
-    cached="${(qq)output} ${(qq)backgroundColor} ${(qq)visual_identifier}"
-    p9k_cache_set $cache_key $cached
+    _P9K_CACHE_VALUE="${(qq)output} ${(qq)backgroundColor} ${(qq)visual_identifier}"
+    p9k_cache_set $cache_key $_P9K_CACHE_VALUE
   fi
 
   # output backgroundColor visual_identifier
-  local tuple=("${(@Q)${(z)cached}}")
+  local tuple=("${(@Q)${(z)_P9K_CACHE_VALUE}}")
   echo -n $tuple[1]
   CURRENT_RIGHT_BG=$tuple[2]
 
@@ -419,17 +423,17 @@ prompt_background_jobs() {
   
   local num_jobs=$#job_lines
   local cache_key="$0 $num_jobs"
-  local cached
 
-  if ! cached=$(p9k_cache_get $cache_key); then
-    cached=""
+  if ! p9k_cache_get $cache_key; then
     if [[ "$POWERLEVEL9K_BACKGROUND_JOBS_VERBOSE" == "true" ]] && ([[ "$num_jobs" -gt 1 ]] || [[ "$POWERLEVEL9K_BACKGROUND_JOBS_VERBOSE_ALWAYS" == "true" ]]); then
-      cached=$num_jobs
+      _P9K_CACHE_VALUE=$num_jobs
+    else
+      _P9K_CACHE_VALUE=''
     fi
-    p9k_cache_set $cache_key $cached
+    p9k_cache_set $cache_key $_P9K_CACHE_VALUE
   fi
 
-  "$1_prompt_segment" "$0" "$2" "$DEFAULT_COLOR" "cyan" "$cached" 'BACKGROUND_JOBS_ICON'
+  "$1_prompt_segment" "$0" "$2" "$DEFAULT_COLOR" "cyan" "$_P9K_CACHE_VALUE" 'BACKGROUND_JOBS_ICON'
 }
 
 ################################################################
@@ -881,8 +885,7 @@ prompt_dir() {
   # using $PWD instead of "$(print -P '%~')" to allow use of POWERLEVEL9K_DIR_PATH_ABSOLUTE
   local current_path=$PWD # WAS: local current_path="$(print -P '%~')"
   local cache_key="$0 $2 ${(q)current_path}"
-  local cached
-  if ! cached=$(p9k_cache_get $cache_key); then
+  if ! p9k_cache_get $cache_key; then
     # check if the user wants to use absolute paths or "~" paths
     [[ ${(L)POWERLEVEL9K_DIR_PATH_ABSOLUTE} != "true" ]] && current_path=${current_path/#$HOME/"~"}
     # declare all local variables
@@ -1123,11 +1126,11 @@ prompt_dir() {
       current_path=${current_path:s/~/$POWERLEVEL9K_HOME_FOLDER_ABBREVIATION}
     fi
 
-    cached="$0_$current_state ${(qq)2} blue ${(qq)DEFAULT_COLOR} ${(qq)current_path} ${(qq)dir_states[$current_state]}"
-    p9k_cache_set $cache_key $cached
+    _P9K_CACHE_VALUE="$0_$current_state ${(qq)2} blue ${(qq)DEFAULT_COLOR} ${(qq)current_path} ${(qq)dir_states[$current_state]}"
+    p9k_cache_set $cache_key $_P9K_CACHE_VALUE
   fi
 
-  "$1_prompt_segment" "${(@Q)${(z)cached}}"
+  "$1_prompt_segment" "${(@Q)${(z)_P9K_CACHE_VALUE}}"
 }
 
 ################################################################
@@ -1499,8 +1502,7 @@ exit_code_or_status() {
 
 prompt_status() {
   local cache_key="$0 $2 $RETVAL $RETVALS"
-  local cached
-  if ! cached=$(p9k_cache_get $cache_key); then
+  if ! p9k_cache_get $cache_key; then
     local ec_text
     local ec_sum
     local ec
@@ -1527,18 +1529,18 @@ prompt_status() {
 
     if (( ec_sum > 0 )); then
       if [[ "$POWERLEVEL9K_STATUS_CROSS" == false && "$POWERLEVEL9K_STATUS_VERBOSE" == true ]]; then
-        cached="$0_ERROR ${(qq)2} red yellow1 ${(qq)ec_text} CARRIAGE_RETURN_ICON"
+        _P9K_CACHE_VALUE="$0_ERROR ${(qq)2} red yellow1 ${(qq)ec_text} CARRIAGE_RETURN_ICON"
       else
-        cached="$0_ERROR ${(qq)2} ${(qq)DEFAULT_COLOR} red '' FAIL_ICON"
+        _P9K_CACHE_VALUE="$0_ERROR ${(qq)2} ${(qq)DEFAULT_COLOR} red '' FAIL_ICON"
       fi
     elif [[ "$POWERLEVEL9K_STATUS_OK" == true ]] && [[ "$POWERLEVEL9K_STATUS_VERBOSE" == true || "$POWERLEVEL9K_STATUS_OK_IN_NON_VERBOSE" == true ]]; then
-      cached="$0_OK ${(qq)2} ${(qq)DEFAULT_COLOR} green '' OK_ICON"
+      _P9K_CACHE_VALUE="$0_OK ${(qq)2} ${(qq)DEFAULT_COLOR} green '' OK_ICON"
     fi
     if (( $#RETVALS < 3 )); then
-      p9k_cache_set $cache_key $cached
+      p9k_cache_set $cache_key $_P9K_CACHE_VALUE
     fi
   fi
-  "$1_prompt_segment" "${(@Q)${(z)cached}}"
+  "$1_prompt_segment" "${(@Q)${(z)_P9K_CACHE_VALUE}}"
 }
 
 ################################################################
@@ -1916,6 +1918,14 @@ powerlevel9k_preexec() {
   _P9K_TIMER_START=$EPOCHREALTIME
 }
 
+if [[ $POWERLEVEL9K_USE_CACHE == true ]]; then
+  _P9K_MULTILINE_FIRST_PROMPT_PREFIX=$(print_icon MULTILINE_FIRST_PROMPT_PREFIX)
+  _P9K_MULTILINE_LAST_PROMPT_PREFIX=$(print_icon MULTILINE_LAST_PROMPT_PREFIX)
+else
+  _P9K_MULTILINE_FIRST_PROMPT_PREFIX='$(print_icon MULTILINE_FIRST_PROMPT_PREFIX)'
+  _P9K_MULTILINE_LAST_PROMPT_PREFIX='$(print_icon MULTILINE_LAST_PROMPT_PREFIX)'
+fi
+
 set_default POWERLEVEL9K_PROMPT_ADD_NEWLINE false
 powerlevel9k_prepare_prompts() {
   # Return values. These need to be global, because
@@ -1933,17 +1943,18 @@ powerlevel9k_prepare_prompts() {
   # Reset start time
   _P9K_TIMER_START=0x7FFFFFFF
 
-  if [[ -s $P9K_CACHE_CHANNEL ]]; then
-    eval $(<$P9K_CACHE_CHANNEL)
-    rm -f $P9K_CACHE_CHANNEL
-    if [[ -n $POWERLEVEL9K_MAX_CACHE_SIZE && $#p9k_cache_data -gt $POWERLEVEL9K_MAX_CACHE_SIZE ]]; then
-      p9k_cache_data=()
+  if [[ -s $_P9K_CACHE_CHANNEL ]]; then
+    eval $(<$_P9K_CACHE_CHANNEL)
+    rm -f $_P9K_CACHE_CHANNEL
+    if [[ -n $POWERLEVEL9K_MAX_CACHE_SIZE && $#_p9k_cache_data -gt $POWERLEVEL9K_MAX_CACHE_SIZE ]]; then
+      _p9k_cache_data=()
     fi
   fi
 
+  local NEWLINE=$'\n'
+
   if [[ "$POWERLEVEL9K_PROMPT_ON_NEWLINE" == true ]]; then
-    PROMPT='$(print_icon 'MULTILINE_FIRST_PROMPT_PREFIX')%f%b%k$(build_left_prompt)
-$(print_icon 'MULTILINE_LAST_PROMPT_PREFIX')'
+    PROMPT="$_P9K_MULTILINE_FIRST_PROMPT_PREFIX%f%b%k\$(build_left_prompt)$NEWLINE$_P9K_MULTILINE_LAST_PROMPT_PREFIX"
     if [[ "$POWERLEVEL9K_RPROMPT_ON_NEWLINE" != true ]]; then
       # The right prompt should be on the same line as the first line of the left
       # prompt. To do so, there is just a quite ugly workaround: Before zsh draws
@@ -1966,9 +1977,6 @@ $(print_icon 'MULTILINE_LAST_PROMPT_PREFIX')'
   if [[ "$POWERLEVEL9K_DISABLE_RPROMPT" != true ]]; then
     RPROMPT="${RPROMPT_PREFIX}"'%f%b%k$(build_right_prompt)%{$reset_color%}'"${RPROMPT_SUFFIX}"
   fi
-
-local NEWLINE='
-'
 
   if [[ $POWERLEVEL9K_PROMPT_ADD_NEWLINE == true ]]; then
     NEWLINES=""
