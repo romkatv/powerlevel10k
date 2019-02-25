@@ -12,7 +12,6 @@ function setUp() {
   P9K_HOME=$(pwd)
   FOLDER=/tmp/powerlevel9k-test
   mkdir -p $FOLDER
-  mkdir $FOLDER/bin
   mkdir $FOLDER/sbin
 }
 
@@ -106,7 +105,7 @@ INNER
 
   if [[ "\$*" =~ 'show ${INTERFACE1}' ]]; then
     cat <<INNER
-3: ${INTERFACE1}: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast state UP group default qlen 1000
+2: ${INTERFACE1}: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast state UP group default qlen 1000
   inet 10.0.2.15/24 brd 10.0.2.255 scope global eth0
   valid_lft forever preferred_lft forever
 INNER
