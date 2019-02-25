@@ -159,7 +159,7 @@ p9k_cache_get() {
 set_default last_left_element_index 1
 set_default POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS " "
 left_prompt_segment() {
-  local cache_key="${(q)0} ${(q)1} ${(q)2} ${(q)3} ${(q)4} ${(q)5:+1} ${(q)6}"
+  local cache_key="${(q)0} ${(q)1} ${(q)2} ${(q)3} ${(q)4} ${(q)5:+1} ${(q)6} ${(q)CURRENT_BG}"
   local cached
 
   if ! cached=$(p9k_cache_get $cache_key); then
@@ -278,7 +278,7 @@ CURRENT_RIGHT_BG='NONE'
 set_default last_right_element_index 1
 set_default POWERLEVEL9K_WHITESPACE_BETWEEN_RIGHT_SEGMENTS " "
 right_prompt_segment() {
-  local cache_key="${(q)0} ${(q)1} ${(q)2} ${(q)3} ${(q)4} ${(q)5:+1} ${(q)6}"
+  local cache_key="${(q)0} ${(q)1} ${(q)2} ${(q)3} ${(q)4} ${(q)5:+1} ${(q)6} ${(q)CURRENT_RIGHT_BG}"
   local cached
 
   if ! cached=$(p9k_cache_get $cache_key); then
