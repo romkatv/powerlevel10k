@@ -1742,10 +1742,25 @@ powerlevel9k_vcs_init() {
 #   POWERLEVEL9K_VCS_STATUS_COMMAND="$HOME/gitstatus/gitstatus --dirty-max-index-size=1024"
 set_default POWERLEVEL9K_VCS_STATUS_COMMAND ""
 
+if [[ $POWERLEVEL9K_USE_CACHE == true ]]; then
+  _P9K_VCS_GIT_GITHUB_ICON=$(print_icon VCS_GIT_GITHUB_ICON)
+  _P9K_VCS_GIT_BITBUCKET_ICON=$(print_icon VCS_GIT_BITBUCKET_ICON)
+  _P9K_VCS_GIT_GITLAB_ICON=$(print_icon VCS_GIT_GITLAB_ICON)
+  _P9K_VCS_GIT_ICON=$(print_icon VCS_GIT_ICON)
+  _P9K_VCS_BRANCH_ICON=$(print_icon VCS_BRANCH_ICON)
+  _P9K_VCS_REMOTE_BRANCH_ICON=$(print_icon VCS_REMOTE_BRANCH_ICON)
+  _P9K_VCS_STAGED_ICON=$(print_icon VCS_STAGED_ICON)
+  _P9K_VCS_UNSTAGED_ICON=$(print_icon VCS_UNSTAGED_ICON)
+  _P9K_VCS_UNTRACKED_ICON=$(print_icon VCS_UNTRACKED_ICON)
+  _P9K_VCS_OUTGOING_CHANGES_ICON=$(print_icon VCS_OUTGOING_CHANGES_ICON)
+  _P9K_VCS_INCOMING_CHANGES_ICON=$(print_icon VCS_INCOMING_CHANGES_ICON)
+  _P9K_VCS_STASH_ICON=$(print_icon VCS_STASH_ICON)
+fi
+
 ################################################################
 # Segment to show VCS information
 prompt_vcs() {
-  if [[ -z $POWERLEVEL9K_VCS_STATUS_COMMAND ]]; then
+  if [[ -z $POWERLEVEL9K_VCS_STATUS_COMMAND || $POWERLEVEL9K_USE_CACHE != true ]]; then
     VCS_WORKDIR_DIRTY=false
     VCS_WORKDIR_HALF_DIRTY=false
     local current_state=""
@@ -1788,39 +1803,40 @@ prompt_vcs() {
       local current_state
       if [[ $has_staged != 0 || $has_unstaged != 0 ]]; then
         current_state='modified'
+        color='yellow'
       elif [[ $has_untracked != 0 ]]; then
         current_state='untracked'
       else
         current_state='clean'
       fi
 
-      local icon
+      local vcs_prompt
       if [[ "$remote_url" =~ "github" ]] then
-        icon='VCS_GIT_GITHUB_ICON'
+        vcs_prompt+=$_P9K_VCS_GIT_GITHUB_ICON
       elif [[ "$remote_url" =~ "bitbucket" ]] then
-        icon='VCS_GIT_BITBUCKET_ICON'
+        vcs_prompt+=$_P9K_VCS_GIT_BITBUCKET_ICON
       elif [[ "$remote_url" =~ "stash" ]] then
-        icon='VCS_GIT_BITBUCKET_ICON'
+        vcs_prompt+=$_P9K_VCS_GIT_GITHUB_ICON
       elif [[ "$remote_url" =~ "gitlab" ]] then
-        icon='VCS_GIT_GITLAB_ICON'
+        vcs_prompt+=$_P9K_VCS_GIT_GITLAB_ICON
       else
-        icon='VCS_GIT_ICON'
+        vcs_prompt+=$_P9K_VCS_GIT_ICON
       fi
 
-      local vcs_prompt="$(print_icon VCS_BRANCH_ICON)$local_branch"
+      vcs_prompt+="$_P9K_VCS_BRANCH_ICON$local_branch"
       if [[ -n $action ]]; then
         vcs_prompt+=" %F{${POWERLEVEL9K_VCS_ACTIONFORMAT_FOREGROUND}}| $action%f"
       else
-        [[ -n $remote_branch && $local_branch != $remote_branch ]] && vcs_prompt+=" $(print_icon VCS_REMOTE_BRANCH_ICON)$remote_branch"
-        [[ $has_staged == 1 ]] && vcs_prompt+=" $(print_icon VCS_STAGED_ICON)"
-        [[ $has_unstaged == 1 ]] && vcs_prompt+=" $(print_icon VCS_UNSTAGED_ICON)"
-        [[ $has_untracked == 1 ]] && vcs_prompt+=" $(print_icon VCS_UNTRACKED_ICON)"
-        [[ $ahead -gt 0 ]] && vcs_prompt+=" $(print_icon VCS_OUTGOING_CHANGES_ICON)$ahead"
-        [[ $behind -gt 0 ]] && vcs_prompt+=" $(print_icon VCS_INCOMING_CHANGES_ICON)$behind"
-        [[ $stashes -gt 0 ]] && vcs_prompt+=" $(print_icon VCS_STASH_ICON)$stashes"
+        [[ -n $remote_branch && $local_branch != $remote_branch ]] && vcs_prompt+=" $_P9K_VCS_REMOTE_BRANCH_ICON$remote_branch"
+        [[ $has_staged == 1 ]] && vcs_prompt+=" $_P9K_VCS_STAGED_ICON"
+        [[ $has_unstaged == 1 ]] && vcs_prompt+=" $_P9K_VCS_UNSTAGED_ICON"
+        [[ $has_untracked == 1 ]] && vcs_prompt+=" $_P9K_VCS_UNTRACKED_ICON"
+        [[ $ahead -gt 0 ]] && vcs_prompt+=" $_P9K_VCS_OUTGOING_CHANGES_ICON$ahead"
+        [[ $behind -gt 0 ]] && vcs_prompt+=" $_P9K_VCS_INCOMING_CHANGES_ICON$behind"
+        [[ $stashes -gt 0 ]] && vcs_prompt+=" $_P9K_VCS_STASH_ICON$stashes"
       fi
 
-      _P9K_CACHE_VALUE="${0}_${(U)current_state} $2 ${(qq)vcs_states[$current_state]} ${(qq)DEFAULT_COLOR} ${(qq)vcs_prompt} ${(qq)icon}"
+      _P9K_CACHE_VALUE="${0}_${(U)current_state} $2 ${(qq)vcs_states[$current_state]} ${(qq)DEFAULT_COLOR} ${(qq)vcs_prompt}"
       p9k_cache_set $cache_key $_P9K_CACHE_VALUE
     fi
     "$1_prompt_segment" "${(@Q)${(z)_P9K_CACHE_VALUE}}"
