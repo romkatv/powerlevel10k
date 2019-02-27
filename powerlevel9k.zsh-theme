@@ -1784,11 +1784,10 @@ prompt_vcs() {
       "$1_prompt_segment" "${0}_${(U)current_state}" "$2" "${vcs_states[$current_state]}" "$DEFAULT_COLOR" "$vcs_prompt" "$vcs_visual_identifier"
     fi
   else
-    local info
-    info=$("${(@Q)${(z)POWERLEVEL9K_VCS_STATUS_COMMAND}}" 2>/dev/null) || return
-    local cache_key="$0 $info"
+    local props
+    props=("${(@fQ)$("${(@Q)${(z)POWERLEVEL9K_VCS_STATUS_COMMAND}}" 2>/dev/null)}") || return
+    local cache_key="$0 ${(@q)props}"
     if ! p9k_cache_get $cache_key; then
-      local -a props=("${(@fQ)${info}}")
       local local_branch=$props[1]
       local remote_branch=$props[2]
       local remote_url=$props[3]
