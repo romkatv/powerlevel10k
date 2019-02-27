@@ -1701,30 +1701,129 @@ powerlevel9k_vcs_init() {
   fi
 }
 
+# If not empty, should be a command that prints vcs status for the current directory. The `vcs`
+# prompt will use it instead of `vcs_info`.
+#
+# The command should return an error if the current directory isn't a vcs repository. Otherwise
+# it should print 10 values, each on its own line. Values MAY be enclosed in quotes -- they'll be
+# stripped off with (Q) expansion flag. Empty string values MUST be enclosed in quotes.
+#
+#   1. Local branch name. Not empty.
+#   2. Upstream branch name. Can be empty.
+#   3. Remote URL. Can be empty.
+#   4. Repository state, A.K.A. action. Can be empty.
+#   5. 1 if there are staged changes, 0 otherwise.
+#   6. 1 if there are unstaged changes, 0 if there aren't, -1 if unknown.
+#   7. 1 if there are untracked files, 0 if there aren't, -1 if unknown.
+#   8. Number of commits the current branch is ahead of upstream. Must be a non-negative integer.
+#   9. Number of commits the current branch is behind upstream. Must be a non-negative integer.
+#  10. Number of stashes. Must be a non-negative integer.
+#
+# The point of reporting -1 as unstaged and untracked is to allow the command to skip scanning
+# files in large repos.
+#
+# Example command output:
+#
+#   "master"
+#   "master"
+#   "git@github.com:romkatv/gitstatus.git"
+#   ""
+#   1
+#   1
+#   0
+#   3
+#   0
+#   2
+#
+# There is a fast implementation of this protocol for git at https://github.com/romkatv/gitstatus.
+#
+# Configuration example (in ~/.zshrc, before sourcing powerlevel9k):
+#
+#   POWERLEVEL9K_VCS_STATUS_COMMAND="$HOME/gitstatus/gitstatus --dirty-max-index-size=1024"
+set_default POWERLEVEL9K_VCS_STATUS_COMMAND ""
+
 ################################################################
 # Segment to show VCS information
 prompt_vcs() {
-  VCS_WORKDIR_DIRTY=false
-  VCS_WORKDIR_HALF_DIRTY=false
-  local current_state=""
+  if [[ -z $POWERLEVEL9K_VCS_STATUS_COMMAND ]]; then
+    VCS_WORKDIR_DIRTY=false
+    VCS_WORKDIR_HALF_DIRTY=false
+    local current_state=""
 
-  # Actually invoke vcs_info manually to gather all information.
-  vcs_info
-  local vcs_prompt="${vcs_info_msg_0_}"
+    # Actually invoke vcs_info manually to gather all information.
+    vcs_info
+    local vcs_prompt="${vcs_info_msg_0_}"
 
-  if [[ -n "$vcs_prompt" ]]; then
-    if [[ "$VCS_WORKDIR_DIRTY" == true ]]; then
-      # $vcs_visual_identifier gets set in +vi-vcs-detect-changes in functions/vcs.zsh,
-      # as we have there access to vcs_info internal hooks.
-      current_state='modified'
-    else
-      if [[ "$VCS_WORKDIR_HALF_DIRTY" == true ]]; then
+    if [[ -n "$vcs_prompt" ]]; then
+      if [[ "$VCS_WORKDIR_DIRTY" == true ]]; then
+        # $vcs_visual_identifier gets set in +vi-vcs-detect-changes in functions/vcs.zsh,
+        # as we have there access to vcs_info internal hooks.
+        current_state='modified'
+      else
+        if [[ "$VCS_WORKDIR_HALF_DIRTY" == true ]]; then
+          current_state='untracked'
+        else
+          current_state='clean'
+        fi
+      fi
+      "$1_prompt_segment" "${0}_${(U)current_state}" "$2" "${vcs_states[$current_state]}" "$DEFAULT_COLOR" "$vcs_prompt" "$vcs_visual_identifier"
+    fi
+  else
+    local info
+    info=$("${(@Q)${(z)POWERLEVEL9K_VCS_STATUS_COMMAND}}" 2>/dev/null) || return
+    local cache_key="$0 $info"
+    if ! p9k_cache_get $cache_key; then
+      local -a props=("${(@fQ)${info}}")
+      local local_branch=$props[1]
+      local remote_branch=$props[2]
+      local remote_url=$props[3]
+      local action=$props[4]
+      local has_staged=$props[5]
+      local has_unstaged=$props[6]
+      local has_untracked=$props[7]
+      local ahead=$props[8]
+      local behind=$props[9]
+      local stashes=$props[10]
+
+      local current_state
+      if [[ $has_staged != 0 || $has_unstaged != 0 ]]; then
+        current_state='modified'
+      elif [[ $has_untracked != 0 ]]; then
         current_state='untracked'
       else
         current_state='clean'
       fi
+
+      local icon
+      if [[ "$remote_url" =~ "github" ]] then
+        icon='VCS_GIT_GITHUB_ICON'
+      elif [[ "$remote_url" =~ "bitbucket" ]] then
+        icon='VCS_GIT_BITBUCKET_ICON'
+      elif [[ "$remote_url" =~ "stash" ]] then
+        icon='VCS_GIT_BITBUCKET_ICON'
+      elif [[ "$remote_url" =~ "gitlab" ]] then
+        icon='VCS_GIT_GITLAB_ICON'
+      else
+        icon='VCS_GIT_ICON'
+      fi
+
+      local vcs_prompt="$(print_icon VCS_BRANCH_ICON)$local_branch"
+      if [[ -n $action ]]; then
+        vcs_prompt+=" %F{${POWERLEVEL9K_VCS_ACTIONFORMAT_FOREGROUND}}| $action%f"
+      else
+        [[ -n $remote_branch && $local_branch != $remote_branch ]] && vcs_prompt+=" $(print_icon VCS_REMOTE_BRANCH_ICON)$remote_branch"
+        [[ $has_staged == 1 ]] && vcs_prompt+=" $(print_icon VCS_STAGED_ICON)"
+        [[ $has_unstaged == 1 ]] && vcs_prompt+=" $(print_icon VCS_UNSTAGED_ICON)"
+        [[ $has_untracked == 1 ]] && vcs_prompt+=" $(print_icon VCS_UNTRACKED_ICON)"
+        [[ $ahead -gt 0 ]] && vcs_prompt+=" $(print_icon VCS_OUTGOING_CHANGES_ICON)$ahead"
+        [[ $behind -gt 0 ]] && vcs_prompt+=" $(print_icon VCS_INCOMING_CHANGES_ICON)$behind"
+        [[ $stashes -gt 0 ]] && vcs_prompt+=" $(print_icon VCS_STASH_ICON)$stashes"
+      fi
+
+      _P9K_CACHE_VALUE="${0}_${(U)current_state} $2 ${(qq)vcs_states[$current_state]} ${(qq)DEFAULT_COLOR} ${(qq)vcs_prompt} ${(qq)icon}"
+      p9k_cache_set $cache_key $_P9K_CACHE_VALUE
     fi
-    "$1_prompt_segment" "${0}_${(U)current_state}" "$2" "${vcs_states[$current_state]}" "$DEFAULT_COLOR" "$vcs_prompt" "$vcs_visual_identifier"
+    "$1_prompt_segment" "${(@Q)${(z)_P9K_CACHE_VALUE}}"
   fi
 }
 
