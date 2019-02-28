@@ -1739,7 +1739,7 @@ powerlevel9k_vcs_init() {
 #
 # Configuration example (in ~/.zshrc, before sourcing powerlevel9k):
 #
-#   POWERLEVEL9K_VCS_STATUS_COMMAND="$HOME/gitstatus/gitstatus --dirty-max-index-size=1024"
+#   POWERLEVEL9K_VCS_STATUS_COMMAND="$HOME/bin/gitstatus --dirty-max-index-size=4096"
 set_default POWERLEVEL9K_VCS_STATUS_COMMAND ""
 
 if [[ $POWERLEVEL9K_USE_CACHE == true ]]; then
