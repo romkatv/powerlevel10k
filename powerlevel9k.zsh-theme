@@ -885,6 +885,7 @@ prompt_dir() {
   # using $PWD instead of "$(print -P '%~')" to allow use of POWERLEVEL9K_DIR_PATH_ABSOLUTE
   local current_path=$PWD # WAS: local current_path="$(print -P '%~')"
   local cache_key="$0 $2 ${(q)current_path}"
+  [[ "${POWERLEVEL9K_DIR_SHOW_WRITABLE}" == true && ! -w "$PWD" ]] && cache_key+=" W";
   if ! p9k_cache_get $cache_key; then
     # check if the user wants to use absolute paths or "~" paths
     [[ ${(L)POWERLEVEL9K_DIR_PATH_ABSOLUTE} != "true" ]] && current_path=${current_path/#$HOME/"~"}
