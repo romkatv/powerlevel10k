@@ -94,9 +94,9 @@ fi
 ################################################################
 
 # The `CURRENT_BG` variable is used to remember what the last BG color used was
-# when building the left-hand prompt. Because the RPROMPT is created from
-# right-left but reads the opposite, this isn't necessary for the other side.
-CURRENT_BG='NONE'
+# when building a prompt segment.
+CURRENT_BG=NONE
+LAST_SEGMENT_INDEX=''
 
 # Cache the results of expensive computations to avoid avoid recomputing them on every prompt.
 # Setting this option to 'true' can greatly speed up prompt generation. However, any changes
@@ -112,46 +112,92 @@ set_default POWERLEVEL9K_USE_CACHE false
 # with data.
 set_default POWERLEVEL9K_MAX_CACHE_SIZE 10000
 
-# Functions producing left and right prompts are called from subshells, so any
-# changes to the environment variables they do get wiped out after the prompt is
-# printed. In order to cache the results of expensive computations in these functions,
-# we use a temporary file to communicate with the parent shell and to ask it to
-# change environment variables.
-typeset -AH _p9k_cache_data=()
-typeset _P9K_CACHE_CHANNEL=${$(mktemp -u)%/*}/p9k_cache_channel.$$
+if [[ $POWERLEVEL9K_USE_CACHE == true ]]; then
+  # Functions producing left and right prompts are called from subshells, so any
+  # changes to the environment variables they do get wiped out after the prompt is
+  # printed. In order to cache the results of expensive computations in these functions,
+  # we use a temporary file to communicate with the parent shell and to ask it to
+  # change environment variables.
+  typeset -AH _p9k_cache_data=()
+  typeset -H _P9K_CACHE_CHANNEL=${$(mktemp -u)%/*}/p9k_cache_channel.$$
 
-# Store a key-value pair in the cache.
-#
-#   * $1: Key.
-#   * $2: Value. Can be empty.
-#
-# Note that an attempt to retrieve the value right away won't succeed. All requested
-# cache update get batched and flushed together after a prompt is built.
-p9k_cache_set() {
-  if [[ $POWERLEVEL9K_USE_CACHE == true ]]; then
+  # Note: Several performance-critical functions return results to the caller via global
+  # variable _P9K_RETVAL rather than stdout. This is faster.
+
+  # Store a key-value pair in the cache.
+  #
+  #   * $1: Key.
+  #   * $2: Value. Can be empty.
+  #
+  # Note that an attempt to retrieve the value right away won't succeed. All requested
+  # cache update get batched and flushed together after a prompt is built.
+  _p9k_cache_set() {
     # Prepend dot to the value so that we can easily tell apart empty
-    # values from missing in p9k_cache_get.
+    # values from missing in _p9k_cache_get.
     echo -E "_p9k_cache_data+=(${(qq)1} .${(qq)2})" >>$_P9K_CACHE_CHANNEL
+    _P9K_RETVAL=$2
+  }
+
+  # Retrieve a value from the cache.
+  #
+  #   * $1: Key.
+  #
+  # If there is value associated with the specified key, sets _P9K_RETVAL and returns 0.
+  # Otherwise returns 1.
+  _p9k_cache_get() {
+    local V=${_p9k_cache_data[$1]}
+    if [[ -n $V ]]; then
+      _P9K_RETVAL=${V:1}
+    else
+      return 1
+    fi
+  }
+
+  # Resolves $(print_icon $1) and stores the result in a global variable.
+  # Use _p9k_get_icon to retrieve the value.
+  _p9k_memoize_icon() {
+    local icon_name=$1
+    typeset -gH _P9K_ICON_${icon_name}="$(print_icon $icon_name)"
+  }
+
+  # If `_p9k_memoize_icon $1` has been called, sets _P9K_RETVAL to the memoized value.
+  # Otherwise sets _P9K_RETVAL to $(print_icon $icon_name).
+  _p9k_get_icon() {
+    local icon_name=$1
+    local var_name=_P9K_ICON_${icon_name}
+    if [[ -v "$var_name" ]]; then
+      _P9K_RETVAL=${(P)var_name}
+    else
+      _P9K_RETVAL="$(print_icon $icon_name)"
+    fi
+  }
+else
+  # Implementations of the cache functions when caching is disabled.
+  _p9k_cache_set() { _P9K_RETVAL=$2 }
+  _p9k_cache_get() { false }
+  _p9k_memoize_icon() { }
+  _p9k_get_icon() { _P9K_RETVAL="$(print_icon $1)" }
+fi
+
+# Resolves a color to its numerical value, or an empty string. Communicates the result back
+# by setting _P9K_RETVAL.
+_p9k_color() {
+  local color=$1
+  local segment_name=$2
+  local suffix=$3
+  local cache_key="$0 ${(q)1} ${(q)2} ${(q)3}"
+  if ! _p9k_cache_get $cache_key; then
+    local user_var=POWERLEVEL9K_${(U)${segment_name}#prompt_}_${suffix}
+    _p9k_cache_set $cache_key $(getColorCode ${${(P)user_var}:-${color}})
   fi
 }
 
-# Retrieve a value from the cache.
-#
-#   * $1: Key.
-#
-# If there is value associated with the specified key, sets _P9K_CACHE_VALUE and returns 0.
-# Otherwise unsets _P9K_CACHE_VALUE and returns 1.
-#
-# Note: The value is returned to the caller via a global variable rather than stdout for
-# better performance.
-p9k_cache_get() {
-  local V=${_p9k_cache_data[$1]}
-  if [[ -n $V ]]; then
-    _P9K_CACHE_VALUE=${V:1}
-  else
-    unset _P9K_CACHE_VALUE
-    return 1
-  fi
+_p9k_background() {
+  [[ -n $1 ]] && _P9K_RETVAL="%K{$1}" || _P9K_RETVAL="%k"
+}
+
+_p9k_foreground() {
+  [[ -n $1 ]] && _P9K_RETVAL="%F{$1}" || _P9K_RETVAL="%f"
 }
 
 # Begin a left prompt segment
@@ -164,111 +210,92 @@ p9k_cache_get() {
 #   * $5: The segment content
 #   * $6: An identifying icon (must be a key of the icons array)
 # The latter three can be omitted,
-set_default last_left_element_index 1
 set_default POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS " "
+_p9k_memoize_icon LEFT_SEGMENT_SEPARATOR
+_p9k_memoize_icon LEFT_SUBSEGMENT_SEPARATOR
 left_prompt_segment() {
   local cache_key="${(q)0} ${(q)1} ${(q)2} ${(q)3} ${(q)4} ${(q)5:+1} ${(q)6} ${(q)CURRENT_BG}"
-  if ! p9k_cache_get $cache_key; then
-    local output=''
+  if ! _p9k_cache_get $cache_key; then
     local segment_name=$1
     local current_index=$2
-    # Check if the segment should be joined with the previous one
-    local joined
-    segmentShouldBeJoined $current_index $last_left_element_index "$POWERLEVEL9K_LEFT_PROMPT_ELEMENTS" && joined=true || joined=false
 
-    # Colors
-    local backgroundColor="${3}"
-    local foregroundColor="${4}"
+    _p9k_color $3 $segment_name BACKGROUND
+    local background_color=$_P9K_RETVAL
 
-    # Overwrite given background-color by user defined variable for this segment.
-    local BACKGROUND_USER_VARIABLE=POWERLEVEL9K_${(U)${segment_name}#prompt_}_BACKGROUND
-    local BG_COLOR_MODIFIER=${(P)BACKGROUND_USER_VARIABLE}
-    [[ -n $BG_COLOR_MODIFIER ]] && backgroundColor="$BG_COLOR_MODIFIER"
+    _p9k_color $4 $segment_name FOREGROUND
+    local foreground_color=$_P9K_RETVAL
+    _p9k_foreground $foreground_color
+    local foreground=$_P9K_RETVAL
 
-    # Overwrite given foreground-color by user defined variable for this segment.
-    local FOREGROUND_USER_VARIABLE=POWERLEVEL9K_${(U)${segment_name}#prompt_}_FOREGROUND
-    local FG_COLOR_MODIFIER=${(P)FOREGROUND_USER_VARIABLE}
-    [[ -n $FG_COLOR_MODIFIER ]] && foregroundColor="$FG_COLOR_MODIFIER"
+    _p9k_background $background_color
+    local output=$_P9K_RETVAL
 
-    # Get color codes here to save some calls later on
-    backgroundColor="$(getColorCode ${backgroundColor})"
-    foregroundColor="$(getColorCode ${foregroundColor})"
-
-    local background foreground
-    [[ -n "${backgroundColor}" ]] && background="$(backgroundColor ${backgroundColor})" || background="%k"
-    [[ -n "${foregroundColor}" ]] && foreground="$(foregroundColor ${foregroundColor})" || foreground="%f"
-
-    if [[ $CURRENT_BG != 'NONE' ]] && ! isSameColor "${backgroundColor}" "$CURRENT_BG"; then
-      output+="${background}%F{$CURRENT_BG}"
-      if [[ $joined == false ]]; then
-        # Middle segment
-        output+="$(print_icon 'LEFT_SEGMENT_SEPARATOR')$POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS"
+    if [[ $CURRENT_BG == NONE ]]; then
+      # The first segment on the line.
+      output+=$POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS
+    elif ! segmentShouldBeJoined $current_index $LAST_SEGMENT_INDEX $POWERLEVEL9K_LEFT_PROMPT_ELEMENTS; then
+      if [[ $background_color == $CURRENT_BG ]]; then
+        # Middle segment with same color as previous segment
+        # We take the current foreground color as color for our
+        # subsegment (or the default color). This should have
+        # enough contrast.
+        if [[ $foreground == "%f" ]]; then
+          _p9k_foreground $DEFAULT_COLOR
+          output+=$_P9K_RETVAL
+        else
+          output+=$foreground
+        fi
+        _p9k_get_icon LEFT_SUBSEGMENT_SEPARATOR
+        output+="${_P9K_RETVAL}${POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS}"
+      else
+        _p9k_foreground $CURRENT_BG
+        output+=$_P9K_RETVAL
+        _p9k_get_icon LEFT_SEGMENT_SEPARATOR
+        output+="${_P9K_RETVAL}${POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS}"
       fi
-    elif isSameColor "$CURRENT_BG" "${backgroundColor}"; then
-      # Middle segment with same color as previous segment
-      # We take the current foreground color as color for our
-      # subsegment (or the default color). This should have
-      # enough contrast.
-      local complement
-      [[ -n "${foregroundColor}" ]] && complement="${foreground}" || complement="$(foregroundColor $DEFAULT_COLOR)"
-      output+="${background}${complement}"
-      if [[ $joined == false ]]; then
-        output+="$(print_icon 'LEFT_SUBSEGMENT_SEPARATOR')$POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS"
-      fi
-    else
-      # First segment
-      output+="${background}$POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS"
     fi
 
-    local visual_identifier
     if [[ -n $6 ]]; then
-      visual_identifier="$(print_icon $6)"
-      if [[ -n "$visual_identifier" ]]; then
+      _p9k_get_icon $6
+      if [[ -n $_P9K_RETVAL ]]; then
+        local icon=$_P9K_RETVAL
+        _p9k_foreground $foreground_color $segment_name VISUAL_IDENTIFIER_COLOR
         # Add an whitespace if we print more than just the visual identifier.
         # To avoid cutting off the visual identifier in some terminal emulators (e.g., Konsole, st),
         # we need to color both the visual identifier and the whitespace.
-        [[ -n "$5" ]] && visual_identifier="$visual_identifier "
-        # Allow users to overwrite the color for the visual identifier only.
-        local visual_identifier_color_variable=POWERLEVEL9K_${(U)${segment_name}#prompt_}_VISUAL_IDENTIFIER_COLOR
-        set_default $visual_identifier_color_variable "${foregroundColor}"
-        visual_identifier="$(foregroundColor ${(P)visual_identifier_color_variable})${visual_identifier}"
+        output+="${_P9K_RETVAL}${icon}${5:+ }"
       fi
     fi
 
-    # Print the visual identifier
-    output+="${visual_identifier}"
-
-    _P9K_CACHE_VALUE="${(qq)output} ${(qq)backgroundColor} ${(qq)foreground}"
-    p9k_cache_set $cache_key $_P9K_CACHE_VALUE
+    output+=$foreground
+    _p9k_cache_set $cache_key "${(qq)output} ${(qq)background_color}"
   fi
 
-  # output backgroundColor foreground
-  local tuple=("${(@Q)${(z)_P9K_CACHE_VALUE}}")
-  echo -n $tuple[1]
+  local tuple=("${(@Q)${(z)_P9K_RETVAL}}")
+  echo -n "${tuple[1]}${5}${POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS}"
+  LAST_SEGMENT_INDEX=$2
   CURRENT_BG=$tuple[2]
-
-  [[ -n "$5" ]] && echo -n "${tuple[3]}${5}"
-  echo -n "${POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS}"
-  last_left_element_index=$2
 }
 
 # End the left prompt, closes the final segment.
+_p9k_memoize_icon LEFT_SEGMENT_SEPARATOR
+_p9k_memoize_icon LEFT_SEGMENT_END_SEPARATOR
 left_prompt_end() {
   local cache_key="$0 ${(q)CURRENT_BG}"
-  if ! p9k_cache_get $cache_key; then
-    if [[ -n $CURRENT_BG ]]; then
-      _P9K_CACHE_VALUE="%k$(foregroundColor ${CURRENT_BG})$(print_icon 'LEFT_SEGMENT_SEPARATOR')"
-    else
-      _P9K_CACHE_VALUE="%k"
+  if ! _p9k_cache_get $cache_key; then
+    local output="%k"
+    if [[ $CURRENT_BG != NONE ]]; then
+      _p9k_foreground $CURRENT_BG
+      output+=$_P9K_RETVAL
+      _p9k_get_icon LEFT_SEGMENT_SEPARATOR
+      output+="${_P9K_RETVAL}"
     fi
-    _P9K_CACHE_VALUE+="%f$(print_icon 'LEFT_SEGMENT_END_SEPARATOR')"
-    p9k_cache_set $cache_key $_P9K_CACHE_VALUE
+    _p9k_get_icon LEFT_SEGMENT_END_SEPARATOR
+      output+="%f${_P9K_RETVAL}"
+    _p9k_cache_set $cache_key $output
   fi
-  echo -n $_P9K_CACHE_VALUE
-  CURRENT_BG=''
+  echo -n $_P9K_RETVAL
 }
-
-CURRENT_RIGHT_BG='NONE'
 
 # Begin a right prompt segment
 # Takes four arguments:
@@ -280,99 +307,78 @@ CURRENT_RIGHT_BG='NONE'
 #   * $5: The segment content
 #   * $6: An identifying icon (must be a key of the icons array)
 # No ending for the right prompt segment is needed (unlike the left prompt, above).
-set_default last_right_element_index 1
 set_default POWERLEVEL9K_WHITESPACE_BETWEEN_RIGHT_SEGMENTS " "
+_p9k_memoize_icon RIGHT_SUBSEGMENT_SEPARATOR
+_p9k_memoize_icon RIGHT_SEGMENT_SEPARATOR
 right_prompt_segment() {
-  local cache_key="${(q)0} ${(q)1} ${(q)2} ${(q)3} ${(q)4} ${(q)5:+1} ${(q)6} ${(q)CURRENT_RIGHT_BG}"
+  local cache_key="${(q)0} ${(q)1} ${(q)2} ${(q)3} ${(q)4} ${(q)6} ${(q)CURRENT_BG}"
 
-  if ! p9k_cache_get $cache_key; then
-    local output=''
-    local segment_name="${1}"
+  if ! _p9k_cache_get $cache_key; then
+    local segment_name=$1
     local current_index=$2
 
-    # Check if the segment should be joined with the previous one
-    local joined
-    segmentShouldBeJoined $current_index $last_right_element_index "$POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS" && joined=true || joined=false
+    _p9k_color $3 $segment_name BACKGROUND
+    local background_color=$_P9K_RETVAL
+    _p9k_background $background_color
+    local background=$_P9K_RETVAL
 
-    # Colors
-    local backgroundColor="${3}"
-    local foregroundColor="${4}"
+    _p9k_color $4 $segment_name FOREGROUND
+    local foreground_color=$_P9K_RETVAL
+    _p9k_foreground $foreground_color
+    local foreground=$_P9K_RETVAL
 
-    # Overwrite given background-color by user defined variable for this segment.
-    local BACKGROUND_USER_VARIABLE=POWERLEVEL9K_${(U)${segment_name}#prompt_}_BACKGROUND
-    local BG_COLOR_MODIFIER=${(P)BACKGROUND_USER_VARIABLE}
-    [[ -n $BG_COLOR_MODIFIER ]] && backgroundColor="$BG_COLOR_MODIFIER"
+    local output=''
 
-    # Overwrite given foreground-color by user defined variable for this segment.
-    local FOREGROUND_USER_VARIABLE=POWERLEVEL9K_${(U)${segment_name}#prompt_}_FOREGROUND
-    local FG_COLOR_MODIFIER=${(P)FOREGROUND_USER_VARIABLE}
-    [[ -n $FG_COLOR_MODIFIER ]] && foregroundColor="$FG_COLOR_MODIFIER"
-
-    # Get color codes here to save some calls later on
-    backgroundColor="$(getColorCode ${backgroundColor})"
-    foregroundColor="$(getColorCode ${foregroundColor})"
-
-    local background foreground
-    [[ -n "${backgroundColor}" ]] && background="$(backgroundColor ${backgroundColor})" || background="%k"
-    [[ -n "${foregroundColor}" ]] && foreground="$(foregroundColor ${foregroundColor})" || foreground="%f"
-
-    # If CURRENT_RIGHT_BG is "NONE", we are the first right segment.
-
-    if [[ "$CURRENT_RIGHT_BG" != "NONE" ]]; then
-      # This is the closing whitespace for the previous segment
-      output+="${POWERLEVEL9K_WHITESPACE_BETWEEN_RIGHT_SEGMENTS}%f"
-    fi
-
-    if [[ $joined == false ]] || [[ "$CURRENT_RIGHT_BG" == "NONE" ]]; then
-      if isSameColor "$CURRENT_RIGHT_BG" "${backgroundColor}"; then
+    if [[ $CURRENT_BG == NONE ]] ||
+       ! segmentShouldBeJoined $current_index $LAST_SEGMENT_INDEX $POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS; then
+      if [[ $background_color == $CURRENT_BG ]]; then
         # Middle segment with same color as previous segment
         # We take the current foreground color as color for our
         # subsegment (or the default color). This should have
         # enough contrast.
-        local complement
-        [[ -n "${foregroundColor}" ]] && complement="${foreground}" || complement="$(foregroundColor $DEFAULT_COLOR)"
-        output+="$complement$(print_icon 'RIGHT_SUBSEGMENT_SEPARATOR')%f"
+        if [[ $foreground == "%f" ]]; then
+          _p9k_foreground $DEFAULT_COLOR
+          output+=$_P9K_RETVAL
+        else
+          output+=$foreground
+        fi
+        _p9k_get_icon RIGHT_SUBSEGMENT_SEPARATOR
+        output+=$_P9K_RETVAL
       else
-        # Use the new Background Color as the foreground of the segment separator
-        output+="$(foregroundColor ${backgroundColor})$(print_icon 'RIGHT_SEGMENT_SEPARATOR')%f"
+        _p9k_foreground $background_color
+        output+=$_P9K_RETVAL
+        _p9k_get_icon RIGHT_SEGMENT_SEPARATOR
+        output+=$_P9K_RETVAL
       fi
+      output+="${background}${POWERLEVEL9K_WHITESPACE_BETWEEN_RIGHT_SEGMENTS}"
+    else
+      output+=$background
     fi
 
-    local visual_identifier
-    if [[ -n "$6" ]]; then
-      visual_identifier="$(print_icon $6)"
-      if [[ -n "$visual_identifier" ]]; then
+    output+=$foreground
+
+    local icon=''
+    if [[ -n $6 ]]; then
+      _p9k_get_icon $6
+      if [[ -n $_P9K_RETVAL ]]; then
+        local icon=$_P9K_RETVAL
+        _p9k_foreground $foreground_color $segment_name VISUAL_IDENTIFIER_COLOR
         # Add an whitespace if we print more than just the visual identifier.
         # To avoid cutting off the visual identifier in some terminal emulators (e.g., Konsole, st),
         # we need to color both the visual identifier and the whitespace.
-        [[ -n "$5" ]] && visual_identifier=" $visual_identifier"
-        # Allow users to overwrite the color for the visual identifier only.
-        local visual_identifier_color_variable=POWERLEVEL9K_${(U)${segment_name}#prompt_}_VISUAL_IDENTIFIER_COLOR
-        set_default $visual_identifier_color_variable "${foregroundColor}"
-        visual_identifier="$(foregroundColor ${(P)visual_identifier_color_variable})${visual_identifier}"
+        icon="${_P9K_RETVAL}${icon} "
       fi
     fi
 
-    output+="${background}${foreground}"
-
-    # Print whitespace only if segment is not joined or first right segment
-    [[ $joined == false ]] || [[ "$CURRENT_RIGHT_BG" == "NONE" ]] && output+="${POWERLEVEL9K_WHITESPACE_BETWEEN_RIGHT_SEGMENTS}"
-
-    _P9K_CACHE_VALUE="${(qq)output} ${(qq)backgroundColor} ${(qq)visual_identifier}"
-    p9k_cache_set $cache_key $_P9K_CACHE_VALUE
+    _p9k_cache_set $cache_key "${(qq)output} ${(qq)background_color} ${(qq)icon}"
   fi
 
-  # output backgroundColor visual_identifier
-  local tuple=("${(@Q)${(z)_P9K_CACHE_VALUE}}")
-  echo -n $tuple[1]
-  CURRENT_RIGHT_BG=$tuple[2]
+  local tuple=("${(@Q)${(z)_P9K_RETVAL}}")
+  local prompt="${tuple[1]}${5}${5:+ }${tuple[3]}"
+  echo -n $prompt
 
-  # Print segment content if there is any
-  [[ -n "$5" ]] && echo -n "${5}"
-  # Print the visual identifier
-  echo -n "${tuple[3]}"
-
-  last_right_element_index=$2
+  CURRENT_BG=$tuple[2]
+  LAST_SEGMENT_INDEX=$2
 }
 
 ################################################################
@@ -417,6 +423,7 @@ prompt_aws_eb_env() {
 # Segment to indicate background jobs with an icon.
 set_default POWERLEVEL9K_BACKGROUND_JOBS_VERBOSE true
 set_default POWERLEVEL9K_BACKGROUND_JOBS_VERBOSE_ALWAYS false
+_p9k_memoize_icon BACKGROUND_JOBS_ICON
 prompt_background_jobs() {
   local job_lines=("${(@f)$(jobs -lr)}")
   [[ ${(c)#job_lines} == 0 ]] && return
@@ -424,16 +431,16 @@ prompt_background_jobs() {
   local num_jobs=$#job_lines
   local cache_key="$0 $num_jobs"
 
-  if ! p9k_cache_get $cache_key; then
-    if [[ "$POWERLEVEL9K_BACKGROUND_JOBS_VERBOSE" == "true" ]] && ([[ "$num_jobs" -gt 1 ]] || [[ "$POWERLEVEL9K_BACKGROUND_JOBS_VERBOSE_ALWAYS" == "true" ]]); then
-      _P9K_CACHE_VALUE=$num_jobs
+  if ! _p9k_cache_get $cache_key; then
+    if [[ "$POWERLEVEL9K_BACKGROUND_JOBS_VERBOSE" == "true" &&
+          ("$num_jobs" -gt 1 || "$POWERLEVEL9K_BACKGROUND_JOBS_VERBOSE_ALWAYS" == "true") ]]; then
+      _p9k_cache_set $cache_key $num_jobs
     else
-      _P9K_CACHE_VALUE=''
+      _p9k_cache_set $cache_key ''
     fi
-    p9k_cache_set $cache_key $_P9K_CACHE_VALUE
   fi
 
-  "$1_prompt_segment" "$0" "$2" "$DEFAULT_COLOR" "cyan" "$_P9K_CACHE_VALUE" 'BACKGROUND_JOBS_ICON'
+  "$1_prompt_segment" "$0" "$2" "$DEFAULT_COLOR" "cyan" "$_P9K_RETVAL" 'BACKGROUND_JOBS_ICON'
 }
 
 ################################################################
@@ -451,7 +458,7 @@ prompt_newline() {
     "$0" \
     "$2" \
     "" "" "${newline}"
-  CURRENT_BG='NONE'
+  CURRENT_BG=NONE
   POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS=$lws
 }
 
@@ -816,6 +823,7 @@ prompt_custom() {
 
 ################################################################
 # Display the duration the command needed to run.
+_p9k_memoize_icon EXECUTION_TIME_ICON
 prompt_command_execution_time() {
   set_default POWERLEVEL9K_COMMAND_EXECUTION_TIME_THRESHOLD 3
   set_default POWERLEVEL9K_COMMAND_EXECUTION_TIME_PRECISION 2
@@ -881,12 +889,17 @@ function getUniqueFolder() {
 set_default POWERLEVEL9K_DIR_PATH_SEPARATOR "/"
 set_default POWERLEVEL9K_HOME_FOLDER_ABBREVIATION "~"
 set_default POWERLEVEL9K_DIR_PATH_HIGHLIGHT_BOLD false
+_p9k_memoize_icon FOLDER_ICON
+_p9k_memoize_icon HOME_ICON
+_p9k_memoize_icon HOME_SUB_ICON
+_p9k_memoize_icon LOCK_ICON
+_p9k_memoize_icon ETC_ICON
 prompt_dir() {
   # using $PWD instead of "$(print -P '%~')" to allow use of POWERLEVEL9K_DIR_PATH_ABSOLUTE
   local current_path=$PWD # WAS: local current_path="$(print -P '%~')"
   local cache_key="$0 $2 ${(q)current_path}"
   [[ "${POWERLEVEL9K_DIR_SHOW_WRITABLE}" == true && ! -w "$PWD" ]] && cache_key+=" W";
-  if ! p9k_cache_get $cache_key; then
+  if ! _p9k_cache_get $cache_key; then
     # check if the user wants to use absolute paths or "~" paths
     [[ ${(L)POWERLEVEL9K_DIR_PATH_ABSOLUTE} != "true" ]] && current_path=${current_path/#$HOME/"~"}
     # declare all local variables
@@ -1127,11 +1140,10 @@ prompt_dir() {
       current_path=${current_path:s/~/$POWERLEVEL9K_HOME_FOLDER_ABBREVIATION}
     fi
 
-    _P9K_CACHE_VALUE="$0_$current_state ${(qq)2} blue ${(qq)DEFAULT_COLOR} ${(qq)current_path} ${(qq)dir_states[$current_state]}"
-    p9k_cache_set $cache_key $_P9K_CACHE_VALUE
+    _p9k_cache_set $cache_key "$0_$current_state ${(qq)2} blue ${(qq)DEFAULT_COLOR} ${(qq)current_path} ${(qq)dir_states[$current_state]}"
   fi
 
-  "$1_prompt_segment" "${(@Q)${(z)_P9K_CACHE_VALUE}}"
+  "$1_prompt_segment" "${(@Q)${(z)_P9K_RETVAL}}"
 }
 
 ################################################################
@@ -1424,6 +1436,7 @@ prompt_chruby() {
 
 ################################################################
 # Segment to print an icon if user is root.
+_p9k_memoize_icon ROOT_ICON
 prompt_root_indicator() {
   if [[ "$UID" -eq 0 ]]; then
     "$1_prompt_segment" "$0" "$2" "$DEFAULT_COLOR" "yellow" "" 'ROOT_ICON'
@@ -1501,9 +1514,12 @@ exit_code_or_status() {
   fi
 }
 
+_p9k_memoize_icon OK_ICON
+_p9k_memoize_icon FAIL_ICON
+_p9k_memoize_icon CARRIAGE_RETURN_ICON
 prompt_status() {
   local cache_key="$0 $2 $RETVAL $RETVALS"
-  if ! p9k_cache_get $cache_key; then
+  if ! _p9k_cache_get $cache_key; then
     local ec_text
     local ec_sum
     local ec
@@ -1530,18 +1546,18 @@ prompt_status() {
 
     if (( ec_sum > 0 )); then
       if [[ "$POWERLEVEL9K_STATUS_CROSS" == false && "$POWERLEVEL9K_STATUS_VERBOSE" == true ]]; then
-        _P9K_CACHE_VALUE="$0_ERROR ${(qq)2} red yellow1 ${(qq)ec_text} CARRIAGE_RETURN_ICON"
+        _P9K_RETVAL="$0_ERROR ${(qq)2} red yellow1 ${(qq)ec_text} CARRIAGE_RETURN_ICON"
       else
-        _P9K_CACHE_VALUE="$0_ERROR ${(qq)2} ${(qq)DEFAULT_COLOR} red '' FAIL_ICON"
+        _P9K_RETVAL="$0_ERROR ${(qq)2} ${(qq)DEFAULT_COLOR} red '' FAIL_ICON"
       fi
     elif [[ "$POWERLEVEL9K_STATUS_OK" == true ]] && [[ "$POWERLEVEL9K_STATUS_VERBOSE" == true || "$POWERLEVEL9K_STATUS_OK_IN_NON_VERBOSE" == true ]]; then
-      _P9K_CACHE_VALUE="$0_OK ${(qq)2} ${(qq)DEFAULT_COLOR} green '' OK_ICON"
+      _P9K_RETVAL="$0_OK ${(qq)2} ${(qq)DEFAULT_COLOR} green '' OK_ICON"
     fi
     if (( $#RETVALS < 3 )); then
-      p9k_cache_set $cache_key $_P9K_CACHE_VALUE
+      _p9k_cache_set $cache_key $_P9K_RETVAL
     fi
   fi
-  "$1_prompt_segment" "${(@Q)${(z)_P9K_CACHE_VALUE}}"
+  "$1_prompt_segment" "${(@Q)${(z)_P9K_RETVAL}}"
 }
 
 ################################################################
@@ -1611,6 +1627,7 @@ build_test_stats() {
 
 ################################################################
 # System time
+_p9k_memoize_icon TIME_ICON
 prompt_time() {
   set_default POWERLEVEL9K_TIME_FORMAT "%D{%H:%M:%S}"
 
@@ -1743,25 +1760,22 @@ powerlevel9k_vcs_init() {
 #   POWERLEVEL9K_VCS_STATUS_COMMAND="$HOME/bin/gitstatus --dirty-max-index-size=4096"
 set_default POWERLEVEL9K_VCS_STATUS_COMMAND ""
 
-if [[ $POWERLEVEL9K_USE_CACHE == true ]]; then
-  _P9K_VCS_GIT_GITHUB_ICON=$(print_icon VCS_GIT_GITHUB_ICON)
-  _P9K_VCS_GIT_BITBUCKET_ICON=$(print_icon VCS_GIT_BITBUCKET_ICON)
-  _P9K_VCS_GIT_GITLAB_ICON=$(print_icon VCS_GIT_GITLAB_ICON)
-  _P9K_VCS_GIT_ICON=$(print_icon VCS_GIT_ICON)
-  _P9K_VCS_BRANCH_ICON=$(print_icon VCS_BRANCH_ICON)
-  _P9K_VCS_REMOTE_BRANCH_ICON=$(print_icon VCS_REMOTE_BRANCH_ICON)
-  _P9K_VCS_STAGED_ICON=$(print_icon VCS_STAGED_ICON)
-  _P9K_VCS_UNSTAGED_ICON=$(print_icon VCS_UNSTAGED_ICON)
-  _P9K_VCS_UNTRACKED_ICON=$(print_icon VCS_UNTRACKED_ICON)
-  _P9K_VCS_OUTGOING_CHANGES_ICON=$(print_icon VCS_OUTGOING_CHANGES_ICON)
-  _P9K_VCS_INCOMING_CHANGES_ICON=$(print_icon VCS_INCOMING_CHANGES_ICON)
-  _P9K_VCS_STASH_ICON=$(print_icon VCS_STASH_ICON)
-fi
-
 ################################################################
 # Segment to show VCS information
+_p9k_memoize_icon VCS_GIT_GITHUB_ICON
+_p9k_memoize_icon VCS_GIT_BITBUCKET_ICON
+_p9k_memoize_icon VCS_GIT_GITLAB_ICON
+_p9k_memoize_icon VCS_GIT_ICON
+_p9k_memoize_icon VCS_BRANCH_ICON
+_p9k_memoize_icon VCS_REMOTE_BRANCH_ICON
+_p9k_memoize_icon VCS_STAGED_ICON
+_p9k_memoize_icon VCS_UNSTAGED_ICON
+_p9k_memoize_icon VCS_UNTRACKED_ICON
+_p9k_memoize_icon VCS_OUTGOING_CHANGES_ICON
+_p9k_memoize_icon VCS_INCOMING_CHANGES_ICON
+_p9k_memoize_icon VCS_STASH_ICON
 prompt_vcs() {
-  if [[ -z $POWERLEVEL9K_VCS_STATUS_COMMAND || $POWERLEVEL9K_USE_CACHE != true ]]; then
+  if [[ -z $POWERLEVEL9K_VCS_STATUS_COMMAND ]]; then
     VCS_WORKDIR_DIRTY=false
     VCS_WORKDIR_HALF_DIRTY=false
     local current_state=""
@@ -1788,7 +1802,7 @@ prompt_vcs() {
     local props
     props=("${(@fQ)$("${(@Q)${(z)POWERLEVEL9K_VCS_STATUS_COMMAND}}" 2>/dev/null)}") || return
     local cache_key="$0 ${(@q)props}"
-    if ! p9k_cache_get $cache_key; then
+    if ! _p9k_cache_get $cache_key; then
       local local_branch=$props[1]
       local remote_branch=$props[2]
       local remote_url=$props[3]
@@ -1811,34 +1825,42 @@ prompt_vcs() {
 
       local vcs_prompt
       if [[ "$remote_url" =~ "github" ]] then
-        vcs_prompt+=$_P9K_VCS_GIT_GITHUB_ICON
+        _p9k_get_icon VCS_GIT_GITHUB_ICON
+        vcs_prompt+=$_P9K_RETVAL
       elif [[ "$remote_url" =~ "bitbucket" ]] then
-        vcs_prompt+=$_P9K_VCS_GIT_BITBUCKET_ICON
+        _p9k_get_icon VCS_GIT_BITBUCKET_ICON
+        vcs_prompt+=$_P9K_RETVAL
       elif [[ "$remote_url" =~ "stash" ]] then
-        vcs_prompt+=$_P9K_VCS_GIT_GITHUB_ICON
+        _p9k_get_icon VCS_GIT_GITHUB_ICON
+        vcs_prompt+=$_P9K_RETVAL
       elif [[ "$remote_url" =~ "gitlab" ]] then
-        vcs_prompt+=$_P9K_VCS_GIT_GITLAB_ICON
+        _p9k_get_icon VCS_GIT_GITLAB_ICON
+        vcs_prompt+=$_P9K_RETVAL
       else
-        vcs_prompt+=$_P9K_VCS_GIT_ICON
+        _p9k_get_icon VCS_GIT_ICON
+        vcs_prompt+=$_P9K_RETVAL
       fi
 
-      vcs_prompt+="$_P9K_VCS_BRANCH_ICON$local_branch"
+      _p9k_get_icon VCS_BRANCH_ICON
+      vcs_prompt+="$_P9K_RETVAL$local_branch"
       if [[ -n $action ]]; then
         vcs_prompt+=" %F{${POWERLEVEL9K_VCS_ACTIONFORMAT_FOREGROUND}}| $action%f"
       else
-        [[ -n $remote_branch && $local_branch != $remote_branch ]] && vcs_prompt+=" $_P9K_VCS_REMOTE_BRANCH_ICON$remote_branch"
-        [[ $has_staged == 1 ]] && vcs_prompt+=" $_P9K_VCS_STAGED_ICON"
-        [[ $has_unstaged == 1 ]] && vcs_prompt+=" $_P9K_VCS_UNSTAGED_ICON"
-        [[ $has_untracked == 1 ]] && vcs_prompt+=" $_P9K_VCS_UNTRACKED_ICON"
-        [[ $ahead -gt 0 ]] && vcs_prompt+=" $_P9K_VCS_OUTGOING_CHANGES_ICON$ahead"
-        [[ $behind -gt 0 ]] && vcs_prompt+=" $_P9K_VCS_INCOMING_CHANGES_ICON$behind"
-        [[ $stashes -gt 0 ]] && vcs_prompt+=" $_P9K_VCS_STASH_ICON$stashes"
+        if [[ -n $remote_branch && $local_branch != $remote_branch ]]; then
+          _p9k_get_icon VCS_REMOTE_BRANCH_ICON
+           vcs_prompt+=" $_P9K_RETVAL$remote_branch"
+        fi
+        [[ $has_staged == 1 ]] && _p9k_get_icon VCS_STAGED_ICON && vcs_prompt+=" $_P9K_RETVAL"
+        [[ $has_unstaged == 1 ]] && _p9k_get_icon VCS_UNSTAGED_ICON && vcs_prompt+=" $_P9K_RETVAL"
+        [[ $has_untracked == 1 ]] && _p9k_get_icon VCS_UNTRACKED_ICON && vcs_prompt+=" $_P9K_RETVAL"
+        [[ $ahead -gt 0 ]] && _p9k_get_icon VCS_OUTGOING_CHANGES_ICON && vcs_prompt+=" $_P9K_RETVAL$ahead"
+        [[ $behind -gt 0 ]] && _p9k_get_icon VCS_INCOMING_CHANGES_ICON && vcs_prompt+=" $_P9K_RETVAL$behind"
+        [[ $stashes -gt 0 ]] && _p9k_get_icon VCS_STASH_ICON && vcs_prompt+=" $_P9K_RETVAL$stashes"
       fi
 
-      _P9K_CACHE_VALUE="${0}_${(U)current_state} $2 ${(qq)vcs_states[$current_state]} ${(qq)DEFAULT_COLOR} ${(qq)vcs_prompt}"
-      p9k_cache_set $cache_key $_P9K_CACHE_VALUE
+      _p9k_cache_set $cache_key "${0}_${(U)current_state} $2 ${(qq)vcs_states[$current_state]} ${(qq)DEFAULT_COLOR} ${(qq)vcs_prompt}"
     fi
-    "$1_prompt_segment" "${(@Q)${(z)_P9K_CACHE_VALUE}}"
+    "$1_prompt_segment" "${(@Q)${(z)_P9K_RETVAL}}"
   fi
 }
 
@@ -1915,6 +1937,7 @@ prompt_swift_version() {
 
 ################################################################
 # dir_writable: Display information about the user's permission to write in the current directory
+_p9k_memoize_icon LOCK_ICON
 prompt_dir_writable() {
   if [[ ! -w "$PWD" ]]; then
     "$1_prompt_segment" "$0_FORBIDDEN" "$2" "red" "yellow1" "" 'LOCK_ICON'
@@ -2057,7 +2080,7 @@ powerlevel9k_prepare_prompts() {
   # Reset start time
   _P9K_TIMER_START=0x7FFFFFFF
 
-  if [[ -s $_P9K_CACHE_CHANNEL ]]; then
+  if [[ $POWERLEVEL9K_USE_CACHE == true && -s $_P9K_CACHE_CHANNEL ]]; then
     eval $(<$_P9K_CACHE_CHANNEL)
     rm -f $_P9K_CACHE_CHANNEL
     if [[ -n $POWERLEVEL9K_MAX_CACHE_SIZE && $#_p9k_cache_data -gt $POWERLEVEL9K_MAX_CACHE_SIZE ]]; then
