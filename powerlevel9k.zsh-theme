@@ -1802,7 +1802,6 @@ prompt_vcs() {
       local current_state
       if [[ $has_staged != 0 || $has_unstaged != 0 ]]; then
         current_state='modified'
-        color='yellow'
       elif [[ $has_untracked != 0 ]]; then
         current_state='untracked'
       else
