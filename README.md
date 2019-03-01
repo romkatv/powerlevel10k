@@ -11,7 +11,7 @@ enjoy responsive shell like it's 80's again!
 Powerlevel10k uses the same configuration options as Powerlevel9k and produces the
 same results. It's simply faster. There is no catch.
 
-** Do not load both Powerlevel9k and Powerlevel10k themes at the same time. Variable name
+**Do not load both Powerlevel9k and Powerlevel10k themes at the same time. Variable name
 clashes will cause mayhem. Source either one or the other. Consider Powerlevel10k
 a patched fork of Powerlevel9k, which it is.**
 
@@ -21,3 +21,18 @@ Powerlevel10k as well.
 
 If you are on Linux or WSL, consider enabling [gitstatus](https://github.com/romkatv/gitstatus)
 plugin for massive performance improvement in vcs/prompt segment. It works well with Powerlevel10k.
+
+## How fast is it?
+
+Powerlevel10k with [gitstatus](https://github.com/romkatv/gitstatus) renders prompt 5+ times
+faster than Powerlevel9k. In some cases it can be over 10 times faster. When using Linux,
+you should expect less than 50ms prompt latency in most cases, about 100ms in large git
+repos and 200ms in huge repos such as Linux kernel. To get comfortable upper bound on
+latency in any repo, set `GITSTATUS_DIRTY_MAX_INDEX_SIZE=4096`. It'll disable dirty file
+scanning in repos with over 4k files. This should give you under 100ms prompt latency
+everywhere.
+
+## What's the catch?
+
+Really, there is no catch. It's the same prompt with the same flexibility and literally the
+same configuration as Powerlevel9k but **much faster**.
