@@ -905,6 +905,8 @@ prompt_dir() {
           package_path=${$(pwd)%%/.git*}
         fi
 
+        [[ ${(L)POWERLEVEL9K_DIR_PATH_ABSOLUTE} != "true" ]] && package_path=${package_path/$HOME/"~"}
+
         # Replace the shortest possible match of the marked folder from
         # the current path. Remove the amount of characters up to the
         # folder marker from the left. Count only the visible characters
