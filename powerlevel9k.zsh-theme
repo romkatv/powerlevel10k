@@ -135,6 +135,8 @@ if [[ $POWERLEVEL9K_USE_CACHE == true ]]; then
   # Note that an attempt to retrieve the value right away won't succeed. All requested
   # cache update get batched and flushed together after a prompt is built.
   _p9k_cache_set() {
+    # Uncomment to see cache misses.
+    # echo "cache: ${(qq)1} => ${(qq)2}" >&2
     echo -E "_p9k_cache_data+=(${(qq)1} ${(qq)2})" >>$_P9K_CACHE_CHANNEL
     _P9K_RETVAL=$2
   }
