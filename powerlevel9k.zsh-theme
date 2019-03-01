@@ -1705,58 +1705,8 @@ powerlevel9k_vcs_init() {
   fi
 }
 
-# If not empty, should be a command that prints vcs status for the current directory. The `vcs`
-# prompt will use it instead of `vcs_info`.
-#
-# The command should return an error or print 0 if the current directory isn't a vcs repository.
-# Otherwise it should print 11 space-separated values. Values MAY be enclosed in quotes -- they'll
-# be stripped off with (Q) expansion flag. Empty string values MUST be enclosed in quotes.
-#
-#   1. Literal number 1. This is to easily distinguish errors from successes.
-#   2. Local branch name. Not empty.
-#   3. Upstream branch name. Can be empty.
-#   4. Remote URL. Can be empty.
-#   5. Repository state, A.K.A. action. Can be empty.
-#   6. 1 if there are staged changes, 0 otherwise.
-#   7. 1 if there are unstaged changes, 0 if there aren't, -1 if unknown.
-#   8. 1 if there are untracked files, 0 if there aren't, -1 if unknown.
-#   9. Number of commits the current branch is ahead of upstream. Must be a non-negative integer.
-#  10. Number of commits the current branch is behind upstream. Must be a non-negative integer.
-#  11. Number of stashes. Must be a non-negative integer.
-#
-# The point of reporting -1 as unstaged and untracked is to allow the command to skip scanning
-# files in large repos.
-#
-# Example command output:
-#
-#   1 "master" "master" "git@github.com:romkatv/gitstatus.git" "" 1 1 0 3 0 2
-#
-# There is a fast implementation of this protocol for git at https://github.com/romkatv/gitstatus.
-#
-# Configuration example (in ~/.zshrc, before sourcing powerlevel9k):
-#
-#   function _gitstatus_create_fifo() {
-#     local fifo
-#     fifo=$(mktemp -u gitstatus.XXXXXXXXXX) &&
-#       mkfifo $fifo &&
-#       eval "exec {$1}<>$fifo" &&
-#       rm $fifo
-#   }
-#
-#   _gitstatus_create_fifo _GITSTATUS_REQ_FD
-#   _gitstatus_create_fifo _GITSTATUS_RESP_FD
-#
-#   unset -f _gitstatus_create_fifo
-#
-#   $HOME/bin/gitstatus --parent-pid=$$ <&$_GITSTATUS_REQ_FD >&$_GITSTATUS_RESP_FD 2>/dev/null &!
-#
-#   function _gitstatus_query() {
-#     <<<$PWD >&$_GITSTATUS_REQ_FD
-#     read line <&$_GITSTATUS_RESP_FD
-#     echo -nE $line
-#   }
-#
-#   POWERLEVEL9K_VCS_STATUS_COMMAND=_gitstatus_query
+# If not empty, should be a command that provides vcs info in the format of gitstatus.
+# See https://github.com/romkatv/gitstatus.
 set_default POWERLEVEL9K_VCS_STATUS_COMMAND ""
 
 ################################################################
@@ -1786,43 +1736,29 @@ prompt_vcs() {
       "$1_prompt_segment" "${0}_${(U)current_state}" "$2" "${vcs_states[$current_state]}" "$DEFAULT_COLOR" "$vcs_prompt" "$vcs_visual_identifier"
     fi
   else
-    local vcs_status
-    vcs_status="$("${(@Q)${(z)POWERLEVEL9K_VCS_STATUS_COMMAND}}" 2>/dev/null)" || return
-    local props=("${(@z)vcs_status}")
-    [[ ${(Q)props[1]} == 1 ]] || return
-    local cache_key="$0 $vcs_status"
+    "${(@Q)${(z)POWERLEVEL9K_VCS_STATUS_COMMAND}}" || return
+    local cache_key="$0 ${(@q)VCS_STATUS_ALL}"
     if ! _p9k_cache_get $cache_key; then
-      local local_branch=${(Q)props[2]}
-      local remote_branch=${(Q)props[3]}
-      local remote_url=${(Q)props[4]}
-      local action=${(Q)props[5]}
-      local has_staged=${(Q)props[6]}
-      local has_unstaged=${(Q)props[7]}
-      local has_untracked=${(Q)props[8]}
-      local ahead=${(Q)props[9]}
-      local behind=${(Q)props[10]}
-      local stashes=${(Q)props[11]}
-
       local current_state
-      if [[ $has_staged != 0 || $has_unstaged != 0 ]]; then
+      if [[ $VCS_STATUS_HAS_STAGED != 0 || $VCS_STATUS_HAS_UNSTAGED != 0 ]]; then
         current_state='modified'
-      elif [[ $has_untracked != 0 ]]; then
+      elif [[ $VCS_STATUS_HAS_UNTRACKED != 0 ]]; then
         current_state='untracked'
       else
         current_state='clean'
       fi
 
       local vcs_prompt
-      if [[ "$remote_url" =~ "github" ]] then
+      if [[ "$VCS_STATUS_REMOTE_URL" =~ "github" ]] then
         _p9k_get_icon VCS_GIT_GITHUB_ICON
         vcs_prompt+=$_P9K_RETVAL
-      elif [[ "$remote_url" =~ "bitbucket" ]] then
+      elif [[ "$VCS_STATUS_REMOTE_URL" =~ "bitbucket" ]] then
         _p9k_get_icon VCS_GIT_BITBUCKET_ICON
         vcs_prompt+=$_P9K_RETVAL
-      elif [[ "$remote_url" =~ "stash" ]] then
+      elif [[ "$VCS_STATUS_REMOTE_URL" =~ "stash" ]] then
         _p9k_get_icon VCS_GIT_GITHUB_ICON
         vcs_prompt+=$_P9K_RETVAL
-      elif [[ "$remote_url" =~ "gitlab" ]] then
+      elif [[ "$VCS_STATUS_REMOTE_URL" =~ "gitlab" ]] then
         _p9k_get_icon VCS_GIT_GITLAB_ICON
         vcs_prompt+=$_P9K_RETVAL
       else
@@ -1831,24 +1767,38 @@ prompt_vcs() {
       fi
 
       _p9k_get_icon VCS_BRANCH_ICON
-      vcs_prompt+="$_P9K_RETVAL$local_branch"
-      if [[ -n $action ]]; then
-        vcs_prompt+=" %F{${POWERLEVEL9K_VCS_ACTIONFORMAT_FOREGROUND}}| $action%f"
+      vcs_prompt+="$_P9K_RETVAL$VCS_STATUS_LOCAL_BRANCH"
+      if [[ -n $VCS_STATUS_ACTION ]]; then
+        vcs_prompt+=" %F{${POWERLEVEL9K_VCS_ACTIONFORMAT_FOREGROUND}}| $VCS_STATUS_ACTION%f"
       else
-        if [[ -n $remote_branch && $local_branch != $remote_branch ]]; then
+        if [[ -n $VCS_STATUS_REMOTE_BRANCH &&
+              $VCS_STATUS_LOCAL_BRANCH != $VCS_STATUS_REMOTE_BRANCH ]]; then
           _p9k_get_icon VCS_REMOTE_BRANCH_ICON
-           vcs_prompt+=" $_P9K_RETVAL$remote_branch"
+           vcs_prompt+=" $_P9K_RETVAL$VCS_STATUS_REMOTE_BRANCH"
         fi
-        [[ $has_staged == 1 ]] && _p9k_get_icon VCS_STAGED_ICON && vcs_prompt+=" $_P9K_RETVAL"
-        [[ $has_unstaged == 1 ]] && _p9k_get_icon VCS_UNSTAGED_ICON && vcs_prompt+=" $_P9K_RETVAL"
-        [[ $has_untracked == 1 ]] && _p9k_get_icon VCS_UNTRACKED_ICON && vcs_prompt+=" $_P9K_RETVAL"
-        [[ $ahead -gt 0 ]] && _p9k_get_icon VCS_OUTGOING_CHANGES_ICON && vcs_prompt+=" $_P9K_RETVAL$ahead"
-        [[ $behind -gt 0 ]] && _p9k_get_icon VCS_INCOMING_CHANGES_ICON && vcs_prompt+=" $_P9K_RETVAL$behind"
-        [[ $stashes -gt 0 ]] && _p9k_get_icon VCS_STASH_ICON && vcs_prompt+=" $_P9K_RETVAL$stashes"
+        if [[ $VCS_STATUS_HAS_STAGED == 1 ]]; then
+          _p9k_get_icon VCS_STAGED_ICON && vcs_prompt+=" $_P9K_RETVAL"
+        fi
+        if [[ $VCS_STATUS_HAS_UNSTAGED == 1 ]]; then
+          _p9k_get_icon VCS_UNSTAGED_ICON && vcs_prompt+=" $_P9K_RETVAL"
+        fi
+        if [[ $VCS_STATUS_HAS_UNTRACKED == 1 ]]; then
+          _p9k_get_icon VCS_UNTRACKED_ICON && vcs_prompt+=" $_P9K_RETVAL"
+        fi
+        if [[ $VCS_STATUS_COMMITS_AHEAD -gt 0 ]]; then
+          _p9k_get_icon VCS_OUTGOING_CHANGES_ICON && vcs_prompt+=" $_P9K_RETVAL$VCS_STATUS_COMMITS_AHEAD"
+        fi
+        if [[ $VCS_STATUS_COMMITS_BEHIND -gt 0 ]]; then
+          _p9k_get_icon VCS_INCOMING_CHANGES_ICON && vcs_prompt+=" $_P9K_RETVAL$VCS_STATUS_COMMITS_BEHIND"
+        fi
+        if [[ $VCS_STATUS_STASHES -gt 0 ]]; then
+          _p9k_get_icon VCS_STASH_ICON && vcs_prompt+=" $_P9K_RETVAL$VCS_STATUS_STASHES"
+        fi
       fi
 
       _p9k_cache_set $cache_key "${0}_${(U)current_state} $2 ${(qq)vcs_states[$current_state]} ${(qq)DEFAULT_COLOR} ${(qq)vcs_prompt}"
     fi
+
     "$1_prompt_segment" "${(@Q)${(z)_P9K_RETVAL}}"
   fi
 }
