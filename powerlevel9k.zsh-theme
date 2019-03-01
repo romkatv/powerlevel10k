@@ -1,19 +1,18 @@
 # vim:ft=zsh ts=2 sw=2 sts=2 et fenc=utf-8
 ################################################################
-# powerlevel9k Theme
+# powerlevel10k Theme
+# https://github.com/romkatv/powerlevel10k
+#
+# Forked from powerlevel9k Theme
 # https://github.com/bhilburn/powerlevel9k
 #
-# This theme was inspired by agnoster's Theme:
+# Which was inspired by agnoster's Theme:
 # https://gist.github.com/3712874
 ################################################################
 
 ################################################################
-# For basic documentation, please refer to the README.md in the top-level
-# directory. For more detailed documentation, refer to the project wiki, hosted
-# on Github: https://github.com/bhilburn/powerlevel9k/wiki
-#
-# There are a lot of easy ways you can customize your prompt segments and
-# theming with simple variables defined in your `~/.zshrc`.
+# For basic documentation, please refer to the README.md in the
+# top-level directory.
 ################################################################
 
 ## Turn on for Debugging
