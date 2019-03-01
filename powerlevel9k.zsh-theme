@@ -1708,42 +1708,55 @@ powerlevel9k_vcs_init() {
 # If not empty, should be a command that prints vcs status for the current directory. The `vcs`
 # prompt will use it instead of `vcs_info`.
 #
-# The command should return an error if the current directory isn't a vcs repository. Otherwise
-# it should print 10 values, each on its own line. Values MAY be enclosed in quotes -- they'll be
-# stripped off with (Q) expansion flag. Empty string values MUST be enclosed in quotes.
+# The command should return an error or print 0 if the current directory isn't a vcs repository.
+# Otherwise it should print 11 space-separated values. Values MAY be enclosed in quotes -- they'll
+# be stripped off with (Q) expansion flag. Empty string values MUST be enclosed in quotes.
 #
-#   1. Local branch name. Not empty.
-#   2. Upstream branch name. Can be empty.
-#   3. Remote URL. Can be empty.
-#   4. Repository state, A.K.A. action. Can be empty.
-#   5. 1 if there are staged changes, 0 otherwise.
-#   6. 1 if there are unstaged changes, 0 if there aren't, -1 if unknown.
-#   7. 1 if there are untracked files, 0 if there aren't, -1 if unknown.
-#   8. Number of commits the current branch is ahead of upstream. Must be a non-negative integer.
-#   9. Number of commits the current branch is behind upstream. Must be a non-negative integer.
-#  10. Number of stashes. Must be a non-negative integer.
+#   1. Literal number 1. This is to easily distinguish errors from successes.
+#   2. Local branch name. Not empty.
+#   3. Upstream branch name. Can be empty.
+#   4. Remote URL. Can be empty.
+#   5. Repository state, A.K.A. action. Can be empty.
+#   6. 1 if there are staged changes, 0 otherwise.
+#   7. 1 if there are unstaged changes, 0 if there aren't, -1 if unknown.
+#   8. 1 if there are untracked files, 0 if there aren't, -1 if unknown.
+#   9. Number of commits the current branch is ahead of upstream. Must be a non-negative integer.
+#  10. Number of commits the current branch is behind upstream. Must be a non-negative integer.
+#  11. Number of stashes. Must be a non-negative integer.
 #
 # The point of reporting -1 as unstaged and untracked is to allow the command to skip scanning
 # files in large repos.
 #
 # Example command output:
 #
-#   "master"
-#   "master"
-#   "git@github.com:romkatv/gitstatus.git"
-#   ""
-#   1
-#   1
-#   0
-#   3
-#   0
-#   2
+#   1 "master" "master" "git@github.com:romkatv/gitstatus.git" "" 1 1 0 3 0 2
 #
 # There is a fast implementation of this protocol for git at https://github.com/romkatv/gitstatus.
 #
 # Configuration example (in ~/.zshrc, before sourcing powerlevel9k):
 #
-#   POWERLEVEL9K_VCS_STATUS_COMMAND="$HOME/bin/gitstatus --dirty-max-index-size=4096"
+#   function _gitstatus_create_fifo() {
+#     local fifo
+#     fifo=$(mktemp -u gitstatus.XXXXXXXXXX) &&
+#       mkfifo $fifo &&
+#       eval "exec {$1}<>$fifo" &&
+#       rm $fifo
+#   }
+#
+#   _gitstatus_create_fifo _GITSTATUS_REQ_FD
+#   _gitstatus_create_fifo _GITSTATUS_RESP_FD
+#
+#   unset -f _gitstatus_create_fifo
+#
+#   $HOME/bin/gitstatus --parent-pid=$$ <&$_GITSTATUS_REQ_FD >&$_GITSTATUS_RESP_FD 2>/dev/null &!
+#
+#   function _gitstatus_query() {
+#     <<<$PWD >&$_GITSTATUS_REQ_FD
+#     read line <&$_GITSTATUS_RESP_FD
+#     echo -nE $line
+#   }
+#
+#   POWERLEVEL9K_VCS_STATUS_COMMAND=_gitstatus_query
 set_default POWERLEVEL9K_VCS_STATUS_COMMAND ""
 
 ################################################################
@@ -1773,20 +1786,22 @@ prompt_vcs() {
       "$1_prompt_segment" "${0}_${(U)current_state}" "$2" "${vcs_states[$current_state]}" "$DEFAULT_COLOR" "$vcs_prompt" "$vcs_visual_identifier"
     fi
   else
-    local props
-    props=("${(@fQ)$("${(@Q)${(z)POWERLEVEL9K_VCS_STATUS_COMMAND}}" 2>/dev/null)}") || return
-    local cache_key="$0 ${(@q)props}"
+    local vcs_status
+    vcs_status="$("${(@Q)${(z)POWERLEVEL9K_VCS_STATUS_COMMAND}}" 2>/dev/null)" || return
+    local props=("${(@z)vcs_status}")
+    [[ ${(Q)props[1]} == 1 ]] || return
+    local cache_key="$0 $vcs_status"
     if ! _p9k_cache_get $cache_key; then
-      local local_branch=$props[1]
-      local remote_branch=$props[2]
-      local remote_url=$props[3]
-      local action=$props[4]
-      local has_staged=$props[5]
-      local has_unstaged=$props[6]
-      local has_untracked=$props[7]
-      local ahead=$props[8]
-      local behind=$props[9]
-      local stashes=$props[10]
+      local local_branch=${(Q)props[2]}
+      local remote_branch=${(Q)props[3]}
+      local remote_url=${(Q)props[4]}
+      local action=${(Q)props[5]}
+      local has_staged=${(Q)props[6]}
+      local has_unstaged=${(Q)props[7]}
+      local has_untracked=${(Q)props[8]}
+      local ahead=${(Q)props[9]}
+      local behind=${(Q)props[10]}
+      local stashes=${(Q)props[11]}
 
       local current_state
       if [[ $has_staged != 0 || $has_unstaged != 0 ]]; then
