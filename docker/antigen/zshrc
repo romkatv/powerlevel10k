@@ -1,4 +1,0 @@
-source ~/antigen/antigen.zsh
-
-antigen theme "${HOME}/p9k" powerlevel9k --no-local-clone
-antigen apply

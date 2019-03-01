@@ -100,94 +100,76 @@ fi
 CURRENT_BG=NONE
 LAST_SEGMENT_INDEX=0
 
-# Cache the results of expensive computations to avoid avoid recomputing them on every prompt.
-# Setting this option to 'true' can greatly speed up prompt generation. However, any changes
-# to the configuration will require re-sourcing powerlevel9k. For example, if you change
-# POWERLEVEL9K_TIME_BACKGROUND in an interactive shell, your next prompt will reflect the change
-# only if caching is disabled.
-set_default POWERLEVEL9K_USE_CACHE false
-
-# Meaningless unless POWERLEVEL9K_USE_CACHE is 'true'.
-#
 # Specifies the maximum number of elements in the cache. When the cache grows over this limit,
 # it gets cleared. This is meant to avoid memory leaks when a rogue prompt is filling the cache
 # with data.
 set_default POWERLEVEL9K_MAX_CACHE_SIZE 10000
 
-if [[ $POWERLEVEL9K_USE_CACHE == true ]]; then
-  # Functions producing left and right prompts are called from subshells, so any
-  # changes to the environment variables they do get wiped out after the prompt is
-  # printed. In order to cache the results of expensive computations in these functions,
-  # we use a temporary file to communicate with the parent shell and to ask it to
-  # change environment variables.
-  typeset -AH _p9k_cache_data=()
-  typeset -H _P9K_CACHE_CHANNEL=${$(mktemp -u)%/*}/p9k_cache_channel.$$
+# Functions producing left and right prompts are called from subshells, so any
+# changes to the environment variables they do get wiped out after the prompt is
+# printed. In order to cache the results of expensive computations in these functions,
+# we use a temporary file to communicate with the parent shell and to ask it to
+# change environment variables.
+typeset -AH _p9k_cache_data=()
+typeset -H _P9K_CACHE_CHANNEL=${$(mktemp -u)%/*}/p9k_cache_channel.$$
 
-  # Note: Several performance-critical functions return results to the caller via global
-  # variable _P9K_RETVAL rather than stdout. This is faster.
+# Note: Several performance-critical functions return results to the caller via global
+# variable _P9K_RETVAL rather than stdout. This is faster.
 
-  # Store a key-value pair in the cache.
-  #
-  #   * $1: Key.
-  #   * $2: Value. Can be empty.
-  #
-  # Note that an attempt to retrieve the value right away won't succeed. All requested
-  # cache update get batched and flushed together after a prompt is built.
-  _p9k_cache_set() {
-    # Uncomment to see cache misses.
-    # echo "cache: ${(qq)1} => ${(qq)2}" >&2
-    echo -E "_p9k_cache_data+=(${(qq)1} ${(qq)2})" >>$_P9K_CACHE_CHANNEL
-    _P9K_RETVAL=$2
-  }
+# Store a key-value pair in the cache.
+#
+#   * $1: Key.
+#   * $2: Value. Can be empty.
+#
+# Note that an attempt to retrieve the value right away won't succeed. All requested
+# cache update get batched and flushed together after a prompt is built.
+_p9k_cache_set() {
+  # Uncomment to see cache misses.
+  # echo "cache: ${(qq)1} => ${(qq)2}" >&2
+  echo -E "_p9k_cache_data+=(${(qq)1} ${(qq)2})" >>$_P9K_CACHE_CHANNEL
+  _P9K_RETVAL=$2
+}
 
-  # Retrieve a value from the cache.
-  #
-  #   * $1: Key.
-  #
-  # If there is value associated with the specified key, sets _P9K_RETVAL and returns 0.
-  # Otherwise returns 1.
-  _p9k_cache_get() {
-    _P9K_RETVAL=${_p9k_cache_data[$1]-__p9k_empty__}
-    [[ $_P9K_RETVAL != __p9k_empty__ ]]
-  }
+# Retrieve a value from the cache.
+#
+#   * $1: Key.
+#
+# If there is value associated with the specified key, sets _P9K_RETVAL and returns 0.
+# Otherwise returns 1.
+_p9k_cache_get() {
+  _P9K_RETVAL=${_p9k_cache_data[$1]-__p9k_empty__}
+  [[ $_P9K_RETVAL != __p9k_empty__ ]]
+}
 
-  # Sets _P9K_RETVAL to icon whose name is supplied via $1.
-  _p9k_get_icon() {
-    local var_name=POWERLEVEL9K_$1
-    _P9K_RETVAL=${${(P)var_name}-$icons[$1]}
-  }
+# Sets _P9K_RETVAL to icon whose name is supplied via $1.
+_p9k_get_icon() {
+  local var_name=POWERLEVEL9K_$1
+  _P9K_RETVAL=${${(P)var_name}-$icons[$1]}
+}
 
-  typeset -aH _p9k_left_join=(1)
-  for ((i = 2; i <= $#POWERLEVEL9K_LEFT_PROMPT_ELEMENTS; ++i)); do
-    elem=$POWERLEVEL9K_LEFT_PROMPT_ELEMENTS[$i]
-    if [[ ${elem[-7,-1]} == '_joined' ]]; then
-      _p9k_left_join+=$_p9k_left_join[((i-1))]
-    else
-      _p9k_left_join+=$i
-    fi
-  done
+typeset -aH _p9k_left_join=(1)
+for ((i = 2; i <= $#POWERLEVEL9K_LEFT_PROMPT_ELEMENTS; ++i)); do
+  elem=$POWERLEVEL9K_LEFT_PROMPT_ELEMENTS[$i]
+  if [[ ${elem[-7,-1]} == '_joined' ]]; then
+    _p9k_left_join+=$_p9k_left_join[((i-1))]
+  else
+    _p9k_left_join+=$i
+  fi
+done
 
-  typeset -aH _p9k_right_join=(1)
-  for ((i = 2; i <= $#POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS; ++i)); do
-    elem=$POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS[$i]
-    if [[ ${elem[-7,-1]} == '_joined' ]]; then
-      _p9k_right_join+=$_p9k_right_join[((i-1))]
-    else
-      _p9k_right_join+=$i
-    fi
-  done
-  unset elem
+typeset -aH _p9k_right_join=(1)
+for ((i = 2; i <= $#POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS; ++i)); do
+  elem=$POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS[$i]
+  if [[ ${elem[-7,-1]} == '_joined' ]]; then
+    _p9k_right_join+=$_p9k_right_join[((i-1))]
+  else
+    _p9k_right_join+=$i
+  fi
+done
+unset elem
 
-  _p9k_should_join_left() [[ $LAST_SEGMENT_INDEX -ge ${_p9k_left_join[$1]:-$1} ]]
-  _p9k_should_join_right() [[ $LAST_SEGMENT_INDEX -ge ${_p9k_right_join[$1]:-$1} ]]
-else
-  # Implementations of the cache functions when caching is disabled.
-  _p9k_cache_set() _P9K_RETVAL=$2
-  _p9k_cache_get() false
-  _p9k_get_icon() _P9K_RETVAL="$(print_icon $1)"
-  _p9k_should_join_left() segmentShouldBeJoined $1 $LAST_SEGMENT_INDEX "$POWERLEVEL9K_LEFT_PROMPT_ELEMENTS"
-  _p9k_should_join_right() segmentShouldBeJoined $1 $LAST_SEGMENT_INDEX "$POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS"
-fi
+_p9k_should_join_left() [[ $LAST_SEGMENT_INDEX -ge ${_p9k_left_join[$1]:-$1} ]]
+_p9k_should_join_right() [[ $LAST_SEGMENT_INDEX -ge ${_p9k_right_join[$1]:-$1} ]]
 
 # Resolves a color to its numerical value, or an empty string. Communicates the result back
 # by setting _P9K_RETVAL.
@@ -1994,13 +1976,8 @@ powerlevel9k_preexec() {
   _P9K_TIMER_START=$EPOCHREALTIME
 }
 
-if [[ $POWERLEVEL9K_USE_CACHE == true ]]; then
-  _P9K_MULTILINE_FIRST_PROMPT_PREFIX=$(print_icon MULTILINE_FIRST_PROMPT_PREFIX)
-  _P9K_MULTILINE_LAST_PROMPT_PREFIX=$(print_icon MULTILINE_LAST_PROMPT_PREFIX)
-else
-  _P9K_MULTILINE_FIRST_PROMPT_PREFIX='$(print_icon MULTILINE_FIRST_PROMPT_PREFIX)'
-  _P9K_MULTILINE_LAST_PROMPT_PREFIX='$(print_icon MULTILINE_LAST_PROMPT_PREFIX)'
-fi
+_P9K_MULTILINE_FIRST_PROMPT_PREFIX=$(print_icon MULTILINE_FIRST_PROMPT_PREFIX)
+_P9K_MULTILINE_LAST_PROMPT_PREFIX=$(print_icon MULTILINE_LAST_PROMPT_PREFIX)
 
 set_default POWERLEVEL9K_PROMPT_ADD_NEWLINE false
 powerlevel9k_prepare_prompts() {
@@ -2019,7 +1996,7 @@ powerlevel9k_prepare_prompts() {
   # Reset start time
   _P9K_TIMER_START=0x7FFFFFFF
 
-  if [[ $POWERLEVEL9K_USE_CACHE == true && -s $_P9K_CACHE_CHANNEL ]]; then
+  if [[ -s $_P9K_CACHE_CHANNEL ]]; then
     eval $(<$_P9K_CACHE_CHANNEL)
     rm -f $_P9K_CACHE_CHANNEL
     if [[ -n $POWERLEVEL9K_MAX_CACHE_SIZE && $#_p9k_cache_data -gt $POWERLEVEL9K_MAX_CACHE_SIZE ]]; then
