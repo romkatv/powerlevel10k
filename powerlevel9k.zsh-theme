@@ -690,15 +690,6 @@ set_default POWERLEVEL9K_ALWAYS_SHOW_USER false
 set_default POWERLEVEL9K_CONTEXT_TEMPLATE "%n@%m"
 prompt_context() {
   local current_state="DEFAULT"
-  typeset -AH context_states
-  context_states=(
-    "ROOT"        "yellow"
-    "SUDO"        "yellow"
-    "DEFAULT"     "yellow"
-    "REMOTE"      "yellow"
-    "REMOTE_SUDO" "yellow"
-  )
-
   local content=""
 
   if [[ "$POWERLEVEL9K_ALWAYS_SHOW_CONTEXT" == true ]] || [[ "$(whoami)" != "$DEFAULT_USER" ]] || [[ -n "$SSH_CLIENT" || -n "$SSH_TTY" ]]; then
@@ -721,7 +712,7 @@ prompt_context() {
     current_state="SUDO"
   fi
 
-  "$1_prompt_segment" "${0}_${current_state}" "$2" "$DEFAULT_COLOR" "${context_states[$current_state]}" "${content}"
+  "$1_prompt_segment" "${0}_${current_state}" "$2" "$DEFAULT_COLOR" yellow "${content}"
 }
 
 ################################################################
