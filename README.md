@@ -46,7 +46,7 @@ Powerlevel10k with [gitstatus](https://github.com/romkatv/gitstatus) renders pro
 powerlevel9k/next (beta version). Powerlevel10k is faster than Powerlevel9k even without
 [gitstatus](https://github.com/romkatv/gitstatus) but the difference isn't as dramatic.
 
-Here's are benchmark results obtained with
+Here are benchmark results obtained with
 [zsh-prompt-benchmark](https://github.com/romkatv/zsh-prompt-benchmark) on Intel i9-7900X
 running Ubuntu 18.04.
 
@@ -93,7 +93,7 @@ POWERLEVEL9K_VCS_STATUS_COMMAND=gitstatus_query_dir
 function custom_rprompt() echo -E "hello world"
 ```
 
-For completeness, here's the same benchmark for Windows Subsystem for Linux (WSL) with
+Here's the same benchmark for Windows Subsystem for Linux (WSL) with
 zsh running in the standard Command Prompt (`cmd.exe`).
 
 
@@ -109,14 +109,14 @@ Here Powerlevel10k with [gitstatus](https://github.com/romkatv/gitstatus) has ev
 advantage over Powerlevel9k and manages to render prompt with low latency.
 
 However, every theme failed miserably on the humongous Linux kernel repo, showing prompt latency
-over 5 seconds. This might be related to some sort of system cache, which can fit indices of
-smaller repos but of Linux kernel. To work around this problem, you can instruct
+over 5 seconds. This might be related to some sort of system cache that can fit indices of
+smaller repos but not of Linux kernel. To work around this problem, you can instruct
 [gitstatus](https://github.com/romkatv/gitstatus) to not scan dirty files on repos with over 4k
 files in the index (see `GITSTATUS_DIRTY_MAX_INDEX_SIZE` in
-[gitstatus docs](https://github.com/romkatv/gitstatus). Linux kernel is the only repo in these
-benchmarks that is affected by this setting. Its prompt latency goes down to 32 ms. The prompt no
-longer shows whether there are dirty (unstaged or untracked) files but it does indicate with the
-color that there _might_ be such files.
+[gitstatus docs](https://github.com/romkatv/gitstatus)). Linux kernel is the only repo in these
+benchmarks that is over this threshold. Its prompt latency goes down to 32 ms but the prompt no
+longer shows whether there are dirty (unstaged or untracked) files. It does helpfully indicate
+with the color that there _might_ be such files.
 
 ## What's the catch?
 
