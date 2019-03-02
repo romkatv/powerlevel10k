@@ -42,7 +42,7 @@ one or the other. Consider Powerlevel10k a patched fork of Powerlevel9k, which i
 ## How fast is it?
 
 Powerlevel10k with [gitstatus](https://github.com/romkatv/gitstatus) renders prompt about
-10 times faster than powerlevel9k/master (stable version) and about 4 times faster than
+10 times faster than powerlevel9k/master (stable version) and about 5 times faster than
 powerlevel9k/next (beta version). Powerlevel10k is faster than Powerlevel9k even without
 [gitstatus](https://github.com/romkatv/gitstatus) but the difference isn't as dramatic.
 
