@@ -53,7 +53,7 @@ running Ubuntu 18.04.
 | Theme                            | /         | ~/testrepo | ~/nerd-fonts | ~/linux    |
 |----------------------------------|----------:|-----------:|-------------:|-----------:|
 | powerlevel9k/master              |    135 ms |     207 ms |       234 ms |     326 ms |
-| powerlevel9k/next                |      47 ms|     101 ms |       122 ms |     213 ms |
+| powerlevel9k/next                |     47 ms |     101 ms |       122 ms |     213 ms |
 | powerlevel10k                    |     24 ms |      82 ms |       104 ms |     197 ms |
 | **powerlevel10k with gitstatus** |  **9 ms** |  **11 ms** |    **27 ms** |  **71 ms** |
 | naked zsh                        |      1 ms |       1 ms |         1 ms |       1 ms |
