@@ -19,24 +19,25 @@ plugin for additional performance improvement in the vcs/prompt segment.
 For installation and configuration instructions see
 [Powerlevel9k](https://github.com/bhilburn/powerlevel9k). Everything in there applies to
 Powerlevel10k as well. Follow the official installation guide, make sure everything works
-and you like the way prompt looks. Then simply replace file `powerlevel9k.zsh-theme` with
-the one from Powerlevel10k
-([link](https://github.com/romkatv/powerlevel10k/blob/master/powerlevel9k.zsh-theme)).
-Or replace the whole `powerlevel9k` directory to gain the ability to `git pull` updates
-in the future. Once you restart zsh, your prompt will be faster.
+and you like the way prompt looks. Then simply replace the content of your `powerlevel9k`
+directory with Powerlevel10k. Once you restart zsh, your prompt will be faster. No
+configuration changes are needed.
 
 If you are using oh-my-zsh, here's how you can replace Powerlevel9k with Powerlevel10k.
 
 ```zsh
-# Delete the powerlevel9k theme.
+# Delete the original powerlevel9k theme.
 rm -rf ~/.oh-my-zsh/custom/themes/powerlevel9k
-# Put powerlevel10k on its place.
+# Put powerlevel10k in its place.
 git clone git@github.com:romkatv/powerlevel10k.git ~/.oh-my-zsh/custom/themes/powerlevel9k
 ```
 
-**Do not load both Powerlevel9k and Powerlevel10k themes at the same time. Variable name
-clashes will cause mayhem. Source either one or the other. Consider Powerlevel10k
-a patched fork of Powerlevel9k, which it is.**
+Adjust these commands based on where your `powerlevel9k` directory is.
+
+Alternatively, you can place `Powerlevel10k` in `powerlevel10k` directory and modify
+the theme name in your `.zshrc`. **However, do not load both Powerlevel9k and Powerlevel10k
+themes at the same time. Variable name clashes will cause mayhem. You can source either
+one or the other. Consider Powerlevel10k a patched fork of Powerlevel9k, which it is.**
 
 ## How fast is it?
 
