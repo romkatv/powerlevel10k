@@ -12,7 +12,7 @@ Powerlevel10k uses the same configuration options as Powerlevel9k and produces t
 same results. It's simply faster. There is no catch.
 
 If you are on Linux or WSL, consider enabling [gitstatus](https://github.com/romkatv/gitstatus)
-plugin for massive performance improvement in the vcs/prompt segment.
+plugin for additional performance improvement in the vcs/prompt segment.
 
 ## Installation & Configuration
 
