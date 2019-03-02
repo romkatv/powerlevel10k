@@ -65,7 +65,7 @@ Columns define the current directory where the prompt was rendered.
     with 4k files.
   * `~/linux` -- [linux](https://github.com/torvalds/linux) git repo. Huge.
 
-Here's how the prompt looked like:
+Here's how the prompt looked like (identical by design in Powerlevel9k and Powerlevel 10k):
 
 ![](https://raw.githubusercontent.com/romkatv/powerlevel10k/master/prompt.png)
 
