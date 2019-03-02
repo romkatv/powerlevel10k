@@ -405,21 +405,18 @@ prompt_aws_eb_env() {
 set_default POWERLEVEL9K_BACKGROUND_JOBS_VERBOSE true
 set_default POWERLEVEL9K_BACKGROUND_JOBS_VERBOSE_ALWAYS false
 prompt_background_jobs() {
-  local job_lines=("${(@f)$(jobs -lr)}")
-  [[ ${(c)#job_lines} == 0 ]] && return
-  
-  local num_jobs=$#job_lines
-  local cache_key="$0 $num_jobs"
+  local n && n="${(fw)#$(jobs -rd)}" && ((n > 1)) || return
+  (( n /= 2 ))
 
+  local cache_key="$0 $n"
   if ! _p9k_cache_get $cache_key; then
     if [[ "$POWERLEVEL9K_BACKGROUND_JOBS_VERBOSE" == "true" &&
-          ("$num_jobs" -gt 1 || "$POWERLEVEL9K_BACKGROUND_JOBS_VERBOSE_ALWAYS" == "true") ]]; then
-      _p9k_cache_set $cache_key $num_jobs
+          ("$n" -gt 1 || "$POWERLEVEL9K_BACKGROUND_JOBS_VERBOSE_ALWAYS" == "true") ]]; then
+      _p9k_cache_set $cache_key $n
     else
       _p9k_cache_set $cache_key ''
     fi
   fi
-
   "$1_prompt_segment" "$0" "$2" "$DEFAULT_COLOR" "cyan" "$_P9K_RETVAL" 'BACKGROUND_JOBS_ICON'
 }
 
