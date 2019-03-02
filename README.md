@@ -46,13 +46,13 @@ Here's are benchmark results obtained with
 [zsh-prompt-benchmark](https://github.com/romkatv/zsh-prompt-benchmark) on Intel i9-7900X
 running Ubuntu 18.04.
 
-| Theme                        | /      | ~/testrepo | ~/nerd-fonts | ~/linux |
-|------------------------------|-------:|-----------:|-------------:|--------:|
-| powerlevel9k/master          | 135 ms |     207 ms |       234 ms | 326 ms  |
-| powerlevel9k/next            |  47 ms |     101 ms |       122 ms | 213 ms  |
-| powerlevel10k                |  24 ms |      82 ms |       104 ms | 197 ms  |
-| powerlevel10k with gitstatus |  11 ms |      14 ms |        31 ms |  76 ms  |
-| naked zsh                    |   1 ms |       1 ms |         1 ms |   1 ms  |
+| Theme                            | /          | ~/testrepo | ~/nerd-fonts | ~/linux    |
+|----------------------------------|-----------:|-----------:|-------------:|-----------:|
+| powerlevel9k/master              |     135 ms |     207 ms |       234 ms |     326 ms |
+| powerlevel9k/next                |       47 ms|     101 ms |       122 ms |     213 ms |
+| powerlevel10k                    |      24 ms |      82 ms |       104 ms |     197 ms |
+| **powerlevel10k with gitstatus** |  **11 ms** |  **14 ms** |    **31 ms** |  **76 ms** |
+| naked zsh                        |       1 ms |       1 ms |         1 ms |       1 ms |
 
 Columns define the current directory where the prompt was rendered.
 
