@@ -93,6 +93,31 @@ POWERLEVEL9K_VCS_STATUS_COMMAND=gitstatus_query_dir
 function custom_rprompt() echo -E "hello world"
 ```
 
+For completeness, here's the same benchmark for Windows Subsystem for Linux (WSL) with
+zsh running in the standard Command Prompt (`cmd.exe`).
+
+
+| Theme                            | /         | ~/testrepo | ~/nerd-fonts | ~/linux     |
+|----------------------------------|----------:|-----------:|-------------:|------------:|
+| powerlevel9k/master              |    313 ms |     531 ms |       693 ms |     5898 ms |
+| powerlevel9k/next                |    119 ms |     278 ms |       442 ms |     5710 ms |
+| powerlevel10k                    |     66 ms |     237 ms |       399 ms |     5569 ms |
+| **powerlevel10k with gitstatus** | **22 ms** |  **30 ms** |    **30 ms** | **5098 ms** |
+| naked zsh                        |     16 ms |      16 ms |        16 ms |       16 ms |
+
+Here Powerlevel10k with [gitstatus](https://github.com/romkatv/gitstatus) has even bigger
+advantage over Powerlevel9k and manages to render prompt with low latency.
+
+However, every theme failed miserably on the humongous Linux kernel repo, showing prompt latency
+over 5 seconds. This might be related to some sort of system cache, which can fit indices of
+smaller repos but of Linux kernel. To work around this problem, you can instruct
+[gitstatus](https://github.com/romkatv/gitstatus) to not scan dirty files on repos with over 4k
+files in the index (see `GITSTATUS_DIRTY_MAX_INDEX_SIZE` in
+[gitstatus docs](https://github.com/romkatv/gitstatus). Linux kernel is the only repo in these
+benchmarks that is affected by this setting. Its prompt latency goes down to 32 ms. The prompt no
+longer shows whether there are dirty (unstaged or untracked) files but it does indicate with the
+color that there _might_ be such files.
+
 ## What's the catch?
 
 Really, there is no catch. It's literally the same prompt with the same flexibility
