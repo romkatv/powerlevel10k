@@ -25,9 +25,12 @@ the one from Powerlevel10k
 Or replace the whole `powerlevel9k` directory to gain the ability to `git pull` updates
 in the future. Once you restart zsh, your prompt will be faster.
 
+If you are using oh-my-zsh, here's how you can replace Powerlevel9k with Powerlevel10k.
+
 ```zsh
-# Assuming oh-my-zsh at the standard location. Adjust to your circumstances.
+# Delete the powerlevel9k theme.
 rm -rf ~/.oh-my-zsh/custom/themes/powerlevel9k
+# Put powerlevel10k on its place.
 git clone git@github.com:romkatv/powerlevel10k.git ~/.oh-my-zsh/custom/themes/powerlevel9k
 ```
 
