@@ -110,8 +110,8 @@ set_default POWERLEVEL9K_MAX_CACHE_SIZE 10000
 # printed. In order to cache the results of expensive computations in these functions,
 # we use a temporary file to communicate with the parent shell and to ask it to
 # change environment variables.
-typeset -AH _p9k_cache_data=()
-typeset -H _P9K_CACHE_CHANNEL=${$(mktemp -u)%/*}/p9k_cache_channel.$$
+typeset -gAH _p9k_cache_data=()
+typeset -gH _P9K_CACHE_CHANNEL=${$(mktemp -u)%/*}/p9k_cache_channel.$$
 
 # Note: Several performance-critical functions return results to the caller via global
 # variable _P9K_RETVAL rather than stdout. This is faster.
@@ -147,7 +147,7 @@ _p9k_get_icon() {
   _P9K_RETVAL=${${(P)var_name}-$icons[$1]}
 }
 
-typeset -aH _p9k_left_join=(1)
+typeset -gaH _p9k_left_join=(1)
 for ((i = 2; i <= $#POWERLEVEL9K_LEFT_PROMPT_ELEMENTS; ++i)); do
   elem=$POWERLEVEL9K_LEFT_PROMPT_ELEMENTS[$i]
   if [[ ${elem[-7,-1]} == '_joined' ]]; then
@@ -157,7 +157,7 @@ for ((i = 2; i <= $#POWERLEVEL9K_LEFT_PROMPT_ELEMENTS; ++i)); do
   fi
 done
 
-typeset -aH _p9k_right_join=(1)
+typeset -gaH _p9k_right_join=(1)
 for ((i = 2; i <= $#POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS; ++i)); do
   elem=$POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS[$i]
   if [[ ${elem[-7,-1]} == '_joined' ]]; then
