@@ -1664,7 +1664,7 @@ prompt_vcs() {
   # in the format of gitstatus. See https://github.com/romkatv/gitstatus. If you enable gitstatus,
   # it'll define POWERLEVEL9K_VCS_STATUS_COMMAND for you. To disable, you can explicitly set
   # POWERLEVEL9K_VCS_STATUS_COMMAND="".
-    if [[ -z $POWERLEVEL9K_VCS_STATUS_COMMAND ]]; then
+  if [[ -z $POWERLEVEL9K_VCS_STATUS_COMMAND ]]; then
     VCS_WORKDIR_DIRTY=false
     VCS_WORKDIR_HALF_DIRTY=false
     local current_state=""
