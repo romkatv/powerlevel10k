@@ -29,7 +29,7 @@ If you are using oh-my-zsh, here's how you can replace Powerlevel9k with Powerle
 # Delete the original powerlevel9k theme.
 rm -rf ~/.oh-my-zsh/custom/themes/powerlevel9k
 # Put powerlevel10k in its place.
-git clone git@github.com:romkatv/powerlevel10k.git ~/.oh-my-zsh/custom/themes/powerlevel9k
+git clone https://github.com/romkatv/powerlevel10k.git ~/.oh-my-zsh/custom/themes/powerlevel9k
 ```
 
 Adjust these commands based on where your `powerlevel9k` directory is.
