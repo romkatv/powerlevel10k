@@ -16,12 +16,12 @@ plugin for additional performance improvement in the vcs/prompt segment.
 
 ## Table of Contents
 
-1. [Installation & Configuration](#installation-and-configuration)
+1. [Installation and configuration](#installation-and-configuration)
 2. [Try it in Docker](#try-it-in-docker)
 3. [How fast is it?](#how-fast-is-it)
 4. [What's the catch?](#whats-the-catch)
 
-## Installation and Configuration
+## Installation and configuration
 
 For installation and configuration instructions see
 [Powerlevel9k](https://github.com/bhilburn/powerlevel9k). Everything in there applies to
