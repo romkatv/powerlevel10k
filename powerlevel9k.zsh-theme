@@ -111,7 +111,7 @@ set_default POWERLEVEL9K_MAX_CACHE_SIZE 10000
 # we use a temporary file to communicate with the parent shell and to ask it to
 # change environment variables.
 typeset -gAH _p9k_cache_data=()
-typeset -gH _P9K_CACHE_CHANNEL=${$(mktemp -u)%/*}/p9k_cache_channel.$$
+typeset -gH _P9K_CACHE_CHANNEL=$(mktemp -u "${TMPDIR:-/tmp}"/p9k_cache_channel.$$.XXXXXXXXXX)
 
 # Note: Several performance-critical functions return results to the caller via global
 # variable _P9K_RETVAL rather than stdout. This is faster.
