@@ -1491,6 +1491,8 @@ prompt_status() {
       fi
     elif [[ "$POWERLEVEL9K_STATUS_OK" == true ]] && [[ "$POWERLEVEL9K_STATUS_VERBOSE" == true || "$POWERLEVEL9K_STATUS_OK_IN_NON_VERBOSE" == true ]]; then
       _P9K_RETVAL="$0_OK ${(qq)2} ${(qq)DEFAULT_COLOR} green '' OK_ICON"
+    else
+      return
     fi
     if (( $#RETVALS < 3 )); then
       _p9k_cache_set $cache_key $_P9K_RETVAL
