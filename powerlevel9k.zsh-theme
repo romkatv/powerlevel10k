@@ -126,7 +126,7 @@ typeset -gH _P9K_CACHE_CHANNEL=$(mktemp -u "${TMPDIR:-/tmp}"/p9k_cache_channel.$
 _p9k_cache_set() {
   # Uncomment to see cache misses.
   # echo "cache: ${(qq)1} => ${(qq)2}" >&2
-  echo -E "_p9k_cache_data+=(${(qq)1} ${(qq)2})" >>!$_P9K_CACHE_CHANNEL
+  echo -E "_p9k_cache_data+=(${(qq)1} ${(qq)2})" >>! $_P9K_CACHE_CHANNEL
   _P9K_RETVAL=$2
 }
 
