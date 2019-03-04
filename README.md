@@ -11,33 +11,78 @@ shell like it's 80's again!
 Powerlevel10k uses the same configuration options as Powerlevel9k and produces the
 same results. It's simply faster. There is no catch.
 
-If you are on Linux or WSL, consider enabling [gitstatus](https://github.com/romkatv/gitstatus)
+If you are on Linux or WSL, enable [gitstatus](https://github.com/romkatv/gitstatus)
 plugin for additional performance improvement in the vcs/prompt segment.
 
-## Installation & Configuration
+## Table of Contents
+
+1. [Installation & Configuration](#installation-and-configuration)
+2. [Try it in Docker](#try-it-in-docker)
+3. [How fast is it?](#how-fast-is-it)
+4. [What's the catch?](#whats-the-catch)
+
+## Installation and Configuration
 
 For installation and configuration instructions see
 [Powerlevel9k](https://github.com/bhilburn/powerlevel9k). Everything in there applies to
 Powerlevel10k as well. Follow the official installation guide, make sure everything works
-and you like the way prompt looks. Then simply replace the content of your `powerlevel9k`
-directory with Powerlevel10k. Once you restart zsh, your prompt will be faster. No
-configuration changes are needed.
+and you like the way prompt looks. Then simply replace Powerlevel9k with Powerlevel10k. Once
+you restart zsh, your prompt will be faster. No configuration changes are needed.
 
-If you are using oh-my-zsh, here's how you can replace Powerlevel9k with Powerlevel10k.
+Manual installation:
 
 ```zsh
-# Delete the original powerlevel9k theme.
-rm -rf ~/.oh-my-zsh/custom/themes/powerlevel9k
-# Put powerlevel10k in its place.
-git clone https://github.com/romkatv/powerlevel10k.git ~/.oh-my-zsh/custom/themes/powerlevel9k
+git clone https://github.com/romkatv/gitstatus.git ~/gitstatus
+git clone https://github.com/romkatv/powerlevel10k.git ~/powerlevel10k
+echo 'source ~/gitstatus/gitstatus.plugin.zsh' >>! ~/.zshrc
+echo 'source ~/powerlevel10k/powerlevel10k.zsh-theme' >>! ~/.zshrc
 ```
 
-Adjust these commands based on where your `powerlevel9k` directory is.
+**Do not load both Powerlevel9k and Powerlevel10k themes at the same time. Variable name clashes
+will cause mayhem. You can source either one or the other. Consider Powerlevel10k a patched fork
+of Powerlevel9k, which it is.**
 
-Alternatively, you can place `Powerlevel10k` in `powerlevel10k` directory and modify
-the theme name in your `.zshrc`. **However, do not load both Powerlevel9k and Powerlevel10k
-themes at the same time. Variable name clashes will cause mayhem. You can source either
-one or the other. Consider Powerlevel10k a patched fork of Powerlevel9k, which it is.**
+## Try it in Docker
+
+Try Powerlevel10k in Docker without making any changes to your system.
+
+```zsh
+docker run -e LANG=C.UTF-8 -e LC_ALL=C.UTF-8 -e TERM=$TERM -it --rm ubuntu bash -c '
+  set -uex
+  apt update
+  apt install -y zsh git
+  cd
+  git clone https://github.com/romkatv/gitstatus.git
+  git clone https://github.com/romkatv/powerlevel10k.git
+  echo "
+    # Your prompt configuration goes here.
+    POWERLEVEL9K_PROMPT_ON_NEWLINE=true
+    POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(root_indicator dir_writable dir vcs)
+    POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(status command_execution_time background_jobs time)
+    source ~/gitstatus/gitstatus.plugin.zsh
+    source ~/powerlevel10k/powerlevel10k.zsh-theme" >~/.zshrc
+  cd powerlevel10k
+  zsh -i'
+```
+
+Compare prompt responsiveness to Powerlevel9k.
+
+```zsh
+docker run -e LANG=C.UTF-8 -e LC_ALL=C.UTF-8 -e TERM=$TERM -it --rm ubuntu bash -c '
+  set -uex
+  apt update
+  apt install -y zsh git
+  cd
+  git clone https://github.com/bhilburn/powerlevel9k.git
+  echo "
+    # Your prompt configuration goes here.
+    POWERLEVEL9K_PROMPT_ON_NEWLINE=true
+    POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(root_indicator dir_writable dir vcs)
+    POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(status command_execution_time background_jobs time)
+    source ~/powerlevel9k/powerlevel9k.zsh-theme" >~/.zshrc
+  cd powerlevel9k
+  zsh -i'
+```
 
 ## How fast is it?
 
