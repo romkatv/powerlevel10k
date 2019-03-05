@@ -1,3 +1,12 @@
+---
+name: Bug report
+about: Create a report to help us improve
+title: ''
+labels: ''
+assignees: ''
+
+---
+
 Thanks for opening an issue! For a project that deals with as many different things as P9k, debugging problems can be difficult. Please follow the guide, below, to create a bug report that will help us help you!
 
 ### Before Opening a Bug
