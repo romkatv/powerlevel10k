@@ -14,11 +14,11 @@ Most issues are best explained with a screenshot. Please share one if you can!
 
 #### Have you tried to debug or fix it?
 
-
 Have you tinkered with your settings, and what happened when you did? Did you find a bit of code that you think might be the culprit? Let us know what you've done so far!
 
 #### Environment Information
-This information will help us understand your configuration. 
+
+This information will help us understand your configuration.
 
   - What version of ZSH are you using? You can use `zsh --version` to see this.
   - Do you use a ZSH framework (e.g., Oh-My-ZSH, Antigen)?
