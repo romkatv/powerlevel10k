@@ -1,3 +1,29 @@
+## v0.6.7
+
+- PR #1175 - Fix home dir shortening when using package_name truncation strategy
+- PR #1158 - [Bugfix] dir: Fix package name path truncation inside home dir
+- PR #1157 - Hide stderr from git ls-files
+- PR #1154 - Fix issues with debug/fonts script in Konsole
+- PR #1151 - [Bugfix] Only abbreviate $HOME at the beginning of cwd
+- PR #1148 - Remove checking for NODEENV_DISABLE_PROMPT
+- PR #1147 - Fix newlines in ZSH 5.7
+- PR #1149 - Fix RVM
+- PR #1128 - [Bugfix] virtualenv prompt displaying
+- PR #981 - [Bugfix] Fix for #974
+- PR #1126 - Use ip command for VPN segment
+- PR #1079 - [Bugfix] Update VIRTUAL_ENV_DISABLE_PROMPT value
+- PR #1080 - [Bugfix] Port #1071 to `master` (Fix fatal errors emitted by untracked file check in vcs.zsh)
+- PR #1074 - Add vcs vulnerability tests master
+- PR #1070 - [Docs] Uniformly apply inline code formatting in README
+- PR #1065 - Protect locale
+- PR #1048 - Speedup Improvements in `vcs` segment
+- PR #1037 - Fix vpn_ip segment
+- PR #1036 - Make truncate with package name work without setting shorten length
+- PR #1020 - Fix context spec
+- PR #990 - [Docs] Add forgotten backtick
+- PR #981 - Avoid error if `/etc/os-release` does not exist
+- PR #966 - [Bugfix] Fix icons cut off in RPROMPT segments
+
 ## v0.6.6
 
 - The `rbenv` segment is no longer a default segment in the LPROMPT.
