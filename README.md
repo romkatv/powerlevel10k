@@ -11,13 +11,10 @@ shell like it's 80's again!
 Powerlevel10k uses the same configuration options as Powerlevel9k and produces the
 same results. It's simply faster. There is no catch.
 
-If you are on Linux or WSL, enable [gitstatus](https://github.com/romkatv/gitstatus)
-plugin for additional performance improvement in the vcs/prompt segment.
-
 ## Table of Contents
 
 1. [Installation and configuration](#installation-and-configuration)
-2. [Try it in Docker](#try-it-in-docker)
+2. [Try it out](#try-it-out)
 3. [How fast is it?](#how-fast-is-it)
 4. [What's the catch?](#whats-the-catch)
 
@@ -32,19 +29,53 @@ you restart zsh, your prompt will be faster. No configuration changes are needed
 Manual installation:
 
 ```zsh
-git clone https://github.com/romkatv/gitstatus.git ~/gitstatus
 git clone https://github.com/romkatv/powerlevel10k.git ~/powerlevel10k
-echo 'source ~/gitstatus/gitstatus.plugin.zsh' >>! ~/.zshrc
 echo 'source ~/powerlevel10k/powerlevel10k.zsh-theme' >>! ~/.zshrc
 ```
 
-**Do not load both Powerlevel9k and Powerlevel10k themes at the same time. Variable name clashes
-will cause mayhem. You can source either one or the other. Consider Powerlevel10k a patched fork
-of Powerlevel9k, which it is.**
+Make sure to disable your current theme.
 
-## Try it in Docker
+## Try it out
 
-Try Powerlevel10k in Docker without making any changes to your system.
+Try Powerlevel10k without making any changes to your setup. If you like it, see
+[Installation and configuration](#installation-and-configuration) for how to make a permanent
+switch.
+
+### For existing Powerlevel9k users
+
+If you are currently using Powerlevel9k, you can try Powerlevel10k in a temporary zsh shell. The
+prompt will look exactly like what you are used to but it'll be faster.
+
+```zsh
+git clone https://github.com/romkatv/powerlevel10k.git /tmp/powerlevel10k
+source /tmp/powerlevel10k/powerlevel10k.zsh-theme
+```
+
+When you are done playing, `rm -rf /tmp/powerlevel10k` and exit zsh.
+
+### For new users
+
+```zsh
+git clone https://github.com/romkatv/powerlevel10k.git /tmp/powerlevel10k
+echo "
+  # Your prompt configuration goes here.
+  POWERLEVEL9K_PROMPT_ON_NEWLINE=true
+  POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(root_indicator dir_writable dir vcs)
+  POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(status command_execution_time background_jobs time)
+  source ~/powerlevel10k/powerlevel10k.zsh-theme" >/tmp/powerlevel10k/.zshrc
+ZDOTDIR=/tmp/powerlevel10k zsh
+```
+
+When you are done playing, `rm -rf /tmp/powerlevel10k` and exit zsh.
+
+```zsh
+git clone https://github.com/romkatv/powerlevel10k.git /tmp/powerlevel10k
+source /tmp/powerlevel10k/powerlevel10k.zsh-theme
+```
+
+### Docker playground (Linux only)
+
+You can try Powerlevel10k in Docker. Once you exit zsh, the image is deleted.
 
 ```zsh
 docker run -e LANG=C.UTF-8 -e LC_ALL=C.UTF-8 -e TERM=$TERM -it --rm ubuntu bash -c '
@@ -52,44 +83,21 @@ docker run -e LANG=C.UTF-8 -e LC_ALL=C.UTF-8 -e TERM=$TERM -it --rm ubuntu bash 
   apt update
   apt install -y zsh git
   cd
-  git clone https://github.com/romkatv/gitstatus.git
   git clone https://github.com/romkatv/powerlevel10k.git
   echo "
     # Your prompt configuration goes here.
     POWERLEVEL9K_PROMPT_ON_NEWLINE=true
     POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(root_indicator dir_writable dir vcs)
     POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(status command_execution_time background_jobs time)
-    source ~/gitstatus/gitstatus.plugin.zsh
     source ~/powerlevel10k/powerlevel10k.zsh-theme" >~/.zshrc
   cd powerlevel10k
   zsh -i'
 ```
 
-Compare prompt responsiveness to Powerlevel9k.
-
-```zsh
-docker run -e LANG=C.UTF-8 -e LC_ALL=C.UTF-8 -e TERM=$TERM -it --rm ubuntu bash -c '
-  set -uex
-  apt update
-  apt install -y zsh git
-  cd
-  git clone https://github.com/bhilburn/powerlevel9k.git
-  echo "
-    # Your prompt configuration goes here.
-    POWERLEVEL9K_PROMPT_ON_NEWLINE=true
-    POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(root_indicator dir_writable dir vcs)
-    POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(status command_execution_time background_jobs time)
-    source ~/powerlevel9k/powerlevel9k.zsh-theme" >~/.zshrc
-  cd powerlevel9k
-  zsh -i'
-```
-
 ## How fast is it?
 
-Powerlevel10k with [gitstatus](https://github.com/romkatv/gitstatus) renders prompt about
-10 times faster than powerlevel9k/master (stable version) and about 5 times faster than
-powerlevel9k/next (beta version). Powerlevel10k is faster than Powerlevel9k even without
-[gitstatus](https://github.com/romkatv/gitstatus) but the difference isn't as dramatic.
+Powerlevel10k renders prompt about 10 times faster than powerlevel9k/master (stable version) and
+about 5 times faster than powerlevel9k/next (beta version).
 
 Here are benchmark results obtained with
 [zsh-prompt-benchmark](https://github.com/romkatv/zsh-prompt-benchmark) on Intel i9-7900X
@@ -97,10 +105,10 @@ running Ubuntu 18.04.
 
 | Theme                            | /         | ~/testrepo | ~/nerd-fonts | ~/linux    |
 |----------------------------------|----------:|-----------:|-------------:|-----------:|
-| powerlevel9k/master              |    135 ms |     207 ms |       234 ms |     326 ms |
+| powerlevel9k/master              |    135 ms |     207 ms |       234 ms |     338 ms |
 | powerlevel9k/next                |     47 ms |     101 ms |       122 ms |     213 ms |
 | powerlevel10k                    |     24 ms |      82 ms |       104 ms |     197 ms |
-| **powerlevel10k with gitstatus** |  **9 ms** |  **11 ms** |    **27 ms** |  **71 ms** |
+| **powerlevel10k with gitstatus** |  **2 ms** |  **5 ms** |    **6 ms** |  **126 ms** |
 | naked zsh                        |      1 ms |       1 ms |         1 ms |       1 ms |
 
 Columns define the current directory where the prompt was rendered.
