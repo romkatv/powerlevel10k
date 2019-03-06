@@ -14,7 +14,12 @@ same results. It's simply faster. There is no catch.
 ## Table of Contents
 
 1. [Installation and configuration](#installation-and-configuration)
+   1. [Manual installation](#manual-installation)
+   2. [Extra configuration](#extra-configuration)
 2. [Try it out](#try-it-out)
+   1. [For Powerlevel9k users](#for-powerlevel9k-users)
+   2. [For new users](#for-new-users)
+   3. [Docker playground](#docker-playground)
 3. [How fast is it?](#how-fast-is-it)
 4. [What's the catch?](#whats-the-catch)
 
@@ -26,7 +31,7 @@ Powerlevel10k as well. Follow the official installation guide, make sure everyth
 and you like the way prompt looks. Then simply replace Powerlevel9k with Powerlevel10k. Once
 you restart zsh, your prompt will be faster. No configuration changes are needed.
 
-Manual installation:
+### Manual installation
 
 ```zsh
 git clone https://github.com/romkatv/powerlevel10k.git ~/powerlevel10k
@@ -35,13 +40,40 @@ echo 'source ~/powerlevel10k/powerlevel10k.zsh-theme' >>! ~/.zshrc
 
 Make sure to disable your current theme.
 
+### Extra configuration
+
+Powerlevel10k has a handful of configuration options that Powerlevel9k doesn't have. They
+are still using the `POWERLEVEL9K` prefix though.
+
+  * `POWERLEVEL9K_VCS_MAX_SYNC_LATENCY_SECONDS (FLOAT) [default=0.05]`
+
+      If it takes longer than this to fetch git repo status, display the prompt with a greyed out
+      vcs segment and fix it asynchronously when the results come it.
+  * `POWERLEVEL9K_VCS_BACKENDS (ARRAY) [default=(git)]`
+  
+      The list of VCS backends to use. Supported values are `git`, `svn` and `hg`. Note that adding
+      anything other than git will make prompt slower even when your current directory isn't a repo.
+  * `POWERLEVEL9K_DISABLE_GITSTATUS (STRING) [default="false"]`
+  
+    If set to `"true"`, Powerlevel10k won't use its fast git backend and will fall back to
+    `vcs_info` like Powerlevel9k.
+  * `POWERLEVEL9K_MAX_CACHE_SIZE (INT) [default=10000]`
+
+    The maximum number of elements that can be stored in the cache. When the cache grows over this
+    limit, it gets cleared.
+  * `POWERLEVEL9K_VCS_MAX_INDEX_SIZE_DIRTY (INT) [default=-1]`
+
+    Don't scan for dirty files in git repos with more files in the index than this. Instead, show
+    them with the "dirty" color (yellow by default) whether they are dirty or not. This makes git
+    prompt much faster on huge repositories.
+
 ## Try it out
 
 Try Powerlevel10k without making any changes to your setup. If you like it, see
 [Installation and configuration](#installation-and-configuration) for how to make a permanent
 switch.
 
-### For existing Powerlevel9k users
+### For Powerlevel9k users
 
 If you are currently using Powerlevel9k, you can try Powerlevel10k in a temporary zsh shell. The
 prompt will look exactly like what you are used to but it'll be faster.
@@ -73,9 +105,9 @@ git clone https://github.com/romkatv/powerlevel10k.git /tmp/powerlevel10k
 source /tmp/powerlevel10k/powerlevel10k.zsh-theme
 ```
 
-### Docker playground (Linux only)
+### Docker playground
 
-You can try Powerlevel10k in Docker. Once you exit zsh, the image is deleted.
+You can try Powerlevel10k in Docker (Linux only). Once you exit zsh, the image is deleted.
 
 ```zsh
 docker run -e LANG=C.UTF-8 -e LC_ALL=C.UTF-8 -e TERM=$TERM -it --rm ubuntu bash -c '
@@ -96,34 +128,38 @@ docker run -e LANG=C.UTF-8 -e LC_ALL=C.UTF-8 -e TERM=$TERM -it --rm ubuntu bash 
 
 ## How fast is it?
 
-Powerlevel10k renders prompt about 10 times faster than powerlevel9k/master (stable version) and
-about 5 times faster than powerlevel9k/next (beta version).
+Powerlevel10k renders prompt about 50 times faster than powerlevel9k/master (stable version) and
+about 15 times faster than powerlevel9k/next (beta version).
 
 Here are benchmark results obtained with
 [zsh-prompt-benchmark](https://github.com/romkatv/zsh-prompt-benchmark) on Intel i9-7900X
 running Ubuntu 18.04.
 
-| Theme                            | /         | ~/testrepo | ~/nerd-fonts | ~/linux    |
-|----------------------------------|----------:|-----------:|-------------:|-----------:|
-| powerlevel9k/master              |    135 ms |     207 ms |       234 ms |     338 ms |
-| powerlevel9k/next                |     47 ms |     101 ms |       122 ms |     213 ms |
-| powerlevel10k                    |     24 ms |      82 ms |       104 ms |     197 ms |
-| **powerlevel10k with gitstatus** |  **2 ms** |  **5 ms** |    **6 ms** |  **126 ms** |
-| naked zsh                        |      1 ms |       1 ms |         1 ms |       1 ms |
+| Theme               | /         | ~/nerd-fonts |
+|---------------------|----------:|-------------:|
+| powerlevel9k/master |    135 ms |       233 ms |
+| powerlevel9k/next   |     27 ms |       107 ms |
+| **powerlevel10k**   |  **2 ms** |     **6 ms** |
+| naked zsh           |      1 ms |         1 ms |
 
 Columns define the current directory where the prompt was rendered.
 
   * `/` -- root directory, not a git repo.
-  * `~/testrepo` -- a tiny git repo.
   * `~/nerd-fonts` -- [nerd-fonts](https://github.com/ryanoasis/nerd-fonts) git repo
     with 4k files.
-  * `~/linux` -- [linux](https://github.com/torvalds/linux) git repo. Huge.
 
-Here's how the prompt looked like (identical by design in Powerlevel9k and Powerlevel 10k):
+_This table used to have another column for Linux kernel git repo, which is massive. It's
+been removed because it's not a fair comparison. Powerlevel10k automatically detects that
+fetching git status is slow and switches to async prompt generation, which allows it to
+achieve 2 ms prompt latency but not all its prompt have up-to-date git info. Those that don't,
+have vcs segment greyed out._
+
+Here's how the prompt looked like during benchmarking (identical by design in Powerlevel9k and
+Powerlevel 10k):
 
 ![](https://raw.githubusercontent.com/romkatv/powerlevel10k/master/prompt.png)
 
-Configuration that was used during benchmarking:
+Configuration that was used:
 
 ```zsh
 POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(dir_writable dir vcs)
@@ -139,9 +175,6 @@ POWERLEVEL9K_CUSTOM_RPROMPT_BACKGROUND=blue
 POWERLEVEL9K_STATUS_OK_BACKGROUND=grey53
 POWERLEVEL9K_BACKGROUND_JOBS_BACKGROUND=orange1
 POWERLEVEL9K_BACKGROUND_JOBS_FOREGROUND=black
-
-# Powerlevel10k extension to enable gitstatus. Has no effect on Powerlevel9k.
-POWERLEVEL9K_VCS_STATUS_COMMAND=gitstatus_query_dir
 
 function custom_rprompt() echo -E "hello world"
 ```
@@ -175,3 +208,12 @@ with the color that there _might_ be such files.
 
 Really, there is no catch. It's literally the same prompt with the same flexibility
 configuration format as Powerlevel9k. But **much faster**.
+
+If you really need to know, here's where Powerlevel10k differs from Powerlevel9k:
+
+  * Git prompt doesn't show tags and revisions. Open an issue if you need them.
+  * By default only git vcs backend is enabled. If you need svn and hg, you'll need to set
+    `POWERLEVEL9K_VCS_BACKENDS`. See [Extra configuration](#extra-configuration).
+  * Fewer configuration options can be changed after the theme is loaded. For example, if you
+    decide to change background color of some segment in the middle of an interactive session,
+    it may not work.
