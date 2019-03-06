@@ -102,7 +102,7 @@ fi
 # Specifies the maximum number of elements in the cache. When the cache grows over this limit,
 # it gets cleared. This is meant to avoid memory leaks when a rogue prompt is filling the cache
 # with data.
-set_default POWERLEVEL9K_MAX_CACHE_SIZE 10000
+[ -v POWERLEVEL9K_MAX_CACHE_SIZE ] || typeset -gi POWERLEVEL9K_MAX_CACHE_SIZE=10000
 
 typeset -gAH _P9K_CACHE=()
 
@@ -2038,9 +2038,6 @@ powerlevel9k_preexec() {
   _P9K_TIMER_START=$EPOCHREALTIME
 }
 
-_P9K_MULTILINE_FIRST_PROMPT_PREFIX=$(print_icon MULTILINE_FIRST_PROMPT_PREFIX)
-_P9K_MULTILINE_LAST_PROMPT_PREFIX=$(print_icon MULTILINE_LAST_PROMPT_PREFIX)
-
 typeset -fH _p9k_set_prompts() {
   typeset -gH _P9K_PROMPT=''
   build_left_prompt
@@ -2053,7 +2050,10 @@ typeset -fH _p9k_set_prompts() {
   local NEWLINE=$'\n'
   local RPROMPT_SUFFIX RPROMPT_PREFIX
   if [[ "$POWERLEVEL9K_PROMPT_ON_NEWLINE" == true ]]; then
-    PROMPT="$_P9K_MULTILINE_FIRST_PROMPT_PREFIX%f%b%k$left$NEWLINE$_P9K_MULTILINE_LAST_PROMPT_PREFIX"
+    _p9k_get_icon MULTILINE_FIRST_PROMPT_PREFIX
+    PROMPT="$_P9K_RETVAL%f%b%k$left$NEWLINE"
+    _p9k_get_icon MULTILINE_LAST_PROMPT_PREFIX
+    PROMPT+=$_P9K_RETVAL
     if [[ "$POWERLEVEL9K_RPROMPT_ON_NEWLINE" != true ]]; then
       # The right prompt should be on the same line as the first line of the left
       # prompt. To do so, there is just a quite ugly workaround: Before zsh draws
@@ -2180,7 +2180,8 @@ prompt_powerlevel9k_setup() {
 
   zle -N zle-keymap-select
 
-  [[ $POWERLEVEL9K_DISABLE_GITSTATUS == true ]] || gitstatus_start POWERLEVEL9K
+  local -i max_dirty=${POWERLEVEL9K_VCS_MAX_INDEX_SIZE_DIRTY:--1}
+  [[ $POWERLEVEL9K_DISABLE_GITSTATUS == true ]] || gitstatus_start -m $max_dirty POWERLEVEL9K
 }
 
 prompt_powerlevel9k_teardown() {
