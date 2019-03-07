@@ -53,6 +53,10 @@ are still using the `POWERLEVEL9K` prefix though.
   
       The list of VCS backends to use. Supported values are `git`, `svn` and `hg`. Note that adding
       anything other than git will make prompt slower even when your current directory isn't a repo.
+
+  * `POWERLEVEL9K_GITSTATUS_DIR (STRING) [default=$POWERLEVEL9K_INSTALLATION_DIR/gitstatus]`
+
+    Directory with gitstatus plugin. By default uses a copy bundled with Powerlevel10k.
   * `POWERLEVEL9K_DISABLE_GITSTATUS (STRING) [default="false"]`
   
     If set to `"true"`, Powerlevel10k won't use its fast git backend and will fall back to
