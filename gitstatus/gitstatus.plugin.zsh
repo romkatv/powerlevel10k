@@ -101,6 +101,8 @@ function gitstatus_query() {
     _gitstatus_process_response $name $timeout $req_id
     [[ $VCS_STATUS_RESULT == *-async ]] || break
   done
+
+  [[ $VCS_STATUS_RESULT != tout || -n $callback ]]
 }
 
 typeset -fH _gitstatus_process_response() {
