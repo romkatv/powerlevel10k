@@ -98,16 +98,11 @@ echo "
   POWERLEVEL9K_PROMPT_ON_NEWLINE=true
   POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(root_indicator dir_writable dir vcs)
   POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(status command_execution_time background_jobs time)
-  source ~/powerlevel10k/powerlevel10k.zsh-theme" >/tmp/powerlevel10k/.zshrc
+  source /tmp/powerlevel10k/powerlevel10k.zsh-theme" >/tmp/powerlevel10k/.zshrc
 ZDOTDIR=/tmp/powerlevel10k zsh
 ```
 
 When you are done playing, `rm -rf /tmp/powerlevel10k` and exit zsh.
-
-```zsh
-git clone https://github.com/romkatv/powerlevel10k.git /tmp/powerlevel10k
-source /tmp/powerlevel10k/powerlevel10k.zsh-theme
-```
 
 ### Docker playground
 
@@ -194,7 +189,7 @@ Command Prompt (`cmd.exe`).
 | **powerlevel10k**   | **16 ms** |    **19 ms** |
 | naked zsh           |     16 ms |        16 ms |
 
-Once again Powerlevel10k wins hands down.
+The fastests results are probably limited by the key repeat rate.
 
 ## What's the catch?
 
