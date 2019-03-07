@@ -168,6 +168,7 @@ typeset -fH _gitstatus_process_response() {
 function gitstatus_start() {
   emulate -L zsh
   setopt err_return no_unset
+  unsetopt bg_nice
 
   local opt
   local -F timeout=5
