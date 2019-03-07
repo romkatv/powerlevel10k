@@ -417,7 +417,8 @@ prompt_newline() {
   newline=$'\n'
   lws=$POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS
   if [[ "$POWERLEVEL9K_PROMPT_ON_NEWLINE" == true ]]; then
-    newline="${newline}$(print_icon 'MULTILINE_NEWLINE_PROMPT_PREFIX')"
+    _p9k_get_icon MULTILINE_NEWLINE_PROMPT_PREFIX
+    newline="${newline}${_P9K_RETVAL}"
   fi
   POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS=
   "$1_prompt_segment" \
@@ -1562,8 +1563,8 @@ prompt_time() {
 # System date
 prompt_date() {
   set_default POWERLEVEL9K_DATE_FORMAT "%D{%d.%m.%y}"
-
-  "$1_prompt_segment" "$0" "$2" "$DEFAULT_COLOR_INVERTED" "$DEFAULT_COLOR" "$POWERLEVEL9K_DATE_FORMAT" "DATE_ICON"
+  [[ -v _P9K_REFRESH_PROMPT ]] || typeset -gH _P9K_DATE=${(%)POWERLEVEL9K_DATE_FORMAT}
+  "$1_prompt_segment" "$0" "$2" "$DEFAULT_COLOR_INVERTED" "$DEFAULT_COLOR" "$_P9K_DATE" "DATE_ICON"
 }
 
 ################################################################
