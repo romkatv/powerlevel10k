@@ -189,7 +189,7 @@ Command Prompt (`cmd.exe`).
 | **powerlevel10k**   | **16 ms** |    **19 ms** |
 | naked zsh           |     16 ms |        16 ms |
 
-Once again Powerlevel10k wins hands down.
+The fastests results are probably limited by the key repeat rate.
 
 ## What's the catch?
 
