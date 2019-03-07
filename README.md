@@ -98,7 +98,7 @@ echo "
   POWERLEVEL9K_PROMPT_ON_NEWLINE=true
   POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(root_indicator dir_writable dir vcs)
   POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(status command_execution_time background_jobs time)
-  source ~/powerlevel10k/powerlevel10k.zsh-theme" >/tmp/powerlevel10k/.zshrc
+  source /tmp/powerlevel10k/powerlevel10k.zsh-theme" >/tmp/powerlevel10k/.zshrc
 ZDOTDIR=/tmp/powerlevel10k zsh
 ```
 
