@@ -104,11 +104,6 @@ ZDOTDIR=/tmp/powerlevel10k zsh
 
 When you are done playing, `rm -rf /tmp/powerlevel10k` and exit zsh.
 
-```zsh
-git clone https://github.com/romkatv/powerlevel10k.git /tmp/powerlevel10k
-source /tmp/powerlevel10k/powerlevel10k.zsh-theme
-```
-
 ### Docker playground
 
 You can try Powerlevel10k in Docker (Linux only). Once you exit zsh, the image is deleted.
