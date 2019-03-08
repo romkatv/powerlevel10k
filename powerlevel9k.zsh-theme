@@ -2088,6 +2088,7 @@ typeset -fH _p9k_set_prompts() {
 }
 
 typeset -fH _p9k_reset_prompts() {
+  [[ $_P9K_LOADED == true ]] || return
   typeset -gH _P9K_REFRESH_PROMPT=''
   _p9k_set_prompts
   unset _P9K_REFRESH_PROMPT
@@ -2182,6 +2183,8 @@ prompt_powerlevel9k_setup() {
 
   local -i max_dirty=${POWERLEVEL9K_VCS_MAX_INDEX_SIZE_DIRTY:--1}
   [[ $POWERLEVEL9K_DISABLE_GITSTATUS == true ]] || gitstatus_start -m $max_dirty POWERLEVEL9K
+
+  _P9K_LOADED=true
 }
 
 prompt_powerlevel9k_teardown() {
@@ -2189,6 +2192,7 @@ prompt_powerlevel9k_teardown() {
   add-zsh-hook -D preexec powerlevel9k_\*
   PROMPT='%m%# '
   RPROMPT=
+  _P9K_LOADED=false
 }
 
 prompt_powerlevel9k_setup "$@"
