@@ -226,3 +226,9 @@ If you really need to know, here's where Powerlevel10k differs from Powerlevel9k
   * Fewer configuration options can be changed after the theme is loaded. For example, if you
     decide to change background color of some segment in the middle of an interactive session,
     it may not work.
+
+## Known bugs
+
+When a notification about an exiting job is displayed, prompt content doesn't get refreshed.
+In Powerlevel9k it does. This could be fixed but the fix will add non-trivial complexity and
+extra prompt latency.
