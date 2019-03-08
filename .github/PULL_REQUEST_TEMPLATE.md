@@ -14,19 +14,20 @@ Once you have submitted your PR, P9k core contributors will review the code and 
 Please follow this template for creating your PR:
 
 #### Title
+
 Please make the title of your PR descriptive! If appropriate, please prefix the title with one of these tags:
 
- - [Bugfix]
- - [New Segment]
- - [Docs]
- - [Enhancement]
- 
+- [Bugfix]
+- [New Segment]
+- [Docs]
+- [Enhancement]
+
 #### Description
+
 Please describe the contribution your PR makes! Screenshots are especially helpful, here, if it's a new segment.
 
 If your PR is addressing an issue, please reference the Issue number here.
 
 #### Questions
+
 Is there something in your PR you're not sure about or need help with? Is there a particular piece of code you would like feedback on? Let us know here!
-
-
