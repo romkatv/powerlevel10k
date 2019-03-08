@@ -215,12 +215,12 @@ function gitstatus_start() {
 
     log=$(mktemp "${TMPDIR:-/tmp}"/gitstatus.$$.log.XXXXXXXXXX)
 
-    (
-      nice -n -20 $daemon --dirty-max-index-size=$max_dirty --parent-pid=$$ \
-        <&$req_fd >&$resp_fd 2>$log || true
-      echo -nE $'bye\x1f0\x1e' >&$resp_fd || true
-      rm -f $req_fifo $resp_fifo
-    ) &!
+    # We use `zsh -c` instead of plain {} or () to work around bugs in zplug. It hangs on startup.
+    zsh -c "
+      ${(q)daemon}2 --dirty-max-index-size=${(q)max_dirty} --parent-pid=$$
+      echo -nE $'bye\x1f0\x1e'
+      rm -f ${(q)req_fifo} ${(q)resp_fifo}
+    " <&$req_fd >&$resp_fd 2>$log &!
 
     daemon_pid=$!
 
