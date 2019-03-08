@@ -104,65 +104,72 @@ fi
 # with data.
 [ -v POWERLEVEL9K_MAX_CACHE_SIZE ] || typeset -gi POWERLEVEL9K_MAX_CACHE_SIZE=10000
 
+typeset -gH _P9K_RETVAL
+typeset -gH _P9K_CACHE_KEY
+typeset -gaH _P9K_CACHE_VAL
 typeset -gAH _P9K_CACHE=()
 
 # Note: Several performance-critical functions return results to the caller via global
-# variable _P9K_RETVAL rather than stdout. This is faster.
+# variabls rather than stdout. This is faster.
 
-# Store a key-value pair in the cache.
+# Caching allows storing array-to-array associations. It should be used like this:
 #
-#   * $1: Key.
-#   * $2: Value. Can be empty.
+#   if ! _p9k_cache_get "$key1" "$key2"; then
+#     # Compute val1 and val2 and then store them in the cache.
+#     _p9k_cache_set "$val1" "$val2"
+#   fi
+#   # Here ${_P9K_CACHE_VAL[1]} and ${_P9K_CACHE_VAL[2]} are $val1 and $val2 respectively.
+# 
+# Limitations:
 #
-# Note that an attempt to retrieve the value right away won't succeed. All requested
-# cache update get batched and flushed together after a prompt is built.
+#   * Calling _p9k_cache_set without arguments clears the cache entry. Subsequent calls to
+#     _p9k_cache_get for the same key will return an error.
+#   * There must be no intervening _p9k_cache_get calls between the associated _p9k_cache_get
+#     and _p9k_cache_set.
 _p9k_cache_set() {
   # Uncomment to see cache misses.
-  # echo "cache: ${(qq)1} => ${(qq)2}" >&2
-  _P9K_CACHE[$1]=$2
-  _P9K_RETVAL=$2
+  # echo "caching: ${(@0q)_P9K_CACHE_KEY} => (${(q)@})" >&2
+  _P9K_CACHE[$_P9K_CACHE_KEY]="${(pj:\0:)*}"
+  _P9K_CACHE_VAL=("$@")
 }
 
-# Retrieve a value from the cache.
-#
-#   * $1: Key.
-#
-# If there is value associated with the specified key, sets _P9K_RETVAL and returns 0.
-# Otherwise returns 1.
 _p9k_cache_get() {
-  _P9K_RETVAL=${_P9K_CACHE[$1]-__p9k_empty__}
-  [[ $_P9K_RETVAL != __p9k_empty__ ]]
+  _P9K_CACHE_KEY="${(pj:\0:)*}"
+  _P9K_CACHE_VAL=("${(@0)${_P9K_CACHE[$_P9K_CACHE_KEY]}}")
+  (( #_P9K_CACHE_VAL ))
 }
 
-# Sets _P9K_RETVAL to icon whose name is supplied via $1.
+# Sets _P9K_RETVAL to the icon whose name is supplied via $1.
 _p9k_get_icon() {
   local var_name=POWERLEVEL9K_$1
   _P9K_RETVAL=${(g::)${${(P)var_name}-$icons[$1]}}
 }
 
-typeset -gaH _p9k_left_join=(1)
-for ((i = 2; i <= $#POWERLEVEL9K_LEFT_PROMPT_ELEMENTS; ++i)); do
-  elem=$POWERLEVEL9K_LEFT_PROMPT_ELEMENTS[$i]
-  if [[ ${elem[-7,-1]} == '_joined' ]]; then
-    _p9k_left_join+=$_p9k_left_join[((i-1))]
-  else
-    _p9k_left_join+=$i
-  fi
-done
+typeset -gaH _P9K_LEFT_JOIN=(1)
+() {
+  local i
+  for ((i = 2; i <= $#POWERLEVEL9K_LEFT_PROMPT_ELEMENTS; ++i)); do
+    local elem=$POWERLEVEL9K_LEFT_PROMPT_ELEMENTS[$i]
+    if [[ ${elem[-7,-1]} == '_joined' ]]; then
+      _P9K_LEFT_JOIN+=$_P9K_LEFT_JOIN[((i-1))]
+    else
+      _P9K_LEFT_JOIN+=$i
+    fi
+  done
 
-typeset -gaH _p9k_right_join=(1)
-for ((i = 2; i <= $#POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS; ++i)); do
-  elem=$POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS[$i]
-  if [[ ${elem[-7,-1]} == '_joined' ]]; then
-    _p9k_right_join+=$_p9k_right_join[((i-1))]
-  else
-    _p9k_right_join+=$i
-  fi
-done
-unset elem
+  typeset -gaH _P9K_RIGHT_JOIN=(1)
+  for ((i = 2; i <= $#POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS; ++i)); do
+    local elem=$POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS[$i]
+    if [[ ${elem[-7,-1]} == '_joined' ]]; then
+      _P9K_RIGHT_JOIN+=$_P9K_RIGHT_JOIN[((i-1))]
+    else
+      _P9K_RIGHT_JOIN+=$i
+    fi
+  done
+}
 
-_p9k_should_join_left() [[ $_P9K_LAST_SEGMENT_INDEX -ge ${_p9k_left_join[$1]:-$1} ]]
-_p9k_should_join_right() [[ $_P9K_LAST_SEGMENT_INDEX -ge ${_p9k_right_join[$1]:-$1} ]]
+_p9k_should_join_left() [[ $_P9K_LAST_SEGMENT_INDEX -ge ${_P9K_LEFT_JOIN[$1]:-$1} ]]
+_p9k_should_join_right() [[ $_P9K_LAST_SEGMENT_INDEX -ge ${_P9K_RIGHT_JOIN[$1]:-$1} ]]
 
 # Resolves a color to its numerical value, or an empty string. Communicates the result back
 # by setting _P9K_RETVAL.
@@ -199,8 +206,7 @@ _p9k_foreground() {
 set_default POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS " "
 left_prompt_segment() {
   _p9k_should_join_left $2 && local join=true || local join=false
-  local cache_key="${(q)0} ${(q)1} ${(q)3} ${(q)4} ${(q)5:+1} ${(q)6} ${(q)_P9K_CURRENT_BG} $join"
-  if ! _p9k_cache_get $cache_key; then
+  if ! _p9k_cache_get "$0" "$1" "$3" "$4" "${5:+1}" "$6" "$_P9K_CURRENT_BG" "$join"; then
     _p9k_color $3 $1 BACKGROUND
     local background_color=$_P9K_RETVAL
 
@@ -250,19 +256,17 @@ left_prompt_segment() {
     fi
 
     output+=$foreground
-    _p9k_cache_set $cache_key "${(qq)output} ${(qq)background_color}"
+    _p9k_cache_set "$output" "$background_color"
   fi
 
-  local tuple=("${(@Q)${(z)_P9K_RETVAL}}")
-  _P9K_PROMPT+="${tuple[1]}${5}${POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS}"
+  _P9K_PROMPT+="${_P9K_CACHE_VAL[1]}${5}${POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS}"
   _P9K_LAST_SEGMENT_INDEX=$2
-  _P9K_CURRENT_BG=$tuple[2]
+  _P9K_CURRENT_BG=$_P9K_CACHE_VAL[2]
 }
 
 # End the left prompt, closes the final segment.
 left_prompt_end() {
-  local cache_key="$0 ${(q)_P9K_CURRENT_BG}"
-  if ! _p9k_cache_get $cache_key; then
+  if ! _p9k_cache_get "$0" "$_P9K_CURRENT_BG"; then
     local output="%k"
     if [[ $_P9K_CURRENT_BG != NONE ]]; then
       _p9k_foreground $_P9K_CURRENT_BG
@@ -272,9 +276,9 @@ left_prompt_end() {
     fi
     _p9k_get_icon LEFT_SEGMENT_END_SEPARATOR
     output+="%f${_P9K_RETVAL}"
-    _p9k_cache_set $cache_key $output
+    _p9k_cache_set "$output"
   fi
-  _P9K_PROMPT+=$_P9K_RETVAL
+  _P9K_PROMPT+="${_P9K_CACHE_VAL[1]}"
 }
 
 # Begin a right prompt segment
@@ -290,9 +294,7 @@ left_prompt_end() {
 set_default POWERLEVEL9K_WHITESPACE_BETWEEN_RIGHT_SEGMENTS " "
 right_prompt_segment() {
   _p9k_should_join_right $2 && local join=true || local join=false
-  local cache_key="${(q)0} ${(q)1} ${(q)3} ${(q)4} ${(q)6} ${(q)_P9K_CURRENT_BG} $join"
-
-  if ! _p9k_cache_get $cache_key; then
+  if ! _p9k_cache_get "$0" "$1" "$3" "$4" "$6" "$_P9K_CURRENT_BG" "$join"; then
     _p9k_color $3 $1 BACKGROUND
     local background_color=$_P9K_RETVAL
     _p9k_background $background_color
@@ -345,13 +347,11 @@ right_prompt_segment() {
       fi
     fi
 
-    _p9k_cache_set $cache_key "${(qq)output} ${(qq)background_color} ${(qq)icon}"
+    _p9k_cache_set "$output" "$background_color" "$icon"
   fi
 
-  local tuple=("${(@Q)${(z)_P9K_RETVAL}}")
-  _P9K_PROMPT+="${tuple[1]}${5}${5:+ }${tuple[3]}"
-
-  _P9K_CURRENT_BG=$tuple[2]
+  _P9K_PROMPT+="${_P9K_CACHE_VAL[1]}${5}${5:+ }${_P9K_CACHE_VAL[3]}"
+  _P9K_CURRENT_BG=$_P9K_CACHE_VAL[2]
   _P9K_LAST_SEGMENT_INDEX=$2
 }
 
@@ -850,9 +850,9 @@ set_default POWERLEVEL9K_DIR_PATH_HIGHLIGHT_BOLD false
 prompt_dir() {
   # using $PWD instead of "$(print -P '%~')" to allow use of POWERLEVEL9K_DIR_PATH_ABSOLUTE
   local current_path=$PWD # WAS: local current_path="$(print -P '%~')"
-  local cache_key="$0 $2 ${(q)current_path}"
-  [[ "${POWERLEVEL9K_DIR_SHOW_WRITABLE}" == true && ! -w "$PWD" ]] && cache_key+=" W";
-  if ! _p9k_cache_get $cache_key; then
+  [[ "${POWERLEVEL9K_DIR_SHOW_WRITABLE}" == true && ! -w "$PWD" ]] &&
+    local -i not_writable=1 || local -i not_writable=0
+  if ! _p9k_cache_get "$0" "$2" "$current_path" "$not_writable"; then
     # check if the user wants to use absolute paths or "~" paths
     [[ ${(L)POWERLEVEL9K_DIR_PATH_ABSOLUTE} != "true" ]] && current_path=${current_path/#$HOME/"~"}
     # declare all local variables
@@ -1011,7 +1011,7 @@ prompt_dir() {
     if [[ $state_path == '/etc'* ]]; then
       current_state='ETC'
       icon='ETC_ICON'
-    elif [[ "${POWERLEVEL9K_DIR_SHOW_WRITABLE}" == true && ! -w "$PWD" ]]; then
+    elif (( not_writable )); then
       current_state="NOT_WRITABLE"
       icon='LOCK_ICON'
     elif [[ $state_path == '~' ]]; then
@@ -1091,10 +1091,10 @@ prompt_dir() {
       current_path=${current_path:s/~/$POWERLEVEL9K_HOME_FOLDER_ABBREVIATION}
     fi
 
-    _p9k_cache_set $cache_key "$0_$current_state ${(qq)2} blue ${(qq)DEFAULT_COLOR} ${(qq)current_path} ${(qq)icon}"
+    _p9k_cache_set "$current_state" "$current_path" "$icon"
   fi
 
-  "$1_prompt_segment" "${(@Q)${(z)_P9K_RETVAL}}"
+  "$1_prompt_segment" "$0_${_P9K_CACHE_VAL[1]}" "$2" blue "$DEFAULT_COLOR" "${_P9K_CACHE_VAL[2]}" "${_P9K_CACHE_VAL[3]}"
 }
 
 ################################################################
@@ -1439,8 +1439,7 @@ exit_code_or_status() {
 }
 
 prompt_status() {
-  local cache_key="$0 $2 $RETVAL $RETVALS"
-  if ! _p9k_cache_get $cache_key; then
+  if ! _p9k_cache_get "$0" "$2" "$RETVAL" "${(@)RETVALS}"; then
     local ec_text
     local ec_sum
     local ec
@@ -1470,20 +1469,20 @@ prompt_status() {
 
     if (( ec_sum > 0 )); then
       if [[ "$POWERLEVEL9K_STATUS_CROSS" == false && "$POWERLEVEL9K_STATUS_VERBOSE" == true ]]; then
-        _P9K_RETVAL="$0_ERROR ${(qq)2} red yellow1 ${(qq)ec_text} CARRIAGE_RETURN_ICON"
+        _P9K_CACHE_VAL=("$0_ERROR" "$2" red yellow1 "$ec_text" CARRIAGE_RETURN_ICON)
       else
-        _P9K_RETVAL="$0_ERROR ${(qq)2} ${(qq)DEFAULT_COLOR} red '' FAIL_ICON"
+        _P9K_CACHE_VAL=("$0_ERROR" "$2" "$DEFAULT_COLOR" red "" FAIL_ICON)
       fi
     elif [[ "$POWERLEVEL9K_STATUS_OK" == true ]] && [[ "$POWERLEVEL9K_STATUS_VERBOSE" == true || "$POWERLEVEL9K_STATUS_OK_IN_NON_VERBOSE" == true ]]; then
-      _P9K_RETVAL="$0_OK ${(qq)2} ${(qq)DEFAULT_COLOR} green '' OK_ICON"
+      _P9K_CACHE_VAL=("$0_OK" "$2" "$DEFAULT_COLOR" green "" OK_ICON)
     else
       return
     fi
     if (( $#RETVALS < 3 )); then
-      _p9k_cache_set $cache_key $_P9K_RETVAL
+      _p9k_cache_set "${(@)_P9K_CACHE_VAL}"
     fi
   fi
-  "$1_prompt_segment" "${(@Q)${(z)_P9K_RETVAL}}"
+  "$1_prompt_segment" "${(@)_P9K_CACHE_VAL}"
 }
 
 ################################################################
@@ -1665,18 +1664,19 @@ typeset -fH _p9k_vcs_render() {
   fi
 
   [[ $VCS_STATUS_RESULT == ok-* ]] || return 1
-  local cache_key="$0
-    ${(q)VCS_STATUS_LOCAL_BRANCH}
-    ${(q)VCS_STATUS_REMOTE_BRANCH}
-    ${(q)VCS_STATUS_REMOTE_URL}
-    ${(q)VCS_STATUS_ACTION}
-    ${(q)VCS_STATUS_HAS_STAGED}
-    ${(q)VCS_STATUS_HAS_UNSTAGED}
-    ${(q)VCS_STATUS_HAS_UNTRACKED}
-    ${(q)VCS_STATUS_COMMITS_AHEAD}
-    ${(q)VCS_STATUS_COMMITS_BEHIND}
-    ${(q)VCS_STATUS_STASHES}"
-  if ! _p9k_cache_get $cache_key; then
+  local -a cache_key=(
+    "$VCS_STATUS_LOCAL_BRANCH"
+    "$VCS_STATUS_REMOTE_BRANCH"
+    "$VCS_STATUS_REMOTE_URL"
+    "$VCS_STATUS_ACTION"
+    "$VCS_STATUS_HAS_STAGED"
+    "$VCS_STATUS_HAS_UNSTAGED"
+    "$VCS_STATUS_HAS_UNTRACKED"
+    "$VCS_STATUS_COMMITS_AHEAD"
+    "$VCS_STATUS_COMMITS_BEHIND"
+    "$VCS_STATUS_STASHES"
+  )
+  if ! _p9k_cache_get "${(@)cache_key}"; then
     local state
     if [[ $VCS_STATUS_HAS_STAGED != 0 || $VCS_STATUS_HAS_UNSTAGED != 0 ]]; then
       state='modified'
@@ -1740,12 +1740,11 @@ typeset -fH _p9k_vcs_render() {
       fi
     fi
 
-    _p9k_cache_set $cache_key "${1}_${(U)state} ${(qq)vcs_states[$state]} ${(qq)vcs_prompt}"
+    _p9k_cache_set "${1}_${(U)state}" "${vcs_states[$state]}" "$vcs_prompt"
   fi
 
-  local tuple=("${(@Q)${(z)_P9K_RETVAL}}")
-  _P9K_LAST_GIT_PROMPT[$VCS_STATUS_WORKDIR]="${tuple[3]}"
-  "$2_prompt_segment" "${tuple[1]}" $3 "${tuple[2]}" "$DEFAULT_COLOR" "${tuple[3]}"
+  _P9K_LAST_GIT_PROMPT[$VCS_STATUS_WORKDIR]="${_P9K_CACHE_VAL[3]}"
+  "$2_prompt_segment" "${_P9K_CACHE_VAL[1]}" $3 "${_P9K_CACHE_VAL[2]}" "$DEFAULT_COLOR" "${_P9K_CACHE_VAL[3]}"
   return 0
 }
 
