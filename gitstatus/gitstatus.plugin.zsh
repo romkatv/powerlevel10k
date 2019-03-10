@@ -213,7 +213,9 @@ function gitstatus_start() {
     }
     zle -F $resp_fd _gitstatus_process_response_${name}
 
-    log=$(mktemp "${TMPDIR:-/tmp}"/gitstatus.$$.log.XXXXXXXXXX)
+    [[ ${GITSTATUS_ENABLE_LOGGING:-0} == 1 ]] &&
+      log=$(mktemp "${TMPDIR:-/tmp}"/gitstatus.$$.log.XXXXXXXXXX) ||
+      log=/dev/null
 
     # We use `zsh -c` instead of plain {} or () to work around bugs in zplug. It hangs on startup.
     zsh -c "
