@@ -236,25 +236,24 @@ left_prompt_segment() {
         _p9k_get_icon LEFT_SUBSEGMENT_SEPARATOR
         output+="${_P9K_RETVAL}${POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS}"
       else
-        _p9k_foreground $_P9K_CURRENT_BG
-        output+=$_P9K_RETVAL
+        output+="%F{$_P9K_CURRENT_BG}"
         _p9k_get_icon LEFT_SEGMENT_SEPARATOR
         output+="${_P9K_RETVAL}${POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS}"
       fi
     fi
-
     if [[ -n $6 ]]; then
       _p9k_get_icon $6
       if [[ -n $_P9K_RETVAL ]]; then
         local icon=$_P9K_RETVAL
-        _p9k_foreground $foreground_color $1 VISUAL_IDENTIFIER_COLOR
+        _p9k_color $foreground_color $1 VISUAL_IDENTIFIER_COLOR
+        _p9k_foreground $_P9K_RETVAL
+        
         # Add an whitespace if we print more than just the visual identifier.
         # To avoid cutting off the visual identifier in some terminal emulators (e.g., Konsole, st),
         # we need to color both the visual identifier and the whitespace.
         output+="${_P9K_RETVAL}${icon}${5:+ }"
       fi
     fi
-
     output+=$foreground
     _p9k_cache_set "$output" "$background_color"
   fi
@@ -322,8 +321,7 @@ right_prompt_segment() {
         _p9k_get_icon RIGHT_SUBSEGMENT_SEPARATOR
         output+=$_P9K_RETVAL
       else
-        _p9k_foreground $background_color
-        output+=$_P9K_RETVAL
+        output+="%F{$background_color}"
         _p9k_get_icon RIGHT_SEGMENT_SEPARATOR
         output+=$_P9K_RETVAL
       fi
@@ -339,7 +337,8 @@ right_prompt_segment() {
       _p9k_get_icon $6
       if [[ -n $_P9K_RETVAL ]]; then
         local icon=$_P9K_RETVAL
-        _p9k_foreground $foreground_color $1 VISUAL_IDENTIFIER_COLOR
+        _p9k_color $foreground_color $1 VISUAL_IDENTIFIER_COLOR
+        _p9k_foreground $_P9K_RETVAL
         # Add an whitespace if we print more than just the visual identifier.
         # To avoid cutting off the visual identifier in some terminal emulators (e.g., Konsole, st),
         # we need to color both the visual identifier and the whitespace.
@@ -1554,7 +1553,7 @@ build_test_stats() {
 # System time
 prompt_time() {
   set_default POWERLEVEL9K_TIME_FORMAT "%D{%H:%M:%S}"
-  [[ -v _P9K_REFRESH_PROMPT ]] || typeset -gH _P9K_TIME=${(%)POWERLEVEL9K_TIME_FORMAT}
+  [[ -v _P9K_REFRESH_PROMPT ]] || typeset -gH _P9K_TIME=$(print -P $POWERLEVEL9K_TIME_FORMAT)
   "$1_prompt_segment" "$0" "$2" "$DEFAULT_COLOR_INVERTED" "$DEFAULT_COLOR" "$_P9K_TIME" "TIME_ICON"
 }
 
@@ -1562,7 +1561,7 @@ prompt_time() {
 # System date
 prompt_date() {
   set_default POWERLEVEL9K_DATE_FORMAT "%D{%d.%m.%y}"
-  [[ -v _P9K_REFRESH_PROMPT ]] || typeset -gH _P9K_DATE=${(%)POWERLEVEL9K_DATE_FORMAT}
+  [[ -v _P9K_REFRESH_PROMPT ]] || typeset -gH _P9K_DATE=$(print -P $POWERLEVEL9K_DATE_FORMAT)
   "$1_prompt_segment" "$0" "$2" "$DEFAULT_COLOR_INVERTED" "$DEFAULT_COLOR" "$_P9K_DATE" "DATE_ICON"
 }
 
