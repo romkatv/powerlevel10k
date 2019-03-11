@@ -184,34 +184,7 @@ sleep 86400 &  # spawn two background jobs
 sleep 86400 &
 ```
 
-Here's the same benchmark for Windows Subsystem for Linux (WSL) with zsh running in the standard
-Command Prompt (`cmd.exe`).
-
-
-| Theme               | /         | ~/nerd-fonts |
-|---------------------|----------:|-------------:|
-| powerlevel9k/master |    313 ms |       693 ms |
-| powerlevel9k/next   |    119 ms |       442 ms |
-| **powerlevel10k**   | **16 ms** |    **19 ms** |
-| naked zsh           |     16 ms |        16 ms |
-
-The fastests results are probably limited by the key repeat rate.
-
-Here's Raspberry Pie 3. I replaced [nerd-fonts](https://github.com/ryanoasis/nerd-fonts) repo with
-[git](https://github.com/git/git) in this benchmark becase the former didn't fit on my SD card.
-Git repo had 3.6k files, so about the same size. I set `POWERLEVEL9K_VCS_MAX_SYNC_LATENCY_SECONDS=1`
-to prevent Powerlevel10k from switching to async prompts. The default threshold is 0.05, or 50 ms,
-after which Powerlevel10k will go async (git latency in ~/git was close to 100 ms, so above the
-default 50 ms). Naturally, async is a good thing, so you shouldn't disable it in your configs. I
-only did it to measure sync latency.
-
-| Theme               | /         | ~/git      |
-|---------------------|----------:|-----------:|
-| powerlevel9k/master |    312 ms |     584 ms |
-| **powerlevel10k**   | **15 ms** | **108 ms** |
-| naked zsh           |      1 ms |       1 ms |
-
-The `next` branch of Powerlevel9k didn't work on Raspberry Pie, so I couldn't benchmark it.
+Powerlevel10k shows similar performance on Mac OS, FreeBSD, WSL, and Raspberry Pie.
 
 ## What's the catch?
 
