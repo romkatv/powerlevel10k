@@ -1551,9 +1551,16 @@ build_test_stats() {
 
 ################################################################
 # System time
+
+# If set to true, `time` prompt will update every second.
+set_default POWERLEVEL9K_EXPERIMENTAL_TIME_REALTIME false
 prompt_time() {
   set_default POWERLEVEL9K_TIME_FORMAT "%D{%H:%M:%S}"
-  [[ -v _P9K_REFRESH_PROMPT ]] || typeset -gH _P9K_TIME=$(print -P $POWERLEVEL9K_TIME_FORMAT)
+  if [[ $POWERLEVEL9K_EXPERIMENTAL_TIME_REALTIME == true ]]; then
+    local _P9K_TIME=$POWERLEVEL9K_TIME_FORMAT
+  else
+    [[ -v _P9K_REFRESH_PROMPT ]] || typeset -gH _P9K_TIME=$(print -P $POWERLEVEL9K_TIME_FORMAT)
+  fi
   "$1_prompt_segment" "$0" "$2" "$DEFAULT_COLOR_INVERTED" "$DEFAULT_COLOR" "$_P9K_TIME" "TIME_ICON"
 }
 
@@ -1759,7 +1766,7 @@ typeset -fH _p9k_vcs_resume() {
 
   if [[ -z $_P9K_NEXT_VCS_DIR ]]; then
     unset _P9K_NEXT_VCS_DIR
-    _p9k_reset_prompts
+    _p9k_update_prompts
   else
     typeset -gFH _P9K_GITSTATUS_START_TIME=$EPOCHREALTIME
     if ! gitstatus_query -d $_P9K_NEXT_VCS_DIR -t 0 -c _p9k_vcs_resume POWERLEVEL9K; then
@@ -1769,7 +1776,7 @@ typeset -fH _p9k_vcs_resume() {
     case $VCS_STATUS_RESULT in
       *-sync)
         unset _P9K_NEXT_VCS_DIR
-        _p9k_reset_prompts
+        _p9k_update_prompts
         ;;
       tout)
         typeset -gH _P9K_NEXT_VCS_DIR=""
@@ -2090,7 +2097,7 @@ typeset -fH _p9k_set_prompts() {
   [[ $ITERM_SHELL_INTEGRATION_INSTALLED == "Yes" ]] && PROMPT="%{$(iterm2_prompt_mark)%}$PROMPT"
 }
 
-typeset -fH _p9k_reset_prompts() {
+typeset -fH _p9k_update_prompts() {
   [[ $_P9K_LOADED == true ]] || return
   typeset -gH _P9K_REFRESH_PROMPT=''
   _p9k_set_prompts
@@ -2186,6 +2193,31 @@ prompt_powerlevel9k_setup() {
 
   local -i max_dirty=${POWERLEVEL9K_VCS_MAX_INDEX_SIZE_DIRTY:--1}
   [[ $POWERLEVEL9K_DISABLE_GITSTATUS == true ]] || gitstatus_start -m $max_dirty POWERLEVEL9K
+
+  if [[ $POWERLEVEL9K_EXPERIMENTAL_TIME_REALTIME == true ]]; then
+    local fifo && fifo=$(mktemp -u "${TMPDIR:-/tmp}"/p10k.$$.pipe.time.XXXXXXXXXX)
+    typeset -giH _P9K_TIMER_FD=0
+    _p9k_start_timer() {
+      emulate -L zsh
+      setopt err_return
+      unsetopt bg_nice
+      mkfifo $fifo
+      exec {_P9K_TIMER_FD}<>$fifo
+      typeset -gfH _p9k_on_timer() {
+        local _ && IFS='' read -u $_P9K_TIMER_FD _ && zle && zle .reset-prompt
+      }
+      zle -F $_P9K_TIMER_FD _p9k_on_timer
+      zsh -c "while kill -0 $$; do sleep 1; echo; done" >&$_P9K_TIMER_FD 2>/dev/null &!
+    }
+    if ! _p9k_start_timer ; then
+      echo "powerlevel10k: failed to initialize realtime clock" >&2
+      zle -F $_P9K_TIMER_FD
+      (( _P9K_TIMER_FD )) && exec {_P9K_TIMER_FD}>&-
+      unset _P9K_TIMER_FD
+      unset -f _p9k_on_timer
+    fi
+    rm -f "$fifo"
+  fi
 
   _P9K_LOADED=true
 }
