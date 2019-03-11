@@ -189,13 +189,10 @@ function gitstatus_start() {
 
   [[ ! -v GITSTATUS_DAEMON_PID_${name} ]] || return 0
 
-  function gitstatus_arch() {
-    local kernel && kernel=$(uname -s) && [[ -n $kernel ]]
-    local arch && arch=$(uname -m) && [[ -n $arch ]]
-    echo -E "${kernel:l}-${arch:l}"
-  }
+  local os && os=$(uname -s) && [[ -n $os ]]
+  local arch && arch=$(uname -m) && [[ -n $arch ]]
 
-  local daemon && daemon=${GITSTATUS_DAEMON:-${${(%):-%x}:A:h}/bin/gitstatusd-$(gitstatus_arch)}
+  local daemon && daemon=${GITSTATUS_DAEMON:-${${(%):-%x}:A:h}/bin/gitstatusd-${os:l}-${arch:l}}
   [[ -f $daemon ]] || { echo "file not found: $daemon" >&2 && return 1 }
 
   local req_fifo resp_fifo log
@@ -217,9 +214,17 @@ function gitstatus_start() {
       log=$(mktemp "${TMPDIR:-/tmp}"/gitstatus.$$.log.XXXXXXXXXX) ||
       log=/dev/null
 
+    local -i threads=${GITSTATUS_NUM_THREADS:-0}
+    (( threads > 0)) || {
+      case $os in
+        FreeBSD) threads=$(sysctl -n hw.ncpu);;
+        *) threads=$(getconf _NPROCESSORS_ONLN);;
+      esac
+    }
+
     # We use `zsh -c` instead of plain {} or () to work around bugs in zplug. It hangs on startup.
     zsh -c "
-      ${(q)daemon} --dirty-max-index-size=${(q)max_dirty} --parent-pid=$$
+      ${(q)daemon} --parent-pid=$$ --dirty-max-index-size=${(q)max_dirty} --num-threads=$threads
       echo -nE $'bye\x1f0\x1e'
       rm -f ${(q)req_fifo} ${(q)resp_fifo}
     " <&$req_fd >&$resp_fd 2>$log &!
