@@ -1749,8 +1749,12 @@ typeset -fH _p9k_vcs_render() {
 
 typeset -fH _p9k_vcs_resume() {
   if [[ $VCS_STATUS_RESULT == ok-async ]]; then
-    local slow=$((EPOCHREALTIME - _P9K_GITSTATUS_START_TIME > POWERLEVEL9K_VCS_MAX_SYNC_LATENCY_SECONDS))
-    _P9K_GIT_SLOW[$VCS_STATUS_WORKDIR]=$slow
+    local latency=$((EPOCHREALTIME - _P9K_GITSTATUS_START_TIME))
+    if (( latency > POWERLEVEL9K_VCS_MAX_SYNC_LATENCY_SECONDS )); then
+      _P9K_GIT_SLOW[$VCS_STATUS_WORKDIR]=1
+    elif (( latency < 0.8 * POWERLEVEL9K_VCS_MAX_SYNC_LATENCY_SECONDS )); then  # 0.8 to avoid flip-flopping
+      _P9K_GIT_SLOW[$VCS_STATUS_WORKDIR]=0
+    fi
   fi
 
   if [[ -z $_P9K_NEXT_VCS_DIR ]]; then
