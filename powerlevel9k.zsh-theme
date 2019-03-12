@@ -773,6 +773,9 @@ prompt_custom() {
   # Get content of custom segment
   local command="POWERLEVEL9K_CUSTOM_${segment_name}"
   local segment_content="$(eval ${(P)command})"
+  # Note: this would be a better implementation. I'm keeping the old one in case anyone
+  # relies on its quirks.
+  # local segment_content=$("${(@Q)${(z)${(P)command}}}")
 
   if [[ -n $segment_content ]]; then
     "$1_prompt_segment" "${0}_${3:u}" "$2" $DEFAULT_COLOR_INVERTED $DEFAULT_COLOR "$segment_content" "CUSTOM_${segment_name}_ICON"
@@ -1554,22 +1557,30 @@ build_test_stats() {
 
 # If set to true, `time` prompt will update every second.
 set_default POWERLEVEL9K_EXPERIMENTAL_TIME_REALTIME false
+set_default POWERLEVEL9K_TIME_FORMAT "%D{%H:%M:%S}"
 prompt_time() {
-  set_default POWERLEVEL9K_TIME_FORMAT "%D{%H:%M:%S}"
-  if [[ $POWERLEVEL9K_EXPERIMENTAL_TIME_REALTIME == true ]]; then
-    local _P9K_TIME=$POWERLEVEL9K_TIME_FORMAT
-  else
-    [[ -v _P9K_REFRESH_PROMPT ]] || typeset -gH _P9K_TIME=$(print -P $POWERLEVEL9K_TIME_FORMAT)
-  fi
-  "$1_prompt_segment" "$0" "$2" "$DEFAULT_COLOR_INVERTED" "$DEFAULT_COLOR" "$_P9K_TIME" "TIME_ICON"
+  "$1_prompt_segment" "$0" "$2" "$DEFAULT_COLOR_INVERTED" "$DEFAULT_COLOR" "$POWERLEVEL9K_TIME_FORMAT" "TIME_ICON"
+  # For the reference, here's how the code should ideally look like. However, it's 2ms slower
+  # for a tiny gain in usability. The difference is that the current code will cause time
+  # to update when vcs segment goes from grey to green/yellow, but the commented-out code
+  # won't (unless POWERLEVEL9K_EXPERIMENTAL_TIME_REALTIME is true).
+  #if [[ $POWERLEVEL9K_EXPERIMENTAL_TIME_REALTIME == true ]]; then
+  #  local _P9K_TIME=$POWERLEVEL9K_TIME_FORMAT
+  #else
+  #  [[ -v _P9K_REFRESH_PROMPT ]] || typeset -gH _P9K_TIME=$(print -P $POWERLEVEL9K_TIME_FORMAT)
+  #  typeset -gH _P9K_TIME=$POWERLEVEL9K_TIME_FORMAT
+  #fi
+  #"$1_prompt_segment" "$0" "$2" "$DEFAULT_COLOR_INVERTED" "$DEFAULT_COLOR" "$_P9K_TIME" "TIME_ICON"
 }
 
 ################################################################
 # System date
+set_default POWERLEVEL9K_DATE_FORMAT "%D{%d.%m.%y}"
 prompt_date() {
-  set_default POWERLEVEL9K_DATE_FORMAT "%D{%d.%m.%y}"
-  [[ -v _P9K_REFRESH_PROMPT ]] || typeset -gH _P9K_DATE=$(print -P $POWERLEVEL9K_DATE_FORMAT)
-  "$1_prompt_segment" "$0" "$2" "$DEFAULT_COLOR_INVERTED" "$DEFAULT_COLOR" "$_P9K_DATE" "DATE_ICON"
+  "$1_prompt_segment" "$0" "$2" "$DEFAULT_COLOR_INVERTED" "$DEFAULT_COLOR" "$POWERLEVEL9K_DATE_FORMAT" "DATE_ICON"
+  # See comments in prompt_time.
+  # [[ -v _P9K_REFRESH_PROMPT ]] || typeset -gH _P9K_DATE=$(print -P $POWERLEVEL9K_DATE_FORMAT)
+  # "$1_prompt_segment" "$0" "$2" "$DEFAULT_COLOR_INVERTED" "$DEFAULT_COLOR" "$_P9K_DATE" "DATE_ICON"
 }
 
 ################################################################
@@ -2001,7 +2012,7 @@ build_left_prompt() {
 
     # Check if it is a custom command, otherwise interpet it as
     # a prompt.
-    if [[ $element[0,7] =~ "custom_" ]]; then
+    if [[ $element == custom_* ]]; then
       "prompt_custom" "left" "$index" $element[8,-1]
     else
       "prompt_$element" "left" "$index"
@@ -2029,7 +2040,7 @@ build_right_prompt() {
 
     # Check if it is a custom command, otherwise interpet it as
     # a prompt.
-    if [[ $element[0,7] =~ "custom_" ]]; then
+    if [[ $element == custom_* ]]; then
       "prompt_custom" "right" "$index" $element[8,-1]
     else
       "prompt_$element" "right" "$index"
