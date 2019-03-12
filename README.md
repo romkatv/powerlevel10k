@@ -71,6 +71,10 @@ are still using the `POWERLEVEL9K` prefix though.
     them with the "dirty" color (yellow by default) whether they are dirty or not. This makes git
     prompt much faster on huge repositories.
 
+  * `POWERLEVEL9K_EXPERIMENTAL_TIME_REALTIME (STRING) [default="false"]`
+
+    If set to true, `time` segment will update every second, turning into a realtime clock.
+
 ## Try it out
 
 Try Powerlevel10k without making any changes to your setup. If you like it, see
@@ -127,64 +131,53 @@ docker run -e LANG=C.UTF-8 -e LC_ALL=C.UTF-8 -e TERM=$TERM -it --rm ubuntu bash 
 
 ## How fast is it?
 
-Powerlevel10k renders prompt about 50 times faster than powerlevel9k/master (stable version) and
-about 15 times faster than powerlevel9k/next (beta version).
+Powerlevel10k renders prompt between 10 and 100 times faster than powerlevel9k.
 
 Here are benchmark results obtained with
 [zsh-prompt-benchmark](https://github.com/romkatv/zsh-prompt-benchmark) on Intel i9-7900X
 running Ubuntu 18.04.
 
-| Theme               | /         | ~/nerd-fonts |
-|---------------------|----------:|-------------:|
-| powerlevel9k/master |    135 ms |       233 ms |
-| powerlevel9k/next   |     27 ms |       107 ms |
-| **powerlevel10k**   |  **2 ms** |     **6 ms** |
-| naked zsh           |      1 ms |         1 ms |
+| Theme               | /         | ~/linux   |
+|---------------------|----------:| ---------:|
+| powerlevel9k/master |    101 ms |    280 ms |
+| powerlevel9k/next   |     26 ms |    255 ms |
+| **powerlevel10k**   |  **1 ms** | **22 ms** |
+| naked zsh           |   0.05 ms |   0.05 ms |
 
 Columns define the current directory where the prompt was rendered.
 
   * `/` -- root directory, not a git repo.
-  * `~/nerd-fonts` -- [nerd-fonts](https://github.com/ryanoasis/nerd-fonts) git repo
-    with 4k files.
+  * `~/linux` -- [https://github.com/torvalds/linux](https://github.com/torvalds/linux) git repo
+    with 60k files. It was checked out to an M.2 SSD.
+
+powerlevel9k/master is the stable branch of powerlevel9k, the one that virtually everyone uses.
+powerlevel9k/next is the development branch for the next release.
 
 Here's how the prompt looked like during benchmarking.
 
 ![](https://raw.githubusercontent.com/romkatv/powerlevel10k/master/prompt.png)
 
 It was identical in Powerlevel10k and Powerlevel9k. Even though Powerlevel10k can dynamically
-switch to async prompts, it wasn't happening here because latencies were low. Prompts with both
-themes were essentially synchronous with every prompt having up-to-date git info.
-
-_This table used to have another column for Linux kernel git repo, which is massive. It's
-been removed because it's not a fair comparison. Powerlevel10k automatically detects that
-fetching git status is slow and switches to async prompt generation, which allows it to
-achieve 2 ms prompt latency but not all its prompt have up-to-date git info. Those that don't,
-have vcs segment greyed out._
+switch to async prompts, it wasn't happening during the benchmark because latencies were low.
+Prompts with both themes were essentially synchronous, with every prompt having up-to-date git info
+(no greyed-out vcs/git segments).
 
 Configuration that was used:
 
 ```zsh
 POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(dir_writable dir vcs)
-POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(status background_jobs time custom_rprompt)
+POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(status time)
 
 POWERLEVEL9K_MODE=nerdfont-complete
 POWERLEVEL9K_PROMPT_ON_NEWLINE=true
-POWERLEVEL9K_CUSTOM_RPROMPT=custom_rprompt
-POWERLEVEL9K_ROOT_ICON=\\uF09CPOWERLEVEL9K_TIME_ICON=\\uF017
-POWERLEVEL9K_CUSTOM_RPROMPT_ICON=\\uF005
+POWERLEVEL9K_ROOT_ICON=\\uF09C
+POWERLEVEL9K_TIME_ICON=\\uF017
 POWERLEVEL9K_TIME_BACKGROUND=magenta
-POWERLEVEL9K_CUSTOM_RPROMPT_BACKGROUND=blue
 POWERLEVEL9K_STATUS_OK_BACKGROUND=grey53
-POWERLEVEL9K_BACKGROUND_JOBS_BACKGROUND=orange1
-POWERLEVEL9K_BACKGROUND_JOBS_FOREGROUND=black
-
-function custom_rprompt() echo -E "hello world"
-
-sleep 86400 &  # spawn two background jobs
-sleep 86400 &
 ```
 
-Powerlevel10k shows similar performance on Mac OS, FreeBSD, WSL, and Raspberry Pie.
+Powerlevel10k shows similar performance advantage over Powerlevel9k on Mac OS, FreeBSD, WSL, and
+Raspberry Pie.
 
 ## What's the catch?
 
