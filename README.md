@@ -181,8 +181,8 @@ Raspberry Pie.
 
 ## What's the catch?
 
-Really, there is no catch. It's literally the same prompt with the same flexibility
-configuration format as Powerlevel9k. But **much faster**.
+Really, there is no catch. It's literally the same prompt with the same configuration format as
+Powerlevel9k. But **much faster**.
 
 If you really need to know, here's where Powerlevel10k differs from Powerlevel9k:
 
