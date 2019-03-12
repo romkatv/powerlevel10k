@@ -131,6 +131,7 @@ _p9k_cache_set() {
   # echo "caching: ${(@0q)_P9K_CACHE_KEY} => (${(q)@})" >&2
   _P9K_CACHE[$_P9K_CACHE_KEY]="${(pj:\0:)*}"
   _P9K_CACHE_VAL=("$@")
+  (( #_P9K_CACHE < POWERLEVEL9K_MAX_CACHE_SIZE )) || typeset -gAH _P9K_CACHE=()
 }
 
 _p9k_cache_get() {
