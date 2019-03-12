@@ -137,7 +137,7 @@ Here are benchmark results obtained with
 [zsh-prompt-benchmark](https://github.com/romkatv/zsh-prompt-benchmark) on Intel i9-7900X
 running Ubuntu 18.04.
 
-| Theme               | /         | ~/linux   |
+| Theme               |        /  |   ~/linux |
 |---------------------|----------:| ---------:|
 | powerlevel9k/master |    101 ms |    280 ms |
 | powerlevel9k/next   |     26 ms |    255 ms |
