@@ -147,8 +147,8 @@ running Ubuntu 18.04.
 Columns define the current directory where the prompt was rendered.
 
   * `/` -- root directory, not a git repo.
-  * `~/linux` -- [https://github.com/torvalds/linux](https://github.com/torvalds/linux) git repo
-    with 60k files. It was checked out to an M.2 SSD.
+  * `~/linux` -- [linux](https://github.com/torvalds/linux) git repo with 60k files. It was checked
+    out to an M.2 SSD.
 
 powerlevel9k/master is the stable branch of powerlevel9k, the one that virtually everyone uses.
 powerlevel9k/next is the development branch for the next release.
