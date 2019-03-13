@@ -1964,52 +1964,24 @@ typeset -gF _P9K_TIMER_START
 powerlevel9k_preexec() { _P9K_TIMER_START=$EPOCHREALTIME }
 
 typeset -g _P9K_PROMPT
+typeset -g _P9K_LEFT_PREFIX
+typeset -g _P9K_LEFT_SUFFIX
+typeset -g _P9K_RIGHT_PREFIX
+typeset -g _P9K_RIGHT_SUFFIX
+
+set_default POWERLEVEL9K_DISABLE_RPROMPT false
 typeset -fH _p9k_set_prompt() {
   _P9K_PROMPT=''
   build_left_prompt
-  local left=$_P9K_PROMPT
-  _P9K_PROMPT=''
-  build_right_prompt
-  local right=$_P9K_PROMPT
+  PROMPT=$_P9K_LEFT_PREFIX$_P9K_PROMPT$_P9K_LEFT_SUFFIX
 
-  local NEWLINE=$'\n'
-  local RPROMPT_SUFFIX RPROMPT_PREFIX
-  if [[ "$POWERLEVEL9K_PROMPT_ON_NEWLINE" == true ]]; then
-    _p9k_get_icon MULTILINE_FIRST_PROMPT_PREFIX
-    PROMPT="$_P9K_RETVAL%f%b%k$left$NEWLINE"
-    _p9k_get_icon MULTILINE_LAST_PROMPT_PREFIX
-    PROMPT+=$_P9K_RETVAL
-    if [[ "$POWERLEVEL9K_RPROMPT_ON_NEWLINE" != true ]]; then
-      # The right prompt should be on the same line as the first line of the left
-      # prompt. To do so, there is just a quite ugly workaround: Before zsh draws
-      # the RPROMPT, we advise it, to go one line up. At the end of RPROMPT, we
-      # advise it to go one line down. See:
-      # http://superuser.com/questions/357107/zsh-right-justify-in-ps1
-      local LC_ALL="" LC_CTYPE="en_US.UTF-8" # Set the right locale to protect special characters
-      RPROMPT_PREFIX='%{'$'\e[1A''%}' # one line up
-      RPROMPT_SUFFIX='%{'$'\e[1B''%}' # one line down
-    else
-      RPROMPT_PREFIX=''
-      RPROMPT_SUFFIX=''
-    fi
+  if [[ $POWERLEVEL9K_DISABLE_RPROMPT == true ]]; then
+    RPROMPT=''
   else
-    PROMPT="%f%b%k$left"
-    RPROMPT_PREFIX=''
-    RPROMPT_SUFFIX=''
+    _P9K_PROMPT=''
+    build_right_prompt
+    RPROMPT=$_P9K_RIGHT_PREFIX$_P9K_PROMPT$_P9K_RIGHT_SUFFIX
   fi
-
-  if [[ "$POWERLEVEL9K_DISABLE_RPROMPT" != true ]]; then
-    RPROMPT="${RPROMPT_PREFIX}%f%b%k$right%{$reset_color%}${RPROMPT_SUFFIX}"
-  fi
-
-  if [[ $POWERLEVEL9K_PROMPT_ADD_NEWLINE == true ]]; then
-    local NEWLINES=""
-    repeat ${POWERLEVEL9K_PROMPT_ADD_NEWLINE_COUNT:-1} { NEWLINES+=$NEWLINE }
-    PROMPT="$NEWLINES$PROMPT"
-  fi
-
-  # Allow iTerm integration to work
-  [[ $ITERM_SHELL_INTEGRATION_INSTALLED == "Yes" ]] && PROMPT="%{$(iterm2_prompt_mark)%}$PROMPT"
 }
 
 typeset -g _P9K_REFRESH_REASON
@@ -2134,6 +2106,38 @@ _p9k_init() {
       _P9K_RIGHT_JOIN+=$i
     fi
   done
+
+  local RPROMPT_SUFFIX RPROMPT_PREFIX
+  if [[ $POWERLEVEL9K_PROMPT_ON_NEWLINE == true ]]; then
+    _p9k_get_icon MULTILINE_FIRST_PROMPT_PREFIX
+    _P9K_LEFT_PREFIX="$_P9K_RETVAL%f%b%k"
+    #PROMPT="$_P9K_RETVAL%f%b%k$left$NEWLINE"
+    _p9k_get_icon MULTILINE_LAST_PROMPT_PREFIX
+    _P9K_LEFT_SUFFIX=$'\n'$_P9K_RETVAL
+    if [[ $POWERLEVEL9K_RPROMPT_ON_NEWLINE != true ]]; then
+      # The right prompt should be on the same line as the first line of the left
+      # prompt. To do so, there is just a quite ugly workaround: Before zsh draws
+      # the RPROMPT, we advise it, to go one line up. At the end of RPROMPT, we
+      # advise it to go one line down. See:
+      # http://superuser.com/questions/357107/zsh-right-justify-in-ps1
+      local LC_ALL="" LC_CTYPE="en_US.UTF-8" # Set the right locale to protect special characters
+      _P9K_RIGHT_PREFIX='%{'$'\e[1A''%}' # one line up
+      _P9K_RIGHT_SUFFIX='%{'$'\e[1B''%}' # one line down
+    fi
+  else
+    _P9K_LEFT_PREFIX="%f%b%k"
+  fi
+
+  if [[ $ITERM_SHELL_INTEGRATION_INSTALLED == Yes ]]; then
+    _P9K_LEFT_PREFIX="%{$(iterm2_prompt_mark)%}$_P9K_LEFT_PREFIX"
+  fi
+
+  _P9K_RIGHT_PREFIX+="%f%b%k"
+  _P9K_RIGHT_SUFFIX="%{$reset_color%}$_P9K_RIGHT_SUFFIX"
+
+  if [[ $POWERLEVEL9K_PROMPT_ADD_NEWLINE == true ]]; then
+    repeat ${POWERLEVEL9K_PROMPT_ADD_NEWLINE_COUNT:-1} { _P9K_LEFT_PREFIX=$'\n'$_P9K_LEFT_PREFIX }
+  fi
 
   # If the terminal `LANG` is set to `C`, this theme will not work at all.
   if [[ $LANG == C && $POWERLEVEL9K_IGNORE_TERM_LANG == false ]]; then
