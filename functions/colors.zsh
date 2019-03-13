@@ -6,10 +6,9 @@
 # https://github.com/bhilburn/powerlevel9k
 ################################################################
 
-typeset -gAh __P9K_COLORS
 # https://jonasjacek.github.io/colors/
 # use color names by default to allow dark/light themes to adjust colors based on names
-__P9K_COLORS=(
+typeset -gAh __P9K_COLORS=(
   black 000
   red 001
   green 002
@@ -270,89 +269,29 @@ __P9K_COLORS=(
   grey93 255
 )
 
-function termColors() {
-  if [[ $POWERLEVEL9K_IGNORE_TERM_COLORS == true ]]; then
-    return
-  fi
-
-  local term_colors
-
-  if which tput &>/dev/null; then
-	term_colors=$(tput colors)
-  else
-	term_colors=$(echotc Co)
-  fi
-  if (( ! $? && ${term_colors:-0} < 256 )); then
-    print -P "%F{red}WARNING!%f Your terminal appears to support fewer than 256 colors!"
-    print -P "If your terminal supports 256 colors, please export the appropriate environment variable"
-    print -P "_before_ loading this theme in your \~\/.zshrc. In most terminal emulators, putting"
-    print -P "%F{blue}export TERM=\"xterm-256color\"%f at the top of your \~\/.zshrc is sufficient."
-  fi
-}
-
-# get the proper color code if it does not exist as a name.
-function getColor() {
-  # If Color is not numerical, try to get the color code.
-  if [[ "$1" != <-> ]]; then
-    1=$(getColorCode $1)
-  fi
-  echo -n "$1"
-}
-
-# empty paramenter resets (stops) background color
-function backgroundColor() {
-  echo -n "%K{$(getColor $1)}"
-}
-
-# empty paramenter resets (stops) foreground color
-function foregroundColor() {
-  echo -n "%F{$(getColor $1)}"
-}
-
-# Get numerical color codes. That way we translate ANSI codes
-# into ZSH-Style color codes.
+# For user convenience: type `getColorCode background` or `getColorCode foreground` to see
+# the list of predefined colors.
 function getColorCode() {
-  # Early exit: Check if given value is already numerical
-  if [[ "$1" == <-> ]]; then
-    # Pad color with zeroes
-    echo -n "${(l:3::0:)1}"
-    return
+  if (( ARGC == 1 )); then
+    case $1 in 
+      foreground)
+        local k
+        for k in "${(k@)__P9K_COLORS}"; do
+          local v=${__P9K_COLORS[$k]}
+          print -P "%F{$v}$v - $k%f"
+        done
+        return
+        ;;
+      background)
+        local k
+        for k in "${(k@)__P9K_COLORS}"; do
+          local v=${__P9K_COLORS[$k]}
+          print -P "%K{$v}$v - $k%k"
+        done
+        return
+        ;;
+    esac
   fi
-
-  local colorName="${1}"
-  # Check if value is none with any case.
-  if [[ "${(L)colorName}" == "none" ]]; then
-      echo -n 'none'
-  elif [[ "${colorName}" == "foreground"  ]]; then
-      # for testing purposes in terminal
-      # call via `getColorCode foreground`
-      for i in "${(k@)__P9K_COLORS}"; do
-          print -P "$(foregroundColor $i)$(getColor $i) - $i%f"
-      done
-  elif [[ "${colorName}" == "background"  ]]; then
-      # call via `getColorCode background`
-      for i in "${(k@)__P9K_COLORS}"; do
-          print -P "$(backgroundColor $i)$(getColor $i) - $i%k"
-      done
-  else
-      # Strip eventual "bg-" prefixes
-      colorName=${colorName#bg-}
-      # Strip eventual "fg-" prefixes
-      colorName=${colorName#fg-}
-      # Strip eventual "br" prefixes ("bright" colors)
-      colorName=${colorName#br}
-      echo -n $__P9K_COLORS[$colorName]
-  fi
-}
-
-# Check if two colors are equal, even if one is specified as ANSI code.
-function isSameColor() {
-  if [[ "$1" == "NONE" || "$2" == "NONE" ]]; then
-    return 1
-  fi
-
-  local color1=$(getColorCode "$1")
-  local color2=$(getColorCode "$2")
-
-  return $(( color1 != color2 ))
+  echo "Usage: getColorCode background|foreground" >&2
+  return 1
 }
