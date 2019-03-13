@@ -21,7 +21,7 @@ same results. It's simply faster. There is no catch.
    2. [For new users](#for-new-users)
    3. [Docker playground](#docker-playground)
 3. [How fast is it?](#how-fast-is-it)
-4. [What's the catch?](#whats-the-catch)
+4. [Known bugs](#known-bugs)
 
 ## Installation and configuration
 
@@ -37,6 +37,9 @@ you restart zsh, your prompt will be faster. No configuration changes are needed
 git clone https://github.com/romkatv/powerlevel10k.git ~/powerlevel10k
 echo 'source ~/powerlevel10k/powerlevel10k.zsh-theme' >>! ~/.zshrc
 ```
+
+If you are using a framework / plugin manager and need help translating these instruction into its
+configuration language, see [FAQ](http://fix.me/).
 
 Make sure to disable your current theme.
 
@@ -179,22 +182,70 @@ POWERLEVEL9K_STATUS_OK_BACKGROUND=grey53
 Powerlevel10k shows similar performance advantage over Powerlevel9k on Mac OS, FreeBSD, WSL, and
 Raspberry Pie.
 
-## What's the catch?
-
-Really, there is no catch. It's literally the same prompt with the same configuration format as
-Powerlevel9k. But **much faster**.
-
-If you really need to know, here's where Powerlevel10k differs from Powerlevel9k:
-
-  * Git prompt doesn't show tags and revisions. Open an issue if you need them.
-  * By default only git vcs backend is enabled. If you need svn and hg, you'll need to set
-    `POWERLEVEL9K_VCS_BACKENDS`. See [Extra configuration](#extra-configuration).
-  * Fewer configuration options can be changed after the theme is loaded. For example, if you
-    decide to change background color of some segment in the middle of an interactive session,
-    it may not work.
-
 ## Known bugs
 
 When a notification about an exiting job is displayed, prompt content doesn't get refreshed.
 In Powerlevel9k it does. This could be fixed but the fix will add non-trivial complexity and
 extra prompt latency.
+
+## FAQ
+
+### Why does Powerlevel10k spawn two extra processes?
+
+Powerlevel10k uses [gitstatus](https://github.com/romkatv/gitstatus) as the backend behind `vcs`
+prompt; gitstatus spawns `gitstatusd` and zsh. See [gitstatus](https://github.com/romkatv/gitstatus)
+for details.
+
+### Does Powerlevel10k always render exactly the same prompt with the same config?
+
+This is the goal. You should be able to switch between Powerlevel9k and Powerlevel10k with no
+visible changes except for performance. There are, however, several differences.
+
+  * Git prompt in Powerlevel10k doesn't show tags and revisions. Open an issue if you need them.
+  * By default only git vcs backend is enabled in Powerlevel10k. If you need svn and hg, you'll
+    need to set `POWERLEVEL9K_VCS_BACKENDS`. See [Extra configuration](#extra-configuration).
+  * Fewer configuration options can be changed after the theme is loaded. For example, if you
+    decide to change background color of some segment in the middle of an interactive session,
+    it may not work.
+
+### Are changes getting up/down-streamed?
+
+Powerlevel10k regularly pulls changes from Powerlevel9k, so all bug fixes and new features that land
+in Powerlevel9k will land here, too.
+
+There is ongoing work on upstreaming some of the changes from Powerlevel10k to Powerlevel9k. E.g.,
+issues [1170](https://github.com/bhilburn/powerlevel9k/issues/1170) and
+[1185](https://github.com/bhilburn/powerlevel9k/issues/1185).
+
+Improvements to [libgit2](https://github.com/libgit2/libgit2/issues/4230#issuecomment-471710359) are
+being upstremed. There are 3 independent optimizations and it's not yet clear whether all of them
+will make it but there is a good chance they will.
+
+### Is there an AUR package for Powerlevel10k?
+
+Yes, [zsh-theme-powerlevel10k-git](https://aur.archlinux.org/packages/zsh-theme-powerlevel10k-git/).
+This package is owned by an unaffiliated volunteer.
+
+### How do I use Powerlevel10k with zplug, prezto, oh-my-zsh, antigen, somethingelse?
+
+If you have to ask, then the easiest way is to disable the current theme (so that you end up with
+no theme) and then install Powerlevel10k the usual way.
+
+1. Disable the current theme in your framework / plugin manager.
+
+  * **zplug:** Open `~/.zshrc` and remove the `zplug` command that refers to your current theme. For
+    example, if you are currently using Powerlevel9k, look for
+    `zplug bhilburn/powerlevel9k, use:powerlevel9k.zsh-theme`.
+  * **prezto:** Open `~/.zpreztorc` and put `zstyle :prezto:module:prompt theme off` in it. Remove
+    any other command that sets `theme` such as `zstyle :prezto:module:prompt theme powerlevel9k`.
+  * **oh-my-zsh:** Open `~/.zshrc` and remove the line that sets `ZSH_THEME`, such as
+    `ZSH_THEME=powerlevel9k/powerlevel9k`.
+  * **antigen:** Open `~/.zshrc` and remove the line that sets `antigen theme`, such as
+    `antigen theme bhilburn/powerlevel9k powerlevel9k`.
+
+2. Install Powerlevel10k the usual way.
+
+```zsh
+git clone https://github.com/romkatv/powerlevel10k.git ~/powerlevel10k
+echo 'source ~/powerlevel10k/powerlevel10k.zsh-theme' >>! ~/.zshrc
+```
