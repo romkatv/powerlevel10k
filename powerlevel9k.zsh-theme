@@ -313,7 +313,7 @@ prompt_aws_eb_env() {
 set_default POWERLEVEL9K_BACKGROUND_JOBS_VERBOSE true
 set_default POWERLEVEL9K_BACKGROUND_JOBS_VERBOSE_ALWAYS false
 prompt_background_jobs() {
-  local n && n="${(fw)#$(jobs -rd)}" && ((n > 1)) || return
+  local n && n="${(fw)#$(jobs -d)}" && ((n > 1)) || return
   (( n /= 2 ))
 
   local prompt=''
