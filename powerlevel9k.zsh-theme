@@ -20,6 +20,11 @@
 #zstyle ':vcs_info:*+*:*' debug true
 #set -o xtrace
 
+# Bail out if it's not the first time the file is being sourced.
+# Second sourcing will cause mayhem.
+[[ -v _P9K_SOURCED ]] && return
+readonly _P9K_SOURCED=1
+
 typeset -g _P9K_INSTALLATION_DIR
 
 # Try to set the installation path
