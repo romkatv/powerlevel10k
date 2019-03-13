@@ -28,6 +28,7 @@ same results. It's simply faster. There is no catch.
    3. [Are changes getting up/down-streamed?](#are-changes-getting-updown-streamed)
    4. [Is there an AUR package for Powerlevel10k?](#is-there-an-aur-package-for-powerlevel10k)
    5. [How do I use Powerlevel10k with zplug, prezto, oh-my-zsh, antigen, somethingelse?](#how-do-i-use-powerlevel10k-with-zplug-prezto-oh-my-zsh-antigen-somethingelse)
+   5. [What is the minimum supported zsh version?](#what-is-the-minimum-supported-zsh-version)
 
 ## Installation and configuration
 
@@ -214,6 +215,9 @@ visible changes except for performance. There are, however, several differences.
     decide to change background color of some segment in the middle of an interactive session,
     it may not work.
 
+If you notice any other differences between prompts in Powerlevel9k and Powerlevel10k when running
+with the same settings, please [open an issue](https://github.com/romkatv/powerlevel10k/issues).
+
 ### Are changes getting up/down-streamed?
 
 Powerlevel10k regularly pulls changes from Powerlevel9k, so all bug fixes and new features that land
@@ -255,3 +259,7 @@ no theme) and then install Powerlevel10k the usual way.
 git clone https://github.com/romkatv/powerlevel10k.git ~/powerlevel10k
 echo 'source ~/powerlevel10k/powerlevel10k.zsh-theme' >>! ~/.zshrc
 ```
+
+### What is the minimum supported zsh version?
+
+Anything below 5.2 definitely won't work. 5.4 definitely will.
