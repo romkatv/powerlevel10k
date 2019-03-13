@@ -1561,7 +1561,7 @@ typeset -fH _p9k_vcs_render() {
       [[ -n $prompt || $dir == / ]] && break
       dir=${dir:h}
     done
-    $2_prompt_segment $1_LOADING $3 "${vcs_states[loading]}" "$DEFAULT_COLOR" ${prompt:-loading}
+    _p9k_vcs_do_render $2 $1_LOADING $3 "${vcs_states[loading]}" "$DEFAULT_COLOR" ${prompt:-loading}
     return 0
   fi
 
@@ -1646,7 +1646,7 @@ typeset -fH _p9k_vcs_render() {
   fi
 
   _P9K_LAST_GIT_PROMPT[$VCS_STATUS_WORKDIR]="${_P9K_CACHE_VAL[3]}"
-  "$2_prompt_segment" "${_P9K_CACHE_VAL[1]}" $3 "${_P9K_CACHE_VAL[2]}" "$DEFAULT_COLOR" "${_P9K_CACHE_VAL[3]}"
+  _p9k_vcs_do_render $2 "${_P9K_CACHE_VAL[1]}" $3 "${_P9K_CACHE_VAL[2]}" "$DEFAULT_COLOR" "${_P9K_CACHE_VAL[3]}"
   return 0
 }
 
@@ -1664,7 +1664,7 @@ typeset -fH _p9k_vcs_resume() {
 
   if [[ -z $_P9K_NEXT_VCS_DIR ]]; then
     unset _P9K_NEXT_VCS_DIR
-    _p9k_update_prompts
+    _p9k_update_prompt gitstatus
   else
     typeset -gFH _P9K_GITSTATUS_START_TIME=$EPOCHREALTIME
     if ! gitstatus_query -d $_P9K_NEXT_VCS_DIR -t 0 -c _p9k_vcs_resume POWERLEVEL9K; then
@@ -1674,7 +1674,7 @@ typeset -fH _p9k_vcs_resume() {
     case $VCS_STATUS_RESULT in
       *-sync)
         unset _P9K_NEXT_VCS_DIR
-        _p9k_update_prompts
+        _p9k_update_prompt gitstatus
         ;;
       tout)
         typeset -gH _P9K_NEXT_VCS_DIR=""
@@ -1685,7 +1685,7 @@ typeset -fH _p9k_vcs_resume() {
 
 typeset -fH _p9k_vcs_gitstatus() {
   [[ $POWERLEVEL9K_DISABLE_GITSTATUS == true ]] && return 1
-  if [[ ! -v _P9K_REFRESH_PROMPT ]]; then
+  if [[ $_P9K_REFRESH_REASON == precmd ]]; then
     if [[ -v _P9K_NEXT_VCS_DIR ]]; then
       typeset -gH _P9K_NEXT_VCS_DIR=$PWD
     else
@@ -1706,10 +1706,26 @@ typeset -fH _p9k_vcs_gitstatus() {
   return 0
 }
 
+function _p9k_vcs_do_render() {
+  local side=$1
+  shift
+  _P9K_LAST_VCS_SEGMENT=("$@")
+  "${side}_prompt_segment" "$@"
+}
+
 ################################################################
 # Segment to show VCS information
 
+typeset -ga _P9K_LAST_VCS_SEGMENT
+
 prompt_vcs() {
+  if [[ $_P9K_REFRESH_REASON != precmd && $_P9K_REFRESH_REASON != gitstatus ]]; then
+    if (( #_P9K_LAST_VCS_SEGMENT )); then
+      "$1_prompt_segment" "${(@)_P9K_LAST_VCS_SEGMENT}"
+    fi
+    return
+  fi
+  _P9K_LAST_VCS_SEGMENT=()
   local -a backends=($POWERLEVEL9K_VCS_BACKENDS)
   if (( ${backends[(I)git]} )) && _p9k_vcs_gitstatus; then
     _p9k_vcs_render $0 $1 $2 && return
@@ -1735,7 +1751,7 @@ prompt_vcs() {
           current_state='clean'
         fi
       fi
-      "$1_prompt_segment" "${0}_${(U)current_state}" "$2" "${vcs_states[$current_state]}" "$DEFAULT_COLOR" "$vcs_prompt" "$vcs_visual_identifier"
+      _p9k_vcs_do_render $1 "${0}_${(U)current_state}" "$2" "${vcs_states[$current_state]}" "$DEFAULT_COLOR" "$vcs_prompt" "$vcs_visual_identifier"
     fi
   fi
 }
@@ -1744,16 +1760,15 @@ prompt_vcs() {
 # Vi Mode: show editing mode (NORMAL|INSERT)
 set_default POWERLEVEL9K_VI_INSERT_MODE_STRING "INSERT"
 set_default POWERLEVEL9K_VI_COMMAND_MODE_STRING "NORMAL"
+
+typeset -gi _P9K_KEYMAP_VIMCMD
+
 prompt_vi_mode() {
-  case ${KEYMAP} in
-    vicmd)
-      "$1_prompt_segment" "$0_NORMAL" "$2" "$DEFAULT_COLOR" "white" "$POWERLEVEL9K_VI_COMMAND_MODE_STRING"
-    ;;
-    main|viins|*)
-      if [[ -z $POWERLEVEL9K_VI_INSERT_MODE_STRING ]]; then return; fi
-      "$1_prompt_segment" "$0_INSERT" "$2" "$DEFAULT_COLOR" "blue" "$POWERLEVEL9K_VI_INSERT_MODE_STRING"
-    ;;
-  esac
+  if (( _P9K_KEYMAP_VIMCMD )); then
+    "$1_prompt_segment" "$0_NORMAL" "$2" "$DEFAULT_COLOR" "white" "$POWERLEVEL9K_VI_COMMAND_MODE_STRING"
+  elif [[ -n $POWERLEVEL9K_VI_INSERT_MODE_STRING ]]; then
+    "$1_prompt_segment" "$0_INSERT" "$2" "$DEFAULT_COLOR" "blue" "$POWERLEVEL9K_VI_INSERT_MODE_STRING"
+  fi
 }
 
 ################################################################
@@ -1949,7 +1964,7 @@ typeset -gF _P9K_TIMER_START
 powerlevel9k_preexec() { _P9K_TIMER_START=$EPOCHREALTIME }
 
 typeset -g _P9K_PROMPT
-typeset -fH _p9k_set_prompts() {
+typeset -fH _p9k_set_prompt() {
   _P9K_PROMPT=''
   build_left_prompt
   local left=$_P9K_PROMPT
@@ -1997,12 +2012,14 @@ typeset -fH _p9k_set_prompts() {
   [[ $ITERM_SHELL_INTEGRATION_INSTALLED == "Yes" ]] && PROMPT="%{$(iterm2_prompt_mark)%}$PROMPT"
 }
 
-typeset -fH _p9k_update_prompts() {
+typeset -g _P9K_REFRESH_REASON
+
+function _p9k_update_prompt() {
   (( _P9K_ENABLED )) || return
-  typeset -gH _P9K_REFRESH_PROMPT=''
-  _p9k_set_prompts
-  unset _P9K_REFRESH_PROMPT
-  zle && zle .reset-prompt
+  _P9K_REFRESH_REASON=$1
+  _p9k_set_prompt
+  _P9K_REFRESH_REASON=''
+  zle .reset-prompt
 }
 
 set_default POWERLEVEL9K_PROMPT_ADD_NEWLINE false
@@ -2016,12 +2033,16 @@ powerlevel9k_prepare_prompts() {
 
   _p9k_init
   _P9K_TIMER_START=1e10
-  _p9k_set_prompts
+  _P9K_KEYMAP_VIMCMD=0
+
+  _P9K_REFRESH_REASON=precmd
+  _p9k_set_prompt
+  _P9K_REFRESH_REASON=''
 }
 
-zle-keymap-select () {
-	zle reset-prompt
-	zle -R
+function _p9k_zle_keymap_select() {
+  [[ $KEYMAP == vicmd ]] && _P9K_KEYMAP_VIMCMD=1 || _P9K_KEYMAP_VIMCMD=0
+  _p9k_update_prompt keymap-select
 }
 
 set_default POWERLEVEL9K_IGNORE_TERM_COLORS false
@@ -2177,6 +2198,8 @@ _p9k_init() {
     rm -f "$fifo"
   fi
 
+  zle -N zle-keymap-select _p9k_zle_keymap_select
+
   _P9K_INITIALIZED=1
 }
 
@@ -2194,8 +2217,6 @@ prompt_powerlevel9k_setup() {
 
   add-zsh-hook precmd powerlevel9k_prepare_prompts
   add-zsh-hook preexec powerlevel9k_preexec
-
-  zle -N zle-keymap-select
 
   _P9K_TIMER_START=1e10
   _P9K_ENABLED=1
