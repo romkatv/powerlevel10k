@@ -22,6 +22,12 @@ same results. It's simply faster. There is no catch.
    3. [Docker playground](#docker-playground)
 3. [How fast is it?](#how-fast-is-it)
 4. [Known bugs](#known-bugs)
+5. [FAQ](#faq)
+   1. [Why does Powerlevel10k spawn two extra processes?](#why-does-powerlevel10k-spawn-two-extra-processes)
+   2. [Does Powerlevel10k always render exactly the same prompt with the same config?](#does-powerlevel10k-always-render-exactly-the-same-prompt-with-the-same-config)
+   3. [Are changes getting up/down-streamed?](#are-changes-getting-updown-streamed)
+   4. [Is there an AUR package for Powerlevel10k?](#is-there-an-aur-package-for-powerlevel10k)
+   5. [How do I use Powerlevel10k with zplug, prezto, oh-my-zsh, antigen, somethingelse?](#how-do-i-use-powerlevel10k-with-zplug-prezto-oh-my-zsh-antigen-somethingelse)
 
 ## Installation and configuration
 
@@ -39,7 +45,7 @@ echo 'source ~/powerlevel10k/powerlevel10k.zsh-theme' >>! ~/.zshrc
 ```
 
 If you are using a framework / plugin manager and need help translating these instruction into its
-configuration language, see [FAQ](http://fix.me/).
+configuration language, see [FAQ](#faq).
 
 Make sure to disable your current theme.
 
