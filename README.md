@@ -189,12 +189,6 @@ POWERLEVEL9K_STATUS_OK_BACKGROUND=grey53
 Powerlevel10k shows similar performance advantage over Powerlevel9k on Mac OS, FreeBSD, WSL, and
 Raspberry Pie.
 
-## Known bugs
-
-When a notification about an exiting job is displayed, prompt content doesn't get refreshed.
-In Powerlevel9k it does. This could be fixed but the fix will add non-trivial complexity and
-extra prompt latency.
-
 ## FAQ
 
 ### Why does Powerlevel10k spawn two extra processes?
