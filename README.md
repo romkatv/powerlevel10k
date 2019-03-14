@@ -9,7 +9,8 @@ simply replace your `powerlevel9k` theme with `powerlevel10k` and enjoy responsi
 shell like it's 80's again!
 
 Powerlevel10k uses the same configuration options as Powerlevel9k and produces the
-same results. It's simply faster. There is no catch.
+same results [*](#does-powerlevel10k-always-render-exactly-the-same-prompt-with-the-same-config).
+It's simply faster.
 
 ## Table of Contents
 
