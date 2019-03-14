@@ -52,8 +52,6 @@ function +vi-git-remotebranch() {
     remote=${$(command git rev-parse --verify HEAD@{upstream} --symbolic-full-name 2>/dev/null)/refs\/(remotes|heads)\/}
 
     if [[ -n "$POWERLEVEL9K_VCS_SHORTEN_LENGTH" ]] && [[ -n "$POWERLEVEL9K_VCS_SHORTEN_MIN_LENGTH" ]]; then
-     set_default POWERLEVEL9K_VCS_SHORTEN_DELIMITER $'\U2026'
-
      if [ ${#hook_com[branch]} -gt ${POWERLEVEL9K_VCS_SHORTEN_MIN_LENGTH} ] && [ ${#hook_com[branch]} -gt ${POWERLEVEL9K_VCS_SHORTEN_LENGTH} ]; then
        case "$POWERLEVEL9K_VCS_SHORTEN_STRATEGY" in
          truncate_middle)
