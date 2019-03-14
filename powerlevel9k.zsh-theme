@@ -2156,7 +2156,7 @@ _p9k_init() {
   # Display a warning if the terminal does not support 256 colors.
   if [[ $POWERLEVEL9K_IGNORE_TERM_COLORS == false ]]; then
     local n
-    if { hash tput && n=$(tput colors) || n=$(echotc Co) } && (( n < 256 )); then
+    if { hash tput && n=$(tput colors) || hash echotc && n=$(echotc Co) } 2>/dev/null && (( n < 256 )); then
       if [[ -n $n && $n -lt 256 ]]; then
         print -P '%F{red}WARNING!%f Your terminal appears to support fewer than 256 colors!'
         print -P 'If your terminal supports 256 colors, please export the appropriate environment variable.'
