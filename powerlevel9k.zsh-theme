@@ -2255,9 +2255,9 @@ _p9k_init() {
 typeset -gi _P9K_ENABLED=0
 
 prompt_powerlevel9k_setup() {
-  setopt nopromptbang prompt{cr,percent,sp,subst}
-
   prompt_powerlevel9k_teardown
+
+  setopt nopromptbang prompt{cr,percent,sp,subst}
 
   add-zsh-hook precmd powerlevel9k_prepare_prompts
   add-zsh-hook preexec powerlevel9k_preexec
@@ -2267,7 +2267,6 @@ prompt_powerlevel9k_setup() {
 }
 
 prompt_powerlevel9k_teardown() {
-  emulate -L zsh
   add-zsh-hook -D precmd powerlevel9k_\*
   add-zsh-hook -D preexec powerlevel9k_\*
   PROMPT='%m%# '
