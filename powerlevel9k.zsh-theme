@@ -1987,6 +1987,9 @@ typeset -fH _p9k_set_prompt() {
     build_right_prompt
     RPROMPT=$_P9K_RIGHT_PREFIX$_P9K_PROMPT$_P9K_RIGHT_SUFFIX
   fi
+
+  unset _P9K_HOOK1
+  unset _P9K_HOOK2
 }
 
 typeset -g _P9K_REFRESH_REASON
@@ -2034,6 +2037,64 @@ typeset -gi _P9K_INITIALIZED=0
 typeset -g OS
 typeset -g OS_ICON
 typeset -g SED_EXTENDED_REGEX_PARAMETER
+
+typeset -gi _P9K_TIMER_FD1=0
+typeset -gi _P9K_TIMER_FD2=0
+
+_p9k_init_timer() {
+  local fifo1 fifo2
+
+  _p9k_start_timer() {
+    emulate -L zsh
+    setopt err_return no_bg_nice
+
+    fifo1=$(mktemp -u "${TMPDIR:-/tmp}"/p9k.$$.pipe1.timer.XXXXXXXXXX)
+    fifo2=$(mktemp -u "${TMPDIR:-/tmp}"/p9k.$$.pipe2.timer.XXXXXXXXXX)
+    mkfifo $fifo1
+    mkfifo $fifo2
+    exec {_P9K_TIMER_FD1}<>$fifo1
+    exec {_P9K_TIMER_FD2}<>$fifo2
+
+    function _p9k_on_timer() {
+      emulate -L zsh
+      local reason
+      IFS='' read -u $_P9K_TIMER_FD1 reason || return
+      unset _P9K_HOOK1
+      unset _P9K_HOOK2
+      [[ -n $reason ]] && _p9k_update_prompt $reason || zle .reset-prompt
+    }
+
+    zle -F $_P9K_TIMER_FD1 _p9k_on_timer
+
+    # This `sleep 1 && kill -WINCH $$` is a workaround for what seems like a bug in zsh.
+    zsh -c "
+      while kill -0 $$; do
+        if IFS='' read -u $_P9K_TIMER_FD2 -t 1; then
+          sleep 1
+          kill -WINCH $$
+          echo job-complete
+        elif [[ $POWERLEVEL9K_EXPERIMENTAL_TIME_REALTIME == true ]]; then
+          echo
+        fi
+      done
+    " <&$_P9K_TIMER_FD2 >&$_P9K_TIMER_FD1 2>/dev/null &!
+  }
+
+  if ! _p9k_start_timer ; then
+    echo "powerlevel10k: failed to initialize background timer" >&2
+    if (( _P9K_TIMER_FD1 )); then
+      zle -F $_P9K_TIMER_FD1
+      exec {_P9K_TIMER_FD1}>&-
+    fi
+    if (( _P9K_TIMER_FD2 )); then
+      exec {_P9K_TIMER_FD2}>&-
+    fi
+    _P9K_TIMER_FD1=0
+    _P9K_TIMER_FD2=0
+    unset -f _p9k_on_timer
+  fi
+  rm -f "$fifo1" "$fifo2"
+}
 
 _p9k_init() {
   (( _P9K_INITIALIZED )) && return
@@ -2112,6 +2173,10 @@ _p9k_init() {
     fi
   done
 
+  if [[ $POWERLEVEL9K_EXPERIMENTAL_TIME_REALTIME == true ]] || segment_in_use background_jobs; then
+    _p9k_init_timer
+  fi
+
   local RPROMPT_SUFFIX RPROMPT_PREFIX
   if [[ $POWERLEVEL9K_PROMPT_ON_NEWLINE == true ]]; then
     _p9k_get_icon MULTILINE_FIRST_PROMPT_PREFIX
@@ -2142,6 +2207,10 @@ _p9k_init() {
 
   if [[ $POWERLEVEL9K_PROMPT_ADD_NEWLINE == true ]]; then
     repeat ${POWERLEVEL9K_PROMPT_ADD_NEWLINE_COUNT:-1} { _P9K_LEFT_PREFIX=$'\n'$_P9K_LEFT_PREFIX }
+  fi
+
+  if segment_in_use background_jobs && (( _P9K_TIMER_FD2 )); then
+    _P9K_LEFT_SUFFIX+="\${_P9K_HOOK1+\${_P9K_HOOK2-\${_P9K_HOOK2=}\$(echo >&$_P9K_TIMER_FD2)}}\${_P9K_HOOK1=}"
   fi
 
   # If the terminal `LANG` is set to `C`, this theme will not work at all.
@@ -2179,34 +2248,6 @@ _p9k_init() {
     fi
   fi
 
-  if [[ $POWERLEVEL9K_EXPERIMENTAL_TIME_REALTIME == true ]]; then
-    local fifo && fifo=$(mktemp -u "${TMPDIR:-/tmp}"/p10k.$$.pipe.time.XXXXXXXXXX)
-    typeset -giH _P9K_TIMER_FD=0
-    _p9k_start_timer() {
-      emulate -L zsh
-      setopt err_return
-      unsetopt bg_nice
-      mkfifo $fifo
-      exec {_P9K_TIMER_FD}<>$fifo
-      typeset -gfH _p9k_on_timer() {
-        emulate -L zsh
-        local _ && IFS='' read -u $_P9K_TIMER_FD _ && zle && zle .reset-prompt
-      }
-      zle -F $_P9K_TIMER_FD _p9k_on_timer
-      zsh -c "while kill -0 $$; do sleep 1; echo; done" >&$_P9K_TIMER_FD 2>/dev/null &!
-    }
-    if ! _p9k_start_timer ; then
-      echo "powerlevel10k: failed to initialize realtime clock" >&2
-      if (( _P9K_TIMER_FD )); then
-        zle -F $_P9K_TIMER_FD
-        exec {_P9K_TIMER_FD}>&-
-      fi
-      unset _P9K_TIMER_FD
-      unset -f _p9k_on_timer
-    fi
-    rm -f "$fifo"
-  fi
-
   zle -N zle-keymap-select _p9k_zle_keymap_select
 
   _P9K_INITIALIZED=1
@@ -2215,7 +2256,7 @@ _p9k_init() {
 typeset -gi _P9K_ENABLED=0
 
 prompt_powerlevel9k_setup() {
-  setopt noprompt{bang,subst} prompt{cr,percent,sp}
+  setopt nopromptbang prompt{cr,percent,sp,subst}
 
   prompt_powerlevel9k_teardown
 
