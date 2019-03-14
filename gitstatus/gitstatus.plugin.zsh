@@ -24,7 +24,9 @@ zmodload zsh/datetime || return
 #
 # If VCS_STATUS_RESULT is ok-sync or ok-async, additional variables are set:
 #
-#   VCS_STATUS_LOCAL_BRANCH    Local branch name. Not empty.
+#   VCS_STATUS_WORKDIR         Git repo working directory. Not empty.
+#   VCS_STATUS_COMMIT          Commit hash that HEAD is pointing to. 40 hex digits.
+#   VCS_STATUS_LOCAL_BRANCH    Local branch name or empty if not on a branch.
 #   VCS_STATUS_REMOTE_BRANCH   Upstream branch name. Can be empty.
 #   VCS_STATUS_REMOTE_URL      Remote URL. Can be empty.
 #   VCS_STATUS_ACTION          Repository state, A.K.A. action. Can be empty.
@@ -36,7 +38,8 @@ zmodload zsh/datetime || return
 #   VCS_STATUS_COMMITS_BEHIND  Number of commits the current branch is behind upstream. Non-negative
 #                              integer.
 #   VCS_STATUS_STASHES         Number of stashes. Non-negative integer.
-#   VCS_STATUS_WORKDIR         Git repo working directory. Not empty.
+#   VCS_STATUS_TAG             The first tag (in lexicographical order) that points to the same
+#                              commit as HEAD.
 #   VCS_STATUS_ALL             All of the above in an array. The order of elements is unspecified.
 #                              More elements can be added in the future.
 #
@@ -129,20 +132,24 @@ typeset -fH _gitstatus_process_response() {
   [[ ${VCS_STATUS_ALL[2]} == 1 ]] && {
     shift 2 VCS_STATUS_ALL
     (( ours )) && VCS_STATUS_RESULT=ok-sync || VCS_STATUS_RESULT=ok-async
-    typeset -g  VCS_STATUS_LOCAL_BRANCH="${VCS_STATUS_ALL[1]}"
-    typeset -g  VCS_STATUS_REMOTE_BRANCH="${VCS_STATUS_ALL[2]}"
-    typeset -g  VCS_STATUS_REMOTE_URL="${VCS_STATUS_ALL[3]}"
-    typeset -g  VCS_STATUS_ACTION="${VCS_STATUS_ALL[4]}"
-    typeset -gi VCS_STATUS_HAS_STAGED="${VCS_STATUS_ALL[5]}"
-    typeset -gi VCS_STATUS_HAS_UNSTAGED="${VCS_STATUS_ALL[6]}"
-    typeset -gi VCS_STATUS_HAS_UNTRACKED="${VCS_STATUS_ALL[7]}"
-    typeset -gi VCS_STATUS_COMMITS_AHEAD="${VCS_STATUS_ALL[8]}"
-    typeset -gi VCS_STATUS_COMMITS_BEHIND="${VCS_STATUS_ALL[9]}"
-    typeset -gi VCS_STATUS_STASHES="${VCS_STATUS_ALL[10]}"
-    typeset -g  VCS_STATUS_WORKDIR="${VCS_STATUS_ALL[11]}"
+    typeset -g  VCS_STATUS_WORKDIR="${VCS_STATUS_ALL[1]}"
+    typeset -g  VCS_STATUS_COMMIT="${VCS_STATUS_ALL[2]}"
+    typeset -g  VCS_STATUS_LOCAL_BRANCH="${VCS_STATUS_ALL[3]}"
+    typeset -g  VCS_STATUS_REMOTE_BRANCH="${VCS_STATUS_ALL[4]}"
+    typeset -g  VCS_STATUS_REMOTE_URL="${VCS_STATUS_ALL[5]}"
+    typeset -g  VCS_STATUS_ACTION="${VCS_STATUS_ALL[6]}"
+    typeset -gi VCS_STATUS_HAS_STAGED="${VCS_STATUS_ALL[7]}"
+    typeset -gi VCS_STATUS_HAS_UNSTAGED="${VCS_STATUS_ALL[8]}"
+    typeset -gi VCS_STATUS_HAS_UNTRACKED="${VCS_STATUS_ALL[9]}"
+    typeset -gi VCS_STATUS_COMMITS_AHEAD="${VCS_STATUS_ALL[10]}"
+    typeset -gi VCS_STATUS_COMMITS_BEHIND="${VCS_STATUS_ALL[11]}"
+    typeset -gi VCS_STATUS_STASHES="${VCS_STATUS_ALL[12]}"
+    typeset -g  VCS_STATUS_TAG="${VCS_STATUS_ALL[13]}"
   } || {
     (( ours )) && VCS_STATUS_RESULT=norepo-sync || VCS_STATUS_RESULT=norepo-async
     unset VCS_STATUS_ALL
+    unset VCS_STATUS_WORKDIR
+    unset VCS_STATUS_COMMIT
     unset VCS_STATUS_LOCAL_BRANCH
     unset VCS_STATUS_REMOTE_BRANCH
     unset VCS_STATUS_REMOTE_URL
@@ -153,7 +160,7 @@ typeset -fH _gitstatus_process_response() {
     unset VCS_STATUS_COMMITS_AHEAD
     unset VCS_STATUS_COMMITS_BEHIND
     unset VCS_STATUS_STASHES
-    unset VCS_STATUS_WORKDIR
+    unset VCS_STATUS_TAG
   }
 
   (( ! ours )) && (( #header )) && emulate -L zsh && "${header[@]}" || true
