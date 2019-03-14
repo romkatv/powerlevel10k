@@ -132,7 +132,7 @@ docker run -e LANG=C.UTF-8 -e LC_ALL=C.UTF-8 -e TERM=$TERM -it --rm ubuntu bash 
     POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(root_indicator dir_writable dir vcs)
     POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(status command_execution_time background_jobs time)
     source ~/powerlevel10k/powerlevel10k.zsh-theme" >~/.zshrc
-  cd powerlevel10k
+  cd ~/powerlevel10k
   zsh -i'
 ```
 
