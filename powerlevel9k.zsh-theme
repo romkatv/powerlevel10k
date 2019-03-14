@@ -318,12 +318,11 @@ prompt_aws_eb_env() {
 set_default POWERLEVEL9K_BACKGROUND_JOBS_VERBOSE true
 set_default POWERLEVEL9K_BACKGROUND_JOBS_VERBOSE_ALWAYS false
 prompt_background_jobs() {
-  local n && n="${(fw)#$(jobs -d)}" && ((n > 1)) || return
-  (( n /= 2 ))
-
-  local prompt=''
-  if [[ "$POWERLEVEL9K_BACKGROUND_JOBS_VERBOSE" == "true" &&
-        ("$n" -gt 1 || "$POWERLEVEL9K_BACKGROUND_JOBS_VERBOSE_ALWAYS" == "true") ]]; then
+  local -i n=${(%)${:-%j}}
+  (( n )) || return
+  local prompt
+  if [[ $POWERLEVEL9K_BACKGROUND_JOBS_VERBOSE == true &&
+        ($n -gt 1 || $POWERLEVEL9K_BACKGROUND_JOBS_VERBOSE_ALWAYS == true) ]]; then
     prompt=$n
   fi
   "$1_prompt_segment" "$0" "$2" "$DEFAULT_COLOR" "cyan" "$prompt" 'BACKGROUND_JOBS_ICON'
