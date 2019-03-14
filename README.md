@@ -84,6 +84,8 @@ are still using the `POWERLEVEL9K` prefix though.
   * `POWERLEVEL9K_EXPERIMENTAL_TIME_REALTIME (STRING) [default="false"]`
 
     If set to `"true"`, `time` segment will update every second, turning into a realtime clock.
+    This option appears to trigger a
+    [bug in completion menu](https://www.zsh.org/mla/workers//2019/msg00161.html) in zsh.
 
 ## Try it out
 
