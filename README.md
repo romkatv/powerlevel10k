@@ -203,7 +203,6 @@ enabled. This is used to trigger prompt refresh.
 This is the goal. You should be able to switch between Powerlevel9k and Powerlevel10k with no
 visible changes except for performance. There are, however, several differences.
 
-  * Git prompt in Powerlevel10k doesn't show tags and revisions. Open an issue if you need them.
   * By default only git vcs backend is enabled in Powerlevel10k. If you need svn and hg, you'll
     need to set `POWERLEVEL9K_VCS_BACKENDS`. See [Extra configuration](#extra-configuration).
   * Fewer configuration options can be changed after the theme is loaded. For example, if you
@@ -258,3 +257,7 @@ echo 'source ~/powerlevel10k/powerlevel10k.zsh-theme' >>! ~/.zshrc
 ### What is the minimum supported zsh version?
 
 Anything below 5.2 definitely won't work. 5.4 definitely will.
+
+### Why am I seeing \uNNNN in my prompt instead of icons?
+
+Use `$'\uNNN'` instead of `'\uNNN'`.
