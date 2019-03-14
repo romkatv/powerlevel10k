@@ -1571,6 +1571,13 @@ typeset -fH _p9k_vcs_render() {
   fi
 
   [[ $VCS_STATUS_RESULT == ok-* ]] || return 1
+
+  (( ${POWERLEVEL9K_VCS_GIT_HOOKS[(I)git-untracked]} )) || VCS_STATUS_HAS_UNTRACKED=0
+  (( ${POWERLEVEL9K_VCS_GIT_HOOKS[(I)git-aheadbehind]} )) || VCS_STATUS_COMMITS_AHEAD=0 && VCS_STATUS_COMMITS_BEHIND=0
+  (( ${POWERLEVEL9K_VCS_GIT_HOOKS[(I)git-stash]} )) || VCS_STATUS_STASHES=0
+  (( ${POWERLEVEL9K_VCS_GIT_HOOKS[(I)git-remotebranch]} )) || VCS_STATUS_REMOTE_BRANCH=""
+  (( ${POWERLEVEL9K_VCS_GIT_HOOKS[(I)git-tagname]} )) || VCS_STATUS_TAG=""
+
   local -a cache_key=(
     "$VCS_STATUS_LOCAL_BRANCH"
     "$VCS_STATUS_REMOTE_BRANCH"
@@ -1582,72 +1589,95 @@ typeset -fH _p9k_vcs_render() {
     "$VCS_STATUS_COMMITS_AHEAD"
     "$VCS_STATUS_COMMITS_BEHIND"
     "$VCS_STATUS_STASHES"
+    "$VCS_STATUS_TAG"
   )
+  if [[ $POWERLEVEL9K_SHOW_CHANGESET == true || -z $VCS_STATUS_LOCAL_BRANCH ]]; then
+    cache_key+=$VCS_STATUS_COMMIT
+  fi
+
   if ! _p9k_cache_get "${(@)cache_key}"; then
-    local state
-    if [[ $VCS_STATUS_HAS_STAGED != 0 || $VCS_STATUS_HAS_UNSTAGED != 0 ]]; then
-      state='modified'
-    elif [[ $VCS_STATUS_HAS_UNTRACKED != 0 ]]; then
-      state='untracked'
-    else
-      state='clean'
-    fi
-
+    local state=clean
     local vcs_prompt
-    if [[ "$VCS_STATUS_REMOTE_URL" == *github* ]] then
-      _p9k_get_icon VCS_GIT_GITHUB_ICON
-      vcs_prompt+=$_P9K_RETVAL
-    elif [[ "$VCS_STATUS_REMOTE_URL" == *bitbucket* ]] then
-      _p9k_get_icon VCS_GIT_BITBUCKET_ICON
-      vcs_prompt+=$_P9K_RETVAL
-    elif [[ "$VCS_STATUS_REMOTE_URL" == *stash* ]] then
-      _p9k_get_icon VCS_GIT_GITHUB_ICON
-      vcs_prompt+=$_P9K_RETVAL
-    elif [[ "$VCS_STATUS_REMOTE_URL" == *gitlab* ]] then
-      _p9k_get_icon VCS_GIT_GITLAB_ICON
-      vcs_prompt+=$_P9K_RETVAL
-    else
-      _p9k_get_icon VCS_GIT_ICON
-      vcs_prompt+=$_P9K_RETVAL
+
+    if (( ${POWERLEVEL9K_VCS_GIT_HOOKS[(I)vcs-detect-changes]} )); then
+      if [[ $VCS_STATUS_HAS_STAGED != 0 || $VCS_STATUS_HAS_UNSTAGED != 0 ]]; then
+        state='modified'
+      elif [[ $VCS_STATUS_HAS_UNTRACKED != 0 ]]; then
+        state='untracked'
+      else
+        state='clean'
+      fi
+
+      # It's weird that removing vcs-detect-changes from POWERLEVEL9K_VCS_GIT_HOOKS gets rid
+      # of the GIT icon. That's what vcs_info does, so we do the same in the name of compatiblity.
+      if [[ "$VCS_STATUS_REMOTE_URL" == *github* ]] then
+        _p9k_get_icon VCS_GIT_GITHUB_ICON
+        vcs_prompt+=$_P9K_RETVAL
+      elif [[ "$VCS_STATUS_REMOTE_URL" == *bitbucket* ]] then
+        _p9k_get_icon VCS_GIT_BITBUCKET_ICON
+        vcs_prompt+=$_P9K_RETVAL
+      elif [[ "$VCS_STATUS_REMOTE_URL" == *stash* ]] then
+        _p9k_get_icon VCS_GIT_GITHUB_ICON
+        vcs_prompt+=$_P9K_RETVAL
+      elif [[ "$VCS_STATUS_REMOTE_URL" == *gitlab* ]] then
+        _p9k_get_icon VCS_GIT_GITLAB_ICON
+        vcs_prompt+=$_P9K_RETVAL
+      else
+        _p9k_get_icon VCS_GIT_ICON
+        vcs_prompt+=$_P9K_RETVAL
+      fi
     fi
 
-    _p9k_get_icon VCS_BRANCH_ICON
-    vcs_prompt+="$_P9K_RETVAL$VCS_STATUS_LOCAL_BRANCH"
+    if [[ $POWERLEVEL9K_SHOW_CHANGESET == true || -z $VCS_STATUS_LOCAL_BRANCH ]]; then
+      _p9k_get_icon VCS_COMMIT_ICON
+      vcs_prompt+="$_P9K_RETVAL${VCS_STATUS_COMMIT:0:$POWERLEVEL9K_VCS_INTERNAL_HASH_LENGTH} "
+    fi
+
+    if [[ -n $VCS_STATUS_LOCAL_BRANCH ]]; then
+      _p9k_get_icon VCS_BRANCH_ICON
+      vcs_prompt+="$_P9K_RETVAL$VCS_STATUS_LOCAL_BRANCH "
+    fi
+
+    if [[ $POWERLEVEL9K_VCS_HIDE_TAGS == false && -n $VCS_STATUS_TAG ]]; then
+      _p9k_get_icon VCS_TAG_ICON
+      vcs_prompt+="$_P9K_RETVAL$VCS_STATUS_TAG "
+    fi
+
     if [[ -n $VCS_STATUS_ACTION ]]; then
-      vcs_prompt+=" %F{${POWERLEVEL9K_VCS_ACTIONFORMAT_FOREGROUND}}| $VCS_STATUS_ACTION%f"
+      vcs_prompt+="%F{${POWERLEVEL9K_VCS_ACTIONFORMAT_FOREGROUND}}| $VCS_STATUS_ACTION%f"
     else
       if [[ -n $VCS_STATUS_REMOTE_BRANCH &&
             $VCS_STATUS_LOCAL_BRANCH != $VCS_STATUS_REMOTE_BRANCH ]]; then
         _p9k_get_icon VCS_REMOTE_BRANCH_ICON
-        vcs_prompt+=" $_P9K_RETVAL$VCS_STATUS_REMOTE_BRANCH"
+        vcs_prompt+="$_P9K_RETVAL$VCS_STATUS_REMOTE_BRANCH "
       fi
       if [[ $VCS_STATUS_HAS_STAGED == 1 ]]; then
         _p9k_get_icon VCS_STAGED_ICON
-        vcs_prompt+=" $_P9K_RETVAL"
+        vcs_prompt+="$_P9K_RETVAL "
       fi
       if [[ $VCS_STATUS_HAS_UNSTAGED == 1 ]]; then
         _p9k_get_icon VCS_UNSTAGED_ICON
-        vcs_prompt+=" $_P9K_RETVAL"
+        vcs_prompt+="$_P9K_RETVAL "
       fi
       if [[ $VCS_STATUS_HAS_UNTRACKED == 1 ]]; then
         _p9k_get_icon VCS_UNTRACKED_ICON
-        vcs_prompt+=" $_P9K_RETVAL"
+        vcs_prompt+="$_P9K_RETVAL "
       fi
       if [[ $VCS_STATUS_COMMITS_AHEAD -gt 0 ]]; then
         _p9k_get_icon VCS_OUTGOING_CHANGES_ICON
-        vcs_prompt+=" $_P9K_RETVAL$VCS_STATUS_COMMITS_AHEAD"
+        vcs_prompt+="$_P9K_RETVAL$VCS_STATUS_COMMITS_AHEAD "
       fi
       if [[ $VCS_STATUS_COMMITS_BEHIND -gt 0 ]]; then
         _p9k_get_icon VCS_INCOMING_CHANGES_ICON
-        vcs_prompt+=" $_P9K_RETVAL$VCS_STATUS_COMMITS_BEHIND"
+        vcs_prompt+="$_P9K_RETVAL$VCS_STATUS_COMMITS_BEHIND "
       fi
       if [[ $VCS_STATUS_STASHES -gt 0 ]]; then
         _p9k_get_icon VCS_STASH_ICON
-        vcs_prompt+=" $_P9K_RETVAL$VCS_STATUS_STASHES"
+        vcs_prompt+="$_P9K_RETVAL$VCS_STATUS_STASHES "
       fi
     fi
 
-    _p9k_cache_set "${1}_${(U)state}" "${vcs_states[$state]}" "$vcs_prompt"
+    _p9k_cache_set "${1}_${(U)state}" "${vcs_states[$state]}" "${vcs_prompt% }"
   fi
 
   _P9K_LAST_GIT_PROMPT[$VCS_STATUS_WORKDIR]="${_P9K_CACHE_VAL[3]}"
@@ -1782,7 +1812,7 @@ prompt_vi_mode() {
 # https://virtualenv.pypa.io/en/latest/
 prompt_virtualenv() {
   if [[ -n "$VIRTUAL_ENV" ]]; then
-    "$1_prompt_segment" "$0" "$2" "blue" "$DEFAULT_COLOR" "${virtualenv_path:t}" 'PYTHON_ICON'
+    "$1_prompt_segment" "$0" "$2" "blue" "$DEFAULT_COLOR" "${VIRTUAL_ENV:t}" 'PYTHON_ICON'
   fi
 }
 
