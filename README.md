@@ -123,12 +123,9 @@ When you are done playing, `rm -rf /tmp/powerlevel10k` and exit zsh.
 You can try Powerlevel10k in Docker (Linux only). Once you exit zsh, the image is deleted.
 
 ```zsh
-docker run -e LANG=C.UTF-8 -e LC_ALL=C.UTF-8 -e TERM=$TERM -it --rm ubuntu bash -c '
-  set -uex
-  apt update
-  apt install -y zsh git
-  cd
-  git clone https://github.com/romkatv/powerlevel10k.git
+docker run -e LANG=C.UTF-8 -e LC_ALL=C.UTF-8 -e TERM=$TERM -it --rm ubuntu bash -uexc '
+  apt update && apt install -y zsh git
+  git clone https://github.com/romkatv/powerlevel10k.git ~/powerlevel10k
   echo "
     # Your prompt configuration goes here.
     POWERLEVEL9K_PROMPT_ON_NEWLINE=true
