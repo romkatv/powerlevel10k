@@ -2119,8 +2119,7 @@ _p9k_init() {
         OS='Linux'
         local os_release_id
         [[ -f /etc/os-release &&
-          "${(f)$((</etc/os-release) 2>/dev/null)}" =~ "ID=([A-Za-z]+)" &&
-          os_release_id="${match[1]}" ]]
+          "${(f)$((</etc/os-release) 2>/dev/null)}" =~ "ID=([A-Za-z]+)" ]] && os_release_id="${match[1]}"
         case "$os_release_id" in
           *arch*)                  set_os Linux LINUX_ARCH_ICON;;
           *debian*)                set_os Linux LINUX_DEBIAN_ICON;;
