@@ -191,11 +191,13 @@ Raspberry Pie.
 
 ## FAQ
 
-### Why does Powerlevel10k spawn two extra processes?
+### Why does Powerlevel10k spawn extra processes?
 
 Powerlevel10k uses [gitstatus](https://github.com/romkatv/gitstatus) as the backend behind `vcs`
-prompt; gitstatus spawns `gitstatusd` and zsh. See [gitstatus](https://github.com/romkatv/gitstatus)
-for details.
+prompt; gitstatus spawns `gitstatusd` and `zsh`. See
+[gitstatus](https://github.com/romkatv/gitstatus) for details. Powerlevel10k spawns another `zsh`
+if `POWERLEVEL9K_EXPERIMENTAL_TIME_REALTIME` is set to `true` or `background_jobs` segment is
+enabled. This is used to trigger prompt refresh.
 
 ### Does Powerlevel10k always render exactly the same prompt with the same config?
 
