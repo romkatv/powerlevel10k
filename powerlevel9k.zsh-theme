@@ -2257,6 +2257,7 @@ typeset -gi _P9K_ENABLED=0
 prompt_powerlevel9k_setup() {
   prompt_powerlevel9k_teardown
 
+  prompt_opts=(cr percent sp subst)
   setopt nopromptbang prompt{cr,percent,sp,subst}
 
   add-zsh-hook precmd powerlevel9k_prepare_prompts
