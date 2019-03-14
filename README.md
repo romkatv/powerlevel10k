@@ -28,7 +28,8 @@ It's simply faster.
    3. [Are changes getting up/down-streamed?](#are-changes-getting-updown-streamed)
    4. [Is there an AUR package for Powerlevel10k?](#is-there-an-aur-package-for-powerlevel10k)
    5. [How do I use Powerlevel10k with zplug, prezto, oh-my-zsh, antigen, somethingelse?](#how-do-i-use-powerlevel10k-with-zplug-prezto-oh-my-zsh-antigen-somethingelse)
-   5. [What is the minimum supported zsh version?](#what-is-the-minimum-supported-zsh-version)
+   6. [What is the minimum supported zsh version?](#what-is-the-minimum-supported-zsh-version)
+   7. [Why am I seeing \uNNNN in my prompt instead of icons?](#why-am-i-seeing-unnnn-in-my-prompt-instead-of-icons)
 
 ## Installation and configuration
 
