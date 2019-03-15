@@ -2093,6 +2093,12 @@ _p9k_init_timer() {
         fi
       done
     " <&$_P9K_TIMER_FD2 >&$_P9K_TIMER_FD1 2>/dev/null &!
+    local pid=$!
+    function _p9k_kill_timer_${pid}() {
+      emulate -L zsh
+      kill -- -${${(%)${:-%N}}#_p9k_kill_timer_} &>/dev/null
+    }
+    add-zsh-hook zshexit _p9k_kill_timer_${pid}
   }
 
   if ! _p9k_start_timer ; then
