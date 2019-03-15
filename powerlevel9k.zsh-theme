@@ -118,7 +118,7 @@ _p9k_color() {
   if [[ $color == <-> ]]; then
     _P9K_RETVAL=${(l:3::0:)color}
   else
-    # Strip prifices if there are any.
+    # Strip prifixes if there are any.
     _P9K_RETVAL=$__P9K_COLORS[${${${color#bg-}#fg-}#br}]
   fi
 }
@@ -946,7 +946,6 @@ prompt_dir() {
       current_path=${POWERLEVEL9K_HOME_FOLDER_ABBREVIATION}${current_path[2,-1]}
     fi
 
-    # declare variables used for bold and state colors
     local bld_on bld_off dir_state_foreground dir_state_user_foreground
     # test if user wants the last directory printed in bold
     if [[ $POWERLEVEL9K_DIR_PATH_HIGHLIGHT_BOLD == true ]]; then
@@ -2192,13 +2191,11 @@ _p9k_init() {
     _p9k_init_timer
   fi
 
-  local RPROMPT_SUFFIX RPROMPT_PREFIX
   if [[ $POWERLEVEL9K_PROMPT_ON_NEWLINE == true ]]; then
     _p9k_get_icon MULTILINE_FIRST_PROMPT_PREFIX
-    _P9K_LEFT_PREFIX="$_P9K_RETVAL%f%b%k"
-    #PROMPT="$_P9K_RETVAL%f%b%k$left$NEWLINE"
+    _P9K_LEFT_PREFIX+="$_P9K_RETVAL%f%b%k"
     _p9k_get_icon MULTILINE_LAST_PROMPT_PREFIX
-    _P9K_LEFT_SUFFIX=$'\n'$_P9K_RETVAL
+    _P9K_LEFT_SUFFIX+=$'\n'$_P9K_RETVAL
     if [[ $POWERLEVEL9K_RPROMPT_ON_NEWLINE != true ]]; then
       # The right prompt should be on the same line as the first line of the left
       # prompt. To do so, there is just a quite ugly workaround: Before zsh draws
@@ -2206,15 +2203,11 @@ _p9k_init() {
       # advise it to go one line down. See:
       # http://superuser.com/questions/357107/zsh-right-justify-in-ps1
       local LC_ALL="" LC_CTYPE="en_US.UTF-8" # Set the right locale to protect special characters
-      _P9K_RIGHT_PREFIX='%{'$'\e[1A''%}' # one line up
-      _P9K_RIGHT_SUFFIX='%{'$'\e[1B''%}' # one line down
+      _P9K_RIGHT_PREFIX+='%{'$'\e[1A''%}' # one line up
+      _P9K_RIGHT_SUFFIX+='%{'$'\e[1B''%}' # one line down
     fi
   else
-    _P9K_LEFT_PREFIX="%f%b%k"
-  fi
-
-  if [[ $ITERM_SHELL_INTEGRATION_INSTALLED == Yes ]]; then
-    _P9K_LEFT_PREFIX="%{$(iterm2_prompt_mark)%}$_P9K_LEFT_PREFIX"
+    _P9K_LEFT_PREFIX+="%f%b%k"
   fi
 
   _P9K_RIGHT_PREFIX+="%f%b%k"
@@ -2222,6 +2215,10 @@ _p9k_init() {
 
   if [[ $POWERLEVEL9K_PROMPT_ADD_NEWLINE == true ]]; then
     repeat ${POWERLEVEL9K_PROMPT_ADD_NEWLINE_COUNT:-1} { _P9K_LEFT_PREFIX=$'\n'$_P9K_LEFT_PREFIX }
+  fi
+
+  if [[ $ITERM_SHELL_INTEGRATION_INSTALLED == Yes ]]; then
+    _P9K_LEFT_PREFIX="%{$(iterm2_prompt_mark)%}$_P9K_LEFT_PREFIX"
   fi
 
   if segment_in_use background_jobs && (( _P9K_TIMER_FD2 )); then
