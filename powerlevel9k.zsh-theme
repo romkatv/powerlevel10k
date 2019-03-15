@@ -931,9 +931,13 @@ prompt_dir() {
       esac
     fi
 
-    # This is some weird shit. ~/foo becomes /foo, while /~foo becomes ~foo. Who could want that?
-    if [[ $POWERLEVEL9K_DIR_OMIT_FIRST_CHARACTER == true && ( $path_opt == /?* || $path_opt == '~'?* ) ]]; then
-      current_path=${current_path[2,-1]}
+    # This is not what Powerlevel9k does but I cannot imagine anyone wanting ~/foo to become /foo.
+    if [[ $POWERLEVEL9K_DIR_OMIT_FIRST_CHARACTER == true ]]; then
+      if [[ $current_path == /?* ]]; then
+        current_path=${current_path[2,-1]}
+      elif [[ $current_path == '~'/?* ]]; then
+        current_path=${current_path[3,-1]}
+      fi
     fi
 
     if [[ $POWERLEVEL9K_HOME_FOLDER_ABBREVIATION != '~' &&
@@ -945,7 +949,7 @@ prompt_dir() {
     # declare variables used for bold and state colors
     local bld_on bld_off dir_state_foreground dir_state_user_foreground
     # test if user wants the last directory printed in bold
-    if [[ "${(L)POWERLEVEL9K_DIR_PATH_HIGHLIGHT_BOLD}" == "true" ]]; then
+    if [[ $POWERLEVEL9K_DIR_PATH_HIGHLIGHT_BOLD == true ]]; then
       bld_on="%B"
       bld_off="%b"
     else
@@ -956,38 +960,30 @@ prompt_dir() {
     local dir_state_user_foreground=POWERLEVEL9K_DIR_${current_state}_FOREGROUND
     local dir_state_foreground=${${(P)dir_state_user_foreground}:-$DEFAULT_COLOR}
 
-    local dir_name=${current_path:h}
+    local dir_name=${${current_path:h}%/}/
     local base_name=${current_path:t}
-
+    if [[ $dir_name == ./ ]]; then
+      dir_name=''
+    fi
     # if the user wants the last directory colored...
     if [[ -n ${POWERLEVEL9K_DIR_PATH_HIGHLIGHT_FOREGROUND} ]]; then
-      if [[ $path_opt == "/" || $path_opt == "~" ]]; then
+      if [[ -z $base_name ]]; then
         current_path="${bld_on}%F{$POWERLEVEL9K_DIR_PATH_HIGHLIGHT_FOREGROUND}${current_path}${bld_off}"
       else
-        if [[ $dir_name == '.' ]]; then
-          current_path="${bld_on}%F{$POWERLEVEL9K_DIR_PATH_HIGHLIGHT_FOREGROUND}${base_name}${bld_off}"
-        else
-          current_path="${dir_name}/${bld_on}%F{$POWERLEVEL9K_DIR_PATH_HIGHLIGHT_FOREGROUND}${base_name}${bld_off}"
-        fi
+        current_path="${dir_name}${bld_on}%F{$POWERLEVEL9K_DIR_PATH_HIGHLIGHT_FOREGROUND}${base_name}${bld_off}"
       fi
     else # no coloring
-      if [[ $path_opt == "/" || $path_opt == "~" ]]; then
+      if [[ -z $base_name ]]; then
         current_path="${bld_on}${current_path}${bld_off}"
       else
-        if [[ $dir_name == '.' ]]; then
-          current_path="${bld_on}${base_name}${bld_off}"
-        else
-          current_path="${dir_name}/${bld_on}${base_name}${bld_off}"
-        fi
+        current_path="${dir_name}${bld_on}${base_name}${bld_off}"
       fi
     fi
-
     # check if the user wants the separator colored.
     if [[ -n ${POWERLEVEL9K_DIR_PATH_SEPARATOR_FOREGROUND} ]]; then
       local repl="%F{$POWERLEVEL9K_DIR_PATH_SEPARATOR_FOREGROUND}/%F{$dir_state_foreground}"
       current_path=${current_path//\//$repl}
     fi
-
     if [[ "${POWERLEVEL9K_DIR_PATH_SEPARATOR}" != "/" ]]; then
       current_path=${current_path//\//$POWERLEVEL9K_DIR_PATH_SEPARATOR}
     fi
