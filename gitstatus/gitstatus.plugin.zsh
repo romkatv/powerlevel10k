@@ -231,7 +231,7 @@ function gitstatus_start() {
     zsh -c "
       ${(q)daemon} --parent-pid=$$ --dirty-max-index-size=${(q)max_dirty} --num-threads=$threads
       echo -nE $'bye\x1f0\x1e'
-      rm -f ${(q)req_fifo} ${(q)resp_fifo}
+      command rm -f ${(q)req_fifo} ${(q)resp_fifo}
     " <&$req_fd >&$resp_fd 2>$log &!
 
     daemon_pid=$!
@@ -251,7 +251,7 @@ function gitstatus_start() {
       local req_fifo=${(P)req_fifo_var}
       local resp_fifo=${(P)resp_fifo_var}
       [[ $daemon_pid -ge 0 ]] && kill -- -$daemon_pid &>/dev/null
-      rm -f $req_fifo $resp_fifo
+      command rm -f $req_fifo $resp_fifo
     }
     add-zsh-hook zshexit _gitstatus_cleanup_${name}
   }
@@ -269,7 +269,7 @@ function gitstatus_start() {
     [[ $daemon_pid -ge 0 ]] && kill -- -$daemon_pid &>/dev/null || true
     [[ $req_fd -ge 0 ]] && exec {req_fd}>&- || true
     [[ $resp_fd -ge 0 ]] && { zle -F $resp_fd || true } && { exec {resp_fd}>&- || true}
-    rm -f $req_fifo $resp_fifo
+    command rm -f $req_fifo $resp_fifo
     return 1
   }
 }
