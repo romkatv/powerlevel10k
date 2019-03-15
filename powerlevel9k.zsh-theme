@@ -197,7 +197,7 @@ left_prompt_segment() {
     _p9k_cache_set "$output" "$background_color"
   fi
 
-  _P9K_PROMPT+="${_P9K_CACHE_VAL[1]}${5//\$/\\$}${POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS}"
+  _P9K_PROMPT+="${_P9K_CACHE_VAL[1]}\${(Q)\${:-${(q)5}}}${POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS}"
   _P9K_LAST_SEGMENT_INDEX=$2
   _P9K_CURRENT_BG=$_P9K_CACHE_VAL[2]
 }
