@@ -2114,7 +2114,7 @@ _p9k_init_timer() {
     _P9K_TIMER_FD2=0
     unset -f _p9k_on_timer
   fi
-  rm -f "$fifo1" "$fifo2"
+  command rm -f "$fifo1" "$fifo2"
 }
 
 _p9k_init() {
