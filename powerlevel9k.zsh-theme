@@ -2122,7 +2122,7 @@ _p9k_init() {
 
   _p9k_init_icons
 
-  typeset -lf _p9k_set_os() {
+  typeset -lf set_os() {
     OS=$1
     _p9k_get_icon $2
     OS_ICON=$_P9K_RETVAL
