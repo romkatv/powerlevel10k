@@ -197,7 +197,7 @@ left_prompt_segment() {
     _p9k_cache_set "$output" "$background_color"
   fi
 
-  _P9K_PROMPT+="${_P9K_CACHE_VAL[1]}${5}${POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS}"
+  _P9K_PROMPT+="${_P9K_CACHE_VAL[1]}${5//\$/\\$}${POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS}"
   _P9K_LAST_SEGMENT_INDEX=$2
   _P9K_CURRENT_BG=$_P9K_CACHE_VAL[2]
 }
@@ -272,7 +272,7 @@ right_prompt_segment() {
     _p9k_cache_set "$output" "$background_color" "$icon"
   fi
 
-  _P9K_PROMPT+="${_P9K_CACHE_VAL[1]}${5}${5:+ }${_P9K_CACHE_VAL[3]}"
+  _P9K_PROMPT+="${_P9K_CACHE_VAL[1]}${5//\$/\\$}${5:+ }${_P9K_CACHE_VAL[3]}"
   _P9K_CURRENT_BG=$_P9K_CACHE_VAL[2]
   _P9K_LAST_SEGMENT_INDEX=$2
 }
@@ -288,9 +288,10 @@ set_default POWERLEVEL9K_ANACONDA_RIGHT_DELIMITER ")"
 prompt_anaconda() {
   # Depending on the conda version, either might be set. This
   # variant works even if both are set.
-  local _path=$CONDA_ENV_PATH$CONDA_PREFIX
-  if ! [ -z "$_path" ]; then
-    "$1_prompt_segment" "$0" "$2" "blue" "$DEFAULT_COLOR" "$POWERLEVEL9K_ANACONDA_LEFT_DELIMITER$(basename $_path)$POWERLEVEL9K_ANACONDA_RIGHT_DELIMITER" 'PYTHON_ICON'
+  local path=$CONDA_ENV_PATH$CONDA_PREFIX
+  if [[ -n $path ]]; then
+    local prompt="$POWERLEVEL9K_ANACONDA_LEFT_DELIMITER${${path:t}//\%/%%}$POWERLEVEL9K_ANACONDA_RIGHT_DELIMITER"
+    "$1_prompt_segment" "$0" "$2" "blue" "$DEFAULT_COLOR" "$prompt" 'PYTHON_ICON'
   fi
 }
 
@@ -299,7 +300,7 @@ prompt_anaconda() {
 prompt_aws() {
   local aws_profile="${AWS_PROFILE:-$AWS_DEFAULT_PROFILE}"
   if [[ -n "$aws_profile" ]]; then
-    "$1_prompt_segment" "$0" "$2" red white "$aws_profile" 'AWS_ICON'
+    "$1_prompt_segment" "$0" "$2" red white "${aws_profile//\%/%%}" 'AWS_ICON'
   fi
 }
 
@@ -309,7 +310,7 @@ prompt_aws_eb_env() {
   # TODO(roman): This is clearly broken. Fix it.
   local eb_env=$(grep environment .elasticbeanstalk/config.yml 2> /dev/null | awk '{print $2}')
   if [[ -n "$eb_env" ]]; then
-    "$1_prompt_segment" "$0" "$2" black green "$eb_env" 'AWS_EB_ICON'
+    "$1_prompt_segment" "$0" "$2" black green "${eb_env//\%/%%}" 'AWS_EB_ICON'
   fi
 }
 
@@ -323,7 +324,7 @@ prompt_background_jobs() {
   local prompt
   if [[ $POWERLEVEL9K_BACKGROUND_JOBS_VERBOSE == true &&
         ($n -gt 1 || $POWERLEVEL9K_BACKGROUND_JOBS_VERBOSE_ALWAYS == true) ]]; then
-    prompt=$n
+    prompt='%j'
   fi
   "$1_prompt_segment" "$0" "$2" "$DEFAULT_COLOR" "cyan" "$prompt" 'BACKGROUND_JOBS_ICON'
 }
@@ -596,17 +597,21 @@ set_default POWERLEVEL9K_ALWAYS_SHOW_CONTEXT false
 set_default POWERLEVEL9K_ALWAYS_SHOW_USER false
 set_default POWERLEVEL9K_CONTEXT_TEMPLATE "%n@%m"
 prompt_context() {
-  local current_state="DEFAULT"
-  local content=""
-
-  if [[ "$POWERLEVEL9K_ALWAYS_SHOW_CONTEXT" == true || "$(whoami)" != "$DEFAULT_USER" || -n "$SSH_CLIENT" || -n "$SSH_TTY" ]]; then
-      content="${POWERLEVEL9K_CONTEXT_TEMPLATE}"
-  elif [[ "$POWERLEVEL9K_ALWAYS_SHOW_USER" == true ]]; then
-      content="$(whoami)"
+  local content
+  if [[ $POWERLEVEL9K_ALWAYS_SHOW_CONTEXT == true ]]; then
+    content=$POWERLEVEL9K_CONTEXT_TEMPLATE
   else
+    local user=$(whoami)
+    if [[ $user != $DEFAULT_USER || -n $SSH_CLIENT || -n $SSH_TTY ]]; then
+      content="${POWERLEVEL9K_CONTEXT_TEMPLATE}"
+    elif [[ $POWERLEVEL9K_ALWAYS_SHOW_USER == true ]]; then
+      content="${user//\%/%%}"
+    else
       return
+    fi
   fi
 
+  local current_state="DEFAULT"
   if [[ "${(%):-%#}" == '#' ]]; then
     current_state="ROOT"
   elif [[ -n "$SSH_CLIENT" || -n "$SSH_TTY" ]]; then
@@ -627,13 +632,14 @@ prompt_context() {
 # Note that if $DEFAULT_USER is not set, this prompt segment will always print
 set_default POWERLEVEL9K_USER_TEMPLATE "%n"
 prompt_user() {
-  [[ "$POWERLEVEL9K_ALWAYS_SHOW_USER" != true && "$(whoami)" == "$DEFAULT_USER" ]] && return
+  local user=$(whoami)
+  [[ $POWERLEVEL9K_ALWAYS_SHOW_USER != true && $user == $DEFAULT_USER ]] && return
   if [[ "${(%):-%#}" == '#' ]]; then
     "$1_prompt_segment" "${0}_ROOT" "$2" "${DEFAULT_COLOR}" yellow "${POWERLEVEL9K_USER_TEMPLATE}" ROOT_ICON
   elif [[ -n "$SUDO_COMMAND" ]]; then
     "$1_prompt_segment" "${0}_SUDO" "$2" "${DEFAULT_COLOR}" yellow "${POWERLEVEL9K_USER_TEMPLATE}" SUDO_ICON
   else
-    "$1_prompt_segment" "${0}_DEFAULT" "$2" "${DEFAULT_COLOR}" yellow "$(whoami)" USER_ICON
+    "$1_prompt_segment" "${0}_DEFAULT" "$2" "${DEFAULT_COLOR}" yellow "${user//\%/%%}" USER_ICON
   fi
 }
 
@@ -733,13 +739,11 @@ set_default POWERLEVEL9K_HOME_FOLDER_ABBREVIATION "~"
 set_default POWERLEVEL9K_DIR_PATH_HIGHLIGHT_BOLD false
 set_default POWERLEVEL9K_DIR_PATH_ABSOLUTE false
 set_default POWERLEVEL9K_DIR_SHOW_WRITABLE false
-set_default POWERLEVEL9K_DIR_SHOW_WRITABLE false
 set_default POWERLEVEL9K_DIR_OMIT_FIRST_CHARACTER false
 set_default POWERLEVEL9K_SHORTEN_STRATEGY ""
 set_default POWERLEVEL9K_DIR_PATH_SEPARATOR_FOREGROUND ""
 set_default POWERLEVEL9K_SHORTEN_DELIMITER $'\u2026'
 set_default POWERLEVEL9K_SHORTEN_FOLDER_MARKER ".shorten_folder_marker"
-set_default POWERLEVEL9K_DIR_PATH_HIGHLIGHT_BOLD ""
 set_default -i POWERLEVEL9K_SHORTEN_DIR_LENGTH -1
 set_default -a POWERLEVEL9K_DIR_PACKAGE_FILES package.json composer.json
 prompt_dir() {
@@ -849,11 +853,11 @@ prompt_dir() {
             # Remove trailing slash from git path, so that we can
             # remove that git path from the pwd.
             gitPath=${gitPath%/}
-            package_path=${$(pwd)%%$gitPath}
+            package_path=${$PWD%%$gitPath}
             # Remove trailing slash
             package_path=${package_path%/}
           elif [[ $(git rev-parse --is-inside-git-dir 2> /dev/null) == "true" ]]; then
-            package_path=${$(pwd)%%/.git*}
+            package_path=${$PWD%%/.git*}
           fi
 
          [[ ${(L)POWERLEVEL9K_DIR_PATH_ABSOLUTE} != "true" ]] && package_path=${package_path/$HOME/"~"}
@@ -864,7 +868,7 @@ prompt_dir() {
           # in the path (this is done by the "zero" pattern; see
           # http://stackoverflow.com/a/40855342/5586433).
           local zero='%([BSUbfksu]|([FB]|){*})'
-          trunc_path=$(pwd)
+          trunc_path=$PWD
           # Then, find the length of the package_path string, and save the
           # subdirectory path as a substring of the current directory's path from 0
           # to the length of the package path's string
@@ -899,23 +903,43 @@ prompt_dir() {
       esac
     fi
 
-    # save state of path for highlighting and bold options
+    current_path=${current_path//\%/%%}
+
     local path_opt=$current_path
-    local state_path="${(%):-%~}"
-    local current_state="DEFAULT"
-    local icon="FOLDER_ICON"
-    if [[ $state_path == '/etc'* ]]; then
-      current_state='ETC'
-      icon='ETC_ICON'
-    elif (( ! writable )); then
-      current_state="NOT_WRITABLE"
-      icon='LOCK_ICON'
-    elif [[ $state_path == '~' ]]; then
-      current_state="HOME"
-      icon='HOME_ICON'
-    elif [[ $state_path == '~'* ]]; then
-      current_state="HOME_SUBFOLDER"
-      icon='HOME_SUB_ICON'
+    local current_state icon
+    if (( ! writable )); then
+      current_state=NOT_WRITABLE
+      icon=LOCK_ICON
+    else
+      case $PWD in
+        /etc*)
+          current_state=ETC
+          icon=ETC_ICON
+          ;;
+        ~)
+          current_state=HOME
+          icon=HOME_ICON
+          ;;
+        ~/*)
+          current_state=HOME_SUBFOLDER
+          icon=HOME_SUB_ICON
+          ;;
+        *)
+          current_state=DEFAULT
+          icon=FOLDER_ICON
+          ;;
+      esac
+    fi
+
+    # This is some weird shit. ~/foo becomes /foo, while /~foo becomes ~foo. Who could want that?
+    if [[ $POWERLEVEL9K_DIR_OMIT_FIRST_CHARACTER == true && ( $path_opt == /?* || $path_opt == '~'?* ) ]]; then
+      current_path=${current_path[2,-1]}
+    fi
+
+    if [[ $POWERLEVEL9K_HOME_FOLDER_ABBREVIATION != '~' &&
+          $POWERLEVEL9K_DIR_OMIT_FIRST_CHARACTER != true &&
+          $path_opt == '~'?* ]]; then
+      current_path=${POWERLEVEL9K_HOME_FOLDER_ABBREVIATION}${current_path[2,-1]}
     fi
 
     # declare variables used for bold and state colors
@@ -930,61 +954,42 @@ prompt_dir() {
     fi
     # determine is the user has set a last directory color
     local dir_state_user_foreground=POWERLEVEL9K_DIR_${current_state}_FOREGROUND
-    local dir_state_foreground=${(P)dir_state_user_foreground}
-    [[ -z ${dir_state_foreground} ]] && dir_state_foreground="${DEFAULT_COLOR}"
+    local dir_state_foreground=${${(P)dir_state_user_foreground}:-$DEFAULT_COLOR}
 
-    local dir_name base_name
-    # use ZSH substitution to get the dirname and basename instead of calling external functions
-    dir_name=${path_opt%/*}
-    base_name=${path_opt##*/}
+    local dir_name=${current_path:h}
+    local base_name=${current_path:t}
 
     # if the user wants the last directory colored...
     if [[ -n ${POWERLEVEL9K_DIR_PATH_HIGHLIGHT_FOREGROUND} ]]; then
-      # it the path is "/" or "~"
       if [[ $path_opt == "/" || $path_opt == "~" ]]; then
         current_path="${bld_on}%F{$POWERLEVEL9K_DIR_PATH_HIGHLIGHT_FOREGROUND}${current_path}${bld_off}"
-      else # has a subfolder
-        # test if dirname != basename - they are equal if we use truncate_to_last or truncate_absolute
-        if [[ $dir_name != $base_name ]]; then
-          current_path="${dir_name}/${bld_on}%F{$POWERLEVEL9K_DIR_PATH_HIGHLIGHT_FOREGROUND}${base_name}${bld_off}"
-        else
+      else
+        if [[ $dir_name == '.' ]]; then
           current_path="${bld_on}%F{$POWERLEVEL9K_DIR_PATH_HIGHLIGHT_FOREGROUND}${base_name}${bld_off}"
+        else
+          current_path="${dir_name}/${bld_on}%F{$POWERLEVEL9K_DIR_PATH_HIGHLIGHT_FOREGROUND}${base_name}${bld_off}"
         fi
       fi
     else # no coloring
-      # it the path is "/" or "~"
       if [[ $path_opt == "/" || $path_opt == "~" ]]; then
         current_path="${bld_on}${current_path}${bld_off}"
-      else # has a subfolder
-        # test if dirname != basename - they are equal if we use truncate_to_last or truncate_absolute
-        if [[ $dir_name != $base_name ]]; then
-          current_path="${dir_name}/${bld_on}${base_name}${bld_off}"
-        else
+      else
+        if [[ $dir_name == '.' ]]; then
           current_path="${bld_on}${base_name}${bld_off}"
+        else
+          current_path="${dir_name}/${bld_on}${base_name}${bld_off}"
         fi
       fi
     fi
 
-    # check if we need to omit the first character and only do it if we are not in "~" or "/"
-    if [[ "${POWERLEVEL9K_DIR_OMIT_FIRST_CHARACTER}" == "true" && $path_opt != "/" && $path_opt != "~" ]]; then
-      current_path="${current_path[2,-1]}"
-    fi
-
     # check if the user wants the separator colored.
-    if [[ -n ${POWERLEVEL9K_DIR_PATH_SEPARATOR_FOREGROUND} && $path_opt != "/" ]]; then
-      # because this contains color changing codes, it is easier to set a variable for what should be replaced
+    if [[ -n ${POWERLEVEL9K_DIR_PATH_SEPARATOR_FOREGROUND} ]]; then
       local repl="%F{$POWERLEVEL9K_DIR_PATH_SEPARATOR_FOREGROUND}/%F{$dir_state_foreground}"
-      # escape the / with a \
       current_path=${current_path//\//$repl}
     fi
 
-    if [[ "${POWERLEVEL9K_DIR_PATH_SEPARATOR}" != "/" && $path_opt != "/" ]]; then
+    if [[ "${POWERLEVEL9K_DIR_PATH_SEPARATOR}" != "/" ]]; then
       current_path=${current_path//\//$POWERLEVEL9K_DIR_PATH_SEPARATOR}
-    fi
-
-    if [[ "${POWERLEVEL9K_HOME_FOLDER_ABBREVIATION}" != "~" && ! "${(L)POWERLEVEL9K_DIR_OMIT_FIRST_CHARACTER}" == "true" ]]; then
-      # use :s to only replace the first occurance
-      current_path=${current_path:s/~/$POWERLEVEL9K_HOME_FOLDER_ABBREVIATION}
     fi
 
     _p9k_cache_set "$current_state" "$current_path" "$icon"
@@ -997,7 +1002,7 @@ prompt_dir() {
 # Docker machine
 prompt_docker_machine() {
   if [[ -n "$DOCKER_MACHINE_NAME" ]]; then
-    "$1_prompt_segment" "$0" "$2" "magenta" "$DEFAULT_COLOR" "$DOCKER_MACHINE_NAME" 'SERVER_ICON'
+    "$1_prompt_segment" "$0" "$2" "magenta" "$DEFAULT_COLOR" "${DOCKER_MACHINE_NAME//\%/%%}" 'SERVER_ICON'
   fi
 }
 
@@ -1007,7 +1012,7 @@ prompt_go_version() {
   local go_version=$(go version 2>/dev/null | sed -E "s/.*(go[0-9.]*).*/\1/")
   local go_path=$(go env GOPATH 2>/dev/null)
   if [[ -n "$go_version" && "${PWD##$go_path}" != "$PWD" ]]; then
-    "$1_prompt_segment" "$0" "$2" "green" "grey93" "$go_version" "GO_ICON"
+    "$1_prompt_segment" "$0" "$2" "green" "grey93" "${go_version//\%/%%}" "GO_ICON"
   fi
 }
 
@@ -1028,7 +1033,7 @@ prompt_detect_virt() {
   fi
 
   if [[ -n "${virt}" ]]; then
-    "$1_prompt_segment" "$0" "$2" "$DEFAULT_COLOR" "yellow" "$virt"
+    "$1_prompt_segment" "$0" "$2" "$DEFAULT_COLOR" "yellow" "${virt//\%/%%}"
   fi
 }
 
@@ -1052,7 +1057,7 @@ prompt_ip() {
   local ip=$(p9k::parseIp "${POWERLEVEL9K_IP_INTERFACE}" "${ROOT_PREFIX}")
 
   if [[ -n "$ip" ]]; then
-    "$1_prompt_segment" "$0" "$2" "cyan" "$DEFAULT_COLOR" "$ip" 'NETWORK_ICON'
+    "$1_prompt_segment" "$0" "$2" "cyan" "$DEFAULT_COLOR" "${ip//\%/%%}" 'NETWORK_ICON'
   fi
 }
 
@@ -1065,7 +1070,7 @@ prompt_vpn_ip() {
   local ip=$(p9k::parseIp "${POWERLEVEL9K_VPN_IP_INTERFACE}" "${ROOT_PREFIX}")
 
   if [[ -n "${ip}" ]]; then
-    "$1_prompt_segment" "$0" "$2" "cyan" "$DEFAULT_COLOR" "$ip" 'VPN_ICON'
+    "$1_prompt_segment" "$0" "$2" "cyan" "$DEFAULT_COLOR" "${ip//\%/%%}" 'VPN_ICON'
   fi
 }
 
@@ -1076,7 +1081,7 @@ prompt_laravel_version() {
   if [[ -n "${laravel_version}" && "${laravel_version}" =~ "Laravel Framework" ]]; then
     # Strip out everything but the version
     laravel_version="${laravel_version//Laravel Framework /}"
-    "$1_prompt_segment" "$0" "$2" "maroon" "white" "${laravel_version}" 'LARAVEL_ICON'
+    "$1_prompt_segment" "$0" "$2" "maroon" "white" "${laravel_version//\%/%%}" 'LARAVEL_ICON'
   fi
 }
 
@@ -1144,7 +1149,7 @@ prompt_node_version() {
   local node_version=$(node -v 2>/dev/null)
   [[ -z "${node_version}" ]] && return
 
-  "$1_prompt_segment" "$0" "$2" "green" "white" "${node_version:1}" 'NODE_ICON'
+  "$1_prompt_segment" "$0" "$2" "green" "white" "${${node_version:1}//\%/%%}" 'NODE_ICON'
 }
 
 ################################################################
@@ -1160,7 +1165,7 @@ prompt_nvm() {
   nvm_default=$(nvm_version default)
   [[ "$node_version" =~ "$nvm_default" ]] && return
 
-  $1_prompt_segment "$0" "$2" "magenta" "black" "${node_version:1}" 'NODE_ICON'
+  $1_prompt_segment "$0" "$2" "magenta" "black" "${${node_version:1}//\%/%%}" 'NODE_ICON'
 }
 
 ################################################################
@@ -1168,7 +1173,7 @@ prompt_nvm() {
 prompt_nodeenv() {
   if [[ -n "$NODE_VIRTUAL_ENV" ]]; then
     local info="$(node -v)[${NODE_VIRTUAL_ENV:t}]"
-    "$1_prompt_segment" "$0" "$2" "black" "green" "$info" 'NODE_ICON'
+    "$1_prompt_segment" "$0" "$2" "black" "green" "${info//\%/%%}" 'NODE_ICON'
   fi
 }
 
@@ -1185,7 +1190,7 @@ prompt_php_version() {
   php_version=$(php -v 2>&1 | grep -oe "^PHP\s*[0-9.]*")
 
   if [[ -n "$php_version" ]]; then
-    "$1_prompt_segment" "$0" "$2" "fuchsia" "grey93" "$php_version"
+    "$1_prompt_segment" "$0" "$2" "fuchsia" "grey93" "${php_version//\%/%%}"
   fi
 }
 
@@ -1225,7 +1230,7 @@ prompt_rbenv() {
     local rbenv_version_name="$(rbenv version-name)"
     local rbenv_global="$(rbenv global)"
     if [[ "${rbenv_version_name}" != "${rbenv_global}" || "${POWERLEVEL9K_RBENV_PROMPT_ALWAYS_SHOW}" == "true" ]]; then
-      "$1_prompt_segment" "$0" "$2" "red" "$DEFAULT_COLOR" "$rbenv_version_name" 'RUBY_ICON'
+      "$1_prompt_segment" "$0" "$2" "red" "$DEFAULT_COLOR" "${rbenv_version_name//\%/%%}" 'RUBY_ICON'
     fi
   fi
 }
@@ -1251,7 +1256,7 @@ prompt_chruby() {
 
   # Don't show anything if the chruby did not change the default ruby
   if [[ "$RUBY_ENGINE" != "" ]]; then
-    "$1_prompt_segment" "$0" "$2" "red" "$DEFAULT_COLOR" "${chruby_label}" 'RUBY_ICON'
+    "$1_prompt_segment" "$0" "$2" "red" "$DEFAULT_COLOR" "${chruby_label//\%/%%}" 'RUBY_ICON'
   fi
 }
 
@@ -1274,13 +1279,13 @@ prompt_rust_version() {
   rust_version=${${rust_version/rustc /}%% *}
 
   if [[ -n "$rust_version" ]]; then
-    "$1_prompt_segment" "$0" "$2" "darkorange" "$DEFAULT_COLOR" "$rust_version" 'RUST_ICON'
+    "$1_prompt_segment" "$0" "$2" "darkorange" "$DEFAULT_COLOR" "${rust_version//\%/%%}" 'RUST_ICON'
   fi
 }
 
 # RSpec test ratio
 prompt_rspec_stats() {
-  if [[ (-d app && -d spec) ]]; then
+  if [[ -d app && -d spec ]]; then
     local code_amount tests_amount
     code_amount=$(ls -1 app/**/*.rb | wc -l)
     tests_amount=$(ls -1 spec/**/*.rb | wc -l)
@@ -1296,7 +1301,7 @@ prompt_rvm() {
     local version_and_gemset=${$(rvm-prompt v p)/ruby-}
 
     if [[ -n "$version_and_gemset" ]]; then
-      "$1_prompt_segment" "$0" "$2" "240" "$DEFAULT_COLOR" "$version_and_gemset" 'RUBY_ICON'
+      "$1_prompt_segment" "$0" "$2" "240" "$DEFAULT_COLOR" "${version_and_gemset//\%/%%}" 'RUBY_ICON'
     fi
   fi
 }
@@ -1425,7 +1430,7 @@ prompt_symfony2_version() {
   if [[ -f app/bootstrap.php.cache ]]; then
     local symfony2_version
     symfony2_version=$(grep " VERSION " app/bootstrap.php.cache | sed -e 's/[^.0-9]*//g')
-    "$1_prompt_segment" "$0" "$2" "grey35" "$DEFAULT_COLOR" "$symfony2_version" 'SYMFONY_ICON'
+    "$1_prompt_segment" "$0" "$2" "grey35" "$DEFAULT_COLOR" "${symfony2_version//\%/%%}" 'SYMFONY_ICON'
   fi
 }
 
@@ -1452,17 +1457,6 @@ set_default POWERLEVEL9K_EXPERIMENTAL_TIME_REALTIME false
 set_default POWERLEVEL9K_TIME_FORMAT "%D{%H:%M:%S}"
 prompt_time() {
   "$1_prompt_segment" "$0" "$2" "$DEFAULT_COLOR_INVERTED" "$DEFAULT_COLOR" "$POWERLEVEL9K_TIME_FORMAT" "TIME_ICON"
-  # For the reference, here's how the code should ideally look like. However, it's 2ms slower
-  # for a tiny gain in usability. The difference is that the current code will cause time
-  # to update when vcs segment goes from grey to green/yellow, but the commented-out code
-  # won't (unless POWERLEVEL9K_EXPERIMENTAL_TIME_REALTIME is true).
-  #if [[ $POWERLEVEL9K_EXPERIMENTAL_TIME_REALTIME == true ]]; then
-  #  local _P9K_TIME=$POWERLEVEL9K_TIME_FORMAT
-  #else
-  #  [[ -v _P9K_REFRESH_PROMPT ]] || typeset -gH _P9K_TIME=$(print -P $POWERLEVEL9K_TIME_FORMAT)
-  #  typeset -gH _P9K_TIME=$POWERLEVEL9K_TIME_FORMAT
-  #fi
-  #"$1_prompt_segment" "$0" "$2" "$DEFAULT_COLOR_INVERTED" "$DEFAULT_COLOR" "$_P9K_TIME" "TIME_ICON"
 }
 
 ################################################################
@@ -1470,9 +1464,6 @@ prompt_time() {
 set_default POWERLEVEL9K_DATE_FORMAT "%D{%d.%m.%y}"
 prompt_date() {
   "$1_prompt_segment" "$0" "$2" "$DEFAULT_COLOR_INVERTED" "$DEFAULT_COLOR" "$POWERLEVEL9K_DATE_FORMAT" "DATE_ICON"
-  # See comments in prompt_time.
-  # [[ -v _P9K_REFRESH_PROMPT ]] || typeset -gH _P9K_DATE=$(print -P $POWERLEVEL9K_DATE_FORMAT)
-  # "$1_prompt_segment" "$0" "$2" "$DEFAULT_COLOR_INVERTED" "$DEFAULT_COLOR" "$_P9K_DATE" "DATE_ICON"
 }
 
 ################################################################
@@ -1481,7 +1472,7 @@ prompt_todo() {
   if $(hash todo.sh 2>&-); then
     count=$(todo.sh ls | egrep "TODO: [0-9]+ of ([0-9]+) tasks shown" | awk '{ print $4 }')
     if [[ "$count" = <-> ]]; then
-      "$1_prompt_segment" "$0" "$2" "grey50" "$DEFAULT_COLOR" "$count" 'TODO_ICON'
+      "$1_prompt_segment" "$0" "$2" "grey50" "$DEFAULT_COLOR" "${count//\%/%%}" 'TODO_ICON'
     fi
   fi
 }
@@ -1634,21 +1625,21 @@ typeset -fH _p9k_vcs_render() {
 
     if [[ -n $VCS_STATUS_LOCAL_BRANCH ]]; then
       _p9k_get_icon VCS_BRANCH_ICON
-      vcs_prompt+="$_P9K_RETVAL$VCS_STATUS_LOCAL_BRANCH "
+      vcs_prompt+="$_P9K_RETVAL${VCS_STATUS_LOCAL_BRANCH//\%/%%} "
     fi
 
     if [[ $POWERLEVEL9K_VCS_HIDE_TAGS == false && -n $VCS_STATUS_TAG ]]; then
       _p9k_get_icon VCS_TAG_ICON
-      vcs_prompt+="$_P9K_RETVAL$VCS_STATUS_TAG "
+      vcs_prompt+="$_P9K_RETVAL${VCS_STATUS_TAG//\%/%%} "
     fi
 
     if [[ -n $VCS_STATUS_ACTION ]]; then
-      vcs_prompt+="%F{${POWERLEVEL9K_VCS_ACTIONFORMAT_FOREGROUND}}| $VCS_STATUS_ACTION%f"
+      vcs_prompt+="%F{${POWERLEVEL9K_VCS_ACTIONFORMAT_FOREGROUND}}| ${VCS_STATUS_ACTION//\%/%%}%f"
     else
       if [[ -n $VCS_STATUS_REMOTE_BRANCH &&
             $VCS_STATUS_LOCAL_BRANCH != $VCS_STATUS_REMOTE_BRANCH ]]; then
         _p9k_get_icon VCS_REMOTE_BRANCH_ICON
-        vcs_prompt+="$_P9K_RETVAL$VCS_STATUS_REMOTE_BRANCH "
+        vcs_prompt+="$_P9K_RETVAL${VCS_STATUS_REMOTE_BRANCH//\%/%%} "
       fi
       if [[ $VCS_STATUS_HAS_STAGED == 1 ]]; then
         _p9k_get_icon VCS_STAGED_ICON
@@ -1811,7 +1802,7 @@ prompt_vi_mode() {
 # https://virtualenv.pypa.io/en/latest/
 prompt_virtualenv() {
   if [[ -n "$VIRTUAL_ENV" ]]; then
-    "$1_prompt_segment" "$0" "$2" "blue" "$DEFAULT_COLOR" "${VIRTUAL_ENV:t}" 'PYTHON_ICON'
+    "$1_prompt_segment" "$0" "$2" "blue" "$DEFAULT_COLOR" "${${VIRTUAL_ENV:t}//\%/%%}" 'PYTHON_ICON'
   fi
 }
 
@@ -1821,7 +1812,7 @@ prompt_virtualenv() {
 set_default POWERLEVEL9K_PYENV_PROMPT_ALWAYS_SHOW false
 prompt_pyenv() {
   if [[ -n "$PYENV_VERSION" ]]; then
-    "$1_prompt_segment" "$0" "$2" "blue" "$DEFAULT_COLOR" "$PYENV_VERSION" 'PYTHON_ICON'
+    "$1_prompt_segment" "$0" "$2" "blue" "$DEFAULT_COLOR" "${PYENV_VERSION//\%/%%}" 'PYTHON_ICON'
   elif [ $commands[pyenv] ]; then
     local pyenv_version_name="$(pyenv version-name)"
     local pyenv_global="system"
@@ -1830,7 +1821,7 @@ prompt_pyenv() {
       pyenv_global="$(pyenv version-file-read ${pyenv_root}/version)"
     fi
     if [[ "${pyenv_version_name}" != "${pyenv_global}" || "${POWERLEVEL9K_PYENV_PROMPT_ALWAYS_SHOW}" == "true" ]]; then
-      "$1_prompt_segment" "$0" "$2" "blue" "$DEFAULT_COLOR" "$pyenv_version_name" 'PYTHON_ICON'
+      "$1_prompt_segment" "$0" "$2" "blue" "$DEFAULT_COLOR" "${pyenv_version_name//\%/%%}" 'PYTHON_ICON'
     fi
   fi
 }
@@ -1840,10 +1831,10 @@ prompt_pyenv() {
 prompt_openfoam() {
   local wm_project_version="$WM_PROJECT_VERSION"
   local wm_fork="$WM_FORK"
-  if [[ -n "$wm_project_version" ]] &&  [[ -z "$wm_fork" ]] ; then
-    "$1_prompt_segment" "$0" "$2" "yellow" "$DEFAULT_COLOR" "OF: $(basename "$wm_project_version")"
-  elif [[ -n "$wm_project_version" ]] && [[ -n "$wm_fork" ]] ; then
-    "$1_prompt_segment" "$0" "$2" "yellow" "$DEFAULT_COLOR" "F-X: $(basename "$wm_project_version")"
+  if [[ -n "$wm_project_version" && -z "$wm_fork" ]] ; then
+    "$1_prompt_segment" "$0" "$2" "yellow" "$DEFAULT_COLOR" "OF: ${${wm_project_version:t}//\%/%%}"
+  elif [[ -n "$wm_project_version" && -n "$wm_fork" ]] ; then
+    "$1_prompt_segment" "$0" "$2" "yellow" "$DEFAULT_COLOR" "F-X: ${${wm_project_version:t}//\%/%%}"
   fi
 }
 
@@ -1854,7 +1845,7 @@ prompt_swift_version() {
   local swift_version=$(swift --version 2>/dev/null | grep -o -E "[0-9.]+" | head -n 1)
   [[ -z "${swift_version}" ]] && return
 
-  "$1_prompt_segment" "$0" "$2" "magenta" "white" "${swift_version}" 'SWIFT_ICON'
+  "$1_prompt_segment" "$0" "$2" "magenta" "white" "${swift_version//\%/%%}" 'SWIFT_ICON'
 }
 
 ################################################################
@@ -1888,7 +1879,7 @@ prompt_kubecontext() {
       k8s_final_text="$cur_ctx/$cur_namespace"
     fi
 
-    "$1_prompt_segment" "$0" "$2" "magenta" "white" "$k8s_final_text" "KUBERNETES_ICON"
+    "$1_prompt_segment" "$0" "$2" "magenta" "white" "${k8s_final_text//\%/%%}" "KUBERNETES_ICON"
   fi
 }
 
@@ -1905,7 +1896,7 @@ prompt_dropbox() {
       dropbox_status=""
     fi
 
-    "$1_prompt_segment" "$0" "$2" "white" "blue" "$dropbox_status" "DROPBOX_ICON"
+    "$1_prompt_segment" "$0" "$2" "white" "blue" "${dropbox_status//\%/%%}" "DROPBOX_ICON"
   fi
 }
 
@@ -1920,7 +1911,7 @@ prompt_java_version() {
   java_version=$(java -version 2>/dev/null && java -fullversion 2>&1 | cut -d '"' -f 2)
 
   if [[ -n "$java_version" ]]; then
-    "$1_prompt_segment" "$0" "$2" "red" "white" "$java_version" "JAVA_ICON"
+    "$1_prompt_segment" "$0" "$2" "red" "white" "${java_version//\%/%%}" "JAVA_ICON"
   fi
 }
 
