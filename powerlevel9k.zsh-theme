@@ -25,6 +25,8 @@
 [[ -v _P9K_SOURCED ]] && return
 readonly _P9K_SOURCED=1
 
+# TODO: Expand all configurable strings with (g::) during initialization.
+
 typeset -g _P9K_INSTALLATION_DIR
 
 # Try to set the installation path
@@ -103,12 +105,6 @@ _p9k_get_icon() {
 typeset -ga _P9K_LEFT_JOIN=(1)
 typeset -ga _P9K_RIGHT_JOIN=(1)
 
-typeset -g _P9K_CURRENT_BG
-typeset -gi _P9K_LAST_SEGMENT_INDEX
-
-_p9k_should_join_left() [[ $_P9K_LAST_SEGMENT_INDEX -ge ${_P9K_LEFT_JOIN[$1]:-$1} ]]
-_p9k_should_join_right() [[ $_P9K_LAST_SEGMENT_INDEX -ge ${_P9K_RIGHT_JOIN[$1]:-$1} ]]
-
 # Resolves a color to its numerical value, or an empty string. Communicates the result back
 # by setting _P9K_RETVAL.
 _p9k_color() {
@@ -131,8 +127,12 @@ _p9k_foreground() {
   [[ -n $1 ]] && _P9K_RETVAL="%F{$1}" || _P9K_RETVAL="%f"
 }
 
-# Begin a left prompt segment
-# Takes four arguments:
+_p9k_escape_rcurly() {
+  _P9K_RETVAL=${${1//\\/\\\\}//\}/\\\}}
+}
+
+# Begin a left prompt segment.
+#
 #   * $1: Name of the function that was originally invoked (mandatory).
 #         Necessary, to make the dynamic color-overwrite mechanism work.
 #   * $2: The array index of the current segment
@@ -140,83 +140,109 @@ _p9k_foreground() {
 #   * $4: Foreground color
 #   * $5: The segment content
 #   * $6: An identifying icon (must be a key of the icons array)
-# The latter three can be omitted,
+#   * $7: 1 to to perform parameter expansion and process substitution.
+#   * $8: If not empty but becomes empty after prompt parameter expansion and process substitution,
+#         the segment isn't rendered.
+#
+# The latter four can be omitted.
 set_default POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS " "
 left_prompt_segment() {
-  _p9k_should_join_left $2
-  local -i separate=$?
-  if ! _p9k_cache_get "$0" "$1" "$3" "$4" "${5:+1}" "$6" "$_P9K_CURRENT_BG" "$separate"; then
+  if ! _p9k_cache_get "$0" "$1" "$2" "$3" "$4" "$6"; then
     _p9k_color $3 $1 BACKGROUND
     local background_color=$_P9K_RETVAL
+    _p9k_background $background_color
+    _p9k_escape_rcurly $_P9K_RETVAL
+    local pre=$_P9K_RETVAL
 
     _p9k_color $4 $1 FOREGROUND
     local foreground_color=$_P9K_RETVAL
     _p9k_foreground $foreground_color
     local foreground=$_P9K_RETVAL
 
-    _p9k_background $background_color
-    local output=$_P9K_RETVAL
+    _p9k_foreground $DEFAULT_COLOR
+    local default_foreground=$_P9K_RETVAL
 
-    if [[ $_P9K_CURRENT_BG == NONE ]]; then
-      # The first segment on the line.
-      output+=$POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS
-    elif (( separate )); then
-      if [[ $background_color == $_P9K_CURRENT_BG ]]; then
-        # Middle segment with same color as previous segment
-        # We take the current foreground color as color for our
-        # subsegment (or the default color). This should have
-        # enough contrast.
-        if [[ $foreground == "%f" ]]; then
-          _p9k_foreground $DEFAULT_COLOR
-          output+=$_P9K_RETVAL
-        else
-          output+=$foreground
-        fi
-        _p9k_get_icon LEFT_SUBSEGMENT_SEPARATOR
-        output+="${_P9K_RETVAL}${POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS}"
-      else
-        output+="%F{$_P9K_CURRENT_BG}"
-        _p9k_get_icon LEFT_SEGMENT_SEPARATOR
-        output+="${_P9K_RETVAL}${POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS}"
-      fi
+    _p9k_get_icon LEFT_SUBSEGMENT_SEPARATOR
+    local subsep=$_P9K_RETVAL
+
+    _p9k_get_icon LEFT_SEGMENT_SEPARATOR
+    local sep=$_P9K_RETVAL
+
+    _p9k_escape_rcurly $POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS
+    local space=$_P9K_RETVAL
+
+    if [[ $foreground == "%f" ]]; then
+      _p9k_escape_rcurly $default_foreground$subsep$POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS
+      local divider=$_P9K_RETVAL
+    else
+      _p9k_escape_rcurly $foreground$subsep$POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS
+      local divider=$_P9K_RETVAL
     fi
+
+    _p9k_escape_rcurly "%F{\$_P9K_BG}${sep}${POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS}"
+    local separator=$_P9K_RETVAL
+
+    local post
+    local has_icon=0
     if [[ -n $6 ]]; then
       _p9k_get_icon $6
       if [[ -n $_P9K_RETVAL ]]; then
         local icon=$_P9K_RETVAL
         _p9k_color $foreground_color $1 VISUAL_IDENTIFIER_COLOR
         _p9k_foreground $_P9K_RETVAL
-        
-        # Add an whitespace if we print more than just the visual identifier.
-        # To avoid cutting off the visual identifier in some terminal emulators (e.g., Konsole, st),
-        # we need to color both the visual identifier and the whitespace.
-        output+="${_P9K_RETVAL}${icon}${5:+ }"
+        _p9k_escape_rcurly "${_P9K_RETVAL}${icon}"
+        post=$_P9K_RETVAL
+        has_icon=1
       fi
     fi
-    output+=$foreground
-    _p9k_cache_set "$output" "$background_color"
+    _p9k_escape_rcurly $foreground
+    post+=$_P9K_RETVAL
+
+    local icon_sep
+    (( has_icon )) && icon_sep="\${_P9K_C:+ }"
+
+    local output
+    output+="\${_P9K_N::=}"
+    output+="\${\${_P9K_E:-\${_P9K_N:=9}}+}"
+    output+="\${\${\${\${_P9K_BG:-0}:#NONE}:-\${_P9K_N:=1}}+}"
+    output+="\${\${\${\$((_P9K_I>0&&_P9K_I>=$_P9K_LEFT_JOIN[$2])):#1}:-\${_P9K_N:=2}}+}"
+    output+="\${\${\${\${:-0\$_P9K_BG}:#0$background_color}:-\${_P9K_N:=3}}+}"
+    output+="\${\${_P9K_N:=4}+}"
+    output+="\${\${_P9K_V[1]::=$pre$space$post}+}"
+    output+="\${\${_P9K_V[2]::=$pre$post}+}"
+    output+="\${\${_P9K_V[3]::=$pre$divider$post}+}"
+    output+="\${\${_P9K_V[4]::=$pre$separator$post}+}"
+    output+="\${_P9K_V[\$_P9K_N]}"
+    output+="\${_P9K_E:+$icon_sep\${_P9K_C}$space\${\${_P9K_I::=$2}+}\${\${_P9K_BG::=$background_color}+}}"
+
+    _p9k_cache_set "$output"
+
+    # Segment separator logic:
+    #
+    #   if [[ $_P9K_BG == NONE ]]; then
+    #     output+=$POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS  // _P9K_N=1
+    #   elif (( joined )); then
+    #     output+=""                                              // _P9K_N=2
+    #   elif [[ $background_color == $_P9K_BG ]]; then
+    #     output+=$divider                                        // _P9K_N=3
+    #   else
+    #     output+=$separator                                      // _P9K_N=4
+    #   fi
   fi
 
-  _P9K_PROMPT+="${_P9K_CACHE_VAL[1]}\${(Q)\${:-${(q)5}}}${POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS}"
-  _P9K_LAST_SEGMENT_INDEX=$2
-  _P9K_CURRENT_BG=$_P9K_CACHE_VAL[2]
+  if (( $7 )); then
+    local content=$5
+  else
+    local content="\${(Q)\${:-${(q)5}}}"
+  fi
+
+  _P9K_PROMPT+="\${\${_P9K_E::=${8:-1}}+}\${\${_P9K_C::=${content}}+}${_P9K_CACHE_VAL[1]}"
 }
 
-# Begin a right prompt segment
-# Takes four arguments:
-#   * $1: Name of the function that was originally invoked (mandatory).
-#         Necessary, to make the dynamic color-overwrite mechanism work.
-#   * $2: The array index of the current segment
-#   * $3: Background color
-#   * $4: Foreground color
-#   * $5: The segment content
-#   * $6: An identifying icon (must be a key of the icons array)
-# No ending for the right prompt segment is needed (unlike the left prompt, above).
+# The same as left_prompt_segment above but for the right prompt.
 set_default POWERLEVEL9K_WHITESPACE_BETWEEN_RIGHT_SEGMENTS " "
 right_prompt_segment() {
-  _p9k_should_join_right $2
-  local -i separate=$?
-  if ! _p9k_cache_get "$0" "$1" "$3" "$4" "$6" "$_P9K_CURRENT_BG" "$separate"; then
+  if ! _p9k_cache_get "$0" "$1" "$2" "$3" "$4" "$6"; then
     _p9k_color $3 $1 BACKGROUND
     local background_color=$_P9K_RETVAL
     _p9k_background $background_color
@@ -227,54 +253,78 @@ right_prompt_segment() {
     _p9k_foreground $foreground_color
     local foreground=$_P9K_RETVAL
 
-    local output=''
+    _p9k_foreground $DEFAULT_COLOR
+    local default_foreground=$_P9K_RETVAL
 
-    if [[ $_P9K_CURRENT_BG == NONE || $separate != 0 ]]; then
-      if [[ $background_color == $_P9K_CURRENT_BG ]]; then
-        # Middle segment with same color as previous segment
-        # We take the current foreground color as color for our
-        # subsegment (or the default color). This should have
-        # enough contrast.
-        if [[ $foreground == "%f" ]]; then
-          _p9k_foreground $DEFAULT_COLOR
-          output+=$_P9K_RETVAL
-        else
-          output+=$foreground
-        fi
-        _p9k_get_icon RIGHT_SUBSEGMENT_SEPARATOR
-        output+=$_P9K_RETVAL
-      else
-        output+="%F{$background_color}"
-        _p9k_get_icon RIGHT_SEGMENT_SEPARATOR
-        output+=$_P9K_RETVAL
-      fi
-      output+="${background}${POWERLEVEL9K_WHITESPACE_BETWEEN_RIGHT_SEGMENTS}"
+    _p9k_get_icon RIGHT_SUBSEGMENT_SEPARATOR
+    local subsep=$_P9K_RETVAL
+
+    _p9k_get_icon RIGHT_SEGMENT_SEPARATOR
+    local sep=$_P9K_RETVAL
+
+    _p9k_escape_rcurly "%F{$background_color}$sep$background$POWERLEVEL9K_WHITESPACE_BETWEEN_RIGHT_SEGMENTS$foreground"
+    local space=$_P9K_RETVAL
+
+    _p9k_escape_rcurly $background$foreground
+    local joiner=$_P9K_RETVAL
+
+    local divider
+    if [[ -z $foreground_color ]]; then
+      divider=$default_foreground
     else
-      output+=$background
+      divider=$foreground
     fi
+    _p9k_escape_rcurly $divider$subsep$background$POWERLEVEL9K_WHITESPACE_BETWEEN_RIGHT_SEGMENTS$foreground
+    divider=$_P9K_RETVAL
 
-    output+=$foreground
-
-    local icon=''
+    local icon
     if [[ -n $6 ]]; then
       _p9k_get_icon $6
       if [[ -n $_P9K_RETVAL ]]; then
-        local icon=$_P9K_RETVAL
+        local glyph=$_P9K_RETVAL
         _p9k_color $foreground_color $1 VISUAL_IDENTIFIER_COLOR
         _p9k_foreground $_P9K_RETVAL
-        # Add an whitespace if we print more than just the visual identifier.
-        # To avoid cutting off the visual identifier in some terminal emulators (e.g., Konsole, st),
-        # we need to color both the visual identifier and the whitespace.
-        icon="${_P9K_RETVAL}${icon} "
+        _p9k_escape_rcurly "${_P9K_RETVAL}${glyph} "
+        icon=$_P9K_RETVAL
       fi
     fi
 
-    _p9k_cache_set "$output" "$background_color" "$icon"
+    local output
+    output+="\${_P9K_N::=}"
+    output+="\${\${_P9K_E:-\${_P9K_N:=9}}+}"
+    output+="\${\${\${\${_P9K_BG:-0}:#NONE}:-\${_P9K_N:=1}}+}"
+    output+="\${\${\${\$((_P9K_I>0&&_P9K_I>=$_P9K_RIGHT_JOIN[$2])):#1}:-\${_P9K_N:=2}}+}"
+    output+="\${\${\${\${:-0\$_P9K_BG}:#0$background_color}:-\${_P9K_N:=3}}+}"
+    output+="\${\${_P9K_N:=1}+}"
+    output+="\${\${_P9K_V[1]::=$space}+}"
+    output+="\${\${_P9K_V[2]::=$joiner}+}"
+    output+="\${\${_P9K_V[3]::=$divider}+}"
+    output+="\${\${_P9K_V[4]::=$space}+}"
+    output+="\${_P9K_V[\$_P9K_N]}"
+    output+="\${_P9K_E:+\${_P9K_C}\${_P9K_C:+ }$icon\${\${_P9K_I::=$2}+}\${\${_P9K_BG::=$background_color}+}}"
+
+    _p9k_cache_set "$output"
+
+    # Segment separator logic:
+    #
+    #   if [[ $_P9K_BG == NONE ]]; then
+    #     output+=$space                                 # _P9K_N=1
+    #   elif (( joined )); then
+    #     output+=$joiner                                # _P9K_N=2
+    #   elif [[ $background_color == $_P9K_BG ]]; then
+    #     output+=$divider                               # _P9K_N=3
+    #   else
+    #     output+=$space                                 # _P9K_N=1
+    #   fi
   fi
 
-  _P9K_PROMPT+="${_P9K_CACHE_VAL[1]}${5//\$/\\$}${5:+ }${_P9K_CACHE_VAL[3]}"
-  _P9K_CURRENT_BG=$_P9K_CACHE_VAL[2]
-  _P9K_LAST_SEGMENT_INDEX=$2
+  if (( $7 )); then
+    local content=$5
+  else
+    local content="\${(Q)\${:-${(q)5}}}"
+  fi
+
+  _P9K_PROMPT+="\${\${_P9K_E::=${8:-1}}+}\${\${_P9K_C::=${content}}+}${_P9K_CACHE_VAL[1]}"
 }
 
 ################################################################
@@ -319,14 +369,15 @@ prompt_aws_eb_env() {
 set_default POWERLEVEL9K_BACKGROUND_JOBS_VERBOSE true
 set_default POWERLEVEL9K_BACKGROUND_JOBS_VERBOSE_ALWAYS false
 prompt_background_jobs() {
-  local -i n=${(%)${:-%j}}
-  (( n )) || return
   local prompt
-  if [[ $POWERLEVEL9K_BACKGROUND_JOBS_VERBOSE == true &&
-        ($n -gt 1 || $POWERLEVEL9K_BACKGROUND_JOBS_VERBOSE_ALWAYS == true) ]]; then
-    prompt='%j'
+  if [[ $POWERLEVEL9K_BACKGROUND_JOBS_VERBOSE == true ]]; then
+    if [[ $POWERLEVEL9K_BACKGROUND_JOBS_VERBOSE_ALWAYS == true ]]; then
+      prompt='${(%)${:-%j}}'
+    else
+      prompt='${${(%)${:-%j}}:#1}'
+    fi
   fi
-  "$1_prompt_segment" "$0" "$2" "$DEFAULT_COLOR" "cyan" "$prompt" 'BACKGROUND_JOBS_ICON'
+  $1_prompt_segment $0 $2 "$DEFAULT_COLOR" cyan "$prompt" BACKGROUND_JOBS_ICON 1 '${${(%)${:-%j}}:#0}'
 }
 
 ################################################################
@@ -342,7 +393,7 @@ prompt_newline() {
   fi
   POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS=
   "$1_prompt_segment" "$0" "$2" "" "" "${newline}"
-  _P9K_CURRENT_BG=NONE
+  _P9K_PROMPT+='${${_P9K_BG::=NONE}+}'
   POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS=$lws
 }
 
@@ -1258,9 +1309,15 @@ prompt_chruby() {
 ################################################################
 # Segment to print an icon if user is root.
 prompt_root_indicator() {
-  if [[ "$UID" -eq 0 ]]; then
-    "$1_prompt_segment" "$0" "$2" "$DEFAULT_COLOR" "yellow" "" 'ROOT_ICON'
-  fi
+  "$1_prompt_segment" "$0" "$2" "$DEFAULT_COLOR" "yellow" "" 'ROOT_ICON' 0 '${${(%)${:-%#}}:#%}'
+}
+
+# This segment is a demo. It can disappear any time. Use prompt_dir instead.
+prompt_simple_dir() {
+  $1_prompt_segment $0_HOME $2 blue "$DEFAULT_COLOR" "%~" HOME_ICON 0 '${$((!${#${(%)${:-%~}}:#\~})):#0}'
+  $1_prompt_segment $0_HOME_SUBFOLDER $2 blue "$DEFAULT_COLOR" "%~" HOME_SUB_ICON 0 '${$((!${#${(%)${:-%~}}:#\~?*})):#0}'
+  $1_prompt_segment $0_ETC $2 blue "$DEFAULT_COLOR" "%~" ETC_ICON 0 '${$((!${#${(%)${:-%~}}:#/etc*})):#0}'
+  $1_prompt_segment $0_DEFAULT $2 blue "$DEFAULT_COLOR" "%~" FOLDER_ICON 0 '${${${(%)${:-%~}}:#\~*}:#/etc*}'
 }
 
 ################################################################
@@ -1780,14 +1837,10 @@ prompt_vcs() {
 # Vi Mode: show editing mode (NORMAL|INSERT)
 set_default POWERLEVEL9K_VI_INSERT_MODE_STRING "INSERT"
 set_default POWERLEVEL9K_VI_COMMAND_MODE_STRING "NORMAL"
-
-typeset -gi _P9K_KEYMAP_VIMCMD
-
 prompt_vi_mode() {
-  if (( _P9K_KEYMAP_VIMCMD )); then
-    "$1_prompt_segment" "$0_NORMAL" "$2" "$DEFAULT_COLOR" "white" "$POWERLEVEL9K_VI_COMMAND_MODE_STRING"
-  elif [[ -n $POWERLEVEL9K_VI_INSERT_MODE_STRING ]]; then
-    "$1_prompt_segment" "$0_INSERT" "$2" "$DEFAULT_COLOR" "blue" "$POWERLEVEL9K_VI_INSERT_MODE_STRING"
+  $1_prompt_segment $0_NORMAL $2 "$DEFAULT_COLOR" white "$POWERLEVEL9K_VI_COMMAND_MODE_STRING" '' 0 '${$((!${#${:-0${KEYMAP}}:#0vicmd})):#0}'
+  if [[ -n $POWERLEVEL9K_VI_INSERT_MODE_STRING ]]; then
+    $1_prompt_segment $0_INSERT $2 "$DEFAULT_COLOR" blue "$POWERLEVEL9K_VI_INSERT_MODE_STRING" '' 0 '${${:-0${KEYMAP}}:#0vicmd}'
   fi
 }
 
@@ -1916,9 +1969,6 @@ prompt_java_version() {
 # Main prompt
 set_default -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS context dir vcs
 build_left_prompt() {
-  _P9K_CURRENT_BG=NONE
-  _P9K_LAST_SEGMENT_INDEX=0
-
   local -i index=1
   local element
   for element in "${POWERLEVEL9K_LEFT_PROMPT_ELEMENTS[@]}"; do
@@ -1935,28 +1985,11 @@ build_left_prompt() {
 
     ((++index))
   done
-
-  if ! _p9k_cache_get "$0" "$_P9K_CURRENT_BG"; then
-    local output="%k"
-    if [[ $_P9K_CURRENT_BG != NONE ]]; then
-      _p9k_foreground $_P9K_CURRENT_BG
-      output+=$_P9K_RETVAL
-      _p9k_get_icon LEFT_SEGMENT_SEPARATOR
-      output+="${_P9K_RETVAL}"
-    fi
-    _p9k_get_icon LEFT_SEGMENT_END_SEPARATOR
-    output+="%f${_P9K_RETVAL}"
-    _p9k_cache_set "$output"
-  fi
-  _P9K_PROMPT+="${_P9K_CACHE_VAL[1]}"
 }
 
 # Right prompt
 set_default -a POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS status root_indicator background_jobs history time
 build_right_prompt() {
-  _P9K_CURRENT_BG=NONE
-  _P9K_LAST_SEGMENT_INDEX=0
-
   local -i index=1
   local element
 
@@ -1974,9 +2007,6 @@ build_right_prompt() {
 
     ((++index))
   done
-
-  # Clear to the end of the line
-  _P9K_PROMPT+="%E"
 }
 
 typeset -gF _P9K_TIMER_START
@@ -2005,8 +2035,8 @@ typeset -fH _p9k_set_prompt() {
     RPROMPT=$_P9K_RIGHT_PREFIX$_P9K_PROMPT$_P9K_RIGHT_SUFFIX
   fi
 
-  unset _P9K_HOOK1
-  unset _P9K_HOOK2
+  unset _P9K_H1
+  unset _P9K_H2
 }
 
 typeset -g _P9K_REFRESH_REASON
@@ -2032,7 +2062,6 @@ powerlevel9k_prepare_prompts() {
 
   _p9k_init
   _P9K_TIMER_START=1e10
-  _P9K_KEYMAP_VIMCMD=0
 
   _P9K_REFRESH_REASON=precmd
   _p9k_set_prompt
@@ -2040,8 +2069,7 @@ powerlevel9k_prepare_prompts() {
 }
 
 function _p9k_zle_keymap_select() {
-  [[ $KEYMAP == vicmd ]] && _P9K_KEYMAP_VIMCMD=1 || _P9K_KEYMAP_VIMCMD=0
-  _p9k_update_prompt keymap-select
+  zle .reset-prompt
 }
 
 set_default POWERLEVEL9K_IGNORE_TERM_COLORS false
@@ -2078,8 +2106,8 @@ _p9k_init_timer() {
       emulate -L zsh
       local reason
       IFS='' read -u $_P9K_TIMER_FD1 reason || return
-      unset _P9K_HOOK1
-      unset _P9K_HOOK2
+      unset _P9K_H1
+      unset _P9K_H2
       [[ -n $reason ]] && _p9k_update_prompt $reason || zle .reset-prompt
     }
 
@@ -2197,9 +2225,29 @@ _p9k_init() {
     fi
   done
 
-  if [[ $POWERLEVEL9K_EXPERIMENTAL_TIME_REALTIME == true ]] || segment_in_use background_jobs; then
+  if [[ $POWERLEVEL9K_EXPERIMENTAL_TIME_REALTIME == true ]]; then
     _p9k_init_timer
   fi
+
+  _P9K_LEFT_PREFIX+='${${_P9K_BG::=NONE}+}${${_P9K_I::=0}+}'
+  _P9K_RIGHT_PREFIX+='${${_P9K_BG::=NONE}+}${${_P9K_I::=0}+}'
+
+  _p9k_get_icon LEFT_SEGMENT_SEPARATOR
+  _p9k_escape_rcurly $_P9K_RETVAL
+  _P9K_LEFT_SUFFIX+='%k'
+  _P9K_LEFT_SUFFIX+="\${_P9K_N::=}"
+  _P9K_LEFT_SUFFIX+="\${\${_P9K_BG:-\${_P9K_N:=1}}+}"
+  _P9K_LEFT_SUFFIX+="\${\${\${_P9K_BG:#NONE}:-\${_P9K_N:=2}}+}"
+  _P9K_LEFT_SUFFIX+="\${\${_P9K_N:=3}+}"
+  _P9K_LEFT_SUFFIX+="\${\${_P9K_V[1]::=%f$_P9K_RETVAL}+}"
+  _P9K_LEFT_SUFFIX+="\${_P9K_V[2]::=}"
+  _P9K_LEFT_SUFFIX+="\${\${_P9K_V[3]::=%F{\$_P9K_BG\}$_P9K_RETVAL}+}"
+  _P9K_LEFT_SUFFIX+="\${_P9K_V[\$_P9K_N]}"
+  _P9K_LEFT_SUFFIX+='%f'
+  _p9k_get_icon LEFT_SEGMENT_END_SEPARATOR
+  _P9K_LEFT_SUFFIX+=$_P9K_RETVAL
+
+  _P9K_RIGHT_SUFFIX+="%E"
 
   if [[ $POWERLEVEL9K_PROMPT_ON_NEWLINE == true ]]; then
     _p9k_get_icon MULTILINE_FIRST_PROMPT_PREFIX
@@ -2232,7 +2280,7 @@ _p9k_init() {
   fi
 
   if segment_in_use background_jobs && (( _P9K_TIMER_FD2 )); then
-    _P9K_LEFT_SUFFIX+="\${_P9K_HOOK1+\${_P9K_HOOK2-\${_P9K_HOOK2=}\$(echo >&$_P9K_TIMER_FD2)}}\${_P9K_HOOK1=}"
+    _P9K_LEFT_SUFFIX+="\${_P9K_H1+\${_P9K_H2-\${_P9K_H2=}\$(echo>&$_P9K_TIMER_FD2)}}\${_P9K_H1=}"
   fi
 
   # If the terminal `LANG` is set to `C`, this theme will not work at all.
