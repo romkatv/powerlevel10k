@@ -1991,6 +1991,8 @@ typeset -g _P9K_RIGHT_SUFFIX
 
 set_default POWERLEVEL9K_DISABLE_RPROMPT false
 typeset -fH _p9k_set_prompt() {
+  emulate -L zsh
+
   _P9K_PROMPT=''
   build_left_prompt
   PROMPT=$_P9K_LEFT_PREFIX$_P9K_PROMPT$_P9K_LEFT_SUFFIX
@@ -2024,7 +2026,9 @@ powerlevel9k_prepare_prompts() {
   _P9K_PIPE_EXIT_CODES=( "$pipestatus[@]" )
   _P9K_COMMAND_DURATION=$((EPOCHREALTIME - _P9K_TIMER_START))
 
-  emulate -L zsh
+  unsetopt local_options
+  prompt_opts=(cr percent sp subst)
+  setopt nopromptbang prompt{cr,percent,sp,subst}
 
   _p9k_init
   _P9K_TIMER_START=1e10
@@ -2275,9 +2279,6 @@ typeset -gi _P9K_ENABLED=0
 
 prompt_powerlevel9k_setup() {
   prompt_powerlevel9k_teardown
-
-  prompt_opts=(cr percent sp subst)
-  setopt nopromptbang prompt{cr,percent,sp,subst}
 
   add-zsh-hook precmd powerlevel9k_prepare_prompts
   add-zsh-hook preexec powerlevel9k_preexec
