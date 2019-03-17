@@ -255,6 +255,9 @@ git clone https://github.com/romkatv/powerlevel10k.git ~/powerlevel10k
 echo 'source ~/powerlevel10k/powerlevel10k.zsh-theme' >>! ~/.zshrc
 ```
 
+If you've been using Powerlevel9k before, **do not remove the configuration options**. Powerlevel10k
+will pick them up and provide you with the same prompt UI you are used to.
+
 ### What is the minimum supported zsh version?
 
 Anything below 5.2 definitely won't work. 5.4 definitely will.
