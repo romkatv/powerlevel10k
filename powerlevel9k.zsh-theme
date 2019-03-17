@@ -171,7 +171,7 @@ left_prompt_segment() {
     _p9k_escape_rcurly $POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS
     local space=$_P9K_RETVAL
 
-    if [[ $foreground == "%f" ]]; then
+    if [[ -z $foreground_color ]]; then
       _p9k_escape_rcurly $default_foreground$subsep$POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS
       local divider=$_P9K_RETVAL
     else
