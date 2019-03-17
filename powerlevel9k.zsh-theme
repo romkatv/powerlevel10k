@@ -205,7 +205,7 @@ left_prompt_segment() {
     output+="\${_P9K_N::=}"
     output+="\${\${_P9K_E:-\${_P9K_N:=9}}+}"
     output+="\${\${\${\${_P9K_BG:-0}:#NONE}:-\${_P9K_N:=1}}+}"
-    output+="\${\${\${\$((_P9K_I>0&&_P9K_I>=$_P9K_LEFT_JOIN[$2])):#1}:-\${_P9K_N:=2}}+}"
+    output+="\${\${\${\$((_P9K_I>=$_P9K_LEFT_JOIN[$2])):#1}:-\${_P9K_N:=2}}+}"
     output+="\${\${\${\${:-0\$_P9K_BG}:#0$background_color}:-\${_P9K_N:=3}}+}"
     output+="\${\${_P9K_N:=4}+}"
     output+="\${\${_P9K_V[1]::=$pre$space$post}+}"
@@ -293,7 +293,7 @@ right_prompt_segment() {
     output+="\${_P9K_N::=}"
     output+="\${\${_P9K_E:-\${_P9K_N:=9}}+}"
     output+="\${\${\${\${_P9K_BG:-0}:#NONE}:-\${_P9K_N:=1}}+}"
-    output+="\${\${\${\$((_P9K_I>0&&_P9K_I>=$_P9K_RIGHT_JOIN[$2])):#1}:-\${_P9K_N:=2}}+}"
+    output+="\${\${\${\$((_P9K_I>=$_P9K_RIGHT_JOIN[$2])):#1}:-\${_P9K_N:=2}}+}"
     output+="\${\${\${\${:-0\$_P9K_BG}:#0$background_color}:-\${_P9K_N:=3}}+}"
     output+="\${\${_P9K_N:=1}+}"
     output+="\${\${_P9K_V[1]::=$space}+}"
@@ -1838,9 +1838,9 @@ prompt_vcs() {
 set_default POWERLEVEL9K_VI_INSERT_MODE_STRING "INSERT"
 set_default POWERLEVEL9K_VI_COMMAND_MODE_STRING "NORMAL"
 prompt_vi_mode() {
-  $1_prompt_segment $0_NORMAL $2 "$DEFAULT_COLOR" white "$POWERLEVEL9K_VI_COMMAND_MODE_STRING" '' 0 '${$((!${#${:-0${KEYMAP}}:#0vicmd})):#0}'
+  $1_prompt_segment $0_NORMAL $2 "$DEFAULT_COLOR" white "$POWERLEVEL9K_VI_COMMAND_MODE_STRING" '' 0 '${$((!${#${KEYMAP:-0}:#vicmd})):#0}'
   if [[ -n $POWERLEVEL9K_VI_INSERT_MODE_STRING ]]; then
-    $1_prompt_segment $0_INSERT $2 "$DEFAULT_COLOR" blue "$POWERLEVEL9K_VI_INSERT_MODE_STRING" '' 0 '${${:-0${KEYMAP}}:#0vicmd}'
+    $1_prompt_segment $0_INSERT $2 "$DEFAULT_COLOR" blue "$POWERLEVEL9K_VI_INSERT_MODE_STRING" '' 0 '${${KEYMAP:-0}:#vicmd}'
   fi
 }
 
