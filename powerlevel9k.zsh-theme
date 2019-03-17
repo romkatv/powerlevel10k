@@ -2082,22 +2082,25 @@ typeset -g OS
 typeset -g OS_ICON
 typeset -g SED_EXTENDED_REGEX_PARAMETER
 
+typeset -g  _P9K_TIMER_FIFO
 typeset -gi _P9K_TIMER_FD=0
+typeset -gi _P9K_TIMER_PID=0
 
 _p9k_init_timer() {
-  local fifo
-
   _p9k_start_timer() {
     emulate -L zsh
     setopt err_return no_bg_nice
 
-    fifo=$(mktemp -u "${TMPDIR:-/tmp}"/p9k.$$.pipe.timer.XXXXXXXXXX)
-    mkfifo $fifo
-    exec {_P9K_TIMER_FD}<>$fifo
+    _P9K_TIMER_FIFO=$(mktemp -u "${TMPDIR:-/tmp}"/p9k.$$.timer.pipe.XXXXXXXXXX)
+    mkfifo $_P9K_TIMER_FIFO
+    sysopen -rw -o cloexec,sync -u _P9K_TIMER_FD $_P9K_TIMER_FIFO
+    zsystem flock $_P9K_TIMER_FIFO
 
     function _p9k_on_timer() {
       emulate -L zsh
-      local dummy && IFS='' read -u $_P9K_TIMER_FD dummy && zle .reset-prompt
+      local dummy
+      while IFS='' read -t -u $_P9K_TIMER_FD dummy; do true; done
+      zle .reset-prompt
     }
 
     zle -F $_P9K_TIMER_FD _p9k_on_timer
@@ -2105,13 +2108,22 @@ _p9k_init_timer() {
     # `kill -WINCH $$` is a workaround for a bug in zsh. After a background job completes, callbacks
     # registered with `zle -F` stop firing until the user presses any key or the process receives a
     # signal (any signal at all).
-    zsh -c "while kill -WINCH $$; do sleep 1; echo; done" </dev/null >&$_P9K_TIMER_FD 2>/dev/null &!
-    local pid=$!
-    function _p9k_kill_timer_${pid}() {
+    zsh -c "
+      zmodload zsh/system
+      while sleep 1 && ! zsystem flock -t 0 ${(q)_P9K_TIMER_FIFO} && kill -WINCH $$ && echo; do
+        true
+      done
+      command rm -f ${(q)_P9K_TIMER_FIFO}
+    " </dev/null >&$_P9K_TIMER_FD 2>/dev/null &!
+
+    _P9K_TIMER_PID=$!
+
+    function _p9k_kill_timer() {
       emulate -L zsh
-      kill -- -${${(%)${:-%N}}#_p9k_kill_timer_} &>/dev/null
+      (( _P9K_TIMER_PID )) && kill -- -$_P9K_TIMER_PID &>/dev/null
+      command rm -f $_P9K_TIMER_FIFO
     }
-    add-zsh-hook zshexit _p9k_kill_timer_${pid}
+    add-zsh-hook zshexit _p9k_kill_timer
   }
 
   if ! _p9k_start_timer ; then
@@ -2121,9 +2133,14 @@ _p9k_init_timer() {
       exec {_P9K_TIMER_FD}>&-
       _P9K_TIMER_FD=0
     fi
+    if (( _P9K_TIMER_PID )); then
+      kill -- -$_P9K_TIMER_PID &>/dev/null
+      _P9K_TIMER_PID=0
+    fi
+    command rm -f $_P9K_TIMER_FIFO
+    _P9K_TIMER_FIFO=''
     unset -f _p9k_on_timer
   fi
-  command rm -f "$fifo"
 }
 
 _p9k_init() {
@@ -2321,5 +2338,6 @@ autoload -Uz add-zsh-hook
 
 zmodload zsh/datetime
 zmodload zsh/mathfunc
+zmodload zsh/system
 
 prompt_powerlevel9k_setup "$@"
