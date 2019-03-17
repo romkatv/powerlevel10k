@@ -2034,9 +2034,6 @@ typeset -fH _p9k_set_prompt() {
     build_right_prompt
     RPROMPT=$_P9K_RIGHT_PREFIX$_P9K_PROMPT$_P9K_RIGHT_SUFFIX
   fi
-
-  unset _P9K_H1
-  unset _P9K_H2
 }
 
 typeset -g _P9K_REFRESH_REASON
@@ -2085,46 +2082,30 @@ typeset -g OS
 typeset -g OS_ICON
 typeset -g SED_EXTENDED_REGEX_PARAMETER
 
-typeset -gi _P9K_TIMER_FD1=0
-typeset -gi _P9K_TIMER_FD2=0
+typeset -gi _P9K_TIMER_FD=0
 
 _p9k_init_timer() {
-  local fifo1 fifo2
+  local fifo
 
   _p9k_start_timer() {
     emulate -L zsh
     setopt err_return no_bg_nice
 
-    fifo1=$(mktemp -u "${TMPDIR:-/tmp}"/p9k.$$.pipe1.timer.XXXXXXXXXX)
-    fifo2=$(mktemp -u "${TMPDIR:-/tmp}"/p9k.$$.pipe2.timer.XXXXXXXXXX)
-    mkfifo $fifo1
-    mkfifo $fifo2
-    exec {_P9K_TIMER_FD1}<>$fifo1
-    exec {_P9K_TIMER_FD2}<>$fifo2
+    fifo=$(mktemp -u "${TMPDIR:-/tmp}"/p9k.$$.pipe.timer.XXXXXXXXXX)
+    mkfifo $fifo
+    exec {_P9K_TIMER_FD}<>$fifo
 
     function _p9k_on_timer() {
       emulate -L zsh
-      local reason
-      IFS='' read -u $_P9K_TIMER_FD1 reason || return
-      unset _P9K_H1
-      unset _P9K_H2
-      [[ -n $reason ]] && _p9k_update_prompt $reason || zle .reset-prompt
+      local dummy && IFS='' read -u $_P9K_TIMER_FD dummy && zle .reset-prompt
     }
 
-    zle -F $_P9K_TIMER_FD1 _p9k_on_timer
+    zle -F $_P9K_TIMER_FD _p9k_on_timer
 
-    # This `sleep 1 && kill -WINCH $$` is a workaround for what seems like a bug in zsh.
-    zsh -c "
-      while kill -0 $$; do
-        if IFS='' read -u $_P9K_TIMER_FD2 -t 1; then
-          sleep 1
-          kill -WINCH $$
-          echo job-complete
-        elif [[ $POWERLEVEL9K_EXPERIMENTAL_TIME_REALTIME == true ]]; then
-          echo
-        fi
-      done
-    " <&$_P9K_TIMER_FD2 >&$_P9K_TIMER_FD1 2>/dev/null &!
+    # `kill -WINCH $$` is a workaround for a bug in zsh. After a background job completes, callbacks
+    # registered with `zle -F` stop firing until the user presses any key or the process receives a
+    # signal (any signal at all).
+    zsh -c "while kill -WINCH $$; do sleep 1; echo; done" </dev/null >&$_P9K_TIMER_FD 2>/dev/null &!
     local pid=$!
     function _p9k_kill_timer_${pid}() {
       emulate -L zsh
@@ -2135,18 +2116,14 @@ _p9k_init_timer() {
 
   if ! _p9k_start_timer ; then
     echo "powerlevel10k: failed to initialize background timer" >&2
-    if (( _P9K_TIMER_FD1 )); then
-      zle -F $_P9K_TIMER_FD1
-      exec {_P9K_TIMER_FD1}>&-
+    if (( _P9K_TIMER_FD )); then
+      zle -F $_P9K_TIMER_FD
+      exec {_P9K_TIMER_FD}>&-
+      _P9K_TIMER_FD=0
     fi
-    if (( _P9K_TIMER_FD2 )); then
-      exec {_P9K_TIMER_FD2}>&-
-    fi
-    _P9K_TIMER_FD1=0
-    _P9K_TIMER_FD2=0
     unset -f _p9k_on_timer
   fi
-  command rm -f "$fifo1" "$fifo2"
+  command rm -f "$fifo"
 }
 
 _p9k_init() {
@@ -2277,10 +2254,6 @@ _p9k_init() {
 
   if [[ $ITERM_SHELL_INTEGRATION_INSTALLED == Yes ]]; then
     _P9K_LEFT_PREFIX="%{$(iterm2_prompt_mark)%}$_P9K_LEFT_PREFIX"
-  fi
-
-  if segment_in_use background_jobs && (( _P9K_TIMER_FD2 )); then
-    _P9K_LEFT_SUFFIX+="\${_P9K_H1+\${_P9K_H2-\${_P9K_H2=}\$(echo>&$_P9K_TIMER_FD2)}}\${_P9K_H1=}"
   fi
 
   # If the terminal `LANG` is set to `C`, this theme will not work at all.
