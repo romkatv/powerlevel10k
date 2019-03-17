@@ -904,11 +904,11 @@ prompt_dir() {
             # Remove trailing slash from git path, so that we can
             # remove that git path from the pwd.
             gitPath=${gitPath%/}
-            package_path=${$PWD%%$gitPath}
+            package_path=${PWD%%$gitPath}
             # Remove trailing slash
             package_path=${package_path%/}
           elif [[ $(git rev-parse --is-inside-git-dir 2> /dev/null) == "true" ]]; then
-            package_path=${$PWD%%/.git*}
+            package_path=${PWD%%/.git*}
           fi
 
          [[ ${(L)POWERLEVEL9K_DIR_PATH_ABSOLUTE} != "true" ]] && package_path=${package_path/$HOME/"~"}
