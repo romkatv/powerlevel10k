@@ -1,4 +1,5 @@
-[[ -o interactive ]] && autoload -Uz add-zsh-hook && zmodload zsh/datetime || return
+[[ -o interactive ]] || return
+ autoload -Uz add-zsh-hook && zmodload zsh/datetime && zmodload zsh/system || return
 
 # Retrives status of a git repo from a directory under its working tree.
 #
@@ -44,11 +45,13 @@
 # The point of reporting -1 as unstaged and untracked is to allow the command to skip scanning
 # files in large repos. See -m flag of gitstatus_start.
 #
+# gitstatus_query returns an error if gitstatus_start hasn't been called in the same shell or
+# failed.
+#
 #       !!!!! WARNING: CONCURRENT CALLS WITH THE SAME NAME ARE NOT ALLOWED !!!!!
 #
-# It's illegal to call `gitstatus_query NAME` if `gitstatus_query NAME` is running concurrently in
-# the same interactive shell or its child, or if the callback for the last timed out request hasn't
-# fired yet. If you need to issue concurrent requests, use different NAME arguments.
+# It's illegal to call gitstatus_query if the last asynchronous call with the same NAME hasn't
+# completed yet. If you need to issue concurrent requests, use different NAME arguments.
 function gitstatus_query() {
   emulate -L zsh
   setopt err_return no_unset
@@ -72,29 +75,12 @@ function gitstatus_query() {
 
   [[ -v GITSTATUS_DAEMON_PID_${name} ]]
 
-  local -i req_fd
-  local req_fd_var=_GITSTATUS_REQ_FD_${name}
+  # Verify that gitstatus_query is running in the same process that ran gitstatus_start.
   local client_pid_var=_GITSTATUS_CLIENT_PID_${name}
+  [[ ${(P)client_pid_var} == $$ ]]
 
-  [[ ${(P)client_pid_var} == $$ ]] && {
-    req_fd=${(P)req_fd_var}
-  } || {
-    local req_fifo_var=_GITSTATUS_REQ_FIFO_${name}
-    local resp_fifo_var=_GITSTATUS_RESP_FIFO_${name}
-    local resp_fd_var=_GITSTATUS_RESP_FD_${name}
-    local -i resp_fd
-    exec {req_fd}<>${(P)req_fifo_var}
-    exec {resp_fd}<>${(P)resp_fifo_var}
-    typeset -g $client_pid_var=$$
-    typeset -g $req_fd_var=$req_fd
-    typeset -g $resp_fd_var=$resp_fd
-    typeset -giH $client_pid_var=$client_pid
-    function _gitstatus_process_response_${name}() {
-      _gitstatus_process_response ${${(%)${:-%N}}#_gitstatus_process_response_} 0 ''
-    }
-    zle -F $resp_fd _gitstatus_process_response_${name}
-  }
-
+  local req_fd_var=_GITSTATUS_REQ_FD_${name}
+  local -i req_fd=${(P)req_fd_var}
   local -r req_id="$EPOCHREALTIME"
   echo -nE "${req_id} ${callback}"$'\x1f'"${dir}"$'\x1e' >&$req_fd
 
@@ -106,7 +92,7 @@ function gitstatus_query() {
   [[ $VCS_STATUS_RESULT != tout || -n $callback ]]
 }
 
-typeset -fH _gitstatus_process_response() {
+function _gitstatus_process_response() {
   emulate -L zsh
   setopt err_return no_unset
 
@@ -172,8 +158,7 @@ typeset -fH _gitstatus_process_response() {
 #             Negative value means infinity. Defaults to -1.
 function gitstatus_start() {
   emulate -L zsh
-  setopt err_return no_unset
-  unsetopt bg_nice
+  setopt err_return no_unset no_bg_nice
 
   local opt
   local -F timeout=5
@@ -200,24 +185,31 @@ function gitstatus_start() {
   local daemon && daemon=${GITSTATUS_DAEMON:-${${(%):-%x}:A:h}/bin/gitstatusd-${os:l}-${arch:l}}
   [[ -f $daemon ]] || { echo "file not found: $daemon" >&2 && return 1 }
 
-  local req_fifo resp_fifo log
-  local -i req_fd=-1 resp_fd=-1 daemon_pid=-1
+  local lock_file req_fifo resp_fifo log_file
+  local -i lock_fd=-1 req_fd=-1 resp_fd=-1 daemon_pid=-1
 
   function start() {
+    lock_file=$(mktemp "${TMPDIR:-/tmp}"/gitstatus.$$.lock.XXXXXXXXXX)
+    zsystem flock -f lock_fd $lock_file
+
     req_fifo=$(mktemp -u "${TMPDIR:-/tmp}"/gitstatus.$$.pipe.req.XXXXXXXXXX)
-    resp_fifo=$(mktemp -u "${TMPDIR:-/tmp}"/gitstatus.$$.pipe.resp.XXXXXXXXXX)
     mkfifo $req_fifo
+    sysopen -rw -o cloexec -u req_fd $req_fifo
+    command rm -f $req_fifo
+
+    resp_fifo=$(mktemp -u "${TMPDIR:-/tmp}"/gitstatus.$$.pipe.resp.XXXXXXXXXX)
     mkfifo $resp_fifo
-    exec {req_fd}<>$req_fifo
-    exec {resp_fd}<>$resp_fifo
+    sysopen -rw -o cloexec -u resp_fd $resp_fifo
+    command rm -f $resp_fifo
+
     function _gitstatus_process_response_${name}() {
       _gitstatus_process_response ${${(%)${:-%N}}#_gitstatus_process_response_} 0 ''
     }
     zle -F $resp_fd _gitstatus_process_response_${name}
 
     [[ ${GITSTATUS_ENABLE_LOGGING:-0} == 1 ]] &&
-      log=$(mktemp "${TMPDIR:-/tmp}"/gitstatus.$$.log.XXXXXXXXXX) ||
-      log=/dev/null
+      log_file=$(mktemp "${TMPDIR:-/tmp}"/gitstatus.$$.log.XXXXXXXXXX) ||
+      log_file=/dev/null
 
     local -i threads=${GITSTATUS_NUM_THREADS:-0}
     (( threads > 0)) || {
@@ -228,48 +220,41 @@ function gitstatus_start() {
     }
 
     # We use `zsh -c` instead of plain {} or () to work around bugs in zplug. It hangs on startup.
-    zsh -c "
-      ${(q)daemon} --parent-pid=$$ --dirty-max-index-size=${(q)max_dirty} --num-threads=$threads
+    zsh -xc "
+      ${(q)daemon} --lock-fd=3 --dirty-max-index-size=$max_dirty --num-threads=$threads
       echo -nE $'bye\x1f0\x1e'
-      command rm -f ${(q)req_fifo} ${(q)resp_fifo}
-    " <&$req_fd >&$resp_fd 2>$log &!
+    " <&$req_fd >&$resp_fd 2>$log_file 3<$lock_file &!
 
     daemon_pid=$!
+    command rm -f $lock_file
 
     local reply
     echo -nE $'hello\x1f\x1e' >&$req_fd
     IFS='' read -r -d $'\x1e' -u $resp_fd -t $timeout reply
     [[ $reply == $'hello\x1f0' ]]
 
-    function _gitstatus_cleanup_${name}() {
+    function _gitstatus_cleanup_${daemon_pid}() {
       emulate -L zsh
-      local name=${${(%)${:-%N}}#_gitstatus_cleanup_}
-      local daemon_pid_var=GITSTATUS_DAEMON_PID_${name}
-      local req_fifo_var=_GITSTATUS_REQ_FIFO_${name}
-      local resp_fifo_var=_GITSTATUS_RESP_FIFO_${name}
-      local -i daemon_pid=${(P)daemon_pid_var}
-      local req_fifo=${(P)req_fifo_var}
-      local resp_fifo=${(P)resp_fifo_var}
-      [[ $daemon_pid -ge 0 ]] && kill -- -$daemon_pid &>/dev/null
-      command rm -f $req_fifo $resp_fifo
+      setopt err_return no_unset
+      local -i daemon_pid=${${(%)${:-%N}}#_gitstatus_cleanup_}
+      kill -- -$daemon_pid &>/dev/null || true
     }
-    add-zsh-hook zshexit _gitstatus_cleanup_${name}
+    add-zsh-hook zshexit _gitstatus_cleanup_${daemon_pid}
   }
 
   start && {
-    typeset -g    GITSTATUS_DAEMON_LOG_${name}=$log
+    typeset -g    GITSTATUS_DAEMON_LOG_${name}=$log_file
     typeset -gi   GITSTATUS_DAEMON_PID_${name}=$daemon_pid
-    typeset -gH  _GITSTATUS_REQ_FIFO_${name}=$req_fifo
-    typeset -gH  _GITSTATUS_RESP_FIFO_${name}=$resp_fifo
     typeset -giH _GITSTATUS_REQ_FD_${name}=$req_fd
     typeset -giH _GITSTATUS_RESP_FD_${name}=$resp_fd
     typeset -giH _GITSTATUS_CLIENT_PID_${name}=$$
   } || {
-    echo "gitstatus failed to initialize" >&2
-    [[ $daemon_pid -ge 0 ]] && kill -- -$daemon_pid &>/dev/null || true
+    echo "gitstatus failed to initialize" >&2 || true
+    [[ $daemon_pid -gt 0 ]] && kill -- -$daemon_pid &>/dev/null || true
+    [[ $lock_fd -ge 0 ]] && zsystem flock -u $lock_fd || true
     [[ $req_fd -ge 0 ]] && exec {req_fd}>&- || true
     [[ $resp_fd -ge 0 ]] && { zle -F $resp_fd || true } && { exec {resp_fd}>&- || true}
-    command rm -f $req_fifo $resp_fifo
+    command rm -f $lock_file $req_fifo $resp_fifo || true
     return 1
   }
 }
