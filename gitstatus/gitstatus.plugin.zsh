@@ -194,7 +194,7 @@ function gitstatus_start() {
 
     req_fifo=$(mktemp -u "${TMPDIR:-/tmp}"/gitstatus.$$.pipe.req.XXXXXXXXXX)
     mkfifo $req_fifo
-    sysopen -rw -o cloexec -u req_fd $req_fifo
+    sysopen -rw -o cloexec,sync -u req_fd $req_fifo
     command rm -f $req_fifo
 
     resp_fifo=$(mktemp -u "${TMPDIR:-/tmp}"/gitstatus.$$.pipe.resp.XXXXXXXXXX)
