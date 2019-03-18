@@ -29,7 +29,6 @@ It's simply faster.
    4. [Is there an AUR package for Powerlevel10k?](#is-there-an-aur-package-for-powerlevel10k)
    5. [How do I use Powerlevel10k with zplug, prezto, oh-my-zsh, antigen, somethingelse?](#how-do-i-use-powerlevel10k-with-zplug-prezto-oh-my-zsh-antigen-somethingelse)
    6. [What is the minimum supported zsh version?](#what-is-the-minimum-supported-zsh-version)
-   7. [Why am I seeing \uNNNN in my prompt instead of icons?](#why-am-i-seeing-unnnn-in-my-prompt-instead-of-icons)
 
 ## Installation and configuration
 
@@ -261,7 +260,3 @@ will pick them up and provide you with the same prompt UI you are used to.
 ### What is the minimum supported zsh version?
 
 Anything below 5.2 definitely won't work. 5.4 definitely will.
-
-### Why am I seeing \uNNNN in my prompt instead of icons?
-
-Use `$'\uNNN'` instead of `'\uNNN'`.
