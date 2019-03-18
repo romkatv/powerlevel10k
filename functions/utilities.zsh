@@ -30,6 +30,18 @@ function set_default() {
   fi
 }
 
+function _p9k_g_expand() {
+  local -a ts=("${=$(typeset -p $1)}")
+  shift ts
+  for x in "${ts[@]}"; do
+    [[ $x == -* ]] || break
+    # Don't change readonly variables. Ideally, we shouldn't modify any variables at all,
+    # but for now this will do.
+    [[ $x == -*r* ]] && return
+  done
+  typeset -g $1=${(g::)${(P)1}}
+}
+
 # Converts large memory values into a human-readable unit (e.g., bytes --> GB)
 # Takes two arguments:
 #   * $size - The number which should be prettified

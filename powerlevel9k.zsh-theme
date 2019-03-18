@@ -25,8 +25,6 @@
 [[ -v _P9K_SOURCED ]] && return
 readonly _P9K_SOURCED=1
 
-# TODO: Expand all configurable strings with (g::) during initialization.
-
 typeset -g _P9K_INSTALLATION_DIR
 
 # Try to set the installation path
@@ -776,9 +774,6 @@ prompt_dir() {
           "$POWERLEVEL9K_SHORTEN_STRATEGY" == "truncate_with_folder_marker" ||
           "$POWERLEVEL9K_SHORTEN_STRATEGY" == "truncate_to_last" ||
           "$POWERLEVEL9K_SHORTEN_STRATEGY" == "truncate_with_package_name" ]]; then
-      # convert delimiter from unicode to literal character, so that we can get the correct length later
-      local delim=$(echo -n $POWERLEVEL9K_SHORTEN_DELIMITER)
-
       case "$POWERLEVEL9K_SHORTEN_STRATEGY" in
         truncate_absolute_chars)
           if [ ${#current_path} -gt $(( $POWERLEVEL9K_SHORTEN_DIR_LENGTH + ${#POWERLEVEL9K_SHORTEN_DELIMITER} )) ]; then
@@ -2105,10 +2100,35 @@ _p9k_init_timer() {
   fi
 }
 
+# Some people write POWERLEVEL9K_DIR_PATH_SEPARATOR='\uNNNN' instead of
+# POWERLEVEL9K_DIR_PATH_SEPARATOR=$'\uNNNN'. There is no good reason for it and if we were
+# starting from scratch we wouldn't perform automatic conversion from the former to the latter.
+# But we aren't starting from scratch, so convert we do.
+_p9k_init_strings() {
+  # To find candidates:
+  #
+  #   egrep 'set_default [^-]' powerlevel9k.zsh-theme | egrep -v '(true|false)$'
+  _p9k_g_expand POWERLEVEL9K_ANACONDA_LEFT_DELIMITER
+  _p9k_g_expand POWERLEVEL9K_ANACONDA_RIGHT_DELIMITER
+  _p9k_g_expand POWERLEVEL9K_CONTEXT_TEMPLATE
+  _p9k_g_expand POWERLEVEL9K_DATE_FORMAT
+  _p9k_g_expand POWERLEVEL9K_DIR_PATH_SEPARATOR
+  _p9k_g_expand POWERLEVEL9K_HOME_FOLDER_ABBREVIATION
+  _p9k_g_expand POWERLEVEL9K_HOST_TEMPLATE
+  _p9k_g_expand POWERLEVEL9K_SHORTEN_DELIMITER
+  _p9k_g_expand POWERLEVEL9K_TIME_FORMAT
+  _p9k_g_expand POWERLEVEL9K_USER_TEMPLATE
+  _p9k_g_expand POWERLEVEL9K_VI_COMMAND_MODE_STRING
+  _p9k_g_expand POWERLEVEL9K_VI_INSERT_MODE_STRING
+  _p9k_g_expand POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS
+  _p9k_g_expand POWERLEVEL9K_WHITESPACE_BETWEEN_RIGHT_SEGMENTS
+}
+
 _p9k_init() {
   (( _P9K_INITIALIZED )) && return
 
   _p9k_init_icons
+  _p9k_init_strings
 
   typeset -lf set_os() {
     OS=$1
