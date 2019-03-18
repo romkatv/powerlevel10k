@@ -1271,10 +1271,19 @@ prompt_root_indicator() {
 
 # This segment is a demo. It can disappear any time. Use prompt_dir instead.
 prompt_simple_dir() {
-  $1_prompt_segment $0_HOME $2 blue "$DEFAULT_COLOR" "%~" HOME_ICON 0 '${$((!${#${(%)${:-%~}}:#\~})):#0}'
-  $1_prompt_segment $0_HOME_SUBFOLDER $2 blue "$DEFAULT_COLOR" "%~" HOME_SUB_ICON 0 '${$((!${#${(%)${:-%~}}:#\~?*})):#0}'
-  $1_prompt_segment $0_ETC $2 blue "$DEFAULT_COLOR" "%~" ETC_ICON 0 '${$((!${#${(%)${:-%~}}:#/etc*})):#0}'
-  $1_prompt_segment $0_DEFAULT $2 blue "$DEFAULT_COLOR" "%~" FOLDER_ICON 0 '${${${(%)${:-%~}}:#\~*}:#/etc*}'
+  if ! _p9k_cache_get "$0" "$1" "$2" ; then
+    local p=$_P9K_PROMPT
+    local key=$_P9K_CACHE_KEY
+    _P9K_PROMPT=''
+    $1_prompt_segment $0_HOME $2 blue "$DEFAULT_COLOR" "%~" HOME_ICON 0 '${$((!${#${(%)${:-%~}}:#\~})):#0}'
+    $1_prompt_segment $0_HOME_SUBFOLDER $2 blue "$DEFAULT_COLOR" "%~" HOME_SUB_ICON 0 '${$((!${#${(%)${:-%~}}:#\~?*})):#0}'
+    $1_prompt_segment $0_ETC $2 blue "$DEFAULT_COLOR" "%~" ETC_ICON 0 '${$((!${#${(%)${:-%~}}:#/etc*})):#0}'
+    $1_prompt_segment $0_DEFAULT $2 blue "$DEFAULT_COLOR" "%~" FOLDER_ICON 0 '${${${(%)${:-%~}}:#\~*}:#/etc*}'
+    _P9K_CACHE_KEY=$key
+    _p9k_cache_set "$_P9K_PROMPT"
+    _P9K_PROMPT=$p
+  fi
+  _P9K_PROMPT+=${_P9K_CACHE_VAL[1]}
 }
 
 ################################################################
