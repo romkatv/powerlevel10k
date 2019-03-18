@@ -59,6 +59,7 @@ typeset -g _P9K_RETVAL
 typeset -g _P9K_CACHE_KEY
 typeset -ga _P9K_CACHE_VAL
 typeset -gA _P9K_CACHE
+typeset -a _P9K_T
 
 # Specifies the maximum number of elements in the cache. When the cache grows over this limit,
 # it gets cleared. This is meant to avoid memory leaks when a rogue prompt is filling the cache
@@ -149,84 +150,67 @@ set_default POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS " "
 left_prompt_segment() {
   if ! _p9k_cache_get "$0" "$1" "$2" "$3" "$4" "$6"; then
     _p9k_color $3 $1 BACKGROUND
-    local background_color=$_P9K_RETVAL
-    _p9k_background $background_color
-    _p9k_escape_rcurly $_P9K_RETVAL
-    local pre=$_P9K_RETVAL
+    local bg_color=$_P9K_RETVAL
+    _p9k_background $bg_color
+    local bg=$_P9K_RETVAL
 
     _p9k_color $4 $1 FOREGROUND
-    local foreground_color=$_P9K_RETVAL
-    _p9k_foreground $foreground_color
-    local foreground=$_P9K_RETVAL
-
-    _p9k_foreground $DEFAULT_COLOR
-    local default_foreground=$_P9K_RETVAL
+    local fg_color=$_P9K_RETVAL
+    _p9k_foreground $fg_color
+    local fg=$_P9K_RETVAL
 
     _p9k_get_icon LEFT_SUBSEGMENT_SEPARATOR
     local subsep=$_P9K_RETVAL
 
-    _p9k_get_icon LEFT_SEGMENT_SEPARATOR
-    local sep=$_P9K_RETVAL
-
     _p9k_escape_rcurly $POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS
     local space=$_P9K_RETVAL
 
-    if [[ -z $foreground_color ]]; then
-      _p9k_escape_rcurly $default_foreground$subsep$POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS
-      local divider=$_P9K_RETVAL
-    else
-      _p9k_escape_rcurly $foreground$subsep$POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS
-      local divider=$_P9K_RETVAL
-    fi
-
-    _p9k_escape_rcurly "%F{\$_P9K_BG}${sep}${POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS}"
-    local separator=$_P9K_RETVAL
-
-    local post
-    local has_icon=0
+    local icon icon_sep
     if [[ -n $6 ]]; then
       _p9k_get_icon $6
       if [[ -n $_P9K_RETVAL ]]; then
-        local icon=$_P9K_RETVAL
-        _p9k_color $foreground_color $1 VISUAL_IDENTIFIER_COLOR
+        local glyph=$_P9K_RETVAL
+        _p9k_color $fg_color $1 VISUAL_IDENTIFIER_COLOR
         _p9k_foreground $_P9K_RETVAL
-        _p9k_escape_rcurly "${_P9K_RETVAL}${icon}"
-        post=$_P9K_RETVAL
-        has_icon=1
+        icon=$_P9K_RETVAL$glyph
+        icon_sep="\${_P9K_C:+ }"
       fi
     fi
-    _p9k_escape_rcurly $foreground
-    post+=$_P9K_RETVAL
+    icon+=$fg
 
-    local icon_sep
-    (( has_icon )) && icon_sep="\${_P9K_C:+ }"
+    local t=$#_P9K_T
+    _P9K_T+=$bg$POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS$icon                      # 1
+    _P9K_T+=$bg$icon                                                                    # 2
+    if [[ -z $fg_color ]]; then
+      _p9k_foreground $DEFAULT_COLOR
+      _P9K_T+=$bg$_P9K_RETVAL$subsep$POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS$icon # 3
+    else
+      _P9K_T+=$bg$fg$subsep$POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS$icon          # 3
+    fi
+    _p9k_get_icon LEFT_SEGMENT_SEPARATOR
+    _P9K_T+=$bg$_P9K_RETVAL$POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS$icon          # 4
 
     local output
     output+="\${_P9K_N::=}"
-    output+="\${\${_P9K_E:-\${_P9K_N:=9}}+}"
-    output+="\${\${\${\${_P9K_BG:-0}:#NONE}:-\${_P9K_N:=1}}+}"
-    output+="\${\${\${\$((_P9K_I>=$_P9K_LEFT_JOIN[$2])):#1}:-\${_P9K_N:=2}}+}"
-    output+="\${\${\${\${:-0\$_P9K_BG}:#0$background_color}:-\${_P9K_N:=3}}+}"
-    output+="\${\${_P9K_N:=4}+}"
-    output+="\${\${_P9K_V[1]::=$pre$space$post}+}"
-    output+="\${\${_P9K_V[2]::=$pre$post}+}"
-    output+="\${\${_P9K_V[3]::=$pre$divider$post}+}"
-    output+="\${\${_P9K_V[4]::=$pre$separator$post}+}"
-    output+="\${_P9K_V[\$_P9K_N]}"
-    output+="\${_P9K_E:+$icon_sep\${_P9K_C}$space\${\${_P9K_I::=$2}+}\${\${_P9K_BG::=$background_color}+}}"
+    output+="\${_P9K_F::=}"
+    output+="\${\${\${\${_P9K_BG:-0}:#NONE}:-\${_P9K_N:=$((t+1))}}+}"
+    output+="\${\${\${\$((_P9K_I>=$_P9K_LEFT_JOIN[$2])):#1}:-\${_P9K_N:=$((t+2))}}+}"
+    output+="\${\${\${\${:-0\$_P9K_BG}:#0$bg_color}:-\${_P9K_N:=$((t+3))}}+}"
+    output+="\${\${_P9K_N:=\${\${_P9K_F::=%F{\$_P9K_BG\}}+$((t+4))}}+}"
+    output+="\${_P9K_E:+\$_P9K_F\${_P9K_T[\$_P9K_N]}$icon_sep\${_P9K_C}$space\${\${_P9K_I::=$2}+}\${\${_P9K_BG::=$bg_color}+}}"
 
     _p9k_cache_set "$output"
 
     # Segment separator logic:
     #
     #   if [[ $_P9K_BG == NONE ]]; then
-    #     output+=$POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS  // _P9K_N=1
+    #     1
     #   elif (( joined )); then
-    #     output+=""                                              // _P9K_N=2
-    #   elif [[ $background_color == $_P9K_BG ]]; then
-    #     output+=$divider                                        // _P9K_N=3
+    #     2
+    #   elif [[ $bg_color == $_P9K_BG ]]; then
+    #     3
     #   else
-    #     output+=$separator                                      // _P9K_N=4
+    #     4
     #   fi
   fi
 
@@ -244,14 +228,14 @@ set_default POWERLEVEL9K_WHITESPACE_BETWEEN_RIGHT_SEGMENTS " "
 right_prompt_segment() {
   if ! _p9k_cache_get "$0" "$1" "$2" "$3" "$4" "$6"; then
     _p9k_color $3 $1 BACKGROUND
-    local background_color=$_P9K_RETVAL
-    _p9k_background $background_color
+    local bg_color=$_P9K_RETVAL
+    _p9k_background $bg_color
     local background=$_P9K_RETVAL
 
     _p9k_color $4 $1 FOREGROUND
-    local foreground_color=$_P9K_RETVAL
-    _p9k_foreground $foreground_color
-    local foreground=$_P9K_RETVAL
+    local fg_color=$_P9K_RETVAL
+    _p9k_foreground $fg_color
+    local fg=$_P9K_RETVAL
 
     _p9k_foreground $DEFAULT_COLOR
     local default_foreground=$_P9K_RETVAL
@@ -262,19 +246,19 @@ right_prompt_segment() {
     _p9k_get_icon RIGHT_SEGMENT_SEPARATOR
     local sep=$_P9K_RETVAL
 
-    _p9k_escape_rcurly "%F{$background_color}$sep$background$POWERLEVEL9K_WHITESPACE_BETWEEN_RIGHT_SEGMENTS$foreground"
+    _p9k_escape_rcurly "%F{$bg_color}$sep$background$POWERLEVEL9K_WHITESPACE_BETWEEN_RIGHT_SEGMENTS$fg"
     local space=$_P9K_RETVAL
 
-    _p9k_escape_rcurly $background$foreground
+    _p9k_escape_rcurly $background$fg
     local joiner=$_P9K_RETVAL
 
     local divider
-    if [[ -z $foreground_color ]]; then
+    if [[ -z $fg_color ]]; then
       divider=$default_foreground
     else
-      divider=$foreground
+      divider=$fg
     fi
-    _p9k_escape_rcurly $divider$subsep$background$POWERLEVEL9K_WHITESPACE_BETWEEN_RIGHT_SEGMENTS$foreground
+    _p9k_escape_rcurly $divider$subsep$background$POWERLEVEL9K_WHITESPACE_BETWEEN_RIGHT_SEGMENTS$fg
     divider=$_P9K_RETVAL
 
     local icon
@@ -282,7 +266,7 @@ right_prompt_segment() {
       _p9k_get_icon $6
       if [[ -n $_P9K_RETVAL ]]; then
         local glyph=$_P9K_RETVAL
-        _p9k_color $foreground_color $1 VISUAL_IDENTIFIER_COLOR
+        _p9k_color $fg_color $1 VISUAL_IDENTIFIER_COLOR
         _p9k_foreground $_P9K_RETVAL
         _p9k_escape_rcurly "${_P9K_RETVAL}${glyph} "
         icon=$_P9K_RETVAL
@@ -294,14 +278,14 @@ right_prompt_segment() {
     output+="\${\${_P9K_E:-\${_P9K_N:=9}}+}"
     output+="\${\${\${\${_P9K_BG:-0}:#NONE}:-\${_P9K_N:=1}}+}"
     output+="\${\${\${\$((_P9K_I>=$_P9K_RIGHT_JOIN[$2])):#1}:-\${_P9K_N:=2}}+}"
-    output+="\${\${\${\${:-0\$_P9K_BG}:#0$background_color}:-\${_P9K_N:=3}}+}"
+    output+="\${\${\${\${:-0\$_P9K_BG}:#0$bg_color}:-\${_P9K_N:=3}}+}"
     output+="\${\${_P9K_N:=1}+}"
     output+="\${\${_P9K_V[1]::=$space}+}"
     output+="\${\${_P9K_V[2]::=$joiner}+}"
     output+="\${\${_P9K_V[3]::=$divider}+}"
     output+="\${\${_P9K_V[4]::=$space}+}"
     output+="\${_P9K_V[\$_P9K_N]}"
-    output+="\${_P9K_E:+\${_P9K_C}\${_P9K_C:+ }$icon\${\${_P9K_I::=$2}+}\${\${_P9K_BG::=$background_color}+}}"
+    output+="\${_P9K_E:+\${_P9K_C}\${_P9K_C:+ }$icon\${\${_P9K_I::=$2}+}\${\${_P9K_BG::=$bg_color}+}}"
 
     _p9k_cache_set "$output"
 
@@ -311,7 +295,7 @@ right_prompt_segment() {
     #     output+=$space                                 # _P9K_N=1
     #   elif (( joined )); then
     #     output+=$joiner                                # _P9K_N=2
-    #   elif [[ $background_color == $_P9K_BG ]]; then
+    #   elif [[ $bg_color == $_P9K_BG ]]; then
     #     output+=$divider                               # _P9K_N=3
     #   else
     #     output+=$space                                 # _P9K_N=1
