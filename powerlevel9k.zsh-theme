@@ -151,12 +151,12 @@ _p9k_escape_rcurly() {
 set_default POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS " "
 left_prompt_segment() {
   if ! _p9k_cache_get "$0" "$1" "$2" "$3" "$4" "$6"; then
-    _p9k_color "$3" "$1" BACKGROUND
+    _p9k_color $3 $1 BACKGROUND
     local bg_color=$_P9K_RETVAL
     _p9k_background $bg_color
     local bg=$_P9K_RETVAL
 
-    _p9k_color "$4" "$1" FOREGROUND
+    _p9k_color $4 $1 FOREGROUND
     local fg_color=$_P9K_RETVAL
     _p9k_foreground $fg_color
     local fg=$_P9K_RETVAL
@@ -172,7 +172,7 @@ left_prompt_segment() {
       _p9k_get_icon $6
       if [[ -n $_P9K_RETVAL ]]; then
         local glyph=$_P9K_RETVAL
-        _p9k_color "$fg_color" "$1" VISUAL_IDENTIFIER_COLOR
+        _p9k_color $fg_color $1 VISUAL_IDENTIFIER_COLOR
         _p9k_foreground $_P9K_RETVAL
         icon=$_P9K_RETVAL$glyph
         icon_sep="\${_P9K_C:+ }"
@@ -228,12 +228,12 @@ left_prompt_segment() {
 set_default POWERLEVEL9K_WHITESPACE_BETWEEN_RIGHT_SEGMENTS " "
 right_prompt_segment() {
   if ! _p9k_cache_get "$0" "$1" "$2" "$3" "$4" "$6"; then
-    _p9k_color "$3" "$1" BACKGROUND
+    _p9k_color $3 $1 BACKGROUND
     local bg_color=$_P9K_RETVAL
     _p9k_background $bg_color
     local bg=$_P9K_RETVAL
 
-    _p9k_color "$4" "$1" FOREGROUND
+    _p9k_color $4 $1 FOREGROUND
     local fg_color=$_P9K_RETVAL
     _p9k_foreground $fg_color
     local fg=$_P9K_RETVAL
@@ -246,10 +246,10 @@ right_prompt_segment() {
       _p9k_get_icon $6
       if [[ -n $_P9K_RETVAL ]]; then
         local glyph=$_P9K_RETVAL
-        _p9k_color "$fg_color" "$1" VISUAL_IDENTIFIER_COLOR
+        _p9k_color $fg_color $1 VISUAL_IDENTIFIER_COLOR
         _p9k_foreground $_P9K_RETVAL
-        _p9k_escape_rcurly "${_P9K_RETVAL}${glyph}"
-        icon="\${_P9K_C:+ }${_P9K_RETVAL}"
+        _p9k_escape_rcurly "${_P9K_RETVAL}${glyph} "
+        icon=$_P9K_RETVAL
       fi
     fi
 
@@ -273,7 +273,7 @@ right_prompt_segment() {
     output+="\${\${_P9K_N:=\${\${\$((_P9K_I>=$_P9K_RIGHT_JOIN[$2])):#0}:+$((t+2))}}+}"        # 2
     output+="\${\${_P9K_N:=\${\${\$((!\${#\${:-0\$_P9K_BG}:#0$bg_color})):#0}:+$((t+3))}}+}"  # 3
     output+="\${\${_P9K_N:=$((t+1))}+}"                                                       # 4 == 1
-    output+="\${_P9K_T[\$_P9K_N]}\${_P9K_C}$icon\${\${_P9K_I::=$2}+}\${\${_P9K_BG::=$bg_color}+}}"
+    output+="\${_P9K_T[\$_P9K_N]}\${_P9K_C}\${_P9K_C:+ }$icon\${\${_P9K_I::=$2}+}\${\${_P9K_BG::=$bg_color}+}}"
 
     _p9k_cache_set "$output"
   fi
@@ -609,11 +609,11 @@ set_default POWERLEVEL9K_ALWAYS_SHOW_USER false
 set_default POWERLEVEL9K_CONTEXT_TEMPLATE "%n@%m"
 prompt_context() {
   local content
-  if [[ $POWERLEVEL9K_ALWAYS_SHOW_CONTEXT == true || -z $DEFAULT_USER || -n $SSH_CLIENT || -n $SSH_TTY ]]; then
+  if [[ $POWERLEVEL9K_ALWAYS_SHOW_CONTEXT == true ]]; then
     content=$POWERLEVEL9K_CONTEXT_TEMPLATE
   else
     local user=$(whoami)
-    if [[ $user != $DEFAULT_USER ]]; then
+    if [[ $user != $DEFAULT_USER || -n $SSH_CLIENT || -n $SSH_TTY ]]; then
       content="${POWERLEVEL9K_CONTEXT_TEMPLATE}"
     elif [[ $POWERLEVEL9K_ALWAYS_SHOW_USER == true ]]; then
       content="${user//\%/%%}"
