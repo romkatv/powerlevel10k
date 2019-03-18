@@ -193,23 +193,23 @@ left_prompt_segment() {
     #   fi
 
     local t=$#_P9K_T
-    _P9K_T+=$bg$POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS$icon                         # 1
-    _P9K_T+=$bg$icon                                                                       # 2
+    _P9K_T+=$bg$POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS$icon                           # 1
+    _P9K_T+=$bg$icon                                                                         # 2
     if [[ -z $fg_color ]]; then
       _p9k_foreground $DEFAULT_COLOR
-      _P9K_T+=$bg$_P9K_RETVAL$subsep$POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS$icon    # 3
+      _P9K_T+=$bg$_P9K_RETVAL$subsep$POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS$icon      # 3
     else
-      _P9K_T+=$bg$fg$subsep$POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS$icon             # 3
+      _P9K_T+=$bg$fg$subsep$POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS$icon               # 3
     fi
     _p9k_get_icon LEFT_SEGMENT_SEPARATOR
-    _P9K_T+=$bg$_P9K_RETVAL$POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS$icon             # 4
+    _P9K_T+=$bg$_P9K_RETVAL$POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS$icon               # 4
 
     local output
     output+="\${_P9K_N::=}\${_P9K_F::=}"
-    output+="\${\${\${\${_P9K_BG:-0}:#NONE}:-\${_P9K_N::=$((t+1))}}+}"                     # 1
-    output+="\${\${_P9K_N:=\${\${\$((_P9K_I>=$_P9K_LEFT_JOIN[$2])):#0}:+$((t+2))}}+}"      # 2
-    output+="\${\${_P9K_N:=\${\${\$((!\${#\${_P9K_BG:-0}:#$bg_color})):#0}:+$((t+3))}}+}"  # 3
-    output+="\${\${_P9K_N:=\${\${_P9K_F::=%F{\$_P9K_BG\}}+$((t+4))}}+}"                    # 4
+    output+="\${\${\${\${_P9K_BG:-0}:#NONE}:-\${_P9K_N::=$((t+1))}}+}"                        # 1
+    output+="\${\${_P9K_N:=\${\${\$((_P9K_I>=$_P9K_LEFT_JOIN[$2])):#0}:+$((t+2))}}+}"         # 2
+    output+="\${\${_P9K_N:=\${\${\$((!\${#\${:-0\$_P9K_BG}:#0$bg_color})):#0}:+$((t+3))}}+}"  # 3
+    output+="\${\${_P9K_N:=\${\${_P9K_F::=%F{\$_P9K_BG\}}+$((t+4))}}+}"                       # 4
     output+="\$_P9K_F\${_P9K_T[\$_P9K_N]}$icon_sep\${_P9K_C}$space\${\${_P9K_I::=$2}+}\${\${_P9K_BG::=$bg_color}+}}"
 
     _p9k_cache_set "$output"
@@ -269,10 +269,10 @@ right_prompt_segment() {
 
     local output
     output+="\${_P9K_N::=}"
-    output+="\${\${\${\${_P9K_BG:-0}:#NONE}:-\${_P9K_N::=$((t+1))}}+}"                     # 1
-    output+="\${\${_P9K_N:=\${\${\$((_P9K_I>=$_P9K_RIGHT_JOIN[$2])):#0}:+$((t+2))}}+}"     # 2
-    output+="\${\${_P9K_N:=\${\${\$((!\${#\${_P9K_BG:-0}:#$bg_color})):#0}:+$((t+3))}}+}"  # 3
-    output+="\${\${_P9K_N:=$((t+1))}+}"                                                    # 4 == 1
+    output+="\${\${\${\${_P9K_BG:-0}:#NONE}:-\${_P9K_N::=$((t+1))}}+}"                        # 1
+    output+="\${\${_P9K_N:=\${\${\$((_P9K_I>=$_P9K_RIGHT_JOIN[$2])):#0}:+$((t+2))}}+}"        # 2
+    output+="\${\${_P9K_N:=\${\${\$((!\${#\${:-0\$_P9K_BG}:#0$bg_color})):#0}:+$((t+3))}}+}"  # 3
+    output+="\${\${_P9K_N:=$((t+1))}+}"                                                       # 4 == 1
     output+="\${_P9K_T[\$_P9K_N]}\${_P9K_C}\${_P9K_C:+ }$icon\${\${_P9K_I::=$2}+}\${\${_P9K_BG::=$bg_color}+}}"
 
     _p9k_cache_set "$output"
