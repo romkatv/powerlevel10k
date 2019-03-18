@@ -197,7 +197,7 @@ left_prompt_segment() {
     output+="\${\${\${\$((_P9K_I>=$_P9K_LEFT_JOIN[$2])):#1}:-\${_P9K_N:=$((t+2))}}+}"
     output+="\${\${\${\${:-0\$_P9K_BG}:#0$bg_color}:-\${_P9K_N:=$((t+3))}}+}"
     output+="\${\${_P9K_N:=\${\${_P9K_F::=%F{\$_P9K_BG\}}+$((t+4))}}+}"
-    output+="\${_P9K_E:+\$_P9K_F\${_P9K_T[\$_P9K_N]}$icon_sep\${_P9K_C}$space\${\${_P9K_I::=$2}+}\${\${_P9K_BG::=$bg_color}+}}"
+    output+="\$_P9K_F\${_P9K_T[\$_P9K_N]}$icon_sep\${_P9K_C}$space\${\${_P9K_I::=$2}+}\${\${_P9K_BG::=$bg_color}+}}"
 
     _p9k_cache_set "$output"
 
@@ -220,7 +220,7 @@ left_prompt_segment() {
     local content="\${(Q)\${:-${(q)5}}}"
   fi
 
-  _P9K_PROMPT+="\${\${_P9K_E::=${8:-1}}+}\${\${_P9K_C::=${content}}+}${_P9K_CACHE_VAL[1]}"
+  _P9K_PROMPT+="\${\${:-${8:-1}}:+\${\${_P9K_C::=${content}}+}${_P9K_CACHE_VAL[1]}"
 }
 
 # The same as left_prompt_segment above but for the right prompt.
