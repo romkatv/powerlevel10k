@@ -245,13 +245,16 @@ right_prompt_segment() {
     if [[ -n $6 ]]; then
       _p9k_get_icon $6
       if [[ -n $_P9K_RETVAL ]]; then
+        _p9k_escape_rcurly $_P9K_RETVAL
         local glyph=$_P9K_RETVAL
         _p9k_color $fg_color $1 VISUAL_IDENTIFIER_COLOR
         _p9k_foreground $_P9K_RETVAL
-        _p9k_escape_rcurly "${_P9K_RETVAL}${glyph} "
-        icon=$_P9K_RETVAL
+        _p9k_escape_rcurly $_P9K_RETVAL
+        icon="$_P9K_RETVAL\${_P9K_C:+ }$glyph"
       fi
     fi
+    _p9k_escape_rcurly $POWERLEVEL9K_WHITESPACE_BETWEEN_RIGHT_SEGMENTS
+    icon+=$_P9K_RETVAL
 
     # Segment separator logic is the same as in left_prompt_segment except that here #4 and #1 are
     # identical.
@@ -273,7 +276,7 @@ right_prompt_segment() {
     output+="\${\${_P9K_N:=\${\${\$((_P9K_I>=$_P9K_RIGHT_JOIN[$2])):#0}:+$((t+2))}}+}"        # 2
     output+="\${\${_P9K_N:=\${\${\$((!\${#\${:-0\$_P9K_BG}:#0$bg_color})):#0}:+$((t+3))}}+}"  # 3
     output+="\${\${_P9K_N:=$((t+1))}+}"                                                       # 4 == 1
-    output+="\${_P9K_T[\$_P9K_N]}\${_P9K_C}\${_P9K_C:+ }$icon\${\${_P9K_I::=$2}+}\${\${_P9K_BG::=$bg_color}+}}"
+    output+="\${_P9K_T[\$_P9K_N]}\${_P9K_C}$icon\${\${_P9K_I::=$2}+}\${\${_P9K_BG::=$bg_color}+}}"
 
     _p9k_cache_set "$output"
   fi
@@ -2231,7 +2234,7 @@ _p9k_init() {
   _p9k_get_icon LEFT_SEGMENT_END_SEPARATOR
   _P9K_LEFT_SUFFIX+=$_P9K_RETVAL
 
-  _P9K_RIGHT_SUFFIX+="%E"
+  _P9K_RIGHT_SUFFIX+="%{$reset_color%}%E"
 
   if [[ $POWERLEVEL9K_PROMPT_ON_NEWLINE == true ]]; then
     _p9k_get_icon MULTILINE_FIRST_PROMPT_PREFIX
@@ -2253,7 +2256,6 @@ _p9k_init() {
   fi
 
   _P9K_RIGHT_PREFIX+="%f%b%k"
-  _P9K_RIGHT_SUFFIX="%{$reset_color%}$_P9K_RIGHT_SUFFIX"
 
   if [[ $POWERLEVEL9K_PROMPT_ADD_NEWLINE == true ]]; then
     repeat ${POWERLEVEL9K_PROMPT_ADD_NEWLINE_COUNT:-1} { _P9K_LEFT_PREFIX=$'\n'$_P9K_LEFT_PREFIX }
