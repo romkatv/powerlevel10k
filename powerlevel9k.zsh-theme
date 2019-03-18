@@ -609,11 +609,11 @@ set_default POWERLEVEL9K_ALWAYS_SHOW_USER false
 set_default POWERLEVEL9K_CONTEXT_TEMPLATE "%n@%m"
 prompt_context() {
   local content
-  if [[ $POWERLEVEL9K_ALWAYS_SHOW_CONTEXT == true ]]; then
+  if [[ $POWERLEVEL9K_ALWAYS_SHOW_CONTEXT == true || -z $DEFAULT_USER || -n $SSH_CLIENT || -n $SSH_TTY ]]; then
     content=$POWERLEVEL9K_CONTEXT_TEMPLATE
   else
     local user=$(whoami)
-    if [[ $user != $DEFAULT_USER || -n $SSH_CLIENT || -n $SSH_TTY ]]; then
+    if [[ $user != $DEFAULT_USER ]]; then
       content="${POWERLEVEL9K_CONTEXT_TEMPLATE}"
     elif [[ $POWERLEVEL9K_ALWAYS_SHOW_USER == true ]]; then
       content="${user//\%/%%}"
