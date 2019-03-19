@@ -1697,61 +1697,51 @@ function _p9k_vcs_render() {
     local ws
     if [[ $POWERLEVEL9K_SHOW_CHANGESET == true || -z $VCS_STATUS_LOCAL_BRANCH ]]; then
       _p9k_get_icon VCS_COMMIT_ICON
-      fmt COMMIT "$ws$_P9K_RETVAL${VCS_STATUS_COMMIT:0:$POWERLEVEL9K_VCS_INTERNAL_HASH_LENGTH}"
+      fmt COMMIT "$_P9K_RETVAL${VCS_STATUS_COMMIT:0:$POWERLEVEL9K_VCS_INTERNAL_HASH_LENGTH}"
       ws=' '
     fi
 
     if [[ -n $VCS_STATUS_LOCAL_BRANCH ]]; then
       _p9k_get_icon VCS_BRANCH_ICON
       fmt BRANCH "$ws$_P9K_RETVAL${VCS_STATUS_LOCAL_BRANCH//\%/%%}"
-      ws=' '
     fi
 
     if [[ $POWERLEVEL9K_VCS_HIDE_TAGS == false && -n $VCS_STATUS_TAG ]]; then
       _p9k_get_icon VCS_TAG_ICON
-      fmt TAG "$ws$_P9K_RETVAL${VCS_STATUS_TAG//\%/%%}"
-      ws=' '
+      fmt TAG " $_P9K_RETVAL${VCS_STATUS_TAG//\%/%%}"
     fi
 
     if [[ -n $VCS_STATUS_ACTION ]]; then
-      fmt ACTION "$ws| ${VCS_STATUS_ACTION//\%/%%}"
-      ws=' '
+      fmt ACTION " | ${VCS_STATUS_ACTION//\%/%%}"
     else
       if [[ -n $VCS_STATUS_REMOTE_BRANCH &&
             $VCS_STATUS_LOCAL_BRANCH != $VCS_STATUS_REMOTE_BRANCH ]]; then
         _p9k_get_icon VCS_REMOTE_BRANCH_ICON
-        fmt REMOTE_BRANCH "$ws$_P9K_RETVAL${VCS_STATUS_REMOTE_BRANCH//\%/%%}"
-        ws=' '
+        fmt REMOTE_BRANCH " $_P9K_RETVAL${VCS_STATUS_REMOTE_BRANCH//\%/%%}"
       fi
       if [[ $VCS_STATUS_HAS_STAGED == 1 ]]; then
         _p9k_get_icon VCS_STAGED_ICON
-        fmt STAGED "$ws$_P9K_RETVAL"
-        ws=' '
+        fmt STAGED " $_P9K_RETVAL"
       fi
       if [[ $VCS_STATUS_HAS_UNSTAGED == 1 ]]; then
         _p9k_get_icon VCS_UNSTAGED_ICON
-        fmt UNSTAGED "$ws$_P9K_RETVAL"
-        ws=' '
+        fmt UNSTAGED " $_P9K_RETVAL"
       fi
       if [[ $VCS_STATUS_HAS_UNTRACKED == 1 ]]; then
         _p9k_get_icon VCS_UNTRACKED_ICON
-        fmt UNTRACKED "$ws$_P9K_RETVAL"
-        ws=' '
+        fmt UNTRACKED " $_P9K_RETVAL"
       fi
       if [[ $VCS_STATUS_COMMITS_AHEAD -gt 0 ]]; then
         _p9k_get_icon VCS_OUTGOING_CHANGES_ICON
-        fmt OUTGOING_CHANGES "$ws$_P9K_RETVAL$VCS_STATUS_COMMITS_AHEAD"
-        ws=' '
+        fmt OUTGOING_CHANGES " $_P9K_RETVAL$VCS_STATUS_COMMITS_AHEAD"
       fi
       if [[ $VCS_STATUS_COMMITS_BEHIND -gt 0 ]]; then
         _p9k_get_icon VCS_INCOMING_CHANGES_ICON
-        fmt INCOMING_CHANGES "$ws$_P9K_RETVAL$VCS_STATUS_COMMITS_BEHIND"
-        ws=' '
+        fmt INCOMING_CHANGES " $_P9K_RETVAL$VCS_STATUS_COMMITS_BEHIND"
       fi
       if [[ $VCS_STATUS_STASHES -gt 0 ]]; then
         _p9k_get_icon VCS_STASH_ICON
-        fmt STASH "$ws$_P9K_RETVAL$VCS_STATUS_STASHES"
-        ws=' '
+        fmt STASH " $_P9K_RETVAL$VCS_STATUS_STASHES"
       fi
     fi
 
