@@ -1625,7 +1625,7 @@ function _p9k_vcs_render() {
       [[ $#msg != 0 || $dir == / ]] && break
       dir=${dir:h}
     done
-    (( $#msg )) || msg=(loading)
+    [[ $#msg -gt 1 || -n ${msg[0]} ]] || msg=(loading)
     $2_prompt_segment $1_LOADING $3 "${vcs_states[loading]}" "$DEFAULT_COLOR" '' 0 '' "${msg[@]}"
     return 0
   fi
