@@ -20,9 +20,13 @@
 #zstyle ':vcs_info:*+*:*' debug true
 #set -o xtrace
 
-# Bail out if it's not the first time the file is being sourced.
-# Second sourcing will cause mayhem.
-[[ -v _P9K_SOURCED ]] && return
+test -n "$ZSH_VERSION" || exit 1
+
+if [[ -v _P9K_SOURCED ]]; then
+  prompt_powerlevel9k_setup "$@"
+  return
+fi
+
 readonly _P9K_SOURCED=1
 
 typeset -g _P9K_INSTALLATION_DIR
