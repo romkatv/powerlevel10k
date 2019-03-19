@@ -140,21 +140,19 @@ _p9k_escape_rcurly() {
 
 # Begin a left prompt segment.
 #
-#   * $1: Name of the function that was originally invoked (mandatory).
-#         Necessary, to make the dynamic color-overwrite mechanism work.
-#   * $2: The array index of the current segment
-#   * $3: Background color
-#   * $4: Foreground color
-#   * $5: The segment content
-#   * $6: An identifying icon (must be a key of the icons array)
-#   * $7: 1 to to perform parameter expansion and process substitution.
-#   * $8: If not empty but becomes empty after prompt parameter expansion and process substitution,
-#         the segment isn't rendered.
-#
-# The latter four can be omitted.
+#    * $1: Name of the function that was originally invoked.
+#          Necessary, to make the dynamic color-overwrite mechanism work.
+#    * $2: The array index of the current segment.
+#    * $3: Background color.
+#    * $4: Foreground color.
+#    * $5: An identifying icon (must be a key of the icons array).
+#    * $6: 1 to to perform parameter expansion and process substitution.
+#    * $7: If not empty but becomes empty after parameter expansion and process substitution,
+#          the segment isn't rendered.
+#   * $8+: The segment content
 set_default POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS " "
 left_prompt_segment() {
-  if ! _p9k_cache_get "$0" "$1" "$2" "$3" "$4" "$6"; then
+  if ! _p9k_cache_get "$0" "$1" "$2" "$3" "$4" "$5"; then
     _p9k_color $3 $1 BACKGROUND
     local bg_color=$_P9K_RETVAL
     _p9k_background $bg_color
@@ -171,18 +169,18 @@ left_prompt_segment() {
     _p9k_escape_rcurly $POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS
     local space=$_P9K_RETVAL
 
-    local icon icon_sep
-    if [[ -n $6 ]]; then
-      _p9k_get_icon $6
+    local icon
+    local -i has_icon
+    if [[ -n $5 ]]; then
+      _p9k_get_icon $5
       if [[ -n $_P9K_RETVAL ]]; then
         local glyph=$_P9K_RETVAL
         _p9k_color $fg_color $1 VISUAL_IDENTIFIER_COLOR
         _p9k_foreground $_P9K_RETVAL
         icon=$_P9K_RETVAL$glyph
-        icon_sep="\${_P9K_C:+ }"
+        has_icon=1
       fi
     fi
-    icon+=$fg
 
     # Segment separator logic:
     #
@@ -208,30 +206,39 @@ left_prompt_segment() {
     _p9k_get_icon LEFT_SEGMENT_SEPARATOR
     _P9K_T+=$bg$_P9K_RETVAL$POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS$icon               # 4
 
-    local output
-    output+="\${_P9K_N::=}\${_P9K_F::=}"
-    output+="\${\${\${\${_P9K_BG:-0}:#NONE}:-\${_P9K_N::=$((t+1))}}+}"                        # 1
-    output+="\${\${_P9K_N:=\${\${\$((_P9K_I>=$_P9K_LEFT_JOIN[$2])):#0}:+$((t+2))}}+}"         # 2
-    output+="\${\${_P9K_N:=\${\${\$((!\${#\${:-0\$_P9K_BG}:#0$bg_color})):#0}:+$((t+3))}}+}"  # 3
-    output+="\${\${_P9K_N:=\${\${_P9K_F::=%F{\$_P9K_BG\}}+$((t+4))}}+}"                       # 4
-    output+="\$_P9K_F\${_P9K_T[\$_P9K_N]}$icon_sep\${_P9K_C}$space\${\${_P9K_I::=$2}+}\${\${_P9K_BG::=$bg_color}+}}"
+    local pre
+    pre+="\${_P9K_N::=}\${_P9K_F::=}"
+    pre+="\${\${\${\${_P9K_BG:-0}:#NONE}:-\${_P9K_N::=$((t+1))}}+}"                        # 1
+    pre+="\${\${_P9K_N:=\${\${\$((_P9K_I>=$_P9K_LEFT_JOIN[$2])):#0}:+$((t+2))}}+}"         # 2
+    pre+="\${\${_P9K_N:=\${\${\$((!\${#\${:-0\$_P9K_BG}:#0$bg_color})):#0}:+$((t+3))}}+}"  # 3
+    pre+="\${\${_P9K_N:=\${\${_P9K_F::=%F{\$_P9K_BG\}}+$((t+4))}}+}"                       # 4
+    pre+="\$_P9K_F\${_P9K_T[\$_P9K_N]}"
+    
+    local post="\${_P9K_C}$space\${\${_P9K_I::=$2}+}\${\${_P9K_BG::=$bg_color}+}}"
 
-    _p9k_cache_set "$output"
+    _p9k_cache_set $has_icon $fg $pre $post
   fi
 
-  if (( $7 )); then
-    local content=$5
-  else
-    local content="\${(Q)\${:-${(q)5}}}"
-  fi
+  local name=$1
+  local -i has_icon=${_P9K_CACHE_VAL[1]}
+  local fg=${_P9K_CACHE_VAL[2]}
+  local -i expand=$6
+  local cond=${7:-1}
+  shift 7
 
-  _P9K_PROMPT+="\${\${:-${8:-1}}:+\${\${_P9K_C::=${content}}+}${_P9K_CACHE_VAL[1]}"
+  _p9k_escape_rcurly $fg
+  local content="${(j::)${:-$_P9K_RETVAL${^@}}}"
+  (( expand )) || content="\${(Q)\${:-${(q)content}}}"
+
+  _P9K_PROMPT+="\${\${:-$cond}:+\${\${_P9K_C::=${content}}+}${_P9K_CACHE_VAL[3]}"
+  (( has_icon )) && _P9K_PROMPT+="\${\${\${#_P9K_C}:#$(($# * $#fg))}:+ }"
+  _P9K_PROMPT+=${_P9K_CACHE_VAL[4]}
 }
 
 # The same as left_prompt_segment above but for the right prompt.
 set_default POWERLEVEL9K_WHITESPACE_BETWEEN_RIGHT_SEGMENTS " "
 right_prompt_segment() {
-  if ! _p9k_cache_get "$0" "$1" "$2" "$3" "$4" "$6"; then
+  if ! _p9k_cache_get "$0" "$1" "$2" "$3" "$4" "$5"; then
     _p9k_color $3 $1 BACKGROUND
     local bg_color=$_P9K_RETVAL
     _p9k_background $bg_color
@@ -245,21 +252,21 @@ right_prompt_segment() {
     _p9k_get_icon RIGHT_SUBSEGMENT_SEPARATOR
     local subsep=$_P9K_RETVAL
 
-    local icon
-    if [[ -n $6 ]]; then
-      _p9k_get_icon $6
+    local icon_fg icon
+    local -i has_icon
+    if [[ -n $5 ]]; then
+      _p9k_get_icon $5
       if [[ -n $_P9K_RETVAL ]]; then
         _p9k_escape_rcurly $_P9K_RETVAL
-        local glyph=$_P9K_RETVAL
+        icon=$_P9K_RETVAL
         _p9k_color $fg_color $1 VISUAL_IDENTIFIER_COLOR
         _p9k_foreground $_P9K_RETVAL
         _p9k_escape_rcurly $_P9K_RETVAL
-        icon="$_P9K_RETVAL\${_P9K_C:+ }$glyph"
+        icon_fg=$_P9K_RETVAL
+        has_icon=1
       fi
     fi
-    _p9k_escape_rcurly $POWERLEVEL9K_WHITESPACE_BETWEEN_RIGHT_SEGMENTS
-    icon+=$_P9K_RETVAL
-
+    
     # Segment separator logic is the same as in left_prompt_segment except that here #4 and #1 are
     # identical.
 
@@ -274,24 +281,33 @@ right_prompt_segment() {
       _P9K_T+=$fg$subsep$bg$POWERLEVEL9K_WHITESPACE_BETWEEN_RIGHT_SEGMENTS                    # 3
     fi
 
-    local output
-    output+="\${_P9K_N::=}"
-    output+="\${\${\${\${_P9K_BG:-0}:#NONE}:-\${_P9K_N::=$((t+1))}}+}"                        # 1
-    output+="\${\${_P9K_N:=\${\${\$((_P9K_I>=$_P9K_RIGHT_JOIN[$2])):#0}:+$((t+2))}}+}"        # 2
-    output+="\${\${_P9K_N:=\${\${\$((!\${#\${:-0\$_P9K_BG}:#0$bg_color})):#0}:+$((t+3))}}+}"  # 3
-    output+="\${\${_P9K_N:=$((t+1))}+}"                                                       # 4 == 1
-    output+="\${_P9K_T[\$_P9K_N]}\${_P9K_C}$icon\${\${_P9K_I::=$2}+}\${\${_P9K_BG::=$bg_color}+}}"
+    local pre
+    pre+="\${_P9K_N::=}"
+    pre+="\${\${\${\${_P9K_BG:-0}:#NONE}:-\${_P9K_N::=$((t+1))}}+}"                        # 1
+    pre+="\${\${_P9K_N:=\${\${\$((_P9K_I>=$_P9K_RIGHT_JOIN[$2])):#0}:+$((t+2))}}+}"        # 2
+    pre+="\${\${_P9K_N:=\${\${\$((!\${#\${:-0\$_P9K_BG}:#0$bg_color})):#0}:+$((t+3))}}+}"  # 3
+    pre+="\${\${_P9K_N:=$((t+1))}+}"                                                       # 4 == 1
+    pre+="\${_P9K_T[\$_P9K_N]}\${_P9K_C}$icon_fg"
+    
+    _p9k_escape_rcurly $POWERLEVEL9K_WHITESPACE_BETWEEN_RIGHT_SEGMENTS
+    local post="$icon$_P9K_RETVAL\${\${_P9K_I::=$2}+}\${\${_P9K_BG::=$bg_color}+}}"
 
-    _p9k_cache_set "$output"
+    _p9k_cache_set $has_icon $fg $pre $post
   fi
 
-  if (( $7 )); then
-    local content=$5
-  else
-    local content="\${(Q)\${:-${(q)5}}}"
-  fi
+  local -i has_icon=${_P9K_CACHE_VAL[1]}
+  local fg=${_P9K_CACHE_VAL[2]}
+  local -i expand=$6
+  local cond=${7:-1}
+  shift 7
 
-  _P9K_PROMPT+="\${\${:-${8:-1}}:+\${\${_P9K_C::=${content}}+}${_P9K_CACHE_VAL[1]}"
+  _p9k_escape_rcurly $fg
+  local content="${(j::)${:-$_P9K_RETVAL${^@}}}"
+  (( expand )) || content="\${(Q)\${:-${(q)content}}}"
+
+  _P9K_PROMPT+="\${\${:-$cond}:+\${\${_P9K_C::=${content}}+}${_P9K_CACHE_VAL[3]}"
+  (( has_icon )) && _P9K_PROMPT+="\${\${\${#_P9K_C}:#$(($# * $#fg))}:+ }"
+  _P9K_PROMPT+=${_P9K_CACHE_VAL[4]}
 }
 
 ################################################################
@@ -308,7 +324,7 @@ prompt_anaconda() {
   local path=$CONDA_ENV_PATH$CONDA_PREFIX
   if [[ -n $path ]]; then
     local prompt="$POWERLEVEL9K_ANACONDA_LEFT_DELIMITER${${path:t}//\%/%%}$POWERLEVEL9K_ANACONDA_RIGHT_DELIMITER"
-    "$1_prompt_segment" "$0" "$2" "blue" "$DEFAULT_COLOR" "$prompt" 'PYTHON_ICON'
+    "$1_prompt_segment" "$0" "$2" "blue" "$DEFAULT_COLOR" 'PYTHON_ICON' 0 '' "$prompt"
   fi
 }
 
@@ -317,7 +333,7 @@ prompt_anaconda() {
 prompt_aws() {
   local aws_profile="${AWS_PROFILE:-$AWS_DEFAULT_PROFILE}"
   if [[ -n "$aws_profile" ]]; then
-    "$1_prompt_segment" "$0" "$2" red white "${aws_profile//\%/%%}" 'AWS_ICON'
+    "$1_prompt_segment" "$0" "$2" red white 'AWS_ICON' 0 '' "${aws_profile//\%/%%}"
   fi
 }
 
@@ -327,7 +343,7 @@ prompt_aws_eb_env() {
   # TODO(roman): This is clearly broken. Fix it.
   local eb_env=$(grep environment .elasticbeanstalk/config.yml 2> /dev/null | awk '{print $2}')
   if [[ -n "$eb_env" ]]; then
-    "$1_prompt_segment" "$0" "$2" black green "${eb_env//\%/%%}" 'AWS_EB_ICON'
+    "$1_prompt_segment" "$0" "$2" black green 'AWS_EB_ICON' 0 '' "${eb_env//\%/%%}"
   fi
 }
 
@@ -344,7 +360,7 @@ prompt_background_jobs() {
       prompt='${${(%)${:-%j}}:#1}'
     fi
   fi
-  $1_prompt_segment $0 $2 "$DEFAULT_COLOR" cyan "$prompt" BACKGROUND_JOBS_ICON 1 '${${(%)${:-%j}}:#0}'
+  $1_prompt_segment $0 $2 "$DEFAULT_COLOR" cyan BACKGROUND_JOBS_ICON 1 '${${(%)${:-%j}}:#0}' "$prompt"
 }
 
 ################################################################
@@ -359,7 +375,7 @@ prompt_newline() {
     newline="${newline}${_P9K_RETVAL}"
   fi
   POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS=
-  "$1_prompt_segment" "$0" "$2" "" "" "${newline}"
+  "$1_prompt_segment" "$0" "$2" "" "" '' 0 '' "${newline}"
   _P9K_PROMPT+='${${_P9K_BG::=NONE}+}'
   POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS=$lws
 }
@@ -403,7 +419,7 @@ prompt_disk_usage() {
 
   # Draw the prompt_segment
   if [[ -n $disk_usage ]]; then
-    "$1_prompt_segment" "${0}_${current_state}" "$2" "${hdd_usage_backcolors[$current_state]}" "${hdd_usage_forecolors[$current_state]}" "$message" 'DISK_ICON'
+    "$1_prompt_segment" "${0}_${current_state}" "$2" "${hdd_usage_backcolors[$current_state]}" "${hdd_usage_forecolors[$current_state]}" 'DISK_ICON' 0 '' "$message"
   fi
 }
 
@@ -519,10 +535,10 @@ prompt_battery() {
   if (( #POWERLEVEL9K_BATTERY_LEVEL_BACKGROUND )); then
     local segment=$(( 100.0 / (${#POWERLEVEL9K_BATTERY_LEVEL_BACKGROUND} - 1 ) ))
     local offset=$(( ($bat_percent / $segment) + 1 ))
-    "$1_prompt_segment" "$0_${current_state}" "$2" "${POWERLEVEL9K_BATTERY_LEVEL_BACKGROUND[$offset]}" "${battery_states[$current_state]}" "${message}" "BATTERY_ICON"
+    "$1_prompt_segment" "$0_${current_state}" "$2" "${POWERLEVEL9K_BATTERY_LEVEL_BACKGROUND[$offset]}" "${battery_states[$current_state]}" "BATTERY_ICON" 0 '' "${message}"
   else
     # Draw the prompt_segment
-    "$1_prompt_segment" "$0_${current_state}" "$2" "${DEFAULT_COLOR}" "${battery_states[$current_state]}" "${message}" "BATTERY_ICON"
+    "$1_prompt_segment" "$0_${current_state}" "$2" "${DEFAULT_COLOR}" "${battery_states[$current_state]}" "BATTERY_ICON" 0 '' "${message}"
   fi
 }
 
@@ -604,7 +620,7 @@ prompt_public_ip() {
         icon='VPN_ICON'
       fi
     fi
-    $1_prompt_segment "$0" "$2" "$DEFAULT_COLOR" "$DEFAULT_COLOR_INVERTED" "${public_ip}" "$icon"
+    $1_prompt_segment "$0" "$2" "$DEFAULT_COLOR" "$DEFAULT_COLOR_INVERTED" "$icon" 0 '' "${public_ip}"
   fi
 }
 
@@ -642,7 +658,7 @@ prompt_context() {
     current_state="SUDO"
   fi
 
-  "$1_prompt_segment" "${0}_${current_state}" "$2" "$DEFAULT_COLOR" yellow "${content}"
+  "$1_prompt_segment" "${0}_${current_state}" "$2" "$DEFAULT_COLOR" yellow '' 0 '' "${content}"
 }
 
 ################################################################
@@ -653,11 +669,11 @@ prompt_user() {
   local user=$(whoami)
   [[ $POWERLEVEL9K_ALWAYS_SHOW_USER != true && $user == $DEFAULT_USER ]] && return
   if [[ "${(%):-%#}" == '#' ]]; then
-    "$1_prompt_segment" "${0}_ROOT" "$2" "${DEFAULT_COLOR}" yellow "${POWERLEVEL9K_USER_TEMPLATE}" ROOT_ICON
+    "$1_prompt_segment" "${0}_ROOT" "$2" "${DEFAULT_COLOR}" yellow ROOT_ICON 0 '' "${POWERLEVEL9K_USER_TEMPLATE}"
   elif [[ -n "$SUDO_COMMAND" ]]; then
-    "$1_prompt_segment" "${0}_SUDO" "$2" "${DEFAULT_COLOR}" yellow "${POWERLEVEL9K_USER_TEMPLATE}" SUDO_ICON
+    "$1_prompt_segment" "${0}_SUDO" "$2" "${DEFAULT_COLOR}" yellow SUDO_ICON 0 '' "${POWERLEVEL9K_USER_TEMPLATE}"
   else
-    "$1_prompt_segment" "${0}_DEFAULT" "$2" "${DEFAULT_COLOR}" yellow "${user//\%/%%}" USER_ICON
+    "$1_prompt_segment" "${0}_DEFAULT" "$2" "${DEFAULT_COLOR}" yellow USER_ICON 0 '' "${user//\%/%%}"
   fi
 }
 
@@ -666,9 +682,9 @@ prompt_user() {
 set_default POWERLEVEL9K_HOST_TEMPLATE "%m"
 prompt_host() {
   if [[ -n "$SSH_CLIENT" || -n "$SSH_TTY" ]]; then
-    "$1_prompt_segment" "$0_REMOTE" "$2" "${DEFAULT_COLOR}" yellow "${POWERLEVEL9K_HOST_TEMPLATE}" SSH_ICON
+    "$1_prompt_segment" "$0_REMOTE" "$2" "${DEFAULT_COLOR}" yellow SSH_ICON 0 '' "${POWERLEVEL9K_HOST_TEMPLATE}"
   else
-    "$1_prompt_segment" "$0_LOCAL" "$2" "${DEFAULT_COLOR}" yellow "${POWERLEVEL9K_HOST_TEMPLATE}" HOST_ICON
+    "$1_prompt_segment" "$0_LOCAL" "$2" "${DEFAULT_COLOR}" yellow HOST_ICON 0 '' "${POWERLEVEL9K_HOST_TEMPLATE}"
   fi
 }
 
@@ -685,7 +701,7 @@ prompt_custom() {
   # local segment_content=$("${(@Q)${(z)${(P)command}}}")
 
   if [[ -n $segment_content ]]; then
-    "$1_prompt_segment" "${0}_${3:u}" "$2" $DEFAULT_COLOR_INVERTED $DEFAULT_COLOR "$segment_content" "CUSTOM_${segment_name}_ICON"
+    "$1_prompt_segment" "${0}_${3:u}" "$2" $DEFAULT_COLOR_INVERTED $DEFAULT_COLOR "CUSTOM_${segment_name}_ICON" 0 '' "$segment_content"
   fi
 }
 
@@ -719,7 +735,7 @@ prompt_command_execution_time() {
     humanReadableDuration=$_P9K_COMMAND_DURATION
   fi
 
-  "$1_prompt_segment" "$0" "$2" "red" "yellow1" "${humanReadableDuration}" 'EXECUTION_TIME_ICON'
+  "$1_prompt_segment" "$0" "$2" "red" "yellow1" 'EXECUTION_TIME_ICON' 0 '' "${humanReadableDuration}"
 }
 
 ################################################################
@@ -1002,17 +1018,17 @@ prompt_dir() {
       current_path=${current_path//\//$POWERLEVEL9K_DIR_PATH_SEPARATOR}
     fi
 
-    _p9k_cache_set "$current_state" "$current_path" "$icon"
+    _p9k_cache_set "$current_state" "$icon" "$current_path"
   fi
 
-  "$1_prompt_segment" "$0_${_P9K_CACHE_VAL[1]}" "$2" blue "$DEFAULT_COLOR" "${_P9K_CACHE_VAL[2]}" "${_P9K_CACHE_VAL[3]}"
+  "$1_prompt_segment" "$0_${_P9K_CACHE_VAL[1]}" "$2" blue "$DEFAULT_COLOR" "${_P9K_CACHE_VAL[2]}" 0 "" "${_P9K_CACHE_VAL[3]}"
 }
 
 ################################################################
 # Docker machine
 prompt_docker_machine() {
   if [[ -n "$DOCKER_MACHINE_NAME" ]]; then
-    "$1_prompt_segment" "$0" "$2" "magenta" "$DEFAULT_COLOR" "${DOCKER_MACHINE_NAME//\%/%%}" 'SERVER_ICON'
+    "$1_prompt_segment" "$0" "$2" "magenta" "$DEFAULT_COLOR" 'SERVER_ICON' 0 '' "${DOCKER_MACHINE_NAME//\%/%%}"
   fi
 }
 
@@ -1022,14 +1038,14 @@ prompt_go_version() {
   local go_version=$(go version 2>/dev/null | sed -E "s/.*(go[0-9.]*).*/\1/")
   local go_path=$(go env GOPATH 2>/dev/null)
   if [[ -n "$go_version" && "${PWD##$go_path}" != "$PWD" ]]; then
-    "$1_prompt_segment" "$0" "$2" "green" "grey93" "${go_version//\%/%%}" "GO_ICON"
+    "$1_prompt_segment" "$0" "$2" "green" "grey93" "GO_ICON" 0 '' "${go_version//\%/%%}"
   fi
 }
 
 ################################################################
 # Command number (in local history)
 prompt_history() {
-  "$1_prompt_segment" "$0" "$2" "grey50" "$DEFAULT_COLOR" '%h'
+  "$1_prompt_segment" "$0" "$2" "grey50" "$DEFAULT_COLOR" '' 0 '' '%h'
 }
 
 ################################################################
@@ -1043,7 +1059,7 @@ prompt_detect_virt() {
   fi
 
   if [[ -n "${virt}" ]]; then
-    "$1_prompt_segment" "$0" "$2" "$DEFAULT_COLOR" "yellow" "${virt//\%/%%}"
+    "$1_prompt_segment" "$0" "$2" "$DEFAULT_COLOR" "yellow" '' 0 '' "${virt//\%/%%}"
   fi
 }
 
@@ -1055,7 +1071,7 @@ prompt_icons_test() {
     # the next color has enough contrast to read.
     local random_color=$((RANDOM % 8))
     local next_color=$((random_color+1))
-    "$1_prompt_segment" "$0" "$2" "$random_color" "$next_color" "$key" "$key"
+    "$1_prompt_segment" "$0" "$2" "$random_color" "$next_color" "$key" 0 '' "$key"
   done
 }
 
@@ -1067,7 +1083,7 @@ prompt_ip() {
   local ip=$(p9k::parseIp "${POWERLEVEL9K_IP_INTERFACE}" "${ROOT_PREFIX}")
 
   if [[ -n "$ip" ]]; then
-    "$1_prompt_segment" "$0" "$2" "cyan" "$DEFAULT_COLOR" "${ip//\%/%%}" 'NETWORK_ICON'
+    "$1_prompt_segment" "$0" "$2" "cyan" "$DEFAULT_COLOR" 'NETWORK_ICON' 0 '' "${ip//\%/%%}"
   fi
 }
 
@@ -1080,7 +1096,7 @@ prompt_vpn_ip() {
   local ip=$(p9k::parseIp "${POWERLEVEL9K_VPN_IP_INTERFACE}" "${ROOT_PREFIX}")
 
   if [[ -n "${ip}" ]]; then
-    "$1_prompt_segment" "$0" "$2" "cyan" "$DEFAULT_COLOR" "${ip//\%/%%}" 'VPN_ICON'
+    "$1_prompt_segment" "$0" "$2" "cyan" "$DEFAULT_COLOR" 'VPN_ICON' 0 '' "${ip//\%/%%}"
   fi
 }
 
@@ -1091,7 +1107,7 @@ prompt_laravel_version() {
   if [[ -n "${laravel_version}" && "${laravel_version}" =~ "Laravel Framework" ]]; then
     # Strip out everything but the version
     laravel_version="${laravel_version//Laravel Framework /}"
-    "$1_prompt_segment" "$0" "$2" "maroon" "white" "${laravel_version//\%/%%}" 'LARAVEL_ICON'
+    "$1_prompt_segment" "$0" "$2" "maroon" "white" 'LARAVEL_ICON' 0 '' "${laravel_version//\%/%%}"
   fi
 }
 
@@ -1150,7 +1166,7 @@ prompt_load() {
     current_state="normal"
   fi
 
-  "$1_prompt_segment" "${0}_${current_state}" "$2" "${load_states[$current_state]}" "$DEFAULT_COLOR" "$load_avg" 'LOAD_ICON'
+  "$1_prompt_segment" "${0}_${current_state}" "$2" "${load_states[$current_state]}" "$DEFAULT_COLOR" 'LOAD_ICON' 0 '' "$load_avg"
 }
 
 ################################################################
@@ -1159,7 +1175,7 @@ prompt_node_version() {
   local node_version=$(node -v 2>/dev/null)
   [[ -z "${node_version}" ]] && return
 
-  "$1_prompt_segment" "$0" "$2" "green" "white" "${${node_version:1}//\%/%%}" 'NODE_ICON'
+  "$1_prompt_segment" "$0" "$2" "green" "white" 'NODE_ICON' 0 '' "${${node_version:1}//\%/%%}"
 }
 
 ################################################################
@@ -1175,7 +1191,7 @@ prompt_nvm() {
   nvm_default=$(nvm_version default)
   [[ "$node_version" =~ "$nvm_default" ]] && return
 
-  $1_prompt_segment "$0" "$2" "magenta" "black" "${${node_version:1}//\%/%%}" 'NODE_ICON'
+  $1_prompt_segment "$0" "$2" "magenta" "black" 'NODE_ICON' 0 '' "${${node_version:1}//\%/%%}"
 }
 
 ################################################################
@@ -1183,14 +1199,14 @@ prompt_nvm() {
 prompt_nodeenv() {
   if [[ -n "$NODE_VIRTUAL_ENV" ]]; then
     local info="$(node -v)[${NODE_VIRTUAL_ENV:t}]"
-    "$1_prompt_segment" "$0" "$2" "black" "green" "${info//\%/%%}" 'NODE_ICON'
+    "$1_prompt_segment" "$0" "$2" "black" "green" 'NODE_ICON' 0 '' "${info//\%/%%}"
   fi
 }
 
 ################################################################
 # Segment to print a little OS icon
 prompt_os_icon() {
-  "$1_prompt_segment" "$0" "$2" "black" "white" "$OS_ICON"
+  "$1_prompt_segment" "$0" "$2" "black" "white" '' 0 '' "$OS_ICON"
 }
 
 ################################################################
@@ -1200,7 +1216,7 @@ prompt_php_version() {
   php_version=$(php -v 2>&1 | grep -oe "^PHP\s*[0-9.]*")
 
   if [[ -n "$php_version" ]]; then
-    "$1_prompt_segment" "$0" "$2" "fuchsia" "grey93" "${php_version//\%/%%}"
+    "$1_prompt_segment" "$0" "$2" "fuchsia" "grey93" '' 0 '' "${php_version//\%/%%}"
   fi
 }
 
@@ -1226,7 +1242,7 @@ prompt_ram() {
     fi
   fi
 
-  "$1_prompt_segment" "$0" "$2" "yellow" "$DEFAULT_COLOR" "$(printSizeHumanReadable "$ramfree" $base)" 'RAM_ICON'
+  "$1_prompt_segment" "$0" "$2" "yellow" "$DEFAULT_COLOR" 'RAM_ICON' 0 '' "$(printSizeHumanReadable "$ramfree" $base)"
 }
 
 ################################################################
@@ -1235,12 +1251,12 @@ prompt_ram() {
 set_default POWERLEVEL9K_RBENV_PROMPT_ALWAYS_SHOW false
 prompt_rbenv() {
   if [[ -n "$RBENV_VERSION" ]]; then
-    "$1_prompt_segment" "$0" "$2" "red" "$DEFAULT_COLOR" "$RBENV_VERSION" 'RUBY_ICON'
+    "$1_prompt_segment" "$0" "$2" "red" "$DEFAULT_COLOR" 'RUBY_ICON' 0 '' "$RBENV_VERSION"
   elif [ $commands[rbenv] ]; then
     local rbenv_version_name="$(rbenv version-name)"
     local rbenv_global="$(rbenv global)"
     if [[ "${rbenv_version_name}" != "${rbenv_global}" || "${POWERLEVEL9K_RBENV_PROMPT_ALWAYS_SHOW}" == "true" ]]; then
-      "$1_prompt_segment" "$0" "$2" "red" "$DEFAULT_COLOR" "${rbenv_version_name//\%/%%}" 'RUBY_ICON'
+      "$1_prompt_segment" "$0" "$2" "red" "$DEFAULT_COLOR" 'RUBY_ICON' 0 '' "${rbenv_version_name//\%/%%}"
     fi
   fi
 }
@@ -1266,14 +1282,14 @@ prompt_chruby() {
 
   # Don't show anything if the chruby did not change the default ruby
   if [[ "$RUBY_ENGINE" != "" ]]; then
-    "$1_prompt_segment" "$0" "$2" "red" "$DEFAULT_COLOR" "${chruby_label//\%/%%}" 'RUBY_ICON'
+    "$1_prompt_segment" "$0" "$2" "red" "$DEFAULT_COLOR" 'RUBY_ICON' 0 '' "${chruby_label//\%/%%}"
   fi
 }
 
 ################################################################
 # Segment to print an icon if user is root.
 prompt_root_indicator() {
-  "$1_prompt_segment" "$0" "$2" "$DEFAULT_COLOR" "yellow" "" 'ROOT_ICON' 0 '${${(%)${:-%#}}:#%}'
+  "$1_prompt_segment" "$0" "$2" "$DEFAULT_COLOR" "yellow" 'ROOT_ICON' 0 '${${(%)${:-%#}}:#%}' ''
 }
 
 # This segment is a demo. It can disappear any time. Use prompt_dir instead.
@@ -1282,10 +1298,10 @@ prompt_simple_dir() {
     local p=$_P9K_PROMPT
     local key=$_P9K_CACHE_KEY
     _P9K_PROMPT=''
-    $1_prompt_segment $0_HOME $2 blue "$DEFAULT_COLOR" "%~" HOME_ICON 0 '${$((!${#${(%)${:-%~}}:#\~})):#0}'
-    $1_prompt_segment $0_HOME_SUBFOLDER $2 blue "$DEFAULT_COLOR" "%~" HOME_SUB_ICON 0 '${$((!${#${(%)${:-%~}}:#\~?*})):#0}'
-    $1_prompt_segment $0_ETC $2 blue "$DEFAULT_COLOR" "%~" ETC_ICON 0 '${$((!${#${(%)${:-%~}}:#/etc*})):#0}'
-    $1_prompt_segment $0_DEFAULT $2 blue "$DEFAULT_COLOR" "%~" FOLDER_ICON 0 '${${${(%)${:-%~}}:#\~*}:#/etc*}'
+    $1_prompt_segment $0_HOME $2 blue "$DEFAULT_COLOR" HOME_ICON 0 '${$((!${#${(%)${:-%~}}:#\~})):#0}' "%~"
+    $1_prompt_segment $0_HOME_SUBFOLDER $2 blue "$DEFAULT_COLOR" HOME_SUB_ICON 0 '${$((!${#${(%)${:-%~}}:#\~?*})):#0}' "%~"
+    $1_prompt_segment $0_ETC $2 blue "$DEFAULT_COLOR" ETC_ICON 0 '${$((!${#${(%)${:-%~}}:#/etc*})):#0}' "%~"
+    $1_prompt_segment $0_DEFAULT $2 blue "$DEFAULT_COLOR" FOLDER_ICON 0 '${${${(%)${:-%~}}:#\~*}:#/etc*}' "%~"
     _P9K_CACHE_KEY=$key
     _p9k_cache_set "$_P9K_PROMPT"
     _P9K_PROMPT=$p
@@ -1304,7 +1320,7 @@ prompt_rust_version() {
   rust_version=${${rust_version/rustc /}%% *}
 
   if [[ -n "$rust_version" ]]; then
-    "$1_prompt_segment" "$0" "$2" "darkorange" "$DEFAULT_COLOR" "${rust_version//\%/%%}" 'RUST_ICON'
+    "$1_prompt_segment" "$0" "$2" "darkorange" "$DEFAULT_COLOR" 'RUST_ICON' 0 '' "${rust_version//\%/%%}"
   fi
 }
 
@@ -1326,7 +1342,7 @@ prompt_rvm() {
     local version_and_gemset=${$(rvm-prompt v p)/ruby-}
 
     if [[ -n "$version_and_gemset" ]]; then
-      "$1_prompt_segment" "$0" "$2" "240" "$DEFAULT_COLOR" "${version_and_gemset//\%/%%}" 'RUBY_ICON'
+      "$1_prompt_segment" "$0" "$2" "240" "$DEFAULT_COLOR" 'RUBY_ICON' 0 '' "${version_and_gemset//\%/%%}"
     fi
   fi
 }
@@ -1335,7 +1351,7 @@ prompt_rvm() {
 # Segment to display SSH icon when connected
 prompt_ssh() {
   if [[ -n "$SSH_CLIENT" || -n "$SSH_TTY" ]]; then
-    "$1_prompt_segment" "$0" "$2" "$DEFAULT_COLOR" "yellow" "" 'SSH_ICON'
+    "$1_prompt_segment" "$0" "$2" "$DEFAULT_COLOR" "yellow" 'SSH_ICON' 0 '' ''
   fi
 }
 
@@ -1394,12 +1410,12 @@ prompt_status() {
 
     if (( ec_sum > 0 )); then
       if [[ "$POWERLEVEL9K_STATUS_CROSS" == false && "$POWERLEVEL9K_STATUS_VERBOSE" == true ]]; then
-        _P9K_CACHE_VAL=("$0_ERROR" "$2" red yellow1 "$ec_text" CARRIAGE_RETURN_ICON)
+        _P9K_CACHE_VAL=("$0_ERROR" "$2" red yellow1 CARRIAGE_RETURN_ICON 0 '' "$ec_text")
       else
-        _P9K_CACHE_VAL=("$0_ERROR" "$2" "$DEFAULT_COLOR" red "" FAIL_ICON)
+        _P9K_CACHE_VAL=("$0_ERROR" "$2" "$DEFAULT_COLOR" red FAIL_ICON 0 '' '')
       fi
     elif [[ "$POWERLEVEL9K_STATUS_OK" == true ]] && [[ "$POWERLEVEL9K_STATUS_VERBOSE" == true || "$POWERLEVEL9K_STATUS_OK_IN_NON_VERBOSE" == true ]]; then
-      _P9K_CACHE_VAL=("$0_OK" "$2" "$DEFAULT_COLOR" green "" OK_ICON)
+      _P9K_CACHE_VAL=("$0_OK" "$2" "$DEFAULT_COLOR" green OK_ICON 0 '' '')
     else
       return
     fi
@@ -1434,7 +1450,7 @@ prompt_swap() {
     base='K'
   fi
 
-  "$1_prompt_segment" "$0" "$2" "yellow" "$DEFAULT_COLOR" "$(printSizeHumanReadable "$swap_used" $base)" 'SWAP_ICON'
+  "$1_prompt_segment" "$0" "$2" "yellow" "$DEFAULT_COLOR" 'SWAP_ICON' 0 '' "$(printSizeHumanReadable "$swap_used" $base)"
 }
 
 ################################################################
@@ -1455,7 +1471,7 @@ prompt_symfony2_version() {
   if [[ -f app/bootstrap.php.cache ]]; then
     local symfony2_version
     symfony2_version=$(grep " VERSION " app/bootstrap.php.cache | sed -e 's/[^.0-9]*//g')
-    "$1_prompt_segment" "$0" "$2" "grey35" "$DEFAULT_COLOR" "${symfony2_version//\%/%%}" 'SYMFONY_ICON'
+    "$1_prompt_segment" "$0" "$2" "grey35" "$DEFAULT_COLOR" 'SYMFONY_ICON' 0 '' "${symfony2_version//\%/%%}"
   fi
 }
 
@@ -1469,9 +1485,9 @@ build_test_stats() {
   # Set float precision to 2 digits:
   local -F 2 ratio=$(( (tests_amount/code_amount) * 100 ))
 
-  (( ratio >= 75 )) && "$1_prompt_segment" "${2}_GOOD" "$3" "cyan" "$DEFAULT_COLOR" "$headline: $ratio%%" "$6"
-  (( ratio >= 50 && ratio < 75 )) && "$1_prompt_segment" "$2_AVG" "$3" "yellow" "$DEFAULT_COLOR" "$headline: $ratio%%" "$6"
-  (( ratio < 50 )) && "$1_prompt_segment" "$2_BAD" "$3" "red" "$DEFAULT_COLOR" "$headline: $ratio%%" "$6"
+  (( ratio >= 75 )) && "$1_prompt_segment" "${2}_GOOD" "$3" "cyan" "$DEFAULT_COLOR" "$6" 0 '' "$headline: $ratio%%"
+  (( ratio >= 50 && ratio < 75 )) && "$1_prompt_segment" "$2_AVG" "$3" "yellow" "$DEFAULT_COLOR" "$6" 0 '' "$headline: $ratio%%"
+  (( ratio < 50 )) && "$1_prompt_segment" "$2_BAD" "$3" "red" "$DEFAULT_COLOR" "$6" 0 '' "$headline: $ratio%%"
 }
 
 ################################################################
@@ -1481,14 +1497,14 @@ build_test_stats() {
 set_default POWERLEVEL9K_EXPERIMENTAL_TIME_REALTIME false
 set_default POWERLEVEL9K_TIME_FORMAT "%D{%H:%M:%S}"
 prompt_time() {
-  "$1_prompt_segment" "$0" "$2" "$DEFAULT_COLOR_INVERTED" "$DEFAULT_COLOR" "$POWERLEVEL9K_TIME_FORMAT" "TIME_ICON"
+  "$1_prompt_segment" "$0" "$2" "$DEFAULT_COLOR_INVERTED" "$DEFAULT_COLOR" "TIME_ICON" 0 '' "$POWERLEVEL9K_TIME_FORMAT"
 }
 
 ################################################################
 # System date
 set_default POWERLEVEL9K_DATE_FORMAT "%D{%d.%m.%y}"
 prompt_date() {
-  "$1_prompt_segment" "$0" "$2" "$DEFAULT_COLOR_INVERTED" "$DEFAULT_COLOR" "$POWERLEVEL9K_DATE_FORMAT" "DATE_ICON"
+  "$1_prompt_segment" "$0" "$2" "$DEFAULT_COLOR_INVERTED" "$DEFAULT_COLOR" "DATE_ICON" 0 '' "$POWERLEVEL9K_DATE_FORMAT"
 }
 
 ################################################################
@@ -1497,7 +1513,7 @@ prompt_todo() {
   if $(hash todo.sh 2>&-); then
     count=$(todo.sh ls | egrep "TODO: [0-9]+ of ([0-9]+) tasks shown" | awk '{ print $4 }')
     if [[ "$count" = <-> ]]; then
-      "$1_prompt_segment" "$0" "$2" "grey50" "$DEFAULT_COLOR" "${count//\%/%%}" 'TODO_ICON'
+      "$1_prompt_segment" "$0" "$2" "grey50" "$DEFAULT_COLOR" 'TODO_ICON' 0 '' "${count//\%/%%}"
     fi
   fi
 }
@@ -1581,7 +1597,7 @@ typeset -fH _p9k_vcs_render() {
       [[ -n $prompt || $dir == / ]] && break
       dir=${dir:h}
     done
-    _p9k_vcs_do_render $2 $1_LOADING $3 "${vcs_states[loading]}" "$DEFAULT_COLOR" ${prompt:-loading}
+    $2_prompt_segment $1_LOADING $3 "${vcs_states[loading]}" "$DEFAULT_COLOR" '' 0 '' ${prompt:-loading}
     return 0
   fi
 
@@ -1696,7 +1712,7 @@ typeset -fH _p9k_vcs_render() {
   fi
 
   _P9K_LAST_GIT_PROMPT[$VCS_STATUS_WORKDIR]="${_P9K_CACHE_VAL[3]}"
-  _p9k_vcs_do_render $2 "${_P9K_CACHE_VAL[1]}" $3 "${_P9K_CACHE_VAL[2]}" "$DEFAULT_COLOR" "${_P9K_CACHE_VAL[3]}"
+  $2_prompt_segment "${_P9K_CACHE_VAL[1]}" $3 "${_P9K_CACHE_VAL[2]}" "$DEFAULT_COLOR" '' 0 '' "${_P9K_CACHE_VAL[3]}"
   return 0
 }
 
@@ -1756,26 +1772,10 @@ typeset -fH _p9k_vcs_gitstatus() {
   return 0
 }
 
-function _p9k_vcs_do_render() {
-  local side=$1
-  shift
-  _P9K_LAST_VCS_SEGMENT=("$@")
-  "${side}_prompt_segment" "$@"
-}
-
 ################################################################
 # Segment to show VCS information
 
-typeset -ga _P9K_LAST_VCS_SEGMENT
-
 prompt_vcs() {
-  if [[ $_P9K_REFRESH_REASON != precmd && $_P9K_REFRESH_REASON != gitstatus ]]; then
-    if (( #_P9K_LAST_VCS_SEGMENT )); then
-      "$1_prompt_segment" "${(@)_P9K_LAST_VCS_SEGMENT}"
-    fi
-    return
-  fi
-  _P9K_LAST_VCS_SEGMENT=()
   local -a backends=($POWERLEVEL9K_VCS_BACKENDS)
   if (( ${backends[(I)git]} )) && _p9k_vcs_gitstatus; then
     _p9k_vcs_render $0 $1 $2 && return
@@ -1801,7 +1801,7 @@ prompt_vcs() {
           current_state='clean'
         fi
       fi
-      _p9k_vcs_do_render $1 "${0}_${(U)current_state}" "$2" "${vcs_states[$current_state]}" "$DEFAULT_COLOR" "$vcs_prompt" "$vcs_visual_identifier"
+      $1_prompt_segment "${0}_${(U)current_state}" "$2" "${vcs_states[$current_state]}" "$DEFAULT_COLOR" "$vcs_visual_identifier" 0 '' "$vcs_prompt"
     fi
   fi
 }
@@ -1811,9 +1811,9 @@ prompt_vcs() {
 set_default POWERLEVEL9K_VI_INSERT_MODE_STRING "INSERT"
 set_default POWERLEVEL9K_VI_COMMAND_MODE_STRING "NORMAL"
 prompt_vi_mode() {
-  $1_prompt_segment $0_NORMAL $2 "$DEFAULT_COLOR" white "$POWERLEVEL9K_VI_COMMAND_MODE_STRING" '' 0 '${$((!${#${KEYMAP:-0}:#vicmd})):#0}'
+  $1_prompt_segment $0_NORMAL $2 "$DEFAULT_COLOR" white '' 0 '${$((!${#${KEYMAP:-0}:#vicmd})):#0}' "$POWERLEVEL9K_VI_COMMAND_MODE_STRING"
   if [[ -n $POWERLEVEL9K_VI_INSERT_MODE_STRING ]]; then
-    $1_prompt_segment $0_INSERT $2 "$DEFAULT_COLOR" blue "$POWERLEVEL9K_VI_INSERT_MODE_STRING" '' 0 '${${KEYMAP:-0}:#vicmd}'
+    $1_prompt_segment $0_INSERT $2 "$DEFAULT_COLOR" blue '' 0 '${${KEYMAP:-0}:#vicmd}' "$POWERLEVEL9K_VI_INSERT_MODE_STRING"
   fi
 }
 
@@ -1823,7 +1823,7 @@ prompt_vi_mode() {
 # https://virtualenv.pypa.io/en/latest/
 prompt_virtualenv() {
   if [[ -n "$VIRTUAL_ENV" ]]; then
-    "$1_prompt_segment" "$0" "$2" "blue" "$DEFAULT_COLOR" "${${VIRTUAL_ENV:t}//\%/%%}" 'PYTHON_ICON'
+    "$1_prompt_segment" "$0" "$2" "blue" "$DEFAULT_COLOR" 'PYTHON_ICON' 0 '' "${${VIRTUAL_ENV:t}//\%/%%}"
   fi
 }
 
@@ -1833,7 +1833,7 @@ prompt_virtualenv() {
 set_default POWERLEVEL9K_PYENV_PROMPT_ALWAYS_SHOW false
 prompt_pyenv() {
   if [[ -n "$PYENV_VERSION" ]]; then
-    "$1_prompt_segment" "$0" "$2" "blue" "$DEFAULT_COLOR" "${PYENV_VERSION//\%/%%}" 'PYTHON_ICON'
+    "$1_prompt_segment" "$0" "$2" "blue" "$DEFAULT_COLOR" 'PYTHON_ICON' 0 '' "${PYENV_VERSION//\%/%%}"
   elif [ $commands[pyenv] ]; then
     local pyenv_version_name="$(pyenv version-name)"
     local pyenv_global="system"
@@ -1842,7 +1842,7 @@ prompt_pyenv() {
       pyenv_global="$(pyenv version-file-read ${pyenv_root}/version)"
     fi
     if [[ "${pyenv_version_name}" != "${pyenv_global}" || "${POWERLEVEL9K_PYENV_PROMPT_ALWAYS_SHOW}" == "true" ]]; then
-      "$1_prompt_segment" "$0" "$2" "blue" "$DEFAULT_COLOR" "${pyenv_version_name//\%/%%}" 'PYTHON_ICON'
+      "$1_prompt_segment" "$0" "$2" "blue" "$DEFAULT_COLOR" 'PYTHON_ICON' 0 '' "${pyenv_version_name//\%/%%}"
     fi
   fi
 }
@@ -1853,9 +1853,9 @@ prompt_openfoam() {
   local wm_project_version="$WM_PROJECT_VERSION"
   local wm_fork="$WM_FORK"
   if [[ -n "$wm_project_version" && -z "$wm_fork" ]] ; then
-    "$1_prompt_segment" "$0" "$2" "yellow" "$DEFAULT_COLOR" "OF: ${${wm_project_version:t}//\%/%%}"
+    "$1_prompt_segment" "$0" "$2" "yellow" "$DEFAULT_COLOR" '' 0 '' "OF: ${${wm_project_version:t}//\%/%%}"
   elif [[ -n "$wm_project_version" && -n "$wm_fork" ]] ; then
-    "$1_prompt_segment" "$0" "$2" "yellow" "$DEFAULT_COLOR" "F-X: ${${wm_project_version:t}//\%/%%}"
+    "$1_prompt_segment" "$0" "$2" "yellow" "$DEFAULT_COLOR" '' 0 '' "F-X: ${${wm_project_version:t}//\%/%%}"
   fi
 }
 
@@ -1866,14 +1866,14 @@ prompt_swift_version() {
   local swift_version=$(swift --version 2>/dev/null | grep -o -E "[0-9.]+" | head -n 1)
   [[ -z "${swift_version}" ]] && return
 
-  "$1_prompt_segment" "$0" "$2" "magenta" "white" "${swift_version//\%/%%}" 'SWIFT_ICON'
+  "$1_prompt_segment" "$0" "$2" "magenta" "white" 'SWIFT_ICON' 0 '' "${swift_version//\%/%%}"
 }
 
 ################################################################
 # dir_writable: Display information about the user's permission to write in the current directory
 prompt_dir_writable() {
   if [[ ! -w "$PWD" ]]; then
-    "$1_prompt_segment" "$0_FORBIDDEN" "$2" "red" "yellow1" "" 'LOCK_ICON'
+    "$1_prompt_segment" "$0_FORBIDDEN" "$2" "red" "yellow1" 'LOCK_ICON' 0 '' ''
   fi
 }
 
@@ -1900,7 +1900,7 @@ prompt_kubecontext() {
       k8s_final_text="$cur_ctx/$cur_namespace"
     fi
 
-    "$1_prompt_segment" "$0" "$2" "magenta" "white" "${k8s_final_text//\%/%%}" "KUBERNETES_ICON"
+    "$1_prompt_segment" "$0" "$2" "magenta" "white" "KUBERNETES_ICON" 0 '' "${k8s_final_text//\%/%%}"
   fi
 }
 
@@ -1917,7 +1917,7 @@ prompt_dropbox() {
       dropbox_status=""
     fi
 
-    "$1_prompt_segment" "$0" "$2" "white" "blue" "${dropbox_status//\%/%%}" "DROPBOX_ICON"
+    "$1_prompt_segment" "$0" "$2" "white" "blue" "DROPBOX_ICON" 0 '' "${dropbox_status//\%/%%}"
   fi
 }
 
@@ -1932,7 +1932,7 @@ prompt_java_version() {
   java_version=$(java -version 2>/dev/null && java -fullversion 2>&1 | cut -d '"' -f 2)
 
   if [[ -n "$java_version" ]]; then
-    "$1_prompt_segment" "$0" "$2" "red" "white" "${java_version//\%/%%}" "JAVA_ICON"
+    "$1_prompt_segment" "$0" "$2" "red" "white" "JAVA_ICON" 0 '' "${java_version//\%/%%}"
   fi
 }
 
