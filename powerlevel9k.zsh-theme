@@ -323,8 +323,8 @@ prompt_anaconda() {
   # variant works even if both are set.
   local path=$CONDA_ENV_PATH$CONDA_PREFIX
   if [[ -n $path ]]; then
-    local prompt="$POWERLEVEL9K_ANACONDA_LEFT_DELIMITER${${path:t}//\%/%%}$POWERLEVEL9K_ANACONDA_RIGHT_DELIMITER"
-    "$1_prompt_segment" "$0" "$2" "blue" "$DEFAULT_COLOR" 'PYTHON_ICON' 0 '' "$prompt"
+    local msg="$POWERLEVEL9K_ANACONDA_LEFT_DELIMITER${${path:t}//\%/%%}$POWERLEVEL9K_ANACONDA_RIGHT_DELIMITER"
+    "$1_prompt_segment" "$0" "$2" "blue" "$DEFAULT_COLOR" 'PYTHON_ICON' 0 '' "$msg"
   fi
 }
 
@@ -352,15 +352,15 @@ prompt_aws_eb_env() {
 set_default POWERLEVEL9K_BACKGROUND_JOBS_VERBOSE true
 set_default POWERLEVEL9K_BACKGROUND_JOBS_VERBOSE_ALWAYS false
 prompt_background_jobs() {
-  local prompt
+  local msg
   if [[ $POWERLEVEL9K_BACKGROUND_JOBS_VERBOSE == true ]]; then
     if [[ $POWERLEVEL9K_BACKGROUND_JOBS_VERBOSE_ALWAYS == true ]]; then
-      prompt='${(%)${:-%j}}'
+      msg='${(%)${:-%j}}'
     else
-      prompt='${${(%)${:-%j}}:#1}'
+      msg='${${(%)${:-%j}}:#1}'
     fi
   fi
-  $1_prompt_segment $0 $2 "$DEFAULT_COLOR" cyan BACKGROUND_JOBS_ICON 1 '${${(%)${:-%j}}:#0}' "$prompt"
+  $1_prompt_segment $0 $2 "$DEFAULT_COLOR" cyan BACKGROUND_JOBS_ICON 1 '${${(%)${:-%j}}:#0}' "$msg"
 }
 
 ################################################################
@@ -1547,6 +1547,16 @@ powerlevel9k_vcs_init() {
     POWERLEVEL9K_VCS_INTERNAL_HASH_LENGTH="$POWERLEVEL9K_CHANGESET_HASH_LENGTH"
   fi
 
+  if [[ -n $POWERLEVEL9K_VCS_ACTIONFORMAT_FOREGROUND ]]; then
+    local k
+    for k in "${(@k)vcs_states}"; do
+      local var=POWERLEVEL9K_VCS_${(U)k}_ACTION_FOREGROUND
+      if [[ -z ${(P)var} ]]; then
+        typeset -g $var=$POWERLEVEL9K_VCS_ACTIONFORMAT_FOREGROUND
+      fi
+    done
+  fi
+
   autoload -Uz vcs_info
 
   VCS_CHANGESET_PREFIX=''
@@ -1588,16 +1598,35 @@ typeset -gAH _P9K_LAST_GIT_PROMPT
 # git workdir => 1 if gitstatus is slow on it, 0 if it's fast.
 typeset -gAH _P9K_GIT_SLOW
 
-typeset -fH _p9k_vcs_render() {
+function _p9k_vcs_style() {
+  local color=${${(P)${:-POWERLEVEL9K_VCS_${1}_${2}_FOREGROUND}}}
+  if [[ -z $color ]]; then
+    _P9K_RETVAL=""
+    return
+  fi
+  if [[ $color == <-> ]]; then
+    color=${(l:3::0:)color}
+  else
+    color=$__P9K_COLORS[${${${color#bg-}#fg-}#br}]
+    if [[ -z $color ]]; then
+      _P9K_RETVAL=""
+      return
+    fi
+  fi
+  _P9K_RETVAL="%F{$color}"
+}
+
+function _p9k_vcs_render() {
   if [[ -v _P9K_NEXT_VCS_DIR ]]; then
-    local prompt
+    local -a msg
     local dir=$PWD
     while true; do
-      prompt=${_P9K_LAST_GIT_PROMPT[$dir]}
-      [[ -n $prompt || $dir == / ]] && break
+      msg=("${(@0)${_P9K_LAST_GIT_PROMPT[$dir]}}")
+      [[ $#msg != 0 || $dir == / ]] && break
       dir=${dir:h}
     done
-    $2_prompt_segment $1_LOADING $3 "${vcs_states[loading]}" "$DEFAULT_COLOR" '' 0 '' ${prompt:-loading}
+    (( $#msg )) || msg=(loading)
+    $2_prompt_segment $1_LOADING $3 "${vcs_states[loading]}" "$DEFAULT_COLOR" '' 0 '' "${msg[@]}"
     return 0
   fi
 
@@ -1627,92 +1656,115 @@ typeset -fH _p9k_vcs_render() {
   fi
 
   if ! _p9k_cache_get "${(@)cache_key}"; then
-    local state=clean
-    local vcs_prompt
+    local state=CLEAN
+    local -a cur_prompt
+    local -a stale_prompt
+
+    typeset -lf fmt() {
+      _p9k_vcs_style $state $1
+      cur_prompt+=$_P9K_RETVAL$2
+      _p9k_vcs_style LOADING $1
+      stale_prompt+=$_P9K_RETVAL$2
+    }
 
     if (( ${POWERLEVEL9K_VCS_GIT_HOOKS[(I)vcs-detect-changes]} )); then
       if [[ $VCS_STATUS_HAS_STAGED != 0 || $VCS_STATUS_HAS_UNSTAGED != 0 ]]; then
-        state='modified'
+        state=MODIFIED
       elif [[ $VCS_STATUS_HAS_UNTRACKED != 0 ]]; then
-        state='untracked'
-      else
-        state='clean'
+        state=UNTRACKED
       fi
 
       # It's weird that removing vcs-detect-changes from POWERLEVEL9K_VCS_GIT_HOOKS gets rid
       # of the GIT icon. That's what vcs_info does, so we do the same in the name of compatiblity.
       if [[ "$VCS_STATUS_REMOTE_URL" == *github* ]] then
         _p9k_get_icon VCS_GIT_GITHUB_ICON
-        vcs_prompt+=$_P9K_RETVAL
+        fmt REMOTE_URL $_P9K_RETVAL
       elif [[ "$VCS_STATUS_REMOTE_URL" == *bitbucket* ]] then
         _p9k_get_icon VCS_GIT_BITBUCKET_ICON
-        vcs_prompt+=$_P9K_RETVAL
+        fmt REMOTE_URL $_P9K_RETVAL
       elif [[ "$VCS_STATUS_REMOTE_URL" == *stash* ]] then
         _p9k_get_icon VCS_GIT_GITHUB_ICON
-        vcs_prompt+=$_P9K_RETVAL
+        fmt REMOTE_URL $_P9K_RETVAL
       elif [[ "$VCS_STATUS_REMOTE_URL" == *gitlab* ]] then
         _p9k_get_icon VCS_GIT_GITLAB_ICON
-        vcs_prompt+=$_P9K_RETVAL
+        fmt REMOTE_URL $_P9K_RETVAL
       else
         _p9k_get_icon VCS_GIT_ICON
-        vcs_prompt+=$_P9K_RETVAL
+        fmt REMOTE_URL $_P9K_RETVAL
       fi
     fi
 
+    local ws
     if [[ $POWERLEVEL9K_SHOW_CHANGESET == true || -z $VCS_STATUS_LOCAL_BRANCH ]]; then
       _p9k_get_icon VCS_COMMIT_ICON
-      vcs_prompt+="$_P9K_RETVAL${VCS_STATUS_COMMIT:0:$POWERLEVEL9K_VCS_INTERNAL_HASH_LENGTH} "
+      fmt COMMIT "$ws$_P9K_RETVAL${VCS_STATUS_COMMIT:0:$POWERLEVEL9K_VCS_INTERNAL_HASH_LENGTH}"
+      ws=' '
     fi
 
     if [[ -n $VCS_STATUS_LOCAL_BRANCH ]]; then
       _p9k_get_icon VCS_BRANCH_ICON
-      vcs_prompt+="$_P9K_RETVAL${VCS_STATUS_LOCAL_BRANCH//\%/%%} "
+      fmt BRANCH "$ws$_P9K_RETVAL${VCS_STATUS_LOCAL_BRANCH//\%/%%}"
+      ws=' '
     fi
 
     if [[ $POWERLEVEL9K_VCS_HIDE_TAGS == false && -n $VCS_STATUS_TAG ]]; then
       _p9k_get_icon VCS_TAG_ICON
-      vcs_prompt+="$_P9K_RETVAL${VCS_STATUS_TAG//\%/%%} "
+      fmt TAG "$ws$_P9K_RETVAL${VCS_STATUS_TAG//\%/%%}"
+      ws=' '
     fi
 
     if [[ -n $VCS_STATUS_ACTION ]]; then
-      vcs_prompt+="%F{${POWERLEVEL9K_VCS_ACTIONFORMAT_FOREGROUND}}| ${VCS_STATUS_ACTION//\%/%%}%f"
+      fmt ACTION "$ws| ${VCS_STATUS_ACTION//\%/%%}"
+      ws=' '
     else
       if [[ -n $VCS_STATUS_REMOTE_BRANCH &&
             $VCS_STATUS_LOCAL_BRANCH != $VCS_STATUS_REMOTE_BRANCH ]]; then
         _p9k_get_icon VCS_REMOTE_BRANCH_ICON
-        vcs_prompt+="$_P9K_RETVAL${VCS_STATUS_REMOTE_BRANCH//\%/%%} "
+        fmt REMOTE_BRANCH "$ws$_P9K_RETVAL${VCS_STATUS_REMOTE_BRANCH//\%/%%}"
+        ws=' '
       fi
       if [[ $VCS_STATUS_HAS_STAGED == 1 ]]; then
         _p9k_get_icon VCS_STAGED_ICON
-        vcs_prompt+="$_P9K_RETVAL "
+        fmt STAGED "$ws$_P9K_RETVAL"
+        ws=' '
       fi
       if [[ $VCS_STATUS_HAS_UNSTAGED == 1 ]]; then
         _p9k_get_icon VCS_UNSTAGED_ICON
-        vcs_prompt+="$_P9K_RETVAL "
+        fmt UNSTAGED "$ws$_P9K_RETVAL"
+        ws=' '
       fi
       if [[ $VCS_STATUS_HAS_UNTRACKED == 1 ]]; then
         _p9k_get_icon VCS_UNTRACKED_ICON
-        vcs_prompt+="$_P9K_RETVAL "
+        fmt UNTRACKED "$ws$_P9K_RETVAL"
+        ws=' '
       fi
       if [[ $VCS_STATUS_COMMITS_AHEAD -gt 0 ]]; then
         _p9k_get_icon VCS_OUTGOING_CHANGES_ICON
-        vcs_prompt+="$_P9K_RETVAL$VCS_STATUS_COMMITS_AHEAD "
+        fmt OUTGOING_CHANGES "$ws$_P9K_RETVAL$VCS_STATUS_COMMITS_AHEAD"
+        ws=' '
       fi
       if [[ $VCS_STATUS_COMMITS_BEHIND -gt 0 ]]; then
         _p9k_get_icon VCS_INCOMING_CHANGES_ICON
-        vcs_prompt+="$_P9K_RETVAL$VCS_STATUS_COMMITS_BEHIND "
+        fmt INCOMING_CHANGES "$ws$_P9K_RETVAL$VCS_STATUS_COMMITS_BEHIND"
+        ws=' '
       fi
       if [[ $VCS_STATUS_STASHES -gt 0 ]]; then
         _p9k_get_icon VCS_STASH_ICON
-        vcs_prompt+="$_P9K_RETVAL$VCS_STATUS_STASHES "
+        fmt STASH "$ws$_P9K_RETVAL$VCS_STATUS_STASHES"
+        ws=' '
       fi
     fi
 
-    _p9k_cache_set "${1}_${(U)state}" "${vcs_states[$state]}" "${vcs_prompt% }"
+    _p9k_cache_set "${1}_$state" "${vcs_states[${(L)state}]}" "${stale_prompt[@]}" "${cur_prompt[@]}"
   fi
 
-  _P9K_LAST_GIT_PROMPT[$VCS_STATUS_WORKDIR]="${_P9K_CACHE_VAL[3]}"
-  $2_prompt_segment "${_P9K_CACHE_VAL[1]}" $3 "${_P9K_CACHE_VAL[2]}" "$DEFAULT_COLOR" '' 0 '' "${_P9K_CACHE_VAL[3]}"
+  local id=${_P9K_CACHE_VAL[1]}
+  local bg=${_P9K_CACHE_VAL[2]}
+  shift 2 _P9K_CACHE_VAL
+  local -i n=$(($#_P9K_CACHE_VAL / 2))
+  _P9K_LAST_GIT_PROMPT[$VCS_STATUS_WORKDIR]="${(pj:\0:)_P9K_CACHE_VAL[1,$n]}"
+  shift $n _P9K_CACHE_VAL
+  $2_prompt_segment "$id" "$3" "$bg" "$DEFAULT_COLOR" '' 0 '' "${(@)_P9K_CACHE_VAL}"
   return 0
 }
 
