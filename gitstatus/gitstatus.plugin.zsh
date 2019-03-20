@@ -226,25 +226,28 @@ function gitstatus_start() {
     " <&$req_fd >&$resp_fd 2>$log_file 3<$lock_file &!
 
     daemon_pid=$!
-    command rm -f $lock_file
 
     local reply
     echo -nE $'hello\x1f\x1e' >&$req_fd
     IFS='' read -r -d $'\x1e' -u $resp_fd -t $timeout reply
     [[ $reply == $'hello\x1f0' ]]
 
-    function _gitstatus_cleanup_${daemon_pid}() {
+    function _gitstatus_cleanup_${name}() {
       emulate -L zsh
       setopt err_return no_unset
-      local -i daemon_pid=${${(%)${:-%N}}#_gitstatus_cleanup_}
-      kill -- -$daemon_pid &>/dev/null || true
+      local name=${${(%)${:-%N}}#_gitstatus_cleanup_}
+      local -i daemon_pid=${(P)${:-GITSTATUS_DAEMON_PID_$name}}
+      [[ $daemon_pid -gt 0 ]] && kill -- -$daemon_pid &>/dev/null || true
+      local lock_file=${(P)${:-_GITSTATUS_LOCK_FILE_$name}}
+      command rm -f $lock_file || true
     }
-    add-zsh-hook zshexit _gitstatus_cleanup_${daemon_pid}
+    add-zsh-hook zshexit _gitstatus_cleanup_${name}
   }
 
   start && {
     typeset -g    GITSTATUS_DAEMON_LOG_${name}=$log_file
     typeset -gi   GITSTATUS_DAEMON_PID_${name}=$daemon_pid
+    typeset -g   _GITSTATUS_LOCK_FILE_${name}=$lock_file
     typeset -giH _GITSTATUS_REQ_FD_${name}=$req_fd
     typeset -giH _GITSTATUS_RESP_FD_${name}=$resp_fd
     typeset -giH _GITSTATUS_CLIENT_PID_${name}=$$
