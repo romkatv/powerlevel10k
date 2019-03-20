@@ -1532,6 +1532,7 @@ typeset -gA vcs_states=(
 
 set_default POWERLEVEL9K_VCS_ACTIONFORMAT_FOREGROUND red
 set_default POWERLEVEL9K_SHOW_CHANGESET false
+set_default POWERLEVEL9K_VCS_LOADING_TEXT loading
 set_default -i POWERLEVEL9K_VCS_INTERNAL_HASH_LENGTH 8
 set_default -a POWERLEVEL9K_VCS_GIT_HOOKS vcs-detect-changes git-untracked git-aheadbehind git-stash git-remotebranch git-tagname
 set_default -a POWERLEVEL9K_VCS_HG_HOOKS vcs-detect-changes
@@ -1547,15 +1548,19 @@ powerlevel9k_vcs_init() {
     POWERLEVEL9K_VCS_INTERNAL_HASH_LENGTH="$POWERLEVEL9K_CHANGESET_HASH_LENGTH"
   fi
 
-  if [[ -n $POWERLEVEL9K_VCS_ACTIONFORMAT_FOREGROUND ]]; then
-    local k
-    for k in "${(@k)vcs_states}"; do
-      local var=POWERLEVEL9K_VCS_${(U)k}_ACTION_FOREGROUND
-      if [[ -z ${(P)var} ]]; then
-        typeset -g $var=$POWERLEVEL9K_VCS_ACTIONFORMAT_FOREGROUND
-      fi
-    done
-  fi
+  local component state
+  for component in REMOTE_URL COMMIT BRANCH TAG REMOTE_BRANCH STAGED UNSTAGED UNTRACKED \
+                   OUTGOING_CHANGES INCOMING_CHANGES STASH ACTION; do
+    local color=${(P)${:-POWERLEVEL9K_VCS_${component}FORMAT_FOREGROUND}}
+    if [[ -n $color ]]; then
+      for state in "${(@k)vcs_states}"; do
+        local var=POWERLEVEL9K_VCS_${(U)state}_${component}FORMAT_FOREGROUND
+        if [[ -z ${(P)var} ]]; then
+          typeset -g $var=$color
+        fi
+      done
+    fi
+  done
 
   autoload -Uz vcs_info
 
@@ -1599,7 +1604,7 @@ typeset -gAH _P9K_LAST_GIT_PROMPT
 typeset -gAH _P9K_GIT_SLOW
 
 function _p9k_vcs_style() {
-  local color=${${(P)${:-POWERLEVEL9K_VCS_${1}_${2}_FOREGROUND}}}
+  local color=${${(P)${:-POWERLEVEL9K_VCS_${1}_${2}FORMAT_FOREGROUND}}}
   if [[ -z $color ]]; then
     _P9K_RETVAL=""
     return
@@ -1625,8 +1630,14 @@ function _p9k_vcs_render() {
       [[ $#msg != 0 || $dir == / ]] && break
       dir=${dir:h}
     done
-    [[ $#msg -gt 1 || -n ${msg[0]} ]] || msg=(loading)
-    $2_prompt_segment $1_LOADING $3 "${vcs_states[loading]}" "$DEFAULT_COLOR" '' 0 '' "${msg[@]}"
+    if [[ $#msg -lt 2 && -z ${msg[1]} ]]; then
+      _p9k_get_icon VCS_LOADING_ICON
+      if [[ -n $_P9K_RETVAL || -n $POWERLEVEL9K_VCS_LOADING_TEXT ]]; then
+        $2_prompt_segment $1_LOADING $3 "${vcs_states[loading]}" "$DEFAULT_COLOR" "$_P9K_RETVAL" 0 '' "$POWERLEVEL9K_VCS_LOADING_TEXT"
+      fi
+    else
+      $2_prompt_segment $1_LOADING $3 "${vcs_states[loading]}" "$DEFAULT_COLOR" '' 0 '' "${msg[@]}"
+    fi
     return 0
   fi
 
@@ -2176,6 +2187,7 @@ _p9k_init_strings() {
   _p9k_g_expand POWERLEVEL9K_SHORTEN_DELIMITER
   _p9k_g_expand POWERLEVEL9K_TIME_FORMAT
   _p9k_g_expand POWERLEVEL9K_USER_TEMPLATE
+  _p9k_g_expand POWERLEVEL9K_VCS_LOADING_TEXT
   _p9k_g_expand POWERLEVEL9K_VI_COMMAND_MODE_STRING
   _p9k_g_expand POWERLEVEL9K_VI_INSERT_MODE_STRING
   _p9k_g_expand POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS
