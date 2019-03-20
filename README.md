@@ -84,8 +84,49 @@ are still using the `POWERLEVEL9K` prefix though.
   * `POWERLEVEL9K_EXPERIMENTAL_TIME_REALTIME (STRING) [default="false"]`
 
     If set to `"true"`, `time` segment will update every second, turning into a realtime clock.
-    This option appears to trigger a
-    [bug in completion menu](https://www.zsh.org/mla/workers//2019/msg00161.html) in zsh.
+    This option triggers a
+    [bug in completion menu](https://www.zsh.org/mla/workers//2019/msg00161.html) in zsh, and
+    another
+    [bug in history](https://github.com/bhilburn/powerlevel9k/commit/fb1ef540228ec7b4394cf2f6860137074c5838a6#commitcomment-32779672).
+    You can pick up a fix for the latter from
+    [a fork of zsh](https://github.com/romkatv/zsh/tree/gentle-reset-prompt).
+
+  * When using gitstatus, there is an extra state called `LOADING` that is used by `vcs` prompt
+    segment when it's waiting for git status in the background. You can define styling for this
+    state the same way as for the other states -- `CLEAN`, `UNTRACKED` and `MODIFIED`. You can
+    also define the icon and the text that will be used when `LOADING` state is triggered for a
+    git repository for which no prior status is known. If both `POWERLEVEL9K_VCS_LOADING_ICON`
+    and `POWERLEVEL9K_VCS_LOADING_TEXT` are empty, `vcs` segment in such cases won't be shown.
+
+    * `POWERLEVEL9K_VCS_LOADING_ICON (STRING) [default=""]`
+
+      Icon shown while waiting for git status for a repo for the first time.
+    * `POWERLEVEL9K_VCS_LOADING_TEXT (STRING) [default="loading"]`
+
+      Text shown while waiting for git status for a repo for the first time.
+    * `POWERLEVEL9K_VCS_LOADING_BACKGROUND (STRING) [default="grey"]`
+
+      Background color for `LOADING` state.
+    * `POWERLEVEL9K_VCS_LOADING_FOREGROUND (STRING) [default="$DEFAULT_COLOR"]`
+
+      Foreground color for `LOADING` state.
+    * `POWERLEVEL9K_VCS_LOADING_VISUAL_IDENTIFIER_COLOR (STRING) [default=$POWERLEVEL9K_VCS_LOADING_FOREGROUND]`
+
+      Foreground color for `POWERLEVEL9K_VCS_LOADING_ICON`.
+  * When using gitstatus, components of `vcs` segment can be colored individually by setting
+    `POWERLEVEL9K_VCS_${STATE}_${COMPONENT}FORMAT_FOREGROUND`. `${STATE}` should be one of `CLEAN`,
+    `UNTRACKED`, `MODIFIED` or `LOADING`. `${COMPONENT}` should be one of `REMOTE_URL`, `COMMIT`,
+    `BRANCH`, `TAG`, `REMOTE_BRANCH`, `STAGED`, `UNSTAGED`, `UNTRACKED`, `OUTGOING_CHANGES`,
+    `INCOMING_CHANGES`, `STASH` or `ACTION`. If
+    `POWERLEVEL9K_VCS_${STATE}_${COMPONENT}FORMAT_FOREGROUND` isn't set for some combination of
+    `${STATE}` and `${COMPONENT}`, the component is colored with
+    `POWERLEVEL9K_VCS_${COMPONENT}FORMAT_FOREGROUND`. If that one isn't set either, the component is
+    colored with `POWERLEVEL9K_VCS_${STATE}_FOREGROUND`. The fallback logic is consistent with
+    Powerlevel9k, meaning that your `vcs` prompt will look the same in Powerlevel10k and
+    Powerlevel9k if you don't define any `POWERLEVEL9K_VCS_${STATE}_${COMPONENT}_FOREGROUND`
+    parameters. Note that both the icon and the text in each component always have the same color.
+    There is currently no `POWERLEVEL9K_VCS_${STATE}_${COMPONENT}FORMAT_VISUAL_IDENTIFIER_COLOR`,
+    although it's easy to implement if desired.
 
 ## Try it out
 
