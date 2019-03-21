@@ -1671,12 +1671,14 @@ function _p9k_vcs_render() {
     local -a cur_prompt
     local -a stale_prompt
 
-    typeset -lf fmt() {
+    function _$0_fmt() {
       _p9k_vcs_style $state $1
       cur_prompt+=$_P9K_RETVAL$2
       _p9k_vcs_style LOADING $1
       stale_prompt+=$_P9K_RETVAL$2
     }
+
+    trap "unfunction _$0_fmt" EXIT
 
     if (( ${POWERLEVEL9K_VCS_GIT_HOOKS[(I)vcs-detect-changes]} )); then
       if [[ $VCS_STATUS_HAS_STAGED != 0 || $VCS_STATUS_HAS_UNSTAGED != 0 ]]; then
@@ -1689,70 +1691,70 @@ function _p9k_vcs_render() {
       # of the GIT icon. That's what vcs_info does, so we do the same in the name of compatiblity.
       if [[ "$VCS_STATUS_REMOTE_URL" == *github* ]] then
         _p9k_get_icon VCS_GIT_GITHUB_ICON
-        fmt REMOTE_URL $_P9K_RETVAL
+        _$0_fmt REMOTE_URL $_P9K_RETVAL
       elif [[ "$VCS_STATUS_REMOTE_URL" == *bitbucket* ]] then
         _p9k_get_icon VCS_GIT_BITBUCKET_ICON
-        fmt REMOTE_URL $_P9K_RETVAL
+        _$0_fmt REMOTE_URL $_P9K_RETVAL
       elif [[ "$VCS_STATUS_REMOTE_URL" == *stash* ]] then
         _p9k_get_icon VCS_GIT_GITHUB_ICON
-        fmt REMOTE_URL $_P9K_RETVAL
+        _$0_fmt REMOTE_URL $_P9K_RETVAL
       elif [[ "$VCS_STATUS_REMOTE_URL" == *gitlab* ]] then
         _p9k_get_icon VCS_GIT_GITLAB_ICON
-        fmt REMOTE_URL $_P9K_RETVAL
+        _$0_fmt REMOTE_URL $_P9K_RETVAL
       else
         _p9k_get_icon VCS_GIT_ICON
-        fmt REMOTE_URL $_P9K_RETVAL
+        _$0_fmt REMOTE_URL $_P9K_RETVAL
       fi
     fi
 
     local ws
     if [[ $POWERLEVEL9K_SHOW_CHANGESET == true || -z $VCS_STATUS_LOCAL_BRANCH ]]; then
       _p9k_get_icon VCS_COMMIT_ICON
-      fmt COMMIT "$_P9K_RETVAL${VCS_STATUS_COMMIT:0:$POWERLEVEL9K_VCS_INTERNAL_HASH_LENGTH}"
+      _$0_fmt COMMIT "$_P9K_RETVAL${VCS_STATUS_COMMIT:0:$POWERLEVEL9K_VCS_INTERNAL_HASH_LENGTH}"
       ws=' '
     fi
 
     if [[ -n $VCS_STATUS_LOCAL_BRANCH ]]; then
       _p9k_get_icon VCS_BRANCH_ICON
-      fmt BRANCH "$ws$_P9K_RETVAL${VCS_STATUS_LOCAL_BRANCH//\%/%%}"
+      _$0_fmt BRANCH "$ws$_P9K_RETVAL${VCS_STATUS_LOCAL_BRANCH//\%/%%}"
     fi
 
     if [[ $POWERLEVEL9K_VCS_HIDE_TAGS == false && -n $VCS_STATUS_TAG ]]; then
       _p9k_get_icon VCS_TAG_ICON
-      fmt TAG " $_P9K_RETVAL${VCS_STATUS_TAG//\%/%%}"
+      _$0_fmt TAG " $_P9K_RETVAL${VCS_STATUS_TAG//\%/%%}"
     fi
 
     if [[ -n $VCS_STATUS_ACTION ]]; then
-      fmt ACTION " | ${VCS_STATUS_ACTION//\%/%%}"
+      _$0_fmt ACTION " | ${VCS_STATUS_ACTION//\%/%%}"
     else
       if [[ -n $VCS_STATUS_REMOTE_BRANCH &&
             $VCS_STATUS_LOCAL_BRANCH != $VCS_STATUS_REMOTE_BRANCH ]]; then
         _p9k_get_icon VCS_REMOTE_BRANCH_ICON
-        fmt REMOTE_BRANCH " $_P9K_RETVAL${VCS_STATUS_REMOTE_BRANCH//\%/%%}"
+        _$0_fmt REMOTE_BRANCH " $_P9K_RETVAL${VCS_STATUS_REMOTE_BRANCH//\%/%%}"
       fi
       if [[ $VCS_STATUS_HAS_STAGED == 1 ]]; then
         _p9k_get_icon VCS_STAGED_ICON
-        fmt STAGED " $_P9K_RETVAL"
+        _$0_fmt STAGED " $_P9K_RETVAL"
       fi
       if [[ $VCS_STATUS_HAS_UNSTAGED == 1 ]]; then
         _p9k_get_icon VCS_UNSTAGED_ICON
-        fmt UNSTAGED " $_P9K_RETVAL"
+        _$0_fmt UNSTAGED " $_P9K_RETVAL"
       fi
       if [[ $VCS_STATUS_HAS_UNTRACKED == 1 ]]; then
         _p9k_get_icon VCS_UNTRACKED_ICON
-        fmt UNTRACKED " $_P9K_RETVAL"
+        _$0_fmt UNTRACKED " $_P9K_RETVAL"
       fi
       if [[ $VCS_STATUS_COMMITS_AHEAD -gt 0 ]]; then
         _p9k_get_icon VCS_OUTGOING_CHANGES_ICON
-        fmt OUTGOING_CHANGES " $_P9K_RETVAL$VCS_STATUS_COMMITS_AHEAD"
+        _$0_fmt OUTGOING_CHANGES " $_P9K_RETVAL$VCS_STATUS_COMMITS_AHEAD"
       fi
       if [[ $VCS_STATUS_COMMITS_BEHIND -gt 0 ]]; then
         _p9k_get_icon VCS_INCOMING_CHANGES_ICON
-        fmt INCOMING_CHANGES " $_P9K_RETVAL$VCS_STATUS_COMMITS_BEHIND"
+        _$0_fmt INCOMING_CHANGES " $_P9K_RETVAL$VCS_STATUS_COMMITS_BEHIND"
       fi
       if [[ $VCS_STATUS_STASHES -gt 0 ]]; then
         _p9k_get_icon VCS_STASH_ICON
-        fmt STASH " $_P9K_RETVAL$VCS_STATUS_STASHES"
+        _$0_fmt STASH " $_P9K_RETVAL$VCS_STATUS_STASHES"
       fi
     fi
 
@@ -1769,7 +1771,7 @@ function _p9k_vcs_render() {
   return 0
 }
 
-typeset -fH _p9k_vcs_resume() {
+function _p9k_vcs_resume() {
   emulate -L zsh
 
   if [[ $VCS_STATUS_RESULT == ok-async ]]; then
@@ -1802,7 +1804,7 @@ typeset -fH _p9k_vcs_resume() {
   fi
 }
 
-typeset -fH _p9k_vcs_gitstatus() {
+function _p9k_vcs_gitstatus() {
   [[ $POWERLEVEL9K_DISABLE_GITSTATUS == true ]] && return 1
   if [[ $_P9K_REFRESH_REASON == precmd ]]; then
     if [[ -v _P9K_NEXT_VCS_DIR ]]; then
@@ -2046,7 +2048,7 @@ typeset -g _P9K_RIGHT_PREFIX
 typeset -g _P9K_RIGHT_SUFFIX
 
 set_default POWERLEVEL9K_DISABLE_RPROMPT false
-typeset -fH _p9k_set_prompt() {
+function _p9k_set_prompt() {
   emulate -L zsh
 
   _P9K_PROMPT=''
@@ -2200,45 +2202,47 @@ _p9k_init() {
   _p9k_init_icons
   _p9k_init_strings
 
-  typeset -lf set_os() {
+  function _$0_set_os() {
     OS=$1
     _p9k_get_icon $2
     OS_ICON=$_P9K_RETVAL
   }
 
+  trap "unfunction _$0_set_os" EXIT
+
   if [[ $(uname -o 2>/dev/null) == Android ]]; then
-    set_os Android ANDROID_ICON
+    _$0_set_os Android ANDROID_ICON
   else
     case $(uname) in
-      SunOS)                     set_os Solaris SUNOS_ICON;;
-      Darwin)                    set_os OSX     APPLE_ICON;;
-      CYGWIN_NT-* | MSYS_NT-*)   set_os Windows WINDOWS_ICON;;
-      FreeBSD|OpenBSD|DragonFly) set_os BSD     FREEBSD_ICON;;
+      SunOS)                     _$0_set_os Solaris SUNOS_ICON;;
+      Darwin)                    _$0_set_os OSX     APPLE_ICON;;
+      CYGWIN_NT-* | MSYS_NT-*)   _$0_set_os Windows WINDOWS_ICON;;
+      FreeBSD|OpenBSD|DragonFly) _$0_set_os BSD     FREEBSD_ICON;;
       Linux)
         OS='Linux'
         local os_release_id
         [[ -f /etc/os-release &&
           "${(f)$((</etc/os-release) 2>/dev/null)}" =~ "ID=([A-Za-z]+)" ]] && os_release_id="${match[1]}"
         case "$os_release_id" in
-          *arch*)                  set_os Linux LINUX_ARCH_ICON;;
-          *debian*)                set_os Linux LINUX_DEBIAN_ICON;;
-          *ubuntu*)                set_os Linux LINUX_UBUNTU_ICON;;
-          *elementary*)            set_os Linux LINUX_ELEMENTARY_ICON;;
-          *fedora*)                set_os Linux LINUX_FEDORA_ICON;;
-          *coreos*)                set_os Linux LINUX_COREOS_ICON;;
-          *gentoo*)                set_os Linux LINUX_GENTOO_ICON;;
-          *mageia*)                set_os Linux LINUX_MAGEIA_ICON;;
-          *centos*)                set_os Linux LINUX_CENTOS_ICON;;
-          *opensuse*|*tumbleweed*) set_os Linux LINUX_OPENSUSE_ICON;;
-          *sabayon*)               set_os Linux LINUX_SABAYON_ICON;;
-          *slackware*)             set_os Linux LINUX_SLACKWARE_ICON;;
-          *linuxmint*)             set_os Linux LINUX_MINT_ICON;;
-          *alpine*)                set_os Linux LINUX_ALPINE_ICON;;
-          *aosc*)                  set_os Linux LINUX_AOSC_ICON;;
-          *nixos*)                 set_os Linux LINUX_NIXOS_ICON;;
-          *devuan*)                set_os Linux LINUX_DEVUAN_ICON;;
-          *manjaro*)               set_os Linux LINUX_MANJARO_ICON;;
-          *)                       set_os Linux LINUX_ICON;;
+          *arch*)                  _$0_set_os Linux LINUX_ARCH_ICON;;
+          *debian*)                _$0_set_os Linux LINUX_DEBIAN_ICON;;
+          *ubuntu*)                _$0_set_os Linux LINUX_UBUNTU_ICON;;
+          *elementary*)            _$0_set_os Linux LINUX_ELEMENTARY_ICON;;
+          *fedora*)                _$0_set_os Linux LINUX_FEDORA_ICON;;
+          *coreos*)                _$0_set_os Linux LINUX_COREOS_ICON;;
+          *gentoo*)                _$0_set_os Linux LINUX_GENTOO_ICON;;
+          *mageia*)                _$0_set_os Linux LINUX_MAGEIA_ICON;;
+          *centos*)                _$0_set_os Linux LINUX_CENTOS_ICON;;
+          *opensuse*|*tumbleweed*) _$0_set_os Linux LINUX_OPENSUSE_ICON;;
+          *sabayon*)               _$0_set_os Linux LINUX_SABAYON_ICON;;
+          *slackware*)             _$0_set_os Linux LINUX_SLACKWARE_ICON;;
+          *linuxmint*)             _$0_set_os Linux LINUX_MINT_ICON;;
+          *alpine*)                _$0_set_os Linux LINUX_ALPINE_ICON;;
+          *aosc*)                  _$0_set_os Linux LINUX_AOSC_ICON;;
+          *nixos*)                 _$0_set_os Linux LINUX_NIXOS_ICON;;
+          *devuan*)                _$0_set_os Linux LINUX_DEVUAN_ICON;;
+          *manjaro*)               _$0_set_os Linux LINUX_MANJARO_ICON;;
+          *)                       _$0_set_os Linux LINUX_ICON;;
         esac
         ;;
     esac
