@@ -1,6 +1,6 @@
 # Powerlevel10k
 
-Powerlevel10k is a theme for ZSH. It's a backward-compatible fork of
+Powerlevel10k is a theme for ZSH. It's a backward-compatible reimplementation of
 [Powerlevel9k](https://github.com/bhilburn/powerlevel9k) with lower latency and better
 prompt responsiveness.
 
