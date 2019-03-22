@@ -233,13 +233,13 @@ function gitstatus_start() {
     IFS='' read -r -d $'\x1e' -u $resp_fd -t $timeout reply
     [[ $reply == $'hello\x1f0' ]]
 
-    function _gitstatus_cleanup_${daemon_pid}() {
+    function _gitstatus_cleanup_${ZSH_SUBSHELL}_${daemon_pid}() {
       emulate -L zsh
       setopt err_return no_unset
-      local -i daemon_pid=${${(%)${:-%N}}#_gitstatus_cleanup_}
-      kill -- -$daemon_pid &>/dev/null || true
+      local -i daemon_pid=${${(%)${:-%N}}#_gitstatus_cleanup_${ZSH_SUBSHELL}_}
+      [[ $daemon_pid -gt 0 ]] && kill -- -$daemon_pid &>/dev/null
     }
-    add-zsh-hook zshexit _gitstatus_cleanup_${daemon_pid}
+    add-zsh-hook zshexit _gitstatus_cleanup_${ZSH_SUBSHELL}_${daemon_pid}
   }
 
   start && {
