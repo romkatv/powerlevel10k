@@ -143,7 +143,7 @@ git clone https://github.com/romkatv/powerlevel10k.git /tmp/powerlevel10k
 (cd /tmp/powerlevel10k && curl -fsSL https://raw.githubusercontent.com/romkatv/dotfiles-public/master/.purepower)
 echo '
   # Replace fancy with portable if your font cannot render some characters.
-  # Remote the line altogether to see the default Powerlevel10k prompt.
+  # Remove the line altogether to see the default Powerlevel10k prompt.
   source /tmp/powerlevel10k/.purepower
   source /tmp/powerlevel10k/powerlevel10k.zsh-theme' >/tmp/powerlevel10k/.zshrc
 ZDOTDIR=/tmp/powerlevel10k zsh
@@ -163,7 +163,7 @@ docker run -e LANG=C.UTF-8 -e LC_ALL=C.UTF-8 -e TERM=$TERM -it --rm ubuntu bash 
   cd && curl -fsSL https://raw.githubusercontent.com/romkatv/dotfiles-public/master/.purepower
   echo "
     # Replace fancy with portable if your font cannot render some characters.
-    # Remote the line altogether to see the default Powerlevel10k prompt.
+    # Remove the line altogether to see the default Powerlevel10k prompt.
     source ~/.purepower fancy
     source ~/powerlevel10k/powerlevel10k.zsh-theme" >~/.zshrc
   cd ~/powerlevel10k
