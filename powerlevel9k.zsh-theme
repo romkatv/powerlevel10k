@@ -1,13 +1,13 @@
 # vim:ft=zsh ts=2 sw=2 sts=2 et fenc=utf-8
 ################################################################
-# powerlevel10k Theme
+# Powerlevel10k Theme
 # https://github.com/romkatv/powerlevel10k
 #
 # Forked from powerlevel9k Theme
 # https://github.com/bhilburn/powerlevel9k
 #
-# Which was inspired by agnoster's Theme:
-# https://gist.github.com/3712874
+# Which in turn was forked from agnoster Theme
+# https://github.com/robbyrussell/oh-my-zsh/blob/74177c5320b2a1b2f8c4c695c05984b57fd7c6ea/themes/agnoster.zsh-theme
 ################################################################
 
 ################################################################
