@@ -2113,6 +2113,7 @@ typeset -g SED_EXTENDED_REGEX_PARAMETER
 typeset -g  _P9K_TIMER_FIFO
 typeset -gi _P9K_TIMER_FD=0
 typeset -gi _P9K_TIMER_PID=0
+typeset -gi _P9K_TIMER_SUBSHELL=0
 
 _p9k_init_timer() {
   _p9k_start_timer() {
@@ -2145,11 +2146,14 @@ _p9k_init_timer() {
     " </dev/null >&$_P9K_TIMER_FD 2>/dev/null &!
 
     _P9K_TIMER_PID=$!
+    _P9K_TIMER_SUBSHELL=$ZSH_SUBSHELL
 
     function _p9k_kill_timer() {
       emulate -L zsh
-      (( _P9K_TIMER_PID )) && kill -- -$_P9K_TIMER_PID &>/dev/null
-      command rm -f $_P9K_TIMER_FIFO
+      if (( ZSH_SUBSHELL == _P9K_TIMER_SUBSHELL )); then
+        (( _P9K_TIMER_PID )) && kill -- -$_P9K_TIMER_PID &>/dev/null
+        command rm -f $_P9K_TIMER_FIFO
+      fi
     }
     add-zsh-hook zshexit _p9k_kill_timer
   }
