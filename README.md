@@ -5,135 +5,120 @@ Powerlevel10k is a theme for ZSH. It's a backward-compatible reimplementation of
 prompt responsiveness.
 
 If you like the looks of Powerlevel9k but feeling frustrated by its slow prompt,
-simply replace your `powerlevel9k` theme with `powerlevel10k` and enjoy responsive
-shell like it's 80's again!
+simply replace it with Powerlevel10k and enjoy responsive shell like it's 80's again!
 
 Powerlevel10k is a drop-in replacement for Powerlevel9k. It uses the same configuration options as
 Powerlevel9k and produces the same results
 [[*]](#does-powerlevel10k-always-render-exactly-the-same-prompt-with-the-same-config).
-It's simply much faster.
+It's simply [much faster](#how-fast-is-it).
 
 ## Table of Contents
 
-1. [Installation and configuration](#installation-and-configuration)
-   1. [Manual installation](#manual-installation)
-   2. [Extra configuration](#extra-configuration)
-2. [Try it out](#try-it-out)
+1. [Installation](#installation)
+   1. [Manual](#manual)
+   2. [Oh My Zsh](#oh-my-zsh)
+   3. [Prezto](#prezto)
+   4. [Antigen](#antigen)
+   5. [Zplug](#zplug)
+   6. [Zgen](#zgen)
+   7. [Antibody](#antibody)
+2. [Configuration](#configuration)
+3. [Try it out](#try-it-out)
    1. [For Powerlevel9k users](#for-powerlevel9k-users)
    2. [For new users](#for-new-users)
    3. [Docker playground](#docker-playground)
-3. [How fast is it?](#how-fast-is-it)
-4. [FAQ](#faq)
-   1. [Why does Powerlevel10k spawn two extra processes?](#why-does-powerlevel10k-spawn-two-extra-processes)
+4. [How fast is it?](#how-fast-is-it)
+5. [FAQ](#faq)
+   1. [Why does Powerlevel10k spawn extra processes?](#why-does-powerlevel10k-spawn-extra-processes)
    2. [Does Powerlevel10k always render exactly the same prompt with the same config?](#does-powerlevel10k-always-render-exactly-the-same-prompt-with-the-same-config)
    3. [Are changes getting up/down-streamed?](#are-changes-getting-updown-streamed)
    4. [Is there an AUR package for Powerlevel10k?](#is-there-an-aur-package-for-powerlevel10k)
    5. [How do I use Powerlevel10k with zplug, prezto, oh-my-zsh, antigen, somethingelse?](#how-do-i-use-powerlevel10k-with-zplug-prezto-oh-my-zsh-antigen-somethingelse)
    6. [What is the minimum supported zsh version?](#what-is-the-minimum-supported-zsh-version)
 
-## Installation and configuration
+## Installation
 
-For installation and configuration instructions see
-[Powerlevel9k](https://github.com/bhilburn/powerlevel9k). Everything in there applies to
-Powerlevel10k as well. Follow the official installation guide, make sure everything works
-and you like the way prompt looks. Then simply replace Powerlevel9k with Powerlevel10k. Once
-you restart zsh, your prompt will be faster. No configuration changes are needed.
+If you don't yet have a Powerline font installed, follow the
+[font installation guide](https://github.com/bhilburn/powerlevel9k/wiki/Install-Instructions#step-2-install-a-powerline-font)
+from Powerlevel9k. Once you have a working Powerline font installed, proceed with the installation
+of Powerlevel10k as described below.
 
-### Manual installation
+### Manual
 
 ```zsh
 git clone https://github.com/romkatv/powerlevel10k.git ~/powerlevel10k
 echo 'source ~/powerlevel10k/powerlevel10k.zsh-theme' >>! ~/.zshrc
 ```
 
-If you are using a framework / plugin manager and need help translating these instruction into its
-configuration language, see
-[FAQ](#how-do-i-use-powerlevel10k-with-zplug-prezto-oh-my-zsh-antigen-somethingelse).
+This is the simplest kind of installation and it works even if you are using a plugin manager. Just
+make sure to disable your current theme in your plugin manager. See [FAQ](#TODO) for help.
 
-Make sure to disable your current theme.
+### Oh My Zsh
 
-### Extra configuration
+```zsh
+git clone https://github.com/romkatv/powerlevel10k.git $ZSH_CUSTOM/themes/powerlevel10k
+```
 
-Powerlevel10k has a handful of configuration options that Powerlevel9k doesn't have. They
-are still using the `POWERLEVEL9K` prefix though.
+Set `ZSH_THEME=powerlevel10k/powerlevel10k` in your `~/.zshrc`.
 
-  * `POWERLEVEL9K_VCS_MAX_SYNC_LATENCY_SECONDS (FLOAT) [default=0.05]`
+### Prezto
 
-      If it takes longer than this to fetch git repo status, display the prompt with a greyed out
-      vcs segment and fix it asynchronously when the results come it.
-  * `POWERLEVEL9K_VCS_BACKENDS (ARRAY) [default=(git)]`
-  
-      The list of VCS backends to use. Supported values are `git`, `svn` and `hg`. Note that adding
-      anything other than git will make prompt slower even when your current directory isn't a repo.
+```zsh
+git clone https://github.com/romkatv/powerlevel10k.git  ~/.zprezto/modules/prompt/external/powerlevel10k
+ln -s ~/.zprezto/modules/prompt/{external/powerlevel10k/powerlevel10k.zsh-theme,functions/prompt_powerlevel10k_setup}
+```
 
-  * `POWERLEVEL9K_GITSTATUS_DIR (STRING) [default=$POWERLEVEL9K_INSTALLATION_DIR/gitstatus]`
+Add `zstyle :prezto:module:prompt theme powerlevel10k` to your `~/.zpreztorc`.
 
-    Directory with gitstatus plugin. By default uses a copy bundled with Powerlevel10k.
-  * `POWERLEVEL9K_DISABLE_GITSTATUS (STRING) [default="false"]`
-  
-    If set to `"true"`, Powerlevel10k won't use its fast git backend and will fall back to
-    `vcs_info` like Powerlevel9k.
-  * `POWERLEVEL9K_MAX_CACHE_SIZE (INT) [default=10000]`
+### Antigen
 
-    The maximum number of elements that can be stored in the cache. When the cache grows over this
-    limit, it gets cleared.
-  * `POWERLEVEL9K_VCS_MAX_INDEX_SIZE_DIRTY (INT) [default=-1]`
+Add `antigen theme romkatv/powerlevel10k` to your `~/.zshrc`. Make sure you have `antigen apply`
+somewhere after it.
 
-    Don't scan for dirty files in git repos with more files in the index than this. Instead, show
-    them with the "dirty" color (yellow by default) whether they are dirty or not. This makes git
-    prompt much faster on huge repositories.
+### Zplug
 
-  * `POWERLEVEL9K_EXPERIMENTAL_TIME_REALTIME (STRING) [default="false"]`
+Add `zplug romkatv/powerlevel10k, use:powerlevel10k.zsh-theme` to your `~/.zshrc`.
 
-    If set to `"true"`, `time` segment will update every second, turning into a realtime clock.
-    This option triggers a
-    [bug in completion menu](https://www.zsh.org/mla/workers//2019/msg00161.html) in zsh, and
-    another
-    [bug in history](https://github.com/bhilburn/powerlevel9k/commit/fb1ef540228ec7b4394cf2f6860137074c5838a6#commitcomment-32779672).
-    You can pick up a fix for the latter from
-    [a fork of zsh](https://github.com/romkatv/zsh/tree/gentle-reset-prompt).
+### Zgen
 
-  * When using gitstatus, there is an extra state called `LOADING` that is used by `vcs` prompt
-    segment when it's waiting for git status in the background. You can define styling for this
-    state the same way as for the other states -- `CLEAN`, `UNTRACKED` and `MODIFIED`. You can
-    also define the icon and the text that will be used when `LOADING` state is triggered for a
-    git repository for which no prior status is known. If both `POWERLEVEL9K_VCS_LOADING_ICON`
-    and `POWERLEVEL9K_VCS_LOADING_TEXT` are empty, `vcs` segment in such cases won't be shown.
+Add `zgen load romkatv/powerlevel10k powerlevel10k` to your `~/.zshrc`.
 
-    * `POWERLEVEL9K_VCS_LOADING_ICON (STRING) [default=""]`
+### Antibody
 
-      Icon shown while waiting for git status for a repo for the first time.
-    * `POWERLEVEL9K_VCS_LOADING_TEXT (STRING) [default="loading"]`
+Add `antibody bundle romkatv/powerlevel10k` to your `~/.zshrc`.
 
-      Text shown while waiting for git status for a repo for the first time.
-    * `POWERLEVEL9K_VCS_LOADING_BACKGROUND (STRING) [default="grey"]`
+## Configuration
 
-      Background color for `LOADING` state.
-    * `POWERLEVEL9K_VCS_LOADING_FOREGROUND (STRING) [default="$DEFAULT_COLOR"]`
+Powerlevel10k recognized all configuration options used by Powerlevel9k. See Powerlevel9k
+[configuration guide](https://github.com/bhilburn/powerlevel9k#prompt-customization) for the full
+list.
 
-      Foreground color for `LOADING` state.
-    * `POWERLEVEL9K_VCS_LOADING_VISUAL_IDENTIFIER_COLOR (STRING) [default=$POWERLEVEL9K_VCS_LOADING_FOREGROUND]`
+If you've been using Powerlevel9k before, **do not remove the configuration options**. Powerlevel10k
+will pick them up and provide you with the same prompt UI you are used to.
 
-      Foreground color for `POWERLEVEL9K_VCS_LOADING_ICON`.
-  * When using gitstatus, components of `vcs` segment can be colored individually by setting
-    `POWERLEVEL9K_VCS_${STATE}_${COMPONENT}FORMAT_FOREGROUND`. `${STATE}` should be one of `CLEAN`,
-    `UNTRACKED`, `MODIFIED` or `LOADING`. `${COMPONENT}` should be one of `REMOTE_URL`, `COMMIT`,
-    `BRANCH`, `TAG`, `REMOTE_BRANCH`, `STAGED`, `UNSTAGED`, `UNTRACKED`, `OUTGOING_CHANGES`,
-    `INCOMING_CHANGES`, `STASH` or `ACTION`. If
-    `POWERLEVEL9K_VCS_${STATE}_${COMPONENT}FORMAT_FOREGROUND` isn't set for some combination of
-    `${STATE}` and `${COMPONENT}`, the component is colored with
-    `POWERLEVEL9K_VCS_${COMPONENT}FORMAT_FOREGROUND`. If that one isn't set either, the component is
-    colored with `POWERLEVEL9K_VCS_${STATE}_FOREGROUND`. The fallback logic is consistent with
-    Powerlevel9k, meaning that your `vcs` prompt will look the same in Powerlevel10k and
-    Powerlevel9k if you don't define any `POWERLEVEL9K_VCS_${STATE}_${COMPONENT}_FOREGROUND`
-    parameters. Note that both the icon and the text in each component always have the same color.
-    There is currently no `POWERLEVEL9K_VCS_${STATE}_${COMPONENT}FORMAT_VISUAL_IDENTIFIER_COLOR`,
-    although it's easy to implement if desired.
+The default configuration in Powerlevel10k is the same as in Powerlevel9k, which is to say it's not
+pretty. [Pure Power](https://github.com/romkatv/dotfiles-public/edit/master/.purepower) is
+recommended as a good starting point for new users. It'll make your prompt look like this.
+
+![Pure Power](https://raw.githubusercontent.com/romkatv/dotfiles-public/master/dotfiles/purepower.png)
+
+Installatin of Pure Power is the same regardless of your plugin manager of choice.
+
+```zsh
+( cd && curl -fsSLO https://raw.githubusercontent.com/romkatv/dotfiles-public/master/.purepower )
+echo 'source ~/.purepower' >>! ~/.zshrc
+```
+
+You can edit `~/.purepower` to change your Powerlevel10k configuration. There is documentation
+inside.
+
+Powerlevel10k has configuration options that Powerlevel9k doesn't. See
+[extended configuration](https://github.com/romkatv/powerlevel10k/blob/master/EXTENDED_CONFIGURATION.md).
 
 ## Try it out
 
 Try Powerlevel10k without making any changes to your setup. If you like it, see
-[Installation and configuration](#installation-and-configuration) for how to make a permanent
+[Installation](#installation) and [Configuration](#configuration) for how to make a permanent
 switch.
 
 ### For Powerlevel9k users
@@ -146,18 +131,19 @@ git clone https://github.com/romkatv/powerlevel10k.git /tmp/powerlevel10k
 source /tmp/powerlevel10k/powerlevel10k.zsh-theme
 ```
 
-When you are done playing, `rm -rf /tmp/powerlevel10k` and exit zsh.
+When you are done playing, `rm -rf /tmp/powerlevel10k` and exit zsh. Feel the difference in prompt
+latency.
 
 ### For new users
 
 ```zsh
 git clone https://github.com/romkatv/powerlevel10k.git /tmp/powerlevel10k
-echo "
-  # Your prompt configuration goes here.
-  POWERLEVEL9K_PROMPT_ON_NEWLINE=true
-  POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(root_indicator dir_writable dir vcs)
-  POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(status command_execution_time background_jobs time)
-  source /tmp/powerlevel10k/powerlevel10k.zsh-theme" >/tmp/powerlevel10k/.zshrc
+(cd /tmp/powerlevel10k && curl -fsSL https://raw.githubusercontent.com/romkatv/dotfiles-public/master/.purepower)
+echo '
+  # Replace fancy with portable if your font cannot render some characters.
+  # Remote the line altogether to see the default Powerlevel10k prompt.
+  source /tmp/powerlevel10k/.purepower
+  source /tmp/powerlevel10k/powerlevel10k.zsh-theme' >/tmp/powerlevel10k/.zshrc
 ZDOTDIR=/tmp/powerlevel10k zsh
 ```
 
@@ -165,17 +151,18 @@ When you are done playing, `rm -rf /tmp/powerlevel10k` and exit zsh.
 
 ### Docker playground
 
-You can try Powerlevel10k in Docker (Linux only). Once you exit zsh, the image is deleted.
+You can try Powerlevel10k in Docker (Linux only). You can safely make any changes to the file system
+while trying out Powerlevel10k. Once you exit zsh, the image is deleted.
 
 ```zsh
 docker run -e LANG=C.UTF-8 -e LC_ALL=C.UTF-8 -e TERM=$TERM -it --rm ubuntu bash -uexc '
   apt update && apt install -y zsh git
   git clone https://github.com/romkatv/powerlevel10k.git ~/powerlevel10k
+  cd && curl -fsSL https://raw.githubusercontent.com/romkatv/dotfiles-public/master/.purepower
   echo "
-    # Your prompt configuration goes here.
-    POWERLEVEL9K_PROMPT_ON_NEWLINE=true
-    POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(root_indicator dir_writable dir vcs)
-    POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(status command_execution_time background_jobs time)
+    # Replace fancy with portable if your font cannot render some characters.
+    # Remote the line altogether to see the default Powerlevel10k prompt.
+    source ~/.purepower fancy
     source ~/powerlevel10k/powerlevel10k.zsh-theme" >~/.zshrc
   cd ~/powerlevel10k
   zsh -i'
@@ -222,8 +209,8 @@ POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(status time)
 
 POWERLEVEL9K_MODE=nerdfont-complete
 POWERLEVEL9K_PROMPT_ON_NEWLINE=true
-POWERLEVEL9K_ROOT_ICON=\\uF09C
-POWERLEVEL9K_TIME_ICON=\\uF017
+POWERLEVEL9K_ROOT_ICON=$'\uF09C'
+POWERLEVEL9K_TIME_ICON=$'\uF017'
 POWERLEVEL9K_TIME_BACKGROUND=magenta
 POWERLEVEL9K_STATUS_OK_BACKGROUND=grey53
 ```
@@ -238,8 +225,8 @@ Raspberry Pie.
 Powerlevel10k uses [gitstatus](https://github.com/romkatv/gitstatus) as the backend behind `vcs`
 prompt; gitstatus spawns `gitstatusd` and `zsh`. See
 [gitstatus](https://github.com/romkatv/gitstatus) for details. Powerlevel10k spawns another `zsh`
-if `POWERLEVEL9K_EXPERIMENTAL_TIME_REALTIME` is set to `true` or `background_jobs` segment is
-enabled. This is used to trigger prompt refresh.
+if `POWERLEVEL9K_EXPERIMENTAL_TIME_REALTIME` is set to `true`. This is used to trigger prompt
+refresh every second.
 
 ### Does Powerlevel10k always render exactly the same prompt with the same config?
 
@@ -247,7 +234,8 @@ This is the goal. You should be able to switch between Powerlevel9k and Powerlev
 visible changes except for performance. There are, however, several differences.
 
   * By default only git vcs backend is enabled in Powerlevel10k. If you need svn and hg, you'll
-    need to set `POWERLEVEL9K_VCS_BACKENDS`. See [Extra configuration](#extra-configuration).
+    need to set `POWERLEVEL9K_VCS_BACKENDS`. See
+    [extended configuration](https://github.com/romkatv/powerlevel10k/blob/master/EXTENDED_CONFIGURATION.md).
   * Fewer configuration options can be changed after the theme is loaded. For example, if you
     decide to change background color of some segment in the middle of an interactive session,
     it may not work.
@@ -255,14 +243,24 @@ visible changes except for performance. There are, however, several differences.
 If you notice any other differences between prompts in Powerlevel9k and Powerlevel10k when running
 with the same settings, please [open an issue](https://github.com/romkatv/powerlevel10k/issues).
 
+### I am getting an error: "zsh: bad math expression: operand expected at end of string"
+
+Did you change any `POWERLEVEL9K` options after the first prompt got rendered, perhaps by editing
+your `~/.zshrc` and executing `source ~/.zshrc`? This isn't supported. You'll need to restart zsh
+for configuration changes to take effect.
+
 ### Are changes getting up/down-streamed?
 
 Powerlevel10k regularly pulls changes from Powerlevel9k, so all bug fixes and new features that land
-in Powerlevel9k will land here, too.
+in Powerlevel9k will land here, too. This is a labor-intensive process because Powerlevel9k and
+Powerlevel10k have very different code. Thankfully, there aren't many changes in Powerlevel9k.
 
-There is ongoing work on upstreaming some of the changes from Powerlevel10k to Powerlevel9k. E.g.,
-issues [1170](https://github.com/bhilburn/powerlevel9k/issues/1170) and
+There is ongoing work on upstreaming some of the performance improvements from Powerlevel10k to
+Powerlevel9k. E.g., issues [1170](https://github.com/bhilburn/powerlevel9k/issues/1170) and
 [1185](https://github.com/bhilburn/powerlevel9k/issues/1185).
+
+I've opening issues for all bugs that I've inherited from Powerlevel9k during the fork and have
+since fixed. They don't see much traction but at least the devs and users know about them.
 
 Improvements to [libgit2](https://github.com/libgit2/libgit2/issues/4230#issuecomment-471710359) are
 being upstremed. There are 3 independent optimizations and it's not yet clear whether all of them
@@ -273,10 +271,10 @@ will make it but there is a good chance they will.
 Yes, [zsh-theme-powerlevel10k-git](https://aur.archlinux.org/packages/zsh-theme-powerlevel10k-git/).
 This package is owned by an unaffiliated volunteer.
 
-### How do I use Powerlevel10k with zplug, prezto, oh-my-zsh, antigen, somethingelse?
+### I cannot make Powerlevel10k work with my plugin manager. Help!
 
-If you have to ask, then the easiest way is to disable the current theme (so that you end up with
-no theme) and then install Powerlevel10k the usual way.
+If the [installation instructions](#installation) didn't work for you, try disabling your current
+theme (so that you end up with no theme) and then installing Powerlevel10k manually.
 
 1. Disable the current theme in your framework / plugin manager.
 
@@ -290,15 +288,14 @@ no theme) and then install Powerlevel10k the usual way.
   * **antigen:** Open `~/.zshrc` and remove the line that sets `antigen theme`, such as
     `antigen theme bhilburn/powerlevel9k powerlevel9k`.
 
-2. Install Powerlevel10k the usual way.
+2. Install Powerlevel10k manually.
 
 ```zsh
 git clone https://github.com/romkatv/powerlevel10k.git ~/powerlevel10k
 echo 'source ~/powerlevel10k/powerlevel10k.zsh-theme' >>! ~/.zshrc
 ```
 
-If you've been using Powerlevel9k before, **do not remove the configuration options**. Powerlevel10k
-will pick them up and provide you with the same prompt UI you are used to.
+This method of installation won't make anything slower or otherwise sub-par.
 
 ### What is the minimum supported zsh version?
 
