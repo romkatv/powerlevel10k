@@ -31,9 +31,10 @@ It's simply [much faster](#how-fast-is-it).
 5. [FAQ](#faq)
    1. [Why does Powerlevel10k spawn extra processes?](#why-does-powerlevel10k-spawn-extra-processes)
    2. [Does Powerlevel10k always render exactly the same prompt with the same config?](#does-powerlevel10k-always-render-exactly-the-same-prompt-with-the-same-config)
+   3. [I am getting an error: "zsh: bad math expression: operand expected at end of string"](#i-am-getting-an-error-zsh-bad-math-expression-operand-expected-at-end-of-string)
    3. [Are changes getting up/down-streamed?](#are-changes-getting-updown-streamed)
    4. [Is there an AUR package for Powerlevel10k?](#is-there-an-aur-package-for-powerlevel10k)
-   5. [How do I use Powerlevel10k with zplug, prezto, oh-my-zsh, antigen, somethingelse?](#how-do-i-use-powerlevel10k-with-zplug-prezto-oh-my-zsh-antigen-somethingelse)
+   5. [I cannot make Powerlevel10k work with my plugin manager. Help!](#i-cannot-make-powerlevel10k-work-with-my-plugin-manager-help)
    6. [What is the minimum supported zsh version?](#what-is-the-minimum-supported-zsh-version)
 
 ## Installation
@@ -51,7 +52,8 @@ echo 'source ~/powerlevel10k/powerlevel10k.zsh-theme' >>! ~/.zshrc
 ```
 
 This is the simplest kind of installation and it works even if you are using a plugin manager. Just
-make sure to disable your current theme in your plugin manager. See [FAQ](#TODO) for help.
+make sure to disable your current theme in your plugin manager. See
+[FAQ](#i-cannot-make-powerlevel10k-work-with-my-plugin-manager-help) for help.
 
 ### Oh My Zsh
 
@@ -118,7 +120,7 @@ Powerlevel10k has configuration options that Powerlevel9k doesn't. See
 ## Try it out
 
 Try Powerlevel10k without making any changes to your setup. If you like it, see
-[Installation](#installation) and [Configuration](#configuration) for how to make a permanent
+[installation](#installation) and [configuration](#configuration) for how to make a permanent
 switch.
 
 ### For Powerlevel9k users
