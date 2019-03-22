@@ -3,10 +3,10 @@
 # Powerlevel10k Theme
 # https://github.com/romkatv/powerlevel10k
 #
-# Forked from powerlevel9k Theme
+# Forked from Powerlevel9k Theme
 # https://github.com/bhilburn/powerlevel9k
 #
-# Which in turn was forked from agnoster Theme
+# Which in turn was forked from Agnoster Theme
 # https://github.com/robbyrussell/oh-my-zsh/blob/74177c5320b2a1b2f8c4c695c05984b57fd7c6ea/themes/agnoster.zsh-theme
 ################################################################
 
