@@ -104,7 +104,7 @@ recommended as a good starting point for new users. It'll make your prompt look 
 
 ![Pure Power](https://raw.githubusercontent.com/romkatv/dotfiles-public/master/dotfiles/purepower.png)
 
-Installatin of Pure Power is the same regardless of your plugin manager of choice.
+Installation of Pure Power is the same regardless of your plugin manager of choice.
 
 ```zsh
 ( cd && curl -fsSLO https://raw.githubusercontent.com/romkatv/dotfiles-public/master/.purepower )
