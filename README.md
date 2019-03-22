@@ -8,9 +8,10 @@ If you like the looks of Powerlevel9k but feeling frustrated by its slow prompt,
 simply replace your `powerlevel9k` theme with `powerlevel10k` and enjoy responsive
 shell like it's 80's again!
 
-Powerlevel10k uses the same configuration options as Powerlevel9k and produces the
-same results [[*]](#does-powerlevel10k-always-render-exactly-the-same-prompt-with-the-same-config).
-It's simply faster.
+Powerlevel10k is a drop-in replacement for Powerlevel9k. It uses the same configuration options as
+Powerlevel9k and produces the same results
+[[*]](#does-powerlevel10k-always-render-exactly-the-same-prompt-with-the-same-config).
+It's simply much faster.
 
 ## Table of Contents
 
