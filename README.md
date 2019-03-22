@@ -140,7 +140,7 @@ latency.
 
 ```zsh
 git clone https://github.com/romkatv/powerlevel10k.git /tmp/powerlevel10k
-(cd /tmp/powerlevel10k && curl -fsSL https://raw.githubusercontent.com/romkatv/dotfiles-public/master/.purepower)
+(cd /tmp/powerlevel10k && curl -fsSLO https://raw.githubusercontent.com/romkatv/dotfiles-public/master/.purepower)
 echo '
   # Replace fancy with portable if your font cannot render some characters.
   # Remove the line altogether to see the default Powerlevel10k prompt.
