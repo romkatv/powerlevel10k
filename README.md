@@ -99,7 +99,7 @@ If you've been using Powerlevel9k before, **do not remove the configuration opti
 will pick them up and provide you with the same prompt UI you are used to.
 
 The default configuration in Powerlevel10k is the same as in Powerlevel9k, which is to say it's not
-pretty. [Pure Power](https://github.com/romkatv/dotfiles-public/edit/master/.purepower) is
+pretty. [Pure Power](https://github.com/romkatv/dotfiles-public/blob/master/.purepower) is
 recommended as a good starting point for new users. It'll make your prompt look like this.
 
 ![Pure Power](https://raw.githubusercontent.com/romkatv/dotfiles-public/master/dotfiles/purepower.png)
@@ -112,7 +112,7 @@ echo 'source ~/.purepower' >>! ~/.zshrc
 ```
 
 Read the documentation at the top of `~/.purepower` (or
-[here](https://github.com/romkatv/dotfiles-public/edit/master/.purepower)) to get an idea of what
+[here](https://github.com/romkatv/dotfiles-public/blob/master/.purepower)) to get an idea of what
 your prompt is capable of. You can edit the file to change your Powerlevel10k configuration.
 
 Powerlevel10k has configuration options that Powerlevel9k doesn't. See
