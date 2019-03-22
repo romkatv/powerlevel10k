@@ -158,7 +158,7 @@ while trying out Powerlevel10k. Once you exit zsh, the image is deleted.
 
 ```zsh
 docker run -e LANG=C.UTF-8 -e LC_ALL=C.UTF-8 -e TERM=$TERM -it --rm ubuntu bash -uexc '
-  apt update && apt install -y zsh git
+  apt update && apt install -y zsh git curl
   git clone https://github.com/romkatv/powerlevel10k.git ~/powerlevel10k
   cd && curl -fsSL https://raw.githubusercontent.com/romkatv/dotfiles-public/master/.purepower
   echo "
