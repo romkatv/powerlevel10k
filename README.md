@@ -111,8 +111,9 @@ Installatin of Pure Power is the same regardless of your plugin manager of choic
 echo 'source ~/.purepower' >>! ~/.zshrc
 ```
 
-You can edit `~/.purepower` to change your Powerlevel10k configuration. There is documentation
-inside.
+Read the documentation at the top of `~/.purepower` (or
+[here](https://github.com/romkatv/dotfiles-public/edit/master/.purepower)) to get an idea of what
+your prompt is capable of. You can edit the file to change your Powerlevel10k configuration.
 
 Powerlevel10k has configuration options that Powerlevel9k doesn't. See
 [extended configuration](https://github.com/romkatv/powerlevel10k/blob/master/EXTENDED_CONFIGURATION.md).
