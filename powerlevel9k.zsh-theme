@@ -1171,11 +1171,35 @@ prompt_load() {
 
 ################################################################
 # Segment to diplay Node version
+set_default P9K_NODE_VERSION_PROJECT_ONLY false
 prompt_node_version() {
-  local node_version=$(node -v 2>/dev/null)
-  [[ -z "${node_version}" ]] && return
+  if [ "$P9K_NODE_VERSION_PROJECT_ONLY" = true ] ; then
+    local foundProject=false # Variable to stop searching if a project is found
+    local currentDir=$(pwd)  # Variable to iterate through the path ancestry tree
+    
+    # Search as long as no project could been found or until the root directory 
+    # has been reached
+    while [ "$foundProject" = false -a ! "$currentDir" = "/" ] ; do
 
-  "$1_prompt_segment" "$0" "$2" "green" "white" 'NODE_ICON' 0 '' "${${node_version:1}//\%/%%}"
+      # Check if directory contains a project description
+      if [[ -e "$currentDir/package.json" ]] ; then
+        foundProject=true
+        break
+      fi
+      # Go to the parent directory
+      currentDir="$(dirname "$currentDir")"
+    done
+  fi
+
+  # Show version if a project has been found, or set to always show
+  if [ "$P9K_NODE_VERSION_PROJECT_ONLY" != true -o "$foundProject" = true ] ; then
+    # Get the node version
+    local node_version=$(node -v 2>/dev/null)
+
+    # Return if node is not installed
+    [[ -z "${node_version}" ]] && return
+    "$1_prompt_segment" "$0" "$2" "green" "white" 'NODE_ICON' 0 '' "${${node_version:1}//\%/%%}"
+  fi
 }
 
 ################################################################
