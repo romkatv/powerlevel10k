@@ -46,7 +46,8 @@ echo 'source ~/powerlevel10k/powerlevel10k.zsh-theme' >>! ~/.zshrc
 ```
 
 If you are using a framework / plugin manager and need help translating these instruction into its
-configuration language, see [FAQ](#faq).
+configuration language, see
+[FAQ](#how-do-i-use-powerlevel10k-with-zplug-prezto-oh-my-zsh-antigen-somethingelse).
 
 Make sure to disable your current theme.
 
