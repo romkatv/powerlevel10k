@@ -111,6 +111,10 @@ Installation of Pure Power is the same regardless of your plugin manager of choi
 echo 'source ~/.purepower' >>! ~/.zshrc
 ```
 
+Pure Power needs to be installed _in addition_ to Powerlevel10k, not instead of it. `~/.purepower`
+defines a set of configuration parameters that affect the styling of Powerlevel10k; there is no code
+in it.
+
 Read the documentation at the top of `~/.purepower` (or
 [here](https://github.com/romkatv/dotfiles-public/blob/master/.purepower)) to get an idea of what
 your prompt is capable of. You can edit the file to change your Powerlevel10k configuration.
