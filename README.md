@@ -143,8 +143,8 @@ latency.
 git clone https://github.com/romkatv/powerlevel10k.git /tmp/powerlevel10k
 (cd /tmp/powerlevel10k && curl -fsSLO https://raw.githubusercontent.com/romkatv/dotfiles-public/master/.purepower)
 echo '
-  # Replace fancy with portable if your font cannot render some characters.
-  # Remove the line altogether to see the default Powerlevel10k prompt.
+  # Uncomment the following line if you see unprintable characters in your prompt
+  # PURE_POWER_MODE=portable
   source /tmp/powerlevel10k/.purepower
   source /tmp/powerlevel10k/powerlevel10k.zsh-theme' >/tmp/powerlevel10k/.zshrc
 ZDOTDIR=/tmp/powerlevel10k zsh
@@ -163,9 +163,9 @@ docker run -e LANG=C.UTF-8 -e LC_ALL=C.UTF-8 -e TERM=$TERM -it --rm ubuntu bash 
   git clone https://github.com/romkatv/powerlevel10k.git ~/powerlevel10k
   cd && curl -fsSLO https://raw.githubusercontent.com/romkatv/dotfiles-public/master/.purepower
   echo "
-    # Replace fancy with portable if your font cannot render some characters.
-    # Remove the line altogether to see the default Powerlevel10k prompt.
-    source ~/.purepower fancy
+    # Uncomment the following line if you see unprintable characters in your prompt
+    # PURE_POWER_MODE=portable
+    source ~/.purepower
     source ~/powerlevel10k/powerlevel10k.zsh-theme" >~/.zshrc
   cd ~/powerlevel10k
   zsh -i'
