@@ -254,7 +254,7 @@ with the same settings, please [open an issue](https://github.com/romkatv/powerl
 
 Did you change any `POWERLEVEL9K` options after the first prompt got rendered, perhaps by editing
 your `~/.zshrc` and executing `source ~/.zshrc`? This isn't supported. You'll need to restart zsh
-for configuration changes to take effect.
+for configuration changes to take effect. Run `exec zsh` to do this without forking a process.
 
 ### Are changes getting up/down-streamed?
 
