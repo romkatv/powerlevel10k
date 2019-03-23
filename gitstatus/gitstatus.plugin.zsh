@@ -221,7 +221,11 @@ function gitstatus_start() {
 
     # We use `zsh -c` instead of plain {} or () to work around bugs in zplug. It hangs on startup.
     zsh -xc "
-      ${(q)daemon} --lock-fd=3 --dirty-max-index-size=$max_dirty --num-threads=$threads
+      ${(q)daemon}             \
+        --lock-fd=3            \
+        --sigwinch-pid=$$      \
+        --num-threads=$threads \
+        --dirty-max-index-size=$max_dirty
       echo -nE $'bye\x1f0\x1e'
     " <&$req_fd >&$resp_fd 2>$log_file 3<$lock_file &!
 
