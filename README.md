@@ -273,6 +273,9 @@ Improvements to [libgit2](https://github.com/libgit2/libgit2/issues/4230#issueco
 being upstreamed. There are 3 independent optimizations and it's not yet clear whether all of them
 will make it but there is a good chance they will.
 
+Fix to a [bug in zsh](https://www.zsh.org/mla/workers//2019/msg00204.html) that affects all async
+themes might get upstreamed.
+
 ### Is there an AUR package for Powerlevel10k?
 
 Yes, [zsh-theme-powerlevel10k-git](https://aur.archlinux.org/packages/zsh-theme-powerlevel10k-git/).
