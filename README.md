@@ -270,7 +270,7 @@ I've opening issues for all bugs that I've inherited from Powerlevel9k during th
 since fixed. They don't see much traction but at least the devs and users know about them.
 
 Improvements to [libgit2](https://github.com/libgit2/libgit2/issues/4230#issuecomment-471710359) are
-being upstremed. There are 3 independent optimizations and it's not yet clear whether all of them
+being upstreamed. There are 3 independent optimizations and it's not yet clear whether all of them
 will make it but there is a good chance they will.
 
 ### Is there an AUR package for Powerlevel10k?
