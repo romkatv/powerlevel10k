@@ -1734,7 +1734,7 @@ function _p9k_vcs_render() {
     local ws
     if [[ $POWERLEVEL9K_SHOW_CHANGESET == true || -z $VCS_STATUS_LOCAL_BRANCH ]]; then
       _p9k_get_icon VCS_COMMIT_ICON
-      _$0_fmt COMMIT "$_P9K_RETVAL${VCS_STATUS_COMMIT:0:$POWERLEVEL9K_VCS_INTERNAL_HASH_LENGTH}"
+      _$0_fmt COMMIT "$_P9K_RETVAL${${VCS_STATUS_COMMIT:0:$POWERLEVEL9K_VCS_INTERNAL_HASH_LENGTH}:-HEAD}"
       ws=' '
     fi
 
@@ -2095,7 +2095,7 @@ function _p9k_update_prompt() {
   _P9K_REFRESH_REASON=$1
   _p9k_set_prompt
   _P9K_REFRESH_REASON=''
-  zle .reset-prompt
+  zle && zle .reset-prompt
 }
 
 set_default POWERLEVEL9K_PROMPT_ADD_NEWLINE false
@@ -2118,7 +2118,7 @@ powerlevel9k_prepare_prompts() {
 }
 
 function _p9k_zle_keymap_select() {
-  zle .reset-prompt
+  zle && zle .reset-prompt
 }
 
 set_default POWERLEVEL9K_IGNORE_TERM_COLORS false
@@ -2153,7 +2153,7 @@ _p9k_init_timer() {
       emulate -L zsh
       local dummy
       while IFS='' read -t -u $_P9K_TIMER_FD dummy; do true; done
-      zle .reset-prompt
+      zle && zle .reset-prompt
     }
 
     zle -F $_P9K_TIMER_FD _p9k_on_timer
