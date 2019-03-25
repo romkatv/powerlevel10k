@@ -28,7 +28,8 @@ It's simply [much faster](#how-fast-is-it).
    2. [For new users](#for-new-users)
    3. [Docker playground](#docker-playground)
 4. [How fast is it?](#how-fast-is-it)
-5. [FAQ](#faq)
+5. [License](#license)
+6. [FAQ](#faq)
    1. [Why does Powerlevel10k spawn extra processes?](#why-does-powerlevel10k-spawn-extra-processes)
    2. [Does Powerlevel10k always render exactly the same prompt with the same config?](#does-powerlevel10k-always-render-exactly-the-same-prompt-with-the-same-config)
    3. [I am getting an error: "zsh: bad math expression: operand expected at end of string"](#i-am-getting-an-error-zsh-bad-math-expression-operand-expected-at-end-of-string)
@@ -224,6 +225,10 @@ POWERLEVEL9K_STATUS_OK_BACKGROUND=grey53
 
 Powerlevel10k shows similar performance advantage over Powerlevel9k on Mac OS, FreeBSD, WSL, and
 Raspberry Pie.
+
+## License
+
+Powerlevel10k is released under the [MIT license](https://github.com/romkatv/powerlevel10k/blob/master/LICENSE). Contributions are convered by the same license.
 
 ## FAQ
 
