@@ -24,7 +24,8 @@
 # If VCS_STATUS_RESULT is ok-sync or ok-async, additional variables are set:
 #
 #   VCS_STATUS_WORKDIR         Git repo working directory. Not empty.
-#   VCS_STATUS_COMMIT          Commit hash that HEAD is pointing to. 40 hex digits.
+#   VCS_STATUS_COMMIT          Commit hash that HEAD is pointing to. Either 40 hex digits or empty
+#                              if there is no HEAD (empty repo).
 #   VCS_STATUS_LOCAL_BRANCH    Local branch name or empty if not on a branch.
 #   VCS_STATUS_REMOTE_BRANCH   Upstream branch name. Can be empty.
 #   VCS_STATUS_REMOTE_URL      Remote URL. Can be empty.
