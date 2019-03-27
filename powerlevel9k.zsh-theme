@@ -1648,7 +1648,7 @@ function _p9k_vcs_style() {
 function _p9k_vcs_render() {
   if [[ -v _P9K_NEXT_VCS_DIR ]]; then
     local -a msg
-    local dir=$PWD
+    local dir=${${GIT_DIR:a}:-$PWD}
     while true; do
       msg=("${(@0)${_P9K_LAST_GIT_PROMPT[$dir]}}")
       [[ $#msg != 0 || $dir == / ]] && break
@@ -1832,9 +1832,9 @@ function _p9k_vcs_gitstatus() {
   [[ $POWERLEVEL9K_DISABLE_GITSTATUS == true ]] && return 1
   if [[ $_P9K_REFRESH_REASON == precmd ]]; then
     if [[ -v _P9K_NEXT_VCS_DIR ]]; then
-      typeset -gH _P9K_NEXT_VCS_DIR=$PWD
+      typeset -gH _P9K_NEXT_VCS_DIR=${${GIT_DIR:a}:-$PWD}
     else
-      local dir=$PWD
+      local dir=${${GIT_DIR:a}:-$PWD}
       local -F timeout=$POWERLEVEL9K_VCS_MAX_SYNC_LATENCY_SECONDS
       while true; do
         case "$_P9K_GIT_SLOW[$dir]" in
@@ -1844,7 +1844,7 @@ function _p9k_vcs_gitstatus() {
         esac
       done
       typeset -gFH _P9K_GITSTATUS_START_TIME=$EPOCHREALTIME
-      gitstatus_query -t $timeout -c _p9k_vcs_resume POWERLEVEL9K || return 1
+      gitstatus_query -d ${${GIT_DIR:a}:-$PWD} -t $timeout -c _p9k_vcs_resume POWERLEVEL9K || return 1
       [[ $VCS_STATUS_RESULT == tout ]] && typeset -gH _P9K_NEXT_VCS_DIR=""
     fi
   fi
