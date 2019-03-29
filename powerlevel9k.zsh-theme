@@ -1910,7 +1910,7 @@ prompt_powerlevel9k_setup() {
   # initialize colors
   autoload -U colors && colors
 
-  if segment_in_use "vcs" || segment_in_use "vcs_joined"; then
+  if segment_in_use "vcs"; then
     powerlevel9k_vcs_init
   fi
 
