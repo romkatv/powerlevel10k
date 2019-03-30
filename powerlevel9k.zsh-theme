@@ -333,7 +333,11 @@ prompt_anaconda() {
 prompt_aws() {
   local aws_profile="${AWS_PROFILE:-$AWS_DEFAULT_PROFILE}"
   if [[ -n "$aws_profile" ]]; then
-    "$1_prompt_segment" "$0" "$2" red white 'AWS_ICON' 0 '' "${aws_profile//\%/%%}"
+    if [[ "$aws_profile" == "$POWERLEVEL9K_AWS_DEFAULT_PROFILE" ]]; then
+      "$1_prompt_segment" "$0_DEFAULT" "$2" "${DEFAULT_COLOR}" white 'AWS_ICON' 0 '' "${aws_profile//\%/%%}"
+    else
+      "$1_prompt_segment" "$0_NONDEFAULT" "$2" "${DEFAULT_COLOR}" white 'AWS_ICON' 0 '' "${aws_profile//\%/%%}"
+    fi
   fi
 }
 
