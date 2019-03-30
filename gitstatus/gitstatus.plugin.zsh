@@ -27,6 +27,7 @@
 #   VCS_STATUS_COMMIT          Commit hash that HEAD is pointing to. Either 40 hex digits or empty
 #                              if there is no HEAD (empty repo).
 #   VCS_STATUS_LOCAL_BRANCH    Local branch name or empty if not on a branch.
+#   VCS_STATUS_REMOTE_NAME     The remote name, e.g. "upstream" or "origin".
 #   VCS_STATUS_REMOTE_BRANCH   Upstream branch name. Can be empty.
 #   VCS_STATUS_REMOTE_URL      Remote URL. Can be empty.
 #   VCS_STATUS_ACTION          Repository state, A.K.A. action. Can be empty.
@@ -121,15 +122,16 @@ function _gitstatus_process_response() {
     typeset -g  VCS_STATUS_COMMIT="${VCS_STATUS_ALL[2]}"
     typeset -g  VCS_STATUS_LOCAL_BRANCH="${VCS_STATUS_ALL[3]}"
     typeset -g  VCS_STATUS_REMOTE_BRANCH="${VCS_STATUS_ALL[4]}"
-    typeset -g  VCS_STATUS_REMOTE_URL="${VCS_STATUS_ALL[5]}"
-    typeset -g  VCS_STATUS_ACTION="${VCS_STATUS_ALL[6]}"
-    typeset -gi VCS_STATUS_HAS_STAGED="${VCS_STATUS_ALL[7]}"
-    typeset -gi VCS_STATUS_HAS_UNSTAGED="${VCS_STATUS_ALL[8]}"
-    typeset -gi VCS_STATUS_HAS_UNTRACKED="${VCS_STATUS_ALL[9]}"
-    typeset -gi VCS_STATUS_COMMITS_AHEAD="${VCS_STATUS_ALL[10]}"
-    typeset -gi VCS_STATUS_COMMITS_BEHIND="${VCS_STATUS_ALL[11]}"
-    typeset -gi VCS_STATUS_STASHES="${VCS_STATUS_ALL[12]}"
-    typeset -g  VCS_STATUS_TAG="${VCS_STATUS_ALL[13]}"
+    typeset -g  VCS_STATUS_REMOTE_NAME="${VCS_STATUS_ALL[5]}"
+    typeset -g  VCS_STATUS_REMOTE_URL="${VCS_STATUS_ALL[6]}"
+    typeset -g  VCS_STATUS_ACTION="${VCS_STATUS_ALL[7]}"
+    typeset -gi VCS_STATUS_HAS_STAGED="${VCS_STATUS_ALL[8]}"
+    typeset -gi VCS_STATUS_HAS_UNSTAGED="${VCS_STATUS_ALL[9]}"
+    typeset -gi VCS_STATUS_HAS_UNTRACKED="${VCS_STATUS_ALL[10]}"
+    typeset -gi VCS_STATUS_COMMITS_AHEAD="${VCS_STATUS_ALL[11]}"
+    typeset -gi VCS_STATUS_COMMITS_BEHIND="${VCS_STATUS_ALL[12]}"
+    typeset -gi VCS_STATUS_STASHES="${VCS_STATUS_ALL[13]}"
+    typeset -g  VCS_STATUS_TAG="${VCS_STATUS_ALL[14]}"
   } || {
     (( ours )) && VCS_STATUS_RESULT=norepo-sync || VCS_STATUS_RESULT=norepo-async
     unset VCS_STATUS_ALL
@@ -137,6 +139,7 @@ function _gitstatus_process_response() {
     unset VCS_STATUS_COMMIT
     unset VCS_STATUS_LOCAL_BRANCH
     unset VCS_STATUS_REMOTE_BRANCH
+    unset VCS_STATUS_REMOTE_NAME
     unset VCS_STATUS_REMOTE_URL
     unset VCS_STATUS_ACTION
     unset VCS_STATUS_HAS_STAGED
