@@ -27,6 +27,35 @@ if [[ -v _P9K_SOURCED ]]; then
   return
 fi
 
+if ! autoload -U is-at-least || ! is-at-least 5.2; then
+  () {
+    >&2 echo -E "You are using ZSH version $ZSH_VERSION. The minimum required version for Powerlevel10k is 5.2."
+    >&2 echo -E "Type 'echo \$ZSH_VERSION' to see your current zsh version."
+    local def=${SHELL:c:A}
+    local cur=${${ZSH_ARGZERO#-}:c:A}
+    local cur_v=$($cur -c 'echo -E $ZSH_VERSION' 2>/dev/null)
+    if [[ $cur_v == $ZSH_VERSION && $cur != $def ]]; then
+      >&2 echo -E "The shell you are currently running is likely $cur."
+    fi
+    local other=${${:-zsh}:c}
+    if [[ -n $other ]] && $other -c 'autoload -U is-at-least && is-at-least 5.2' &>/dev/null; then
+      local other_v=$($other -c 'echo -E $ZSH_VERSION' 2>/dev/null)
+      if [[ -n $other_v && $other_v != $ZSH_VERSION ]]; then
+        >&2 echo -E "You have $other with version $other_v but this is not what you are using."
+        if [[ -n $def && $def != ${other:A} ]]; then
+          >&2 echo -E "To change your user shell, type the following command:"
+          >&2 echo -E ""
+          if [[ $(grep -F $other /etc/shells 2>/dev/null) != $other ]]; then
+            >&2 echo -E "  echo ${(q-)other} | sudo tee -a /etc/shells"
+          fi
+          >&2 echo -E "  chsh -s ${(q-)other}"
+        fi
+      fi
+    fi
+  }
+  return 1
+fi
+
 readonly _P9K_SOURCED=1
 
 typeset -g _P9K_INSTALLATION_DIR
