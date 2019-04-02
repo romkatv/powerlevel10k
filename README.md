@@ -573,10 +573,6 @@ It figures out the version being used by taking the output of the `rbenv version
 * If `rbenv` is not in $PATH, nothing will be shown.
 * By default, if the current local Ruby version is the same as the global Ruby version, nothing will be shown. See the configuration variable, below, to modify this behavior.
 
-Variable | Default Value | Description |
-|----------|---------------|-------------|
-|`POWERLEVEL9K_RBENV_ALWAYS`|'false'|Always show the `rbenv` segment, even if the local version matches the global.|
-
 | Variable | Default Value | Description |
 |----------|---------------|-------------|
 |`POWERLEVEL9K_RBENV_PROMPT_ALWAYS_SHOW`|`false`|Set to true if you wish to show the rbenv segment even if the current Ruby version is the same as the global Ruby version|
