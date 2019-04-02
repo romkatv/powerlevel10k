@@ -96,6 +96,7 @@ function _p9k_init_icons() {
         VCS_COMMIT_ICON                $'\uE821 '             # 
         VCS_BRANCH_ICON                $'\uE220 '             # 
         VCS_REMOTE_BRANCH_ICON         $'\u2192'              # →
+        VCS_LOADING_ICON               ''
         VCS_GIT_ICON                   $'\uE20E '             # 
         VCS_GIT_GITHUB_ICON            $'\uE20E '             #
         VCS_GIT_BITBUCKET_ICON         $'\uE20E '             #
@@ -192,6 +193,7 @@ function _p9k_init_icons() {
         VCS_COMMIT_ICON                $'\uF221 '             # 
         VCS_BRANCH_ICON                $'\uF126 '             # 
         VCS_REMOTE_BRANCH_ICON         $'\u2192'              # →
+        VCS_LOADING_ICON               ''
         VCS_GIT_ICON                   $'\uF1D3 '             # 
         VCS_GIT_GITHUB_ICON            $'\uF113 '             # 
         VCS_GIT_BITBUCKET_ICON         $'\uF171 '             # 
@@ -294,6 +296,7 @@ function _p9k_init_icons() {
         VCS_COMMIT_ICON                '\u'$CODEPOINT_OF_OCTICONS_GIT_COMMIT' '       # 
         VCS_BRANCH_ICON                '\u'$CODEPOINT_OF_OCTICONS_GIT_BRANCH' '       # 
         VCS_REMOTE_BRANCH_ICON         '\u'$CODEPOINT_OF_OCTICONS_REPO_PUSH           # 
+        VCS_LOADING_ICON               ''
         VCS_GIT_ICON                   '\u'$CODEPOINT_OF_AWESOME_GIT' '               # 
         VCS_GIT_GITHUB_ICON            '\u'$CODEPOINT_OF_AWESOME_GITHUB_ALT' '        # 
         VCS_GIT_BITBUCKET_ICON         '\u'$CODEPOINT_OF_AWESOME_BITBUCKET' '         # 
@@ -390,6 +393,7 @@ function _p9k_init_icons() {
         VCS_COMMIT_ICON                $'\uE729 '             # 
         VCS_BRANCH_ICON                $'\uF126 '             # 
         VCS_REMOTE_BRANCH_ICON         $'\uE728 '             # 
+        VCS_LOADING_ICON               ''
         VCS_GIT_ICON                   $'\uF1D3 '             # 
         VCS_GIT_GITHUB_ICON            $'\uF113 '             # 
         VCS_GIT_BITBUCKET_ICON         $'\uE703 '             # 
@@ -486,6 +490,7 @@ function _p9k_init_icons() {
         VCS_COMMIT_ICON                ''
         VCS_BRANCH_ICON                $'\uE0A0 '             # 
         VCS_REMOTE_BRANCH_ICON         $'\u2192'              # →
+        VCS_LOADING_ICON               ''
         VCS_GIT_ICON                   ''
         VCS_GIT_GITHUB_ICON            ''
         VCS_GIT_BITBUCKET_ICON         ''
