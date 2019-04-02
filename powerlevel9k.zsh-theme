@@ -111,7 +111,7 @@ set_default -i POWERLEVEL9K_MAX_CACHE_SIZE 10000
 #     _p9k_cache_set "$val1" "$val2"
 #   fi
 #   # Here ${_P9K_CACHE_VAL[1]} and ${_P9K_CACHE_VAL[2]} are $val1 and $val2 respectively.
-# 
+#
 # Limitations:
 #
 #   * Calling _p9k_cache_set without arguments clears the cache entry. Subsequent calls to
@@ -242,7 +242,7 @@ left_prompt_segment() {
     pre+="\${\${_P9K_N:=\${\${\$((!\${#\${:-0\$_P9K_BG}:#0$bg_color})):#0}:+$((t+3))}}+}"  # 3
     pre+="\${\${_P9K_N:=\${\${_P9K_F::=%F{\$_P9K_BG\}}+$((t+4))}}+}"                       # 4
     pre+="\$_P9K_F\${_P9K_T[\$_P9K_N]}"
-    
+
     local post="\${_P9K_C}$space\${\${_P9K_I::=$2}+}\${\${_P9K_BG::=$bg_color}+}}"
 
     _p9k_cache_set $has_icon $fg $pre $post
@@ -295,7 +295,7 @@ right_prompt_segment() {
         has_icon=1
       fi
     fi
-    
+
     # Segment separator logic is the same as in left_prompt_segment except that here #4 and #1 are
     # identical.
 
@@ -317,7 +317,7 @@ right_prompt_segment() {
     pre+="\${\${_P9K_N:=\${\${\$((!\${#\${:-0\$_P9K_BG}:#0$bg_color})):#0}:+$((t+3))}}+}"  # 3
     pre+="\${\${_P9K_N:=$((t+1))}+}"                                                       # 4 == 1
     pre+="\${_P9K_T[\$_P9K_N]}\${_P9K_C}$icon_fg"
-    
+
     _p9k_escape_rcurly $POWERLEVEL9K_WHITESPACE_BETWEEN_RIGHT_SEGMENTS
     local post="$icon$_P9K_RETVAL\${\${_P9K_I::=$2}+}\${\${_P9K_BG::=$bg_color}+}}"
 
@@ -1205,8 +1205,8 @@ prompt_node_version() {
   if [ "$P9K_NODE_VERSION_PROJECT_ONLY" = true ] ; then
     local foundProject=false # Variable to stop searching if a project is found
     local currentDir=$(pwd)  # Variable to iterate through the path ancestry tree
-    
-    # Search as long as no project could been found or until the root directory 
+
+    # Search as long as no project could been found or until the root directory
     # has been reached
     while [ "$foundProject" = false -a ! "$currentDir" = "/" ] ; do
 
@@ -1442,7 +1442,7 @@ prompt_status() {
       if (( $#_P9K_PIPE_EXIT_CODES > 1 )); then
         ec_sum=${_P9K_PIPE_EXIT_CODES[1]}
         exit_code_or_status "${_P9K_PIPE_EXIT_CODES[1]}"
-        
+
       else
         ec_sum=${_P9K_EXIT_CODE}
         exit_code_or_status "${_P9K_EXIT_CODE}"
@@ -1686,7 +1686,7 @@ function _p9k_vcs_render() {
     if [[ $#msg -lt 2 && -z ${msg[1]} ]]; then
       _p9k_get_icon VCS_LOADING_ICON
       if [[ -n $_P9K_RETVAL || -n $POWERLEVEL9K_VCS_LOADING_TEXT ]]; then
-        $2_prompt_segment $1_LOADING $3 "${vcs_states[loading]}" "$DEFAULT_COLOR" "$_P9K_RETVAL" 0 '' "$POWERLEVEL9K_VCS_LOADING_TEXT"
+        $2_prompt_segment $1_LOADING $3 "${vcs_states[loading]}" "$DEFAULT_COLOR" VCS_LOADING_ICON 0 '' "$POWERLEVEL9K_VCS_LOADING_TEXT"
       fi
     else
       $2_prompt_segment $1_LOADING $3 "${vcs_states[loading]}" "$DEFAULT_COLOR" '' 0 '' "${msg[@]}"
