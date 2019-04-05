@@ -2283,6 +2283,7 @@ _p9k_init() {
         case "$os_release_id" in
           *arch*)                  _$0_set_os Linux LINUX_ARCH_ICON;;
           *debian*)                _$0_set_os Linux LINUX_DEBIAN_ICON;;
+          *raspbian*)              _$0_set_os Linux LINUX_RASPBIAN_ICON;;
           *ubuntu*)                _$0_set_os Linux LINUX_UBUNTU_ICON;;
           *elementary*)            _$0_set_os Linux LINUX_ELEMENTARY_ICON;;
           *fedora*)                _$0_set_os Linux LINUX_FEDORA_ICON;;
