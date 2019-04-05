@@ -55,6 +55,7 @@ function _p9k_init_icons() {
         LINUX_ICON                     $'\uE271'              # 
         LINUX_ARCH_ICON                $'\uE271'              # 
         LINUX_DEBIAN_ICON              $'\uE271'              # 
+        LINUX_RASPBIAN_ICON            $'\uE271'              # 
         LINUX_UBUNTU_ICON              $'\uE271'              # 
         LINUX_CENTOS_ICON              $'\uE271'              # 
         LINUX_COREOS_ICON              $'\uE271'              # 
@@ -156,6 +157,7 @@ function _p9k_init_icons() {
         LINUX_ICON                     $'\uF17C'              # 
         LINUX_ARCH_ICON                $'\uF17C'              # 
         LINUX_DEBIAN_ICON              $'\uF17C'              # 
+        LINUX_RASPBIAN_ICON            $'\uF17C'              # 
         LINUX_UBUNTU_ICON              $'\uF17C'              # 
         LINUX_CENTOS_ICON              $'\uF17C'              # 
         LINUX_COREOS_ICON              $'\uF17C'              # 
@@ -259,6 +261,7 @@ function _p9k_init_icons() {
         LINUX_ICON                     '\u'$CODEPOINT_OF_AWESOME_LINUX                # 
         LINUX_ARCH_ICON                '\u'$CODEPOINT_OF_AWESOME_LINUX                # 
         LINUX_DEBIAN_ICON              '\u'$CODEPOINT_OF_AWESOME_LINUX                # 
+        LINUX_RASPBIAN_ICON            '\u'$CODEPOINT_OF_AWESOME_LINUX                # 
         LINUX_UBUNTU_ICON              '\u'$CODEPOINT_OF_AWESOME_LINUX                # 
         LINUX_CENTOS_ICON              '\u'$CODEPOINT_OF_AWESOME_LINUX                # 
         LINUX_COREOS_ICON              '\u'$CODEPOINT_OF_AWESOME_LINUX                # 
@@ -357,6 +360,7 @@ function _p9k_init_icons() {
         LINUX_CENTOS_ICON              $'\uF304'              # 
         LINUX_COREOS_ICON              $'\uF305'              # 
         LINUX_DEBIAN_ICON              $'\uF306'              # 
+        LINUX_RASPBIAN_ICON            $'\uF315'              # 
         LINUX_ELEMENTARY_ICON          $'\uF309'              # 
         LINUX_FEDORA_ICON              $'\uF30a'              # 
         LINUX_GENTOO_ICON              $'\uF30d'              # 
@@ -453,6 +457,7 @@ function _p9k_init_icons() {
         LINUX_ICON                     'Lx'
         LINUX_ARCH_ICON                'Arc'
         LINUX_DEBIAN_ICON              'Deb'
+        LINUX_RASPBIAN_ICON            'RPi'
         LINUX_UBUNTU_ICON              'Ubu'
         LINUX_CENTOS_ICON              'Cen'
         LINUX_COREOS_ICON              'Cor'
