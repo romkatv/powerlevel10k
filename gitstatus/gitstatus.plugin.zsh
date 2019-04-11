@@ -221,6 +221,7 @@ function gitstatus_start() {
         FreeBSD) threads=$(( 2 * $(sysctl -n hw.ncpu) ));;
         *) threads=$(( 2 * $(getconf _NPROCESSORS_ONLN) ));;
       esac
+      (( threads <= 32 )) || threads=32
     }
 
     local -i sigwinch_pid=-1
