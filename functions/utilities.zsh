@@ -10,6 +10,7 @@
 #
 # Options are the same as in `typeset`.
 function set_default() {
+  emulate -L zsh
   local -a flags=(-g)
   while true; do
     case $1 in
