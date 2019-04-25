@@ -2124,7 +2124,7 @@ function _p9k_update_prompt() {
   _P9K_REFRESH_REASON=$1
   _p9k_set_prompt
   _P9K_REFRESH_REASON=''
-  zle && zle .reset-prompt
+  zle && zle .reset-prompt && zle -R
 }
 
 set_default POWERLEVEL9K_PROMPT_ADD_NEWLINE false
@@ -2147,7 +2147,7 @@ powerlevel9k_prepare_prompts() {
 }
 
 function _p9k_zle_keymap_select() {
-  zle && zle .reset-prompt
+  zle && zle .reset-prompt && zle -R
 }
 
 set_default POWERLEVEL9K_IGNORE_TERM_COLORS false
@@ -2182,7 +2182,7 @@ _p9k_init_timer() {
       emulate -L zsh
       local dummy
       while IFS='' read -t -u $_P9K_TIMER_FD dummy; do true; done
-      zle && zle .reset-prompt
+      zle && zle .reset-prompt && zle -R
     }
 
     zle -F $_P9K_TIMER_FD _p9k_on_timer
