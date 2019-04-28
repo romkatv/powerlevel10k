@@ -1,7 +1,53 @@
+# Copyright 2019 Roman Perepelitsa.
+#
+# This file is part of GitStatus. It provides ZSH bindings.
+#
+# GitStatus is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# GitStatus is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with GitStatus. If not, see <https://www.gnu.org/licenses/>.
+#
+# ------------------------------------------------------------------
+#
+# Example: Start gitstatusd, send it a request, wait for response and print it.
+#
+#   source gitstatus.plugin.zsh
+#   gitstatus_start MY
+#   gitstatus_query -d $PWD MY
+#   set | egrep '^VCS_STATUS'
+#
+# Output:
+#
+#   VCS_STATUS_ACTION=''
+#   VCS_STATUS_COMMIT=6e86ec135bf77875e222463cbac8ef72a7e8d823
+#   VCS_STATUS_COMMITS_AHEAD=0
+#   VCS_STATUS_COMMITS_BEHIND=0
+#   VCS_STATUS_HAS_STAGED=0
+#   VCS_STATUS_HAS_UNSTAGED=1
+#   VCS_STATUS_HAS_UNTRACKED=1
+#   VCS_STATUS_LOCAL_BRANCH=master
+#   VCS_STATUS_REMOTE_BRANCH=master
+#   VCS_STATUS_REMOTE_NAME=origin
+#   VCS_STATUS_REMOTE_URL=git@github.com:romkatv/powerlevel10k.git
+#   VCS_STATUS_RESULT=ok-sync
+#   VCS_STATUS_STASHES=0
+#   VCS_STATUS_TAG=''
+#   VCS_STATUS_WORKDIR=/home/romka/.oh-my-zsh/custom/themes/powerlevel10k
+
 [[ -o interactive ]] || return
- autoload -Uz add-zsh-hook && zmodload zsh/datetime && zmodload zsh/system || return
+autoload -Uz add-zsh-hook && zmodload zsh/datetime && zmodload zsh/system || return
 
 # Retrives status of a git repo from a directory under its working tree.
+#
+## Usage: gitstatus_query [OPTION]... NAME
 #
 #   -d STR    Directory to query. Defaults to ${${GIT_DIR:-$PWD}:a}. Must be absolute.
 #   -c STR    Callback function to call once the results are available. Called only after
@@ -16,7 +62,7 @@
 #   norepo-sync  The directory isn't a git repo.
 #   ok-sync      The directory is a git repo.
 #
-# When the callback is called VCS_STATUS_RESULT s set to one of the following values:
+# When the callback is called VCS_STATUS_RESULT is set to one of the following values:
 #
 #   norepo-async  The directory isn't a git repo.
 #   ok-async      The directory is a git repo.
@@ -39,16 +85,14 @@
 #   VCS_STATUS_COMMITS_BEHIND  Number of commits the current branch is behind upstream. Non-negative
 #                              integer.
 #   VCS_STATUS_STASHES         Number of stashes. Non-negative integer.
-#   VCS_STATUS_TAG             The first tag (in lexicographical order) that points to the same
+#   VCS_STATUS_TAG             The last tag (in lexicographical order) that points to the same
 #                              commit as HEAD.
-#   VCS_STATUS_ALL             All of the above in an array. The order of elements is unspecified.
-#                              More elements can be added in the future.
 #
 # The point of reporting -1 as unstaged and untracked is to allow the command to skip scanning
 # files in large repos. See -m flag of gitstatus_start.
 #
 # gitstatus_query returns an error if gitstatus_start hasn't been called in the same shell or
-# failed.
+# the call had failed.
 #
 #       !!!!! WARNING: CONCURRENT CALLS WITH THE SAME NAME ARE NOT ALLOWED !!!!!
 #
@@ -103,38 +147,35 @@ function _gitstatus_process_response() {
   local req_id=$3
   local resp_fd_var=_GITSTATUS_RESP_FD_${name}
 
-  typeset -ga VCS_STATUS_ALL
   typeset -g VCS_STATUS_RESULT
   (( timeout >= 0 )) && local -a t=(-t $timeout) || local -a t=()
-  IFS=$'\x1f' read -rd $'\x1e' -u ${(P)resp_fd_var} $t -A VCS_STATUS_ALL || {
+  local -a resp
+  IFS=$'\x1f' read -rd $'\x1e' -u ${(P)resp_fd_var} $t -A resp || {
     VCS_STATUS_RESULT=tout
-    unset VCS_STATUS_ALL
     return
   }
 
-  local -a header=("${(@Q)${(z)VCS_STATUS_ALL[1]}}")
+  local -a header=("${(@Q)${(z)resp[1]}}")
   [[ ${header[1]} == $req_id ]] && local -i ours=1 || local -i ours=0
   shift header
-  [[ ${VCS_STATUS_ALL[2]} == 1 ]] && {
-    shift 2 VCS_STATUS_ALL
+  [[ ${resp[2]} == 1 ]] && {
     (( ours )) && VCS_STATUS_RESULT=ok-sync || VCS_STATUS_RESULT=ok-async
-    typeset -g  VCS_STATUS_WORKDIR="${VCS_STATUS_ALL[1]}"
-    typeset -g  VCS_STATUS_COMMIT="${VCS_STATUS_ALL[2]}"
-    typeset -g  VCS_STATUS_LOCAL_BRANCH="${VCS_STATUS_ALL[3]}"
-    typeset -g  VCS_STATUS_REMOTE_BRANCH="${VCS_STATUS_ALL[4]}"
-    typeset -g  VCS_STATUS_REMOTE_NAME="${VCS_STATUS_ALL[5]}"
-    typeset -g  VCS_STATUS_REMOTE_URL="${VCS_STATUS_ALL[6]}"
-    typeset -g  VCS_STATUS_ACTION="${VCS_STATUS_ALL[7]}"
-    typeset -gi VCS_STATUS_HAS_STAGED="${VCS_STATUS_ALL[8]}"
-    typeset -gi VCS_STATUS_HAS_UNSTAGED="${VCS_STATUS_ALL[9]}"
-    typeset -gi VCS_STATUS_HAS_UNTRACKED="${VCS_STATUS_ALL[10]}"
-    typeset -gi VCS_STATUS_COMMITS_AHEAD="${VCS_STATUS_ALL[11]}"
-    typeset -gi VCS_STATUS_COMMITS_BEHIND="${VCS_STATUS_ALL[12]}"
-    typeset -gi VCS_STATUS_STASHES="${VCS_STATUS_ALL[13]}"
-    typeset -g  VCS_STATUS_TAG="${VCS_STATUS_ALL[14]}"
+    typeset -g  VCS_STATUS_WORKDIR="${resp[3]}"
+    typeset -g  VCS_STATUS_COMMIT="${resp[4]}"
+    typeset -g  VCS_STATUS_LOCAL_BRANCH="${resp[5]}"
+    typeset -g  VCS_STATUS_REMOTE_BRANCH="${resp[6]}"
+    typeset -g  VCS_STATUS_REMOTE_NAME="${resp[7]}"
+    typeset -g  VCS_STATUS_REMOTE_URL="${resp[8]}"
+    typeset -g  VCS_STATUS_ACTION="${resp[9]}"
+    typeset -gi VCS_STATUS_HAS_STAGED="${resp[10]}"
+    typeset -gi VCS_STATUS_HAS_UNSTAGED="${resp[11]}"
+    typeset -gi VCS_STATUS_HAS_UNTRACKED="${resp[12]}"
+    typeset -gi VCS_STATUS_COMMITS_AHEAD="${resp[13]}"
+    typeset -gi VCS_STATUS_COMMITS_BEHIND="${resp[14]}"
+    typeset -gi VCS_STATUS_STASHES="${resp[15]}"
+    typeset -g  VCS_STATUS_TAG="${resp[16]}"
   } || {
     (( ours )) && VCS_STATUS_RESULT=norepo-sync || VCS_STATUS_RESULT=norepo-async
-    unset VCS_STATUS_ALL
     unset VCS_STATUS_WORKDIR
     unset VCS_STATUS_COMMIT
     unset VCS_STATUS_LOCAL_BRANCH
@@ -154,6 +195,8 @@ function _gitstatus_process_response() {
   (( ! ours )) && (( #header )) && emulate -L zsh && "${header[@]}" || true
 }
 
+# Starts gitstatusd in the background. Does nothing and succeeds if gitstatusd is already running.
+#
 # Usage: gitstatus_start [OPTION]... NAME
 #
 #   -t FLOAT  Fail the self-check on initialization if not getting a response from gitstatusd for
@@ -192,7 +235,7 @@ function gitstatus_start() {
   local lock_file req_fifo resp_fifo log_file
   local -i lock_fd=-1 req_fd=-1 resp_fd=-1 daemon_pid=-1
 
-  function start() {
+  function gitstatus_start_impl() {
     lock_file=$(mktemp "${TMPDIR:-/tmp}"/gitstatus.$$.lock.XXXXXXXXXX)
     zsystem flock -f lock_fd $lock_file
 
@@ -224,15 +267,12 @@ function gitstatus_start() {
       (( threads <= 32 )) || threads=32
     }
 
-    local -i sigwinch_pid=-1
-    (( ! ${GITSTATUS_SEND_SIGWINCH:-0} )) || sigwinch_pid=$$
-
     # We use `zsh -c` instead of plain {} or () to work around bugs in zplug. It hangs on startup.
     zsh -xc "
-      ${(q)daemon}                   \
-        --lock-fd=3                  \
-        --sigwinch-pid=$sigwinch_pid \
-        --num-threads=$threads       \
+      ${(q)daemon}             \
+        --lock-fd=3            \
+        --parent-pid=$$        \
+        --num-threads=$threads \
         --dirty-max-index-size=$max_dirty
       echo -nE $'bye\x1f0\x1e'
     " <&$req_fd >&$resp_fd 2>$log_file 3<$lock_file &!
@@ -254,12 +294,13 @@ function gitstatus_start() {
     add-zsh-hook zshexit _gitstatus_cleanup_${ZSH_SUBSHELL}_${daemon_pid}
   }
 
-  start && {
+  gitstatus_start_impl && {
     typeset -g    GITSTATUS_DAEMON_LOG_${name}=$log_file
     typeset -gi   GITSTATUS_DAEMON_PID_${name}=$daemon_pid
     typeset -giH _GITSTATUS_REQ_FD_${name}=$req_fd
     typeset -giH _GITSTATUS_RESP_FD_${name}=$resp_fd
     typeset -giH _GITSTATUS_CLIENT_PID_${name}=$$
+    unset -f gitstatus_start_impl
   } || {
     echo "gitstatus failed to initialize" >&2 || true
     [[ $daemon_pid -gt 0 ]] && kill -- -$daemon_pid &>/dev/null || true
@@ -267,6 +308,7 @@ function gitstatus_start() {
     [[ $req_fd -ge 0 ]] && exec {req_fd}>&- || true
     [[ $resp_fd -ge 0 ]] && { zle -F $resp_fd || true } && { exec {resp_fd}>&- || true}
     command rm -f $lock_file $req_fifo $resp_fifo || true
+    unset -f gitstatus_start_impl
     return 1
   }
 }
