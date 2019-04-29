@@ -20,11 +20,10 @@
 #zstyle ':vcs_info:*+*:*' debug true
 #set -o xtrace
 
-test -n "$ZSH_VERSION" || exit 1
-
-if [[ -v _P9K_SOURCED ]]; then
-  prompt_powerlevel9k_setup "$@"
-  return
+if test -z "${ZSH_VERSION}"; then
+  echo "powerlevel10k: unsupported shell; try zsh instead" >&2
+  return 1
+  exit 1
 fi
 
 if ! autoload -U is-at-least || ! is-at-least 5.2; then
@@ -54,6 +53,11 @@ if ! autoload -U is-at-least || ! is-at-least 5.2; then
     fi
   }
   return 1
+fi
+
+if [[ -v _P9K_SOURCED ]]; then
+  prompt_powerlevel9k_setup "$@"
+  return
 fi
 
 readonly _P9K_SOURCED=1
