@@ -150,10 +150,11 @@ typeset -ga _P9K_RIGHT_JOIN=(1)
 _p9k_color() {
   local user_var=POWERLEVEL9K_${(U)${2}#prompt_}_${3}
   local color=${${(P)user_var}:-${1}}
-  # Check if given value is already numerical.
-  if [[ $color == <-> ]]; then
+  if [[ $color == <-> ]]; then     # decimal color code: 255
     _P9K_RETVAL=${(l:3::0:)color}
-  else
+  elif [[ $color == '#'* ]]; then  # hexademical color code: #ffffff
+    _P9K_RETVAL=$color
+  else                             # named color: red
     # Strip prifixes if there are any.
     _P9K_RETVAL=$__P9K_COLORS[${${${color#bg-}#fg-}#br}]
   fi
