@@ -260,7 +260,7 @@ left_prompt_segment() {
   shift 7
 
   _p9k_escape_rcurly $fg
-  local content="${(j::)${:-$_P9K_RETVAL${^@}}}"
+  local content="${(j::):-$_P9K_RETVAL${^@}}"
   (( expand )) || content="\${(Q)\${:-${(q)content}}}"
 
   _P9K_PROMPT+="\${\${:-$cond}:+\${\${_P9K_C::=${content}}+}${_P9K_CACHE_VAL[3]}"
@@ -335,7 +335,7 @@ right_prompt_segment() {
   shift 7
 
   _p9k_escape_rcurly $fg
-  local content="${(j::)${:-$_P9K_RETVAL${^@}}}"
+  local content="${(j::):-$_P9K_RETVAL${^@}}"
   (( expand )) || content="\${(Q)\${:-${(q)content}}}"
 
   _P9K_PROMPT+="\${\${:-$cond}:+\${\${_P9K_C::=${content}}+}${_P9K_CACHE_VAL[3]}"
@@ -388,12 +388,12 @@ prompt_background_jobs() {
   local msg
   if [[ $POWERLEVEL9K_BACKGROUND_JOBS_VERBOSE == true ]]; then
     if [[ $POWERLEVEL9K_BACKGROUND_JOBS_VERBOSE_ALWAYS == true ]]; then
-      msg='${(%)${:-%j}}'
+      msg='${(%):-%j}'
     else
-      msg='${${(%)${:-%j}}:#1}'
+      msg='${${(%):-%j}:#1}'
     fi
   fi
-  $1_prompt_segment $0 $2 "$DEFAULT_COLOR" cyan BACKGROUND_JOBS_ICON 1 '${${(%)${:-%j}}:#0}' "$msg"
+  $1_prompt_segment $0 $2 "$DEFAULT_COLOR" cyan BACKGROUND_JOBS_ICON 1 '${${(%):-%j}:#0}' "$msg"
 }
 
 ################################################################
@@ -1346,7 +1346,7 @@ prompt_chruby() {
 ################################################################
 # Segment to print an icon if user is root.
 prompt_root_indicator() {
-  "$1_prompt_segment" "$0" "$2" "$DEFAULT_COLOR" "yellow" 'ROOT_ICON' 0 '${${(%)${:-%#}}:#%}' ''
+  "$1_prompt_segment" "$0" "$2" "$DEFAULT_COLOR" "yellow" 'ROOT_ICON' 0 '${${(%):-%#}:#%}' ''
 }
 
 # This segment is a demo. It can disappear any time. Use prompt_dir instead.
@@ -1355,10 +1355,10 @@ prompt_simple_dir() {
     local p=$_P9K_PROMPT
     local key=$_P9K_CACHE_KEY
     _P9K_PROMPT=''
-    $1_prompt_segment $0_HOME $2 blue "$DEFAULT_COLOR" HOME_ICON 0 '${$((!${#${(%)${:-%~}}:#\~})):#0}' "%~"
-    $1_prompt_segment $0_HOME_SUBFOLDER $2 blue "$DEFAULT_COLOR" HOME_SUB_ICON 0 '${$((!${#${(%)${:-%~}}:#\~?*})):#0}' "%~"
-    $1_prompt_segment $0_ETC $2 blue "$DEFAULT_COLOR" ETC_ICON 0 '${$((!${#${(%)${:-%~}}:#/etc*})):#0}' "%~"
-    $1_prompt_segment $0_DEFAULT $2 blue "$DEFAULT_COLOR" FOLDER_ICON 0 '${${${(%)${:-%~}}:#\~*}:#/etc*}' "%~"
+    $1_prompt_segment $0_HOME $2 blue "$DEFAULT_COLOR" HOME_ICON 0 '${$((!${#${(%):-%~}:#\~})):#0}' "%~"
+    $1_prompt_segment $0_HOME_SUBFOLDER $2 blue "$DEFAULT_COLOR" HOME_SUB_ICON 0 '${$((!${#${(%):-%~}:#\~?*})):#0}' "%~"
+    $1_prompt_segment $0_ETC $2 blue "$DEFAULT_COLOR" ETC_ICON 0 '${$((!${#${(%):-%~}:#/etc*})):#0}' "%~"
+    $1_prompt_segment $0_DEFAULT $2 blue "$DEFAULT_COLOR" FOLDER_ICON 0 '${${${(%):-%~}:#\~*}:#/etc*}' "%~"
     _P9K_CACHE_KEY=$key
     _p9k_cache_set "$_P9K_PROMPT"
     _P9K_PROMPT=$p
@@ -1608,7 +1608,7 @@ powerlevel9k_vcs_init() {
   local component state
   for component in REMOTE_URL COMMIT BRANCH TAG REMOTE_BRANCH STAGED UNSTAGED UNTRACKED \
                    OUTGOING_CHANGES INCOMING_CHANGES STASH ACTION; do
-    local color=${(P)${:-POWERLEVEL9K_VCS_${component}FORMAT_FOREGROUND}}
+    local color=${(P):-POWERLEVEL9K_VCS_${component}FORMAT_FOREGROUND}
     if [[ -n $color ]]; then
       for state in "${(@k)vcs_states}"; do
         local var=POWERLEVEL9K_VCS_${(U)state}_${component}FORMAT_FOREGROUND
@@ -1661,7 +1661,7 @@ typeset -gAH _P9K_LAST_GIT_PROMPT
 typeset -gAH _P9K_GIT_SLOW
 
 function _p9k_vcs_style() {
-  local color=${${(P)${:-POWERLEVEL9K_VCS_${1}_${2}FORMAT_FOREGROUND}}}
+  local color=${(P):-POWERLEVEL9K_VCS_${1}_${2}FORMAT_FOREGROUND}
   if [[ -z $color ]]; then
     _P9K_RETVAL=""
     return
