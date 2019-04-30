@@ -550,8 +550,8 @@ function _p9k_init_icons() {
 function print_icon() {
   local icon_name=$1
   local var_name=POWERLEVEL9K_${icon_name}
-  if [[ -v "$var_name" ]]; then
-    echo -n "${(P)ICON_USER_VARIABLE}"
+  if [[ -n "${(tP)var_name}" ]]; then
+    echo -n "${(P)var_name}"
   else
     echo -n "${icons[$icon_name]}"
   fi

@@ -22,7 +22,7 @@ function set_default() {
 
   local varname=$1
   shift
-  if [[ -v $varname ]]; then
+  if [[ -n ${(tP)varname} ]]; then
     typeset $flags $varname
   elif [[ "$flags" == *[aA]* ]]; then
     eval "typeset ${(@q)flags} ${(q)varname}=(${(qq)@})"
