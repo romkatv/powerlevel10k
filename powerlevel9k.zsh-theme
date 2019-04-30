@@ -1608,7 +1608,7 @@ powerlevel9k_vcs_init() {
   local component state
   for component in REMOTE_URL COMMIT BRANCH TAG REMOTE_BRANCH STAGED UNSTAGED UNTRACKED \
                    OUTGOING_CHANGES INCOMING_CHANGES STASH ACTION; do
-    local color=${(P):-POWERLEVEL9K_VCS_${component}FORMAT_FOREGROUND}
+    local color=${(P)${:-POWERLEVEL9K_VCS_${component}FORMAT_FOREGROUND}}
     if [[ -n $color ]]; then
       for state in "${(@k)vcs_states}"; do
         local var=POWERLEVEL9K_VCS_${(U)state}_${component}FORMAT_FOREGROUND
@@ -1661,7 +1661,7 @@ typeset -gAH _P9K_LAST_GIT_PROMPT
 typeset -gAH _P9K_GIT_SLOW
 
 function _p9k_vcs_style() {
-  local color=${(P):-POWERLEVEL9K_VCS_${1}_${2}FORMAT_FOREGROUND}
+  local color=${(P)${:-POWERLEVEL9K_VCS_${1}_${2}FORMAT_FOREGROUND}}
   if [[ -z $color ]]; then
     _P9K_RETVAL=""
     return
