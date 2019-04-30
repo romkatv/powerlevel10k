@@ -26,9 +26,9 @@ if test -z "${ZSH_VERSION}"; then
   exit 1
 fi
 
-if ! autoload -U is-at-least || ! is-at-least 5.2; then
+if ! autoload -U is-at-least || ! is-at-least 5.1; then
   () {
-    >&2 echo -E "You are using ZSH version $ZSH_VERSION. The minimum required version for Powerlevel10k is 5.2."
+    >&2 echo -E "You are using ZSH version $ZSH_VERSION. The minimum required version for Powerlevel10k is 5.1."
     >&2 echo -E "Type 'echo \$ZSH_VERSION' to see your current zsh version."
     local def=${SHELL:c:A}
     local cur=${${ZSH_ARGZERO#-}:c:A}
@@ -37,7 +37,7 @@ if ! autoload -U is-at-least || ! is-at-least 5.2; then
       >&2 echo -E "The shell you are currently running is likely $cur."
     fi
     local other=${${:-zsh}:c}
-    if [[ -n $other ]] && $other -c 'autoload -U is-at-least && is-at-least 5.2' &>/dev/null; then
+    if [[ -n $other ]] && $other -c 'autoload -U is-at-least && is-at-least 5.1' &>/dev/null; then
       local other_v=$($other -c 'echo -E $ZSH_VERSION' 2>/dev/null)
       if [[ -n $other_v && $other_v != $ZSH_VERSION ]]; then
         >&2 echo -E "You have $other with version $other_v but this is not what you are using."
@@ -55,7 +55,7 @@ if ! autoload -U is-at-least || ! is-at-least 5.2; then
   return 1
 fi
 
-if [[ -v _P9K_SOURCED ]]; then
+if (( $+_P9K_SOURCED )); then
   prompt_powerlevel9k_setup "$@"
   return
 fi
@@ -1680,7 +1680,7 @@ function _p9k_vcs_style() {
 }
 
 function _p9k_vcs_render() {
-  if [[ -v _P9K_NEXT_VCS_DIR ]]; then
+  if (( $+_P9K_NEXT_VCS_DIR )); then
     local -a msg
     local dir=${${GIT_DIR:a}:-$PWD}
     while true; do
@@ -1865,7 +1865,7 @@ function _p9k_vcs_resume() {
 function _p9k_vcs_gitstatus() {
   [[ $POWERLEVEL9K_DISABLE_GITSTATUS == true ]] && return 1
   if [[ $_P9K_REFRESH_REASON == precmd ]]; then
-    if [[ -v _P9K_NEXT_VCS_DIR ]]; then
+    if (( $+_P9K_NEXT_VCS_DIR )); then
       typeset -gH _P9K_NEXT_VCS_DIR=${${GIT_DIR:a}:-$PWD}
     else
       local dir=${${GIT_DIR:a}:-$PWD}
