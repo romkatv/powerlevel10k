@@ -119,7 +119,7 @@ function gitstatus_query() {
   (( OPTIND == ARGC )) || { echo "usage: gitstatus_query [OPTION]... NAME" >&2; return 1 }
   local name=${*[$OPTIND]}
 
-  [[ -v GITSTATUS_DAEMON_PID_${name} ]]
+  [[ -n ${(P)${:-GITSTATUS_DAEMON_PID_${name}}:-} ]]
 
   # Verify that gitstatus_query is running in the same process that ran gitstatus_start.
   local client_pid_var=_GITSTATUS_CLIENT_PID_${name}
@@ -224,7 +224,7 @@ function gitstatus_start() {
   (( OPTIND == ARGC )) || { echo "usage: gitstatus_start [OPTION]... NAME" >&2; return 1 }
   local name=${*[$OPTIND]}
 
-  [[ ! -v GITSTATUS_DAEMON_PID_${name} ]] || return 0
+  [[ -z ${(P)${:-GITSTATUS_DAEMON_PID_${name}}:-} ]] || return 0
 
   local os && os=$(uname -s) && [[ -n $os ]]
   local arch && arch=$(uname -m) && [[ -n $arch ]]
@@ -319,5 +319,5 @@ function gitstatus_start() {
 # If it returns non-zero, gitstatus_query NAME is guaranteed to return non-zero.
 function gitstatus_check() {
   local name=$1
-  [[ -v GITSTATUS_DAEMON_PID_${name} ]]
+  [[ -n ${(P)${:-GITSTATUS_DAEMON_PID_${name}}:-} ]]
 }
