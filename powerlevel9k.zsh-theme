@@ -26,9 +26,9 @@ if test -z "${ZSH_VERSION}"; then
   exit 1
 fi
 
-if ! autoload -U is-at-least || ! is-at-least 5.2; then
+if ! autoload -U is-at-least || ! is-at-least 5.1; then
   () {
-    >&2 echo -E "You are using ZSH version $ZSH_VERSION. The minimum required version for Powerlevel10k is 5.2."
+    >&2 echo -E "You are using ZSH version $ZSH_VERSION. The minimum required version for Powerlevel10k is 5.1."
     >&2 echo -E "Type 'echo \$ZSH_VERSION' to see your current zsh version."
     local def=${SHELL:c:A}
     local cur=${${ZSH_ARGZERO#-}:c:A}
@@ -37,7 +37,7 @@ if ! autoload -U is-at-least || ! is-at-least 5.2; then
       >&2 echo -E "The shell you are currently running is likely $cur."
     fi
     local other=${${:-zsh}:c}
-    if [[ -n $other ]] && $other -c 'autoload -U is-at-least && is-at-least 5.2' &>/dev/null; then
+    if [[ -n $other ]] && $other -c 'autoload -U is-at-least && is-at-least 5.1' &>/dev/null; then
       local other_v=$($other -c 'echo -E $ZSH_VERSION' 2>/dev/null)
       if [[ -n $other_v && $other_v != $ZSH_VERSION ]]; then
         >&2 echo -E "You have $other with version $other_v but this is not what you are using."
