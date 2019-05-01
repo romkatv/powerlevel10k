@@ -207,6 +207,8 @@ function gitstatus_start() {
   emulate -L zsh
   setopt err_return no_unset no_bg_nice
 
+  [[ ${GITSTATUS_ENABLE_XTRACE:-0} != 1 ]] || setopt xtrace
+
   local opt
   local -F timeout=5
   local -i max_dirty=-1
