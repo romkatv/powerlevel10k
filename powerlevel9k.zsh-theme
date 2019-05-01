@@ -1685,16 +1685,17 @@ function _p9k_vcs_render() {
     local dir=${${GIT_DIR:a}:-$PWD}
     while true; do
       msg=("${(@0)${_P9K_LAST_GIT_PROMPT[$dir]}}")
-      [[ $#msg != 0 || $dir == / ]] && break
+      [[ $#msg -gt 1 || -n ${msg[1]} ]] && break
+      [[ $dir == / ]] && msg=() && break
       dir=${dir:h}
     done
-    if [[ $#msg -lt 2 && -z ${msg[1]} ]]; then
+    if (( $#msg )); then
+      $2_prompt_segment $1_LOADING $3 "${vcs_states[loading]}" "$DEFAULT_COLOR" '' 0 '' "${msg[@]}"
+    else
       _p9k_get_icon VCS_LOADING_ICON
       if [[ -n $_P9K_RETVAL || -n $POWERLEVEL9K_VCS_LOADING_TEXT ]]; then
         $2_prompt_segment $1_LOADING $3 "${vcs_states[loading]}" "$DEFAULT_COLOR" VCS_LOADING_ICON 0 '' "$POWERLEVEL9K_VCS_LOADING_TEXT"
       fi
-    else
-      $2_prompt_segment $1_LOADING $3 "${vcs_states[loading]}" "$DEFAULT_COLOR" '' 0 '' "${msg[@]}"
     fi
     return 0
   fi
