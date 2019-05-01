@@ -256,9 +256,10 @@ function gitstatus_start() {
     }
     zle -F $resp_fd _gitstatus_process_response_${name}
 
-    typeset -g GITSTATUS_DAEMON_LOG_${name}=/dev/null
-    [[ ${GITSTATUS_ENABLE_LOGGING:-0} != 1 ]] ||
-      typeset GITSTATUS_DAEMON_LOG_${name}=$(mktemp "${TMPDIR:-/tmp}"/gitstatus.$$.log.XXXXXXXXXX)
+    [[ ${GITSTATUS_ENABLE_LOGGING:-0} == 1 ]] &&
+      log_file=$(mktemp "${TMPDIR:-/tmp}"/gitstatus.$$.log.XXXXXXXXXX) ||
+      log_file=/dev/null
+    typeset -g GITSTATUS_DAEMON_LOG_${name}=$log_file
 
     local -i threads=${GITSTATUS_NUM_THREADS:-0}
     (( threads > 0)) || {
@@ -277,7 +278,7 @@ function gitstatus_start() {
         --num-threads=$threads \
         --dirty-max-index-size=$max_dirty
       echo -nE $'bye\x1f0\x1e'
-    " <&$req_fd >&$resp_fd 2>$GITSTATUS_DAEMON_LOG_${name} 3<$lock_file &!
+    " <&$req_fd >&$resp_fd 2>$log_file 3<$lock_file &!
 
     daemon_pid=$!
     command rm -f $lock_file
