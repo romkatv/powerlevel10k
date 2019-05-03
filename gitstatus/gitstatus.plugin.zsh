@@ -225,6 +225,7 @@ function gitstatus_start() {
 
   [[ -z ${(P)${:-GITSTATUS_DAEMON_PID_${name}}:-} ]] || return 0
 
+  local dir && dir=${${(%):-%x}:A:h}
   local xtrace_file lock_file req_fifo resp_fifo log_file
   local -i stderr_fd=-1 lock_fd=-1 req_fd=-1 resp_fd=-1 daemon_pid=-1
 
@@ -239,7 +240,7 @@ function gitstatus_start() {
     local os && os=$(uname -s) && [[ -n $os ]]
     local arch && arch=$(uname -m) && [[ -n $arch ]]
 
-    local daemon && daemon=${GITSTATUS_DAEMON:-${${(%):-%x}:A:h}/bin/gitstatusd-${os:l}-${arch:l}}
+    local daemon && daemon=${GITSTATUS_DAEMON:-$dir/bin/gitstatusd-${os:l}-${arch:l}}
     [[ -f $daemon ]] || { echo "file not found: $daemon" >&2 && return 1 }
 
     lock_file=$(mktemp "${TMPDIR:-/tmp}"/gitstatus.$$.lock.XXXXXXXXXX)
