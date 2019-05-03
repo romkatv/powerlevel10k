@@ -240,8 +240,8 @@ function gitstatus_start() {
     local os && os=$(uname -s) && [[ -n $os ]]
     local arch && arch=$(uname -m) && [[ -n $arch ]]
 
-    local daemon && daemon=${GITSTATUS_DAEMON:-$dir/bin/gitstatusd-${os:l}-${arch:l}}
-    [[ -f $daemon ]] || { echo "file not found: $daemon" >&2 && return 1 }
+    local daemon=${GITSTATUS_DAEMON:-$dir/bin/gitstatusd-${os:l}-${arch:l}}
+    [[ -f $daemon ]]
 
     lock_file=$(mktemp "${TMPDIR:-/tmp}"/gitstatus.$$.lock.XXXXXXXXXX)
     zsystem flock -f lock_fd $lock_file
