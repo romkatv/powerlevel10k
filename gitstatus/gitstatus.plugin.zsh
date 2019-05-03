@@ -207,8 +207,6 @@ function gitstatus_start() {
   emulate -L zsh
   setopt err_return no_unset no_bg_nice
 
-  [[ ${GITSTATUS_ENABLE_XTRACE:-0} != 1 ]] || setopt xtrace
-
   local opt
   local -F timeout=5
   local -i max_dirty=-1
@@ -218,7 +216,6 @@ function gitstatus_start() {
       t) timeout=$OPTARG;;
       m) max_dirty=$OPTARG;;
       ?) return 1;;
-      done) break;;
     esac
   done
 
@@ -228,16 +225,23 @@ function gitstatus_start() {
 
   [[ -z ${(P)${:-GITSTATUS_DAEMON_PID_${name}}:-} ]] || return 0
 
-  local os && os=$(uname -s) && [[ -n $os ]]
-  local arch && arch=$(uname -m) && [[ -n $arch ]]
-
-  local daemon && daemon=${GITSTATUS_DAEMON:-${${(%):-%x}:A:h}/bin/gitstatusd-${os:l}-${arch:l}}
-  [[ -f $daemon ]] || { echo "file not found: $daemon" >&2 && return 1 }
-
-  local lock_file req_fifo resp_fifo log_file
-  local -i lock_fd=-1 req_fd=-1 resp_fd=-1 daemon_pid=-1
+  local xtrace_file lock_file req_fifo resp_fifo log_file
+  local -i stderr_fd=-1 lock_fd=-1 req_fd=-1 resp_fd=-1 daemon_pid=-1
 
   function gitstatus_start_impl() {
+    [[ ${GITSTATUS_ENABLE_LOGGING:-0} != 1 ]] || {
+      xtrace_file=$(mktemp "${TMPDIR:-/tmp}"/gitstatus.$$.xtrace.XXXXXXXXXX)
+      typeset -g GITSTATUS_XTRACE_${name}=$xtrace_file
+      exec {stderr_fd}>&2 2>$xtrace_file
+      setopt xtrace
+    }
+
+    local os && os=$(uname -s) && [[ -n $os ]]
+    local arch && arch=$(uname -m) && [[ -n $arch ]]
+
+    local daemon && daemon=${GITSTATUS_DAEMON:-${${(%):-%x}:A:h}/bin/gitstatusd-${os:l}-${arch:l}}
+    [[ -f $daemon ]] || { echo "file not found: $daemon" >&2 && return 1 }
+
     lock_file=$(mktemp "${TMPDIR:-/tmp}"/gitstatus.$$.lock.XXXXXXXXXX)
     zsystem flock -f lock_fd $lock_file
 
@@ -257,7 +261,7 @@ function gitstatus_start() {
     zle -F $resp_fd _gitstatus_process_response_${name}
 
     [[ ${GITSTATUS_ENABLE_LOGGING:-0} == 1 ]] &&
-      log_file=$(mktemp "${TMPDIR:-/tmp}"/gitstatus.$$.log.XXXXXXXXXX) ||
+      log_file=$(mktemp "${TMPDIR:-/tmp}"/gitstatus.$$.daemon-log.XXXXXXXXXX) ||
       log_file=/dev/null
     typeset -g GITSTATUS_DAEMON_LOG_${name}=$log_file
 
@@ -295,6 +299,12 @@ function gitstatus_start() {
       [[ $daemon_pid -gt 0 ]] && kill -- -$daemon_pid &>/dev/null
     }
     add-zsh-hook zshexit _gitstatus_cleanup_${ZSH_SUBSHELL}_${daemon_pid}
+
+    [[ $stderr_fd == -1 ]] || {
+      unsetopt xtrace
+      exec 2>&$stderr_fd {stderr_fd}>&-
+      stderr_fd=-1
+    }
   }
 
   gitstatus_start_impl && {
@@ -304,13 +314,50 @@ function gitstatus_start() {
     typeset -giH _GITSTATUS_CLIENT_PID_${name}=$$
     unset -f gitstatus_start_impl
   } || {
-    echo "gitstatus failed to initialize" >&2 || true
-    [[ $daemon_pid -gt 0 ]] && kill -- -$daemon_pid &>/dev/null || true
-    [[ $lock_fd -ge 0 ]] && zsystem flock -u $lock_fd || true
-    [[ $req_fd -ge 0 ]] && exec {req_fd}>&- || true
-    [[ $resp_fd -ge 0 ]] && { zle -F $resp_fd || true } && { exec {resp_fd}>&- || true}
-    command rm -f $lock_file $req_fifo $resp_fifo || true
+    unsetopt err_return
+    [[ $daemon_pid -gt 0 ]] && kill -- -$daemon_pid &>/dev/null
+    [[ $stderr_fd  -ge 0 ]] && { exec 2>&$stderr_fd {stderr_fd}>&- }
+    [[ $lock_fd    -ge 0 ]] && zsystem flock -u $lock_fd
+    [[ $req_fd     -ge 0 ]] && exec {req_fd}>&-
+    [[ $resp_fd    -ge 0 ]] && { zle -F $resp_fd; exec {resp_fd}>&- }
+    command rm -f $lock_file $req_fifo $resp_fifo
     unset -f gitstatus_start_impl
+
+    >&2 print -P '[%F{red}ERROR%f]: gitstatus failed to initialize.'
+    >&2 echo -E ''
+    >&2 echo -E '  Your git prompt may disappear or become slow.'
+    if [[ -s $xtrace_file ]]; then
+      >&2 echo -E ''
+      >&2 echo -E "  The content of ${(q-)xtrace_file} (gitstatus_start_impl xtrace):"
+      >&2 print -P '%F{yellow}'
+      >&2 awk '{print "    " $0}' <$xtrace_file
+      >&2 print -P '%F{red}                               ^ this command failed%f'
+    fi
+    if [[ -s $log_file ]]; then
+      >&2 echo -E ''
+      >&2 echo -E "  The content of ${(q-)log_file} (gitstatus daemon log):"
+      >&2 print -P '%F{yellow}'
+      >&2 awk '{print "    " $0}' <$log_file
+      >&2 print -nP '%f'
+    fi
+    if [[ ${GITSTATUS_ENABLE_LOGGING:-0} == 1 ]]; then
+      >&2 echo -E ''
+      >&2 echo -E '  Your system information:'
+      >&2 print -P '%F{yellow}'
+      >&2 echo -E "    zsh:      $ZSH_VERSION"
+      >&2 echo -E "    uname -a: $(uname -a)"
+      >&2 print -P '%f'
+      >&2 echo -E '  If you need help, open an issue and attach this whole error message to it:'
+      >&2 echo -E ''
+      >&2 print -P '    %F{green}https://github.com/romkatv/gitstatus/issues/new%f'
+    else
+      >&2 echo -E ''
+      >&2 echo -E '  Run the following command to retry with extra diagnostics:'
+      >&2 print -P '%F{green}'
+      >&2 echo -E "    GITSTATUS_ENABLE_LOGGING=1 gitstatus_start ${(@q-)*}"
+      >&2 print -nP '%f'
+    fi
+
     return 1
   }
 }
