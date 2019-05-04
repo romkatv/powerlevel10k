@@ -43,7 +43,7 @@
 #   VCS_STATUS_WORKDIR=/home/romka/.oh-my-zsh/custom/themes/powerlevel10k
 
 [[ -o interactive ]] || return
-autoload -Uz add-zsh-hook && zmodload zsh/datetime && zmodload zsh/system || return
+autoload -Uz add-zsh-hook && zmodload zsh/datetime zsh/system || return
 
 # Retrives status of a git repo from a directory under its working tree.
 #
@@ -276,7 +276,7 @@ function gitstatus_start() {
     }
 
     # We use `zsh -c` instead of plain {} or () to work around bugs in zplug. It hangs on startup.
-    zsh -xc "
+    zsh -dfxc "
       ${(q)daemon}             \
         --lock-fd=3            \
         --parent-pid=$$        \
@@ -296,8 +296,8 @@ function gitstatus_start() {
     function _gitstatus_cleanup_${ZSH_SUBSHELL}_${daemon_pid}() {
       emulate -L zsh
       setopt err_return no_unset
-      local -i daemon_pid=${${(%)${:-%N}}#_gitstatus_cleanup_${ZSH_SUBSHELL}_}
-      [[ $daemon_pid -gt 0 ]] && kill -- -$daemon_pid &>/dev/null
+      local -i daemon_pid=${${(%):-%N}#_gitstatus_cleanup_${ZSH_SUBSHELL}_}
+      [[ $daemon_pid -gt 0 ]] && kill -- -$daemon_pid &>/dev/null || true
     }
     add-zsh-hook zshexit _gitstatus_cleanup_${ZSH_SUBSHELL}_${daemon_pid}
 
@@ -309,13 +309,15 @@ function gitstatus_start() {
   }
 
   gitstatus_start_impl && {
-    typeset -gi   GITSTATUS_DAEMON_PID_${name}=$daemon_pid
-    typeset -giH _GITSTATUS_REQ_FD_${name}=$req_fd
-    typeset -giH _GITSTATUS_RESP_FD_${name}=$resp_fd
-    typeset -giH _GITSTATUS_CLIENT_PID_${name}=$$
+    typeset -gi  GITSTATUS_DAEMON_PID_${name}=$daemon_pid
+    typeset -gi _GITSTATUS_REQ_FD_${name}=$req_fd
+    typeset -gi _GITSTATUS_RESP_FD_${name}=$resp_fd
+    typeset -gi _GITSTATUS_LOCK_FD_${name}=$lock_fd
+    typeset -gi _GITSTATUS_CLIENT_PID_${name}=$$
     unset -f gitstatus_start_impl
   } || {
     unsetopt err_return
+    add-zsh-hook -d zshexit _gitstatus_cleanup_${ZSH_SUBSHELL}_${daemon_pid}
     [[ $daemon_pid -gt 0 ]] && kill -- -$daemon_pid &>/dev/null
     [[ $stderr_fd  -ge 0 ]] && { exec 2>&$stderr_fd {stderr_fd}>&- }
     [[ $lock_fd    -ge 0 ]] && zsystem flock -u $lock_fd
@@ -363,11 +365,48 @@ function gitstatus_start() {
   }
 }
 
+# Stops gitstatusd if it's running.
+#
+# Usage: gitstatus_stop NAME.
+function gitstatus_stop() {
+  emulate -L zsh
+  setopt no_unset
+  (( ARGC == 1 )) || { echo "usage: gitstatus_stop NAME" >&2; return 1 }
+
+  local name=$1
+
+  local req_fd_var=_GITSTATUS_REQ_FD_${name}
+  local resp_fd_var=_GITSTATUS_RESP_FD_${name}
+  local lock_fd_var=_GITSTATUS_LOCK_FD_${name}
+  local daemon_pid_var=GITSTATUS_DAEMON_PID_${name}
+  local client_pid_var=_GITSTATUS_CLIENT_PID_${name}
+
+  local req_fd=${(P)req_fd_var:-}
+  local resp_fd=${(P)resp_fd_var:-}
+  local lock_fd=${(P)lock_fd_var:-}
+  local daemon_pid=${(P)daemon_pid_var:-}
+
+  local cleanup_func=_gitstatus_cleanup_${ZSH_SUBSHELL}_${daemon_pid}
+
+  [[ -n $daemon_pid ]] && kill -- -$daemon_pid &>/dev/null
+  [[ -n $req_fd     ]] && exec {req_fd}>&-
+  [[ -n $resp_fd    ]] && { zle -F $resp_fd; exec {resp_fd}>&- }
+  [[ -n $lock_fd    ]] && zsystem flock -u $lock_fd
+
+  unset $req_fd_var $resp_fd_var $lock_fd_var $daemon_pid_var $client_pid_var
+
+  if (( $+functions[$cleanup_func] )); then
+    add-zsh-hook -d zshexit $cleanup_func
+    unfunction $cleanup_func
+  fi
+}
+
 # Usage: gitstatus_check NAME.
 #
 # Returns 0 if and only if `gitstatus_start NAME` has succeeded previously.
 # If it returns non-zero, gitstatus_query NAME is guaranteed to return non-zero.
 function gitstatus_check() {
-  local name=$1
-  [[ -n ${(P)${:-GITSTATUS_DAEMON_PID_${name}}:-} ]]
+  emulate -L zsh
+  (( ARGC == 1 )) || { echo "usage: gitstatus_check NAME" >&2; return 1 }
+  [[ -n ${(P)${:-GITSTATUS_DAEMON_PID_${1}}} ]]
 }
