@@ -1921,11 +1921,15 @@ prompt_vcs() {
 }
 
 ################################################################
-# Vi Mode: show editing mode (NORMAL|INSERT)
+# Vi Mode: show editing mode (NORMAL|INSERT|VISUAL)
+#
+# VISUAL mode is shown as NORMAL unless POWERLEVEL9K_VI_VISUAL_MODE_STRING is explicitly set.
+# Your ZSH version must be >= 5.3 if you set this parameter.
 set_default POWERLEVEL9K_VI_INSERT_MODE_STRING "INSERT"
 set_default POWERLEVEL9K_VI_COMMAND_MODE_STRING "NORMAL"
 prompt_vi_mode() {
-  $1_prompt_segment $0_NORMAL $2 "$DEFAULT_COLOR" white '' 0 '${$((!${#${KEYMAP:-0}:#vicmd})):#0}' "$POWERLEVEL9K_VI_COMMAND_MODE_STRING"
+  $1_prompt_segment $0_NORMAL $2 "$DEFAULT_COLOR" white '' 0 '${$((!${#${:-$KEYMAP$_P9K_REGION_ACTIVE}:#vicmd0})):#0}' "$POWERLEVEL9K_VI_COMMAND_MODE_STRING"
+  $1_prompt_segment $0_VISUAL $2 "$DEFAULT_COLOR" white '' 0 '${$((!${#${:-$KEYMAP$_P9K_REGION_ACTIVE}:#vicmd1})):#0}' "$POWERLEVEL9K_VI_VISUAL_MODE_STRING"
   if [[ -n $POWERLEVEL9K_VI_INSERT_MODE_STRING ]]; then
     $1_prompt_segment $0_INSERT $2 "$DEFAULT_COLOR" blue '' 0 '${${KEYMAP:-0}:#vicmd}' "$POWERLEVEL9K_VI_INSERT_MODE_STRING"
   fi
@@ -2067,7 +2071,7 @@ build_left_prompt() {
     if [[ $element == custom_* ]]; then
       "prompt_custom" "left" "$index" $element[8,-1]
     else
-      "prompt_$element" "left" "$index"
+      (( $+functions[prompt_$element] )) && "prompt_$element" "left" "$index"
     fi
 
     ((++index))
@@ -2089,7 +2093,7 @@ build_right_prompt() {
     if [[ $element == custom_* ]]; then
       "prompt_custom" "right" "$index" $element[8,-1]
     else
-      "prompt_$element" "right" "$index"
+      (( $+functions[prompt_$element] )) && "prompt_$element" "right" "$index"
     fi
 
     ((++index))
@@ -2133,6 +2137,8 @@ function _p9k_update_prompt() {
   zle && zle .reset-prompt && zle -R
 }
 
+typeset -gi _P9K_REGION_ACTIVE
+
 set_default POWERLEVEL9K_PROMPT_ADD_NEWLINE false
 powerlevel9k_prepare_prompts() {
   # Do not move these lines down, otherwise the last command is not what you expected it to be.
@@ -2146,6 +2152,7 @@ powerlevel9k_prepare_prompts() {
 
   _p9k_init
   _P9K_TIMER_START=1e10
+  _P9K_REGION_ACTIVE=0
 
   _P9K_REFRESH_REASON=precmd
   _p9k_set_prompt
@@ -2423,6 +2430,23 @@ _p9k_init() {
     if [[ $POWERLEVEL9K_DISABLE_GITSTATUS != true ]] && (( ${POWERLEVEL9K_VCS_BACKENDS[(I)git]} )); then
       source ${POWERLEVEL9K_GITSTATUS_DIR:-${_P9K_INSTALLATION_DIR}/gitstatus}/gitstatus.plugin.zsh
       gitstatus_start -m $POWERLEVEL9K_VCS_MAX_INDEX_SIZE_DIRTY POWERLEVEL9K
+    fi
+  fi
+
+  if segment_in_use vi_mode && (( $+POWERLEVEL9K_VI_VISUAL_MODE_STRING )); then
+    if is-at-least 5.3; then
+      function _p9k_zle_line_pre_redraw() {
+        [[ $KEYMAP == vicmd ]] &&
+          [[ ${REGION_ACTIVE:-0} != $_P9K_REGION_ACTIVE ]] &&
+          _P9K_REGION_ACTIVE=${REGION_ACTIVE:-0} &&
+          zle && zle .reset-prompt && zle -R
+      }
+      autoload -Uz add-zle-hook-widget
+      add-zle-hook-widget line-pre-redraw _p9k_zle_line_pre_redraw
+      _p9k_g_expand POWERLEVEL9K_VI_VISUAL_MODE_STRING
+    else
+      >&2 print -P '%F{yellow}Warning!%f POWERLEVEL9K_VI_VISUAL_MODE_STRING requires ZSH >= 5.3.'
+      >&2 print -r "Your zsh version is $ZSH_VERSION. Either upgrade zsh or unset POWERLEVEL9K_VI_VISUAL_MODE_STRING."
     fi
   fi
 
