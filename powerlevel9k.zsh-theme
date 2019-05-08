@@ -2418,7 +2418,7 @@ _p9k_init() {
   fi
 
   if segment_in_use longstatus; then
-    print -P '%F{yellow}Warning!%f The "longstatus" segment is deprecated. Use "%F{blue}status%f" instead.'
+    print -P '%F{yellow}WARNING!%f The "longstatus" segment is deprecated. Use "%F{blue}status%f" instead.'
     print -P 'For more informations, have a look at https://github.com/bhilburn/powerlevel9k/blob/master/CHANGELOG.md.'
   fi
 
@@ -2442,7 +2442,7 @@ _p9k_init() {
       add-zle-hook-widget line-pre-redraw _p9k_zle_line_pre_redraw
       _p9k_g_expand POWERLEVEL9K_VI_VISUAL_MODE_STRING
     else
-      >&2 print -P '%F{yellow}Warning!%f POWERLEVEL9K_VI_VISUAL_MODE_STRING requires ZSH >= 5.3.'
+      >&2 print -P '%F{yellow}WARNING!%f POWERLEVEL9K_VI_VISUAL_MODE_STRING requires ZSH >= 5.3.'
       >&2 print -r "Your zsh version is $ZSH_VERSION. Either upgrade zsh or unset POWERLEVEL9K_VI_VISUAL_MODE_STRING."
     fi
   fi
