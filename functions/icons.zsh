@@ -17,7 +17,12 @@ typeset -gAH icons
 set_default POWERLEVEL9K_HIDE_BRANCH_ICON false
 set_default POWERLEVEL9K_MODE ""
 
+typeset -gi _P9K_ICONS_INITIALIZED=0
+
 function _p9k_init_icons() {
+  (( _P9K_ICONS_INITIALIZED )) && return
+  _P9K_ICONS_INITIALIZED=1
+
   case $POWERLEVEL9K_MODE in
     'flat'|'awesome-patched')
       # Awesome-Patched Font required! See:
@@ -548,6 +553,7 @@ function _p9k_init_icons() {
 # Safety function for printing icons
 # Prints the named icon, or if that icon is undefined, the string name.
 function print_icon() {
+  _p9k_init_icons
   local icon_name=$1
   local var_name=POWERLEVEL9K_${icon_name}
   if [[ -n "${(tP)var_name}" ]]; then
@@ -562,6 +568,7 @@ function print_icon() {
 #                 otherwise "print_icon" is used, which takes the users
 #                 overrides into account.
 function get_icon_names() {
+  _p9k_init_icons
   # Iterate over a ordered list of keys of the icons array
   for key in ${(@kon)icons}; do
     echo -n "POWERLEVEL9K_$key: "
