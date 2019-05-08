@@ -2409,14 +2409,11 @@ _p9k_init() {
 
   # Display a warning if the terminal does not support 256 colors.
   if [[ $POWERLEVEL9K_IGNORE_TERM_COLORS == false ]]; then
-    local n
-    if { hash tput && n=$(tput colors) || hash echotc && n=$(echotc Co) } 2>/dev/null && (( n < 256 )); then
-      if [[ -n $n && $n -lt 256 ]]; then
-        print -P '%F{red}WARNING!%f Your terminal appears to support fewer than 256 colors!'
-        print -P 'If your terminal supports 256 colors, please export the appropriate environment variable.'
-        print -P 'In most terminal emulators, putting %F{blue}export TERM=xterm-256color%f at the top of your ~/.zshrc is sufficient.'
-        print -P 'Set POWERLEVEL9K_IGNORE_TERM_COLORS=true to suppress this warning.'
-      fi
+    if zmodload zsh/terminfo 2>/dev/null && (( $+terminfo[colors] && $terminfo[colors] < 256 )); then
+      print -P '%F{red}WARNING!%f Your terminal appears to support fewer than 256 colors!'
+      print -P 'If your terminal supports 256 colors, please export the appropriate environment variable.'
+      print -P 'In most terminal emulators, adding %F{blue}export TERM=xterm-256color%f to your %F{yellow}~/.zshrc%f is sufficient.'
+      print -P 'Set %F{blue}POWERLEVEL9K_IGNORE_TERM_COLORS=true%f to suppress this warning.'
     fi
   fi
 
