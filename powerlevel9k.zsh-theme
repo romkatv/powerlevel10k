@@ -397,21 +397,30 @@ prompt_background_jobs() {
   $1_prompt_segment $0 $2 "$DEFAULT_COLOR" cyan BACKGROUND_JOBS_ICON 1 '${${(%):-%j}:#0}' "$msg"
 }
 
+function _p9k_left_prompt_end_line() {
+  _p9k_get_icon LEFT_SEGMENT_SEPARATOR
+  _p9k_escape_rcurly $_P9K_RETVAL
+  _P9K_PROMPT+="%k"
+  _P9K_PROMPT+="\${_P9K_N::=}"
+  _P9K_PROMPT+="\${\${\${_P9K_BG:#NONE}:-\${_P9K_N:=1}}+}"
+  _P9K_PROMPT+="\${\${_P9K_N:=2}+}"
+  _P9K_PROMPT+="\${\${_P9K_T[2]::=%F{\$_P9K_BG\}$_P9K_RETVAL}+}"
+  _P9K_PROMPT+="\${_P9K_T[\$_P9K_N]}"
+  _P9K_PROMPT+='%f'
+}
+
 ################################################################
 # A newline in your prompt, so you can segments on multiple lines.
 set_default POWERLEVEL9K_PROMPT_ON_NEWLINE false
 prompt_newline() {
   [[ "$1" == "right" ]] && return
-  local newline=$'\n'
-  local lws=$POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS
-  if [[ "$POWERLEVEL9K_PROMPT_ON_NEWLINE" == true ]]; then
-    _p9k_get_icon MULTILINE_NEWLINE_PROMPT_PREFIX
-    newline="${newline}${_P9K_RETVAL}"
-  fi
-  POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS=
-  "$1_prompt_segment" "$0" "$2" "" "" '' 0 '' "${newline}"
+  _p9k_left_prompt_end_line
+  _P9K_PROMPT+=$'\n'
   _P9K_PROMPT+='${${_P9K_BG::=NONE}+}'
-  POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS=$lws
+  if [[ $POWERLEVEL9K_PROMPT_ON_NEWLINE == true ]]; then
+    _p9k_get_icon MULTILINE_NEWLINE_PROMPT_PREFIX
+    _P9K_PROMPT+=$_P9K_RETVAL
+  fi
 }
 
 ################################################################
@@ -2354,16 +2363,11 @@ _p9k_init() {
   _P9K_RIGHT_PREFIX+='${${_P9K_BG::=NONE}+}${${_P9K_I::=0}+}'
 
   _p9k_get_icon LEFT_SEGMENT_SEPARATOR
-  _P9K_T=("%f$_P9K_RETVAL" "" "")
-  _p9k_escape_rcurly $_P9K_RETVAL
-  _P9K_LEFT_SUFFIX+='%k'
-  _P9K_LEFT_SUFFIX+="\${_P9K_N::=}"
-  _P9K_LEFT_SUFFIX+="\${\${_P9K_BG:-\${_P9K_N:=1}}+}"
-  _P9K_LEFT_SUFFIX+="\${\${\${_P9K_BG:#NONE}:-\${_P9K_N:=2}}+}"
-  _P9K_LEFT_SUFFIX+="\${\${_P9K_N:=3}+}"
-  _P9K_LEFT_SUFFIX+="\${\${_P9K_T[3]::=%F{\$_P9K_BG\}$_P9K_RETVAL}+}"
-  _P9K_LEFT_SUFFIX+="\${_P9K_T[\$_P9K_N]}"
-  _P9K_LEFT_SUFFIX+='%f'
+  _P9K_T=("%f$_P9K_RETVAL" "")
+  _P9K_PROMPT=''
+  _p9k_left_prompt_end_line
+  _P9K_LEFT_SUFFIX=$_P9K_PROMPT
+  _P9K_PROMPT=''
   _p9k_get_icon LEFT_SEGMENT_END_SEPARATOR
   _P9K_LEFT_SUFFIX+=$_P9K_RETVAL
 
