@@ -2371,7 +2371,8 @@ _p9k_init() {
   _p9k_get_icon LEFT_SEGMENT_END_SEPARATOR
   _P9K_LEFT_SUFFIX+=$_P9K_RETVAL
 
-  _P9K_RIGHT_SUFFIX+="%{$reset_color%}%E"
+  _P9K_RIGHT_SUFFIX+='%f%b%k'
+  _P9K_RIGHT_PREFIX+='%f%b%k'
 
   if [[ $POWERLEVEL9K_PROMPT_ON_NEWLINE == true ]]; then
     _p9k_get_icon MULTILINE_FIRST_PROMPT_PREFIX
@@ -2391,8 +2392,6 @@ _p9k_init() {
   else
     _P9K_LEFT_PREFIX+="%f%b%k"
   fi
-
-  _P9K_RIGHT_PREFIX+="%f%b%k"
 
   if [[ $POWERLEVEL9K_PROMPT_ADD_NEWLINE == true ]]; then
     repeat ${POWERLEVEL9K_PROMPT_ADD_NEWLINE_COUNT:-1} { _P9K_LEFT_PREFIX=$'\n'$_P9K_LEFT_PREFIX }
