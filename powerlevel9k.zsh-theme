@@ -2402,7 +2402,7 @@ _p9k_init() {
   fi
 
   # If the terminal `LANG` is set to `C`, this theme will not work at all.
-  if [[ $LANG == C && $POWERLEVEL9K_IGNORE_TERM_LANG == false ]]; then
+  if [[ $LANG == "C" && $POWERLEVEL9K_IGNORE_TERM_LANG == false ]]; then
     print -P "\t%F{red}WARNING!%f Your terminal's 'LANG' is set to 'C', which breaks this theme!"
     print -P "\t%F{red}WARNING!%f Please set your 'LANG' to a UTF-8 language, like 'en_US.UTF-8'"
     print -P "\t%F{red}WARNING!%f _before_ loading this theme in your \~\.zshrc. Putting"
