@@ -145,19 +145,22 @@ _p9k_get_icon() {
 typeset -ga _P9K_LEFT_JOIN=(1)
 typeset -ga _P9K_RIGHT_JOIN=(1)
 
+_p9k_translate_color() {
+  if [[ $1 == <-> ]]; then     # decimal color code: 255
+    _P9K_RETVAL=${(l:3::0:)1}
+  elif [[ $1 == '#'* ]]; then  # hexademical color code: #ffffff
+    _P9K_RETVAL=$1
+  else                         # named color: red
+    # Strip prifixes if there are any.
+    _P9K_RETVAL=$__P9K_COLORS[${${${1#bg-}#fg-}#br}]
+  fi
+}
+
 # Resolves a color to its numerical value, or an empty string. Communicates the result back
 # by setting _P9K_RETVAL.
 _p9k_color() {
   local user_var=POWERLEVEL9K_${(U)${2}#prompt_}_${3}
-  local color=${${(P)user_var}:-${1}}
-  if [[ $color == <-> ]]; then     # decimal color code: 255
-    _P9K_RETVAL=${(l:3::0:)color}
-  elif [[ $color == '#'* ]]; then  # hexademical color code: #ffffff
-    _P9K_RETVAL=$color
-  else                             # named color: red
-    # Strip prifixes if there are any.
-    _P9K_RETVAL=$__P9K_COLORS[${${${color#bg-}#fg-}#br}]
-  fi
+  _p9k_translate_color ${${(P)user_var}:-${1}}
 }
 
 _p9k_background() {
@@ -782,31 +785,6 @@ prompt_command_execution_time() {
 }
 
 ################################################################
-# Determine the unique path - this is needed for the
-# truncate_to_unique strategy.
-#
-function getUniqueFolder() {
-  local trunc_path directory test_dir test_dir_length
-  local -a matching
-  local -a paths
-  local cur_path='/'
-  paths=(${(s:/:)1})
-  for directory in ${paths[@]}; do
-    test_dir=''
-    for (( i=0; i < ${#directory}; i++ )); do
-      test_dir+="${directory:$i:1}"
-      matching=("$cur_path"/"$test_dir"*/)
-      if [[ ${#matching[@]} -eq 1 ]]; then
-        break
-      fi
-    done
-    trunc_path+="$test_dir/"
-    cur_path+="$directory/"
-  done
-  echo "${trunc_path: : -1}"
-}
-
-################################################################
 # Dir: current working directory
 # Parameters:
 #   * $1 Alignment: string - left|right
@@ -824,247 +802,176 @@ set_default POWERLEVEL9K_SHORTEN_FOLDER_MARKER ".shorten_folder_marker"
 set_default -i POWERLEVEL9K_SHORTEN_DIR_LENGTH -1
 set_default -a POWERLEVEL9K_DIR_PACKAGE_FILES package.json composer.json
 prompt_dir() {
-  # using $PWD instead of "$(print -P '%~')" to allow use of POWERLEVEL9K_DIR_PATH_ABSOLUTE
-  local current_path=$PWD # WAS: local current_path="$(print -P '%~')"
-  [[ "${POWERLEVEL9K_DIR_SHOW_WRITABLE}" == true && ! -w "$PWD" ]]
-  local -i writable=$?
-  if ! _p9k_cache_get "$0" "$2" "$current_path" "$writable"; then
-    # check if the user wants to use absolute paths or "~" paths
-    [[ ${(L)POWERLEVEL9K_DIR_PATH_ABSOLUTE} != "true" ]] && current_path=${current_path/#$HOME/"~"}
-    # declare all local variables
-    local paths directory test_dir test_dir_length trunc_path threshhold
-    # if we are not in "~" or "/", split the paths into an array and exclude "~"
-    (( ${#current_path} > 1 )) && paths=(${(s:/:)${current_path//"~\/"/}}) || paths=()
-    # only run the code if SHORTEN_DIR_LENGTH is set, or we are using the two strategies that don't rely on it.
-    if [[ "$POWERLEVEL9K_SHORTEN_DIR_LENGTH" -ge 0 ||
-          "$POWERLEVEL9K_SHORTEN_STRATEGY" == "truncate_with_folder_marker" ||
-          "$POWERLEVEL9K_SHORTEN_STRATEGY" == "truncate_to_last" ||
-          "$POWERLEVEL9K_SHORTEN_STRATEGY" == "truncate_with_package_name" ]]; then
-      case "$POWERLEVEL9K_SHORTEN_STRATEGY" in
-        truncate_absolute_chars)
-          if [ ${#current_path} -gt $(( $POWERLEVEL9K_SHORTEN_DIR_LENGTH + ${#POWERLEVEL9K_SHORTEN_DELIMITER} )) ]; then
-            current_path=$POWERLEVEL9K_SHORTEN_DELIMITER${current_path:(-POWERLEVEL9K_SHORTEN_DIR_LENGTH)}
-          fi
-        ;;
-        truncate_middle)
-          # truncate characters from the middle of the path
-          current_path=$(truncatePath $current_path $POWERLEVEL9K_SHORTEN_DIR_LENGTH $POWERLEVEL9K_SHORTEN_DELIMITER "middle")
-        ;;
-        truncate_from_right)
-          # truncate characters from the right of the path
-          current_path=$(truncatePath "$current_path" $POWERLEVEL9K_SHORTEN_DIR_LENGTH $POWERLEVEL9K_SHORTEN_DELIMITER)
-        ;;
-        truncate_absolute)
-          # truncate all characters except the last POWERLEVEL9K_SHORTEN_DIR_LENGTH characters
-          if [ ${#current_path} -gt $(( $POWERLEVEL9K_SHORTEN_DIR_LENGTH + ${#POWERLEVEL9K_SHORTEN_DELIMITER} )) ]; then
-            current_path=$POWERLEVEL9K_SHORTEN_DELIMITER${current_path:(-POWERLEVEL9K_SHORTEN_DIR_LENGTH)}
-          fi
-        ;;
-        truncate_to_last)
-          # truncate all characters before the current directory
-          current_path=${current_path##*/}
-        ;;
-        truncate_to_first_and_last)
-          if (( ${#current_path} > 1 )) && (( ${POWERLEVEL9K_SHORTEN_DIR_LENGTH} > 0 )); then
-            threshhold=$(( ${POWERLEVEL9K_SHORTEN_DIR_LENGTH} * 2))
-            # if we are in "~", add it back into the paths array
-            [[ $current_path == '~'* ]] && paths=("~" "${paths[@]}")
-            if (( ${#paths} > $threshhold )); then
-              local num=$(( ${#paths} - ${POWERLEVEL9K_SHORTEN_DIR_LENGTH} ))
-              # repace the middle elements
-              for (( i=$POWERLEVEL9K_SHORTEN_DIR_LENGTH; i<$num; i++ )); do
-                paths[$i+1]=$POWERLEVEL9K_SHORTEN_DELIMITER
-              done
-              [[ $current_path != '~'* ]] && current_path="/" || current_path=""
-              current_path+="${(j:/:)paths}"
-            fi
-          fi
-        ;;
-        truncate_to_unique)
-          # for each parent path component find the shortest unique beginning
-          # characters sequence. Source: https://stackoverflow.com/a/45336078
-          if (( ${#current_path} > 1 )); then # root and home are exceptions and won't have paths
-            # cheating here to retain ~ as home folder
-            local home_path="$(getUniqueFolder $HOME)"
-            trunc_path="$(getUniqueFolder $PWD)"
-            [[ $current_path == "~"* ]] && current_path="~${trunc_path//${home_path}/}" || current_path="/${trunc_path}"
-          fi
-        ;;
-        truncate_with_folder_marker)
-          if (( ${#paths} > 0 )); then # root and home are exceptions and won't have paths, so skip this
-            local last_marked_folder marked_folder
+  [[ $POWERLEVEL9K_DIR_PATH_ABSOLUTE == true ]] && local p=$PWD || local p=${(%):-%~}
 
-            # Search for the folder marker in the parent directories and
-            # buildup a pattern that is removed from the current path
-            # later on.
-            for marked_folder in $(upsearch $POWERLEVEL9K_SHORTEN_FOLDER_MARKER); do
-              if [[ "$marked_folder" == "/" ]]; then
-                # If we reached root folder, stop upsearch.
-                trunc_path="/"
-              elif [[ "$marked_folder" == "$HOME" ]]; then
-                # If we reached home folder, stop upsearch.
-                trunc_path="~"
-              elif [[ "${marked_folder%/*}" == $last_marked_folder ]]; then
-                trunc_path="${trunc_path%/}/${marked_folder##*/}"
-              else
-                trunc_path="${trunc_path%/}/$POWERLEVEL9K_SHORTEN_DELIMITER/${marked_folder##*/}"
-              fi
-              last_marked_folder=$marked_folder
-            done
-
-            # Replace the shortest possible match of the marked folder from
-            # the current path.
-            current_path=$trunc_path${current_path#${last_marked_folder}*}
-          fi
-        ;;
-        truncate_with_package_name)
-          local name repo_path package_path current_dir zero
-
-          # Get the path of the Git repo, which should have the package.json file
-          if [[ $(git rev-parse --is-inside-work-tree 2> /dev/null) == "true" ]]; then
-            # Get path from the root of the git repository to the current dir
-            local gitPath=$(git rev-parse --show-prefix)
-            # Remove trailing slash from git path, so that we can
-            # remove that git path from the pwd.
-            gitPath=${gitPath%/}
-            package_path=${PWD%%$gitPath}
-            # Remove trailing slash
-            package_path=${package_path%/}
-          elif [[ $(git rev-parse --is-inside-git-dir 2> /dev/null) == "true" ]]; then
-            package_path=${PWD%%/.git*}
-          fi
-
-         [[ ${(L)POWERLEVEL9K_DIR_PATH_ABSOLUTE} != "true" ]] && package_path=${package_path/$HOME/"~"}
-
-          # Replace the shortest possible match of the marked folder from
-          # the current path. Remove the amount of characters up to the
-          # folder marker from the left. Count only the visible characters
-          # in the path (this is done by the "zero" pattern; see
-          # http://stackoverflow.com/a/40855342/5586433).
-          local zero='%([BSUbfksu]|([FB]|){*})'
-          trunc_path=$PWD
-          # Then, find the length of the package_path string, and save the
-          # subdirectory path as a substring of the current directory's path from 0
-          # to the length of the package path's string
-          subdirectory_path=$(truncatePath "${trunc_path:${#${(S%%)package_path//$~zero/}}}" $POWERLEVEL9K_SHORTEN_DIR_LENGTH $POWERLEVEL9K_SHORTEN_DELIMITER)
-          # Parse the 'name' from the package.json; if there are any problems, just
-          # print the file path
-
-          local pkgFile="unknown"
-          for file in "${POWERLEVEL9K_DIR_PACKAGE_FILES[@]}"; do
-            if [[ -f "${package_path}/${file}" ]]; then
-              pkgFile="${package_path}/${file}"
-              break;
-            fi
-          done
-
-          local packageName=$(jq '.name' ${pkgFile} 2> /dev/null \
-            || node -e 'console.log(require(process.argv[1]).name);' ${pkgFile} 2>/dev/null \
-            || cat "${pkgFile}" 2> /dev/null | grep -m 1 "\"name\"" | awk -F ':' '{print $2}' | awk -F '"' '{print $2}' 2>/dev/null \
-            )
-          if [[ -n "${packageName}" ]]; then
-            # Instead of printing out the full path, print out the name of the package
-            # from the package.json and append the current subdirectory
-            current_path="`echo $packageName | tr -d '"'`$subdirectory_path"
-          fi
-        ;;
-        *)
-          if [[ $current_path != "~" ]]; then
-            current_path="%$((POWERLEVEL9K_SHORTEN_DIR_LENGTH+1))(c:$POWERLEVEL9K_SHORTEN_DELIMITER/:)%${POWERLEVEL9K_SHORTEN_DIR_LENGTH}c"
-            current_path="${(%)current_path}"
-          fi
-        ;;
-      esac
-    fi
-
-    current_path=${current_path//\%/%%}
-
-    local path_opt=$current_path
-    local current_state icon
-    if (( ! writable )); then
-      current_state=NOT_WRITABLE
-      icon=LOCK_ICON
+  if [[ $p == '~['* ]]; then
+    # If "${(%):-%~}" expands to "~[a]/]/b", is the first component "~[a]" or "~[a]/]"?
+    # One would expect "${(%):-%-1~}" to give the right answer but alas it always simply
+    # gives the segment before the first slash, which would be "~[a]" in this case. Worse,
+    # for "~[a/b]" it'll give the nonsensical "~a[". To solve this problem we have to
+    # repeat what "${(%):-%~}" does and hope that it produces the same result.
+    local func=''
+    local -a parts=()
+    for func in zsh_directory_name $zsh_directory_name_functions; do
+      if (( $+functions[$func] )) && $func d $PWD && [[ $p == '~['$reply[1]']'* ]]; then
+        parts+='~['$reply[1]']'
+        break
+      fi
+    done
+    if (( $#parts )); then
+      parts+=(${(s:/:)${p#$parts[1]}})
     else
-      case $PWD in
-        /etc*)
-          current_state=ETC
-          icon=ETC_ICON
-          ;;
-        ~)
-          current_state=HOME
-          icon=HOME_ICON
-          ;;
-        ~/*)
-          current_state=HOME_SUBFOLDER
-          icon=HOME_SUB_ICON
-          ;;
-        *)
-          current_state=DEFAULT
-          icon=FOLDER_ICON
-          ;;
-      esac
+      p=$PWD
+      parts=("${(s:/:)p}")
     fi
-
-    # This is not what Powerlevel9k does but I cannot imagine anyone wanting ~/foo to become /foo.
-    if [[ $POWERLEVEL9K_DIR_OMIT_FIRST_CHARACTER == true ]]; then
-      if [[ $current_path == /?* ]]; then
-        current_path=${current_path[2,-1]}
-      elif [[ $current_path == '~'/?* ]]; then
-        current_path=${current_path[3,-1]}
-      fi
-    fi
-
-    if [[ $POWERLEVEL9K_HOME_FOLDER_ABBREVIATION != '~' &&
-          $POWERLEVEL9K_DIR_OMIT_FIRST_CHARACTER != true &&
-          $path_opt == '~'?* ]]; then
-      current_path=${POWERLEVEL9K_HOME_FOLDER_ABBREVIATION}${current_path[2,-1]}
-    fi
-
-    local bld_on bld_off dir_state_foreground dir_state_user_foreground
-    # test if user wants the last directory printed in bold
-    if [[ $POWERLEVEL9K_DIR_PATH_HIGHLIGHT_BOLD == true ]]; then
-      bld_on="%B"
-      bld_off="%b"
-    else
-      bld_on=""
-      bld_off=""
-    fi
-    # determine is the user has set a last directory color
-    local dir_state_user_foreground=POWERLEVEL9K_DIR_${current_state}_FOREGROUND
-    local dir_state_foreground=${${(P)dir_state_user_foreground}:-$DEFAULT_COLOR}
-
-    local dir_name=${${current_path:h}%/}/
-    local base_name=${current_path:t}
-    if [[ $dir_name == ./ ]]; then
-      dir_name=''
-    fi
-    # if the user wants the last directory colored...
-    if [[ -n ${POWERLEVEL9K_DIR_PATH_HIGHLIGHT_FOREGROUND} ]]; then
-      if [[ -z $base_name ]]; then
-        current_path="${bld_on}%F{$POWERLEVEL9K_DIR_PATH_HIGHLIGHT_FOREGROUND}${current_path}${bld_off}"
-      else
-        current_path="${dir_name}${bld_on}%F{$POWERLEVEL9K_DIR_PATH_HIGHLIGHT_FOREGROUND}${base_name}${bld_off}"
-      fi
-    else # no coloring
-      if [[ -z $base_name ]]; then
-        current_path="${bld_on}${current_path}${bld_off}"
-      else
-        current_path="${dir_name}${bld_on}${base_name}${bld_off}"
-      fi
-    fi
-    # check if the user wants the separator colored.
-    if [[ -n ${POWERLEVEL9K_DIR_PATH_SEPARATOR_FOREGROUND} ]]; then
-      local repl="%F{$POWERLEVEL9K_DIR_PATH_SEPARATOR_FOREGROUND}/%F{$dir_state_foreground}"
-      current_path=${current_path//\//$repl}
-    fi
-    if [[ "${POWERLEVEL9K_DIR_PATH_SEPARATOR}" != "/" ]]; then
-      current_path=${current_path//\//$POWERLEVEL9K_DIR_PATH_SEPARATOR}
-    fi
-
-    _p9k_cache_set "$current_state" "$icon" "$current_path"
+  else
+    local -a parts=("${(s:/:)p}")
   fi
 
-  "$1_prompt_segment" "$0_${_P9K_CACHE_VAL[1]}" "$2" blue "$DEFAULT_COLOR" "${_P9K_CACHE_VAL[2]}" 0 "" "${_P9K_CACHE_VAL[3]}"
+  local -i fake_first=0
+
+  case $POWERLEVEL9K_SHORTEN_STRATEGY in
+    truncate_absolute|truncate_absolute_chars)
+      if (( POWERLEVEL9K_SHORTEN_DIR_LENGTH > 0 && $#p > POWERLEVEL9K_SHORTEN_DIR_LENGTH )); then
+        local -i n=POWERLEVEL9K_SHORTEN_DIR_LENGTH
+        local -i i=$#parts
+        while true; do
+          local dir=$parts[i]
+          local -i len=$(( $#dir + (i > 1) ))
+          if (( len <= n )); then
+            (( n -= len ))
+            (( --i ))
+          else
+            parts[i]=$'\0'$dir[-n,-1]
+            parts[1,i-1]=()
+            break
+          fi
+        done
+      fi
+    ;;
+    truncate_with_package_name|truncate_middle|truncate_from_right)
+      () {
+        [[ $POWERLEVEL9K_SHORTEN_STRATEGY == truncate_with_package_name ]] || return
+        local -i i=$#parts
+        local pkg_dir=$PWD
+        for (( ; i > 0; --i )); do
+          local fname=''
+          for fname in $POWERLEVEL9K_DIR_PACKAGE_FILES; do
+            if [[ -f $pkg_dir/$fname ]]; then
+              local pkg_name=''
+              pkg_name=$(jq -j '.name' <$pkg_dir/$fname) && [[ -n $pkg_name ]] || return
+              parts[1,i]=($pkg_name)
+              fake_first=1
+              return
+            fi
+          done
+          pkg_dir=${pkg_dir:h}
+        done
+      }
+      if (( POWERLEVEL9K_SHORTEN_DIR_LENGTH > 0 )); then
+        local -i pref=$POWERLEVEL9K_SHORTEN_DIR_LENGTH suf=0 i=2
+        [[ $POWERLEVEL9K_SHORTEN_STRATEGY == truncate_middle ]] && suf=pref
+        for (( ; i < $#parts; ++i )); do
+          local dir=$parts[i]
+          if (( $#dir > pref + suf )); then
+            dir[pref+1,-suf-1]=$'\0'
+            parts[i]=$dir
+          fi
+        done
+      fi
+    ;;
+    truncate_to_last)
+      fake_first=$(($#parts > 1))
+      parts[1,-2]=()
+    ;;
+    truncate_to_first_and_last)
+      if (( POWERLEVEL9K_SHORTEN_DIR_LENGTH > 0 )); then
+        local -i i=$(( POWERLEVEL9K_SHORTEN_DIR_LENGTH + 1 ))
+        [[ $p == /* ]] && (( ++i ))
+        for (( ; i <= $#parts - POWERLEVEL9K_SHORTEN_DIR_LENGTH; ++i )); do
+          parts[i]=$'\0'
+        done
+      fi
+    ;;
+    truncate_to_unique)
+      local parent="${PWD%/${(pj./.)parts[2,-1]}}" dir
+      local -i i=2
+      for (( ; i <= $#parts; ++i )); do
+        local dir=$parts[i]
+        local -i j=1
+        for (( ; j <= $#dir; ++j )); do
+          local -a matching=($parent/$dir[1,j]*/)
+          (( $#matching == 1 )) && break
+        done
+        parent+=/$dir
+        parts[i]=$dir[1,j]
+      done
+    ;;
+    truncate_with_folder_marker)
+      local dir=$PWD
+      local -a m=()
+      local -i i=$(($#parts - 1))
+      for (( ; i > 1; --i )); do
+        dir=${dir:h}
+        [[ -e $dir/$POWERLEVEL9K_SHORTEN_FOLDER_MARKER ]] && m+=$i
+      done
+      m+=1
+      for (( i=1; i < $#m; ++i )); do
+        (( m[i] - m[i+1] > 2 )) && parts[m[i+1]+1,m[i]-1]=($'\0')
+      done
+    ;;
+    *)
+      if (( POWERLEVEL9K_SHORTEN_DIR_LENGTH > 0 )); then
+        local -i len=$#parts
+        [[ -z $parts[1] ]] && (( --len ))
+        if (( len > POWERLEVEL9K_SHORTEN_DIR_LENGTH )); then
+          parts[1,-POWERLEVEL9K_SHORTEN_DIR_LENGTH-1]=($'\0')
+        fi
+      fi
+    ;;
+  esac
+
+  parts=("${(@)parts//\%/%%}")
+
+  local state='' icon=''
+  if [[ $POWERLEVEL9K_DIR_SHOW_WRITABLE == true && ! -w $PWD ]]; then
+    state=NOT_WRITABLE
+    icon=LOCK_ICON
+  else
+    case $PWD in
+      /etc|/etc/*) state=ETC;            icon=ETC_ICON;;
+      ~)           state=HOME;           icon=HOME_ICON;;
+      ~/*)         state=HOME_SUBFOLDER; icon=HOME_SUB_ICON;;
+      *)           state=DEFAULT;        icon=FOLDER_ICON;;
+    esac
+  fi
+
+  _p9k_color "$DEFAULT_COLOR" "$0_$state" FOREGROUND
+  _p9k_foreground $_P9K_RETVAL
+  local style=$_P9K_RETVAL'%b'
+
+  [[ $fake_first == 0 && $parts[1] == '~' ]] && parts[1]=$POWERLEVEL9K_HOME_FOLDER_ABBREVIATION$style
+  [[ $POWERLEVEL9K_DIR_OMIT_FIRST_CHARACTER == true && $#parts > 1 && -n $parts[2] ]] && parts[1]=()
+  parts=("${(@)parts//$'\0'/$POWERLEVEL9K_SHORTEN_DELIMITER$style}")
+
+  if [[ -n $POWERLEVEL9K_DIR_PATH_HIGHLIGHT_FOREGROUND ]]; then
+    _p9k_translate_color $POWERLEVEL9K_DIR_PATH_HIGHLIGHT_FOREGROUND
+    _p9k_foreground $_P9K_RETVAL
+    parts[-1]=$_P9K_RETVAL$parts[-1]
+  fi
+
+  if [[ $POWERLEVEL9K_DIR_PATH_HIGHLIGHT_BOLD == true ]]; then
+    parts[-1]='%B'$parts[-1]'%b'
+  fi
+
+  local sep=$POWERLEVEL9K_DIR_PATH_SEPARATOR$style
+  if [[ -n $POWERLEVEL9K_DIR_PATH_SEPARATOR_FOREGROUND ]]; then
+    _p9k_translate_color $POWERLEVEL9K_DIR_PATH_SEPARATOR_FOREGROUND
+    _p9k_foreground $_P9K_RETVAL
+    sep=$_P9K_RETVAL$sep
+  fi
+
+  "$1_prompt_segment" "$0_$state" "$2" blue "$DEFAULT_COLOR" "$icon" 0 "" "${(pj.$sep.)parts}"
 }
 
 ################################################################
@@ -2448,6 +2355,12 @@ _p9k_init() {
       >&2 print -P '%F{yellow}WARNING!%f POWERLEVEL9K_VI_VISUAL_MODE_STRING requires ZSH >= 5.3.'
       >&2 print -r "Your zsh version is $ZSH_VERSION. Either upgrade zsh or unset POWERLEVEL9K_VI_VISUAL_MODE_STRING."
     fi
+  fi
+
+  if segment_in_use dir &&
+     [[ $POWERLEVEL9K_SHORTEN_STRATEGY == truncate_with_package_name && $+commands[jq] == 0 ]]; then
+    >&2 print -P '%F{yellow}WARNING!%f %BPOWERLEVEL9K_SHORTEN_STRATEGY=truncate_with_package_name%b requires %F{green}jq%f.'
+    >&2 print -P 'Either install %F{green}jq%f or change the value of %BPOWERLEVEL9K_SHORTEN_STRATEGY%b.'
   fi
 
   zle -N zle-keymap-select _p9k_zle_keymap_select
