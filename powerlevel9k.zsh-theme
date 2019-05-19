@@ -198,7 +198,7 @@ left_prompt_segment() {
     _p9k_color $4 $1 FOREGROUND
     local fg_color=$_P9K_RETVAL
     _p9k_foreground $fg_color
-    local fg=$_P9K_RETVAL
+    local fg=%b$_P9K_RETVAL
 
     _p9k_get_icon LEFT_SUBSEGMENT_SEPARATOR
     local subsep=$_P9K_RETVAL
@@ -232,16 +232,16 @@ left_prompt_segment() {
     #   fi
 
     local t=$#_P9K_T
-    _P9K_T+=$bg$POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS$icon                           # 1
-    _P9K_T+=$bg$icon                                                                         # 2
+    _P9K_T+=$bg$POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS$icon                         # 1
+    _P9K_T+=$bg$icon                                                                       # 2
     if [[ -z $fg_color ]]; then
       _p9k_foreground $DEFAULT_COLOR
-      _P9K_T+=$bg$_P9K_RETVAL$subsep$POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS$icon      # 3
+      _P9K_T+=$bg$_P9K_RETVAL$subsep$POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS$icon    # 3
     else
-      _P9K_T+=$bg$fg$subsep$POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS$icon               # 3
+      _P9K_T+=$bg$fg$subsep$POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS$icon             # 3
     fi
     _p9k_get_icon LEFT_SEGMENT_SEPARATOR
-    _P9K_T+=$bg$_P9K_RETVAL$POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS$icon               # 4
+    _P9K_T+=$bg$_P9K_RETVAL$POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS$icon             # 4
 
     local pre
     pre+="\${_P9K_N::=}\${_P9K_F::=}"
@@ -249,7 +249,7 @@ left_prompt_segment() {
     pre+="\${\${_P9K_N:=\${\${\$((_P9K_I>=$_P9K_LEFT_JOIN[$2])):#0}:+$((t+2))}}+}"         # 2
     pre+="\${\${_P9K_N:=\${\${\$((!\${#\${:-0\$_P9K_BG}:#0$bg_color})):#0}:+$((t+3))}}+}"  # 3
     pre+="\${\${_P9K_N:=\${\${_P9K_F::=%F{\$_P9K_BG\}}+$((t+4))}}+}"                       # 4
-    pre+="\$_P9K_F\${_P9K_T[\$_P9K_N]}"
+    pre+="\${_P9K_F}%b\${_P9K_T[\$_P9K_N]}"
 
     local post="\${_P9K_C}$space\${\${_P9K_I::=$2}+}\${\${_P9K_BG::=$bg_color}+}}"
 
@@ -284,7 +284,7 @@ right_prompt_segment() {
     _p9k_color $4 $1 FOREGROUND
     local fg_color=$_P9K_RETVAL
     _p9k_foreground $fg_color
-    local fg=$_P9K_RETVAL
+    local fg=%b$_P9K_RETVAL
 
     _p9k_get_icon RIGHT_SUBSEGMENT_SEPARATOR
     local subsep=$_P9K_RETVAL
@@ -324,7 +324,7 @@ right_prompt_segment() {
     pre+="\${\${_P9K_N:=\${\${\$((_P9K_I>=$_P9K_RIGHT_JOIN[$2])):#0}:+$((t+2))}}+}"        # 2
     pre+="\${\${_P9K_N:=\${\${\$((!\${#\${:-0\$_P9K_BG}:#0$bg_color})):#0}:+$((t+3))}}+}"  # 3
     pre+="\${\${_P9K_N:=$((t+1))}+}"                                                       # 4 == 1
-    pre+="\${_P9K_T[\$_P9K_N]}\${_P9K_C}$icon_fg"
+    pre+="%b\${_P9K_T[\$_P9K_N]}\${_P9K_C}$icon_fg"
 
     _p9k_escape_rcurly $POWERLEVEL9K_WHITESPACE_BETWEEN_RIGHT_SEGMENTS
     local post="$icon$_P9K_RETVAL\${\${_P9K_I::=$2}+}\${\${_P9K_BG::=$bg_color}+}}"
@@ -933,8 +933,6 @@ prompt_dir() {
     ;;
   esac
 
-  parts=("${(@)parts//\%/%%}")
-
   local state='' icon=''
   if [[ $POWERLEVEL9K_DIR_SHOW_WRITABLE == true && ! -w $PWD ]]; then
     state=NOT_WRITABLE
@@ -950,23 +948,23 @@ prompt_dir() {
 
   _p9k_color "$DEFAULT_COLOR" "$0_$state" FOREGROUND
   _p9k_foreground $_P9K_RETVAL
-  local clr=$_P9K_RETVAL'%b'
+  local fg=%b$_P9K_RETVAL
 
-  [[ $fake_first == 0 && $parts[1] == '~' ]] && parts[1]=$POWERLEVEL9K_HOME_FOLDER_ABBREVIATION$clr
+  parts=("${(@)parts//\%/%%}")
+  [[ $fake_first == 0 && $parts[1] == '~' ]] && parts[1]=$POWERLEVEL9K_HOME_FOLDER_ABBREVIATION$fg
   [[ $POWERLEVEL9K_DIR_OMIT_FIRST_CHARACTER == true && $#parts > 1 && -n $parts[2] ]] && parts[1]=()
-  parts=("${(@)parts//$'\0'/$POWERLEVEL9K_SHORTEN_DELIMITER$clr}")
 
+  local last_fg=
+  [[ $POWERLEVEL9K_DIR_PATH_HIGHLIGHT_BOLD == true ]] && last_fg+=%B
   if [[ -n $POWERLEVEL9K_DIR_PATH_HIGHLIGHT_FOREGROUND ]]; then
     _p9k_translate_color $POWERLEVEL9K_DIR_PATH_HIGHLIGHT_FOREGROUND
     _p9k_foreground $_P9K_RETVAL
-    parts[-1]=$_P9K_RETVAL$parts[-1]
+    last_fg+=$_P9K_RETVAL
   fi
+  parts[-1]=$last_fg${parts[-1]//$'\0'/$'\0'$last_fg}
+  parts=("${(@)parts//$'\0'/$POWERLEVEL9K_SHORTEN_DELIMITER$fg}")
 
-  if [[ $POWERLEVEL9K_DIR_PATH_HIGHLIGHT_BOLD == true ]]; then
-    parts[-1]='%B'$parts[-1]'%b'
-  fi
-
-  local sep=$POWERLEVEL9K_DIR_PATH_SEPARATOR$clr
+  local sep=$POWERLEVEL9K_DIR_PATH_SEPARATOR$fg
   if [[ -n $POWERLEVEL9K_DIR_PATH_SEPARATOR_FOREGROUND ]]; then
     _p9k_translate_color $POWERLEVEL9K_DIR_PATH_SEPARATOR_FOREGROUND
     _p9k_foreground $_P9K_RETVAL
