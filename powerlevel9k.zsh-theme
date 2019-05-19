@@ -950,11 +950,11 @@ prompt_dir() {
 
   _p9k_color "$DEFAULT_COLOR" "$0_$state" FOREGROUND
   _p9k_foreground $_P9K_RETVAL
-  local style=$_P9K_RETVAL'%b'
+  local clr=$_P9K_RETVAL'%b'
 
-  [[ $fake_first == 0 && $parts[1] == '~' ]] && parts[1]=$POWERLEVEL9K_HOME_FOLDER_ABBREVIATION$style
+  [[ $fake_first == 0 && $parts[1] == '~' ]] && parts[1]=$POWERLEVEL9K_HOME_FOLDER_ABBREVIATION$clr
   [[ $POWERLEVEL9K_DIR_OMIT_FIRST_CHARACTER == true && $#parts > 1 && -n $parts[2] ]] && parts[1]=()
-  parts=("${(@)parts//$'\0'/$POWERLEVEL9K_SHORTEN_DELIMITER$style}")
+  parts=("${(@)parts//$'\0'/$POWERLEVEL9K_SHORTEN_DELIMITER$clr}")
 
   if [[ -n $POWERLEVEL9K_DIR_PATH_HIGHLIGHT_FOREGROUND ]]; then
     _p9k_translate_color $POWERLEVEL9K_DIR_PATH_HIGHLIGHT_FOREGROUND
@@ -966,7 +966,7 @@ prompt_dir() {
     parts[-1]='%B'$parts[-1]'%b'
   fi
 
-  local sep=$POWERLEVEL9K_DIR_PATH_SEPARATOR$style
+  local sep=$POWERLEVEL9K_DIR_PATH_SEPARATOR$clr
   if [[ -n $POWERLEVEL9K_DIR_PATH_SEPARATOR_FOREGROUND ]]; then
     _p9k_translate_color $POWERLEVEL9K_DIR_PATH_SEPARATOR_FOREGROUND
     _p9k_foreground $_P9K_RETVAL
