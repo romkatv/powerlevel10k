@@ -895,7 +895,7 @@ prompt_dir() {
       fi
     ;;
     truncate_to_unique)
-      local parent="${PWD%/${(pj./.)parts[2,-1]}}" dir
+      local parent="${PWD%/${(pj./.)parts[2,-1]}}" dir=''
       local -i i=2
       for (( ; i < $#parts; ++i )); do
         local dir=$parts[i]
