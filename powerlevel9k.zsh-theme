@@ -784,11 +784,6 @@ prompt_command_execution_time() {
   "$1_prompt_segment" "$0" "$2" "red" "yellow1" 'EXECUTION_TIME_ICON' 0 '' "${humanReadableDuration}"
 }
 
-################################################################
-# Dir: current working directory
-# Parameters:
-#   * $1 Alignment: string - left|right
-#   * $2 Index: integer
 set_default POWERLEVEL9K_DIR_PATH_SEPARATOR "/"
 set_default POWERLEVEL9K_HOME_FOLDER_ABBREVIATION "~"
 set_default POWERLEVEL9K_DIR_PATH_HIGHLIGHT_BOLD false
@@ -798,9 +793,15 @@ set_default POWERLEVEL9K_DIR_OMIT_FIRST_CHARACTER false
 set_default POWERLEVEL9K_SHORTEN_STRATEGY ""
 set_default POWERLEVEL9K_DIR_PATH_SEPARATOR_FOREGROUND ""
 set_default POWERLEVEL9K_SHORTEN_DELIMITER $'\u2026'
+# This defines a pattern. It is expanded with the options set by `emulate zsh`.
+# This works pretty well: POWERLEVEL9K_SHORTEN_FOLDER_MARKER="(.bzr|CVS|.git|.hg|.svn|.citc)"
 set_default POWERLEVEL9K_SHORTEN_FOLDER_MARKER ".shorten_folder_marker"
 set_default -i POWERLEVEL9K_SHORTEN_DIR_LENGTH -1
+# Individual elements are patterns. They are expanded with the options set by `emulate zsh`.
 set_default -a POWERLEVEL9K_DIR_PACKAGE_FILES package.json composer.json
+
+################################################################
+# Dir: current working directory
 prompt_dir() {
   [[ $POWERLEVEL9K_DIR_PATH_ABSOLUTE == true ]] && local p=$PWD || local p=${(%):-%~}
 
@@ -851,21 +852,21 @@ prompt_dir() {
     ;;
     truncate_with_package_name|truncate_middle|truncate_from_right)
       () {
-        [[ $POWERLEVEL9K_SHORTEN_STRATEGY == truncate_with_package_name ]] || return
+        [[ $POWERLEVEL9K_SHORTEN_STRATEGY == truncate_with_package_name &&
+           $+commands[jq] == 1 && $#POWERLEVEL9K_DIR_PACKAGE_FILES > 0 ]] || return
+        local pat="(${(j:|:)POWERLEVEL9K_DIR_PACKAGE_FILES})"
         local -i i=$#parts
-        local pkg_dir=$PWD
+        local dir=$PWD
         for (( ; i > 0; --i )); do
-          local fname=''
-          for fname in $POWERLEVEL9K_DIR_PACKAGE_FILES; do
-            if [[ -f $pkg_dir/$fname ]]; then
-              local pkg_name=''
-              pkg_name=$(jq -j '.name' <$pkg_dir/$fname) && [[ -n $pkg_name ]] || return
-              parts[1,i]=($pkg_name)
-              fake_first=1
-              return
-            fi
+          local pkg_file=''
+          for pkg_file in $dir/${~pat}(N); do
+            local pkg_name=''
+            pkg_name=$(command jq -j '.name' <$pkg_file) && [[ -n $pkg_name ]] || return
+            parts[1,i]=($pkg_name)
+            fake_first=1
+            return
           done
-          pkg_dir=${pkg_dir:h}
+          dir=${dir:h}
         done
       }
       if (( POWERLEVEL9K_SHORTEN_DIR_LENGTH > 0 )); then
@@ -900,7 +901,7 @@ prompt_dir() {
         local dir=$parts[i]
         local -i j=1
         for (( ; j <= $#dir; ++j )); do
-          local -a matching=($parent/$dir[1,j]*/)
+          local -a matching=($parent/$dir[1,j]*/(N))
           (( $#matching == 1 )) && break
         done
         parent+=/$dir
@@ -913,7 +914,8 @@ prompt_dir() {
       local -i i=$(($#parts - 1))
       for (( ; i > 1; --i )); do
         dir=${dir:h}
-        [[ -e $dir/$POWERLEVEL9K_SHORTEN_FOLDER_MARKER ]] && m+=$i
+        local -a matches=($dir/${~POWERLEVEL9K_SHORTEN_FOLDER_MARKER}(N))
+        (( $#matches )) && m+=$i
       done
       m+=1
       for (( i=1; i < $#m; ++i )); do
