@@ -832,7 +832,7 @@ prompt_dir() {
 
   case $POWERLEVEL9K_SHORTEN_STRATEGY in
     truncate_absolute|truncate_absolute_chars)
-      if (( POWERLEVEL9K_SHORTEN_DIR_LENGTH > 0 && $#p > POWERLEVEL9K_SHORTEN_DIR_LENGTH )); then
+      if (( POWERLEVEL9K_SHORTEN_DIR_LENGTH > 0 && $#p > POWERLEVEL9K_SHORTEN_DIR_LENGTH + 1 )); then
         local -i n=POWERLEVEL9K_SHORTEN_DIR_LENGTH
         local -i i=$#parts
         while true; do
@@ -873,7 +873,7 @@ prompt_dir() {
         [[ $POWERLEVEL9K_SHORTEN_STRATEGY == truncate_middle ]] && suf=pref
         for (( ; i < $#parts; ++i )); do
           local dir=$parts[i]
-          if (( $#dir > pref + suf )); then
+          if (( $#dir > pref + suf + 1 )); then
             dir[pref+1,-suf-1]=$'\0'
             parts[i]=$dir
           fi
