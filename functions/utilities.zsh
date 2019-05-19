@@ -32,8 +32,10 @@ function set_default() {
 }
 
 function _p9k_g_expand() {
+  (( $+parameters[$1] )) || return
   local -a ts=("${=$(typeset -p $1)}")
   shift ts
+  local x
   for x in "${ts[@]}"; do
     [[ $x == -* ]] || break
     # Don't change readonly variables. Ideally, we shouldn't modify any variables at all,

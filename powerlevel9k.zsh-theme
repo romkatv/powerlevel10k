@@ -792,7 +792,6 @@ set_default POWERLEVEL9K_DIR_SHOW_WRITABLE false
 set_default POWERLEVEL9K_DIR_OMIT_FIRST_CHARACTER false
 set_default POWERLEVEL9K_SHORTEN_STRATEGY ""
 set_default POWERLEVEL9K_DIR_PATH_SEPARATOR_FOREGROUND ""
-set_default POWERLEVEL9K_SHORTEN_DELIMITER $'\u2026'
 # This defines a pattern. It is expanded with the options set by `emulate zsh`.
 # This works pretty well: POWERLEVEL9K_SHORTEN_FOLDER_MARKER="(.bzr|CVS|.git|.hg|.svn|.citc)"
 set_default POWERLEVEL9K_SHORTEN_FOLDER_MARKER ".shorten_folder_marker"
@@ -830,6 +829,7 @@ prompt_dir() {
   fi
 
   local -i fake_first=0
+  local delim=${POWERLEVEL9K_SHORTEN_DELIMITER-$'\u2026'}
 
   case $POWERLEVEL9K_SHORTEN_STRATEGY in
     truncate_absolute|truncate_absolute_chars)
@@ -900,13 +900,14 @@ prompt_dir() {
       for (( ; i < $#parts; ++i )); do
         local dir=$parts[i]
         local -i j=1
-        for (( ; j <= $#dir; ++j )); do
+        for (( ; j < $#dir; ++j )); do
           local -a matching=($parent/$dir[1,j]*/(N))
           (( $#matching == 1 )) && break
         done
         parent+=/$dir
-        parts[i]=$dir[1,j]
+        (( j == $#dir )) || parts[i]=$dir[1,j]$'\0'
       done
+      delim=${POWERLEVEL9K_SHORTEN_DELIMITER-'*'}
     ;;
     truncate_with_folder_marker)
       local dir=$PWD
@@ -962,7 +963,7 @@ prompt_dir() {
     last_fg+=$_P9K_RETVAL
   fi
   parts[-1]=$last_fg${parts[-1]//$'\0'/$'\0'$last_fg}
-  parts=("${(@)parts//$'\0'/$POWERLEVEL9K_SHORTEN_DELIMITER$fg}")
+  parts=("${(@)parts//$'\0'/$delim$fg}")
 
   local sep=$POWERLEVEL9K_DIR_PATH_SEPARATOR$fg
   if [[ -n $POWERLEVEL9K_DIR_PATH_SEPARATOR_FOREGROUND ]]; then
