@@ -173,7 +173,7 @@ docker run -e LANG=C.UTF-8 -e LC_ALL=C.UTF-8 -e TERM=$TERM -it --rm ubuntu bash 
     source ~/.purepower
     source ~/powerlevel10k/powerlevel10k.zsh-theme" >~/.zshrc
   cd ~/powerlevel10k
-  zsh -i'
+  exec zsh'
 ```
 
 ## How fast is it?
