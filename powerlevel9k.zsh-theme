@@ -792,9 +792,6 @@ set_default POWERLEVEL9K_DIR_SHOW_WRITABLE false
 set_default POWERLEVEL9K_DIR_OMIT_FIRST_CHARACTER false
 set_default POWERLEVEL9K_SHORTEN_STRATEGY ""
 set_default POWERLEVEL9K_DIR_PATH_SEPARATOR_FOREGROUND ""
-# This defines a pattern. It is expanded with the options set by `emulate zsh`.
-# This works pretty well: POWERLEVEL9K_SHORTEN_FOLDER_MARKER="(.bzr|CVS|.git|.hg|.svn|.citc)"
-set_default POWERLEVEL9K_SHORTEN_FOLDER_MARKER ".shorten_folder_marker"
 set_default -i POWERLEVEL9K_SHORTEN_DIR_LENGTH -1
 # Individual elements are patterns. They are expanded with the options set by `emulate zsh`.
 set_default -a POWERLEVEL9K_DIR_PACKAGE_FILES package.json composer.json
@@ -895,33 +892,46 @@ prompt_dir() {
       fi
     ;;
     truncate_to_unique)
-      local parent="${PWD%/${(pj./.)parts[2,-1]}}" dir=''
-      local -i i=2
-      for (( ; i < $#parts; ++i )); do
+      local -i i=2 n=1
+      [[ $p == /* ]] && (( ++i ))
+      (( POWERLEVEL9K_SHORTEN_DIR_LENGTH > 0 )) && n=POWERLEVEL9K_SHORTEN_DIR_LENGTH
+      local pat=${POWERLEVEL9K_SHORTEN_FOLDER_MARKER-'(.bzr|CVS|.git|.hg|.svn|.citc)'}
+      local parent="${PWD%/${(pj./.)parts[i,-1]}}"
+      for (( ; i <= $#parts - n; ++i )); do
         local dir=$parts[i]
+        if [[ -n $pat ]]; then
+          local -a matches=($parent/$dir/${~pat}(N))
+          if (( $#matches )); then
+            parent+=/$dir
+            continue
+          fi
+        fi
         local -i j=1
         for (( ; j < $#dir; ++j )); do
           local -a matching=($parent/$dir[1,j]*/(N))
           (( $#matching == 1 )) && break
         done
-        parent+=/$dir
         (( j == $#dir )) || parts[i]=$dir[1,j]$'\0'
+        parent+=/$dir
       done
       delim=${POWERLEVEL9K_SHORTEN_DELIMITER-'*'}
     ;;
     truncate_with_folder_marker)
-      local dir=$PWD
-      local -a m=()
-      local -i i=$(($#parts - 1))
-      for (( ; i > 1; --i )); do
-        dir=${dir:h}
-        local -a matches=($dir/${~POWERLEVEL9K_SHORTEN_FOLDER_MARKER}(N))
-        (( $#matches )) && m+=$i
-      done
-      m+=1
-      for (( i=1; i < $#m; ++i )); do
-        (( m[i] - m[i+1] > 2 )) && parts[m[i+1]+1,m[i]-1]=($'\0')
-      done
+      local pat=${POWERLEVEL9K_SHORTEN_FOLDER_MARKER-.shorten_folder_marker}
+      if [[ -n $pat ]]; then
+        local dir=$PWD
+        local -a m=()
+        local -i i=$(($#parts - 1))
+        for (( ; i > 1; --i )); do
+          dir=${dir:h}
+          local -a matches=($dir/${~pat}(N))
+          (( $#matches )) && m+=$i
+        done
+        m+=1
+        for (( i=1; i < $#m; ++i )); do
+          (( m[i] - m[i+1] > 2 )) && parts[m[i+1]+1,m[i]-1]=($'\0')
+        done
+      fi
     ;;
     *)
       if (( POWERLEVEL9K_SHORTEN_DIR_LENGTH > 0 )); then
