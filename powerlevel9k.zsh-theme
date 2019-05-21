@@ -1401,11 +1401,10 @@ prompt_rust_version() {
 # RSpec test ratio
 prompt_rspec_stats() {
   if [[ -d app && -d spec ]]; then
-    local code_amount tests_amount
-    code_amount=$(ls -1 app/**/*.rb | wc -l)
-    tests_amount=$(ls -1 spec/**/*.rb | wc -l)
-
-    build_test_stats "$1" "$0" "$2" "$code_amount" "$tests_amount" "RSpec" 'TEST_ICON'
+    local -a code=(app/**/*.rb(N))
+    (( $#code )) || return
+    local tests=(spec/**/*.rb(N))
+    build_test_stats "$1" "$0" "$2" "$#code" "$#tests" "RSpec" 'TEST_ICON'
   fi
 }
 
@@ -1531,11 +1530,10 @@ prompt_swap() {
 # Symfony2-PHPUnit test ratio
 prompt_symfony2_tests() {
   if [[ -d src && -d app && -f app/AppKernel.php ]]; then
-    local code_amount tests_amount
-    code_amount=$(ls -1 src/**/*.php | grep -vc Tests)
-    tests_amount=$(ls -1 src/**/*.php | grep -c Tests)
-
-    build_test_stats "$1" "$0" "$2" "$code_amount" "$tests_amount" "SF2" 'TEST_ICON'
+    local -a all=(src/**/*.php(N))
+    local -a code=(${(@)all##*Tests*})
+    (( $#code )) || return
+    build_test_stats "$1" "$0" "$2" "$#code" "$(($#all - $#code))" "SF2" 'TEST_ICON'
   fi
 }
 
@@ -1553,11 +1551,11 @@ prompt_symfony2_version() {
 # Show a ratio of tests vs code
 build_test_stats() {
   local code_amount="$4"
-  local tests_amount="$5"+0.00001
+  local tests_amount="$5"
   local headline="$6"
 
-  # Set float precision to 2 digits:
-  local -F 2 ratio=$(( (tests_amount/code_amount) * 100 ))
+  (( code_amount > 0 )) || return
+  local -F 2 ratio=$(( 100. * tests_amount / code_amount ))
 
   (( ratio >= 75 )) && "$1_prompt_segment" "${2}_GOOD" "$3" "cyan" "$DEFAULT_COLOR" "$6" 0 '' "$headline: $ratio%%"
   (( ratio >= 50 && ratio < 75 )) && "$1_prompt_segment" "$2_AVG" "$3" "yellow" "$DEFAULT_COLOR" "$6" 0 '' "$headline: $ratio%%"
