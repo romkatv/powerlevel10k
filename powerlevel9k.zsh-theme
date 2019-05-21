@@ -999,7 +999,7 @@ prompt_go_version() {
   _p9k_cached_cmd_stdout go version || return
   emulate -L zsh && setopt extendedglob
   local -a match
-  [[ $_P9K_RETVAL == (#b)*(go[0-9.]##)* ]] || return
+  [[ $_P9K_RETVAL == (#b)*(go[[:digit:].]##)* ]] || return
   local v=$match[1]
   local p=${GOPATH:-$(go env GOPATH 2>/dev/null)}
   [[ -n $p && $PWD/ == $p/* ]] || return
@@ -1295,7 +1295,7 @@ prompt_php_version() {
   _p9k_cached_cmd_stdout php --version || return
   emulate -L zsh && setopt extendedglob
   local -a match
-  [[ $_P9K_RETVAL == (#b)(*$'\n')#(PHP [0-9.]##)* ]] || return
+  [[ $_P9K_RETVAL == (#b)(*$'\n')#(PHP [[:digit:].]##)* ]] || return
   local v=$match[2]
   "$1_prompt_segment" "$0" "$2" "fuchsia" "grey93" '' 0 '' "${v//\%/%%}"
 }
