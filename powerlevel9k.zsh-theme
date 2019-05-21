@@ -1277,7 +1277,8 @@ prompt_nvm() {
 # Segment to display NodeEnv
 prompt_nodeenv() {
   if [[ -n "$NODE_VIRTUAL_ENV" ]]; then
-    local info="$(node -v)[${NODE_VIRTUAL_ENV:t}]"
+    _p9k_cached_cmd_stdout node --version || return
+    local info="${_P9K_RETVAL}[${NODE_VIRTUAL_ENV:t}]"
     "$1_prompt_segment" "$0" "$2" "black" "green" 'NODE_ICON' 0 '' "${info//\%/%%}"
   fi
 }
