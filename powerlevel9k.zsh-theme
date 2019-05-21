@@ -403,7 +403,7 @@ prompt_background_jobs() {
 function _p9k_left_prompt_end_line() {
   _p9k_get_icon LEFT_SEGMENT_SEPARATOR
   _p9k_escape_rcurly $_P9K_RETVAL
-  _P9K_PROMPT+="%k"
+  _P9K_PROMPT+="%k%b"
   _P9K_PROMPT+="\${_P9K_N::=}"
   _P9K_PROMPT+="\${\${\${_P9K_BG:#NONE}:-\${_P9K_N:=1}}+}"
   _P9K_PROMPT+="\${\${_P9K_N:=2}+}"
