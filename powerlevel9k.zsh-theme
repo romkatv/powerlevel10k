@@ -1130,36 +1130,133 @@ prompt_load() {
   "$1_prompt_segment" "${0}_${current_state}" "$2" "${load_states[$current_state]}" "$DEFAULT_COLOR" 'LOAD_ICON' 0 '' "$load_avg"
 }
 
+function _p9k_cached_cmd_stdout() {
+  local cmd=$commands[$1]
+  [[ -n $cmd ]] || return
+  shift
+  local -H stat
+  zstat -H stat -- $cmd 2>/dev/null || return
+  if ! _p9k_cache_get "$0" "$stat[inode]" "$stat[mtime]" "$stat[size]" "$cmd" "$@"; then
+    local out
+    out=$($cmd "$@" 2>/dev/null)
+    _p9k_cache_set $(( ! $? )) "$out"
+  fi
+  (( $_P9K_CACHE_VAL[1] )) || return
+  _P9K_RETVAL=$_P9K_CACHE_VAL[2]
+}
+
 ################################################################
 # Segment to diplay Node version
 set_default P9K_NODE_VERSION_PROJECT_ONLY false
 prompt_node_version() {
-  if [ "$P9K_NODE_VERSION_PROJECT_ONLY" = true ] ; then
-    local foundProject=false # Variable to stop searching if a project is found
-    local currentDir=$(pwd)  # Variable to iterate through the path ancestry tree
+  (( $+commands[node] )) || return
 
-    # Search as long as no project could been found or until the root directory
-    # has been reached
-    while [ "$foundProject" = false -a ! "$currentDir" = "/" ] ; do
-
-      # Check if directory contains a project description
-      if [[ -e "$currentDir/package.json" ]] ; then
-        foundProject=true
-        break
-      fi
-      # Go to the parent directory
-      currentDir="$(dirname "$currentDir")"
+  if [[ $P9K_NODE_VERSION_PROJECT_ONLY == true ]] ; then
+    local dir=$PWD
+    while true; do
+      [[ $dir == / ]] && return
+      [[ -e $dir/package.json ]] && break
+      dir=${dir:h}
     done
   fi
 
-  # Show version if a project has been found, or set to always show
-  if [ "$P9K_NODE_VERSION_PROJECT_ONLY" != true -o "$foundProject" = true ] ; then
-    # Get the node version
-    local node_version=$(node -v 2>/dev/null)
+  _p9k_cached_cmd_stdout node --version && [[ $_P9K_RETVAL == v?* ]] || return
+  "$1_prompt_segment" "$0" "$2" "green" "white" 'NODE_ICON' 0 '' "${_P9K_RETVAL#v}"
+}
 
-    # Return if node is not installed
-    [[ -z "${node_version}" ]] && return
-    "$1_prompt_segment" "$0" "$2" "green" "white" 'NODE_ICON' 0 '' "${${node_version:1}//\%/%%}"
+# Almost the same as `nvm_version default` but faster. The differences shouldn't affect
+# the observable behavior of Powerlevel10k.
+function _p9k_nvm_ls_default() {
+  local v=default
+  local -a seen=($v)
+  local target
+  while [[ -r $NVM_DIR/alias/$v ]] && read target <$NVM_DIR/alias/$v; do
+    [[ -n $target && ${seen[(I)$target]} == 0 ]] || return
+    seen+=$target
+    v=$target
+  done
+
+  case $v in
+    default|N/A)
+      return 1
+    ;;
+    system|v)
+      _P9K_RETVAL=system
+      return
+    ;;
+    iojs-[0-9]*)
+      v=iojs-v${v#iojs-}
+    ;;
+    [0-9]*)
+      v=v$v
+    ;;
+  esac
+
+  if [[ $v == v*.*.* ]]; then
+    if [[ -x $NVM_DIR/versions/node/$v/bin/node || -x $NVM_DIR/$v/bin/node ]]; then
+      _P9K_RETVAL=$v
+      return
+    elif [[ -x $NVM_DIR/versions/io.js/$v/bin/node ]]; then
+      _P9K_RETVAL=iojs-$v
+      return
+    else
+      return 1
+    fi
+  fi
+
+  local -a dirs=()
+  case $v in
+    node|node-|stable)
+      dirs=($NVM_DIR/versions/node $NVM_DIR)
+      v='(v[1-9]*|v0.*[02468].*)'
+    ;;
+    unstable)
+      dirs=($NVM_DIR/versions/node $NVM_DIR)
+      v='v0.*[13579].*'
+    ;;
+    iojs*)
+      dirs=($NVM_DIR/versions/io.js)
+      v=v${${${v#iojs}#-}#v}'*'
+    ;;
+    *)
+      dirs=($NVM_DIR/versions/node $NVM_DIR $NVM_DIR/versions/io.js)
+      v=v${v#v}'*'
+    ;;
+  esac
+
+  local -a matches=(${^dirs}/${~v}(/N))
+  (( $#matches )) || return
+
+  emulate -L zsh && setopt extendedglob
+
+  local max path
+  local -a match
+  for path in ${(Oa)matches}; do
+    [[ ${path:t} == (#b)v(*).(*).(*) ]] || continue
+    v=${(j::)${(@l:6::0:)match}}
+    [[ $v > $max ]] || continue
+    max=$v
+    _P9K_RETVAL=${path:t}
+    [[ ${path:h:t} != io.js ]] || _P9K_RETVAL=iojs-$_P9K_RETVAL
+  done
+
+  [[ -n $max ]]
+}
+
+# The same as `nvm_version current` but faster.
+_p9k_nvm_ls_current() {
+  local node_path=${commands[node]:A}
+  [[ -n $node_path ]] || return
+
+  local nvm_dir=${NVM_DIR:A}
+  if [[ -n $nvm_dir && $node_path == $nvm_dir/versions/io.js/* ]]; then
+    _p9k_cached_cmd_stdout iojs --version || return
+    _P9K_RETVAL=iojs-v${_P9K_RETVAL#v}
+  elif [[ -n $nvm_dir && $node_path == $nvm_dir/* ]]; then
+    _p9k_cached_cmd_stdout node --version || return
+    _P9K_RETVAL=v${_P9K_RETVAL#v}
+  else
+    _P9K_RETVAL=system
   fi
 }
 
@@ -1167,16 +1264,10 @@ prompt_node_version() {
 # Segment to display Node version from NVM
 # Only prints the segment if different than the default value
 prompt_nvm() {
-  local node_version nvm_default
-  (( $+functions[nvm_version] )) || return
-
-  node_version=$(nvm_version current)
-  [[ -z "${node_version}" || ${node_version} == "none" ]] && return
-
-  nvm_default=$(nvm_version default)
-  [[ "$node_version" =~ "$nvm_default" ]] && return
-
-  $1_prompt_segment "$0" "$2" "magenta" "black" 'NODE_ICON' 0 '' "${${node_version:1}//\%/%%}"
+  [[ -n $NVM_DIR ]] && _p9k_nvm_ls_current || return
+  local current=$_P9K_RETVAL
+  ! _p9k_nvm_ls_default || [[ $_P9K_RETVAL != $current ]] || return
+  $1_prompt_segment "$0" "$2" "magenta" "black" 'NODE_ICON' 0 '' "${${current#v}//\%/%%}"
 }
 
 ################################################################
@@ -2405,5 +2496,6 @@ autoload -Uz add-zsh-hook
 zmodload zsh/datetime
 zmodload zsh/mathfunc
 zmodload zsh/system
+zmodload -F zsh/stat b:zstat
 
 prompt_powerlevel9k_setup "$@"
