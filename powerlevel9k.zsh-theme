@@ -1392,16 +1392,10 @@ prompt_simple_dir() {
 ################################################################
 # Segment to display Rust version number
 prompt_rust_version() {
-  local rust_version
-  rust_version=$(command rustc --version 2>/dev/null)
-  # Remove "rustc " (including the whitespace) from the beginning
-  # of the version string and remove everything after the next
-  # whitespace. This way we'll end up with only the version.
-  rust_version=${${rust_version/rustc /}%% *}
-
-  if [[ -n "$rust_version" ]]; then
-    "$1_prompt_segment" "$0" "$2" "darkorange" "$DEFAULT_COLOR" 'RUST_ICON' 0 '' "${rust_version//\%/%%}"
-  fi
+  _p9k_cached_cmd_stdout rustc --version || return
+  local v=${${_P9K_RETVAL#rustc }%% *}
+  [[ -n $v ]] || return
+  "$1_prompt_segment" "$0" "$2" "darkorange" "$DEFAULT_COLOR" 'RUST_ICON' 0 '' "${v//\%/%%}"
 }
 
 # RSpec test ratio
