@@ -1292,12 +1292,12 @@ prompt_os_icon() {
 ################################################################
 # Segment to display PHP version number
 prompt_php_version() {
-  local php_version
-  php_version=$(php -v 2>&1 | grep -oe "^PHP\s*[0-9.]*")
-
-  if [[ -n "$php_version" ]]; then
-    "$1_prompt_segment" "$0" "$2" "fuchsia" "grey93" '' 0 '' "${php_version//\%/%%}"
-  fi
+  _p9k_cached_cmd_stdout php --version || return
+  emulate -L zsh && setopt extendedglob
+  local -a match
+  [[ $_P9K_RETVAL == (#b)(*$'\n')#(PHP [0-9.]##)* ]] || return
+  local v=$match[2]
+  "$1_prompt_segment" "$0" "$2" "fuchsia" "grey93" '' 0 '' "${v//\%/%%}"
 }
 
 ################################################################
