@@ -996,11 +996,14 @@ prompt_docker_machine() {
 ################################################################
 # GO prompt
 prompt_go_version() {
-  local go_version=$(go version 2>/dev/null | sed -E "s/.*(go[0-9.]*).*/\1/")
-  local go_path=$(go env GOPATH 2>/dev/null)
-  if [[ -n "$go_version" && "${PWD##$go_path}" != "$PWD" ]]; then
-    "$1_prompt_segment" "$0" "$2" "green" "grey93" "GO_ICON" 0 '' "${go_version//\%/%%}"
-  fi
+  _p9k_cached_cmd_stdout go version || return
+  emulate -L zsh && setopt extendedglob
+  local -a match
+  [[ $_P9K_RETVAL == (#b)*(go[0-9.]##)* ]] || return
+  local v=$match[1]
+  local p=${GOPATH:-$(go env GOPATH 2>/dev/null)}
+  [[ -n $p && $PWD/ == $p/* ]] || return
+  "$1_prompt_segment" "$0" "$2" "green" "grey93" "GO_ICON" 0 '' "${v//\%/%%}"
 }
 
 ################################################################
