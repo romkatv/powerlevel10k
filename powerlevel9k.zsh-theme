@@ -105,9 +105,6 @@ typeset -g _P9K_F
 # with data.
 set_default -i POWERLEVEL9K_MAX_CACHE_SIZE 10000
 
-# Note: Several performance-critical functions return results to the caller via global
-# variabls rather than stdout. This is faster.
-
 # Caching allows storing array-to-array associations. It should be used like this:
 #
 #   if ! _p9k_cache_get "$key1" "$key2"; then
@@ -125,15 +122,15 @@ set_default -i POWERLEVEL9K_MAX_CACHE_SIZE 10000
 _p9k_cache_set() {
   # Uncomment to see cache misses.
   # echo "caching: ${(@0q)_P9K_CACHE_KEY} => (${(q)@})" >&2
-  _P9K_CACHE[$_P9K_CACHE_KEY]="${(pj:\0:)*}"
+  _P9K_CACHE[$_P9K_CACHE_KEY]="${(pj:\0:)*}0"
   _P9K_CACHE_VAL=("$@")
-  (( #_P9K_CACHE < POWERLEVEL9K_MAX_CACHE_SIZE )) || typeset -gAH _P9K_CACHE=()
+  (( $#_P9K_CACHE < POWERLEVEL9K_MAX_CACHE_SIZE )) || typeset -gAH _P9K_CACHE=()
 }
 
 _p9k_cache_get() {
   _P9K_CACHE_KEY="${(pj:\0:)*}"
-  _P9K_CACHE_VAL=("${(@0)${_P9K_CACHE[$_P9K_CACHE_KEY]}}")
-  (( #_P9K_CACHE_VAL ))
+  local v=$_P9K_CACHE[$_P9K_CACHE_KEY]
+  [[ -n $v ]] && _P9K_CACHE_VAL=("${(@0)${v[1,-2]}}")
 }
 
 # Sets _P9K_RETVAL to the icon whose name is supplied via $1.
@@ -1923,7 +1920,7 @@ prompt_vcs() {
     _p9k_vcs_render $0 $1 $2 && return
     backends=(${backends:#git})
   fi
-  if (( #backends )); then
+  if (( $#backends )); then
     VCS_WORKDIR_DIRTY=false
     VCS_WORKDIR_HALF_DIRTY=false
     local current_state=""
@@ -2048,11 +2045,24 @@ prompt_dir_writable() {
 # Kubernetes Current Context/Namespace
 prompt_kubecontext() {
   (( $+commands[kubectl] )) || return
-  local ctx=$(command kubectl config view -o=jsonpath='{.current-context}')
-  [[ -n $ctx ]] || return
-  local ns="${$(command kubectl config view -o=jsonpath="{.contexts[?(@.name==\"$ctx\")].context.namespace}"):-default}"
-  [[ $ctx == $ns ]] || ctx+="/$ns"
-  "$1_prompt_segment" "$0" "$2" "magenta" "white" "KUBERNETES_ICON" 0 '' "${ctx//\%/%%}"
+  local cfg
+  local -a key
+  for cfg in ${(s.:.)${KUBECONFIG:-$HOME/.kube/config}}; do
+    local -H stat
+    zstat -H stat -- $cfg 2>/dev/null || continue
+    key+=($cfg $stat[inode] $stat[mtime] $stat[size] $stat[mode])
+  done
+  if ! _p9k_cache_get $0 "${key[@]}"; then
+    local ctx=$(command kubectl config view -o=jsonpath='{.current-context}')
+    if [[ -n $ctx ]]; then
+      local p="{.contexts[?(@.name==\"$ctx\")].context.namespace}"
+      local ns="${$(command kubectl config view -o=jsonpath=$p):-default}"
+      [[ $ctx == $ns ]] || ctx+="/$ns"
+    fi
+    _p9k_cache_set "$ctx"
+  fi
+  [[ -n $_P9K_CACHE_VAL[1] ]] || return
+  $1_prompt_segment $0 $2 magenta white KUBERNETES_ICON 0 '' "${_P9K_CACHE_VAL[1]//\%/%%}"
 }
 
 ################################################################
