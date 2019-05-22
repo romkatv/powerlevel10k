@@ -2074,8 +2074,9 @@ prompt_kubecontext() {
 ################################################################
 # Dropbox status
 prompt_dropbox() {
+  (( $+commands[dropbox-cli] )) || return
   # The first column is just the directory, so cut it
-  local dropbox_status="$(dropbox-cli filestatus . | cut -d\  -f2-)"
+  local dropbox_status="$(command dropbox-cli filestatus . | cut -d\  -f2-)"
 
   # Only show if the folder is tracked and dropbox is running
   if [[ "$dropbox_status" != 'unwatched' && "$dropbox_status" != "isn't running!" ]]; then
