@@ -428,41 +428,24 @@ set_default POWERLEVEL9K_DISK_USAGE_ONLY_WARNING false
 set_default -i POWERLEVEL9K_DISK_USAGE_WARNING_LEVEL 90
 set_default -i POWERLEVEL9K_DISK_USAGE_CRITICAL_LEVEL 95
 prompt_disk_usage() {
-  local current_state="unknown"
-  typeset -AH hdd_usage_forecolors
-  hdd_usage_forecolors=(
-    'normal'        'yellow'
-    'warning'       "$DEFAULT_COLOR"
-    'critical'      'white'
-  )
-  typeset -AH hdd_usage_backcolors
-  hdd_usage_backcolors=(
-    'normal'        $DEFAULT_COLOR
-    'warning'       'yellow'
-    'critical'      'red'
-  )
-
-  local disk_usage="${$(\df -P . | sed -n '2p' | awk '{ print $5 }')%%\%}"
-
-  if [ "$disk_usage" -ge "$POWERLEVEL9K_DISK_USAGE_WARNING_LEVEL" ]; then
-    current_state='warning'
-    if [ "$disk_usage" -ge "$POWERLEVEL9K_DISK_USAGE_CRITICAL_LEVEL" ]; then
-        current_state='critical'
-    fi
+  (( $+commands[df] )) || return
+  local disk_usage=${${=${(f)"$(command df -P .)"}[2]}[5]%%%}
+  local state bg fg
+  if (( disk_usage >= POWERLEVEL9K_DISK_USAGE_CRITICAL_LEVEL )); then
+    state=critical
+    bg=red
+    fg=white
+  elif (( disk_usage >= POWERLEVEL9K_DISK_USAGE_WARNING_LEVEL )); then
+    state=warning
+    bg=yellow
+    fg=$DEFAULT_COLOR
   else
-    if [[ "$POWERLEVEL9K_DISK_USAGE_ONLY_WARNING" == true ]]; then
-        current_state=''
-        return
-    fi
-    current_state='normal'
+    [[ "$POWERLEVEL9K_DISK_USAGE_ONLY_WARNING" == true ]] && return
+    state=normal
+    bg=$DEFAULT_COLOR
+    fg=yellow
   fi
-
-  local message="${disk_usage}%%"
-
-  # Draw the prompt_segment
-  if [[ -n $disk_usage ]]; then
-    "$1_prompt_segment" "${0}_${current_state}" "$2" "${hdd_usage_backcolors[$current_state]}" "${hdd_usage_forecolors[$current_state]}" 'DISK_ICON' 0 '' "$message"
-  fi
+  $1_prompt_segment $0_$state $2 $bg $fg DISK_ICON 0 '' "$disk_usage%%"
 }
 
 ################################################################
