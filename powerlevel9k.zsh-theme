@@ -1139,7 +1139,7 @@ function _p9k_cached_cmd_stdout() {
   shift
   local -H stat
   zstat -H stat -- $cmd 2>/dev/null || return
-  if ! _p9k_cache_get "$0" "$stat[inode]" "$stat[mtime]" "$stat[size]" "$cmd" "$@"; then
+  if ! _p9k_cache_get $0 $stat[inode] $stat[mtime] $stat[size] $stat[mode] $cmd "$@"; then
     local out
     out=$($cmd "$@" 2>/dev/null)
     _p9k_cache_set $(( ! $? )) "$out"
@@ -1581,12 +1581,36 @@ prompt_date() {
 ################################################################
 # todo.sh: shows the number of tasks in your todo.sh file
 prompt_todo() {
-  if $(hash todo.sh 2>&-); then
-    count=$(todo.sh ls | egrep "TODO: [0-9]+ of ([0-9]+) tasks shown" | awk '{ print $4 }')
-    if [[ "$count" = <-> ]]; then
-      "$1_prompt_segment" "$0" "$2" "grey50" "$DEFAULT_COLOR" 'TODO_ICON' 0 '' "${count//\%/%%}"
+  #emulate -L zsh && setopt xtrace
+  local todo=$commands[todo.sh]
+  [[ -n $todo ]] || return
+  if (( ! $+_P9K_TODO_FILE )); then
+    # There is a bug in todo.sh where it uses $0 instead of ${BASH_SOURCE[0]}. We work around
+    # it by overriding `dirname`, to which $0 is passed as an argument.
+    local script="
+      function dirname() {
+        local f=\$1
+        [[ \"\$f\" == bash ]] && f=${(Q)commands[todo.sh]}
+        command dirname \"\$f\"
+      }
+      source todo.sh shorthelp &>/dev/null
+      echo \"\$TODO_FILE\""
+    typeset -g _P9K_TODO_FILE=$(bash -c $script)
+  fi
+  [[ -r $_P9K_TODO_FILE ]] || return
+  local -H stat
+  zstat -H stat -- $_P9K_TODO_FILE 2>/dev/null || return
+  if ! _p9k_cache_get $0 $stat[inode] $stat[mtime] $stat[size]; then
+    local count=$($todo -p ls | command tail -1)
+    emulate -L zsh && setopt extendedglob
+    if [[ $count == (#b)'TODO: '[[:digit:]]##' of '([[:digit:]]##)' '* ]]; then
+      _p9k_cache_set 1 $match[1]
+    else
+      _p9k_cache_set 0 0
     fi
   fi
+  (( $_P9K_CACHE_VAL[1] )) || return
+  "$1_prompt_segment" "$0" "$2" "grey50" "$DEFAULT_COLOR" 'TODO_ICON' 0 '' "${_P9K_CACHE_VAL[2]}"
 }
 
 ################################################################
