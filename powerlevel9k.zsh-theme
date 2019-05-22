@@ -2039,11 +2039,10 @@ prompt_openfoam() {
 ################################################################
 # Segment to display Swift version
 prompt_swift_version() {
-  # Get the first number as this is probably the "main" version number..
-  local swift_version=$(swift --version 2>/dev/null | grep -o -E "[0-9.]+" | head -n 1)
-  [[ -z "${swift_version}" ]] && return
-
-  "$1_prompt_segment" "$0" "$2" "magenta" "white" 'SWIFT_ICON' 0 '' "${swift_version//\%/%%}"
+  _p9k_cached_cmd_stdout swift --version || return
+  emulate -L zsh && setopt extendedglob
+  [[ $_P9K_RETVAL == (#b)[^[:digit:]]#([[:digit:].]##)* ]] || return
+  "$1_prompt_segment" "$0" "$2" "magenta" "white" 'SWIFT_ICON' 0 '' "${match[1]//\%/%%}"
 }
 
 ################################################################
