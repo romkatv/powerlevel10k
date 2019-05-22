@@ -456,115 +456,112 @@ set_default -a POWERLEVEL9K_BATTERY_LEVEL_BACKGROUND
 set_default    POWERLEVEL9K_BATTERY_VERBOSE true
 typeset     -g POWERLEVEL9K_BATTERY_STAGES
 
+typeset -gA _P9K_BATTERY_STATES=(
+  'low'           'red'
+  'charging'      'yellow'
+  'charged'       'green'
+  'disconnected'  "$DEFAULT_COLOR_INVERTED"
+)
+
+function _p9k_read_file() {
+  _P9K_RETVAL=''
+  [[ -n $1 ]] && read -r _P9K_RETVAL <$1
+  [[ -n $_P9K_RETVAL ]]
+}
+
 prompt_battery() {
-  # The battery can have four different states - default to 'unknown'.
-  local current_state='unknown'
-  typeset -AH battery_states
-  battery_states=(
-    'low'           'red'
-    'charging'      'yellow'
-    'charged'       'green'
-    'disconnected'  "$DEFAULT_COLOR_INVERTED"
-  )
-  local ROOT_PREFIX="${4}"
+  local state remain
+  local -i bat_percent
 
-  if [[ $OS =~ OSX && -f "${ROOT_PREFIX}"/usr/bin/pmset && -x "${ROOT_PREFIX}"/usr/bin/pmset ]]; then
-    # obtain battery information from system
-    local raw_data="$(${ROOT_PREFIX}/usr/bin/pmset -g batt | awk 'FNR==2{print}')"
-    # return if there is no battery on system
-    [[ -z $(echo $raw_data | grep "InternalBattery") ]] && return
+  case $OS in
+    OSX)
+      (( $+commands[pmset] )) || return
+      local raw_data=${${(f)$(command pmset -g batt)}[2]}
+      [[ $raw_data == *InternalBattery* ]] || return
+      remain=${${(s: :)${${(s:; :)raw_data}[3]}}[1]}
+      [[ $remain == *no* ]] && remain="..."
+      [[ $raw_data =~ '([0-9]+)%' ]] && bat_percent=$match[1]
 
-    # Time remaining on battery operation (charging/discharging)
-    local tstring=$(echo $raw_data | awk -F ';' '{print $3}' | awk '{print $1}')
-    # If time has not been calculated by system yet
-    [[ $tstring =~ '(\(no|not)' ]] && tstring="..."
-
-    # percent of battery charged
-    typeset -i 10 bat_percent
-    bat_percent=$(echo $raw_data | grep -o '[0-9]*%' | sed 's/%//')
-
-    local remain=""
-    # Logic for string output
-    case $(echo $raw_data | awk -F ';' '{print $2}' | awk '{$1=$1};1') in
-      # for a short time after attaching power, status will be 'AC attached;'
-      'charging'|'finishing charge'|'AC attached')
-        current_state="charging"
-        remain=" ($tstring)"
+      case "${${(s:; :)raw_data}[2]}" in
+        'charging'|'finishing charge'|'AC attached')
+          state=charging
         ;;
-      'discharging')
-        [[ $bat_percent -lt $POWERLEVEL9K_BATTERY_LOW_THRESHOLD ]] && current_state="low" || current_state="disconnected"
-        remain=" ($tstring)"
+        'discharging')
+          (( bat_percent < POWERLEVEL9K_BATTERY_LOW_THRESHOLD )) && state=low || state=disconnected
         ;;
-      *)
-        current_state="charged"
+        *)
+          state=charged
+          remain=''
         ;;
-    esac
-  fi
+      esac
+    ;;
 
-  if [[ "$OS" == 'Linux' ]] || [[ "$OS" == 'Android' ]]; then
-    local sysp="${ROOT_PREFIX}/sys/class/power_supply"
+    Linux|Android)
+      local -a bats=( /sys/class/power_supply/(BAT*|battery)(FN) )
+      (( $#bats )) || return
 
-    # Reported BAT0 or BAT1 depending on kernel version
-    [[ -a $sysp/BAT0 ]] && local bat=$sysp/BAT0
-    [[ -a $sysp/BAT1 ]] && local bat=$sysp/BAT1
+      local -i energy_now energy_full power_now 
+      local -i is_full=1 is_calculating is_charching
+      local dir
+      for dir in $bats; do
+        local -i pow=0
+        _p9k_read_file $dir/(energy|charge)_now(N)  && (( energy_now+=_P9K_RETVAL ))
+        _p9k_read_file $dir/(energy|charge)_full(N) && (( energy_full+=_P9K_RETVAL ))
+        _p9k_read_file $dir/(power|current)_now(N)  && (( power_now+=${pow::=$_P9K_RETVAL} ))
+        _p9k_read_file $dir/status(N) && local bat_status=$_P9K_RETVAL || continue
+        [[ $bat_status != Full                                ]] && is_full=0
+        [[ $bat_status == Charging                            ]] && is_charching=1
+        [[ $bat_status == (Charging|Discharging) && $pow == 0 ]] && is_calculating=1
+      done
 
-    # Android-related
-    # Tested on: Moto G falcon (CM 13.0)
-    [[ -a $sysp/battery ]] && local bat=$sysp/battery
-
-    # Return if no battery found
-    [[ -z $bat ]] && return
-    local capacity=$(cat $bat/capacity)
-    local battery_status=$(cat $bat/status)
-    [[ $capacity -gt 100 ]] && local bat_percent=100 || local bat_percent=$capacity
-    [[ $battery_status =~ Charging || $battery_status =~ Full ]] && local connected=true
-    if [[ -z  $connected ]]; then
-      [[ $bat_percent -lt $POWERLEVEL9K_BATTERY_LOW_THRESHOLD ]] && current_state="low" || current_state="disconnected"
-    else
-      [[ $bat_percent =~ 100 ]] && current_state="charged"
-      [[ $bat_percent -lt 100 ]] && current_state="charging"
-    fi
-    if [[ -f ${ROOT_PREFIX}/usr/bin/acpi ]]; then
-      local time_remaining=$(${ROOT_PREFIX}/usr/bin/acpi | awk '{ print $5 }')
-      if [[ $time_remaining =~ rate ]]; then
-        local tstring="..."
-      elif [[ $time_remaining =~ "[[:digit:]]+" ]]; then
-        local tstring=${(f)$(date -u -d "$(echo $time_remaining)" +%k:%M 2> /dev/null)}
+      if (( energy_full )); then
+        bat_percent=$(( 100 * energy_now / energy_full ))
+        (( bat_percent > 100 )) && bat_percent=100
       fi
+
+      if (( is_full || bat_percent == 100 )); then
+        state=charged
+      else
+        if (( is_charching )); then
+          state=charging
+        elif (( bat_percent < POWERLEVEL9K_BATTERY_LOW_THRESHOLD )); then
+          state=low
+        else
+          state=disconnected
+        fi
+
+        if (( power_now > 0 )); then
+          (( is_charching )) && local -i e=$((energy_full - energy_now)) || local -i e=energy_now
+          local -i minutes=$(( 60 * e / power_now ))
+          (( minutes > 0 )) && remain=$((minutes/60)):${(l#2##0#)$((minutes%60))}
+        elif (( is_calculating )); then
+          remain="..."
+        fi
+      fi
+    ;;
+
+    *)
+      return
+    ;;
+  esac
+
+  (( bat_percent >= POWERLEVEL9K_BATTERY_HIDE_ABOVE_THRESHOLD )) && return
+
+  local msg="$bat_percent%%"
+  [[ $POWERLEVEL9K_BATTERY_VERBOSE == true && -n $remain ]] && msg+=" ($remain)"
+
+  local icon=BATTERY_ICON bg=$DEFAULT_COLOR
+  if (( $#POWERLEVEL9K_BATTERY_STAGES || $#POWERLEVEL9K_BATTERY_LEVEL_BACKGROUND )); then
+    local -i idx=$#POWERLEVEL9K_BATTERY_STAGES
+    (( bat_percent < 100 )) && idx=$((bat_percent * $#POWERLEVEL9K_BATTERY_STAGES / 100 + 1))
+    if (( $#POWERLEVEL9K_BATTERY_STAGES )); then
+      icon+=_$idx
+      typeset -g POWERLEVEL9K_$icon=$POWERLEVEL9K_BATTERY_STAGES[idx]
     fi
-    [[ -n $tstring ]] && local remain=" ($tstring)"
+    (( $#POWERLEVEL9K_BATTERY_LEVEL_BACKGROUND )) && bg=$POWERLEVEL9K_BATTERY_LEVEL_BACKGROUND[idx]
   fi
 
-  local message
-  if [[ "$POWERLEVEL9K_BATTERY_VERBOSE" == true ]]; then
-    message="$bat_percent%%$remain"
-  else
-    message="$bat_percent%%"
-  fi
-
-  # override default icon if we are using battery stages
-  if [[ -n "$POWERLEVEL9K_BATTERY_STAGES" ]]; then
-    local segment=$(( 100.0 / (${#POWERLEVEL9K_BATTERY_STAGES} - 1 ) ))
-    if [[ $segment > 1 ]]; then
-      local offset=$(( ($bat_percent / $segment) + 1 ))
-      # check if the stages are in an array or a string
-      [[ "${(t)POWERLEVEL9K_BATTERY_STAGES}" =~ "array" ]] && POWERLEVEL9K_BATTERY_ICON="$POWERLEVEL9K_BATTERY_STAGES[$offset]" || POWERLEVEL9K_BATTERY_ICON=${POWERLEVEL9K_BATTERY_STAGES:$offset:1}
-    fi
-  fi
-  # return if POWERLEVEL9K_BATTERY_HIDE_ABOVE_THRESHOLD is set and the battery percentage is greater or equal
-  if (( bat_percent >= POWERLEVEL9K_BATTERY_HIDE_ABOVE_THRESHOLD )); then
-    return
-  fi
-
-  # override the default color if we are using a color level array
-  if (( #POWERLEVEL9K_BATTERY_LEVEL_BACKGROUND )); then
-    local segment=$(( 100.0 / (${#POWERLEVEL9K_BATTERY_LEVEL_BACKGROUND} - 1 ) ))
-    local offset=$(( ($bat_percent / $segment) + 1 ))
-    "$1_prompt_segment" "$0_${current_state}" "$2" "${POWERLEVEL9K_BATTERY_LEVEL_BACKGROUND[$offset]}" "${battery_states[$current_state]}" "BATTERY_ICON" 0 '' "${message}"
-  else
-    # Draw the prompt_segment
-    "$1_prompt_segment" "$0_${current_state}" "$2" "${DEFAULT_COLOR}" "${battery_states[$current_state]}" "BATTERY_ICON" 0 '' "${message}"
-  fi
+  $1_prompt_segment $0_$state $2 "$bg" "$_P9K_BATTERY_STATES[$state]" $icon 0 '' $msg
 }
 
 ################################################################
