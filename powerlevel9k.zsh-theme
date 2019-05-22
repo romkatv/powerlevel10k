@@ -1301,20 +1301,47 @@ prompt_ram() {
   "$1_prompt_segment" "$0" "$2" "yellow" "$DEFAULT_COLOR" 'RAM_ICON' 0 '' "$(printSizeHumanReadable "$ramfree" $base)"
 }
 
+function _p9k_read_rbenv_version_file() {
+  [[ -r $1 ]] || return
+  local content
+  read -r content <$1 2>/dev/null
+  _P9K_RETVAL="${${(A)=content}[1]}"
+  [[ -n $_P9K_RETVAL ]]
+}
+
+function _p9k_rbenv_global_version() {
+  _p9k_read_rbenv_version_file ${RBENV_ROOT:-$HOME/.rbenv}/version || _P9K_RETVAL=system
+}
+
 ################################################################
 # Segment to display rbenv information
 # https://github.com/rbenv/rbenv#choosing-the-ruby-version
 set_default POWERLEVEL9K_RBENV_PROMPT_ALWAYS_SHOW false
 prompt_rbenv() {
-  if [[ -n "$RBENV_VERSION" ]]; then
-    "$1_prompt_segment" "$0" "$2" "red" "$DEFAULT_COLOR" 'RUBY_ICON' 0 '' "$RBENV_VERSION"
-  elif [ $commands[rbenv] ]; then
-    local rbenv_version_name="$(rbenv version-name)"
-    local rbenv_global="$(rbenv global)"
-    if [[ "${rbenv_version_name}" != "${rbenv_global}" || "${POWERLEVEL9K_RBENV_PROMPT_ALWAYS_SHOW}" == "true" ]]; then
-      "$1_prompt_segment" "$0" "$2" "red" "$DEFAULT_COLOR" 'RUBY_ICON' 0 '' "${rbenv_version_name//\%/%%}"
-    fi
+  local v=$RBENV_VERSION
+  if [[ -z $v ]]; then
+    [[ $RBENV_DIR == /* ]] && local dir=$RBENV_DIR || local dir="$PWD/$RBENV_DIR"
+    while true; do
+      if _p9k_read_rbenv_version_file $dir/.ruby-version; then
+        v=$_P9K_RETVAL
+        break
+      fi
+      if [[ $dir == / ]]; then
+        [[ $POWERLEVEL9K_RBENV_PROMPT_ALWAYS_SHOW == true ]] || return
+        _p9k_rbenv_global_version
+        v=$_P9K_RETVAL
+        break
+      fi
+      dir=${dir:h}
+    done
   fi
+
+  if [[ $POWERLEVEL9K_RBENV_PROMPT_ALWAYS_SHOW == false ]]; then
+    _p9k_rbenv_global_version
+    [[ $v == $_P9K_RETVAL ]] && return
+  fi
+
+  "$1_prompt_segment" "$0" "$2" "red" "$DEFAULT_COLOR" 'RUBY_ICON' 0 '' "${v//\%/%%}"
 }
 
 ################################################################
