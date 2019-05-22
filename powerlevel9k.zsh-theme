@@ -2090,17 +2090,11 @@ prompt_dropbox() {
 
 # print Java version number
 prompt_java_version() {
-  local java_version
-  # Stupid: Java prints its version on STDERR.
-  # The first version ouput will print nothing, we just
-  # use it to transport whether the command was successful.
-  # If yes, we parse the version string (and need to
-  # redirect the stderr to stdout to make the pipe work).
-  java_version=$(java -version 2>/dev/null && java -fullversion 2>&1 | cut -d '"' -f 2)
-
-  if [[ -n "$java_version" ]]; then
-    "$1_prompt_segment" "$0" "$2" "red" "white" "JAVA_ICON" 0 '' "${java_version//\%/%%}"
-  fi
+  (( $+commands[java] )) || return
+  local v && v=$(java -fullversion 2>&1) || return
+  v=${${v#*\"}%\"*}
+  [[ -n $v ]] || return
+  "$1_prompt_segment" "$0" "$2" "red" "white" "JAVA_ICON" 0 '' "${v//\%/%%}"
 }
 
 ################################################################
