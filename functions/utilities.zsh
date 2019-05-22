@@ -92,7 +92,7 @@ function _p9k_parse_ip() {
       if [[ "${interface//${newline}/}" =~ "<([^>]*)>(.*)inet[ ]+([^ ]*)" ]]; then
         local ipFound="${match[3]}"
         local -a interfaceStates=(${(s:,:)match[1]})
-        if (( "${interfaceStates[(I)UP]}" )); then
+        if (( ${interfaceStates[(I)UP]} )); then
           _P9K_RETVAL=$ipFound
           return
         fi
