@@ -376,7 +376,7 @@ prompt_aws() {
 # Current Elastic Beanstalk environment
 prompt_aws_eb_env() {
   [[ -r .elasticbeanstalk/config.yml ]] || return
-  local v=${=$(grep environment .elasticbeanstalk/config.yml 2>/dev/null)[2]}
+  local v=${=$(command grep environment .elasticbeanstalk/config.yml 2>/dev/null)[2]}
   [[ -n $v ]] && "$1_prompt_segment" "$0" "$2" black green 'AWS_EB_ICON' 0 '' "${v//\%/%%}"
 }
 
@@ -429,7 +429,7 @@ set_default -i POWERLEVEL9K_DISK_USAGE_WARNING_LEVEL 90
 set_default -i POWERLEVEL9K_DISK_USAGE_CRITICAL_LEVEL 95
 prompt_disk_usage() {
   (( $+commands[df] )) || return
-  local disk_usage=${${=${(f)"$(command df -P .)"}[2]}[5]%%%}
+  local disk_usage=${${=${(f)"$(command df -P . 2>/dev/null)"}[2]}[5]%%%}
   local state bg fg
   if (( disk_usage >= POWERLEVEL9K_DISK_USAGE_CRITICAL_LEVEL )); then
     state=critical
@@ -476,7 +476,7 @@ prompt_battery() {
   case $OS in
     OSX)
       (( $+commands[pmset] )) || return
-      local raw_data=${${(f)$(command pmset -g batt)}[2]}
+      local raw_data=${${(f)$(command pmset -g batt 2>/dev/null)}[2]}
       [[ $raw_data == *InternalBattery* ]] || return
       remain=${${(s: :)${${(s:; :)raw_data}[3]}}[1]}
       [[ $remain == *no* ]] && remain="..."
@@ -991,13 +991,11 @@ prompt_history() {
 ################################################################
 # Detection for virtualization (systemd based systems only)
 prompt_detect_virt() {
-  local virt=$(systemd-detect-virt 2> /dev/null)
+  (( $+commands[systemd-detect-virt] )) || return
+  local virt=$(command systemd-detect-virt 2>/dev/null)
   if [[ "$virt" == "none" ]]; then
-    if [[ "$(ls -di / | grep -o 2)" != "2" ]]; then
-      virt="chroot"
-    fi
+    [[ "$(command ls -di /)" != "2 /" ]] && virt="chroot"
   fi
-
   if [[ -n "${virt}" ]]; then
     "$1_prompt_segment" "$0" "$2" "$DEFAULT_COLOR" "yellow" '' 0 '' "${virt//\%/%%}"
   fi
@@ -1066,7 +1064,7 @@ prompt_load() {
   case $OS in
     OSX|BSD)
       (( $+commands[sysctl] )) || return
-      load=$(sysctl -n vm.loadavg) || return
+      load=$(command sysctl -n vm.loadavg 2>/dev/null) || return
       load=${${(A)=load}[bucket+1]//,/.}
     ;;
     *)
@@ -1077,9 +1075,9 @@ prompt_load() {
 
   if (( ! $+_P9K_NUM_CPUS )); then
     case $OS in
-      OSX) (( $+commands[sysctl] )) && _P9K_NUM_CPUS=$(sysctl -n hw.logicalcpu) || return;;
-      BSD) (( $+commands[sysctl] )) && _P9K_NUM_CPUS=$(sysctl -n hw.ncpu) || return;;
-      *) (( $+commands[nproc] )) && _P9K_NUM_CPUS=$(nproc) || return;;
+      OSX) (( $+commands[sysctl] )) && _P9K_NUM_CPUS=$(command sysctl -n hw.logicalcpu 2>/dev/null) || return;;
+      BSD) (( $+commands[sysctl] )) && _P9K_NUM_CPUS=$(command sysctl -n hw.ncpu 2>/dev/null) || return;;
+      *)   (( $+commands[nproc]  )) && _P9K_NUM_CPUS=$(command nproc 2>/dev/null) || return;;
     esac
   fi
 
@@ -1498,7 +1496,7 @@ prompt_swap() {
 
   if [[ "$OS" == "OSX" ]]; then
     (( $+commands[sysctl] )) || return
-    [[ "$(sysctl vm.swapusage)" =~ "used = ([0-9,.]+)([A-Z]+)" ]] || return
+    [[ "$(command sysctl vm.swapusage 2>/dev/null)" =~ "used = ([0-9,.]+)([A-Z]+)" ]] || return
     used_bytes=${match[1]//,/.}
     case ${match[2]} in
       K) (( used_bytes *= 1024 ));;
@@ -1508,7 +1506,7 @@ prompt_swap() {
       *) return;;
     esac
   else
-    local meminfo && meminfo=$(command grep -F 'Swap' /proc/meminfo) || return
+    local meminfo && meminfo=$(command grep -F 'Swap' /proc/meminfo 2>/dev/null) || return
     [[ $meminfo =~ 'SwapTotal:[[:space:]]+([0-9]+)' ]] || return
     (( used_bytes+=match[1] ))
     [[ $meminfo =~ 'SwapFree:[[:space:]]+([0-9]+)' ]] || return
@@ -1575,7 +1573,6 @@ prompt_date() {
 ################################################################
 # todo.sh: shows the number of tasks in your todo.sh file
 prompt_todo() {
-  #emulate -L zsh && setopt xtrace
   local todo=$commands[todo.sh]
   [[ -n $todo ]] || return
   if (( ! $+_P9K_TODO_FILE )); then
