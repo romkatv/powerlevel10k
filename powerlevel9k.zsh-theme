@@ -1055,58 +1055,43 @@ prompt_laravel_version() {
 # Segment to display load
 set_default -i POWERLEVEL9K_LOAD_WHICH 5
 prompt_load() {
-  local ROOT_PREFIX="${4}"
-  # The load segment can have three different states
-  local current_state="unknown"
-  local load_select=2
-  local load_avg
-  local cores
-
-  typeset -AH load_states
-  load_states=(
-    'critical'      'red'
-    'warning'       'yellow'
-    'normal'        'green'
-  )
-
-  case "$POWERLEVEL9K_LOAD_WHICH" in
-    1)
-      load_select=1
-      ;;
-    5)
-      load_select=2
-      ;;
-    15)
-      load_select=3
-      ;;
+  local bucket=2
+  case $POWERLEVEL9K_LOAD_WHICH in
+    1) bucket=1;;
+    5) bucket=2;;
+    15) bucket=3;;
   esac
 
-  case "$OS" in
+  local load
+  case $OS in
     OSX|BSD)
-      load_avg=$(sysctl vm.loadavg | grep -o -E '[0-9]+(\.|,)[0-9]+' | sed -n ${load_select}p)
-      if [[ "$OS" == "OSX" ]]; then
-        cores=$(sysctl -n hw.logicalcpu)
-      else
-        cores=$(sysctl -n hw.ncpu)
-      fi
-      ;;
+      (( $+commands[sysctl] )) || return
+      load=$(sysctl -n vm.loadavg) || return
+      load=${${(A)=load}[bucket+1]//,/.}
+    ;;
     *)
-      load_avg=$(cut -d" " -f${load_select} ${ROOT_PREFIX}/proc/loadavg)
-      cores=$(nproc)
+      _p9k_read_file /proc/loadavg || return
+      load=${${(A)=_P9K_RETVAL}[bucket]//,/.}
+    ;;
   esac
 
-  # Replace comma
-  load_avg=${load_avg//,/.}
-
-  if [[ "$load_avg" -gt $((${cores} * 0.7)) ]]; then
-    current_state="critical"
-  elif [[ "$load_avg" -gt $((${cores} * 0.5)) ]]; then
-    current_state="warning"
-  else
-    current_state="normal"
+  if (( ! $+_P9K_NUM_CPUS )); then
+    case $OS in
+      OSX) (( $+commands[sysctl] )) && _P9K_NUM_CPUS=$(sysctl -n hw.logicalcpu) || return;;
+      BSD) (( $+commands[sysctl] )) && _P9K_NUM_CPUS=$(sysctl -n hw.ncpu) || return;;
+      *) (( $+commands[nproc] )) && _P9K_NUM_CPUS=$(nproc) || return;;
+    esac
   fi
 
-  "$1_prompt_segment" "${0}_${current_state}" "$2" "${load_states[$current_state]}" "$DEFAULT_COLOR" 'LOAD_ICON' 0 '' "$load_avg"
+  if (( load > 0.7 * _P9K_NUM_CPUS )); then
+    local state=critical bg=red
+  elif (( load > 0.5 * _P9K_NUM_CPUS )); then
+    local state=warning bg=yellow
+  else
+    local state=normal bg=green
+  fi
+
+  $1_prompt_segment $0_$state $2 $bg "$DEFAULT_COLOR" LOAD_ICON 0 '' $load
 }
 
 function _p9k_cached_cmd_stdout() {
