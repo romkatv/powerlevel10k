@@ -377,11 +377,9 @@ prompt_aws() {
 ################################################################
 # Current Elastic Beanstalk environment
 prompt_aws_eb_env() {
-  # TODO(roman): This is clearly broken. Fix it.
-  local eb_env=$(grep environment .elasticbeanstalk/config.yml 2> /dev/null | awk '{print $2}')
-  if [[ -n "$eb_env" ]]; then
-    "$1_prompt_segment" "$0" "$2" black green 'AWS_EB_ICON' 0 '' "${eb_env//\%/%%}"
-  fi
+  [[ -r .elasticbeanstalk/config.yml ]] || return
+  local v=${=$(grep environment .elasticbeanstalk/config.yml 2>/dev/null)[2]}
+  [[ -n $v ]] && "$1_prompt_segment" "$0" "$2" black green 'AWS_EB_ICON' 0 '' "${v//\%/%%}"
 }
 
 ################################################################
