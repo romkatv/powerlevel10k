@@ -45,34 +45,18 @@ function _p9k_g_expand() {
   typeset -g $1=${(g::)${(P)1}}
 }
 
-# Converts large memory values into a human-readable unit (e.g., bytes --> GB)
-# Takes two arguments:
-#   * $size - The number which should be prettified
-#   * $base - The base of the number (default Bytes)
-printSizeHumanReadable() {
-  typeset -F 2 size
-  size="$1"+0.00001
-  local extension
-  extension=('B' 'K' 'M' 'G' 'T' 'P' 'E' 'Z' 'Y')
-  local index=1
+typeset -g _P9K_BYTE_SUFFIX=('B' 'K' 'M' 'G' 'T' 'P' 'E' 'Z' 'Y')
 
-  # if the base is not Bytes
-  if [[ -n $2 ]]; then
-    local idx
-    for idx in "${extension[@]}"; do
-      if [[ "$2" == "$idx" ]]; then
-        break
-      fi
-      index=$(( index + 1 ))
-    done
-  fi
-
-  while (( (size / 1024) > 0.1 )); do
-    size=$(( size / 1024 ))
-    index=$(( index + 1 ))
+# 42 => 42B
+# 1536 => 1.5K
+function _p9k_human_readable_bytes() {
+  typeset -F 2 n=$1
+  local suf
+  for suf in $_P9K_BYTE_SUFFIX; do
+    (( n < 100 )) && break
+    (( n /= 1024 ))
   done
-
-  echo "$size${extension[$index]}"
+  _P9K_RETVAL=$n$suf
 }
 
 # Determine if the passed segment is used in the prompt

@@ -1279,26 +1279,30 @@ prompt_php_version() {
 ################################################################
 # Segment to display free RAM and used Swap
 prompt_ram() {
-  local ROOT_PREFIX="${4}"
-  local base=''
-  local ramfree=0
-  if [[ "$OS" == "OSX" ]]; then
-    # Available = Free + Inactive
-    # See https://support.apple.com/en-us/HT201538
-    ramfree=$(vm_stat | grep "Pages free" | grep -o -E '[0-9]+')
-    ramfree=$((ramfree + $(vm_stat | grep "Pages inactive" | grep -o -E '[0-9]+')))
-    # Convert pages into Bytes
-    ramfree=$(( ramfree * 4096 ))
-  else
-    if [[ "$OS" == "BSD" ]]; then
-      ramfree=$(grep 'avail memory' ${ROOT_PREFIX}/var/run/dmesg.boot | awk '{print $4}')
-    else
-      ramfree=$(grep -o -E "MemAvailable:\s+[0-9]+" ${ROOT_PREFIX}/proc/meminfo | grep -o -E "[0-9]+")
-      base='K'
-    fi
-  fi
+  local -F free_bytes
 
-  "$1_prompt_segment" "$0" "$2" "yellow" "$DEFAULT_COLOR" 'RAM_ICON' 0 '' "$(printSizeHumanReadable "$ramfree" $base)"
+  case $OS in
+    OSX)
+      (( $+commands[vm_stat] )) || return
+      local stat && stat=$(command vm_stat 2>/dev/null) || return
+      [[ $stat =~ 'Pages free:[[:space:]]+([0-9]+)' ]] || return
+      (( free_bytes+=match[1] ))
+      [[ $stat =~ 'Pages inactive:[[:space:]]+([0-9]+)' ]] || return
+      (( free_bytes+=match[1] ))
+      (( free_bytes *= 4096 ))
+    ;;
+    BSD)
+      local stat && stat=$(command grep -F 'avail memory' /var/run/dmesg.boot 2>/dev/null) || return
+      free_bytes=${${(A)=stat}[4]}
+    ;;
+    *)
+      local stat && stat=$(command grep -F MemAvailable /proc/meminfo 2>/dev/null) || return
+      free_bytes=$(( ${${(A)=stat}[2]} * 1024 ))
+    ;;
+  esac
+
+  _p9k_human_readable_bytes $free_bytes
+  $1_prompt_segment $0 $2 yellow "$DEFAULT_COLOR" RAM_ICON 0 '' $_P9K_RETVAL
 }
 
 function _p9k_read_rbenv_version_file() {
@@ -1505,28 +1509,30 @@ prompt_status() {
 ################################################################
 # Segment to display Swap information
 prompt_swap() {
-  local ROOT_PREFIX="${4}"
-  local swap_used=0
-  local base=''
+  local -F used_bytes
 
   if [[ "$OS" == "OSX" ]]; then
-    local raw_swap_used
-    raw_swap_used=$(sysctl vm.swapusage | grep -o "used\s*=\s*[0-9,.A-Z]*" | grep -o "[0-9,.A-Z]*$")
-
-    typeset -F 2 swap_used
-    swap_used=${$(echo $raw_swap_used | grep -o "[0-9,.]*")//,/.}
-    # Replace comma
-    swap_used=${swap_used//,/.}
-
-    base=$(echo "$raw_swap_used" | grep -o "[A-Z]*$")
+    (( $+commands[sysctl] )) || return
+    [[ "$(sysctl vm.swapusage)" =~ "used = ([0-9,.]+)([A-Z]+)" ]] || return
+    used_bytes=${match[1]//,/.}
+    case ${match[2]} in
+      K) (( used_bytes *= 1024 ));;
+      M) (( used_bytes *= 1048576 ));;
+      G) (( used_bytes *= 1073741824 ));;
+      T) (( used_bytes *= 1099511627776 ));;
+      *) return;;
+    esac
   else
-    swap_total=$(grep -o -E "SwapTotal:\s+[0-9]+" ${ROOT_PREFIX}/proc/meminfo | grep -o -E "[0-9]+")
-    swap_free=$(grep -o -E "SwapFree:\s+[0-9]+" ${ROOT_PREFIX}/proc/meminfo | grep -o -E "[0-9]+")
-    swap_used=$(( swap_total - swap_free ))
-    base='K'
+    local meminfo && meminfo=$(command grep -F 'Swap' /proc/meminfo) || return
+    [[ $meminfo =~ 'SwapTotal:[[:space:]]+([0-9]+)' ]] || return
+    (( used_bytes+=match[1] ))
+    [[ $meminfo =~ 'SwapFree:[[:space:]]+([0-9]+)' ]] || return
+    (( used_bytes-=match[1] ))
+    (( used_bytes *= 1024 ))
   fi
 
-  "$1_prompt_segment" "$0" "$2" "yellow" "$DEFAULT_COLOR" 'SWAP_ICON' 0 '' "$(printSizeHumanReadable "$swap_used" $base)"
+  _p9k_human_readable_bytes $used_bytes
+  $1_prompt_segment $0 $2 yellow "$DEFAULT_COLOR" SWAP_ICON 0 '' $_P9K_RETVAL
 }
 
 ################################################################
