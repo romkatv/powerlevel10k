@@ -356,11 +356,9 @@ right_prompt_segment() {
 set_default POWERLEVEL9K_ANACONDA_LEFT_DELIMITER "("
 set_default POWERLEVEL9K_ANACONDA_RIGHT_DELIMITER ")"
 prompt_anaconda() {
-  # Depending on the conda version, either might be set. This
-  # variant works even if both are set.
-  local path=$CONDA_ENV_PATH$CONDA_PREFIX
-  if [[ -n $path ]]; then
-    local msg="$POWERLEVEL9K_ANACONDA_LEFT_DELIMITER${${path:t}//\%/%%}$POWERLEVEL9K_ANACONDA_RIGHT_DELIMITER"
+  local p=${CONDA_PREFIX:-$CONDA_ENV_PATH}
+  if [[ -n $p ]]; then
+    local msg="$POWERLEVEL9K_ANACONDA_LEFT_DELIMITER${${p:t}//\%/%%}$POWERLEVEL9K_ANACONDA_RIGHT_DELIMITER"
     "$1_prompt_segment" "$0" "$2" "blue" "$DEFAULT_COLOR" 'PYTHON_ICON' 0 '' "$msg"
   fi
 }
