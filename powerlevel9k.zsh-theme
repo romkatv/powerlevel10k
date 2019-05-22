@@ -2047,28 +2047,12 @@ prompt_dir_writable() {
 ################################################################
 # Kubernetes Current Context/Namespace
 prompt_kubecontext() {
-  local kubectl_version="$(kubectl version --client 2>/dev/null)"
-
-  if [[ -n "$kubectl_version" ]]; then
-    # Get the current Kuberenetes context
-    local cur_ctx=$(kubectl config view -o=jsonpath='{.current-context}')
-    cur_namespace="$(kubectl config view -o=jsonpath="{.contexts[?(@.name==\"${cur_ctx}\")].context.namespace}")"
-    # If the namespace comes back empty set it default.
-    if [[ -z "${cur_namespace}" ]]; then
-      cur_namespace="default"
-    fi
-
-    local k8s_final_text=""
-
-    if [[ "$cur_ctx" == "$cur_namespace" ]]; then
-      # No reason to print out the same identificator twice
-      k8s_final_text="$cur_ctx"
-    else
-      k8s_final_text="$cur_ctx/$cur_namespace"
-    fi
-
-    "$1_prompt_segment" "$0" "$2" "magenta" "white" "KUBERNETES_ICON" 0 '' "${k8s_final_text//\%/%%}"
-  fi
+  (( $+commands[kubectl] )) || return
+  local ctx=$(command kubectl config view -o=jsonpath='{.current-context}')
+  [[ -n $ctx ]] || return
+  local ns="${$(command kubectl config view -o=jsonpath="{.contexts[?(@.name==\"$ctx\")].context.namespace}"):-default}"
+  [[ $ctx == $ns ]] || ctx+="/$ns"
+  "$1_prompt_segment" "$0" "$2" "magenta" "white" "KUBERNETES_ICON" 0 '' "${ctx//\%/%%}"
 }
 
 ################################################################
