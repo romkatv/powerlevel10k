@@ -561,86 +561,56 @@ prompt_battery() {
   $1_prompt_segment $0_$state $2 "$bg" "$_P9K_BATTERY_STATES[$state]" $icon 0 '' $msg
 }
 
+typeset -gF _P9K_PUBLIC_IP_TIMESTAMP
+typeset -g  _P9K_PUBLIC_IP
+
 ################################################################
 # Public IP segment
-# Parameters:
-#   * $1 Alignment: string - left|right
-#   * $2 Index: integer
-#   * $3 Joined: bool - If the segment should be joined
-#   * $4 Root Prefix: string - Root prefix for testing purposes
 set_default -i POWERLEVEL9K_PUBLIC_IP_TIMEOUT 300
 set_default -a POWERLEVEL9K_PUBLIC_IP_METHODS dig curl wget
 set_default    POWERLEVEL9K_PUBLIC_IP_NONE ""
-set_default    POWERLEVEL9K_PUBLIC_IP_FILE "/tmp/p9k_public_ip"
 set_default    POWERLEVEL9K_PUBLIC_IP_HOST "http://ident.me"
 set_default    POWERLEVEL9K_PUBLIC_IP_VPN_INTERFACE ""
 
 prompt_public_ip() {
-  local ROOT_PREFIX="${4}"
-
-  # Do we need a fresh IP?
-  local refresh_ip=false
-  if [[ -f $POWERLEVEL9K_PUBLIC_IP_FILE ]]; then
-    typeset -i timediff
-    # if saved IP is more than
-    if [[ "$OS" == "OSX" ]]; then
-      timediff=$(($(date +%s) - $(stat -f "%m" $POWERLEVEL9K_PUBLIC_IP_FILE)))
-    else
-      timediff=$(($(date +%s) - $(date -r $POWERLEVEL9K_PUBLIC_IP_FILE +%s)))
-    fi
-    (( timediff > POWERLEVEL9K_PUBLIC_IP_TIMEOUT )) && refresh_ip=true
-    # If tmp file is empty get a fresh IP
-    [[ -z $(cat $POWERLEVEL9K_PUBLIC_IP_FILE) ]] && refresh_ip=true
-    [[ -n $POWERLEVEL9K_PUBLIC_IP_NONE ]] && [[ $(cat $POWERLEVEL9K_PUBLIC_IP_FILE) =~ "$POWERLEVEL9K_PUBLIC_IP_NONE" ]] && refresh_ip=true
-  else
-    touch $POWERLEVEL9K_PUBLIC_IP_FILE && refresh_ip=true
-  fi
-
-  # grab a fresh IP if needed
-  local fresh_ip
-  if [[ $refresh_ip == true && -w $POWERLEVEL9K_PUBLIC_IP_FILE ]]; then
-    for method in "${POWERLEVEL9K_PUBLIC_IP_METHODS[@]}"; do
+  if (( ! $#_P9K_PUBLIC_IP || EPOCHREALTIME >= _P9K_PUBLIC_IP_TIMESTAMP + POWERLEVEL9K_PUBLIC_IP_TIMEOUT )); then
+    _P9K_PUBLIC_IP=''
+    local method
+    for method in $POWERLEVEL9K_PUBLIC_IP_METHODS; do
       case $method in
         'dig')
-            fresh_ip="$(dig +time=1 +tries=1 +short myip.opendns.com @resolver1.opendns.com 2> /dev/null)"
-            [[ "$fresh_ip" =~ ^\; ]] && unset fresh_ip
-          ;;
+          if (( $+commands[dig] )); then
+            _P9K_PUBLIC_IP="$(command dig +time=1 +tries=1 +short myip.opendns.com @resolver1.opendns.com 2> /dev/null)"
+            [[ $_P9K_PUBLIC_IP == ';'* ]] && _P9K_PUBLIC_IP=''
+          fi
+        ;;
         'curl')
-            fresh_ip="$(curl --max-time 10 -w '\n' "$POWERLEVEL9K_PUBLIC_IP_HOST" 2> /dev/null)"
-          ;;
+          if (( $+commands[curl] )); then
+            _P9K_PUBLIC_IP="$(command curl --max-time 10 -w '\n' "$POWERLEVEL9K_PUBLIC_IP_HOST" 2> /dev/null)"
+          fi
+        ;;
         'wget')
-            fresh_ip="$(wget -T 10 -qO- "$POWERLEVEL9K_PUBLIC_IP_HOST" 2> /dev/null)"
-          ;;
+          if (( $+commands[wget] )); then
+            _P9K_PUBLIC_IP="$(wget -T 10 -qO- "$POWERLEVEL9K_PUBLIC_IP_HOST" 2> /dev/null)"
+          fi
+        ;;
       esac
-      # If we found a fresh IP, break loop.
-      if [[ -n "${fresh_ip}" ]]; then
-        break;
+      if [[ -n $_P9K_PUBLIC_IP ]]; then
+        _P9K_PUBLIC_IP_TIMESTAMP=$EPOCHREALTIME
+        break
       fi
     done
-
-    # write IP to tmp file or clear tmp file if an IP was not retrieved
-    # Redirection with `>!`. From the manpage: Same as >, except that the file
-    #   is truncated to zero length if it exists, even if CLOBBER is unset.
-    # If the file already exists, and a simple `>` redirection and CLOBBER
-    # unset, ZSH will produce an error.
-    [[ -n "${fresh_ip}" ]] && echo $fresh_ip >! $POWERLEVEL9K_PUBLIC_IP_FILE || echo $POWERLEVEL9K_PUBLIC_IP_NONE >! $POWERLEVEL9K_PUBLIC_IP_FILE
   fi
 
-  # read public IP saved to tmp file
-  local public_ip="$(cat $POWERLEVEL9K_PUBLIC_IP_FILE)"
+  local ip=${_P9K_PUBLIC_IP:-$POWERLEVEL9K_PUBLIC_IP_NONE}
+  [[ -n $ip ]] || return
 
-  # Draw the prompt segment
-  if [[ -n $public_ip ]]; then
-    icon='PUBLIC_IP_ICON'
-    # Check VPN is on if VPN interface is set
-    if [[ -n $POWERLEVEL9K_PUBLIC_IP_VPN_INTERFACE ]]; then
-      local vpnIp="$(p9k::parseIp "${POWERLEVEL9K_PUBLIC_IP_VPN_INTERFACE}" "${ROOT_PREFIX}")"
-      if [[ -n "$vpnIp" ]]; then
-        icon='VPN_ICON'
-      fi
-    fi
-    $1_prompt_segment "$0" "$2" "$DEFAULT_COLOR" "$DEFAULT_COLOR_INVERTED" "$icon" 0 '' "${public_ip}"
+  local icon='PUBLIC_IP_ICON'
+  if [[ -n $POWERLEVEL9K_PUBLIC_IP_VPN_INTERFACE ]]; then
+    _p9k_parse_ip $POWERLEVEL9K_PUBLIC_IP_VPN_INTERFACE && icon='VPN_ICON'
   fi
+
+  $1_prompt_segment "$0" "$2" "$DEFAULT_COLOR" "$DEFAULT_COLOR_INVERTED" "$icon" 0 '' "${ip//\%/%%}"
 }
 
 ################################################################
@@ -1014,12 +984,8 @@ prompt_icons_test() {
 # Segment to display the current IP address
 set_default POWERLEVEL9K_IP_INTERFACE "^[^ ]+"
 prompt_ip() {
-  local ROOT_PREFIX="${4}"
-  local ip=$(p9k::parseIp "${POWERLEVEL9K_IP_INTERFACE}" "${ROOT_PREFIX}")
-
-  if [[ -n "$ip" ]]; then
-    "$1_prompt_segment" "$0" "$2" "cyan" "$DEFAULT_COLOR" 'NETWORK_ICON' 0 '' "${ip//\%/%%}"
-  fi
+  _p9k_parse_ip $POWERLEVEL9K_IP_INTERFACE || return
+  "$1_prompt_segment" "$0" "$2" "cyan" "$DEFAULT_COLOR" 'NETWORK_ICON' 0 '' "${_P9K_RETVAL//\%/%%}"
 }
 
 ################################################################
@@ -1027,12 +993,8 @@ prompt_ip() {
 set_default POWERLEVEL9K_VPN_IP_INTERFACE "tun"
 # prompt if vpn active
 prompt_vpn_ip() {
-  local ROOT_PREFIX="${4}"
-  local ip=$(p9k::parseIp "${POWERLEVEL9K_VPN_IP_INTERFACE}" "${ROOT_PREFIX}")
-
-  if [[ -n "${ip}" ]]; then
-    "$1_prompt_segment" "$0" "$2" "cyan" "$DEFAULT_COLOR" 'VPN_ICON' 0 '' "${ip//\%/%%}"
-  fi
+  _p9k_parse_ip $POWERLEVEL9K_VPN_IP_INTERFACE || return
+  "$1_prompt_segment" "$0" "$2" "cyan" "$DEFAULT_COLOR" 'VPN_ICON' 0 '' "${_P9K_RETVAL//\%/%%}"
 }
 
 ################################################################

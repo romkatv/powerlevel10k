@@ -72,54 +72,41 @@ segment_in_use() {
      -n "${POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS[(r)${key}_joined]}" ]]
 }
 
-# Parse IP address from ifconfig on OSX and from IP on Linux
-# Parameters:
-#  $1 - string The desired Interface
-#  $2 - string A root prefix for testing purposes
-function p9k::parseIp() {
-  local desiredInterface="${1}"
+function _p9k_parse_ip() {
+  local desiredInterface=${1:-'^[^ ]+'}
 
-  if [[ -z "${desiredInterface}" ]]; then
-    desiredInterface="^[^ ]+"
-  fi
-
-  local ROOT_PREFIX="${2}"
-  if [[ "$OS" == "OSX" ]]; then
-    # Get a plain list of all interfaces
-    local rawInterfaces="$(${ROOT_PREFIX}/sbin/ifconfig -l 2>/dev/null)"
-    # Parse into array (split by whitespace)
-    local -a interfaces
-    interfaces=(${=rawInterfaces})
-    # Parse only relevant interface names
+  if [[ $OS == OSX ]]; then
+    [[ -x /sbin/ifconfig ]] || return
+    local rawInterfaces && rawInterfaces="$(/sbin/ifconfig -l 2>/dev/null)" || return
+    local -a interfaces=(${(A)=rawInterfaces})
     local pattern="${desiredInterface}[^ ]?"
     local -a relevantInterfaces
     for rawInterface in $interfaces; do
-      [[ "$rawInterface" =~ $pattern ]] && relevantInterfaces+=( $MATCH )
+      [[ "$rawInterface" =~ $pattern ]] && relevantInterfaces+=$MATCH
     done
     local newline=$'\n'
+    local interfaceName interface
     for interfaceName in $relevantInterfaces; do
-      local interface="$(${ROOT_PREFIX}/sbin/ifconfig $interfaceName 2>/dev/null)"
-      if [[ "${interface}" =~ "lo[0-9]*" ]]; then
-        continue
-      fi
-      # Check if interface is UP.
+      interface="$(/sbin/ifconfig $interfaceName 2>/dev/null)" || continue
+      [[ "${interface}" =~ "lo[0-9]*" ]] && continue
       if [[ "${interface//${newline}/}" =~ "<([^>]*)>(.*)inet[ ]+([^ ]*)" ]]; then
         local ipFound="${match[3]}"
         local -a interfaceStates=(${(s:,:)match[1]})
-        if [[ "${interfaceStates[(r)UP]}" == "UP" ]]; then
-          echo "${ipFound}"
-          return 0
+        if (( "${interfaceStates[(I)UP]}" )); then
+          _P9K_RETVAL=$ipFound
+          return
         fi
       fi
     done
   else
-    local -a interfaces
-    interfaces=( "${(f)$(${ROOT_PREFIX}/sbin/ip -brief -4 a show 2>/dev/null)}" )
-    local pattern="^${desiredInterface}[ ]+UP[ ]+([^/ ]+)"
+    [[ -x /sbin/ip ]] || return
+    local -a interfaces=( "${(f)$(/sbin/ip -brief -4 a show 2>/dev/null)}" )
+    local pattern="^${desiredInterface}[[:space:]]+UP[[:space:]]+([^/ ]+)"
+    local interface
     for interface in "${(@)interfaces}"; do
       if [[ "$interface" =~ $pattern ]]; then
-        echo "${match[1]}"
-        return 0
+        _P9K_RETVAL=$match[1]
+        return
       fi
     done
   fi
