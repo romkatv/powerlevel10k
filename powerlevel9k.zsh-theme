@@ -1540,10 +1540,9 @@ prompt_symfony2_tests() {
 ################################################################
 # Segment to display Symfony2-Version
 prompt_symfony2_version() {
-  if [[ -f app/bootstrap.php.cache ]]; then
-    local symfony2_version
-    symfony2_version=$(grep " VERSION " app/bootstrap.php.cache | sed -e 's/[^.0-9]*//g')
-    "$1_prompt_segment" "$0" "$2" "grey35" "$DEFAULT_COLOR" 'SYMFONY_ICON' 0 '' "${symfony2_version//\%/%%}"
+  if [[ -r app/bootstrap.php.cache ]]; then
+    local v="${$(command grep -F " VERSION " app/bootstrap.php.cache 2>/dev/null)//[![:digit:].]}"
+    "$1_prompt_segment" "$0" "$2" "grey35" "$DEFAULT_COLOR" 'SYMFONY_ICON' 0 '' "${v//\%/%%}"
   fi
 }
 
