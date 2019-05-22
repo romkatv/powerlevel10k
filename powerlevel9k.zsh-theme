@@ -1982,24 +1982,46 @@ prompt_virtualenv() {
   fi
 }
 
+function _p9k_read_pyenv_version_file() {
+  [[ -r $1 ]] || return
+  local content
+  read -rd $'\0' content <$1 2>/dev/null
+  _P9K_RETVAL=${${(j.:.)${(@)${=content}#python-}:-system}}
+}
+
+function _p9k_pyenv_global_version() {
+  _p9k_read_pyenv_version_file ${PYENV_ROOT:-$HOME/.pyenv}/version || _P9K_RETVAL=system
+}
+
 ################################################################
 # Segment to display pyenv information
 # https://github.com/pyenv/pyenv#choosing-the-python-version
 set_default POWERLEVEL9K_PYENV_PROMPT_ALWAYS_SHOW false
 prompt_pyenv() {
-  if [[ -n "$PYENV_VERSION" ]]; then
-    "$1_prompt_segment" "$0" "$2" "blue" "$DEFAULT_COLOR" 'PYTHON_ICON' 0 '' "${PYENV_VERSION//\%/%%}"
-  elif [ $commands[pyenv] ]; then
-    local pyenv_version_name="$(pyenv version-name)"
-    local pyenv_global="system"
-    local pyenv_root="$(pyenv root)"
-    if [[ -f "${pyenv_root}/version" ]]; then
-      pyenv_global="$(pyenv version-file-read ${pyenv_root}/version)"
-    fi
-    if [[ "${pyenv_version_name}" != "${pyenv_global}" || "${POWERLEVEL9K_PYENV_PROMPT_ALWAYS_SHOW}" == "true" ]]; then
-      "$1_prompt_segment" "$0" "$2" "blue" "$DEFAULT_COLOR" 'PYTHON_ICON' 0 '' "${pyenv_version_name//\%/%%}"
-    fi
+  local v=${(j.:.)${(@)${(s.:.)PYENV_VERSION}#python-}}
+  if [[ -z $v ]]; then
+    [[ $PYENV_DIR == /* ]] && local dir=$PYENV_DIR || local dir="$PWD/$PYENV_DIR"
+    while true; do
+      if _p9k_read_pyenv_version_file $dir/.python-version; then
+        v=$_P9K_RETVAL
+        break
+      fi
+      if [[ $dir == / ]]; then
+        [[ $POWERLEVEL9K_PYENV_PROMPT_ALWAYS_SHOW == true ]] || return
+        _p9k_pyenv_global_version
+        v=$_P9K_RETVAL
+        break
+      fi
+      dir=${dir:h}
+    done
   fi
+
+  if [[ $POWERLEVEL9K_PYENV_PROMPT_ALWAYS_SHOW == false ]]; then
+    _p9k_pyenv_global_version
+    [[ $v == $_P9K_RETVAL ]] && return
+  fi
+
+  "$1_prompt_segment" "$0" "$2" "blue" "$DEFAULT_COLOR" 'PYTHON_ICON' 0 '' "${v//\%/%%}"
 }
 
 ################################################################
