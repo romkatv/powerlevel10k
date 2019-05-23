@@ -1700,6 +1700,9 @@ function _p9k_vcs_render() {
     "$VCS_STATUS_REMOTE_BRANCH"
     "$VCS_STATUS_REMOTE_URL"
     "$VCS_STATUS_ACTION"
+    "$VCS_STATUS_NUM_STAGED"
+    "$VCS_STATUS_NUM_UNSTAGED"
+    "$VCS_STATUS_NUM_UNTRACKED"
     "$VCS_STATUS_HAS_STAGED"
     "$VCS_STATUS_HAS_UNSTAGED"
     "$VCS_STATUS_HAS_UNTRACKED"
@@ -1780,14 +1783,17 @@ function _p9k_vcs_render() {
       fi
       if [[ $VCS_STATUS_HAS_STAGED == 1 ]]; then
         _p9k_get_icon VCS_STAGED_ICON
+        (( POWERLEVEL9K_VCS_MAX_NUM_STAGED != 1 )) && _P9K_RETVAL+=$VCS_STATUS_NUM_STAGED
         _$0_fmt STAGED " $_P9K_RETVAL"
       fi
       if [[ $VCS_STATUS_HAS_UNSTAGED == 1 ]]; then
         _p9k_get_icon VCS_UNSTAGED_ICON
+        (( POWERLEVEL9K_VCS_MAX_NUM_UNSTAGED != 1 )) && _P9K_RETVAL+=$VCS_STATUS_NUM_UNSTAGED
         _$0_fmt UNSTAGED " $_P9K_RETVAL"
       fi
       if [[ $VCS_STATUS_HAS_UNTRACKED == 1 ]]; then
         _p9k_get_icon VCS_UNTRACKED_ICON
+        (( POWERLEVEL9K_VCS_MAX_NUM_UNTRACKED != 1 )) && _P9K_RETVAL+=$VCS_STATUS_NUM_UNTRACKED
         _$0_fmt UNTRACKED " $_P9K_RETVAL"
       fi
       if [[ $VCS_STATUS_COMMITS_AHEAD -gt 0 ]]; then
@@ -2167,6 +2173,9 @@ set_default POWERLEVEL9K_IGNORE_TERM_COLORS false
 set_default POWERLEVEL9K_IGNORE_TERM_LANG false
 set_default POWERLEVEL9K_DISABLE_GITSTATUS false
 set_default -i POWERLEVEL9K_VCS_MAX_INDEX_SIZE_DIRTY -1
+set_default -i POWERLEVEL9K_VCS_MAX_NUM_STAGED 1
+set_default -i POWERLEVEL9K_VCS_MAX_NUM_UNSTAGED 1
+set_default -i POWERLEVEL9K_VCS_MAX_NUM_UNTRACKED 1
 
 typeset -g DEFAULT_COLOR
 typeset -g DEFAULT_COLOR_INVERTED
@@ -2420,7 +2429,12 @@ _p9k_init() {
     powerlevel9k_vcs_init
     if [[ $POWERLEVEL9K_DISABLE_GITSTATUS != true ]] && (( ${POWERLEVEL9K_VCS_BACKENDS[(I)git]} )); then
       source ${POWERLEVEL9K_GITSTATUS_DIR:-${_P9K_INSTALLATION_DIR}/gitstatus}/gitstatus.plugin.zsh
-      gitstatus_start -m $POWERLEVEL9K_VCS_MAX_INDEX_SIZE_DIRTY POWERLEVEL9K
+      gitstatus_start                             \
+        -s $POWERLEVEL9K_VCS_MAX_NUM_STAGED       \
+        -u $POWERLEVEL9K_VCS_MAX_NUM_UNSTAGED     \
+        -d $POWERLEVEL9K_VCS_MAX_NUM_UNTRACKED    \
+        -m $POWERLEVEL9K_VCS_MAX_INDEX_SIZE_DIRTY \
+        POWERLEVEL9K
     fi
   fi
 
