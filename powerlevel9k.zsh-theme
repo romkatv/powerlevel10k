@@ -494,7 +494,7 @@ prompt_battery() {
     ;;
 
     Linux|Android)
-      local -a bats=( /sys/class/power_supply/(BAT*|battery)(FN) )
+      local -a bats=( /sys/class/power_supply/(BAT*|battery)/(FN) )
       (( $#bats )) || return
 
       local -i energy_now energy_full power_now 
