@@ -30,6 +30,10 @@
 #   VCS_STATUS_COMMIT=6e86ec135bf77875e222463cbac8ef72a7e8d823
 #   VCS_STATUS_COMMITS_AHEAD=0
 #   VCS_STATUS_COMMITS_BEHIND=0
+#   VCS_STATUS_INDEX_SIZE=42
+#   VCS_STATUS_NUM_STAGED=0
+#   VCS_STATUS_NUM_UNSTAGED=2
+#   VCS_STATUS_NUM_UNTRACKED=3
 #   VCS_STATUS_HAS_STAGED=0
 #   VCS_STATUS_HAS_UNSTAGED=1
 #   VCS_STATUS_HAS_UNTRACKED=1
@@ -146,6 +150,7 @@ function _gitstatus_process_response() {
   local -F timeout=$2
   local req_id=$3
   local resp_fd_var=_GITSTATUS_RESP_FD_${name}
+  local -i dirty_max_index_size=_GITSTATUS_DIRTY_MAX_INDEX_SIZE_${name}
 
   typeset -g VCS_STATUS_RESULT
   (( timeout >= 0 )) && local -a t=(-t $timeout) || local -a t=()
@@ -167,13 +172,22 @@ function _gitstatus_process_response() {
     typeset -g  VCS_STATUS_REMOTE_NAME="${resp[7]}"
     typeset -g  VCS_STATUS_REMOTE_URL="${resp[8]}"
     typeset -g  VCS_STATUS_ACTION="${resp[9]}"
-    typeset -gi VCS_STATUS_HAS_STAGED="${resp[10]}"
-    typeset -gi VCS_STATUS_HAS_UNSTAGED="${resp[11]}"
-    typeset -gi VCS_STATUS_HAS_UNTRACKED="${resp[12]}"
-    typeset -gi VCS_STATUS_COMMITS_AHEAD="${resp[13]}"
-    typeset -gi VCS_STATUS_COMMITS_BEHIND="${resp[14]}"
-    typeset -gi VCS_STATUS_STASHES="${resp[15]}"
-    typeset -g  VCS_STATUS_TAG="${resp[16]}"
+    typeset -gi VCS_STATUS_INDEX_SIZE="${resp[10]}"
+    typeset -gi VCS_STATUS_NUM_STAGED="${resp[11]}"
+    typeset -gi VCS_STATUS_NUM_UNSTAGED="${resp[12]}"
+    typeset -gi VCS_STATUS_NUM_UNTRACKED="${resp[13]}"
+    typeset -gi VCS_STATUS_COMMITS_AHEAD="${resp[14]}"
+    typeset -gi VCS_STATUS_COMMITS_BEHIND="${resp[15]}"
+    typeset -gi VCS_STATUS_STASHES="${resp[16]}"
+    typeset -g  VCS_STATUS_TAG="${resp[17]}"
+    typeset -gi VCS_STATUS_HAS_STAGED=$((VCS_STATUS_NUM_STAGED > 0))
+    if (( dirty_max_index_size >= 0 && VCS_STATUS_INDEX_SIZE > dirty_max_index_size )); then
+      typeset -gi VCS_STATUS_HAS_UNSTAGED=-1
+      typeset -gi VCS_STATUS_HAS_UNTRACKED=-1
+    else
+      typeset -gi VCS_STATUS_HAS_UNSTAGED=$((VCS_STATUS_NUM_UNSTAGED > 0))
+      typeset -gi VCS_STATUS_HAS_UNTRACKED=$((VCS_STATUS_NUM_UNTRACKED > 0))
+    fi
   } || {
     (( ours )) && VCS_STATUS_RESULT=norepo-sync || VCS_STATUS_RESULT=norepo-async
     unset VCS_STATUS_WORKDIR
@@ -183,6 +197,10 @@ function _gitstatus_process_response() {
     unset VCS_STATUS_REMOTE_NAME
     unset VCS_STATUS_REMOTE_URL
     unset VCS_STATUS_ACTION
+    unset VCS_STATUS_INDEX_SIZE
+    unset VCS_STATUS_NUM_STAGED
+    unset VCS_STATUS_NUM_UNSTAGED
+    unset VCS_STATUS_NUM_UNTRACKED
     unset VCS_STATUS_HAS_STAGED
     unset VCS_STATUS_HAS_UNSTAGED
     unset VCS_STATUS_HAS_UNTRACKED
@@ -201,20 +219,36 @@ function _gitstatus_process_response() {
 #
 #   -t FLOAT  Fail the self-check on initialization if not getting a response from gitstatusd for
 #             this this many seconds. Defaults to 5.
-#   -m INT    Report -1 unstaged and untracked if there are more than this many files in the index.
-#             Negative value means infinity. Defaults to -1.
+#
+#   -s INT    Report at most this many staged changes; negative value means infinity.
+#             Defaults to 1.
+#
+#   -u INT    Report at most this many unstaged changes; negative value means infinity.
+#             Defaults to 1.
+#
+#   -d INT    Report at most this many untracked files; negative value means infinity.
+#             Defaults to 1.
+#
+#   -m INT    If a repo has more files in its index than this, override -u and -d (but not -s)
+#             with zeros. Negative value means infinity. Defaults to -1.
 function gitstatus_start() {
   emulate -L zsh
   setopt err_return no_unset no_bg_nice
 
   local opt
   local -F timeout=5
-  local -i max_dirty=-1
+  local -i max_num_staged=1
+  local -i max_num_unstaged=1
+  local -i max_num_untracked=1
+  local -i dirty_max_index_size=-1
   while true; do
-    getopts "t:m:" opt || break
+    getopts "t:s:u:d:m:" opt || break
     case $opt in
       t) timeout=$OPTARG;;
-      m) max_dirty=$OPTARG;;
+      s) max_num_staged=$OPTARG;;
+      u) max_num_unstaged=$OPTARG;;
+      d) max_num_untracked=$OPTARG;;
+      m) dirty_max_index_size=$OPTARG;;
       ?) return 1;;
     esac
   done
@@ -277,11 +311,14 @@ function gitstatus_start() {
 
     # We use `zsh -c` instead of plain {} or () to work around bugs in zplug. It hangs on startup.
     zsh -dfxc "
-      ${(q)daemon}             \
-        --lock-fd=3            \
-        --parent-pid=$$        \
-        --num-threads=$threads \
-        --dirty-max-index-size=$max_dirty
+      ${(q)daemon}                             \
+        --lock-fd=3                            \
+        --parent-pid=$$                        \
+        --num-threads=$threads                 \
+        --max-num-staged=$max_num_staged       \
+        --max-num-unstaged=$max_num_unstaged   \
+        --max-num-untracked=$max_num_untracked \
+        --dirty-max-index-size=$dirty_max_index_size
       echo -nE $'bye\x1f0\x1e'
     " <&$req_fd >&$resp_fd 2>$log_file 3<$lock_file &!
 
@@ -317,6 +354,7 @@ function gitstatus_start() {
     typeset -gi _GITSTATUS_RESP_FD_${name}=$resp_fd
     typeset -gi _GITSTATUS_LOCK_FD_${name}=$lock_fd
     typeset -gi _GITSTATUS_CLIENT_PID_${name}=$$
+    typeset -gi _GITSTATUS_DIRTY_MAX_INDEX_SIZE_${name}=$dirty_max_index_size
     unset -f gitstatus_start_impl
   } || {
     unsetopt err_return
