@@ -944,8 +944,21 @@ prompt_go_version() {
   local -a match
   [[ $_P9K_RETVAL == (#b)*(go[[:digit:].]##)* ]] || return
   local v=$match[1]
-  local p=${GOPATH:-$(go env GOPATH 2>/dev/null)}
-  [[ -n $p && $PWD/ == $p/* ]] || return
+  local p=$GOPATH
+  if [[ -z $p ]]; then
+    if [[ -d $HOME/go ]]; then
+      p=$HOME/go
+    else
+      p=$(command go env GOPATH 2>/dev/null) && [[ -n $p ]] || return
+    fi
+  fi
+  if [[ $PWD/ != $p/* ]]; then
+    local dir=$PWD
+    while [[ ! -e $dir/go.mod ]]; do
+      [[ $dir == / ]] && return
+      dir=${dir:h}
+    done
+  fi
   "$1_prompt_segment" "$0" "$2" "green" "grey93" "GO_ICON" 0 '' "${v//\%/%%}"
 }
 
