@@ -836,8 +836,8 @@ prompt_dir() {
     ;;
     truncate_to_unique)
       local -i i=2 n=1
-      [[ $p == /* ]] && (( ++i ))
-      (( POWERLEVEL9K_SHORTEN_DIR_LENGTH > 0 )) && n=POWERLEVEL9K_SHORTEN_DIR_LENGTH
+      delim=${POWERLEVEL9K_SHORTEN_DELIMITER-'*'}
+      (( POWERLEVEL9K_SHORTEN_DIR_LENGTH >= 0 )) && n=POWERLEVEL9K_SHORTEN_DIR_LENGTH
       local pat=${POWERLEVEL9K_SHORTEN_FOLDER_MARKER-'(.bzr|CVS|.git|.hg|.svn|.citc)'}
       local parent="${PWD%/${(pj./.)parts[i,-1]}}"
       for (( ; i <= $#parts - n; ++i )); do
@@ -850,14 +850,13 @@ prompt_dir() {
           fi
         fi
         local -i j=1
-        for (( ; j < $#dir; ++j )); do
+        for (( ; j + $#delim < $#dir; ++j )); do
           local -a matching=($parent/$dir[1,j]*/(N))
           (( $#matching == 1 )) && break
         done
-        (( j == $#dir )) || parts[i]=$dir[1,j]$'\0'
+        (( j + $#delim >= $#dir )) || parts[i]=$dir[1,j]$'\0'
         parent+=/$dir
       done
-      delim=${POWERLEVEL9K_SHORTEN_DELIMITER-'*'}
     ;;
     truncate_with_folder_marker)
       local pat=${POWERLEVEL9K_SHORTEN_FOLDER_MARKER-.shorten_folder_marker}
