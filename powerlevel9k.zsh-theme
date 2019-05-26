@@ -836,6 +836,7 @@ prompt_dir() {
     ;;
     truncate_to_unique)
       local -i i=2 n=1 d=0
+      [[ $p == /* ]] && (( ++i ))
       delim=${POWERLEVEL9K_SHORTEN_DELIMITER-'*'}
       shortenlen=${POWERLEVEL9K_SHORTEN_DIR_LENGTH:-1}
       d=${POWERLEVEL9K_SHORTEN_DELIMITER_LENGTH:-$#POWERLEVEL9K_SHORTEN_DELIMITER}
