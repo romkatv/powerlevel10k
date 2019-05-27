@@ -410,16 +410,6 @@ function _p9k_left_prompt_end_line() {
   _P9K_PROMPT+='%f'
 
   if (( ! _P9K_RPROMPT_DONE )); then
-    #_P9K_PROMPT+='${${_P9K_X::=0}+}${${_P9K_Y::=$((COLUMNS+1))}+}'
-    #local -i i=0
-    #for (( ; i != 10; ++i )); do
-    #  _P9K_PROMPT+='${${_P9K_M::=$(((_P9K_X+_P9K_Y)/2))}+}${${_P9K_XY::=${${(%):-$_P9K_RPROMPT%$_P9K_M(l./$_P9K_M;$_P9K_Y./$_P9K_X;$_P9K_M)}##*/}}+}${${_P9K_X::=${_P9K_XY%;*}}+}${${_P9K_Y::=${_P9K_XY#*;}}+}'
-    #done
-    #_P9K_PROMPT+='${${_P9K_X::=$((_P9K_X+1+${${ZLE_RPROMPT_INDENT:-1}/#-*/0}))}+}'
-    #for (( ; i != 256; ++i )); do
-    #  _P9K_PROMPT+='%-$_P9K_X(l. .)'
-    #done
-    #_P9K_PROMPT+='$_P9K_RPROMPT'
     _P9K_PROMPT+=$_P9K_ALIGNED_RPROMPT
     _P9K_RPROMPT_DONE=1
   fi
