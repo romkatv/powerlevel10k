@@ -2196,23 +2196,29 @@ function _p9k_update_prompt() {
 typeset -gi _P9K_REGION_ACTIVE
 
 set_default POWERLEVEL9K_PROMPT_ADD_NEWLINE false
-powerlevel9k_prepare_prompts() {
-  # Do not move these lines down, otherwise the last command is not what you expected it to be.
-  _P9K_EXIT_CODE=$?
-  _P9K_PIPE_EXIT_CODES=( "$pipestatus[@]" )
-  _P9K_COMMAND_DURATION=$((EPOCHREALTIME - _P9K_TIMER_START))
 
-  unsetopt local_options
-  prompt_opts=(cr percent sp subst)
-  setopt nopromptbang prompt{cr,percent,sp,subst}
+powerlevel9k_refresh_prompt_inplace() {
+  emulate -L zsh
 
   _p9k_init
-  _P9K_TIMER_START=1e10
-  _P9K_REGION_ACTIVE=0
 
   _P9K_REFRESH_REASON=precmd
   _p9k_set_prompt
   _P9K_REFRESH_REASON=''
+}
+
+powerlevel9k_prepare_prompts() {
+  _P9K_EXIT_CODE=$?
+  _P9K_PIPE_EXIT_CODES=( "$pipestatus[@]" )
+  _P9K_COMMAND_DURATION=$((EPOCHREALTIME - _P9K_TIMER_START))
+  _P9K_TIMER_START=1e10
+  _P9K_REGION_ACTIVE=0
+
+  unsetopt localoptions
+  prompt_opts=(cr percent sp subst)
+  setopt nopromptbang prompt{cr,percent,sp,subst}
+
+  powerlevel9k_refresh_prompt_inplace
 }
 
 function _p9k_zle_keymap_select() {
