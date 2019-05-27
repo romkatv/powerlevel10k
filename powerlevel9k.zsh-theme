@@ -767,13 +767,14 @@ prompt_dir() {
     local -a parts=("${(s:/:)p}")
   fi
 
-  local -i fake_first=0 shortenlen
+  local -i fake_first=0
   local delim=${POWERLEVEL9K_SHORTEN_DELIMITER-$'\u2026'}
-  local shortenlen=${POWERLEVEL9K_SHORTEN_DIR_LENGTH:--1}
+  local -i shortenlen=${POWERLEVEL9K_SHORTEN_DIR_LENGTH:--1}
+  local -i d=${POWERLEVEL9K_SHORTEN_DELIMITER_LENGTH:-$#POWERLEVEL9K_SHORTEN_DELIMITER}
 
   case $POWERLEVEL9K_SHORTEN_STRATEGY in
     truncate_absolute|truncate_absolute_chars)
-      if (( shortenlen > 0 && $#p > shortenlen + 1 )); then
+      if (( shortenlen > 0 && $#p > shortenlen + d )); then
         local -i n=shortenlen
         local -i i=$#parts
         while true; do
@@ -814,7 +815,7 @@ prompt_dir() {
         [[ $POWERLEVEL9K_SHORTEN_STRATEGY == truncate_middle ]] && suf=pref
         for (( ; i < $#parts; ++i )); do
           local dir=$parts[i]
-          if (( $#dir > pref + suf + 1 )); then
+          if (( $#dir > pref + suf + d )); then
             dir[pref+1,-suf-1]=$'\0'
             parts[i]=$dir
           fi
@@ -835,11 +836,10 @@ prompt_dir() {
       fi
     ;;
     truncate_to_unique)
-      local -i i=2 n=1 d=0
+      local -i i=2 n=1
       [[ $p == /* ]] && (( ++i ))
       delim=${POWERLEVEL9K_SHORTEN_DELIMITER-'*'}
       shortenlen=${POWERLEVEL9K_SHORTEN_DIR_LENGTH:-1}
-      d=${POWERLEVEL9K_SHORTEN_DELIMITER_LENGTH:-$#POWERLEVEL9K_SHORTEN_DELIMITER}
       (( shortenlen >= 0 )) && n=shortenlen
       local pat=${POWERLEVEL9K_SHORTEN_FOLDER_MARKER-'(.bzr|CVS|.git|.hg|.svn|.citc)'}
       local parent="${PWD%/${(pj./.)parts[i,-1]}}"
