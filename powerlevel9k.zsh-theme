@@ -759,6 +759,12 @@ set_default POWERLEVEL9K_DIR_PATH_SEPARATOR_FOREGROUND ""
 # Individual elements are patterns. They are expanded with the options set by `emulate zsh`.
 set_default -a POWERLEVEL9K_DIR_PACKAGE_FILES package.json composer.json
 
+function _p9k_shorten_delim_len() {
+  local def=$1
+  _P9K_RETVAL=${POWERLEVEL9K_SHORTEN_DELIMITER_LENGTH:--1}
+  (( _P9K_RETVAL >= 0 )) || _p9k_prompt_length $1
+}
+
 ################################################################
 # Dir: current working directory
 prompt_dir() {
@@ -791,25 +797,27 @@ prompt_dir() {
   local -i fake_first=0
   local delim=${POWERLEVEL9K_SHORTEN_DELIMITER-$'\u2026'}
   local -i shortenlen=${POWERLEVEL9K_SHORTEN_DIR_LENGTH:--1}
-  local -i d=${POWERLEVEL9K_SHORTEN_DELIMITER_LENGTH:-$#POWERLEVEL9K_SHORTEN_DELIMITER}
 
   case $POWERLEVEL9K_SHORTEN_STRATEGY in
     truncate_absolute|truncate_absolute_chars)
-      if (( shortenlen > 0 && $#p > shortenlen + d )); then
-        local -i n=shortenlen
-        local -i i=$#parts
-        while true; do
-          local dir=$parts[i]
-          local -i len=$(( $#dir + (i > 1) ))
-          if (( len <= n )); then
-            (( n -= len ))
-            (( --i ))
-          else
-            parts[i]=$'\0'$dir[-n,-1]
-            parts[1,i-1]=()
-            break
-          fi
-        done
+      if (( shortenlen > 0 && $#p > shortenlen )); then
+        _p9k_shorten_delim_len $delim
+        if (( $#p > shortenlen + $_P9K_RETVAL )); then
+          local -i n=shortenlen
+          local -i i=$#parts
+          while true; do
+            local dir=$parts[i]
+            local -i len=$(( $#dir + (i > 1) ))
+            if (( len <= n )); then
+              (( n -= len ))
+              (( --i ))
+            else
+              parts[i]=$'\0'$dir[-n,-1]
+              parts[1,i-1]=()
+              break
+            fi
+          done
+        fi
       fi
     ;;
     truncate_with_package_name|truncate_middle|truncate_from_right)
@@ -832,7 +840,8 @@ prompt_dir() {
         done
       }
       if (( shortenlen > 0 )); then
-        local -i pref=$shortenlen suf=0 i=2
+        _p9k_shorten_delim_len $delim
+        local -i d=_P9K_RETVAL pref=shortenlen suf=0 i=2
         [[ $POWERLEVEL9K_SHORTEN_STRATEGY == truncate_middle ]] && suf=pref
         for (( ; i < $#parts; ++i )); do
           local dir=$parts[i]
@@ -860,6 +869,8 @@ prompt_dir() {
       local -i i=2 n=1
       [[ $p == /* ]] && (( ++i ))
       delim=${POWERLEVEL9K_SHORTEN_DELIMITER-'*'}
+      _p9k_shorten_delim_len $delim
+      local -i d=_P9K_RETVAL
       shortenlen=${POWERLEVEL9K_SHORTEN_DIR_LENGTH:-1}
       (( shortenlen >= 0 )) && n=shortenlen
       local pat=${POWERLEVEL9K_SHORTEN_FOLDER_MARKER-'(.bzr|CVS|.git|.hg|.svn|.citc)'}
