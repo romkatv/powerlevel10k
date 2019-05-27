@@ -399,6 +399,7 @@ typeset -gi _P9K_X _P9K_Y _P9K_M
 typeset -gi _P9K_RPROMPT_DONE
 typeset -g _P9K_ALIGNED_RPROMPT
 
+# Returns 1 if the cursor is at the very end of the screen.
 function _p9k_left_prompt_end_line() {
   _p9k_get_icon LEFT_SEGMENT_SEPARATOR
   _p9k_escape_rcurly $_P9K_RETVAL
@@ -410,10 +411,10 @@ function _p9k_left_prompt_end_line() {
   _P9K_PROMPT+="\${_P9K_T[\$_P9K_N]}"
   _P9K_PROMPT+="%f$1%f%k%b"
 
-  if (( ! _P9K_RPROMPT_DONE )); then
-    _P9K_PROMPT+=$_P9K_ALIGNED_RPROMPT
-    _P9K_RPROMPT_DONE=1
-  fi
+  (( ! _P9K_RPROMPT_DONE )) || return
+  _P9K_PROMPT+=$_P9K_ALIGNED_RPROMPT
+  _P9K_RPROMPT_DONE=1
+  (( ${ZLE_RPROMPT_INDENT:-1} > 0 ))
 }
 
 ################################################################
@@ -422,8 +423,7 @@ set_default POWERLEVEL9K_PROMPT_ON_NEWLINE false
 set_default POWERLEVEL9K_RPROMPT_ON_NEWLINE false
 prompt_newline() {
   [[ "$1" == "right" ]] && return
-  _p9k_left_prompt_end_line
-  _P9K_PROMPT+=$'\n'
+  _p9k_left_prompt_end_line && _P9K_PROMPT+=$'\n'
   _P9K_PROMPT+='${${_P9K_BG::=NONE}+}'
   if [[ $POWERLEVEL9K_PROMPT_ON_NEWLINE == true ]]; then
     _p9k_get_icon MULTILINE_NEWLINE_PROMPT_PREFIX
@@ -2103,6 +2103,8 @@ prompt_java_version() {
 ################################################################
 # Main prompt
 set_default -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS context dir vcs
+
+# Returns 1 if the cursor is at the very end of the screen.
 build_left_prompt() {
   local -i index=1
   local element
@@ -2180,8 +2182,11 @@ function _p9k_set_prompt() {
   fi
 
   _P9K_PROMPT=''
-  build_left_prompt
-  PROMPT+=$_P9K_LEFT_PREFIX$_P9K_PROMPT$_P9K_LEFT_SUFFIX
+  if build_left_prompt; then
+    PROMPT+=$_P9K_LEFT_PREFIX$_P9K_PROMPT$_P9K_LEFT_SUFFIX
+  else
+    PROMPT+=$_P9K_LEFT_PREFIX$_P9K_PROMPT${_P9K_LEFT_SUFFIX#$'\n'}
+  fi
 }
 
 typeset -g _P9K_REFRESH_REASON
