@@ -58,7 +58,10 @@ function _p9k_prompt_length() {
   emulate -L zsh
   local -i x y=$#1 m
   if (( y )); then
-    while (( ${${(%):-$1%$y(l.1.0)}[-1]} )); do (( y *= 2 )); done
+    while (( ${${(%):-$1%$y(l.1.0)}[-1]} )); do
+      x=y
+      (( y *= 2 ));
+    done
     local xy
     while (( y > x + 1 )); do
       m=$(( x + (y - x) / 2 ))
