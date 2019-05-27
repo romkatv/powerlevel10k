@@ -393,6 +393,11 @@ prompt_background_jobs() {
   $1_prompt_segment $0 $2 "$DEFAULT_COLOR" cyan BACKGROUND_JOBS_ICON 1 '${${(%):-%j}:#0}' "$msg"
 }
 
+typeset -g _P9K_XY
+typeset -gi _P9K_X _P9K_Y _P9K_M
+typeset -gi _P9K_RPROMPT_DONE
+typeset -g _P9K_ALIGNED_RPROMPT
+
 function _p9k_left_prompt_end_line() {
   _p9k_get_icon LEFT_SEGMENT_SEPARATOR
   _p9k_escape_rcurly $_P9K_RETVAL
@@ -403,11 +408,27 @@ function _p9k_left_prompt_end_line() {
   _P9K_PROMPT+="\${\${_P9K_T[2]::=%F{\$_P9K_BG\}$_P9K_RETVAL}+}"
   _P9K_PROMPT+="\${_P9K_T[\$_P9K_N]}"
   _P9K_PROMPT+='%f'
+
+  if (( ! _P9K_RPROMPT_DONE )); then
+    #_P9K_PROMPT+='${${_P9K_X::=0}+}${${_P9K_Y::=$((COLUMNS+1))}+}'
+    #local -i i=0
+    #for (( ; i != 10; ++i )); do
+    #  _P9K_PROMPT+='${${_P9K_M::=$(((_P9K_X+_P9K_Y)/2))}+}${${_P9K_XY::=${${(%):-$_P9K_RPROMPT%$_P9K_M(l./$_P9K_M;$_P9K_Y./$_P9K_X;$_P9K_M)}##*/}}+}${${_P9K_X::=${_P9K_XY%;*}}+}${${_P9K_Y::=${_P9K_XY#*;}}+}'
+    #done
+    #_P9K_PROMPT+='${${_P9K_X::=$((_P9K_X+1+${${ZLE_RPROMPT_INDENT:-1}/#-*/0}))}+}'
+    #for (( ; i != 256; ++i )); do
+    #  _P9K_PROMPT+='%-$_P9K_X(l. .)'
+    #done
+    #_P9K_PROMPT+='$_P9K_RPROMPT'
+    _P9K_PROMPT+=$_P9K_ALIGNED_RPROMPT
+    _P9K_RPROMPT_DONE=1
+  fi
 }
 
 ################################################################
 # A newline in your prompt, so you can segments on multiple lines.
 set_default POWERLEVEL9K_PROMPT_ON_NEWLINE false
+set_default POWERLEVEL9K_RPROMPT_ON_NEWLINE false
 prompt_newline() {
   [[ "$1" == "right" ]] && return
   _p9k_left_prompt_end_line
@@ -2097,6 +2118,8 @@ build_left_prompt() {
 
     ((++index))
   done
+
+  _p9k_left_prompt_end_line
 }
 
 # Right prompt
@@ -2126,6 +2149,7 @@ typeset -gF _P9K_TIMER_START
 powerlevel9k_preexec() { _P9K_TIMER_START=$EPOCHREALTIME }
 
 typeset -g _P9K_PROMPT
+typeset -g _P9K_RPROMPT
 typeset -g _P9K_LEFT_PREFIX
 typeset -g _P9K_LEFT_SUFFIX
 typeset -g _P9K_RIGHT_PREFIX
@@ -2134,18 +2158,27 @@ typeset -g _P9K_RIGHT_SUFFIX
 set_default POWERLEVEL9K_DISABLE_RPROMPT false
 function _p9k_set_prompt() {
   emulate -L zsh
+  PROMPT=
+  RPROMPT=
+  if [[ $POWERLEVEL9K_DISABLE_RPROMPT == true ]]; then
+    _P9K_RPROMPT_DONE=1
+  else
+    _P9K_PROMPT=
+    build_right_prompt
+    local right=$_P9K_RIGHT_PREFIX$_P9K_PROMPT$_P9K_RIGHT_SUFFIX
+    if [[ $POWERLEVEL9K_PROMPT_ON_NEWLINE != true || $POWERLEVEL9K_RPROMPT_ON_NEWLINE == true ]]; then
+      RPROMPT=$right
+      _P9K_RPROMPT_DONE=1
+    else
+      unset _P9K_RPROMPT_OVERRIDE
+      PROMPT="\${\${_P9K_RPROMPT::=\${_P9K_RPROMPT_OVERRIDE-$right}}+}"
+      _P9K_RPROMPT_DONE=0
+    fi
+  fi
 
   _P9K_PROMPT=''
   build_left_prompt
-  PROMPT=$_P9K_LEFT_PREFIX$_P9K_PROMPT$_P9K_LEFT_SUFFIX
-
-  if [[ $POWERLEVEL9K_DISABLE_RPROMPT == true ]]; then
-    RPROMPT=''
-  else
-    _P9K_PROMPT=''
-    build_right_prompt
-    RPROMPT=$_P9K_RIGHT_PREFIX$_P9K_PROMPT$_P9K_RIGHT_SUFFIX
-  fi
+  PROMPT+=$_P9K_LEFT_PREFIX$_P9K_PROMPT$_P9K_LEFT_SUFFIX
 }
 
 typeset -g _P9K_REFRESH_REASON
@@ -2374,15 +2407,28 @@ _p9k_init() {
     _p9k_init_timer
   fi
 
+  _P9K_ALIGNED_RPROMPT='${${_P9K_X::=0}+}${${_P9K_Y::=$((COLUMNS+1))}+}'
+  repeat 10; do
+    _P9K_ALIGNED_RPROMPT+='${${_P9K_M::=$(((_P9K_X+_P9K_Y)/2))}+}'
+    _P9K_ALIGNED_RPROMPT+='${${_P9K_XY::=${${(%):-$_P9K_RPROMPT%$_P9K_M(l./$_P9K_M;$_P9K_Y./$_P9K_X;$_P9K_M)}##*/}}+}'
+    _P9K_ALIGNED_RPROMPT+='${${_P9K_X::=${_P9K_XY%;*}}+}'
+    _P9K_ALIGNED_RPROMPT+='${${_P9K_Y::=${_P9K_XY#*;}}+}'
+  done
+  _P9K_ALIGNED_RPROMPT+='${${_P9K_X::=$((_P9K_X+1+${${ZLE_RPROMPT_INDENT:-1}/#-*/0}))}+}'
+  _P9K_ALIGNED_RPROMPT+='${${_P9K_Y::=$((_P9K_X+31))}+}'
+  repeat 32; do
+    _P9K_ALIGNED_RPROMPT+='%-$_P9K_Y(l.                                .)'
+  done
+  repeat 32; do
+    _P9K_ALIGNED_RPROMPT+='%-$_P9K_X(l. .)'
+  done
+  _P9K_ALIGNED_RPROMPT+='$_P9K_RPROMPT'
+
   _P9K_LEFT_PREFIX+='${${_P9K_BG::=NONE}+}${${_P9K_I::=0}+}'
   _P9K_RIGHT_PREFIX+='${${_P9K_BG::=NONE}+}${${_P9K_I::=0}+}'
 
   _p9k_get_icon LEFT_SEGMENT_SEPARATOR
   _P9K_T=("%f$_P9K_RETVAL" "")
-  _P9K_PROMPT=''
-  _p9k_left_prompt_end_line
-  _P9K_LEFT_SUFFIX=$_P9K_PROMPT
-  _P9K_PROMPT=''
   _p9k_get_icon LEFT_SEGMENT_END_SEPARATOR
   _P9K_LEFT_SUFFIX+=$_P9K_RETVAL
 
@@ -2395,14 +2441,17 @@ _p9k_init() {
     _p9k_get_icon MULTILINE_LAST_PROMPT_PREFIX
     _P9K_LEFT_SUFFIX+=$'\n'$_P9K_RETVAL
     if [[ $POWERLEVEL9K_RPROMPT_ON_NEWLINE != true ]]; then
-      # The right prompt should be on the same line as the first line of the left
-      # prompt. To do so, there is just a quite ugly workaround: Before zsh draws
-      # the RPROMPT, we advise it, to go one line up. At the end of RPROMPT, we
-      # advise it to go one line down. See:
-      # http://superuser.com/questions/357107/zsh-right-justify-in-ps1
-      local LC_ALL="" LC_CTYPE="en_US.UTF-8" # Set the right locale to protect special characters
-      _P9K_RIGHT_PREFIX+='%{'$'\e[1A''%}' # one line up
-      _P9K_RIGHT_SUFFIX+='%{'$'\e[1B''%}' # one line down
+      if is-at-least 5.3; then
+        function _p9k_zle_line_finish() {
+          [[ -o TRANSIENT_RPROMPT ]] || return
+          _P9K_RPROMPT_OVERRIDE=
+          zle && zle .reset-prompt && zle -R
+        }
+        autoload -Uz add-zle-hook-widget
+        zle -N _p9k_zle_line_finish
+        add-zle-hook-widget line-finish _p9k_zle_line_finish
+        add-zle-hook-widget -D line-finish user:_zsh_highlight_widget_orig-\*-zle-line-finish
+      fi
     fi
   else
     _P9K_LEFT_PREFIX+="%f%b%k"
@@ -2463,6 +2512,7 @@ _p9k_init() {
       }
       autoload -Uz add-zle-hook-widget
       add-zle-hook-widget line-pre-redraw _p9k_zle_line_pre_redraw
+      add-zle-hook-widget -D line-pre-redraw user:_zsh_highlight_widget_orig-\*-zle-line-pre-redraw
       _p9k_g_expand POWERLEVEL9K_VI_VISUAL_MODE_STRING
     else
       >&2 print -P '%F{yellow}WARNING!%f POWERLEVEL9K_VI_VISUAL_MODE_STRING requires ZSH >= 5.3.'
