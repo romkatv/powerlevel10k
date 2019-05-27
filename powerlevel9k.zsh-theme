@@ -2462,7 +2462,8 @@ _p9k_init() {
         autoload -Uz add-zle-hook-widget
         zle -N _p9k_zle_line_finish
         add-zle-hook-widget line-finish _p9k_zle_line_finish
-        add-zle-hook-widget -D line-finish user:_zsh_highlight_widget_orig-\*-zle-line-finish
+        add-zle-hook-widget -D line-finish user:_zsh_highlight_widget_orig-\*
+        add-zle-hook-widget -D line-finish user:_zsh_autosuggest_bound_\*
       fi
     fi
   else
@@ -2524,7 +2525,8 @@ _p9k_init() {
       }
       autoload -Uz add-zle-hook-widget
       add-zle-hook-widget line-pre-redraw _p9k_zle_line_pre_redraw
-      add-zle-hook-widget -D line-pre-redraw user:_zsh_highlight_widget_orig-\*-zle-line-pre-redraw
+      add-zle-hook-widget -D line-pre-redraw user:_zsh_highlight_widget_orig-\*
+      add-zle-hook-widget -D line-pre-redraw user:_zsh_autosuggest_bound_\*
       _p9k_g_expand POWERLEVEL9K_VI_VISUAL_MODE_STRING
     else
       >&2 print -P '%F{yellow}WARNING!%f POWERLEVEL9K_VI_VISUAL_MODE_STRING requires ZSH >= 5.3.'
