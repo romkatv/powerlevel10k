@@ -408,7 +408,7 @@ function _p9k_left_prompt_end_line() {
   _P9K_PROMPT+="\${\${_P9K_N:=2}+}"
   _P9K_PROMPT+="\${\${_P9K_T[2]::=%F{\$_P9K_BG\}$_P9K_RETVAL}+}"
   _P9K_PROMPT+="\${_P9K_T[\$_P9K_N]}"
-  _P9K_PROMPT+='%f'
+  _P9K_PROMPT+="%f$1%f%k%b"
 
   if (( ! _P9K_RPROMPT_DONE )); then
     _P9K_PROMPT+=$_P9K_ALIGNED_RPROMPT
@@ -2121,7 +2121,8 @@ build_left_prompt() {
     ((++index))
   done
 
-  _p9k_left_prompt_end_line
+  _p9k_get_icon LEFT_SEGMENT_END_SEPARATOR
+  _p9k_left_prompt_end_line $_P9K_RETVAL
 }
 
 # Right prompt
@@ -2437,8 +2438,6 @@ _p9k_init() {
 
   _p9k_get_icon LEFT_SEGMENT_SEPARATOR
   _P9K_T=("%f$_P9K_RETVAL" "")
-  _p9k_get_icon LEFT_SEGMENT_END_SEPARATOR
-  _P9K_LEFT_SUFFIX+=$_P9K_RETVAL
 
   _P9K_RIGHT_SUFFIX+='%f%b%k'
   _P9K_RIGHT_PREFIX+='%f%b%k'
