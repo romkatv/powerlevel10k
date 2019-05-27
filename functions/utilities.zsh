@@ -45,6 +45,29 @@ function _p9k_g_expand() {
   typeset -g $1=${(g::)${(P)1}}
 }
 
+# If we execute `print -P $1`, how many characters will be printed on the last line?
+# Assumes that `%{%}` and `%G` don't lie.
+#
+#   _p9k_prompt_length '' => 0
+#   _p9k_prompt_length 'abc' => 3
+#   _p9k_prompt_length $'abc\nxy' => 2
+#   _p9k_prompt_length $'\t' => 8
+#   _p9k_prompt_length '%F{red}abc' => 3
+#   _p9k_prompt_length $'%{a\b%Gb%}' => 1
+function _p9k_prompt_length() {
+  emulate -L zsh
+  local -i x y=$#1 m
+  if (( y )); then
+    while (( ${${(%):-$1%$y(l.1.0)}[-1]} )); do (( y *= 2 )); done
+    local xy
+    while (( y > x + 1 )); do
+      m=$(( x + (y - x) / 2 ))
+      typeset ${${(%):-$1%$m(l.x.y)}[-1]}=$m
+    done
+  fi
+  _P9K_RETVAL=$x
+}
+
 typeset -g _P9K_BYTE_SUFFIX=('B' 'K' 'M' 'G' 'T' 'P' 'E' 'Z' 'Y')
 
 # 42 => 42B
