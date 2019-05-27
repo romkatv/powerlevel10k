@@ -181,13 +181,13 @@ function _gitstatus_process_response() {
     typeset -gi VCS_STATUS_STASHES="${resp[16]}"
     typeset -g  VCS_STATUS_TAG="${resp[17]}"
     typeset -gi VCS_STATUS_HAS_STAGED=$((VCS_STATUS_NUM_STAGED > 0))
-    if (( dirty_max_index_size >= 0 && VCS_STATUS_INDEX_SIZE > dirty_max_index_size )); then
+    (( dirty_max_index_size >= 0 && VCS_STATUS_INDEX_SIZE > dirty_max_index_size )) && {
       typeset -gi VCS_STATUS_HAS_UNSTAGED=-1
       typeset -gi VCS_STATUS_HAS_UNTRACKED=-1
-    else
+    } || {
       typeset -gi VCS_STATUS_HAS_UNSTAGED=$((VCS_STATUS_NUM_UNSTAGED > 0))
       typeset -gi VCS_STATUS_HAS_UNTRACKED=$((VCS_STATUS_NUM_UNTRACKED > 0))
-    fi
+    }
   } || {
     (( ours )) && VCS_STATUS_RESULT=norepo-sync || VCS_STATUS_RESULT=norepo-async
     unset VCS_STATUS_WORKDIR
