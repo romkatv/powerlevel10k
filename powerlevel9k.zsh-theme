@@ -137,6 +137,7 @@ _p9k_cache_get() {
 _p9k_get_icon() {
   local var_name=POWERLEVEL9K_$1
   _P9K_RETVAL=${(g::)${${(P)var_name}-$icons[$1]}}
+  [[ $_P9K_RETVAL != $'\b'? ]] || _P9K_RETVAL="%{$_P9K_RETVAL%}"  # penance for past sins
 }
 
 typeset -ga _P9K_LEFT_JOIN=(1)
