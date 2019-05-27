@@ -411,7 +411,7 @@ function _p9k_left_prompt_end_line() {
   _P9K_PROMPT+="\${_P9K_T[\$_P9K_N]}"
   _P9K_PROMPT+="%f$1%f%k%b"
 
-  (( ! _P9K_RPROMPT_DONE )) || return
+  (( ! _P9K_RPROMPT_DONE )) || return 0
   _P9K_PROMPT+=$_P9K_ALIGNED_RPROMPT
   _P9K_RPROMPT_DONE=1
   (( ${ZLE_RPROMPT_INDENT:-1} > 0 ))
