@@ -240,7 +240,7 @@ prompt; gitstatus spawns `gitstatusd` and `zsh`. See
 if `POWERLEVEL9K_EXPERIMENTAL_TIME_REALTIME` is set to `true`. This is used to trigger prompt
 refresh every second.
 
-### Does Powerlevel10k always render exactly the same prompt with the same config?
+### Does Powerlevel10k always render exactly the same prompt as Powerlevel9k given the same config?
 
 This is the goal. You should be able to switch between Powerlevel9k and Powerlevel10k with no
 visible changes except for performance. There are, however, several differences.
@@ -267,19 +267,11 @@ Powerlevel10k regularly pulls changes from Powerlevel9k, so all bug fixes and ne
 in Powerlevel9k will land here, too. This is a labor-intensive process because Powerlevel9k and
 Powerlevel10k have very different code. Thankfully, there aren't many changes in Powerlevel9k.
 
-There is ongoing work on upstreaming some of the performance improvements from Powerlevel10k to
-Powerlevel9k. E.g., issues [1170](https://github.com/bhilburn/powerlevel9k/issues/1170) and
-[1185](https://github.com/bhilburn/powerlevel9k/issues/1185).
+Occasionally Powerlevel9k copies features and bug fixes from Powerlevel10k but this is happens
+rarely.
 
-I've opening issues for all bugs that I've inherited from Powerlevel9k during the fork and have
-since fixed. They don't see much traction but at least the devs and users know about them.
-
-Improvements to [libgit2](https://github.com/libgit2/libgit2/issues/4230#issuecomment-471710359) are
-being upstreamed. There are 3 independent optimizations and it's not yet clear whether all of them
-will make it but there is a good chance they will.
-
-Fix to a [bug in zsh](https://www.zsh.org/mla/workers//2019/msg00204.html) that affects all async
-themes might get upstreamed.
+Improvements to [libgit2](https://github.com/libgit2/libgit2/issues/5038)
+might eventually be upstreamed. It's a very slow process.
 
 ### Is there an AUR package for Powerlevel10k?
 
