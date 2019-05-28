@@ -2465,6 +2465,10 @@ _p9k_init() {
       local pad_len="\$((COLUMNS-$ruler_len))"
       _P9K_LEFT_PREFIX+="%b\${(pl$sep$ruler_len$sep$sep${(q)ruler_char}$sep)}%k%f"
       _P9K_LEFT_PREFIX+="\${(l$sep$pad_len$sep$sep $sep)}"
+    else
+      print -P "%F{red}WARNING!%f %BPOWERLEVEL9K_RULER_CHAR%b is not one character long. Ruler won't be rendered."
+      print -P "Either change the value of %BPOWERLEVEL9K_RULER_CHAR%b or set %BPOWERLEVEL9K_SHOW_RULER=false%b to"
+      print -P "disable ruler."
     fi
   fi
 
