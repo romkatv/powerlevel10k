@@ -1557,14 +1557,18 @@ build_test_stats() {
 set_default POWERLEVEL9K_EXPERIMENTAL_TIME_REALTIME false
 set_default POWERLEVEL9K_TIME_FORMAT "%D{%H:%M:%S}"
 prompt_time() {
-  "$1_prompt_segment" "$0" "$2" "$DEFAULT_COLOR_INVERTED" "$DEFAULT_COLOR" "TIME_ICON" 0 '' "$POWERLEVEL9K_TIME_FORMAT"
+  local t=$POWERLEVEL9K_TIME_FORMAT
+  [[ $POWERLEVEL9K_EXPERIMENTAL_TIME_REALTIME == true ]] || t=${(%)t}
+  "$1_prompt_segment" "$0" "$2" "$DEFAULT_COLOR_INVERTED" "$DEFAULT_COLOR" "TIME_ICON" 0 '' "${t//\%/%%}"
 }
 
 ################################################################
 # System date
 set_default POWERLEVEL9K_DATE_FORMAT "%D{%d.%m.%y}"
 prompt_date() {
-  "$1_prompt_segment" "$0" "$2" "$DEFAULT_COLOR_INVERTED" "$DEFAULT_COLOR" "DATE_ICON" 0 '' "$POWERLEVEL9K_DATE_FORMAT"
+  local d=$POWERLEVEL9K_DATE_FORMAT
+  [[ $POWERLEVEL9K_EXPERIMENTAL_TIME_REALTIME == true ]] || d=${(%)d}
+  "$1_prompt_segment" "$0" "$2" "$DEFAULT_COLOR_INVERTED" "$DEFAULT_COLOR" "DATE_ICON" 0 '' "${d//\%/%%}"
 }
 
 ################################################################
