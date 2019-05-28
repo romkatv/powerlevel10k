@@ -30,6 +30,7 @@ function _p9k_init_icons() {
       # Set the right locale to protect special characters
       local LC_ALL="" LC_CTYPE="en_US.UTF-8"
       icons=(
+        RULER_CHAR                     $'\u2500'              # ─
         LEFT_SEGMENT_SEPARATOR         $'\uE0B0'              # 
         RIGHT_SEGMENT_SEPARATOR        $'\uE0B2'              # 
         LEFT_SEGMENT_END_SEPARATOR     ' '                    # Whitespace
@@ -132,6 +133,7 @@ function _p9k_init_icons() {
       # Set the right locale to protect special characters
       local LC_ALL="" LC_CTYPE="en_US.UTF-8"
       icons=(
+        RULER_CHAR                     $'\u2500'              # ─
         LEFT_SEGMENT_SEPARATOR         $'\uE0B0'              # 
         RIGHT_SEGMENT_SEPARATOR        $'\uE0B2'              # 
         LEFT_SEGMENT_END_SEPARATOR     ' '                    # Whitespace
@@ -239,6 +241,7 @@ function _p9k_init_icons() {
       fi
 
       icons=(
+        RULER_CHAR                     $'\u2500'              # ─
         LEFT_SEGMENT_SEPARATOR         $'\uE0B0'                                      # 
         RIGHT_SEGMENT_SEPARATOR        $'\uE0B2'                                      # 
         LEFT_SEGMENT_END_SEPARATOR     ' '                                            # Whitespace
@@ -334,6 +337,7 @@ function _p9k_init_icons() {
       # Set the right locale to protect special characters
       local LC_ALL="" LC_CTYPE="en_US.UTF-8"
       icons=(
+        RULER_CHAR                     $'\u2500'              # ─
         LEFT_SEGMENT_SEPARATOR         $'\uE0B0'              # 
         RIGHT_SEGMENT_SEPARATOR        $'\uE0B2'              # 
         LEFT_SEGMENT_END_SEPARATOR     ' '                    # Whitespace
@@ -432,6 +436,7 @@ function _p9k_init_icons() {
       # Set the right locale to protect special characters
       local LC_ALL="" LC_CTYPE="en_US.UTF-8"
       icons=(
+        RULER_CHAR                     $'\u2500'              # ─
         LEFT_SEGMENT_SEPARATOR         $'\uE0B0'              # 
         RIGHT_SEGMENT_SEPARATOR        $'\uE0B2'              # 
         LEFT_SEGMENT_END_SEPARATOR     ' '                    # Whitespace

@@ -2202,6 +2202,7 @@ function _p9k_update_prompt() {
 typeset -gi _P9K_REGION_ACTIVE
 
 set_default POWERLEVEL9K_PROMPT_ADD_NEWLINE false
+set_default POWERLEVEL9K_SHOW_RULER false
 
 powerlevel9k_refresh_prompt_inplace() {
   emulate -L zsh
@@ -2439,6 +2440,34 @@ _p9k_init() {
   done
   _P9K_ALIGNED_RPROMPT+='$_P9K_RPROMPT'
 
+  if [[ $POWERLEVEL9K_PROMPT_ADD_NEWLINE == true ]]; then
+    repeat ${POWERLEVEL9K_PROMPT_ADD_NEWLINE_COUNT:-1} _P9K_LEFT_PREFIX+=$'\n'
+  fi
+
+  if [[ $POWERLEVEL9K_SHOW_RULER == true ]]; then
+    _p9k_get_icon RULER_CHAR
+    local ruler_char=$_P9K_RETVAL
+    _p9k_prompt_length $ruler_char
+    if (( _P9K_RETVAL == 1 && $#ruler_char == 1 )); then
+      _p9k_color "" prompt_ruler BACKGROUND
+      _p9k_background $_P9K_RETVAL
+      _P9K_LEFT_PREFIX+=$_P9K_RETVAL
+      _p9k_color "" prompt_ruler FOREGROUND
+      _p9k_foreground $_P9K_RETVAL
+      _P9K_LEFT_PREFIX+=$_P9K_RETVAL
+      [[ $ruler_char == '.' ]] && local sep=',' || local sep='.'
+      local indent='${${ZLE_RPROMPT_INDENT:-1}/#-*/0}'
+      local ruler_len="\${\$((COLUMNS-$indent))/#-*/0}"
+      local pad_len="\$((COLUMNS-$ruler_len))"
+      _P9K_LEFT_PREFIX+="%b\${(pl$sep$ruler_len$sep$sep${(q)ruler_char}$sep)}%k%f"
+      _P9K_LEFT_PREFIX+="\${(l$sep$pad_len$sep$sep $sep)}"
+    fi
+  fi
+
+  if [[ $ITERM_SHELL_INTEGRATION_INSTALLED == Yes ]]; then
+    _P9K_LEFT_PREFIX+="%{$(iterm2_prompt_mark)%}"
+  fi
+
   _P9K_LEFT_PREFIX+='${${_P9K_BG::=NONE}+}${${_P9K_I::=0}+}'
   _P9K_RIGHT_PREFIX+='${${_P9K_BG::=NONE}+}${${_P9K_I::=0}+}'
 
@@ -2469,14 +2498,6 @@ _p9k_init() {
     fi
   else
     _P9K_LEFT_PREFIX+="%f%b%k"
-  fi
-
-  if [[ $POWERLEVEL9K_PROMPT_ADD_NEWLINE == true ]]; then
-    repeat ${POWERLEVEL9K_PROMPT_ADD_NEWLINE_COUNT:-1} { _P9K_LEFT_PREFIX=$'\n'$_P9K_LEFT_PREFIX }
-  fi
-
-  if [[ $ITERM_SHELL_INTEGRATION_INSTALLED == Yes ]]; then
-    _P9K_LEFT_PREFIX="%{$(iterm2_prompt_mark)%}$_P9K_LEFT_PREFIX"
   fi
 
   # If the terminal `LANG` is set to `C`, this theme will not work at all.
