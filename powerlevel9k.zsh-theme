@@ -243,10 +243,10 @@ left_prompt_segment() {
 
     local pre
     pre+="\${_P9K_N::=}\${_P9K_F::=}"
-    pre+="\${\${\${\${_P9K_BG:-0}:#NONE}:-\${_P9K_N::=$((t+1))}}+}"                        # 1
-    pre+="\${\${_P9K_N:=\${\${\$((_P9K_I>=$_P9K_LEFT_JOIN[$2])):#0}:+$((t+2))}}+}"         # 2
-    pre+="\${\${_P9K_N:=\${\${\$((!\${#\${:-0\$_P9K_BG}:#0$bg_color})):#0}:+$((t+3))}}+}"  # 3
-    pre+="\${\${_P9K_N:=\${\${_P9K_F::=%F{\$_P9K_BG\}}+$((t+4))}}+}"                       # 4
+    pre+="\${\${\${_P9K_BG:-0}:#NONE}:-\${_P9K_N::=$((t+1))}}"                        # 1
+    pre+="\${_P9K_N:=\${\${\$((_P9K_I>=$_P9K_LEFT_JOIN[$2])):#0}:+$((t+2))}}"         # 2
+    pre+="\${_P9K_N:=\${\${\$((!\${#\${:-0\$_P9K_BG}:#0$bg_color})):#0}:+$((t+3))}}"  # 3
+    pre+="\${_P9K_N:=\${\${_P9K_F::=%F{\$_P9K_BG\}}+$((t+4))}}}+}"                    # 4
     pre+="\${_P9K_F}%b\${_P9K_T[\$_P9K_N]}"
 
     local post="\${_P9K_C}$space\${\${_P9K_I::=$2}+}\${\${_P9K_BG::=$bg_color}+}}"
@@ -265,7 +265,7 @@ left_prompt_segment() {
   local content="${(j::):-$_P9K_RETVAL${^@}}"
   (( expand )) || content="\${(Q)\${:-${(q)content}}}"
 
-  _P9K_PROMPT+="\${\${:-$cond}:+\${\${_P9K_C::=${content}}+}${_P9K_CACHE_VAL[3]}"
+  _P9K_PROMPT+="\${\${:-$cond}:+\${\${:-\${_P9K_C::=${content}}${_P9K_CACHE_VAL[3]}"
   (( has_icon )) && _P9K_PROMPT+="\${\${\${#_P9K_C}:#$(($# * $#fg))}:+ }"
   _P9K_PROMPT+=${_P9K_CACHE_VAL[4]}
 }
@@ -318,10 +318,10 @@ right_prompt_segment() {
 
     local pre
     pre+="\${_P9K_N::=}"
-    pre+="\${\${\${\${_P9K_BG:-0}:#NONE}:-\${_P9K_N::=$((t+1))}}+}"                        # 1
-    pre+="\${\${_P9K_N:=\${\${\$((_P9K_I>=$_P9K_RIGHT_JOIN[$2])):#0}:+$((t+2))}}+}"        # 2
-    pre+="\${\${_P9K_N:=\${\${\$((!\${#\${:-0\$_P9K_BG}:#0$bg_color})):#0}:+$((t+3))}}+}"  # 3
-    pre+="\${\${_P9K_N:=$((t+1))}+}"                                                       # 4 == 1
+    pre+="\${\${\${_P9K_BG:-0}:#NONE}:-\${_P9K_N::=$((t+1))}}"                        # 1
+    pre+="\${_P9K_N:=\${\${\$((_P9K_I>=$_P9K_RIGHT_JOIN[$2])):#0}:+$((t+2))}}"        # 2
+    pre+="\${_P9K_N:=\${\${\$((!\${#\${:-0\$_P9K_BG}:#0$bg_color})):#0}:+$((t+3))}}"  # 3
+    pre+="\${_P9K_N:=$((t+1))}}+}"                                                    # 4 == 1
     pre+="%b\${_P9K_T[\$_P9K_N]}\${_P9K_C}$icon_fg"
 
     _p9k_escape_rcurly $POWERLEVEL9K_WHITESPACE_BETWEEN_RIGHT_SEGMENTS
@@ -340,7 +340,7 @@ right_prompt_segment() {
   local content="${(j::):-$_P9K_RETVAL${^@}}"
   (( expand )) || content="\${(Q)\${:-${(q)content}}}"
 
-  _P9K_PROMPT+="\${\${:-$cond}:+\${\${_P9K_C::=${content}}+}${_P9K_CACHE_VAL[3]}"
+  _P9K_PROMPT+="\${\${:-$cond}:+\${\${:-\${_P9K_C::=${content}}${_P9K_CACHE_VAL[3]}"
   (( has_icon )) && _P9K_PROMPT+="\${\${\${#_P9K_C}:#$(($# * $#fg))}:+ }"
   _P9K_PROMPT+=${_P9K_CACHE_VAL[4]}
 }
@@ -2421,15 +2421,16 @@ _p9k_init() {
     _p9k_init_timer
   fi
 
-  _P9K_ALIGNED_RPROMPT='${${_P9K_X::=0}+}${${_P9K_Y::=$((COLUMNS+1))}+}'
+  _P9K_ALIGNED_RPROMPT='${${:-${_P9K_X::=0}${_P9K_Y::=$((COLUMNS+1))}'
   repeat 10; do
-    _P9K_ALIGNED_RPROMPT+='${${_P9K_M::=$(((_P9K_X+_P9K_Y)/2))}+}'
-    _P9K_ALIGNED_RPROMPT+='${${_P9K_XY::=${${(%):-$_P9K_RPROMPT%$_P9K_M(l./$_P9K_M;$_P9K_Y./$_P9K_X;$_P9K_M)}##*/}}+}'
-    _P9K_ALIGNED_RPROMPT+='${${_P9K_X::=${_P9K_XY%;*}}+}'
-    _P9K_ALIGNED_RPROMPT+='${${_P9K_Y::=${_P9K_XY#*;}}+}'
+    _P9K_ALIGNED_RPROMPT+='${_P9K_M::=$(((_P9K_X+_P9K_Y)/2))}'
+    _P9K_ALIGNED_RPROMPT+='${_P9K_XY::=${${(%):-$_P9K_RPROMPT%$_P9K_M(l./$_P9K_M;$_P9K_Y./$_P9K_X;$_P9K_M)}##*/}}'
+    _P9K_ALIGNED_RPROMPT+='${_P9K_X::=${_P9K_XY%;*}}'
+    _P9K_ALIGNED_RPROMPT+='${_P9K_Y::=${_P9K_XY#*;}}'
   done
-  _P9K_ALIGNED_RPROMPT+='${${_P9K_X::=$((_P9K_X+1+${${ZLE_RPROMPT_INDENT:-1}/#-*/0}))}+}'
-  _P9K_ALIGNED_RPROMPT+='${${_P9K_Y::=$((_P9K_X+31))}+}'
+  _P9K_ALIGNED_RPROMPT+='${_P9K_X::=$((_P9K_X+1+${${ZLE_RPROMPT_INDENT:-1}/#-*/0}))}'
+  _P9K_ALIGNED_RPROMPT+='${_P9K_Y::=$((_P9K_X+31))}}+}'
+
   repeat 32; do
     _P9K_ALIGNED_RPROMPT+='%-$_P9K_Y(l.                                .)'
   done
