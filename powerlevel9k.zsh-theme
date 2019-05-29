@@ -2332,7 +2332,8 @@ function _p9k_prompt_overflow_bug() {
   is-at-least 5.4.2 || return 1
   [[ $ZSH_PATCHLEVEL =~ '^zsh-5\.4\.2-([0-9]+)-' ]] && return $(( match[1] < 159 ))
   is-at-least 5.7.2 && return 1
-  [[ $ZSH_PATCHLEVEL =~ '^zsh-5\.7\.1-([0-9]+)-' ]] && return $(( match[1] >= 50 ))  
+  [[ $ZSH_PATCHLEVEL =~ '^zsh-5\.7\.1-([0-9]+)-' ]] && return $(( match[1] >= 50 ))
+  return 0
 }
 
 # Some people write POWERLEVEL9K_DIR_PATH_SEPARATOR='\uNNNN' instead of
