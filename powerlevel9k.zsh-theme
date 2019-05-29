@@ -697,14 +697,11 @@ prompt_custom() {
   local segment_name="${3:u}"
   # Get content of custom segment
   local command="POWERLEVEL9K_CUSTOM_${segment_name}"
-  local segment_content="$(eval ${(P)command})"
-  # Note: this would be a better implementation. I'm keeping the old one in case anyone
-  # relies on its quirks.
-  # local segment_content=$("${(@Q)${(z)${(P)command}}}")
-
-  if [[ -n $segment_content ]]; then
-    "$1_prompt_segment" "${0}_${3:u}" "$2" $DEFAULT_COLOR_INVERTED $DEFAULT_COLOR "CUSTOM_${segment_name}_ICON" 0 '' "$segment_content"
-  fi
+  local -a cmd=("${(@Q)${(z)${(P):-POWERLEVEL9K_CUSTOM_${segment_name}}}}")
+  whence $cmd[1] &>/dev/null || return
+  local content=$("$cmd[@]")
+  [[ -n $content ]] || return
+  "$1_prompt_segment" "${0}_${3:u}" "$2" $DEFAULT_COLOR_INVERTED $DEFAULT_COLOR "CUSTOM_${segment_name}_ICON" 0 '' "$content"
 }
 
 ################################################################
