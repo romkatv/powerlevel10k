@@ -66,11 +66,6 @@ Set `ZSH_THEME=powerlevel10k/powerlevel10k` in your `~/.zshrc`.
 
 ### Prezto
 
-```zsh
-git clone https://github.com/romkatv/powerlevel10k.git  ~/.zprezto/modules/prompt/external/powerlevel10k
-ln -s ~/.zprezto/modules/prompt/{external/powerlevel10k/powerlevel10k.zsh-theme,functions/prompt_powerlevel10k_setup}
-```
-
 Add `zstyle :prezto:module:prompt theme powerlevel10k` to your `~/.zpreztorc`.
 
 ### Antigen
