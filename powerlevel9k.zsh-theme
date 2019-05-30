@@ -2326,11 +2326,9 @@ _p9k_init_timer() {
 # Test: PROMPT="${(pl:$((COLUMNS))::-:)}<%1(l.%2(l.FAIL.PASS).FAIL)> " zsh -dfis <<<exit
 # Workaround: PROMPT="${(pl:$((COLUMNS))::-:)}%{%G%}<%1(l.%2(l.FAIL.PASS).FAIL)> " zsh -dfis <<<exit
 function _p9k_prompt_overflow_bug() {
-  is-at-least 5.4.2 || return 1
   [[ $ZSH_PATCHLEVEL =~ '^zsh-5\.4\.2-([0-9]+)-' ]] && return $(( match[1] < 159 ))
-  is-at-least 5.7.2 && return 1
   [[ $ZSH_PATCHLEVEL =~ '^zsh-5\.7\.1-([0-9]+)-' ]] && return $(( match[1] >= 50 ))
-  return 0
+  is-at-least 5.5 && ! is-at-least 5.7.2
 }
 
 # Some people write POWERLEVEL9K_DIR_PATH_SEPARATOR='\uNNNN' instead of
