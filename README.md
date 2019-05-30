@@ -115,7 +115,7 @@ Read the documentation at the top of `~/.purepower` (or
 [here](https://github.com/romkatv/dotfiles-public/blob/master/.purepower)) to get an idea of what
 your prompt is capable of. You can edit the file to change your Powerlevel10k configuration.
 
-Powerlevel10k has configuration options that Powerlevel9k doesn't. See
+Powerlevel10k has a few configuration options that Powerlevel9k doesn't. See
 [extended configuration](https://github.com/romkatv/powerlevel10k/blob/master/EXTENDED_CONFIGURATION.md).
 
 ## Try it out
@@ -143,8 +143,6 @@ latency.
 git clone https://github.com/romkatv/powerlevel10k.git /tmp/powerlevel10k
 (cd /tmp/powerlevel10k && curl -fsSLO https://raw.githubusercontent.com/romkatv/dotfiles-public/master/.purepower)
 echo '
-  # Uncomment the following line if you see unprintable characters in your prompt
-  # PURE_POWER_MODE=portable
   source /tmp/powerlevel10k/.purepower
   source /tmp/powerlevel10k/powerlevel10k.zsh-theme' >/tmp/powerlevel10k/.zshrc
 ZDOTDIR=/tmp/powerlevel10k zsh
@@ -163,8 +161,6 @@ docker run -e LANG=C.UTF-8 -e LC_ALL=C.UTF-8 -e TERM=$TERM -it --rm ubuntu bash 
   git clone https://github.com/romkatv/powerlevel10k.git ~/powerlevel10k
   cd && curl -fsSLO https://raw.githubusercontent.com/romkatv/dotfiles-public/master/.purepower
   echo "
-    # Uncomment the following line if you see unprintable characters in your prompt
-    # PURE_POWER_MODE=portable
     source ~/.purepower
     source ~/powerlevel10k/powerlevel10k.zsh-theme" >~/.zshrc
   cd ~/powerlevel10k
