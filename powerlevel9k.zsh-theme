@@ -2315,22 +2315,6 @@ _p9k_init_timer() {
   fi
 }
 
-# Does ZSH have a certain off-by-one bug that triggers when PROMPT overflows to a new line?
-#
-# Bug: https://github.com/zsh-users/zsh/commit/d8d9fee137a5aa2cf9bf8314b06895bfc2a05518.
-# ZSH_PATCHLEVEL=zsh-5.4.2-159-gd8d9fee13. Released in 5.5.
-#
-# Fix: https://github.com/zsh-users/zsh/commit/64d13738357c9b9c212adbe17f271716abbcf6ea.
-# ZSH_PATCHLEVEL=zsh-5.7.1-50-g64d137383.
-#
-# Test: PROMPT="${(pl:$((COLUMNS))::-:)}<%1(l.%2(l.FAIL.PASS).FAIL)> " zsh -dfis <<<exit
-# Workaround: PROMPT="${(pl:$((COLUMNS))::-:)}%{%G%}<%1(l.%2(l.FAIL.PASS).FAIL)> " zsh -dfis <<<exit
-function _p9k_prompt_overflow_bug() {
-  [[ $ZSH_PATCHLEVEL =~ '^zsh-5\.4\.2-([0-9]+)-' ]] && return $(( match[1] < 159 ))
-  [[ $ZSH_PATCHLEVEL =~ '^zsh-5\.7\.1-([0-9]+)-' ]] && return $(( match[1] >= 50 ))
-  is-at-least 5.5 && ! is-at-least 5.7.2
-}
-
 # Some people write POWERLEVEL9K_DIR_PATH_SEPARATOR='\uNNNN' instead of
 # POWERLEVEL9K_DIR_PATH_SEPARATOR=$'\uNNNN'. There is no good reason for it and if we were
 # starting from scratch we wouldn't perform automatic conversion from the former to the latter.
@@ -2440,8 +2424,6 @@ _p9k_init() {
     _p9k_init_timer
   fi
 
-  _p9k_prompt_overflow_bug && local glitch='%{%G%}' || local glitch=''
-
   _P9K_ALIGNED_RPROMPT='${${:-${_P9K_X::=0}${_P9K_Y::=$((COLUMNS+1))}'
   repeat 10; do
     _P9K_ALIGNED_RPROMPT+='${_P9K_M::=$(((_P9K_X+_P9K_Y)/2))}'
@@ -2458,8 +2440,8 @@ _p9k_init() {
   repeat 32; do
     _P9K_ALIGNED_RPROMPT+='%-$_P9K_X(l. .)'
   done
-  _P9K_ALIGNED_RPROMPT+=' $_P9K_RPROMPT${(pl.${${ZLE_RPROMPT_INDENT:-1}/#-*/0}.. .)}'
-  _P9K_ALIGNED_RPROMPT+=$glitch
+  _P9K_ALIGNED_RPROMPT+=' $_P9K_RPROMPT'
+  _P9K_ALIGNED_RPROMPT+=$'\n'
 
   if [[ $POWERLEVEL9K_PROMPT_ADD_NEWLINE == true ]]; then
     repeat ${POWERLEVEL9K_PROMPT_ADD_NEWLINE_COUNT:-1} _P9K_LEFT_PREFIX+=$'\n'
@@ -2479,10 +2461,8 @@ _p9k_init() {
       [[ $ruler_char == '.' ]] && local sep=',' || local sep='.'
       local indent='${${ZLE_RPROMPT_INDENT:-1}/#-*/0}'
       local ruler_len="\${\$((COLUMNS-$indent))/#-*/0}"
-      local pad_len="\$((COLUMNS-$ruler_len))"
       _P9K_LEFT_PREFIX+="%b\${(pl$sep$ruler_len$sep$sep${(q)ruler_char}$sep)}%k%f"
-      _P9K_LEFT_PREFIX+="\${(l$sep$pad_len$sep$sep $sep)}"
-      _P9K_LEFT_PREFIX+=$glitch
+      _P9K_LEFT_PREFIX+=$'\n'
     else
       print -P "%F{red}WARNING!%f %BPOWERLEVEL9K_RULER_CHAR%b is not one character long. Ruler won't be rendered."
       print -P "Either change the value of %BPOWERLEVEL9K_RULER_CHAR%b or set %BPOWERLEVEL9K_SHOW_RULER=false%b to"
