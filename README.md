@@ -10,40 +10,38 @@ simply replace it with Powerlevel10k and enjoy responsive shell like it's 80's a
 Powerlevel10k is a drop-in replacement for Powerlevel9k. It uses the same configuration options as
 Powerlevel9k and produces the same results
 [[*]](#does-powerlevel10k-always-render-exactly-the-same-prompt-with-the-same-config).
-It's simply [much faster](#how-fast-is-it).
+It's simply [much faster](#is-it-really-faster).
 
 ## Table of Contents
 
 1. [Installation](#installation)
    1. [Manual](#manual)
-   2. [Oh My Zsh](#oh-my-zsh)
-   3. [Prezto](#prezto)
-   4. [Antigen](#antigen)
-   5. [Zplug](#zplug)
-   6. [Zgen](#zgen)
-   7. [Antibody](#antibody)
-2. [Configuration](#configuration)
-3. [Try it out](#try-it-out)
+   1. [Oh My Zsh](#oh-my-zsh)
+   1. [Prezto](#prezto)
+   1. [Antigen](#antigen)
+   1. [Zplug](#zplug)
+   1. [Zgen](#zgen)
+   1. [Antibody](#antibody)
+1. [Configuration](#configuration)
+1. [Fonts](#fonts)
+1. [Try it out](#try-it-out)
    1. [For Powerlevel9k users](#for-powerlevel9k-users)
-   2. [For new users](#for-new-users)
-   3. [Docker playground](#docker-playground)
-4. [How fast is it?](#how-fast-is-it)
-5. [License](#license)
-6. [FAQ](#faq)
+   1. [For new users](#for-new-users)
+   1. [Docker playground](#docker-playground)
+1. [Is it really faster?](#is-it-really-faster)
+1. [License](#license)
+1. [FAQ](#faq)
    1. [Why does Powerlevel10k spawn extra processes?](#why-does-powerlevel10k-spawn-extra-processes)
-   2. [Does Powerlevel10k always render exactly the same prompt with the same config?](#does-powerlevel10k-always-render-exactly-the-same-prompt-with-the-same-config)
-   3. [I am getting an error: "zsh: bad math expression: operand expected at end of string"](#i-am-getting-an-error-zsh-bad-math-expression-operand-expected-at-end-of-string)
-   3. [Are changes getting up/down-streamed?](#are-changes-getting-updown-streamed)
-   4. [Is there an AUR package for Powerlevel10k?](#is-there-an-aur-package-for-powerlevel10k)
-   5. [I cannot make Powerlevel10k work with my plugin manager. Help!](#i-cannot-make-powerlevel10k-work-with-my-plugin-manager-help)
-   6. [What is the minimum supported zsh version?](#what-is-the-minimum-supported-zsh-version)
+   1. [Are there configuration options that make Powerlevel10k slow?](are-there-configuration-options-that-make-powerlevel10k-slow)
+   1. [Does Powerlevel10k always render exactly the same prompt with the same config?](#does-powerlevel10k-always-render-exactly-the-same-prompt-with-the-same-config)
+   1. [I am getting an error: "zsh: bad math expression: operand expected at end of string"](#i-am-getting-an-error-zsh-bad-math-expression-operand-expected-at-end-of-string)
+   1. [Is there an AUR package for Powerlevel10k?](#is-there-an-aur-package-for-powerlevel10k)
+   1. [I cannot make Powerlevel10k work with my plugin manager. Help!](#i-cannot-make-powerlevel10k-work-with-my-plugin-manager-help)
+   1. [What is the minimum supported ZSH version?](#what-is-the-minimum-supported-zsh-version)
 
 ## Installation
 
-If you don't yet have a Powerline font installed, follow the
-[font installation guide](https://github.com/bhilburn/powerlevel9k/wiki/Install-Instructions#step-2-install-a-powerline-font)
-from Powerlevel9k. Once you have a working Powerline font installed, proceed with the installation
-of Powerlevel10k as described below.
+Installation is virtually the same as in Powerlevel9k. If you managed to install Powerlevel9k, you'll be able to install Powerlevel10k.
 
 ### Manual
 
@@ -88,8 +86,9 @@ Add `antibody bundle romkatv/powerlevel10k` to your `~/.zshrc`.
 ## Configuration
 
 Powerlevel10k recognized all configuration options used by Powerlevel9k. See Powerlevel9k
-[configuration guide](https://github.com/bhilburn/powerlevel9k#prompt-customization) for the full
-list.
+[configuration guide](https://github.com/bhilburn/powerlevel9k#prompt-customization). Powerlevel10k
+has a few
+[extensions](https://github.com/romkatv/powerlevel10k/blob/master/EXTENDED_CONFIGURATION.md).
 
 If you've been using Powerlevel9k before, **do not remove the configuration options**. Powerlevel10k
 will pick them up and provide you with the same prompt UI you are used to.
@@ -115,8 +114,15 @@ Read the documentation at the top of `~/.purepower` (or
 [here](https://github.com/romkatv/dotfiles-public/blob/master/.purepower)) to get an idea of what
 your prompt is capable of. You can edit the file to change your Powerlevel10k configuration.
 
-Powerlevel10k has a few configuration options that Powerlevel9k doesn't. See
-[extended configuration](https://github.com/romkatv/powerlevel10k/blob/master/EXTENDED_CONFIGURATION.md).
+## Fonts
+
+Depending on your configuration, you might need to install a Powerline font. Follow the
+[font installation guide](https://github.com/bhilburn/powerlevel9k/wiki/Install-Instructions#step-2-install-a-powerline-font)
+from Powerlevel9k.
+
+[Pure Power](https://github.com/romkatv/dotfiles-public/blob/master/.purepower) config doesn't
+require custom fonts. It'll work even with regular system fonts. If you are having trouble with
+patched fonts, try Pure Power.
 
 ## Try it out
 
@@ -126,7 +132,7 @@ switch.
 
 ### For Powerlevel9k users
 
-If you are currently using Powerlevel9k, you can try Powerlevel10k in a temporary zsh shell. The
+If you are currently using Powerlevel9k, you can try Powerlevel10k in a temporary zsh session. The
 prompt will look exactly like what you are used to but it'll be faster.
 
 ```zsh
@@ -167,59 +173,30 @@ docker run -e LANG=C.UTF-8 -e LC_ALL=C.UTF-8 -e TERM=$TERM -it --rm ubuntu bash 
   exec zsh'
 ```
 
-## How fast is it?
+## Is it really fast?
 
-Powerlevel10k renders prompt between 10 and 100 times faster than powerlevel9k.
+Yes.
 
-Here are benchmark results obtained with
+[![asciicast](https://asciinema.org/a/NHRjK3BMePw66jtRVY2livHwZ.svg)](https://asciinema.org/a/NHRjK3BMePw66jtRVY2livHwZ)
+
+Benchmark results obtained with
 [zsh-prompt-benchmark](https://github.com/romkatv/zsh-prompt-benchmark) on Intel i9-7900X
-running Ubuntu 18.04.
+running Ubuntu 18.04 with the config from the demo.
 
-| Theme               |        /  |   ~/linux |
-|---------------------|----------:| ---------:|
-| powerlevel9k/master |    101 ms |    280 ms |
-| powerlevel9k/next   |     26 ms |    255 ms |
-| **powerlevel10k**   |  **1 ms** | **22 ms** |
-| naked zsh           |   0.05 ms |   0.05 ms |
-
-Columns define the current directory where the prompt was rendered.
-
-  * `/` -- root directory, not a git repo.
-  * `~/linux` -- [linux](https://github.com/torvalds/linux) git repo with 60k files. It was checked
-    out to an M.2 SSD.
+| Theme               | Prompt Latency |
+|---------------------|---------------:|
+| powerlevel9k/master |        1046 ms |
+| powerlevel9k/next   |        1005 ms |
+| **powerlevel10k**   |     **8.7 ms** |
 
 powerlevel9k/master is the stable branch of powerlevel9k, the one that virtually everyone uses.
 powerlevel9k/next is the development branch for the next release.
 
-Here's how the prompt looked like during benchmarking.
-
-![](https://raw.githubusercontent.com/romkatv/powerlevel10k/master/prompt.png)
-
-It was identical in Powerlevel10k and Powerlevel9k. Even though Powerlevel10k can dynamically
-switch to async prompts, it wasn't happening during the benchmark because latencies were low.
-Prompts with both themes were essentially synchronous, with every prompt having up-to-date git info
-(no greyed-out vcs/git segments).
-
-Configuration that was used:
-
-```zsh
-POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(dir_writable dir vcs)
-POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(status time)
-
-POWERLEVEL9K_MODE=nerdfont-complete
-POWERLEVEL9K_PROMPT_ON_NEWLINE=true
-POWERLEVEL9K_ROOT_ICON=$'\uF09C'
-POWERLEVEL9K_TIME_ICON=$'\uF017'
-POWERLEVEL9K_TIME_BACKGROUND=magenta
-POWERLEVEL9K_STATUS_OK_BACKGROUND=grey53
-```
-
-Powerlevel10k shows similar performance advantage over Powerlevel9k on Mac OS, FreeBSD, WSL, and
-Raspberry Pie.
-
 ## License
 
-Powerlevel10k is released under the [MIT license](https://github.com/romkatv/powerlevel10k/blob/master/LICENSE). Contributions are convered by the same license.
+Powerlevel10k is released under the
+[MIT license](https://github.com/romkatv/powerlevel10k/blob/master/LICENSE). Contributions are
+convered by the same license.
 
 ## FAQ
 
@@ -231,14 +208,23 @@ prompt; gitstatus spawns `gitstatusd` and `zsh`. See
 if `POWERLEVEL9K_EXPERIMENTAL_TIME_REALTIME` is set to `true`. This is used to trigger prompt
 refresh every second.
 
+### Are there configuration options that make Powerlevel10k slow?
+
+No, Powerlevel10k is always fast, with any configuration you throw at it. If you have noticeable
+prompt latency when using Powerlevel10k, please
+[open an issue](https://github.com/romkatv/powerlevel10k/issues).
+
 ### Does Powerlevel10k always render exactly the same prompt as Powerlevel9k given the same config?
 
 This is the goal. You should be able to switch between Powerlevel9k and Powerlevel10k with no
 visible changes except for performance. There are, however, several differences.
 
   * By default only git vcs backend is enabled in Powerlevel10k. If you need svn and hg, you'll
-    need to set `POWERLEVEL9K_VCS_BACKENDS`. See
-    [extended configuration](https://github.com/romkatv/powerlevel10k/blob/master/EXTENDED_CONFIGURATION.md).
+    need to set `POWERLEVEL9K_VCS_BACKENDS`.
+  * Powerlevel10k implements a few
+    [extensions](https://github.com/romkatv/powerlevel10k/blob/master/EXTENDED_CONFIGURATION.md). If
+    you use them, you'll get different prompt when you switch to Powerlevel9k. However, extensions
+    are designed with graceful degradation in mind, so your prompt will still be functional.
   * Fewer configuration options can be changed after the theme is loaded. For example, if you
     decide to change background color of some segment in the middle of an interactive session,
     it may not work.
@@ -251,18 +237,6 @@ with the same settings, please [open an issue](https://github.com/romkatv/powerl
 Did you change any `POWERLEVEL9K` options after the first prompt got rendered, perhaps by editing
 your `~/.zshrc` and executing `source ~/.zshrc`? This isn't supported. You'll need to restart zsh
 for configuration changes to take effect. Run `exec zsh` to do this without forking a process.
-
-### Are changes getting up/down-streamed?
-
-Powerlevel10k regularly pulls changes from Powerlevel9k, so all bug fixes and new features that land
-in Powerlevel9k will land here, too. This is a labor-intensive process because Powerlevel9k and
-Powerlevel10k have very different code. Thankfully, there aren't many changes in Powerlevel9k.
-
-Occasionally Powerlevel9k copies features and bug fixes from Powerlevel10k but this is happens
-rarely.
-
-Improvements to [libgit2](https://github.com/libgit2/libgit2/issues/5038)
-might eventually be upstreamed. It's a very slow process.
 
 ### Is there an AUR package for Powerlevel10k?
 
@@ -295,7 +269,7 @@ echo 'source ~/powerlevel10k/powerlevel10k.zsh-theme' >>! ~/.zshrc
 
 This method of installation won't make anything slower or otherwise sub-par.
 
-### What is the minimum supported zsh version?
+### What is the minimum supported ZSH version?
 
 ZSH 5.1 or newer should work.
 
