@@ -1106,6 +1106,21 @@ function _p9k_cached_cmd_stdout() {
   _P9K_RETVAL=$_P9K_CACHE_VAL[2]
 }
 
+function _p9k_cached_cmd_stdout_stderr() {
+  local cmd=$commands[$1]
+  [[ -n $cmd ]] || return
+  shift
+  local -H stat
+  zstat -H stat -- $cmd 2>/dev/null || return
+  if ! _p9k_cache_get $0 $stat[inode] $stat[mtime] $stat[size] $stat[mode] $cmd "$@"; then
+    local out
+    out=$($cmd "$@" 2>&1)  # this line is the only diff with _p9k_cached_cmd_stdout
+    _p9k_cache_set $(( ! $? )) "$out"
+  fi
+  (( $_P9K_CACHE_VAL[1] )) || return
+  _P9K_RETVAL=$_P9K_CACHE_VAL[2]
+}
+
 ################################################################
 # Segment to diplay Node version
 set_default P9K_NODE_VERSION_PROJECT_ONLY false
@@ -2138,11 +2153,20 @@ prompt_dropbox() {
   fi
 }
 
+# Specifies the format of java version.
+#
+#   POWERLEVEL9K_JAVA_VERSION_FULL=true  => 1.8.0_212-8u212-b03-0ubuntu1.18.04.1-b03
+#   POWERLEVEL9K_JAVA_VERSION_FULL=false => 1.8.0_212
+#
+# These correspond to `java -fullversion` and `java -version` respectively.
+set_default POWERLEVEL9K_JAVA_VERSION_FULL true
+
 # print Java version number
 prompt_java_version() {
-  (( $+commands[java] )) || return
-  local v && v=$(java -fullversion 2>&1) || return
+  _p9k_cached_cmd_stdout_stderr java -fullversion || return
+  local v=$_P9K_RETVAL
   v=${${v#*\"}%\"*}
+  [[ $POWERLEVEL9K_JAVA_VERSION_FULL == true ]] || v=${v%%-*}
   [[ -n $v ]] || return
   "$1_prompt_segment" "$0" "$2" "red" "white" "JAVA_ICON" 0 '' "${v//\%/%%}"
 }
