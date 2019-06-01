@@ -263,7 +263,7 @@ left_prompt_segment() {
 
   _p9k_escape_rcurly $fg
   local content="${(j::):-$_P9K_RETVAL${^@}}"
-  (( expand )) || content="\${(Q)\${:-${(q)content}}}"
+  (( expand )) || content="\${(Q)\${:-${(qqq)content}}}"
 
   _P9K_PROMPT+="\${\${:-$cond}:+\${\${:-\${_P9K_C::=${content}}${_P9K_CACHE_VAL[3]}"
   (( has_icon )) && _P9K_PROMPT+="\${\${\${#_P9K_C}:#$(($# * $#fg))}:+ }"
@@ -338,7 +338,7 @@ right_prompt_segment() {
 
   _p9k_escape_rcurly $fg
   local content="${(j::):-$_P9K_RETVAL${^@}}"
-  (( expand )) || content="\${(Q)\${:-${(q)content}}}"
+  (( expand )) || content="\${(Q)\${:-${(qqq)content}}}"
 
   _P9K_PROMPT+="\${\${:-$cond}:+\${\${:-\${_P9K_C::=${content}}${_P9K_CACHE_VAL[3]}"
   (( has_icon )) && _P9K_PROMPT+="\${\${\${#_P9K_C}:#$(($# * $#fg))}:+ }"
