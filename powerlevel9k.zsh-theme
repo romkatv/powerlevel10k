@@ -2623,11 +2623,11 @@ _p9k_init() {
     powerlevel9k_vcs_init
     if [[ $POWERLEVEL9K_DISABLE_GITSTATUS != true ]] && (( ${POWERLEVEL9K_VCS_BACKENDS[(I)git]} )); then
       source ${POWERLEVEL9K_GITSTATUS_DIR:-${_P9K_INSTALLATION_DIR}/gitstatus}/gitstatus.plugin.zsh
-      gitstatus_start                                                                \
-        -s ${POWERLEVEL9K_VCS_MAX_NUM_STAGED:-$POWERLEVEL9K_VCS_STAGED_MAX_NUM}      \
-        -u ${POWERLEVEL9K_VCS_MAX_NUM_UNSTAGED:-$POWERLEVEL9K_VCS_UNSTAGED_MAX_NUM}  \
-        -d ${POWERLEVEL9K_VCS_MAX_NUM_UNTRACKED:-POWERLEVEL9K_VCS_UNTRACKED_MAX_NUM} \
-        -m $POWERLEVEL9K_VCS_MAX_INDEX_SIZE_DIRTY                                    \
+      gitstatus_start                                                                 \
+        -s ${POWERLEVEL9K_VCS_MAX_NUM_STAGED:-$POWERLEVEL9K_VCS_STAGED_MAX_NUM}       \
+        -u ${POWERLEVEL9K_VCS_MAX_NUM_UNSTAGED:-$POWERLEVEL9K_VCS_UNSTAGED_MAX_NUM}   \
+        -d ${POWERLEVEL9K_VCS_MAX_NUM_UNTRACKED:-$POWERLEVEL9K_VCS_UNTRACKED_MAX_NUM} \
+        -m $POWERLEVEL9K_VCS_MAX_INDEX_SIZE_DIRTY                                     \
         POWERLEVEL9K
     fi
   fi
