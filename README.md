@@ -189,8 +189,17 @@ running Ubuntu 18.04 with the config from the demo.
 | powerlevel9k/next   |        1005 ms |
 | **powerlevel10k**   |     **8.7 ms** |
 
-powerlevel9k/master is the stable branch of powerlevel9k, the one that virtually everyone uses.
-powerlevel9k/next is the development branch for the next release.
+_powerlevel9k/master_ is the stable branch of Powerlevel9k, the one that virtually everyone uses.
+_powerlevel9k/next_ is the development branch for the next release. Powerlevel10k is over 100
+times faster than either in this benchmark.
+
+In fairness, Powerlevel9k has acceptable latency when given a spartan configuration. If all you need
+is the current directory without truncation or shortening, Powerlevel9k can render it for you in
+17 ms. Powerlevel10k can do the same 30 times faster but it won't matter in practice because 17 ms
+is fast enough (the threshold where latency becomes noticeable is around 50 ms). You have to be
+careful with Powerlevel9k configuration as it's all too easy to make prompt frustratingly slow.
+Powerlevel10k, on the other hand, doesn't require trading latency for utility -- it's virtually
+instant with any configuration.
 
 ## License
 
