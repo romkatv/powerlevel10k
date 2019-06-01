@@ -819,9 +819,15 @@ prompt_dir() {
         for (( ; i > 0; --i )); do
           local pkg_file=''
           for pkg_file in $dir/${~pat}(N); do
-            local pkg_name=''
-            pkg_name=$(command jq -j '.name' <$pkg_file) && [[ -n $pkg_name ]] || return
-            parts[1,i]=($pkg_name)
+            local -H stat=()
+            zstat -H stat -- $pkg_file 2>/dev/null || return
+            if ! _p9k_cache_get $0_pkg $stat[inode] $stat[mtime] $stat[size]; then
+              local pkg_name=''
+              pkg_name=$(command jq -j '.name' <$pkg_file 2>/dev/null) || pkg_name=''
+              _p9k_cache_set "$pkg_name"
+            fi
+            [[ -n $_P9K_CACHE_VAL[1] ]] || return
+            parts[1,i]=($_P9K_CACHE_VAL[1])
             fake_first=1
             return
           done
