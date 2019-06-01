@@ -2057,7 +2057,35 @@ prompt_dir_writable() {
 
 ################################################################
 # Kubernetes Current Context/Namespace
+
+# Set to false to truncate trailing "/default": "mycontext/default" will become "mycontext".
 set_default POWERLEVEL9K_KUBECONTEXT_SHOW_DEFAULT_NAMESPACE true
+
+# Defines context classes for the purpose of applying different styling to different contexts.
+#
+# POWERLEVEL9K_KUBECONTEXT_CLASSES must be an array with even number of elements. The first
+# element in each pair defines a pattern against which the current context (in the format it is
+# displayed in the prompt) gets matched. The second element defines context class. Patterns are
+# tried in order. The first match wins.
+#
+# If a non-empty class <C> is assigned to a context, the segment is styled with
+# POWERLEVEL9K_KUBECONTEXT_<U>_BACKGROUND and POWERLEVEL9K_KUBECONTEXT_<U>_FOREGROUND where <U> is
+# uppercased <C>. Otherwise with POWERLEVEL9K_KUBECONTEXT_BACKGROUND and
+# POWERLEVEL9K_KUBECONTEXT_FOREGROUND.
+#
+# Example: Use red background for contexts containing "prod", green for "testing" and yellow for
+# everything else.
+#
+#   POWERLEVEL9K_KUBECONTEXT_CLASSES=(
+#       '*prod*'    prod
+#       '*testing*' testing
+#       '*'         other)
+#
+#   POWERLEVEL9K_KUBECONTEXT_PROD_BACKGROUND=red
+#   POWERLEVEL9K_KUBECONTEXT_TESTING_BACKGROUND=green
+#   POWERLEVEL9K_KUBECONTEXT_OTHER_BACKGROUND=yellow
+set_default -a POWERLEVEL9K_KUBECONTEXT_CLASSES
+
 prompt_kubecontext() {
   (( $+commands[kubectl] )) || return
   local cfg
@@ -2067,6 +2095,7 @@ prompt_kubecontext() {
     zstat -H stat -- $cfg 2>/dev/null || continue
     key+=($cfg $stat[inode] $stat[mtime] $stat[size] $stat[mode])
   done
+
   if ! _p9k_cache_get $0 "${key[@]}"; then
     local ctx=$(command kubectl config view -o=jsonpath='{.current-context}')
     if [[ -n $ctx ]]; then
@@ -2076,10 +2105,21 @@ prompt_kubecontext() {
         ctx+="/$ns"
       fi
     fi
-    _p9k_cache_set "$ctx"
+    local suf
+    if [[ -n $ctx ]]; then
+      local pat class
+      for pat class in $POWERLEVEL9K_KUBECONTEXT_CLASSES; do
+        if [[ $ctx == ${~pat} ]]; then
+          [[ -n $class ]] && suf=_${(U)class}
+          break
+        fi
+      done
+    fi
+    _p9k_cache_set "$ctx" "$suf"
   fi
+
   [[ -n $_P9K_CACHE_VAL[1] ]] || return
-  $1_prompt_segment $0 $2 magenta white KUBERNETES_ICON 0 '' "${_P9K_CACHE_VAL[1]//\%/%%}"
+  $1_prompt_segment $0$_P9K_CACHE_VAL[2] $2 magenta white KUBERNETES_ICON 0 '' "${_P9K_CACHE_VAL[1]//\%/%%}"
 }
 
 ################################################################
