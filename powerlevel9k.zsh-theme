@@ -20,32 +20,44 @@
 #zstyle ':vcs_info:*+*:*' debug true
 #set -o xtrace
 
-'builtin' 'typeset' "_p9k_aliases=$(
-    'builtin' 'alias' '-rL'
-    'builtin' 'alias' '-gL'
-    'builtin' 'alias' '-sL')"
+() {
+  'builtin' 'emulate' '-L' 'zsh'
 
-'builtin' 'unalias' '-m' '*'
+  'builtin' 'local' "_p9k_aliases=$(
+      'builtin' 'alias' '-rL'
+      'builtin' 'alias' '-gL'
+      'builtin' 'alias' '-sL')"
 
-_p9k_installation_dir=''
+  'builtin' 'unalias' '-m' '*'
 
-if [[ -n $POWERLEVEL9K_INSTALLATION_DIR ]]; then
-  _p9k_installation_dir=${POWERLEVEL9K_INSTALLATION_DIR:A}
-else
-  if [[ ${(%):-%N} == '(eval)' ]]; then
-    if [[ $0 == '-antigen-load' && -r powerlevel9k.zsh-theme ]]; then
-      # Antigen uses eval to load things so it can change the plugin (!!)
-      # https://github.com/zsh-users/antigen/issues/581
-      _p9k_installation_dir=$PWD
-    else
-      >&2 print -P '%F{red}[ERROR]%f Powerlevel10k cannot figure out its installation directory.'
-      >&2 print -P 'Please set %F{green}POWERLEVEL9K_INSTALLATION_DIR.%f'
+  {
+    if (( $+_p9k_sourced )); then
+      prompt_powerlevel9k_setup
+      return
     fi
-  else
-    _p9k_installation_dir=${${(%):-%x}:A:h}
-  fi
-fi
+    typeset -gr _p9k_sourced=1
+    typeset -g _p9k_installation_dir=''
 
-[[ -n $_p9k_installation_dir ]] && source $_p9k_installation_dir/internal/p10k.zsh
+    if [[ -n $POWERLEVEL9K_INSTALLATION_DIR ]]; then
+      _p9k_installation_dir=${POWERLEVEL9K_INSTALLATION_DIR:A}
+    else
+      if [[ ${(%):-%N} == '(eval)' ]]; then
+        if [[ $0 == '-antigen-load' && -r powerlevel9k.zsh-theme ]]; then
+          # Antigen uses eval to load things so it can change the plugin (!!)
+          # https://github.com/zsh-users/antigen/issues/581
+          _p9k_installation_dir=$PWD
+        else
+          >&2 print -P '%F{red}[ERROR]%f Powerlevel10k cannot figure out its installation directory.'
+          >&2 print -P 'Please set %F{green}POWERLEVEL9K_INSTALLATION_DIR.%f'
+          return 1
+        fi
+      else
+        _p9k_installation_dir=${${(%):-%x}:A:h}
+      fi
+    fi
 
-eval "$_p9k_aliases"
+    source $_p9k_installation_dir/internal/p10k.zsh
+  } always {
+    eval "$_p9k_aliases"
+  }
+}

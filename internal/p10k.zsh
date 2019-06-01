@@ -27,13 +27,6 @@ if ! autoload -U is-at-least || ! is-at-least 5.1; then
   return 1
 fi
 
-if (( $+_P9K_SOURCED )); then
-  prompt_powerlevel9k_setup
-  return
-fi
-
-readonly _P9K_SOURCED=1
-
 source "${_p9k_installation_dir}/functions/utilities.zsh"
 source "${_p9k_installation_dir}/functions/icons.zsh"
 source "${_p9k_installation_dir}/functions/colors.zsh"
