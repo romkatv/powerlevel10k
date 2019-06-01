@@ -20,10 +20,10 @@
 #zstyle ':vcs_info:*+*:*' debug true
 #set -o xtrace
 
-_p9k_aliases=$(
+'builtin' 'typeset' "_p9k_aliases=$(
     'builtin' 'alias' '-rL'
     'builtin' 'alias' '-gL'
-    'builtin' 'alias' '-sL')
+    'builtin' 'alias' '-sL')"
 
 'builtin' 'unalias' '-m' '*'
 
