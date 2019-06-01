@@ -2057,6 +2057,7 @@ prompt_dir_writable() {
 
 ################################################################
 # Kubernetes Current Context/Namespace
+set_default POWERLEVEL9K_KUBECONTEXT_SHOW_DEFAULT_NAMESPACE true
 prompt_kubecontext() {
   (( $+commands[kubectl] )) || return
   local cfg
@@ -2071,7 +2072,9 @@ prompt_kubecontext() {
     if [[ -n $ctx ]]; then
       local p="{.contexts[?(@.name==\"$ctx\")].context.namespace}"
       local ns="${$(command kubectl config view -o=jsonpath=$p):-default}"
-      [[ $ctx == $ns ]] || ctx+="/$ns"
+      if [[ $ctx != $ns && ($ns != default || $POWERLEVEL9K_KUBECONTEXT_SHOW_DEFAULT_NAMESPACE == true) ]]; then
+        ctx+="/$ns"
+      fi
     fi
     _p9k_cache_set "$ctx"
   fi
