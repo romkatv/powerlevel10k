@@ -10,7 +10,7 @@ simply replace it with Powerlevel10k and enjoy responsive shell like it's 80's a
 Powerlevel10k is a drop-in replacement for Powerlevel9k. It uses the same configuration options as
 Powerlevel9k and produces the same results
 [[*]](#does-powerlevel10k-always-render-exactly-the-same-prompt-with-the-same-config).
-It's simply [much faster](#is-it-really-faster).
+It's simply [much faster](#is-it-really-fast).
 
 ## Table of Contents
 
@@ -28,7 +28,7 @@ It's simply [much faster](#is-it-really-faster).
    1. [For Powerlevel9k users](#for-powerlevel9k-users)
    1. [For new users](#for-new-users)
    1. [Docker playground](#docker-playground)
-1. [Is it really faster?](#is-it-really-faster)
+1. [Is it really faster?](#is-it-really-fast)
 1. [License](#license)
 1. [FAQ](#faq)
    1. [Why does Powerlevel10k spawn extra processes?](#why-does-powerlevel10k-spawn-extra-processes)
