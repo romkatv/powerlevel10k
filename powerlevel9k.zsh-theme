@@ -1513,10 +1513,10 @@ prompt_swap() {
     [[ "$(command sysctl vm.swapusage 2>/dev/null)" =~ "used = ([0-9,.]+)([A-Z]+)" ]] || return
     used_bytes=${match[1]//,/.}
     case ${match[2]} in
-      K) (( used_bytes *= 1024 ));;
-      M) (( used_bytes *= 1048576 ));;
-      G) (( used_bytes *= 1073741824 ));;
-      T) (( used_bytes *= 1099511627776 ));;
+      'K') (( used_bytes *= 1024 ));;
+      'M') (( used_bytes *= 1048576 ));;
+      'G') (( used_bytes *= 1073741824 ));;
+      'T') (( used_bytes *= 1099511627776 ));;
       *) return;;
     esac
   else
