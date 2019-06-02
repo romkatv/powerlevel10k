@@ -808,7 +808,7 @@ prompt_dir() {
       local -i d=_P9K_RETVAL
       shortenlen=${POWERLEVEL9K_SHORTEN_DIR_LENGTH:-1}
       (( shortenlen >= 0 )) && n=shortenlen
-      local pat=${POWERLEVEL9K_SHORTEN_FOLDER_MARKER-'(.bzr|CVS|.git|.hg|.svn|.citc)'}
+      local pat=${POWERLEVEL9K_SHORTEN_FOLDER_MARKER-'(.bzr|CVS|.git|.hg|.svn|.terraform|.citc)'}
       local parent="${PWD%/${(pj./.)parts[i,-1]}}"
       for (( ; i <= $#parts - n; ++i )); do
         local dir=$parts[i]
