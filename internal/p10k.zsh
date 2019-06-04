@@ -1801,15 +1801,15 @@ function _p9k_vcs_render() {
         (( ${POWERLEVEL9K_VCS_MAX_NUM_UNTRACKED:-$POWERLEVEL9K_VCS_UNTRACKED_MAX_NUM} != 1 )) && _P9K_RETVAL+=$VCS_STATUS_NUM_UNTRACKED
         _$0_fmt UNTRACKED " $_P9K_RETVAL"
       fi
-      if [[ $VCS_STATUS_COMMITS_AHEAD -gt 0 ]]; then
-        _p9k_get_icon VCS_OUTGOING_CHANGES_ICON
-        (( POWERLEVEL9K_VCS_COMMITS_AHEAD_MAX_NUM != 1 )) && _P9K_RETVAL+=$VCS_STATUS_COMMITS_AHEAD
-        _$0_fmt OUTGOING_CHANGES " $_P9K_RETVAL"
-      fi
       if [[ $VCS_STATUS_COMMITS_BEHIND -gt 0 ]]; then
         _p9k_get_icon VCS_INCOMING_CHANGES_ICON
         (( POWERLEVEL9K_VCS_COMMITS_BEHIND_MAX_NUM != 1 )) && _P9K_RETVAL+=$VCS_STATUS_COMMITS_BEHIND
         _$0_fmt INCOMING_CHANGES " $_P9K_RETVAL"
+      fi
+      if [[ $VCS_STATUS_COMMITS_AHEAD -gt 0 ]]; then
+        _p9k_get_icon VCS_OUTGOING_CHANGES_ICON
+        (( POWERLEVEL9K_VCS_COMMITS_AHEAD_MAX_NUM != 1 )) && _P9K_RETVAL+=$VCS_STATUS_COMMITS_AHEAD
+        _$0_fmt OUTGOING_CHANGES " $_P9K_RETVAL"
       fi
       if [[ $VCS_STATUS_STASHES -gt 0 ]]; then
         _p9k_get_icon VCS_STASH_ICON
