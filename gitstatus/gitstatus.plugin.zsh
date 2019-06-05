@@ -81,6 +81,10 @@ autoload -Uz add-zsh-hook && zmodload zsh/datetime zsh/system || return
 #   VCS_STATUS_REMOTE_BRANCH   Upstream branch name. Can be empty.
 #   VCS_STATUS_REMOTE_URL      Remote URL. Can be empty.
 #   VCS_STATUS_ACTION          Repository state, A.K.A. action. Can be empty.
+#   VCS_STATUS_INDEX_SIZE      The number of files in the index.
+#   VCS_STATUS_NUM_STAGED      The number of staged changes.
+#   VCS_STATUS_NUM_UNSTAGED    The number of unstaged changes.
+#   VCS_STATUS_NUM_UNTRACKED   The number of untracked files.
 #   VCS_STATUS_HAS_STAGED      1 if there are staged changes, 0 otherwise.
 #   VCS_STATUS_HAS_UNSTAGED    1 if there are unstaged changes, 0 if there aren't, -1 if unknown.
 #   VCS_STATUS_HAS_UNTRACKED   1 if there are untracked files, 0 if there aren't, -1 if unknown.
