@@ -856,49 +856,54 @@ prompt_dir() {
     ;;
   esac
 
-  local state='' icon=''
-  if [[ $POWERLEVEL9K_DIR_SHOW_WRITABLE == true && ! -w $PWD ]]; then
-    state=NOT_WRITABLE
-    icon=LOCK_ICON
-  else
-    case $PWD in
-      /etc|/etc/*) state=ETC;            icon=ETC_ICON;;
-      ~)           state=HOME;           icon=HOME_ICON;;
-      ~/*)         state=HOME_SUBFOLDER; icon=HOME_SUB_ICON;;
-      *)           state=DEFAULT;        icon=FOLDER_ICON;;
-    esac
-  fi
+  [[ $POWERLEVEL9K_DIR_SHOW_WRITABLE == true && ! -w $PWD ]]
+  local w=$?
+  if ! _p9k_cache_get $0 $w $fake_first "$delim" "${parts[@]}"; then
+    local state='' icon=''
+    if (( ! w )); then
+      state=NOT_WRITABLE
+      icon=LOCK_ICON
+    else
+      case $PWD in
+        /etc|/etc/*) state=ETC;            icon=ETC_ICON;;
+        ~)           state=HOME;           icon=HOME_ICON;;
+        ~/*)         state=HOME_SUBFOLDER; icon=HOME_SUB_ICON;;
+        *)           state=DEFAULT;        icon=FOLDER_ICON;;
+      esac
+    fi
 
-  local style=%b
-  _p9k_color blue $0_$state BACKGROUND
-  _p9k_background $_P9K_RETVAL
-  style+=$_P9K_RETVAL
-  _p9k_color "$DEFAULT_COLOR" "$0_$state" FOREGROUND
-  _p9k_foreground $_P9K_RETVAL
-  style+=$_P9K_RETVAL
-
-  parts=("${(@)parts//\%/%%}")
-  [[ $fake_first == 0 && $parts[1] == '~' ]] && parts[1]=$POWERLEVEL9K_HOME_FOLDER_ABBREVIATION$style
-  [[ $POWERLEVEL9K_DIR_OMIT_FIRST_CHARACTER == true && $#parts > 1 && -n $parts[2] ]] && parts[1]=()
-
-  local last_fg=
-  [[ $POWERLEVEL9K_DIR_PATH_HIGHLIGHT_BOLD == true ]] && last_fg+=%B
-  if [[ -n $POWERLEVEL9K_DIR_PATH_HIGHLIGHT_FOREGROUND ]]; then
-    _p9k_translate_color $POWERLEVEL9K_DIR_PATH_HIGHLIGHT_FOREGROUND
+    local style=%b
+    _p9k_color blue $0_$state BACKGROUND
+    _p9k_background $_P9K_RETVAL
+    style+=$_P9K_RETVAL
+    _p9k_color "$DEFAULT_COLOR" "$0_$state" FOREGROUND
     _p9k_foreground $_P9K_RETVAL
-    last_fg+=$_P9K_RETVAL
-  fi
-  parts[-1]=$last_fg${parts[-1]//$'\0'/$'\0'$last_fg}$style
-  parts=("${(@)parts//$'\0'/$delim$style}")
+    style+=$_P9K_RETVAL
 
-  local sep=$POWERLEVEL9K_DIR_PATH_SEPARATOR$style
-  if [[ -n $POWERLEVEL9K_DIR_PATH_SEPARATOR_FOREGROUND ]]; then
-    _p9k_translate_color $POWERLEVEL9K_DIR_PATH_SEPARATOR_FOREGROUND
-    _p9k_foreground $_P9K_RETVAL
-    sep=$_P9K_RETVAL$sep
-  fi
+    parts=("${(@)parts//\%/%%}")
+    [[ $fake_first == 0 && $parts[1] == '~' ]] && parts[1]=$POWERLEVEL9K_HOME_FOLDER_ABBREVIATION$style
+    [[ $POWERLEVEL9K_DIR_OMIT_FIRST_CHARACTER == true && $#parts > 1 && -n $parts[2] ]] && parts[1]=()
 
-  "$1_prompt_segment" "$0_$state" "$2" blue "$DEFAULT_COLOR" "$icon" 0 "" "${(pj.$sep.)parts}"
+    local last_fg=
+    [[ $POWERLEVEL9K_DIR_PATH_HIGHLIGHT_BOLD == true ]] && last_fg+=%B
+    if [[ -n $POWERLEVEL9K_DIR_PATH_HIGHLIGHT_FOREGROUND ]]; then
+      _p9k_translate_color $POWERLEVEL9K_DIR_PATH_HIGHLIGHT_FOREGROUND
+      _p9k_foreground $_P9K_RETVAL
+      last_fg+=$_P9K_RETVAL
+    fi
+    parts[-1]=$last_fg${parts[-1]//$'\0'/$'\0'$last_fg}$style
+    parts=("${(@)parts//$'\0'/$delim$style}")
+
+    local sep=$POWERLEVEL9K_DIR_PATH_SEPARATOR$style
+    if [[ -n $POWERLEVEL9K_DIR_PATH_SEPARATOR_FOREGROUND ]]; then
+      _p9k_translate_color $POWERLEVEL9K_DIR_PATH_SEPARATOR_FOREGROUND
+      _p9k_foreground $_P9K_RETVAL
+      sep=$_P9K_RETVAL$sep
+    fi
+
+    _p9k_cache_set "$0_$state" "$2" blue "$DEFAULT_COLOR" "$icon" 0 "" "${(pj.$sep.)parts}"
+  fi
+  "$1_prompt_segment" "$_P9K_CACHE_VAL[@]"
 }
 
 ################################################################
