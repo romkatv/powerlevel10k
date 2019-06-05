@@ -138,7 +138,7 @@ left_prompt_segment() {
     _p9k_color $4 $1 FOREGROUND
     local fg_color=$_P9K_RETVAL
     _p9k_foreground $fg_color
-    local fg=%b$_P9K_RETVAL
+    local fg=$_P9K_RETVAL
 
     _p9k_get_icon LEFT_SUBSEGMENT_SEPARATOR
     local subsep=$_P9K_RETVAL
@@ -189,26 +189,26 @@ left_prompt_segment() {
     pre+="\${_P9K_N:=\${\${\$((_P9K_I>=$_P9K_LEFT_JOIN[$2])):#0}:+$((t+2))}}"         # 2
     pre+="\${_P9K_N:=\${\${\$((!\${#\${:-0\$_P9K_BG}:#0$bg_color})):#0}:+$((t+3))}}"  # 3
     pre+="\${_P9K_N:=\${\${_P9K_F::=%F{\$_P9K_BG\}}+$((t+4))}}}+}"                    # 4
-    pre+="\${_P9K_F}%b\${_P9K_T[\$_P9K_N]}"
+    pre+="%b\${_P9K_F}\${_P9K_T[\$_P9K_N]}"
 
-    local post="\${_P9K_C}$space\${\${_P9K_I::=$2}+}\${\${_P9K_BG::=$bg_color}+}}"
+    _p9k_escape_rcurly %b$bg$fg
+    local post="\${_P9K_C}$_P9K_RETVAL$space\${\${_P9K_I::=$2}+}\${\${_P9K_BG::=$bg_color}+}}"
 
-    _p9k_cache_set $has_icon $fg $pre $post
+    _p9k_cache_set $has_icon $_P9K_RETVAL $pre $post
   fi
 
   local name=$1
   local -i has_icon=${_P9K_CACHE_VAL[1]}
-  local fg=${_P9K_CACHE_VAL[2]}
+  local style=${_P9K_CACHE_VAL[2]}
   local -i expand=$6
   local cond=${7:-1}
   shift 7
 
-  _p9k_escape_rcurly $fg
-  local content="${(j::):-$_P9K_RETVAL${^@}}"
+    local content="${(j::):-$style${^@}}"
   (( expand )) || content="\${(Q)\${:-${(qqq)content}}}"
 
   _P9K_PROMPT+="\${\${:-$cond}:+\${\${:-\${_P9K_C::=${content}}${_P9K_CACHE_VAL[3]}"
-  (( has_icon )) && _P9K_PROMPT+="\${\${\${#_P9K_C}:#$(($# * $#fg))}:+ }"
+  (( has_icon )) && _P9K_PROMPT+='${${(%):-$_P9K_C%1(l. .x)}[-1]%x}'
   _P9K_PROMPT+=${_P9K_CACHE_VAL[4]}
 }
 
@@ -224,12 +224,12 @@ right_prompt_segment() {
     _p9k_color $4 $1 FOREGROUND
     local fg_color=$_P9K_RETVAL
     _p9k_foreground $fg_color
-    local fg=%b$_P9K_RETVAL
+    local fg=$_P9K_RETVAL
 
     _p9k_get_icon RIGHT_SUBSEGMENT_SEPARATOR
     local subsep=$_P9K_RETVAL
 
-    local icon_fg icon
+    local icon_style icon
     local -i has_icon
     if [[ -n $5 ]]; then
       _p9k_get_icon $5
@@ -238,8 +238,8 @@ right_prompt_segment() {
         icon=$_P9K_RETVAL
         _p9k_color $fg_color $1 VISUAL_IDENTIFIER_COLOR
         _p9k_foreground $_P9K_RETVAL
-        _p9k_escape_rcurly $_P9K_RETVAL
-        icon_fg=$_P9K_RETVAL
+        _p9k_escape_rcurly %b$bg$_P9K_RETVAL
+        icon_style=$_P9K_RETVAL
         has_icon=1
       fi
     fi
@@ -250,12 +250,12 @@ right_prompt_segment() {
     local t=$#_P9K_T
     _p9k_get_icon RIGHT_SEGMENT_SEPARATOR
     _P9K_T+="%F{$bg_color}$_P9K_RETVAL$bg$POWERLEVEL9K_WHITESPACE_BETWEEN_RIGHT_SEGMENTS$fg"  # 1
-    _P9K_T+=$bg$fg                                                                            # 2
+    _P9K_T+=$fg                                                                               # 2
     if [[ -z $fg_color ]]; then
       _p9k_foreground $DEFAULT_COLOR
-      _P9K_T+=$_P9K_RETVAL$subsep$bg$POWERLEVEL9K_WHITESPACE_BETWEEN_RIGHT_SEGMENTS$fg        # 3
+      _P9K_T+=$bg$_P9K_RETVAL$subsep$POWERLEVEL9K_WHITESPACE_BETWEEN_RIGHT_SEGMENTS$fg        # 3
     else
-      _P9K_T+=$fg$subsep$bg$POWERLEVEL9K_WHITESPACE_BETWEEN_RIGHT_SEGMENTS                    # 3
+      _P9K_T+=$bg$fg$subsep$POWERLEVEL9K_WHITESPACE_BETWEEN_RIGHT_SEGMENTS                    # 3
     fi
 
     local pre
@@ -264,26 +264,28 @@ right_prompt_segment() {
     pre+="\${_P9K_N:=\${\${\$((_P9K_I>=$_P9K_RIGHT_JOIN[$2])):#0}:+$((t+2))}}"        # 2
     pre+="\${_P9K_N:=\${\${\$((!\${#\${:-0\$_P9K_BG}:#0$bg_color})):#0}:+$((t+3))}}"  # 3
     pre+="\${_P9K_N:=$((t+1))}}+}"                                                    # 4 == 1
-    pre+="%b\${_P9K_T[\$_P9K_N]}\${_P9K_C}$icon_fg"
+    pre+="\${_P9K_T[\$_P9K_N]}\${_P9K_C}$icon_style"
 
     _p9k_escape_rcurly $POWERLEVEL9K_WHITESPACE_BETWEEN_RIGHT_SEGMENTS
-    local post="$icon$_P9K_RETVAL\${\${_P9K_I::=$2}+}\${\${_P9K_BG::=$bg_color}+}}"
+    local space=$_P9K_RETVAL
+    _p9k_escape_rcurly %b$bg$fg
+    local post="$icon$_P9K_RETVAL$space\${\${_P9K_I::=$2}+}\${\${_P9K_BG::=$bg_color}+}}"
 
-    _p9k_cache_set $has_icon $fg $pre $post
+    _p9k_cache_set $has_icon $_P9K_RETVAL $pre $post
   fi
 
   local -i has_icon=${_P9K_CACHE_VAL[1]}
-  local fg=${_P9K_CACHE_VAL[2]}
+  local style=${_P9K_CACHE_VAL[2]}
   local -i expand=$6
   local cond=${7:-1}
   shift 7
 
-  _p9k_escape_rcurly $fg
+  _p9k_escape_rcurly $style
   local content="${(j::):-$_P9K_RETVAL${^@}}"
   (( expand )) || content="\${(Q)\${:-${(qqq)content}}}"
 
   _P9K_PROMPT+="\${\${:-$cond}:+\${\${:-\${_P9K_C::=${content}}${_P9K_CACHE_VAL[3]}"
-  (( has_icon )) && _P9K_PROMPT+="\${\${\${#_P9K_C}:#$(($# * $#fg))}:+ }"
+  (( has_icon )) && _P9K_PROMPT+='${${(%):-$_P9K_C%1(l. .x)}[-1]%x}'
   _P9K_PROMPT+=${_P9K_CACHE_VAL[4]}
 }
 
@@ -867,12 +869,16 @@ prompt_dir() {
     esac
   fi
 
+  local style=%b
+  _p9k_color blue $0_$state BACKGROUND
+  _p9k_background $_P9K_RETVAL
+  style+=$_P9K_RETVAL
   _p9k_color "$DEFAULT_COLOR" "$0_$state" FOREGROUND
   _p9k_foreground $_P9K_RETVAL
-  local fg=%b$_P9K_RETVAL
+  style+=$_P9K_RETVAL
 
   parts=("${(@)parts//\%/%%}")
-  [[ $fake_first == 0 && $parts[1] == '~' ]] && parts[1]=$POWERLEVEL9K_HOME_FOLDER_ABBREVIATION$fg
+  [[ $fake_first == 0 && $parts[1] == '~' ]] && parts[1]=$POWERLEVEL9K_HOME_FOLDER_ABBREVIATION$style
   [[ $POWERLEVEL9K_DIR_OMIT_FIRST_CHARACTER == true && $#parts > 1 && -n $parts[2] ]] && parts[1]=()
 
   local last_fg=
@@ -882,10 +888,10 @@ prompt_dir() {
     _p9k_foreground $_P9K_RETVAL
     last_fg+=$_P9K_RETVAL
   fi
-  parts[-1]=$last_fg${parts[-1]//$'\0'/$'\0'$last_fg}
-  parts=("${(@)parts//$'\0'/$delim$fg}")
+  parts[-1]=$last_fg${parts[-1]//$'\0'/$'\0'$last_fg}$style
+  parts=("${(@)parts//$'\0'/$delim$style}")
 
-  local sep=$POWERLEVEL9K_DIR_PATH_SEPARATOR$fg
+  local sep=$POWERLEVEL9K_DIR_PATH_SEPARATOR$style
   if [[ -n $POWERLEVEL9K_DIR_PATH_SEPARATOR_FOREGROUND ]]; then
     _p9k_translate_color $POWERLEVEL9K_DIR_PATH_SEPARATOR_FOREGROUND
     _p9k_foreground $_P9K_RETVAL
