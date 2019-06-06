@@ -275,7 +275,7 @@ function gitstatus_start() {
       setopt xtrace
     }
 
-    local os && os=$(uname -s) && [[ -n $os ]]
+    local os && { [[ $(uname -o) == Android ]] && os=Android || os=$(uname -s) } && [[ -n $os ]]
     local arch && arch=$(uname -m) && [[ -n $arch ]]
 
     local daemon=${GITSTATUS_DAEMON:-$dir/bin/gitstatusd-${os:l}-${arch:l}}
