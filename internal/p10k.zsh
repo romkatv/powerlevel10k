@@ -87,7 +87,7 @@ typeset -ga _P9K_RIGHT_JOIN=(1)
 
 _p9k_translate_color() {
   if [[ $1 == <-> ]]; then     # decimal color code: 255
-    _P9K_RETVAL=${(l:3::0:)1}
+    _P9K_RETVAL=$1
   elif [[ $1 == '#'* ]]; then  # hexademical color code: #ffffff
     _P9K_RETVAL=$1
   else                         # named color: red
