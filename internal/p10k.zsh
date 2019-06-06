@@ -688,7 +688,16 @@ set_default POWERLEVEL9K_DIR_OMIT_FIRST_CHARACTER false
 set_default POWERLEVEL9K_SHORTEN_STRATEGY ""
 set_default POWERLEVEL9K_DIR_PATH_SEPARATOR_FOREGROUND ""
 set_default POWERLEVEL9K_SHORTEN_FOLDER_MARKER "(.shorten_folder_marker|.bzr|CVS|.git|.hg|.svn|.terraform|.citc)"
-# Individual elements are patterns. They are expanded with the options set by `emulate zsh`.
+
+# Stop shortening the directory once its length is no greater than this. The value can be either
+# absolute (e.g., '50') or a percentage of terminal width (e.g, '50%').
+#
+# Currently only applied when POWERLEVEL9K_SHORTEN_STRATEGY=truncate_to_unique. If you want to use
+# it with another shortening strategy, open an issue.
+set_default POWERLEVEL9K_DIR_MAX_LENGTH 0
+
+# Individual elements are patterns. They are expanded with the options set
+# by `emulate zsh && setopt extended_glob`.
 set_default -a POWERLEVEL9K_DIR_PACKAGE_FILES package.json composer.json
 
 function _p9k_shorten_delim_len() {
@@ -809,12 +818,20 @@ prompt_dir() {
       local -i i=2 n=1
       [[ $p == /* ]] && (( ++i ))
       delim=${POWERLEVEL9K_SHORTEN_DELIMITER-'*'}
-      _p9k_shorten_delim_len $delim
-      local -i d=_P9K_RETVAL
+      _p9k_prompt_length $delim
+      local -i real_delim_len=_P9K_RETVAL
+      local -i d=${POWERLEVEL9K_SHORTEN_DELIMITER_LENGTH:--1}
+      (( d >= 0 )) || d=real_delim_len
       shortenlen=${POWERLEVEL9K_SHORTEN_DIR_LENGTH:-1}
       (( shortenlen >= 0 )) && n=shortenlen
+      if [[ $POWERLEVEL9K_DIR_MAX_LENGTH == *% ]]; then
+        local -i max_len=$(( COLUMNS * $POWERLEVEL9K_DIR_MAX_LENGTH[1,-2] / 100 ))
+      else
+        local -i max_len=POWERLEVEL9K_DIR_MAX_LENGTH
+      fi
+      local -i len=$#p
       local parent="${PWD%/${(pj./.)parts[i,-1]}}"
-      for (( ; i <= $#parts - n; ++i )); do
+      for (( ; len > max_len && i <= $#parts - n; ++i )); do
         local dir=$parts[i]
         if [[ -n $POWERLEVEL9K_SHORTEN_FOLDER_MARKER &&
               -n $parent/$dir/${~POWERLEVEL9K_SHORTEN_FOLDER_MARKER}(#qN) ]]; then
@@ -826,7 +843,10 @@ prompt_dir() {
           local -a matching=($parent/$dir[1,j]*/(N))
           (( $#matching == 1 )) && break
         done
-        (( j + d >= $#dir )) || parts[i]=$dir[1,j]$'\0'
+        if (( j + d < $#dir )); then
+          (( len -= ($#dir - j - real_delim_len) ))
+          parts[i]=$dir[1,j]$'\0'
+        fi
         parent+=/$dir
       done
     ;;
