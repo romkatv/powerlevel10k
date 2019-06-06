@@ -1018,6 +1018,7 @@ prompt_load() {
       load=${${(A)=load}[bucket+1]//,/.}
     ;;
     *)
+      [[ -r /proc/loadavg ]] || return
       _p9k_read_file /proc/loadavg || return
       load=${${(A)=_P9K_RETVAL}[bucket]//,/.}
     ;;
