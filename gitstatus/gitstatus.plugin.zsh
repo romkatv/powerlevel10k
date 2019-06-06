@@ -274,8 +274,10 @@ function gitstatus_start() {
       exec {stderr_fd}>&2 2>$xtrace_file
       setopt xtrace
     }
-
-    local os && { [[ $(uname -o) == Android ]] && os=Android || os=$(uname -s) } && [[ -n $os ]]
+    
+    # uname -o fails on macOS, so suppress it's stderr output as that case
+    # will be caught by uname -s
+    local os && { [[ $(uname -o 2>/dev/null) == Android ]] && os=Android || os=$(uname -s) } && [[ -n $os ]]
     local arch && arch=$(uname -m) && [[ -n $arch ]]
 
     local daemon=${GITSTATUS_DAEMON:-$dir/bin/gitstatusd-${os:l}-${arch:l}}
