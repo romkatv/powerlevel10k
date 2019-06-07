@@ -278,8 +278,10 @@ function gitstatus_start() {
     local os && os=$(uname -s) && [[ -n $os ]]
     [[ $os != Linux || $(uname -o) != Android ]] || os=Android
     local arch && arch=$(uname -m) && [[ -n $arch ]]
+    local ldd_v && (( $+commands[ldd] )) && ldd_v=$(command ldd --version 2>/dev/null) || true
+    local linkage && [[ ${(L)ldd_v} == (*glibc*|*gnu\ libc*) ]] || linkage=-static
 
-    local daemon=${GITSTATUS_DAEMON:-$dir/bin/gitstatusd-${os:l}-${arch:l}}
+    local daemon=${GITSTATUS_DAEMON:-$dir/bin/gitstatusd-${os:l}-${arch:l}${linkage}}
     [[ -f $daemon ]]
 
     lock_file=$(mktemp "${TMPDIR:-/tmp}"/gitstatus.$$.lock.XXXXXXXXXX)
