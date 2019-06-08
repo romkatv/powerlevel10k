@@ -1571,10 +1571,10 @@ prompt_todo() {
     local script="
       function dirname() {
         local f=\$1
-        [[ \"\$f\" == bash ]] && f=${(Q)commands[todo.sh]}
+        [[ \"\$f\" == bash ]] && f=${(qqq)todo}
         command dirname \"\$f\"
       }
-      source todo.sh shorthelp &>/dev/null
+      source ${(qqq)todo} shorthelp &>/dev/null
       echo \"\$TODO_FILE\""
     typeset -g _P9K_TODO_FILE=$(bash -c $script)
   fi
