@@ -1685,9 +1685,7 @@ function _p9k_vcs_style() {
     _P9K_RETVAL=""
     return
   fi
-  if [[ $color == <-> ]]; then
-    color=${(l:3::0:)color}
-  else
+  if [[ $color != <-> ]]; then
     color=$__P9K_COLORS[${${${color#bg-}#fg-}#br}]
     if [[ -z $color ]]; then
       _P9K_RETVAL=""
