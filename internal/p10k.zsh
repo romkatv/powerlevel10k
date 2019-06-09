@@ -338,7 +338,7 @@ prompt_background_jobs() {
   $1_prompt_segment $0 $2 "$DEFAULT_COLOR" cyan BACKGROUND_JOBS_ICON 1 '${${(%):-%j}:#0}' "$msg"
 }
 
-typeset -g _P9K_XY _P9K_ALIGNED_RPROMPT
+typeset -g _P9K_XY _P9K_CLM _P9K_ALIGNED_RPROMPT
 typeset -gi _P9K_X _P9K_Y _P9K_M _P9K_RPROMPT_DONE _P9K_IND
 
 # Returns 1 if the cursor is at the very end of the screen.
@@ -2494,13 +2494,14 @@ _p9k_init() {
     _p9k_init_timer
   fi
 
-  _P9K_ALIGNED_RPROMPT='${${:-${_P9K_X::=0}${_P9K_Y::=$((COLUMNS+1))}'
+  _P9K_ALIGNED_RPROMPT='${${:-${_P9K_X::=0}${_P9K_Y::=1024}${_P9K_CLM::=$COLUMNS}${COLUMNS::=1024}'
   repeat 10; do
     _P9K_ALIGNED_RPROMPT+='${_P9K_M::=$(((_P9K_X+_P9K_Y)/2))}'
     _P9K_ALIGNED_RPROMPT+='${_P9K_XY::=${${(%):-$_P9K_RPROMPT%$_P9K_M(l./$_P9K_M;$_P9K_Y./$_P9K_X;$_P9K_M)}##*/}}'
     _P9K_ALIGNED_RPROMPT+='${_P9K_X::=${_P9K_XY%;*}}'
     _P9K_ALIGNED_RPROMPT+='${_P9K_Y::=${_P9K_XY#*;}}'
   done
+  _P9K_ALIGNED_RPROMPT+='${COLUMNS::=_P9K_CLM}'
   _P9K_ALIGNED_RPROMPT+='${_P9K_X::=$((_P9K_X+2+_P9K_IND))}'
   _P9K_ALIGNED_RPROMPT+='${_P9K_Y::=$((_P9K_X+31))}}+}'
 
@@ -2510,8 +2511,8 @@ _p9k_init() {
   repeat 32; do
     _P9K_ALIGNED_RPROMPT+='%-$_P9K_X(l. .)'
   done
-  _P9K_ALIGNED_RPROMPT+=' $_P9K_RPROMPT'
-  _P9K_ALIGNED_RPROMPT+='$_P9K_T[$((3+!_P9K_IND))]'
+  _P9K_ALIGNED_RPROMPT+='%$(((COLUMNS-_P9K_X+2)*(COLUMNS+2>=_P9K_X)))'
+  _P9K_ALIGNED_RPROMPT+=$'(l.\n. ${_P9K_RPROMPT//)/%)}$_P9K_T[$((3+!_P9K_IND))])'
 
   _P9K_LEFT_PREFIX+='${${_P9K_IND::=${${ZLE_RPROMPT_INDENT:-1}/#-*/0}}+}'
 
