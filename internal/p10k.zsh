@@ -1566,17 +1566,17 @@ prompt_todo() {
   local todo=$commands[todo.sh]
   [[ -n $todo ]] || return
   if (( ! $+_P9K_TODO_FILE )); then
-    # There is a bug in todo.sh where it uses $0 instead of ${BASH_SOURCE[0]}. We work around
-    # it by overriding `dirname`, to which $0 is passed as an argument.
-    local script="
-      function dirname() {
-        local f=\$1
-        [[ \"\$f\" == bash ]] && f=${(qqq)todo}
-        command dirname \"\$f\"
-      }
-      source ${(qqq)todo} shorthelp &>/dev/null
-      echo \"\$TODO_FILE\""
-    typeset -g _P9K_TODO_FILE=$(bash -c $script)
+    local bash=${commands[bash]:-:}
+    typeset -g _P9K_TODO_FILE=$($bash 2>/dev/null -c "
+      [ -e \"\$TODOTXT_CFG_FILE\" ] || TODOTXT_CFG_FILE=\$HOME/.todo/config
+      [ -e \"\$TODOTXT_CFG_FILE\" ] || TODOTXT_CFG_FILE=\$HOME/todo.cfg
+      [ -e \"\$TODOTXT_CFG_FILE\" ] || TODOTXT_CFG_FILE=\$HOME/.todo.cfg
+      [ -e \"\$TODOTXT_CFG_FILE\" ] || TODOTXT_CFG_FILE=\${XDG_CONFIG_HOME:-\$HOME/.config}/todo/config
+      [ -e \"\$TODOTXT_CFG_FILE\" ] || TODOTXT_CFG_FILE=${(qqq)todo:h}/todo.cfg
+      [ -e \"\$TODOTXT_CFG_FILE\" ] || TODOTXT_CFG_FILE=\${TODOTXT_GLOBAL_CFG_FILE:-/etc/todo/config}
+      [ -r \"\$TODOTXT_CFG_FILE\" ] || exit
+      source \"\$TODOTXT_CFG_FILE\" &>/dev/null
+      echo \"\$TODO_FILE\"")
   fi
   [[ -r $_P9K_TODO_FILE ]] || return
   local -H stat
