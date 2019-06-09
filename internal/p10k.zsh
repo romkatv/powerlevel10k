@@ -2240,6 +2240,9 @@ function _p9k_set_prompt() {
   else
     PROMPT+=$_P9K_LEFT_PREFIX$_P9K_PROMPT${_P9K_LEFT_SUFFIX#$'\n'}
   fi
+
+  PROMPT=${PROMPT//$' %{\b'/'%{%G'}
+  RPROMPT=${RPROMPT//$' %{\b'/'%{%G'}
 }
 
 typeset -g _P9K_REFRESH_REASON
