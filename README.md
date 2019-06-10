@@ -9,7 +9,7 @@ simply replace it with Powerlevel10k and enjoy responsive shell like it's 80's a
 
 Powerlevel10k is a drop-in replacement for Powerlevel9k. It uses the same configuration options as
 Powerlevel9k and produces the same results
-[[*]](#does-powerlevel10k-always-render-exactly-the-same-prompt-with-the-same-config).
+[[*]](#does-powerlevel10k-always-render-exactly-the-same-prompt-as-powerlevel9k-given-the-same-config).
 It's simply [much faster](#is-it-really-fast).
 
 ## Table of Contents
@@ -33,7 +33,7 @@ It's simply [much faster](#is-it-really-fast).
 1. [FAQ](#faq)
    1. [Why does Powerlevel10k spawn extra processes?](#why-does-powerlevel10k-spawn-extra-processes)
    1. [Are there configuration options that make Powerlevel10k slow?](#are-there-configuration-options-that-make-powerlevel10k-slow)
-   1. [Does Powerlevel10k always render exactly the same prompt with the same config?](#does-powerlevel10k-always-render-exactly-the-same-prompt-with-the-same-config)
+   1. [Does Powerlevel10k always render exactly the same prompt as Powerlevel9k given the same config?](#does-powerlevel10k-always-render-exactly-the-same-prompt-as-powerlevel9k-given-the-same-config)
    1. [I am getting an error: "zsh: bad math expression: operand expected at end of string"](#i-am-getting-an-error-zsh-bad-math-expression-operand-expected-at-end-of-string)
    1. [Is there an AUR package for Powerlevel10k?](#is-there-an-aur-package-for-powerlevel10k)
    1. [I cannot make Powerlevel10k work with my plugin manager. Help!](#i-cannot-make-powerlevel10k-work-with-my-plugin-manager-help)
