@@ -278,10 +278,8 @@ function gitstatus_start() {
     local os && os=$(uname -s) && [[ -n $os ]]
     [[ $os != Linux || $(uname -o) != Android ]] || os=Android
     local arch && arch=$(uname -m) && [[ -n $arch ]]
-    local ldd_v && (( $+commands[ldd] )) && ldd_v=$(command ldd --version 2>/dev/null) || true
-    local linkage && [[ $os != Linux || ${(L)ldd_v} == (*glibc*|*gnu\ libc*) ]] || linkage=-static
 
-    local daemon=${GITSTATUS_DAEMON:-$dir/bin/gitstatusd-${os:l}-${arch:l}${linkage}}
+    local daemon=${GITSTATUS_DAEMON:-$dir/bin/gitstatusd-${os:l}-${arch:l}}
     [[ -f $daemon ]]
 
     lock_file=$(mktemp "${TMPDIR:-/tmp}"/gitstatus.$$.lock.XXXXXXXXXX)
@@ -317,16 +315,21 @@ function gitstatus_start() {
       (( threads <= 32 )) || threads=32
     }
 
+    local -a daemon_args=(
+      --lock-fd=3
+      --parent-pid=${(q)$}
+      --num-threads=${(q)threads}
+      --max-num-staged=${(q)max_num_staged}
+      --max-num-unstaged=${(q)max_num_unstaged}
+      --max-num-untracked=${(q)max_num_untracked}
+      --dirty-max-index-size=${(q)dirty_max_index_size})
+
     # We use `zsh -c` instead of plain {} or () to work around bugs in zplug. It hangs on startup.
     zsh -dfxc "
-      ${(q)daemon}                             \
-        --lock-fd=3                            \
-        --parent-pid=$$                        \
-        --num-threads=$threads                 \
-        --max-num-staged=$max_num_staged       \
-        --max-num-unstaged=$max_num_unstaged   \
-        --max-num-untracked=$max_num_untracked \
-        --dirty-max-index-size=$dirty_max_index_size
+      ${(q)daemon} $daemon_args
+      if [[ \$? == 127 && -z ${(q)GITSTATUS_DAEMON:-} && -f ${(q)daemon}-static ]]; then
+        ${(q)daemon}-static $daemon_args
+      fi
       echo -nE $'bye\x1f0\x1e'
     " <&$req_fd >&$resp_fd 2>$log_file 3<$lock_file &!
 
