@@ -327,7 +327,9 @@ function gitstatus_start() {
     # We use `zsh -c` instead of plain {} or () to work around bugs in zplug. It hangs on startup.
     zsh -dfxc "
       ${(q)daemon} $daemon_args
-      if [[ \$? == 127 && -z ${(q)GITSTATUS_DAEMON:-} && -f ${(q)daemon}-static ]]; then
+      if [[ \$? != (0|10) && \$? -le 128 &&
+            -z ${(q)GITSTATUS_DAEMON:-} &&
+            -f ${(q)daemon}-static ]]; then
         ${(q)daemon}-static $daemon_args
       fi
       echo -nE $'bye\x1f0\x1e'
