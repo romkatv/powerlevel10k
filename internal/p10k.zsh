@@ -1421,7 +1421,7 @@ exit_code_or_status() {
   if [[ "$POWERLEVEL9K_STATUS_HIDE_SIGNAME" = true ]] || (( ec <= 128 )); then
     _P9K_RETVAL=$ec
   else
-    _P9K_RETVAL="SIG${signals[$((sig + 1))]}($((ec - 128)))"
+    _P9K_RETVAL="SIG${signals[$((ec - 127))]}($((ec - 128)))"
   fi
 }
 
