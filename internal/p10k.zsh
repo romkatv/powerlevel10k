@@ -653,30 +653,27 @@ set_default -i POWERLEVEL9K_COMMAND_EXECUTION_TIME_THRESHOLD 3
 set_default -i POWERLEVEL9K_COMMAND_EXECUTION_TIME_PRECISION 2
 prompt_command_execution_time() {
   (( _P9K_COMMAND_DURATION < POWERLEVEL9K_COMMAND_EXECUTION_TIME_THRESHOLD )) && return
-  # Print time in human readable format
-  # For that use `strftime` and convert
-  # the duration (float) to an seconds
-  # (integer).
-  # See http://unix.stackexchange.com/a/89748
-  local humanReadableDuration
-  if (( _P9K_COMMAND_DURATION > 3600 )); then
-    humanReadableDuration=$(TZ=GMT; strftime '%H:%M:%S' $(( int(rint(_P9K_COMMAND_DURATION)) )))
-  elif (( _P9K_COMMAND_DURATION > 60 )); then
-    humanReadableDuration=$(TZ=GMT; strftime '%M:%S' $(( int(rint(_P9K_COMMAND_DURATION)) )))
-  else
-    # If the command executed in seconds, print as float.
-    # Convert to float
-    if [[ "${POWERLEVEL9K_COMMAND_EXECUTION_TIME_PRECISION}" == "0" ]]; then
-      # If user does not want microseconds, then we need to convert
-      # the duration to an integer.
-      typeset -i humanReadableDuration
+
+  if (( _P9K_COMMAND_DURATION < 60 )); then
+    if [[ $POWERLEVEL9K_COMMAND_EXECUTION_TIME_PRECISION == 0 ]]; then
+      local -i text=_P9K_COMMAND_DURATION
     else
-      typeset -F ${POWERLEVEL9K_COMMAND_EXECUTION_TIME_PRECISION} humanReadableDuration
+      local -F $POWERLEVEL9K_COMMAND_EXECUTION_TIME_PRECISION text=_P9K_COMMAND_DURATION
     fi
-    humanReadableDuration=$_P9K_COMMAND_DURATION
+  else
+    local -i d=_P9K_COMMAND_DURATION
+    local text=${(l.2..0.)$((d % 60))}
+    if (( d >= 60 )); then
+      text=${(l.2..0.)$((d / 60 % 60))}:$text
+      if (( d >= 36000 )); then
+        text=$((d / 3600)):$text
+      elif (( d >= 3600 )); then
+        text=0$((d / 3600)):$text
+      fi
+    fi
   fi
 
-  "$1_prompt_segment" "$0" "$2" "red" "yellow1" 'EXECUTION_TIME_ICON' 0 '' "${humanReadableDuration}"
+  "$1_prompt_segment" "$0" "$2" "red" "yellow1" 'EXECUTION_TIME_ICON' 0 '' $text
 }
 
 set_default POWERLEVEL9K_DIR_PATH_SEPARATOR "/"
