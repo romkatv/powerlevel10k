@@ -264,10 +264,15 @@ right_prompt_segment() {
     pre+="\${_P9K_N:=\${\${\$((_P9K_I>=$_P9K_RIGHT_JOIN[$2])):#0}:+$((t+2))}}"        # 2
     pre+="\${_P9K_N:=\${\${\$((!\${#\${:-0\$_P9K_BG}:#0$bg_color})):#0}:+$((t+3))}}"  # 3
     pre+="\${_P9K_N:=$((t+1))}}+}"                                                    # 4 == 1
+    (( _P9K_EMULATE_ZERO_RPROMPT_INDENT )) && pre+=' '
     pre+="\${_P9K_T[\$_P9K_N]}\${_P9K_C}$icon_style"
 
-    _p9k_escape_rcurly $POWERLEVEL9K_WHITESPACE_BETWEEN_RIGHT_SEGMENTS
-    local space=$_P9K_RETVAL
+    if (( _P9K_EMULATE_ZERO_RPROMPT_INDENT )); then
+      local space=''
+    else
+      _p9k_escape_rcurly $POWERLEVEL9K_WHITESPACE_BETWEEN_RIGHT_SEGMENTS
+      local space=$_P9K_RETVAL
+    fi
     _p9k_escape_rcurly %b$bg$fg
     local post="$icon$_P9K_RETVAL$space\${\${_P9K_I::=$2}+}\${\${_P9K_BG::=$bg_color}+}}"
 
@@ -2199,7 +2204,16 @@ build_right_prompt() {
 
 typeset -gF _P9K_TIMER_START
 
-powerlevel9k_preexec() { _P9K_TIMER_START=$EPOCHREALTIME }
+powerlevel9k_preexec() {
+  if (( _P9K_EMULATE_ZERO_RPROMPT_INDENT )); then
+    if [[ -n $_P9K_REAL_ZLE_RPROMPT_INDENT ]]; then
+      ZLE_RPROMPT_INDENT=$_P9K_REAL_ZLE_RPROMPT_INDENT
+    else
+      unset ZLE_RPROMPT_INDENT
+    fi
+  fi
+  _P9K_TIMER_START=$EPOCHREALTIME
+}
 
 typeset -g _P9K_PROMPT
 typeset -g _P9K_RPROMPT
@@ -2238,6 +2252,8 @@ function _p9k_set_prompt() {
 
   PROMPT=${PROMPT//$' %{\b'/'%{%G'}
   RPROMPT=${RPROMPT//$' %{\b'/'%{%G'}
+
+  _P9K_REAL_ZLE_RPROMPT_INDENT=
 }
 
 typeset -g _P9K_REFRESH_REASON
@@ -2295,7 +2311,9 @@ set_default -i POWERLEVEL9K_VCS_COMMITS_BEHIND_MAX_NUM -1
 
 typeset -g DEFAULT_COLOR
 typeset -g DEFAULT_COLOR_INVERTED
+typeset -g _P9K_REAL_ZLE_RPROMPT_INDENT
 typeset -gi _P9K_INITIALIZED=0
+typeset -gi _P9K_EMULATE_ZERO_RPROMPT_INDENT=0
 
 typeset -g OS
 typeset -g OS_ICON
@@ -2489,6 +2507,17 @@ _p9k_init() {
 
   if [[ $POWERLEVEL9K_EXPERIMENTAL_TIME_REALTIME == true ]]; then
     _p9k_init_timer
+  fi
+
+  # Bug fixed in: https://github.com/zsh-users/zsh/commit/3eea35d0853bddae13fa6f122669935a01618bf9.
+  # If affects most terminals when RPROMPT is non-empty and ZLE_RPROMPT_INDENT is zero.
+  # We can work around it as long as RPROMPT ends with a space.
+  if [[ ($POWERLEVEL9K_RPROMPT_ON_NEWLINE == true || $POWERLEVEL9K_PROMPT_ON_NEWLINE == false) &&
+        $POWERLEVEL9K_WHITESPACE_BETWEEN_RIGHT_SEGMENTS == ' ' && $ZLE_RPROMPT_INDENT == 0 ]] &&
+     ! is-at-least 5.7.2; then
+    _P9K_EMULATE_ZERO_RPROMPT_INDENT=1
+    _P9K_LEFT_PREFIX+='${${:-${_P9K_REAL_ZLE_RPROMPT_INDENT:=$ZLE_RPROMPT_INDENT}${ZLE_RPROMPT_INDENT::=1}}+}'
+    _P9K_RIGHT_SUFFIX+='%E'
   fi
 
   _P9K_ALIGNED_RPROMPT='${${:-${_P9K_X::=0}${_P9K_Y::=1024}${_P9K_CLM::=$COLUMNS}${COLUMNS::=1024}'
