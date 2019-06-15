@@ -413,13 +413,6 @@ set_default -a POWERLEVEL9K_BATTERY_LEVEL_BACKGROUND
 set_default    POWERLEVEL9K_BATTERY_VERBOSE true
 typeset     -g POWERLEVEL9K_BATTERY_STAGES
 
-typeset -gA _P9K_BATTERY_STATES=(
-  'low'           'red'
-  'charging'      'yellow'
-  'charged'       'green'
-  'disconnected'  "$DEFAULT_COLOR_INVERTED"
-)
-
 function _p9k_read_file() {
   _P9K_RETVAL=''
   [[ -n $1 ]] && read -r _P9K_RETVAL <$1
@@ -507,15 +500,19 @@ prompt_battery() {
   local msg="$bat_percent%%"
   [[ $POWERLEVEL9K_BATTERY_VERBOSE == true && -n $remain ]] && msg+=" ($remain)"
 
-  local icon=BATTERY_ICON bg=$DEFAULT_COLOR
-  if (( $#POWERLEVEL9K_BATTERY_STAGES || $#POWERLEVEL9K_BATTERY_LEVEL_BACKGROUND )); then
+  local icon=BATTERY_ICON
+  if (( $#POWERLEVEL9K_BATTERY_STAGES )); then
     local -i idx=$#POWERLEVEL9K_BATTERY_STAGES
     (( bat_percent < 100 )) && idx=$((bat_percent * $#POWERLEVEL9K_BATTERY_STAGES / 100 + 1))
-    if (( $#POWERLEVEL9K_BATTERY_STAGES )); then
-      icon+=_$idx
-      typeset -g POWERLEVEL9K_$icon=$POWERLEVEL9K_BATTERY_STAGES[idx]
-    fi
-    (( $#POWERLEVEL9K_BATTERY_LEVEL_BACKGROUND )) && bg=$POWERLEVEL9K_BATTERY_LEVEL_BACKGROUND[idx]
+    icon+=_$idx
+    typeset -g POWERLEVEL9K_$icon=$POWERLEVEL9K_BATTERY_STAGES[idx]
+  fi
+
+  local bg=$DEFAULT_COLOR
+  if (( $#POWERLEVEL9K_BATTERY_LEVEL_BACKGROUND )); then
+    local -i idx=$#POWERLEVEL9K_BATTERY_LEVEL_BACKGROUND
+    (( bat_percent < 100 )) && idx=$((bat_percent * $#POWERLEVEL9K_BATTERY_LEVEL_BACKGROUND / 100 + 1))
+    bg=$POWERLEVEL9K_BATTERY_LEVEL_BACKGROUND[idx]
   fi
 
   $1_prompt_segment $0_$state $2 "$bg" "$_P9K_BATTERY_STATES[$state]" $icon 0 '' $msg
@@ -2485,6 +2482,13 @@ _p9k_init() {
     DEFAULT_COLOR=black
     DEFAULT_COLOR_INVERTED=white
   fi
+
+  typeset -gA _P9K_BATTERY_STATES=(
+    'low'           'red'
+    'charging'      'yellow'
+    'charged'       'green'
+    'disconnected'  "$DEFAULT_COLOR_INVERTED"
+  )
 
   local i
   for ((i = 2; i <= $#POWERLEVEL9K_LEFT_PROMPT_ELEMENTS; ++i)); do
