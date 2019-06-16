@@ -464,7 +464,7 @@ prompt_battery() {
         if _p9k_read_file $dir/(energy|charge)_now(N); then
           (( energy_now += _P9K_RETVAL ))
         elif _p9k_read_file $dir/capacity(N); then
-          (( energy_now += _P9K_RETVAL * full / 100 ))
+          (( energy_now += _P9K_RETVAL * full / 100. + 0.5 ))
         fi
         _p9k_read_file $dir/status(N) && local bat_status=$_P9K_RETVAL || continue
         [[ $bat_status != Full                                ]] && is_full=0
@@ -474,7 +474,7 @@ prompt_battery() {
 
       (( energy_full )) || return
 
-      bat_percent=$(( 100 * energy_now / energy_full ))
+      bat_percent=$(( 100. * energy_now / energy_full + 0.5 ))
       (( bat_percent > 100 )) && bat_percent=100
 
       if (( is_full || bat_percent == 100 )); then
