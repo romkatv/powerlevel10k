@@ -305,7 +305,7 @@ set_default POWERLEVEL9K_ANACONDA_RIGHT_DELIMITER ")"
 prompt_anaconda() {
   local p=${CONDA_PREFIX:-$CONDA_ENV_PATH}
   if [[ -n $p ]]; then
-    local msg="$POWERLEVEL9K_ANACONDA_LEFT_DELIMITER${${p:t}//\%/%%}$POWERLEVEL9K_ANACONDA_RIGHT_DELIMITER"
+    local msg="$POWERLEVEL9K_ANACONDA_LEFT_DELIMITER${${${p:t}//\%/%%}//\\/\\\\}$POWERLEVEL9K_ANACONDA_RIGHT_DELIMITER"
     "$1_prompt_segment" "$0" "$2" "blue" "$DEFAULT_COLOR" 'PYTHON_ICON' 0 '' "$msg"
   fi
 }
@@ -315,7 +315,7 @@ prompt_anaconda() {
 prompt_aws() {
   local aws_profile="${AWS_PROFILE:-$AWS_DEFAULT_PROFILE}"
   if [[ -n "$aws_profile" ]]; then
-    "$1_prompt_segment" "$0" "$2" red white 'AWS_ICON' 0 '' "${aws_profile//\%/%%}"
+    "$1_prompt_segment" "$0" "$2" red white 'AWS_ICON' 0 '' "${${aws_profile//\%/%%}//\\/\\\\}"
   fi
 }
 
@@ -324,7 +324,7 @@ prompt_aws() {
 prompt_aws_eb_env() {
   [[ -r .elasticbeanstalk/config.yml ]] || return
   local v=${=$(command grep environment .elasticbeanstalk/config.yml 2>/dev/null)[2]}
-  [[ -n $v ]] && "$1_prompt_segment" "$0" "$2" black green 'AWS_EB_ICON' 0 '' "${v//\%/%%}"
+  [[ -n $v ]] && "$1_prompt_segment" "$0" "$2" black green 'AWS_EB_ICON' 0 '' "${${v//\%/%%}//\\/\\\\}"
 }
 
 ################################################################
@@ -575,7 +575,7 @@ prompt_public_ip() {
     _p9k_parse_ip $POWERLEVEL9K_PUBLIC_IP_VPN_INTERFACE && icon='VPN_ICON'
   fi
 
-  $1_prompt_segment "$0" "$2" "$DEFAULT_COLOR" "$DEFAULT_COLOR_INVERTED" "$icon" 0 '' "${ip//\%/%%}"
+  $1_prompt_segment "$0" "$2" "$DEFAULT_COLOR" "$DEFAULT_COLOR_INVERTED" "$icon" 0 '' "${${ip//\%/%%}//\\/\\\\}"
 }
 
 ################################################################
@@ -593,7 +593,7 @@ prompt_context() {
     if [[ $user != $DEFAULT_USER ]]; then
       content="${POWERLEVEL9K_CONTEXT_TEMPLATE}"
     elif [[ $POWERLEVEL9K_ALWAYS_SHOW_USER == true ]]; then
-      content="${user//\%/%%}"
+      content="${${user//\%/%%}//\\/\\\\}"
     else
       return
     fi
@@ -627,7 +627,7 @@ prompt_user() {
   elif [[ -n "$SUDO_COMMAND" ]]; then
     "$1_prompt_segment" "${0}_SUDO" "$2" "${DEFAULT_COLOR}" yellow SUDO_ICON 0 '' "${POWERLEVEL9K_USER_TEMPLATE}"
   else
-    "$1_prompt_segment" "${0}_DEFAULT" "$2" "${DEFAULT_COLOR}" yellow USER_ICON 0 '' "${user//\%/%%}"
+    "$1_prompt_segment" "${0}_DEFAULT" "$2" "${DEFAULT_COLOR}" yellow USER_ICON 0 '' "${${user//\%/%%}//\\/\\\\}"
   fi
 }
 
@@ -907,7 +907,7 @@ prompt_dir() {
     _p9k_foreground $_P9K_RETVAL
     style+=$_P9K_RETVAL
 
-    parts=("${(@)parts//\%/%%}")
+    parts=("${(@)${(@)parts//\%/%%}//\\/\\\\}")
     [[ $fake_first == 0 && $parts[1] == '~' ]] && parts[1]=$POWERLEVEL9K_HOME_FOLDER_ABBREVIATION$style
     [[ $POWERLEVEL9K_DIR_OMIT_FIRST_CHARACTER == true && $#parts > 1 && -n $parts[2] ]] && parts[1]=()
 
@@ -937,7 +937,7 @@ prompt_dir() {
 # Docker machine
 prompt_docker_machine() {
   if [[ -n "$DOCKER_MACHINE_NAME" ]]; then
-    "$1_prompt_segment" "$0" "$2" "magenta" "$DEFAULT_COLOR" 'SERVER_ICON' 0 '' "${DOCKER_MACHINE_NAME//\%/%%}"
+    "$1_prompt_segment" "$0" "$2" "magenta" "$DEFAULT_COLOR" 'SERVER_ICON' 0 '' "${${DOCKER_MACHINE_NAME//\%/%%}//\\/\\\\}"
   fi
 }
 
@@ -964,7 +964,7 @@ prompt_go_version() {
       dir=${dir:h}
     done
   fi
-  "$1_prompt_segment" "$0" "$2" "green" "grey93" "GO_ICON" 0 '' "${v//\%/%%}"
+  "$1_prompt_segment" "$0" "$2" "green" "grey93" "GO_ICON" 0 '' "${${v//\%/%%}//\\/\\\\}"
 }
 
 ################################################################
@@ -982,7 +982,7 @@ prompt_detect_virt() {
     [[ "$(command ls -di /)" != "2 /" ]] && virt="chroot"
   fi
   if [[ -n "${virt}" ]]; then
-    "$1_prompt_segment" "$0" "$2" "$DEFAULT_COLOR" "yellow" '' 0 '' "${virt//\%/%%}"
+    "$1_prompt_segment" "$0" "$2" "$DEFAULT_COLOR" "yellow" '' 0 '' "${${virt//\%/%%}//\\/\\\\}"
   fi
 }
 
@@ -1003,7 +1003,7 @@ prompt_icons_test() {
 set_default POWERLEVEL9K_IP_INTERFACE "^[^ ]+"
 prompt_ip() {
   _p9k_parse_ip $POWERLEVEL9K_IP_INTERFACE || return
-  "$1_prompt_segment" "$0" "$2" "cyan" "$DEFAULT_COLOR" 'NETWORK_ICON' 0 '' "${_P9K_RETVAL//\%/%%}"
+  "$1_prompt_segment" "$0" "$2" "cyan" "$DEFAULT_COLOR" 'NETWORK_ICON' 0 '' "${${_P9K_RETVAL//\%/%%}//\\/\\\\}"
 }
 
 ################################################################
@@ -1012,7 +1012,7 @@ set_default POWERLEVEL9K_VPN_IP_INTERFACE "tun"
 # prompt if vpn active
 prompt_vpn_ip() {
   _p9k_parse_ip $POWERLEVEL9K_VPN_IP_INTERFACE || return
-  "$1_prompt_segment" "$0" "$2" "cyan" "$DEFAULT_COLOR" 'VPN_ICON' 0 '' "${_P9K_RETVAL//\%/%%}"
+  "$1_prompt_segment" "$0" "$2" "cyan" "$DEFAULT_COLOR" 'VPN_ICON' 0 '' "${${_P9K_RETVAL//\%/%%}//\\/\\\\}"
 }
 
 ################################################################
@@ -1022,7 +1022,7 @@ prompt_laravel_version() {
   if [[ -n "${laravel_version}" && "${laravel_version}" =~ "Laravel Framework" ]]; then
     # Strip out everything but the version
     laravel_version="${laravel_version//Laravel Framework /}"
-    "$1_prompt_segment" "$0" "$2" "maroon" "white" 'LARAVEL_ICON' 0 '' "${laravel_version//\%/%%}"
+    "$1_prompt_segment" "$0" "$2" "maroon" "white" 'LARAVEL_ICON' 0 '' "${${laravel_version//\%/%%}//\\/\\\\}"
   fi
 }
 
@@ -1222,7 +1222,7 @@ prompt_nvm() {
   [[ -n $NVM_DIR ]] && _p9k_nvm_ls_current || return
   local current=$_P9K_RETVAL
   ! _p9k_nvm_ls_default || [[ $_P9K_RETVAL != $current ]] || return
-  $1_prompt_segment "$0" "$2" "magenta" "black" 'NODE_ICON' 0 '' "${${current#v}//\%/%%}"
+  $1_prompt_segment "$0" "$2" "magenta" "black" 'NODE_ICON' 0 '' "${${${current#v}//\%/%%}//\\/\\\\}"
 }
 
 ################################################################
@@ -1231,7 +1231,7 @@ prompt_nodeenv() {
   if [[ -n "$NODE_VIRTUAL_ENV" ]]; then
     _p9k_cached_cmd_stdout node --version || return
     local info="${_P9K_RETVAL}[${NODE_VIRTUAL_ENV:t}]"
-    "$1_prompt_segment" "$0" "$2" "black" "green" 'NODE_ICON' 0 '' "${info//\%/%%}"
+    "$1_prompt_segment" "$0" "$2" "black" "green" 'NODE_ICON' 0 '' "${${info//\%/%%}//\\/\\\\}"
   fi
 }
 
@@ -1249,7 +1249,7 @@ prompt_php_version() {
   local -a match
   [[ $_P9K_RETVAL == (#b)(*$'\n')#(PHP [[:digit:].]##)* ]] || return
   local v=$match[2]
-  "$1_prompt_segment" "$0" "$2" "fuchsia" "grey93" '' 0 '' "${v//\%/%%}"
+  "$1_prompt_segment" "$0" "$2" "fuchsia" "grey93" '' 0 '' "${${v//\%/%%}//\\/\\\\}"
 }
 
 ################################################################
@@ -1321,7 +1321,7 @@ prompt_rbenv() {
     [[ $v == $_P9K_RETVAL ]] && return
   fi
 
-  "$1_prompt_segment" "$0" "$2" "red" "$DEFAULT_COLOR" 'RUBY_ICON' 0 '' "${v//\%/%%}"
+  "$1_prompt_segment" "$0" "$2" "red" "$DEFAULT_COLOR" 'RUBY_ICON' 0 '' "${${v//\%/%%}//\\/\\\\}"
 }
 
 ################################################################
@@ -1345,7 +1345,7 @@ prompt_chruby() {
 
   # Don't show anything if the chruby did not change the default ruby
   if [[ "$RUBY_ENGINE" != "" ]]; then
-    "$1_prompt_segment" "$0" "$2" "red" "$DEFAULT_COLOR" 'RUBY_ICON' 0 '' "${chruby_label//\%/%%}"
+    "$1_prompt_segment" "$0" "$2" "red" "$DEFAULT_COLOR" 'RUBY_ICON' 0 '' "${${chruby_label//\%/%%}//\\/\\\\}"
   fi
 }
 
@@ -1378,7 +1378,7 @@ prompt_rust_version() {
   _p9k_cached_cmd_stdout rustc --version || return
   local v=${${_P9K_RETVAL#rustc }%% *}
   [[ -n $v ]] || return
-  "$1_prompt_segment" "$0" "$2" "darkorange" "$DEFAULT_COLOR" 'RUST_ICON' 0 '' "${v//\%/%%}"
+  "$1_prompt_segment" "$0" "$2" "darkorange" "$DEFAULT_COLOR" 'RUST_ICON' 0 '' "${${v//\%/%%}//\\/\\\\}"
 }
 
 # RSpec test ratio
@@ -1398,7 +1398,7 @@ prompt_rvm() {
     local version_and_gemset=${$(rvm-prompt v p)/ruby-}
 
     if [[ -n "$version_and_gemset" ]]; then
-      "$1_prompt_segment" "$0" "$2" "240" "$DEFAULT_COLOR" 'RUBY_ICON' 0 '' "${version_and_gemset//\%/%%}"
+      "$1_prompt_segment" "$0" "$2" "240" "$DEFAULT_COLOR" 'RUBY_ICON' 0 '' "${${version_and_gemset//\%/%%}//\\/\\\\}"
     fi
   fi
 }
@@ -1527,7 +1527,7 @@ prompt_symfony2_tests() {
 prompt_symfony2_version() {
   if [[ -r app/bootstrap.php.cache ]]; then
     local v="${$(command grep -F " VERSION " app/bootstrap.php.cache 2>/dev/null)//[![:digit:].]}"
-    "$1_prompt_segment" "$0" "$2" "grey35" "$DEFAULT_COLOR" 'SYMFONY_ICON' 0 '' "${v//\%/%%}"
+    "$1_prompt_segment" "$0" "$2" "grey35" "$DEFAULT_COLOR" 'SYMFONY_ICON' 0 '' "${${v//\%/%%}//\\/\\\\}"
   fi
 }
 
@@ -1555,7 +1555,7 @@ set_default POWERLEVEL9K_TIME_FORMAT "%D{%H:%M:%S}"
 prompt_time() {
   local t=$POWERLEVEL9K_TIME_FORMAT
   [[ $POWERLEVEL9K_EXPERIMENTAL_TIME_REALTIME == true ]] || t=${(%)t}
-  "$1_prompt_segment" "$0" "$2" "$DEFAULT_COLOR_INVERTED" "$DEFAULT_COLOR" "TIME_ICON" 0 '' "${t//\%/%%}"
+  "$1_prompt_segment" "$0" "$2" "$DEFAULT_COLOR_INVERTED" "$DEFAULT_COLOR" "TIME_ICON" 0 '' "${${t//\%/%%}//\\/\\\\}"
 }
 
 ################################################################
@@ -1564,7 +1564,7 @@ set_default POWERLEVEL9K_DATE_FORMAT "%D{%d.%m.%y}"
 prompt_date() {
   local d=$POWERLEVEL9K_DATE_FORMAT
   [[ $POWERLEVEL9K_EXPERIMENTAL_TIME_REALTIME == true ]] || d=${(%)d}
-  "$1_prompt_segment" "$0" "$2" "$DEFAULT_COLOR_INVERTED" "$DEFAULT_COLOR" "DATE_ICON" 0 '' "${d//\%/%%}"
+  "$1_prompt_segment" "$0" "$2" "$DEFAULT_COLOR_INVERTED" "$DEFAULT_COLOR" "DATE_ICON" 0 '' "${${d//\%/%%}//\\/\\\\}"
 }
 
 ################################################################
@@ -1807,21 +1807,21 @@ function _p9k_vcs_render() {
 
     if [[ -n $VCS_STATUS_LOCAL_BRANCH ]]; then
       _p9k_get_icon VCS_BRANCH_ICON
-      _$0_fmt BRANCH "$ws$_P9K_RETVAL${VCS_STATUS_LOCAL_BRANCH//\%/%%}"
+      _$0_fmt BRANCH "$ws$_P9K_RETVAL${${VCS_STATUS_LOCAL_BRANCH//\%/%%}//\\/\\\\}"
     fi
 
     if [[ $POWERLEVEL9K_VCS_HIDE_TAGS == false && -n $VCS_STATUS_TAG ]]; then
       _p9k_get_icon VCS_TAG_ICON
-      _$0_fmt TAG " $_P9K_RETVAL${VCS_STATUS_TAG//\%/%%}"
+      _$0_fmt TAG " $_P9K_RETVAL${${VCS_STATUS_TAG//\%/%%}//\\/\\\\}"
     fi
 
     if [[ -n $VCS_STATUS_ACTION ]]; then
-      _$0_fmt ACTION " | ${VCS_STATUS_ACTION//\%/%%}"
+      _$0_fmt ACTION " | ${${VCS_STATUS_ACTION//\%/%%}//\\/\\\\}"
     else
       if [[ -n $VCS_STATUS_REMOTE_BRANCH &&
             $VCS_STATUS_LOCAL_BRANCH != $VCS_STATUS_REMOTE_BRANCH ]]; then
         _p9k_get_icon VCS_REMOTE_BRANCH_ICON
-        _$0_fmt REMOTE_BRANCH " $_P9K_RETVAL${VCS_STATUS_REMOTE_BRANCH//\%/%%}"
+        _$0_fmt REMOTE_BRANCH " $_P9K_RETVAL${${VCS_STATUS_REMOTE_BRANCH//\%/%%}//\\/\\\\}"
       fi
       if [[ $VCS_STATUS_HAS_STAGED == 1 ]]; then
         _p9k_get_icon VCS_STAGED_ICON
@@ -1978,7 +1978,7 @@ prompt_vi_mode() {
 # https://virtualenv.pypa.io/en/latest/
 prompt_virtualenv() {
   if [[ -n "$VIRTUAL_ENV" ]]; then
-    "$1_prompt_segment" "$0" "$2" "blue" "$DEFAULT_COLOR" 'PYTHON_ICON' 0 '' "${${VIRTUAL_ENV:t}//\%/%%}"
+    "$1_prompt_segment" "$0" "$2" "blue" "$DEFAULT_COLOR" 'PYTHON_ICON' 0 '' "${${${VIRTUAL_ENV:t}//\%/%%}//\\/\\\\}"
   fi
 }
 
@@ -2021,7 +2021,7 @@ prompt_pyenv() {
     [[ $v == $_P9K_RETVAL ]] && return
   fi
 
-  "$1_prompt_segment" "$0" "$2" "blue" "$DEFAULT_COLOR" 'PYTHON_ICON' 0 '' "${v//\%/%%}"
+  "$1_prompt_segment" "$0" "$2" "blue" "$DEFAULT_COLOR" 'PYTHON_ICON' 0 '' "${${v//\%/%%}//\\/\\\\}"
 }
 
 ################################################################
@@ -2030,9 +2030,9 @@ prompt_openfoam() {
   local wm_project_version="$WM_PROJECT_VERSION"
   local wm_fork="$WM_FORK"
   if [[ -n "$wm_project_version" && -z "$wm_fork" ]] ; then
-    "$1_prompt_segment" "$0" "$2" "yellow" "$DEFAULT_COLOR" '' 0 '' "OF: ${${wm_project_version:t}//\%/%%}"
+    "$1_prompt_segment" "$0" "$2" "yellow" "$DEFAULT_COLOR" '' 0 '' "OF: ${${${wm_project_version:t}//\%/%%}//\\/\\\\}"
   elif [[ -n "$wm_project_version" && -n "$wm_fork" ]] ; then
-    "$1_prompt_segment" "$0" "$2" "yellow" "$DEFAULT_COLOR" '' 0 '' "F-X: ${${wm_project_version:t}//\%/%%}"
+    "$1_prompt_segment" "$0" "$2" "yellow" "$DEFAULT_COLOR" '' 0 '' "F-X: ${${${wm_project_version:t}//\%/%%}//\\/\\\\}"
   fi
 }
 
@@ -2042,7 +2042,7 @@ prompt_swift_version() {
   _p9k_cached_cmd_stdout swift --version || return
   emulate -L zsh && setopt extendedglob
   [[ $_P9K_RETVAL == (#b)[^[:digit:]]#([[:digit:].]##)* ]] || return
-  "$1_prompt_segment" "$0" "$2" "magenta" "white" 'SWIFT_ICON' 0 '' "${match[1]//\%/%%}"
+  "$1_prompt_segment" "$0" "$2" "magenta" "white" 'SWIFT_ICON' 0 '' "${${match[1]//\%/%%}//\\/\\\\}"
 }
 
 ################################################################
@@ -2117,7 +2117,7 @@ prompt_kubecontext() {
   fi
 
   [[ -n $_P9K_CACHE_VAL[1] ]] || return
-  $1_prompt_segment $0$_P9K_CACHE_VAL[2] $2 magenta white KUBERNETES_ICON 0 '' "${_P9K_CACHE_VAL[1]//\%/%%}"
+  $1_prompt_segment $0$_P9K_CACHE_VAL[2] $2 magenta white KUBERNETES_ICON 0 '' "${${_P9K_CACHE_VAL[1]//\%/%%}//\\/\\\\}"
 }
 
 ################################################################
@@ -2134,7 +2134,7 @@ prompt_dropbox() {
       dropbox_status=""
     fi
 
-    "$1_prompt_segment" "$0" "$2" "white" "blue" "DROPBOX_ICON" 0 '' "${dropbox_status//\%/%%}"
+    "$1_prompt_segment" "$0" "$2" "white" "blue" "DROPBOX_ICON" 0 '' "${${dropbox_status//\%/%%}//\\/\\\\}"
   fi
 }
 
@@ -2153,7 +2153,7 @@ prompt_java_version() {
   v=${${v#*\"}%\"*}
   [[ $POWERLEVEL9K_JAVA_VERSION_FULL == true ]] || v=${v%%-*}
   [[ -n $v ]] || return
-  "$1_prompt_segment" "$0" "$2" "red" "white" "JAVA_ICON" 0 '' "${v//\%/%%}"
+  "$1_prompt_segment" "$0" "$2" "red" "white" "JAVA_ICON" 0 '' "${${v//\%/%%}//\\/\\\\}"
 }
 
 ################################################################
