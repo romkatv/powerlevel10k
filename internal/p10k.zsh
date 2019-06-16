@@ -454,20 +454,28 @@ prompt_battery() {
       local -i is_full=1 is_calculating is_charching
       local dir
       for dir in $bats; do
-        local -i pow=0
-        _p9k_read_file $dir/(energy|charge)_now(N)  && (( energy_now+=_P9K_RETVAL ))
-        _p9k_read_file $dir/(energy|charge)_full(N) && (( energy_full+=_P9K_RETVAL ))
-        _p9k_read_file $dir/(power|current)_now(N)  && (( power_now+=${pow::=$_P9K_RETVAL} ))
+        local -i pow=0 full=0
+        if _p9k_read_file $dir/(energy_full|charge_full|charge_counter)(N); then
+          (( energy_full += ${full::=_P9K_RETVAL} ))
+        fi
+        if _p9k_read_file $dir/(power|current)_now(N) && (( $#_P9K_RETVAL < 9 )); then
+          (( power_now += ${pow::=$_P9K_RETVAL} ))
+        fi
+        if _p9k_read_file $dir/(energy|charge)_now(N); then
+          (( energy_now += _P9K_RETVAL ))
+        elif _p9k_read_file $dir/capacity(N); then
+          (( energy_now += _P9K_RETVAL * full / 100 ))
+        fi
         _p9k_read_file $dir/status(N) && local bat_status=$_P9K_RETVAL || continue
         [[ $bat_status != Full                                ]] && is_full=0
         [[ $bat_status == Charging                            ]] && is_charching=1
         [[ $bat_status == (Charging|Discharging) && $pow == 0 ]] && is_calculating=1
       done
 
-      if (( energy_full )); then
-        bat_percent=$(( 100 * energy_now / energy_full ))
-        (( bat_percent > 100 )) && bat_percent=100
-      fi
+      (( energy_full )) || return
+
+      bat_percent=$(( 100 * energy_now / energy_full ))
+      (( bat_percent > 100 )) && bat_percent=100
 
       if (( is_full || bat_percent == 100 )); then
         state=charged
