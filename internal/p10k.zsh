@@ -947,7 +947,7 @@ prompt_go_version() {
   _p9k_cached_cmd_stdout go version || return
   emulate -L zsh && setopt extendedglob
   local -a match
-  [[ $_P9K_RETVAL == (#b)*(go[[:digit:].]##)* ]] || return
+  [[ $_P9K_RETVAL == (#b)*go([[:digit:].]##)* ]] || return
   local v=$match[1]
   local p=$GOPATH
   if [[ -z $p ]]; then
