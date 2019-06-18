@@ -426,7 +426,7 @@ prompt_battery() {
   case $OS in
     OSX)
       (( $+commands[pmset] )) || return
-      local raw_data=${${(f)$(command pmset -g batt 2>/dev/null)}[2]}
+      local raw_data=${${(f)"$(command pmset -g batt 2>/dev/null)"}[2]}
       [[ $raw_data == *InternalBattery* ]] || return
       remain=${${(s: :)${${(s:; :)raw_data}[3]}}[1]}
       [[ $remain == *no* ]] && remain="..."
