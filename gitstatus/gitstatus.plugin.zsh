@@ -287,18 +287,9 @@ function gitstatus_start() {
 
     req_fifo=$(mktemp -u "${TMPDIR:-/tmp}"/gitstatus.$$.pipe.req.XXXXXXXXXX)
     mkfifo $req_fifo
-    sysopen -rw -o cloexec,sync -u req_fd $req_fifo
-    command rm -f $req_fifo
 
     resp_fifo=$(mktemp -u "${TMPDIR:-/tmp}"/gitstatus.$$.pipe.resp.XXXXXXXXXX)
     mkfifo $resp_fifo
-    sysopen -rw -o cloexec -u resp_fd $resp_fifo
-    command rm -f $resp_fifo
-
-    function _gitstatus_process_response_${name}() {
-      _gitstatus_process_response ${${(%)${:-%N}}#_gitstatus_process_response_} 0 ''
-    }
-    zle -F $resp_fd _gitstatus_process_response_${name}
 
     [[ ${GITSTATUS_ENABLE_LOGGING:-0} == 1 ]] &&
       log_file=$(mktemp "${TMPDIR:-/tmp}"/gitstatus.$$.daemon-log.XXXXXXXXXX) ||
@@ -333,10 +324,19 @@ function gitstatus_start() {
         ${(q)daemon}-static $daemon_args
       fi
       echo -nE $'bye\x1f0\x1e'
-    " <&$req_fd >&$resp_fd 2>$log_file 3<$lock_file &!
+    " <$req_fifo >$resp_fifo 2>$log_file 3<$lock_file &!
 
     daemon_pid=$!
-    command rm -f $lock_file
+    
+    sysopen -w -o cloexec,sync -u req_fd $req_fifo
+    sysopen -r -o cloexec -u resp_fd $resp_fifo
+
+    command rm -f $req_fifo $resp_fifo $lock_file
+
+    function _gitstatus_process_response_${name}() {
+      _gitstatus_process_response ${${(%)${:-%N}}#_gitstatus_process_response_} 0 ''
+    }
+    zle -F $resp_fd _gitstatus_process_response_${name}
 
     local reply
     echo -nE $'hello\x1f\x1e' >&$req_fd
