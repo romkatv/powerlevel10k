@@ -2599,7 +2599,7 @@ _p9k_init() {
     _P9K_LEFT_PREFIX+="$_P9K_RETVAL%f%b%k"
     _p9k_get_icon MULTILINE_LAST_PROMPT_PREFIX
     _P9K_LEFT_SUFFIX+=$'\n'$_P9K_RETVAL
-    if [[ $POWERLEVEL9K_RPROMPT_ON_NEWLINE != true ]]; then
+    if [[ $POWERLEVEL9K_RPROMPT_ON_NEWLINE != true && -o TRANSIENT_RPROMPT ]]; then
       if is-at-least 5.3; then
         function _p9k_zle_line_finish() {
           [[ -o TRANSIENT_RPROMPT ]] || return
