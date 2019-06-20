@@ -2661,10 +2661,11 @@ _p9k_init() {
   if segment_in_use vi_mode && (( $+POWERLEVEL9K_VI_VISUAL_MODE_STRING )); then
     if is-at-least 5.3; then
       function _p9k_zle_line_pre_redraw() {
-        [[ $KEYMAP == vicmd ]] &&
-          [[ ${REGION_ACTIVE:-0} != $_P9K_REGION_ACTIVE ]] &&
-          _P9K_REGION_ACTIVE=${REGION_ACTIVE:-0} &&
-          zle && zle .reset-prompt && zle -R
+        [[ $KEYMAP == vicmd ]] || return
+        local region=${${REGION_ACTIVE:-0}/2/1}
+        [[ $region != $_P9K_REGION_ACTIVE ]] || return
+        _P9K_REGION_ACTIVE=$region
+        zle && zle .reset-prompt && zle -R
       }
       autoload -Uz add-zle-hook-widget
       add-zle-hook-widget line-pre-redraw _p9k_zle_line_pre_redraw
