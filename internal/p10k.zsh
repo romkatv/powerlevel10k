@@ -1341,23 +1341,11 @@ prompt_rbenv() {
 set_default POWERLEVEL9K_CHRUBY_SHOW_VERSION true
 set_default POWERLEVEL9K_CHRUBY_SHOW_ENGINE true
 prompt_chruby() {
-  # Uses $RUBY_VERSION and $RUBY_ENGINE set by chruby
-  local chruby_label=""
-
-  if [[ "$POWERLEVEL9K_CHRUBY_SHOW_ENGINE" == true ]]; then
-    chruby_label+="$RUBY_ENGINE "
-  fi
-  if [[ "$POWERLEVEL9K_CHRUBY_SHOW_VERSION" == true ]]; then
-    chruby_label+="$RUBY_VERSION"
-  fi
-
-  # Truncate trailing spaces
-  chruby_label="${chruby_label%"${chruby_label##*[![:space:]]}"}"
-
-  # Don't show anything if the chruby did not change the default ruby
-  if [[ "$RUBY_ENGINE" != "" ]]; then
-    "$1_prompt_segment" "$0" "$2" "red" "$DEFAULT_COLOR" 'RUBY_ICON' 0 '' "${${chruby_label//\%/%%}//\\/\\\\}"
-  fi
+  [[ -n $RUBY_ENGINE ]] || return
+  local v=''
+  [[ $POWERLEVEL9K_CHRUBY_SHOW_ENGINE == true ]] && v=$RUBY_ENGINE
+  if [[ $POWERLEVEL9K_CHRUBY_SHOW_VERSION == true && -n $RUBY_VERSION ]] && v+=${v:+ }$RUBY_VERSION
+  "$1_prompt_segment" "$0" "$2" "red" "$DEFAULT_COLOR" 'RUBY_ICON' 0 '' "${${v//\%/%%}//\\/\\\\}"
 }
 
 ################################################################
