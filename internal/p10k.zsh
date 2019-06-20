@@ -703,6 +703,7 @@ set_default POWERLEVEL9K_DIR_PATH_HIGHLIGHT_BOLD false
 set_default POWERLEVEL9K_DIR_PATH_ABSOLUTE false
 set_default POWERLEVEL9K_DIR_SHOW_WRITABLE false
 set_default POWERLEVEL9K_DIR_OMIT_FIRST_CHARACTER false
+set_default POWERLEVEL9K_DIR_HYPERLINK false
 set_default POWERLEVEL9K_SHORTEN_STRATEGY ""
 set_default POWERLEVEL9K_DIR_PATH_SEPARATOR_FOREGROUND ""
 set_default POWERLEVEL9K_SHORTEN_FOLDER_MARKER "(.shorten_folder_marker|.bzr|CVS|.git|.hg|.svn|.terraform|.citc)"
@@ -939,7 +940,11 @@ prompt_dir() {
       sep=$_P9K_RETVAL$sep
     fi
 
-    _p9k_cache_set "$0_$state" "$2" blue "$DEFAULT_COLOR" "$icon" 0 "" "${(pj.$sep.)parts}"
+    local content="${(pj.$sep.)parts}"
+    if [[ $POWERLEVEL9K_DIR_HYPERLINK == true ]]; then
+      content=$'%{\e]8;;file://'${${PWD//\%/%%25}//'#'/%%23}$'\a%}'$content$'%{\e]8;;\a%}'
+    fi
+    _p9k_cache_set "$0_$state" "$2" blue "$DEFAULT_COLOR" "$icon" 0 "" $content
   fi
   "$1_prompt_segment" "$_P9K_CACHE_VAL[@]"
 }
