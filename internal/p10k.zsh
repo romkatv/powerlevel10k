@@ -1635,8 +1635,8 @@ powerlevel9k_vcs_init() {
   fi
 
   local component state
-  for component in REMOTE_URL COMMIT BRANCH TAG REMOTE_BRANCH STAGED UNSTAGED UNTRACKED \
-                   OUTGOING_CHANGES INCOMING_CHANGES STASH ACTION; do
+  for component in REMOTE_URL COMMIT BRANCH DIRTY TAG REMOTE_BRANCH STAGED UNSTAGED \
+                   UNTRACKED OUTGOING_CHANGES INCOMING_CHANGES STASH ACTION; do
     local color=${(P)${:-POWERLEVEL9K_VCS_${component}FORMAT_FOREGROUND}}
     if [[ -n $color ]]; then
       for state in "${(@k)vcs_states}"; do
@@ -1826,20 +1826,24 @@ function _p9k_vcs_render() {
         _p9k_get_icon VCS_REMOTE_BRANCH_ICON
         _$0_fmt REMOTE_BRANCH " $_P9K_RETVAL${VCS_STATUS_REMOTE_BRANCH//\%/%%}"
       fi
-      if [[ $VCS_STATUS_HAS_STAGED == 1 ]]; then
-        _p9k_get_icon VCS_STAGED_ICON
-        (( ${POWERLEVEL9K_VCS_MAX_NUM_STAGED:-$POWERLEVEL9K_VCS_STAGED_MAX_NUM} != 1 )) && _P9K_RETVAL+=$VCS_STATUS_NUM_STAGED
-        _$0_fmt STAGED " $_P9K_RETVAL"
-      fi
-      if [[ $VCS_STATUS_HAS_UNSTAGED == 1 ]]; then
-        _p9k_get_icon VCS_UNSTAGED_ICON
-        (( ${POWERLEVEL9K_VCS_MAX_NUM_UNSTAGED:-$POWERLEVEL9K_VCS_UNSTAGED_MAX_NUM} != 1 )) && _P9K_RETVAL+=$VCS_STATUS_NUM_UNSTAGED
-        _$0_fmt UNSTAGED " $_P9K_RETVAL"
-      fi
-      if [[ $VCS_STATUS_HAS_UNTRACKED == 1 ]]; then
-        _p9k_get_icon VCS_UNTRACKED_ICON
-        (( ${POWERLEVEL9K_VCS_MAX_NUM_UNTRACKED:-$POWERLEVEL9K_VCS_UNTRACKED_MAX_NUM} != 1 )) && _P9K_RETVAL+=$VCS_STATUS_NUM_UNTRACKED
-        _$0_fmt UNTRACKED " $_P9K_RETVAL"
+      if [[ $VCS_STATUS_HAS_STAGED == 1 || $VCS_STATUS_HAS_UNSTAGED == 1 || $VCS_STATUS_HAS_UNTRACKED == 1 ]]; then
+        _p9k_get_icon VCS_DIRTY_ICON
+        _$0_fmt DIRTY "$_P9K_RETVAL"
+        if [[ $VCS_STATUS_HAS_STAGED == 1 ]]; then
+          _p9k_get_icon VCS_STAGED_ICON
+          (( ${POWERLEVEL9K_VCS_MAX_NUM_STAGED:-$POWERLEVEL9K_VCS_STAGED_MAX_NUM} != 1 )) && _P9K_RETVAL+=$VCS_STATUS_NUM_STAGED
+          _$0_fmt STAGED " $_P9K_RETVAL"
+        fi
+        if [[ $VCS_STATUS_HAS_UNSTAGED == 1 ]]; then
+          _p9k_get_icon VCS_UNSTAGED_ICON
+          (( ${POWERLEVEL9K_VCS_MAX_NUM_UNSTAGED:-$POWERLEVEL9K_VCS_UNSTAGED_MAX_NUM} != 1 )) && _P9K_RETVAL+=$VCS_STATUS_NUM_UNSTAGED
+          _$0_fmt UNSTAGED " $_P9K_RETVAL"
+        fi
+        if [[ $VCS_STATUS_HAS_UNTRACKED == 1 ]]; then
+          _p9k_get_icon VCS_UNTRACKED_ICON
+          (( ${POWERLEVEL9K_VCS_MAX_NUM_UNTRACKED:-$POWERLEVEL9K_VCS_UNTRACKED_MAX_NUM} != 1 )) && _P9K_RETVAL+=$VCS_STATUS_NUM_UNTRACKED
+          _$0_fmt UNTRACKED " $_P9K_RETVAL"
+        fi
       fi
       if [[ $VCS_STATUS_COMMITS_BEHIND -gt 0 ]]; then
         _p9k_get_icon VCS_INCOMING_CHANGES_ICON
@@ -2263,8 +2267,8 @@ function _p9k_set_prompt() {
     PROMPT+=$_P9K_LEFT_PREFIX$_P9K_PROMPT${_P9K_LEFT_SUFFIX#$'\n'}
   fi
 
-  PROMPT=${PROMPT//$' %{\b'/'%{%G'}
-  RPROMPT=${RPROMPT//$' %{\b'/'%{%G'}
+  PROMPT=${${PROMPT//$' %{\b'/'%{%G'}//$' \b'}
+  RPROMPT=${${RPROMPT//$' %{\b'/'%{%G'}//$' \b'}
 
   _P9K_REAL_ZLE_RPROMPT_INDENT=
 }
