@@ -1975,10 +1975,15 @@ prompt_vi_mode() {
 # Virtualenv: current working virtualenv
 # More information on virtualenv (Python):
 # https://virtualenv.pypa.io/en/latest/
+set_default POWERLEVEL9K_VIRTUALENV_SHOW_PYTHON_VERSION true
 prompt_virtualenv() {
-  if [[ -n "$VIRTUAL_ENV" ]]; then
-    "$1_prompt_segment" "$0" "$2" "blue" "$DEFAULT_COLOR" 'PYTHON_ICON' 0 '' "${${${VIRTUAL_ENV:t}//\%/%%}//\\/\\\\}"
+  [[ -n $VIRTUAL_ENV ]] || return
+  local msg=''
+  if [[ $POWERLEVEL9K_VIRTUALENV_SHOW_PYTHON_VERSION == true ]] && _p9k_python_version; then
+    msg="$_P9K_RETVAL "
   fi
+  msg+=${${${VIRTUAL_ENV:t}//\%/%%}//\\/\\\\}
+  "$1_prompt_segment" "$0" "$2" "blue" "$DEFAULT_COLOR" 'PYTHON_ICON' 0 '' "$msg"
 }
 
 function _p9k_read_pyenv_version_file() {
