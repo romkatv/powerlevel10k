@@ -295,6 +295,12 @@ right_prompt_segment() {
   _P9K_PROMPT+=${_P9K_CACHE_VAL[4]}
 }
 
+function _p9k_python_version() {
+  _p9k_cached_cmd_stdout_stderr python --version || return
+  emulate -L zsh && setopt extended_glob
+  [[ $_P9K_RETVAL == (#b)Python\ ([[:digit:]]##.[[:digit:]]##)* ]] && _P9K_RETVAL=$match[1]
+}
+
 ################################################################
 # Prompt Segment Definitions
 ################################################################
@@ -303,12 +309,16 @@ right_prompt_segment() {
 # Anaconda Environment
 set_default POWERLEVEL9K_ANACONDA_LEFT_DELIMITER "("
 set_default POWERLEVEL9K_ANACONDA_RIGHT_DELIMITER ")"
+set_default POWERLEVEL9K_ANACONDA_SHOW_PYTHON_VERSION true
 prompt_anaconda() {
   local p=${CONDA_PREFIX:-$CONDA_ENV_PATH}
-  if [[ -n $p ]]; then
-    local msg="$POWERLEVEL9K_ANACONDA_LEFT_DELIMITER${${${p:t}//\%/%%}//\\/\\\\}$POWERLEVEL9K_ANACONDA_RIGHT_DELIMITER"
-    "$1_prompt_segment" "$0" "$2" "blue" "$DEFAULT_COLOR" 'PYTHON_ICON' 0 '' "$msg"
+  [[ -n $p ]] || return
+  local msg=''
+  if [[ $POWERLEVEL9K_ANACONDA_SHOW_PYTHON_VERSION == true ]] && _p9k_python_version; then
+    msg="$_P9K_RETVAL "
   fi
+  msg+="$POWERLEVEL9K_ANACONDA_LEFT_DELIMITER${${${p:t}//\%/%%}//\\/\\\\}$POWERLEVEL9K_ANACONDA_RIGHT_DELIMITER"
+  "$1_prompt_segment" "$0" "$2" "blue" "$DEFAULT_COLOR" 'PYTHON_ICON' 0 '' "$msg"
 }
 
 ################################################################
