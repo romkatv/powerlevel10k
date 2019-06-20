@@ -677,7 +677,8 @@ prompt_command_execution_time() {
 
   if (( _P9K_COMMAND_DURATION < 60 )); then
     if [[ $POWERLEVEL9K_COMMAND_EXECUTION_TIME_PRECISION == 0 ]]; then
-      local -i text=_P9K_COMMAND_DURATION
+      local -i sec=_P9K_COMMAND_DURATION
+      local text=${sec}s
     else
       local -F $POWERLEVEL9K_COMMAND_EXECUTION_TIME_PRECISION text=_P9K_COMMAND_DURATION
     fi
