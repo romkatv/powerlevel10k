@@ -298,7 +298,7 @@ right_prompt_segment() {
 function _p9k_python_version() {
   _p9k_cached_cmd_stdout_stderr python --version || return
   emulate -L zsh && setopt extended_glob
-  [[ $_P9K_RETVAL == (#b)Python\ ([[:digit:]]##.[[:digit:]]##)* ]] && _P9K_RETVAL=$match[1]
+  [[ $_P9K_RETVAL == (#b)Python\ ([[:digit:].]##)* ]] && _P9K_RETVAL=$match[1]
 }
 
 ################################################################
