@@ -537,56 +537,24 @@ prompt_battery() {
   $1_prompt_segment $0_$state $2 "$bg" "$_P9K_BATTERY_STATES[$state]" $icon 0 '' $msg
 }
 
-typeset -gF _P9K_PUBLIC_IP_TIMESTAMP
 typeset -g  _P9K_PUBLIC_IP
 
 ################################################################
 # Public IP segment
-set_default -i POWERLEVEL9K_PUBLIC_IP_TIMEOUT 300
+set_default -F POWERLEVEL9K_PUBLIC_IP_TIMEOUT 300
 set_default -a POWERLEVEL9K_PUBLIC_IP_METHODS dig curl wget
 set_default    POWERLEVEL9K_PUBLIC_IP_NONE ""
 set_default    POWERLEVEL9K_PUBLIC_IP_HOST "http://ident.me"
 set_default    POWERLEVEL9K_PUBLIC_IP_VPN_INTERFACE ""
 
 prompt_public_ip() {
-  if (( ! $#_P9K_PUBLIC_IP || EPOCHREALTIME >= _P9K_PUBLIC_IP_TIMESTAMP + POWERLEVEL9K_PUBLIC_IP_TIMEOUT )); then
-    _P9K_PUBLIC_IP=''
-    local method
-    for method in $POWERLEVEL9K_PUBLIC_IP_METHODS; do
-      case $method in
-        'dig')
-          if (( $+commands[dig] )); then
-            _P9K_PUBLIC_IP="$(command dig +time=1 +tries=1 +short myip.opendns.com @resolver1.opendns.com 2> /dev/null)"
-            [[ $_P9K_PUBLIC_IP == ';'* ]] && _P9K_PUBLIC_IP=''
-          fi
-        ;;
-        'curl')
-          if (( $+commands[curl] )); then
-            _P9K_PUBLIC_IP="$(command curl --max-time 10 -w '\n' "$POWERLEVEL9K_PUBLIC_IP_HOST" 2> /dev/null)"
-          fi
-        ;;
-        'wget')
-          if (( $+commands[wget] )); then
-            _P9K_PUBLIC_IP="$(wget -T 10 -qO- "$POWERLEVEL9K_PUBLIC_IP_HOST" 2> /dev/null)"
-          fi
-        ;;
-      esac
-      if [[ -n $_P9K_PUBLIC_IP ]]; then
-        _P9K_PUBLIC_IP_TIMESTAMP=$EPOCHREALTIME
-        break
-      fi
-    done
-  fi
-
-  local ip=${_P9K_PUBLIC_IP:-$POWERLEVEL9K_PUBLIC_IP_NONE}
-  [[ -n $ip ]] || return
-
   local icon='PUBLIC_IP_ICON'
   if [[ -n $POWERLEVEL9K_PUBLIC_IP_VPN_INTERFACE ]]; then
     _p9k_parse_ip $POWERLEVEL9K_PUBLIC_IP_VPN_INTERFACE && icon='VPN_ICON'
   fi
 
-  $1_prompt_segment "$0" "$2" "$DEFAULT_COLOR" "$DEFAULT_COLOR_INVERTED" "$icon" 0 '' "${ip//\%/%%}"
+  local ip='${_P9K_PUBLIC_IP:-$POWERLEVEL9K_PUBLIC_IP_NONE}'
+  $1_prompt_segment "$0" "$2" "$DEFAULT_COLOR" "$DEFAULT_COLOR_INVERTED" "$icon" 1  $ip $ip
 }
 
 ################################################################
@@ -1557,8 +1525,8 @@ set_default POWERLEVEL9K_EXPERIMENTAL_TIME_REALTIME false
 set_default POWERLEVEL9K_TIME_FORMAT "%D{%H:%M:%S}"
 prompt_time() {
   local t=$POWERLEVEL9K_TIME_FORMAT
-  [[ $POWERLEVEL9K_EXPERIMENTAL_TIME_REALTIME == true ]] || t=${(%)t}
-  "$1_prompt_segment" "$0" "$2" "$DEFAULT_COLOR_INVERTED" "$DEFAULT_COLOR" "TIME_ICON" 0 '' "${t//\%/%%}"
+  [[ $POWERLEVEL9K_EXPERIMENTAL_TIME_REALTIME == true ]] || t=${${(%)t}//\%/%%}
+  "$1_prompt_segment" "$0" "$2" "$DEFAULT_COLOR_INVERTED" "$DEFAULT_COLOR" "TIME_ICON" 0 '' "$t"
 }
 
 ################################################################
@@ -1566,8 +1534,8 @@ prompt_time() {
 set_default POWERLEVEL9K_DATE_FORMAT "%D{%d.%m.%y}"
 prompt_date() {
   local d=$POWERLEVEL9K_DATE_FORMAT
-  [[ $POWERLEVEL9K_EXPERIMENTAL_TIME_REALTIME == true ]] || d=${(%)d}
-  "$1_prompt_segment" "$0" "$2" "$DEFAULT_COLOR_INVERTED" "$DEFAULT_COLOR" "DATE_ICON" 0 '' "${d//\%/%%}"
+  [[ $POWERLEVEL9K_EXPERIMENTAL_TIME_REALTIME == true ]] || d=${${(%)d}//\%/%%}
+  "$1_prompt_segment" "$0" "$2" "$DEFAULT_COLOR_INVERTED" "$DEFAULT_COLOR" "DATE_ICON" 0 '' "$d"
 }
 
 ################################################################
@@ -2336,68 +2304,143 @@ typeset -g OS
 typeset -g OS_ICON
 typeset -g SED_EXTENDED_REGEX_PARAMETER
 
-typeset -g  _P9K_TIMER_FIFO
-typeset -gi _P9K_TIMER_FD=0
-typeset -gi _P9K_TIMER_PID=0
-typeset -gi _P9K_TIMER_SUBSHELL=0
+typeset -g  _P9K_ASYNC_PUMP_LINE
+typeset -g  _P9K_ASYNC_PUMP_FIFO
+typeset -gi _P9K_ASYNC_PUMP_FD=0
+typeset -gi _P9K_ASYNC_PUMP_PID=0
+typeset -gi _P9K_ASYNC_PUMP_SUBSHELL=0
 
-_p9k_init_timer() {
-  _p9k_start_timer() {
+_p9k_init_async_pump() {
+  local -i public_ip time_realtime
+  segment_in_use public_ip && public_ip=1
+  segment_in_use time && [[ $POWERLEVEL9K_EXPERIMENTAL_TIME_REALTIME == true ]] && time_realtime=1
+  (( public_ip || time_realtime )) || return
+
+  _p9k_start_async_pump() {
     emulate -L zsh
     setopt err_return no_bg_nice
 
-    _P9K_TIMER_FIFO=$(mktemp -u "${TMPDIR:-/tmp}"/p9k.$$.timer.pipe.XXXXXXXXXX)
-    mkfifo $_P9K_TIMER_FIFO
-    sysopen -rw -o cloexec,sync -u _P9K_TIMER_FD $_P9K_TIMER_FIFO
-    zsystem flock $_P9K_TIMER_FIFO
+    _P9K_ASYNC_PUMP_FIFO=$(mktemp -u "${TMPDIR:-/tmp}"/p9k.$$.async.pump.XXXXXXXXXX)
+    mkfifo $_P9K_ASYNC_PUMP_FIFO
+    sysopen -rw -o cloexec,sync -u _P9K_ASYNC_PUMP_FD $_P9K_ASYNC_PUMP_FIFO
+    zsystem flock $_P9K_ASYNC_PUMP_FIFO
 
-    function _p9k_on_timer() {
+    function _p9k_on_async_message() {
       emulate -L zsh
-      local dummy
-      while IFS='' read -t -u $_P9K_TIMER_FD dummy; do true; done
+      local msg=''
+      while IFS='' read -r -t -u $_P9K_ASYNC_PUMP_FD msg; do
+        eval $_P9K_ASYNC_PUMP_LINE$msg
+        _P9K_ASYNC_PUMP_LINE=
+        msg=
+      done
+      _P9K_ASYNC_PUMP_LINE+=$msg
       zle && zle .reset-prompt && zle -R
     }
 
-    zle -F $_P9K_TIMER_FD _p9k_on_timer
+    zle -F $_P9K_ASYNC_PUMP_FD _p9k_on_async_message
 
-    # `kill -WINCH $$` is a workaround for a bug in zsh. After a background job completes, callbacks
-    # registered with `zle -F` stop firing until the user presses any key or the process receives a
-    # signal (any signal at all).
-    zsh -c "
-      zmodload zsh/system
-      while sleep 1 && ! zsystem flock -t 0 ${(q)_P9K_TIMER_FIFO} && kill -WINCH $$ && echo; do
-        true
+    function _p9k_async_pump() {
+      emulate -L zsh && zmodload zsh/system && zmodload zsh/datetime && echo ok || return
+
+      local ip last_ip
+      local -F next_ip_time
+      while ! zsystem flock -t 0 $fifo 2>/dev/null && kill -0 $parent_pid; do
+        if (( time_realtime )); then
+          echo || break
+          # SIGWINCH is a workaround for a bug in zsh. After a background job completes, callbacks
+          # registered with `zle -F` stop firing until the user presses any key or the process
+          # receives a signal (any signal at all).
+          # Fix: https://github.com/zsh-users/zsh/commit/5e11082349bf72897f93f3a4493a97a2caf15984.
+          kill -WINCH $parent_pid
+        fi
+        if (( public_ip && EPOCHREALTIME >= next_ip_time )); then
+          ip=
+          local method=''
+          local -F start=EPOCHREALTIME
+          next_ip_time=$((start + 5))
+          for method in $ip_methods $ip_methods; do
+            case $method in
+              dig)
+                if (( $+commands[dig] )); then
+                  ip=$(command dig +tries=1 +short -4 A myip.opendns.com @resolver1.opendns.com 2>/dev/null)
+                  [[ $ip == ';'* ]] && ip=
+                  if [[ -z $ip ]]; then
+                    ip=$(command dig +tries=1 +short -6 AAAA myip.opendns.com @resolver1.opendns.com 2>/dev/null)
+                    [[ $ip == ';'* ]] && ip=
+                  fi
+                fi
+              ;;
+              curl)
+                if (( $+commands[curl] )); then
+                  ip=$(command curl --max-time 5 -w '\n' "$ip_url" 2>/dev/null)
+                fi
+              ;;
+              wget)
+                if (( $+commands[wget] )); then
+                  ip=$(wget -T 5 -qO- "$ip_url" 2>/dev/null)
+                fi
+              ;;
+            esac
+            [[ $ip =~ '^[0-9a-f.:]+$' ]] || ip=''
+            if [[ -n $ip ]]; then
+              next_ip_time=$((start + tout))
+              break
+            fi
+          done
+          if [[ $ip != $last_ip ]]; then
+            last_ip=$ip
+            echo _P9K_PUBLIC_IP=${(q)${${ip//\%/%%}//$'\n'}} || break
+            kill -WINCH $parent_pid
+          fi
+        fi
+        sleep 1
       done
-      command rm -f ${(q)_P9K_TIMER_FIFO}
-    " </dev/null >&$_P9K_TIMER_FD 2>/dev/null &!
+      command rm -f $fifo
+    }
 
-    _P9K_TIMER_PID=$!
-    _P9K_TIMER_SUBSHELL=$ZSH_SUBSHELL
+    zsh -dfc "
+      local -i public_ip=$public_ip time_realtime=$time_realtime parent_pid=$$
+      local -a ip_methods=($POWERLEVEL9K_PUBLIC_IP_METHODS)
+      local -F tout=$POWERLEVEL9K_PUBLIC_IP_TIMEOUT
+      local ip_url=$POWERLEVEL9K_PUBLIC_IP_HOST
+      local fifo=$_P9K_ASYNC_PUMP_FIFO
+      $functions[_p9k_async_pump]
+    " </dev/null >&$_P9K_ASYNC_PUMP_FD 2>/dev/null &!
 
-    function _p9k_kill_timer() {
+    _P9K_ASYNC_PUMP_PID=$!
+    _P9K_ASYNC_PUMP_SUBSHELL=$ZSH_SUBSHELL
+
+    unfunction _p9k_async_pump
+
+    local resp
+    read -r -u $_P9K_ASYNC_PUMP_FD resp && [[ $resp == ok ]]
+
+    function _p9k_kill_async_pump() {
       emulate -L zsh
-      if (( ZSH_SUBSHELL == _P9K_TIMER_SUBSHELL )); then
-        (( _P9K_TIMER_PID )) && kill -- -$_P9K_TIMER_PID &>/dev/null
-        command rm -f $_P9K_TIMER_FIFO
+      if (( ZSH_SUBSHELL == _P9K_ASYNC_PUMP_SUBSHELL )); then
+        (( _P9K_ASYNC_PUMP_PID )) && kill -- -$_P9K_ASYNC_PUMP_PID &>/dev/null
+        command rm -f $_P9K_ASYNC_PUMP_FIFO
       fi
     }
-    add-zsh-hook zshexit _p9k_kill_timer
+    add-zsh-hook zshexit _p9k_kill_async_pump
   }
 
-  if ! _p9k_start_timer ; then
-    echo "powerlevel10k: failed to initialize background timer" >&2
-    if (( _P9K_TIMER_FD )); then
-      zle -F $_P9K_TIMER_FD
-      exec {_P9K_TIMER_FD}>&-
-      _P9K_TIMER_FD=0
+  if ! _p9k_start_async_pump ; then
+     >&2 print -P "%F{red}[ERROR]%f Powerlevel10k failed to start async worker. The following segments may malfunction: "
+    (( public_ip     )) &&  >&2 print -P "  - %F{green}public_ip%f"
+    (( time_realtime )) &&  >&2 print -P "  - %F{green}time%f"
+    if (( _P9K_ASYNC_PUMP_FD )); then
+      zle -F $_P9K_ASYNC_PUMP_FD
+      exec {_P9K_ASYNC_PUMP_FD}>&-
+      _P9K_ASYNC_PUMP_FD=0
     fi
-    if (( _P9K_TIMER_PID )); then
-      kill -- -$_P9K_TIMER_PID &>/dev/null
-      _P9K_TIMER_PID=0
+    if (( _P9K_ASYNC_PUMP_PID )); then
+      kill -- -$_P9K_ASYNC_PUMP_PID &>/dev/null
+      _P9K_ASYNC_PUMP_PID=0
     fi
-    command rm -f $_P9K_TIMER_FIFO
-    _P9K_TIMER_FIFO=''
-    unset -f _p9k_on_timer
+    command rm -f $_P9K_ASYNC_PUMP_FIFO
+    _P9K_ASYNC_PUMP_FIFO=''
+    unset -f _p9k_on_async_message
   fi
 }
 
@@ -2432,6 +2475,7 @@ _p9k_init_strings() {
   _p9k_g_expand POWERLEVEL9K_DIR_PATH_SEPARATOR
   _p9k_g_expand POWERLEVEL9K_HOME_FOLDER_ABBREVIATION
   _p9k_g_expand POWERLEVEL9K_HOST_TEMPLATE
+  _p9k_g_expand POWERLEVEL9K_PUBLIC_IP_NONE
   _p9k_g_expand POWERLEVEL9K_SHORTEN_DELIMITER
   _p9k_g_expand POWERLEVEL9K_TIME_FORMAT
   _p9k_g_expand POWERLEVEL9K_USER_TEMPLATE
@@ -2528,10 +2572,6 @@ _p9k_init() {
       _P9K_RIGHT_JOIN+=$i
     fi
   done
-
-  if [[ $POWERLEVEL9K_EXPERIMENTAL_TIME_REALTIME == true ]]; then
-    _p9k_init_timer
-  fi
 
   # Bug fixed in: https://github.com/zsh-users/zsh/commit/3eea35d0853bddae13fa6f122669935a01618bf9.
   # If affects most terminals when RPROMPT is non-empty and ZLE_RPROMPT_INDENT is zero.
@@ -2665,6 +2705,8 @@ _p9k_init() {
         POWERLEVEL9K
     fi
   fi
+
+  _p9k_init_async_pump
 
   if segment_in_use vi_mode && (( $+POWERLEVEL9K_VI_VISUAL_MODE_STRING )); then
     if is-at-least 5.3; then
