@@ -205,7 +205,7 @@ left_prompt_segment() {
   local cond=${7:-1}
   shift 7
 
-    local content="${(j::):-$style${^@}}"
+  local content="${(j::):-$style${^@}}"
   (( expand )) || content="\${(Q)\${:-${(qqq)${(q)content}}}}"
 
   _P9K_PROMPT+="\${\${:-$cond}:+\${\${:-\${_P9K_C::=${content}}${_P9K_CACHE_VAL[3]}"
@@ -297,7 +297,6 @@ right_prompt_segment() {
 
 function _p9k_python_version() {
   _p9k_cached_cmd_stdout_stderr python --version || return
-  emulate -L zsh && setopt extended_glob
   [[ $_P9K_RETVAL == (#b)Python\ ([[:digit:].]##)* ]] && _P9K_RETVAL=$match[1]
 }
 
@@ -697,8 +696,6 @@ function _p9k_shorten_delim_len() {
 ################################################################
 # Dir: current working directory
 prompt_dir() {
-  emulate -L zsh && setopt extended_glob
-
   [[ $POWERLEVEL9K_DIR_PATH_ABSOLUTE == true ]] && local p=$PWD || local p=${(%):-%~}
 
   if [[ $p == '~['* ]]; then
@@ -930,7 +927,6 @@ prompt_docker_machine() {
 # GO prompt
 prompt_go_version() {
   _p9k_cached_cmd_stdout go version || return
-  emulate -L zsh && setopt extendedglob
   local -a match
   [[ $_P9K_RETVAL == (#b)*go([[:digit:].]##)* ]] || return
   local v=$match[1]
@@ -1167,8 +1163,6 @@ function _p9k_nvm_ls_default() {
   local -a matches=(${^dirs}/${~v}(/N))
   (( $#matches )) || return
 
-  emulate -L zsh && setopt extendedglob
-
   local max path
   local -a match
   for path in ${(Oa)matches}; do
@@ -1230,7 +1224,6 @@ prompt_os_icon() {
 # Segment to display PHP version number
 prompt_php_version() {
   _p9k_cached_cmd_stdout php --version || return
-  emulate -L zsh && setopt extendedglob
   local -a match
   [[ $_P9K_RETVAL == (#b)(*$'\n')#(PHP [[:digit:].]##)* ]] || return
   local v=$match[2]
@@ -1561,7 +1554,6 @@ prompt_todo() {
   zstat -H stat -- $_P9K_TODO_FILE 2>/dev/null || return
   if ! _p9k_cache_get $0 $stat[inode] $stat[mtime] $stat[size]; then
     local count=$($todo -p ls | command tail -1)
-    emulate -L zsh && setopt extendedglob
     if [[ $count == (#b)'TODO: '[[:digit:]]##' of '([[:digit:]]##)' '* ]]; then
       _p9k_cache_set 1 $match[1]
     else
@@ -1843,7 +1835,7 @@ function _p9k_vcs_render() {
 }
 
 function _p9k_vcs_resume() {
-  emulate -L zsh
+  emulate -L zsh && setopt no_hist_expand extended_glob
 
   if [[ $VCS_STATUS_RESULT == ok-async ]]; then
     local latency=$((EPOCHREALTIME - _P9K_GITSTATUS_START_TIME))
@@ -2020,7 +2012,6 @@ prompt_openfoam() {
 # Segment to display Swift version
 prompt_swift_version() {
   _p9k_cached_cmd_stdout swift --version || return
-  emulate -L zsh && setopt extendedglob
   [[ $_P9K_RETVAL == (#b)[^[:digit:]]#([[:digit:].]##)* ]] || return
   "$1_prompt_segment" "$0" "$2" "magenta" "white" 'SWIFT_ICON' 0 '' "${match[1]//\%/%%}"
 }
@@ -2209,7 +2200,6 @@ typeset -g _P9K_RIGHT_SUFFIX
 
 set_default POWERLEVEL9K_DISABLE_RPROMPT false
 function _p9k_set_prompt() {
-  emulate -L zsh
   PROMPT=
   RPROMPT=
   if [[ $POWERLEVEL9K_DISABLE_RPROMPT == true ]]; then
@@ -2257,10 +2247,8 @@ set_default POWERLEVEL9K_PROMPT_ADD_NEWLINE false
 set_default POWERLEVEL9K_SHOW_RULER false
 
 powerlevel9k_refresh_prompt_inplace() {
-  emulate -L zsh
-
+  emulate -L zsh && setopt no_hist_expand extended_glob
   _p9k_init
-
   _P9K_REFRESH_REASON=precmd
   _p9k_set_prompt
   _P9K_REFRESH_REASON=''
@@ -2317,7 +2305,6 @@ _p9k_init_async_pump() {
   (( public_ip || time_realtime )) || return
 
   _p9k_start_async_pump() {
-    emulate -L zsh
     setopt err_return no_bg_nice
 
     _P9K_ASYNC_PUMP_FIFO=$(mktemp -u "${TMPDIR:-/tmp}"/p9k.$$.async.pump.XXXXXXXXXX)
@@ -2326,7 +2313,7 @@ _p9k_init_async_pump() {
     zsystem flock $_P9K_ASYNC_PUMP_FIFO
 
     function _p9k_on_async_message() {
-      emulate -L zsh
+      emulate -L zsh && setopt no_hist_expand extended_glob
       local msg=''
       while IFS='' read -r -t -u $_P9K_ASYNC_PUMP_FD msg; do
         eval $_P9K_ASYNC_PUMP_LINE$msg
@@ -2340,7 +2327,7 @@ _p9k_init_async_pump() {
     zle -F $_P9K_ASYNC_PUMP_FD _p9k_on_async_message
 
     function _p9k_async_pump() {
-      emulate -L zsh && zmodload zsh/system && zmodload zsh/datetime && echo ok || return
+      emulate -L zsh && setopt no_hist_expand extended_glob && zmodload zsh/system zsh/datetime && echo ok || return
 
       local ip last_ip
       local -F next_ip_time
@@ -2416,7 +2403,7 @@ _p9k_init_async_pump() {
     read -r -u $_P9K_ASYNC_PUMP_FD resp && [[ $resp == ok ]]
 
     function _p9k_kill_async_pump() {
-      emulate -L zsh
+      emulate -L zsh && setopt no_hist_expand extended_glob
       if (( ZSH_SUBSHELL == _P9K_ASYNC_PUMP_SUBSHELL )); then
         (( _P9K_ASYNC_PUMP_PID )) && kill -- -$_P9K_ASYNC_PUMP_PID &>/dev/null
         command rm -f $_P9K_ASYNC_PUMP_FIFO
@@ -2711,7 +2698,7 @@ _p9k_init() {
   if segment_in_use vi_mode && (( $+POWERLEVEL9K_VI_VISUAL_MODE_STRING )); then
     if is-at-least 5.3; then
       function _p9k_zle_line_pre_redraw() {
-        [[ $KEYMAP == vicmd ]] || return
+        [[ ${KEYMAP:-} == vicmd ]] || return
         local region=${${REGION_ACTIVE:-0}/2/1}
         [[ $region != $_P9K_REGION_ACTIVE ]] || return
         _P9K_REGION_ACTIVE=$region
