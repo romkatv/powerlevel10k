@@ -2294,6 +2294,7 @@ typeset -g SED_EXTENDED_REGEX_PARAMETER
 
 typeset -g  _P9K_ASYNC_PUMP_LINE
 typeset -g  _P9K_ASYNC_PUMP_FIFO
+typeset -g  _P9K_ASYNC_PUMP_LOCK
 typeset -gi _P9K_ASYNC_PUMP_FD=0
 typeset -gi _P9K_ASYNC_PUMP_PID=0
 typeset -gi _P9K_ASYNC_PUMP_SUBSHELL=0
@@ -2307,10 +2308,11 @@ _p9k_init_async_pump() {
   _p9k_start_async_pump() {
     setopt err_return no_bg_nice
 
-    _P9K_ASYNC_PUMP_FIFO=$(mktemp -u "${TMPDIR:-/tmp}"/p9k.$$.async.pump.XXXXXXXXXX)
+    _P9K_ASYNC_PUMP_LOCK=$(mktemp ${TMPDIR:-/tmp}/p9k-$$-async-pump-lock.XXXXXXXXXX)
+    _P9K_ASYNC_PUMP_FIFO=$(mktemp -u ${TMPDIR:-/tmp}/p9k-$$-async-pump-fifo.XXXXXXXXXX)
     mkfifo $_P9K_ASYNC_PUMP_FIFO
     sysopen -rw -o cloexec,sync -u _P9K_ASYNC_PUMP_FD $_P9K_ASYNC_PUMP_FIFO
-    zsystem flock $_P9K_ASYNC_PUMP_FIFO
+    zsystem flock $_P9K_ASYNC_PUMP_LOCK
 
     function _p9k_on_async_message() {
       emulate -L zsh && setopt no_hist_expand extended_glob
@@ -2331,7 +2333,7 @@ _p9k_init_async_pump() {
 
       local ip last_ip
       local -F next_ip_time
-      while ! zsystem flock -t 0 $fifo 2>/dev/null && kill -0 $parent_pid; do
+      while ! zsystem flock -t 0 $lock 2>/dev/null && kill -0 $parent_pid; do
         if (( time_realtime )); then
           echo || break
           # SIGWINCH is a workaround for a bug in zsh. After a background job completes, callbacks
@@ -2382,7 +2384,7 @@ _p9k_init_async_pump() {
         fi
         sleep 1
       done
-      command rm -f $fifo
+      command rm -f $lock $fifo
     }
 
     zsh -dfc "
@@ -2390,6 +2392,7 @@ _p9k_init_async_pump() {
       local -a ip_methods=($POWERLEVEL9K_PUBLIC_IP_METHODS)
       local -F tout=$POWERLEVEL9K_PUBLIC_IP_TIMEOUT
       local ip_url=$POWERLEVEL9K_PUBLIC_IP_HOST
+      local lock=$_P9K_ASYNC_PUMP_LOCK
       local fifo=$_P9K_ASYNC_PUMP_FIFO
       $functions[_p9k_async_pump]
     " </dev/null >&$_P9K_ASYNC_PUMP_FD 2>/dev/null &!
@@ -2406,7 +2409,7 @@ _p9k_init_async_pump() {
       emulate -L zsh && setopt no_hist_expand extended_glob
       if (( ZSH_SUBSHELL == _P9K_ASYNC_PUMP_SUBSHELL )); then
         (( _P9K_ASYNC_PUMP_PID )) && kill -- -$_P9K_ASYNC_PUMP_PID &>/dev/null
-        command rm -f $_P9K_ASYNC_PUMP_FIFO
+        command rm -f "$_P9K_ASYNC_PUMP_FIFO" "$_P9K_ASYNC_PUMP_LOCK"
       fi
     }
     add-zsh-hook zshexit _p9k_kill_async_pump
