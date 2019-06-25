@@ -1944,13 +1944,15 @@ prompt_vi_mode() {
 # More information on virtualenv (Python):
 # https://virtualenv.pypa.io/en/latest/
 set_default POWERLEVEL9K_VIRTUALENV_SHOW_PYTHON_VERSION true
+set_default POWERLEVEL9K_VIRTUALENV_LEFT_DELIMITER "("
+set_default POWERLEVEL9K_VIRTUALENV_RIGHT_DELIMITER ")"
 prompt_virtualenv() {
   [[ -n $VIRTUAL_ENV ]] || return
   local msg=''
   if [[ $POWERLEVEL9K_VIRTUALENV_SHOW_PYTHON_VERSION == true ]] && _p9k_python_version; then
     msg="$_P9K_RETVAL "
   fi
-  msg+=${${VIRTUAL_ENV:t}//\%/%%}
+  msg+="$POWERLEVEL9K_VIRTUALENV_LEFT_DELIMITER${${VIRTUAL_ENV:t}//\%/%%}$POWERLEVEL9K_VIRTUALENV_RIGHT_DELIMITER"
   "$1_prompt_segment" "$0" "$2" "blue" "$DEFAULT_COLOR" 'PYTHON_ICON' 0 '' "$msg"
 }
 
