@@ -624,10 +624,9 @@ prompt_host() {
 # The 'custom` prompt provides a way for users to invoke commands and display
 # the output in a segment.
 prompt_custom() {
-  local segment_name="${3:u}"
-  # Get content of custom segment
-  local command="POWERLEVEL9K_CUSTOM_${segment_name}"
-  local -a cmd=("${(@Q)${(z)${(P):-POWERLEVEL9K_CUSTOM_${segment_name}}}}")
+  local segment_name=${3:u}
+  local command=POWERLEVEL9K_CUSTOM_${segment_name}
+  local -a cmd=("${(@Q)${(z)${(P)command}}}")
   whence $cmd[1] &>/dev/null || return
   local content=$("$cmd[@]")
   [[ -n $content ]] || return
