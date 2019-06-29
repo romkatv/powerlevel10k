@@ -1596,7 +1596,8 @@ powerlevel9k_vcs_init() {
   local component state
   for component in REMOTE_URL COMMIT BRANCH DIRTY TAG REMOTE_BRANCH STAGED UNSTAGED \
                    UNTRACKED OUTGOING_CHANGES INCOMING_CHANGES STASH ACTION; do
-    local color=${(P)${:-POWERLEVEL9K_VCS_${component}FORMAT_FOREGROUND}}
+    local var=POWERLEVEL9K_VCS_${component}FORMAT_FOREGROUND
+    local color=${(P)var}
     if [[ -n $color ]]; then
       for state in "${(@k)vcs_states}"; do
         local var=POWERLEVEL9K_VCS_${(U)state}_${component}FORMAT_FOREGROUND
