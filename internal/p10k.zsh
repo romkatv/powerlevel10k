@@ -42,6 +42,16 @@ typeset -gi _P9K_I
 typeset -g _P9K_BG
 typeset -g _P9K_F
 
+typeset -gA ICON_ASSOC=(
+        "/etc|/etc/*"  ETC_ICON
+        "${HOME}"      HOME_ICON
+        "${HOME}/*"    HOME_SUB_ICON
+      )
+typeset -gA STATE_ASSOC=(
+        "/etc|/etc/*"  ETC
+        "${HOME}"      HOME
+        "${HOME}/*"    HOME_SUBFOLDER
+      )
 # Specifies the maximum number of elements in the cache. When the cache grows over this limit,
 # it gets cleared. This is meant to avoid memory leaks when a rogue prompt is filling the cache
 # with data.
@@ -868,14 +878,9 @@ prompt_dir() {
       state=NOT_WRITABLE
       icon=LOCK_ICON
     else
-      case $PWD in
-        /etc|/etc/*) state=ETC;            icon=ETC_ICON;;
-        ~)           state=HOME;           icon=HOME_ICON;;
-        ~/*)         state=HOME_SUBFOLDER; icon=HOME_SUB_ICON;;
-        *)           state=DEFAULT;        icon=FOLDER_ICON;;
-      esac
+      icon=${ICON_ASSOC[(k)$PWD]:-DEFAULT}
+      state=${STATE_ASSOC[(k)$PWD]:-DEFAULT}
     fi
-
     local style=%b
     _p9k_color blue $0_$state BACKGROUND
     _p9k_background $_P9K_RETVAL
