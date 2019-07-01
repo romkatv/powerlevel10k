@@ -42,6 +42,16 @@ typeset -gi _P9K_I
 typeset -g _P9K_BG
 typeset -g _P9K_F
 
+typeset -gA ICON_ASSOC=(
+        "/etc|/etc/*"  ETC_ICON
+        "${HOME}"      HOME_ICON
+        "${HOME}/*"    HOME_SUB_ICON
+      )
+typeset -gA STATE_ASSOC=(
+        "/etc|/etc/*"  ETC
+        "${HOME}"      HOME
+        "${HOME}/*"    HOME_SUBFOLDER
+      )
 # Specifies the maximum number of elements in the cache. When the cache grows over this limit,
 # it gets cleared. This is meant to avoid memory leaks when a rogue prompt is filling the cache
 # with data.
@@ -624,10 +634,9 @@ prompt_host() {
 # The 'custom` prompt provides a way for users to invoke commands and display
 # the output in a segment.
 prompt_custom() {
-  local segment_name="${3:u}"
-  # Get content of custom segment
-  local command="POWERLEVEL9K_CUSTOM_${segment_name}"
-  local -a cmd=("${(@Q)${(z)${(P):-POWERLEVEL9K_CUSTOM_${segment_name}}}}")
+  local segment_name=${3:u}
+  local command=POWERLEVEL9K_CUSTOM_${segment_name}
+  local -a cmd=("${(@Q)${(z)${(P)command}}}")
   whence $cmd[1] &>/dev/null || return
   local content=$("$cmd[@]")
   [[ -n $content ]] || return
@@ -869,14 +878,9 @@ prompt_dir() {
       state=NOT_WRITABLE
       icon=LOCK_ICON
     else
-      case $PWD in
-        /etc|/etc/*) state=ETC;            icon=ETC_ICON;;
-        ~)           state=HOME;           icon=HOME_ICON;;
-        ~/*)         state=HOME_SUBFOLDER; icon=HOME_SUB_ICON;;
-        *)           state=DEFAULT;        icon=FOLDER_ICON;;
-      esac
+      icon=${ICON_ASSOC[(k)$PWD]:-DEFAULT}
+      state=${STATE_ASSOC[(k)$PWD]:-DEFAULT}
     fi
-
     local style=%b
     _p9k_color blue $0_$state BACKGROUND
     _p9k_background $_P9K_RETVAL
@@ -1597,7 +1601,8 @@ powerlevel9k_vcs_init() {
   local component state
   for component in REMOTE_URL COMMIT BRANCH DIRTY TAG REMOTE_BRANCH STAGED UNSTAGED \
                    UNTRACKED OUTGOING_CHANGES INCOMING_CHANGES STASH ACTION; do
-    local color=${(P)${:-POWERLEVEL9K_VCS_${component}FORMAT_FOREGROUND}}
+    local var=POWERLEVEL9K_VCS_${component}FORMAT_FOREGROUND
+    local color=${(P)var}
     if [[ -n $color ]]; then
       for state in "${(@k)vcs_states}"; do
         local var=POWERLEVEL9K_VCS_${(U)state}_${component}FORMAT_FOREGROUND
