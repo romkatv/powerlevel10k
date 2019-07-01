@@ -708,7 +708,7 @@ set_default -a POWERLEVEL9K_DIR_PACKAGE_FILES package.json composer.json
 #   2. Directory class for the purpose of styling.
 #   3. Icon.
 #
-# Triplets are tried in order. The first triplet whose patterm matches $PWD wins. If there are no
+# Triplets are tried in order. The first triplet whose pattern matches $PWD wins. If there are no
 # matches, there will be no icon and the styling is done according to POWERLEVEL9K_DIR_BACKGROUND,
 # POWERLEVEL9K_DIR_FOREGROUND, etc.
 #
@@ -723,7 +723,7 @@ set_default -a POWERLEVEL9K_DIR_PACKAGE_FILES package.json composer.json
 #   POWERLEVEL9K_DIR_HOME_BACKGROUND=blue
 #   POWERLEVEL9K_DIR_DEFAULT_BACKGROUND=yellow
 #
-# With the settins, the current directory in the prompt may look like this:
+# With the settings, the current directory in the prompt may look like this:
 #
 #   (╯°□°）╯︵ ┻━┻ ~/work/projects/important/urgent
 #
