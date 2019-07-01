@@ -42,16 +42,6 @@ typeset -gi _P9K_I
 typeset -g _P9K_BG
 typeset -g _P9K_F
 
-typeset -gA ICON_ASSOC=(
-        "/etc|/etc/*"  ETC_ICON
-        "${HOME}"      HOME_ICON
-        "${HOME}/*"    HOME_SUB_ICON
-      )
-typeset -gA STATE_ASSOC=(
-        "/etc|/etc/*"  ETC
-        "${HOME}"      HOME
-        "${HOME}/*"    HOME_SUBFOLDER
-      )
 # Specifies the maximum number of elements in the cache. When the cache grows over this limit,
 # it gets cleared. This is meant to avoid memory leaks when a rogue prompt is filling the cache
 # with data.
@@ -85,12 +75,24 @@ _p9k_cache_get() {
   [[ -n $v ]] && _P9K_CACHE_VAL=("${(@0)${v[1,-2]}}")
 }
 
+typeset -gA _p9k_icon_cache=()
+
 # Sets _P9K_RETVAL to the icon whose name is supplied via $1.
 _p9k_get_icon() {
-  local x=POWERLEVEL9K_$1
-  (( $+parameters[$x] )) && x=${(P)x} || x=$icons[$1]
-  _P9K_RETVAL=${(g::)x}
-  [[ $_P9K_RETVAL != $'\b'? ]] || _P9K_RETVAL="%{$_P9K_RETVAL%}"  # penance for past sins
+  _P9K_RETVAL=$_p9k_icon_cache[$1]
+  if [[ -n $_P9K_RETVAL ]]; then
+    _P9K_RETVAL[-1,-1]=''
+  else
+    if [[ $1 == $'\1'* ]]; then
+      _P9K_RETVAL=${1[2,-1]}
+    else
+      local x=POWERLEVEL9K_$1
+      (( $+parameters[$x] )) && x=${(P)x} || x=$icons[$1]
+      _P9K_RETVAL=${(g::)x}
+      [[ $_P9K_RETVAL != $'\b'? ]] || _P9K_RETVAL="%{$_P9K_RETVAL%}"  # penance for past sins
+    fi
+    _p9k_icon_cache[$1]=${_P9K_RETVAL}.
+  fi
 }
 
 typeset -ga _P9K_LEFT_JOIN=(1)
@@ -696,6 +698,37 @@ set_default POWERLEVEL9K_DIR_MAX_LENGTH 0
 # by `emulate zsh && setopt extended_glob`.
 set_default -a POWERLEVEL9K_DIR_PACKAGE_FILES package.json composer.json
 
+# You can define POWERLEVEL9K_DIR_CLASSES to specify custom styling and icons for different
+# directories.
+#
+# POWERLEVEL9K_DIR_CLASSES must be an array with 3 * N elements. Each triplet consists of:
+#
+#   1. A pattern against which the current directory is matched. Matching is done with
+#      extended_glob option enabled.
+#   2. Directory class for the purpose of styling.
+#   3. Icon.
+#
+# Triplets are tried in order. The first triplet whose patterm matches $PWD wins. If there are no
+# matches, there will be no icon and the styling is done according to POWERLEVEL9K_DIR_BACKGROUND,
+# POWERLEVEL9K_DIR_FOREGROUND, etc.
+#
+# Example:
+#
+#   POWERLEVEL9K_DIR_CLASSES=(
+#       '~/work(/*)#'  WORK     '(╯°□°）╯︵ ┻━┻'
+#       '~(/*)#'       HOME     '⌂'
+#       '*'            DEFAULT  '')
+#
+#   POWERLEVEL9K_DIR_WORK_BACKGROUND=red
+#   POWERLEVEL9K_DIR_HOME_BACKGROUND=blue
+#   POWERLEVEL9K_DIR_DEFAULT_BACKGROUND=yellow
+#
+# With the settins, the current directory in the prompt may look like this:
+#
+#   (╯°□°）╯︵ ┻━┻ ~/work/projects/important/urgent
+#
+#   ⌂ ~/best/powerlevel10k
+
 function _p9k_shorten_delim_len() {
   local def=$1
   _P9K_RETVAL=${POWERLEVEL9K_SHORTEN_DELIMITER_LENGTH:--1}
@@ -872,20 +905,28 @@ prompt_dir() {
 
   [[ $POWERLEVEL9K_DIR_SHOW_WRITABLE == true && ! -w $PWD ]]
   local w=$?
-  if ! _p9k_cache_get $0 $w $fake_first "$delim" "${parts[@]}"; then
-    local state='' icon=''
+  if ! _p9k_cache_get $0 $PWD $w $fake_first "$delim" "${parts[@]}"; then
+    local state=$0
+    local icon=''
     if (( ! w )); then
-      state=NOT_WRITABLE
+      state+=_NOT_WRITABLE
       icon=LOCK_ICON
     else
-      icon=${ICON_ASSOC[(k)$PWD]:-DEFAULT}
-      state=${STATE_ASSOC[(k)$PWD]:-DEFAULT}
+      local a='' b='' c=''
+      for a b c in "${POWERLEVEL9K_DIR_CLASSES[@]}"; do
+        if [[ $PWD == ${~a} ]]; then
+          [[ -n $b ]] && state+=_${(U)b}
+          icon=$'\1'$c
+          break
+        fi
+      done
     fi
+
     local style=%b
-    _p9k_color blue $0_$state BACKGROUND
+    _p9k_color blue $state BACKGROUND
     _p9k_background $_P9K_RETVAL
     style+=$_P9K_RETVAL
-    _p9k_color "$DEFAULT_COLOR" "$0_$state" FOREGROUND
+    _p9k_color "$DEFAULT_COLOR" $state FOREGROUND
     _p9k_foreground $_P9K_RETVAL
     style+=$_P9K_RETVAL
 
@@ -914,7 +955,7 @@ prompt_dir() {
     if [[ $POWERLEVEL9K_DIR_HYPERLINK == true ]]; then
       content=$'%{\e]8;;file://'${${PWD//\%/%%25}//'#'/%%23}$'\a%}'$content$'%{\e]8;;\a%}'
     fi
-    _p9k_cache_set "$0_$state" "$2" blue "$DEFAULT_COLOR" "$icon" 0 "" $content
+    _p9k_cache_set $state "$2" blue "$DEFAULT_COLOR" "$icon" 0 "" $content
   fi
   "$1_prompt_segment" "$_P9K_CACHE_VAL[@]"
 }
@@ -2700,6 +2741,27 @@ _p9k_init() {
         -d ${POWERLEVEL9K_VCS_MAX_NUM_UNTRACKED:-$POWERLEVEL9K_VCS_UNTRACKED_MAX_NUM} \
         -m $POWERLEVEL9K_VCS_MAX_INDEX_SIZE_DIRTY                                     \
         POWERLEVEL9K
+    fi
+  fi
+
+  if segment_in_use dir; then
+    if (( $+POWERLEVEL9K_DIR_CLASSES )); then
+      local -a x=()
+      local a='' b='' c=''
+      for a b c in "${POWERLEVEL9K_DIR_CLASSES[@]}"; do
+        x+=("$a" "$b" "${(g::)c}")
+      done
+      POWERLEVEL9K_DIR_CLASSES=("${x[@]}")
+    else
+      typeset -ga POWERLEVEL9K_DIR_CLASSES=()
+      _p9k_get_icon ETC_ICON
+      POWERLEVEL9K_DIR_CLASSES+=('/etc|/etc/*' ETC "$_P9K_RETVAL")
+      _p9k_get_icon HOME_ICON
+      POWERLEVEL9K_DIR_CLASSES+=('~' HOME "$_P9K_RETVAL")
+      _p9k_get_icon HOME_SUB_ICON
+      POWERLEVEL9K_DIR_CLASSES+=('~/*' HOME_SUBFOLDER "$_P9K_RETVAL")
+      _p9k_get_icon FOLDER_ICON
+      POWERLEVEL9K_DIR_CLASSES+=('*' DEFAULT "$_P9K_RETVAL")
     fi
   fi
 
