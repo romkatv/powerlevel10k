@@ -2317,6 +2317,7 @@ powerlevel9k_prepare_prompts() {
 }
 
 function _p9k_zle_keymap_select() {
+  VI_KEYMAP=$KEYMAP
   zle && zle .reset-prompt && zle -R
 }
 
