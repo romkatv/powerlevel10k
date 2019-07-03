@@ -34,6 +34,7 @@ function _p9k_init_icons() {
         LEFT_SEGMENT_SEPARATOR         $'\uE0B0'              # 
         RIGHT_SEGMENT_SEPARATOR        $'\uE0B2'              # 
         LEFT_SEGMENT_END_SEPARATOR     ' '                    # Whitespace
+        RIGHT_SEGMENT_END_SEPARATOR    ''
         LEFT_SUBSEGMENT_SEPARATOR      $'\uE0B1'              # 
         RIGHT_SUBSEGMENT_SEPARATOR     $'\uE0B3'              # 
         CARRIAGE_RETURN_ICON           $'\u21B5'              # ↵
@@ -137,6 +138,7 @@ function _p9k_init_icons() {
         LEFT_SEGMENT_SEPARATOR         $'\uE0B0'              # 
         RIGHT_SEGMENT_SEPARATOR        $'\uE0B2'              # 
         LEFT_SEGMENT_END_SEPARATOR     ' '                    # Whitespace
+        RIGHT_SEGMENT_END_SEPARATOR    ''
         LEFT_SUBSEGMENT_SEPARATOR      $'\uE0B1'              # 
         RIGHT_SUBSEGMENT_SEPARATOR     $'\uE0B3'              # 
         CARRIAGE_RETURN_ICON           $'\u21B5'              # ↵
@@ -245,6 +247,7 @@ function _p9k_init_icons() {
         LEFT_SEGMENT_SEPARATOR         $'\uE0B0'                                      # 
         RIGHT_SEGMENT_SEPARATOR        $'\uE0B2'                                      # 
         LEFT_SEGMENT_END_SEPARATOR     ' '                                            # Whitespace
+        RIGHT_SEGMENT_END_SEPARATOR    ''
         LEFT_SUBSEGMENT_SEPARATOR      $'\uE0B1'                                      # 
         RIGHT_SUBSEGMENT_SEPARATOR     $'\uE0B3'                                      # 
         CARRIAGE_RETURN_ICON           $'\u21B5'                                      # ↵
@@ -341,6 +344,7 @@ function _p9k_init_icons() {
         LEFT_SEGMENT_SEPARATOR         $'\uE0B0'              # 
         RIGHT_SEGMENT_SEPARATOR        $'\uE0B2'              # 
         LEFT_SEGMENT_END_SEPARATOR     ' '                    # Whitespace
+        RIGHT_SEGMENT_END_SEPARATOR    ''
         LEFT_SUBSEGMENT_SEPARATOR      $'\uE0B1'              # 
         RIGHT_SUBSEGMENT_SEPARATOR     $'\uE0B3'              # 
         CARRIAGE_RETURN_ICON           $'\u21B5'              # ↵
@@ -440,6 +444,7 @@ function _p9k_init_icons() {
         LEFT_SEGMENT_SEPARATOR         $'\uE0B0'              # 
         RIGHT_SEGMENT_SEPARATOR        $'\uE0B2'              # 
         LEFT_SEGMENT_END_SEPARATOR     ' '                    # Whitespace
+        RIGHT_SEGMENT_END_SEPARATOR    ''
         LEFT_SUBSEGMENT_SEPARATOR      $'\uE0B1'              # 
         RIGHT_SUBSEGMENT_SEPARATOR     $'\uE0B3'              # 
         CARRIAGE_RETURN_ICON           $'\u21B5'              # ↵
