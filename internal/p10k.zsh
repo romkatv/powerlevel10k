@@ -1791,21 +1791,18 @@ function _p9k_vcs_render() {
       # of the GIT icon. That's what vcs_info does, so we do the same in the name of compatiblity.
       if [[ "$VCS_STATUS_REMOTE_URL" == *github* ]] then
         _p9k_get_icon VCS_GIT_GITHUB_ICON
-        _$0_fmt REMOTE_URL $_P9K_RETVAL
       elif [[ "$VCS_STATUS_REMOTE_URL" == *bitbucket* ]] then
         _p9k_get_icon VCS_GIT_BITBUCKET_ICON
-        _$0_fmt REMOTE_URL $_P9K_RETVAL
       elif [[ "$VCS_STATUS_REMOTE_URL" == *stash* ]] then
         _p9k_get_icon VCS_GIT_GITHUB_ICON
-        _$0_fmt REMOTE_URL $_P9K_RETVAL
       elif [[ "$VCS_STATUS_REMOTE_URL" == *gitlab* ]] then
         _p9k_get_icon VCS_GIT_GITLAB_ICON
-        _$0_fmt REMOTE_URL $_P9K_RETVAL
       else
         _p9k_get_icon VCS_GIT_ICON
-        _$0_fmt REMOTE_URL $_P9K_RETVAL
       fi
     fi
+
+    _$0_fmt REMOTE_URL "$_P9K_RETVAL "
 
     local ws
     if [[ $POWERLEVEL9K_SHOW_CHANGESET == true || -z $VCS_STATUS_LOCAL_BRANCH ]]; then
