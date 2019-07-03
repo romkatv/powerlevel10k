@@ -141,8 +141,6 @@ function +vi-vcs-detect-changes() {
     vcs_visual_identifier='VCS_SVN_ICON'
   fi
 
-  [[ -n "$vcs_visual_identifier" ]] && vcs_visual_identifier="$vcs_visual_identifier "
-
   if [[ -n "${hook_com[staged]}" ]] || [[ -n "${hook_com[unstaged]}" ]]; then
     VCS_WORKDIR_DIRTY=true
   else

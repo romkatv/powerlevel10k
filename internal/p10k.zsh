@@ -1640,7 +1640,7 @@ powerlevel9k_vcs_init() {
   fi
 
   local component state
-  for component in REMOTE_URL COMMIT BRANCH DIRTY TAG REMOTE_BRANCH STAGED UNSTAGED \
+  for component in COMMIT BRANCH DIRTY TAG REMOTE_BRANCH STAGED UNSTAGED \
                    UNTRACKED OUTGOING_CHANGES INCOMING_CHANGES STASH ACTION; do
     local var=POWERLEVEL9K_VCS_${component}FORMAT_FOREGROUND
     local color=${(P)var}
@@ -1722,7 +1722,7 @@ function _p9k_vcs_render() {
       dir=${dir:h}
     done
     if (( $#msg )); then
-      $2_prompt_segment $1_LOADING $3 "${vcs_states[loading]}" "$DEFAULT_COLOR" '' 0 '' "${msg[@]}"
+      $2_prompt_segment $1_LOADING $3 "${vcs_states[loading]}" "$DEFAULT_COLOR" "${msg[@]}"
     else
       _p9k_get_icon VCS_LOADING_ICON
       if [[ -n $_P9K_RETVAL || -n $POWERLEVEL9K_VCS_LOADING_TEXT ]]; then
@@ -1767,7 +1767,7 @@ function _p9k_vcs_render() {
   fi
 
   if ! _p9k_cache_get "${(@)cache_key}"; then
-    local state=CLEAN
+    local state=CLEAN icon=''
     local -a cur_prompt
     local -a stale_prompt
 
@@ -1789,20 +1789,14 @@ function _p9k_vcs_render() {
 
       # It's weird that removing vcs-detect-changes from POWERLEVEL9K_VCS_GIT_HOOKS gets rid
       # of the GIT icon. That's what vcs_info does, so we do the same in the name of compatiblity.
-      if [[ "$VCS_STATUS_REMOTE_URL" == *github* ]] then
-        _p9k_get_icon VCS_GIT_GITHUB_ICON
-      elif [[ "$VCS_STATUS_REMOTE_URL" == *bitbucket* ]] then
-        _p9k_get_icon VCS_GIT_BITBUCKET_ICON
-      elif [[ "$VCS_STATUS_REMOTE_URL" == *stash* ]] then
-        _p9k_get_icon VCS_GIT_GITHUB_ICON
-      elif [[ "$VCS_STATUS_REMOTE_URL" == *gitlab* ]] then
-        _p9k_get_icon VCS_GIT_GITLAB_ICON
-      else
-        _p9k_get_icon VCS_GIT_ICON
-      fi
+      case "$VCS_STATUS_REMOTE_URL" in
+        *github*)    icon=VCS_GIT_GITHUB_ICON;;
+        *bitbucket*) icon=VCS_GIT_BITBUCKET_ICON;;
+        *stash*)     icon=VCS_GIT_GITHUB_ICON;;
+        *gitlab*)    icon=VCS_GIT_GITLAB_ICON;;
+        *)           icon=VCS_GIT_ICON;;
+      esac
     fi
-
-    _$0_fmt REMOTE_URL "$_P9K_RETVAL "
 
     local ws
     if [[ $POWERLEVEL9K_SHOW_CHANGESET == true || -z $VCS_STATUS_LOCAL_BRANCH ]]; then
@@ -1864,7 +1858,7 @@ function _p9k_vcs_render() {
       fi
     fi
 
-    _p9k_cache_set "${1}_$state" "${vcs_states[${(L)state}]}" "${stale_prompt[@]}" "${cur_prompt[@]}"
+    _p9k_cache_set "${1}_$state" "${vcs_states[${(L)state}]}" "$icon" 0 '' "${stale_prompt[@]}" "$icon" 0 '' "${cur_prompt[@]}"
   fi
 
   local id=${_P9K_CACHE_VAL[1]}
@@ -1873,7 +1867,7 @@ function _p9k_vcs_render() {
   local -i n=$(($#_P9K_CACHE_VAL / 2))
   _P9K_LAST_GIT_PROMPT[$VCS_STATUS_WORKDIR]="${(pj:\0:)_P9K_CACHE_VAL[1,$n]}"
   shift $n _P9K_CACHE_VAL
-  $2_prompt_segment "$id" "$3" "$bg" "$DEFAULT_COLOR" '' 0 '' "${(@)_P9K_CACHE_VAL}"
+  $2_prompt_segment "$id" "$3" "$bg" "$DEFAULT_COLOR" "${(@)_P9K_CACHE_VAL}"
   return 0
 }
 
