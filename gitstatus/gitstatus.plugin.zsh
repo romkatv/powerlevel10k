@@ -268,7 +268,10 @@ function gitstatus_start() {
   local -i stderr_fd=-1 lock_fd=-1 req_fd=-1 resp_fd=-1 daemon_pid=-1
 
   function gitstatus_start_impl() {
-    [[ ${GITSTATUS_ENABLE_LOGGING:-0} != 1 ]] || {
+    local log_level=${GITSTATUS_LOG_LEVEL:-}
+    [[ -n $log_level || ${GITSTATUS_ENABLE_LOGGING:-0} != 1 ]] || log_level=INFO
+
+    [[ -z $log_level ]] || {
       xtrace_file=$(mktemp "${TMPDIR:-/tmp}"/gitstatus.$$.xtrace.XXXXXXXXXX)
       typeset -g GITSTATUS_XTRACE_${name}=$xtrace_file
       exec {stderr_fd}>&2 2>$xtrace_file
@@ -291,7 +294,7 @@ function gitstatus_start() {
     resp_fifo=$(mktemp -u "${TMPDIR:-/tmp}"/gitstatus.$$.pipe.resp.XXXXXXXXXX)
     mkfifo $resp_fifo
 
-    [[ ${GITSTATUS_ENABLE_LOGGING:-0} == 1 ]] &&
+    [[ -n $log_level ]] &&
       log_file=$(mktemp "${TMPDIR:-/tmp}"/gitstatus.$$.daemon-log.XXXXXXXXXX) ||
       log_file=/dev/null
     typeset -g GITSTATUS_DAEMON_LOG_${name}=$log_file
@@ -313,7 +316,8 @@ function gitstatus_start() {
       --max-num-staged=${(q)max_num_staged}
       --max-num-unstaged=${(q)max_num_unstaged}
       --max-num-untracked=${(q)max_num_untracked}
-      --dirty-max-index-size=${(q)dirty_max_index_size})
+      --dirty-max-index-size=${(q)dirty_max_index_size}
+      ${${log_level:#INFO}:+--log-level=$log_level})
 
     # We use `zsh -c` instead of plain {} or () to work around bugs in zplug. It hangs on startup.
     zsh -dfxc "
@@ -397,7 +401,7 @@ function gitstatus_start() {
       >&2 awk '{print "    " $0}' <$log_file
       >&2 print -nP '%f'
     fi
-    if [[ ${GITSTATUS_ENABLE_LOGGING:-0} == 1 ]]; then
+    if [[ -n ${GITSTATUS_LOG_LEVEL:-} || ${GITSTATUS_ENABLE_LOGGING:-0} == 1 ]]; then
       >&2 echo -E ''
       >&2 echo -E '  Your system information:'
       >&2 print -P '%F{yellow}'
