@@ -159,6 +159,9 @@ left_prompt_segment() {
     _p9k_escape_rcurly $POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS
     local space=$_P9K_RETVAL
 
+    local line_start=$POWERLEVEL9K_LEFT_PROMPT_FIRST_SEGMENT_START_SYMBOL
+    [[ -n $line_start ]] && line_start="%F{$bg_color}$line_start%b%k%f"
+
     local icon
     local -i has_icon
     if [[ -n $5 ]]; then
@@ -185,7 +188,7 @@ left_prompt_segment() {
     #   fi
 
     local t=$#_P9K_T
-    _P9K_T+=$bg$POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS$icon                         # 1
+    _P9K_T+=$line_start$bg$POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS$icon              # 1
     _P9K_T+=$bg$icon                                                                       # 2
     if [[ -z $fg_color ]]; then
       _p9k_foreground $DEFAULT_COLOR
@@ -782,7 +785,7 @@ prompt_dir() {
               (( n -= len ))
               (( --i ))
             else
-              parts[i]=$'\0'$dir[-n,-1]
+              parts[i]=$'\1'$dir[-n,-1]
               parts[1,i-1]=()
               break
             fi
@@ -822,7 +825,7 @@ prompt_dir() {
         for (( ; i < $#parts; ++i )); do
           local dir=$parts[i]
           if (( $#dir > pref + suf + d )); then
-            dir[pref+1,-suf-1]=$'\0'
+            dir[pref+1,-suf-1]=$'\1'
             parts[i]=$dir
           fi
         done
@@ -837,7 +840,7 @@ prompt_dir() {
         local -i i=$(( shortenlen + 1 ))
         [[ $p == /* ]] && (( ++i ))
         for (( ; i <= $#parts - shortenlen; ++i )); do
-          parts[i]=$'\0'
+          parts[i]=$'\1'
         done
       fi
     ;;
@@ -872,7 +875,7 @@ prompt_dir() {
         done
         if (( j + d < $#dir )); then
           (( len -= ($#dir - j - real_delim_len) ))
-          parts[i]=$dir[1,j]$'\0'
+          parts[i]=$dir[1,j]$'\1'
         fi
         parent+=/$dir
       done
@@ -888,7 +891,7 @@ prompt_dir() {
         done
         m+=1
         for (( i=1; i < $#m; ++i )); do
-          (( m[i] - m[i+1] > 2 )) && parts[m[i+1]+1,m[i]-1]=($'\0')
+          (( m[i] - m[i+1] > 2 )) && parts[m[i+1]+1,m[i]-1]=($'\1')
         done
       fi
     ;;
@@ -897,7 +900,7 @@ prompt_dir() {
         local -i len=$#parts
         [[ -z $parts[1] ]] && (( --len ))
         if (( len > shortenlen )); then
-          parts[1,-shortenlen-1]=($'\0')
+          parts[1,-shortenlen-1]=($'\1')
         fi
       fi
     ;;
@@ -905,7 +908,7 @@ prompt_dir() {
 
   [[ $POWERLEVEL9K_DIR_SHOW_WRITABLE == true && ! -w $PWD ]]
   local w=$?
-  if ! _p9k_cache_get $0 $PWD $w $fake_first "$delim" "${parts[@]}"; then
+  if ! _p9k_cache_get $0 $2 $PWD $w $fake_first "$delim" "${parts[@]}"; then
     local state=$0
     local icon=''
     if (( ! w )); then
@@ -941,8 +944,8 @@ prompt_dir() {
       _p9k_foreground $_P9K_RETVAL
       last_fg+=$_P9K_RETVAL
     fi
-    parts[-1]=$last_fg${parts[-1]//$'\0'/$'\0'$last_fg}$style
-    parts=("${(@)parts//$'\0'/$delim$style}")
+    parts[-1]=$last_fg${parts[-1]//$'\1'/$'\1'$last_fg}$style
+    parts=("${(@)parts//$'\1'/$delim$style}")
 
     local sep=$POWERLEVEL9K_DIR_PATH_SEPARATOR$style
     if [[ -n $POWERLEVEL9K_DIR_PATH_SEPARATOR_FOREGROUND ]]; then
@@ -955,9 +958,9 @@ prompt_dir() {
     if [[ $POWERLEVEL9K_DIR_HYPERLINK == true ]]; then
       content=$'%{\e]8;;file://'${${PWD//\%/%%25}//'#'/%%23}$'\a%}'$content$'%{\e]8;;\a%}'
     fi
-    _p9k_cache_set $state "$2" blue "$DEFAULT_COLOR" "$icon" 0 "" $content
+    _p9k_cache_set $state $2 blue "$DEFAULT_COLOR" "$icon" 0 "" $content
   fi
-  "$1_prompt_segment" "$_P9K_CACHE_VAL[@]"
+  $1_prompt_segment "$_P9K_CACHE_VAL[@]"
 }
 
 ################################################################
@@ -2514,6 +2517,8 @@ _p9k_init_strings() {
   _p9k_g_expand POWERLEVEL9K_VI_INSERT_MODE_STRING
   _p9k_g_expand POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS
   _p9k_g_expand POWERLEVEL9K_WHITESPACE_BETWEEN_RIGHT_SEGMENTS
+  _p9k_g_expand POWERLEVEL9K_LEFT_PROMPT_FIRST_SEGMENT_START_SYMBOL
+  _p9k_g_expand POWERLEVEL9K_RIGHT_PROMPT_LAST_SEGMENT_END_SYMBOL
 }
 
 _p9k_init() {
@@ -2603,12 +2608,21 @@ _p9k_init() {
     fi
   done
 
+  if [[ -n $POWERLEVEL9K_RIGHT_PROMPT_LAST_SEGMENT_END_SYMBOL ]]; then
+    _p9k_escape_rcurly $POWERLEVEL9K_RIGHT_PROMPT_LAST_SEGMENT_END_SYMBOL
+    _P9K_RIGHT_SUFFIX+="\${_P9K_N::=}"
+    _P9K_RIGHT_SUFFIX+="\${\${\${\${:-x\$_P9K_BG}:#xNONE}:-\${_P9K_N:=3}}+}"
+    _P9K_RIGHT_SUFFIX+="\${\${_P9K_N:=4}+}"
+    _P9K_RIGHT_SUFFIX+="\${\${_P9K_T[4]::=%b%k%F{\$_P9K_BG\}$_P9K_RETVAL}+}"
+    _P9K_RIGHT_SUFFIX+="\${_P9K_T[\$_P9K_N]}"
+  fi
+
   # Bug fixed in: https://github.com/zsh-users/zsh/commit/3eea35d0853bddae13fa6f122669935a01618bf9.
   # If affects most terminals when RPROMPT is non-empty and ZLE_RPROMPT_INDENT is zero.
   # We can work around it as long as RPROMPT ends with a space.
   if [[ ($POWERLEVEL9K_RPROMPT_ON_NEWLINE == true || $POWERLEVEL9K_PROMPT_ON_NEWLINE == false) &&
-        $POWERLEVEL9K_WHITESPACE_BETWEEN_RIGHT_SEGMENTS == ' ' && $ZLE_RPROMPT_INDENT == 0 ]] &&
-     ! is-at-least 5.7.2; then
+        $POWERLEVEL9K_WHITESPACE_BETWEEN_RIGHT_SEGMENTS == ' ' && $ZLE_RPROMPT_INDENT == 0 &&
+        -z $POWERLEVEL9K_RIGHT_PROMPT_LAST_SEGMENT_END_SYMBOL ]] && ! is-at-least 5.7.2; then
     _P9K_EMULATE_ZERO_RPROMPT_INDENT=1
     _P9K_LEFT_PREFIX+='${${:-${_P9K_REAL_ZLE_RPROMPT_INDENT:=$ZLE_RPROMPT_INDENT}${ZLE_RPROMPT_INDENT::=1}}+}'
     _P9K_RIGHT_SUFFIX+='%E'
@@ -2632,7 +2646,7 @@ _p9k_init() {
     _P9K_ALIGNED_RPROMPT+='%-$_P9K_X(l. .)'
   done
   _P9K_ALIGNED_RPROMPT+='%$(((COLUMNS-_P9K_X+2)*(COLUMNS+2>=_P9K_X)))'
-  _P9K_ALIGNED_RPROMPT+=$'(l.\n. ${_P9K_RPROMPT//)/%)}$_P9K_T[$((3+!_P9K_IND))])'
+  _P9K_ALIGNED_RPROMPT+=$'(l.\n. ${_P9K_RPROMPT//)/%)}$_P9K_T[$((5+!_P9K_IND))])'
 
   _P9K_LEFT_PREFIX+='${${_P9K_IND::=${${ZLE_RPROMPT_INDENT:-1}/#-*/0}}+}'
 
@@ -2654,7 +2668,7 @@ _p9k_init() {
       [[ $ruler_char == '.' ]] && local sep=',' || local sep='.'
       local ruler_len='${$((COLUMNS-_P9K_IND))/#-*/0}'
       _P9K_LEFT_PREFIX+="%b\${(pl$sep$ruler_len$sep$sep${(q)ruler_char}$sep)}%k%f"
-      _P9K_LEFT_PREFIX+='$_P9K_T[$((3+!_P9K_IND))]'
+      _P9K_LEFT_PREFIX+='$_P9K_T[$((5+!_P9K_IND))]'
     else
       print -P "%F{red}WARNING!%f %BPOWERLEVEL9K_RULER_CHAR%b is not one character long. Ruler won't be rendered."
       print -P "Either change the value of %BPOWERLEVEL9K_RULER_CHAR%b or set %BPOWERLEVEL9K_SHOW_RULER=false%b to"
@@ -2669,9 +2683,18 @@ _p9k_init() {
   _P9K_LEFT_PREFIX+='${${_P9K_BG::=NONE}+}${${_P9K_I::=0}+}'
   _P9K_RIGHT_PREFIX+='${${_P9K_BG::=NONE}+}${${_P9K_I::=0}+}'
 
+  # left prompt end
+  _P9K_T=(
+    ""    ""  # left prompt end
+    ""    ""  # right prompt end
+    $'\n' ""  # left prompt overflow
+  )
+  if [[ -n $POWERLEVEL9K_LEFT_PROMPT_FIRST_SEGMENT_START_SYMBOL ]]; then
+    _P9K_T[1]+="%f$POWERLEVEL9K_LEFT_PROMPT_FIRST_SEGMENT_START_SYMBOL"
+  fi
   _p9k_get_icon LEFT_SEGMENT_SEPARATOR
-  _P9K_T=("%f$_P9K_RETVAL" "" $'\n')
-  _p9k_prompt_overflow_bug && _P9K_T+='%{%G%}' || _P9K_T+=''
+  _P9K_T[1]+="%f$_P9K_RETVAL"
+  _p9k_prompt_overflow_bug && _P9K_T[6]+='%{%G%}'
 
   _P9K_RIGHT_SUFFIX+='%f%b%k'
   _P9K_RIGHT_PREFIX+='%f%b%k'
