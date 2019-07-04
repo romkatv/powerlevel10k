@@ -2126,6 +2126,9 @@ prompt_kubecontext() {
         fi
       done
     fi
+    if [[ -n $POWERLEVEL9K_KUBECONTEXT_CONTEXT_FUNCTION ]]; then
+      ctx=$($POWERLEVEL9K_KUBECONTEXT_CONTEXT_FUNCTION $ctx)
+    fi
     _p9k_cache_set "$ctx" "$suf"
   fi
 
