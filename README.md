@@ -33,6 +33,7 @@ It's simply [much faster](#is-it-really-fast).
 1. [FAQ](#faq)
    1. [Why does Powerlevel10k spawn extra processes?](#why-does-powerlevel10k-spawn-extra-processes)
    1. [Are there configuration options that make Powerlevel10k slow?](#are-there-configuration-options-that-make-powerlevel10k-slow)
+   1. [Is Powerlevel10k fast to load?](#is-powerlevel10k-fast-to-load)
    1. [Does Powerlevel10k always render exactly the same prompt as Powerlevel9k given the same config?](#does-powerlevel10k-always-render-exactly-the-same-prompt-as-powerlevel9k-given-the-same-config)
    1. [I am getting an error: "zsh: bad math expression: operand expected at end of string"](#i-am-getting-an-error-zsh-bad-math-expression-operand-expected-at-end-of-string)
    1. [Is there an AUR package for Powerlevel10k?](#is-there-an-aur-package-for-powerlevel10k)
@@ -221,6 +222,25 @@ refresh every second.
 No, Powerlevel10k is always fast, with any configuration you throw at it. If you have noticeable
 prompt latency when using Powerlevel10k, please
 [open an issue](https://github.com/romkatv/powerlevel10k/issues).
+
+### Is Powerlevel10k fast to load?
+
+The short answer is no. The amount of time it takes for Powerlevel10k to render the first prompt
+is in the same ballpark as for Powerlevel9k.
+
+Time to first prompt can be measured with the following benchmark:
+
+```zsh
+time (repeat 100 zsh -dfis <<< 'source ~/powerlevel10k/powerlevel10k.zsh-theme')
+```
+
+On the same machine as in the [prompt benchmark](#is-it-really-fast) this results in 147 ms per
+invocation when executed in a small git repository (I used the `powerlevel10k` repo itself). For
+comparison, the same benchmark gives 170 ms for powerlevel9k/master and 505 ms for
+powerlevel9k/next.
+
+If your workflow requires that you open a terminal tab, type a command or two and close the tab,
+Powerlevel10k isn't the best choice. Powerlevel10k is optimized for long-lived ZSH sessions.
 
 ### Does Powerlevel10k always render exactly the same prompt as Powerlevel9k given the same config?
 
