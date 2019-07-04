@@ -205,7 +205,7 @@ budget for other plugins you might install.
 
 Powerlevel10k is released under the
 [MIT license](https://github.com/romkatv/powerlevel10k/blob/master/LICENSE). Contributions are
-convered by the same license.
+covered by the same license.
 
 ## FAQ
 
