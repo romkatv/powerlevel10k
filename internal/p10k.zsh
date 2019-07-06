@@ -170,7 +170,8 @@ left_prompt_segment() {
         local glyph=$_P9K_RETVAL
         _p9k_color $fg_color $1 VISUAL_IDENTIFIER_COLOR
         _p9k_foreground $_P9K_RETVAL
-        icon=$_P9K_RETVAL$glyph
+        _p9k_escape_rcurly %b$bg$_P9K_RETVAL$glyph
+        icon=$_P9K_RETVAL
         has_icon=1
       fi
     fi
@@ -188,16 +189,16 @@ left_prompt_segment() {
     #   fi
 
     local t=$#_P9K_T
-    _P9K_T+=$line_start$bg$POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS$icon              # 1
-    _P9K_T+=$bg$icon                                                                       # 2
+    _P9K_T+=$line_start$bg$POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS              # 1
+    _P9K_T+=$bg                                                                       # 2
     if [[ -z $fg_color ]]; then
       _p9k_foreground $DEFAULT_COLOR
-      _P9K_T+=$bg$_P9K_RETVAL$subsep$POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS$icon    # 3
+      _P9K_T+=$bg$_P9K_RETVAL$subsep$POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS    # 3
     else
-      _P9K_T+=$bg$fg$subsep$POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS$icon             # 3
+      _P9K_T+=$bg$fg$subsep$POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS             # 3
     fi
     _p9k_get_icon LEFT_SEGMENT_SEPARATOR
-    _P9K_T+=$bg$_P9K_RETVAL$POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS$icon             # 4
+    _P9K_T+=$bg$_P9K_RETVAL$POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS             # 4
 
     local pre
     pre+="\${_P9K_N::=}\${_P9K_F::=}"
@@ -205,16 +206,21 @@ left_prompt_segment() {
     pre+="\${_P9K_N:=\${\${\$((_P9K_I>=$_P9K_LEFT_JOIN[$2])):#0}:+$((t+2))}}"         # 2
     pre+="\${_P9K_N:=\${\${\$((!\${#\${:-0\$_P9K_BG}:#0$bg_color})):#0}:+$((t+3))}}"  # 3
     pre+="\${_P9K_N:=\${\${_P9K_F::=%F{\$_P9K_BG\}}+$((t+4))}}}+}"                    # 4
-    pre+="%b\${_P9K_F}\${_P9K_T[\$_P9K_N]}"
 
     _p9k_escape_rcurly %b$bg$fg
     local style=$_P9K_RETVAL
+    local state=${(U)${1}#prompt_}
 
-    local tr=POWERLEVEL9K_${(U)${1}#prompt_}_CONTENT_TRANSFORMER
+    _p9k_get_icon ${state}_PREFIX
+    _p9k_escape_rcurly $_P9K_RETVAL
+    pre+="%b\${_P9K_F}\${_P9K_T[\$_P9K_N]}$_P9K_RETVAL$icon"
+
+    _p9k_get_icon ${state}_SUFFIX
+    _p9k_escape_rcurly $_P9K_RETVAL
+    local post="\${_P9K_C}$style$_P9K_RETVAL$style$space\${\${_P9K_I::=$2}+}\${\${_P9K_BG::=$bg_color}+}}"
+
+    local tr=POWERLEVEL9K_${state}_CONTENT_TRANSFORMER
     (( $+parameters[$tr] )) && tr=${(P)tr} || tr='${P9K_CONTENT}'
-
-    local post="\${_P9K_C}$style$space\${\${_P9K_I::=$2}+}\${\${_P9K_BG::=$bg_color}+}}"
-
     _p9k_cache_set "$has_icon" "$style" "$tr" "$pre" "$post"
   fi
 
@@ -282,7 +288,15 @@ right_prompt_segment() {
     pre+="\${_P9K_N:=\${\${\$((!\${#\${:-0\$_P9K_BG}:#0$bg_color})):#0}:+$((t+3))}}"  # 3
     pre+="\${_P9K_N:=$((t+1))}}+}"                                                    # 4 == 1
     (( _P9K_EMULATE_ZERO_RPROMPT_INDENT )) && pre+=' '
-    pre+="\${_P9K_T[\$_P9K_N]}\${_P9K_C}$icon_style"
+
+    local state=${(U)${1}#prompt_}
+
+    _p9k_escape_rcurly %b$bg$fg
+    local style=$_P9K_RETVAL
+
+    _p9k_get_icon ${state}_PREFIX
+    _p9k_escape_rcurly $_P9K_RETVAL
+    pre+="\${_P9K_T[\$_P9K_N]}$_P9K_RETVAL$style\${_P9K_C}$icon_style"
 
     if (( _P9K_EMULATE_ZERO_RPROMPT_INDENT )); then
       local space=''
@@ -291,13 +305,12 @@ right_prompt_segment() {
       local space=$_P9K_RETVAL
     fi
 
-    _p9k_escape_rcurly %b$bg$fg
-    local style=$_P9K_RETVAL
-
-    local tr=POWERLEVEL9K_${(U)${1}#prompt_}_CONTENT_TRANSFORMER
+    local tr=POWERLEVEL9K_${state}_CONTENT_TRANSFORMER
     (( $+parameters[$tr] )) && tr=${(P)tr} || tr='${P9K_CONTENT}'
 
-    local post="$icon$style$space\${\${_P9K_I::=$2}+}\${\${_P9K_BG::=$bg_color}+}}"
+    _p9k_get_icon ${state}_SUFFIX
+    _p9k_escape_rcurly $_P9K_RETVAL
+    local post="$icon$style$_P9K_RETVAL$style$space\${\${_P9K_I::=$2}+}\${\${_P9K_BG::=$bg_color}+}}"
 
     _p9k_cache_set "$has_icon" "$style" "$tr" "$pre" "$post"
   fi
