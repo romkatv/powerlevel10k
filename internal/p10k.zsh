@@ -208,24 +208,25 @@ left_prompt_segment() {
     pre+="%b\${_P9K_F}\${_P9K_T[\$_P9K_N]}"
 
     _p9k_escape_rcurly %b$bg$fg
-    local post="\${_P9K_C}$_P9K_RETVAL$space\${\${_P9K_I::=$2}+}\${\${_P9K_BG::=$bg_color}+}}"
+    local style=$_P9K_RETVAL
 
-    _p9k_cache_set $has_icon $_P9K_RETVAL $pre $post
+    local tr=POWERLEVEL9K_${(U)${1}#prompt_}_CONTENT_TRANSFORMER
+    (( $+parameters[$tr] )) && tr=${(P)tr} || tr='${P9K_CONTENT}'
+
+    local post="\${_P9K_C}$style$space\${\${_P9K_I::=$2}+}\${\${_P9K_BG::=$bg_color}+}}"
+
+    _p9k_cache_set "$has_icon" "$style" "$tr" "$pre" "$post"
   fi
 
-  local name=$1
-  local -i has_icon=${_P9K_CACHE_VAL[1]}
-  local style=${_P9K_CACHE_VAL[2]}
   local -i expand=$6
   local cond=${7:-1}
   shift 7
 
-  local content="${(j::):-$style${^@}}"
-  (( expand )) || content="\${(Q)\${:-${(qqq)${(q)content}}}}"
-
-  _P9K_PROMPT+="\${\${:-$cond}:+\${\${:-\${_P9K_C::=${content}}${_P9K_CACHE_VAL[3]}"
-  (( has_icon )) && _P9K_PROMPT+='${${(%):-$_P9K_C%1(l. .x)}[-1]%x}'
-  _P9K_PROMPT+=${_P9K_CACHE_VAL[4]}
+  (( $6 )) || set -- "${:-\${\${P9K_CONTENT::=\${(Q)\${:-${(@qqq)^${(@q)@}}\}\}\}+\}}"
+  local content="${(j::):-${_P9K_CACHE_VAL[2]}${^@}${_P9K_CACHE_VAL[3]}}"
+  _P9K_PROMPT+="\${\${:-$cond}:+\${\${:-\${_P9K_C::=${content}}${_P9K_CACHE_VAL[4]}"
+  (( _P9K_CACHE_VAL[1] )) && _P9K_PROMPT+='${${(%):-$_P9K_C%1(l. .x)}[-1]%x}'
+  _P9K_PROMPT+=${_P9K_CACHE_VAL[5]}
 }
 
 # The same as left_prompt_segment above but for the right prompt.
@@ -289,25 +290,27 @@ right_prompt_segment() {
       _p9k_escape_rcurly $POWERLEVEL9K_WHITESPACE_BETWEEN_RIGHT_SEGMENTS
       local space=$_P9K_RETVAL
     fi
-    _p9k_escape_rcurly %b$bg$fg
-    local post="$icon$_P9K_RETVAL$space\${\${_P9K_I::=$2}+}\${\${_P9K_BG::=$bg_color}+}}"
 
-    _p9k_cache_set $has_icon $_P9K_RETVAL $pre $post
+    _p9k_escape_rcurly %b$bg$fg
+    local style=$_P9K_RETVAL
+
+    local tr=POWERLEVEL9K_${(U)${1}#prompt_}_CONTENT_TRANSFORMER
+    (( $+parameters[$tr] )) && tr=${(P)tr} || tr='${P9K_CONTENT}'
+
+    local post="$icon$style$space\${\${_P9K_I::=$2}+}\${\${_P9K_BG::=$bg_color}+}}"
+
+    _p9k_cache_set "$has_icon" "$style" "$tr" "$pre" "$post"
   fi
 
-  local -i has_icon=${_P9K_CACHE_VAL[1]}
-  local style=${_P9K_CACHE_VAL[2]}
   local -i expand=$6
   local cond=${7:-1}
   shift 7
 
-  _p9k_escape_rcurly $style
-  local content="${(j::):-$_P9K_RETVAL${^@}}"
-  (( expand )) || content="\${(Q)\${:-${(qqq)${(q)content}}}}"
-
-  _P9K_PROMPT+="\${\${:-$cond}:+\${\${:-\${_P9K_C::=${content}}${_P9K_CACHE_VAL[3]}"
-  (( has_icon )) && _P9K_PROMPT+='${${(%):-$_P9K_C%1(l. .x)}[-1]%x}'
-  _P9K_PROMPT+=${_P9K_CACHE_VAL[4]}
+  (( expand )) || set -- "${:-\${\${P9K_CONTENT::=\${(Q)\${:-${(@qqq)^${(@q)@}}\}\}\}+\}}"
+  local content="${(j::):-${_P9K_CACHE_VAL[2]}${^@}${_P9K_CACHE_VAL[3]}}"
+  _P9K_PROMPT+="\${\${:-$cond}:+\${\${:-\${_P9K_C::=${content}}${_P9K_CACHE_VAL[4]}"
+  (( _P9K_CACHE_VAL[1] )) && _P9K_PROMPT+='${${(%):-$_P9K_C%1(l. .x)}[-1]%x}'
+  _P9K_PROMPT+=${_P9K_CACHE_VAL[5]}
 }
 
 function _p9k_python_version() {
