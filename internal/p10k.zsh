@@ -2677,13 +2677,13 @@ _p9k_init() {
     if (( _P9K_RETVAL == 1 && $#ruler_char == 1 )); then
       _p9k_color "" prompt_ruler BACKGROUND
       _p9k_background $_P9K_RETVAL
-      _P9K_LEFT_PREFIX+=$_P9K_RETVAL
+      _P9K_LEFT_PREFIX+=%b$_P9K_RETVAL
       _p9k_color "" prompt_ruler FOREGROUND
       _p9k_foreground $_P9K_RETVAL
       _P9K_LEFT_PREFIX+=$_P9K_RETVAL
       [[ $ruler_char == '.' ]] && local sep=',' || local sep='.'
       local ruler_len='${$((COLUMNS-_P9K_IND))/#-*/0}'
-      _P9K_LEFT_PREFIX+="%b\${(pl$sep$ruler_len$sep$sep${(q)ruler_char}$sep)}%k%f"
+      _P9K_LEFT_PREFIX+="\${(pl$sep$ruler_len$sep$sep${(q)ruler_char}$sep)}%k%f"
       _P9K_LEFT_PREFIX+='$_P9K_T[$((5+!_P9K_IND))]'
     else
       print -P "%F{red}WARNING!%f %BPOWERLEVEL9K_RULER_CHAR%b is not one character long. Ruler won't be rendered."
