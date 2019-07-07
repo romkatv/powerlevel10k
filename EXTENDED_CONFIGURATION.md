@@ -43,19 +43,6 @@ another
 You can pick up a fix for the latter from
 [a fork of zsh](https://github.com/romkatv/zsh/tree/gentle-reset-prompt).
 
-`POWERLEVEL9K_KUBECONTEXT_CONTEXT_FUNCTION (FUNCTION) [default=""]`
-
-Add your own function to modify the k8s context name, e.g. remove superfluous information:
-
-```bash
-# Input: gke_project-name-1337_europe-west1-c_production/ns
-# Output: production
-function k8s_context_short() {
-  echo "$1" | sed -E 's/.*-[a-z]_(.*)\/.*/\1/'
-}
-POWERLEVEL9K_KUBECONTEXT_CONTEXT_FUNCTION="k8s_context_short"
-```
-
 When using gitstatus, there is an extra state called `LOADING` that is used by `vcs` prompt
 segment when it's waiting for git status in the background. You can define styling for this
 state the same way as for the other states -- `CLEAN`, `UNTRACKED` and `MODIFIED`. You can
