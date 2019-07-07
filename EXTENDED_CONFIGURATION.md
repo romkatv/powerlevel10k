@@ -80,3 +80,17 @@ Powerlevel9k if you don't define any `POWERLEVEL9K_VCS_${STATE}_${COMPONENT}_FOR
 parameters. Note that both the icon and the text in each component always have the same color.
 There is currently no `POWERLEVEL9K_VCS_${STATE}_${COMPONENT}FORMAT_VISUAL_IDENTIFIER_COLOR`,
 although it's easy to implement if desired.
+
+## VI mode colors
+
+  * `POWERLEVEL10K_VI_COMMAND_MODE_FG_COLOR (COLOR) [default="$DEFAULT_COLOR_INVERTED"]`
+  * `POWERLEVEL10K_VI_VISUAL_MODE_FG_COLOR (COLOR) [default="$DEFAULT_COLOR_INVERTED"]`
+  * `POWERLEVEL10K_VI_INSERT_MODE_FG_COLOR (COLOR) [default="$DEFAULT_COLOR_INVERTED"]`
+
+    VI mode font colors
+
+  * `POWERLEVEL10K_VI_COMMAND_MODE_BG_COLOR (COLOR) [default="$DEFAULT_COLOR"]`
+  * `POWERLEVEL10K_VI_VISUAL_MODE_BG_COLOR (COLOR) [default="$DEFAULT_COLOR"]`
+  * `POWERLEVEL10K_VI_INSERT_MODE_BG_COLOR (COLOR) [default="$DEFAULT_COLOR"]`
+
+    VI mode background colors:
