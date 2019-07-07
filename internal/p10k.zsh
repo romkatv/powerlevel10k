@@ -594,34 +594,42 @@ set_default POWERLEVEL9K_ALWAYS_SHOW_CONTEXT false
 set_default POWERLEVEL9K_ALWAYS_SHOW_USER false
 set_default POWERLEVEL9K_CONTEXT_TEMPLATE "%n@%m"
 prompt_context() {
-  local content
-  if [[ $POWERLEVEL9K_ALWAYS_SHOW_CONTEXT == true || -z $DEFAULT_USER || -n $SSH_CLIENT || -n $SSH_TTY ]]; then
-    content=$POWERLEVEL9K_CONTEXT_TEMPLATE
-  else
-    local user=$(whoami)
-    if [[ $user != $DEFAULT_USER ]]; then
-      content="${POWERLEVEL9K_CONTEXT_TEMPLATE}"
-    elif [[ $POWERLEVEL9K_ALWAYS_SHOW_USER == true ]]; then
-      content="${user//\%/%%}"
+  if ! _p9k_cache_get $0; then
+    local -i enabled=1
+    local content='' state=''
+    if [[ $POWERLEVEL9K_ALWAYS_SHOW_CONTEXT == true || -z $DEFAULT_USER || -n $SSH_CLIENT || -n $SSH_TTY ]]; then
+      content=$POWERLEVEL9K_CONTEXT_TEMPLATE
     else
-      return
+      local user=$(whoami)
+      if [[ $user != $DEFAULT_USER ]]; then
+        content="${POWERLEVEL9K_CONTEXT_TEMPLATE}"
+      elif [[ $POWERLEVEL9K_ALWAYS_SHOW_USER == true ]]; then
+        content="${user//\%/%%}"
+      else
+        enabled=0
+      fi
     fi
+
+    if (( enabled )); then
+      state="DEFAULT"
+      if [[ "${(%):-%#}" == '#' ]]; then
+        state="ROOT"
+      elif [[ -n "$SSH_CLIENT" || -n "$SSH_TTY" ]]; then
+        if [[ -n "$SUDO_COMMAND" ]]; then
+          state="REMOTE_SUDO"
+        else
+          state="REMOTE"
+        fi
+      elif [[ -n "$SUDO_COMMAND" ]]; then
+        state="SUDO"
+      fi
+    fi
+
+    _p9k_cache_set "$enabled" "$state" "$content"
   fi
 
-  local current_state="DEFAULT"
-  if [[ "${(%):-%#}" == '#' ]]; then
-    current_state="ROOT"
-  elif [[ -n "$SSH_CLIENT" || -n "$SSH_TTY" ]]; then
-    if [[ -n "$SUDO_COMMAND" ]]; then
-      current_state="REMOTE_SUDO"
-    else
-      current_state="REMOTE"
-    fi
-  elif [[ -n "$SUDO_COMMAND" ]]; then
-    current_state="SUDO"
-  fi
-
-  "$1_prompt_segment" "${0}_${current_state}" "$2" "$DEFAULT_COLOR" yellow '' 0 '' "${content}"
+  (( _P9K_CACHE_VAL[1] )) || return
+  "$1_prompt_segment" "$0_$_P9K_CACHE_VAL[2]" "$2" "$DEFAULT_COLOR" yellow '' 0 '' "$_P9K_CACHE_VAL[3]"
 }
 
 ################################################################
@@ -629,15 +637,19 @@ prompt_context() {
 # Note that if $DEFAULT_USER is not set, this prompt segment will always print
 set_default POWERLEVEL9K_USER_TEMPLATE "%n"
 prompt_user() {
-  local user=$(whoami)
-  [[ $POWERLEVEL9K_ALWAYS_SHOW_USER != true && $user == $DEFAULT_USER ]] && return
-  if [[ "${(%):-%#}" == '#' ]]; then
-    "$1_prompt_segment" "${0}_ROOT" "$2" "${DEFAULT_COLOR}" yellow ROOT_ICON 0 '' "${POWERLEVEL9K_USER_TEMPLATE}"
-  elif [[ -n "$SUDO_COMMAND" ]]; then
-    "$1_prompt_segment" "${0}_SUDO" "$2" "${DEFAULT_COLOR}" yellow SUDO_ICON 0 '' "${POWERLEVEL9K_USER_TEMPLATE}"
-  else
-    "$1_prompt_segment" "${0}_DEFAULT" "$2" "${DEFAULT_COLOR}" yellow USER_ICON 0 '' "${user//\%/%%}"
+  if ! _p9k_cache_get $0 $1 $2; then
+    local user=$(whoami)
+    if [[ $POWERLEVEL9K_ALWAYS_SHOW_USER != true && $user == $DEFAULT_USER ]]; then
+      _p9k_cache_set true
+    elif [[ "${(%):-%#}" == '#' ]]; then
+      _p9k_cache_set "$1_prompt_segment" "${0}_ROOT" "$2" "${DEFAULT_COLOR}" yellow ROOT_ICON 0 '' "${POWERLEVEL9K_USER_TEMPLATE}"
+    elif [[ -n "$SUDO_COMMAND" ]]; then
+      _p9k_cache_set "$1_prompt_segment" "${0}_SUDO" "$2" "${DEFAULT_COLOR}" yellow SUDO_ICON 0 '' "${POWERLEVEL9K_USER_TEMPLATE}"
+    else
+      _p9k_cache_set "$1_prompt_segment" "${0}_DEFAULT" "$2" "${DEFAULT_COLOR}" yellow USER_ICON 0 '' "${user//\%/%%}"
+    fi
   fi
+  "$_P9K_CACHE_VAL[@]"
 }
 
 ################################################################
