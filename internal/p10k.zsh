@@ -1742,28 +1742,58 @@ function _p9k_vcs_style() {
   _P9K_RETVAL="%F{$color}"
 }
 
-function _p9k_vcs_render() {
-  if (( $+_P9K_NEXT_VCS_DIR )); then
-    local -a msg
-    local dir=${${GIT_DIR:a}:-$PWD}
-    while true; do
-      msg=("${(@0)${_P9K_LAST_GIT_PROMPT[$dir]}}")
-      [[ $#msg -gt 1 || -n ${msg[1]} ]] && break
-      [[ $dir == / ]] && msg=() && break
-      dir=${dir:h}
-    done
-    if (( $#msg )); then
-      $2_prompt_segment $1_LOADING $3 "${vcs_states[loading]}" "$DEFAULT_COLOR" "${msg[@]}"
-    else
-      _p9k_get_icon VCS_LOADING_ICON
-      if [[ -n $_P9K_RETVAL || -n $POWERLEVEL9K_VCS_LOADING_TEXT ]]; then
-        $2_prompt_segment $1_LOADING $3 "${vcs_states[loading]}" "$DEFAULT_COLOR" VCS_LOADING_ICON 0 '' "$POWERLEVEL9K_VCS_LOADING_TEXT"
-      fi
-    fi
-    return 0
-  fi
+function _p9k_vcs_status_save() {
+  local z=$'\0'
+  _P9K_LAST_GIT_PROMPT[$VCS_STATUS_WORKDIR]=$VCS_STATUS_COMMIT$z$VCS_STATUS_LOCAL_BRANCH$z$VCS_STATUS_REMOTE_BRANCH\
+$z$VCS_STATUS_REMOTE_URL$z$VCS_STATUS_ACTION$z$VCS_STATUS_NUM_STAGED$z$VCS_STATUS_NUM_UNSTAGED\
+$z$VCS_STATUS_NUM_UNTRACKED$z$VCS_STATUS_HAS_STAGED$z$VCS_STATUS_HAS_UNSTAGED$z$VCS_STATUS_HAS_UNTRACKED\
+$z$VCS_STATUS_COMMITS_AHEAD$z$VCS_STATUS_COMMITS_BEHIND$z$VCS_STATUS_STASHES$z$VCS_STATUS_TAG
+}
 
-  [[ $VCS_STATUS_RESULT == ok-* ]] || return 1
+function _p9k_vcs_status_restore() {
+  for VCS_STATUS_COMMIT VCS_STATUS_LOCAL_BRANCH VCS_STATUS_REMOTE_BRANCH                              \
+      VCS_STATUS_REMOTE_URL VCS_STATUS_ACTION VCS_STATUS_NUM_STAGED VCS_STATUS_NUM_UNSTAGED           \
+      VCS_STATUS_NUM_UNTRACKED VCS_STATUS_HAS_STAGED VCS_STATUS_HAS_UNSTAGED VCS_STATUS_HAS_UNTRACKED \
+      VCS_STATUS_COMMITS_AHEAD VCS_STATUS_COMMITS_BEHIND VCS_STATUS_STASHES VCS_STATUS_TAG            \
+      in "${(@0)1}"; do done
+}
+
+function _p9k_vcs_status_for_dir() {
+  local dir=$1
+  while true; do
+    _P9K_RETVAL=$_P9K_LAST_GIT_PROMPT[$dir]
+    [[ -n $_P9K_RETVAL ]] && return 0
+    [[ $dir == / ]] && return 1
+    dir=${dir:h}
+  done
+}
+
+function _p9k_vcs_status_purge() {
+  local dir=$1
+  while true; do
+    unset _P9K_LAST_GIT_PROMPT[$dir]
+    unset _P9K_GIT_SLOW[$dir]
+    [[ $dir == / ]] && break
+    dir=${dir:h}
+  done
+}
+
+function _p9k_vcs_render() {
+  local state
+
+  if (( $+_P9K_NEXT_VCS_DIR )); then
+    if _p9k_vcs_status_for_dir ${${GIT_DIR:a}:-$PWD}; then
+      _p9k_vcs_status_restore $_P9K_RETVAL
+      state=LOADING
+    else
+      if [[ -n $POWERLEVEL9K_VCS_LOADING_TEXT ]] || { _p9k_get_icon VCS_LOADING_ICON; [[ -n $_P9K_RETVAL ]] }; then
+        $1_prompt_segment prompt_vcs_LOADING $2 "${vcs_states[loading]}" "$DEFAULT_COLOR" VCS_LOADING_ICON 0 '' "$POWERLEVEL9K_VCS_LOADING_TEXT"
+      fi
+      return 0
+    fi
+  elif [[ $VCS_STATUS_RESULT != ok-* ]]; then
+    return 1
+  fi
 
   (( ${POWERLEVEL9K_VCS_GIT_HOOKS[(I)git-untracked]} )) || VCS_STATUS_HAS_UNTRACKED=0
   (( ${POWERLEVEL9K_VCS_GIT_HOOKS[(I)git-aheadbehind]} )) || { VCS_STATUS_COMMITS_AHEAD=0 && VCS_STATUS_COMMITS_BEHIND=0 }
@@ -1797,25 +1827,15 @@ function _p9k_vcs_render() {
     cache_key+=$VCS_STATUS_COMMIT
   fi
 
-  if ! _p9k_cache_get "${(@)cache_key}"; then
-    local state=CLEAN icon=''
+  if ! _p9k_cache_get "$1" "$2" "$state" "${(@)cache_key}"; then
+    local icon
     local -a cur_prompt
-    local -a stale_prompt
-
-    function _$0_fmt() {
-      _p9k_vcs_style $state $1
-      cur_prompt+=$_P9K_RETVAL$2
-      _p9k_vcs_style LOADING $1
-      stale_prompt+=$_P9K_RETVAL$2
-    }
-
-    trap "unfunction _$0_fmt" EXIT
 
     if (( ${POWERLEVEL9K_VCS_GIT_HOOKS[(I)vcs-detect-changes]} )); then
       if [[ $VCS_STATUS_HAS_STAGED != 0 || $VCS_STATUS_HAS_UNSTAGED != 0 ]]; then
-        state=MODIFIED
+        : ${state:=MODIFIED}
       elif [[ $VCS_STATUS_HAS_UNTRACKED != 0 ]]; then
-        state=UNTRACKED
+        : ${state:=UNTRACKED}
       fi
 
       # It's weird that removing vcs-detect-changes from POWERLEVEL9K_VCS_GIT_HOOKS gets rid
@@ -1828,6 +1848,13 @@ function _p9k_vcs_render() {
         *)           icon=VCS_GIT_ICON;;
       esac
     fi
+
+    : ${state:=CLEAN}
+
+    function _$0_fmt() {
+      _p9k_vcs_style $state $1
+      cur_prompt+=$_P9K_RETVAL$2
+    }
 
     local ws
     if [[ $POWERLEVEL9K_SHOW_CHANGESET == true || -z $VCS_STATUS_LOCAL_BRANCH ]]; then
@@ -1889,18 +1916,14 @@ function _p9k_vcs_render() {
       fi
     fi
 
-    _p9k_cache_set "${1}_$state" "${vcs_states[${(L)state}]}" "$icon" 0 '' "${stale_prompt[@]}" "$icon" 0 '' "${cur_prompt[@]}"
+    _p9k_cache_set "prompt_vcs_$state" "$2" "${vcs_states[${(L)state}]}" "$DEFAULT_COLOR" "$icon" 0 '' "${cur_prompt[@]}"
   fi
 
-  local id=${_P9K_CACHE_VAL[1]}
-  local bg=${_P9K_CACHE_VAL[2]}
-  shift 2 _P9K_CACHE_VAL
-  local -i n=$(($#_P9K_CACHE_VAL / 2))
-  _P9K_LAST_GIT_PROMPT[$VCS_STATUS_WORKDIR]="${(pj:\0:)_P9K_CACHE_VAL[1,$n]}"
-  shift $n _P9K_CACHE_VAL
-  $2_prompt_segment "$id" "$3" "$bg" "$DEFAULT_COLOR" "${(@)_P9K_CACHE_VAL}"
+  $1_prompt_segment "$_P9K_CACHE_VAL[@]"
   return 0
 }
+
+typeset -gF _P9K_GITSTATUS_START_TIME
 
 function _p9k_vcs_resume() {
   emulate -L zsh && setopt no_hist_expand extended_glob
@@ -1909,50 +1932,70 @@ function _p9k_vcs_resume() {
     local latency=$((EPOCHREALTIME - _P9K_GITSTATUS_START_TIME))
     if (( latency > POWERLEVEL9K_VCS_MAX_SYNC_LATENCY_SECONDS )); then
       _P9K_GIT_SLOW[$VCS_STATUS_WORKDIR]=1
-    elif (( latency < 0.8 * POWERLEVEL9K_VCS_MAX_SYNC_LATENCY_SECONDS )); then  # 0.8 to avoid flip-flopping
+    elif (( $1 && latency < 0.8 * POWERLEVEL9K_VCS_MAX_SYNC_LATENCY_SECONDS )); then  # 0.8 to avoid flip-flopping
       _P9K_GIT_SLOW[$VCS_STATUS_WORKDIR]=0
     fi
+    _p9k_vcs_status_save
   fi
 
   if [[ -z $_P9K_NEXT_VCS_DIR ]]; then
     unset _P9K_NEXT_VCS_DIR
-    _p9k_update_prompt gitstatus
-  else
-    typeset -gFH _P9K_GITSTATUS_START_TIME=$EPOCHREALTIME
-    if ! gitstatus_query -d $_P9K_NEXT_VCS_DIR -t 0 -c _p9k_vcs_resume POWERLEVEL9K; then
-      unset _P9K_NEXT_VCS_DIR
-      return
-    fi
     case $VCS_STATUS_RESULT in
-      *-sync)
-        unset _P9K_NEXT_VCS_DIR
-        _p9k_update_prompt gitstatus
-        ;;
-      tout)
-        typeset -gH _P9K_NEXT_VCS_DIR=""
-        ;;
+      norepo-async) (( $1 )) && _p9k_vcs_status_purge ${${GIT_DIR:a}:-$PWD};;
+      ok-async) (( $1 )) || _P9K_NEXT_VCS_DIR=${${GIT_DIR:a}:-$PWD};;
     esac
   fi
+
+  if [[ -n $_P9K_NEXT_VCS_DIR ]]; then
+    if ! gitstatus_query -d $_P9K_NEXT_VCS_DIR -t 0 -c '_p9k_vcs_resume 1' POWERLEVEL9K; then
+      unset _P9K_NEXT_VCS_DIR
+      unset VCS_STATUS_RESULT
+    else
+      case $VCS_STATUS_RESULT in
+        tout) _P9K_NEXT_VCS_DIR=''; _P9K_GITSTATUS_START_TIME=$EPOCHREALTIME;;
+        norepo-sync) _p9k_vcs_status_purge $_P9K_NEXT_VCS_DIR; unset _P9K_NEXT_VCS_DIR;;
+        ok-sync) _p9k_vcs_status_save; unset _P9K_NEXT_VCS_DIR;;
+      esac
+    fi
+  fi
+
+  _p9k_update_prompt gitstatus
 }
 
 function _p9k_vcs_gitstatus() {
   [[ $POWERLEVEL9K_DISABLE_GITSTATUS == true ]] && return 1
   if [[ $_P9K_REFRESH_REASON == precmd ]]; then
     if (( $+_P9K_NEXT_VCS_DIR )); then
-      typeset -gH _P9K_NEXT_VCS_DIR=${${GIT_DIR:a}:-$PWD}
+      _P9K_NEXT_VCS_DIR=${${GIT_DIR:a}:-$PWD}
     else
       local dir=${${GIT_DIR:a}:-$PWD}
       local -F timeout=$POWERLEVEL9K_VCS_MAX_SYNC_LATENCY_SECONDS
-      while true; do
-        case "$_P9K_GIT_SLOW[$dir]" in
-          "") [[ $dir == / ]] && break; dir=${dir:h};;
-          0) break;;
-          1) timeout=0; break;;
+      if ! _p9k_vcs_status_for_dir $dir; then
+        gitstatus_query -d $dir -t $timeout -p -c '_p9k_vcs_resume 0' POWERLEVEL9K || return 1
+        case $VCS_STATUS_RESULT in
+          tout) _P9K_NEXT_VCS_DIR=''; _P9K_GITSTATUS_START_TIME=$EPOCHREALTIME; return 0;;
+          norepo-sync) return 0;;
+          ok-sync) _p9k_vcs_status_save;;
         esac
-      done
-      typeset -gFH _P9K_GITSTATUS_START_TIME=$EPOCHREALTIME
-      gitstatus_query -d ${${GIT_DIR:a}:-$PWD} -t $timeout -c _p9k_vcs_resume POWERLEVEL9K || return 1
-      [[ $VCS_STATUS_RESULT == tout ]] && typeset -gH _P9K_NEXT_VCS_DIR=""
+      else
+        while true; do
+          case $_P9K_GIT_SLOW[$dir] in
+            "") [[ $dir == / ]] && break; dir=${dir:h};;
+            0) break;;
+            1) timeout=0; break;;
+          esac
+        done
+        dir=${${GIT_DIR:a}:-$PWD}
+      fi
+      if ! gitstatus_query -d $dir -t $timeout -c '_p9k_vcs_resume 1' POWERLEVEL9K; then
+        unset VCS_STATUS_RESULT
+        return 1
+      fi
+      case $VCS_STATUS_RESULT in
+        tout) _P9K_NEXT_VCS_DIR=''; _P9K_GITSTATUS_START_TIME=$EPOCHREALTIME;;
+        norepo-sync) _p9k_vcs_status_purge $dir;;
+        ok-sync) _p9k_vcs_status_save;;
+      esac
     fi
   fi
   return 0
@@ -1964,7 +2007,7 @@ function _p9k_vcs_gitstatus() {
 prompt_vcs() {
   local -a backends=($POWERLEVEL9K_VCS_BACKENDS)
   if (( ${backends[(I)git]} )) && _p9k_vcs_gitstatus; then
-    _p9k_vcs_render $0 $1 $2 && return
+    _p9k_vcs_render $1 $2 && return
     backends=(${backends:#git})
   fi
   if (( $#backends )); then
