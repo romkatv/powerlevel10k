@@ -224,13 +224,8 @@ left_prompt_segment() {
     _p9k_cache_set "$has_icon" "$style" "$tr" "$pre" "$post"
   fi
 
-  local -i expand=$6
-  local cond=${7:-1}
-  shift 7
-
-  (( $6 )) || set -- "${:-\${\${P9K_CONTENT::=\${(Q)\${:-${(@qqq)^${(@q)@}}\}\}\}+\}}"
-  local content="${(j::):-${_P9K_CACHE_VAL[2]}${^@}${_P9K_CACHE_VAL[3]}}"
-  _P9K_PROMPT+="\${\${:-$cond}:+\${\${:-\${_P9K_C::=${content}}${_P9K_CACHE_VAL[4]}"
+  (( $6 )) && local content=$8 || local content="\${(Q)\${:-${(qqq)${(q)8}}}}"
+  _P9K_PROMPT+="\${\${:-${7:-1}}:+\${\${:-\${_P9K_C::=${_P9K_CACHE_VAL[2]}\${\${P9K_CONTENT::=$content}+}${_P9K_CACHE_VAL[3]}}${_P9K_CACHE_VAL[4]}"
   (( _P9K_CACHE_VAL[1] )) && _P9K_PROMPT+='${${(%):-$_P9K_C%1(l. .x)}[-1]%x}'
   _P9K_PROMPT+=${_P9K_CACHE_VAL[5]}
 }
@@ -315,13 +310,8 @@ right_prompt_segment() {
     _p9k_cache_set "$has_icon" "$style" "$tr" "$pre" "$post"
   fi
 
-  local -i expand=$6
-  local cond=${7:-1}
-  shift 7
-
-  (( expand )) || set -- "${:-\${\${P9K_CONTENT::=\${(Q)\${:-${(@qqq)^${(@q)@}}\}\}\}+\}}"
-  local content="${(j::):-${_P9K_CACHE_VAL[2]}${^@}${_P9K_CACHE_VAL[3]}}"
-  _P9K_PROMPT+="\${\${:-$cond}:+\${\${:-\${_P9K_C::=${content}}${_P9K_CACHE_VAL[4]}"
+  (( $6 )) && local content=$8 || local content="\${(Q)\${:-${(qqq)${(q)8}}}}"
+  _P9K_PROMPT+="\${\${:-${7:-1}}:+\${\${:-\${_P9K_C::=${_P9K_CACHE_VAL[2]}\${\${P9K_CONTENT::=$content}+}${_P9K_CACHE_VAL[3]}}${_P9K_CACHE_VAL[4]}"
   (( _P9K_CACHE_VAL[1] )) && _P9K_PROMPT+='${${(%):-$_P9K_C%1(l. .x)}[-1]%x}'
   _P9K_PROMPT+=${_P9K_CACHE_VAL[5]}
 }
@@ -1726,22 +1716,6 @@ typeset -gAH _P9K_LAST_GIT_PROMPT
 # git workdir => 1 if gitstatus is slow on it, 0 if it's fast.
 typeset -gAH _P9K_GIT_SLOW
 
-function _p9k_vcs_style() {
-  local color=${(P)${:-POWERLEVEL9K_VCS_${1}_${2}FORMAT_FOREGROUND}}
-  if [[ -z $color ]]; then
-    _P9K_RETVAL=""
-    return
-  fi
-  if [[ $color != <-> ]]; then
-    color=$__P9K_COLORS[${${${color#bg-}#fg-}#br}]
-    if [[ -z $color ]]; then
-      _P9K_RETVAL=""
-      return
-    fi
-  fi
-  _P9K_RETVAL="%F{$color}"
-}
-
 function _p9k_vcs_status_save() {
   local z=$'\0'
   _P9K_LAST_GIT_PROMPT[$VCS_STATUS_WORKDIR]=$VCS_STATUS_COMMIT$z$VCS_STATUS_LOCAL_BRANCH$z$VCS_STATUS_REMOTE_BRANCH\
@@ -1829,7 +1803,7 @@ function _p9k_vcs_render() {
 
   if ! _p9k_cache_get "$1" "$2" "$state" "${(@)cache_key}"; then
     local icon
-    local -a cur_prompt
+    local content
 
     if (( ${POWERLEVEL9K_VCS_GIT_HOOKS[(I)vcs-detect-changes]} )); then
       if [[ $VCS_STATUS_HAS_STAGED != 0 || $VCS_STATUS_HAS_UNSTAGED != 0 ]]; then
@@ -1851,9 +1825,18 @@ function _p9k_vcs_render() {
 
     : ${state:=CLEAN}
 
+    local style=%b
+    _p9k_color "${vcs_states[${(L)state}]}" prompt_vcs_$state BACKGROUND
+    _p9k_background $_P9K_RETVAL
+    style+=$_P9K_RETVAL
+    _p9k_color "$DEFAULT_COLOR" prompt_vcs_$state FOREGROUND
+    _p9k_foreground $_P9K_RETVAL
+    style+=$_P9K_RETVAL
+
     function _$0_fmt() {
-      _p9k_vcs_style $state $1
-      cur_prompt+=$_P9K_RETVAL$2
+      local color=${(P)${:-POWERLEVEL9K_VCS_${state}_${1}FORMAT_FOREGROUND}}
+      [[ -n $color && $color != <-> ]] && color=$__P9K_COLORS[${${${color#bg-}#fg-}#br}]
+      content+="${color:+%F{$color\}}$2$style"
     }
 
     local ws
@@ -1916,7 +1899,7 @@ function _p9k_vcs_render() {
       fi
     fi
 
-    _p9k_cache_set "prompt_vcs_$state" "$2" "${vcs_states[${(L)state}]}" "$DEFAULT_COLOR" "$icon" 0 '' "${cur_prompt[@]}"
+    _p9k_cache_set "prompt_vcs_$state" "$2" "${vcs_states[${(L)state}]}" "$DEFAULT_COLOR" "$icon" 0 '' "$content"
   fi
 
   $1_prompt_segment "$_P9K_CACHE_VAL[@]"
