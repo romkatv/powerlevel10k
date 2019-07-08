@@ -1748,6 +1748,7 @@ function _p9k_vcs_status_for_dir() {
 }
 
 function _p9k_vcs_status_purge() {
+  unsetopt nomatch
   local dir=$1
   while true; do
     unset _P9K_LAST_GIT_PROMPT[$dir]
