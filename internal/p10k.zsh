@@ -2661,11 +2661,11 @@ _p9k_init() {
   fi
 
   if [[ $POWERLEVEL9K_COLOR_SCHEME == light ]]; then
-    DEFAULT_COLOR=white
-    DEFAULT_COLOR_INVERTED=black
+    DEFAULT_COLOR=7
+    DEFAULT_COLOR_INVERTED=0
   else
-    DEFAULT_COLOR=black
-    DEFAULT_COLOR_INVERTED=white
+    DEFAULT_COLOR=0
+    DEFAULT_COLOR_INVERTED=7
   fi
 
   typeset -gA _P9K_BATTERY_STATES=(
