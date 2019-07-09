@@ -341,7 +341,7 @@ left_prompt_segment() {
       if [[ $_P9K_RETVAL == *%* ]]; then
         _P9K_RETVAL=${${:-$_P9K_RETVAL$style_}//\%/%%%%}
       fi
-      p+="\${\${(%):-\$_P9K_V%1(l$s\${(%):-\$_P9K_C%1(l$s.$_P9K_RETVAL$s.)}$s.)}##*.}"
+      p+="\${\${(%):-\$_P9K_C%1(l$s\${(%):-\$_P9K_V%1(l$s.$_P9K_RETVAL$s.)}$s.)}##*.}"
     fi
 
     _p9k_param $1 SUFFIX ''
@@ -514,21 +514,11 @@ typeset -gi _P9K_X _P9K_Y _P9K_M _P9K_RPROMPT_DONE _P9K_IND
 
 # Returns 1 if the cursor is at the very end of the screen.
 function _p9k_left_prompt_end_line() {
-  _p9k_get_icon prompt_eol LEFT_SEGMENT_SEPARATOR
-  _p9k_escape_rcurly $_P9K_RETVAL
-  _P9K_PROMPT+="%k%b"
-  _P9K_PROMPT+="\${_P9K_N::=}"
-  _P9K_PROMPT+="\${\${\${_P9K_BG:#NONE}:-\${_P9K_N:=1}}+}"
-  _P9K_PROMPT+="\${\${_P9K_N:=2}+}"
-  _P9K_PROMPT+="\${\${_P9K_T[2]::=%F{\$_P9K_BG\}$_P9K_RETVAL}+}"
-  _P9K_PROMPT+="\${_P9K_T[\$_P9K_N]}"
-  _P9K_PROMPT+="%f$1%f%k%b"
-
-  if (( ! _P9K_RPROMPT_DONE )); then
-    _P9K_PROMPT+=$_P9K_ALIGNED_RPROMPT
-    _P9K_RPROMPT_DONE=1
-    return 1
-  fi
+  _P9K_PROMPT+=$_P9K_LEFT_LINE_SUFFIX$1
+  (( _P9K_RPROMPT_DONE )) && return 0
+  _P9K_PROMPT+=$_P9K_ALIGNED_RPROMPT
+  _P9K_RPROMPT_DONE=1
+  return 1
 }
 
 ################################################################
@@ -538,7 +528,7 @@ set_default POWERLEVEL9K_RPROMPT_ON_NEWLINE false
 prompt_newline() {
   [[ "$1" == "right" ]] && return
   _p9k_left_prompt_end_line && _P9K_PROMPT+=$'\n'
-  _P9K_PROMPT+='${${_P9K_BG::=NONE}+}'
+  _P9K_PROMPT+=$_P9K_LEFT_LINE_PREFIX
   if [[ $POWERLEVEL9K_PROMPT_ON_NEWLINE == true ]]; then
     _p9k_get_icon '' MULTILINE_NEWLINE_PROMPT_PREFIX
     _P9K_PROMPT+=$_P9K_RETVAL
@@ -2393,7 +2383,7 @@ build_left_prompt() {
   done
 
   _p9k_get_icon '' LEFT_SEGMENT_END_SEPARATOR
-  _p9k_left_prompt_end_line $_P9K_RETVAL
+  _p9k_left_prompt_end_line $_P9K_RETVAL%b%k%f
 }
 
 # Right prompt
@@ -2878,20 +2868,23 @@ _p9k_init() {
     _P9K_LEFT_PREFIX+="%{$(iterm2_prompt_mark)%}"
   fi
 
-  _P9K_LEFT_PREFIX+='${${_P9K_BG::=NONE}+}${${_P9K_I::=0}+}'
+  _p9k_get_icon '' LEFT_SEGMENT_SEPARATOR
+  _p9k_get_icon '' LEFT_PROMPT_LAST_SEGMENT_END_SYMBOL $_P9K_RETVAL
+  _p9k_escape $_P9K_RETVAL
+  _P9K_LEFT_LINE_PREFIX='${${:-${_P9K_BG::=NONE}${_P9K_I::=0}${_P9K_SSS::='$_P9K_RETVAL'}}+}'
+
+  _P9K_LEFT_LINE_SUFFIX='%b%k%f${${_P9K_BG:#NONE}+%F{$_P9K_BG\}}$_P9K_SSS%b%k%f'
+
+  _P9K_LEFT_PREFIX+=$_P9K_LEFT_LINE_PREFIX
   _P9K_RIGHT_PREFIX+='${${_P9K_BG::=NONE}+}${${_P9K_I::=0}+}'
 
   # left prompt end
   _P9K_T=(
-    ""    ""  # left prompt end
+    ""    ""  # left prompt end (unused)
     ""    ""  # right prompt end
     $'\n' ""  # left prompt overflow
   )
-  if [[ -n $POWERLEVEL9K_LEFT_PROMPT_FIRST_SEGMENT_START_SYMBOL ]]; then
-    _P9K_T[1]+="%f$POWERLEVEL9K_LEFT_PROMPT_FIRST_SEGMENT_START_SYMBOL"
-  fi
-  _p9k_get_icon prompt_eol LEFT_SEGMENT_SEPARATOR
-  _P9K_T[1]+="%f$_P9K_RETVAL"
+
   _p9k_prompt_overflow_bug && _P9K_T[6]+='%{%G%}'
 
   _P9K_RIGHT_SUFFIX+='%f%b%k'
