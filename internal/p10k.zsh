@@ -206,18 +206,16 @@ _p9k_escape() {
   [[ $1 == *["~!#\$^&*()\\\"'<>?{}[]"]* ]] && _P9K_RETVAL="\${(Q)\${:-${(qqq)${(q)1}}}}" || _P9K_RETVAL=$1
 }
 
-# Begin a left prompt segment.
-#
-#    * $1: Name of the function that was originally invoked.
-#          Necessary, to make the dynamic color-overwrite mechanism work.
-#    * $2: The array index of the current segment.
-#    * $3: Background color.
-#    * $4: Foreground color.
-#    * $5: An identifying icon (must be a key of the icons array).
-#    * $6: 1 to to perform parameter expansion and process substitution.
-#    * $7: If not empty but becomes empty after parameter expansion and process substitution,
-#          the segment isn't rendered.
-#   * $8+: The segment content
+# * $1: Name of the function that was originally invoked.
+#       Necessary, to make the dynamic color-overwrite mechanism work.
+# * $2: The array index of the current segment.
+# * $3: Background color.
+# * $4: Foreground color.
+# * $5: An identifying icon.
+# * $6: 1 to to perform parameter expansion and process substitution.
+# * $7: If not empty but becomes empty after parameter expansion and process substitution,
+#       the segment isn't rendered.
+# * $8: Content.
 set_default POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS " "
 left_prompt_segment() {
   if ! _p9k_cache_get "$0" "$1" "$2" "$3" "$4" "$5"; then
@@ -286,7 +284,7 @@ left_prompt_segment() {
     #   fi
 
     local t=$#_P9K_T
-    _P9K_T+=$start_sep$style$left_space           # 1
+    _P9K_T+=$start_sep$style$left_space            # 1
     _P9K_T+=$style                                 # 2
     if [[ -z $fg_color ]]; then
       _p9k_foreground $DEFAULT_COLOR
@@ -2873,7 +2871,7 @@ _p9k_init() {
   _p9k_escape $_P9K_RETVAL
   _P9K_LEFT_LINE_PREFIX='${${:-${_P9K_BG::=NONE}${_P9K_I::=0}${_P9K_SSS::='$_P9K_RETVAL'}}+}'
 
-  _P9K_LEFT_LINE_SUFFIX='%b%k%f${${_P9K_BG:#NONE}+%F{$_P9K_BG\}}$_P9K_SSS%b%k%f'
+  _P9K_LEFT_LINE_SUFFIX='%b%k%f${${_P9K_BG:#NONE}:+%F{$_P9K_BG\}}$_P9K_SSS%b%k%f'
 
   _P9K_LEFT_PREFIX+=$_P9K_LEFT_LINE_PREFIX
   _P9K_RIGHT_PREFIX+='${${_P9K_BG::=NONE}+}${${_P9K_I::=0}+}'
