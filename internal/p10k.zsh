@@ -156,6 +156,36 @@ _p9k_color() {
   fi
 }
 
+# _p9k_vcs_color CLEAN REMOTE_BRANCH
+_p9k_vcs_style() {
+  local key="_p9k_vcs_color ${(pj:\0:)*}"
+  _P9K_RETVAL=$_P9K_CACHE[key]
+  if [[ -n $_P9K_RETVAL ]]; then
+    _P9K_RETVAL[-1,-1]=''
+  else
+    local style=%b  # TODO: support bold
+    _p9k_color prompt_vcs_$1 BACKGROUND "${vcs_states[$state]}"
+    _p9k_background $_P9K_RETVAL
+    style+=$_P9K_RETVAL
+
+    local var=POWERLEVEL9K_VCS_${1}_${2}FORMAT_FOREGROUND
+    if (( $+parameters[$var] )); then
+      _P9K_RETVAL=${(P)var}
+    else
+      var=POWERLEVEL9K_VCS_${2}FORMAT_FOREGROUND
+      if (( $+parameters[$var] )); then
+        _P9K_RETVAL=${(P)var}
+      else
+        _p9k_color prompt_vcs_$1 FOREGROUND "$DEFAULT_COLOR"
+      fi
+    fi
+    
+    _p9k_foreground $_P9K_RETVAL
+    _P9K_RETVAL=$style$_P9K_RETVAL
+    _P9K_CACHE[$key]=${_P9K_RETVAL}.
+  fi
+}
+
 _p9k_background() {
   [[ -n $1 ]] && _P9K_RETVAL="%K{$1}" || _P9K_RETVAL="%k"
 }
@@ -287,11 +317,10 @@ left_prompt_segment() {
     _p9k_param $1 LEFT_SEGMENT_ICON_SEPARATOR ' '
     if [[ -n $_P9K_RETVAL ]]; then
       local z=$'\1'
-      if [[ $_P9K_RETVAL == *%* ]]; then
-        _P9K_RETVAL+=$style
-        _P9K_RETVAL=${_P9K_RETVAL//\%/%%%%}
-      fi
       _p9k_escape $_P9K_RETVAL
+      if [[ $_P9K_RETVAL == *%* ]]; then
+        _P9K_RETVAL=${${:-$_P9K_RETVAL$style_}//\%/%%%%}
+      fi
       p+="\${\${(%):-\$_P9K_V%1(l$z\${(%):-\$_P9K_C%1(l$z.$_P9K_RETVAL$z.)}$z.)}##*.}"
     fi
 
@@ -1743,21 +1772,6 @@ powerlevel9k_vcs_init() {
     POWERLEVEL9K_VCS_INTERNAL_HASH_LENGTH="$POWERLEVEL9K_CHANGESET_HASH_LENGTH"
   fi
 
-  local component state
-  for component in COMMIT BRANCH DIRTY TAG REMOTE_BRANCH STAGED UNSTAGED \
-                   UNTRACKED OUTGOING_CHANGES INCOMING_CHANGES STASH ACTION; do
-    local var=POWERLEVEL9K_VCS_${component}FORMAT_FOREGROUND
-    local color=${(P)var}
-    if [[ -n $color ]]; then
-      for state in "${(@k)vcs_states}"; do
-        local var=POWERLEVEL9K_VCS_${(U)state}_${component}FORMAT_FOREGROUND
-        if [[ -z ${(P)var} ]]; then
-          typeset -g $var=$color
-        fi
-      done
-    fi
-  done
-
   autoload -Uz vcs_info
 
   VCS_CHANGESET_PREFIX=''
@@ -1941,18 +1955,9 @@ function _p9k_vcs_render() {
 
     : ${state:=CLEAN}
 
-    local style=%b
-    _p9k_color prompt_vcs_$state BACKGROUND "${vcs_states[${(L)state}]}"
-    _p9k_background $_P9K_RETVAL
-    style+=$_P9K_RETVAL
-    _p9k_color prompt_vcs_$state FOREGROUND "$DEFAULT_COLOR"
-    _p9k_foreground $_P9K_RETVAL
-    style+=$_P9K_RETVAL
-
     function _$0_fmt() {
-      local color=${(P)${:-POWERLEVEL9K_VCS_${state}_${1}FORMAT_FOREGROUND}}
-      [[ -n $color && $color != <-> ]] && color=$__P9K_COLORS[${${${color#bg-}#fg-}#br}]
-      content+="${color:+%F{$color\}}$2$style"
+      _p9k_vcs_style $state $1
+      content+="$_P9K_RETVAL$2"
     }
 
     local ws
