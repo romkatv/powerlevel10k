@@ -114,7 +114,7 @@ _p9k_param() {
   fi
 }
 
-# _p9k_get_icon prompt_foo_BAR BAZ_ICON
+# _p9k_get_icon prompt_foo_BAR BAZ_ICON quix
 _p9k_get_icon() {
   local key="_p9k_param ${(pj:\0:)*}"
   _P9K_RETVAL=$_P9K_CACHE[key]
@@ -124,9 +124,13 @@ _p9k_get_icon() {
     if [[ $2 == $'\1'* ]]; then
       _P9K_RETVAL=${2[2,-1]}
     else
-      _p9k_param "$@" $icons[$2]
-      _P9K_RETVAL=${(g::)_P9K_RETVAL}
-      [[ $_P9K_RETVAL != $'\b'? ]] || _P9K_RETVAL="%{$_P9K_RETVAL%}"  # penance for past sins
+      _p9k_param "$@" ${icons[$2]-$'\1'$3}
+      if [[ $_P9K_RETVAL == $'\1'* ]]; then
+        _P9K_RETVAL=${_P9K_RETVAL[2,-1]}
+      else
+        _P9K_RETVAL=${(g::)_P9K_RETVAL}
+        [[ $_P9K_RETVAL != $'\b'? ]] || _P9K_RETVAL="%{$_P9K_RETVAL%}"  # penance for past sins
+      fi
     fi
     _P9K_CACHE[$key]=${_P9K_RETVAL}.
   fi
@@ -227,8 +231,14 @@ left_prompt_segment() {
     _p9k_foreground $fg_color
     local fg=$_P9K_RETVAL
 
+    _p9k_get_icon $1 LEFT_SEGMENT_SEPARATOR
+    local sep=$_P9K_RETVAL
+    _p9k_escape $_P9K_RETVAL
+    local sep_=$_P9K_RETVAL
+
     _p9k_get_icon $1 LEFT_SUBSEGMENT_SEPARATOR
-    local subsep=$_P9K_RETVAL
+    _p9k_escape $_P9K_RETVAL
+    local subsep_=$_P9K_RETVAL
 
     local icon_
     if [[ -n $5 ]]; then
@@ -237,19 +247,31 @@ left_prompt_segment() {
       icon_=$_P9K_RETVAL
     fi
 
-    local line_start=$POWERLEVEL9K_LEFT_PROMPT_FIRST_SEGMENT_START_SYMBOL
-    [[ -n $line_start ]] && line_start="%k%F{$bg_color}$line_start"
+    _p9k_get_icon $1 LEFT_PROMPT_FIRST_SEGMENT_START_SYMBOL
+    local start_sep=$_P9K_RETVAL
+    [[ -n $start_sep ]] && first_sep="%k%F{$bg_color}$start_sep"
+
+    _p9k_get_icon $1 LEFT_PROMPT_LAST_SEGMENT_END_SYMBOL $sep
+    _p9k_escape $_P9K_RETVAL
+    local last_sep_=$_P9K_RETVAL
 
     local style=%b$bg$fg
     _p9k_escape_rcurly $style
     local style_=$_P9K_RETVAL
 
-    local space=$POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS
-    [[ $space == *%* ]] && space+=$style
-    _p9k_escape $space
-    local space_=$_P9K_RETVAL
+    _p9k_get_icon $1 WHITESPACE_BETWEEN_LEFT_SEGMENTS
+    local space=$_P9K_RETVAL
 
-    local state=${(U)${1}#prompt_}
+    _p9k_get_icon $1 LEFT_LEFT_WHITESPACE $space
+    local left_space=$_P9K_RETVAL
+    [[ $left_space == *%* ]] && left_space+=$style
+
+    _p9k_get_icon $1 LEFT_RIGHT_WHITESPACE $space
+    _p9k_escape $_P9K_RETVAL
+    local right_space_=$_P9K_RETVAL
+    [[ $right_space_ == *%* ]] && right_space_+=$style_
+
+    local s=$'\1' ss=$'\1\1'
 
     # Segment separator logic:
     #
@@ -264,16 +286,15 @@ left_prompt_segment() {
     #   fi
 
     local t=$#_P9K_T
-    _P9K_T+=$line_start$style$space               # 1
-    _P9K_T+=$style                                # 2
+    _P9K_T+=$start_sep$style$left_space           # 1
+    _P9K_T+=$style                                 # 2
     if [[ -z $fg_color ]]; then
       _p9k_foreground $DEFAULT_COLOR
-      _P9K_T+=$bg$_P9K_RETVAL$subsep$style$space  # 3
+      _P9K_T+=$bg$_P9K_RETVAL$ss$style$left_space  # 3
     else
-      _P9K_T+=$bg$fg$subsep$style$space           # 3
+      _P9K_T+=$bg$fg$ss$style$left_space           # 3
     fi
-    _p9k_get_icon $1 LEFT_SEGMENT_SEPARATOR
-    _P9K_T+=$bg$_P9K_RETVAL$style$space           # 4
+    _P9K_T+=$bg$s$style$left_space                 # 4
 
     local p=
     p+="\${_P9K_N::=}\${_P9K_F::=}"
@@ -282,7 +303,7 @@ left_prompt_segment() {
     p+="\${_P9K_N:=\${\${(M)\${:-x$bg_color}:#x(\$_P9K_BG|\${_P9K_BG:-0})}:+$((t+3))}}"  # 3
     p+="\${_P9K_N:=\${\${_P9K_F::=%F{\$_P9K_BG\}}:+$((t+4))}}"                           # 4
 
-    p+="\${_P9K_I::=$2}\${_P9K_BG::=$bg_color}"
+    p+="\${_P9K_I::=$2}\${_P9K_BG::=$bg_color}\${_P9K_SSS::=$last_sep_}"
 
     _p9k_param $1 VISUAL_IDENTIFIER_EXPANSION '${P9K_VISUAL_IDENTIFIER}'
     local icon_exp=$_P9K_RETVAL
@@ -305,7 +326,7 @@ left_prompt_segment() {
     _p9k_param $1 PREFIX ''
     _P9K_RETVAL=${(g::)_P9K_RETVAL}
     _p9k_escape $_P9K_RETVAL
-    p+="%b\${_P9K_F}\${_P9K_T[\$_P9K_N]}$_P9K_RETVAL"
+    p+="%b\${_P9K_F}\${\${_P9K_T[\$_P9K_N]/$ss/\$_P9K_SS}/$s/\$_P9K_S}$_P9K_RETVAL"
     [[ $_P9K_RETVAL == *%* ]] && local -i need_style=1 || local -i need_style=0
 
     _p9k_color $1 VISUAL_IDENTIFIER_COLOR $fg_color
@@ -314,14 +335,13 @@ left_prompt_segment() {
     [[ $_P9K_RETVAL != $style_ || $need_style == 1 ]] && p+=$_P9K_RETVAL
     p+="\$_P9K_V"
 
-    _p9k_param $1 LEFT_SEGMENT_ICON_SEPARATOR ' '
+    _p9k_get_icon $1 LEFT_MIDDLE_WHITESPACE $space
     if [[ -n $_P9K_RETVAL ]]; then
-      local z=$'\1'
       _p9k_escape $_P9K_RETVAL
       if [[ $_P9K_RETVAL == *%* ]]; then
         _P9K_RETVAL=${${:-$_P9K_RETVAL$style_}//\%/%%%%}
       fi
-      p+="\${\${(%):-\$_P9K_V%1(l$z\${(%):-\$_P9K_C%1(l$z.$_P9K_RETVAL$z.)}$z.)}##*.}"
+      p+="\${\${(%):-\$_P9K_V%1(l$s\${(%):-\$_P9K_C%1(l$s.$_P9K_RETVAL$s.)}$s.)}##*.}"
     fi
 
     _p9k_param $1 SUFFIX ''
@@ -329,7 +349,10 @@ left_prompt_segment() {
     _p9k_escape $_P9K_RETVAL
     p+="\${_P9K_C}$style_$_P9K_RETVAL"
     [[ $_P9K_RETVAL == *%* ]] && p+=$style_
-    p+=$space_
+    p+=$right_space_
+
+    p+="\${\${_P9K_S::=$sep_}+}"
+    p+="\${\${_P9K_SS::=$subsep_}+}"
 
     _p9k_cache_set "$p"
   fi
