@@ -168,7 +168,7 @@ _p9k_vcs_style() {
     _P9K_RETVAL[-1,-1]=''
   else
     local style=%b  # TODO: support bold
-    _p9k_color prompt_vcs_$1 BACKGROUND "${vcs_states[$state]}"
+    _p9k_color prompt_vcs_$1 BACKGROUND "${vcs_states[$1]}"
     _p9k_background $_P9K_RETVAL
     style+=$_P9K_RETVAL
 
@@ -1759,10 +1759,10 @@ prompt_todo() {
 
 # The vcs segment can have 4 different states - defaults to 'clean'.
 typeset -gA vcs_states=(
-  'clean'         'green'
-  'modified'      'yellow'
-  'untracked'     'green'
-  'loading'       'grey'
+  'CLEAN'         '2'
+  'MODIFIED'      '3'
+  'UNTRACKED'     '2'
+  'LOADING'       '8'
 )
 
 set_default POWERLEVEL9K_VCS_ACTIONFORMAT_FOREGROUND red
@@ -1887,7 +1887,7 @@ function _p9k_vcs_render() {
       state=LOADING
     else
       if [[ -n $POWERLEVEL9K_VCS_LOADING_TEXT ]] || { _p9k_get_icon prompt_vcs_LOADING VCS_LOADING_ICON; [[ -n $_P9K_RETVAL ]] }; then
-        $1_prompt_segment prompt_vcs_LOADING $2 "${vcs_states[loading]}" "$DEFAULT_COLOR" VCS_LOADING_ICON 0 '' "$POWERLEVEL9K_VCS_LOADING_TEXT"
+        $1_prompt_segment prompt_vcs_LOADING $2 "${vcs_states[LOADING]}" "$DEFAULT_COLOR" VCS_LOADING_ICON 0 '' "$POWERLEVEL9K_VCS_LOADING_TEXT"
       fi
       return 0
     fi
@@ -2031,7 +2031,7 @@ function _p9k_vcs_render() {
       fi
     fi
 
-    _p9k_cache_set "prompt_vcs_$state" "$2" "${vcs_states[${(L)state}]}" "$DEFAULT_COLOR" "$icon" 0 '' "$content"
+    _p9k_cache_set "prompt_vcs_$state" "$2" "${vcs_states[$state]}" "$DEFAULT_COLOR" "$icon" 0 '' "$content"
   fi
 
   $1_prompt_segment "$_P9K_CACHE_VAL[@]"
@@ -2137,12 +2137,12 @@ prompt_vcs() {
       if [[ "$VCS_WORKDIR_DIRTY" == true ]]; then
         # $vcs_visual_identifier gets set in +vi-vcs-detect-changes in functions/vcs.zsh,
         # as we have there access to vcs_info internal hooks.
-        current_state='modified'
+        current_state='MODIFIED'
       else
         if [[ "$VCS_WORKDIR_HALF_DIRTY" == true ]]; then
-          current_state='untracked'
+          current_state='UNTRACKED'
         else
-          current_state='clean'
+          current_state='CLEAN'
         fi
       fi
       $1_prompt_segment "${0}_${(U)current_state}" "$2" "${vcs_states[$current_state]}" "$DEFAULT_COLOR" "$vcs_visual_identifier" 0 '' "$vcs_prompt"
