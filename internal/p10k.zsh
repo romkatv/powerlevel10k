@@ -294,10 +294,14 @@ left_prompt_segment() {
     fi
     _P9K_T+=$bg$s$style$left_space                 # 4
 
+    local join="_P9K_I>=$_P9K_LEFT_JOIN[$2]"
+    _p9k_param $1 SELF_JOINED false
+    [[ $_P9K_RETVAL == false ]] && join+="&&_P9K_I<$2"
+
     local p=
     p+="\${_P9K_N::=}\${_P9K_F::=}"
     p+="\${\${\${_P9K_BG:-0}:#NONE}:-\${_P9K_N::=$((t+1))}}"                             # 1
-    p+="\${_P9K_N:=\${\${\$((_P9K_I>=$_P9K_LEFT_JOIN[$2])):#0}:+$((t+2))}}"              # 2
+    p+="\${_P9K_N:=\${\${\$(($join)):#0}:+$((t+2))}}"                                    # 2
     p+="\${_P9K_N:=\${\${(M)\${:-x$bg_color}:#x(\$_P9K_BG|\${_P9K_BG:-0})}:+$((t+3))}}"  # 3
     p+="\${_P9K_N:=\${\${_P9K_F::=%F{\$_P9K_BG\}}:+$((t+4))}}"                           # 4
 
@@ -447,6 +451,35 @@ right_prompt_segment() {
   _P9K_PROMPT+="\${\${:-${7:-1}}:+\${\${:-\${_P9K_C::=${_P9K_CACHE_VAL[2]}\${\${P9K_CONTENT::=$content}+}${_P9K_CACHE_VAL[3]}}${_P9K_CACHE_VAL[4]}"
   (( _P9K_CACHE_VAL[1] )) && _P9K_PROMPT+='${${(%):-$_P9K_C%1(l. .x)}[-1]%x}'
   _P9K_PROMPT+=${_P9K_CACHE_VAL[5]}
+}
+
+function p9k_prompt_segment() {
+  emulate -L zsh && setopt no_hist_expand extended_glob
+  local opt state bg fg icon cond text sym=0 expand=0
+  while getopts 's:b:f:i:c:t:se' opt; do
+    case $opt in
+      s) state=$OPTARG;;
+      b) bg=$OPTARG;;
+      f) fg=$OPTARG;;
+      i) icon=$OPTARG;;
+      c) cond=${OPTARG:-'${:-}'};;
+      t) text=$OPTARG;;
+      s) sym=1;;
+      e) expand=1;;
+      +s) sym=0;;
+      +e) expand=0;;
+      ?) return 1;;
+      done) break;;
+    esac
+  done
+  if (( OPTIND <= ARGC )) {
+    echo "usage: p9k_prompt_segment [{+|-}re] [-s state] [-b bg] [-f fg] [-i icon] [-c cond] [-t text]" >&2
+    return 1
+  }
+  (( sym )) || icon=$'\1'$icon
+  "${_P9K_PROMPT_SIDE}_prompt_segment" "prompt_${_P9K_SEGMENT_NAME}${state:+_${(U)state}}" \
+      "${_P9K_SEGMENT_INDEX}" "$bg" "${fg:-$DEFAULT_COLOR}" "$icon" "$expand" "$cond" "$text"
+  return 0
 }
 
 function _p9k_python_version() {
@@ -1510,23 +1543,6 @@ prompt_root_indicator() {
   "$1_prompt_segment" "$0" "$2" "$DEFAULT_COLOR" "yellow" 'ROOT_ICON' 0 '${${(%):-%#}:#%}' ''
 }
 
-# This segment is a demo. It can disappear any time. Use prompt_dir instead.
-prompt_simple_dir() {
-  if ! _p9k_cache_get "$0" "$1" "$2" ; then
-    local p=$_P9K_PROMPT
-    local key=$_P9K_CACHE_KEY
-    _P9K_PROMPT=''
-    $1_prompt_segment $0_HOME $2 blue "$DEFAULT_COLOR" HOME_ICON 0 '${$((!${#${(%):-%~}:#\~})):#0}' "%~"
-    $1_prompt_segment $0_HOME_SUBFOLDER $2 blue "$DEFAULT_COLOR" HOME_SUB_ICON 0 '${$((!${#${(%):-%~}:#\~?*})):#0}' "%~"
-    $1_prompt_segment $0_ETC $2 blue "$DEFAULT_COLOR" ETC_ICON 0 '${$((!${#${(%):-%~}:#/etc*})):#0}' "%~"
-    $1_prompt_segment $0_DEFAULT $2 blue "$DEFAULT_COLOR" FOLDER_ICON 0 '${${${(%):-%~}:#\~*}:#/etc*}' "%~"
-    _P9K_CACHE_KEY=$key
-    _p9k_cache_set "$_P9K_PROMPT"
-    _P9K_PROMPT=$p
-  fi
-  _P9K_PROMPT+=${_P9K_CACHE_VAL[1]}
-}
-
 ################################################################
 # Segment to display Rust version number
 prompt_rust_version() {
@@ -1757,7 +1773,7 @@ prompt_todo() {
 # VCS segment: shows the state of your repository, if you are in a folder under
 # version control
 
-# The vcs segment can have 4 different states - defaults to 'clean'.
+# The vcs segment can have 4 different states - defaults to 'CLEAN'.
 typeset -gA vcs_states=(
   'CLEAN'         '2'
   'MODIFIED'      '3'
@@ -2360,49 +2376,23 @@ prompt_java_version() {
 ################################################################
 # Main prompt
 set_default -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS context dir vcs
-
-# Returns 1 if the cursor is at the very end of the screen.
-build_left_prompt() {
-  local -i index=1
-  local element
-  for element in "${POWERLEVEL9K_LEFT_PROMPT_ELEMENTS[@]}"; do
-    # Remove joined information in direct calls
-    element=${element%_joined}
-
-    # Check if it is a custom command, otherwise interpet it as
-    # a prompt.
-    if [[ $element == custom_* ]]; then
-      "prompt_custom" "left" "$index" $element[8,-1]
-    else
-      (( $+functions[prompt_$element] )) && "prompt_$element" "left" "$index"
-    fi
-
-    ((++index))
-  done
-
-  _p9k_get_icon '' LEFT_SEGMENT_END_SEPARATOR
-  _p9k_left_prompt_end_line $_P9K_RETVAL%b%k%f
-}
-
-# Right prompt
 set_default -a POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS status root_indicator background_jobs history time
-build_right_prompt() {
-  local -i index=1
-  local element
 
-  for element in "${POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS[@]}"; do
-    # Remove joined information in direct calls
-    element=${element%_joined}
+typeset -g _P9K_PROMPT_SIDE _P9K_SEGMENT_NAME
+typeset -gi _P9K_SEGMENT_INDEX
 
-    # Check if it is a custom command, otherwise interpet it as
-    # a prompt.
-    if [[ $element == custom_* ]]; then
-      "prompt_custom" "right" "$index" $element[8,-1]
-    else
-      (( $+functions[prompt_$element] )) && "prompt_$element" "right" "$index"
+_p9k_build_prompt() {
+  _P9K_SEGMENT_INDEX=1
+  _P9K_PROMPT_SIDE=$1
+  local list=POWERLEVEL9K_${(U)_P9K_PROMPT_SIDE}_PROMPT_ELEMENTS
+  for _P9K_SEGMENT_NAME in ${(P)list}; do
+    _P9K_SEGMENT_NAME=${_P9K_SEGMENT_NAME%_joined}
+    if [[ $_P9K_SEGMENT_NAME == custom_* ]]; then
+      prompt_custom $_P9K_PROMPT_SIDE $_P9K_SEGMENT_INDEX $_P9K_SEGMENT_NAME[8,-1]
+    elif (( $+functions[prompt_$_P9K_SEGMENT_NAME] )); then
+      prompt_$_P9K_SEGMENT_NAME $_P9K_PROMPT_SIDE $_P9K_SEGMENT_INDEX
     fi
-
-    ((++index))
+    ((++_P9K_SEGMENT_INDEX))
   done
 }
 
@@ -2434,7 +2424,7 @@ function _p9k_set_prompt() {
     _P9K_RPROMPT_DONE=1
   else
     _P9K_PROMPT=
-    build_right_prompt
+    _p9k_build_prompt right
     local right=$_P9K_RIGHT_PREFIX$_P9K_PROMPT$_P9K_RIGHT_SUFFIX
     if [[ $POWERLEVEL9K_PROMPT_ON_NEWLINE != true || $POWERLEVEL9K_RPROMPT_ON_NEWLINE == true ]]; then
       RPROMPT=$right
@@ -2447,7 +2437,9 @@ function _p9k_set_prompt() {
   fi
 
   _P9K_PROMPT=''
-  if build_left_prompt; then
+  _p9k_build_prompt left
+  _p9k_get_icon '' LEFT_SEGMENT_END_SEPARATOR
+  if _p9k_left_prompt_end_line $_P9K_RETVAL%b%k%f; then
     PROMPT+=$_P9K_LEFT_PREFIX$_P9K_PROMPT$_P9K_LEFT_SUFFIX
   else
     PROMPT+=$_P9K_LEFT_PREFIX$_P9K_PROMPT${_P9K_LEFT_SUFFIX#$'\n'}
