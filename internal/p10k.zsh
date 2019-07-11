@@ -247,11 +247,11 @@ left_prompt_segment() {
 
     _p9k_get_icon $1 LEFT_PROMPT_FIRST_SEGMENT_START_SYMBOL
     local start_sep=$_P9K_RETVAL
-    [[ -n $start_sep ]] && first_sep="%k%F{$bg_color}$start_sep"
+    [[ -n $start_sep ]] && start_sep="%b%k%F{$bg_color}$start_sep"
 
     _p9k_get_icon $1 LEFT_PROMPT_LAST_SEGMENT_END_SYMBOL $sep
     _p9k_escape $_P9K_RETVAL
-    local last_sep_=$_P9K_RETVAL
+    local end_sep_=$_P9K_RETVAL
 
     local style=%b$bg$fg
     _p9k_escape_rcurly $style
@@ -269,7 +269,7 @@ left_prompt_segment() {
     local right_space_=$_P9K_RETVAL
     [[ $right_space_ == *%* ]] && right_space_+=$style_
 
-    local s=$'\1' ss=$'\1\1'
+    local s='<_P9K_S>' ss='<_P9K_SS>'
 
     # Segment separator logic:
     #
@@ -284,28 +284,28 @@ left_prompt_segment() {
     #   fi
 
     local t=$#_P9K_T
-    _P9K_T+=$start_sep$style$left_space            # 1
-    _P9K_T+=$style                                 # 2
+    _P9K_T+=$start_sep$style$left_space              # 1
+    _P9K_T+=$style                                   # 2
     if [[ -z $fg_color ]]; then
       _p9k_foreground $DEFAULT_COLOR
-      _P9K_T+=$bg$_P9K_RETVAL$ss$style$left_space  # 3
+      _P9K_T+=%b$bg$_P9K_RETVAL$ss$style$left_space  # 3
     else
-      _P9K_T+=$bg$fg$ss$style$left_space           # 3
+      _P9K_T+=%b$bg$fg$ss$style$left_space           # 3
     fi
-    _P9K_T+=$bg$s$style$left_space                 # 4
+    _P9K_T+=%b$bg$s$style$left_space                 # 4
 
     local join="_P9K_I>=$_P9K_LEFT_JOIN[$2]"
     _p9k_param $1 SELF_JOINED false
     [[ $_P9K_RETVAL == false ]] && join+="&&_P9K_I<$2"
 
     local p=
-    p+="\${_P9K_N::=}\${_P9K_F::=}"
+    p+="\${_P9K_N::=}"
     p+="\${\${\${_P9K_BG:-0}:#NONE}:-\${_P9K_N::=$((t+1))}}"                             # 1
     p+="\${_P9K_N:=\${\${\$(($join)):#0}:+$((t+2))}}"                                    # 2
     p+="\${_P9K_N:=\${\${(M)\${:-x$bg_color}:#x(\$_P9K_BG|\${_P9K_BG:-0})}:+$((t+3))}}"  # 3
-    p+="\${_P9K_N:=\${\${_P9K_F::=%F{\$_P9K_BG\}}:+$((t+4))}}"                           # 4
+    p+="\${_P9K_N:=$((t+4))}"                                                            # 4
 
-    p+="\${_P9K_I::=$2}\${_P9K_BG::=$bg_color}\${_P9K_SSS::=$last_sep_}"
+    p+="\${_P9K_I::=$2}\${_P9K_BG::=$bg_color}"
 
     _p9k_param $1 VISUAL_IDENTIFIER_EXPANSION '${P9K_VISUAL_IDENTIFIER}'
     local icon_exp=$_P9K_RETVAL
@@ -322,39 +322,43 @@ left_prompt_segment() {
     fi
 
     p+="\${_P9K_C::=$content_exp}"
+    p+='${_P9K_E::=${${(%):-$_P9K_C%1(l.1.0)}[-1]}${${(%):-$_P9K_V%1(l.1.0)}[-1]}}'
 
     p+='}+}'
+
+    p+='${${_P9K_E:#00}:+'
 
     _p9k_param $1 PREFIX ''
     _P9K_RETVAL=${(g::)_P9K_RETVAL}
     _p9k_escape $_P9K_RETVAL
-    p+="%b\${_P9K_F}\${\${_P9K_T[\$_P9K_N]/$ss/\$_P9K_SS}/$s/\$_P9K_S}$_P9K_RETVAL"
+    p+="\${\${_P9K_T[\$_P9K_N]/$ss/\$_P9K_SS}/$s/\$_P9K_S}$_P9K_RETVAL"
     [[ $_P9K_RETVAL == *%* ]] && local -i need_style=1 || local -i need_style=0
 
     _p9k_color $1 VISUAL_IDENTIFIER_COLOR $fg_color
     _p9k_foreground $_P9K_RETVAL
     _p9k_escape_rcurly %b$bg$_P9K_RETVAL
     [[ $_P9K_RETVAL != $style_ || $need_style == 1 ]] && p+=$_P9K_RETVAL
-    p+="\$_P9K_V"
+    p+="\$_P9K_V$style_"
 
     _p9k_get_icon $1 LEFT_MIDDLE_WHITESPACE $space
     if [[ -n $_P9K_RETVAL ]]; then
       _p9k_escape $_P9K_RETVAL
-      if [[ $_P9K_RETVAL == *%* ]]; then
-        _P9K_RETVAL=${${:-$_P9K_RETVAL$style_}//\%/%%%%}
-      fi
-      p+="\${\${(%):-\$_P9K_C%1(l$s\${(%):-\$_P9K_V%1(l$s.$_P9K_RETVAL$s.)}$s.)}##*.}"
+      [[ _P9K_RETVAL == *%* ]] && _P9K_RETVAL+=$style_
+      p+="\${\${(M)_P9K_E:#11}:+$_P9K_RETVAL}"
     fi
+
+    p+="\${_P9K_C}$style_"
 
     _p9k_param $1 SUFFIX ''
     _P9K_RETVAL=${(g::)_P9K_RETVAL}
     _p9k_escape $_P9K_RETVAL
-    p+="\${_P9K_C}$style_$_P9K_RETVAL"
-    [[ $_P9K_RETVAL == *%* ]] && p+=$style_
+    p+=$_P9K_RETVAL
+    [[ $_P9K_RETVAL == *%* && -n $right_space_ ]] && p+=$style_
     p+=$right_space_
 
-    p+="\${\${_P9K_S::=$sep_}+}"
-    p+="\${\${_P9K_SS::=$subsep_}+}"
+    p+="\${\${:-\${_P9K_S::=%F{$bg_color\}$sep_}\${_P9K_SS::=$subsep_}\${_P9K_SSS::=%F{$bg_color\}$end_sep_}}+}"
+
+    p+='}'
 
     _p9k_cache_set "$p"
   fi
@@ -363,7 +367,7 @@ left_prompt_segment() {
   if [[ -z $7 ]]; then
     _P9K_PROMPT+="\${\${:-\${P9K_CONTENT::=$_P9K_RETVAL}$_P9K_CACHE_VAL[1]"
   else
-  _P9K_PROMPT+="\${\${:-$7}:+\${\${:-\${P9K_CONTENT::=$_P9K_RETVAL}$_P9K_CACHE_VAL[1]}"
+    _P9K_PROMPT+="\${\${:-$7}:+\${\${:-\${P9K_CONTENT::=$_P9K_RETVAL}$_P9K_CACHE_VAL[1]}"
   fi
 }
 
@@ -375,30 +379,164 @@ right_prompt_segment() {
     local bg_color=$_P9K_RETVAL
     _p9k_background $bg_color
     local bg=$_P9K_RETVAL
+    _p9k_escape_rcurly $_P9K_RETVAL
+    local bg_=$_P9K_RETVAL
 
     _p9k_color $1 FOREGROUND $4
     local fg_color=$_P9K_RETVAL
     _p9k_foreground $fg_color
     local fg=$_P9K_RETVAL
 
+    _p9k_get_icon $1 RIGHT_SEGMENT_SEPARATOR
+    local sep=$_P9K_RETVAL
+    _p9k_escape $_P9K_RETVAL
+    local sep_=$_P9K_RETVAL
+
     _p9k_get_icon $1 RIGHT_SUBSEGMENT_SEPARATOR
     local subsep=$_P9K_RETVAL
 
-    local icon_style icon
-    local -i has_icon
+    local icon_
     if [[ -n $5 ]]; then
       _p9k_get_icon $1 $5
-      if [[ -n $_P9K_RETVAL ]]; then
-        _p9k_escape_rcurly $_P9K_RETVAL
-        icon=$_P9K_RETVAL
-        _p9k_color $1 VISUAL_IDENTIFIER_COLOR $fg_color
-        _p9k_foreground $_P9K_RETVAL
-        _p9k_escape_rcurly %b$bg$_P9K_RETVAL
-        icon_style=$_P9K_RETVAL
-        has_icon=1
-      fi
+      _p9k_escape $_P9K_RETVAL
+      icon_=$_P9K_RETVAL
     fi
 
+    _p9k_get_icon $1 RIGHT_PROMPT_FIRST_SEGMENT_START_SYMBOL $sep
+    local start_sep=$_P9K_RETVAL
+    [[ -n $start_sep ]] && start_sep="%b%k%F{$bg_color}$start_sep"
+
+    _p9k_get_icon $1 RIGHT_PROMPT_LAST_SEGMENT_END_SYMBOL
+    _p9k_escape $_P9K_RETVAL
+    local end_sep_=$_P9K_RETVAL
+
+    local style=%b$bg$fg
+    _p9k_escape_rcurly $style
+    local style_=$_P9K_RETVAL
+
+    _p9k_get_icon $1 WHITESPACE_BETWEEN_RIGHT_SEGMENTS
+    local space=$_P9K_RETVAL
+
+    _p9k_get_icon $1 RIGHT_LEFT_WHITESPACE $space
+    local left_space=$_P9K_RETVAL
+    [[ $left_space == *%* ]] && left_space+=$style
+
+    _p9k_get_icon $1 RIGHT_RIGHT_WHITESPACE $space
+    _p9k_escape $_P9K_RETVAL
+    local right_space_=$_P9K_RETVAL
+    [[ $right_space_ == *%* ]] && right_space_+=$style_
+
+    local w='<_P9K_W>' s='<_P9K_S>'
+
+    # Segment separator logic:
+    #
+    #   if [[ $_P9K_BG == NONE ]]; then
+    #     1
+    #   elif (( joined )); then
+    #     2
+    #   elif [[ $bg_color == (${_P9K_BG}|${_P9K_BG:-0}) ]]; then
+    #     3
+    #   else
+    #     4
+    #   fi
+
+    local t=$#_P9K_T
+    _P9K_T+=$start_sep$style$left_space              # 1
+    _P9K_T+=$w$style                                 # 2
+    if [[ -z $fg_color ]]; then
+      _p9k_foreground $DEFAULT_COLOR
+      _P9K_T+=$w%b$bg$_P9K_RETVAL$subsep$style$left_space  # 3
+    else
+      _P9K_T+=$w%b$bg$fg$subsep$style$left_space           # 3
+    fi
+    _P9K_T+=$w%F{$bg_color}$sep$style$left_space                 # 4
+
+    local join="_P9K_I>=$_P9K_RIGHT_JOIN[$2]"
+    _p9k_param $1 SELF_JOINED false
+    [[ $_P9K_RETVAL == false ]] && join+="&&_P9K_I<$2"
+
+    local p=
+    p+="\${_P9K_N::=}"
+    p+="\${\${\${_P9K_BG:-0}:#NONE}:-\${_P9K_N::=$((t+1))}}"                             # 1
+    p+="\${_P9K_N:=\${\${\$(($join)):#0}:+$((t+2))}}"                                    # 2
+    p+="\${_P9K_N:=\${\${(M)\${:-x$bg_color}:#x(\$_P9K_BG|\${_P9K_BG:-0})}:+$((t+3))}}"  # 3
+    p+="\${_P9K_N:=$((t+4))}"                                                            # 4
+
+    p+="\${_P9K_I::=$2}\${_P9K_BG::=$bg_color}"
+
+    _p9k_param $1 VISUAL_IDENTIFIER_EXPANSION '${P9K_VISUAL_IDENTIFIER}'
+    local icon_exp=$_P9K_RETVAL
+
+    _p9k_param $1 CONTENT_EXPANSION '${P9K_CONTENT}'
+    local content_exp=$_P9K_RETVAL
+
+    if [[ $icon_exp == '${P9K_VISUAL_IDENTIFIER}' && $content_exp == '${P9K_CONTENT}' ]]; then
+      p+="\${_P9K_V::=$icon_"
+      [[ $icon_ == *%* ]] && p+=$style_
+      p+="}"
+    else
+      p+="\${P9K_VISUAL_IDENTIFIER::=$icon}\${_P9K_V::=$icon_exp$style_}"
+    fi
+
+    p+="\${_P9K_C::=$content_exp}"
+    p+='${_P9K_E::=${${(%):-$_P9K_C%1(l.1.0)}[-1]}${${(%):-$_P9K_V%1(l.1.0)}[-1]}}'
+
+    p+='}+}'
+
+    p+='${${_P9K_E:#00}:+'
+
+    _p9k_param $1 PREFIX ''
+    _P9K_RETVAL=${(g::)_P9K_RETVAL}
+    _p9k_escape $_P9K_RETVAL
+    p+="\${_P9K_T[\$_P9K_N]/$w/\$_P9K_W}$_P9K_RETVAL"
+    [[ $_P9K_RETVAL == *%* ]] && p+=$style_
+    
+    p+="\${_P9K_C}$style_"
+
+    local -i need_style=0
+    _p9k_get_icon $1 RIGHT_MIDDLE_WHITESPACE $space
+    if [[ -n $_P9K_RETVAL ]]; then
+      _p9k_escape $_P9K_RETVAL
+      [[ $_P9K_RETVAL == *%* ]] && need_style=1
+      p+="\${\${(M)_P9K_E:#11}:+$_P9K_RETVAL}"
+    fi
+
+    _p9k_color $1 VISUAL_IDENTIFIER_COLOR $fg_color
+    _p9k_foreground $_P9K_RETVAL
+    _p9k_escape_rcurly %b$bg$_P9K_RETVAL
+    [[ $_P9K_RETVAL != $style_ || $need_style == 1 ]] && p+=$_P9K_RETVAL
+    p+="\$_P9K_V$style_"
+
+    _p9k_param $1 SUFFIX ''
+    _P9K_RETVAL=${(g::)_P9K_RETVAL}
+    _p9k_escape $_P9K_RETVAL
+    p+=$_P9K_RETVAL
+
+    p+="\${\${_P9K_W::=${right_space_:+$style_}$right_space_%b$bg_}+}"
+
+    if (( _P9K_EMULATE_ZERO_RPROMPT_INDENT )); then
+      p+="\${\${_P9K_SSS::=$bg_%E}+}"
+    elif [[ -n $right_space_ || -n $end_sep_ ]]; then
+      p+="\${\${_P9K_SSS::=$style_$right_space_"
+      [[ $right_space_ == *%* ]] && p+=$style_
+      p+="$end_sep_}+}"
+    else
+      p+='${_P9K_SSS::=}'
+    fi
+
+    p+='}'
+
+    _p9k_cache_set "$p"
+  fi
+
+  (( $6 )) && _P9K_RETVAL=$8 || _p9k_escape $8
+  if [[ -z $7 ]]; then
+    _P9K_PROMPT+="\${\${:-\${P9K_CONTENT::=$_P9K_RETVAL}$_P9K_CACHE_VAL[1]"
+  else
+    _P9K_PROMPT+="\${\${:-$7}:+\${\${:-\${P9K_CONTENT::=$_P9K_RETVAL}$_P9K_CACHE_VAL[1]}"
+  fi
+
+  if false; then
     # Segment separator logic is the same as in left_prompt_segment except that here #4 and #1 are
     # identical.
 
@@ -421,36 +559,13 @@ right_prompt_segment() {
     pre+="\${_P9K_N:=$((t+1))}}+}"                                                    # 4 == 1
     (( _P9K_EMULATE_ZERO_RPROMPT_INDENT )) && pre+=' '
 
-    local state=${(U)${1}#prompt_}
-
-    _p9k_escape_rcurly %b$bg$fg
-    local style=$_P9K_RETVAL
-
-    _p9k_get_icon $1 ${state}_PREFIX
-    _p9k_escape_rcurly $_P9K_RETVAL
-    pre+="\${_P9K_T[\$_P9K_N]}$_P9K_RETVAL$style\${_P9K_C}$icon_style"
-
     if (( _P9K_EMULATE_ZERO_RPROMPT_INDENT )); then
       local space=''
     else
       _p9k_escape_rcurly $POWERLEVEL9K_WHITESPACE_BETWEEN_RIGHT_SEGMENTS
       local space=$_P9K_RETVAL
     fi
-
-    local tr=POWERLEVEL9K_${state}_CONTENT_EXPANSION
-    (( $+parameters[$tr] )) && tr=${(P)tr} || tr='${P9K_CONTENT}'
-
-    _p9k_get_icon $1 ${state}_SUFFIX
-    _p9k_escape_rcurly $_P9K_RETVAL
-    local post="$icon$style$_P9K_RETVAL$style$space\${\${_P9K_I::=$2}+}\${\${_P9K_BG::=$bg_color}+}}"
-
-    _p9k_cache_set "$has_icon" "$style" "$tr" "$pre" "$post"
   fi
-
-  (( $6 )) && local content=$8 || local content="\${(Q)\${:-${(qqq)${(q)8}}}}"
-  _P9K_PROMPT+="\${\${:-${7:-1}}:+\${\${:-\${_P9K_C::=${_P9K_CACHE_VAL[2]}\${\${P9K_CONTENT::=$content}+}${_P9K_CACHE_VAL[3]}}${_P9K_CACHE_VAL[4]}"
-  (( _P9K_CACHE_VAL[1] )) && _P9K_PROMPT+='${${(%):-$_P9K_C%1(l. .x)}[-1]%x}'
-  _P9K_PROMPT+=${_P9K_CACHE_VAL[5]}
 }
 
 function p9k_prompt_segment() {
@@ -2693,10 +2808,6 @@ _p9k_init_strings() {
   _p9k_g_expand POWERLEVEL9K_VCS_LOADING_TEXT
   _p9k_g_expand POWERLEVEL9K_VI_COMMAND_MODE_STRING
   _p9k_g_expand POWERLEVEL9K_VI_INSERT_MODE_STRING
-  _p9k_g_expand POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS
-  _p9k_g_expand POWERLEVEL9K_WHITESPACE_BETWEEN_RIGHT_SEGMENTS
-  _p9k_g_expand POWERLEVEL9K_LEFT_PROMPT_FIRST_SEGMENT_START_SYMBOL
-  _p9k_g_expand POWERLEVEL9K_RIGHT_PROMPT_LAST_SEGMENT_END_SYMBOL
 }
 
 _p9k_init() {
@@ -2786,24 +2897,17 @@ _p9k_init() {
     fi
   done
 
-  if [[ -n $POWERLEVEL9K_RIGHT_PROMPT_LAST_SEGMENT_END_SYMBOL ]]; then
-    _p9k_escape_rcurly $POWERLEVEL9K_RIGHT_PROMPT_LAST_SEGMENT_END_SYMBOL
-    _P9K_RIGHT_SUFFIX+="\${_P9K_N::=}"
-    _P9K_RIGHT_SUFFIX+="\${\${\${\${:-x\$_P9K_BG}:#xNONE}:-\${_P9K_N:=3}}+}"
-    _P9K_RIGHT_SUFFIX+="\${\${_P9K_N:=4}+}"
-    _P9K_RIGHT_SUFFIX+="\${\${_P9K_T[4]::=%b%k%F{\$_P9K_BG\}$_P9K_RETVAL}+}"
-    _P9K_RIGHT_SUFFIX+="\${_P9K_T[\$_P9K_N]}"
-  fi
+  _P9K_RIGHT_SUFFIX+='$_P9K_SSS'
 
   # Bug fixed in: https://github.com/zsh-users/zsh/commit/3eea35d0853bddae13fa6f122669935a01618bf9.
   # If affects most terminals when RPROMPT is non-empty and ZLE_RPROMPT_INDENT is zero.
   # We can work around it as long as RPROMPT ends with a space.
   if [[ ($POWERLEVEL9K_RPROMPT_ON_NEWLINE == true || $POWERLEVEL9K_PROMPT_ON_NEWLINE == false) &&
         $POWERLEVEL9K_WHITESPACE_BETWEEN_RIGHT_SEGMENTS == ' ' && $ZLE_RPROMPT_INDENT == 0 &&
-        -z $POWERLEVEL9K_RIGHT_PROMPT_LAST_SEGMENT_END_SYMBOL ]] && ! is-at-least 5.7.2; then
+        -z $(typeset -m 'POWERLEVEL9K_*(RIGHT_RIGHT_WHITESPACE|RIGHT_PROMPT_LAST_SEGMENT_END_SYMBOL)') ]] &&
+        ! is-at-least 5.7.2; then
     _P9K_EMULATE_ZERO_RPROMPT_INDENT=1
     _P9K_LEFT_PREFIX+='${${:-${_P9K_REAL_ZLE_RPROMPT_INDENT:=$ZLE_RPROMPT_INDENT}${ZLE_RPROMPT_INDENT::=1}}+}'
-    _P9K_RIGHT_SUFFIX+='%E'
   fi
 
   _P9K_ALIGNED_RPROMPT='${${:-${_P9K_X::=0}${_P9K_Y::=1024}${_P9K_CLM::=$COLUMNS}${COLUMNS::=1024}'
@@ -2824,7 +2928,7 @@ _p9k_init() {
     _P9K_ALIGNED_RPROMPT+='%-$_P9K_X(l. .)'
   done
   _P9K_ALIGNED_RPROMPT+='%$(((COLUMNS-_P9K_X+2)*(COLUMNS+2>=_P9K_X)))'
-  _P9K_ALIGNED_RPROMPT+=$'(l.\n. ${_P9K_RPROMPT//)/%)}$_P9K_T[$((5+!_P9K_IND))])'
+  _P9K_ALIGNED_RPROMPT+=$'(l.\n. ${_P9K_RPROMPT//)/%)}$_P9K_T[$((1+!_P9K_IND))])'
 
   _P9K_LEFT_PREFIX+='${${_P9K_IND::=${${ZLE_RPROMPT_INDENT:-1}/#-*/0}}+}'
 
@@ -2846,7 +2950,7 @@ _p9k_init() {
       [[ $ruler_char == '.' ]] && local sep=',' || local sep='.'
       local ruler_len='${$((COLUMNS-_P9K_IND))/#-*/0}'
       _P9K_LEFT_PREFIX+="\${(pl$sep$ruler_len$sep$sep${(q)ruler_char}$sep)}%k%f"
-      _P9K_LEFT_PREFIX+='$_P9K_T[$((5+!_P9K_IND))]'
+      _P9K_LEFT_PREFIX+='$_P9K_T[$((1+!_P9K_IND))]'
     else
       print -P "%F{red}WARNING!%f %BPOWERLEVEL9K_RULER_CHAR%b is not one character long. Ruler won't be rendered."
       print -P "Either change the value of %BPOWERLEVEL9K_RULER_CHAR%b or set %BPOWERLEVEL9K_SHOW_RULER=false%b to"
@@ -2861,28 +2965,20 @@ _p9k_init() {
   _p9k_get_icon '' LEFT_SEGMENT_SEPARATOR
   _p9k_get_icon '' LEFT_PROMPT_LAST_SEGMENT_END_SYMBOL $_P9K_RETVAL
   _p9k_escape $_P9K_RETVAL
-  _P9K_LEFT_LINE_PREFIX='${${:-${_P9K_BG::=NONE}${_P9K_I::=0}${_P9K_SSS::='$_P9K_RETVAL'}}+}'
+  _P9K_LEFT_LINE_PREFIX='${${:-${_P9K_BG::=NONE}${_P9K_I::=0}${_P9K_SSS::=%f'$_P9K_RETVAL'}}+}'
 
-  _P9K_LEFT_LINE_SUFFIX='%b%k%f${${_P9K_BG:#NONE}:+%F{$_P9K_BG\}}$_P9K_SSS%b%k%f'
+  _P9K_LEFT_LINE_SUFFIX='%b%k$_P9K_SSS%b%k%f'
 
   _P9K_LEFT_PREFIX+=$_P9K_LEFT_LINE_PREFIX
-  _P9K_RIGHT_PREFIX+='${${_P9K_BG::=NONE}+}${${_P9K_I::=0}+}'
+  _P9K_RIGHT_PREFIX+='${${:-${_P9K_BG::=NONE}${_P9K_I::=0}${_P9K_SSS::=}}+}'
 
-  # left prompt end
   _P9K_T=(
-    ""    ""  # left prompt end (unused)
-    ""    ""  # right prompt end
     $'\n' ""  # left prompt overflow
   )
-
-  _p9k_prompt_overflow_bug && _P9K_T[6]+='%{%G%}'
+  _p9k_prompt_overflow_bug && _P9K_T[2]+='%{%G%}'
 
   _P9K_RIGHT_SUFFIX+='%f%b%k'
   _P9K_RIGHT_PREFIX+='%f%b%k'
-
-  _p9k_get_icon '' RIGHT_SEGMENT_END_SEPARATOR
-  _p9k_escape_rcurly $_P9K_RETVAL
-  _P9K_RIGHT_PREFIX+=$_P9K_RETVAL
 
   if [[ $POWERLEVEL9K_PROMPT_ON_NEWLINE == true ]]; then
     _p9k_get_icon '' MULTILINE_FIRST_PROMPT_PREFIX
