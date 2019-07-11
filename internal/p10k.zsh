@@ -286,8 +286,12 @@ left_prompt_segment() {
     local t=$#_P9K_T
     _P9K_T+=$start_sep$style$left_space              # 1
     _P9K_T+=$style                                   # 2
-    if [[ -z $fg_color ]]; then
-      _p9k_foreground $DEFAULT_COLOR
+    if [[ -n $fg_color && $fg_color == $bg_color ]]; then
+      if [[ $fg_color == $DEFAULT_COLOR ]]; then
+        _p9k_foreground $DEFAULT_COLOR_INVERTED
+      else
+        _p9k_foreground $DEFAULT_COLOR
+      fi
       _P9K_T+=%b$bg$_P9K_RETVAL$ss$style$left_space  # 3
     else
       _P9K_T+=%b$bg$fg$ss$style$left_space           # 3
@@ -443,11 +447,15 @@ right_prompt_segment() {
     local t=$#_P9K_T
     _P9K_T+=$start_sep$style$left_space                    # 1
     _P9K_T+=$w$style                                       # 2
-    if [[ -z $fg_color ]]; then
-      _p9k_foreground $DEFAULT_COLOR
-      _P9K_T+=$w%b$bg$_P9K_RETVAL$subsep$style$left_space  # 3
+    if [[ -n $fg_color && $fg_color == $bg_color ]]; then
+      if [[ $fg_color == $DEFAULT_COLOR ]]; then
+        _p9k_foreground $DEFAULT_COLOR_INVERTED
+      else
+        _p9k_foreground $DEFAULT_COLOR
+      fi
+      _P9K_T+=$w$_P9K_RETVAL$subsep$style$left_space       # 3
     else
-      _P9K_T+=$w%b$bg$fg$subsep$style$left_space           # 3
+      _P9K_T+=$w$fg$subsep$style$left_space                # 3
     fi
     _P9K_T+=$w%F{$bg_color}$sep$style$left_space           # 4
 
