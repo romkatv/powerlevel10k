@@ -434,22 +434,22 @@ right_prompt_segment() {
     #     1
     #   elif (( joined )); then
     #     2
-    #   elif [[ $bg_color == (${_P9K_BG}|${_P9K_BG:-0}) ]]; then
+    #   elif [[ $_P9K_BG == (${bg_color}|${bg_color:-0}) ]]; then
     #     3
     #   else
     #     4
     #   fi
 
     local t=$#_P9K_T
-    _P9K_T+=$start_sep$style$left_space              # 1
-    _P9K_T+=$w$style                                 # 2
+    _P9K_T+=$start_sep$style$left_space                    # 1
+    _P9K_T+=$w$style                                       # 2
     if [[ -z $fg_color ]]; then
       _p9k_foreground $DEFAULT_COLOR
       _P9K_T+=$w%b$bg$_P9K_RETVAL$subsep$style$left_space  # 3
     else
       _P9K_T+=$w%b$bg$fg$subsep$style$left_space           # 3
     fi
-    _P9K_T+=$w%F{$bg_color}$sep$style$left_space                 # 4
+    _P9K_T+=$w%F{$bg_color}$sep$style$left_space           # 4
 
     local join="_P9K_I>=$_P9K_RIGHT_JOIN[$2]"
     _p9k_param $1 SELF_JOINED false
@@ -457,10 +457,10 @@ right_prompt_segment() {
 
     local p=
     p+="\${_P9K_N::=}"
-    p+="\${\${\${_P9K_BG:-0}:#NONE}:-\${_P9K_N::=$((t+1))}}"                             # 1
-    p+="\${_P9K_N:=\${\${\$(($join)):#0}:+$((t+2))}}"                                    # 2
-    p+="\${_P9K_N:=\${\${(M)\${:-x$bg_color}:#x(\$_P9K_BG|\${_P9K_BG:-0})}:+$((t+3))}}"  # 3
-    p+="\${_P9K_N:=$((t+4))}"                                                            # 4
+    p+="\${\${\${_P9K_BG:-0}:#NONE}:-\${_P9K_N::=$((t+1))}}"                                     # 1
+    p+="\${_P9K_N:=\${\${\$(($join)):#0}:+$((t+2))}}"                                            # 2
+    p+="\${_P9K_N:=\${\${(M)\${:-x\$_P9K_BG}:#x(${(b)bg_color}|${(b)bg_color:-0})}:+$((t+3))}}"  # 3
+    p+="\${_P9K_N:=$((t+4))}"                                                                    # 4
 
     p+="\${_P9K_I::=$2}\${_P9K_BG::=$bg_color}"
 
@@ -534,37 +534,6 @@ right_prompt_segment() {
     _P9K_PROMPT+="\${\${:-\${P9K_CONTENT::=$_P9K_RETVAL}$_P9K_CACHE_VAL[1]"
   else
     _P9K_PROMPT+="\${\${:-$7}:+\${\${:-\${P9K_CONTENT::=$_P9K_RETVAL}$_P9K_CACHE_VAL[1]}"
-  fi
-
-  if false; then
-    # Segment separator logic is the same as in left_prompt_segment except that here #4 and #1 are
-    # identical.
-
-    local t=$#_P9K_T
-    _p9k_get_icon $1 RIGHT_SEGMENT_SEPARATOR
-    _P9K_T+="%F{$bg_color}$_P9K_RETVAL$bg$POWERLEVEL9K_WHITESPACE_BETWEEN_RIGHT_SEGMENTS$fg"  # 1  # TODO: use _p9k_get_icon prompt_eol RIGHT_SEGMENT_SEPARATOR here
-    _P9K_T+=$fg                                                                               # 2
-    if [[ -z $fg_color ]]; then
-      _p9k_foreground $DEFAULT_COLOR
-      _P9K_T+=$bg$_P9K_RETVAL$subsep$POWERLEVEL9K_WHITESPACE_BETWEEN_RIGHT_SEGMENTS$fg        # 3
-    else
-      _P9K_T+=$bg$fg$subsep$POWERLEVEL9K_WHITESPACE_BETWEEN_RIGHT_SEGMENTS                    # 3
-    fi
-
-    local pre
-    pre+="\${_P9K_N::=}"
-    pre+="\${\${\${_P9K_BG:-0}:#NONE}:-\${_P9K_N::=$((t+1))}}"                        # 1
-    pre+="\${_P9K_N:=\${\${\$((_P9K_I>=$_P9K_RIGHT_JOIN[$2])):#0}:+$((t+2))}}"        # 2
-    pre+="\${_P9K_N:=\${\${\$((!\${#\${:-0\$_P9K_BG}:#0$bg_color})):#0}:+$((t+3))}}"  # 3
-    pre+="\${_P9K_N:=$((t+1))}}+}"                                                    # 4 == 1
-    (( _P9K_EMULATE_ZERO_RPROMPT_INDENT )) && pre+=' '
-
-    if (( _P9K_EMULATE_ZERO_RPROMPT_INDENT )); then
-      local space=''
-    else
-      _p9k_escape_rcurly $POWERLEVEL9K_WHITESPACE_BETWEEN_RIGHT_SEGMENTS
-      local space=$_P9K_RETVAL
-    fi
   fi
 }
 
