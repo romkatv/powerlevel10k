@@ -3000,6 +3000,28 @@ _p9k_init() {
     fi
   fi
 
+  if [[ -n $POWERLEVEL9K_RIGHT_SEGMENT_END_SEPARATOR ]]; then
+    print -P "%F{yellow}WARNING!%f %F{red}POWERLEVEL9K_RIGHT_SEGMENT_END_SEPARATOR%f is no longer supported!"
+    print -P ""
+    print -P "To fix your prompt, replace %F{red}POWERLEVEL9K_RIGHT_SEGMENT_END_SEPARATOR%f with"
+    print -P "%F{green}POWERLEVEL9K_RIGHT_PROMPT_FIRST_SEGMENT_START_SYMBOL%f."
+    print -P ""
+    print -P "  %F{red} - POWERLEVEL9K_RIGHT_SEGMENT_END_SEPARATOR=${(qqq)${POWERLEVEL9K_RIGHT_SEGMENT_END_SEPARATOR//\%/%%}}%f"
+    print -P "  %F{green} + POWERLEVEL9K_RIGHT_PROMPT_FIRST_SEGMENT_START_SYMBOL=${(qqq)${POWERLEVEL9K_RIGHT_SEGMENT_END_SEPARATOR//\%/%%}}%f"
+    if [[ -n $POWERLEVEL9K_LEFT_SEGMENT_END_SEPARATOR ]]; then
+      print -P ""
+      print -P "While at it, also replace %F{red}POWERLEVEL9K_LEFT_SEGMENT_END_SEPARATOR%f with"
+      print -P "%F{green}POWERLEVEL9K_LEFT_PROMPT_LAST_SEGMENT_END_SYMBOL%f. The new option, unlike"
+      print -P "the old, works correctly in multiline prompts."
+      print -P ""
+      print -P "  %F{red} - POWERLEVEL9K_LEFT_SEGMENT_END_SEPARATOR=${(qqq)${POWERLEVEL9K_LEFT_SEGMENT_END_SEPARATOR//\%/%%}}%f"
+      print -P "  %F{green} + POWERLEVEL9K_LEFT_PROMPT_LAST_SEGMENT_END_SYMBOL=${(qqq)${POWERLEVEL9K_LEFT_SEGMENT_END_SEPARATOR//\%/%%}}%f"
+    fi
+    print -P ""
+    print -P "To get rid of this warning without changing the appearance of your prompt,"
+    print -P "remove %F{red}POWERLEVEL9K_RIGHT_SEGMENT_END_SEPARATOR%f from your config"
+  fi
+
   if segment_in_use longstatus; then
     print -P '%F{yellow}WARNING!%f The "longstatus" segment is deprecated. Use "%F{blue}status%f" instead.'
     print -P 'For more informations, have a look at https://github.com/bhilburn/powerlevel9k/blob/master/CHANGELOG.md.'
