@@ -836,7 +836,8 @@ prompt_context() {
   if ! _p9k_cache_get $0; then
     local -i enabled=1
     local content='' state=''
-    if [[ $POWERLEVEL9K_ALWAYS_SHOW_CONTEXT == true || -z $DEFAULT_USER || -n $SSH_CLIENT || -n $SSH_TTY ]]; then
+    if [[ $POWERLEVEL9K_ALWAYS_SHOW_CONTEXT == true ||
+          -z $DEFAULT_USER || -n $SSH_CLIENT || -n $SSH_TTY || -n $SSH_CONNECTION ]]; then
       content=$POWERLEVEL9K_CONTEXT_TEMPLATE
     else
       local user=$(whoami)
@@ -853,7 +854,7 @@ prompt_context() {
       state="DEFAULT"
       if [[ "${(%):-%#}" == '#' ]]; then
         state="ROOT"
-      elif [[ -n "$SSH_CLIENT" || -n "$SSH_TTY" ]]; then
+      elif [[ -n "$SSH_CLIENT" || -n "$SSH_TTY" || -n "$SSH_CONNECTION" ]]; then
         if [[ -n "$SUDO_COMMAND" ]]; then
           state="REMOTE_SUDO"
         else
@@ -895,7 +896,7 @@ prompt_user() {
 # Host: machine (where am I)
 set_default POWERLEVEL9K_HOST_TEMPLATE "%m"
 prompt_host() {
-  if [[ -n "$SSH_CLIENT" || -n "$SSH_TTY" ]]; then
+  if [[ -n "$SSH_CLIENT" || -n "$SSH_TTY" || -n "$SSH_CONNECTION" ]]; then
     "$1_prompt_segment" "$0_REMOTE" "$2" "${DEFAULT_COLOR}" yellow SSH_ICON 0 '' "${POWERLEVEL9K_HOST_TEMPLATE}"
   else
     "$1_prompt_segment" "$0_LOCAL" "$2" "${DEFAULT_COLOR}" yellow HOST_ICON 0 '' "${POWERLEVEL9K_HOST_TEMPLATE}"
@@ -1744,6 +1745,18 @@ prompt_status() {
   "$1_prompt_segment" "${(@)_P9K_CACHE_VAL}"
 }
 
+prompt_prompt_char() {
+  if (( _P9K_EXIT_CODE )); then
+    $1_prompt_segment $0_ERROR_VIINS $2 "$DEFAULT_COLOR" 196 '' 0 '${${KEYMAP:-0}:#vicmd}' '❯ '
+    $1_prompt_segment $0_ERROR_VICMD $2 "$DEFAULT_COLOR" 196 '' 0 '${(M)${:-$KEYMAP$_P9K_REGION_ACTIVE}:#vicmd0}' '❮ '
+    $1_prompt_segment $0_ERROR_VIVIS $2 "$DEFAULT_COLOR" 196 '' 0 '${(M)${:-$KEYMAP$_P9K_REGION_ACTIVE}:#vicmd1}' 'Ⅴ '
+  else
+    $1_prompt_segment $0_OK_VIINS $2 "$DEFAULT_COLOR" 76 '' 0 '${${KEYMAP:-0}:#vicmd}' '❯ '
+    $1_prompt_segment $0_OK_VICMD $2 "$DEFAULT_COLOR" 76 '' 0 '${(M)${:-$KEYMAP$_P9K_REGION_ACTIVE}:#vicmd0}' '❮ '
+    $1_prompt_segment $0_OK_VIVIS $2 "$DEFAULT_COLOR" 76 '' 0 '${(M)${:-$KEYMAP$_P9K_REGION_ACTIVE}:#vicmd1}' 'Ⅴ '
+  fi
+}
+
 ################################################################
 # Segment to display Swap information
 prompt_swap() {
@@ -2522,7 +2535,7 @@ function _p9k_set_prompt() {
     _P9K_PROMPT=
     _p9k_build_prompt right
     local right=$_P9K_RIGHT_PREFIX$_P9K_PROMPT$_P9K_RIGHT_SUFFIX
-    if [[ $POWERLEVEL9K_PROMPT_ON_NEWLINE != true || $POWERLEVEL9K_RPROMPT_ON_NEWLINE == true ]]; then
+    if (( _P9K_REAL_RPROMPT )); then
       RPROMPT=$right
       _P9K_RPROMPT_DONE=1
     else
@@ -2904,10 +2917,18 @@ _p9k_init() {
 
   _P9K_RIGHT_SUFFIX+='$_P9K_SSS'
 
+  _P9K_REAL_RPROMPT=1
+  if [[ $POWERLEVEL9K_RPROMPT_ON_NEWLINE == false &&
+        ($POWERLEVEL9K_PROMPT_ON_NEWLINE == true ||
+         -n $POWERLEVEL9K_LEFT_PROMPT_ELEMENTS[(r)newline] ||
+         -n $POWERLEVEL9K_LEFT_PROMPT_ELEMENTS[(r)newline_joined]) ]]; then
+    _P9K_REAL_RPROMPT=0
+  fi
+
   # Bug fixed in: https://github.com/zsh-users/zsh/commit/3eea35d0853bddae13fa6f122669935a01618bf9.
   # If affects most terminals when RPROMPT is non-empty and ZLE_RPROMPT_INDENT is zero.
   # We can work around it as long as RPROMPT ends with a space.
-  if [[ ($POWERLEVEL9K_RPROMPT_ON_NEWLINE == true || $POWERLEVEL9K_PROMPT_ON_NEWLINE == false) &&
+  if [[ $_P9K_REAL_RPROMPT == 1 &&
         $POWERLEVEL9K_WHITESPACE_BETWEEN_RIGHT_SEGMENTS == ' ' && $ZLE_RPROMPT_INDENT == 0 &&
         -z $(typeset -m 'POWERLEVEL9K_*(RIGHT_RIGHT_WHITESPACE|RIGHT_PROMPT_LAST_SEGMENT_END_SYMBOL)') ]] &&
         ! is-at-least 5.7.2; then
@@ -2990,16 +3011,17 @@ _p9k_init() {
     _P9K_LEFT_PREFIX+="$_P9K_RETVAL%f%b%k"
     _p9k_get_icon 'prompt_multiline_LAST' PROMPT_PREFIX
     _P9K_LEFT_SUFFIX+=$'\n'$_P9K_RETVAL'%f%b%k'
-    if [[ $POWERLEVEL9K_RPROMPT_ON_NEWLINE != true && -o TRANSIENT_RPROMPT ]]; then
-      function _p9k_zle_line_finish() {
-        [[ -o TRANSIENT_RPROMPT ]] || return
-        _P9K_RPROMPT_OVERRIDE=
-        zle && zle .reset-prompt && zle -R
-      }
-      _p9k_wrap_zle_widget zle-line-finish _p9k_zle_line_finish
-    fi
   else
     _P9K_LEFT_PREFIX+="%f%b%k"
+  fi
+
+  if [[ $_P9K_REAL_RPROMPT == 0 && -o TRANSIENT_RPROMPT ]]; then
+    function _p9k_zle_line_finish() {
+      [[ -o TRANSIENT_RPROMPT ]] || return
+      _P9K_RPROMPT_OVERRIDE=
+      zle && zle .reset-prompt && zle -R
+    }
+    _p9k_wrap_zle_widget zle-line-finish _p9k_zle_line_finish
   fi
 
   # If the terminal `LANG` is set to `C`, this theme will not work at all.
@@ -3084,7 +3106,7 @@ _p9k_init() {
 
   _p9k_init_async_pump
 
-  if segment_in_use vi_mode && (( $+POWERLEVEL9K_VI_VISUAL_MODE_STRING )); then
+  if segment_in_use vi_mode && (( $+POWERLEVEL9K_VI_VISUAL_MODE_STRING )) || segment_in_use prompt_char; then
     function _p9k_zle_line_pre_redraw() {
       [[ ${KEYMAP:-} == vicmd ]] || return
       local region=${${REGION_ACTIVE:-0}/2/1}
