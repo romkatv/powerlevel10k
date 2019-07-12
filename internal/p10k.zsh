@@ -322,7 +322,7 @@ left_prompt_segment() {
       [[ $icon_ == *%* ]] && p+=$style_
       p+="}"
     else
-      p+="\${P9K_VISUAL_IDENTIFIER::=$icon}\${_P9K_V::=$icon_exp$style_}"
+      p+="\${P9K_VISUAL_IDENTIFIER::=$icon_}\${_P9K_V::=$icon_exp$style_}"
     fi
 
     p+="\${_P9K_C::=$content_exp}"
@@ -474,7 +474,7 @@ right_prompt_segment() {
       [[ $icon_ == *%* ]] && p+=$style_
       p+="}"
     else
-      p+="\${P9K_VISUAL_IDENTIFIER::=$icon}\${_P9K_V::=$icon_exp$style_}"
+      p+="\${P9K_VISUAL_IDENTIFIER::=$icon_}\${_P9K_V::=$icon_exp$style_}"
     fi
 
     p+="\${_P9K_C::=$content_exp}"
