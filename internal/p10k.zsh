@@ -2941,7 +2941,7 @@ _p9k_init() {
   fi
 
   _p9k_get_icon '' LEFT_SEGMENT_SEPARATOR
-  _p9k_get_icon '' LEFT_PROMPT_LAST_SEGMENT_END_SYMBOL $_P9K_RETVAL
+  _p9k_get_icon 'prompt_empty_line' LEFT_PROMPT_LAST_SEGMENT_END_SYMBOL $_P9K_RETVAL
   _p9k_escape $_P9K_RETVAL
   _P9K_LEFT_LINE_PREFIX='${${:-${_P9K_BG::=NONE}${_P9K_I::=0}${_P9K_SSS::=%f'$_P9K_RETVAL'}}+}'
 
