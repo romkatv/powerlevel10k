@@ -2263,14 +2263,17 @@ prompt_vcs() {
 # Vi Mode: show editing mode (NORMAL|INSERT|VISUAL)
 #
 # VISUAL mode is shown as NORMAL unless POWERLEVEL9K_VI_VISUAL_MODE_STRING is explicitly set.
-# Your ZSH version must be >= 5.3 if you set this parameter.
 set_default POWERLEVEL9K_VI_INSERT_MODE_STRING "INSERT"
 set_default POWERLEVEL9K_VI_COMMAND_MODE_STRING "NORMAL"
 prompt_vi_mode() {
-  $1_prompt_segment $0_NORMAL $2 "$DEFAULT_COLOR" white '' 0 '${$((!${#${:-$KEYMAP$_P9K_REGION_ACTIVE}:#vicmd0})):#0}' "$POWERLEVEL9K_VI_COMMAND_MODE_STRING"
-  $1_prompt_segment $0_VISUAL $2 "$DEFAULT_COLOR" white '' 0 '${$((!${#${:-$KEYMAP$_P9K_REGION_ACTIVE}:#vicmd1})):#0}' "$POWERLEVEL9K_VI_VISUAL_MODE_STRING"
   if [[ -n $POWERLEVEL9K_VI_INSERT_MODE_STRING ]]; then
     $1_prompt_segment $0_INSERT $2 "$DEFAULT_COLOR" blue '' 0 '${${KEYMAP:-0}:#vicmd}' "$POWERLEVEL9K_VI_INSERT_MODE_STRING"
+  fi
+  if (( $+parameters[POWERLEVEL9K_VI_VISUAL_MODE_STRING] )); then
+    $1_prompt_segment $0_NORMAL $2 "$DEFAULT_COLOR" white '' 0 '${(M)${:-$KEYMAP$_P9K_REGION_ACTIVE}:#vicmd0}' "$POWERLEVEL9K_VI_COMMAND_MODE_STRING"
+    $1_prompt_segment $0_VISUAL $2 "$DEFAULT_COLOR" white '' 0 '${(M)${:-$KEYMAP$_P9K_REGION_ACTIVE}:#vicmd1}' "$POWERLEVEL9K_VI_VISUAL_MODE_STRING"
+  else
+    $1_prompt_segment $0_NORMAL $2 "$DEFAULT_COLOR" white '' 0 '${(M)KEYMAP:#vicmd}' "$POWERLEVEL9K_VI_COMMAND_MODE_STRING"
   fi
 }
 
@@ -2788,6 +2791,30 @@ _p9k_init_strings() {
   _p9k_g_expand POWERLEVEL9K_VI_INSERT_MODE_STRING
 }
 
+# _p9k_wrap_zle_widget zle-keymap-select _p9k_zle_keymap_select
+_p9k_wrap_zle_widget() {
+  local widget=$1
+  local hook=$2
+  local orig=p9k-orig-$widget
+  case $widgets[$widget] in
+		user:*)
+			zle -N $orig ${widgets[$widget]#user:}
+			;;
+		builtin)
+			eval "_p9k_orig_${(q)widget}() { zle .${(q)widget} }"
+			zle -N $orig _p9k_orig_$widget
+			;;
+	esac
+
+  local wrapper=_p9k_wrapper_$widget_$hook
+  eval "function ${(q)wrapper}() {
+    ${(q)hook} \"\$@\"
+    (( \$+widgets[${(q)orig}] )) && zle ${(q)orig} -- \"\$@\"
+	}"
+
+	zle -N -- $widget $wrapper
+}
+
 _p9k_init() {
   (( _P9K_INITIALIZED )) && return
 
@@ -2964,18 +2991,12 @@ _p9k_init() {
     _p9k_get_icon 'prompt_multiline_LAST' PROMPT_PREFIX
     _P9K_LEFT_SUFFIX+=$'\n'$_P9K_RETVAL'%f%b%k'
     if [[ $POWERLEVEL9K_RPROMPT_ON_NEWLINE != true && -o TRANSIENT_RPROMPT ]]; then
-      if is-at-least 5.3; then
-        function _p9k_zle_line_finish() {
-          [[ -o TRANSIENT_RPROMPT ]] || return
-          _P9K_RPROMPT_OVERRIDE=
-          zle && zle .reset-prompt && zle -R
-        }
-        autoload -Uz add-zle-hook-widget
-        zle -N _p9k_zle_line_finish
-        add-zle-hook-widget line-finish _p9k_zle_line_finish
-        add-zle-hook-widget -D line-finish user:_zsh_highlight_widget_orig-\*
-        add-zle-hook-widget -D line-finish user:_zsh_autosuggest_bound_\*
-      fi
+      function _p9k_zle_line_finish() {
+        [[ -o TRANSIENT_RPROMPT ]] || return
+        _P9K_RPROMPT_OVERRIDE=
+        zle && zle .reset-prompt && zle -R
+      }
+      _p9k_wrap_zle_widget zle-line-finish _p9k_zle_line_finish
     fi
   else
     _P9K_LEFT_PREFIX+="%f%b%k"
@@ -3064,23 +3085,15 @@ _p9k_init() {
   _p9k_init_async_pump
 
   if segment_in_use vi_mode && (( $+POWERLEVEL9K_VI_VISUAL_MODE_STRING )); then
-    if is-at-least 5.3; then
-      function _p9k_zle_line_pre_redraw() {
-        [[ ${KEYMAP:-} == vicmd ]] || return
-        local region=${${REGION_ACTIVE:-0}/2/1}
-        [[ $region != $_P9K_REGION_ACTIVE ]] || return
-        _P9K_REGION_ACTIVE=$region
-        zle && zle .reset-prompt && zle -R
-      }
-      autoload -Uz add-zle-hook-widget
-      add-zle-hook-widget line-pre-redraw _p9k_zle_line_pre_redraw
-      add-zle-hook-widget -D line-pre-redraw user:_zsh_highlight_widget_orig-\*
-      add-zle-hook-widget -D line-pre-redraw user:_zsh_autosuggest_bound_\*
-      _p9k_g_expand POWERLEVEL9K_VI_VISUAL_MODE_STRING
-    else
-      >&2 print -P '%F{yellow}WARNING!%f POWERLEVEL9K_VI_VISUAL_MODE_STRING requires ZSH >= 5.3.'
-      >&2 print -r "Your zsh version is $ZSH_VERSION. Either upgrade zsh or unset POWERLEVEL9K_VI_VISUAL_MODE_STRING."
-    fi
+    function _p9k_zle_line_pre_redraw() {
+      [[ ${KEYMAP:-} == vicmd ]] || return
+      local region=${${REGION_ACTIVE:-0}/2/1}
+      [[ $region != $_P9K_REGION_ACTIVE ]] || return
+      _P9K_REGION_ACTIVE=$region
+      zle && zle .reset-prompt && zle -R
+    }
+    _p9k_wrap_zle_widget zle-line-pre-redraw _p9k_zle_line_pre_redraw
+    _p9k_g_expand POWERLEVEL9K_VI_VISUAL_MODE_STRING
   fi
 
   if segment_in_use dir &&
