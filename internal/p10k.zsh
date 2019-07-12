@@ -654,7 +654,7 @@ prompt_newline() {
   _p9k_left_prompt_end_line && _P9K_PROMPT+=$'\n'
   _P9K_PROMPT+=$_P9K_LEFT_LINE_PREFIX
   if [[ $POWERLEVEL9K_PROMPT_ON_NEWLINE == true ]]; then
-    _p9k_get_icon '' MULTILINE_NEWLINE_PROMPT_PREFIX
+    _p9k_get_icon 'prompt_multiline_NEWLINE' PROMPT_PREFIX
     _P9K_PROMPT+=$_P9K_RETVAL
   fi
 }
@@ -2959,9 +2959,9 @@ _p9k_init() {
   _P9K_RIGHT_PREFIX+='%f%b%k'
 
   if [[ $POWERLEVEL9K_PROMPT_ON_NEWLINE == true ]]; then
-    _p9k_get_icon '' MULTILINE_FIRST_PROMPT_PREFIX
+    _p9k_get_icon 'prompt_multiline_FIRST' PROMPT_PREFIX
     _P9K_LEFT_PREFIX+="$_P9K_RETVAL%f%b%k"
-    _p9k_get_icon '' MULTILINE_LAST_PROMPT_PREFIX
+    _p9k_get_icon 'prompt_multiline_LAST' PROMPT_PREFIX
     _P9K_LEFT_SUFFIX+=$'\n'$_P9K_RETVAL'%f%b%k'
     if [[ $POWERLEVEL9K_RPROMPT_ON_NEWLINE != true && -o TRANSIENT_RPROMPT ]]; then
       if is-at-least 5.3; then
