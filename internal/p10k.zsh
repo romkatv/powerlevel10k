@@ -445,19 +445,10 @@ right_prompt_segment() {
     #   fi
 
     local t=$#_P9K_T
-    _P9K_T+=$start_sep$style$left_space                    # 1
-    _P9K_T+=$w$style                                       # 2
-    if [[ -n $fg_color && $fg_color == $bg_color ]]; then
-      if [[ $fg_color == $DEFAULT_COLOR ]]; then
-        _p9k_foreground $DEFAULT_COLOR_INVERTED
-      else
-        _p9k_foreground $DEFAULT_COLOR
-      fi
-      _P9K_T+=$w$_P9K_RETVAL$subsep$style$left_space       # 3
-    else
-      _P9K_T+=$w$fg$subsep$style$left_space                # 3
-    fi
-    _P9K_T+=$w%F{$bg_color}$sep$style$left_space           # 4
+    _P9K_T+=$start_sep$style$left_space           # 1
+    _P9K_T+=$w$style                              # 2
+    _P9K_T+=$w$subsep$style$left_space            # 3
+    _P9K_T+=$w%F{$bg_color}$sep$style$left_space  # 4
 
     local join="_P9K_I>=$_P9K_RIGHT_JOIN[$2]"
     _p9k_param $1 SELF_JOINED false
@@ -520,7 +511,17 @@ right_prompt_segment() {
     _p9k_escape $_P9K_RETVAL
     p+=$_P9K_RETVAL
 
-    p+="\${\${_P9K_W::=${right_space_:+$style_}$right_space_%b$bg_}+}"
+    if [[ -n $fg_color && $fg_color == $bg_color ]]; then
+      if [[ $fg_color == $DEFAULT_COLOR ]]; then
+        _p9k_foreground $DEFAULT_COLOR_INVERTED
+      else
+        _p9k_foreground $DEFAULT_COLOR
+      fi
+    else
+      _P9K_RETVAL=$fg
+    fi
+    _p9k_escape_rcurly $_P9K_RETVAL
+    p+="\${\${_P9K_W::=${right_space_:+$style_}$right_space_%b$bg_$_P9K_RETVAL}+}"
 
     if (( _P9K_EMULATE_ZERO_RPROMPT_INDENT )); then
       p+="\${\${_P9K_SSS::=$bg_%E}+}"
