@@ -208,11 +208,12 @@ fi
   # typeset -g POWERLEVEL9K_KUBECONTEXT_PROD_FOREGROUND=1
   # typeset -g POWERLEVEL9K_KUBECONTEXT_TEST_FOREGROUND=2
   typeset -g POWERLEVEL9K_KUBECONTEXT_DEFAULT_FOREGROUND=3
-  # Kubernetes too long? You can shorten it by defining an expansion. The original
+  # Kubernetes context too long? You can shorten it by defining an expansion. The original
   # Kubernetes context that you see in your prompt is stored in ${P9K_CONTENT} when
   # the expansion is evaluated. To remove everything up to and including the last '/',
-  # set POWERLEVEL9K_KUBECONTEXT_CONTENT_EXPANSION='${P9K_CONTENT##*/}'. Parameter
-  # expansions are flexible and fast. See reference:
+  # set POWERLEVEL9K_KUBECONTEXT_CONTENT_EXPANSION='${P9K_CONTENT##*/}'. This is just,
+  # an example which isn't necessarily the right expansion for you. Parameter expansions
+  # are very flexible and fast, too. See reference:
   # http://zsh.sourceforge.net/Doc/Release/Expansion.html#Parameter-Expansion.
   typeset POWERLEVEL9K_KUBECONTEXT_CONTENT_EXPANSION='${P9K_CONTENT}'
   # Show the trailing "/default" in kubernetes context.
