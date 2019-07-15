@@ -2996,7 +2996,9 @@ _p9k_init() {
   _P9K_LEFT_LINE_SUFFIX='%b%k$_P9K_SSS%b%k%f'
 
   _P9K_LEFT_PREFIX+=$_P9K_LEFT_LINE_PREFIX
-  _P9K_RIGHT_PREFIX+='${${:-${_P9K_BG::=NONE}${_P9K_I::=0}${_P9K_SSS::=}}+}'
+
+  _p9k_escape ${(g::)POWERLEVEL9K_EMPTY_LINE_RIGHT_PROMPT_FIRST_SEGMENT_START_SYMBOL}
+  _P9K_RIGHT_PREFIX+="\${\${:-\${_P9K_BG::=NONE}\${_P9K_I::=0}\${_P9K_SSS::=$_P9K_RETVAL}}+}"
 
   _P9K_T=(
     $'\n' ""  # left prompt overflow
