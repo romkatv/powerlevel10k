@@ -1747,13 +1747,13 @@ prompt_status() {
 
 prompt_prompt_char() {
   if (( _P9K_EXIT_CODE )); then
-    $1_prompt_segment $0_ERROR_VIINS $2 "$DEFAULT_COLOR" 196 '' 0 '${${KEYMAP:-0}:#vicmd}' '❯ '
-    $1_prompt_segment $0_ERROR_VICMD $2 "$DEFAULT_COLOR" 196 '' 0 '${(M)${:-$KEYMAP$_P9K_REGION_ACTIVE}:#vicmd0}' '❮ '
-    $1_prompt_segment $0_ERROR_VIVIS $2 "$DEFAULT_COLOR" 196 '' 0 '${(M)${:-$KEYMAP$_P9K_REGION_ACTIVE}:#vicmd1}' 'Ⅴ '
+    $1_prompt_segment $0_ERROR_VIINS $2 "$DEFAULT_COLOR" 196 '' 0 '${${KEYMAP:-0}:#vicmd}' '❯'
+    $1_prompt_segment $0_ERROR_VICMD $2 "$DEFAULT_COLOR" 196 '' 0 '${(M)${:-$KEYMAP$_P9K_REGION_ACTIVE}:#vicmd0}' '❮'
+    $1_prompt_segment $0_ERROR_VIVIS $2 "$DEFAULT_COLOR" 196 '' 0 '${(M)${:-$KEYMAP$_P9K_REGION_ACTIVE}:#vicmd1}' 'Ⅴ'
   else
-    $1_prompt_segment $0_OK_VIINS $2 "$DEFAULT_COLOR" 76 '' 0 '${${KEYMAP:-0}:#vicmd}' '❯ '
-    $1_prompt_segment $0_OK_VICMD $2 "$DEFAULT_COLOR" 76 '' 0 '${(M)${:-$KEYMAP$_P9K_REGION_ACTIVE}:#vicmd0}' '❮ '
-    $1_prompt_segment $0_OK_VIVIS $2 "$DEFAULT_COLOR" 76 '' 0 '${(M)${:-$KEYMAP$_P9K_REGION_ACTIVE}:#vicmd1}' 'Ⅴ '
+    $1_prompt_segment $0_OK_VIINS $2 "$DEFAULT_COLOR" 76 '' 0 '${${KEYMAP:-0}:#vicmd}' '❯'
+    $1_prompt_segment $0_OK_VICMD $2 "$DEFAULT_COLOR" 76 '' 0 '${(M)${:-$KEYMAP$_P9K_REGION_ACTIVE}:#vicmd0}' '❮'
+    $1_prompt_segment $0_OK_VIVIS $2 "$DEFAULT_COLOR" 76 '' 0 '${(M)${:-$KEYMAP$_P9K_REGION_ACTIVE}:#vicmd1}' 'Ⅴ'
   fi
 }
 
