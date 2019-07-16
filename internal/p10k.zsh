@@ -2813,11 +2813,11 @@ _p9k_init_lines() {
   local -i num_left_lines=$((1 + ${#${(@M)left_segments:#newline}}))
   local -i num_right_lines=$((1 + ${#${(@M)right_segments:#newline}}))
   if (( num_right_lines > num_left_lines )); then
-    repeat $((num_right_lines - num_left_lines)) left_segments+=(newline $left_segments)
+    repeat $((num_right_lines - num_left_lines)) left_segments=(newline $left_segments)
     local -i num_lines=num_right_lines
   else
     if [[ $POWERLEVEL9K_RPROMPT_ON_NEWLINE == true ]]; then
-      repeat $((num_left_lines - num_right_lines)) right_segments+=(newline $right_segments)
+      repeat $((num_left_lines - num_right_lines)) right_segments=(newline $right_segments)
     else
       repeat $((num_left_lines - num_right_lines)) right_segments+=newline
     fi
@@ -2843,9 +2843,9 @@ _p9k_init_lines() {
     _P9K_LINE_SUFFIX_RIGHT+='$_P9K_SSS%b%k%f'  # gets overridden for _P9K_EMULATE_ZERO_RPROMPT_INDENT
   done
 
+  # Not escaped for historical reasons.
   _p9k_get_icon '' LEFT_SEGMENT_END_SEPARATOR
   if [[ -n $_P9K_RETVAL ]]; then
-    _p9k_escape $_P9K_RETVAL
     _P9K_RETVAL+=%b%k%f
     if [[ $POWERLEVEL9K_PROMPT_ON_NEWLINE == true ]]; then
       _P9K_LINE_SUFFIX_LEFT[-2]+=$_P9K_RETVAL
@@ -2914,10 +2914,11 @@ _p9k_init_prompt() {
         -z $(typeset -m 'POWERLEVEL9K_*(RIGHT_RIGHT_WHITESPACE|RIGHT_PROMPT_LAST_SEGMENT_END_SYMBOL)') ]] &&
         ! is-at-least 5.7.2; then
     typeset -gi _P9K_EMULATE_ZERO_RPROMPT_INDENT=1
-    _P9K_PROMPT_PREFIX_LEFT+='${${:-${_P9K_REAL_ZLE_RPROMPT_INDENT:=$ZLE_RPROMPT_INDENT}${ZLE_RPROMPT_INDENT::=1}}+}'
+    _P9K_PROMPT_PREFIX_LEFT+='${${:-${_P9K_REAL_ZLE_RPROMPT_INDENT:=$ZLE_RPROMPT_INDENT}${ZLE_RPROMPT_INDENT::=1}${_P9K_IND::=0}}+}'
     _P9K_LINE_SUFFIX_RIGHT[-1]='${_P9K_SSS:+${_P9K_SSS% }%E}'
   else
     typeset -gi _P9K_EMULATE_ZERO_RPROMPT_INDENT=0
+    _P9K_PROMPT_PREFIX_LEFT+='${${_P9K_IND::=${${ZLE_RPROMPT_INDENT:-1}/#-*/0}}+}'
   fi
 
   if [[ $POWERLEVEL9K_PROMPT_ADD_NEWLINE == true ]]; then
@@ -2926,8 +2927,6 @@ _p9k_init_prompt() {
 
   _P9K_T=($'\n' '')
   _p9k_prompt_overflow_bug && _P9K_T[2]='%{%G%}'
-
-  _P9K_PROMPT_PREFIX_LEFT+='${${_P9K_IND::=${${ZLE_RPROMPT_INDENT:-1}/#-*/0}}+}'
 
   if [[ $POWERLEVEL9K_SHOW_RULER == true ]]; then
     _p9k_get_icon '' RULER_CHAR
