@@ -523,15 +523,12 @@ right_prompt_segment() {
     _p9k_escape_rcurly $_P9K_RETVAL
     p+="\${\${_P9K_W::=${right_space_:+$style_}$right_space_%b$bg_$_P9K_RETVAL}+}"
 
-    if (( _P9K_EMULATE_ZERO_RPROMPT_INDENT )); then
-      p+="\${\${_P9K_SSS::=$bg_%E}+}"
-    elif [[ -n $right_space_ || -n $end_sep_ ]]; then
-      p+="\${\${_P9K_SSS::=$style_$right_space_"
-      [[ $right_space_ == *%* ]] && p+=$style_
-      p+="$end_sep_}+}"
-    else
-      p+='${_P9K_SSS::=}'
-    fi
+    p+='${${_P9K_SSS::='
+    p+=$style_$right_space_
+    [[ $right_space_ == *%* ]] && p+=$style_
+    p+=$end_sep_
+    [[ $end_sep_ == *%* ]] && p+=$style_
+    p+='}+}'
 
     p+='}'
 
@@ -631,32 +628,6 @@ prompt_background_jobs() {
     fi
   fi
   $1_prompt_segment $0 $2 "$DEFAULT_COLOR" cyan BACKGROUND_JOBS_ICON 1 '${${(%):-%j}:#0}' "$msg"
-}
-
-typeset -g _P9K_XY _P9K_CLM _P9K_ALIGNED_RPROMPT
-typeset -gi _P9K_X _P9K_Y _P9K_M _P9K_RPROMPT_DONE _P9K_IND
-
-# Returns 1 if the cursor is at the very end of the screen.
-function _p9k_left_prompt_end_line() {
-  _P9K_PROMPT+=$_P9K_LEFT_LINE_SUFFIX$1
-  (( _P9K_RPROMPT_DONE )) && return 0
-  _P9K_PROMPT+=$_P9K_ALIGNED_RPROMPT
-  _P9K_RPROMPT_DONE=1
-  return 1
-}
-
-################################################################
-# A newline in your prompt, so you can segments on multiple lines.
-set_default POWERLEVEL9K_PROMPT_ON_NEWLINE false
-set_default POWERLEVEL9K_RPROMPT_ON_NEWLINE false
-prompt_newline() {
-  [[ "$1" == "right" ]] && return
-  _p9k_left_prompt_end_line && _P9K_PROMPT+=$'\n'
-  _P9K_PROMPT+=$_P9K_LEFT_LINE_PREFIX
-  if [[ $POWERLEVEL9K_PROMPT_ON_NEWLINE == true ]]; then
-    _p9k_get_icon '' MULTILINE_NEWLINE_PROMPT_PREFIX
-    _P9K_PROMPT+=$_P9K_RETVAL
-  fi
 }
 
 ################################################################
@@ -2281,7 +2252,7 @@ prompt_vi_mode() {
   if [[ -n $POWERLEVEL9K_VI_INSERT_MODE_STRING ]]; then
     $1_prompt_segment $0_INSERT $2 "$DEFAULT_COLOR" blue '' 0 '${${KEYMAP:-0}:#vicmd}' "$POWERLEVEL9K_VI_INSERT_MODE_STRING"
   fi
-  if (( $+parameters[POWERLEVEL9K_VI_VISUAL_MODE_STRING] )); then
+  if (( $+POWERLEVEL9K_VI_VISUAL_MODE_STRING )); then
     $1_prompt_segment $0_NORMAL $2 "$DEFAULT_COLOR" white '' 0 '${(M)${:-$KEYMAP$_P9K_REGION_ACTIVE}:#vicmd0}' "$POWERLEVEL9K_VI_COMMAND_MODE_STRING"
     $1_prompt_segment $0_VISUAL $2 "$DEFAULT_COLOR" white '' 0 '${(M)${:-$KEYMAP$_P9K_REGION_ACTIVE}:#vicmd1}' "$POWERLEVEL9K_VI_VISUAL_MODE_STRING"
   else
@@ -2486,24 +2457,6 @@ prompt_java_version() {
 set_default -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS context dir vcs
 set_default -a POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS status root_indicator background_jobs history time
 
-typeset -g _P9K_PROMPT_SIDE _P9K_SEGMENT_NAME
-typeset -gi _P9K_SEGMENT_INDEX
-
-_p9k_build_prompt() {
-  _P9K_SEGMENT_INDEX=1
-  _P9K_PROMPT_SIDE=$1
-  local list=POWERLEVEL9K_${(U)_P9K_PROMPT_SIDE}_PROMPT_ELEMENTS
-  for _P9K_SEGMENT_NAME in ${(P)list}; do
-    _P9K_SEGMENT_NAME=${_P9K_SEGMENT_NAME%_joined}
-    if [[ $_P9K_SEGMENT_NAME == custom_* ]]; then
-      prompt_custom $_P9K_PROMPT_SIDE $_P9K_SEGMENT_INDEX $_P9K_SEGMENT_NAME[8,-1]
-    elif (( $+functions[prompt_$_P9K_SEGMENT_NAME] )); then
-      prompt_$_P9K_SEGMENT_NAME $_P9K_PROMPT_SIDE $_P9K_SEGMENT_INDEX
-    fi
-    ((++_P9K_SEGMENT_INDEX))
-  done
-}
-
 typeset -gF _P9K_TIMER_START
 
 powerlevel9k_preexec() {
@@ -2519,39 +2472,60 @@ powerlevel9k_preexec() {
 
 typeset -g _P9K_PROMPT
 typeset -g _P9K_RPROMPT
-typeset -g _P9K_LEFT_PREFIX
-typeset -g _P9K_LEFT_SUFFIX
-typeset -g _P9K_RIGHT_PREFIX
-typeset -g _P9K_RIGHT_SUFFIX
+
+typeset -g _P9K_PROMPT_SIDE _P9K_SEGMENT_NAME
+typeset -gi _P9K_SEGMENT_INDEX
+
+function _p9k_build_segment() {
+  _P9K_SEGMENT_NAME=${_P9K_SEGMENT_NAME%_joined}
+  if [[ $_P9K_SEGMENT_NAME == custom_* ]]; then
+    prompt_custom $_P9K_PROMPT_SIDE $_P9K_SEGMENT_INDEX $_P9K_SEGMENT_NAME[8,-1]
+  elif (( $+functions[prompt_$_P9K_SEGMENT_NAME] )); then
+    prompt_$_P9K_SEGMENT_NAME $_P9K_PROMPT_SIDE $_P9K_SEGMENT_INDEX
+  fi
+  ((++_P9K_SEGMENT_INDEX))
+}
 
 set_default POWERLEVEL9K_DISABLE_RPROMPT false
 function _p9k_set_prompt() {
-  PROMPT=
+  unset _P9K_RPROMPT_OVERRIDE
+  PROMPT=$_P9K_PROMPT_PREFIX_LEFT
   RPROMPT=
-  if [[ $POWERLEVEL9K_DISABLE_RPROMPT == true ]]; then
-    _P9K_RPROMPT_DONE=1
-  else
-    _P9K_PROMPT=
-    _p9k_build_prompt right
-    local right=$_P9K_RIGHT_PREFIX$_P9K_PROMPT$_P9K_RIGHT_SUFFIX
-    if (( _P9K_REAL_RPROMPT )); then
-      RPROMPT=$right
-      _P9K_RPROMPT_DONE=1
-    else
-      unset _P9K_RPROMPT_OVERRIDE
-      PROMPT="\${\${_P9K_RPROMPT::=\${_P9K_RPROMPT_OVERRIDE-$right}}+}"
-      _P9K_RPROMPT_DONE=0
-    fi
-  fi
 
-  _P9K_PROMPT=''
-  _p9k_build_prompt left
-  _p9k_get_icon '' LEFT_SEGMENT_END_SEPARATOR
-  if _p9k_left_prompt_end_line $_P9K_RETVAL%b%k%f; then
-    PROMPT+=$_P9K_LEFT_PREFIX$_P9K_PROMPT$_P9K_LEFT_SUFFIX
-  else
-    PROMPT+=$_P9K_LEFT_PREFIX$_P9K_PROMPT${_P9K_LEFT_SUFFIX#$'\n'}
-  fi
+  local -i left_idx=1 right_idx=1 num_lines=$#_P9K_LINE_SEGMENTS_LEFT i
+  for i in {1..$num_lines}; do
+    if [[ $POWERLEVEL9K_DISABLE_RPROMPT == false ]]; then
+      _P9K_PROMPT=$_P9K_LINE_PREFIX_RIGHT[i]
+      _P9K_SEGMENT_INDEX=right_idx
+      _P9K_PROMPT_SIDE=right
+      for _P9K_SEGMENT_NAME in ${(@0)_P9K_LINE_SEGMENTS_RIGHT[i]}; do
+        _p9k_build_segment
+      done
+      right_idx=_P9K_SEGMENT_INDEX
+      _P9K_PROMPT+=$_P9K_LINE_SUFFIX_RIGHT[i]
+      if (( i == num_lines )); then
+        RPROMPT=$_P9K_PROMPT
+      else
+        PROMPT+='${${_P9K_RPROMPT::=${_P9K_RPROMPT_OVERRIDE-'$_P9K_PROMPT'}}+}'
+      fi
+    fi
+    _P9K_PROMPT=$_P9K_LINE_PREFIX_LEFT[i]
+    _P9K_SEGMENT_INDEX=left_idx
+    _P9K_PROMPT_SIDE=left
+    for _P9K_SEGMENT_NAME in ${(@0)_P9K_LINE_SEGMENTS_LEFT[i]}; do
+      _p9k_build_segment
+    done
+    left_idx=_P9K_SEGMENT_INDEX
+    _P9K_PROMPT+=$_P9K_LINE_SUFFIX_LEFT[i]
+    PROMPT+=$_P9K_PROMPT
+    if (( i != num_lines )); then
+      if [[ $POWERLEVEL9K_DISABLE_RPROMPT == false ]]; then
+        PROMPT+=$_P9K_ALIGNED_RPROMPT
+      else
+        PROMPT+=$'\n'
+      fi
+    fi
+  done
 
   PROMPT=${${PROMPT//$' %{\b'/'%{%G'}//$' \b'}
   RPROMPT=${${RPROMPT//$' %{\b'/'%{%G'}//$' \b'}
@@ -2597,7 +2571,6 @@ powerlevel9k_prepare_prompts() {
 }
 
 function _p9k_zle_keymap_select() {
-  VI_KEYMAP=$KEYMAP
   zle && zle .reset-prompt && zle -R
 }
 
@@ -2611,11 +2584,8 @@ set_default -i POWERLEVEL9K_VCS_UNTRACKED_MAX_NUM 1
 set_default -i POWERLEVEL9K_VCS_COMMITS_AHEAD_MAX_NUM -1
 set_default -i POWERLEVEL9K_VCS_COMMITS_BEHIND_MAX_NUM -1
 
-typeset -g DEFAULT_COLOR
-typeset -g DEFAULT_COLOR_INVERTED
 typeset -g _P9K_REAL_ZLE_RPROMPT_INDENT
 typeset -gi _P9K_INITIALIZED=0
-typeset -gi _P9K_EMULATE_ZERO_RPROMPT_INDENT=0
 
 typeset -g OS
 typeset -g OS_ICON
@@ -2827,11 +2797,180 @@ _p9k_wrap_zle_widget() {
   zle -N -- $widget $wrapper
 }
 
+prompt__p9k_internal_nothing() {
+  _P9K_PROMPT+='${_P9K_SSS::=}'
+}
+
+_p9k_init_lines() {
+  typeset -ga _P9K_LINE_{SEGMENTS,PREFIX,SUFFIX}_{LEFT,RIGHT}
+  local -a left_segments=($POWERLEVEL9K_LEFT_PROMPT_ELEMENTS)
+  local -a right_segments=($POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS)
+
+  if [[ $POWERLEVEL9K_PROMPT_ON_NEWLINE == true ]]; then
+    left_segments+=(newline _p9k_internal_nothing)
+  fi
+
+  local -i num_left_lines=$((1 + ${#${(@M)left_segments:#newline}}))
+  local -i num_right_lines=$((1 + ${#${(@M)right_segments:#newline}}))
+  if (( num_right_lines > num_left_lines )); then
+    repeat $((num_right_lines - num_left_lines)) left_segments+=(newline $left_segments)
+    local -i num_lines=num_right_lines
+  else
+    if [[ $POWERLEVEL9K_RPROMPT_ON_NEWLINE == true ]]; then
+      repeat $((num_left_lines - num_right_lines)) right_segments+=(newline $right_segments)
+    else
+      repeat $((num_left_lines - num_right_lines)) right_segments+=newline
+    fi
+    local -i num_lines=num_left_lines
+  fi
+
+  repeat num_lines; do
+    local -i left_end=${left_segments[(i)newline]}
+    local -i right_end=${right_segments[(i)newline]}
+    _P9K_LINE_SEGMENTS_LEFT+="${(pj:\0:)left_segments[1,left_end-1]}"
+    _P9K_LINE_SEGMENTS_RIGHT+="${(pj:\0:)right_segments[1,right_end-1]}"
+    (( left_end > $#left_segments )) && left_segments=() || shift left_end left_segments
+    (( right_end > $#right_segments )) && right_segments=() || shift right_end right_segments
+
+    _p9k_get_icon '' LEFT_SEGMENT_SEPARATOR
+    _p9k_get_icon 'prompt_empty_line' LEFT_PROMPT_LAST_SEGMENT_END_SYMBOL $_P9K_RETVAL
+    _p9k_escape $_P9K_RETVAL
+    _P9K_LINE_PREFIX_LEFT+='${${:-${_P9K_BG::=NONE}${_P9K_I::=0}${_P9K_SSS::=%f'$_P9K_RETVAL'}}+}'
+    _P9K_LINE_SUFFIX_LEFT+='%b%k$_P9K_SSS%b%k%f'
+
+    _p9k_escape ${(g::)POWERLEVEL9K_EMPTY_LINE_RIGHT_PROMPT_FIRST_SEGMENT_START_SYMBOL}
+    _P9K_LINE_PREFIX_RIGHT+='${${:-${_P9K_BG::=NONE}${_P9K_I::=0}${_P9K_SSS::='$_P9K_RETVAL'}}+}'
+    _P9K_LINE_SUFFIX_RIGHT+='$_P9K_SSS%b%k%f'  # gets overridden for _P9K_EMULATE_ZERO_RPROMPT_INDENT
+  done
+
+  _p9k_get_icon '' LEFT_SEGMENT_END_SEPARATOR
+  if [[ -n $_P9K_RETVAL ]]; then
+    _p9k_escape $_P9K_RETVAL
+    _P9K_RETVAL+=%b%k%f
+    if [[ $POWERLEVEL9K_PROMPT_ON_NEWLINE == true ]]; then
+      _P9K_LINE_SUFFIX_LEFT[-2]+=$_P9K_RETVAL
+    else
+      _P9K_LINE_SUFFIX_LEFT[-1]+=$_P9K_RETVAL
+    fi
+  fi
+
+  # These aren't escaped for historical reasons.
+  if (( num_lines > 1 )); then
+    if [[ $+POWERLEVEL9K_MULTILINE_FIRST_PROMPT_PREFIX == 1 || $POWERLEVEL9K_PROMPT_ON_NEWLINE == true ]]; then
+      _p9k_get_icon '' MULTILINE_FIRST_PROMPT_PREFIX
+      [[ _P9K_RETVAL == *%* ]] && _P9K_RETVAL+=%b%k%f
+      _P9K_LINE_PREFIX_LEFT[1]=$_P9K_RETVAL$_P9K_LINE_PREFIX_LEFT[1]
+    fi
+
+    if [[ $+POWERLEVEL9K_MULTILINE_LAST_PROMPT_PREFIX == 1 || $POWERLEVEL9K_PROMPT_ON_NEWLINE == true ]]; then
+      _p9k_get_icon '' MULTILINE_LAST_PROMPT_PREFIX
+      [[ _P9K_RETVAL == *%* ]] && _P9K_RETVAL+=%b%k%f
+      _P9K_LINE_PREFIX_LEFT[-1]=$_P9K_RETVAL$_P9K_LINE_PREFIX_LEFT[-1]
+    fi
+
+    if (( num_lines > 2 )); then
+      if [[ $+POWERLEVEL9K_MULTILINE_NEWLINE_PROMPT_PREFIX == 1 || $POWERLEVEL9K_PROMPT_ON_NEWLINE == true ]]; then
+        _p9k_get_icon '' MULTILINE_NEWLINE_PROMPT_PREFIX
+        [[ _P9K_RETVAL == *%* ]] && _P9K_RETVAL+=%b%k%f
+        _P9K_LINE_PREFIX_LEFT[2,-2]=$_P9K_RETVAL${^_P9K_LINE_PREFIX_LEFT[2,-2]}
+      fi
+    fi
+  fi
+}
+
+_p9k_init_prompt() {
+  _p9k_init_lines
+
+  typeset -g _P9K_ALIGNED_RPROMPT _P9K_XY _P9K_CLM
+  typeset -gi _P9K_X _P9K_Y _P9K_M _P9K_IND
+  _P9K_ALIGNED_RPROMPT='${${:-${_P9K_X::=0}${_P9K_Y::=1024}${_P9K_CLM::=$COLUMNS}${COLUMNS::=1024}'
+  repeat 10; do
+    _P9K_ALIGNED_RPROMPT+='${_P9K_M::=$(((_P9K_X+_P9K_Y)/2))}'
+    _P9K_ALIGNED_RPROMPT+='${_P9K_XY::=${${(%):-$_P9K_RPROMPT%$_P9K_M(l./$_P9K_M;$_P9K_Y./$_P9K_X;$_P9K_M)}##*/}}'
+    _P9K_ALIGNED_RPROMPT+='${_P9K_X::=${_P9K_XY%;*}}'
+    _P9K_ALIGNED_RPROMPT+='${_P9K_Y::=${_P9K_XY#*;}}'
+  done
+  _P9K_ALIGNED_RPROMPT+='${COLUMNS::=_P9K_CLM}'
+  _P9K_ALIGNED_RPROMPT+='${_P9K_X::=$((_P9K_X+2+_P9K_IND))}'
+  _P9K_ALIGNED_RPROMPT+='${_P9K_Y::=$((_P9K_X+31))}}+}'
+
+  repeat 32; do
+    _P9K_ALIGNED_RPROMPT+='%-$_P9K_Y(l.                                .)'
+  done
+  repeat 32; do
+    _P9K_ALIGNED_RPROMPT+='%-$_P9K_X(l. .)'
+  done
+  _P9K_ALIGNED_RPROMPT+='%$(((COLUMNS-_P9K_X+2)*(COLUMNS+2>=_P9K_X)))'
+  _P9K_ALIGNED_RPROMPT+=$'(l.\n. ${_P9K_RPROMPT//)/%)}$_P9K_T[$((1+!_P9K_IND))])'
+
+  typeset -g _P9K_PROMPT_PREFIX_LEFT=%b%k%f
+
+  # Bug fixed in: https://github.com/zsh-users/zsh/commit/3eea35d0853bddae13fa6f122669935a01618bf9.
+  # If affects most terminals when RPROMPT is non-empty and ZLE_RPROMPT_INDENT is zero.
+  # We can work around it as long as RPROMPT ends with a space.
+  if [[ -n $_P9K_LINE_SEGMENTS_RIGHT[-1] && $ZLE_RPROMPT_INDENT == 0 &&
+        -z $POWERLEVEL9K_EMPTY_LINE_RIGHT_PROMPT_FIRST_SEGMENT_START_SYMBOL &&
+        $POWERLEVEL9K_WHITESPACE_BETWEEN_RIGHT_SEGMENTS == ' ' &&
+        -z $(typeset -m 'POWERLEVEL9K_*(RIGHT_RIGHT_WHITESPACE|RIGHT_PROMPT_LAST_SEGMENT_END_SYMBOL)') ]] &&
+        ! is-at-least 5.7.2; then
+    typeset -gi _P9K_EMULATE_ZERO_RPROMPT_INDENT=1
+    _P9K_PROMPT_PREFIX_LEFT+='${${:-${_P9K_REAL_ZLE_RPROMPT_INDENT:=$ZLE_RPROMPT_INDENT}${ZLE_RPROMPT_INDENT::=1}}+}'
+    _P9K_LINE_SUFFIX_RIGHT[-1]='${_P9K_SSS:+${_P9K_SSS% }%E}'
+  else
+    typeset -gi _P9K_EMULATE_ZERO_RPROMPT_INDENT=0
+  fi
+
+  if [[ $POWERLEVEL9K_PROMPT_ADD_NEWLINE == true ]]; then
+    repeat ${POWERLEVEL9K_PROMPT_ADD_NEWLINE_COUNT:-1} _P9K_PROMPT_PREFIX_LEFT+=$'\n'
+  fi
+
+  _P9K_T=($'\n' '')
+  _p9k_prompt_overflow_bug && _P9K_T[2]='%{%G%}'
+
+  _P9K_PROMPT_PREFIX_LEFT+='${${_P9K_IND::=${${ZLE_RPROMPT_INDENT:-1}/#-*/0}}+}'
+
+  if [[ $POWERLEVEL9K_SHOW_RULER == true ]]; then
+    _p9k_get_icon '' RULER_CHAR
+    local ruler_char=$_P9K_RETVAL
+    _p9k_prompt_length $ruler_char
+    if (( _P9K_RETVAL == 1 && $#ruler_char == 1 )); then
+      _p9k_color prompt_ruler BACKGROUND ""
+      _p9k_background $_P9K_RETVAL
+      _P9K_PROMPT_PREFIX_LEFT+=%b$_P9K_RETVAL
+      _p9k_color prompt_ruler FOREGROUND ""
+      _p9k_foreground $_P9K_RETVAL
+      _P9K_PROMPT_PREFIX_LEFT+=$_P9K_RETVAL
+      [[ $ruler_char == '.' ]] && local sep=',' || local sep='.'
+      local ruler_len='${$((COLUMNS-_P9K_IND))/#-*/0}'
+      _P9K_PROMPT_PREFIX_LEFT+="\${(pl$sep$ruler_len$sep$sep${(q)ruler_char}$sep)}%k%f"
+      _P9K_PROMPT_PREFIX_LEFT+='$_P9K_T[$((1+!_P9K_IND))]'
+    else
+      print -P "%F{red}WARNING!%f %BPOWERLEVEL9K_RULER_CHAR%b is not one character long. Ruler won't be rendered."
+      print -P "Either change the value of %BPOWERLEVEL9K_RULER_CHAR%b or set %BPOWERLEVEL9K_SHOW_RULER=false%b to"
+      print -P "disable ruler."
+    fi
+  fi
+
+  if [[ $ITERM_SHELL_INTEGRATION_INSTALLED == Yes ]]; then
+    _P9K_PROMPT_PREFIX_LEFT+="%{$(iterm2_prompt_mark)%}"
+  fi
+
+  if [[ -o TRANSIENT_RPROMPT && -n "$_P9K_LINE_SEGMENTS_RIGHT[2,-1]" ]]; then
+    function _p9k_zle_line_finish() {
+      [[ -o TRANSIENT_RPROMPT ]] || return 0
+      _P9K_RPROMPT_OVERRIDE=
+      zle && zle .reset-prompt && zle -R
+    }
+    _p9k_wrap_zle_widget zle-line-finish _p9k_zle_line_finish
+  fi
+}
+
 _p9k_init() {
   (( _P9K_INITIALIZED )) && return
 
   _p9k_init_icons
   _p9k_init_strings
+  _p9k_init_prompt
 
   function _$0_set_os() {
     OS=$1
@@ -2841,10 +2980,11 @@ _p9k_init() {
 
   trap "unfunction _$0_set_os" EXIT
 
-  if [[ $(uname -o 2>/dev/null) == Android ]]; then
+  local uname=$(uname)
+  if [[ $uname == Linux && $(uname -o 2>/dev/null) == Android ]]; then
     _$0_set_os Android ANDROID_ICON
   else
-    case $(uname) in
+    case $uname in
       SunOS)                     _$0_set_os Solaris SUNOS_ICON;;
       Darwin)                    _$0_set_os OSX     APPLE_ICON;;
       CYGWIN_NT-* | MSYS_NT-*)   _$0_set_os Windows WINDOWS_ICON;;
@@ -2881,11 +3021,11 @@ _p9k_init() {
   fi
 
   if [[ $POWERLEVEL9K_COLOR_SCHEME == light ]]; then
-    DEFAULT_COLOR=7
-    DEFAULT_COLOR_INVERTED=0
+    typeset -g DEFAULT_COLOR=7
+    typeset -g DEFAULT_COLOR_INVERTED=0
   else
-    DEFAULT_COLOR=0
-    DEFAULT_COLOR_INVERTED=7
+    typeset -g DEFAULT_COLOR=0
+    typeset -g DEFAULT_COLOR_INVERTED=7
   fi
 
   typeset -gA _P9K_BATTERY_STATES=(
@@ -2895,9 +3035,10 @@ _p9k_init() {
     'disconnected'  "$DEFAULT_COLOR_INVERTED"
   )
 
-  local i
-  for ((i = 2; i <= $#POWERLEVEL9K_LEFT_PROMPT_ELEMENTS; ++i)); do
-    local elem=$POWERLEVEL9K_LEFT_PROMPT_ELEMENTS[$i]
+  local -i i=0
+  local -a left_segments=(${(@0)_P9K_LINE_SEGMENTS_LEFT[@]})
+  for ((i = 2; i <= $#left_segments; ++i)); do
+    local elem=$left_segments[i]
     if [[ $elem == *_joined ]]; then
       _P9K_LEFT_JOIN+=$_P9K_LEFT_JOIN[((i-1))]
     else
@@ -2905,125 +3046,15 @@ _p9k_init() {
     fi
   done
 
-  for ((i = 2; i <= $#POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS; ++i)); do
-    local elem=$POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS[$i]
+  local -a right_segments=(${(@0)_P9K_LINE_SEGMENTS_RIGHT[@]})
+  for ((i = 2; i <= $#right_segments; ++i)); do
+    local elem=$right_segments[i]
     if [[ $elem == *_joined ]]; then
       _P9K_RIGHT_JOIN+=$_P9K_RIGHT_JOIN[((i-1))]
     else
       _P9K_RIGHT_JOIN+=$i
     fi
   done
-
-  _P9K_RIGHT_SUFFIX+='$_P9K_SSS'
-
-  _P9K_REAL_RPROMPT=1
-  if [[ $POWERLEVEL9K_RPROMPT_ON_NEWLINE == false &&
-        ($POWERLEVEL9K_PROMPT_ON_NEWLINE == true ||
-         -n $POWERLEVEL9K_LEFT_PROMPT_ELEMENTS[(r)newline] ||
-         -n $POWERLEVEL9K_LEFT_PROMPT_ELEMENTS[(r)newline_joined]) ]]; then
-    _P9K_REAL_RPROMPT=0
-  fi
-
-  # Bug fixed in: https://github.com/zsh-users/zsh/commit/3eea35d0853bddae13fa6f122669935a01618bf9.
-  # If affects most terminals when RPROMPT is non-empty and ZLE_RPROMPT_INDENT is zero.
-  # We can work around it as long as RPROMPT ends with a space.
-  if [[ $_P9K_REAL_RPROMPT == 1 &&
-        $POWERLEVEL9K_WHITESPACE_BETWEEN_RIGHT_SEGMENTS == ' ' && $ZLE_RPROMPT_INDENT == 0 &&
-        -z $(typeset -m 'POWERLEVEL9K_*(RIGHT_RIGHT_WHITESPACE|RIGHT_PROMPT_LAST_SEGMENT_END_SYMBOL)') ]] &&
-        ! is-at-least 5.7.2; then
-    _P9K_EMULATE_ZERO_RPROMPT_INDENT=1
-    _P9K_LEFT_PREFIX+='${${:-${_P9K_REAL_ZLE_RPROMPT_INDENT:=$ZLE_RPROMPT_INDENT}${ZLE_RPROMPT_INDENT::=1}}+}'
-  fi
-
-  _P9K_ALIGNED_RPROMPT='${${:-${_P9K_X::=0}${_P9K_Y::=1024}${_P9K_CLM::=$COLUMNS}${COLUMNS::=1024}'
-  repeat 10; do
-    _P9K_ALIGNED_RPROMPT+='${_P9K_M::=$(((_P9K_X+_P9K_Y)/2))}'
-    _P9K_ALIGNED_RPROMPT+='${_P9K_XY::=${${(%):-$_P9K_RPROMPT%$_P9K_M(l./$_P9K_M;$_P9K_Y./$_P9K_X;$_P9K_M)}##*/}}'
-    _P9K_ALIGNED_RPROMPT+='${_P9K_X::=${_P9K_XY%;*}}'
-    _P9K_ALIGNED_RPROMPT+='${_P9K_Y::=${_P9K_XY#*;}}'
-  done
-  _P9K_ALIGNED_RPROMPT+='${COLUMNS::=_P9K_CLM}'
-  _P9K_ALIGNED_RPROMPT+='${_P9K_X::=$((_P9K_X+2+_P9K_IND))}'
-  _P9K_ALIGNED_RPROMPT+='${_P9K_Y::=$((_P9K_X+31))}}+}'
-
-  repeat 32; do
-    _P9K_ALIGNED_RPROMPT+='%-$_P9K_Y(l.                                .)'
-  done
-  repeat 32; do
-    _P9K_ALIGNED_RPROMPT+='%-$_P9K_X(l. .)'
-  done
-  _P9K_ALIGNED_RPROMPT+='%$(((COLUMNS-_P9K_X+2)*(COLUMNS+2>=_P9K_X)))'
-  _P9K_ALIGNED_RPROMPT+=$'(l.\n. ${_P9K_RPROMPT//)/%)}$_P9K_T[$((1+!_P9K_IND))])'
-
-  _P9K_LEFT_PREFIX+='${${_P9K_IND::=${${ZLE_RPROMPT_INDENT:-1}/#-*/0}}+}'
-
-  if [[ $POWERLEVEL9K_PROMPT_ADD_NEWLINE == true ]]; then
-    repeat ${POWERLEVEL9K_PROMPT_ADD_NEWLINE_COUNT:-1} _P9K_LEFT_PREFIX+=$'\n'
-  fi
-
-  if [[ $POWERLEVEL9K_SHOW_RULER == true ]]; then
-    _p9k_get_icon '' RULER_CHAR
-    local ruler_char=$_P9K_RETVAL
-    _p9k_prompt_length $ruler_char
-    if (( _P9K_RETVAL == 1 && $#ruler_char == 1 )); then
-      _p9k_color prompt_ruler BACKGROUND ""
-      _p9k_background $_P9K_RETVAL
-      _P9K_LEFT_PREFIX+=%b$_P9K_RETVAL
-      _p9k_color prompt_ruler FOREGROUND ""
-      _p9k_foreground $_P9K_RETVAL
-      _P9K_LEFT_PREFIX+=$_P9K_RETVAL
-      [[ $ruler_char == '.' ]] && local sep=',' || local sep='.'
-      local ruler_len='${$((COLUMNS-_P9K_IND))/#-*/0}'
-      _P9K_LEFT_PREFIX+="\${(pl$sep$ruler_len$sep$sep${(q)ruler_char}$sep)}%k%f"
-      _P9K_LEFT_PREFIX+='$_P9K_T[$((1+!_P9K_IND))]'
-    else
-      print -P "%F{red}WARNING!%f %BPOWERLEVEL9K_RULER_CHAR%b is not one character long. Ruler won't be rendered."
-      print -P "Either change the value of %BPOWERLEVEL9K_RULER_CHAR%b or set %BPOWERLEVEL9K_SHOW_RULER=false%b to"
-      print -P "disable ruler."
-    fi
-  fi
-
-  if [[ $ITERM_SHELL_INTEGRATION_INSTALLED == Yes ]]; then
-    _P9K_LEFT_PREFIX+="%{$(iterm2_prompt_mark)%}"
-  fi
-
-  _p9k_get_icon '' LEFT_SEGMENT_SEPARATOR
-  _p9k_get_icon 'prompt_empty_line' LEFT_PROMPT_LAST_SEGMENT_END_SYMBOL $_P9K_RETVAL
-  _p9k_escape $_P9K_RETVAL
-  _P9K_LEFT_LINE_PREFIX='${${:-${_P9K_BG::=NONE}${_P9K_I::=0}${_P9K_SSS::=%f'$_P9K_RETVAL'}}+}'
-
-  _P9K_LEFT_LINE_SUFFIX='%b%k$_P9K_SSS%b%k%f'
-
-  _P9K_LEFT_PREFIX+=$_P9K_LEFT_LINE_PREFIX
-
-  _p9k_escape ${(g::)POWERLEVEL9K_EMPTY_LINE_RIGHT_PROMPT_FIRST_SEGMENT_START_SYMBOL}
-  _P9K_RIGHT_PREFIX+="\${\${:-\${_P9K_BG::=NONE}\${_P9K_I::=0}\${_P9K_SSS::=$_P9K_RETVAL}}+}"
-
-  _P9K_T=(
-    $'\n' ""  # left prompt overflow
-  )
-  _p9k_prompt_overflow_bug && _P9K_T[2]+='%{%G%}'
-
-  _P9K_RIGHT_SUFFIX+='%f%b%k'
-  _P9K_RIGHT_PREFIX+='%f%b%k'
-
-  if [[ $POWERLEVEL9K_PROMPT_ON_NEWLINE == true ]]; then
-    _p9k_get_icon '' MULTILINE_FIRST_PROMPT_PREFIX
-    _P9K_LEFT_PREFIX+="$_P9K_RETVAL%f%b%k"
-    _p9k_get_icon '' MULTILINE_LAST_PROMPT_PREFIX
-    _P9K_LEFT_SUFFIX+=$'\n'$_P9K_RETVAL'%f%b%k'
-  else
-    _P9K_LEFT_PREFIX+="%f%b%k"
-  fi
-
-  if [[ $_P9K_REAL_RPROMPT == 0 && -o TRANSIENT_RPROMPT ]]; then
-    function _p9k_zle_line_finish() {
-      [[ -o TRANSIENT_RPROMPT ]] || return
-      _P9K_RPROMPT_OVERRIDE=
-      zle && zle .reset-prompt && zle -R
-    }
-    _p9k_wrap_zle_widget zle-line-finish _p9k_zle_line_finish
-  fi
 
   # If the terminal `LANG` is set to `C`, this theme will not work at all.
   if [[ $LANG == "C" && $POWERLEVEL9K_IGNORE_TERM_LANG == false ]]; then
@@ -3073,7 +3104,7 @@ _p9k_init() {
 
   if segment_in_use vcs; then
     powerlevel9k_vcs_init
-    if [[ $POWERLEVEL9K_DISABLE_GITSTATUS != true ]] && (( ${POWERLEVEL9K_VCS_BACKENDS[(I)git]} )); then
+    if [[ $POWERLEVEL9K_DISABLE_GITSTATUS != true && -n $POWERLEVEL9K_VCS_BACKENDS[(r)git] ]]; then
       source ${POWERLEVEL9K_GITSTATUS_DIR:-${_p9k_installation_dir}/gitstatus}/gitstatus.plugin.zsh
       gitstatus_start                                                                 \
         -s ${POWERLEVEL9K_VCS_MAX_NUM_STAGED:-$POWERLEVEL9K_VCS_STAGED_MAX_NUM}       \
@@ -3109,9 +3140,9 @@ _p9k_init() {
 
   if segment_in_use vi_mode && (( $+POWERLEVEL9K_VI_VISUAL_MODE_STRING )) || segment_in_use prompt_char; then
     function _p9k_zle_line_pre_redraw() {
-      [[ ${KEYMAP:-} == vicmd ]] || return
+      [[ ${KEYMAP:-} == vicmd ]] || return 0
       local region=${${REGION_ACTIVE:-0}/2/1}
-      [[ $region != $_P9K_REGION_ACTIVE ]] || return
+      [[ $region != $_P9K_REGION_ACTIVE ]] || return 0
       _P9K_REGION_ACTIVE=$region
       zle && zle .reset-prompt && zle -R
     }
@@ -3125,7 +3156,7 @@ _p9k_init() {
     >&2 print -P 'Either install %F{green}jq%f or change the value of %BPOWERLEVEL9K_SHORTEN_STRATEGY%b.'
   fi
 
-  zle -N zle-keymap-select _p9k_zle_keymap_select
+  _p9k_wrap_zle_widget zle-keymap-select _p9k_zle_keymap_select
 
   _P9K_INITIALIZED=1
 }
