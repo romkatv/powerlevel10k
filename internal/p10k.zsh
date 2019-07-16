@@ -1504,6 +1504,58 @@ prompt_nodeenv() {
   fi
 }
 
+function _p9k_read_nodenv_version_file() {
+  [[ -r $1 ]] || return
+  local rest
+  read _P9K_RETVAL rest <$1 2>/dev/null
+  [[ -n $_P9K_RETVAL ]]
+}
+
+function _p9k_nodeenv_version_transform() {
+  local dir=${NODENV_ROOT:-$HOME/.nodenv}/versions
+  [[ -z $1 || $1 == system ]] && _P9K_RETVAL=$1          && return
+  [[ -d $dir/$1 ]]            && _P9K_RETVAL=$1          && return
+  [[ -d $dir/${1/v} ]]        && _P9K_RETVAL=${1/v}      && return
+  [[ -d $dir/${1#node-} ]]    && _P9K_RETVAL=${1#node-}  && return
+  [[ -d $dir/${1#node-v} ]]   && _P9K_RETVAL=${1#node-v} && return
+  return 1
+}
+
+function _p9k_nodenv_global_version() {
+  _p9k_read_nodenv_version_file ${NODENV_ROOT:-$HOME/.nodenv}/version || _P9K_RETVAL=system
+}
+
+################################################################
+# Segment to display nodenv information
+# https://github.com/nodenv/nodenv
+set_default POWERLEVEL9K_NODENV_PROMPT_ALWAYS_SHOW false
+prompt_nodenv() {
+  (( $+commands[nodenv] )) || return
+  _P9K_RETVAL=$NODENV_VERSION
+  if [[ -z $_P9K_RETVAL ]]; then
+    [[ $NODENV_DIR == /* ]] && local dir=$NODENV_DIR || local dir="$PWD/$NODENV_DIR"
+    while [[ $dir != //[^/]# ]]; do
+      _p9k_read_nodenv_version_file $dir/.node-version && break
+      [[ $dir == / ]] && break
+      dir=${dir:h}
+    done
+    if [[ -z $_P9K_RETVAL ]]; then
+      [[ $POWERLEVEL9K_NODENV_PROMPT_ALWAYS_SHOW == true ]] || return
+      _p9k_nodenv_global_version
+    fi
+  fi
+
+  _p9k_nodeenv_version_transform $_P9K_RETVAL || return
+  local v=$_P9K_RETVAL
+
+  if [[ $POWERLEVEL9K_NODENV_PROMPT_ALWAYS_SHOW == false ]]; then
+    _p9k_nodenv_global_version
+    _p9k_nodeenv_version_transform $_P9K_RETVAL && [[ $v == $_P9K_RETVAL ]] && return
+  fi
+
+  "$1_prompt_segment" "$0" "$2" "black" "green" 'NODE_ICON' 0 '' "${v//\%/%%}"
+}
+
 ################################################################
 # Segment to print a little OS icon
 prompt_os_icon() {
@@ -1566,6 +1618,7 @@ function _p9k_rbenv_global_version() {
 # https://github.com/rbenv/rbenv#choosing-the-ruby-version
 set_default POWERLEVEL9K_RBENV_PROMPT_ALWAYS_SHOW false
 prompt_rbenv() {
+  (( $+commands[rbenv] )) || return
   local v=$RBENV_VERSION
   if [[ -z $v ]]; then
     [[ $RBENV_DIR == /* ]] && local dir=$RBENV_DIR || local dir="$PWD/$RBENV_DIR"
@@ -2297,6 +2350,7 @@ function _p9k_pyenv_global_version() {
 # https://github.com/pyenv/pyenv#choosing-the-python-version
 set_default POWERLEVEL9K_PYENV_PROMPT_ALWAYS_SHOW false
 prompt_pyenv() {
+  (( $+commands[pyenv] )) || return
   local v=${(j.:.)${(@)${(s.:.)PYENV_VERSION}#python-}}
   if [[ -z $v ]]; then
     [[ $PYENV_DIR == /* ]] && local dir=$PYENV_DIR || local dir="$PWD/$PYENV_DIR"
