@@ -14,6 +14,7 @@ fi
       # Line #1
       dir          # current directory
       vcs          # git status
+
       # Line #2
       newline
       prompt_char  # prompt symbol
@@ -24,6 +25,7 @@ fi
   # automatically hidden when the input line reaches it. Right prompt above the
   # last prompt line gets hidden if it would overlap with left prompt.
   typeset -ga POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(
+      # Line #1
       status                  # exit code of the last command
       command_execution_time  # duration of the last command
       background_jobs         # presence of background jobs
@@ -36,6 +38,10 @@ fi
       # node_version          # node.js version
       # kubecontext           # current kubernetes context (https://kubernetes.io/)
       context                 # user@host
+
+      # Line #2
+      newline
+      # public_ip             # public IP address
       # time                  # current time
   )
 
@@ -240,6 +246,9 @@ fi
   typeset POWERLEVEL9K_KUBECONTEXT_CONTENT_EXPANSION='${P9K_CONTENT}'
   # Show the trailing "/default" in kubernetes context.
   typeset -g POWERLEVEL9K_KUBECONTEXT_SHOW_DEFAULT_NAMESPACE=true
+
+  # Public IP color.
+  typeset -g POWERLEVEL9K_PUBLIC_IP_FOREGROUND=144
 
   # Current time color.
   typeset -g POWERLEVEL9K_TIME_FOREGROUND=66
