@@ -1556,6 +1556,7 @@ function _p9k_nodenv_global_version() {
 # https://github.com/nodenv/nodenv
 set_default POWERLEVEL9K_NODENV_PROMPT_ALWAYS_SHOW false
 prompt_nodenv() {
+  (( $+commands[nodenv] )) || return
   _P9K_RETVAL=$NODENV_VERSION
   if [[ -z $_P9K_RETVAL ]]; then
     [[ $NODENV_DIR == /* ]] && local dir=$NODENV_DIR || local dir="$PWD/$NODENV_DIR"
@@ -1643,6 +1644,7 @@ function _p9k_rbenv_global_version() {
 # https://github.com/rbenv/rbenv#choosing-the-ruby-version
 set_default POWERLEVEL9K_RBENV_PROMPT_ALWAYS_SHOW false
 prompt_rbenv() {
+  (( $+commands[rbenv] )) || return
   local v=$RBENV_VERSION
   if [[ -z $v ]]; then
     [[ $RBENV_DIR == /* ]] && local dir=$RBENV_DIR || local dir="$PWD/$RBENV_DIR"
@@ -2374,6 +2376,7 @@ function _p9k_pyenv_global_version() {
 # https://github.com/pyenv/pyenv#choosing-the-python-version
 set_default POWERLEVEL9K_PYENV_PROMPT_ALWAYS_SHOW false
 prompt_pyenv() {
+  (( $+commands[pyenv] )) || return
   local v=${(j.:.)${(@)${(s.:.)PYENV_VERSION}#python-}}
   if [[ -z $v ]]; then
     [[ $PYENV_DIR == /* ]] && local dir=$PYENV_DIR || local dir="$PWD/$PYENV_DIR"
