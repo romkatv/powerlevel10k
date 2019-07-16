@@ -888,28 +888,32 @@ prompt_custom() {
 
 ################################################################
 # Display the duration the command needed to run.
-typeset -gF _P9K_COMMAND_DURATION
 set_default -i POWERLEVEL9K_COMMAND_EXECUTION_TIME_THRESHOLD 3
 set_default -i POWERLEVEL9K_COMMAND_EXECUTION_TIME_PRECISION 2
+set_default POWERLEVEL9K_COMMAND_EXECUTION_TIME_DISABLE_FORMATTING false
 prompt_command_execution_time() {
-  (( _P9K_COMMAND_DURATION < POWERLEVEL9K_COMMAND_EXECUTION_TIME_THRESHOLD )) && return
+  (( $+P9K_COMMAND_DURATION_SECONDS && P9K_COMMAND_DURATION_SECONDS >= POWERLEVEL9K_COMMAND_EXECUTION_TIME_THRESHOLD )) || return
 
-  if (( _P9K_COMMAND_DURATION < 60 )); then
-    if [[ $POWERLEVEL9K_COMMAND_EXECUTION_TIME_PRECISION == 0 ]]; then
-      local -i sec=$((_P9K_COMMAND_DURATION + 0.5))
-    else
-      local -F $POWERLEVEL9K_COMMAND_EXECUTION_TIME_PRECISION sec=_P9K_COMMAND_DURATION
-    fi
-    local text=${sec}s
+  if [[ $POWERLEVEL9K_COMMAND_EXECUTION_TIME_DISABLE_FORMATTING == true ]]; then
+    local text=''
   else
-    local -i d=_P9K_COMMAND_DURATION
-    local text=${(l.2..0.)$((d % 60))}
-    if (( d >= 60 )); then
-      text=${(l.2..0.)$((d / 60 % 60))}:$text
-      if (( d >= 36000 )); then
-        text=$((d / 3600)):$text
-      elif (( d >= 3600 )); then
-        text=0$((d / 3600)):$text
+    if (( _P9K_COMMAND_DURATION < 60 )); then
+      if [[ $POWERLEVEL9K_COMMAND_EXECUTION_TIME_PRECISION == 0 ]]; then
+        local -i sec=$((_P9K_COMMAND_DURATION + 0.5))
+      else
+        local -F $POWERLEVEL9K_COMMAND_EXECUTION_TIME_PRECISION sec=_P9K_COMMAND_DURATION
+      fi
+      local text=${sec}s
+    else
+      local -i d=_P9K_COMMAND_DURATION
+      local text=${(l.2..0.)$((d % 60))}
+      if (( d >= 60 )); then
+        text=${(l.2..0.)$((d / 60 % 60))}:$text
+        if (( d >= 36000 )); then
+          text=$((d / 3600)):$text
+        elif (( d >= 3600 )); then
+          text=0$((d / 3600)):$text
+        fi
       fi
     fi
   fi
@@ -2457,8 +2461,6 @@ prompt_java_version() {
 set_default -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS context dir vcs
 set_default -a POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS status root_indicator background_jobs history time
 
-typeset -gF _P9K_TIMER_START
-
 powerlevel9k_preexec() {
   if (( _P9K_EMULATE_ZERO_RPROMPT_INDENT )); then
     if [[ -n $_P9K_REAL_ZLE_RPROMPT_INDENT ]]; then
@@ -2467,7 +2469,7 @@ powerlevel9k_preexec() {
       unset ZLE_RPROMPT_INDENT
     fi
   fi
-  _P9K_TIMER_START=$EPOCHREALTIME
+  typeset -gF _P9K_TIMER_START=EPOCHREALTIME
 }
 
 typeset -g _P9K_PROMPT
@@ -2559,8 +2561,12 @@ powerlevel9k_refresh_prompt_inplace() {
 powerlevel9k_prepare_prompts() {
   _P9K_EXIT_CODE=$?
   _P9K_PIPE_EXIT_CODES=( "$pipestatus[@]" )
-  _P9K_COMMAND_DURATION=$((EPOCHREALTIME - _P9K_TIMER_START))
-  _P9K_TIMER_START=1e10
+  if (( $+_P9K_TIMER_START )); then
+    P9K_COMMAND_DURATION_SECONDS=$((EPOCHREALTIME - _P9K_TIMER_START))
+    unset _P9K_TIMER_START
+  else
+    unset P9K_COMMAND_DURATION_SECONDS
+  fi
   _P9K_REGION_ACTIVE=0
 
   unsetopt localoptions
@@ -3168,7 +3174,7 @@ prompt_powerlevel9k_setup() {
   add-zsh-hook precmd powerlevel9k_prepare_prompts
   add-zsh-hook preexec powerlevel9k_preexec
 
-  _P9K_TIMER_START=1e10
+  unset _P9K_TIMER_START
   _P9K_ENABLED=1
 }
 
