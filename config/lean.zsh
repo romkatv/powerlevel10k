@@ -30,6 +30,10 @@ fi
       # virtualenv            # python virtual environment (https://docs.python.org/3/library/venv.html)
       # anaconda              # conda environment (https://conda.io/)
       # pyenv                 # python environment (https://github.com/pyenv/pyenv)
+      # nodenv                # node.js version from nodenv (https://github.com/nodenv/nodenv)
+      # nvm                   # node.js version from nvm (https://github.com/nvm-sh/nvm)
+      # nodeenv               # node.js environment (https://github.com/ekalinin/nodeenv)
+      # node_version          # node.js version
       # kubecontext           # current kubernetes context (https://kubernetes.io/)
       context                 # user@host
       # time                  # current time
@@ -189,6 +193,22 @@ fi
   typeset -g POWERLEVEL9K_PYENV_FOREGROUND=6
   # Don't show the current Python version if it's the same as global.
   typeset -g POWERLEVEL9K_PYENV_PROMPT_ALWAYS_SHOW=false
+
+  # Nodenv color.
+  typeset -g POWERLEVEL9K_NODENV_FOREGROUND=2
+  # Don't show node version if it's the same as global: $(nodenv version-name) == $(nodenv global).
+  typeset -g POWERLEVEL9K_NODENV_PROMPT_ALWAYS_SHOW=false
+
+  # Nvm color.
+  typeset -g POWERLEVEL9K_NVM_FOREGROUND=2
+
+  # Nodeenv color.
+  typeset -g POWERLEVEL9K_NODEENV_FOREGROUND=2
+
+  # Node version color.
+  typeset -g POWERLEVEL9K_NODE_VERSION_FOREGROUND=2
+  # Show node version only when in a directory tree containing package.json.
+  typeset -g P9K_NODE_VERSION_PROJECT_ONLY=true
 
   # Kubernetes context classes for the purpose of using different colors with
   # different contexts.
