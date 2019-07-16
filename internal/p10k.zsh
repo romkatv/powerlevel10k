@@ -792,8 +792,7 @@ prompt_battery() {
   if (( $#POWERLEVEL9K_BATTERY_STAGES )); then
     local -i idx=$#POWERLEVEL9K_BATTERY_STAGES
     (( bat_percent < 100 )) && idx=$((bat_percent * $#POWERLEVEL9K_BATTERY_STAGES / 100 + 1))
-    icon+=_$idx
-    typeset -g POWERLEVEL9K_$icon=$POWERLEVEL9K_BATTERY_STAGES[idx]
+    icon=$'\1'${(g::)POWERLEVEL9K_BATTERY_STAGES[idx]}
   fi
 
   local bg=$DEFAULT_COLOR
