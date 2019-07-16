@@ -2834,7 +2834,7 @@ _p9k_init_lines() {
     local -i num_lines=num_left_lines
   fi
 
-  repeat num_lines; do
+  repeat $num_lines; do
     local -i left_end=${left_segments[(i)newline]}
     local -i right_end=${right_segments[(i)newline]}
     _P9K_LINE_SEGMENTS_LEFT+="${(pj:\0:)left_segments[1,left_end-1]}"
