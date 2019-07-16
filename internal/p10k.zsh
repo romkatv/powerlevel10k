@@ -2496,19 +2496,23 @@ function _p9k_set_prompt() {
 
   local -i left_idx=1 right_idx=1 num_lines=$#_P9K_LINE_SEGMENTS_LEFT i
   for i in {1..$num_lines}; do
+    local right=0
     if [[ $POWERLEVEL9K_DISABLE_RPROMPT == false ]]; then
-      _P9K_PROMPT=$_P9K_LINE_PREFIX_RIGHT[i]
+      _P9K_PROMPT=
       _P9K_SEGMENT_INDEX=right_idx
       _P9K_PROMPT_SIDE=right
       for _P9K_SEGMENT_NAME in ${(@0)_P9K_LINE_SEGMENTS_RIGHT[i]}; do
         _p9k_build_segment
       done
       right_idx=_P9K_SEGMENT_INDEX
-      _P9K_PROMPT+=$_P9K_LINE_SUFFIX_RIGHT[i]
-      if (( i == num_lines )); then
-        RPROMPT=$_P9K_PROMPT
-      else
-        PROMPT+='${${_P9K_RPROMPT::=${_P9K_RPROMPT_OVERRIDE-'$_P9K_PROMPT'}}+}'
+      if [[ -n $_P9K_PROMPT || -n $POWERLEVEL9K_EMPTY_LINE_RIGHT_PROMPT_FIRST_SEGMENT_START_SYMBOL ]]; then
+        _P9K_PROMPT=$_P9K_LINE_PREFIX_RIGHT[i]$_P9K_PROMPT$_P9K_LINE_SUFFIX_RIGHT[i]
+        if (( i == num_lines )); then
+          RPROMPT=$_P9K_PROMPT
+        else
+          right=1
+          PROMPT+='${${_P9K_RPROMPT::=${_P9K_RPROMPT_OVERRIDE-'$_P9K_PROMPT'}}+}'
+        fi
       fi
     fi
     _P9K_PROMPT=$_P9K_LINE_PREFIX_LEFT[i]
@@ -2521,7 +2525,7 @@ function _p9k_set_prompt() {
     _P9K_PROMPT+=$_P9K_LINE_SUFFIX_LEFT[i]
     PROMPT+=$_P9K_PROMPT
     if (( i != num_lines )); then
-      if [[ $POWERLEVEL9K_DISABLE_RPROMPT == false ]]; then
+      if (( right )); then
         PROMPT+=$_P9K_ALIGNED_RPROMPT
       else
         PROMPT+=$'\n'
