@@ -897,15 +897,15 @@ prompt_command_execution_time() {
   if [[ $POWERLEVEL9K_COMMAND_EXECUTION_TIME_DISABLE_FORMATTING == true ]]; then
     local text=''
   else
-    if (( _P9K_COMMAND_DURATION < 60 )); then
+    if (( P9K_COMMAND_DURATION_SECONDS < 60 )); then
       if [[ $POWERLEVEL9K_COMMAND_EXECUTION_TIME_PRECISION == 0 ]]; then
-        local -i sec=$((_P9K_COMMAND_DURATION + 0.5))
+        local -i sec=$((P9K_COMMAND_DURATION_SECONDS + 0.5))
       else
-        local -F $POWERLEVEL9K_COMMAND_EXECUTION_TIME_PRECISION sec=_P9K_COMMAND_DURATION
+        local -F $POWERLEVEL9K_COMMAND_EXECUTION_TIME_PRECISION sec=P9K_COMMAND_DURATION_SECONDS
       fi
       local text=${sec}s
     else
-      local -i d=_P9K_COMMAND_DURATION
+      local -i d=$((P9K_COMMAND_DURATION_SECONDS + 0.5))
       local text=${(l.2..0.)$((d % 60))}
       if (( d >= 60 )); then
         text=${(l.2..0.)$((d / 60 % 60))}:$text
