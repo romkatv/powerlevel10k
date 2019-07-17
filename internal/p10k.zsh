@@ -3050,7 +3050,7 @@ _p9k_init_prompt() {
   _P9K_GAP_PRE+='${_P9K_M::=$((_P9K_CLM-_P9K_X-_P9K_IND-1))}'
   _P9K_GAP_PRE+='}+}'
 
-  typeset -g _P9K_GAP_POST=$'${${${$((_P9K_M+=1)):#-*}:+${(pl.$_P9K_M.. .)}$_P9K_RPROMPT$_P9K_T[$((1+!_P9K_IND))]}:-\n}'
+  typeset -g _P9K_GAP_POST=$'${${${_P9K_M:#-*}:+${(pl.$((_P9K_M+1)).. .)}$_P9K_RPROMPT$_P9K_T[$((1+!_P9K_IND))]}:-\n}'
 
   typeset -g _P9K_PROMPT_PREFIX_LEFT='${${_P9K_CLM::=$COLUMNS}+}${${COLUMNS::=1024}+}'
   typeset -g _P9K_PROMPT_PREFIX_RIGHT='${${_P9K_CLM::=$COLUMNS}+}${${COLUMNS::=1024}+}'
