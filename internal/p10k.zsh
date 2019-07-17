@@ -1899,21 +1899,21 @@ set_default POWERLEVEL9K_EXPERIMENTAL_TIME_REALTIME false
 # behavior where they contain the end times of their preceding commands.
 set_default POWERLEVEL9K_TIME_UPDATE_ON_COMMAND false
 prompt_time() {
-  if (( ! $+_P9K_TIME_TEXT )); then
-    if [[ $POWERLEVEL9K_EXPERIMENTAL_TIME_REALTIME == true ]]; then
+  if [[ $POWERLEVEL9K_EXPERIMENTAL_TIME_REALTIME == true ]]; then
+    "$1_prompt_segment" "$0" "$2" "$DEFAULT_COLOR_INVERTED" "$DEFAULT_COLOR" "TIME_ICON" 0 '' \
+        "$POWERLEVEL9K_TIME_FORMAT"
+  else
+    local t=${${(%)POWERLEVEL9K_TIME_FORMAT}//\%/%%}
+    if [[ $POWERLEVEL9K_TIME_UPDATE_ON_COMMAND == true ]]; then
+      _p9k_escape $t
+      t=$_P9K_RETVAL
       _p9k_escape $POWERLEVEL9K_TIME_FORMAT
-      _P9K_TIME_TEXT=("" "$_P9K_RETVAL")
+      "$1_prompt_segment" "$0" "$2" "$DEFAULT_COLOR_INVERTED" "$DEFAULT_COLOR" "TIME_ICON" 1 '' \
+          "\${_P9K_LINE_FINISH-$t}\${_P9K_LINE_FINISH+$_P9K_RETVAL}"
     else
-      _p9k_escape $POWERLEVEL9K_TIME_FORMAT
-      if [[ $POWERLEVEL9K_TIME_UPDATE_ON_COMMAND == true ]]; then
-        _P9K_TIME_TEXT=("\${_P9K_LINE_FINISH-$_P9K_RETVAL}" "\${_P9K_LINE_FINISH+$_P9K_RETVAL}")
-      else
-        _P9K_TIME_TEXT=("$_P9K_RETVAL" "")
-      fi
+      "$1_prompt_segment" "$0" "$2" "$DEFAULT_COLOR_INVERTED" "$DEFAULT_COLOR" "TIME_ICON" 0 '' $t
     fi
   fi
-  "$1_prompt_segment" "$0" "$2" "$DEFAULT_COLOR_INVERTED" "$DEFAULT_COLOR" "TIME_ICON" 1 '' \
-      "${(%)_P9K_TIME_TEXT[1]//\%/%%}${_P9K_TIME_TEXT[2]}"
 }
 
 ################################################################
