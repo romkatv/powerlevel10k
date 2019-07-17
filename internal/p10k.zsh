@@ -977,7 +977,8 @@ set_default POWERLEVEL9K_SHORTEN_FOLDER_MARKER "(.shorten_folder_marker|.bzr|CVS
 #
 # Currently only applied when POWERLEVEL9K_SHORTEN_STRATEGY=truncate_to_unique. If you want to use
 # it with another shortening strategy, open an issue.
-set_default POWERLEVEL9K_DIR_MAX_LENGTH 0
+# TODO: this is gone.
+# set_default POWERLEVEL9K_DIR_MAX_LENGTH 0
 
 # Individual elements are patterns. They are expanded with the options set
 # by `emulate zsh && setopt extended_glob`.
@@ -1029,7 +1030,7 @@ prompt_dir() {
     # If "${(%):-%~}" expands to "~[a]/]/b", is the first component "~[a]" or "~[a]/]"?
     # One would expect "${(%):-%-1~}" to give the right answer but alas it always simply
     # gives the segment before the first slash, which would be "~[a]" in this case. Worse,
-    # for "~[a/b]" it'll give the nonsensical "~a[". To solve this problem we have to
+    # for "~[a/b]" it'll give the nonsensical "~[a". To solve this problem we have to
     # repeat what "${(%):-%~}" does and hope that it produces the same result.
     local func=''
     local -a parts=()
@@ -1128,7 +1129,7 @@ prompt_dir() {
     ;;
     truncate_to_unique)
       local -i i=2 n=1
-      [[ $p == /* ]] && (( ++i ))
+      [[ $p[1] == / ]] && (( ++i ))
       delim=${POWERLEVEL9K_SHORTEN_DELIMITER-'*'}
       _p9k_prompt_length $delim
       local -i real_delim_len=_P9K_RETVAL
@@ -1136,14 +1137,8 @@ prompt_dir() {
       (( d >= 0 )) || d=real_delim_len
       shortenlen=${POWERLEVEL9K_SHORTEN_DIR_LENGTH:-1}
       (( shortenlen >= 0 )) && n=shortenlen
-      if [[ $POWERLEVEL9K_DIR_MAX_LENGTH == *% ]]; then
-        local -i max_len=$(( COLUMNS * $POWERLEVEL9K_DIR_MAX_LENGTH[1,-2] / 100 ))
-      else
-        local -i max_len=POWERLEVEL9K_DIR_MAX_LENGTH
-      fi
-      local -i len=$#p
       local parent="${PWD%/${(pj./.)parts[i,-1]}}"
-      for (( ; len > max_len && i <= $#parts - n; ++i )); do
+      for (( ; i <= $#parts - n; ++i )); do
         local dir=$parts[i]
         if [[ -n $POWERLEVEL9K_SHORTEN_FOLDER_MARKER &&
               -n $parent/$dir/${~POWERLEVEL9K_SHORTEN_FOLDER_MARKER}(#qN) ]]; then
@@ -1155,9 +1150,9 @@ prompt_dir() {
           local -a matching=($parent/$dir[1,j]*/(N))
           (( $#matching == 1 )) && break
         done
-        if (( j + d < $#dir )); then
-          (( len -= ($#dir - j - real_delim_len) ))
-          parts[i]=$dir[1,j]$'\1'
+        local -i saved=$(($#dir - j - d))
+        if (( saved > 0 )); then
+          parts[i]='${${${_P9K_M:#-*}:+'$parts[i]'}:-'$dir[1,j]$'\1''${$((_P9K_M+='$saved'))+}}'
         fi
         parent+=/$dir
       done
@@ -1214,6 +1209,8 @@ prompt_dir() {
     _p9k_color $state FOREGROUND "$DEFAULT_COLOR"
     _p9k_foreground $_P9K_RETVAL
     style+=$_P9K_RETVAL
+    _p9k_escape_rcurly $style
+    style=$_P9K_RETVAL
 
     parts=("${(@)parts//\%/%%}")
     [[ $fake_first == 0 && $parts[1] == '~' ]] && parts[1]=$POWERLEVEL9K_HOME_FOLDER_ABBREVIATION$style
@@ -1226,7 +1223,8 @@ prompt_dir() {
       _p9k_foreground $_P9K_RETVAL
       last_fg+=$_P9K_RETVAL
     fi
-    parts[-1]=$last_fg${parts[-1]//$'\1'/$'\1'$last_fg}$style
+    _p9k_escape_rcurly $last_fg
+    parts[-1]=$_P9K_RETVAL${parts[-1]//$'\1'/$'\1'$_P9K_RETVAL}$style
     parts=("${(@)parts//$'\1'/$delim$style}")
 
     local sep=$POWERLEVEL9K_DIR_PATH_SEPARATOR$style
@@ -1240,9 +1238,10 @@ prompt_dir() {
     if [[ $POWERLEVEL9K_DIR_HYPERLINK == true ]]; then
       content=$'%{\e]8;;file://'${${PWD//\%/%%25}//'#'/%%23}$'\a%}'$content$'%{\e]8;;\a%}'
     fi
-    _p9k_cache_set $state $2 blue "$DEFAULT_COLOR" "$icon" 0 "" $content
+    _p9k_cache_set $state $2 blue "$DEFAULT_COLOR" "$icon" 1 "" "$content"
   fi
-  $1_prompt_segment "$_P9K_CACHE_VAL[@]"
+  _P9K_DIR=$_P9K_CACHE_VAL[-1]
+  $1_prompt_segment "${(@)_P9K_CACHE_VAL[1,-2]}" '%{dir%\}'$_P9K_DIR'%{dir%\}'
 }
 
 ################################################################
@@ -2627,6 +2626,7 @@ function _p9k_set_prompt() {
         fi
       fi
     fi
+    _P9K_DIR=
     _P9K_PROMPT=$_P9K_LINE_PREFIX_LEFT[i]
     _P9K_SEGMENT_INDEX=left_idx
     _P9K_PROMPT_SIDE=left
@@ -2635,18 +2635,26 @@ function _p9k_set_prompt() {
     done
     left_idx=_P9K_SEGMENT_INDEX
     _P9K_PROMPT+=$_P9K_LINE_SUFFIX_LEFT[i]
-    PROMPT+=$_P9K_PROMPT
     if (( i != num_lines )); then
       if (( right )); then
-        PROMPT+=$_P9K_ALIGNED_RPROMPT
+        PROMPT+='${${_P9K_M::=0}+}${${_P9K_LPROMPT::='$_P9K_PROMPT'}+}'
+        PROMPT+=$_P9K_GAP_PRE
+        PROMPT+='${_P9K_LPROMPT/\%\{dir\%\}*\%\{dir\%\}/'$_P9K_DIR'}'
+        PROMPT+=$_P9K_GAP_POST
       else
+        PROMPT+=$_P9K_PROMPT
         PROMPT+=$'\n'
       fi
+    else
+      PROMPT+=$_P9K_PROMPT
     fi
   done
 
   PROMPT=${${PROMPT//$' %{\b'/'%{%G'}//$' \b'}
   RPROMPT=${${RPROMPT//$' %{\b'/'%{%G'}//$' \b'}
+
+  PROMPT+=$_P9K_PROMPT_SUFFIX_LEFT
+  [[ -n $RPROMPT ]] && RPROMPT=$_P9K_PROMPT_PREFIX_RIGHT$RPROMPT$_P9K_PROMPT_SUFFIX_RIGHT
 
   _P9K_REAL_ZLE_RPROMPT_INDENT=
 }
@@ -3030,29 +3038,26 @@ _p9k_init_lines() {
 _p9k_init_prompt() {
   _p9k_init_lines
 
-  typeset -g _P9K_ALIGNED_RPROMPT _P9K_XY _P9K_CLM
+  typeset -g _P9K_XY _P9K_CLM
   typeset -gi _P9K_X _P9K_Y _P9K_M _P9K_IND
-  _P9K_ALIGNED_RPROMPT='${${:-${_P9K_X::=0}${_P9K_Y::=1024}${_P9K_CLM::=$COLUMNS}${COLUMNS::=1024}'
+  typeset -g _P9K_GAP_PRE='${${:-${_P9K_X::=0}${_P9K_Y::=1024}'
   repeat 10; do
-    _P9K_ALIGNED_RPROMPT+='${_P9K_M::=$(((_P9K_X+_P9K_Y)/2))}'
-    _P9K_ALIGNED_RPROMPT+='${_P9K_XY::=${${(%):-$_P9K_RPROMPT%$_P9K_M(l./$_P9K_M;$_P9K_Y./$_P9K_X;$_P9K_M)}##*/}}'
-    _P9K_ALIGNED_RPROMPT+='${_P9K_X::=${_P9K_XY%;*}}'
-    _P9K_ALIGNED_RPROMPT+='${_P9K_Y::=${_P9K_XY#*;}}'
+    _P9K_GAP_PRE+='${_P9K_M::=$(((_P9K_X+_P9K_Y)/2))}'
+    _P9K_GAP_PRE+='${_P9K_XY::=${${(%):-$_P9K_LPROMPT$_P9K_RPROMPT%$_P9K_M(l./$_P9K_M;$_P9K_Y./$_P9K_X;$_P9K_M)}##*/}}'
+    _P9K_GAP_PRE+='${_P9K_X::=${_P9K_XY%;*}}'
+    _P9K_GAP_PRE+='${_P9K_Y::=${_P9K_XY#*;}}'
   done
-  _P9K_ALIGNED_RPROMPT+='${COLUMNS::=_P9K_CLM}'
-  _P9K_ALIGNED_RPROMPT+='${_P9K_X::=$((_P9K_X+2+_P9K_IND))}'
-  _P9K_ALIGNED_RPROMPT+='${_P9K_Y::=$((_P9K_X+31))}}+}'
+  _P9K_GAP_PRE+='${_P9K_M::=$((_P9K_CLM-_P9K_X-_P9K_IND-1))}'
+  _P9K_GAP_PRE+='}+}'
 
-  repeat 32; do
-    _P9K_ALIGNED_RPROMPT+='%-$_P9K_Y(l.                                .)'
-  done
-  repeat 32; do
-    _P9K_ALIGNED_RPROMPT+='%-$_P9K_X(l. .)'
-  done
-  _P9K_ALIGNED_RPROMPT+='%$(((COLUMNS-_P9K_X+2)*(COLUMNS+2>=_P9K_X)))'
-  _P9K_ALIGNED_RPROMPT+=$'(l.\n. ${_P9K_RPROMPT//)/%)}$_P9K_T[$((1+!_P9K_IND))])'
+  typeset -g _P9K_GAP_POST=$'${${${$((_P9K_M+=1)):#-*}:+${(pl.$_P9K_M.. .)}$_P9K_RPROMPT$_P9K_T[$((1+!_P9K_IND))]}:-\n}'
 
-  typeset -g _P9K_PROMPT_PREFIX_LEFT=%b%k%f
+  typeset -g _P9K_PROMPT_PREFIX_LEFT='${${_P9K_CLM::=$COLUMNS}+}${${COLUMNS::=1024}+}'
+  typeset -g _P9K_PROMPT_PREFIX_RIGHT='${${_P9K_CLM::=$COLUMNS}+}${${COLUMNS::=1024}+}'
+  typeset -g _P9K_PROMPT_SUFFIX_LEFT='${${COLUMNS::=$_P9K_CLM}+}'
+  typeset -g _P9K_PROMPT_SUFFIX_RIGHT='${${COLUMNS::=$_P9K_CLM}+}'
+
+  _P9K_PROMPT_PREFIX_LEFT+='%b%k%f'
 
   # Bug fixed in: https://github.com/zsh-users/zsh/commit/3eea35d0853bddae13fa6f122669935a01618bf9.
   # If affects most terminals when RPROMPT is non-empty and ZLE_RPROMPT_INDENT is zero.
@@ -3088,7 +3093,7 @@ _p9k_init_prompt() {
       _p9k_foreground $_P9K_RETVAL
       _P9K_PROMPT_PREFIX_LEFT+=$_P9K_RETVAL
       [[ $ruler_char == '.' ]] && local sep=',' || local sep='.'
-      local ruler_len='${$((COLUMNS-_P9K_IND))/#-*/0}'
+      local ruler_len='${$((_P9K_CLM-_P9K_IND))/#-*/0}'
       _P9K_PROMPT_PREFIX_LEFT+="\${(pl$sep$ruler_len$sep$sep${(q)ruler_char}$sep)}%k%f"
       _P9K_PROMPT_PREFIX_LEFT+='$_P9K_T[$((1+!_P9K_IND))]'
     else

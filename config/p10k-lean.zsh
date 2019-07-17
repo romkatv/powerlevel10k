@@ -112,6 +112,8 @@ fi
   # Can also be handy when the directory is shortened, as it allows you to see
   # the full directory that was used in previous commands.
   typeset -g POWERLEVEL9K_DIR_HYPERLINK=false
+  typeset -g POWERLEVEL9K_SHORTEN_STRATEGY=truncate_to_unique
+  typeset -g POWERLEVEL9K_SHORTEN_DELIMITER=
 
   # Git status: feature:master#tag ⇣42⇡42 *42 merge ~42 +42 !42 ?42.
   # We are using parameters defined by the gitstatus plugin. See reference:
