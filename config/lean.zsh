@@ -11,13 +11,12 @@ fi
 
   # The list of segments shown on the left. Fill it with the most important segments.
   typeset -ga POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(
-      # Line #1
-      dir          # current directory
-      vcs          # git status
-
-      # Line #2
+      # =========================[ Line #1 ]=========================
+      dir                     # current directory
+      vcs                     # git status
+      # =========================[ Line #2 ]=========================
       newline
-      prompt_char  # prompt symbol
+      prompt_char             # prompt symbol
   )
 
   # The list of segments shown on the right. Fill it with less important segments.
@@ -25,7 +24,7 @@ fi
   # automatically hidden when the input line reaches it. Right prompt above the
   # last prompt line gets hidden if it would overlap with left prompt.
   typeset -ga POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(
-      # Line #1
+      # =========================[ Line #1 ]=========================
       status                  # exit code of the last command
       command_execution_time  # duration of the last command
       background_jobs         # presence of background jobs
@@ -38,8 +37,7 @@ fi
       # node_version          # node.js version
       # kubecontext           # current kubernetes context (https://kubernetes.io/)
       context                 # user@host
-
-      # Line #2
+      # =========================[ Line #2 ]=========================
       newline
       # public_ip             # public IP address
       # time                  # current time
