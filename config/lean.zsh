@@ -1,3 +1,7 @@
+# Looking for a nice color? Here's a one-liner to print colormap.
+#
+#   for i in {0..255}; do print -Pn "%${i}F${(l:3::0:)i}%f " ${${(M)$((i%8)):#7}:+$'\n'}; done
+
 if [[ -o 'aliases' ]]; then
   'builtin' 'unsetopt' 'aliases'
   local p9k_lean_restore_aliases=1
@@ -10,7 +14,7 @@ fi
   setopt no_unset
 
   # The list of segments shown on the left. Fill it with the most important segments.
-  typeset -ga POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(
+  typeset -g POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(
       # =========================[ Line #1 ]=========================
       dir                     # current directory
       vcs                     # git status
@@ -23,7 +27,7 @@ fi
   # Right prompt on the last prompt line (where you are typing your commands) gets
   # automatically hidden when the input line reaches it. Right prompt above the
   # last prompt line gets hidden if it would overlap with left prompt.
-  typeset -ga POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(
+  typeset -g POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(
       # =========================[ Line #1 ]=========================
       status                  # exit code of the last command
       command_execution_time  # duration of the last command
@@ -43,19 +47,32 @@ fi
       # time                  # current time
   )
 
-  # No background colors.
-  typeset -g POWERLEVEL9K_BACKGROUND=
-  # No segment icons.
+  # Basic style options that define the overall look of your prompt.
+  typeset -g POWERLEVEL9K_BACKGROUND=                            # transparent background
+  typeset -g POWERLEVEL9K_{LEFT,RIGHT}_{LEFT,RIGHT}_WHITESPACE=  # no surrounding whitespace
+  typeset -g POWERLEVEL9K_RPROMPT_ON_NEWLINE=false               # align the first left/right lines
+  typeset -g POWERLEVEL9K_{LEFT,RIGHT}_SUBSEGMENT_SEPARATOR=' '  # separate segments with a space
+  typeset -g POWERLEVEL9K_{LEFT,RIGHT}_SEGMENT_SEPARATOR=        # no end-of-line symbol
+
+  # Disable segment icons by default.
+  #
+  # To set a specific icon for a segment (e.g., dir), define
+  # POWERLEVEL9K_DIR_VISUAL_IDENTIFIER_EXPANSION='⭐'.
+  #
+  # To set a specific icon for a segment in a given state (e.g., dir in state NOT_WRITABLE),
+  # define POWERLEVEL9K_DIR_NOT_WRITABLE_VISUAL_IDENTIFIER_EXPANSION='⭐'.
+  #
+  # To enable default segment icons for one segment (e.g., dir), define
+  # POWERLEVEL9K_DIR_VISUAL_IDENTIFIER_EXPANSION='${P9K_VISUAL_IDENTIFIER}'.
+  #
+  # To enable default icons for all segments, don't set POWERLEVEL9K_VISUAL_IDENTIFIER_EXPANSION
+  # or set it to '${P9K_VISUAL_IDENTIFIER}'.
+  #
+  # When a segment is displaying its default icon, in addition to being able to chage it with
+  # VISUAL_IDENTIFIER_EXPANSION as described above, you can also change it with an override
+  # such as POWERLEVEL9K_LOCK_ICON='⭐'. This will change the icon in every segment that uses
+  # LOCK_ICON as default icon.
   typeset -g POWERLEVEL9K_VISUAL_IDENTIFIER_EXPANSION=
-  # No whitespace within segments.
-  typeset -g POWERLEVEL9K_{LEFT,RIGHT}_{LEFT,MIDDLE,RIGHT}_WHITESPACE=
-  # No trailing space.
-  typeset -g POWERLEVEL9K_LEFT_SEGMENT_END_SEPARATOR=
-  # Don't push right prompt to the last prompt line.
-  typeset -g POWERLEVEL9K_RPROMPT_ON_NEWLINE=false
-  # Separate segments with a space.
-  typeset -g POWERLEVEL9K_{LEFT,RIGHT}_SUBSEGMENT_SEPARATOR=' '
-  typeset -g POWERLEVEL9K_{LEFT,RIGHT}_SEGMENT_SEPARATOR=
 
   # Add an empty line before each prompt. If you set it to false, you might want to
   # set POWERLEVEL9K_SHOW_RULER to true below.
@@ -72,11 +89,11 @@ fi
   # Red prompt symbol if the last command failed.
   typeset -g POWERLEVEL9K_PROMPT_CHAR_ERROR_{VIINS,VICMD,VIVIS}_FOREGROUND=196
   # Default prompt symbol.
-  typeset -g POWERLEVEL9K_PROMPT_CHAR_{OK,ERROR}_VIINS_CONTENT_EXPANSION='❯ '
+  typeset -g POWERLEVEL9K_PROMPT_CHAR_{OK,ERROR}_VIINS_CONTENT_EXPANSION='❯'
   # Prompt symbol in command vi mode.
-  typeset -g POWERLEVEL9K_PROMPT_CHAR_{OK,ERROR}_VICMD_CONTENT_EXPANSION='❮ '
+  typeset -g POWERLEVEL9K_PROMPT_CHAR_{OK,ERROR}_VICMD_CONTENT_EXPANSION='❮'
   # Prompt symbol in visual vi mode.
-  typeset -g POWERLEVEL9K_PROMPT_CHAR_{OK,ERROR}_VIVIS_CONTENT_EXPANSION='Ⅴ '
+  typeset -g POWERLEVEL9K_PROMPT_CHAR_{OK,ERROR}_VIVIS_CONTENT_EXPANSION='Ⅴ'
 
   # Enable special styling for non-writable directories. If set to false,
   # POWERLEVEL9K_DIR_NOT_WRITABLE_FOREGROUND defined below won't have effect.
@@ -131,6 +148,11 @@ fi
   # Enable counters for staged, unstaged, etc.
   typeset -g POWERLEVEL9K_VCS_{STAGED,UNSTAGED,UNTRACKED,COMMITS_AHEAD,COMMITS_BEHIND}_MAX_NUM=-1
 
+  # Show status of repositories of these types. You can add svn and/or hg if you are
+  # using them. If you do, your prompt may become slow even when your current directory
+  # isn't in an svn or hg reposotiry.
+  typeset -g POWERLEVEL9K_VCS_BACKENDS=(git)
+
   # These settings are used for respositories other than Git or when gitstatusd fails and
   # Powerlevel10k has to fall back to using vcs_info.
   typeset -g POWERLEVEL9K_VCS_CLEAN_FOREGROUND=76
@@ -152,7 +174,7 @@ fi
   # Error status color.
   typeset -g POWERLEVEL9K_STATUS_ERROR_FOREGROUND=9
   # Don't show status unless the last command was terminated by a signal.
-  # Show the signal as INT, ABORT, KILL, etc.
+  # Show signals as "INT", "ABORT", "KILL", etc.
   typeset -g POWERLEVEL9K_STATUS_ERROR_CONTENT_EXPANSION='${${P9K_CONTENT#SIG}//[!A-Z]}'
 
   # Show execution time of the last command if takes longer than this many seconds.
@@ -175,8 +197,8 @@ fi
   typeset -g POWERLEVEL9K_CONTEXT_FOREGROUND=244
   # Context color when running with privileges.
   typeset -g POWERLEVEL9K_CONTEXT_ROOT_FOREGROUND=11
-  # Don't show context unless running with privileges on via SSH.
-  typeset -g POWERLEVEL9K_CONTEXT_{DEFAULT,SUDO}_CONTENT_EXPANSION=
+  # Don't show context unless running with privileges on in SSH.
+  typeset -g POWERLEVEL9K_CONTEXT_{DEFAULT,SUDO}_{CONTENT,VISUAL_IDENTIFIER}_EXPANSION=
   typeset -g POWERLEVEL9K_ALWAYS_SHOW_CONTEXT=true
 
   # Python virtual environment color.
