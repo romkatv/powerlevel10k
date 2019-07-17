@@ -1,7 +1,12 @@
+# Lightweight config for Powerlevel10k. Doesn't require a Powerline font. Works even
+# with the default system fonts. The default colors are suitable for dark terminal
+# background. Copy the config and edit it to customize your prompt.
+#
 # Looking for a nice color? Here's a one-liner to print colormap.
 #
 #   for i in {0..255}; do print -Pn "%${i}F${(l:3::0:)i}%f " ${${(M)$((i%8)):#7}:+$'\n'}; done
 
+# Temporarily disable aliases.
 if [[ -o 'aliases' ]]; then
   'builtin' 'unsetopt' 'aliases'
   local p9k_lean_restore_aliases=1
