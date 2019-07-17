@@ -317,18 +317,33 @@ left_prompt_segment() {
     _p9k_param $1 CONTENT_EXPANSION '${P9K_CONTENT}'
     local content_exp=$_P9K_RETVAL
 
-    if [[ ( $icon_exp == '${P9K_VISUAL_IDENTIFIER}' || $icon_exp != *'$'* ) &&
-          ( $content_exp == '${P9K_CONTENT}' || $content_exp != *'$'* ) ]]; then
-      [[ $icon_exp == '${P9K_VISUAL_IDENTIFIER}' ]] && _P9K_RETVAL=$icon_ || _p9k_escape $icon_exp
-      p+="\${_P9K_V::=$_P9K_RETVAL"
-      [[ $_P9K_RETVAL == *%* ]] && p+=$style_
-      p+="}"
+    if [[ ( $icon_exp != '${P9K_VISUAL_IDENTIFIER}' && $icon_exp == *'$'* ) ||
+          ( $content_exp != '${P9K_CONTENT}' && $content_exp == *'$'* ) ]]; then
+      p+="\${P9K_VISUAL_IDENTIFIER::=$icon_}"
+    fi
+
+    local -i has_icon=-1  # maybe
+
+    if [[ $icon_exp != '${P9K_VISUAL_IDENTIFIER}' && $icon_exp == *'$'* ]]; then
+      p+="\${_P9K_V::=$icon_exp$style_}"
     else
-      p+="\${P9K_VISUAL_IDENTIFIER::=$icon_}\${_P9K_V::=$icon_exp$style_}"
+      [[ $icon_exp == '${P9K_VISUAL_IDENTIFIER}' ]] && _P9K_RETVAL=$icon_ || _p9k_escape $icon_exp
+      if [[ -n $_P9K_RETVAL ]]; then
+        p+="\${_P9K_V::=$_P9K_RETVAL"
+        [[ $_P9K_RETVAL == *%* ]] && p+=$style_
+        p+="}"
+        has_icon=1  # definitely yes
+      else
+        has_icon=0  # definitely no
+      fi
     fi
 
     p+="\${_P9K_C::=$content_exp}"
-    p+='${_P9K_E::=${${(%):-$_P9K_C%1(l.1.0)}[-1]}${${(%):-$_P9K_V%1(l.1.0)}[-1]}}'
+    if (( has_icon == -1 )); then
+      p+='${_P9K_E::=${${(%):-$_P9K_C%1(l.1.0)}[-1]}${${(%):-$_P9K_V%1(l.1.0)}[-1]}}'
+    else
+      p+='${_P9K_E::=${${(%):-$_P9K_C%1(l.1.0)}[-1]}'$has_icon'}'
+    fi
 
     p+='}+}'
 
@@ -340,17 +355,21 @@ left_prompt_segment() {
     p+="\${\${_P9K_T[\$_P9K_N]/$ss/\$_P9K_SS}/$s/\$_P9K_S}$_P9K_RETVAL"
     [[ $_P9K_RETVAL == *%* ]] && local -i need_style=1 || local -i need_style=0
 
-    _p9k_color $1 VISUAL_IDENTIFIER_COLOR $fg_color
-    _p9k_foreground $_P9K_RETVAL
-    _p9k_escape_rcurly %b$bg$_P9K_RETVAL
-    [[ $_P9K_RETVAL != $style_ || $need_style == 1 ]] && p+=$_P9K_RETVAL
-    p+="\$_P9K_V$style_"
+    if (( has_icon != 0 )); then
+      _p9k_color $1 VISUAL_IDENTIFIER_COLOR $fg_color
+      _p9k_foreground $_P9K_RETVAL
+      _p9k_escape_rcurly %b$bg$_P9K_RETVAL
+      [[ $_P9K_RETVAL != $style_ || $need_style == 1 ]] && p+=$_P9K_RETVAL
+      p+='${_P9K_V}'
 
-    _p9k_get_icon $1 LEFT_MIDDLE_WHITESPACE $space
-    if [[ -n $_P9K_RETVAL ]]; then
-      _p9k_escape $_P9K_RETVAL
-      [[ _P9K_RETVAL == *%* ]] && _P9K_RETVAL+=$style_
-      p+="\${\${(M)_P9K_E:#11}:+$_P9K_RETVAL}"
+      _p9k_get_icon $1 LEFT_MIDDLE_WHITESPACE $space
+      if [[ -n $_P9K_RETVAL ]]; then
+        _p9k_escape $_P9K_RETVAL
+        [[ _P9K_RETVAL == *%* ]] && _P9K_RETVAL+=$style_
+        p+="\${\${(M)_P9K_E:#11}:+$_P9K_RETVAL}"
+      fi
+    elif (( need_style )); then
+      p+=$style_
     fi
 
     p+="\${_P9K_C}$style_"
@@ -471,18 +490,33 @@ right_prompt_segment() {
     _p9k_param $1 CONTENT_EXPANSION '${P9K_CONTENT}'
     local content_exp=$_P9K_RETVAL
 
-    if [[ ( $icon_exp == '${P9K_VISUAL_IDENTIFIER}' || $icon_exp != *'$'* ) &&
-          ( $content_exp == '${P9K_CONTENT}' || $content_exp != *'$'* ) ]]; then
-      [[ $icon_exp == '${P9K_VISUAL_IDENTIFIER}' ]] && _P9K_RETVAL=$icon_ || _p9k_escape $icon_exp
-      p+="\${_P9K_V::=$_P9K_RETVAL"
-      [[ $_P9K_RETVAL == *%* ]] && p+=$style_
-      p+="}"
+    if [[ ( $icon_exp != '${P9K_VISUAL_IDENTIFIER}' && $icon_exp == *'$'* ) ||
+          ( $content_exp != '${P9K_CONTENT}' && $content_exp == *'$'* ) ]]; then
+      p+="\${P9K_VISUAL_IDENTIFIER::=$icon_}"
+    fi
+
+    local -i has_icon=-1  # maybe
+
+    if [[ $icon_exp != '${P9K_VISUAL_IDENTIFIER}' && $icon_exp == *'$'* ]]; then
+      p+="\${_P9K_V::=$icon_exp$style_}"
     else
-      p+="\${P9K_VISUAL_IDENTIFIER::=$icon_}\${_P9K_V::=$icon_exp$style_}"
+      [[ $icon_exp == '${P9K_VISUAL_IDENTIFIER}' ]] && _P9K_RETVAL=$icon_ || _p9k_escape $icon_exp
+      if [[ -n $_P9K_RETVAL ]]; then
+        p+="\${_P9K_V::=$_P9K_RETVAL"
+        [[ $_P9K_RETVAL == *%* ]] && p+=$style_
+        p+="}"
+        has_icon=1  # definitely yes
+      else
+        has_icon=0  # definitely no
+      fi
     fi
 
     p+="\${_P9K_C::=$content_exp}"
-    p+='${_P9K_E::=${${(%):-$_P9K_C%1(l.1.0)}[-1]}${${(%):-$_P9K_V%1(l.1.0)}[-1]}}'
+    if (( has_icon == -1 )); then
+      p+='${_P9K_E::=${${(%):-$_P9K_C%1(l.1.0)}[-1]}${${(%):-$_P9K_V%1(l.1.0)}[-1]}}'
+    else
+      p+='${_P9K_E::=${${(%):-$_P9K_C%1(l.1.0)}[-1]}'$has_icon'}'
+    fi
 
     p+='}+}'
 
@@ -493,22 +527,24 @@ right_prompt_segment() {
     _p9k_escape $_P9K_RETVAL
     p+="\${_P9K_T[\$_P9K_N]/$w/\$_P9K_W}$_P9K_RETVAL"
     [[ $_P9K_RETVAL == *%* ]] && p+=$style_
-    
+
     p+="\${_P9K_C}$style_"
 
-    local -i need_style=0
-    _p9k_get_icon $1 RIGHT_MIDDLE_WHITESPACE $space
-    if [[ -n $_P9K_RETVAL ]]; then
-      _p9k_escape $_P9K_RETVAL
-      [[ $_P9K_RETVAL == *%* ]] && need_style=1
-      p+="\${\${(M)_P9K_E:#11}:+$_P9K_RETVAL}"
-    fi
+    if (( has_icon != 0 )); then
+      local -i need_style=0
+      _p9k_get_icon $1 RIGHT_MIDDLE_WHITESPACE $space
+      if [[ -n $_P9K_RETVAL ]]; then
+        _p9k_escape $_P9K_RETVAL
+        [[ $_P9K_RETVAL == *%* ]] && need_style=1
+        p+="\${\${(M)_P9K_E:#11}:+$_P9K_RETVAL}"
+      fi
 
-    _p9k_color $1 VISUAL_IDENTIFIER_COLOR $fg_color
-    _p9k_foreground $_P9K_RETVAL
-    _p9k_escape_rcurly %b$bg$_P9K_RETVAL
-    [[ $_P9K_RETVAL != $style_ || $need_style == 1 ]] && p+=$_P9K_RETVAL
-    p+="\$_P9K_V$style_"
+      _p9k_color $1 VISUAL_IDENTIFIER_COLOR $fg_color
+      _p9k_foreground $_P9K_RETVAL
+      _p9k_escape_rcurly %b$bg$_P9K_RETVAL
+      [[ $_P9K_RETVAL != $style_ || $need_style == 1 ]] && p+=$_P9K_RETVAL
+      p+='$_P9K_V'
+    fi
 
     _p9k_param $1 SUFFIX ''
     _P9K_RETVAL=${(g::)_P9K_RETVAL}
