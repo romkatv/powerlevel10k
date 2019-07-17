@@ -1851,13 +1851,29 @@ build_test_stats() {
 ################################################################
 # System time
 
-# If set to true, `time` prompt will update every second.
-set_default POWERLEVEL9K_EXPERIMENTAL_TIME_REALTIME false
+# Format for the current time: 09:51:02. See `man 3 strftime`.
 set_default POWERLEVEL9K_TIME_FORMAT "%D{%H:%M:%S}"
+# If set to true, time will update every second.
+set_default POWERLEVEL9K_EXPERIMENTAL_TIME_REALTIME false
+# If set to true, time will update when you hit enter. This way prompts for the past
+# commands will contain the start times of their commands as opposed to the default
+# behavior where they contain the end times of their preceeding commands.
+set_default POWERLEVEL9K_TIME_UPDATE_ON_COMMAND false
 prompt_time() {
-  local t=$POWERLEVEL9K_TIME_FORMAT
-  [[ $POWERLEVEL9K_EXPERIMENTAL_TIME_REALTIME == true ]] || t=${${(%)t}//\%/%%}
-  "$1_prompt_segment" "$0" "$2" "$DEFAULT_COLOR_INVERTED" "$DEFAULT_COLOR" "TIME_ICON" 0 '' "$t"
+  if (( ! $+_P9K_TIME_TEXT )); then
+    if [[ $POWERLEVEL9K_EXPERIMENTAL_TIME_REALTIME == true ]]; then
+      _p9k_escape $POWERLEVEL9K_TIME_FORMAT
+      _P9K_TIME_TEXT=$_P9K_RETVAL
+    else
+      _p9k_escape ${${(%)POWERLEVEL9K_TIME_FORMAT}//\%/%%}
+      _P9K_TIME_TEXT=$_P9K_RETVAL
+      if [[ $POWERLEVEL9K_TIME_UPDATE_ON_COMMAND == true ]]; then
+        _p9k_escape $POWERLEVEL9K_TIME_FORMAT
+        _P9K_TIME_TEXT=\${_P9K_LINE_FINISH-$_P9K_TIME_TEXT}\${_P9K_LINE_FINISH+$_P9K_RETVAL}
+      fi
+    fi
+  fi
+  "$1_prompt_segment" "$0" "$2" "$DEFAULT_COLOR_INVERTED" "$DEFAULT_COLOR" "TIME_ICON" 1 '' "$_P9K_TIME_TEXT"
 }
 
 ################################################################
@@ -2544,6 +2560,7 @@ function _p9k_build_segment() {
 
 set_default POWERLEVEL9K_DISABLE_RPROMPT false
 function _p9k_set_prompt() {
+  unset _P9K_LINE_FINISH
   unset _P9K_RPROMPT_OVERRIDE
   PROMPT=$_P9K_PROMPT_PREFIX_LEFT
   RPROMPT=
@@ -3018,10 +3035,11 @@ _p9k_init_prompt() {
     _P9K_PROMPT_PREFIX_LEFT+="%{$(iterm2_prompt_mark)%}"
   fi
 
-  if [[ -o TRANSIENT_RPROMPT && -n "$_P9K_LINE_SEGMENTS_RIGHT[2,-1]" ]]; then
+  if [[ -o TRANSIENT_RPROMPT && -n "$_P9K_LINE_SEGMENTS_RIGHT[2,-1]" ]] || 
+     ( segment_in_use time && [[ $POWERLEVEL9K_TIME_UPDATE_ON_COMMAND == true ]] ); then
     function _p9k_zle_line_finish() {
-      [[ -o TRANSIENT_RPROMPT ]] || return 0
-      _P9K_RPROMPT_OVERRIDE=
+      [[ ! -o TRANSIENT_RPROMPT ]] || _P9K_RPROMPT_OVERRIDE=
+      _P9K_LINE_FINISH=
       zle && zle .reset-prompt && zle -R
     }
     _p9k_wrap_zle_widget zle-line-finish _p9k_zle_line_finish
