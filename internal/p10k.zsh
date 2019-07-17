@@ -2616,7 +2616,7 @@ function _p9k_set_prompt() {
         _p9k_build_segment
       done
       right_idx=_P9K_SEGMENT_INDEX
-      if [[ -n $_P9K_PROMPT || -n $POWERLEVEL9K_EMPTY_LINE_RIGHT_PROMPT_FIRST_SEGMENT_START_SYMBOL ]]; then
+      if [[ -n $_P9K_PROMPT || $_P9K_LINE_NEVER_EMPTY_RIGHT[i] == 1 ]]; then
         _P9K_PROMPT=$_P9K_LINE_PREFIX_RIGHT[i]$_P9K_PROMPT$_P9K_LINE_SUFFIX_RIGHT[i]
         if (( i == num_lines )); then
           RPROMPT=$_P9K_PROMPT
@@ -2923,7 +2923,7 @@ prompt__p9k_internal_nothing() {
 }
 
 _p9k_init_lines() {
-  typeset -ga _P9K_LINE_{SEGMENTS,PREFIX,SUFFIX}_{LEFT,RIGHT}
+  typeset -ga _P9K_LINE_{SEGMENTS,PREFIX,SUFFIX}_{LEFT,RIGHT} _P9K_LINE_NEVER_EMPTY_RIGHT
   local -a left_segments=($POWERLEVEL9K_LEFT_PROMPT_ELEMENTS)
   local -a right_segments=($POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS)
 
@@ -2960,13 +2960,14 @@ _p9k_init_lines() {
     _P9K_LINE_SUFFIX_LEFT+='%b%k$_P9K_SSS%b%k%f'
 
     _p9k_escape ${(g::)POWERLEVEL9K_EMPTY_LINE_RIGHT_PROMPT_FIRST_SEGMENT_START_SYMBOL}
+    [[ -n $_P9K_RETVAL ]] && _P9K_LINE_NEVER_EMPTY_RIGHT+=1 || _P9K_LINE_NEVER_EMPTY_RIGHT+=0
     _P9K_LINE_PREFIX_RIGHT+='${${:-${_P9K_BG::=NONE}${_P9K_I::=0}${_P9K_SSS::='$_P9K_RETVAL'}}+}'
     _P9K_LINE_SUFFIX_RIGHT+='$_P9K_SSS%b%k%f'  # gets overridden for _P9K_EMULATE_ZERO_RPROMPT_INDENT
   done
 
-  # Not escaped for historical reasons.
   _p9k_get_icon '' LEFT_SEGMENT_END_SEPARATOR
   if [[ -n $_P9K_RETVAL ]]; then
+    # Not escaped for historical reasons.
     _P9K_RETVAL+=%b%k%f
     if [[ $POWERLEVEL9K_PROMPT_ON_NEWLINE == true ]]; then
       _P9K_LINE_SUFFIX_LEFT[-2]+=$_P9K_RETVAL
@@ -2975,25 +2976,51 @@ _p9k_init_lines() {
     fi
   fi
 
-  # These aren't escaped for historical reasons.
   if (( num_lines > 1 )); then
     if [[ $+POWERLEVEL9K_MULTILINE_FIRST_PROMPT_PREFIX == 1 || $POWERLEVEL9K_PROMPT_ON_NEWLINE == true ]]; then
+      # Not escaped for historical reasons.
       _p9k_get_icon '' MULTILINE_FIRST_PROMPT_PREFIX
       [[ _P9K_RETVAL == *%* ]] && _P9K_RETVAL+=%b%k%f
       _P9K_LINE_PREFIX_LEFT[1]=$_P9K_RETVAL$_P9K_LINE_PREFIX_LEFT[1]
     fi
 
     if [[ $+POWERLEVEL9K_MULTILINE_LAST_PROMPT_PREFIX == 1 || $POWERLEVEL9K_PROMPT_ON_NEWLINE == true ]]; then
+      # Not escaped for historical reasons.
       _p9k_get_icon '' MULTILINE_LAST_PROMPT_PREFIX
       [[ _P9K_RETVAL == *%* ]] && _P9K_RETVAL+=%b%k%f
       _P9K_LINE_PREFIX_LEFT[-1]=$_P9K_RETVAL$_P9K_LINE_PREFIX_LEFT[-1]
     fi
 
+    _p9k_get_icon '' MULTILINE_FIRST_PROMPT_SUFFIX
+    if [[ -n $_P9K_RETVAL ]]; then
+      [[ _P9K_RETVAL == *%* ]] && _P9K_RETVAL+=%b%k%f
+      _p9k_escape $_P9K_RETVAL
+      _P9K_LINE_SUFFIX_RIGHT[1]+=$_P9K_RETVAL
+      _P9K_LINE_NEVER_EMPTY_RIGHT[1]=1
+    fi
+
+    _p9k_get_icon '' MULTILINE_LAST_PROMPT_SUFFIX
+    if [[ -n $_P9K_RETVAL ]]; then
+      [[ _P9K_RETVAL == *%* ]] && _P9K_RETVAL+=%b%k%f
+      _p9k_escape $_P9K_RETVAL
+      _P9K_LINE_SUFFIX_RIGHT[-1]+=$_P9K_RETVAL
+      _P9K_LINE_NEVER_EMPTY_RIGHT[-1]=1
+    fi
+
     if (( num_lines > 2 )); then
       if [[ $+POWERLEVEL9K_MULTILINE_NEWLINE_PROMPT_PREFIX == 1 || $POWERLEVEL9K_PROMPT_ON_NEWLINE == true ]]; then
+        # Not escaped for historical reasons.
         _p9k_get_icon '' MULTILINE_NEWLINE_PROMPT_PREFIX
         [[ _P9K_RETVAL == *%* ]] && _P9K_RETVAL+=%b%k%f
         _P9K_LINE_PREFIX_LEFT[2,-2]=$_P9K_RETVAL${^_P9K_LINE_PREFIX_LEFT[2,-2]}
+      fi
+
+      _p9k_get_icon '' MULTILINE_NEWLINE_PROMPT_SUFFIX
+      if [[ -n $_P9K_RETVAL ]]; then
+        [[ _P9K_RETVAL == *%* ]] && _P9K_RETVAL+=%b%k%f
+        _p9k_escape $_P9K_RETVAL
+        _P9K_LINE_SUFFIX_RIGHT[2,-2]=${^_P9K_LINE_SUFFIX_RIGHT[2,-2]}$_P9K_RETVAL
+        _P9K_LINE_NEVER_EMPTY_RIGHT[2,-2]=${(@)_P9K_LINE_NEVER_EMPTY_RIGHT[2,-2]/0/1}
       fi
     fi
   fi
@@ -3029,9 +3056,8 @@ _p9k_init_prompt() {
   # Bug fixed in: https://github.com/zsh-users/zsh/commit/3eea35d0853bddae13fa6f122669935a01618bf9.
   # If affects most terminals when RPROMPT is non-empty and ZLE_RPROMPT_INDENT is zero.
   # We can work around it as long as RPROMPT ends with a space.
-  if [[ -n $_P9K_LINE_SEGMENTS_RIGHT[-1] && $ZLE_RPROMPT_INDENT == 0 &&
-        -z $POWERLEVEL9K_EMPTY_LINE_RIGHT_PROMPT_FIRST_SEGMENT_START_SYMBOL &&
-        $POWERLEVEL9K_WHITESPACE_BETWEEN_RIGHT_SEGMENTS == ' ' &&
+  if [[ -n $_P9K_LINE_SEGMENTS_RIGHT[-1] && $_P9K_LINE_NEVER_EMPTY_RIGHT[-1] == 0 &&
+        $ZLE_RPROMPT_INDENT == 0 && $POWERLEVEL9K_WHITESPACE_BETWEEN_RIGHT_SEGMENTS == ' ' &&
         -z $(typeset -m 'POWERLEVEL9K_*(RIGHT_RIGHT_WHITESPACE|RIGHT_PROMPT_LAST_SEGMENT_END_SYMBOL)') ]] &&
         ! is-at-least 5.7.2; then
     typeset -gi _P9K_EMULATE_ZERO_RPROMPT_INDENT=1
