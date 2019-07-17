@@ -1857,7 +1857,7 @@ set_default POWERLEVEL9K_TIME_FORMAT "%D{%H:%M:%S}"
 set_default POWERLEVEL9K_EXPERIMENTAL_TIME_REALTIME false
 # If set to true, time will update when you hit enter. This way prompts for the past
 # commands will contain the start times of their commands as opposed to the default
-# behavior where they contain the end times of their preceeding commands.
+# behavior where they contain the end times of their preceding commands.
 set_default POWERLEVEL9K_TIME_UPDATE_ON_COMMAND false
 prompt_time() {
   if (( ! $+_P9K_TIME_TEXT )); then
