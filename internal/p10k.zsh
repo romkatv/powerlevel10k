@@ -317,9 +317,11 @@ left_prompt_segment() {
     _p9k_param $1 CONTENT_EXPANSION '${P9K_CONTENT}'
     local content_exp=$_P9K_RETVAL
 
-    if [[ $icon_exp == '${P9K_VISUAL_IDENTIFIER}' && $content_exp == '${P9K_CONTENT}' ]]; then
-      p+="\${_P9K_V::=$icon_"
-      [[ $icon_ == *%* ]] && p+=$style_
+    if [[ ( $icon_exp == '${P9K_VISUAL_IDENTIFIER}' || $icon_exp != *'$'* ) &&
+          ( $content_exp == '${P9K_CONTENT}' || $content_exp != *'$'* ) ]]; then
+      [[ $icon_exp == '${P9K_VISUAL_IDENTIFIER}' ]] && _P9K_RETVAL=$icon_ || _p9k_escape $icon_exp
+      p+="\${_P9K_V::=$_P9K_RETVAL"
+      [[ $_P9K_RETVAL == *%* ]] && p+=$style_
       p+="}"
     else
       p+="\${P9K_VISUAL_IDENTIFIER::=$icon_}\${_P9K_V::=$icon_exp$style_}"
@@ -469,9 +471,11 @@ right_prompt_segment() {
     _p9k_param $1 CONTENT_EXPANSION '${P9K_CONTENT}'
     local content_exp=$_P9K_RETVAL
 
-    if [[ $icon_exp == '${P9K_VISUAL_IDENTIFIER}' && $content_exp == '${P9K_CONTENT}' ]]; then
-      p+="\${_P9K_V::=$icon_"
-      [[ $icon_ == *%* ]] && p+=$style_
+    if [[ ( $icon_exp == '${P9K_VISUAL_IDENTIFIER}' || $icon_exp != *'$'* ) &&
+          ( $content_exp == '${P9K_CONTENT}' || $content_exp != *'$'* ) ]]; then
+      [[ $icon_exp == '${P9K_VISUAL_IDENTIFIER}' ]] && _P9K_RETVAL=$icon_ || _p9k_escape $icon_exp
+      p+="\${_P9K_V::=$_P9K_RETVAL"
+      [[ $_P9K_RETVAL == *%* ]] && p+=$style_
       p+="}"
     else
       p+="\${P9K_VISUAL_IDENTIFIER::=$icon_}\${_P9K_V::=$icon_exp$style_}"
