@@ -1142,8 +1142,8 @@ prompt_dir() {
       _p9k_prompt_length $delim
       local -i real_delim_len=_P9K_RETVAL i=2 n=1 q=0
       [[ $p[1] == / ]] && (( ++i ))
-      [[ $p[2,-1] == *["~!#\$^&*()\\\"'<>?{}[]"]* ]] && q=1
-      parts[i-1]="\${(Q)\${:-${(qqq)${(q)parts[i-1]}}}}"
+      [[ -n $parts[i-1] ]] && parts[i-1]="\${(Q)\${:-${(qqq)${(q)parts[i-1]}}}}"
+      [[ $p[i,-1] == *["~!#\$^&*()\\\"'<>?{}[]"]* ]] && q=1
       local -i d=${POWERLEVEL9K_SHORTEN_DELIMITER_LENGTH:--1}
       (( d >= 0 )) || d=real_delim_len
       shortenlen=${POWERLEVEL9K_SHORTEN_DIR_LENGTH:-1}
@@ -1258,17 +1258,18 @@ prompt_dir() {
     fi
 
     (( expand )) && _p9k_escape $delim || _P9K_RETVAL=$delim
-    [[ $delim == *%* ]] && delim+=$style
-    parts=("${(@)parts//$'\1'/$delim}")
+    [[ $_P9K_RETVAL == *%* ]] && _P9K_RETVAL+=$style
+    parts=("${(@)parts//$'\1'/$_P9K_RETVAL}")
 
     local sep=''
     if [[ -n $POWERLEVEL9K_DIR_PATH_SEPARATOR_FOREGROUND ]]; then
       _p9k_translate_color $POWERLEVEL9K_DIR_PATH_SEPARATOR_FOREGROUND
       _p9k_foreground $_P9K_RETVAL
+      (( expand )) && _p9k_escape_rcurly $_P9K_RETVAL
       sep=$_P9K_RETVAL
     fi
     (( expand )) && _p9k_escape $POWERLEVEL9K_DIR_PATH_SEPARATOR || _P9K_RETVAL=$POWERLEVEL9K_DIR_PATH_SEPARATOR
-    sep+=$POWERLEVEL9K_DIR_PATH_SEPARATOR
+    sep+=$_P9K_RETVAL
     [[ $sep == *%* ]] && sep+=$style
 
     local content="${(pj.$sep.)parts}"
