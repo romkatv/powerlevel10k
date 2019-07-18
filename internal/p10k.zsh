@@ -1167,9 +1167,10 @@ prompt_dir() {
         local -i saved=$(($#dir - j - d))
         if (( saved > 0 )); then
           if (( q )); then
-            parts[i]='${${${_P9K_M:#-*}:+${(Q)${:-'${(qqq)${(q)dir}}'}}}:-${(Q)${:-'${(qqq)${(q)dir[1,j]}}$'}}\1''${$((_P9K_M+='$saved'))+}}'
+            parts[i]='${${${_P9K_M:#-*}:+${(Q)${:-'${(qqq)${(q)dir}}'}}}:-${(Q)${:-'
+            parts[i]+=$'\3'${(qqq)${(q)dir[1,j]}}$'}}\1\3''${$((_P9K_M+='$saved'))+}}'
           else
-            parts[i]='${${${_P9K_M:#-*}:+'$dir'}:-'$dir[1,j]$'\1''${$((_P9K_M+='$saved'))+}}'
+            parts[i]='${${${_P9K_M:#-*}:+'$dir$'}:-\3'$dir[1,j]$'\1\3''${$((_P9K_M+='$saved'))+}}'
           fi
         else
           (( q )) && parts[i]="\${(Q)\${:-${(qqq)${(q)dir}}}}"
@@ -1277,9 +1278,21 @@ prompt_dir() {
       parts=("${(@)parts/$'\2'}")
     fi
 
-    (( expand )) && _p9k_escape $delim || _P9K_RETVAL=$delim
-    [[ $_P9K_RETVAL == *%* ]] && _P9K_RETVAL+=$style
-    parts=("${(@)parts//$'\1'/$_P9K_RETVAL}")
+    if (( $+POWERLEVEL9K_DIR_SHORTENED_FOREGROUND )); then
+      _p9k_translate_color $POWERLEVEL9K_DIR_SHORTENED_FOREGROUND
+      _p9k_foreground $_P9K_RETVAL
+      (( expand )) && _p9k_escape_rcurly $_P9K_RETVAL
+      local shortened_fg=$_P9K_RETVAL
+      (( expand )) && _p9k_escape $delim || _P9K_RETVAL=$delim
+      [[ $_P9K_RETVAL == *%* ]] && _P9K_RETVAL+=$style$shortened_fg
+      parts=("${(@)parts/(#b)$'\3'(*)$'\1'(*)$'\3'/$shortened_fg$match[1]$_P9K_RETVAL$match[2]$style}")
+      parts=("${(@)parts/(#b)(*)$'\1'(*)/$shortened_fg$match[1]$_P9K_RETVAL$match[2]$style}")
+    else
+      (( expand )) && _p9k_escape $delim || _P9K_RETVAL=$delim
+      [[ $_P9K_RETVAL == *%* ]] && _P9K_RETVAL+=$style
+      parts=("${(@)parts/$'\1'/$_P9K_RETVAL}")
+      parts=("${(@)parts//$'\3'}")
+    fi
 
     local sep=''
     if [[ -n $POWERLEVEL9K_DIR_PATH_SEPARATOR_FOREGROUND ]]; then
