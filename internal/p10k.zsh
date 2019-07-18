@@ -1050,7 +1050,7 @@ prompt_dir() {
     local -a parts=("${(s:/:)p}")
   fi
 
-  local -i fake_first=0
+  local -i fake_first=0 expand=0
   local delim=${POWERLEVEL9K_SHORTEN_DELIMITER-$'\u2026'}
   local -i shortenlen=${POWERLEVEL9K_SHORTEN_DIR_LENGTH:--1}
 
@@ -1128,11 +1128,13 @@ prompt_dir() {
       fi
     ;;
     truncate_to_unique)
-      local -i i=2 n=1
-      [[ $p[1] == / ]] && (( ++i ))
+      expand=1
       delim=${POWERLEVEL9K_SHORTEN_DELIMITER-'*'}
       _p9k_prompt_length $delim
-      local -i real_delim_len=_P9K_RETVAL
+      local -i real_delim_len=_P9K_RETVAL i=2 n=1 q=0
+      [[ $p[1] == / ]] && (( ++i ))
+      [[ $p[2,-1] == *["~!#\$^&*()\\\"'<>?{}[]"]* ]] && q=1
+      parts[i-1]="\${(Q)\${:-${(qqq)${(q)parts[i-1]}}}}"
       local -i d=${POWERLEVEL9K_SHORTEN_DELIMITER_LENGTH:--1}
       (( d >= 0 )) || d=real_delim_len
       shortenlen=${POWERLEVEL9K_SHORTEN_DIR_LENGTH:-1}
@@ -1143,6 +1145,7 @@ prompt_dir() {
         if [[ -n $POWERLEVEL9K_SHORTEN_FOLDER_MARKER &&
               -n $parent/$dir/${~POWERLEVEL9K_SHORTEN_FOLDER_MARKER}(#qN) ]]; then
           parent+=/$dir
+          (( q )) && parts[i]="\${(Q)\${:-${(qqq)${(q)dir}}}}"
           continue
         fi
         local -i j=1
@@ -1152,7 +1155,13 @@ prompt_dir() {
         done
         local -i saved=$(($#dir - j - d))
         if (( saved > 0 )); then
-          parts[i]='${${${_P9K_M:#-*}:+'$parts[i]'}:-'$dir[1,j]$'\1''${$((_P9K_M+='$saved'))+}}'
+          if (( q )); then
+            parts[i]='${${${_P9K_M:#-*}:+${(Q)\${:-'${(qqq)${(q)dir}}'}}}:-${(Q)\${:-'${(qqq)${(q)dir[1,j]}}$'}}\1''${$((_P9K_M+='$saved'))+}}'
+          else
+            parts[i]='${${${_P9K_M:#-*}:+'$dir'}:-'$dir[1,j]$'\1''${$((_P9K_M+='$saved'))+}}'
+          fi
+        else
+          (( q )) && parts[i]="\${(Q)\${:-${(qqq)${(q)dir}}}}"
         fi
         parent+=/$dir
       done
@@ -1185,7 +1194,7 @@ prompt_dir() {
 
   [[ $POWERLEVEL9K_DIR_SHOW_WRITABLE == true && ! -w $PWD ]]
   local w=$?
-  if ! _p9k_cache_get $0 $2 $PWD $w $fake_first "$delim" "${parts[@]}"; then
+  if ! _p9k_cache_get $0 $2 $PWD $w $fake_first "${parts[@]}"; then
     local state=$0
     local icon=''
     if (( ! w )); then
@@ -1209,11 +1218,17 @@ prompt_dir() {
     _p9k_color $state FOREGROUND "$DEFAULT_COLOR"
     _p9k_foreground $_P9K_RETVAL
     style+=$_P9K_RETVAL
-    _p9k_escape_rcurly $style
-    style=$_P9K_RETVAL
+    if (( expand )); then
+      _p9k_escape_rcurly $style
+      style=$_P9K_RETVAL
+    fi
 
     parts=("${(@)parts//\%/%%}")
-    [[ $fake_first == 0 && $parts[1] == '~' ]] && parts[1]=$POWERLEVEL9K_HOME_FOLDER_ABBREVIATION$style
+    if [[ $POWERLEVEL9K_HOME_FOLDER_ABBREVIATION != '~' && $fake_first == 0 && $p == ('~'|'~/'*) ]]; then
+      (( expand )) && _p9k_escape $POWERLEVEL9K_HOME_FOLDER_ABBREVIATION || _P9K_RETVAL=$POWERLEVEL9K_HOME_FOLDER_ABBREVIATION
+      parts[1]=$_P9K_RETVAL
+      [[ $_P9K_RETVAL == *%* ]] && parts[1]+=$style
+    fi
     [[ $POWERLEVEL9K_DIR_OMIT_FIRST_CHARACTER == true && $#parts > 1 && -n $parts[2] ]] && parts[1]=()
 
     local last_fg=
@@ -1223,25 +1238,48 @@ prompt_dir() {
       _p9k_foreground $_P9K_RETVAL
       last_fg+=$_P9K_RETVAL
     fi
-    _p9k_escape_rcurly $last_fg
-    parts[-1]=$_P9K_RETVAL${parts[-1]//$'\1'/$'\1'$_P9K_RETVAL}$style
-    parts=("${(@)parts//$'\1'/$delim$style}")
+    if [[ -n $last_fg ]]; then
+      (( expand )) && _p9k_escape_rcurly $last_fg || _P9K_RETVAL=$last_fg
+      parts[-1]=$_P9K_RETVAL${parts[-1]//$'\1'/$'\1'$_P9K_RETVAL}$style
+    fi
 
-    local sep=$POWERLEVEL9K_DIR_PATH_SEPARATOR$style
+    (( expand )) && _p9k_escape $delim || _P9K_RETVAL=$delim
+    [[ $delim == *%* ]] && delim+=$style
+    parts=("${(@)parts//$'\1'/$delim}")
+
+    local sep=''
     if [[ -n $POWERLEVEL9K_DIR_PATH_SEPARATOR_FOREGROUND ]]; then
       _p9k_translate_color $POWERLEVEL9K_DIR_PATH_SEPARATOR_FOREGROUND
       _p9k_foreground $_P9K_RETVAL
-      sep=$_P9K_RETVAL$sep
+      sep=$_P9K_RETVAL
     fi
+    (( expand )) && _p9k_escape $POWERLEVEL9K_DIR_PATH_SEPARATOR || _P9K_RETVAL=$POWERLEVEL9K_DIR_PATH_SEPARATOR
+    sep+=$POWERLEVEL9K_DIR_PATH_SEPARATOR
+    [[ $sep == *%* ]] && sep+=$style
 
     local content="${(pj.$sep.)parts}"
     if [[ $POWERLEVEL9K_DIR_HYPERLINK == true ]]; then
-      content=$'%{\e]8;;file://'${${PWD//\%/%%25}//'#'/%%23}$'\a%}'$content$'%{\e]8;;\a%}'
+      local pref=$'%{\e]8;;file://'${${PWD//\%/%%25}//'#'/%%23}$'\a%}'
+      local suf=$'%{\e]8;;\a%}'
+      if (( expand )); then
+        _p9k_escape $pref
+        pref=$_P9K_RETVAL
+        _p9k_escape $suf
+        suf=$_P9K_RETVAL
+      fi
+      content=$pref$content$suf
     fi
-    _p9k_cache_set $state $2 blue "$DEFAULT_COLOR" "$icon" 1 "" "$content"
+    _p9k_cache_set "$state" "$icon" "$expand" "$content"
   fi
-  _P9K_DIR=$_P9K_CACHE_VAL[-1]
-  $1_prompt_segment "${(@)_P9K_CACHE_VAL[1,-2]}" '%{dir%\}'$_P9K_DIR'%{dir%\}'
+  if (( _P9K_CACHE_VAL[3] )); then
+    if (( $+_P9K_DIR )); then
+      _P9K_CACHE_VAL[4]='${${_P9K_M1::=_P9K_M}+}${${_P9K_M::=-1024}+}'$_P9K_CACHE_VAL[4]'${${_P9K_M::=_P9K_M1}+}'
+    else
+      _P9K_DIR=$_P9K_CACHE_VAL[4]
+      _P9K_CACHE_VAL[4]='%{d%\}'$_P9K_CACHE_VAL[4]'%{d%\}'
+    fi
+  fi
+  $1_prompt_segment "$_P9K_CACHE_VAL[1]" "$2" "blue" "$DEFAULT_COLOR" "$_P9K_CACHE_VAL[2]" "$_P9K_CACHE_VAL[3]" "" "$_P9K_CACHE_VAL[4]"
 }
 
 ################################################################
@@ -2607,8 +2645,9 @@ function _p9k_set_prompt() {
 
   local -i left_idx=1 right_idx=1 num_lines=$#_P9K_LINE_SEGMENTS_LEFT i
   for i in {1..$num_lines}; do
-    local right=0
+    local right=
     if [[ $POWERLEVEL9K_DISABLE_RPROMPT == false ]]; then
+      _P9K_DIR=
       _P9K_PROMPT=
       _P9K_SEGMENT_INDEX=right_idx
       _P9K_PROMPT_SIDE=right
@@ -2617,16 +2656,10 @@ function _p9k_set_prompt() {
       done
       right_idx=_P9K_SEGMENT_INDEX
       if [[ -n $_P9K_PROMPT || $_P9K_LINE_NEVER_EMPTY_RIGHT[i] == 1 ]]; then
-        _P9K_PROMPT=$_P9K_LINE_PREFIX_RIGHT[i]$_P9K_PROMPT$_P9K_LINE_SUFFIX_RIGHT[i]
-        if (( i == num_lines )); then
-          RPROMPT=$_P9K_PROMPT
-        else
-          right=1
-          PROMPT+='${${_P9K_RPROMPT::=${_P9K_RPROMPT_OVERRIDE-'$_P9K_PROMPT'}}+}'
-        fi
+        right=$_P9K_LINE_PREFIX_RIGHT[i]$_P9K_PROMPT$_P9K_LINE_SUFFIX_RIGHT[i]
       fi
     fi
-    _P9K_DIR=
+    unset _P9K_DIR
     _P9K_PROMPT=$_P9K_LINE_PREFIX_LEFT[i]
     _P9K_SEGMENT_INDEX=left_idx
     _P9K_PROMPT_SIDE=left
@@ -2635,18 +2668,18 @@ function _p9k_set_prompt() {
     done
     left_idx=_P9K_SEGMENT_INDEX
     _P9K_PROMPT+=$_P9K_LINE_SUFFIX_LEFT[i]
-    if (( i != num_lines )); then
-      if (( right )); then
-        PROMPT+='${${_P9K_M::=0}+}${${_P9K_LPROMPT::='$_P9K_PROMPT'}+}'
-        PROMPT+=$_P9K_GAP_PRE
-        PROMPT+='${_P9K_LPROMPT/\%\{dir\%\}*\%\{dir\%\}/'$_P9K_DIR'}'
-        PROMPT+=$_P9K_GAP_POST
-      else
-        PROMPT+=$_P9K_PROMPT
-        PROMPT+=$'\n'
-      fi
+    if (( $+_P9K_DIR || (i != num_lines && $#right) )); then
+      PROMPT+='${${:-${_P9K_M::=0}${_P9K_RPROMPT::=${_P9K_RPROMPT_OVERRIDE-'$right'}}${_P9K_LPROMPT::='$_P9K_PROMPT'}}+}'
+      PROMPT+=$_P9K_GAP_PRE
+      (( $+_P9K_DIR )) && PROMPT+='${_P9K_LPROMPT/\%\{d\%\}*\%\{d\%\}/'$_P9K_DIR'}' || PROMPT+='${_P9K_LPROMPT}'
+      ((i != num_lines && $#right)) && PROMPT+=$_P9K_GAP_POST
     else
       PROMPT+=$_P9K_PROMPT
+    fi
+    if (( i == num_lines )); then
+      RPROMPT=$right
+    elif [[ -z $right ]]; then
+      PROMPT+=$'\n'
     fi
   done
 
@@ -3039,7 +3072,7 @@ _p9k_init_prompt() {
   _p9k_init_lines
 
   typeset -g _P9K_XY _P9K_CLM
-  typeset -gi _P9K_X _P9K_Y _P9K_M _P9K_IND
+  typeset -gi _P9K_X _P9K_Y _P9K_M _P9K_M1 _P9K_IND
   typeset -g _P9K_GAP_PRE='${${:-${_P9K_X::=0}${_P9K_Y::=1024}'
   repeat 10; do
     _P9K_GAP_PRE+='${_P9K_M::=$(((_P9K_X+_P9K_Y)/2))}'
