@@ -964,6 +964,7 @@ prompt_command_execution_time() {
 set_default POWERLEVEL9K_DIR_PATH_SEPARATOR "/"
 set_default POWERLEVEL9K_HOME_FOLDER_ABBREVIATION "~"
 set_default POWERLEVEL9K_DIR_PATH_HIGHLIGHT_BOLD false
+set_default POWERLEVEL9K_DIR_ANCHORS_BOLD false
 set_default POWERLEVEL9K_DIR_PATH_ABSOLUTE false
 set_default POWERLEVEL9K_DIR_SHOW_WRITABLE false
 set_default POWERLEVEL9K_DIR_OMIT_FIRST_CHARACTER false
@@ -1142,7 +1143,7 @@ prompt_dir() {
       _p9k_prompt_length $delim
       local -i real_delim_len=_P9K_RETVAL i=2 n=1 q=0
       [[ $p[1] == / ]] && (( ++i ))
-      [[ -n $parts[i-1] ]] && parts[i-1]="\${(Q)\${:-${(qqq)${(q)parts[i-1]}}}}"
+      [[ -n $parts[i-1] ]] && parts[i-1]="\${(Q)\${:-${(qqq)${(q)parts[i-1]}}}}"$'\2'
       [[ $p[i,-1] == *["~!#\$^&*()\\\"'<>?{}[]"]* ]] && q=1
       local -i d=${POWERLEVEL9K_SHORTEN_DELIMITER_LENGTH:--1}
       (( d >= 0 )) || d=real_delim_len
@@ -1155,6 +1156,7 @@ prompt_dir() {
               -n $parent/$dir/${~POWERLEVEL9K_SHORTEN_FOLDER_MARKER}(#qN) ]]; then
           parent+=/$dir
           (( q )) && parts[i]="\${(Q)\${:-${(qqq)${(q)dir}}}}"
+          parts[i]+=$'\2'
           continue
         fi
         local -i j=1
@@ -1174,11 +1176,10 @@ prompt_dir() {
         fi
         parent+=/$dir
       done
-      if (( q )); then
-        for ((; i <= $#parts; ++i)); do
-          parts[i]='${(Q)${:-'${(qqq)${(q)parts[i]}}'}}'
-        done
-      fi
+      for ((; i <= $#parts; ++i)); do
+        (( q )) && parts[i]='${(Q)${:-'${(qqq)${(q)parts[i]}}'}}'
+        parts[i]+=$'\2'
+      done
     ;;
     truncate_with_folder_marker)
       if [[ -n $POWERLEVEL9K_SHORTEN_FOLDER_MARKER ]]; then
@@ -1245,16 +1246,35 @@ prompt_dir() {
     fi
     [[ $POWERLEVEL9K_DIR_OMIT_FIRST_CHARACTER == true && $#parts > 1 && -n $parts[2] ]] && parts[1]=()
 
-    local last_fg=
-    [[ $POWERLEVEL9K_DIR_PATH_HIGHLIGHT_BOLD == true ]] && last_fg+=%B
-    if [[ -n $POWERLEVEL9K_DIR_PATH_HIGHLIGHT_FOREGROUND ]]; then
+    local last_style=
+    [[ $POWERLEVEL9K_DIR_PATH_HIGHLIGHT_BOLD == true ]] && last_style+=%B
+    if (( $+POWERLEVEL9K_DIR_PATH_HIGHLIGHT_FOREGROUND )); then
       _p9k_translate_color $POWERLEVEL9K_DIR_PATH_HIGHLIGHT_FOREGROUND
       _p9k_foreground $_P9K_RETVAL
-      last_fg+=$_P9K_RETVAL
+      last_style+=$_P9K_RETVAL
     fi
-    if [[ -n $last_fg ]]; then
-      (( expand )) && _p9k_escape_rcurly $last_fg || _P9K_RETVAL=$last_fg
+    if [[ -n $last_style ]]; then
+      (( expand )) && _p9k_escape_rcurly $last_style || _P9K_RETVAL=$last_style
       parts[-1]=$_P9K_RETVAL${parts[-1]//$'\1'/$'\1'$_P9K_RETVAL}$style
+    fi
+
+    local anchor_style=
+    [[ $POWERLEVEL9K_DIR_ANCHOR_BOLD == true ]] && anchor_style+=%B
+    if (( $+POWERLEVEL9K_DIR_ANCHOR_FOREGROUND )); then
+      _p9k_translate_color $POWERLEVEL9K_DIR_ANCHOR_FOREGROUND
+      _p9k_foreground $_P9K_RETVAL
+      anchor_style+=$_P9K_RETVAL
+    fi
+    if [[ -n $anchor_style ]]; then
+      (( expand )) && _p9k_escape_rcurly $anchor_style || _P9K_RETVAL=$anchor_style
+      if [[ -z $last_style ]]; then
+        parts=("${(@)parts/%(#b)(*)$'\2'/$_P9K_RETVAL$match[1]$style}")
+      else
+        (( $#parts > 1 )) && parts[1,-2]=("${(@)parts[1,-2]/%(#b)(*)$'\2'/$_P9K_RETVAL$match[1]$style}")
+        parts[-1]=${parts[-1]/$'\2'}
+      fi
+    else
+      parts=("${(@)parts/$'\2'}")
     fi
 
     (( expand )) && _p9k_escape $delim || _P9K_RETVAL=$delim
