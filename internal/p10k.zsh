@@ -1165,7 +1165,7 @@ prompt_dir() {
         local -i saved=$(($#dir - j - d))
         if (( saved > 0 )); then
           if (( q )); then
-            parts[i]='${${${_P9K_M:#-*}:+${(Q)\${:-'${(qqq)${(q)dir}}'}}}:-${(Q)\${:-'${(qqq)${(q)dir[1,j]}}$'}}\1''${$((_P9K_M+='$saved'))+}}'
+            parts[i]='${${${_P9K_M:#-*}:+${(Q)${:-'${(qqq)${(q)dir}}'}}}:-${(Q)${:-'${(qqq)${(q)dir[1,j]}}$'}}\1''${$((_P9K_M+='$saved'))+}}'
           else
             parts[i]='${${${_P9K_M:#-*}:+'$dir'}:-'$dir[1,j]$'\1''${$((_P9K_M+='$saved'))+}}'
           fi
@@ -1174,6 +1174,11 @@ prompt_dir() {
         fi
         parent+=/$dir
       done
+      if (( q )); then
+        for ((; i <= $#parts; ++i)); do
+          parts[i]='${(Q)${:-'${(qqq)${(q)parts[i]}}'}}'
+        done
+      fi
     ;;
     truncate_with_folder_marker)
       if [[ -n $POWERLEVEL9K_SHORTEN_FOLDER_MARKER ]]; then
