@@ -101,19 +101,32 @@ fi
   typeset -g POWERLEVEL9K_PROMPT_CHAR_{OK,ERROR}_VIVIS_CONTENT_EXPANSION='Ⅴ'
 
   # Enable special styling for non-writable directories. If set to false,
-  # POWERLEVEL9K_DIR_NOT_WRITABLE_FOREGROUND defined below won't have effect.
+  # POWERLEVEL9K_DIR_NOT_WRITABLE_VISUAL_IDENTIFIER_EXPANSION defined below won't have effect.
   typeset -g POWERLEVEL9K_DIR_SHOW_WRITABLE=true
+  # Icon to display when the current directory isn't writable.
+  typeset -g POWERLEVEL9K_DIR_NOT_WRITABLE_VISUAL_IDENTIFIER_EXPANSION='%214F%B!w'
   # Default current directory color.
   typeset -g POWERLEVEL9K_DIR_FOREGROUND=39
-  # Directory color if it isn't writable.
-  typeset -g POWERLEVEL9K_DIR_NOT_WRITABLE_FOREGROUND=209
+  # If directory is too long, shorten some of its segments to the shortest possible unique
+  # prefix. The shortened directory can be tab-completed to the original.
+  typeset -g POWERLEVEL9K_SHORTEN_STRATEGY=truncate_to_unique
+  # Replace removed segment suffixes with this symbol.
+  typeset -g POWERLEVEL9K_SHORTEN_DELIMITER=
+  # Color of the shortened directory segments.
+  typeset -g POWERLEVEL9K_DIR_SHORTENED_FOREGROUND=24
+  # Display anchor directory segments in bold. Anchor segments are never shortened. The first
+  # segment is always an anchor.
+  typeset -g POWERLEVEL9K_DIR_ANCHOR_BOLD=true
+  # Don't shorten directories that contain files matching this pattern. They are anchors.
+  typeset -g POWERLEVEL9K_SHORTEN_FOLDER_MARKER='(.shorten_folder_marker|.bzr|CVS|.git|.hg|.svn|.terraform|.citc)'
+  # Don't shorten this many last directory segments. They are anchors.
+  typeset -g POWERLEVEL9K_SHORTEN_DIR_LENGTH=1
+
   # If set to true, embed a hyperlink into the directory. Useful for quickly
   # opening a directory in the file manager simply by clicking the link.
   # Can also be handy when the directory is shortened, as it allows you to see
   # the full directory that was used in previous commands.
   typeset -g POWERLEVEL9K_DIR_HYPERLINK=false
-  typeset -g POWERLEVEL9K_SHORTEN_STRATEGY=truncate_to_unique
-  typeset -g POWERLEVEL9K_SHORTEN_DELIMITER=
 
   # Git status: feature:master#tag ⇣42⇡42 *42 merge ~42 +42 !42 ?42.
   # We are using parameters defined by the gitstatus plugin. See reference:
