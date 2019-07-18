@@ -984,6 +984,15 @@ set_default POWERLEVEL9K_SHORTEN_FOLDER_MARKER "(.shorten_folder_marker|.bzr|CVS
 # by `emulate zsh && setopt extended_glob`.
 set_default -a POWERLEVEL9K_DIR_PACKAGE_FILES package.json composer.json
 
+# When dir is on the last prompt line, try to shorten it enough to leave at least this many
+# columns for typing commands. Applies only when POWERLEVEL9K_SHORTEN_STRATEGY=truncate_to_unique.
+set_default -i POWERLEVEL9K_DIR_MIN_COMMAND_COLUMNS 40
+
+# When dir is on the last prompt line, try to shorten it enough to leave at least
+# COLUMNS * POWERLEVEL9K_DIR_MIN_COMMAND_COLUMNS_PCT * 0.01 columns for typing commands. Applies
+# only when POWERLEVEL9K_SHORTEN_STRATEGY=truncate_to_unique.
+set_default -F POWERLEVEL9K_DIR_MIN_COMMAND_COLUMNS_PCT 50
+
 # You can define POWERLEVEL9K_DIR_CLASSES to specify custom styling and icons for different
 # directories.
 #
@@ -2671,7 +2680,16 @@ function _p9k_set_prompt() {
     if (( $+_P9K_DIR || (i != num_lines && $#right) )); then
       PROMPT+='${${:-${_P9K_M::=0}${_P9K_RPROMPT::=${_P9K_RPROMPT_OVERRIDE-'$right'}}${_P9K_LPROMPT::='$_P9K_PROMPT'}}+}'
       PROMPT+=$_P9K_GAP_PRE
-      (( $+_P9K_DIR )) && PROMPT+='${_P9K_LPROMPT/\%\{d\%\}*\%\{d\%\}/'$_P9K_DIR'}' || PROMPT+='${_P9K_LPROMPT}'
+      if (( $+_P9K_DIR )); then
+        if (( i == num_lines && (POWERLEVEL9K_DIR_MIN_COMMAND_COLUMNS > 0 || POWERLEVEL9K_DIR_MIN_COMMAND_COLUMNS_PCT > 0) )); then
+          local a=$POWERLEVEL9K_DIR_MIN_COMMAND_COLUMNS
+          local f=$((0.01*POWERLEVEL9K_DIR_MIN_COMMAND_COLUMNS_PCT))'*_P9K_CLM'
+          PROMPT+="\${\$((_P9K_M-=($a<$f)*$f+($a>=$f)*$a))+}"
+        fi
+        PROMPT+='${_P9K_LPROMPT/\%\{d\%\}*\%\{d\%\}/'$_P9K_DIR'}'
+      else
+        PROMPT+='${_P9K_LPROMPT}'
+      fi
       ((i != num_lines && $#right)) && PROMPT+=$_P9K_GAP_POST
     else
       PROMPT+=$_P9K_PROMPT
