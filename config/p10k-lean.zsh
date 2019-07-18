@@ -106,16 +106,18 @@ fi
   # Icon to display when the current directory isn't writable.
   typeset -g POWERLEVEL9K_DIR_NOT_WRITABLE_VISUAL_IDENTIFIER_EXPANSION='%214F%B!w'
   # Default current directory color.
-  typeset -g POWERLEVEL9K_DIR_FOREGROUND=39
+  typeset -g POWERLEVEL9K_DIR_FOREGROUND=12
   # If directory is too long, shorten some of its segments to the shortest possible unique
   # prefix. The shortened directory can be tab-completed to the original.
   typeset -g POWERLEVEL9K_SHORTEN_STRATEGY=truncate_to_unique
   # Replace removed segment suffixes with this symbol.
   typeset -g POWERLEVEL9K_SHORTEN_DELIMITER=
   # Color of the shortened directory segments.
-  typeset -g POWERLEVEL9K_DIR_SHORTENED_FOREGROUND=24
-  # Display anchor directory segments in bold. Anchor segments are never shortened. The first
+  typeset -g POWERLEVEL9K_DIR_SHORTENED_FOREGROUND=23
+  # Color of the anchor directory segments. Anchor segments are never shortened. The first
   # segment is always an anchor.
+  typeset -g POWERLEVEL9K_DIR_ANCHOR_FOREGROUND=39
+  # Display anchor directory segments in bold.
   typeset -g POWERLEVEL9K_DIR_ANCHOR_BOLD=true
   # Don't shorten directories that contain files matching this pattern. They are anchors.
   typeset -g POWERLEVEL9K_SHORTEN_FOLDER_MARKER='(.shorten_folder_marker|.bzr|CVS|.git|.hg|.svn|.terraform|.citc)'
