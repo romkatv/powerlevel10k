@@ -123,6 +123,9 @@ fi
   typeset -g POWERLEVEL9K_SHORTEN_FOLDER_MARKER='(.shorten_folder_marker|.bzr|CVS|.git|.hg|.svn|.terraform|.citc)'
   # Don't shorten this many last directory segments. They are anchors.
   typeset -g POWERLEVEL9K_SHORTEN_DIR_LENGTH=1
+  # Shorten directory if it's longer than this even if there is space for it. If set
+  # to -1, directory will be shortened only when prompt doesn't fit.
+  typeset -g POWERLEVEL9K_DIR_MAX_LENGTH=100
 
   # If set to true, embed a hyperlink into the directory. Useful for quickly
   # opening a directory in the file manager simply by clicking the link.

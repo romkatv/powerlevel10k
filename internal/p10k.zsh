@@ -973,13 +973,10 @@ set_default POWERLEVEL9K_SHORTEN_STRATEGY ""
 set_default POWERLEVEL9K_DIR_PATH_SEPARATOR_FOREGROUND ""
 set_default POWERLEVEL9K_SHORTEN_FOLDER_MARKER "(.shorten_folder_marker|.bzr|CVS|.git|.hg|.svn|.terraform|.citc)"
 
-# Stop shortening the directory once its length is no greater than this. The value can be either
-# absolute (e.g., '50') or a percentage of terminal width (e.g, '50%').
-#
-# Currently only applied when POWERLEVEL9K_SHORTEN_STRATEGY=truncate_to_unique. If you want to use
-# it with another shortening strategy, open an issue.
-# TODO: this is gone.
-# set_default POWERLEVEL9K_DIR_MAX_LENGTH 0
+# Shorten directory if it's longer than this even if there is space for it. If set
+# to -1, directory will be shortened only when prompt doesn't fit. Applies only
+# when POWERLEVEL9K_SHORTEN_STRATEGY=truncate_to_unique.
+set_default -i POWERLEVEL9K_DIR_MAX_LENGTH 0
 
 # Individual elements are patterns. They are expanded with the options set
 # by `emulate zsh && setopt extended_glob`.
@@ -1149,7 +1146,10 @@ prompt_dir() {
       (( d >= 0 )) || d=real_delim_len
       shortenlen=${POWERLEVEL9K_SHORTEN_DIR_LENGTH:-1}
       (( shortenlen >= 0 )) && n=shortenlen
+      local -i max_len=1024
+      (( POWERLEVEL9K_DIR_MAX_LENGTH >= 0 )) && max_len=POWERLEVEL9K_DIR_MAX_LENGTH
       local parent="${PWD%/${(pj./.)parts[i,-1]}}"
+      local -i len=$#p
       for (( ; i <= $#parts - n; ++i )); do
         local dir=$parts[i]
         if [[ -n $POWERLEVEL9K_SHORTEN_FOLDER_MARKER &&
@@ -1166,11 +1166,20 @@ prompt_dir() {
         done
         local -i saved=$(($#dir - j - d))
         if (( saved > 0 )); then
-          if (( q )); then
-            parts[i]='${${${_P9K_M:#-*}:+${(Q)${:-'${(qqq)${(q)dir}}'}}}:-${(Q)${:-'
-            parts[i]+=$'\3'${(qqq)${(q)dir[1,j]}}$'}}\1\3''${$((_P9K_M+='$saved'))+}}'
+          if (( len > max_len )); then
+            (( len -= ($#dir - j - real_delim_len) ))
+            if (( q )); then
+              parts[i]=$'\3'${(qqq)${(q)dir[1,j]}}$'\1\3'
+            else
+              parts[i]=$'\3'$dir[1,j]$'\1\3'
+            fi
           else
-            parts[i]='${${${_P9K_M:#-*}:+'$dir$'}:-\3'$dir[1,j]$'\1\3''${$((_P9K_M+='$saved'))+}}'
+            if (( q )); then
+              parts[i]='${${${_P9K_M:#-*}:+${(Q)${:-'${(qqq)${(q)dir}}'}}}:-${(Q)${:-'
+              parts[i]+=$'\3'${(qqq)${(q)dir[1,j]}}$'}}\1\3''${$((_P9K_M+='$saved'))+}}'
+            else
+              parts[i]='${${${_P9K_M:#-*}:+'$dir$'}:-\3'$dir[1,j]$'\1\3''${$((_P9K_M+='$saved'))+}}'
+            fi
           fi
         else
           (( q )) && parts[i]="\${(Q)\${:-${(qqq)${(q)dir}}}}"
