@@ -1018,7 +1018,7 @@ set_default -F POWERLEVEL9K_DIR_MIN_COMMAND_COLUMNS_PCT 50
 #   POWERLEVEL9K_DIR_HOME_BACKGROUND=blue
 #   POWERLEVEL9K_DIR_DEFAULT_BACKGROUND=yellow
 #
-# With the settings, the current directory in the prompt may look like this:
+# With these settings, the current directory in the prompt may look like this:
 #
 #   (╯°□°）╯︵ ┻━┻ ~/work/projects/important/urgent
 #
