@@ -973,10 +973,11 @@ set_default POWERLEVEL9K_SHORTEN_STRATEGY ""
 set_default POWERLEVEL9K_DIR_PATH_SEPARATOR_FOREGROUND ""
 set_default POWERLEVEL9K_SHORTEN_FOLDER_MARKER "(.shorten_folder_marker|.bzr|CVS|.git|.hg|.svn|.terraform|.citc)"
 
-# Shorten directory if it's longer than this even if there is space for it. If set
-# to -1, directory will be shortened only when prompt doesn't fit. Applies only
-# when POWERLEVEL9K_SHORTEN_STRATEGY=truncate_to_unique.
-set_default -i POWERLEVEL9K_DIR_MAX_LENGTH 0
+# Shorten directory if it's longer than this even if there is space for it.
+# The value can be either absolute (e.g., '80') or a percentage of terminal
+# width (e.g, '50%'). If empty, directory will be shortened only when prompt
+# doesn't fit. Applies only when POWERLEVEL9K_SHORTEN_STRATEGY=truncate_to_unique.
+set_default POWERLEVEL9K_DIR_MAX_LENGTH 0
 
 # Individual elements are patterns. They are expanded with the options set
 # by `emulate zsh && setopt extended_glob`.
@@ -1146,10 +1147,7 @@ prompt_dir() {
       (( d >= 0 )) || d=real_delim_len
       shortenlen=${POWERLEVEL9K_SHORTEN_DIR_LENGTH:-1}
       (( shortenlen >= 0 )) && n=shortenlen
-      local -i max_len=1024
-      (( POWERLEVEL9K_DIR_MAX_LENGTH >= 0 )) && max_len=POWERLEVEL9K_DIR_MAX_LENGTH
       local parent="${PWD%/${(pj./.)parts[i,-1]}}"
-      local -i len=$#p
       for (( ; i <= $#parts - n; ++i )); do
         local dir=$parts[i]
         if [[ -n $POWERLEVEL9K_SHORTEN_FOLDER_MARKER &&
@@ -1166,20 +1164,11 @@ prompt_dir() {
         done
         local -i saved=$(($#dir - j - d))
         if (( saved > 0 )); then
-          if (( len > max_len )); then
-            (( len -= ($#dir - j - real_delim_len) ))
-            if (( q )); then
-              parts[i]=$'\3'${(qqq)${(q)dir[1,j]}}$'\1\3'
-            else
-              parts[i]=$'\3'$dir[1,j]$'\1\3'
-            fi
+          if (( q )); then
+            parts[i]='${${${_P9K_D:#-*}:+${(Q)${:-'${(qqq)${(q)dir}}'}}}:-${(Q)${:-'
+            parts[i]+=$'\3'${(qqq)${(q)dir[1,j]}}$'}}\1\3''${$((_P9K_D+='$saved'))+}}'
           else
-            if (( q )); then
-              parts[i]='${${${_P9K_M:#-*}:+${(Q)${:-'${(qqq)${(q)dir}}'}}}:-${(Q)${:-'
-              parts[i]+=$'\3'${(qqq)${(q)dir[1,j]}}$'}}\1\3''${$((_P9K_M+='$saved'))+}}'
-            else
-              parts[i]='${${${_P9K_M:#-*}:+'$dir$'}:-\3'$dir[1,j]$'\1\3''${$((_P9K_M+='$saved'))+}}'
-            fi
+            parts[i]='${${${_P9K_D:#-*}:+'$dir$'}:-\3'$dir[1,j]$'\1\3''${$((_P9K_D+='$saved'))+}}'
           fi
         else
           (( q )) && parts[i]="\${(Q)\${:-${(qqq)${(q)dir}}}}"
@@ -1326,13 +1315,17 @@ prompt_dir() {
       fi
       content=$pref$content$suf
     fi
-    _p9k_cache_set "$state" "$icon" "$expand" "$content"
+
+    (( expand )) && eval "_p9k_prompt_length \"\${\${_P9K_D::=0}+}$content\"" || _P9K_RETVAL=
+    _p9k_cache_set "$state" "$icon" "$expand" "$content" $_P9K_RETVAL
   fi
+
   if (( _P9K_CACHE_VAL[3] )); then
     if (( $+_P9K_DIR )); then
-      _P9K_CACHE_VAL[4]='${${_P9K_M1::=_P9K_M}+}${${_P9K_M::=-1024}+}'$_P9K_CACHE_VAL[4]'${${_P9K_M::=_P9K_M1}+}'
+      _P9K_CACHE_VAL[4]='${${_P9K_D::=-1024}+}'$_P9K_CACHE_VAL[4]
     else
       _P9K_DIR=$_P9K_CACHE_VAL[4]
+      _P9K_DIR_LEN=$_P9K_CACHE_VAL[5]
       _P9K_CACHE_VAL[4]='%{d%\}'$_P9K_CACHE_VAL[4]'%{d%\}'
     fi
   fi
@@ -2726,15 +2719,31 @@ function _p9k_set_prompt() {
     left_idx=_P9K_SEGMENT_INDEX
     _P9K_PROMPT+=$_P9K_LINE_SUFFIX_LEFT[i]
     if (( $+_P9K_DIR || (i != num_lines && $#right) )); then
-      PROMPT+='${${:-${_P9K_M::=0}${_P9K_RPROMPT::=${_P9K_RPROMPT_OVERRIDE-'$right'}}${_P9K_LPROMPT::='$_P9K_PROMPT'}}+}'
+      PROMPT+='${${:-${_P9K_D::=0}${_P9K_RPROMPT::=${_P9K_RPROMPT_OVERRIDE-'$right'}}${_P9K_LPROMPT::='$_P9K_PROMPT'}}+}'
       PROMPT+=$_P9K_GAP_PRE
       if (( $+_P9K_DIR )); then
         if (( i == num_lines && (POWERLEVEL9K_DIR_MIN_COMMAND_COLUMNS > 0 || POWERLEVEL9K_DIR_MIN_COMMAND_COLUMNS_PCT > 0) )); then
           local a=$POWERLEVEL9K_DIR_MIN_COMMAND_COLUMNS
           local f=$((0.01*POWERLEVEL9K_DIR_MIN_COMMAND_COLUMNS_PCT))'*_P9K_CLM'
-          PROMPT+="\${\$((_P9K_M-=($a<$f)*$f+($a>=$f)*$a))+}"
+          PROMPT+="\${\${_P9K_G::=$((($a<$f)*$f+($a>=$f)*$a))}}+}"
+        else
+          PROMPT+='${${_P9K_G::=0}+}'
         fi
+        if [[ $POWERLEVEL9K_DIR_MAX_LENGTH == <->('%'|) ]]; then
+          local lim
+          if [[ $POWERLEVEL9K_DIR_MAX_LENGTH[-1] == '%' ]]; then
+            lim="$_P9K_DIR_LEN-$((0.01*$POWERLEVEL9K_DIR_MAX_LENGTH[1,-2]))*_P9K_CLM"
+          else
+            lim=$((_P9K_DIR_LEN-POWERLEVEL9K_DIR_MAX_LENGTH))
+            ((lim <= 0)) && lim=
+          fi
+          if [[ -n $lim ]]; then
+            PROMPT+='${${${$((_P9K_G<_P9K_M+'$lim')):#1}:-${_P9K_G::=$((_P9K_M+'$lim'))}}+}'
+          fi
+        fi
+        PROMPT+='${${_P9K_D::=$((_P9K_M-_P9K_G))}+}'
         PROMPT+='${_P9K_LPROMPT/\%\{d\%\}*\%\{d\%\}/'$_P9K_DIR'}'
+        PROMPT+='${${_P9K_M::=$((_P9K_D+_P9K_G))}+}'
       else
         PROMPT+='${_P9K_LPROMPT}'
       fi
@@ -3138,7 +3147,7 @@ _p9k_init_prompt() {
   _p9k_init_lines
 
   typeset -g _P9K_XY _P9K_CLM
-  typeset -gi _P9K_X _P9K_Y _P9K_M _P9K_M1 _P9K_IND
+  typeset -gi _P9K_X _P9K_Y _P9K_M _P9K_D _P9K_G _P9K_IND
   typeset -g _P9K_GAP_PRE='${${:-${_P9K_X::=0}${_P9K_Y::=1024}'
   repeat 10; do
     _P9K_GAP_PRE+='${_P9K_M::=$(((_P9K_X+_P9K_Y)/2))}'
