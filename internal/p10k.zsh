@@ -1138,47 +1138,59 @@ prompt_dir() {
     truncate_to_unique)
       expand=1
       delim=${POWERLEVEL9K_SHORTEN_DELIMITER-'*'}
-      _p9k_prompt_length $delim
-      local -i real_delim_len=_P9K_RETVAL i=2 n=1 q=0
+      local -i i=2
       [[ $p[1] == / ]] && (( ++i ))
-      [[ -n $parts[i-1] ]] && parts[i-1]="\${(Q)\${:-${(qqq)${(q)parts[i-1]}}}}"$'\2'
-      [[ $p[i,-1] == *["~!#\$^&*()\\\"'<>?{}[]"]* ]] && q=1
-      local -i d=${POWERLEVEL9K_SHORTEN_DELIMITER_LENGTH:--1}
-      (( d >= 0 )) || d=real_delim_len
-      shortenlen=${POWERLEVEL9K_SHORTEN_DIR_LENGTH:-1}
-      (( shortenlen >= 0 )) && n=shortenlen
       local parent="${PWD%/${(pj./.)parts[i,-1]}}"
-      for (( ; i <= $#parts - n; ++i )); do
-        local dir=$parts[i]
-        if [[ -n $POWERLEVEL9K_SHORTEN_FOLDER_MARKER &&
-              -n $parent/$dir/${~POWERLEVEL9K_SHORTEN_FOLDER_MARKER}(#qN) ]]; then
-          parent+=/$dir
-          (( q )) && parts[i]="\${(Q)\${:-${(qqq)${(q)dir}}}}"
-          parts[i]+=$'\2'
-          continue
-        fi
-        local -i j=1
-        for (( ; j + d < $#dir; ++j )); do
-          local -a matching=($parent/$dir[1,j]*/(N))
-          (( $#matching == 1 )) && break
-        done
-        local -i saved=$(($#dir - j - d))
-        if (( saved > 0 )); then
-          if (( q )); then
-            parts[i]='${${${_P9K_D:#-*}:+${(Q)${:-'${(qqq)${(q)dir}}'}}}:-${(Q)${:-'
-            parts[i]+=$'\3'${(qqq)${(q)dir[1,j]}}$'}}\1\3''${$((_P9K_D+='$saved'))+}}'
-          else
-            parts[i]='${${${_P9K_D:#-*}:+'$dir$'}:-\3'$dir[1,j]$'\1\3''${$((_P9K_D+='$saved'))+}}'
+      if (( i <= $#parts )); then
+        local mtime=()
+        zstat -A mtime +mtime -- ${(@)${:-{$i..$#parts}}/(#b)(*)/$parent/${(pj./.)parts[i,$match[1]]}} 2>/dev/null || mtime=()
+        mtime="${(pj:\1:)mtime}"
+      else
+        local mtime='good'
+      fi
+      if ! _p9k_cache_get $0 "${parts[@]}" || [[ -z $mtime || $mtime != $_P9K_CACHE_VAL[1] ]] ; then
+        _p9k_prompt_length $delim
+        local -i real_delim_len=_P9K_RETVAL n=1 q=0
+        [[ -n $parts[i-1] ]] && parts[i-1]="\${(Q)\${:-${(qqq)${(q)parts[i-1]}}}}"$'\2'
+        [[ $p[i,-1] == *["~!#\$^&*()\\\"'<>?{}[]"]* ]] && q=1
+        local -i d=${POWERLEVEL9K_SHORTEN_DELIMITER_LENGTH:--1}
+        (( d >= 0 )) || d=real_delim_len
+        shortenlen=${POWERLEVEL9K_SHORTEN_DIR_LENGTH:-1}
+        (( shortenlen >= 0 )) && n=shortenlen
+        for (( ; i <= $#parts - n; ++i )); do
+          local dir=$parts[i]
+          if [[ -n $POWERLEVEL9K_SHORTEN_FOLDER_MARKER &&
+                -n $parent/$dir/${~POWERLEVEL9K_SHORTEN_FOLDER_MARKER}(#qN) ]]; then
+            parent+=/$dir
+            (( q )) && parts[i]="\${(Q)\${:-${(qqq)${(q)dir}}}}"
+            parts[i]+=$'\2'
+            continue
           fi
-        else
-          (( q )) && parts[i]="\${(Q)\${:-${(qqq)${(q)dir}}}}"
-        fi
-        parent+=/$dir
-      done
-      for ((; i <= $#parts; ++i)); do
-        (( q )) && parts[i]='${(Q)${:-'${(qqq)${(q)parts[i]}}'}}'
-        parts[i]+=$'\2'
-      done
+          local -i j=1
+          for (( ; j + d < $#dir; ++j )); do
+            local -a matching=($parent/$dir[1,j]*/(N))
+            (( $#matching == 1 )) && break
+          done
+          local -i saved=$(($#dir - j - d))
+          if (( saved > 0 )); then
+            if (( q )); then
+              parts[i]='${${${_P9K_D:#-*}:+${(Q)${:-'${(qqq)${(q)dir}}'}}}:-${(Q)${:-'
+              parts[i]+=$'\3'${(qqq)${(q)dir[1,j]}}$'}}\1\3''${$((_P9K_D+='$saved'))+}}'
+            else
+              parts[i]='${${${_P9K_D:#-*}:+'$dir$'}:-\3'$dir[1,j]$'\1\3''${$((_P9K_D+='$saved'))+}}'
+            fi
+          else
+            (( q )) && parts[i]="\${(Q)\${:-${(qqq)${(q)dir}}}}"
+          fi
+          parent+=/$dir
+        done
+        for ((; i <= $#parts; ++i)); do
+          (( q )) && parts[i]='${(Q)${:-'${(qqq)${(q)parts[i]}}'}}'
+          parts[i]+=$'\2'
+        done
+        _p9k_cache_set "$mtime" "${parts[@]}"
+      fi
+      parts=("${(@)_P9K_CACHE_VAL[2,-1]}")
     ;;
     truncate_with_folder_marker)
       if [[ -n $POWERLEVEL9K_SHORTEN_FOLDER_MARKER ]]; then
