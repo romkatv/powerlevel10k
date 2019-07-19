@@ -46,8 +46,18 @@
 #   VCS_STATUS_TAG=''
 #   VCS_STATUS_WORKDIR=/home/romka/.oh-my-zsh/custom/themes/powerlevel10k
 
-[[ -o interactive ]] || return
-autoload -Uz add-zsh-hook && zmodload zsh/datetime zsh/system || return
+[[ -o 'interactive' ]] || 'return'
+
+# Temporarily disable aliases.
+if [[ -o 'aliases' ]]; then
+  'builtin' 'unsetopt' 'aliases'
+  local _gitstatus_restore_aliases=1
+else
+  local _gitstatus_restore_aliases=0
+fi
+
+autoload -Uz add-zsh-hook
+zmodload zsh/datetime zsh/system
 
 # Retrives status of a git repo from a directory under its working tree.
 #
@@ -320,8 +330,8 @@ function gitstatus_start() {
     (( threads > 0)) || {
       threads=8
       case $os in
-        FreeBSD) (( ! $+commands[sysctl] )) || threads=$(( 2 * $(command sysctl -n hw.ncpu) ));;
-        *) (( ! $+commands[getconf] )) || threads=$(( 2 * $(command getconf _NPROCESSORS_ONLN) ));;
+        FreeBSD) (( ! $+commands[sysctl] )) || threads=$(( 2 * $(sysctl -n hw.ncpu) ));;
+        *) (( ! $+commands[getconf] )) || threads=$(( 2 * $(getconf _NPROCESSORS_ONLN) ));;
       esac
       (( threads <= 32 )) || threads=32
     }
@@ -353,7 +363,7 @@ function gitstatus_start() {
     sysopen -w -o cloexec,sync -u req_fd $req_fifo
     sysopen -r -o cloexec -u resp_fd $resp_fifo
 
-    command rm -f $req_fifo $resp_fifo $lock_file
+    rm -f $req_fifo $resp_fifo $lock_file
 
     function _gitstatus_process_response_${name}() {
       _gitstatus_process_response ${${(%)${:-%N}}#_gitstatus_process_response_} 0 ''
@@ -399,7 +409,7 @@ function gitstatus_start() {
     [[ $lock_fd    -ge 0 ]] && zsystem flock -u $lock_fd
     [[ $req_fd     -ge 0 ]] && exec {req_fd}>&-
     [[ $resp_fd    -ge 0 ]] && { zle -F $resp_fd; exec {resp_fd}>&- }
-    command rm -f $lock_file $req_fifo $resp_fifo
+    rm -f $lock_file $req_fifo $resp_fifo
     unset -f gitstatus_start_impl
 
     >&2 print -P '[%F{red}ERROR%f]: gitstatus failed to initialize.'
@@ -488,3 +498,6 @@ function gitstatus_check() {
   (( ARGC == 1 )) || { echo "usage: gitstatus_check NAME" >&2; return 1 }
   [[ -n ${(P)${:-GITSTATUS_DAEMON_PID_${1}}} ]]
 }
+
+(( ! p9k_lean_restore_aliases )) || setopt aliases
+'builtin' 'unset' 'p9k_lean_restore_aliases'
