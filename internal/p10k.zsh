@@ -309,8 +309,6 @@ left_prompt_segment() {
     p+="\${_P9K_N:=\${\${(M)\${:-x$bg_color}:#x(\$_P9K_BG|\${_P9K_BG:-0})}:+$((t+3))}}"  # 3
     p+="\${_P9K_N:=$((t+4))}"                                                            # 4
 
-    p+="\${_P9K_I::=$2}\${_P9K_BG::=$bg_color}"
-
     _p9k_param $1 VISUAL_IDENTIFIER_EXPANSION '${P9K_VISUAL_IDENTIFIER}'
     local icon_exp=$_P9K_RETVAL
 
@@ -381,7 +379,10 @@ left_prompt_segment() {
     [[ $_P9K_RETVAL == *%* && -n $right_space_ ]] && p+=$style_
     p+=$right_space_
 
-    p+="\${\${:-\${_P9K_S::=%F{$bg_color\}$sep_}\${_P9K_SS::=$subsep_}\${_P9K_SSS::=%F{$bg_color\}$end_sep_}}+}"
+    p+='${${:-'
+    p+="\${_P9K_S::=%F{$bg_color\}$sep_}\${_P9K_SS::=$subsep_}\${_P9K_SSS::=%F{$bg_color\}$end_sep_}"
+    p+="\${_P9K_I::=$2}\${_P9K_BG::=$bg_color}"
+    p+='}+}'
 
     p+='}'
 
@@ -482,8 +483,6 @@ right_prompt_segment() {
     p+="\${_P9K_N:=\${\${(M)\${:-x\$_P9K_BG}:#x(${(b)bg_color}|${(b)bg_color:-0})}:+$((t+3))}}"  # 3
     p+="\${_P9K_N:=$((t+4))}"                                                                    # 4
 
-    p+="\${_P9K_I::=$2}\${_P9K_BG::=$bg_color}"
-
     _p9k_param $1 VISUAL_IDENTIFIER_EXPANSION '${P9K_VISUAL_IDENTIFIER}'
     local icon_exp=$_P9K_RETVAL
 
@@ -551,6 +550,8 @@ right_prompt_segment() {
     _p9k_escape $_P9K_RETVAL
     p+=$_P9K_RETVAL
 
+    p+='${${:-'
+
     if [[ -n $fg_color && $fg_color == $bg_color ]]; then
       if [[ $fg_color == $DEFAULT_COLOR ]]; then
         _p9k_foreground $DEFAULT_COLOR_INVERTED
@@ -561,15 +562,18 @@ right_prompt_segment() {
       _P9K_RETVAL=$fg
     fi
     _p9k_escape_rcurly $_P9K_RETVAL
-    p+="\${\${_P9K_W::=${right_space_:+$style_}$right_space_%b$bg_$_P9K_RETVAL}+}"
+    p+="\${_P9K_W::=${right_space_:+$style_}$right_space_%b$bg_$_P9K_RETVAL}"
 
-    p+='${${_P9K_SSS::='
+    p+='${_P9K_SSS::='
     p+=$style_$right_space_
     [[ $right_space_ == *%* ]] && p+=$style_
     p+=$end_sep_
     [[ $end_sep_ == *%* ]] && p+=$style_
-    p+='}+}'
+    p+='}'
 
+    p+="\${_P9K_I::=$2}\${_P9K_BG::=$bg_color}"
+
+    p+='}+}'
     p+='}'
 
     _p9k_cache_set "$p"
@@ -3159,12 +3163,12 @@ _p9k_init_lines() {
 _p9k_init_prompt() {
   _p9k_init_lines
 
-  typeset -g _P9K_XY _P9K_CLM
+  typeset -g _P9K_XY _P9K_CLM _P9K_P
   typeset -gi _P9K_X _P9K_Y _P9K_M _P9K_D _P9K_G _P9K_IND
-  typeset -g _P9K_GAP_PRE='${${:-${_P9K_X::=0}${_P9K_Y::=1024}'
+  typeset -g _P9K_GAP_PRE='${${:-${_P9K_X::=0}${_P9K_Y::=1024}${_P9K_P::=$_P9K_LPROMPT$_P9K_RPROMPT}'
   repeat 10; do
     _P9K_GAP_PRE+='${_P9K_M::=$(((_P9K_X+_P9K_Y)/2))}'
-    _P9K_GAP_PRE+='${_P9K_XY::=${${(%):-$_P9K_LPROMPT$_P9K_RPROMPT%$_P9K_M(l./$_P9K_M;$_P9K_Y./$_P9K_X;$_P9K_M)}##*/}}'
+    _P9K_GAP_PRE+='${_P9K_XY::=${${(%):-$_P9K_P%$_P9K_M(l./$_P9K_M;$_P9K_Y./$_P9K_X;$_P9K_M)}##*/}}'
     _P9K_GAP_PRE+='${_P9K_X::=${_P9K_XY%;*}}'
     _P9K_GAP_PRE+='${_P9K_Y::=${_P9K_XY#*;}}'
   done
