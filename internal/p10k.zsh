@@ -360,7 +360,7 @@ left_prompt_segment() {
       [[ $_P9K_RETVAL != $style_ || $need_style == 1 ]] && p+=$_P9K_RETVAL
       p+='${_P9K_V}'
 
-      _p9k_get_icon $1 LEFT_MIDDLE_WHITESPACE $space
+      _p9k_get_icon $1 LEFT_MIDDLE_WHITESPACE ' '
       if [[ -n $_P9K_RETVAL ]]; then
         _p9k_escape $_P9K_RETVAL
         [[ _P9K_RETVAL == *%* ]] && _P9K_RETVAL+=$style_
@@ -531,7 +531,7 @@ right_prompt_segment() {
 
     if (( has_icon != 0 )); then
       local -i need_style=0
-      _p9k_get_icon $1 RIGHT_MIDDLE_WHITESPACE $space
+      _p9k_get_icon $1 RIGHT_MIDDLE_WHITESPACE ' '
       if [[ -n $_P9K_RETVAL ]]; then
         _p9k_escape $_P9K_RETVAL
         [[ $_P9K_RETVAL == *%* ]] && need_style=1
