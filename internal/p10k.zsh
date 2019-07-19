@@ -2742,7 +2742,7 @@ function _p9k_set_prompt() {
         if (( i == num_lines && (POWERLEVEL9K_DIR_MIN_COMMAND_COLUMNS > 0 || POWERLEVEL9K_DIR_MIN_COMMAND_COLUMNS_PCT > 0) )); then
           local a=$POWERLEVEL9K_DIR_MIN_COMMAND_COLUMNS
           local f=$((0.01*POWERLEVEL9K_DIR_MIN_COMMAND_COLUMNS_PCT))'*_P9K_CLM'
-          PROMPT+="\${\${_P9K_G::=$((($a<$f)*$f+($a>=$f)*$a))}}+}"
+          PROMPT+="\${\${_P9K_G::=$((($a<$f)*$f+($a>=$f)*$a))}+}"
         else
           PROMPT+='${${_P9K_G::=0}+}'
         fi
