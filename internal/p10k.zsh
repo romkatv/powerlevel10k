@@ -2164,8 +2164,9 @@ function _p9k_vcs_status_purge() {
   unsetopt nomatch
   local dir=$1
   while true; do
-    unset _P9K_LAST_GIT_PROMPT[$dir]
-    unset _P9K_GIT_SLOW[$dir]
+    # unset doesn't work if $dir contains weird shit
+    _P9K_LAST_GIT_PROMPT[$dir]=""
+    _P9K_GIT_SLOW[$dir]=""
     [[ $dir == / ]] && break
     dir=${dir:h}
   done
