@@ -729,13 +729,13 @@ prompt_battery() {
 
       case "${${(s:; :)raw_data}[2]}" in
         'charging'|'finishing charge'|'AC attached')
-          state=charging
+          state=CHARGING
         ;;
         'discharging')
-          (( bat_percent < POWERLEVEL9K_BATTERY_LOW_THRESHOLD )) && state=low || state=disconnected
+          (( bat_percent < POWERLEVEL9K_BATTERY_LOW_THRESHOLD )) && state=LOW || state=DISCONNECTED
         ;;
         *)
-          state=charged
+          state=CHARGED
           remain=''
         ;;
       esac
@@ -772,15 +772,15 @@ prompt_battery() {
       bat_percent=$(( 100. * energy_now / energy_full + 0.5 ))
       (( bat_percent > 100 )) && bat_percent=100
 
-      if (( is_full || bat_percent == 100 )); then
-        state=charged
+      if (( is_full || (bat_percent == 100 && is_charching) )); then
+        state=CHARGED
       else
         if (( is_charching )); then
-          state=charging
+          state=CHARGING
         elif (( bat_percent < POWERLEVEL9K_BATTERY_LOW_THRESHOLD )); then
-          state=low
+          state=LOW
         else
-          state=disconnected
+          state=DISCONNECTED
         fi
 
         if (( power_now > 0 )); then
@@ -3344,10 +3344,10 @@ _p9k_init() {
   fi
 
   typeset -gA _P9K_BATTERY_STATES=(
-    'low'           'red'
-    'charging'      'yellow'
-    'charged'       'green'
-    'disconnected'  "$DEFAULT_COLOR_INVERTED"
+    'LOW'           'red'
+    'CHARGING'      'yellow'
+    'CHARGED'       'green'
+    'DISCONNECTED'  "$DEFAULT_COLOR_INVERTED"
   )
 
   local -i i=0
