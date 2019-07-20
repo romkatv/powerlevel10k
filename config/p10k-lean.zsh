@@ -1,8 +1,15 @@
-# Config for Powerlevel10k with lightweight prompt style. Doesn't require a Powerline font.
-# The default colors are suitable for dark terminal background. Copy the config and edit it
-# to customize your prompt.
+# Config for Powerlevel10k with lean prompt style. Doesn't require a Powerline font.
+# The color scheme is suitable for dark terminal background.
 #
-# Looking for a nice color? Here's a one-liner to print colormap.
+# Once you've installed Powerlevel10k, run these commands to apply lean style.
+#
+#   curl -fsSL -O ~/p10k-lean.zsh https://raw.githubusercontent.com/romkatv/powerlevel10k/master/config/p10k-lean.zsh
+#   echo 'source ~/p10k-lean.zsh' >>! ~/.zshrc
+#
+# To customize your prompt, open ~/p10k-lean.zsh in your favorite text editor, change it and
+# restart ZSH. The file is well-documented.
+#
+# Tip: Looking for a nice color? Here's a one-liner to print colormap.
 #
 #   for i in {0..255}; do print -Pn "%${i}F${(l:3::0:)i}%f " ${${(M)$((i%8)):#7}:+$'\n'}; done
 

@@ -1,16 +1,13 @@
 # Powerlevel10k
 
-Powerlevel10k is a theme for ZSH. It's a backward-compatible reimplementation of
-[Powerlevel9k](https://github.com/bhilburn/powerlevel9k) with lower latency and better
-prompt responsiveness.
+Powerlevel10k is a theme for ZSH. It's a backward-compatible modern reimplementation of
+[Powerlevel9k](https://github.com/bhilburn/powerlevel9k) with lower latency, better
+prompt responsiveness and scores of extra features.
 
-If you like the looks of Powerlevel9k but feeling frustrated by its slow prompt,
-simply replace it with Powerlevel10k and enjoy responsive shell like it's 80's again!
-
-Powerlevel10k is a drop-in replacement for Powerlevel9k. It uses the same configuration options as
-Powerlevel9k and produces the same results
-[[*]](#does-powerlevel10k-always-render-exactly-the-same-prompt-as-powerlevel9k-given-the-same-config).
-It's simply [much faster](#is-it-really-fast).
+Powerlevel10k can be used as a drop-in replacement for Powerlevel9k. When given the same
+configuration options it will generate
+[the same](#does-powerlevel10k-always-render-exactly-the-same-prompt-as-powerlevel9k-given-the-same-config)
+prompt. It will be [much faster](#is-it-really-fast) though.
 
 ## Table of Contents
 
@@ -23,11 +20,10 @@ It's simply [much faster](#is-it-really-fast).
    1. [Zgen](#zgen)
    1. [Antibody](#antibody)
 1. [Configuration](#configuration)
-1. [Fonts](#fonts)
-1. [Try it out](#try-it-out)
-   1. [For Powerlevel9k users](#for-powerlevel9k-users)
    1. [For new users](#for-new-users)
-   1. [Docker playground](#docker-playground)
+   1. [For existing users](#for-existing-users)
+1. [Fonts](#fonts)
+1. [Try it in Docker](#try-it-in-docker)
 1. [Is it really faster?](#is-it-really-fast)
 1. [License](#license)
 1. [FAQ](#faq)
@@ -41,8 +37,6 @@ It's simply [much faster](#is-it-really-fast).
    1. [What is the minimum supported ZSH version?](#what-is-the-minimum-supported-zsh-version)
 
 ## Installation
-
-Installation is virtually the same as in Powerlevel9k. If you managed to install Powerlevel9k, you'll be able to install Powerlevel10k.
 
 ### Manual
 
@@ -86,34 +80,28 @@ Add `antibody bundle romkatv/powerlevel10k` to your `~/.zshrc`.
 
 ## Configuration
 
-Powerlevel10k recognized all configuration options used by Powerlevel9k. See Powerlevel9k
-[configuration guide](https://github.com/bhilburn/powerlevel9k#prompt-customization). Powerlevel10k
-has a few
-[extensions](https://github.com/romkatv/powerlevel10k/blob/master/EXTENDED_CONFIGURATION.md).
+### For new users
 
-If you've been using Powerlevel9k before, **do not remove the configuration options**. Powerlevel10k
-will pick them up and provide you with the same prompt UI you are used to.
-
-The default configuration in Powerlevel10k is the same as in Powerlevel9k, which is to say it's not
-pretty. [Pure Power](https://github.com/romkatv/dotfiles-public/blob/master/.purepower) is
-recommended as a good starting point for new users. It'll make your prompt look like this.
-
-![Pure Power](https://raw.githubusercontent.com/romkatv/dotfiles-public/master/dotfiles/purepower.png)
-
-Installation of Pure Power is the same regardless of your plugin manager of choice.
+If you are new to Powerlevel10k/9k and don't have your own config yet, start with the
+[lean](https://github.com/romkatv/powerlevel10k/blob/master/config/p10k-lean.zsh) style.
 
 ```zsh
-( cd && curl -fsSLO https://raw.githubusercontent.com/romkatv/dotfiles-public/master/.purepower )
-echo 'source ~/.purepower' >>! ~/.zshrc
+curl -fsSL -O ~/p10k-lean.zsh https://raw.githubusercontent.com/romkatv/powerlevel10k/master/config/p10k-lean.zsh
+echo 'source ~/p10k-lean.zsh' >>! ~/.zshrc
 ```
 
-Pure Power needs to be installed _in addition_ to Powerlevel10k, not instead of it. `~/.purepower`
-defines a set of configuration parameters that affect the styling of Powerlevel10k; there is no code
-in it.
+To customize your prompt, open `~/p10k-lean.zsh` in your favorite text editor, change it and restart
+ZSH. The file is well-documented.
 
-Read the documentation at the top of `~/.purepower` (or
-[here](https://github.com/romkatv/dotfiles-public/blob/master/.purepower)) to get an idea of what
-your prompt is capable of. You can edit the file to change your Powerlevel10k configuration.
+### For existing users
+
+If you've been using Powerlevel9k before, **do not remove the configuration options**. Powerlevel10k
+will pick them up and provide you with the same prompt UI you are used to. Powerlevel10k recognized
+all configuration options used by Powerlevel9k. See Powerlevel9k
+[configuration guide](https://github.com/bhilburn/powerlevel9k#prompt-customization).
+
+If you aren't completely satisfied with your prompt or looking for something fresh, try
+[lean](https://github.com/romkatv/powerlevel10k/blob/master/config/p10k-lean.zsh) config.
 
 ## Fonts
 
@@ -121,55 +109,21 @@ Depending on your configuration, you might need to install a Powerline font. Fol
 [font installation guide](https://github.com/bhilburn/powerlevel9k/wiki/Install-Instructions#step-2-install-a-powerline-font)
 from Powerlevel9k.
 
-[Pure Power](https://github.com/romkatv/dotfiles-public/blob/master/.purepower) config doesn't
+[Lean](https://github.com/romkatv/powerlevel10k/blob/master/config/p10k-lean.zsh) config doesn't
 require custom fonts. It'll work even with regular system fonts. If you are having trouble with
-patched fonts, try Pure Power.
+Powerline fonts, try this config.
 
-## Try it out
+## Try it in Docker
 
-Try Powerlevel10k without making any changes to your setup. If you like it, see
-[installation](#installation) and [configuration](#configuration) for how to make a permanent
-switch.
-
-### For Powerlevel9k users
-
-If you are currently using Powerlevel9k, you can try Powerlevel10k in a temporary zsh session. The
-prompt will look exactly like what you are used to but it'll be faster.
+Try Powerlevel10k in Docker. You can safely make any changes to the file system while trying out
+the theme. Once you exit zsh, the image is deleted.
 
 ```zsh
-git clone https://github.com/romkatv/powerlevel10k.git /tmp/powerlevel10k
-source /tmp/powerlevel10k/powerlevel10k.zsh-theme
-```
-
-When you are done playing, `rm -rf /tmp/powerlevel10k` and exit zsh. Feel the difference in prompt
-latency.
-
-### For new users
-
-```zsh
-git clone https://github.com/romkatv/powerlevel10k.git /tmp/powerlevel10k
-(cd /tmp/powerlevel10k && curl -fsSLO https://raw.githubusercontent.com/romkatv/dotfiles-public/master/.purepower)
-echo '
-  source /tmp/powerlevel10k/.purepower
-  source /tmp/powerlevel10k/powerlevel10k.zsh-theme' >/tmp/powerlevel10k/.zshrc
-ZDOTDIR=/tmp/powerlevel10k zsh
-```
-
-When you are done playing, `rm -rf /tmp/powerlevel10k` and exit zsh.
-
-### Docker playground
-
-You can try Powerlevel10k in Docker (Linux only). You can safely make any changes to the file system
-while trying out Powerlevel10k. Once you exit zsh, the image is deleted.
-
-```zsh
-docker run -e LANG=C.UTF-8 -e LC_ALL=C.UTF-8 -e TERM=$TERM -it --rm ubuntu bash -uexc '
-  apt update && apt install -y zsh git curl
-  git clone https://github.com/romkatv/powerlevel10k.git ~/powerlevel10k
-  cd && curl -fsSLO https://raw.githubusercontent.com/romkatv/dotfiles-public/master/.purepower
-  echo "
-    source ~/.purepower
-    source ~/powerlevel10k/powerlevel10k.zsh-theme" >~/.zshrc
+docker run -e LANG=C.UTF-8 -e LC_ALL=C.UTF-8 -e TERM -it --rm ubuntu bash -uexc '
+  cd && apt update && apt install -y zsh git
+  git clone --depth 1 https://github.com/romkatv/powerlevel10k.git
+  echo "source ~/powerlevel10k/config/p10k-lean.zsh" >>~/.zshrc
+  echo "source ~/powerlevel10k/powerlevel10k.zsh-theme" >>~/.zshrc
   cd ~/powerlevel10k
   exec zsh'
 ```
@@ -213,9 +167,8 @@ covered by the same license.
 
 Powerlevel10k uses [gitstatus](https://github.com/romkatv/gitstatus) as the backend behind `vcs`
 prompt; gitstatus spawns `gitstatusd` and `zsh`. See
-[gitstatus](https://github.com/romkatv/gitstatus) for details. Powerlevel10k spawns another `zsh`
-if `POWERLEVEL9K_EXPERIMENTAL_TIME_REALTIME` is set to `true`. This is used to trigger prompt
-refresh every second.
+[gitstatus](https://github.com/romkatv/gitstatus) for details. Powerlevel10k may also spawn `zsh`
+to trigger async prompt refresh.
 
 ### Are there configuration options that make Powerlevel10k slow?
 
@@ -249,12 +202,8 @@ visible changes except for performance. There are, however, several differences.
 
   * By default only git vcs backend is enabled in Powerlevel10k. If you need svn and hg, you'll
     need to set `POWERLEVEL9K_VCS_BACKENDS`.
-  * Powerlevel10k implements a few
-    [extensions](https://github.com/romkatv/powerlevel10k/blob/master/EXTENDED_CONFIGURATION.md). If
-    you use them, you'll get different prompt when you switch to Powerlevel9k. However, extensions
-    are designed with graceful degradation in mind, so your prompt will still be functional.
   * Fewer configuration options can be changed after the theme is loaded. For example, if you
-    decide to change background color of some segment in the middle of an interactive session,
+    decide to change background color of some segment in the middle of an interactive ZSH session,
     it may not work.
 
 If you notice any other differences between prompts in Powerlevel9k and Powerlevel10k when running
