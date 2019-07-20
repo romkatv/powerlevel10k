@@ -9,6 +9,8 @@ configuration options it will generate
 [the same](#does-powerlevel10k-always-render-exactly-the-same-prompt-as-powerlevel9k-given-the-same-config)
 prompt. It will be [much faster](#is-it-really-fast) though.
 
+![p10k-lean](https://raw.githubusercontent.com/romkatv/powerlevel10k/master/config/p10k-lean.png)
+
 ## Table of Contents
 
 1. [Installation](#installation)
