@@ -28,6 +28,7 @@ fi
   # The list of segments shown on the left. Fill it with the most important segments.
   typeset -g POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(
       # =========================[ Line #1 ]=========================
+      # os_icon               # os identifier
       dir                     # current directory
       vcs                     # git status
       # =========================[ Line #2 ]=========================
@@ -107,7 +108,7 @@ fi
   #   Nerd Fonts                       | nerdfont-complete
   #
   # Tip: Don't use default icons and forget about font configuration headaches.
-  typeset -g POWERLEVEL9K_MODE=powerline
+  typeset -g POWERLEVEL9K_MODE=nerdfont-complete
 
   # Add an empty line before each prompt. If you set it to false, you might want to
   # set POWERLEVEL9K_SHOW_RULER to true below.
@@ -118,6 +119,11 @@ fi
   typeset -g POWERLEVEL9K_SHOW_RULER=false
   typeset -g POWERLEVEL9K_RULER_CHAR='─'
   typeset -g POWERLEVEL9K_RULER_FOREGROUND=237
+
+  # OS identifier color.
+  typeset -g POWERLEVEL9K_OS_ICON_FOREGROUND=212
+  # Want to display a different icon? Uncomment the next line and set the desired value.
+  # typeset -g POWERLEVEL9K_OS_ICON_CONTENT_EXPANSION=$'\uFB8A'
 
   # Green prompt symbol if the last command succeeded.
   typeset -g POWERLEVEL9K_PROMPT_CHAR_OK_{VIINS,VICMD,VIVIS}_FOREGROUND=76
