@@ -6,8 +6,8 @@
 #
 #   for i in {0..255}; do print -Pn "%${i}F${(l:3::0:)i}%f " ${${(M)$((i%8)):#7}:+$'\n'}; done
 
-# Temporarily disable aliases.
 if [[ -o 'aliases' ]]; then
+  # Temporarily disable aliases.
   'builtin' 'unsetopt' 'aliases'
   local p10k_lean_restore_aliases=1
 else
@@ -79,7 +79,7 @@ fi
   # LOCK_ICON as default icon.
   #
   # Note: Many default icons cannot be displayed with system fonts. You'll need to install a
-  # powerline font to use them.
+  # Powerline font to use them.
   typeset -g POWERLEVEL9K_VISUAL_IDENTIFIER_EXPANSION=
 
   # This option doesn't make a difference unless you've enabled default icons for all or some
