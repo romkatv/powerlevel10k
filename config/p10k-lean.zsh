@@ -49,6 +49,7 @@ fi
       # =========================[ Line #2 ]=========================
       newline
       # public_ip             # public IP address
+      # battery               # internal battery
       # time                  # current time
   )
 
@@ -318,6 +319,22 @@ fi
 
   # Public IP color.
   typeset -g POWERLEVEL9K_PUBLIC_IP_FOREGROUND=144
+
+  # Show battery in red when it's below this level and not connected to power supply.
+  typeset -g POWERLEVEL9K_BATTERY_LOW_THRESHOLD=20
+  typeset -g POWERLEVEL9K_BATTERY_LOW_FOREGROUND=1
+  # Show battery in green when it's charging.
+  typeset -g POWERLEVEL9K_BATTERY_CHARGING_FOREGROUND=2
+  # Show battery in yellow when not connected to power supply.
+  typeset -g POWERLEVEL9K_BATTERY_DISCONNECTED_FOREGROUND=3
+  # Battery pictograms going from low to high level of charge.
+  typeset -g POWERLEVEL9K_BATTERY_STAGES='▁▂▃▄▅▆▇'
+  # Display battery pictogram on black background.
+  typeset -g POWERLEVEL9K_BATTERY_VISUAL_IDENTIFIER_EXPANSION='%0K${P9K_VISUAL_IDENTIFIER}%k'
+  # Don't show battery when it's fully charged and connected to power supply.
+  typeset -g POWERLEVEL9K_BATTERY_CHARGED_{CONTENT,VISUAL_IDENTIFIER}_EXPANSION=
+  # Don't show the remaining time to charge/discharge.
+  typeset -g POWERLEVEL9K_BATTERY_VERBOSE=false
 
   # Current time color.
   typeset -g POWERLEVEL9K_TIME_FOREGROUND=66
