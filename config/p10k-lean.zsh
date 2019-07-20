@@ -208,10 +208,8 @@ fi
   typeset -g POWERLEVEL9K_COMMAND_EXECUTION_TIME_PRECISION=0
   # Execution time color.
   typeset -g POWERLEVEL9K_COMMAND_EXECUTION_TIME_FOREGROUND=101
-  # Duration format: 1h 2m 3s.
-  local d='${${P9K_CONTENT:/(#b)(*):(*):(*)/${match[1]#0}h ${match[2]#0}m ${match[3]#0}s}'
-  d+=':/(#b)(*):(*)/${match[1]#0}m ${match[2]#0}s}'
-  typeset -g POWERLEVEL9K_COMMAND_EXECUTION_TIME_CONTENT_EXPANSION=$d
+  # Duration format: 1d 2h 3m 4s.
+  typeset -g POWERLEVEL9K_COMMAND_EXECUTION_TIME_FORMAT='d h m s'
 
   # Don't show the number of background jobs.
   typeset -g POWERLEVEL9K_BACKGROUND_JOBS_VERBOSE=false

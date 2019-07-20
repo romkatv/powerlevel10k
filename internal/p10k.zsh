@@ -934,22 +934,21 @@ prompt_custom() {
 # Display the duration the command needed to run.
 set_default -i POWERLEVEL9K_COMMAND_EXECUTION_TIME_THRESHOLD 3
 set_default -i POWERLEVEL9K_COMMAND_EXECUTION_TIME_PRECISION 2
-set_default POWERLEVEL9K_COMMAND_EXECUTION_TIME_DISABLE_FORMATTING false
+# Other options: "d h m s".
+set_default POWERLEVEL9K_COMMAND_EXECUTION_TIME_FORMAT "H:M:S"
 prompt_command_execution_time() {
   (( $+P9K_COMMAND_DURATION_SECONDS && P9K_COMMAND_DURATION_SECONDS >= POWERLEVEL9K_COMMAND_EXECUTION_TIME_THRESHOLD )) || return
 
-  if [[ $POWERLEVEL9K_COMMAND_EXECUTION_TIME_DISABLE_FORMATTING == true ]]; then
-    local text=''
-  else
-    if (( P9K_COMMAND_DURATION_SECONDS < 60 )); then
-      if [[ $POWERLEVEL9K_COMMAND_EXECUTION_TIME_PRECISION == 0 ]]; then
-        local -i sec=$((P9K_COMMAND_DURATION_SECONDS + 0.5))
-      else
-        local -F $POWERLEVEL9K_COMMAND_EXECUTION_TIME_PRECISION sec=P9K_COMMAND_DURATION_SECONDS
-      fi
-      local text=${sec}s
+  if (( P9K_COMMAND_DURATION_SECONDS < 60 )); then
+    if [[ $POWERLEVEL9K_COMMAND_EXECUTION_TIME_PRECISION == 0 ]]; then
+      local -i sec=$((P9K_COMMAND_DURATION_SECONDS + 0.5))
     else
-      local -i d=$((P9K_COMMAND_DURATION_SECONDS + 0.5))
+      local -F $POWERLEVEL9K_COMMAND_EXECUTION_TIME_PRECISION sec=P9K_COMMAND_DURATION_SECONDS
+    fi
+    local text=${sec}s
+  else
+    local -i d=$((P9K_COMMAND_DURATION_SECONDS + 0.5))
+    if [[ $POWERLEVEL9K_COMMAND_EXECUTION_TIME_FORMAT == "H:M:S" ]]; then
       local text=${(l.2..0.)$((d % 60))}
       if (( d >= 60 )); then
         text=${(l.2..0.)$((d / 60 % 60))}:$text
@@ -957,6 +956,17 @@ prompt_command_execution_time() {
           text=$((d / 3600)):$text
         elif (( d >= 3600 )); then
           text=0$((d / 3600)):$text
+        fi
+      fi
+    else
+      local text="$((d % 60))s"
+      if (( d >= 60 )); then
+        text="$((d / 60 % 60))m $text"
+        if (( d >= 3600 )); then
+          text="$((d / 3600 % 24))h $text"
+          if (( d >= 86400 )); then
+            text="$((d / 86400))d $text"
+          fi
         fi
       fi
     fi
