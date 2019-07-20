@@ -1,6 +1,6 @@
-# Lightweight config for Powerlevel10k. Doesn't require a Powerline font. Works even
-# with the default system fonts. The default colors are suitable for dark terminal
-# background. Copy the config and edit it to customize your prompt.
+# Config for Powerlevel10k with lightweight prompt style. Doesn't require a Powerline font.
+# The default colors are suitable for dark terminal background. Copy the config and edit it
+# to customize your prompt.
 #
 # Looking for a nice color? Here's a one-liner to print colormap.
 #
@@ -9,9 +9,9 @@
 # Temporarily disable aliases.
 if [[ -o 'aliases' ]]; then
   'builtin' 'unsetopt' 'aliases'
-  local p9k_lean_restore_aliases=1
+  local p10k_lean_restore_aliases=1
 else
-  local p9k_lean_restore_aliases=0
+  local p10k_lean_restore_aliases=0
 fi
 
 () {
@@ -77,7 +77,29 @@ fi
   # VISUAL_IDENTIFIER_EXPANSION as described above, you can also change it with an override
   # such as POWERLEVEL9K_LOCK_ICON='⭐'. This will change the icon in every segment that uses
   # LOCK_ICON as default icon.
+  #
+  # Note: Many default icons cannot be displayed with system fonts. You'll need to install a
+  # powerline font to use them.
   typeset -g POWERLEVEL9K_VISUAL_IDENTIFIER_EXPANSION=
+
+  # This option doesn't make a difference unless you've enabled default icons for all or some
+  # prompt segments (see POWERLEVEL9K_VISUAL_IDENTIFIER_EXPANSION above). Default icons depend on
+  # the value of POWERLEVEL9K_MODE. For example, LOCK_ICON can be printed as $'\uE0A2', $'\uE138'
+  # or $'\uF023' depending on POWERLEVEL9K_MODE. The correct value of this parameter depends on
+  # the provider of the font your terminal is using.
+  #
+  #   Font Provider                    | POWERLEVEL9K_MODE
+  #   ---------------------------------+-------------------
+  #   Powerline                        | powerline
+  #   Font Awesome                     | awesome-fontconfig
+  #   Adobe Source Code Pro            | awesome-fontconfig
+  #   Source Code Pro                  | awesome-fontconfig
+  #   Awesome-Terminal Fonts (regular) | awesome-fontconfig
+  #   Awesome-Terminal Fonts (patched) | awesome-patched
+  #   Nerd Fonts                       | nerdfont-complete
+  #
+  # Tip: Don't use default icons and forget about font configuration headaches.
+  typeset -g POWERLEVEL9K_MODE=powerline
 
   # Add an empty line before each prompt. If you set it to false, you might want to
   # set POWERLEVEL9K_SHOW_RULER to true below.
@@ -307,5 +329,5 @@ fi
   typeset -g POWERLEVEL9K_TIME_UPDATE_ON_COMMAND=false
 }
 
-(( ! p9k_lean_restore_aliases )) || setopt aliases
-'builtin' 'unset' 'p9k_lean_restore_aliases'
+(( ! p10k_lean_restore_aliases )) || setopt aliases
+'builtin' 'unset' 'p10k_lean_restore_aliases'
