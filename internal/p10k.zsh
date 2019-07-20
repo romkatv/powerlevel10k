@@ -850,8 +850,7 @@ prompt_context() {
   if ! _p9k_cache_get $0; then
     local -i enabled=1
     local content='' state=''
-    if [[ $POWERLEVEL9K_ALWAYS_SHOW_CONTEXT == true ||
-          -z $DEFAULT_USER || -n $SSH_CLIENT || -n $SSH_TTY || -n $SSH_CONNECTION ]]; then
+    if [[ $POWERLEVEL9K_ALWAYS_SHOW_CONTEXT == true || -z $DEFAULT_USER || $_P9K_SSH == 1 ]]; then
       content=$POWERLEVEL9K_CONTEXT_TEMPLATE
     else
       local user=$(whoami)
@@ -868,7 +867,7 @@ prompt_context() {
       state="DEFAULT"
       if [[ "${(%):-%#}" == '#' ]]; then
         state="ROOT"
-      elif [[ -n "$SSH_CLIENT" || -n "$SSH_TTY" || -n "$SSH_CONNECTION" ]]; then
+      elif (( _P9K_SSH )); then
         if [[ -n "$SUDO_COMMAND" ]]; then
           state="REMOTE_SUDO"
         else
@@ -910,7 +909,7 @@ prompt_user() {
 # Host: machine (where am I)
 set_default POWERLEVEL9K_HOST_TEMPLATE "%m"
 prompt_host() {
-  if [[ -n "$SSH_CLIENT" || -n "$SSH_TTY" || -n "$SSH_CONNECTION" ]]; then
+  if (( _P9K_SSH )); then
     "$1_prompt_segment" "$0_REMOTE" "$2" "${DEFAULT_COLOR}" yellow SSH_ICON 0 '' "${POWERLEVEL9K_HOST_TEMPLATE}"
   else
     "$1_prompt_segment" "$0_LOCAL" "$2" "${DEFAULT_COLOR}" yellow HOST_ICON 0 '' "${POWERLEVEL9K_HOST_TEMPLATE}"
@@ -3253,12 +3252,40 @@ _p9k_init_prompt() {
   fi
 }
 
+_p9k_init_ssh() {
+  # The following code is based on Pure:
+  # https://github.com/sindresorhus/pure/blob/e8abf9d37185ec9b7b4398ca9c5eba555a1028eb/pure.zsh.
+  #
+  # License: https://github.com/sindresorhus/pure/blob/e8abf9d37185ec9b7b4398ca9c5eba555a1028eb/license.
+
+  [[ -n $_P9K_SSH ]] && return
+  export _P9K_SSH=0
+  if [[ -n $SSH_CLIENT || -n $SSH_TTY || -n $SSH_CONNECTION ]]; then
+    _P9K_SSH=1
+    return
+  fi
+
+  # When changing user on a remote system, the $SSH_CONNECTION environment variable can be lost.
+  # Attempt detection via `who`.
+  (( $+commands[who] )) || return
+  local w && w=$(who -m 2>/dev/null) || w=${(@M)${(f)"$(who 2>/dev/null)"}:#*[[:space:]]${TTY#/dev/}[[:space:]]*}
+
+  local ipv6='(([0-9a-fA-F]+:)|:){2,}[0-9a-fA-F]+'  # Simplified, only checks partial pattern.
+  local ipv4='([0-9]{1,3}\.){3}[0-9]+'              # Simplified, allows invalid ranges.
+  # Assume two non-consecutive periods represents a hostname. Matches `x.y.z`, but not `x.y`.
+  local hostname='([.][^. ]+){2}'
+
+  # Usually the remote address is surrounded by parenthesis but not on all systems (e.g., Busybox).
+  [[ $w =~ "\(?($ipv4|$ipv6|$hostname)\)?\$" ]] && _P9K_SSH=1
+}
+
 _p9k_init() {
   (( _P9K_INITIALIZED )) && return
 
   _p9k_init_icons
   _p9k_init_strings
   _p9k_init_prompt
+  _p9k_init_ssh
 
   function _$0_set_os() {
     OS=$1
