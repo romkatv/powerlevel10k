@@ -3071,19 +3071,28 @@ _p9k_build_gap_post() {
   local char=${_P9K_RETVAL:- }
   _p9k_prompt_length $char
   if (( _P9K_RETVAL != 1 || $#char != 1 )); then
-    print -P "%F{red}WARNING!%f %BMULTILINE_{(U)1}_PROMPT_GAP_CHAR%b is not one character long. Will use ' '."
-    print -P "Either change the value of %BPOWERLEVEL9K_MULTILINE_{(U)1}_PROMPT_GAP_CHAR%b or remove it."
+    print -P "%F{red}WARNING!%f %BMULTILINE_${(U)1}_PROMPT_GAP_CHAR%b is not one character long. Will use ' '."
+    print -P "Either change the value of %BPOWERLEVEL9K_MULTILINE_${(U)1}_PROMPT_GAP_CHAR%b or remove it."
     char=' '
   fi
   local style
   _p9k_color prompt_multiline_$1_prompt_gap BACKGROUND ""
-  _p9k_background $_P9K_RETVAL
+  [[ -n $_P9K_RETVAL ]] && _p9k_background $_P9K_RETVAL
   style+=$_P9K_RETVAL
   _p9k_color prompt_multiline_$1_prompt_gap FOREGROUND ""
-  _p9k_foreground $_P9K_RETVAL
+  [[ -n $_P9K_RETVAL ]] && _p9k_foreground $_P9K_RETVAL
   style+=$_P9K_RETVAL
+  local exp=POWERLEVEL9K_MULTILINE_${(U)1}_PROMPT_GAP_EXPANSION
+  (( $+parameters[$exp] )) && exp=${(P)exp} || exp='${P9K_GAP}'
   [[ $char == '.' ]] && local s=',' || local s='.'
-  _P9K_RETVAL=$style'${${${_P9K_M:#-*}:+${(pl'$s'$((_P9K_M+1))'$s$s$char$s$')}$_P9K_RPROMPT$_P9K_T[$((1+!_P9K_IND))]}:-\n}'
+  _P9K_RETVAL=$style'${${${_P9K_M:#-*}:+'
+  if [[ $exp == '${P9K_GAP}' ]]; then
+    _P9K_RETVAL+='${(pl'$s'$((_P9K_M+1))'$s$s$char$s$')}'
+  else
+    _P9K_RETVAL+='${${P9K_GAP::=${(pl'$s'$((_P9K_M+1))'$s$s$char$s$')}}+}'$exp
+    style=1
+  fi
+  _P9K_RETVAL+='$_P9K_RPROMPT$_P9K_T[$((1+!_P9K_IND))]}:-\n}'
   [[ -n $style ]] && _P9K_RETVAL+='%b%k%f'
 }
 
