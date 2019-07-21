@@ -111,14 +111,35 @@ fi
   typeset -g POWERLEVEL9K_MODE=nerdfont-complete
 
   # Add an empty line before each prompt. If you set it to false, you might want to
-  # set POWERLEVEL9K_SHOW_RULER to true below.
+  # set POWERLEVEL9K_SHOW_RULER=true or POWERLEVEL9K_MULTILINE_FIRST_PROMPT_GAP_CHAR='·' below.
   typeset -g POWERLEVEL9K_PROMPT_ADD_NEWLINE=true
 
   # Ruler, a.k.a. the horizontal line before each prompt. If you set it to true, you'll
-  # probably want to set POWERLEVEL9K_PROMPT_ADD_NEWLINE to false above.
+  # probably want to set POWERLEVEL9K_PROMPT_ADD_NEWLINE=false above and
+  # POWERLEVEL9K_MULTILINE_FIRST_PROMPT_GAP_CHAR=' ' below.
   typeset -g POWERLEVEL9K_SHOW_RULER=false
-  typeset -g POWERLEVEL9K_RULER_CHAR='─'
+  typeset -g POWERLEVEL9K_RULER_CHAR='─'        # reasonable alternative: '·'
   typeset -g POWERLEVEL9K_RULER_FOREGROUND=237
+
+  # Filler between left and right prompt on the first prompt line. You can set it to '·' or '─'
+  # to make it easier to see the alignment between left and right prompt and to separate prompt
+  # from command output. It serves the same purpose as ruler (see above) without increasing
+  # the number of prompt lines. You'll probably want to set POWERLEVEL9K_SHOW_RULER=false
+  # if using this. You might also like POWERLEVEL9K_PROMPT_ADD_NEWLINE=false for more compact
+  # prompt.
+  typeset -g POWERLEVEL9K_MULTILINE_FIRST_PROMPT_GAP_CHAR=' '
+  if [[ $POWERLEVEL9K_MULTILINE_FIRST_PROMPT_GAP_CHAR != ' ' ]]; then
+    # The color of the filler.
+    typeset -g POWERLEVEL9K_MULTILINE_FIRST_PROMPT_GAP_FOREGROUND=237
+    # Add a space between the end of left prompt and the filler.
+    typeset -g POWERLEVEL9K_LEFT_PROMPT_LAST_SEGMENT_END_SYMBOL=' '
+    # Add a space between the filler and the start of right prompt.
+    typeset -g POWERLEVEL9K_RIGHT_PROMPT_FIRST_SEGMENT_START_SYMBOL=' '
+    # Start filler from the edge of the screen if there are no left segments on the first line.
+    typeset -g POWERLEVEL9K_EMPTY_LINE_LEFT_PROMPT_FIRST_SEGMENT_END_SYMBOL='%{%}'
+    # End filler on the edge of the screen if there are no right segments on the first line.
+    typeset -g POWERLEVEL9K_EMPTY_LINE_RIGHT_PROMPT_FIRST_SEGMENT_START_SYMBOL='%{%}'
+  fi
 
   # OS identifier color.
   typeset -g POWERLEVEL9K_OS_ICON_FOREGROUND=212
@@ -135,6 +156,7 @@ fi
   typeset -g POWERLEVEL9K_PROMPT_CHAR_{OK,ERROR}_VICMD_CONTENT_EXPANSION='❮'
   # Prompt symbol in visual vi mode.
   typeset -g POWERLEVEL9K_PROMPT_CHAR_{OK,ERROR}_VIVIS_CONTENT_EXPANSION='Ⅴ'
+  typeset -g POWERLEVEL9K_PROMPT_CHAR_LEFT_PROMPT_LAST_SEGMENT_END_SYMBOL=''
 
   # Enable special styling for non-writable directories. If set to false,
   # POWERLEVEL9K_DIR_NOT_WRITABLE_VISUAL_IDENTIFIER_EXPANSION defined below won't have effect.

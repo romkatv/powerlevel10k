@@ -2773,7 +2773,7 @@ function _p9k_set_prompt() {
       else
         PROMPT+='${_P9K_LPROMPT}'
       fi
-      ((i != num_lines && $#right)) && PROMPT+=$_P9K_GAP_POST
+      ((i != num_lines && $#right)) && PROMPT+=$_P9K_LINE_GAP_POST[i]
     else
       PROMPT+=$_P9K_PROMPT
     fi
@@ -3065,8 +3065,31 @@ prompt__p9k_internal_nothing() {
   _P9K_PROMPT+='${_P9K_SSS::=}'
 }
 
+# _p9k_build_gap_post <first|newline>
+_p9k_build_gap_post() {
+  _p9k_get_icon '' MULTILINE_${(U)1}_PROMPT_GAP_CHAR
+  local char=${_P9K_RETVAL:- }
+  _p9k_prompt_length $char
+  if (( _P9K_RETVAL != 1 || $#char != 1 )); then
+    print -P "%F{red}WARNING!%f %BMULTILINE_{(U)1}_PROMPT_GAP_CHAR%b is not one character long. Will use ' '."
+    print -P "Either change the value of %BPOWERLEVEL9K_MULTILINE_{(U)1}_PROMPT_GAP_CHAR%b or remove it."
+    char=' '
+  fi
+  local style
+  _p9k_color prompt_multiline_$1_prompt_gap BACKGROUND ""
+  _p9k_background $_P9K_RETVAL
+  style+=$_P9K_RETVAL
+  _p9k_color prompt_multiline_$1_prompt_gap FOREGROUND ""
+  _p9k_foreground $_P9K_RETVAL
+  style+=$_P9K_RETVAL
+  [[ $char == '.' ]] && local s=',' || local s='.'
+  _P9K_RETVAL=$style'${${${_P9K_M:#-*}:+${(pl'$s'$((_P9K_M+1))'$s$s$char$s$')}$_P9K_RPROMPT$_P9K_T[$((1+!_P9K_IND))]}:-\n}'
+  [[ -n $style ]] && _P9K_RETVAL+='%b%k%f'
+}
+
 _p9k_init_lines() {
-  typeset -ga _P9K_LINE_{SEGMENTS,PREFIX,SUFFIX}_{LEFT,RIGHT} _P9K_LINE_NEVER_EMPTY_RIGHT
+  typeset -ga _P9K_LINE_{SEGMENTS,PREFIX,SUFFIX}_{LEFT,RIGHT}
+  typeset -ga _P9K_LINE_NEVER_EMPTY_RIGHT _P9K_LINE_GAP_POST
   local -a left_segments=($POWERLEVEL9K_LEFT_PROMPT_ELEMENTS)
   local -a right_segments=($POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS)
 
@@ -3120,6 +3143,9 @@ _p9k_init_lines() {
   fi
 
   if (( num_lines > 1 )); then
+    _p9k_build_gap_post first
+    _P9K_LINE_GAP_POST[1]=$_P9K_RETVAL
+
     if [[ $+POWERLEVEL9K_MULTILINE_FIRST_PROMPT_PREFIX == 1 || $POWERLEVEL9K_PROMPT_ON_NEWLINE == true ]]; then
       # Not escaped for historical reasons.
       _p9k_get_icon '' MULTILINE_FIRST_PROMPT_PREFIX
@@ -3151,6 +3177,9 @@ _p9k_init_lines() {
     fi
 
     if (( num_lines > 2 )); then
+      _p9k_build_gap_post newline
+      _P9K_LINE_GAP_POST[2,-2]=(${${:-{3..num_lines}}:/*/$_P9K_RETVAL})
+
       if [[ $+POWERLEVEL9K_MULTILINE_NEWLINE_PROMPT_PREFIX == 1 || $POWERLEVEL9K_PROMPT_ON_NEWLINE == true ]]; then
         # Not escaped for historical reasons.
         _p9k_get_icon '' MULTILINE_NEWLINE_PROMPT_PREFIX
@@ -3183,8 +3212,6 @@ _p9k_init_prompt() {
   done
   _P9K_GAP_PRE+='${_P9K_M::=$((_P9K_CLM-_P9K_X-_P9K_IND-1))}'
   _P9K_GAP_PRE+='}+}'
-
-  typeset -g _P9K_GAP_POST=$'${${${_P9K_M:#-*}:+${(pl.$((_P9K_M+1)).. .)}$_P9K_RPROMPT$_P9K_T[$((1+!_P9K_IND))]}:-\n}'
 
   typeset -g _P9K_PROMPT_PREFIX_LEFT='${${_P9K_CLM::=$COLUMNS}+}${${COLUMNS::=1024}+}'
   typeset -g _P9K_PROMPT_PREFIX_RIGHT='${${_P9K_CLM::=$COLUMNS}+}${${COLUMNS::=1024}+}'
