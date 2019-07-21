@@ -42,6 +42,21 @@ fi
       # time                  # current time
   )
 
+  # Default segment icons depend on the value of POWERLEVEL9K_MODE. For example, LOCK_ICON
+  # can be printed as $'\uE0A2', $'\uE138' or $'\uF023' depending on POWERLEVEL9K_MODE. The
+  # correct value of this parameter depends on the provider of the font your terminal is using.
+  #
+  #   Font Provider                    | POWERLEVEL9K_MODE
+  #   ---------------------------------+-------------------
+  #   Powerline                        | powerline
+  #   Font Awesome                     | awesome-fontconfig
+  #   Adobe Source Code Pro            | awesome-fontconfig
+  #   Source Code Pro                  | awesome-fontconfig
+  #   Awesome-Terminal Fonts (regular) | awesome-fontconfig
+  #   Awesome-Terminal Fonts (patched) | awesome-patched
+  #   Nerd Fonts                       | nerdfont-complete
+  typeset -g POWERLEVEL9K_MODE=nerdfont-complete
+
   # Add an empty line before each prompt.
   typeset -g POWERLEVEL9K_PROMPT_ADD_NEWLINE=true
   # Add a space between the prompt and the cursor.
