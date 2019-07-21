@@ -88,7 +88,7 @@ If you are new to Powerlevel10k/9k and don't have your own config yet, start wit
 [lean](https://github.com/romkatv/powerlevel10k/blob/master/config/p10k-lean.zsh) style.
 
 ```zsh
-curl -fsSL -O ~/p10k-lean.zsh https://raw.githubusercontent.com/romkatv/powerlevel10k/master/config/p10k-lean.zsh
+curl -fsSL -o ~/p10k-lean.zsh https://raw.githubusercontent.com/romkatv/powerlevel10k/master/config/p10k-lean.zsh
 echo 'source ~/p10k-lean.zsh' >>! ~/.zshrc
 ```
 
