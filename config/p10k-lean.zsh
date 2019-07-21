@@ -70,17 +70,17 @@ fi
 
   # Disable segment icons by default.
   #
+  # To enable default icons for all segments, don't set POWERLEVEL9K_VISUAL_IDENTIFIER_EXPANSION
+  # or set it to '${P9K_VISUAL_IDENTIFIER}'.
+  #
+  # To enable default segment icons for one segment (e.g., dir), define
+  # POWERLEVEL9K_DIR_VISUAL_IDENTIFIER_EXPANSION='${P9K_VISUAL_IDENTIFIER}'.
+  #
   # To set a specific icon for a segment (e.g., dir), define
   # POWERLEVEL9K_DIR_VISUAL_IDENTIFIER_EXPANSION='⭐'.
   #
   # To set a specific icon for a segment in a given state (e.g., dir in state NOT_WRITABLE),
   # define POWERLEVEL9K_DIR_NOT_WRITABLE_VISUAL_IDENTIFIER_EXPANSION='⭐'.
-  #
-  # To enable default segment icons for one segment (e.g., dir), define
-  # POWERLEVEL9K_DIR_VISUAL_IDENTIFIER_EXPANSION='${P9K_VISUAL_IDENTIFIER}'.
-  #
-  # To enable default icons for all segments, don't set POWERLEVEL9K_VISUAL_IDENTIFIER_EXPANSION
-  # or set it to '${P9K_VISUAL_IDENTIFIER}'.
   #
   # When a segment is displaying its default icon, in addition to being able to chage it with
   # VISUAL_IDENTIFIER_EXPANSION as described above, you can also change it with an override
@@ -88,7 +88,7 @@ fi
   # LOCK_ICON as default icon.
   #
   # Note: Many default icons cannot be displayed with system fonts. You'll need to install a
-  # Powerline font to use them.
+  # Powerline font to use them. See POWERLEVEL9K_MODE below.
   typeset -g POWERLEVEL9K_VISUAL_IDENTIFIER_EXPANSION=
 
   # This option doesn't make a difference unless you've enabled default icons for all or some
@@ -106,9 +106,20 @@ fi
   #   Awesome-Terminal Fonts (regular) | awesome-fontconfig
   #   Awesome-Terminal Fonts (patched) | awesome-patched
   #   Nerd Fonts                       | nerdfont-complete
-  #
-  # Tip: Don't use default icons and forget about font configuration headaches.
   typeset -g POWERLEVEL9K_MODE=nerdfont-complete
+
+  # When set to true, icons appear before content on both sides of the prompt. When set
+  # to false, icons go after content. If not set, icons go before content in the left prompt
+  # and after content in the right prompt.
+  #
+  # You can also override it for a specific segment:
+  #
+  #   POWERLEVEL9K_STATUS_ICON_BEFORE_CONTENT=false
+  #
+  # Or for specific segment in specific state:
+  #
+  #   POWERLEVEL9K_DIR_NOT_WRITABLE_ICON_BEFORE_CONTENT=false
+  typeset -g POWERLEVEL9K_ICON_BEFORE_CONTENT=true
 
   # Add an empty line before each prompt. If you set it to false, you might want to
   # set POWERLEVEL9K_SHOW_RULER=true or POWERLEVEL9K_MULTILINE_FIRST_PROMPT_GAP_CHAR='·' below.
@@ -158,11 +169,8 @@ fi
   typeset -g POWERLEVEL9K_PROMPT_CHAR_{OK,ERROR}_VIVIS_CONTENT_EXPANSION='Ⅴ'
   typeset -g POWERLEVEL9K_PROMPT_CHAR_LEFT_PROMPT_LAST_SEGMENT_END_SYMBOL=''
 
-  # Enable special styling for non-writable directories. If set to false,
-  # POWERLEVEL9K_DIR_NOT_WRITABLE_VISUAL_IDENTIFIER_EXPANSION defined below won't have effect.
+  # Enable special styling for non-writable directories.
   typeset -g POWERLEVEL9K_DIR_SHOW_WRITABLE=true
-  # Icon to display when the current directory isn't writable.
-  typeset -g POWERLEVEL9K_DIR_NOT_WRITABLE_VISUAL_IDENTIFIER_EXPANSION='%214F%B!w'
   # Default current directory color.
   typeset -g POWERLEVEL9K_DIR_FOREGROUND=12
   # If directory is too long, shorten some of its segments to the shortest possible unique
@@ -230,6 +238,7 @@ fi
   typeset -g POWERLEVEL9K_VCS_LOADING_FOREGROUND=244
   # Enable counters for staged, unstaged, etc.
   typeset -g POWERLEVEL9K_VCS_{STAGED,UNSTAGED,UNTRACKED,COMMITS_AHEAD,COMMITS_BEHIND}_MAX_NUM=-1
+  typeset -g POWERLEVEL9K_VCS_VISUAL_IDENTIFIER_COLOR=76
 
   # Show status of repositories of these types. You can add svn and/or hg if you are
   # using them. If you do, your prompt may become slow even when your current directory
