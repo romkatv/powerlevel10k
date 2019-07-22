@@ -3197,8 +3197,9 @@ _p9k_init_lines() {
 
   _p9k_get_icon '' LEFT_SEGMENT_END_SEPARATOR
   if [[ -n $_P9K_RETVAL ]]; then
-    # Not escaped for historical reasons.
     _P9K_RETVAL+=%b%k%f
+    # Not escaped for historical reasons.
+    _P9K_RETVAL='${_P9K_Z::="'${${_P9K_RETVAL//\\/\\\\\\}//\"/\\\\\"}'"}'
     if [[ $POWERLEVEL9K_PROMPT_ON_NEWLINE == true ]]; then
       _P9K_LINE_SUFFIX_LEFT[-2]+=$_P9K_RETVAL
     else
@@ -3211,16 +3212,18 @@ _p9k_init_lines() {
     _P9K_LINE_GAP_POST[1]=$_P9K_RETVAL
 
     if [[ $+POWERLEVEL9K_MULTILINE_FIRST_PROMPT_PREFIX == 1 || $POWERLEVEL9K_PROMPT_ON_NEWLINE == true ]]; then
-      # Not escaped for historical reasons.
       _p9k_get_icon '' MULTILINE_FIRST_PROMPT_PREFIX
       [[ _P9K_RETVAL == *%* ]] && _P9K_RETVAL+=%b%k%f
+      # Not escaped for historical reasons.
+      _P9K_RETVAL='${_P9K_Z::="'${${_P9K_RETVAL//\\/\\\\\\}//\"/\\\\\"}'"}'
       _P9K_LINE_PREFIX_LEFT[1]=$_P9K_RETVAL$_P9K_LINE_PREFIX_LEFT[1]
     fi
 
     if [[ $+POWERLEVEL9K_MULTILINE_LAST_PROMPT_PREFIX == 1 || $POWERLEVEL9K_PROMPT_ON_NEWLINE == true ]]; then
-      # Not escaped for historical reasons.
       _p9k_get_icon '' MULTILINE_LAST_PROMPT_PREFIX
       [[ _P9K_RETVAL == *%* ]] && _P9K_RETVAL+=%b%k%f
+      # Not escaped for historical reasons.
+    _P9K_RETVAL='${_P9K_Z::="'${${_P9K_RETVAL//\\/\\\\\\}//\"/\\\\\"}'"}'
       _P9K_LINE_PREFIX_LEFT[-1]=$_P9K_RETVAL$_P9K_LINE_PREFIX_LEFT[-1]
     fi
 
@@ -3245,9 +3248,10 @@ _p9k_init_lines() {
       _P9K_LINE_GAP_POST[2,-2]=(${${:-{3..num_lines}}:/*/$_P9K_RETVAL})
 
       if [[ $+POWERLEVEL9K_MULTILINE_NEWLINE_PROMPT_PREFIX == 1 || $POWERLEVEL9K_PROMPT_ON_NEWLINE == true ]]; then
-        # Not escaped for historical reasons.
         _p9k_get_icon '' MULTILINE_NEWLINE_PROMPT_PREFIX
         [[ _P9K_RETVAL == *%* ]] && _P9K_RETVAL+=%b%k%f
+        # Not escaped for historical reasons.
+        _P9K_RETVAL='${_P9K_Z::="'${${_P9K_RETVAL//\\/\\\\\\}//\"/\\\\\"}'"}'
         _P9K_LINE_PREFIX_LEFT[2,-2]=$_P9K_RETVAL${^_P9K_LINE_PREFIX_LEFT[2,-2]}
       fi
 
