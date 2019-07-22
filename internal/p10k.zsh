@@ -3199,7 +3199,7 @@ _p9k_init_lines() {
   if [[ -n $_P9K_RETVAL ]]; then
     _P9K_RETVAL+=%b%k%f
     # Not escaped for historical reasons.
-    _P9K_RETVAL='${_P9K_Z::="'${${_P9K_RETVAL//\\/\\\\}//\"/\\\"}'"}'
+    _P9K_RETVAL='${:-"'${${_P9K_RETVAL//\\/\\\\}//\"/\\\"}'"}'
     if [[ $POWERLEVEL9K_PROMPT_ON_NEWLINE == true ]]; then
       _P9K_LINE_SUFFIX_LEFT[-2]+=$_P9K_RETVAL
     else
@@ -3215,7 +3215,7 @@ _p9k_init_lines() {
       _p9k_get_icon '' MULTILINE_FIRST_PROMPT_PREFIX
       [[ _P9K_RETVAL == *%* ]] && _P9K_RETVAL+=%b%k%f
       # Not escaped for historical reasons.
-      _P9K_RETVAL='${_P9K_Z::="'${${_P9K_RETVAL//\\/\\\\}//\"/\\\"}'"}'
+      _P9K_RETVAL='${:-"'${${_P9K_RETVAL//\\/\\\\}//\"/\\\"}'"}'
       _P9K_LINE_PREFIX_LEFT[1]=$_P9K_RETVAL$_P9K_LINE_PREFIX_LEFT[1]
     fi
 
@@ -3223,7 +3223,7 @@ _p9k_init_lines() {
       _p9k_get_icon '' MULTILINE_LAST_PROMPT_PREFIX
       [[ _P9K_RETVAL == *%* ]] && _P9K_RETVAL+=%b%k%f
       # Not escaped for historical reasons.
-    _P9K_RETVAL='${_P9K_Z::="'${${_P9K_RETVAL//\\/\\\\}//\"/\\\"}'"}'
+    _P9K_RETVAL='${:-"'${${_P9K_RETVAL//\\/\\\\}//\"/\\\"}'"}'
       _P9K_LINE_PREFIX_LEFT[-1]=$_P9K_RETVAL$_P9K_LINE_PREFIX_LEFT[-1]
     fi
 
@@ -3251,7 +3251,7 @@ _p9k_init_lines() {
         _p9k_get_icon '' MULTILINE_NEWLINE_PROMPT_PREFIX
         [[ _P9K_RETVAL == *%* ]] && _P9K_RETVAL+=%b%k%f
         # Not escaped for historical reasons.
-        _P9K_RETVAL='${_P9K_Z::="'${${_P9K_RETVAL//\\/\\\\}//\"/\\\"}'"}'
+        _P9K_RETVAL='${:-"'${${_P9K_RETVAL//\\/\\\\}//\"/\\\"}'"}'
         _P9K_LINE_PREFIX_LEFT[2,-2]=$_P9K_RETVAL${^_P9K_LINE_PREFIX_LEFT[2,-2]}
       fi
 
