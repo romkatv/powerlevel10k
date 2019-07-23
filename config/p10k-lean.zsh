@@ -204,7 +204,8 @@ fi
   # https://github.com/romkatv/gitstatus/blob/master/gitstatus.plugin.zsh.
   local vcs=''
   # 'feature' or '@72f5c8a' if not on a branch.
-  vcs+='%76F${${VCS_STATUS_LOCAL_BRANCH//\%/%%}:-%f@%76F${VCS_STATUS_COMMIT[1,8]}}'
+  vcs+='${${VCS_STATUS_LOCAL_BRANCH:+%76F${(g::)POWERLEVEL9K_VCS_BRANCH_ICON}${VCS_STATUS_LOCAL_BRANCH//\%/%%}}'
+  vcs+=':-%f@%76F${VCS_STATUS_COMMIT[1,8]}}'
   # ':master' if the tracking branch name differs from local branch.
   vcs+='${${VCS_STATUS_REMOTE_BRANCH:#$VCS_STATUS_LOCAL_BRANCH}:+%f:%76F${VCS_STATUS_REMOTE_BRANCH//\%/%%}}'
   # '#tag' if on a tag.
@@ -229,6 +230,9 @@ fi
   # If P9K_CONTENT is not empty, leave it unchanged. It's either "loading" or from vcs_info.
   vcs="\${P9K_CONTENT:-$vcs}"
 
+  # No branch icon. Set this parameter to '\uF126 ' for the popular Powerline branch icon.
+  typeset -g POWERLEVEL9K_VCS_BRANCH_ICON=
+
   # Disable the default Git status formatting.
   typeset -g POWERLEVEL9K_VCS_DISABLE_GITSTATUS_FORMATTING=true
   # Install our own Git status formatter.
@@ -238,7 +242,6 @@ fi
   typeset -g POWERLEVEL9K_VCS_LOADING_FOREGROUND=244
   # Enable counters for staged, unstaged, etc.
   typeset -g POWERLEVEL9K_VCS_{STAGED,UNSTAGED,UNTRACKED,COMMITS_AHEAD,COMMITS_BEHIND}_MAX_NUM=-1
-  typeset -g POWERLEVEL9K_VCS_VISUAL_IDENTIFIER_COLOR=76
 
   # Show status of repositories of these types. You can add svn and/or hg if you are
   # using them. If you do, your prompt may become slow even when your current directory
@@ -247,9 +250,7 @@ fi
 
   # These settings are used for respositories other than Git or when gitstatusd fails and
   # Powerlevel10k has to fall back to using vcs_info.
-  typeset -g POWERLEVEL9K_VCS_CLEAN_FOREGROUND=76
-  typeset -g POWERLEVEL9K_VCS_MODIFIED_FOREGROUND=11
-  typeset -g POWERLEVEL9K_VCS_UNTRACKED_FOREGROUND=76
+  typeset -g POWERLEVEL9K_VCS_{CLEAN,MODIFIED,UNTRACKED}_FOREGROUND=76
   typeset -g POWERLEVEL9K_VCS_REMOTE_BRANCH_ICON=':'
   typeset -g POWERLEVEL9K_VCS_COMMIT_ICON='@'
   typeset -g POWERLEVEL9K_VCS_INCOMING_CHANGES_ICON='⇣'
@@ -259,7 +260,6 @@ fi
   typeset -g POWERLEVEL9K_VCS_UNTRACKED_ICON=$'%{\b?%}'
   typeset -g POWERLEVEL9K_VCS_UNSTAGED_ICON=$'%{\b!%}'
   typeset -g POWERLEVEL9K_VCS_STAGED_ICON=$'%{\b+%}'
-  typeset -g POWERLEVEL9K_VCS_BRANCH_ICON=
 
   # Don't show status on success.
   typeset -g POWERLEVEL9K_STATUS_OK=false
