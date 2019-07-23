@@ -1475,11 +1475,10 @@ function _p9k_cached_cmd_stdout_stderr() {
 
 ################################################################
 # Segment to diplay Node version
-set_default P9K_NODE_VERSION_PROJECT_ONLY false
 prompt_node_version() {
   (( $+commands[node] )) || return
 
-  if [[ $P9K_NODE_VERSION_PROJECT_ONLY == true ]] ; then
+  if (( _P9K_NODE_VERSION_PROJECT_ONLY )); then
     local dir=$PWD
     while true; do
       [[ $dir == / ]] && return
@@ -3000,6 +2999,7 @@ _p9k_init_params() {
   _p9k_declare -s POWERLEVEL9K_VPN_IP_INTERFACE "tun"
   _p9k_declare -i POWERLEVEL9K_LOAD_WHICH 5
   _p9k_declare -b POWERLEVEL9K_NODENV_PROMPT_ALWAYS_SHOW 0
+  _p9k_declare -b POWERLEVEL9K_NODE_VERSION_PROJECT_ONLY 0
   _p9k_declare -b POWERLEVEL9K_RBENV_PROMPT_ALWAYS_SHOW 0
   _p9k_declare -b POWERLEVEL9K_CHRUBY_SHOW_VERSION 1
   _p9k_declare -b POWERLEVEL9K_CHRUBY_SHOW_ENGINE 1
