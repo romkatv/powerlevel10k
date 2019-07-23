@@ -310,22 +310,22 @@ left_prompt_segment() {
     p+="\${_P9K_N:=$((t+4))}"                                                            # 4
 
     _p9k_param $1 VISUAL_IDENTIFIER_EXPANSION '${P9K_VISUAL_IDENTIFIER}'
-    local icon_exp=$_P9K_RETVAL
+    local icon_exp_=${_P9K_RETVAL:+\"${${_P9K_RETVAL//\\/\\\\}//\"/\\\"}\"}
 
     _p9k_param $1 CONTENT_EXPANSION '${P9K_CONTENT}'
-    local content_exp=$_P9K_RETVAL
+    local content_exp_=${_P9K_RETVAL:+\"${${_P9K_RETVAL//\\/\\\\}//\"/\\\"}\"}
 
-    if [[ ( $icon_exp != '${P9K_VISUAL_IDENTIFIER}' && $icon_exp == *'$'* ) ||
-          ( $content_exp != '${P9K_CONTENT}' && $content_exp == *'$'* ) ]]; then
+    if [[ ( $icon_exp_ != '"${P9K_VISUAL_IDENTIFIER}"' && $icon_exp_ == *'$'* ) ||
+          ( $content_exp_ != '"${P9K_CONTENT}"' && $content_exp_ == *'$'* ) ]]; then
       p+="\${P9K_VISUAL_IDENTIFIER::=$icon_}"
     fi
 
     local -i has_icon=-1  # maybe
 
-    if [[ $icon_exp != '${P9K_VISUAL_IDENTIFIER}' && $icon_exp == *'$'* ]]; then
-      p+="\${_P9K_V::=$icon_exp$style_}"
+    if [[ $icon_exp_ != '"${P9K_VISUAL_IDENTIFIER}"' && $icon_exp_ == *'$'* ]]; then
+      p+='${_P9K_V::='$icon_exp_$style_'}'
     else
-      [[ $icon_exp == '${P9K_VISUAL_IDENTIFIER}' ]] && _P9K_RETVAL=$icon_ || _p9k_escape $icon_exp
+      [[ $icon_exp_ == '"${P9K_VISUAL_IDENTIFIER}"' ]] && _P9K_RETVAL=$icon_ || _P9K_RETVAL=$icon_exp_
       if [[ -n $_P9K_RETVAL ]]; then
         p+="\${_P9K_V::=$_P9K_RETVAL"
         [[ $_P9K_RETVAL == *%* ]] && p+=$style_
@@ -336,7 +336,7 @@ left_prompt_segment() {
       fi
     fi
 
-    p+="\${_P9K_C::=$content_exp}"
+    p+="\${_P9K_C::=$content_exp_}"
     if (( has_icon == -1 )); then
       p+='${_P9K_E::=${${(%):-$_P9K_C%1(l.1.0)}[-1]}${${(%):-$_P9K_V%1(l.1.0)}[-1]}}'
     else
@@ -511,22 +511,22 @@ right_prompt_segment() {
     p+="\${_P9K_N:=$((t+4))}"                                                                    # 4
 
     _p9k_param $1 VISUAL_IDENTIFIER_EXPANSION '${P9K_VISUAL_IDENTIFIER}'
-    local icon_exp=$_P9K_RETVAL
+    local icon_exp_=${_P9K_RETVAL:+\"${${_P9K_RETVAL//\\/\\\\}//\"/\\\"}\"}
 
     _p9k_param $1 CONTENT_EXPANSION '${P9K_CONTENT}'
-    local content_exp=$_P9K_RETVAL
+    local content_exp_=${_P9K_RETVAL:+\"${${_P9K_RETVAL//\\/\\\\}//\"/\\\"}\"}
 
-    if [[ ( $icon_exp != '${P9K_VISUAL_IDENTIFIER}' && $icon_exp == *'$'* ) ||
-          ( $content_exp != '${P9K_CONTENT}' && $content_exp == *'$'* ) ]]; then
+    if [[ ( $icon_exp_ != '"${P9K_VISUAL_IDENTIFIER}"' && $icon_exp_ == *'$'* ) ||
+          ( $content_exp_ != '"${P9K_CONTENT}"' && $content_exp_ == *'$'* ) ]]; then
       p+="\${P9K_VISUAL_IDENTIFIER::=$icon_}"
     fi
 
     local -i has_icon=-1  # maybe
 
-    if [[ $icon_exp != '${P9K_VISUAL_IDENTIFIER}' && $icon_exp == *'$'* ]]; then
-      p+="\${_P9K_V::=$icon_exp$style_}"
+    if [[ $icon_exp_ != '"${P9K_VISUAL_IDENTIFIER}"' && $icon_exp_ == *'$'* ]]; then
+      p+="\${_P9K_V::=$icon_exp_$style_}"
     else
-      [[ $icon_exp == '${P9K_VISUAL_IDENTIFIER}' ]] && _P9K_RETVAL=$icon_ || _p9k_escape $icon_exp
+      [[ $icon_exp_ == '"${P9K_VISUAL_IDENTIFIER}"' ]] && _P9K_RETVAL=$icon_ || _P9K_RETVAL=$icon_exp_
       if [[ -n $_P9K_RETVAL ]]; then
         p+="\${_P9K_V::=$_P9K_RETVAL"
         [[ $_P9K_RETVAL == *%* ]] && p+=$style_
@@ -537,7 +537,7 @@ right_prompt_segment() {
       fi
     fi
 
-    p+="\${_P9K_C::=$content_exp}"
+    p+="\${_P9K_C::=$content_exp_}"
     if (( has_icon == -1 )); then
       p+='${_P9K_E::=${${(%):-$_P9K_C%1(l.1.0)}[-1]}${${(%):-$_P9K_V%1(l.1.0)}[-1]}}'
     else
@@ -3144,7 +3144,8 @@ _p9k_build_gap_post() {
   if [[ $exp == '${P9K_GAP}' ]]; then
     _P9K_RETVAL+='${(pl'$s'$((_P9K_M+1))'$s$s$char$s$')}'
   else
-    _P9K_RETVAL+='${${P9K_GAP::=${(pl'$s'$((_P9K_M+1))'$s$s$char$s$')}}+}'$exp
+    _P9K_RETVAL+='${${P9K_GAP::=${(pl'$s'$((_P9K_M+1))'$s$s$char$s$')}}+}'
+    _P9K_RETVAL+='${:-"'${${exp//\\/\\\\}//\"/\\\"}'"}'
     style=1
   fi
   _P9K_RETVAL+='$_P9K_RPROMPT$_P9K_T[$((1+!_P9K_IND))]}:-\n}'
