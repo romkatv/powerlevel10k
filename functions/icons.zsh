@@ -1,34 +1,15 @@
-# vim:ft=zsh ts=2 sw=2 sts=2 et fenc=utf-8
-################################################################
-# icons
-# This file holds the icon definitions and
-# icon-functions for the powerlevel9k-ZSH-theme
-# https://github.com/bhilburn/powerlevel9k
-################################################################
-
-# These characters require the Powerline fonts to work properly. If you see
-# boxes or bizarre characters below, your fonts are not correctly installed. If
-# you do not want to install a special font, you can set `POWERLEVEL9K_MODE` to
-# `compatible`. This shows all icons in regular symbols.
-
-# Initialize the icon list according to the user's `POWERLEVEL9K_MODE`.
-typeset -gAH icons
-
-set_default POWERLEVEL9K_HIDE_BRANCH_ICON false
-set_default POWERLEVEL9K_MODE ""
-
-typeset -gi _P9K_ICONS_INITIALIZED=0
+typeset -gA icons
 
 function _p9k_init_icons() {
-  (( _P9K_ICONS_INITIALIZED )) && return
-  _P9K_ICONS_INITIALIZED=1
+  [[ $+_p9k_icon_mode && $_p9k_icon_mode == $POWERLEVEL9K_MODE ]] && return
+  typeset -g _p9k_icon_mode=$POWERLEVEL9K_MODE
+
+  local LC_ALL=C.UTF-8
 
   case $POWERLEVEL9K_MODE in
     'flat'|'awesome-patched')
       # Awesome-Patched Font required! See:
       # https://github.com/gabrielelana/awesome-terminal-fonts/tree/patching-strategy/patched
-      # Set the right locale to protect special characters
-      local LC_ALL="" LC_CTYPE="en_US.UTF-8"
       icons=(
         RULER_CHAR                     $'\u2500'              # ─
         LEFT_SEGMENT_SEPARATOR         $'\uE0B0'              # 
@@ -131,8 +112,6 @@ function _p9k_init_icons() {
     'awesome-fontconfig')
       # fontconfig with awesome-font required! See
       # https://github.com/gabrielelana/awesome-terminal-fonts
-      # Set the right locale to protect special characters
-      local LC_ALL="" LC_CTYPE="en_US.UTF-8"
       icons=(
         RULER_CHAR                     $'\u2500'              # ─
         LEFT_SEGMENT_SEPARATOR         $'\uE0B0'              # 
@@ -232,16 +211,12 @@ function _p9k_init_icons() {
       # mapped fontconfig with awesome-font required! See
       # https://github.com/gabrielelana/awesome-terminal-fonts
       # don't forget to source the font maps in your startup script
-      # Set the right locale to protect special characters
-      local LC_ALL="" LC_CTYPE="en_US.UTF-8"
-
       if [ -z "$AWESOME_GLYPHS_LOADED" ]; then
           echo "Powerlevel9k warning: Awesome-Font mappings have not been loaded.
           Source a font mapping in your shell config, per the Awesome-Font docs
           (https://github.com/gabrielelana/awesome-terminal-fonts),
           Or use a different Powerlevel9k font configuration.";
       fi
-
       icons=(
         RULER_CHAR                     $'\u2500'              # ─
         LEFT_SEGMENT_SEPARATOR         $'\uE0B0'                                      # 
@@ -337,8 +312,6 @@ function _p9k_init_icons() {
       # nerd-font patched (complete) font required! See
       # https://github.com/ryanoasis/nerd-fonts
       # http://nerdfonts.com/#cheat-sheet
-      # Set the right locale to protect special characters
-      local LC_ALL="" LC_CTYPE="en_US.UTF-8"
       icons=(
         RULER_CHAR                     $'\u2500'              # ─
         LEFT_SEGMENT_SEPARATOR         $'\uE0B0'              # 
@@ -437,8 +410,6 @@ function _p9k_init_icons() {
     *)
       # Powerline-Patched Font required!
       # See https://github.com/Lokaltog/powerline-fonts
-      # Set the right locale to protect special characters
-      local LC_ALL="" LC_CTYPE="en_US.UTF-8"
       icons=(
         RULER_CHAR                     $'\u2500'              # ─
         LEFT_SEGMENT_SEPARATOR         $'\uE0B0'              # 
@@ -539,30 +510,22 @@ function _p9k_init_icons() {
   # Override the above icon settings with any user-defined variables.
   case $POWERLEVEL9K_MODE in
     'flat')
-      # Set the right locale to protect special characters
-      local LC_ALL="" LC_CTYPE="en_US.UTF-8"
       icons[LEFT_SEGMENT_SEPARATOR]=''
       icons[RIGHT_SEGMENT_SEPARATOR]=''
       icons[LEFT_SUBSEGMENT_SEPARATOR]='|'
       icons[RIGHT_SUBSEGMENT_SEPARATOR]='|'
     ;;
     'compatible')
-      # Set the right locale to protect special characters
-      local LC_ALL="" LC_CTYPE="en_US.UTF-8"
       icons[LEFT_SEGMENT_SEPARATOR]=$'\u2B80'                 # ⮀
       icons[RIGHT_SEGMENT_SEPARATOR]=$'\u2B82'                # ⮂
       icons[VCS_BRANCH_ICON]='@'
     ;;
   esac
-
-  if [[ "$POWERLEVEL9K_HIDE_BRANCH_ICON" == true ]]; then
-      icons[VCS_BRANCH_ICON]=''
-  fi
 }
 
-# Safety function for printing icons
-# Prints the named icon, or if that icon is undefined, the string name.
+# Sadly, this is a part of public API. Its use is emphatically discouraged.
 function print_icon() {
+  emulate -L zsh
   _p9k_init_icons
   local icon_name=$1
   local var_name=POWERLEVEL9K_${icon_name}
@@ -573,11 +536,13 @@ function print_icon() {
   fi
 }
 
-# Get a list of configured icons
+# Prints a list of configured icons.
+#
 #   * $1 string - If "original", then the original icons are printed,
 #                 otherwise "print_icon" is used, which takes the users
 #                 overrides into account.
 function get_icon_names() {
+  emulate -L zsh
   _p9k_init_icons
   # Iterate over a ordered list of keys of the icons array
   for key in ${(@kon)icons}; do

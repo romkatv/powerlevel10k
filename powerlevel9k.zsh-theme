@@ -20,32 +20,33 @@ fi
 () {
   emulate -L zsh
 
-  if (( $+_p9k_sourced )); then
+  if (( $+__p9k_sourced )); then
     prompt_powerlevel9k_setup
     return
   fi
-  typeset -gr _p9k_sourced=1
-  typeset -g _p9k_installation_dir=''
+  typeset -gr __p9k_sourced=1
+  typeset -g __p9k_installation_dir=''
 
   if [[ -n $POWERLEVEL9K_INSTALLATION_DIR ]]; then
-    _p9k_installation_dir=${POWERLEVEL9K_INSTALLATION_DIR:A}
+    __p9k_installation_dir=${POWERLEVEL9K_INSTALLATION_DIR:A}
   else
     if [[ ${(%):-%N} == '(eval)' ]]; then
       if [[ $0 == '-antigen-load' && -r powerlevel9k.zsh-theme ]]; then
         # Antigen uses eval to load things so it can change the plugin (!!)
         # https://github.com/zsh-users/antigen/issues/581
-        _p9k_installation_dir=$PWD
+        __p9k_installation_dir=$PWD
       else
         >&2 print -P '%F{red}[ERROR]%f Powerlevel10k cannot figure out its installation directory.'
         >&2 print -P 'Please set %F{green}POWERLEVEL9K_INSTALLATION_DIR.%f'
-        return 1
+        return
       fi
     else
-      _p9k_installation_dir=${${(%):-%x}:A:h}
+      __p9k_installation_dir=${${(%):-%x}:A:h}
     fi
   fi
 
-  source $_p9k_installation_dir/internal/p10k.zsh
+  typeset -gr __p9k_installation_dir
+  source $__p9k_installation_dir/internal/p10k.zsh || true
 }
 
 (( ! _p9k_restore_aliases )) || setopt aliases

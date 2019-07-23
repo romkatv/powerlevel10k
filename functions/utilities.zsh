@@ -1,48 +1,46 @@
-# vim:ft=zsh ts=2 sw=2 sts=2 et fenc=utf-8
-################################################################
-# Utility functions
-# This file holds some utility-functions for
-# the powerlevel9k-ZSH-theme
-# https://github.com/bhilburn/powerlevel9k
-################################################################
-
-# Usage: set_default [OPTION]... NAME [VALUE]...
-#
-# Options are the same as in `typeset`.
-function set_default() {
-  emulate -L zsh
-  local -a flags=(-g)
-  while true; do
-    case $1 in
-      --) shift; break;;
-      -*) flags+=$1; shift;;
-      *) break;
-    esac
-  done
-
-  local varname=$1
-  shift
-  if [[ -n ${(tP)varname} ]]; then
-    typeset $flags $varname
-  elif [[ "$flags" == *[aA]* ]]; then
-    eval "typeset ${(@q)flags} ${(q)varname}=(${(qq)@})"
-  else
-    typeset $flags $varname="$*"
-  fi
-}
-
-function _p9k_g_expand() {
-  (( $+parameters[$1] )) || return
-  local -a ts=("${=$(typeset -p $1)}")
-  shift ts
-  local x
-  for x in "${ts[@]}"; do
-    [[ $x == -* ]] || break
-    # Don't change readonly variables. Ideally, we shouldn't modify any variables at all,
-    # but for now this will do.
-    [[ $x == -*r* ]] && return
-  done
-  typeset -g $1=${(g::)${(P)1}}
+# _p9k_declare <type> <uppercase-name> [default]...
+function _p9k_declare() {
+  local -i set=$+parameters[$2]
+  (( ARGC > 2 || set )) || return 0
+  case $1 in
+    -b)
+      if (( set )); then
+        [[ ${(P)2} == true ]] && typeset -gi _$2=1 || typeset -gi _$2=0
+      else
+        typeset -gi _$2=$3
+      fi
+      ;;
+    -a)
+      local -a v=(${(P)2})
+      if (( set )); then
+        eval "typeset -ga _${(q)2}=(${(@qq)v})";
+      else
+        if [[ $3 != '--' ]]; then
+          echo "internal error in _p9k_declare " "${(qqq)@}" >&2
+        fi
+        eval "typeset -ga _${(q)2}=(${(@qq)*[4,-1]})"
+      fi
+      ;;
+    -i)
+      (( set )) && typeset -gi _$2=$2 || typeset -gi _$2=$3
+      ;;
+    -F)
+      (( set )) && typeset -gF _$2=$2 || typeset -gF _$2=$3
+      ;;
+    -s)
+      (( set )) && typeset -g _$2=${(P)2} || typeset -g _$2=$3
+      ;;
+    -e)
+      if (( set )); then
+        local v=${(P)2}
+        typeset -g _$2=${(g::)v}
+      else
+        typeset -g _$2=${(g::)3}
+      fi
+      ;;
+    *)
+      echo "internal error in _p9k_declare " "${(qqq)@}" >&2
+  esac
 }
 
 # If we execute `print -P $1`, how many characters will be printed on the last line?
@@ -69,21 +67,21 @@ function _p9k_prompt_length() {
       typeset ${${(%):-$1%$m(l.x.y)}[-1]}=$m
     done
   fi
-  _P9K_RETVAL=$x
+  _p9k_ret=$x
 }
 
-typeset -g _P9K_BYTE_SUFFIX=('B' 'K' 'M' 'G' 'T' 'P' 'E' 'Z' 'Y')
+typeset -gr __p9k_byte_suffix=('B' 'K' 'M' 'G' 'T' 'P' 'E' 'Z' 'Y')
 
 # 42 => 42B
 # 1536 => 1.5K
 function _p9k_human_readable_bytes() {
   typeset -F 2 n=$1
   local suf
-  for suf in $_P9K_BYTE_SUFFIX; do
+  for suf in $__p9k_byte_suffix; do
     (( n < 100 )) && break
     (( n /= 1024 ))
   done
-  _P9K_RETVAL=$n$suf
+  _p9k_ret=$n$suf
 }
 
 # Determine if the passed segment is used in the prompt
@@ -92,11 +90,10 @@ function _p9k_human_readable_bytes() {
 # either the LEFT or RIGHT prompt arrays.
 #    * $1: The segment to be tested.
 segment_in_use() {
-  local key=$1
-  [[ -n "${POWERLEVEL9K_LEFT_PROMPT_ELEMENTS[(r)${key}]}" ||
-     -n "${POWERLEVEL9K_LEFT_PROMPT_ELEMENTS[(r)${key}_joined]}" ||
-     -n "${POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS[(r)${key}]}" ||
-     -n "${POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS[(r)${key}_joined]}" ]]
+  [[ -n "${POWERLEVEL9K_LEFT_PROMPT_ELEMENTS[(r)${1}]}" ||
+     -n "${POWERLEVEL9K_LEFT_PROMPT_ELEMENTS[(r)${1}_joined]}" ||
+     -n "${POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS[(r)${1}]}" ||
+     -n "${POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS[(r)${1}_joined]}" ]]
 }
 
 function _p9k_parse_ip() {
@@ -120,7 +117,7 @@ function _p9k_parse_ip() {
         local ipFound="${match[3]}"
         local -a interfaceStates=(${(s:,:)match[1]})
         if (( ${interfaceStates[(I)UP]} )); then
-          _P9K_RETVAL=$ipFound
+          _p9k_ret=$ipFound
           return
         fi
       fi
@@ -132,7 +129,7 @@ function _p9k_parse_ip() {
     local interface
     for interface in "${(@)interfaces}"; do
       if [[ "$interface" =~ $pattern ]]; then
-        _P9K_RETVAL=$match[1]
+        _p9k_ret=$match[1]
         return
       fi
     done

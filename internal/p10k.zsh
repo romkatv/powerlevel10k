@@ -27,12 +27,12 @@ if ! autoload -U is-at-least || ! is-at-least 5.1; then
   return 1
 fi
 
-source "${_p9k_installation_dir}/functions/utilities.zsh"
-source "${_p9k_installation_dir}/functions/icons.zsh"
-source "${_p9k_installation_dir}/functions/colors.zsh"
-source "${_p9k_installation_dir}/functions/vcs.zsh"
+source "${__p9k_installation_dir}/functions/utilities.zsh"
+source "${__p9k_installation_dir}/functions/icons.zsh"
+source "${__p9k_installation_dir}/functions/colors.zsh"
+source "${__p9k_installation_dir}/functions/vcs.zsh"
 
-typeset -g _P9K_RETVAL
+typeset -g _p9k_ret
 typeset -g _P9K_CACHE_KEY
 typeset -ga _P9K_CACHE_VAL
 typeset -gA _P9K_CACHE
@@ -41,11 +41,6 @@ typeset -g _P9K_N
 typeset -gi _P9K_I
 typeset -g _P9K_BG
 typeset -g _P9K_F
-
-# Specifies the maximum number of elements in the cache. When the cache grows over this limit,
-# it gets cleared. This is meant to avoid memory leaks when a rogue prompt is filling the cache
-# with data.
-set_default -i POWERLEVEL9K_MAX_CACHE_SIZE 10000
 
 # Caching allows storing array-to-array associations. It should be used like this:
 #
@@ -66,7 +61,6 @@ _p9k_cache_set() {
   # echo "caching: ${(@0q)_P9K_CACHE_KEY} => (${(q)@})" >&2
   _P9K_CACHE[$_P9K_CACHE_KEY]="${(pj:\0:)*}0"
   _P9K_CACHE_VAL=("$@")
-  (( $#_P9K_CACHE < POWERLEVEL9K_MAX_CACHE_SIZE )) || typeset -gAH _P9K_CACHE=()
 }
 
 _p9k_cache_get() {
@@ -81,129 +75,129 @@ typeset -ga _P9K_RIGHT_JOIN=(1)
 # _p9k_param prompt_foo_BAR BACKGROUND red
 _p9k_param() {
   local key="_p9k_param ${(pj:\0:)*}"
-  _P9K_RETVAL=$_P9K_CACHE[key]
-  if [[ -n $_P9K_RETVAL ]]; then
-    _P9K_RETVAL[-1,-1]=''
+  _p9k_ret=$_P9K_CACHE[key]
+  if [[ -n $_p9k_ret ]]; then
+    _p9k_ret[-1,-1]=''
   else
     if [[ $1 == (#b)prompt_([a-z0-9_]#)(*) ]]; then
       local var=POWERLEVEL9K_${(U)match[1]}$match[2]_$2
       if (( $+parameters[$var] )); then
-        _P9K_RETVAL=${(P)var}
+        _p9k_ret=${(P)var}
       else
         var=POWERLEVEL9K_${(U)match[1]%_}_$2
         if (( $+parameters[$var] )); then
-          _P9K_RETVAL=${(P)var}
+          _p9k_ret=${(P)var}
         else
           var=POWERLEVEL9K_$2
           if (( $+parameters[$var] )); then
-            _P9K_RETVAL=${(P)var}
+            _p9k_ret=${(P)var}
           else
-            _P9K_RETVAL=$3
+            _p9k_ret=$3
           fi
         fi
       fi
     else
       local var=POWERLEVEL9K_$2
       if (( $+parameters[$var] )); then
-        _P9K_RETVAL=${(P)var}
+        _p9k_ret=${(P)var}
       else
-        _P9K_RETVAL=$3
+        _p9k_ret=$3
       fi
     fi
-    _P9K_CACHE[$key]=${_P9K_RETVAL}.
+    _P9K_CACHE[$key]=${_p9k_ret}.
   fi
 }
 
 # _p9k_get_icon prompt_foo_BAR BAZ_ICON quix
 _p9k_get_icon() {
   local key="_p9k_param ${(pj:\0:)*}"
-  _P9K_RETVAL=$_P9K_CACHE[key]
-  if [[ -n $_P9K_RETVAL ]]; then
-    _P9K_RETVAL[-1,-1]=''
+  _p9k_ret=$_P9K_CACHE[key]
+  if [[ -n $_p9k_ret ]]; then
+    _p9k_ret[-1,-1]=''
   else
     if [[ $2 == $'\1'* ]]; then
-      _P9K_RETVAL=${2[2,-1]}
+      _p9k_ret=${2[2,-1]}
     else
       _p9k_param "$@" ${icons[$2]-$'\1'$3}
-      if [[ $_P9K_RETVAL == $'\1'* ]]; then
-        _P9K_RETVAL=${_P9K_RETVAL[2,-1]}
+      if [[ $_p9k_ret == $'\1'* ]]; then
+        _p9k_ret=${_p9k_ret[2,-1]}
       else
-        _P9K_RETVAL=${(g::)_P9K_RETVAL}
-        [[ $_P9K_RETVAL != $'\b'? ]] || _P9K_RETVAL="%{$_P9K_RETVAL%}"  # penance for past sins
+        _p9k_ret=${(g::)_p9k_ret}
+        [[ $_p9k_ret != $'\b'? ]] || _p9k_ret="%{$_p9k_ret%}"  # penance for past sins
       fi
     fi
-    _P9K_CACHE[$key]=${_P9K_RETVAL}.
+    _P9K_CACHE[$key]=${_p9k_ret}.
   fi
 }
 
 _p9k_translate_color() {
   if [[ $1 == <-> ]]; then                  # decimal color code: 255
-    _P9K_RETVAL=$1
+    _p9k_ret=$1
   elif [[ $1 == '#'[[:xdigit:]]## ]]; then  # hexademical color code: #ffffff
-    _P9K_RETVAL=$1
+    _p9k_ret=$1
   else                                      # named color: red
     # Strip prifixes if there are any.
-    _P9K_RETVAL=$__P9K_COLORS[${${${1#bg-}#fg-}#br}]
+    _p9k_ret=$__p9k_colors[${${${1#bg-}#fg-}#br}]
   fi
 }
 
 # _p9k_param prompt_foo_BAR BACKGROUND red
 _p9k_color() {
   local key="_p9k_color ${(pj:\0:)*}"
-  _P9K_RETVAL=$_P9K_CACHE[key]
-  if [[ -n $_P9K_RETVAL ]]; then
-    _P9K_RETVAL[-1,-1]=''
+  _p9k_ret=$_P9K_CACHE[key]
+  if [[ -n $_p9k_ret ]]; then
+    _p9k_ret[-1,-1]=''
   else
     _p9k_param "$@"
-    _p9k_translate_color $_P9K_RETVAL
-    _P9K_CACHE[$key]=${_P9K_RETVAL}.
+    _p9k_translate_color $_p9k_ret
+    _P9K_CACHE[$key]=${_p9k_ret}.
   fi
 }
 
 # _p9k_vcs_color CLEAN REMOTE_BRANCH
 _p9k_vcs_style() {
   local key="_p9k_vcs_color ${(pj:\0:)*}"
-  _P9K_RETVAL=$_P9K_CACHE[key]
-  if [[ -n $_P9K_RETVAL ]]; then
-    _P9K_RETVAL[-1,-1]=''
+  _p9k_ret=$_P9K_CACHE[key]
+  if [[ -n $_p9k_ret ]]; then
+    _p9k_ret[-1,-1]=''
   else
     local style=%b  # TODO: support bold
     _p9k_color prompt_vcs_$1 BACKGROUND "${vcs_states[$1]}"
-    _p9k_background $_P9K_RETVAL
-    style+=$_P9K_RETVAL
+    _p9k_background $_p9k_ret
+    style+=$_p9k_ret
 
     local var=POWERLEVEL9K_VCS_${1}_${2}FORMAT_FOREGROUND
     if (( $+parameters[$var] )); then
-      _P9K_RETVAL=${(P)var}
+      _p9k_ret=${(P)var}
     else
       var=POWERLEVEL9K_VCS_${2}FORMAT_FOREGROUND
       if (( $+parameters[$var] )); then
-        _P9K_RETVAL=${(P)var}
+        _p9k_ret=${(P)var}
       else
         _p9k_color prompt_vcs_$1 FOREGROUND "$DEFAULT_COLOR"
       fi
     fi
     
-    _p9k_foreground $_P9K_RETVAL
-    _P9K_RETVAL=$style$_P9K_RETVAL
-    _P9K_CACHE[$key]=${_P9K_RETVAL}.
+    _p9k_foreground $_p9k_ret
+    _p9k_ret=$style$_p9k_ret
+    _P9K_CACHE[$key]=${_p9k_ret}.
   fi
 }
 
 _p9k_background() {
-  [[ -n $1 ]] && _P9K_RETVAL="%K{$1}" || _P9K_RETVAL="%k"
+  [[ -n $1 ]] && _p9k_ret="%K{$1}" || _p9k_ret="%k"
 }
 
 _p9k_foreground() {
-  [[ -n $1 ]] && _P9K_RETVAL="%F{$1}" || _P9K_RETVAL="%f"
+  [[ -n $1 ]] && _p9k_ret="%F{$1}" || _p9k_ret="%f"
 }
 
 _p9k_escape_rcurly() {
-  _P9K_RETVAL=${${1//\\/\\\\}//\}/\\\}}
+  _p9k_ret=${${1//\\/\\\\}//\}/\\\}}
 }
 
 _p9k_escape() {
-  [[ $1 == *["~!#\$^&*()\\\"'<>?{}[]"]* ]] && _P9K_RETVAL="\${(Q)\${:-${(qqq)${(q)1}}}}" || _P9K_RETVAL=$1
+  [[ $1 == *["~!#\$^&*()\\\"'<>?{}[]"]* ]] && _p9k_ret="\${(Q)\${:-${(qqq)${(q)1}}}}" || _p9k_ret=$1
 }
 
 # * $1: Name of the function that was originally invoked.
@@ -216,57 +210,56 @@ _p9k_escape() {
 # * $7: If not empty but becomes empty after parameter expansion and process substitution,
 #       the segment isn't rendered.
 # * $8: Content.
-set_default POWERLEVEL9K_WHITESPACE_BETWEEN_LEFT_SEGMENTS " "
 left_prompt_segment() {
   if ! _p9k_cache_get "$0" "$1" "$2" "$3" "$4" "$5"; then
     _p9k_color $1 BACKGROUND $3
-    local bg_color=$_P9K_RETVAL
+    local bg_color=$_p9k_ret
     _p9k_background $bg_color
-    local bg=$_P9K_RETVAL
+    local bg=$_p9k_ret
 
     _p9k_color $1 FOREGROUND $4
-    local fg_color=$_P9K_RETVAL
+    local fg_color=$_p9k_ret
     _p9k_foreground $fg_color
-    local fg=$_P9K_RETVAL
+    local fg=$_p9k_ret
 
     _p9k_get_icon $1 LEFT_SEGMENT_SEPARATOR
-    local sep=$_P9K_RETVAL
-    _p9k_escape $_P9K_RETVAL
-    local sep_=$_P9K_RETVAL
+    local sep=$_p9k_ret
+    _p9k_escape $_p9k_ret
+    local sep_=$_p9k_ret
 
     _p9k_get_icon $1 LEFT_SUBSEGMENT_SEPARATOR
-    _p9k_escape $_P9K_RETVAL
-    local subsep_=$_P9K_RETVAL
+    _p9k_escape $_p9k_ret
+    local subsep_=$_p9k_ret
 
     local icon_
     if [[ -n $5 ]]; then
       _p9k_get_icon $1 $5
-      _p9k_escape $_P9K_RETVAL
-      icon_=$_P9K_RETVAL
+      _p9k_escape $_p9k_ret
+      icon_=$_p9k_ret
     fi
 
     _p9k_get_icon $1 LEFT_PROMPT_FIRST_SEGMENT_START_SYMBOL
-    local start_sep=$_P9K_RETVAL
+    local start_sep=$_p9k_ret
     [[ -n $start_sep ]] && start_sep="%b%k%F{$bg_color}$start_sep"
 
     _p9k_get_icon $1 LEFT_PROMPT_LAST_SEGMENT_END_SYMBOL $sep
-    _p9k_escape $_P9K_RETVAL
-    local end_sep_=$_P9K_RETVAL
+    _p9k_escape $_p9k_ret
+    local end_sep_=$_p9k_ret
 
     local style=%b$bg$fg
     _p9k_escape_rcurly $style
-    local style_=$_P9K_RETVAL
+    local style_=$_p9k_ret
 
-    _p9k_get_icon $1 WHITESPACE_BETWEEN_LEFT_SEGMENTS
-    local space=$_P9K_RETVAL
+    _p9k_get_icon $1 WHITESPACE_BETWEEN_LEFT_SEGMENTS ' '
+    local space=$_p9k_ret
 
     _p9k_get_icon $1 LEFT_LEFT_WHITESPACE $space
-    local left_space=$_P9K_RETVAL
+    local left_space=$_p9k_ret
     [[ $left_space == *%* ]] && left_space+=$style
 
     _p9k_get_icon $1 LEFT_RIGHT_WHITESPACE $space
-    _p9k_escape $_P9K_RETVAL
-    local right_space_=$_P9K_RETVAL
+    _p9k_escape $_p9k_ret
+    local right_space_=$_p9k_ret
     [[ $right_space_ == *%* ]] && right_space_+=$style_
 
     local s='<_P9K_S>' ss='<_P9K_SS>'
@@ -292,7 +285,7 @@ left_prompt_segment() {
       else
         _p9k_foreground $DEFAULT_COLOR
       fi
-      _P9K_T+=%b$bg$_P9K_RETVAL$ss$style$left_space  # 3
+      _P9K_T+=%b$bg$_p9k_ret$ss$style$left_space  # 3
     else
       _P9K_T+=%b$bg$fg$ss$style$left_space           # 3
     fi
@@ -300,7 +293,7 @@ left_prompt_segment() {
 
     local join="_P9K_I>=$_P9K_LEFT_JOIN[$2]"
     _p9k_param $1 SELF_JOINED false
-    [[ $_P9K_RETVAL == false ]] && join+="&&_P9K_I<$2"
+    [[ $_p9k_ret == false ]] && join+="&&_P9K_I<$2"
 
     local p=
     p+="\${_P9K_N::=}"
@@ -310,10 +303,10 @@ left_prompt_segment() {
     p+="\${_P9K_N:=$((t+4))}"                                                            # 4
 
     _p9k_param $1 VISUAL_IDENTIFIER_EXPANSION '${P9K_VISUAL_IDENTIFIER}'
-    local icon_exp_=${_P9K_RETVAL:+\"$_P9K_RETVAL\"}
+    local icon_exp_=${_p9k_ret:+\"$_p9k_ret\"}
 
     _p9k_param $1 CONTENT_EXPANSION '${P9K_CONTENT}'
-    local content_exp_=${_P9K_RETVAL:+\"$_P9K_RETVAL\"}
+    local content_exp_=${_p9k_ret:+\"$_p9k_ret\"}
 
     if [[ ( $icon_exp_ != '"${P9K_VISUAL_IDENTIFIER}"' && $icon_exp_ == *'$'* ) ||
           ( $content_exp_ != '"${P9K_CONTENT}"' && $content_exp_ == *'$'* ) ]]; then
@@ -325,10 +318,10 @@ left_prompt_segment() {
     if [[ $icon_exp_ != '"${P9K_VISUAL_IDENTIFIER}"' && $icon_exp_ == *'$'* ]]; then
       p+='${_P9K_V::='$icon_exp_$style_'}'
     else
-      [[ $icon_exp_ == '"${P9K_VISUAL_IDENTIFIER}"' ]] && _P9K_RETVAL=$icon_ || _P9K_RETVAL=$icon_exp_
-      if [[ -n $_P9K_RETVAL ]]; then
-        p+="\${_P9K_V::=$_P9K_RETVAL"
-        [[ $_P9K_RETVAL == *%* ]] && p+=$style_
+      [[ $icon_exp_ == '"${P9K_VISUAL_IDENTIFIER}"' ]] && _p9k_ret=$icon_ || _p9k_ret=$icon_exp_
+      if [[ -n $_p9k_ret ]]; then
+        p+="\${_P9K_V::=$_p9k_ret"
+        [[ $_p9k_ret == *%* ]] && p+=$style_
         p+="}"
         has_icon=1  # definitely yes
       else
@@ -348,25 +341,25 @@ left_prompt_segment() {
     p+='${${_P9K_E:#00}:+${${_P9K_T[$_P9K_N]/'$ss'/$_P9K_SS}/'$s'/$_P9K_S}'
 
     _p9k_param $1 ICON_BEFORE_CONTENT ''
-    if [[ $_P9K_RETVAL != false ]]; then
+    if [[ $_p9k_ret != false ]]; then
       _p9k_param $1 PREFIX ''
-      _P9K_RETVAL=${(g::)_P9K_RETVAL}
-      _p9k_escape $_P9K_RETVAL
-      p+=$_P9K_RETVAL
-      [[ $_P9K_RETVAL == *%* ]] && local -i need_style=1 || local -i need_style=0
+      _p9k_ret=${(g::)_p9k_ret}
+      _p9k_escape $_p9k_ret
+      p+=$_p9k_ret
+      [[ $_p9k_ret == *%* ]] && local -i need_style=1 || local -i need_style=0
 
       if (( has_icon != 0 )); then
         _p9k_color $1 VISUAL_IDENTIFIER_COLOR $fg_color
-        _p9k_foreground $_P9K_RETVAL
-        _p9k_escape_rcurly %b$bg$_P9K_RETVAL
-        [[ $_P9K_RETVAL != $style_ || $need_style == 1 ]] && p+=$_P9K_RETVAL
+        _p9k_foreground $_p9k_ret
+        _p9k_escape_rcurly %b$bg$_p9k_ret
+        [[ $_p9k_ret != $style_ || $need_style == 1 ]] && p+=$_p9k_ret
         p+='${_P9K_V}'
 
         _p9k_get_icon $1 LEFT_MIDDLE_WHITESPACE ' '
-        if [[ -n $_P9K_RETVAL ]]; then
-          _p9k_escape $_P9K_RETVAL
-          [[ _P9K_RETVAL == *%* ]] && _P9K_RETVAL+=$style_
-          p+='${${(M)_P9K_E:#11}:+'$_P9K_RETVAL'}'
+        if [[ -n $_p9k_ret ]]; then
+          _p9k_escape $_p9k_ret
+          [[ _p9k_ret == *%* ]] && _p9k_ret+=$style_
+          p+='${${(M)_P9K_E:#11}:+'$_p9k_ret'}'
         fi
       elif (( need_style )); then
         p+=$style_
@@ -375,35 +368,35 @@ left_prompt_segment() {
       p+='${_P9K_C}'$style_
     else
       _p9k_param $1 PREFIX ''
-      _P9K_RETVAL=${(g::)_P9K_RETVAL}
-      _p9k_escape $_P9K_RETVAL
-      p+=$_P9K_RETVAL
-      [[ $_P9K_RETVAL == *%* ]] && p+=$style_
+      _p9k_ret=${(g::)_p9k_ret}
+      _p9k_escape $_p9k_ret
+      p+=$_p9k_ret
+      [[ $_p9k_ret == *%* ]] && p+=$style_
 
       p+='${_P9K_C}'$style_
 
       if (( has_icon != 0 )); then
         local -i need_style=0
         _p9k_get_icon $1 LEFT_MIDDLE_WHITESPACE ' '
-        if [[ -n $_P9K_RETVAL ]]; then
-          _p9k_escape $_P9K_RETVAL
-          [[ $_P9K_RETVAL == *%* ]] && need_style=1
-          p+='${${(M)_P9K_E:#11}:+'$_P9K_RETVAL'}'
+        if [[ -n $_p9k_ret ]]; then
+          _p9k_escape $_p9k_ret
+          [[ $_p9k_ret == *%* ]] && need_style=1
+          p+='${${(M)_P9K_E:#11}:+'$_p9k_ret'}'
         fi
 
         _p9k_color $1 VISUAL_IDENTIFIER_COLOR $fg_color
-        _p9k_foreground $_P9K_RETVAL
-        _p9k_escape_rcurly %b$bg$_P9K_RETVAL
-        [[ $_P9K_RETVAL != $style_ || $need_style == 1 ]] && p+=$_P9K_RETVAL
+        _p9k_foreground $_p9k_ret
+        _p9k_escape_rcurly %b$bg$_p9k_ret
+        [[ $_p9k_ret != $style_ || $need_style == 1 ]] && p+=$_p9k_ret
         p+='$_P9K_V'
       fi
     fi
 
     _p9k_param $1 SUFFIX ''
-    _P9K_RETVAL=${(g::)_P9K_RETVAL}
-    _p9k_escape $_P9K_RETVAL
-    p+=$_P9K_RETVAL
-    [[ $_P9K_RETVAL == *%* && -n $right_space_ ]] && p+=$style_
+    _p9k_ret=${(g::)_p9k_ret}
+    _p9k_escape $_p9k_ret
+    p+=$_p9k_ret
+    [[ $_p9k_ret == *%* && -n $right_space_ ]] && p+=$style_
     p+=$right_space_
 
     p+='${${:-'
@@ -416,67 +409,66 @@ left_prompt_segment() {
     _p9k_cache_set "$p"
   fi
 
-  (( $6 )) && _P9K_RETVAL=$8 || _p9k_escape $8
+  (( $6 )) && _p9k_ret=$8 || _p9k_escape $8
   if [[ -z $7 ]]; then
-    _P9K_PROMPT+="\${\${:-\${P9K_CONTENT::=$_P9K_RETVAL}$_P9K_CACHE_VAL[1]"
+    _P9K_PROMPT+="\${\${:-\${P9K_CONTENT::=$_p9k_ret}$_P9K_CACHE_VAL[1]"
   else
-    _P9K_PROMPT+="\${\${:-$7}:+\${\${:-\${P9K_CONTENT::=$_P9K_RETVAL}$_P9K_CACHE_VAL[1]}"
+    _P9K_PROMPT+="\${\${:-$7}:+\${\${:-\${P9K_CONTENT::=$_p9k_ret}$_P9K_CACHE_VAL[1]}"
   fi
 }
 
 # The same as left_prompt_segment above but for the right prompt.
-set_default POWERLEVEL9K_WHITESPACE_BETWEEN_RIGHT_SEGMENTS " "
 right_prompt_segment() {
   if ! _p9k_cache_get "$0" "$1" "$2" "$3" "$4" "$5"; then
     _p9k_color $1 BACKGROUND $3
-    local bg_color=$_P9K_RETVAL
+    local bg_color=$_p9k_ret
     _p9k_background $bg_color
-    local bg=$_P9K_RETVAL
-    _p9k_escape_rcurly $_P9K_RETVAL
-    local bg_=$_P9K_RETVAL
+    local bg=$_p9k_ret
+    _p9k_escape_rcurly $_p9k_ret
+    local bg_=$_p9k_ret
 
     _p9k_color $1 FOREGROUND $4
-    local fg_color=$_P9K_RETVAL
+    local fg_color=$_p9k_ret
     _p9k_foreground $fg_color
-    local fg=$_P9K_RETVAL
+    local fg=$_p9k_ret
 
     _p9k_get_icon $1 RIGHT_SEGMENT_SEPARATOR
-    local sep=$_P9K_RETVAL
-    _p9k_escape $_P9K_RETVAL
-    local sep_=$_P9K_RETVAL
+    local sep=$_p9k_ret
+    _p9k_escape $_p9k_ret
+    local sep_=$_p9k_ret
 
     _p9k_get_icon $1 RIGHT_SUBSEGMENT_SEPARATOR
-    local subsep=$_P9K_RETVAL
+    local subsep=$_p9k_ret
 
     local icon_
     if [[ -n $5 ]]; then
       _p9k_get_icon $1 $5
-      _p9k_escape $_P9K_RETVAL
-      icon_=$_P9K_RETVAL
+      _p9k_escape $_p9k_ret
+      icon_=$_p9k_ret
     fi
 
     _p9k_get_icon $1 RIGHT_PROMPT_FIRST_SEGMENT_START_SYMBOL $sep
-    local start_sep=$_P9K_RETVAL
+    local start_sep=$_p9k_ret
     [[ -n $start_sep ]] && start_sep="%b%k%F{$bg_color}$start_sep"
 
     _p9k_get_icon $1 RIGHT_PROMPT_LAST_SEGMENT_END_SYMBOL
-    _p9k_escape $_P9K_RETVAL
-    local end_sep_=$_P9K_RETVAL
+    _p9k_escape $_p9k_ret
+    local end_sep_=$_p9k_ret
 
     local style=%b$bg$fg
     _p9k_escape_rcurly $style
-    local style_=$_P9K_RETVAL
+    local style_=$_p9k_ret
 
-    _p9k_get_icon $1 WHITESPACE_BETWEEN_RIGHT_SEGMENTS
-    local space=$_P9K_RETVAL
+    _p9k_get_icon $1 WHITESPACE_BETWEEN_RIGHT_SEGMENTS ' '
+    local space=$_p9k_ret
 
     _p9k_get_icon $1 RIGHT_LEFT_WHITESPACE $space
-    local left_space=$_P9K_RETVAL
+    local left_space=$_p9k_ret
     [[ $left_space == *%* ]] && left_space+=$style
 
     _p9k_get_icon $1 RIGHT_RIGHT_WHITESPACE $space
-    _p9k_escape $_P9K_RETVAL
-    local right_space_=$_P9K_RETVAL
+    _p9k_escape $_p9k_ret
+    local right_space_=$_p9k_ret
     [[ $right_space_ == *%* ]] && right_space_+=$style_
 
     local w='<_P9K_W>' s='<_P9K_S>'
@@ -501,7 +493,7 @@ right_prompt_segment() {
 
     local join="_P9K_I>=$_P9K_RIGHT_JOIN[$2]"
     _p9k_param $1 SELF_JOINED false
-    [[ $_P9K_RETVAL == false ]] && join+="&&_P9K_I<$2"
+    [[ $_p9k_ret == false ]] && join+="&&_P9K_I<$2"
 
     local p=
     p+="\${_P9K_N::=}"
@@ -511,10 +503,10 @@ right_prompt_segment() {
     p+="\${_P9K_N:=$((t+4))}"                                                                    # 4
 
     _p9k_param $1 VISUAL_IDENTIFIER_EXPANSION '${P9K_VISUAL_IDENTIFIER}'
-    local icon_exp_=${_P9K_RETVAL:+\"$_P9K_RETVAL\"}
+    local icon_exp_=${_p9k_ret:+\"$_p9k_ret\"}
 
     _p9k_param $1 CONTENT_EXPANSION '${P9K_CONTENT}'
-    local content_exp_=${_P9K_RETVAL:+\"$_P9K_RETVAL\"}
+    local content_exp_=${_p9k_ret:+\"$_p9k_ret\"}
 
     if [[ ( $icon_exp_ != '"${P9K_VISUAL_IDENTIFIER}"' && $icon_exp_ == *'$'* ) ||
           ( $content_exp_ != '"${P9K_CONTENT}"' && $content_exp_ == *'$'* ) ]]; then
@@ -526,10 +518,10 @@ right_prompt_segment() {
     if [[ $icon_exp_ != '"${P9K_VISUAL_IDENTIFIER}"' && $icon_exp_ == *'$'* ]]; then
       p+="\${_P9K_V::=$icon_exp_$style_}"
     else
-      [[ $icon_exp_ == '"${P9K_VISUAL_IDENTIFIER}"' ]] && _P9K_RETVAL=$icon_ || _P9K_RETVAL=$icon_exp_
-      if [[ -n $_P9K_RETVAL ]]; then
-        p+="\${_P9K_V::=$_P9K_RETVAL"
-        [[ $_P9K_RETVAL == *%* ]] && p+=$style_
+      [[ $icon_exp_ == '"${P9K_VISUAL_IDENTIFIER}"' ]] && _p9k_ret=$icon_ || _p9k_ret=$icon_exp_
+      if [[ -n $_p9k_ret ]]; then
+        p+="\${_P9K_V::=$_p9k_ret"
+        [[ $_p9k_ret == *%* ]] && p+=$style_
         p+="}"
         has_icon=1  # definitely yes
       else
@@ -549,49 +541,49 @@ right_prompt_segment() {
     p+='${${_P9K_E:#00}:+${_P9K_T[$_P9K_N]/'$w'/$_P9K_W}'
 
     _p9k_param $1 ICON_BEFORE_CONTENT ''
-    if [[ $_P9K_RETVAL != true ]]; then
+    if [[ $_p9k_ret != true ]]; then
       _p9k_param $1 PREFIX ''
-      _P9K_RETVAL=${(g::)_P9K_RETVAL}
-      _p9k_escape $_P9K_RETVAL
-      p+=$_P9K_RETVAL
-      [[ $_P9K_RETVAL == *%* ]] && p+=$style_
+      _p9k_ret=${(g::)_p9k_ret}
+      _p9k_escape $_p9k_ret
+      p+=$_p9k_ret
+      [[ $_p9k_ret == *%* ]] && p+=$style_
 
       p+='${_P9K_C}'$style_
 
       if (( has_icon != 0 )); then
         local -i need_style=0
         _p9k_get_icon $1 RIGHT_MIDDLE_WHITESPACE ' '
-        if [[ -n $_P9K_RETVAL ]]; then
-          _p9k_escape $_P9K_RETVAL
-          [[ $_P9K_RETVAL == *%* ]] && need_style=1
-          p+='${${(M)_P9K_E:#11}:+'$_P9K_RETVAL'}'
+        if [[ -n $_p9k_ret ]]; then
+          _p9k_escape $_p9k_ret
+          [[ $_p9k_ret == *%* ]] && need_style=1
+          p+='${${(M)_P9K_E:#11}:+'$_p9k_ret'}'
         fi
 
         _p9k_color $1 VISUAL_IDENTIFIER_COLOR $fg_color
-        _p9k_foreground $_P9K_RETVAL
-        _p9k_escape_rcurly %b$bg$_P9K_RETVAL
-        [[ $_P9K_RETVAL != $style_ || $need_style == 1 ]] && p+=$_P9K_RETVAL
+        _p9k_foreground $_p9k_ret
+        _p9k_escape_rcurly %b$bg$_p9k_ret
+        [[ $_p9k_ret != $style_ || $need_style == 1 ]] && p+=$_p9k_ret
         p+='$_P9K_V'
       fi
     else
       _p9k_param $1 PREFIX ''
-      _P9K_RETVAL=${(g::)_P9K_RETVAL}
-      _p9k_escape $_P9K_RETVAL
-      p+=$_P9K_RETVAL
-      [[ $_P9K_RETVAL == *%* ]] && local -i need_style=1 || local -i need_style=0
+      _p9k_ret=${(g::)_p9k_ret}
+      _p9k_escape $_p9k_ret
+      p+=$_p9k_ret
+      [[ $_p9k_ret == *%* ]] && local -i need_style=1 || local -i need_style=0
 
       if (( has_icon != 0 )); then
         _p9k_color $1 VISUAL_IDENTIFIER_COLOR $fg_color
-        _p9k_foreground $_P9K_RETVAL
-        _p9k_escape_rcurly %b$bg$_P9K_RETVAL
-        [[ $_P9K_RETVAL != $style_ || $need_style == 1 ]] && p+=$_P9K_RETVAL
+        _p9k_foreground $_p9k_ret
+        _p9k_escape_rcurly %b$bg$_p9k_ret
+        [[ $_p9k_ret != $style_ || $need_style == 1 ]] && p+=$_p9k_ret
         p+='${_P9K_V}'
 
         _p9k_get_icon $1 RIGHT_MIDDLE_WHITESPACE ' '
-        if [[ -n $_P9K_RETVAL ]]; then
-          _p9k_escape $_P9K_RETVAL
-          [[ _P9K_RETVAL == *%* ]] && _P9K_RETVAL+=$style_
-          p+='${${(M)_P9K_E:#11}:+'$_P9K_RETVAL'}'
+        if [[ -n $_p9k_ret ]]; then
+          _p9k_escape $_p9k_ret
+          [[ _p9k_ret == *%* ]] && _p9k_ret+=$style_
+          p+='${${(M)_P9K_E:#11}:+'$_p9k_ret'}'
         fi
       elif (( need_style )); then
         p+=$style_
@@ -601,9 +593,9 @@ right_prompt_segment() {
     fi
 
     _p9k_param $1 SUFFIX ''
-    _P9K_RETVAL=${(g::)_P9K_RETVAL}
-    _p9k_escape $_P9K_RETVAL
-    p+=$_P9K_RETVAL
+    _p9k_ret=${(g::)_p9k_ret}
+    _p9k_escape $_p9k_ret
+    p+=$_p9k_ret
 
     p+='${${:-'
 
@@ -614,10 +606,10 @@ right_prompt_segment() {
         _p9k_foreground $DEFAULT_COLOR
       fi
     else
-      _P9K_RETVAL=$fg
+      _p9k_ret=$fg
     fi
-    _p9k_escape_rcurly $_P9K_RETVAL
-    p+="\${_P9K_W::=${right_space_:+$style_}$right_space_%b$bg_$_P9K_RETVAL}"
+    _p9k_escape_rcurly $_p9k_ret
+    p+="\${_P9K_W::=${right_space_:+$style_}$right_space_%b$bg_$_p9k_ret}"
 
     p+='${_P9K_SSS::='
     p+=$style_$right_space_
@@ -634,11 +626,11 @@ right_prompt_segment() {
     _p9k_cache_set "$p"
   fi
 
-  (( $6 )) && _P9K_RETVAL=$8 || _p9k_escape $8
+  (( $6 )) && _p9k_ret=$8 || _p9k_escape $8
   if [[ -z $7 ]]; then
-    _P9K_PROMPT+="\${\${:-\${P9K_CONTENT::=$_P9K_RETVAL}$_P9K_CACHE_VAL[1]"
+    _P9K_PROMPT+="\${\${:-\${P9K_CONTENT::=$_p9k_ret}$_P9K_CACHE_VAL[1]"
   else
-    _P9K_PROMPT+="\${\${:-$7}:+\${\${:-\${P9K_CONTENT::=$_P9K_RETVAL}$_P9K_CACHE_VAL[1]}"
+    _P9K_PROMPT+="\${\${:-$7}:+\${\${:-\${P9K_CONTENT::=$_p9k_ret}$_P9K_CACHE_VAL[1]}"
   fi
 }
 
@@ -673,7 +665,7 @@ function p9k_prompt_segment() {
 
 function _p9k_python_version() {
   _p9k_cached_cmd_stdout_stderr python --version || return
-  [[ $_P9K_RETVAL == (#b)Python\ ([[:digit:].]##)* ]] && _P9K_RETVAL=$match[1]
+  [[ $_p9k_ret == (#b)Python\ ([[:digit:].]##)* ]] && _p9k_ret=$match[1]
 }
 
 ################################################################
@@ -682,17 +674,14 @@ function _p9k_python_version() {
 
 ################################################################
 # Anaconda Environment
-set_default POWERLEVEL9K_ANACONDA_LEFT_DELIMITER "("
-set_default POWERLEVEL9K_ANACONDA_RIGHT_DELIMITER ")"
-set_default POWERLEVEL9K_ANACONDA_SHOW_PYTHON_VERSION true
 prompt_anaconda() {
   local p=${CONDA_PREFIX:-$CONDA_ENV_PATH}
   [[ -n $p ]] || return
   local msg=''
-  if [[ $POWERLEVEL9K_ANACONDA_SHOW_PYTHON_VERSION == true ]] && _p9k_python_version; then
-    msg="$_P9K_RETVAL "
+  if (( _POWERLEVEL9K_ANACONDA_SHOW_PYTHON_VERSION )) && _p9k_python_version; then
+    msg="$_p9k_ret "
   fi
-  msg+="$POWERLEVEL9K_ANACONDA_LEFT_DELIMITER${${p:t}//\%/%%}$POWERLEVEL9K_ANACONDA_RIGHT_DELIMITER"
+  msg+="$_POWERLEVEL9K_ANACONDA_LEFT_DELIMITER${${p:t}//\%/%%}$_POWERLEVEL9K_ANACONDA_RIGHT_DELIMITER"
   "$1_prompt_segment" "$0" "$2" "blue" "$DEFAULT_COLOR" 'PYTHON_ICON' 0 '' "$msg"
 }
 
@@ -715,12 +704,10 @@ prompt_aws_eb_env() {
 
 ################################################################
 # Segment to indicate background jobs with an icon.
-set_default POWERLEVEL9K_BACKGROUND_JOBS_VERBOSE true
-set_default POWERLEVEL9K_BACKGROUND_JOBS_VERBOSE_ALWAYS false
 prompt_background_jobs() {
   local msg
-  if [[ $POWERLEVEL9K_BACKGROUND_JOBS_VERBOSE == true ]]; then
-    if [[ $POWERLEVEL9K_BACKGROUND_JOBS_VERBOSE_ALWAYS == true ]]; then
+  if (( _POWERLEVEL9K_BACKGROUND_JOBS_VERBOSE )); then
+    if (( _POWERLEVEL9K_BACKGROUND_JOBS_VERBOSE_ALWAYS )); then
       msg='${(%):-%j}'
     else
       msg='${${(%):-%j}:#1}'
@@ -731,23 +718,20 @@ prompt_background_jobs() {
 
 ################################################################
 # Segment that indicates usage level of current partition.
-set_default POWERLEVEL9K_DISK_USAGE_ONLY_WARNING false
-set_default -i POWERLEVEL9K_DISK_USAGE_WARNING_LEVEL 90
-set_default -i POWERLEVEL9K_DISK_USAGE_CRITICAL_LEVEL 95
 prompt_disk_usage() {
   (( $+commands[df] )) || return
   local disk_usage=${${=${(f)"$(command df -P . 2>/dev/null)"}[2]}[5]%%%}
   local state bg fg
-  if (( disk_usage >= POWERLEVEL9K_DISK_USAGE_CRITICAL_LEVEL )); then
+  if (( disk_usage >= _POWERLEVEL9K_DISK_USAGE_CRITICAL_LEVEL )); then
     state=critical
     bg=red
     fg=white
-  elif (( disk_usage >= POWERLEVEL9K_DISK_USAGE_WARNING_LEVEL )); then
+  elif (( disk_usage >= _POWERLEVEL9K_DISK_USAGE_WARNING_LEVEL )); then
     state=warning
     bg=yellow
     fg=$DEFAULT_COLOR
   else
-    [[ "$POWERLEVEL9K_DISK_USAGE_ONLY_WARNING" == true ]] && return
+    (( _POWERLEVEL9K_DISK_USAGE_ONLY_WARNING )) && return
     state=normal
     bg=$DEFAULT_COLOR
     fg=yellow
@@ -755,20 +739,14 @@ prompt_disk_usage() {
   $1_prompt_segment $0_$state $2 $bg $fg DISK_ICON 0 '' "$disk_usage%%"
 }
 
-################################################################
-# Segment that displays the battery status in levels and colors
-set_default -i POWERLEVEL9K_BATTERY_LOW_THRESHOLD  10
-set_default -i POWERLEVEL9K_BATTERY_HIDE_ABOVE_THRESHOLD 999
-set_default -a POWERLEVEL9K_BATTERY_LEVEL_BACKGROUND
-set_default    POWERLEVEL9K_BATTERY_VERBOSE true
-typeset     -g POWERLEVEL9K_BATTERY_STAGES
-
 function _p9k_read_file() {
-  _P9K_RETVAL=''
-  [[ -n $1 ]] && read -r _P9K_RETVAL <$1
-  [[ -n $_P9K_RETVAL ]]
+  _p9k_ret=''
+  [[ -n $1 ]] && read -r _p9k_ret <$1
+  [[ -n $_p9k_ret ]]
 }
 
+################################################################
+# Segment that displays the battery status in levels and colors
 prompt_battery() {
   local state remain
   local -i bat_percent
@@ -787,7 +765,7 @@ prompt_battery() {
           state=CHARGING
         ;;
         'discharging')
-          (( bat_percent < POWERLEVEL9K_BATTERY_LOW_THRESHOLD )) && state=LOW || state=DISCONNECTED
+          (( bat_percent < _POWERLEVEL9K_BATTERY_LOW_THRESHOLD )) && state=LOW || state=DISCONNECTED
         ;;
         *)
           state=CHARGED
@@ -806,17 +784,17 @@ prompt_battery() {
       for dir in $bats; do
         local -i pow=0 full=0
         if _p9k_read_file $dir/(energy_full|charge_full|charge_counter)(N); then
-          (( energy_full += ${full::=_P9K_RETVAL} ))
+          (( energy_full += ${full::=_p9k_ret} ))
         fi
-        if _p9k_read_file $dir/(power|current)_now(N) && (( $#_P9K_RETVAL < 9 )); then
-          (( power_now += ${pow::=$_P9K_RETVAL} ))
+        if _p9k_read_file $dir/(power|current)_now(N) && (( $#_p9k_ret < 9 )); then
+          (( power_now += ${pow::=$_p9k_ret} ))
         fi
         if _p9k_read_file $dir/(energy|charge)_now(N); then
-          (( energy_now += _P9K_RETVAL ))
+          (( energy_now += _p9k_ret ))
         elif _p9k_read_file $dir/capacity(N); then
-          (( energy_now += _P9K_RETVAL * full / 100. + 0.5 ))
+          (( energy_now += _p9k_ret * full / 100. + 0.5 ))
         fi
-        _p9k_read_file $dir/status(N) && local bat_status=$_P9K_RETVAL || continue
+        _p9k_read_file $dir/status(N) && local bat_status=$_p9k_ret || continue
         [[ $bat_status != Full                                ]] && is_full=0
         [[ $bat_status == Charging                            ]] && is_charching=1
         [[ $bat_status == (Charging|Discharging) && $pow == 0 ]] && is_calculating=1
@@ -832,7 +810,7 @@ prompt_battery() {
       else
         if (( is_charching )); then
           state=CHARGING
-        elif (( bat_percent < POWERLEVEL9K_BATTERY_LOW_THRESHOLD )); then
+        elif (( bat_percent < _POWERLEVEL9K_BATTERY_LOW_THRESHOLD )); then
           state=LOW
         else
           state=DISCONNECTED
@@ -853,23 +831,23 @@ prompt_battery() {
     ;;
   esac
 
-  (( bat_percent >= POWERLEVEL9K_BATTERY_HIDE_ABOVE_THRESHOLD )) && return
+  (( bat_percent >= _POWERLEVEL9K_BATTERY_HIDE_ABOVE_THRESHOLD )) && return
 
   local msg="$bat_percent%%"
-  [[ $POWERLEVEL9K_BATTERY_VERBOSE == true && -n $remain ]] && msg+=" ($remain)"
+  [[ $_POWERLEVEL9K_BATTERY_VERBOSE == 1 && -n $remain ]] && msg+=" ($remain)"
 
   local icon=BATTERY_ICON
-  if (( $#POWERLEVEL9K_BATTERY_STAGES )); then
-    local -i idx=$#POWERLEVEL9K_BATTERY_STAGES
-    (( bat_percent < 100 )) && idx=$((bat_percent * $#POWERLEVEL9K_BATTERY_STAGES / 100 + 1))
-    icon=$'\1'${(g::)POWERLEVEL9K_BATTERY_STAGES[idx]}
+  if (( $#_POWERLEVEL9K_BATTERY_STAGES )); then
+    local -i idx=$#_POWERLEVEL9K_BATTERY_STAGES
+    (( bat_percent < 100 )) && idx=$((bat_percent * $#_POWERLEVEL9K_BATTERY_STAGES / 100 + 1))
+    icon=$'\1'$_POWERLEVEL9K_BATTERY_STAGES[idx]
   fi
 
   local bg=$DEFAULT_COLOR
-  if (( $#POWERLEVEL9K_BATTERY_LEVEL_BACKGROUND )); then
-    local -i idx=$#POWERLEVEL9K_BATTERY_LEVEL_BACKGROUND
-    (( bat_percent < 100 )) && idx=$((bat_percent * $#POWERLEVEL9K_BATTERY_LEVEL_BACKGROUND / 100 + 1))
-    bg=$POWERLEVEL9K_BATTERY_LEVEL_BACKGROUND[idx]
+  if (( $#_POWERLEVEL9K_BATTERY_LEVEL_BACKGROUND )); then
+    local -i idx=$#_POWERLEVEL9K_BATTERY_LEVEL_BACKGROUND
+    (( bat_percent < 100 )) && idx=$((bat_percent * $#_POWERLEVEL9K_BATTERY_LEVEL_BACKGROUND / 100 + 1))
+    bg=$_POWERLEVEL9K_BATTERY_LEVEL_BACKGROUND[idx]
   fi
 
   $1_prompt_segment $0_$state $2 "$bg" "$_P9K_BATTERY_STATES[$state]" $icon 0 '' $msg
@@ -879,39 +857,29 @@ typeset -g  _P9K_PUBLIC_IP
 
 ################################################################
 # Public IP segment
-set_default -F POWERLEVEL9K_PUBLIC_IP_TIMEOUT 300
-set_default -a POWERLEVEL9K_PUBLIC_IP_METHODS dig curl wget
-set_default    POWERLEVEL9K_PUBLIC_IP_NONE ""
-set_default    POWERLEVEL9K_PUBLIC_IP_HOST "http://ident.me"
-set_default    POWERLEVEL9K_PUBLIC_IP_VPN_INTERFACE ""
-
 prompt_public_ip() {
   local icon='PUBLIC_IP_ICON'
-  if [[ -n $POWERLEVEL9K_PUBLIC_IP_VPN_INTERFACE ]]; then
-    _p9k_parse_ip $POWERLEVEL9K_PUBLIC_IP_VPN_INTERFACE && icon='VPN_ICON'
+  if [[ -n $_POWERLEVEL9K_PUBLIC_IP_VPN_INTERFACE ]]; then
+    _p9k_parse_ip $_POWERLEVEL9K_PUBLIC_IP_VPN_INTERFACE && icon='VPN_ICON'
   fi
 
-  local ip='${_P9K_PUBLIC_IP:-$POWERLEVEL9K_PUBLIC_IP_NONE}'
+  local ip='${_P9K_PUBLIC_IP:-$_POWERLEVEL9K_PUBLIC_IP_NONE}'
   $1_prompt_segment "$0" "$2" "$DEFAULT_COLOR" "$DEFAULT_COLOR_INVERTED" "$icon" 1  $ip $ip
 }
 
 ################################################################
 # Context: user@hostname (who am I and where am I)
-# Note that if $DEFAULT_USER is not set, this prompt segment will always print
-set_default POWERLEVEL9K_ALWAYS_SHOW_CONTEXT false
-set_default POWERLEVEL9K_ALWAYS_SHOW_USER false
-set_default POWERLEVEL9K_CONTEXT_TEMPLATE "%n@%m"
 prompt_context() {
   if ! _p9k_cache_get $0; then
     local -i enabled=1
     local content='' state=''
-    if [[ $POWERLEVEL9K_ALWAYS_SHOW_CONTEXT == true || -z $DEFAULT_USER || $_P9K_SSH == 1 ]]; then
-      content=$POWERLEVEL9K_CONTEXT_TEMPLATE
+    if [[ $_POWERLEVEL9K_ALWAYS_SHOW_CONTEXT == 1 || -z $DEFAULT_USER || $_P9K_SSH == 1 ]]; then
+      content=$_POWERLEVEL9K_CONTEXT_TEMPLATE
     else
       local user=$(whoami)
       if [[ $user != $DEFAULT_USER ]]; then
-        content="${POWERLEVEL9K_CONTEXT_TEMPLATE}"
-      elif [[ $POWERLEVEL9K_ALWAYS_SHOW_USER == true ]]; then
+        content=$_POWERLEVEL9K_CONTEXT_TEMPLATE
+      elif (( _POWERLEVEL9K_ALWAYS_SHOW_USER )); then
         content="${user//\%/%%}"
       else
         enabled=0
@@ -942,17 +910,15 @@ prompt_context() {
 
 ################################################################
 # User: user (who am I)
-# Note that if $DEFAULT_USER is not set, this prompt segment will always print
-set_default POWERLEVEL9K_USER_TEMPLATE "%n"
 prompt_user() {
   if ! _p9k_cache_get $0 $1 $2; then
     local user=$(whoami)
-    if [[ $POWERLEVEL9K_ALWAYS_SHOW_USER != true && $user == $DEFAULT_USER ]]; then
+    if [[ $_POWERLEVEL9K_ALWAYS_SHOW_USER == 0 && $user == $DEFAULT_USER ]]; then
       _p9k_cache_set true
     elif [[ "${(%):-%#}" == '#' ]]; then
-      _p9k_cache_set "$1_prompt_segment" "${0}_ROOT" "$2" "${DEFAULT_COLOR}" yellow ROOT_ICON 0 '' "${POWERLEVEL9K_USER_TEMPLATE}"
+      _p9k_cache_set "$1_prompt_segment" "${0}_ROOT" "$2" "${DEFAULT_COLOR}" yellow ROOT_ICON 0 '' "$_POWERLEVEL9K_USER_TEMPLATE"
     elif [[ -n "$SUDO_COMMAND" ]]; then
-      _p9k_cache_set "$1_prompt_segment" "${0}_SUDO" "$2" "${DEFAULT_COLOR}" yellow SUDO_ICON 0 '' "${POWERLEVEL9K_USER_TEMPLATE}"
+      _p9k_cache_set "$1_prompt_segment" "${0}_SUDO" "$2" "${DEFAULT_COLOR}" yellow SUDO_ICON 0 '' "$_POWERLEVEL9K_USER_TEMPLATE"
     else
       _p9k_cache_set "$1_prompt_segment" "${0}_DEFAULT" "$2" "${DEFAULT_COLOR}" yellow USER_ICON 0 '' "${user//\%/%%}"
     fi
@@ -962,12 +928,11 @@ prompt_user() {
 
 ################################################################
 # Host: machine (where am I)
-set_default POWERLEVEL9K_HOST_TEMPLATE "%m"
 prompt_host() {
   if (( _P9K_SSH )); then
-    "$1_prompt_segment" "$0_REMOTE" "$2" "${DEFAULT_COLOR}" yellow SSH_ICON 0 '' "${POWERLEVEL9K_HOST_TEMPLATE}"
+    "$1_prompt_segment" "$0_REMOTE" "$2" "${DEFAULT_COLOR}" yellow SSH_ICON 0 '' "$_POWERLEVEL9K_HOST_TEMPLATE"
   else
-    "$1_prompt_segment" "$0_LOCAL" "$2" "${DEFAULT_COLOR}" yellow HOST_ICON 0 '' "${POWERLEVEL9K_HOST_TEMPLATE}"
+    "$1_prompt_segment" "$0_LOCAL" "$2" "${DEFAULT_COLOR}" yellow HOST_ICON 0 '' "$_POWERLEVEL9K_HOST_TEMPLATE"
   fi
 }
 
@@ -986,23 +951,19 @@ prompt_custom() {
 
 ################################################################
 # Display the duration the command needed to run.
-set_default -i POWERLEVEL9K_COMMAND_EXECUTION_TIME_THRESHOLD 3
-set_default -i POWERLEVEL9K_COMMAND_EXECUTION_TIME_PRECISION 2
-# Other options: "d h m s".
-set_default POWERLEVEL9K_COMMAND_EXECUTION_TIME_FORMAT "H:M:S"
 prompt_command_execution_time() {
-  (( $+P9K_COMMAND_DURATION_SECONDS && P9K_COMMAND_DURATION_SECONDS >= POWERLEVEL9K_COMMAND_EXECUTION_TIME_THRESHOLD )) || return
+  (( $+P9K_COMMAND_DURATION_SECONDS && P9K_COMMAND_DURATION_SECONDS >= _POWERLEVEL9K_COMMAND_EXECUTION_TIME_THRESHOLD )) || return
 
   if (( P9K_COMMAND_DURATION_SECONDS < 60 )); then
-    if [[ $POWERLEVEL9K_COMMAND_EXECUTION_TIME_PRECISION == 0 ]]; then
+    if (( !_POWERLEVEL9K_COMMAND_EXECUTION_TIME_PRECISION )); then
       local -i sec=$((P9K_COMMAND_DURATION_SECONDS + 0.5))
     else
-      local -F $POWERLEVEL9K_COMMAND_EXECUTION_TIME_PRECISION sec=P9K_COMMAND_DURATION_SECONDS
+      local -F $_POWERLEVEL9K_COMMAND_EXECUTION_TIME_PRECISION sec=P9K_COMMAND_DURATION_SECONDS
     fi
     local text=${sec}s
   else
     local -i d=$((P9K_COMMAND_DURATION_SECONDS + 0.5))
-    if [[ $POWERLEVEL9K_COMMAND_EXECUTION_TIME_FORMAT == "H:M:S" ]]; then
+    if [[ $_POWERLEVEL9K_COMMAND_EXECUTION_TIME_FORMAT == "H:M:S" ]]; then
       local text=${(l.2..0.)$((d % 60))}
       if (( d >= 60 )); then
         text=${(l.2..0.)$((d / 60 % 60))}:$text
@@ -1029,78 +990,16 @@ prompt_command_execution_time() {
   "$1_prompt_segment" "$0" "$2" "red" "yellow1" 'EXECUTION_TIME_ICON' 0 '' $text
 }
 
-set_default POWERLEVEL9K_DIR_PATH_SEPARATOR "/"
-set_default POWERLEVEL9K_HOME_FOLDER_ABBREVIATION "~"
-set_default POWERLEVEL9K_DIR_PATH_HIGHLIGHT_BOLD false
-set_default POWERLEVEL9K_DIR_ANCHORS_BOLD false
-set_default POWERLEVEL9K_DIR_PATH_ABSOLUTE false
-set_default POWERLEVEL9K_DIR_SHOW_WRITABLE false
-set_default POWERLEVEL9K_DIR_OMIT_FIRST_CHARACTER false
-set_default POWERLEVEL9K_DIR_HYPERLINK false
-set_default POWERLEVEL9K_SHORTEN_STRATEGY ""
-set_default POWERLEVEL9K_DIR_PATH_SEPARATOR_FOREGROUND ""
-set_default POWERLEVEL9K_SHORTEN_FOLDER_MARKER "(.shorten_folder_marker|.bzr|CVS|.git|.hg|.svn|.terraform|.citc)"
-
-# Shorten directory if it's longer than this even if there is space for it.
-# The value can be either absolute (e.g., '80') or a percentage of terminal
-# width (e.g, '50%'). If empty, directory will be shortened only when prompt
-# doesn't fit. Applies only when POWERLEVEL9K_SHORTEN_STRATEGY=truncate_to_unique.
-set_default POWERLEVEL9K_DIR_MAX_LENGTH 0
-
-# Individual elements are patterns. They are expanded with the options set
-# by `emulate zsh && setopt extended_glob`.
-set_default -a POWERLEVEL9K_DIR_PACKAGE_FILES package.json composer.json
-
-# When dir is on the last prompt line, try to shorten it enough to leave at least this many
-# columns for typing commands. Applies only when POWERLEVEL9K_SHORTEN_STRATEGY=truncate_to_unique.
-set_default -i POWERLEVEL9K_DIR_MIN_COMMAND_COLUMNS 40
-
-# When dir is on the last prompt line, try to shorten it enough to leave at least
-# COLUMNS * POWERLEVEL9K_DIR_MIN_COMMAND_COLUMNS_PCT * 0.01 columns for typing commands. Applies
-# only when POWERLEVEL9K_SHORTEN_STRATEGY=truncate_to_unique.
-set_default -F POWERLEVEL9K_DIR_MIN_COMMAND_COLUMNS_PCT 50
-
-# You can define POWERLEVEL9K_DIR_CLASSES to specify custom styling and icons for different
-# directories.
-#
-# POWERLEVEL9K_DIR_CLASSES must be an array with 3 * N elements. Each triplet consists of:
-#
-#   1. A pattern against which the current directory is matched. Matching is done with
-#      extended_glob option enabled.
-#   2. Directory class for the purpose of styling.
-#   3. Icon.
-#
-# Triplets are tried in order. The first triplet whose pattern matches $PWD wins. If there are no
-# matches, there will be no icon and the styling is done according to POWERLEVEL9K_DIR_BACKGROUND,
-# POWERLEVEL9K_DIR_FOREGROUND, etc.
-#
-# Example:
-#
-#   POWERLEVEL9K_DIR_CLASSES=(
-#       '~/work(/*)#'  WORK     '(╯°□°）╯︵ ┻━┻'
-#       '~(/*)#'       HOME     '⌂'
-#       '*'            DEFAULT  '')
-#
-#   POWERLEVEL9K_DIR_WORK_BACKGROUND=red
-#   POWERLEVEL9K_DIR_HOME_BACKGROUND=blue
-#   POWERLEVEL9K_DIR_DEFAULT_BACKGROUND=yellow
-#
-# With these settings, the current directory in the prompt may look like this:
-#
-#   (╯°□°）╯︵ ┻━┻ ~/work/projects/important/urgent
-#
-#   ⌂ ~/best/powerlevel10k
-
 function _p9k_shorten_delim_len() {
   local def=$1
-  _P9K_RETVAL=${POWERLEVEL9K_SHORTEN_DELIMITER_LENGTH:--1}
-  (( _P9K_RETVAL >= 0 )) || _p9k_prompt_length $1
+  _p9k_ret=${_POWERLEVEL9K_SHORTEN_DELIMITER_LENGTH:--1}
+  (( _p9k_ret >= 0 )) || _p9k_prompt_length $1
 }
 
 ################################################################
 # Dir: current working directory
 prompt_dir() {
-  [[ $POWERLEVEL9K_DIR_PATH_ABSOLUTE == true ]] && local p=$PWD || local p=${(%):-%~}
+  (( _POWERLEVEL9K_DIR_PATH_ABSOLUTE )) && local p=$PWD || local p=${(%):-%~}
 
   if [[ $p == '~['* ]]; then
     # If "${(%):-%~}" expands to "~[a]/]/b", is the first component "~[a]" or "~[a]/]"?
@@ -1127,14 +1026,14 @@ prompt_dir() {
   fi
 
   local -i fake_first=0 expand=0
-  local delim=${POWERLEVEL9K_SHORTEN_DELIMITER-$'\u2026'}
-  local -i shortenlen=${POWERLEVEL9K_SHORTEN_DIR_LENGTH:--1}
+  local delim=${_POWERLEVEL9K_SHORTEN_DELIMITER-$'\u2026'}
+  local -i shortenlen=${_POWERLEVEL9K_SHORTEN_DIR_LENGTH:--1}
 
-  case $POWERLEVEL9K_SHORTEN_STRATEGY in
+  case $_POWERLEVEL9K_SHORTEN_STRATEGY in
     truncate_absolute|truncate_absolute_chars)
       if (( shortenlen > 0 && $#p > shortenlen )); then
         _p9k_shorten_delim_len $delim
-        if (( $#p > shortenlen + $_P9K_RETVAL )); then
+        if (( $#p > shortenlen + $_p9k_ret )); then
           local -i n=shortenlen
           local -i i=$#parts
           while true; do
@@ -1154,9 +1053,9 @@ prompt_dir() {
     ;;
     truncate_with_package_name|truncate_middle|truncate_from_right)
       () {
-        [[ $POWERLEVEL9K_SHORTEN_STRATEGY == truncate_with_package_name &&
-           $+commands[jq] == 1 && $#POWERLEVEL9K_DIR_PACKAGE_FILES > 0 ]] || return
-        local pat="(${(j:|:)POWERLEVEL9K_DIR_PACKAGE_FILES})"
+        [[ $_POWERLEVEL9K_SHORTEN_STRATEGY == truncate_with_package_name &&
+           $+commands[jq] == 1 && $#_POWERLEVEL9K_DIR_PACKAGE_FILES > 0 ]] || return
+        local pat="(${(j:|:)_POWERLEVEL9K_DIR_PACKAGE_FILES})"
         local -i i=$#parts
         local dir=$PWD
         for (( ; i > 0; --i )); do
@@ -1179,8 +1078,8 @@ prompt_dir() {
       }
       if (( shortenlen > 0 )); then
         _p9k_shorten_delim_len $delim
-        local -i d=_P9K_RETVAL pref=shortenlen suf=0 i=2
-        [[ $POWERLEVEL9K_SHORTEN_STRATEGY == truncate_middle ]] && suf=pref
+        local -i d=_p9k_ret pref=shortenlen suf=0 i=2
+        [[ $_POWERLEVEL9K_SHORTEN_STRATEGY == truncate_middle ]] && suf=pref
         for (( ; i < $#parts; ++i )); do
           local dir=$parts[i]
           if (( $#dir > pref + suf + d )); then
@@ -1205,7 +1104,7 @@ prompt_dir() {
     ;;
     truncate_to_unique)
       expand=1
-      delim=${POWERLEVEL9K_SHORTEN_DELIMITER-'*'}
+      delim=${_POWERLEVEL9K_SHORTEN_DELIMITER-'*'}
       local -i i=2
       [[ $p[1] == / ]] && (( ++i ))
       local parent="${PWD%/${(pj./.)parts[i,-1]}}"
@@ -1218,17 +1117,17 @@ prompt_dir() {
       fi
       if ! _p9k_cache_get $0 "${parts[@]}" || [[ -z $mtime || $mtime != $_P9K_CACHE_VAL[1] ]] ; then
         _p9k_prompt_length $delim
-        local -i real_delim_len=_P9K_RETVAL n=1 q=0
+        local -i real_delim_len=_p9k_ret n=1 q=0
         [[ -n $parts[i-1] ]] && parts[i-1]="\${(Q)\${:-${(qqq)${(q)parts[i-1]}}}}"$'\2'
         [[ $p[i,-1] == *["~!#\$^&*()\\\"'<>?{}[]"]* ]] && q=1
-        local -i d=${POWERLEVEL9K_SHORTEN_DELIMITER_LENGTH:--1}
+        local -i d=${_POWERLEVEL9K_SHORTEN_DELIMITER_LENGTH:--1}
         (( d >= 0 )) || d=real_delim_len
-        shortenlen=${POWERLEVEL9K_SHORTEN_DIR_LENGTH:-1}
+        shortenlen=${_POWERLEVEL9K_SHORTEN_DIR_LENGTH:-1}
         (( shortenlen >= 0 )) && n=shortenlen
         for (( ; i <= $#parts - n; ++i )); do
           local dir=$parts[i]
-          if [[ -n $POWERLEVEL9K_SHORTEN_FOLDER_MARKER &&
-                -n $parent/$dir/${~POWERLEVEL9K_SHORTEN_FOLDER_MARKER}(#qN) ]]; then
+          if [[ -n $_POWERLEVEL9K_SHORTEN_FOLDER_MARKER &&
+                -n $parent/$dir/${~_POWERLEVEL9K_SHORTEN_FOLDER_MARKER}(#qN) ]]; then
             parent+=/$dir
             (( q )) && parts[i]="\${(Q)\${:-${(qqq)${(q)dir}}}}"
             parts[i]+=$'\2'
@@ -1261,13 +1160,13 @@ prompt_dir() {
       parts=("${(@)_P9K_CACHE_VAL[2,-1]}")
     ;;
     truncate_with_folder_marker)
-      if [[ -n $POWERLEVEL9K_SHORTEN_FOLDER_MARKER ]]; then
+      if [[ -n $_POWERLEVEL9K_SHORTEN_FOLDER_MARKER ]]; then
         local dir=$PWD
         local -a m=()
         local -i i=$(($#parts - 1))
         for (( ; i > 1; --i )); do
           dir=${dir:h}
-          [[ -n $dir/${~POWERLEVEL9K_SHORTEN_FOLDER_MARKER}(#qN) ]] && m+=$i
+          [[ -n $dir/${~_POWERLEVEL9K_SHORTEN_FOLDER_MARKER}(#qN) ]] && m+=$i
         done
         m+=1
         for (( i=1; i < $#m; ++i )); do
@@ -1286,7 +1185,7 @@ prompt_dir() {
     ;;
   esac
 
-  [[ $POWERLEVEL9K_DIR_SHOW_WRITABLE == true && ! -w $PWD ]]
+  [[ $_POWERLEVEL9K_DIR_SHOW_WRITABLE == 1 && ! -w $PWD ]]
   local w=$?
   if ! _p9k_cache_get $0 $2 $PWD $w $fake_first "${parts[@]}"; then
     local state=$0
@@ -1296,7 +1195,7 @@ prompt_dir() {
       icon=LOCK_ICON
     else
       local a='' b='' c=''
-      for a b c in "${POWERLEVEL9K_DIR_CLASSES[@]}"; do
+      for a b c in "${_POWERLEVEL9K_DIR_CLASSES[@]}"; do
         if [[ $PWD == ${~a} ]]; then
           [[ -n $b ]] && state+=_${(U)b}
           icon=$'\1'$c
@@ -1307,97 +1206,97 @@ prompt_dir() {
 
     local style=%b
     _p9k_color $state BACKGROUND blue
-    _p9k_background $_P9K_RETVAL
-    style+=$_P9K_RETVAL
+    _p9k_background $_p9k_ret
+    style+=$_p9k_ret
     _p9k_color $state FOREGROUND "$DEFAULT_COLOR"
-    _p9k_foreground $_P9K_RETVAL
-    style+=$_P9K_RETVAL
+    _p9k_foreground $_p9k_ret
+    style+=$_p9k_ret
     if (( expand )); then
       _p9k_escape_rcurly $style
-      style=$_P9K_RETVAL
+      style=$_p9k_ret
     fi
 
     parts=("${(@)parts//\%/%%}")
-    if [[ $POWERLEVEL9K_HOME_FOLDER_ABBREVIATION != '~' && $fake_first == 0 && $p == ('~'|'~/'*) ]]; then
-      (( expand )) && _p9k_escape $POWERLEVEL9K_HOME_FOLDER_ABBREVIATION || _P9K_RETVAL=$POWERLEVEL9K_HOME_FOLDER_ABBREVIATION
-      parts[1]=$_P9K_RETVAL
-      [[ $_P9K_RETVAL == *%* ]] && parts[1]+=$style
+    if [[ $_POWERLEVEL9K_HOME_FOLDER_ABBREVIATION != '~' && $fake_first == 0 && $p == ('~'|'~/'*) ]]; then
+      (( expand )) && _p9k_escape $_POWERLEVEL9K_HOME_FOLDER_ABBREVIATION || _p9k_ret=$_POWERLEVEL9K_HOME_FOLDER_ABBREVIATION
+      parts[1]=$_p9k_ret
+      [[ $_p9k_ret == *%* ]] && parts[1]+=$style
     fi
-    [[ $POWERLEVEL9K_DIR_OMIT_FIRST_CHARACTER == true && $#parts > 1 && -n $parts[2] ]] && parts[1]=()
+    [[ $_POWERLEVEL9K_DIR_OMIT_FIRST_CHARACTER == 1 && $#parts > 1 && -n $parts[2] ]] && parts[1]=()
 
     local last_style=
-    [[ $POWERLEVEL9K_DIR_PATH_HIGHLIGHT_BOLD == true ]] && last_style+=%B
-    if (( $+POWERLEVEL9K_DIR_PATH_HIGHLIGHT_FOREGROUND )); then
-      _p9k_translate_color $POWERLEVEL9K_DIR_PATH_HIGHLIGHT_FOREGROUND
-      _p9k_foreground $_P9K_RETVAL
-      last_style+=$_P9K_RETVAL
+    (( _POWERLEVEL9K_DIR_PATH_HIGHLIGHT_BOLD )) && last_style+=%B
+    if (( $+_POWERLEVEL9K_DIR_PATH_HIGHLIGHT_FOREGROUND )); then
+      _p9k_translate_color $_POWERLEVEL9K_DIR_PATH_HIGHLIGHT_FOREGROUND
+      _p9k_foreground $_p9k_ret
+      last_style+=$_p9k_ret
     fi
     if [[ -n $last_style ]]; then
-      (( expand )) && _p9k_escape_rcurly $last_style || _P9K_RETVAL=$last_style
-      parts[-1]=$_P9K_RETVAL${parts[-1]//$'\1'/$'\1'$_P9K_RETVAL}$style
+      (( expand )) && _p9k_escape_rcurly $last_style || _p9k_ret=$last_style
+      parts[-1]=$_p9k_ret${parts[-1]//$'\1'/$'\1'$_p9k_ret}$style
     fi
 
     local anchor_style=
-    [[ $POWERLEVEL9K_DIR_ANCHOR_BOLD == true ]] && anchor_style+=%B
-    if (( $+POWERLEVEL9K_DIR_ANCHOR_FOREGROUND )); then
-      _p9k_translate_color $POWERLEVEL9K_DIR_ANCHOR_FOREGROUND
-      _p9k_foreground $_P9K_RETVAL
-      anchor_style+=$_P9K_RETVAL
+    (( _POWERLEVEL9K_DIR_ANCHOR_BOLD )) && anchor_style+=%B
+    if (( $+_POWERLEVEL9K_DIR_ANCHOR_FOREGROUND )); then
+      _p9k_translate_color $_POWERLEVEL9K_DIR_ANCHOR_FOREGROUND
+      _p9k_foreground $_p9k_ret
+      anchor_style+=$_p9k_ret
     fi
     if [[ -n $anchor_style ]]; then
-      (( expand )) && _p9k_escape_rcurly $anchor_style || _P9K_RETVAL=$anchor_style
+      (( expand )) && _p9k_escape_rcurly $anchor_style || _p9k_ret=$anchor_style
       if [[ -z $last_style ]]; then
-        parts=("${(@)parts/%(#b)(*)$'\2'/$_P9K_RETVAL$match[1]$style}")
+        parts=("${(@)parts/%(#b)(*)$'\2'/$_p9k_ret$match[1]$style}")
       else
-        (( $#parts > 1 )) && parts[1,-2]=("${(@)parts[1,-2]/%(#b)(*)$'\2'/$_P9K_RETVAL$match[1]$style}")
+        (( $#parts > 1 )) && parts[1,-2]=("${(@)parts[1,-2]/%(#b)(*)$'\2'/$_p9k_ret$match[1]$style}")
         parts[-1]=${parts[-1]/$'\2'}
       fi
     else
       parts=("${(@)parts/$'\2'}")
     fi
 
-    if (( $+POWERLEVEL9K_DIR_SHORTENED_FOREGROUND )); then
-      _p9k_translate_color $POWERLEVEL9K_DIR_SHORTENED_FOREGROUND
-      _p9k_foreground $_P9K_RETVAL
-      (( expand )) && _p9k_escape_rcurly $_P9K_RETVAL
-      local shortened_fg=$_P9K_RETVAL
-      (( expand )) && _p9k_escape $delim || _P9K_RETVAL=$delim
-      [[ $_P9K_RETVAL == *%* ]] && _P9K_RETVAL+=$style$shortened_fg
-      parts=("${(@)parts/(#b)$'\3'(*)$'\1'(*)$'\3'/$shortened_fg$match[1]$_P9K_RETVAL$match[2]$style}")
-      parts=("${(@)parts/(#b)(*)$'\1'(*)/$shortened_fg$match[1]$_P9K_RETVAL$match[2]$style}")
+    if (( $+_POWERLEVEL9K_DIR_SHORTENED_FOREGROUND )); then
+      _p9k_translate_color $_POWERLEVEL9K_DIR_SHORTENED_FOREGROUND
+      _p9k_foreground $_p9k_ret
+      (( expand )) && _p9k_escape_rcurly $_p9k_ret
+      local shortened_fg=$_p9k_ret
+      (( expand )) && _p9k_escape $delim || _p9k_ret=$delim
+      [[ $_p9k_ret == *%* ]] && _p9k_ret+=$style$shortened_fg
+      parts=("${(@)parts/(#b)$'\3'(*)$'\1'(*)$'\3'/$shortened_fg$match[1]$_p9k_ret$match[2]$style}")
+      parts=("${(@)parts/(#b)(*)$'\1'(*)/$shortened_fg$match[1]$_p9k_ret$match[2]$style}")
     else
-      (( expand )) && _p9k_escape $delim || _P9K_RETVAL=$delim
-      [[ $_P9K_RETVAL == *%* ]] && _P9K_RETVAL+=$style
-      parts=("${(@)parts/$'\1'/$_P9K_RETVAL}")
+      (( expand )) && _p9k_escape $delim || _p9k_ret=$delim
+      [[ $_p9k_ret == *%* ]] && _p9k_ret+=$style
+      parts=("${(@)parts/$'\1'/$_p9k_ret}")
       parts=("${(@)parts//$'\3'}")
     fi
 
     local sep=''
-    if [[ -n $POWERLEVEL9K_DIR_PATH_SEPARATOR_FOREGROUND ]]; then
-      _p9k_translate_color $POWERLEVEL9K_DIR_PATH_SEPARATOR_FOREGROUND
-      _p9k_foreground $_P9K_RETVAL
-      (( expand )) && _p9k_escape_rcurly $_P9K_RETVAL
-      sep=$_P9K_RETVAL
+    if (( $+_POWERLEVEL9K_DIR_PATH_SEPARATOR_FOREGROUND )); then
+      _p9k_translate_color $_POWERLEVEL9K_DIR_PATH_SEPARATOR_FOREGROUND
+      _p9k_foreground $_p9k_ret
+      (( expand )) && _p9k_escape_rcurly $_p9k_ret
+      sep=$_p9k_ret
     fi
-    (( expand )) && _p9k_escape $POWERLEVEL9K_DIR_PATH_SEPARATOR || _P9K_RETVAL=$POWERLEVEL9K_DIR_PATH_SEPARATOR
-    sep+=$_P9K_RETVAL
+    (( expand )) && _p9k_escape $_POWERLEVEL9K_DIR_PATH_SEPARATOR || _p9k_ret=$_POWERLEVEL9K_DIR_PATH_SEPARATOR
+    sep+=$_p9k_ret
     [[ $sep == *%* ]] && sep+=$style
 
     local content="${(pj.$sep.)parts}"
-    if [[ $POWERLEVEL9K_DIR_HYPERLINK == true ]]; then
+    if (( _POWERLEVEL9K_DIR_HYPERLINK )); then
       local pref=$'%{\e]8;;file://'${${PWD//\%/%%25}//'#'/%%23}$'\a%}'
       local suf=$'%{\e]8;;\a%}'
       if (( expand )); then
         _p9k_escape $pref
-        pref=$_P9K_RETVAL
+        pref=$_p9k_ret
         _p9k_escape $suf
-        suf=$_P9K_RETVAL
+        suf=$_p9k_ret
       fi
       content=$pref$content$suf
     fi
 
-    (( expand )) && eval "_p9k_prompt_length \"\${\${_P9K_D::=0}+}$content\"" || _P9K_RETVAL=
-    _p9k_cache_set "$state" "$icon" "$expand" "$content" $_P9K_RETVAL
+    (( expand )) && eval "_p9k_prompt_length \"\${\${_P9K_D::=0}+}$content\"" || _p9k_ret=
+    _p9k_cache_set "$state" "$icon" "$expand" "$content" $_p9k_ret
   fi
 
   if (( _P9K_CACHE_VAL[3] )); then
@@ -1425,7 +1324,7 @@ prompt_docker_machine() {
 prompt_go_version() {
   _p9k_cached_cmd_stdout go version || return
   local -a match
-  [[ $_P9K_RETVAL == (#b)*go([[:digit:].]##)* ]] || return
+  [[ $_p9k_ret == (#b)*go([[:digit:].]##)* ]] || return
   local v=$match[1]
   local p=$GOPATH
   if [[ -z $p ]]; then
@@ -1478,19 +1377,16 @@ prompt_icons_test() {
 
 ################################################################
 # Segment to display the current IP address
-set_default POWERLEVEL9K_IP_INTERFACE "^[^ ]+"
 prompt_ip() {
-  _p9k_parse_ip $POWERLEVEL9K_IP_INTERFACE || return
-  "$1_prompt_segment" "$0" "$2" "cyan" "$DEFAULT_COLOR" 'NETWORK_ICON' 0 '' "${_P9K_RETVAL//\%/%%}"
+  _p9k_parse_ip $_POWERLEVEL9K_IP_INTERFACE || return
+  "$1_prompt_segment" "$0" "$2" "cyan" "$DEFAULT_COLOR" 'NETWORK_ICON' 0 '' "${_p9k_ret//\%/%%}"
 }
 
 ################################################################
 # Segment to display if VPN is active
-set_default POWERLEVEL9K_VPN_IP_INTERFACE "tun"
-# prompt if vpn active
 prompt_vpn_ip() {
-  _p9k_parse_ip $POWERLEVEL9K_VPN_IP_INTERFACE || return
-  "$1_prompt_segment" "$0" "$2" "cyan" "$DEFAULT_COLOR" 'VPN_ICON' 0 '' "${_P9K_RETVAL//\%/%%}"
+  _p9k_parse_ip $_POWERLEVEL9K_VPN_IP_INTERFACE || return
+  "$1_prompt_segment" "$0" "$2" "cyan" "$DEFAULT_COLOR" 'VPN_ICON' 0 '' "${_p9k_ret//\%/%%}"
 }
 
 ################################################################
@@ -1506,10 +1402,9 @@ prompt_laravel_version() {
 
 ################################################################
 # Segment to display load
-set_default -i POWERLEVEL9K_LOAD_WHICH 5
 prompt_load() {
   local bucket=2
-  case $POWERLEVEL9K_LOAD_WHICH in
+  case $_POWERLEVEL9K_LOAD_WHICH in
     1) bucket=1;;
     5) bucket=2;;
     15) bucket=3;;
@@ -1525,7 +1420,7 @@ prompt_load() {
     *)
       [[ -r /proc/loadavg ]] || return
       _p9k_read_file /proc/loadavg || return
-      load=${${(A)=_P9K_RETVAL}[bucket]//,/.}
+      load=${${(A)=_p9k_ret}[bucket]//,/.}
     ;;
   esac
 
@@ -1560,7 +1455,7 @@ function _p9k_cached_cmd_stdout() {
     _p9k_cache_set $(( ! $? )) "$out"
   fi
   (( $_P9K_CACHE_VAL[1] )) || return
-  _P9K_RETVAL=$_P9K_CACHE_VAL[2]
+  _p9k_ret=$_P9K_CACHE_VAL[2]
 }
 
 function _p9k_cached_cmd_stdout_stderr() {
@@ -1575,7 +1470,7 @@ function _p9k_cached_cmd_stdout_stderr() {
     _p9k_cache_set $(( ! $? )) "$out"
   fi
   (( $_P9K_CACHE_VAL[1] )) || return
-  _P9K_RETVAL=$_P9K_CACHE_VAL[2]
+  _p9k_ret=$_P9K_CACHE_VAL[2]
 }
 
 ################################################################
@@ -1593,8 +1488,8 @@ prompt_node_version() {
     done
   fi
 
-  _p9k_cached_cmd_stdout node --version && [[ $_P9K_RETVAL == v?* ]] || return
-  "$1_prompt_segment" "$0" "$2" "green" "white" 'NODE_ICON' 0 '' "${_P9K_RETVAL#v}"
+  _p9k_cached_cmd_stdout node --version && [[ $_p9k_ret == v?* ]] || return
+  "$1_prompt_segment" "$0" "$2" "green" "white" 'NODE_ICON' 0 '' "${_p9k_ret#v}"
 }
 
 # Almost the same as `nvm_version default` but faster. The differences shouldn't affect
@@ -1614,7 +1509,7 @@ function _p9k_nvm_ls_default() {
       return 1
     ;;
     system|v)
-      _P9K_RETVAL=system
+      _p9k_ret=system
       return
     ;;
     iojs-[0-9]*)
@@ -1627,10 +1522,10 @@ function _p9k_nvm_ls_default() {
 
   if [[ $v == v*.*.* ]]; then
     if [[ -x $NVM_DIR/versions/node/$v/bin/node || -x $NVM_DIR/$v/bin/node ]]; then
-      _P9K_RETVAL=$v
+      _p9k_ret=$v
       return
     elif [[ -x $NVM_DIR/versions/io.js/$v/bin/node ]]; then
-      _P9K_RETVAL=iojs-$v
+      _p9k_ret=iojs-$v
       return
     else
       return 1
@@ -1667,8 +1562,8 @@ function _p9k_nvm_ls_default() {
     v=${(j::)${(@l:6::0:)match}}
     [[ $v > $max ]] || continue
     max=$v
-    _P9K_RETVAL=${path:t}
-    [[ ${path:h:t} != io.js ]] || _P9K_RETVAL=iojs-$_P9K_RETVAL
+    _p9k_ret=${path:t}
+    [[ ${path:h:t} != io.js ]] || _p9k_ret=iojs-$_p9k_ret
   done
 
   [[ -n $max ]]
@@ -1682,12 +1577,12 @@ _p9k_nvm_ls_current() {
   local nvm_dir=${NVM_DIR:A}
   if [[ -n $nvm_dir && $node_path == $nvm_dir/versions/io.js/* ]]; then
     _p9k_cached_cmd_stdout iojs --version || return
-    _P9K_RETVAL=iojs-v${_P9K_RETVAL#v}
+    _p9k_ret=iojs-v${_p9k_ret#v}
   elif [[ -n $nvm_dir && $node_path == $nvm_dir/* ]]; then
     _p9k_cached_cmd_stdout node --version || return
-    _P9K_RETVAL=v${_P9K_RETVAL#v}
+    _p9k_ret=v${_p9k_ret#v}
   else
-    _P9K_RETVAL=system
+    _p9k_ret=system
   fi
 }
 
@@ -1696,8 +1591,8 @@ _p9k_nvm_ls_current() {
 # Only prints the segment if different than the default value
 prompt_nvm() {
   [[ -n $NVM_DIR ]] && _p9k_nvm_ls_current || return
-  local current=$_P9K_RETVAL
-  ! _p9k_nvm_ls_default || [[ $_P9K_RETVAL != $current ]] || return
+  local current=$_p9k_ret
+  ! _p9k_nvm_ls_default || [[ $_p9k_ret != $current ]] || return
   $1_prompt_segment "$0" "$2" "magenta" "black" 'NODE_ICON' 0 '' "${${current#v}//\%/%%}"
 }
 
@@ -1706,7 +1601,7 @@ prompt_nvm() {
 prompt_nodeenv() {
   if [[ -n "$NODE_VIRTUAL_ENV" ]]; then
     _p9k_cached_cmd_stdout node --version || return
-    local info="${_P9K_RETVAL}[${NODE_VIRTUAL_ENV:t}]"
+    local info="${_p9k_ret}[${NODE_VIRTUAL_ENV:t}]"
     "$1_prompt_segment" "$0" "$2" "black" "green" 'NODE_ICON' 0 '' "${info//\%/%%}"
   fi
 }
@@ -1714,50 +1609,49 @@ prompt_nodeenv() {
 function _p9k_read_nodenv_version_file() {
   [[ -r $1 ]] || return
   local rest
-  read _P9K_RETVAL rest <$1 2>/dev/null
-  [[ -n $_P9K_RETVAL ]]
+  read _p9k_ret rest <$1 2>/dev/null
+  [[ -n $_p9k_ret ]]
 }
 
 function _p9k_nodeenv_version_transform() {
   local dir=${NODENV_ROOT:-$HOME/.nodenv}/versions
-  [[ -z $1 || $1 == system ]] && _P9K_RETVAL=$1          && return
-  [[ -d $dir/$1 ]]            && _P9K_RETVAL=$1          && return
-  [[ -d $dir/${1/v} ]]        && _P9K_RETVAL=${1/v}      && return
-  [[ -d $dir/${1#node-} ]]    && _P9K_RETVAL=${1#node-}  && return
-  [[ -d $dir/${1#node-v} ]]   && _P9K_RETVAL=${1#node-v} && return
+  [[ -z $1 || $1 == system ]] && _p9k_ret=$1          && return
+  [[ -d $dir/$1 ]]            && _p9k_ret=$1          && return
+  [[ -d $dir/${1/v} ]]        && _p9k_ret=${1/v}      && return
+  [[ -d $dir/${1#node-} ]]    && _p9k_ret=${1#node-}  && return
+  [[ -d $dir/${1#node-v} ]]   && _p9k_ret=${1#node-v} && return
   return 1
 }
 
 function _p9k_nodenv_global_version() {
-  _p9k_read_nodenv_version_file ${NODENV_ROOT:-$HOME/.nodenv}/version || _P9K_RETVAL=system
+  _p9k_read_nodenv_version_file ${NODENV_ROOT:-$HOME/.nodenv}/version || _p9k_ret=system
 }
 
 ################################################################
 # Segment to display nodenv information
 # https://github.com/nodenv/nodenv
-set_default POWERLEVEL9K_NODENV_PROMPT_ALWAYS_SHOW false
 prompt_nodenv() {
   (( $+commands[nodenv] )) || return
-  _P9K_RETVAL=$NODENV_VERSION
-  if [[ -z $_P9K_RETVAL ]]; then
+  _p9k_ret=$NODENV_VERSION
+  if [[ -z $_p9k_ret ]]; then
     [[ $NODENV_DIR == /* ]] && local dir=$NODENV_DIR || local dir="$PWD/$NODENV_DIR"
     while [[ $dir != //[^/]# ]]; do
       _p9k_read_nodenv_version_file $dir/.node-version && break
       [[ $dir == / ]] && break
       dir=${dir:h}
     done
-    if [[ -z $_P9K_RETVAL ]]; then
-      [[ $POWERLEVEL9K_NODENV_PROMPT_ALWAYS_SHOW == true ]] || return
+    if [[ -z $_p9k_ret ]]; then
+      (( _POWERLEVEL9K_NODENV_PROMPT_ALWAYS_SHOW )) || return
       _p9k_nodenv_global_version
     fi
   fi
 
-  _p9k_nodeenv_version_transform $_P9K_RETVAL || return
-  local v=$_P9K_RETVAL
+  _p9k_nodeenv_version_transform $_p9k_ret || return
+  local v=$_p9k_ret
 
-  if [[ $POWERLEVEL9K_NODENV_PROMPT_ALWAYS_SHOW == false ]]; then
+  if (( !_POWERLEVEL9K_NODENV_PROMPT_ALWAYS_SHOW )); then
     _p9k_nodenv_global_version
-    _p9k_nodeenv_version_transform $_P9K_RETVAL && [[ $v == $_P9K_RETVAL ]] && return
+    _p9k_nodeenv_version_transform $_p9k_ret && [[ $v == $_p9k_ret ]] && return
   fi
 
   "$1_prompt_segment" "$0" "$2" "black" "green" 'NODE_ICON' 0 '' "${v//\%/%%}"
@@ -1774,7 +1668,7 @@ prompt_os_icon() {
 prompt_php_version() {
   _p9k_cached_cmd_stdout php --version || return
   local -a match
-  [[ $_P9K_RETVAL == (#b)(*$'\n')#(PHP [[:digit:].]##)* ]] || return
+  [[ $_p9k_ret == (#b)(*$'\n')#(PHP [[:digit:].]##)* ]] || return
   local v=$match[2]
   "$1_prompt_segment" "$0" "$2" "fuchsia" "grey93" '' 0 '' "${v//\%/%%}"
 }
@@ -1805,25 +1699,24 @@ prompt_ram() {
   esac
 
   _p9k_human_readable_bytes $free_bytes
-  $1_prompt_segment $0 $2 yellow "$DEFAULT_COLOR" RAM_ICON 0 '' $_P9K_RETVAL
+  $1_prompt_segment $0 $2 yellow "$DEFAULT_COLOR" RAM_ICON 0 '' $_p9k_ret
 }
 
 function _p9k_read_rbenv_version_file() {
   [[ -r $1 ]] || return
   local content
   read -r content <$1 2>/dev/null
-  _P9K_RETVAL="${${(A)=content}[1]}"
-  [[ -n $_P9K_RETVAL ]]
+  _p9k_ret="${${(A)=content}[1]}"
+  [[ -n $_p9k_ret ]]
 }
 
 function _p9k_rbenv_global_version() {
-  _p9k_read_rbenv_version_file ${RBENV_ROOT:-$HOME/.rbenv}/version || _P9K_RETVAL=system
+  _p9k_read_rbenv_version_file ${RBENV_ROOT:-$HOME/.rbenv}/version || _p9k_ret=system
 }
 
 ################################################################
 # Segment to display rbenv information
 # https://github.com/rbenv/rbenv#choosing-the-ruby-version
-set_default POWERLEVEL9K_RBENV_PROMPT_ALWAYS_SHOW false
 prompt_rbenv() {
   (( $+commands[rbenv] )) || return
   local v=$RBENV_VERSION
@@ -1831,22 +1724,22 @@ prompt_rbenv() {
     [[ $RBENV_DIR == /* ]] && local dir=$RBENV_DIR || local dir="$PWD/$RBENV_DIR"
     while true; do
       if _p9k_read_rbenv_version_file $dir/.ruby-version; then
-        v=$_P9K_RETVAL
+        v=$_p9k_ret
         break
       fi
       if [[ $dir == / ]]; then
-        [[ $POWERLEVEL9K_RBENV_PROMPT_ALWAYS_SHOW == true ]] || return
+        (( _POWERLEVEL9K_RBENV_PROMPT_ALWAYS_SHOW )) || return
         _p9k_rbenv_global_version
-        v=$_P9K_RETVAL
+        v=$_p9k_ret
         break
       fi
       dir=${dir:h}
     done
   fi
 
-  if [[ $POWERLEVEL9K_RBENV_PROMPT_ALWAYS_SHOW == false ]]; then
+  if (( !_POWERLEVEL9K_RBENV_PROMPT_ALWAYS_SHOW )); then
     _p9k_rbenv_global_version
-    [[ $v == $_P9K_RETVAL ]] && return
+    [[ $v == $_p9k_ret ]] && return
   fi
 
   "$1_prompt_segment" "$0" "$2" "red" "$DEFAULT_COLOR" 'RUBY_ICON' 0 '' "${v//\%/%%}"
@@ -1855,13 +1748,11 @@ prompt_rbenv() {
 ################################################################
 # Segment to display chruby information
 # see https://github.com/postmodern/chruby/issues/245 for chruby_auto issue with ZSH
-set_default POWERLEVEL9K_CHRUBY_SHOW_VERSION true
-set_default POWERLEVEL9K_CHRUBY_SHOW_ENGINE true
 prompt_chruby() {
   [[ -n $RUBY_ENGINE ]] || return
   local v=''
-  [[ $POWERLEVEL9K_CHRUBY_SHOW_ENGINE == true ]] && v=$RUBY_ENGINE
-  if [[ $POWERLEVEL9K_CHRUBY_SHOW_VERSION == true && -n $RUBY_VERSION ]] && v+=${v:+ }$RUBY_VERSION
+  (( _POWERLEVEL9K_CHRUBY_SHOW_ENGINE )) && v=$RUBY_ENGINE
+  if [[ $_POWERLEVEL9K_CHRUBY_SHOW_VERSION == 1 && -n $RUBY_VERSION ]] && v+=${v:+ }$RUBY_VERSION
   "$1_prompt_segment" "$0" "$2" "red" "$DEFAULT_COLOR" 'RUBY_ICON' 0 '' "${v//\%/%%}"
 }
 
@@ -1875,7 +1766,7 @@ prompt_root_indicator() {
 # Segment to display Rust version number
 prompt_rust_version() {
   _p9k_cached_cmd_stdout rustc --version || return
-  local v=${${_P9K_RETVAL#rustc }%% *}
+  local v=${${_p9k_ret#rustc }%% *}
   [[ -n $v ]] || return
   "$1_prompt_segment" "$0" "$2" "darkorange" "$DEFAULT_COLOR" 'RUST_ICON' 0 '' "${v//\%/%%}"
 }
@@ -1908,37 +1799,28 @@ prompt_ssh() {
   fi
 }
 
-################################################################
-# Status: When an error occur, return the error code, or a cross icon if option is set
-# Display an ok icon when no error occur, or hide the segment if option is set to false
-#
-set_default POWERLEVEL9K_STATUS_CROSS false
-set_default POWERLEVEL9K_STATUS_OK true
-set_default POWERLEVEL9K_STATUS_SHOW_PIPESTATUS true
-set_default POWERLEVEL9K_STATUS_HIDE_SIGNAME false
-# old options, retro compatibility
-set_default POWERLEVEL9K_STATUS_VERBOSE true
-set_default POWERLEVEL9K_STATUS_OK_IN_NON_VERBOSE false
-
 exit_code_or_status() {
   local ec=$1
-  if [[ "$POWERLEVEL9K_STATUS_HIDE_SIGNAME" = true ]] || (( ec <= 128 )); then
-    _P9K_RETVAL=$ec
+  if (( _POWERLEVEL9K_STATUS_HIDE_SIGNAME || ec <= 128 )); then
+    _p9k_ret=$ec
   else
-    _P9K_RETVAL="SIG${signals[$((ec - 127))]}($((ec - 128)))"
+    _p9k_ret="SIG${signals[$((ec - 127))]}($((ec - 128)))"
   fi
 }
 
 typeset -gi _P9K_EXIT_CODE
 typeset -ga _P9K_PIPE_EXIT_CODES
 
+################################################################
+# Status: When an error occur, return the error code, or a cross icon if option is set
+# Display an ok icon when no error occur, or hide the segment if option is set to false
 prompt_status() {
   if ! _p9k_cache_get "$0" "$2" "$_P9K_EXIT_CODE" "${(@)_P9K_PIPE_EXIT_CODES}"; then
     local ec_text
     local ec_sum
     local ec
 
-    if [[ $POWERLEVEL9K_STATUS_SHOW_PIPESTATUS == true ]]; then
+    if (( _POWERLEVEL9K_STATUS_SHOW_PIPESTATUS )); then
       if (( $#_P9K_PIPE_EXIT_CODES > 1 )); then
         ec_sum=${_P9K_PIPE_EXIT_CODES[1]}
         exit_code_or_status "${_P9K_PIPE_EXIT_CODES[1]}"
@@ -1947,27 +1829,27 @@ prompt_status() {
         ec_sum=${_P9K_EXIT_CODE}
         exit_code_or_status "${_P9K_EXIT_CODE}"
       fi
-      ec_text=$_P9K_RETVAL
+      ec_text=$_p9k_ret
       for ec in "${(@)_P9K_PIPE_EXIT_CODES[2,-1]}"; do
         (( ec_sum += ec ))
         exit_code_or_status "$ec"
-        ec_text+="|$_P9K_RETVAL"
+        ec_text+="|$_p9k_ret"
       done
     else
       ec_sum=${_P9K_EXIT_CODE}
       # We use _P9K_EXIT_CODE instead of the right-most _P9K_PIPE_EXIT_CODES item because
       # PIPE_FAIL may be set.
       exit_code_or_status "${_P9K_EXIT_CODE}"
-      ec_text=$_P9K_RETVAL
+      ec_text=$_p9k_ret
     fi
 
     if (( ec_sum > 0 )); then
-      if [[ "$POWERLEVEL9K_STATUS_CROSS" == false && "$POWERLEVEL9K_STATUS_VERBOSE" == true ]]; then
+      if (( !_POWERLEVEL9K_STATUS_CROSS && _POWERLEVEL9K_STATUS_VERBOSE )); then
         _P9K_CACHE_VAL=("$0_ERROR" "$2" red yellow1 CARRIAGE_RETURN_ICON 0 '' "$ec_text")
       else
         _P9K_CACHE_VAL=("$0_ERROR" "$2" "$DEFAULT_COLOR" red FAIL_ICON 0 '' '')
       fi
-    elif [[ "$POWERLEVEL9K_STATUS_OK" == true ]] && [[ "$POWERLEVEL9K_STATUS_VERBOSE" == true || "$POWERLEVEL9K_STATUS_OK_IN_NON_VERBOSE" == true ]]; then
+    elif (( _POWERLEVEL9K_STATUS_OK && (_POWERLEVEL9K_STATUS_VERBOSE || _POWERLEVEL9K_STATUS_OK_IN_NON_VERBOSE) )); then
       _P9K_CACHE_VAL=("$0_OK" "$2" "$DEFAULT_COLOR" green OK_ICON 0 '' '')
     else
       return
@@ -2017,7 +1899,7 @@ prompt_swap() {
   fi
 
   _p9k_human_readable_bytes $used_bytes
-  $1_prompt_segment $0 $2 yellow "$DEFAULT_COLOR" SWAP_ICON 0 '' $_P9K_RETVAL
+  $1_prompt_segment $0 $2 yellow "$DEFAULT_COLOR" SWAP_ICON 0 '' $_p9k_ret
 }
 
 ################################################################
@@ -2057,27 +1939,18 @@ build_test_stats() {
 
 ################################################################
 # System time
-
-# Format for the current time: 09:51:02. See `man 3 strftime`.
-set_default POWERLEVEL9K_TIME_FORMAT "%D{%H:%M:%S}"
-# If set to true, time will update every second.
-set_default POWERLEVEL9K_EXPERIMENTAL_TIME_REALTIME false
-# If set to true, time will update when you hit enter. This way prompts for the past
-# commands will contain the start times of their commands as opposed to the default
-# behavior where they contain the end times of their preceding commands.
-set_default POWERLEVEL9K_TIME_UPDATE_ON_COMMAND false
 prompt_time() {
-  if [[ $POWERLEVEL9K_EXPERIMENTAL_TIME_REALTIME == true ]]; then
+  if (( _POWERLEVEL9K_EXPERIMENTAL_TIME_REALTIME )); then
     "$1_prompt_segment" "$0" "$2" "$DEFAULT_COLOR_INVERTED" "$DEFAULT_COLOR" "TIME_ICON" 0 '' \
-        "$POWERLEVEL9K_TIME_FORMAT"
+        "$_POWERLEVEL9K_TIME_FORMAT"
   else
-    local t=${${(%)POWERLEVEL9K_TIME_FORMAT}//\%/%%}
-    if [[ $POWERLEVEL9K_TIME_UPDATE_ON_COMMAND == true ]]; then
+    local t=${${(%)_POWERLEVEL9K_TIME_FORMAT}//\%/%%}
+    if (( _POWERLEVEL9K_TIME_UPDATE_ON_COMMAND )); then
       _p9k_escape $t
-      t=$_P9K_RETVAL
-      _p9k_escape $POWERLEVEL9K_TIME_FORMAT
+      t=$_p9k_ret
+      _p9k_escape $_POWERLEVEL9K_TIME_FORMAT
       "$1_prompt_segment" "$0" "$2" "$DEFAULT_COLOR_INVERTED" "$DEFAULT_COLOR" "TIME_ICON" 1 '' \
-          "\${_P9K_LINE_FINISH-$t}\${_P9K_LINE_FINISH+$_P9K_RETVAL}"
+          "\${_P9K_LINE_FINISH-$t}\${_P9K_LINE_FINISH+$_p9k_ret}"
     else
       "$1_prompt_segment" "$0" "$2" "$DEFAULT_COLOR_INVERTED" "$DEFAULT_COLOR" "TIME_ICON" 0 '' $t
     fi
@@ -2086,10 +1959,8 @@ prompt_time() {
 
 ################################################################
 # System date
-set_default POWERLEVEL9K_DATE_FORMAT "%D{%d.%m.%y}"
 prompt_date() {
-  local d=$POWERLEVEL9K_DATE_FORMAT
-  [[ $POWERLEVEL9K_EXPERIMENTAL_TIME_REALTIME == true ]] || d=${${(%)d}//\%/%%}
+  local d=${${(%)_POWERLEVEL9K_DATE_FORMAT}//\%/%%}
   "$1_prompt_segment" "$0" "$2" "$DEFAULT_COLOR_INVERTED" "$DEFAULT_COLOR" "DATE_ICON" 0 '' "$d"
 }
 
@@ -2138,44 +2009,34 @@ typeset -gA vcs_states=(
   'LOADING'       '8'
 )
 
-set_default POWERLEVEL9K_VCS_ACTIONFORMAT_FOREGROUND red
-set_default POWERLEVEL9K_SHOW_CHANGESET false
-set_default POWERLEVEL9K_VCS_LOADING_TEXT loading
-set_default -i POWERLEVEL9K_VCS_INTERNAL_HASH_LENGTH 8
-set_default -a POWERLEVEL9K_VCS_GIT_HOOKS vcs-detect-changes git-untracked git-aheadbehind git-stash git-remotebranch git-tagname
-set_default -a POWERLEVEL9K_VCS_HG_HOOKS vcs-detect-changes
-set_default -a POWERLEVEL9K_VCS_SVN_HOOKS vcs-detect-changes svn-detect-changes
-
-# If it takes longer than this to fetch git repo status, display the prompt with a greyed out
-# vcs segment and fix it asynchronously when the results come it.
-set_default -F POWERLEVEL9K_VCS_MAX_SYNC_LATENCY_SECONDS 0.05
-set_default -a POWERLEVEL9K_VCS_BACKENDS git
-
 powerlevel9k_vcs_init() {
-  if [[ -n "$POWERLEVEL9K_CHANGESET_HASH_LENGTH" ]]; then
-    POWERLEVEL9K_VCS_INTERNAL_HASH_LENGTH="$POWERLEVEL9K_CHANGESET_HASH_LENGTH"
-  fi
-
   autoload -Uz vcs_info
 
-  VCS_CHANGESET_PREFIX=''
-  if [[ "$POWERLEVEL9K_SHOW_CHANGESET" == true ]]; then
-    VCS_CHANGESET_PREFIX="$(print_icon 'VCS_COMMIT_ICON')%0.$POWERLEVEL9K_VCS_INTERNAL_HASH_LENGTH""i "
+  local prefix=''
+  if (( _POWERLEVEL9K_SHOW_CHANGESET )); then
+    _p9k_get_icon '' VCS_COMMIT_ICON
+    prefix="$_p9k_ret%0.${_POWERLEVEL9K_CHANGESET_HASH_LENGTH}i "
   fi
 
   zstyle ':vcs_info:*' check-for-changes true
 
-  VCS_DEFAULT_FORMAT="$VCS_CHANGESET_PREFIX%b%c%u%m"
-  zstyle ':vcs_info:*' formats "$VCS_DEFAULT_FORMAT"
-  zstyle ':vcs_info:*' actionformats "%b %F{${POWERLEVEL9K_VCS_ACTIONFORMAT_FOREGROUND}}| %a%f"
-  zstyle ':vcs_info:*' stagedstr " $(print_icon 'VCS_STAGED_ICON')"
-  zstyle ':vcs_info:*' unstagedstr " $(print_icon 'VCS_UNSTAGED_ICON')"
-  zstyle ':vcs_info:git*+set-message:*' hooks $POWERLEVEL9K_VCS_GIT_HOOKS
-  zstyle ':vcs_info:hg*+set-message:*' hooks $POWERLEVEL9K_VCS_HG_HOOKS
-  zstyle ':vcs_info:svn*+set-message:*' hooks $POWERLEVEL9K_VCS_SVN_HOOKS
+  zstyle ':vcs_info:*' formats "$prefix%b%c%u%m"
+  zstyle ':vcs_info:*' actionformats "%b %F{$_POWERLEVEL9K_VCS_ACTIONFORMAT_FOREGROUND}| %a%f"
+  _p9k_get_icon '' VCS_STAGED_ICON
+  zstyle ':vcs_info:*' stagedstr " $_p9k_ret"
+  _p9k_get_icon '' VCS_UNSTAGED_ICON
+  zstyle ':vcs_info:*' unstagedstr " $_p9k_ret"
+  zstyle ':vcs_info:git*+set-message:*' hooks $_POWERLEVEL9K_VCS_GIT_HOOKS
+  zstyle ':vcs_info:hg*+set-message:*' hooks $_POWERLEVEL9K_VCS_HG_HOOKS
+  zstyle ':vcs_info:svn*+set-message:*' hooks $_POWERLEVEL9K_VCS_SVN_HOOKS
 
   # For Hg, only show the branch name
-  zstyle ':vcs_info:hg*:*' branchformat "$(print_icon 'VCS_BRANCH_ICON')%b"
+  if (( _POWERLEVEL9K_HIDE_BRANCH_ICON )); then
+    zstyle ':vcs_info:hg*:*' branchformat "%b"
+  else
+    _p9k_get_icon '' VCS_BRANCH_ICON
+    zstyle ':vcs_info:hg*:*' branchformat "$_p9k_ret%b"
+  fi
   # The `get-revision` function must be turned on for dirty-check to work for Hg
   zstyle ':vcs_info:hg*:*' get-revision true
   zstyle ':vcs_info:hg*:*' get-bookmarks true
@@ -2183,10 +2044,10 @@ powerlevel9k_vcs_init() {
 
   # TODO: fix the %b (branch) format for svn. Using %b breaks color-encoding of the foreground
   # for the rest of the powerline.
-  zstyle ':vcs_info:svn*:*' formats "$VCS_CHANGESET_PREFIX%c%u"
-  zstyle ':vcs_info:svn*:*' actionformats "$VCS_CHANGESET_PREFIX%c%u %F{${POWERLEVEL9K_VCS_ACTIONFORMAT_FOREGROUND}}| %a%f"
+  zstyle ':vcs_info:svn*:*' formats "$prefix%c%u"
+  zstyle ':vcs_info:svn*:*' actionformats "$prefix%c%u %F{$_POWERLEVEL9K_VCS_ACTIONFORMAT_FOREGROUND}| %a%f"
 
-  if [[ "$POWERLEVEL9K_SHOW_CHANGESET" == true ]]; then
+  if (( _POWERLEVEL9K_SHOW_CHANGESET )); then
     zstyle ':vcs_info:*' get-revision true
   fi
 }
@@ -2221,8 +2082,8 @@ function _p9k_vcs_status_restore() {
 function _p9k_vcs_status_for_dir() {
   local dir=$1
   while true; do
-    _P9K_RETVAL=$_P9K_LAST_GIT_PROMPT[$dir]
-    [[ -n $_P9K_RETVAL ]] && return 0
+    _p9k_ret=$_P9K_LAST_GIT_PROMPT[$dir]
+    [[ -n $_p9k_ret ]] && return 0
     [[ $dir == / ]] && return 1
     dir=${dir:h}
   done
@@ -2242,34 +2103,30 @@ function _p9k_vcs_status_purge() {
 
 function _p9k_vcs_icon() {
   case "$VCS_STATUS_REMOTE_URL" in
-    *github*)    _P9K_RETVAL=VCS_GIT_GITHUB_ICON;;
-    *bitbucket*) _P9K_RETVAL=VCS_GIT_BITBUCKET_ICON;;
-    *stash*)     _P9K_RETVAL=VCS_GIT_GITHUB_ICON;;
-    *gitlab*)    _P9K_RETVAL=VCS_GIT_GITLAB_ICON;;
-    *)           _P9K_RETVAL=VCS_GIT_ICON;;
+    *github*)    _p9k_ret=VCS_GIT_GITHUB_ICON;;
+    *bitbucket*) _p9k_ret=VCS_GIT_BITBUCKET_ICON;;
+    *stash*)     _p9k_ret=VCS_GIT_GITHUB_ICON;;
+    *gitlab*)    _p9k_ret=VCS_GIT_GITLAB_ICON;;
+    *)           _p9k_ret=VCS_GIT_ICON;;
   esac
 }
-
-set_default POWERLEVEL9K_VCS_DISABLE_GITSTATUS_FORMATTING false
 
 function _p9k_vcs_render() {
   local state
 
   if (( $+_P9K_NEXT_VCS_DIR )); then
     if _p9k_vcs_status_for_dir ${${GIT_DIR:a}:-$PWD}; then
-      _p9k_vcs_status_restore $_P9K_RETVAL
+      _p9k_vcs_status_restore $_p9k_ret
       state=LOADING
     else
-      if [[ -n $POWERLEVEL9K_VCS_LOADING_TEXT ]] || { _p9k_get_icon prompt_vcs_LOADING VCS_LOADING_ICON; [[ -n $_P9K_RETVAL ]] }; then
-        $1_prompt_segment prompt_vcs_LOADING $2 "${vcs_states[LOADING]}" "$DEFAULT_COLOR" VCS_LOADING_ICON 0 '' "$POWERLEVEL9K_VCS_LOADING_TEXT"
-      fi
+      $1_prompt_segment prompt_vcs_LOADING $2 "${vcs_states[LOADING]}" "$DEFAULT_COLOR" VCS_LOADING_ICON 0 '' "$_POWERLEVEL9K_VCS_LOADING_TEXT"
       return 0
     fi
   elif [[ $VCS_STATUS_RESULT != ok-* ]]; then
     return 1
   fi
 
-  if [[ $POWERLEVEL9K_VCS_DISABLE_GITSTATUS_FORMATTING == true ]]; then
+  if (( _POWERLEVEL9K_VCS_DISABLE_GITSTATUS_FORMATTING )); then
     if [[ -z $state ]]; then
       if [[ $VCS_STATUS_HAS_STAGED != 0 || $VCS_STATUS_HAS_UNSTAGED != 0 ]]; then
         state=MODIFIED
@@ -2280,21 +2137,21 @@ function _p9k_vcs_render() {
       fi
     fi
     _p9k_vcs_icon
-    $1_prompt_segment prompt_vcs_$state $2 "${vcs_states[$state]}" "$DEFAULT_COLOR" "$_P9K_RETVAL" 0 '' ""
+    $1_prompt_segment prompt_vcs_$state $2 "${vcs_states[$state]}" "$DEFAULT_COLOR" "$_p9k_ret" 0 '' ""
     return 0
   fi
 
-  (( ${POWERLEVEL9K_VCS_GIT_HOOKS[(I)git-untracked]} )) || VCS_STATUS_HAS_UNTRACKED=0
-  (( ${POWERLEVEL9K_VCS_GIT_HOOKS[(I)git-aheadbehind]} )) || { VCS_STATUS_COMMITS_AHEAD=0 && VCS_STATUS_COMMITS_BEHIND=0 }
-  (( ${POWERLEVEL9K_VCS_GIT_HOOKS[(I)git-stash]} )) || VCS_STATUS_STASHES=0
-  (( ${POWERLEVEL9K_VCS_GIT_HOOKS[(I)git-remotebranch]} )) || VCS_STATUS_REMOTE_BRANCH=""
-  (( ${POWERLEVEL9K_VCS_GIT_HOOKS[(I)git-tagname]} )) || VCS_STATUS_TAG=""
+  (( ${_POWERLEVEL9K_VCS_GIT_HOOKS[(I)git-untracked]} )) || VCS_STATUS_HAS_UNTRACKED=0
+  (( ${_POWERLEVEL9K_VCS_GIT_HOOKS[(I)git-aheadbehind]} )) || { VCS_STATUS_COMMITS_AHEAD=0 && VCS_STATUS_COMMITS_BEHIND=0 }
+  (( ${_POWERLEVEL9K_VCS_GIT_HOOKS[(I)git-stash]} )) || VCS_STATUS_STASHES=0
+  (( ${_POWERLEVEL9K_VCS_GIT_HOOKS[(I)git-remotebranch]} )) || VCS_STATUS_REMOTE_BRANCH=""
+  (( ${_POWERLEVEL9K_VCS_GIT_HOOKS[(I)git-tagname]} )) || VCS_STATUS_TAG=""
 
-  (( POWERLEVEL9K_VCS_COMMITS_AHEAD_MAX_NUM >= 0 && VCS_STATUS_COMMITS_AHEAD > POWERLEVEL9K_VCS_COMMITS_AHEAD_MAX_NUM )) &&
-    VCS_STATUS_COMMITS_AHEAD=$POWERLEVEL9K_VCS_COMMITS_AHEAD_MAX_NUM
+  (( _POWERLEVEL9K_VCS_COMMITS_AHEAD_MAX_NUM >= 0 && VCS_STATUS_COMMITS_AHEAD > _POWERLEVEL9K_VCS_COMMITS_AHEAD_MAX_NUM )) &&
+    VCS_STATUS_COMMITS_AHEAD=$_POWERLEVEL9K_VCS_COMMITS_AHEAD_MAX_NUM
 
-  (( POWERLEVEL9K_VCS_COMMITS_BEHIND_MAX_NUM >= 0 && VCS_STATUS_COMMITS_BEHIND > POWERLEVEL9K_VCS_COMMITS_BEHIND_MAX_NUM )) &&
-    VCS_STATUS_COMMITS_BEHIND=$POWERLEVEL9K_VCS_COMMITS_BEHIND_MAX_NUM
+  (( _POWERLEVEL9K_VCS_COMMITS_BEHIND_MAX_NUM >= 0 && VCS_STATUS_COMMITS_BEHIND > _POWERLEVEL9K_VCS_COMMITS_BEHIND_MAX_NUM )) &&
+    VCS_STATUS_COMMITS_BEHIND=$_POWERLEVEL9K_VCS_COMMITS_BEHIND_MAX_NUM
 
   local -a cache_key=(
     "$VCS_STATUS_LOCAL_BRANCH"
@@ -2312,7 +2169,7 @@ function _p9k_vcs_render() {
     "$VCS_STATUS_STASHES"
     "$VCS_STATUS_TAG"
   )
-  if [[ $POWERLEVEL9K_SHOW_CHANGESET == true || -z $VCS_STATUS_LOCAL_BRANCH ]]; then
+  if [[ $_POWERLEVEL9K_SHOW_CHANGESET == 1 || -z $VCS_STATUS_LOCAL_BRANCH ]]; then
     cache_key+=$VCS_STATUS_COMMIT
   fi
 
@@ -2320,7 +2177,7 @@ function _p9k_vcs_render() {
     local icon
     local content
 
-    if (( ${POWERLEVEL9K_VCS_GIT_HOOKS[(I)vcs-detect-changes]} )); then
+    if (( ${_POWERLEVEL9K_VCS_GIT_HOOKS[(I)vcs-detect-changes]} )); then
       if [[ $VCS_STATUS_HAS_STAGED != 0 || $VCS_STATUS_HAS_UNSTAGED != 0 ]]; then
         : ${state:=MODIFIED}
       elif [[ $VCS_STATUS_HAS_UNTRACKED != 0 ]]; then
@@ -2342,24 +2199,24 @@ function _p9k_vcs_render() {
 
     function _$0_fmt() {
       _p9k_vcs_style $state $1
-      content+="$_P9K_RETVAL$2"
+      content+="$_p9k_ret$2"
     }
 
     local ws
-    if [[ $POWERLEVEL9K_SHOW_CHANGESET == true || -z $VCS_STATUS_LOCAL_BRANCH ]]; then
+    if [[ $_POWERLEVEL9K_SHOW_CHANGESET == 1 || -z $VCS_STATUS_LOCAL_BRANCH ]]; then
       _p9k_get_icon prompt_vcs_$state VCS_COMMIT_ICON
-      _$0_fmt COMMIT "$_P9K_RETVAL${${VCS_STATUS_COMMIT:0:$POWERLEVEL9K_VCS_INTERNAL_HASH_LENGTH}:-HEAD}"
+      _$0_fmt COMMIT "$_p9k_ret${${VCS_STATUS_COMMIT:0:$_POWERLEVEL9K_CHANGESET_HASH_LENGTH}:-HEAD}"
       ws=' '
     fi
 
     if [[ -n $VCS_STATUS_LOCAL_BRANCH ]]; then
-      _p9k_get_icon prompt_vcs_$state VCS_BRANCH_ICON
-      _$0_fmt BRANCH "$ws$_P9K_RETVAL${VCS_STATUS_LOCAL_BRANCH//\%/%%}"
+      (( _POWERLEVEL9K_HIDE_BRANCH_ICON )) && _p9k_ret='' || _p9k_get_icon prompt_vcs_$state VCS_BRANCH_ICON
+      _$0_fmt BRANCH "$ws$_p9k_ret${VCS_STATUS_LOCAL_BRANCH//\%/%%}"
     fi
 
-    if [[ $POWERLEVEL9K_VCS_HIDE_TAGS == false && -n $VCS_STATUS_TAG ]]; then
+    if [[ $_POWERLEVEL9K_VCS_HIDE_TAGS == 0 && -n $VCS_STATUS_TAG ]]; then
       _p9k_get_icon prompt_vcs_$state VCS_TAG_ICON
-      _$0_fmt TAG " $_P9K_RETVAL${VCS_STATUS_TAG//\%/%%}"
+      _$0_fmt TAG " $_p9k_ret${VCS_STATUS_TAG//\%/%%}"
     fi
 
     if [[ -n $VCS_STATUS_ACTION ]]; then
@@ -2368,40 +2225,40 @@ function _p9k_vcs_render() {
       if [[ -n $VCS_STATUS_REMOTE_BRANCH &&
             $VCS_STATUS_LOCAL_BRANCH != $VCS_STATUS_REMOTE_BRANCH ]]; then
         _p9k_get_icon prompt_vcs_$state VCS_REMOTE_BRANCH_ICON
-        _$0_fmt REMOTE_BRANCH " $_P9K_RETVAL${VCS_STATUS_REMOTE_BRANCH//\%/%%}"
+        _$0_fmt REMOTE_BRANCH " $_p9k_ret${VCS_STATUS_REMOTE_BRANCH//\%/%%}"
       fi
       if [[ $VCS_STATUS_HAS_STAGED == 1 || $VCS_STATUS_HAS_UNSTAGED == 1 || $VCS_STATUS_HAS_UNTRACKED == 1 ]]; then
         _p9k_get_icon prompt_vcs_$state VCS_DIRTY_ICON
-        _$0_fmt DIRTY "$_P9K_RETVAL"
+        _$0_fmt DIRTY "$_p9k_ret"
         if [[ $VCS_STATUS_HAS_STAGED == 1 ]]; then
           _p9k_get_icon prompt_vcs_$state VCS_STAGED_ICON
-          (( ${POWERLEVEL9K_VCS_MAX_NUM_STAGED:-$POWERLEVEL9K_VCS_STAGED_MAX_NUM} != 1 )) && _P9K_RETVAL+=$VCS_STATUS_NUM_STAGED
-          _$0_fmt STAGED " $_P9K_RETVAL"
+          (( _POWERLEVEL9K_VCS_STAGED_MAX_NUM != 1 )) && _p9k_ret+=$VCS_STATUS_NUM_STAGED
+          _$0_fmt STAGED " $_p9k_ret"
         fi
         if [[ $VCS_STATUS_HAS_UNSTAGED == 1 ]]; then
           _p9k_get_icon prompt_vcs_$state VCS_UNSTAGED_ICON
-          (( ${POWERLEVEL9K_VCS_MAX_NUM_UNSTAGED:-$POWERLEVEL9K_VCS_UNSTAGED_MAX_NUM} != 1 )) && _P9K_RETVAL+=$VCS_STATUS_NUM_UNSTAGED
-          _$0_fmt UNSTAGED " $_P9K_RETVAL"
+          (( _POWERLEVEL9K_VCS_UNSTAGED_MAX_NUM != 1 )) && _p9k_ret+=$VCS_STATUS_NUM_UNSTAGED
+          _$0_fmt UNSTAGED " $_p9k_ret"
         fi
         if [[ $VCS_STATUS_HAS_UNTRACKED == 1 ]]; then
           _p9k_get_icon prompt_vcs_$state VCS_UNTRACKED_ICON
-          (( ${POWERLEVEL9K_VCS_MAX_NUM_UNTRACKED:-$POWERLEVEL9K_VCS_UNTRACKED_MAX_NUM} != 1 )) && _P9K_RETVAL+=$VCS_STATUS_NUM_UNTRACKED
-          _$0_fmt UNTRACKED " $_P9K_RETVAL"
+          (( _POWERLEVEL9K_VCS_UNTRACKED_MAX_NUM != 1 )) && _p9k_ret+=$VCS_STATUS_NUM_UNTRACKED
+          _$0_fmt UNTRACKED " $_p9k_ret"
         fi
       fi
       if [[ $VCS_STATUS_COMMITS_BEHIND -gt 0 ]]; then
         _p9k_get_icon prompt_vcs_$state VCS_INCOMING_CHANGES_ICON
-        (( POWERLEVEL9K_VCS_COMMITS_BEHIND_MAX_NUM != 1 )) && _P9K_RETVAL+=$VCS_STATUS_COMMITS_BEHIND
-        _$0_fmt INCOMING_CHANGES " $_P9K_RETVAL"
+        (( _POWERLEVEL9K_VCS_COMMITS_BEHIND_MAX_NUM != 1 )) && _p9k_ret+=$VCS_STATUS_COMMITS_BEHIND
+        _$0_fmt INCOMING_CHANGES " $_p9k_ret"
       fi
       if [[ $VCS_STATUS_COMMITS_AHEAD -gt 0 ]]; then
         _p9k_get_icon prompt_vcs_$state VCS_OUTGOING_CHANGES_ICON
-        (( POWERLEVEL9K_VCS_COMMITS_AHEAD_MAX_NUM != 1 )) && _P9K_RETVAL+=$VCS_STATUS_COMMITS_AHEAD
-        _$0_fmt OUTGOING_CHANGES " $_P9K_RETVAL"
+        (( _POWERLEVEL9K_VCS_COMMITS_AHEAD_MAX_NUM != 1 )) && _p9k_ret+=$VCS_STATUS_COMMITS_AHEAD
+        _$0_fmt OUTGOING_CHANGES " $_p9k_ret"
       fi
       if [[ $VCS_STATUS_STASHES -gt 0 ]]; then
         _p9k_get_icon prompt_vcs_$state VCS_STASH_ICON
-        _$0_fmt STASH " $_P9K_RETVAL$VCS_STATUS_STASHES"
+        _$0_fmt STASH " $_p9k_ret$VCS_STATUS_STASHES"
       fi
     fi
 
@@ -2419,9 +2276,9 @@ function _p9k_vcs_resume() {
 
   if [[ $VCS_STATUS_RESULT == ok-async ]]; then
     local latency=$((EPOCHREALTIME - _P9K_GITSTATUS_START_TIME))
-    if (( latency > POWERLEVEL9K_VCS_MAX_SYNC_LATENCY_SECONDS )); then
+    if (( latency > _POWERLEVEL9K_VCS_MAX_SYNC_LATENCY_SECONDS )); then
       _P9K_GIT_SLOW[$VCS_STATUS_WORKDIR]=1
-    elif (( $1 && latency < 0.8 * POWERLEVEL9K_VCS_MAX_SYNC_LATENCY_SECONDS )); then  # 0.8 to avoid flip-flopping
+    elif (( $1 && latency < 0.8 * _POWERLEVEL9K_VCS_MAX_SYNC_LATENCY_SECONDS )); then  # 0.8 to avoid flip-flopping
       _P9K_GIT_SLOW[$VCS_STATUS_WORKDIR]=0
     fi
     _p9k_vcs_status_save
@@ -2452,13 +2309,13 @@ function _p9k_vcs_resume() {
 }
 
 function _p9k_vcs_gitstatus() {
-  [[ $POWERLEVEL9K_DISABLE_GITSTATUS == true ]] && return 1
+  (( _POWERLEVEL9K_DISABLE_GITSTATUS )) && return 1
   if [[ $_P9K_REFRESH_REASON == precmd ]]; then
     if (( $+_P9K_NEXT_VCS_DIR )); then
       _P9K_NEXT_VCS_DIR=${${GIT_DIR:a}:-$PWD}
     else
       local dir=${${GIT_DIR:a}:-$PWD}
-      local -F timeout=$POWERLEVEL9K_VCS_MAX_SYNC_LATENCY_SECONDS
+      local -F timeout=_POWERLEVEL9K_VCS_MAX_SYNC_LATENCY_SECONDS
       if ! _p9k_vcs_status_for_dir $dir; then
         gitstatus_query -d $dir -t $timeout -p -c '_p9k_vcs_resume 0' POWERLEVEL9K || return 1
         case $VCS_STATUS_RESULT in
@@ -2494,7 +2351,7 @@ function _p9k_vcs_gitstatus() {
 # Segment to show VCS information
 
 prompt_vcs() {
-  local -a backends=($POWERLEVEL9K_VCS_BACKENDS)
+  local -a backends=($_POWERLEVEL9K_VCS_BACKENDS)
   if (( ${backends[(I)git]} )) && _p9k_vcs_gitstatus; then
     _p9k_vcs_render $1 $2 && return
     backends=(${backends:#git})
@@ -2526,19 +2383,15 @@ prompt_vcs() {
 
 ################################################################
 # Vi Mode: show editing mode (NORMAL|INSERT|VISUAL)
-#
-# VISUAL mode is shown as NORMAL unless POWERLEVEL9K_VI_VISUAL_MODE_STRING is explicitly set.
-set_default POWERLEVEL9K_VI_INSERT_MODE_STRING "INSERT"
-set_default POWERLEVEL9K_VI_COMMAND_MODE_STRING "NORMAL"
 prompt_vi_mode() {
-  if [[ -n $POWERLEVEL9K_VI_INSERT_MODE_STRING ]]; then
-    $1_prompt_segment $0_INSERT $2 "$DEFAULT_COLOR" blue '' 0 '${${KEYMAP:-0}:#vicmd}' "$POWERLEVEL9K_VI_INSERT_MODE_STRING"
+  if [[ -n $_POWERLEVEL9K_VI_INSERT_MODE_STRING ]]; then
+    $1_prompt_segment $0_INSERT $2 "$DEFAULT_COLOR" blue '' 0 '${${KEYMAP:-0}:#vicmd}' "$_POWERLEVEL9K_VI_INSERT_MODE_STRING"
   fi
-  if (( $+POWERLEVEL9K_VI_VISUAL_MODE_STRING )); then
-    $1_prompt_segment $0_NORMAL $2 "$DEFAULT_COLOR" white '' 0 '${(M)${:-$KEYMAP$_P9K_REGION_ACTIVE}:#vicmd0}' "$POWERLEVEL9K_VI_COMMAND_MODE_STRING"
-    $1_prompt_segment $0_VISUAL $2 "$DEFAULT_COLOR" white '' 0 '${(M)${:-$KEYMAP$_P9K_REGION_ACTIVE}:#vicmd1}' "$POWERLEVEL9K_VI_VISUAL_MODE_STRING"
+  if (( $+_POWERLEVEL9K_VI_VISUAL_MODE_STRING )); then
+    $1_prompt_segment $0_NORMAL $2 "$DEFAULT_COLOR" white '' 0 '${(M)${:-$KEYMAP$_P9K_REGION_ACTIVE}:#vicmd0}' "$_POWERLEVEL9K_VI_COMMAND_MODE_STRING"
+    $1_prompt_segment $0_VISUAL $2 "$DEFAULT_COLOR" white '' 0 '${(M)${:-$KEYMAP$_P9K_REGION_ACTIVE}:#vicmd1}' "$_POWERLEVEL9K_VI_VISUAL_MODE_STRING"
   else
-    $1_prompt_segment $0_NORMAL $2 "$DEFAULT_COLOR" white '' 0 '${(M)KEYMAP:#vicmd}' "$POWERLEVEL9K_VI_COMMAND_MODE_STRING"
+    $1_prompt_segment $0_NORMAL $2 "$DEFAULT_COLOR" white '' 0 '${(M)KEYMAP:#vicmd}' "$_POWERLEVEL9K_VI_COMMAND_MODE_STRING"
   fi
 }
 
@@ -2546,16 +2399,13 @@ prompt_vi_mode() {
 # Virtualenv: current working virtualenv
 # More information on virtualenv (Python):
 # https://virtualenv.pypa.io/en/latest/
-set_default POWERLEVEL9K_VIRTUALENV_SHOW_PYTHON_VERSION true
-set_default POWERLEVEL9K_VIRTUALENV_LEFT_DELIMITER "("
-set_default POWERLEVEL9K_VIRTUALENV_RIGHT_DELIMITER ")"
 prompt_virtualenv() {
   [[ -n $VIRTUAL_ENV ]] || return
   local msg=''
-  if [[ $POWERLEVEL9K_VIRTUALENV_SHOW_PYTHON_VERSION == true ]] && _p9k_python_version; then
-    msg="$_P9K_RETVAL "
+  if (( _POWERLEVEL9K_VIRTUALENV_SHOW_PYTHON_VERSION )) && _p9k_python_version; then
+    msg="$_p9k_ret "
   fi
-  msg+="$POWERLEVEL9K_VIRTUALENV_LEFT_DELIMITER${${VIRTUAL_ENV:t}//\%/%%}$POWERLEVEL9K_VIRTUALENV_RIGHT_DELIMITER"
+  msg+="$_POWERLEVEL9K_VIRTUALENV_LEFT_DELIMITER${${VIRTUAL_ENV:t}//\%/%%}$_POWERLEVEL9K_VIRTUALENV_RIGHT_DELIMITER"
   "$1_prompt_segment" "$0" "$2" "blue" "$DEFAULT_COLOR" 'PYTHON_ICON' 0 '' "$msg"
 }
 
@@ -2563,17 +2413,16 @@ function _p9k_read_pyenv_version_file() {
   [[ -r $1 ]] || return
   local content
   read -rd $'\0' content <$1 2>/dev/null
-  _P9K_RETVAL=${${(j.:.)${(@)${=content}#python-}:-system}}
+  _p9k_ret=${${(j.:.)${(@)${=content}#python-}:-system}}
 }
 
 function _p9k_pyenv_global_version() {
-  _p9k_read_pyenv_version_file ${PYENV_ROOT:-$HOME/.pyenv}/version || _P9K_RETVAL=system
+  _p9k_read_pyenv_version_file ${PYENV_ROOT:-$HOME/.pyenv}/version || _p9k_ret=system
 }
 
 ################################################################
 # Segment to display pyenv information
 # https://github.com/pyenv/pyenv#choosing-the-python-version
-set_default POWERLEVEL9K_PYENV_PROMPT_ALWAYS_SHOW false
 prompt_pyenv() {
   (( $+commands[pyenv] )) || return
   local v=${(j.:.)${(@)${(s.:.)PYENV_VERSION}#python-}}
@@ -2581,22 +2430,22 @@ prompt_pyenv() {
     [[ $PYENV_DIR == /* ]] && local dir=$PYENV_DIR || local dir="$PWD/$PYENV_DIR"
     while true; do
       if _p9k_read_pyenv_version_file $dir/.python-version; then
-        v=$_P9K_RETVAL
+        v=$_p9k_ret
         break
       fi
       if [[ $dir == / ]]; then
-        [[ $POWERLEVEL9K_PYENV_PROMPT_ALWAYS_SHOW == true ]] || return
+        (( _POWERLEVEL9K_PYENV_PROMPT_ALWAYS_SHOW )) || return
         _p9k_pyenv_global_version
-        v=$_P9K_RETVAL
+        v=$_p9k_ret
         break
       fi
       dir=${dir:h}
     done
   fi
 
-  if [[ $POWERLEVEL9K_PYENV_PROMPT_ALWAYS_SHOW == false ]]; then
+  if (( !_POWERLEVEL9K_PYENV_PROMPT_ALWAYS_SHOW )); then
     _p9k_pyenv_global_version
-    [[ $v == $_P9K_RETVAL ]] && return
+    [[ $v == $_p9k_ret ]] && return
   fi
 
   "$1_prompt_segment" "$0" "$2" "blue" "$DEFAULT_COLOR" 'PYTHON_ICON' 0 '' "${v//\%/%%}"
@@ -2618,7 +2467,7 @@ prompt_openfoam() {
 # Segment to display Swift version
 prompt_swift_version() {
   _p9k_cached_cmd_stdout swift --version || return
-  [[ $_P9K_RETVAL == (#b)[^[:digit:]]#([[:digit:].]##)* ]] || return
+  [[ $_p9k_ret == (#b)[^[:digit:]]#([[:digit:].]##)* ]] || return
   "$1_prompt_segment" "$0" "$2" "magenta" "white" 'SWIFT_ICON' 0 '' "${match[1]//\%/%%}"
 }
 
@@ -2632,35 +2481,6 @@ prompt_dir_writable() {
 
 ################################################################
 # Kubernetes Current Context/Namespace
-
-# Set to false to truncate trailing "/default": "mycontext/default" will become "mycontext".
-set_default POWERLEVEL9K_KUBECONTEXT_SHOW_DEFAULT_NAMESPACE true
-
-# Defines context classes for the purpose of applying different styling to different contexts.
-#
-# POWERLEVEL9K_KUBECONTEXT_CLASSES must be an array with even number of elements. The first
-# element in each pair defines a pattern against which the current context (in the format it is
-# displayed in the prompt) gets matched. The second element defines context class. Patterns are
-# tried in order. The first match wins.
-#
-# If a non-empty class <C> is assigned to a context, the segment is styled with
-# POWERLEVEL9K_KUBECONTEXT_<U>_BACKGROUND and POWERLEVEL9K_KUBECONTEXT_<U>_FOREGROUND where <U> is
-# uppercased <C>. Otherwise with POWERLEVEL9K_KUBECONTEXT_BACKGROUND and
-# POWERLEVEL9K_KUBECONTEXT_FOREGROUND.
-#
-# Example: Use red background for contexts containing "prod", green for "testing" and yellow for
-# everything else.
-#
-#   POWERLEVEL9K_KUBECONTEXT_CLASSES=(
-#       '*prod*'    prod
-#       '*testing*' testing
-#       '*'         other)
-#
-#   POWERLEVEL9K_KUBECONTEXT_PROD_BACKGROUND=red
-#   POWERLEVEL9K_KUBECONTEXT_TESTING_BACKGROUND=green
-#   POWERLEVEL9K_KUBECONTEXT_OTHER_BACKGROUND=yellow
-set_default -a POWERLEVEL9K_KUBECONTEXT_CLASSES
-
 prompt_kubecontext() {
   (( $+commands[kubectl] )) || return
   local cfg
@@ -2676,14 +2496,14 @@ prompt_kubecontext() {
     if [[ -n $ctx ]]; then
       local p="{.contexts[?(@.name==\"$ctx\")].context.namespace}"
       local ns="${$(command kubectl config view -o=jsonpath=$p):-default}"
-      if [[ $ctx != $ns && ($ns != default || $POWERLEVEL9K_KUBECONTEXT_SHOW_DEFAULT_NAMESPACE == true) ]]; then
+      if [[ $ctx != $ns && ($ns != default || $_POWERLEVEL9K_KUBECONTEXT_SHOW_DEFAULT_NAMESPACE == 1) ]]; then
         ctx+="/$ns"
       fi
     fi
     local suf
     if [[ -n $ctx ]]; then
       local pat class
-      for pat class in $POWERLEVEL9K_KUBECONTEXT_CLASSES; do
+      for pat class in "${_POWERLEVEL9K_KUBECONTEXT_CLASSES[@]}"; do
         if [[ $ctx == ${~pat} ]]; then
           [[ -n $class ]] && suf=_${(U)class}
           break
@@ -2715,30 +2535,15 @@ prompt_dropbox() {
   fi
 }
 
-# Specifies the format of java version.
-#
-#   POWERLEVEL9K_JAVA_VERSION_FULL=true  => 1.8.0_212-8u212-b03-0ubuntu1.18.04.1-b03
-#   POWERLEVEL9K_JAVA_VERSION_FULL=false => 1.8.0_212
-#
-# These correspond to `java -fullversion` and `java -version` respectively.
-set_default POWERLEVEL9K_JAVA_VERSION_FULL true
-
 # print Java version number
 prompt_java_version() {
   _p9k_cached_cmd_stdout_stderr java -fullversion || return
-  local v=$_P9K_RETVAL
+  local v=$_p9k_ret
   v=${${v#*\"}%\"*}
-  [[ $POWERLEVEL9K_JAVA_VERSION_FULL == true ]] || v=${v%%-*}
+  (( _POWERLEVEL9K_JAVA_VERSION_FULL )) || v=${v%%-*}
   [[ -n $v ]] || return
   "$1_prompt_segment" "$0" "$2" "red" "white" "JAVA_ICON" 0 '' "${v//\%/%%}"
 }
-
-################################################################
-# Prompt processing and drawing
-################################################################
-# Main prompt
-set_default -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS context dir vcs
-set_default -a POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS status root_indicator background_jobs history time
 
 powerlevel9k_preexec() {
   if (( _P9K_EMULATE_ZERO_RPROMPT_INDENT )); then
@@ -2767,7 +2572,6 @@ function _p9k_build_segment() {
   ((++_P9K_SEGMENT_INDEX))
 }
 
-set_default POWERLEVEL9K_DISABLE_RPROMPT false
 function _p9k_set_prompt() {
   unset _P9K_LINE_FINISH
   unset _P9K_RPROMPT_OVERRIDE
@@ -2777,7 +2581,7 @@ function _p9k_set_prompt() {
   local -i left_idx=1 right_idx=1 num_lines=$#_P9K_LINE_SEGMENTS_LEFT i
   for i in {1..$num_lines}; do
     local right=
-    if [[ $POWERLEVEL9K_DISABLE_RPROMPT == false ]]; then
+    if (( !_POWERLEVEL9K_DISABLE_RPROMPT )); then
       _P9K_DIR=
       _P9K_PROMPT=
       _P9K_SEGMENT_INDEX=right_idx
@@ -2803,19 +2607,19 @@ function _p9k_set_prompt() {
       PROMPT+='${${:-${_P9K_D::=0}${_P9K_RPROMPT::=${_P9K_RPROMPT_OVERRIDE-'$right'}}${_P9K_LPROMPT::='$_P9K_PROMPT'}}+}'
       PROMPT+=$_P9K_GAP_PRE
       if (( $+_P9K_DIR )); then
-        if (( i == num_lines && (POWERLEVEL9K_DIR_MIN_COMMAND_COLUMNS > 0 || POWERLEVEL9K_DIR_MIN_COMMAND_COLUMNS_PCT > 0) )); then
-          local a=$POWERLEVEL9K_DIR_MIN_COMMAND_COLUMNS
-          local f=$((0.01*POWERLEVEL9K_DIR_MIN_COMMAND_COLUMNS_PCT))'*_P9K_CLM'
+        if (( i == num_lines && (_POWERLEVEL9K_DIR_MIN_COMMAND_COLUMNS > 0 || _POWERLEVEL9K_DIR_MIN_COMMAND_COLUMNS_PCT > 0) )); then
+          local a=$_POWERLEVEL9K_DIR_MIN_COMMAND_COLUMNS
+          local f=$((0.01*_POWERLEVEL9K_DIR_MIN_COMMAND_COLUMNS_PCT))'*_P9K_CLM'
           PROMPT+="\${\${_P9K_G::=$((($a<$f)*$f+($a>=$f)*$a))}+}"
         else
           PROMPT+='${${_P9K_G::=0}+}'
         fi
-        if [[ $POWERLEVEL9K_DIR_MAX_LENGTH == <->('%'|) ]]; then
+        if [[ $_POWERLEVEL9K_DIR_MAX_LENGTH == <->('%'|) ]]; then
           local lim
-          if [[ $POWERLEVEL9K_DIR_MAX_LENGTH[-1] == '%' ]]; then
-            lim="$_P9K_DIR_LEN-$((0.01*$POWERLEVEL9K_DIR_MAX_LENGTH[1,-2]))*_P9K_CLM"
+          if [[ $_POWERLEVEL9K_DIR_MAX_LENGTH[-1] == '%' ]]; then
+            lim="$_P9K_DIR_LEN-$((0.01*$_POWERLEVEL9K_DIR_MAX_LENGTH[1,-2]))*_P9K_CLM"
           else
-            lim=$((_P9K_DIR_LEN-POWERLEVEL9K_DIR_MAX_LENGTH))
+            lim=$((_P9K_DIR_LEN-_POWERLEVEL9K_DIR_MAX_LENGTH))
             ((lim <= 0)) && lim=
           fi
           if [[ -n $lim ]]; then
@@ -2860,15 +2664,13 @@ function _p9k_update_prompt() {
 
 typeset -gi _P9K_REGION_ACTIVE
 
-set_default POWERLEVEL9K_PROMPT_ADD_NEWLINE false
-set_default POWERLEVEL9K_SHOW_RULER false
-
 powerlevel9k_refresh_prompt_inplace() {
   emulate -L zsh && setopt no_hist_expand extended_glob
   _p9k_init
   _P9K_REFRESH_REASON=precmd
   _p9k_set_prompt
   _P9K_REFRESH_REASON=''
+  (( $#_P9K_CACHE < _POWERLEVEL9K_MAX_CACHE_SIZE )) || typeset -gA _P9K_CACHE=()
 }
 
 powerlevel9k_prepare_prompts() {
@@ -2893,16 +2695,6 @@ function _p9k_zle_keymap_select() {
   zle && zle .reset-prompt && zle -R
 }
 
-set_default POWERLEVEL9K_IGNORE_TERM_COLORS false
-set_default POWERLEVEL9K_IGNORE_TERM_LANG false
-set_default POWERLEVEL9K_DISABLE_GITSTATUS false
-set_default -i POWERLEVEL9K_VCS_MAX_INDEX_SIZE_DIRTY -1
-set_default -i POWERLEVEL9K_VCS_STAGED_MAX_NUM 1
-set_default -i POWERLEVEL9K_VCS_UNSTAGED_MAX_NUM 1
-set_default -i POWERLEVEL9K_VCS_UNTRACKED_MAX_NUM 1
-set_default -i POWERLEVEL9K_VCS_COMMITS_AHEAD_MAX_NUM -1
-set_default -i POWERLEVEL9K_VCS_COMMITS_BEHIND_MAX_NUM -1
-
 typeset -g _P9K_REAL_ZLE_RPROMPT_INDENT
 typeset -gi _P9K_INITIALIZED=0
 
@@ -2920,7 +2712,7 @@ typeset -gi _P9K_ASYNC_PUMP_SUBSHELL=0
 _p9k_init_async_pump() {
   local -i public_ip time_realtime
   segment_in_use public_ip && public_ip=1
-  segment_in_use time && [[ $POWERLEVEL9K_EXPERIMENTAL_TIME_REALTIME == true ]] && time_realtime=1
+  segment_in_use time && (( _POWERLEVEL9K_EXPERIMENTAL_TIME_REALTIME )) && time_realtime=1
   (( public_ip || time_realtime )) || return
 
   _p9k_start_async_pump() {
@@ -3007,9 +2799,9 @@ _p9k_init_async_pump() {
 
     zsh -dfc "
       local -i public_ip=$public_ip time_realtime=$time_realtime parent_pid=$$
-      local -a ip_methods=($POWERLEVEL9K_PUBLIC_IP_METHODS)
-      local -F tout=$POWERLEVEL9K_PUBLIC_IP_TIMEOUT
-      local ip_url=$POWERLEVEL9K_PUBLIC_IP_HOST
+      local -a ip_methods=($_POWERLEVEL9K_PUBLIC_IP_METHODS)
+      local -F tout=$_POWERLEVEL9K_PUBLIC_IP_TIMEOUT
+      local ip_url=$_POWERLEVEL9K_PUBLIC_IP_HOST
       local lock=$_P9K_ASYNC_PUMP_LOCK
       local fifo=$_P9K_ASYNC_PUMP_FIFO
       $functions[_p9k_async_pump]
@@ -3068,11 +2860,246 @@ function _p9k_prompt_overflow_bug() {
   is-at-least 5.5 && ! is-at-least 5.7.2
 }
 
-# Some people write POWERLEVEL9K_DIR_PATH_SEPARATOR='\uNNNN' instead of
-# POWERLEVEL9K_DIR_PATH_SEPARATOR=$'\uNNNN'. There is no good reason for it and if we were
-# starting from scratch we wouldn't perform automatic conversion from the former to the latter.
-# But we aren't starting from scratch, so convert we do.
-_p9k_init_strings() {
+# POWERLEVEL9K_*
+# _POWERLEVEL9K_*
+# P9K_*
+# _p9k_*
+
+_p9k_init_params() {
+  # TODO: DEFAULT_USER is also a config flag. ZLE_RPROMPT_INDENT transient_rprompt
+  _p9k_declare -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS -- context dir vcs
+  _p9k_declare -a POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS -- status root_indicator background_jobs history time
+  _p9k_declare -b POWERLEVEL9K_DISABLE_RPROMPT 0
+  _p9k_declare -b POWERLEVEL9K_PROMPT_ADD_NEWLINE 0
+  _p9k_declare -b POWERLEVEL9K_SHOW_RULER 0
+  _p9k_declare -i POWERLEVEL9K_PROMPT_ADD_NEWLINE_COUNT 1
+  _p9k_declare -s POWERLEVEL9K_COLOR_SCHEME dark
+  _p9k_declare -s POWERLEVEL9K_GITSTATUS_DIR ""
+  _p9k_declare -
+  _p9k_declare -
+  _p9k_declare -
+  _p9k_declare -
+  _p9k_declare -
+  _p9k_declare -
+  _p9k_declare -
+  _p9k_declare -b POWERLEVEL9K_VCS_SHOW_SUBMODULE_DIRTY 0
+  _p9k_declare -i POWERLEVEL9K_VCS_SHORTEN_LENGTH
+  _p9k_declare -i POWERLEVEL9K_VCS_SHORTEN_MIN_LENGTH
+  _p9k_declare -s POWERLEVEL9K_VCS_SHORTEN_STRATEGY
+  _p9k_declare -s POWERLEVEL9K_VCS_SHORTEN_DELIMITER
+  _p9k_declare -b POWERLEVEL9K_HIDE_BRANCH_ICON 0
+  _p9k_declare -b POWERLEVEL9K_VCS_HIDE_TAGS 0
+  _p9k_declare -i POWERLEVEL9K_CHANGESET_HASH_LENGTH 8
+  # Specifies the maximum number of elements in the cache. When the cache grows over this limit,
+  # it gets cleared. This is meant to avoid memory leaks when a rogue prompt is filling the cache
+  # with data.
+  _p9k_declare -i POWERLEVEL9K_MAX_CACHE_SIZE 10000
+  _p9k_declare -e POWERLEVEL9K_ANACONDA_LEFT_DELIMITER "("
+  _p9k_declare -e POWERLEVEL9K_ANACONDA_RIGHT_DELIMITER ")"
+  _p9k_declare -b POWERLEVEL9K_ANACONDA_SHOW_PYTHON_VERSION 1
+  _p9k_declare -b POWERLEVEL9K_BACKGROUND_JOBS_VERBOSE 1
+  _p9k_declare -b POWERLEVEL9K_BACKGROUND_JOBS_VERBOSE_ALWAYS 0
+  _p9k_declare -b POWERLEVEL9K_DISK_USAGE_ONLY_WARNING 0
+  _p9k_declare -i POWERLEVEL9K_DISK_USAGE_WARNING_LEVEL 90
+  _p9k_declare -i POWERLEVEL9K_DISK_USAGE_CRITICAL_LEVEL 95
+  _p9k_declare -i POWERLEVEL9K_BATTERY_LOW_THRESHOLD 10
+  _p9k_declare -i POWERLEVEL9K_BATTERY_HIDE_ABOVE_THRESHOLD 999
+  _p9k_declare -a POWERLEVEL9K_BATTERY_LEVEL_BACKGROUND --
+  _p9k_declare -b POWERLEVEL9K_BATTERY_VERBOSE 1
+  if [[ $parameters[POWERLEVEL9K_BATTERY_STAGES] == scalar ]]; then
+    _p9k_declare -e POWERLEVEL9K_BATTERY_STAGES
+  else
+    _p9k_declare -a POWERLEVEL9K_BATTERY_STAGES --
+    _POWERLEVEL9K_BATTERY_STAGES=("${(@g::)_POWERLEVEL9K_BATTERY_STAGES}")
+  fi
+  _p9k_declare -F POWERLEVEL9K_PUBLIC_IP_TIMEOUT 300
+  _p9k_declare -a POWERLEVEL9K_PUBLIC_IP_METHODS -- dig curl wget
+  _p9k_declare -e POWERLEVEL9K_PUBLIC_IP_NONE ""
+  _p9k_declare -s POWERLEVEL9K_PUBLIC_IP_HOST "http://ident.me"
+  _p9k_declare -s POWERLEVEL9K_PUBLIC_IP_VPN_INTERFACE ""
+  _p9k_declare -b POWERLEVEL9K_ALWAYS_SHOW_CONTEXT 0
+  _p9k_declare -b POWERLEVEL9K_ALWAYS_SHOW_USER 0
+  _p9k_declare -e POWERLEVEL9K_CONTEXT_TEMPLATE "%n@%m"
+  _p9k_declare -e POWERLEVEL9K_USER_TEMPLATE "%n"
+  _p9k_declare -e POWERLEVEL9K_HOST_TEMPLATE "%m"
+  _p9k_declare -F POWERLEVEL9K_COMMAND_EXECUTION_TIME_THRESHOLD 3
+  _p9k_declare -i POWERLEVEL9K_COMMAND_EXECUTION_TIME_PRECISION 2
+  # Other options: "d h m s".
+  _p9k_declare -s POWERLEVEL9K_COMMAND_EXECUTION_TIME_FORMAT "H:M:S"
+  _p9k_declare -e POWERLEVEL9K_DIR_PATH_SEPARATOR "/"
+  _p9k_declare -e POWERLEVEL9K_HOME_FOLDER_ABBREVIATION "~"
+  _p9k_declare -b POWERLEVEL9K_DIR_PATH_HIGHLIGHT_BOLD 0
+  _p9k_declare -b POWERLEVEL9K_DIR_ANCHORS_BOLD 0
+  _p9k_declare -b POWERLEVEL9K_DIR_PATH_ABSOLUTE 0
+  _p9k_declare -b POWERLEVEL9K_DIR_SHOW_WRITABLE 0
+  _p9k_declare -b POWERLEVEL9K_DIR_OMIT_FIRST_CHARACTER 0
+  _p9k_declare -b POWERLEVEL9K_DIR_HYPERLINK 0
+  _p9k_declare -s POWERLEVEL9K_SHORTEN_STRATEGY ""
+  _p9k_declare -s POWERLEVEL9K_DIR_PATH_SEPARATOR_FOREGROUND
+  _p9k_declare -s POWERLEVEL9K_DIR_PATH_HIGHLIGHT_FOREGROUND
+  _p9k_declare -s POWERLEVEL9K_DIR_ANCHOR_FOREGROUND
+  _p9k_declare -s POWERLEVEL9K_DIR_SHORTENED_FOREGROUND
+  _p9k_declare -s POWERLEVEL9K_SHORTEN_FOLDER_MARKER "(.shorten_folder_marker|.bzr|CVS|.git|.hg|.svn|.terraform|.citc)"
+  # Shorten directory if it's longer than this even if there is space for it.
+  # The value can be either absolute (e.g., '80') or a percentage of terminal
+  # width (e.g, '50%'). If empty, directory will be shortened only when prompt
+  # doesn't fit. Applies only when POWERLEVEL9K_SHORTEN_STRATEGY=truncate_to_unique.
+  _p9k_declare -s POWERLEVEL9K_DIR_MAX_LENGTH 0
+  # Individual elements are patterns. They are expanded with the options set
+  # by `emulate zsh && setopt extended_glob`.
+  _p9k_declare -a POWERLEVEL9K_DIR_PACKAGE_FILES -- package.json composer.json
+  # When dir is on the last prompt line, try to shorten it enough to leave at least this many
+  # columns for typing commands. Applies only when POWERLEVEL9K_SHORTEN_STRATEGY=truncate_to_unique.
+  _p9k_declare -i POWERLEVEL9K_DIR_MIN_COMMAND_COLUMNS 40
+  # When dir is on the last prompt line, try to shorten it enough to leave at least
+  # COLUMNS * POWERLEVEL9K_DIR_MIN_COMMAND_COLUMNS_PCT * 0.01 columns for typing commands. Applies
+  # only when POWERLEVEL9K_SHORTEN_STRATEGY=truncate_to_unique.
+  _p9k_declare -F POWERLEVEL9K_DIR_MIN_COMMAND_COLUMNS_PCT 50
+  # POWERLEVEL9K_DIR_CLASSES allow you to specify custom styling and icons for different
+  # directories.
+  #
+  # POWERLEVEL9K_DIR_CLASSES must be an array with 3 * N elements. Each triplet consists of:
+  #
+  #   1. A pattern against which the current directory is matched. Matching is done with
+  #      extended_glob option enabled.
+  #   2. Directory class for the purpose of styling.
+  #   3. Icon.
+  #
+  # Triplets are tried in order. The first triplet whose pattern matches $PWD wins. If there are no
+  # matches, there will be no icon and the styling is done according to POWERLEVEL9K_DIR_BACKGROUND,
+  # POWERLEVEL9K_DIR_FOREGROUND, etc.
+  #
+  # Example:
+  #
+  #   POWERLEVEL9K_DIR_CLASSES=(
+  #       '~/work(/*)#'  WORK     '(╯°□°）╯︵ ┻━┻'
+  #       '~(/*)#'       HOME     '⌂'
+  #       '*'            DEFAULT  '')
+  #
+  #   POWERLEVEL9K_DIR_WORK_BACKGROUND=red
+  #   POWERLEVEL9K_DIR_HOME_BACKGROUND=blue
+  #   POWERLEVEL9K_DIR_DEFAULT_BACKGROUND=yellow
+  #
+  # With these settings, the current directory in the prompt may look like this:
+  #
+  #   (╯°□°）╯︵ ┻━┻ ~/work/projects/important/urgent
+  #
+  #   ⌂ ~/best/powerlevel10k
+  typeset -ga _POWERLEVEL9K_DIR_CLASSES=()
+  if (( $+POWERLEVEL9K_DIR_CLASSES )); then
+    local a='' b='' c=''
+    for a b c in "${POWERLEVEL9K_DIR_CLASSES[@]}"; do
+      _POWERLEVEL9K_DIR_CLASSES+=("$a" "$b" "${(g::)c}")
+    done
+  else
+    _p9k_get_icon prompt_dir_ETC ETC_ICON
+    _POWERLEVEL9K_DIR_CLASSES+=('/etc|/etc/*' ETC "$_p9k_ret")
+    _p9k_get_icon prompt_dir_HOME HOME_ICON
+    _POWERLEVEL9K_DIR_CLASSES+=('~' HOME "$_p9k_ret")
+    _p9k_get_icon prompt_dir_HOME_SUBFOLDER HOME_SUB_ICON
+    _POWERLEVEL9K_DIR_CLASSES+=('~/*' HOME_SUBFOLDER "$_p9k_ret")
+    _p9k_get_icon prompt_dir_DEFAULT FOLDER_ICON
+    _POWERLEVEL9K_DIR_CLASSES+=('*' DEFAULT "$_p9k_ret")
+  fi
+  _p9k_declare -i POWERLEVEL9K_SHORTEN_DELIMITER_LENGTH
+  _p9k_declare -e POWERLEVEL9K_SHORTEN_DELIMITER
+  _p9k_declare -i POWERLEVEL9K_SHORTEN_DIR_LENGTH
+  _p9k_declare -s POWERLEVEL9K_IP_INTERFACE "^[^ ]+"
+  _p9k_declare -s POWERLEVEL9K_VPN_IP_INTERFACE "tun"
+  _p9k_declare -i POWERLEVEL9K_LOAD_WHICH 5
+  _p9k_declare -b POWERLEVEL9K_NODENV_PROMPT_ALWAYS_SHOW 0
+  _p9k_declare -b POWERLEVEL9K_RBENV_PROMPT_ALWAYS_SHOW 0
+  _p9k_declare -b POWERLEVEL9K_CHRUBY_SHOW_VERSION 1
+  _p9k_declare -b POWERLEVEL9K_CHRUBY_SHOW_ENGINE 1
+  _p9k_declare -b POWERLEVEL9K_STATUS_CROSS 0
+  _p9k_declare -b POWERLEVEL9K_STATUS_OK 1
+  _p9k_declare -b POWERLEVEL9K_STATUS_SHOW_PIPESTATUS 1
+  _p9k_declare -b POWERLEVEL9K_STATUS_HIDE_SIGNAME 0
+  _p9k_declare -b POWERLEVEL9K_STATUS_VERBOSE 1
+  _p9k_declare -b POWERLEVEL9K_STATUS_OK_IN_NON_VERBOSE 0
+  # Format for the current time: 09:51:02. See `man 3 strftime`.
+  _p9k_declare -e POWERLEVEL9K_TIME_FORMAT "%D{%H:%M:%S}"
+  # If set to true, time will update every second.
+  _p9k_declare -b POWERLEVEL9K_EXPERIMENTAL_TIME_REALTIME 0
+  # If set to true, time will update when you hit enter. This way prompts for the past
+  # commands will contain the start times of their commands as opposed to the default
+  # behavior where they contain the end times of their preceding commands.
+  _p9k_declare -b POWERLEVEL9K_TIME_UPDATE_ON_COMMAND 0
+  _p9k_declare -e POWERLEVEL9K_DATE_FORMAT "%D{%d.%m.%y}"
+  _p9k_declare -s POWERLEVEL9K_VCS_ACTIONFORMAT_FOREGROUND 1
+  _p9k_declare -b POWERLEVEL9K_SHOW_CHANGESET 0
+  _p9k_declare -e POWERLEVEL9K_VCS_LOADING_TEXT loading
+  _p9k_declare -a POWERLEVEL9K_VCS_GIT_HOOKS -- vcs-detect-changes git-untracked git-aheadbehind git-stash git-remotebranch git-tagname
+  _p9k_declare -a POWERLEVEL9K_VCS_HG_HOOKS -- vcs-detect-changes
+  _p9k_declare -a POWERLEVEL9K_VCS_SVN_HOOKS -- vcs-detect-changes svn-detect-changes
+  # If it takes longer than this to fetch git repo status, display the prompt with a greyed out
+  # vcs segment and fix it asynchronously when the results come it.
+  _p9k_declare -F POWERLEVEL9K_VCS_MAX_SYNC_LATENCY_SECONDS 0.05
+  _p9k_declare -a POWERLEVEL9K_VCS_BACKENDS -- git
+  _p9k_declare -b POWERLEVEL9K_VCS_DISABLE_GITSTATUS_FORMATTING 0
+  _p9k_declare -i POWERLEVEL9K_VCS_MAX_INDEX_SIZE_DIRTY -1
+  _p9k_declare -i POWERLEVEL9K_VCS_STAGED_MAX_NUM 1
+  _p9k_declare -i POWERLEVEL9K_VCS_UNSTAGED_MAX_NUM 1
+  _p9k_declare -i POWERLEVEL9K_VCS_UNTRACKED_MAX_NUM 1
+  _p9k_declare -i POWERLEVEL9K_VCS_COMMITS_AHEAD_MAX_NUM -1
+  _p9k_declare -i POWERLEVEL9K_VCS_COMMITS_BEHIND_MAX_NUM -1
+  _p9k_declare -b POWERLEVEL9K_DISABLE_GITSTATUS 0
+  _p9k_declare -e POWERLEVEL9K_VI_INSERT_MODE_STRING "INSERT"
+  _p9k_declare -e POWERLEVEL9K_VI_COMMAND_MODE_STRING "NORMAL"
+  # VISUAL mode is shown as NORMAL unless POWERLEVEL9K_VI_VISUAL_MODE_STRING is explicitly set.
+  _p9k_declare -e POWERLEVEL9K_VI_VISUAL_MODE_STRING
+  _p9k_declare -b POWERLEVEL9K_VIRTUALENV_SHOW_PYTHON_VERSION 1
+  _p9k_declare -e POWERLEVEL9K_VIRTUALENV_LEFT_DELIMITER "("
+  _p9k_declare -e POWERLEVEL9K_VIRTUALENV_RIGHT_DELIMITER ")"
+  _p9k_declare -b POWERLEVEL9K_PYENV_PROMPT_ALWAYS_SHOW 0
+  _p9k_declare -b POWERLEVEL9K_KUBECONTEXT_SHOW_DEFAULT_NAMESPACE 1
+  # Defines context classes for the purpose of applying different styling to different contexts.
+  #
+  # POWERLEVEL9K_KUBECONTEXT_CLASSES must be an array with even number of elements. The first
+  # element in each pair defines a pattern against which the current context (in the format it is
+  # displayed in the prompt) gets matched. The second element defines context class. Patterns are
+  # tried in order. The first match wins.
+  #
+  # If a non-empty class <C> is assigned to a context, the segment is styled with
+  # POWERLEVEL9K_KUBECONTEXT_<U>_BACKGROUND and POWERLEVEL9K_KUBECONTEXT_<U>_FOREGROUND where <U> is
+  # uppercased <C>. Otherwise with POWERLEVEL9K_KUBECONTEXT_BACKGROUND and
+  # POWERLEVEL9K_KUBECONTEXT_FOREGROUND.
+  #
+  # Example: Use red background for contexts containing "prod", green for "testing" and yellow for
+  # everything else.
+  #
+  #   POWERLEVEL9K_KUBECONTEXT_CLASSES=(
+  #       '*prod*'    prod
+  #       '*testing*' testing
+  #       '*'         other)
+  #
+  #   POWERLEVEL9K_KUBECONTEXT_PROD_BACKGROUND=red
+  #   POWERLEVEL9K_KUBECONTEXT_TESTING_BACKGROUND=green
+  #   POWERLEVEL9K_KUBECONTEXT_OTHER_BACKGROUND=yellow
+  _p9k_declare -a POWERLEVEL9K_KUBECONTEXT_CLASSES --
+  # Specifies the format of java version.
+  #
+  #   POWERLEVEL9K_JAVA_VERSION_FULL=true  => 1.8.0_212-8u212-b03-0ubuntu1.18.04.1-b03
+  #   POWERLEVEL9K_JAVA_VERSION_FULL=false => 1.8.0_212
+  #
+  # These correspond to `java -fullversion` and `java -version` respectively.
+  _p9k_declare -b POWERLEVEL9K_JAVA_VERSION_FULL 1
+  _p9k_declare -
+  _p9k_declare -
+  _p9k_declare -
+  _p9k_declare -
+  _p9k_declare -
+  _p9k_declare -
+  _p9k_declare -
+  _p9k_declare -
+  _p9k_declare -
+  _p9k_declare -
+  _p9k_declare -
+  _p9k_declare -
+  _p9k_declare -
+  _p9k_declare -
+  _p9k_declare -
+
   # To find candidates:
   #
   #   egrep 'set_default [^-]' powerlevel9k.zsh-theme | egrep -v '(true|false)$'
@@ -3123,42 +3150,42 @@ prompt__p9k_internal_nothing() {
 # _p9k_build_gap_post <first|newline>
 _p9k_build_gap_post() {
   _p9k_get_icon '' MULTILINE_${(U)1}_PROMPT_GAP_CHAR
-  local char=${_P9K_RETVAL:- }
+  local char=${_p9k_ret:- }
   _p9k_prompt_length $char
-  if (( _P9K_RETVAL != 1 || $#char != 1 )); then
+  if (( _p9k_ret != 1 || $#char != 1 )); then
     print -P "%F{red}WARNING!%f %BMULTILINE_${(U)1}_PROMPT_GAP_CHAR%b is not one character long. Will use ' '."
     print -P "Either change the value of %BPOWERLEVEL9K_MULTILINE_${(U)1}_PROMPT_GAP_CHAR%b or remove it."
     char=' '
   fi
   local style
   _p9k_color prompt_multiline_$1_prompt_gap BACKGROUND ""
-  [[ -n $_P9K_RETVAL ]] && _p9k_background $_P9K_RETVAL
-  style+=$_P9K_RETVAL
+  [[ -n $_p9k_ret ]] && _p9k_background $_p9k_ret
+  style+=$_p9k_ret
   _p9k_color prompt_multiline_$1_prompt_gap FOREGROUND ""
-  [[ -n $_P9K_RETVAL ]] && _p9k_foreground $_P9K_RETVAL
-  style+=$_P9K_RETVAL
+  [[ -n $_p9k_ret ]] && _p9k_foreground $_p9k_ret
+  style+=$_p9k_ret
   local exp=POWERLEVEL9K_MULTILINE_${(U)1}_PROMPT_GAP_EXPANSION
   (( $+parameters[$exp] )) && exp=${(P)exp} || exp='${P9K_GAP}'
   [[ $char == '.' ]] && local s=',' || local s='.'
-  _P9K_RETVAL=$style'${${${_P9K_M:#-*}:+'
+  _p9k_ret=$style'${${${_P9K_M:#-*}:+'
   if [[ $exp == '${P9K_GAP}' ]]; then
-    _P9K_RETVAL+='${(pl'$s'$((_P9K_M+1))'$s$s$char$s$')}'
+    _p9k_ret+='${(pl'$s'$((_P9K_M+1))'$s$s$char$s$')}'
   else
-    _P9K_RETVAL+='${${P9K_GAP::=${(pl'$s'$((_P9K_M+1))'$s$s$char$s$')}}+}'
-    _P9K_RETVAL+='${:-"'$exp'"}'
+    _p9k_ret+='${${P9K_GAP::=${(pl'$s'$((_P9K_M+1))'$s$s$char$s$')}}+}'
+    _p9k_ret+='${:-"'$exp'"}'
     style=1
   fi
-  _P9K_RETVAL+='$_P9K_RPROMPT$_P9K_T[$((1+!_P9K_IND))]}:-\n}'
-  [[ -n $style ]] && _P9K_RETVAL+='%b%k%f'
+  _p9k_ret+='$_P9K_RPROMPT$_P9K_T[$((1+!_P9K_IND))]}:-\n}'
+  [[ -n $style ]] && _p9k_ret+='%b%k%f'
 }
 
 _p9k_init_lines() {
   typeset -ga _P9K_LINE_{SEGMENTS,PREFIX,SUFFIX}_{LEFT,RIGHT}
   typeset -ga _P9K_LINE_NEVER_EMPTY_RIGHT _P9K_LINE_GAP_POST
-  local -a left_segments=($POWERLEVEL9K_LEFT_PROMPT_ELEMENTS)
-  local -a right_segments=($POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS)
+  local -a left_segments=($_POWERLEVEL9K_LEFT_PROMPT_ELEMENTS)
+  local -a right_segments=($_POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS)
 
-  if [[ $POWERLEVEL9K_PROMPT_ON_NEWLINE == true ]]; then
+  if (( _POWERLEVEL9K_PROMPT_ON_NEWLINE )); then
     left_segments+=(newline _p9k_internal_nothing)
   fi
 
@@ -3168,7 +3195,7 @@ _p9k_init_lines() {
     repeat $((num_right_lines - num_left_lines)) left_segments=(newline $left_segments)
     local -i num_lines=num_right_lines
   else
-    if [[ $POWERLEVEL9K_RPROMPT_ON_NEWLINE == true ]]; then
+    if (( _POWERLEVEL9K_RPROMPT_ON_NEWLINE )); then
       repeat $((num_left_lines - num_right_lines)) right_segments=(newline $right_segments)
     else
       repeat $((num_left_lines - num_right_lines)) right_segments+=newline
@@ -3185,82 +3212,82 @@ _p9k_init_lines() {
     (( right_end > $#right_segments )) && right_segments=() || shift right_end right_segments
 
     _p9k_get_icon '' LEFT_SEGMENT_SEPARATOR
-    _p9k_get_icon 'prompt_empty_line' LEFT_PROMPT_LAST_SEGMENT_END_SYMBOL $_P9K_RETVAL
-    _p9k_escape $_P9K_RETVAL
-    _P9K_LINE_PREFIX_LEFT+='${${:-${_P9K_BG::=NONE}${_P9K_I::=0}${_P9K_SSS::=%f'$_P9K_RETVAL'}}+}'
+    _p9k_get_icon 'prompt_empty_line' LEFT_PROMPT_LAST_SEGMENT_END_SYMBOL $_p9k_ret
+    _p9k_escape $_p9k_ret
+    _P9K_LINE_PREFIX_LEFT+='${${:-${_P9K_BG::=NONE}${_P9K_I::=0}${_P9K_SSS::=%f'$_p9k_ret'}}+}'
     _P9K_LINE_SUFFIX_LEFT+='%b%k$_P9K_SSS%b%k%f'
 
     _p9k_escape ${(g::)POWERLEVEL9K_EMPTY_LINE_RIGHT_PROMPT_FIRST_SEGMENT_START_SYMBOL}
-    [[ -n $_P9K_RETVAL ]] && _P9K_LINE_NEVER_EMPTY_RIGHT+=1 || _P9K_LINE_NEVER_EMPTY_RIGHT+=0
-    _P9K_LINE_PREFIX_RIGHT+='${${:-${_P9K_BG::=NONE}${_P9K_I::=0}${_P9K_SSS::='$_P9K_RETVAL'}}+}'
+    [[ -n $_p9k_ret ]] && _P9K_LINE_NEVER_EMPTY_RIGHT+=1 || _P9K_LINE_NEVER_EMPTY_RIGHT+=0
+    _P9K_LINE_PREFIX_RIGHT+='${${:-${_P9K_BG::=NONE}${_P9K_I::=0}${_P9K_SSS::='$_p9k_ret'}}+}'
     _P9K_LINE_SUFFIX_RIGHT+='$_P9K_SSS%b%k%f'  # gets overridden for _P9K_EMULATE_ZERO_RPROMPT_INDENT
   done
 
   _p9k_get_icon '' LEFT_SEGMENT_END_SEPARATOR
-  if [[ -n $_P9K_RETVAL ]]; then
-    _P9K_RETVAL+=%b%k%f
+  if [[ -n $_p9k_ret ]]; then
+    _p9k_ret+=%b%k%f
     # Not escaped for historical reasons.
-    _P9K_RETVAL='${:-"'$_P9K_RETVAL'"}'
-    if [[ $POWERLEVEL9K_PROMPT_ON_NEWLINE == true ]]; then
-      _P9K_LINE_SUFFIX_LEFT[-2]+=$_P9K_RETVAL
+    _p9k_ret='${:-"'$_p9k_ret'"}'
+    if (( _POWERLEVEL9K_PROMPT_ON_NEWLINE )); then
+      _P9K_LINE_SUFFIX_LEFT[-2]+=$_p9k_ret
     else
-      _P9K_LINE_SUFFIX_LEFT[-1]+=$_P9K_RETVAL
+      _P9K_LINE_SUFFIX_LEFT[-1]+=$_p9k_ret
     fi
   fi
 
   if (( num_lines > 1 )); then
     _p9k_build_gap_post first
-    _P9K_LINE_GAP_POST[1]=$_P9K_RETVAL
+    _P9K_LINE_GAP_POST[1]=$_p9k_ret
 
-    if [[ $+POWERLEVEL9K_MULTILINE_FIRST_PROMPT_PREFIX == 1 || $POWERLEVEL9K_PROMPT_ON_NEWLINE == true ]]; then
+    if [[ $+POWERLEVEL9K_MULTILINE_FIRST_PROMPT_PREFIX == 1 || $_POWERLEVEL9K_PROMPT_ON_NEWLINE == 1 ]]; then
       _p9k_get_icon '' MULTILINE_FIRST_PROMPT_PREFIX
-      [[ _P9K_RETVAL == *%* ]] && _P9K_RETVAL+=%b%k%f
+      [[ _p9k_ret == *%* ]] && _p9k_ret+=%b%k%f
       # Not escaped for historical reasons.
-      _P9K_RETVAL='${:-"'$_P9K_RETVAL'"}'
-      _P9K_LINE_PREFIX_LEFT[1]=$_P9K_RETVAL$_P9K_LINE_PREFIX_LEFT[1]
+      _p9k_ret='${:-"'$_p9k_ret'"}'
+      _P9K_LINE_PREFIX_LEFT[1]=$_p9k_ret$_P9K_LINE_PREFIX_LEFT[1]
     fi
 
-    if [[ $+POWERLEVEL9K_MULTILINE_LAST_PROMPT_PREFIX == 1 || $POWERLEVEL9K_PROMPT_ON_NEWLINE == true ]]; then
+    if [[ $+POWERLEVEL9K_MULTILINE_LAST_PROMPT_PREFIX == 1 || $_POWERLEVEL9K_PROMPT_ON_NEWLINE == 1 ]]; then
       _p9k_get_icon '' MULTILINE_LAST_PROMPT_PREFIX
-      [[ _P9K_RETVAL == *%* ]] && _P9K_RETVAL+=%b%k%f
+      [[ _p9k_ret == *%* ]] && _p9k_ret+=%b%k%f
       # Not escaped for historical reasons.
-    _P9K_RETVAL='${:-"'$_P9K_RETVAL'"}'
-      _P9K_LINE_PREFIX_LEFT[-1]=$_P9K_RETVAL$_P9K_LINE_PREFIX_LEFT[-1]
+    _p9k_ret='${:-"'$_p9k_ret'"}'
+      _P9K_LINE_PREFIX_LEFT[-1]=$_p9k_ret$_P9K_LINE_PREFIX_LEFT[-1]
     fi
 
     _p9k_get_icon '' MULTILINE_FIRST_PROMPT_SUFFIX
-    if [[ -n $_P9K_RETVAL ]]; then
-      [[ _P9K_RETVAL == *%* ]] && _P9K_RETVAL+=%b%k%f
-      _p9k_escape $_P9K_RETVAL
-      _P9K_LINE_SUFFIX_RIGHT[1]+=$_P9K_RETVAL
+    if [[ -n $_p9k_ret ]]; then
+      [[ _p9k_ret == *%* ]] && _p9k_ret+=%b%k%f
+      _p9k_escape $_p9k_ret
+      _P9K_LINE_SUFFIX_RIGHT[1]+=$_p9k_ret
       _P9K_LINE_NEVER_EMPTY_RIGHT[1]=1
     fi
 
     _p9k_get_icon '' MULTILINE_LAST_PROMPT_SUFFIX
-    if [[ -n $_P9K_RETVAL ]]; then
-      [[ _P9K_RETVAL == *%* ]] && _P9K_RETVAL+=%b%k%f
-      _p9k_escape $_P9K_RETVAL
-      _P9K_LINE_SUFFIX_RIGHT[-1]+=$_P9K_RETVAL
+    if [[ -n $_p9k_ret ]]; then
+      [[ _p9k_ret == *%* ]] && _p9k_ret+=%b%k%f
+      _p9k_escape $_p9k_ret
+      _P9K_LINE_SUFFIX_RIGHT[-1]+=$_p9k_ret
       _P9K_LINE_NEVER_EMPTY_RIGHT[-1]=1
     fi
 
     if (( num_lines > 2 )); then
       _p9k_build_gap_post newline
-      _P9K_LINE_GAP_POST[2,-2]=(${${:-{3..num_lines}}:/*/$_P9K_RETVAL})
+      _P9K_LINE_GAP_POST[2,-2]=(${${:-{3..num_lines}}:/*/$_p9k_ret})
 
-      if [[ $+POWERLEVEL9K_MULTILINE_NEWLINE_PROMPT_PREFIX == 1 || $POWERLEVEL9K_PROMPT_ON_NEWLINE == true ]]; then
+      if [[ $+POWERLEVEL9K_MULTILINE_NEWLINE_PROMPT_PREFIX == 1 || $_POWERLEVEL9K_PROMPT_ON_NEWLINE == 1 ]]; then
         _p9k_get_icon '' MULTILINE_NEWLINE_PROMPT_PREFIX
-        [[ _P9K_RETVAL == *%* ]] && _P9K_RETVAL+=%b%k%f
+        [[ _p9k_ret == *%* ]] && _p9k_ret+=%b%k%f
         # Not escaped for historical reasons.
-        _P9K_RETVAL='${:-"'$_P9K_RETVAL'"}'
-        _P9K_LINE_PREFIX_LEFT[2,-2]=$_P9K_RETVAL${^_P9K_LINE_PREFIX_LEFT[2,-2]}
+        _p9k_ret='${:-"'$_p9k_ret'"}'
+        _P9K_LINE_PREFIX_LEFT[2,-2]=$_p9k_ret${^_P9K_LINE_PREFIX_LEFT[2,-2]}
       fi
 
       _p9k_get_icon '' MULTILINE_NEWLINE_PROMPT_SUFFIX
-      if [[ -n $_P9K_RETVAL ]]; then
-        [[ _P9K_RETVAL == *%* ]] && _P9K_RETVAL+=%b%k%f
-        _p9k_escape $_P9K_RETVAL
-        _P9K_LINE_SUFFIX_RIGHT[2,-2]=${^_P9K_LINE_SUFFIX_RIGHT[2,-2]}$_P9K_RETVAL
+      if [[ -n $_p9k_ret ]]; then
+        [[ _p9k_ret == *%* ]] && _p9k_ret+=%b%k%f
+        _p9k_escape $_p9k_ret
+        _P9K_LINE_SUFFIX_RIGHT[2,-2]=${^_P9K_LINE_SUFFIX_RIGHT[2,-2]}$_p9k_ret
         _P9K_LINE_NEVER_EMPTY_RIGHT[2,-2]=${(@)_P9K_LINE_NEVER_EMPTY_RIGHT[2,-2]/0/1}
       fi
     fi
@@ -3304,24 +3331,24 @@ _p9k_init_prompt() {
     _P9K_PROMPT_PREFIX_LEFT+='${${_P9K_IND::=${${ZLE_RPROMPT_INDENT:-1}/#-*/0}}+}'
   fi
 
-  if [[ $POWERLEVEL9K_PROMPT_ADD_NEWLINE == true ]]; then
-    repeat ${POWERLEVEL9K_PROMPT_ADD_NEWLINE_COUNT:-1} _P9K_PROMPT_PREFIX_LEFT+=$'\n'
+  if (( _POWERLEVEL9K_PROMPT_ADD_NEWLINE )); then
+    repeat $_POWERLEVEL9K_PROMPT_ADD_NEWLINE_COUNT _P9K_PROMPT_PREFIX_LEFT+=$'\n'
   fi
 
   _P9K_T=($'\n' '')
   _p9k_prompt_overflow_bug && _P9K_T[2]='%{%G%}'
 
-  if [[ $POWERLEVEL9K_SHOW_RULER == true ]]; then
+  if (( _POWERLEVEL9K_SHOW_RULER )); then
     _p9k_get_icon '' RULER_CHAR
-    local ruler_char=$_P9K_RETVAL
+    local ruler_char=$_p9k_ret
     _p9k_prompt_length $ruler_char
-    if (( _P9K_RETVAL == 1 && $#ruler_char == 1 )); then
+    if (( _p9k_ret == 1 && $#ruler_char == 1 )); then
       _p9k_color prompt_ruler BACKGROUND ""
-      _p9k_background $_P9K_RETVAL
-      _P9K_PROMPT_PREFIX_LEFT+=%b$_P9K_RETVAL
+      _p9k_background $_p9k_ret
+      _P9K_PROMPT_PREFIX_LEFT+=%b$_p9k_ret
       _p9k_color prompt_ruler FOREGROUND ""
-      _p9k_foreground $_P9K_RETVAL
-      _P9K_PROMPT_PREFIX_LEFT+=$_P9K_RETVAL
+      _p9k_foreground $_p9k_ret
+      _P9K_PROMPT_PREFIX_LEFT+=$_p9k_ret
       [[ $ruler_char == '.' ]] && local sep=',' || local sep='.'
       local ruler_len='${$((_P9K_CLM-_P9K_IND))/#-*/0}'
       _P9K_PROMPT_PREFIX_LEFT+="\${(pl$sep$ruler_len$sep$sep${(q)ruler_char}$sep)}%k%f"
@@ -3338,7 +3365,7 @@ _p9k_init_prompt() {
   fi
 
   if [[ -o TRANSIENT_RPROMPT && -n "$_P9K_LINE_SEGMENTS_RIGHT[2,-1]" ]] || 
-     ( segment_in_use time && [[ $POWERLEVEL9K_TIME_UPDATE_ON_COMMAND == true ]] ); then
+     ( segment_in_use time && (( _POWERLEVEL9K_TIME_UPDATE_ON_COMMAND )) ); then
     function _p9k_zle_line_finish() {
       [[ ! -o TRANSIENT_RPROMPT ]] || _P9K_RPROMPT_OVERRIDE=
       _P9K_LINE_FINISH=
@@ -3386,7 +3413,7 @@ _p9k_init() {
   function _$0_set_os() {
     OS=$1
     _p9k_get_icon prompt_os_icon $2
-    OS_ICON=$_P9K_RETVAL
+    OS_ICON=$_p9k_ret
   }
 
   trap "unfunction _$0_set_os" EXIT
@@ -3431,7 +3458,7 @@ _p9k_init() {
     esac
   fi
 
-  if [[ $POWERLEVEL9K_COLOR_SCHEME == light ]]; then
+  if [[ $_POWERLEVEL9K_COLOR_SCHEME == light ]]; then
     typeset -g DEFAULT_COLOR=7
     typeset -g DEFAULT_COLOR_INVERTED=0
   else
@@ -3467,25 +3494,6 @@ _p9k_init() {
     fi
   done
 
-  # If the terminal `LANG` is set to `C`, this theme will not work at all.
-  if [[ $LANG == "C" && $POWERLEVEL9K_IGNORE_TERM_LANG == false ]]; then
-    print -P "\t%F{red}WARNING!%f Your terminal's 'LANG' is set to 'C', which breaks this theme!"
-    print -P "\t%F{red}WARNING!%f Please set your 'LANG' to a UTF-8 language, like 'en_US.UTF-8'"
-    print -P "\t%F{red}WARNING!%f _before_ loading this theme in your \~\.zshrc. Putting"
-    print -P "\t%F{red}WARNING!%f %F{blue}export LANG=\"en_US.UTF-8\"%f at the top of your \~\/.zshrc is sufficient."
-    print -P 'Set POWERLEVEL9K_IGNORE_TERM_LANG=true to suppress this warning.'
-  fi
-
-  # Display a warning if the terminal does not support 256 colors.
-  if [[ $POWERLEVEL9K_IGNORE_TERM_COLORS == false ]]; then
-    if zmodload zsh/terminfo 2>/dev/null && (( $+terminfo[colors] && $terminfo[colors] < 256 )); then
-      print -P '%F{red}WARNING!%f Your terminal appears to support fewer than 256 colors!'
-      print -P 'If your terminal supports 256 colors, please export the appropriate environment variable.'
-      print -P 'In most terminal emulators, adding %F{blue}export TERM=xterm-256color%f to your %F{yellow}~/.zshrc%f is sufficient.'
-      print -P 'Set %F{blue}POWERLEVEL9K_IGNORE_TERM_COLORS=true%f to suppress this warning.'
-    fi
-  fi
-
   if [[ -n $POWERLEVEL9K_RIGHT_SEGMENT_END_SEPARATOR ]]; then
     print -P "%F{yellow}WARNING!%f %F{red}POWERLEVEL9K_RIGHT_SEGMENT_END_SEPARATOR%f is no longer supported!"
     print -P ""
@@ -3515,41 +3523,20 @@ _p9k_init() {
 
   if segment_in_use vcs; then
     powerlevel9k_vcs_init
-    if [[ $POWERLEVEL9K_DISABLE_GITSTATUS != true && -n $POWERLEVEL9K_VCS_BACKENDS[(r)git] ]]; then
-      source ${POWERLEVEL9K_GITSTATUS_DIR:-${_p9k_installation_dir}/gitstatus}/gitstatus.plugin.zsh
+    if [[ $_POWERLEVEL9K_DISABLE_GITSTATUS == 0 && -n $_POWERLEVEL9K_VCS_BACKENDS[(r)git] ]]; then
+      source ${_POWERLEVEL9K_GITSTATUS_DIR:-${__p9k_installation_dir}/gitstatus}/gitstatus.plugin.zsh
       gitstatus_start                                                                 \
-        -s ${POWERLEVEL9K_VCS_MAX_NUM_STAGED:-$POWERLEVEL9K_VCS_STAGED_MAX_NUM}       \
-        -u ${POWERLEVEL9K_VCS_MAX_NUM_UNSTAGED:-$POWERLEVEL9K_VCS_UNSTAGED_MAX_NUM}   \
-        -d ${POWERLEVEL9K_VCS_MAX_NUM_UNTRACKED:-$POWERLEVEL9K_VCS_UNTRACKED_MAX_NUM} \
-        -m $POWERLEVEL9K_VCS_MAX_INDEX_SIZE_DIRTY                                     \
+        -s $_POWERLEVEL9K_VCS_STAGED_MAX_NUM       \
+        -u $_POWERLEVEL9K_VCS_UNSTAGED_MAX_NUM     \
+        -d $_POWERLEVEL9K_VCS_UNTRACKED_MAX_NUM    \
+        -m $_POWERLEVEL9K_VCS_MAX_INDEX_SIZE_DIRTY \
         POWERLEVEL9K
-    fi
-  fi
-
-  if segment_in_use dir; then
-    if (( $+POWERLEVEL9K_DIR_CLASSES )); then
-      local -a x=()
-      local a='' b='' c=''
-      for a b c in "${POWERLEVEL9K_DIR_CLASSES[@]}"; do
-        x+=("$a" "$b" "${(g::)c}")
-      done
-      POWERLEVEL9K_DIR_CLASSES=("${x[@]}")
-    else
-      typeset -ga POWERLEVEL9K_DIR_CLASSES=()
-      _p9k_get_icon prompt_dir_ETC ETC_ICON
-      POWERLEVEL9K_DIR_CLASSES+=('/etc|/etc/*' ETC "$_P9K_RETVAL")
-      _p9k_get_icon prompt_dir_HOME HOME_ICON
-      POWERLEVEL9K_DIR_CLASSES+=('~' HOME "$_P9K_RETVAL")
-      _p9k_get_icon prompt_dir_HOME_SUBFOLDER HOME_SUB_ICON
-      POWERLEVEL9K_DIR_CLASSES+=('~/*' HOME_SUBFOLDER "$_P9K_RETVAL")
-      _p9k_get_icon prompt_dir_DEFAULT FOLDER_ICON
-      POWERLEVEL9K_DIR_CLASSES+=('*' DEFAULT "$_P9K_RETVAL")
     fi
   fi
 
   _p9k_init_async_pump
 
-  if segment_in_use vi_mode && (( $+POWERLEVEL9K_VI_VISUAL_MODE_STRING )) || segment_in_use prompt_char; then
+  if segment_in_use vi_mode && (( $+_POWERLEVEL9K_VI_VISUAL_MODE_STRING )) || segment_in_use prompt_char; then
     function _p9k_zle_line_pre_redraw() {
       [[ ${KEYMAP:-} == vicmd ]] || return 0
       local region=${${REGION_ACTIVE:-0}/2/1}
@@ -3558,11 +3545,10 @@ _p9k_init() {
       zle && zle .reset-prompt && zle -R
     }
     _p9k_wrap_zle_widget zle-line-pre-redraw _p9k_zle_line_pre_redraw
-    _p9k_g_expand POWERLEVEL9K_VI_VISUAL_MODE_STRING
   fi
 
   if segment_in_use dir &&
-     [[ $POWERLEVEL9K_SHORTEN_STRATEGY == truncate_with_package_name && $+commands[jq] == 0 ]]; then
+     [[ $_POWERLEVEL9K_SHORTEN_STRATEGY == truncate_with_package_name && $+commands[jq] == 0 ]]; then
     >&2 print -P '%F{yellow}WARNING!%f %BPOWERLEVEL9K_SHORTEN_STRATEGY=truncate_with_package_name%b requires %F{green}jq%f.'
     >&2 print -P 'Either install %F{green}jq%f or change the value of %BPOWERLEVEL9K_SHORTEN_STRATEGY%b.'
   fi

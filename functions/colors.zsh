@@ -1,14 +1,6 @@
-# vim:ft=zsh ts=2 sw=2 sts=2 et fenc=utf-8
-################################################################
-# Color functions
-# This file holds some color-functions for
-# the powerlevel9k-ZSH-theme
-# https://github.com/bhilburn/powerlevel9k
-################################################################
-
-# https://jonasjacek.github.io/colors/
-# use color names by default to allow dark/light themes to adjust colors based on names
-typeset -gAh __P9K_COLORS=(
+# For compatibility with Powerlevel9k. It's not recommended to use mnemonic color
+# names in the configuration except for colors 0-7 as these are standard.
+typeset -grA __p9k_colors=(
   black 000
   red 001
   green 002
@@ -269,23 +261,25 @@ typeset -gAh __P9K_COLORS=(
   grey93 255
 )
 
-# For user convenience: type `getColorCode background` or `getColorCode foreground` to see
-# the list of predefined colors.
+# For compatibility with Powerlevel9k.
+#
+# Type `getColorCode background` or `getColorCode foreground` to see the list of predefined colors.
 function getColorCode() {
+  emulate -L zsh
   if (( ARGC == 1 )); then
     case $1 in 
       foreground)
         local k
-        for k in "${(k@)__P9K_COLORS}"; do
-          local v=${__P9K_COLORS[$k]}
+        for k in "${(k@)__p9k_colors}"; do
+          local v=${__p9k_colors[$k]}
           print -P "%F{$v}$v - $k%f"
         done
         return
         ;;
       background)
         local k
-        for k in "${(k@)__P9K_COLORS}"; do
-          local v=${__P9K_COLORS[$k]}
+        for k in "${(k@)__p9k_colors}"; do
+          local v=${__p9k_colors[$k]}
           print -P "%K{$v}$v - $k%k"
         done
         return
