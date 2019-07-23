@@ -92,8 +92,8 @@ curl -fsSL -o ~/p10k-lean.zsh https://raw.githubusercontent.com/romkatv/powerlev
 echo 'source ~/p10k-lean.zsh' >>! ~/.zshrc
 ```
 
-To customize your prompt, open `~/p10k-lean.zsh` in your favorite text editor, change it and restart
-ZSH. The file is well-documented.
+That's it! Your have a fast and functional prompt. If you want to customize it, edit
+`~/p10k-lean.zsh` and restart ZSH.
 
 ### For existing users
 
