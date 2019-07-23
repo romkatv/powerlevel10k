@@ -75,7 +75,7 @@ typeset -ga _P9K_RIGHT_JOIN=(1)
 # _p9k_param prompt_foo_BAR BACKGROUND red
 _p9k_param() {
   local key="_p9k_param ${(pj:\0:)*}"
-  _p9k_ret=$_P9K_CACHE[key]
+  _p9k_ret=$_P9K_CACHE[$key]
   if [[ -n $_p9k_ret ]]; then
     _p9k_ret[-1,-1]=''
   else
@@ -111,7 +111,7 @@ _p9k_param() {
 # _p9k_get_icon prompt_foo_BAR BAZ_ICON quix
 _p9k_get_icon() {
   local key="_p9k_param ${(pj:\0:)*}"
-  _p9k_ret=$_P9K_CACHE[key]
+  _p9k_ret=$_P9K_CACHE[$key]
   if [[ -n $_p9k_ret ]]; then
     _p9k_ret[-1,-1]=''
   else
@@ -144,7 +144,7 @@ _p9k_translate_color() {
 # _p9k_param prompt_foo_BAR BACKGROUND red
 _p9k_color() {
   local key="_p9k_color ${(pj:\0:)*}"
-  _p9k_ret=$_P9K_CACHE[key]
+  _p9k_ret=$_P9K_CACHE[$key]
   if [[ -n $_p9k_ret ]]; then
     _p9k_ret[-1,-1]=''
   else
@@ -157,7 +157,7 @@ _p9k_color() {
 # _p9k_vcs_color CLEAN REMOTE_BRANCH
 _p9k_vcs_style() {
   local key="_p9k_vcs_color ${(pj:\0:)*}"
-  _p9k_ret=$_P9K_CACHE[key]
+  _p9k_ret=$_P9K_CACHE[$key]
   if [[ -n $_p9k_ret ]]; then
     _p9k_ret[-1,-1]=''
   else
@@ -2860,12 +2860,11 @@ function _p9k_prompt_overflow_bug() {
   is-at-least 5.5 && ! is-at-least 5.7.2
 }
 
-# POWERLEVEL9K_*
-# _POWERLEVEL9K_*
-# P9K_*
-# _p9k_*
-
 _p9k_init_params() {
+  # POWERLEVEL9K_*
+  # _POWERLEVEL9K_*
+  # P9K_*
+  # _p9k_*
   # TODO: DEFAULT_USER is also a config flag. ZLE_RPROMPT_INDENT transient_rprompt
   _p9k_declare -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS -- context dir vcs
   _p9k_declare -a POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS -- status root_indicator background_jobs history time
@@ -2875,13 +2874,6 @@ _p9k_init_params() {
   _p9k_declare -i POWERLEVEL9K_PROMPT_ADD_NEWLINE_COUNT 1
   _p9k_declare -s POWERLEVEL9K_COLOR_SCHEME dark
   _p9k_declare -s POWERLEVEL9K_GITSTATUS_DIR ""
-  _p9k_declare -
-  _p9k_declare -
-  _p9k_declare -
-  _p9k_declare -
-  _p9k_declare -
-  _p9k_declare -
-  _p9k_declare -
   _p9k_declare -b POWERLEVEL9K_VCS_SHOW_SUBMODULE_DIRTY 0
   _p9k_declare -i POWERLEVEL9K_VCS_SHORTEN_LENGTH
   _p9k_declare -i POWERLEVEL9K_VCS_SHORTEN_MIN_LENGTH
@@ -3084,39 +3076,6 @@ _p9k_init_params() {
   #
   # These correspond to `java -fullversion` and `java -version` respectively.
   _p9k_declare -b POWERLEVEL9K_JAVA_VERSION_FULL 1
-  _p9k_declare -
-  _p9k_declare -
-  _p9k_declare -
-  _p9k_declare -
-  _p9k_declare -
-  _p9k_declare -
-  _p9k_declare -
-  _p9k_declare -
-  _p9k_declare -
-  _p9k_declare -
-  _p9k_declare -
-  _p9k_declare -
-  _p9k_declare -
-  _p9k_declare -
-  _p9k_declare -
-
-  # To find candidates:
-  #
-  #   egrep 'set_default [^-]' powerlevel9k.zsh-theme | egrep -v '(true|false)$'
-  _p9k_g_expand POWERLEVEL9K_ANACONDA_LEFT_DELIMITER
-  _p9k_g_expand POWERLEVEL9K_ANACONDA_RIGHT_DELIMITER
-  _p9k_g_expand POWERLEVEL9K_CONTEXT_TEMPLATE
-  _p9k_g_expand POWERLEVEL9K_DATE_FORMAT
-  _p9k_g_expand POWERLEVEL9K_DIR_PATH_SEPARATOR
-  _p9k_g_expand POWERLEVEL9K_HOME_FOLDER_ABBREVIATION
-  _p9k_g_expand POWERLEVEL9K_HOST_TEMPLATE
-  _p9k_g_expand POWERLEVEL9K_PUBLIC_IP_NONE
-  _p9k_g_expand POWERLEVEL9K_SHORTEN_DELIMITER
-  _p9k_g_expand POWERLEVEL9K_TIME_FORMAT
-  _p9k_g_expand POWERLEVEL9K_USER_TEMPLATE
-  _p9k_g_expand POWERLEVEL9K_VCS_LOADING_TEXT
-  _p9k_g_expand POWERLEVEL9K_VI_COMMAND_MODE_STRING
-  _p9k_g_expand POWERLEVEL9K_VI_INSERT_MODE_STRING
 }
 
 # _p9k_wrap_zle_widget zle-keymap-select _p9k_zle_keymap_select
@@ -3406,7 +3365,7 @@ _p9k_init() {
   (( _P9K_INITIALIZED )) && return
 
   _p9k_init_icons
-  _p9k_init_strings
+  _p9k_init_params
   _p9k_init_prompt
   _p9k_init_ssh
 

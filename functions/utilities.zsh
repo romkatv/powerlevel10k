@@ -90,10 +90,8 @@ function _p9k_human_readable_bytes() {
 # either the LEFT or RIGHT prompt arrays.
 #    * $1: The segment to be tested.
 segment_in_use() {
-  [[ -n "${POWERLEVEL9K_LEFT_PROMPT_ELEMENTS[(r)${1}]}" ||
-     -n "${POWERLEVEL9K_LEFT_PROMPT_ELEMENTS[(r)${1}_joined]}" ||
-     -n "${POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS[(r)${1}]}" ||
-     -n "${POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS[(r)${1}_joined]}" ]]
+  (( $_POWERLEVEL9K_LEFT_PROMPT_ELEMENTS[(I)$1(|_joined)] ||
+     $_POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS[(I)$1(|_joined)] ))
 }
 
 function _p9k_parse_ip() {
