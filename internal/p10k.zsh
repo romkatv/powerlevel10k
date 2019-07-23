@@ -310,10 +310,10 @@ left_prompt_segment() {
     p+="\${_P9K_N:=$((t+4))}"                                                            # 4
 
     _p9k_param $1 VISUAL_IDENTIFIER_EXPANSION '${P9K_VISUAL_IDENTIFIER}'
-    local icon_exp_=${_P9K_RETVAL:+\"${${_P9K_RETVAL//\\/\\\\}//\"/\\\"}\"}
+    local icon_exp_=${_P9K_RETVAL:+\"$_P9K_RETVAL\"}
 
     _p9k_param $1 CONTENT_EXPANSION '${P9K_CONTENT}'
-    local content_exp_=${_P9K_RETVAL:+\"${${_P9K_RETVAL//\\/\\\\}//\"/\\\"}\"}
+    local content_exp_=${_P9K_RETVAL:+\"$_P9K_RETVAL\"}
 
     if [[ ( $icon_exp_ != '"${P9K_VISUAL_IDENTIFIER}"' && $icon_exp_ == *'$'* ) ||
           ( $content_exp_ != '"${P9K_CONTENT}"' && $content_exp_ == *'$'* ) ]]; then
@@ -511,10 +511,10 @@ right_prompt_segment() {
     p+="\${_P9K_N:=$((t+4))}"                                                                    # 4
 
     _p9k_param $1 VISUAL_IDENTIFIER_EXPANSION '${P9K_VISUAL_IDENTIFIER}'
-    local icon_exp_=${_P9K_RETVAL:+\"${${_P9K_RETVAL//\\/\\\\}//\"/\\\"}\"}
+    local icon_exp_=${_P9K_RETVAL:+\"$_P9K_RETVAL\"}
 
     _p9k_param $1 CONTENT_EXPANSION '${P9K_CONTENT}'
-    local content_exp_=${_P9K_RETVAL:+\"${${_P9K_RETVAL//\\/\\\\}//\"/\\\"}\"}
+    local content_exp_=${_P9K_RETVAL:+\"$_P9K_RETVAL\"}
 
     if [[ ( $icon_exp_ != '"${P9K_VISUAL_IDENTIFIER}"' && $icon_exp_ == *'$'* ) ||
           ( $content_exp_ != '"${P9K_CONTENT}"' && $content_exp_ == *'$'* ) ]]; then
@@ -3145,7 +3145,7 @@ _p9k_build_gap_post() {
     _P9K_RETVAL+='${(pl'$s'$((_P9K_M+1))'$s$s$char$s$')}'
   else
     _P9K_RETVAL+='${${P9K_GAP::=${(pl'$s'$((_P9K_M+1))'$s$s$char$s$')}}+}'
-    _P9K_RETVAL+='${:-"'${${exp//\\/\\\\}//\"/\\\"}'"}'
+    _P9K_RETVAL+='${:-"'$exp'"}'
     style=1
   fi
   _P9K_RETVAL+='$_P9K_RPROMPT$_P9K_T[$((1+!_P9K_IND))]}:-\n}'
@@ -3200,7 +3200,7 @@ _p9k_init_lines() {
   if [[ -n $_P9K_RETVAL ]]; then
     _P9K_RETVAL+=%b%k%f
     # Not escaped for historical reasons.
-    _P9K_RETVAL='${:-"'${${_P9K_RETVAL//\\/\\\\}//\"/\\\"}'"}'
+    _P9K_RETVAL='${:-"'$_P9K_RETVAL'"}'
     if [[ $POWERLEVEL9K_PROMPT_ON_NEWLINE == true ]]; then
       _P9K_LINE_SUFFIX_LEFT[-2]+=$_P9K_RETVAL
     else
@@ -3216,7 +3216,7 @@ _p9k_init_lines() {
       _p9k_get_icon '' MULTILINE_FIRST_PROMPT_PREFIX
       [[ _P9K_RETVAL == *%* ]] && _P9K_RETVAL+=%b%k%f
       # Not escaped for historical reasons.
-      _P9K_RETVAL='${:-"'${${_P9K_RETVAL//\\/\\\\}//\"/\\\"}'"}'
+      _P9K_RETVAL='${:-"'$_P9K_RETVAL'"}'
       _P9K_LINE_PREFIX_LEFT[1]=$_P9K_RETVAL$_P9K_LINE_PREFIX_LEFT[1]
     fi
 
@@ -3224,7 +3224,7 @@ _p9k_init_lines() {
       _p9k_get_icon '' MULTILINE_LAST_PROMPT_PREFIX
       [[ _P9K_RETVAL == *%* ]] && _P9K_RETVAL+=%b%k%f
       # Not escaped for historical reasons.
-    _P9K_RETVAL='${:-"'${${_P9K_RETVAL//\\/\\\\}//\"/\\\"}'"}'
+    _P9K_RETVAL='${:-"'$_P9K_RETVAL'"}'
       _P9K_LINE_PREFIX_LEFT[-1]=$_P9K_RETVAL$_P9K_LINE_PREFIX_LEFT[-1]
     fi
 
@@ -3252,7 +3252,7 @@ _p9k_init_lines() {
         _p9k_get_icon '' MULTILINE_NEWLINE_PROMPT_PREFIX
         [[ _P9K_RETVAL == *%* ]] && _P9K_RETVAL+=%b%k%f
         # Not escaped for historical reasons.
-        _P9K_RETVAL='${:-"'${${_P9K_RETVAL//\\/\\\\}//\"/\\\"}'"}'
+        _P9K_RETVAL='${:-"'$_P9K_RETVAL'"}'
         _P9K_LINE_PREFIX_LEFT[2,-2]=$_P9K_RETVAL${^_P9K_LINE_PREFIX_LEFT[2,-2]}
       fi
 
