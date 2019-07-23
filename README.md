@@ -123,8 +123,9 @@ the theme. Once you exit zsh, the image is deleted.
 ```zsh
 docker run -e LANG=C.UTF-8 -e LC_ALL=C.UTF-8 -e TERM -it --rm ubuntu bash -uexc '
   cd && apt update && apt install -y zsh git
-  git clone --depth 1 https://github.com/romkatv/powerlevel10k.git
-  echo "source ~/powerlevel10k/config/p10k-lean.zsh" >>~/.zshrc
+  git clone https://github.com/romkatv/powerlevel10k.git
+  cp ~/powerlevel10k/config/p10k-lean.zsh ~/
+  echo "source ~/p10k-lean.zsh" >>~/.zshrc
   echo "source ~/powerlevel10k/powerlevel10k.zsh-theme" >>~/.zshrc
   cd ~/powerlevel10k
   exec zsh'
