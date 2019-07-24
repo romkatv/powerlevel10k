@@ -395,11 +395,15 @@ _p9k_background() {
 }
 
 _p9k_foreground() {
-  [[ -n $1 ]] && _p9k_ret="%F{$1}" || _p9k_ret="%f"
+  case $1 in
+    '')   _p9k_ret="%f";;
+    '#'*) _p9k_ret="%F{$1}";;
+    *)    _p9k_ret="%${1}F";;
+  esac
 }
 
-_p9k_escape_rcurly() {
-  _p9k_ret=${${1//\\/\\\\}//\}/\\\}}
+_p9k_escape_style() {
+  [[ $1 == *'}'* ]] && _p9k_ret='${:-"'$1'"}' || _p9k_ret=$1
 }
 
 _p9k_escape() {
@@ -452,8 +456,7 @@ _p9k_left_prompt_segment() {
     local end_sep_=$_p9k_ret
 
     local style=%b$bg$fg
-    _p9k_escape_rcurly $style
-    local style_=$_p9k_ret
+    local style_=${style//\}/\\\}}
 
     _p9k_get_icon $1 WHITESPACE_BETWEEN_LEFT_SEGMENTS ' '
     local space=$_p9k_ret
@@ -556,7 +559,8 @@ _p9k_left_prompt_segment() {
       if (( has_icon != 0 )); then
         _p9k_color $1 VISUAL_IDENTIFIER_COLOR $fg_color
         _p9k_foreground $_p9k_ret
-        _p9k_escape_rcurly %b$bg$_p9k_ret
+        _p9k_ret=%b$bg$_p9k_ret
+        _p9k_ret=${_p9k_ret//\}/\\\}}
         [[ $_p9k_ret != $style_ || $need_style == 1 ]] && p+=$_p9k_ret
         p+='${_p9k_v}'
 
@@ -591,7 +595,8 @@ _p9k_left_prompt_segment() {
 
         _p9k_color $1 VISUAL_IDENTIFIER_COLOR $fg_color
         _p9k_foreground $_p9k_ret
-        _p9k_escape_rcurly %b$bg$_p9k_ret
+        _p9k_ret=%b$bg$_p9k_ret
+        _p9k_ret=${_p9k_ret//\}/\\\}}
         [[ $_p9k_ret != $style_ || $need_style == 1 ]] && p+=$_p9k_ret
         p+='$_p9k_v'
       fi
@@ -614,11 +619,11 @@ _p9k_left_prompt_segment() {
     _p9k_cache_set "$p"
   fi
 
-  (( $5 )) && _p9k_ret=$7 || _p9k_escape $7
+  (( $5 )) && _p9k_ret=\"$7\" || _p9k_escape $7
   if [[ -z $6 ]]; then
     _p9k_prompt+="\${\${:-\${P9K_CONTENT::=$_p9k_ret}$_p9k_cache_val[1]"
   else
-    _p9k_prompt+="\${\${:-$6}:+\${\${:-\${P9K_CONTENT::=$_p9k_ret}$_p9k_cache_val[1]}"
+    _p9k_prompt+="\${\${:-\"$6\"}:+\${\${:-\${P9K_CONTENT::=$_p9k_ret}$_p9k_cache_val[1]}"
   fi
 }
 
@@ -629,8 +634,7 @@ _p9k_right_prompt_segment() {
     local bg_color=$_p9k_ret
     _p9k_background $bg_color
     local bg=$_p9k_ret
-    _p9k_escape_rcurly $_p9k_ret
-    local bg_=$_p9k_ret
+    local bg_=${_p9k_ret//\}/\\\}}
 
     _p9k_color $1 FOREGROUND $3
     local fg_color=$_p9k_ret
@@ -661,8 +665,7 @@ _p9k_right_prompt_segment() {
     local end_sep_=$_p9k_ret
 
     local style=%b$bg$fg
-    _p9k_escape_rcurly $style
-    local style_=$_p9k_ret
+    local style_=${style//\}/\\\}}
 
     _p9k_get_icon $1 WHITESPACE_BETWEEN_RIGHT_SEGMENTS ' '
     local space=$_p9k_ret
@@ -766,7 +769,8 @@ _p9k_right_prompt_segment() {
 
         _p9k_color $1 VISUAL_IDENTIFIER_COLOR $fg_color
         _p9k_foreground $_p9k_ret
-        _p9k_escape_rcurly %b$bg$_p9k_ret
+        _p9k_ret=%b$bg$_p9k_ret
+        _p9k_ret=${_p9k_ret//\}/\\\}}
         [[ $_p9k_ret != $style_ || $need_style == 1 ]] && p+=$_p9k_ret
         p+='$_p9k_v'
       fi
@@ -780,7 +784,8 @@ _p9k_right_prompt_segment() {
       if (( has_icon != 0 )); then
         _p9k_color $1 VISUAL_IDENTIFIER_COLOR $fg_color
         _p9k_foreground $_p9k_ret
-        _p9k_escape_rcurly %b$bg$_p9k_ret
+        _p9k_ret=%b$bg$_p9k_ret
+        _p9k_ret=${_p9k_ret//\}/\\\}}
         [[ $_p9k_ret != $style_ || $need_style == 1 ]] && p+=$_p9k_ret
         p+='${_p9k_v}'
 
@@ -813,7 +818,7 @@ _p9k_right_prompt_segment() {
     else
       _p9k_ret=$fg
     fi
-    _p9k_escape_rcurly $_p9k_ret
+    _p9k_ret=${_p9k_ret//\}/\\\}}
     p+="\${_p9k_w::=${right_space_:+$style_}$right_space_%b$bg_$_p9k_ret}"
 
     p+='${_p9k_sss::='
@@ -831,11 +836,11 @@ _p9k_right_prompt_segment() {
     _p9k_cache_set "$p"
   fi
 
-  (( $5 )) && _p9k_ret=$7 || _p9k_escape $7
+  (( $5 )) && _p9k_ret=\"$7\" || _p9k_escape $7
   if [[ -z $6 ]]; then
     _p9k_prompt+="\${\${:-\${P9K_CONTENT::=$_p9k_ret}$_p9k_cache_val[1]"
   else
-    _p9k_prompt+="\${\${:-$6}:+\${\${:-\${P9K_CONTENT::=$_p9k_ret}$_p9k_cache_val[1]}"
+    _p9k_prompt+="\${\${:-\"$6\"}:+\${\${:-\${P9K_CONTENT::=$_p9k_ret}$_p9k_cache_val[1]}"
   fi
 }
 
@@ -1488,7 +1493,7 @@ prompt_dir() {
     _p9k_foreground $_p9k_ret
     style+=$_p9k_ret
     if (( expand )); then
-      _p9k_escape_rcurly $style
+      _p9k_escape_style $style
       style=$_p9k_ret
     fi
 
@@ -1508,7 +1513,7 @@ prompt_dir() {
       last_style+=$_p9k_ret
     fi
     if [[ -n $last_style ]]; then
-      (( expand )) && _p9k_escape_rcurly $last_style || _p9k_ret=$last_style
+      (( expand )) && _p9k_escape_style $last_style || _p9k_ret=$last_style
       parts[-1]=$_p9k_ret${parts[-1]//$'\1'/$'\1'$_p9k_ret}$style
     fi
 
@@ -1520,7 +1525,7 @@ prompt_dir() {
       anchor_style+=$_p9k_ret
     fi
     if [[ -n $anchor_style ]]; then
-      (( expand )) && _p9k_escape_rcurly $anchor_style || _p9k_ret=$anchor_style
+      (( expand )) && _p9k_escape_style $anchor_style || _p9k_ret=$anchor_style
       if [[ -z $last_style ]]; then
         parts=("${(@)parts/%(#b)(*)$'\2'/$_p9k_ret$match[1]$style}")
       else
@@ -1534,7 +1539,7 @@ prompt_dir() {
     if (( $+_POWERLEVEL9K_DIR_SHORTENED_FOREGROUND )); then
       _p9k_translate_color $_POWERLEVEL9K_DIR_SHORTENED_FOREGROUND
       _p9k_foreground $_p9k_ret
-      (( expand )) && _p9k_escape_rcurly $_p9k_ret
+      (( expand )) && _p9k_escape_style $_p9k_ret
       local shortened_fg=$_p9k_ret
       (( expand )) && _p9k_escape $delim || _p9k_ret=$delim
       [[ $_p9k_ret == *%* ]] && _p9k_ret+=$style$shortened_fg
@@ -1551,7 +1556,7 @@ prompt_dir() {
     if (( $+_POWERLEVEL9K_DIR_PATH_SEPARATOR_FOREGROUND )); then
       _p9k_translate_color $_POWERLEVEL9K_DIR_PATH_SEPARATOR_FOREGROUND
       _p9k_foreground $_p9k_ret
-      (( expand )) && _p9k_escape_rcurly $_p9k_ret
+      (( expand )) && _p9k_escape_style $_p9k_ret
       sep=$_p9k_ret
     fi
     (( expand )) && _p9k_escape $_POWERLEVEL9K_DIR_PATH_SEPARATOR || _p9k_ret=$_POWERLEVEL9K_DIR_PATH_SEPARATOR
@@ -1581,7 +1586,7 @@ prompt_dir() {
     else
       _p9k_dir=$_p9k_cache_val[4]
       _p9k_dir_len=$_p9k_cache_val[5]
-      _p9k_cache_val[4]='%{d%\}'$_p9k_cache_val[4]'%{d%\}'
+      _p9k_cache_val[4]='%{d%}'$_p9k_cache_val[4]'%{d%}'
     fi
   fi
   _p9k_prompt_segment "$_p9k_cache_val[1]" "blue" "$_p9k_color1" "$_p9k_cache_val[2]" "$_p9k_cache_val[3]" "" "$_p9k_cache_val[4]"
