@@ -33,7 +33,6 @@ prompt. It will be [much faster](#is-it-really-fast) though.
    1. [Are there configuration options that make Powerlevel10k slow?](#are-there-configuration-options-that-make-powerlevel10k-slow)
    1. [Is Powerlevel10k fast to load?](#is-powerlevel10k-fast-to-load)
    1. [Does Powerlevel10k always render exactly the same prompt as Powerlevel9k given the same config?](#does-powerlevel10k-always-render-exactly-the-same-prompt-as-powerlevel9k-given-the-same-config)
-   1. [I am getting an error: "zsh: bad math expression: operand expected at end of string"](#i-am-getting-an-error-zsh-bad-math-expression-operand-expected-at-end-of-string)
    1. [Is there an AUR package for Powerlevel10k?](#is-there-an-aur-package-for-powerlevel10k)
    1. [I cannot make Powerlevel10k work with my plugin manager. Help!](#i-cannot-make-powerlevel10k-work-with-my-plugin-manager-help)
    1. [What is the minimum supported ZSH version?](#what-is-the-minimum-supported-zsh-version)
@@ -200,23 +199,27 @@ Powerlevel10k isn't the best choice. Powerlevel10k is optimized for long-lived Z
 
 ### Does Powerlevel10k always render exactly the same prompt as Powerlevel9k given the same config?
 
-This is the goal. You should be able to switch between Powerlevel9k and Powerlevel10k with no
+This is the goal. You should be able to switch from Powerlevel9k to Powerlevel10k with no
 visible changes except for performance. There are, however, several differences.
 
-  * By default only git vcs backend is enabled in Powerlevel10k. If you need svn and hg, you'll
-    need to set `POWERLEVEL9K_VCS_BACKENDS`.
-  * Fewer configuration options can be changed after the theme is loaded. For example, if you
-    decide to change background color of some segment in the middle of an interactive ZSH session,
-    it may not work.
+- By default only `git` vcs backend is enabled in Powerlevel10k. If you need `svn` and `hg`, you'll
+  need to set `POWERLEVEL9K_VCS_BACKENDS`.
+- Powerlevel10k is bug-compatible with Powerlevel9k except for egregious bugs. If you accidentally
+  rely on these bugs, your prompt will differ between Powerlevel9k and Powerlevel10k. Some examples:
+  - Powerlevel9k doesn't respect `ZLE_RPROMPT_INDENT`. As a result, right prompt in Powerlevel10k
+    can have an extra space compared to Powerlevel9k. Set `ZLE_RPROMPT_INDENT=0` if you don't want
+    that space.
+  - Powerlevel9k ignores some options that are set after the theme is sources while Powerlevel10k
+    respects all options. If you see different icons in Powerlevel9k and Powerlevel10k, you've
+    probably defined `POWERLEVEL9K_MODE` before sourcing the theme. This parameter gets ignored
+    by Powerlevel9k but not Powerlevel10k. If you want your prompt to look in Powerlevel10k the same
+    was as in Powerlevel9k, remove `POWERLEVEL9K_MODE`.
+  - There are
+    [dozens more bugs](https://github.com/Powerlevel9k/powerlevel9k/issues/created_by/romkatv) in
+    Powerlevel9k that don't exist in Powerlevel10k.
 
-If you notice any other differences between prompts in Powerlevel9k and Powerlevel10k when running
-with the same settings, please [open an issue](https://github.com/romkatv/powerlevel10k/issues).
-
-### I am getting an error: "zsh: bad math expression: operand expected at end of string"
-
-Did you change any `POWERLEVEL9K` options after the first prompt got rendered, perhaps by editing
-your `~/.zshrc` and executing `source ~/.zshrc`? This isn't supported. You'll need to restart zsh
-for configuration changes to take effect. Run `exec zsh` to do this without forking a process.
+If you notice any other changes in prompt appearance when switching from Powerlevel9k to
+Powerlevel10k, please [open an issue](https://github.com/romkatv/powerlevel10k/issues).
 
 ### Is there an AUR package for Powerlevel10k?
 
@@ -230,15 +233,15 @@ theme (so that you end up with no theme) and then installing Powerlevel10k manua
 
 1. Disable the current theme in your framework / plugin manager.
 
-  * **zplug:** Open `~/.zshrc` and remove the `zplug` command that refers to your current theme. For
-    example, if you are currently using Powerlevel9k, look for
-    `zplug bhilburn/powerlevel9k, use:powerlevel9k.zsh-theme`.
-  * **prezto:** Open `~/.zpreztorc` and put `zstyle :prezto:module:prompt theme off` in it. Remove
-    any other command that sets `theme` such as `zstyle :prezto:module:prompt theme powerlevel9k`.
-  * **oh-my-zsh:** Open `~/.zshrc` and remove the line that sets `ZSH_THEME`, such as
-    `ZSH_THEME=powerlevel9k/powerlevel9k`.
-  * **antigen:** Open `~/.zshrc` and remove the line that sets `antigen theme`, such as
-    `antigen theme bhilburn/powerlevel9k powerlevel9k`.
+- **zplug:** Open `~/.zshrc` and remove the `zplug` command that refers to your current theme. For
+  example, if you are currently using Powerlevel9k, look for
+  `zplug bhilburn/powerlevel9k, use:powerlevel9k.zsh-theme`.
+- **prezto:** Open `~/.zpreztorc` and put `zstyle :prezto:module:prompt theme off` in it. Remove
+  any other command that sets `theme` such as `zstyle :prezto:module:prompt theme powerlevel9k`.
+- **oh-my-zsh:** Open `~/.zshrc` and remove the line that sets `ZSH_THEME`, such as
+  `ZSH_THEME=powerlevel9k/powerlevel9k`.
+- **antigen:** Open `~/.zshrc` and remove the line that sets `antigen theme`, such as
+  `antigen theme bhilburn/powerlevel9k powerlevel9k`.
 
 2. Install Powerlevel10k manually.
 
