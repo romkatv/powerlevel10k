@@ -3072,7 +3072,7 @@ function _p9k_async_pump() {
   emulate -L zsh                                 || return
   setopt noaliases no_hist_expand extended_glob  || return
   zmodload zsh/system zsh/datetime               || return
-  echo ok                                        || return
+  echo $$                                        || return
 
   local ip last_ip
   local -F next_ip_time
@@ -3153,22 +3153,23 @@ _p9k_init_async_pump() {
     zle -F $_p9k_async_pump_fd _p9k_on_async_message
     zsystem flock -f _p9k_async_pump_lock_fd $_p9k_async_pump_lock
 
-    zsh -dfc "
+    local cmd="
       local -i public_ip=$public_ip time_realtime=$time_realtime parent_pid=$$
       local -a ip_methods=($_POWERLEVEL9K_PUBLIC_IP_METHODS)
       local -F tout=$_POWERLEVEL9K_PUBLIC_IP_TIMEOUT
       local ip_url=$_POWERLEVEL9K_PUBLIC_IP_HOST
       local lock=$_p9k_async_pump_lock
       local fifo=$_p9k_async_pump_fifo
-      $functions[_p9k_async_pump]
-    " </dev/null >&$_p9k_async_pump_fd 2>/dev/null &!
+      $functions[_p9k_async_pump]" 
 
-    _p9k_async_pump_pid=$!
+    local setsid=${commands[setsid]:-/usr/local/opt/util-linux/bin/setsid}
+    [[ -f $setsid ]] && setsid=${(q)setsid} || setsid=
+    cmd="$setsid zsh -dfxc ${(q)cmd} &!"
+    zsh -dfmxc $cmd </dev/null >&$_p9k_async_pump_fd 2>/dev/null &!
+
+    read -t 5 -r -u $_p9k_async_pump_fd _p9k_async_pump_pid && (( _p9k_async_pump_pid ))
+
     _p9k_async_pump_subshell=$ZSH_SUBSHELL
-
-    local resp
-    read -r -u $_p9k_async_pump_fd resp && [[ $resp == ok ]]
-
     add-zsh-hook zshexit _p9k_kill_async_pump
   }
 
