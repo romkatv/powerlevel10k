@@ -88,7 +88,7 @@ typeset -grA __p9k_colors=(
 #
 # Type `getColorCode background` or `getColorCode foreground` to see the list of predefined colors.
 function getColorCode() {
-  emulate -L zsh
+  emulate -L zsh && setopt no_hist_expand extended_glob
   if (( ARGC == 1 )); then
     case $1 in 
       foreground)
@@ -168,7 +168,7 @@ function _p9k_declare() {
 #   _p9k_prompt_length '%F{red}abc' => 3
 #   _p9k_prompt_length $'%{a\b%Gb%}' => 1
 function _p9k_prompt_length() {
-  emulate -L zsh
+  emulate -L zsh && setopt no_hist_expand extended_glob
   local COLUMNS=1024
   local -i x y=$#1 m
   if (( y )); then
@@ -904,7 +904,7 @@ prompt_aws() {
 # Current Elastic Beanstalk environment
 prompt_aws_eb_env() {
   [[ -r .elasticbeanstalk/config.yml ]] || return
-  local v=${=$(command grep environment .elasticbeanstalk/config.yml 2>/dev/null)[2]}
+  local v=${=$(grep environment .elasticbeanstalk/config.yml 2>/dev/null)[2]}
   [[ -n $v ]] && "$1_prompt_segment" "$0" "$2" black green 'AWS_EB_ICON' 0 '' "${v//\%/%%}"
 }
 
@@ -926,7 +926,7 @@ prompt_background_jobs() {
 # Segment that indicates usage level of current partition.
 prompt_disk_usage() {
   (( $+commands[df] )) || return
-  local disk_usage=${${=${(f)"$(command df -P . 2>/dev/null)"}[2]}[5]%%%}
+  local disk_usage=${${=${(f)"$(df -P . 2>/dev/null)"}[2]}[5]%%%}
   local state bg fg
   if (( disk_usage >= _POWERLEVEL9K_DISK_USAGE_CRITICAL_LEVEL )); then
     state=critical
@@ -960,7 +960,7 @@ prompt_battery() {
   case $_p9k_os in
     OSX)
       (( $+commands[pmset] )) || return
-      local raw_data=${${(f)"$(command pmset -g batt 2>/dev/null)"}[2]}
+      local raw_data=${${(f)"$(pmset -g batt 2>/dev/null)"}[2]}
       [[ $raw_data == *InternalBattery* ]] || return
       remain=${${(s: :)${${(s:; :)raw_data}[3]}}[1]}
       [[ $remain == *no* ]] && remain="..."
@@ -1269,7 +1269,7 @@ prompt_dir() {
             zstat -H stat -- $pkg_file 2>/dev/null || return
             if ! _p9k_cache_get $0_pkg $stat[inode] $stat[mtime] $stat[size]; then
               local pkg_name=''
-              pkg_name=$(command jq -j '.name' <$pkg_file 2>/dev/null) || pkg_name=''
+              pkg_name=$(jq -j '.name' <$pkg_file 2>/dev/null) || pkg_name=''
               _p9k_cache_set "$pkg_name"
             fi
             [[ -n $_p9k_cache_val[1] ]] || return
@@ -1535,7 +1535,7 @@ prompt_go_version() {
     if [[ -d $HOME/go ]]; then
       p=$HOME/go
     else
-      p=$(command go env GOPATH 2>/dev/null) && [[ -n $p ]] || return
+      p=$(go env GOPATH 2>/dev/null) && [[ -n $p ]] || return
     fi
   fi
   if [[ $PWD/ != $p/* ]]; then
@@ -1558,9 +1558,9 @@ prompt_history() {
 # Detection for virtualization (systemd based systems only)
 prompt_detect_virt() {
   (( $+commands[systemd-detect-virt] )) || return
-  local virt=$(command systemd-detect-virt 2>/dev/null)
+  local virt=$(systemd-detect-virt 2>/dev/null)
   if [[ "$virt" == "none" ]]; then
-    [[ "$(command ls -di /)" != "2 /" ]] && virt="chroot"
+    [[ "$(ls -di /)" != "2 /" ]] && virt="chroot"
   fi
   if [[ -n "${virt}" ]]; then
     "$1_prompt_segment" "$0" "$2" "$_p9k_color1" "yellow" '' 0 '' "${virt//\%/%%}"
@@ -1618,7 +1618,7 @@ prompt_load() {
   case $_p9k_os in
     OSX|BSD)
       (( $+commands[sysctl] )) || return
-      load=$(command sysctl -n vm.loadavg 2>/dev/null) || return
+      load=$(sysctl -n vm.loadavg 2>/dev/null) || return
       load=${${(A)=load}[bucket+1]//,/.}
     ;;
     *)
@@ -1878,7 +1878,7 @@ prompt_ram() {
   case $_p9k_os in
     OSX)
       (( $+commands[vm_stat] )) || return
-      local stat && stat=$(command vm_stat 2>/dev/null) || return
+      local stat && stat=$(vm_stat 2>/dev/null) || return
       [[ $stat =~ 'Pages free:[[:space:]]+([0-9]+)' ]] || return
       (( free_bytes+=match[1] ))
       [[ $stat =~ 'Pages inactive:[[:space:]]+([0-9]+)' ]] || return
@@ -1886,11 +1886,11 @@ prompt_ram() {
       (( free_bytes *= 4096 ))
     ;;
     BSD)
-      local stat && stat=$(command grep -F 'avail memory' /var/run/dmesg.boot 2>/dev/null) || return
+      local stat && stat=$(grep -F 'avail memory' /var/run/dmesg.boot 2>/dev/null) || return
       free_bytes=${${(A)=stat}[4]}
     ;;
     *)
-      local stat && stat=$(command grep -F MemAvailable /proc/meminfo 2>/dev/null) || return
+      local stat && stat=$(grep -F MemAvailable /proc/meminfo 2>/dev/null) || return
       free_bytes=$(( ${${(A)=stat}[2]} * 1024 ))
     ;;
   esac
@@ -2074,7 +2074,7 @@ prompt_swap() {
 
   if [[ "$_p9k_os" == "OSX" ]]; then
     (( $+commands[sysctl] )) || return
-    [[ "$(command sysctl vm.swapusage 2>/dev/null)" =~ "used = ([0-9,.]+)([A-Z]+)" ]] || return
+    [[ "$(sysctl vm.swapusage 2>/dev/null)" =~ "used = ([0-9,.]+)([A-Z]+)" ]] || return
     used_bytes=${match[1]//,/.}
     case ${match[2]} in
       'K') (( used_bytes *= 1024 ));;
@@ -2084,7 +2084,7 @@ prompt_swap() {
       *) return;;
     esac
   else
-    local meminfo && meminfo=$(command grep -F 'Swap' /proc/meminfo 2>/dev/null) || return
+    local meminfo && meminfo=$(grep -F 'Swap' /proc/meminfo 2>/dev/null) || return
     [[ $meminfo =~ 'SwapTotal:[[:space:]]+([0-9]+)' ]] || return
     (( used_bytes+=match[1] ))
     [[ $meminfo =~ 'SwapFree:[[:space:]]+([0-9]+)' ]] || return
@@ -2111,7 +2111,7 @@ prompt_symfony2_tests() {
 # Segment to display Symfony2-Version
 prompt_symfony2_version() {
   if [[ -r app/bootstrap.php.cache ]]; then
-    local v="${$(command grep -F " VERSION " app/bootstrap.php.cache 2>/dev/null)//[![:digit:].]}"
+    local v="${$(grep -F " VERSION " app/bootstrap.php.cache 2>/dev/null)//[![:digit:].]}"
     "$1_prompt_segment" "$0" "$2" "grey35" "$_p9k_color1" 'SYMFONY_ICON' 0 '' "${v//\%/%%}"
   fi
 }
@@ -2193,14 +2193,14 @@ function +vi-git-untracked() {
   [[ -z "${vcs_comm[gitdir]}" || "${vcs_comm[gitdir]}" == "." ]] && return
 
   # get the root for the current repo or submodule
-  local repoTopLevel="$(command git rev-parse --show-toplevel 2> /dev/null)"
+  local repoTopLevel="$(git rev-parse --show-toplevel 2> /dev/null)"
   # dump out if we're outside a git repository (which includes being in the .git folder)
   [[ $? != 0 || -z $repoTopLevel ]] && return
 
-  local untrackedFiles=$(command git ls-files --others --exclude-standard "${repoTopLevel}" 2> /dev/null)
+  local untrackedFiles=$(git ls-files --others --exclude-standard "${repoTopLevel}" 2> /dev/null)
 
   if [[ -z $untrackedFiles && $_POWERLEVEL9K_VCS_SHOW_SUBMODULE_DIRTY == 1 ]]; then
-    untrackedFiles+=$(command git submodule foreach --quiet --recursive 'command git ls-files --others --exclude-standard' 2> /dev/null)
+    untrackedFiles+=$(git submodule foreach --quiet --recursive 'git ls-files --others --exclude-standard' 2> /dev/null)
   fi
 
   [[ -z $untrackedFiles ]] && return
@@ -2214,13 +2214,13 @@ function +vi-git-aheadbehind() {
     local -a gitstatus
 
     # for git prior to 1.7
-    # ahead=$(command git rev-list origin/${hook_com[branch]}..HEAD | wc -l)
-    ahead=$(command git rev-list --count "${hook_com[branch]}"@{upstream}..HEAD 2>/dev/null)
+    # ahead=$(git rev-list origin/${hook_com[branch]}..HEAD | wc -l)
+    ahead=$(git rev-list --count "${hook_com[branch]}"@{upstream}..HEAD 2>/dev/null)
     (( ahead )) && gitstatus+=( " $(print_icon 'VCS_OUTGOING_CHANGES_ICON')${ahead// /}" )
 
     # for git prior to 1.7
-    # behind=$(command git rev-list HEAD..origin/${hook_com[branch]} | wc -l)
-    behind=$(command git rev-list --count HEAD.."${hook_com[branch]}"@{upstream} 2>/dev/null)
+    # behind=$(git rev-list HEAD..origin/${hook_com[branch]} | wc -l)
+    behind=$(git rev-list --count HEAD.."${hook_com[branch]}"@{upstream} 2>/dev/null)
     (( behind )) && gitstatus+=( " $(print_icon 'VCS_INCOMING_CHANGES_ICON')${behind// /}" )
 
     hook_com[misc]+=${(j::)gitstatus}
@@ -2231,7 +2231,7 @@ function +vi-git-remotebranch() {
     local branch_name="${hook_com[branch]}"
 
     # Are we on a remote-tracking branch?
-    remote=${$(command git rev-parse --verify HEAD@{upstream} --symbolic-full-name 2>/dev/null)/refs\/(remotes|heads)\/}
+    remote=${$(git rev-parse --verify HEAD@{upstream} --symbolic-full-name 2>/dev/null)/refs\/(remotes|heads)\/}
 
     if (( $+_POWERLEVEL9K_VCS_SHORTEN_LENGTH && $+_POWERLEVEL9K_VCS_SHORTEN_MIN_LENGTH )); then
      if (( ${#hook_com[branch]} > _POWERLEVEL9K_VCS_SHORTEN_MIN_LENGTH && ${#hook_com[branch]} > _POWERLEVEL9K_VCS_SHORTEN_LENGTH )); then
@@ -2263,18 +2263,18 @@ function +vi-git-tagname() {
   if (( !_POWERLEVEL9K_VCS_HIDE_TAGS )); then
       # If we are on a tag, append the tagname to the current branch string.
       local tag
-      tag=$(command git describe --tags --exact-match HEAD 2>/dev/null)
+      tag=$(git describe --tags --exact-match HEAD 2>/dev/null)
 
       if [[ -n "${tag}" ]] ; then
           # There is a tag that points to our current commit. Need to determine if we
           # are also on a branch, or are in a DETACHED_HEAD state.
-          if [[ -z $(command git symbolic-ref HEAD 2>/dev/null) ]]; then
+          if [[ -z $(git symbolic-ref HEAD 2>/dev/null) ]]; then
               # DETACHED_HEAD state. We want to append the tag name to the commit hash
               # and print it. Unfortunately, `vcs_info` blows away the hash when a tag
               # exists, so we have to manually retrieve it and clobber the branch
               # string.
               local revision
-              revision=$(command git rev-list -n 1 --abbrev-commit --abbrev=${_POWERLEVEL9K_CHANGESET_HASH_LENGTH} HEAD)
+              revision=$(git rev-list -n 1 --abbrev-commit --abbrev=${_POWERLEVEL9K_CHANGESET_HASH_LENGTH} HEAD)
               if (( _POWERLEVEL9K_HIDE_BRANCH_ICON )); then
                 hook_com[branch]="${revision} $(print_icon 'VCS_TAG_ICON')${tag}"
               else
@@ -2311,7 +2311,7 @@ function +vi-hg-bookmarks() {
 function +vi-vcs-detect-changes() {
   if [[ "${hook_com[vcs]}" == "git" ]]; then
 
-    local remote=$(command git ls-remote --get-url 2> /dev/null)
+    local remote=$(git ls-remote --get-url 2> /dev/null)
     if [[ "$remote" =~ "github" ]] then
       vcs_visual_identifier='VCS_GIT_GITHUB_ICON'
     elif [[ "$remote" =~ "bitbucket" ]] then
@@ -2429,7 +2429,6 @@ function _p9k_vcs_status_for_dir() {
 }
 
 function _p9k_vcs_status_purge() {
-  unsetopt nomatch
   local dir=$1
   while true; do
     # unset doesn't work if $dir contains weird shit
@@ -2829,10 +2828,10 @@ prompt_kubecontext() {
   done
 
   if ! _p9k_cache_get $0 "${key[@]}"; then
-    local ctx=$(command kubectl config view -o=jsonpath='{.current-context}')
+    local ctx=$(kubectl config view -o=jsonpath='{.current-context}')
     if [[ -n $ctx ]]; then
       local p="{.contexts[?(@.name==\"$ctx\")].context.namespace}"
-      local ns="${$(command kubectl config view -o=jsonpath=$p):-default}"
+      local ns="${$(kubectl config view -o=jsonpath=$p):-default}"
       if [[ $ctx != $ns && ($ns != default || $_POWERLEVEL9K_KUBECONTEXT_SHOW_DEFAULT_NAMESPACE == 1) ]]; then
         ctx+="/$ns"
       fi
@@ -2859,7 +2858,7 @@ prompt_kubecontext() {
 prompt_dropbox() {
   (( $+commands[dropbox-cli] )) || return
   # The first column is just the directory, so cut it
-  local dropbox_status="$(command dropbox-cli filestatus . | cut -d\  -f2-)"
+  local dropbox_status="$(dropbox-cli filestatus . | cut -d\  -f2-)"
 
   # Only show if the folder is tracked and dropbox is running
   if [[ "$dropbox_status" != 'unwatched' && "$dropbox_status" != "isn't running!" ]]; then
@@ -2993,7 +2992,7 @@ function _p9k_update_prompt() {
 
 powerlevel9k_refresh_prompt_inplace() {
   emulate -L zsh && setopt no_hist_expand extended_glob
-  _p9k_init
+  (( _p9k_initialized )) || _p9k_init
   _p9k_refresh_reason=precmd
   _p9k_set_prompt
   _p9k_refresh_reason=''
@@ -3022,6 +3021,112 @@ function _p9k_zle_keymap_select() {
   zle && zle .reset-prompt && zle -R
 }
 
+_p9k_deinit_async_pump() {
+  if (( _p9k_async_pump_lock_fd )); then
+    zsystem flock -u $_p9k_async_pump_lock_fd
+    _p9k_async_pump_lock_fd=0
+  fi
+  if (( _p9k_async_pump_fd )); then
+    zle -F $_p9k_async_pump_fd
+    exec {_p9k_async_pump_fd}>&-
+    _p9k_async_pump_fd=0
+  fi
+  if (( _p9k_async_pump_pid )); then
+    kill -- -$_p9k_async_pump_pid &>/dev/null
+    _p9k_async_pump_pid=0
+  fi
+  if [[ -n $_p9k_async_pump_fifo ]]; then
+    rm -f $_p9k_async_pump_fifo
+    _p9k_async_pump_fifo=''
+  fi
+  if [[ -n $_p9k_async_pump_lock ]]; then
+    rm -f $_p9k_async_pump_lock
+    _p9k_async_pump_lock=''
+  fi
+  add-zsh-hook -D zshexit _p9k_kill_async_pump
+}
+
+function _p9k_on_async_message() {
+  emulate -L zsh && setopt no_hist_expand extended_glob
+  local msg=''
+  while IFS='' read -r -t -u $_p9k_async_pump_fd msg; do
+    eval $_p9k_async_pump_line$msg
+    _p9k_async_pump_line=
+    msg=
+  done
+  _p9k_async_pump_line+=$msg
+  zle && zle .reset-prompt && zle -R
+}
+
+function _p9k_async_pump() {
+  emulate -L zsh                                 || return
+  setopt noaliases no_hist_expand extended_glob  || return
+  zmodload zsh/system zsh/datetime               || return
+  echo ok                                        || return
+
+  local ip last_ip
+  local -F next_ip_time
+  while ! zsystem flock -t 0 $lock 2>/dev/null && kill -0 $parent_pid; do
+    if (( time_realtime )); then
+      echo || break
+      # SIGWINCH is a workaround for a bug in zsh. After a background job completes, callbacks
+      # registered with `zle -F` stop firing until the user presses any key or the process
+      # receives a signal (any signal at all).
+      # Fix: https://github.com/zsh-users/zsh/commit/5e11082349bf72897f93f3a4493a97a2caf15984.
+      kill -WINCH $parent_pid
+    fi
+    if (( public_ip && EPOCHREALTIME >= next_ip_time )); then
+      ip=
+      local method=''
+      local -F start=EPOCHREALTIME
+      next_ip_time=$((start + 5))
+      for method in $ip_methods $ip_methods; do
+        case $method in
+          dig)
+            if (( $+commands[dig] )); then
+              ip=$(dig +tries=1 +short -4 A myip.opendns.com @resolver1.opendns.com 2>/dev/null)
+              [[ $ip == ';'* ]] && ip=
+              if [[ -z $ip ]]; then
+                ip=$(dig +tries=1 +short -6 AAAA myip.opendns.com @resolver1.opendns.com 2>/dev/null)
+                [[ $ip == ';'* ]] && ip=
+              fi
+            fi
+          ;;
+          curl)
+            if (( $+commands[curl] )); then
+              ip=$(curl --max-time 5 -w '\n' "$ip_url" 2>/dev/null)
+            fi
+          ;;
+          wget)
+            if (( $+commands[wget] )); then
+              ip=$(wget -T 5 -qO- "$ip_url" 2>/dev/null)
+            fi
+          ;;
+        esac
+        [[ $ip =~ '^[0-9a-f.:]+$' ]] || ip=''
+        if [[ -n $ip ]]; then
+          next_ip_time=$((start + tout))
+          break
+        fi
+      done
+      if [[ $ip != $last_ip ]]; then
+        last_ip=$ip
+        echo _p9k_public_ip=${(q)${${ip//\%/%%}//$'\n'}} || break
+        kill -WINCH $parent_pid
+      fi
+    fi
+    sleep 1
+  done
+  rm -f $lock $fifo
+}
+
+function _p9k_kill_async_pump() {
+  emulate -L zsh && setopt no_hist_expand extended_glob
+  if (( ZSH_SUBSHELL == _p9k_async_pump_subshell )); then
+    _p9k_deinit_async_pump
+  fi
+}
+
 _p9k_init_async_pump() {
   local -i public_ip time_realtime
   segment_in_use public_ip && public_ip=1
@@ -3035,80 +3140,8 @@ _p9k_init_async_pump() {
     _p9k_async_pump_fifo=$(mktemp -u ${TMPDIR:-/tmp}/p9k-$$-async-pump-fifo.XXXXXXXXXX)
     mkfifo $_p9k_async_pump_fifo
     sysopen -rw -o cloexec,sync -u _p9k_async_pump_fd $_p9k_async_pump_fifo
-    zsystem flock $_p9k_async_pump_lock
-
-    function _p9k_on_async_message() {
-      emulate -L zsh && setopt no_hist_expand extended_glob
-      local msg=''
-      while IFS='' read -r -t -u $_p9k_async_pump_fd msg; do
-        eval $_p9k_async_pump_line$msg
-        _p9k_async_pump_line=
-        msg=
-      done
-      _p9k_async_pump_line+=$msg
-      zle && zle .reset-prompt && zle -R
-    }
-
     zle -F $_p9k_async_pump_fd _p9k_on_async_message
-
-    function _p9k_async_pump() {
-      emulate -L zsh && setopt no_hist_expand extended_glob && zmodload zsh/system zsh/datetime && echo ok || return
-
-      local ip last_ip
-      local -F next_ip_time
-      while ! zsystem flock -t 0 $lock 2>/dev/null && kill -0 $parent_pid; do
-        if (( time_realtime )); then
-          echo || break
-          # SIGWINCH is a workaround for a bug in zsh. After a background job completes, callbacks
-          # registered with `zle -F` stop firing until the user presses any key or the process
-          # receives a signal (any signal at all).
-          # Fix: https://github.com/zsh-users/zsh/commit/5e11082349bf72897f93f3a4493a97a2caf15984.
-          kill -WINCH $parent_pid
-        fi
-        if (( public_ip && EPOCHREALTIME >= next_ip_time )); then
-          ip=
-          local method=''
-          local -F start=EPOCHREALTIME
-          next_ip_time=$((start + 5))
-          for method in $ip_methods $ip_methods; do
-            case $method in
-              dig)
-                if (( $+commands[dig] )); then
-                  ip=$(command dig +tries=1 +short -4 A myip.opendns.com @resolver1.opendns.com 2>/dev/null)
-                  [[ $ip == ';'* ]] && ip=
-                  if [[ -z $ip ]]; then
-                    ip=$(command dig +tries=1 +short -6 AAAA myip.opendns.com @resolver1.opendns.com 2>/dev/null)
-                    [[ $ip == ';'* ]] && ip=
-                  fi
-                fi
-              ;;
-              curl)
-                if (( $+commands[curl] )); then
-                  ip=$(command curl --max-time 5 -w '\n' "$ip_url" 2>/dev/null)
-                fi
-              ;;
-              wget)
-                if (( $+commands[wget] )); then
-                  ip=$(wget -T 5 -qO- "$ip_url" 2>/dev/null)
-                fi
-              ;;
-            esac
-            [[ $ip =~ '^[0-9a-f.:]+$' ]] || ip=''
-            if [[ -n $ip ]]; then
-              next_ip_time=$((start + tout))
-              break
-            fi
-          done
-          if [[ $ip != $last_ip ]]; then
-            last_ip=$ip
-            echo _p9k_public_ip=${(q)${${ip//\%/%%}//$'\n'}} || break
-            kill -WINCH $parent_pid
-          fi
-        fi
-        sleep 1
-      done
-      command rm -f $lock $fifo
-    }
+    zsystem flock -f _p9k_async_pump_lock_fd $_p9k_async_pump_lock
 
     zsh -dfc "
       local -i public_ip=$public_ip time_realtime=$time_realtime parent_pid=$$
@@ -3123,18 +3156,9 @@ _p9k_init_async_pump() {
     _p9k_async_pump_pid=$!
     _p9k_async_pump_subshell=$ZSH_SUBSHELL
 
-    unfunction _p9k_async_pump
-
     local resp
     read -r -u $_p9k_async_pump_fd resp && [[ $resp == ok ]]
 
-    function _p9k_kill_async_pump() {
-      emulate -L zsh && setopt no_hist_expand extended_glob
-      if (( ZSH_SUBSHELL == _p9k_async_pump_subshell )); then
-        (( _p9k_async_pump_pid )) && kill -- -$_p9k_async_pump_pid &>/dev/null
-        command rm -f "$_p9k_async_pump_fifo" "$_p9k_async_pump_lock"
-      fi
-    }
     add-zsh-hook zshexit _p9k_kill_async_pump
   }
 
@@ -3142,18 +3166,7 @@ _p9k_init_async_pump() {
      >&2 print -P "%F{red}[ERROR]%f Powerlevel10k failed to start async worker. The following segments may malfunction: "
     (( public_ip     )) &&  >&2 print -P "  - %F{green}public_ip%f"
     (( time_realtime )) &&  >&2 print -P "  - %F{green}time%f"
-    if (( _p9k_async_pump_fd )); then
-      zle -F $_p9k_async_pump_fd
-      exec {_p9k_async_pump_fd}>&-
-      _p9k_async_pump_fd=0
-    fi
-    if (( _p9k_async_pump_pid )); then
-      kill -- -$_p9k_async_pump_pid &>/dev/null
-      _p9k_async_pump_pid=0
-    fi
-    command rm -f $_p9k_async_pump_fifo
-    _p9k_async_pump_fifo=''
-    unset -f _p9k_on_async_message
+    _p9k_deinit_async_pump
   fi
 }
 
@@ -3206,6 +3219,7 @@ _p9k_init_vars() {
   typeset -g  _p9k_async_pump_line
   typeset -g  _p9k_async_pump_fifo
   typeset -g  _p9k_async_pump_lock
+  typeset -gi _p9k_async_pump_lock_fd
   typeset -gi _p9k_async_pump_fd
   typeset -gi _p9k_async_pump_pid
   typeset -gi _p9k_async_pump_subshell
@@ -3458,10 +3472,14 @@ _p9k_init_params() {
   _p9k_declare -b POWERLEVEL9K_JAVA_VERSION_FULL 1
 }
 
+typeset -ga __p9k_wrapped_zle_widgets
+
 # _p9k_wrap_zle_widget zle-keymap-select _p9k_zle_keymap_select
 _p9k_wrap_zle_widget() {
   local widget=$1
   local hook=$2
+  (( __p9k_wrapped_zle_widgets[(I)$widget:$hook] )) && return
+  __p9k_wrapped_zle_widgets+=$widget:$hook
   local orig=p9k-orig-$widget
   case $widgets[$widget] in
     user:*)
@@ -3480,6 +3498,22 @@ _p9k_wrap_zle_widget() {
   }"
 
   zle -N -- $widget $wrapper
+}
+
+function _p9k_zle_line_finish() {
+  (( __p9k_enabled )) || return
+  [[ ! -o TRANSIENT_RPROMPT ]] || _p9k_rprompt_override=
+  _p9k_line_finish=
+  zle && zle .reset-prompt && zle -R
+}
+
+function _p9k_zle_line_pre_redraw() {
+  (( __p9k_enabled )) || return
+  [[ ${KEYMAP:-} == vicmd ]] || return 0
+  local region=${${REGION_ACTIVE:-0}/2/1}
+  [[ $region != $_p9k_region_active ]] || return 0
+  _p9k_region_active=$region
+  zle && zle .reset-prompt && zle -R
 }
 
 prompt__p9k_internal_nothing() {
@@ -3701,11 +3735,6 @@ _p9k_init_prompt() {
 
   if [[ -o TRANSIENT_RPROMPT && -n "$_p9k_line_segments_right[2,-1]" ]] || 
      ( segment_in_use time && (( _POWERLEVEL9K_TIME_UPDATE_ON_COMMAND )) ); then
-    function _p9k_zle_line_finish() {
-      [[ ! -o TRANSIENT_RPROMPT ]] || _p9k_rprompt_override=
-      _p9k_line_finish=
-      zle && zle .reset-prompt && zle -R
-    }
     _p9k_wrap_zle_widget zle-line-finish _p9k_zle_line_finish
   fi
 }
@@ -3738,8 +3767,6 @@ _p9k_init_ssh() {
 }
 
 _p9k_init() {
-  (( _p9k_initialized )) && return
-
   _p9k_init_icons
   _p9k_init_vars
   _p9k_init_params
@@ -3894,9 +3921,9 @@ _p9k_init() {
 
   if segment_in_use load; then
     case $_p9k_os in
-      OSX) (( $+commands[sysctl] )) && _p9k_num_cpus=$(command sysctl -n hw.logicalcpu 2>/dev/null);;
-      BSD) (( $+commands[sysctl] )) && _p9k_num_cpus=$(command sysctl -n hw.ncpu 2>/dev/null);;
-      *)   (( $+commands[nproc]  )) && _p9k_num_cpus=$(command nproc 2>/dev/null);;
+      OSX) (( $+commands[sysctl] )) && _p9k_num_cpus=$(sysctl -n hw.logicalcpu 2>/dev/null);;
+      BSD) (( $+commands[sysctl] )) && _p9k_num_cpus=$(sysctl -n hw.ncpu 2>/dev/null);;
+      *)   (( $+commands[nproc]  )) && _p9k_num_cpus=$(nproc 2>/dev/null);;
     esac
   fi
 
@@ -3922,13 +3949,6 @@ _p9k_init() {
   _p9k_init_async_pump
 
   if segment_in_use vi_mode && (( $+_POWERLEVEL9K_VI_VISUAL_MODE_STRING )) || segment_in_use prompt_char; then
-    function _p9k_zle_line_pre_redraw() {
-      [[ ${KEYMAP:-} == vicmd ]] || return 0
-      local region=${${REGION_ACTIVE:-0}/2/1}
-      [[ $region != $_p9k_region_active ]] || return 0
-      _p9k_region_active=$region
-      zle && zle .reset-prompt && zle -R
-    }
     _p9k_wrap_zle_widget zle-line-pre-redraw _p9k_zle_line_pre_redraw
   fi
 
@@ -3943,22 +3963,29 @@ _p9k_init() {
   _p9k_initialized=1
 }
 
+typeset -gi __p9k_enabled=0
+
 prompt_powerlevel9k_setup() {
-  emulate -L zsh
+  emulate -L zsh && setopt no_hist_expand extended_glob
   prompt_powerlevel9k_teardown
   add-zsh-hook precmd powerlevel9k_prepare_prompts
   add-zsh-hook preexec powerlevel9k_preexec
-  typeset -gi __p9k_enabled=1
+  __p9k_enabled=1
   typeset -gF __p9k_timer_start=0
 }
 
 prompt_powerlevel9k_teardown() {
-  emulate -L zsh
+  emulate -L zsh && setopt no_hist_expand extended_glob
   add-zsh-hook -D precmd powerlevel9k_\*
   add-zsh-hook -D preexec powerlevel9k_\*
   PROMPT='%m%# '
   RPROMPT=
-  typeset -gi __p9k_enabled=0
+  if (( __p9k_enabled )); then
+    unset -m '(_POWERLEVEL9K_|P9K_|_p9k_)*'
+    _p9k_deinit_async_pump
+    (( $+functions[gitstatus_stop] )) && gitstatus_stop POWERLEVEL9K
+    __p9k_enabled=0
+  fi
 }
 
 autoload -Uz colors && colors
