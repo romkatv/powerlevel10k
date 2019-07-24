@@ -849,20 +849,21 @@ Options:
   -i icon   segment's icon
   -r        icon is a symbolic reference that needs to be resolved; for example, 'LOCK_ICON'
   +r        icon is already resolved and should be printed literally; for example, '⭐';
-            this is the default
+            this is the default; you can also use $'\u2B50' if you don't want to have
+            non-ascii characters in source code
   -b bg     background color; for example, 'blue', '4', or '#0000ff'; empty value means
-            transparent background
+            transparent background, as in '%k'
   -f fg     foreground color; for example, 'blue', '4', or '#0000ff'; empty value means
-            default foreground color ('%f')
+            default foreground color, as in '%f'
   -s state  segment's state for the purpose of applying styling options; if you want to
             to be able to use POWERLEVEL9K parameters to specify different colors or icons
             depending on some property, use different states for different values of that
             property
   -c        condition; if empty after parameter expansion and process substitution, the
-            segment is hidden; this is an advance feature, use with caution
+            segment is hidden; this is an advanced feature, use with caution
   -e        segment's main content will undergo parameter expansion and process
             substitution; the content will be surrounded with double quotes and thus
-            should quote its own double quotes; this is an advance feature, use with
+            should quote its own double quotes; this is an advanced feature, use with
             caution
   +e        segment's main content should not undergo parameter expansion and process
             substitution; this is the default
@@ -870,9 +871,9 @@ Options:
 
 Example: 'core' segment tells you if there is a file name 'core' in the current directory.
 
-- If you have permissions to delete the file, state is DELETABLE. If not, it's PROTECTED.
 - Segment's icon is '⭐'.
 - Segment's text is the file's size in bytes.
+- If you have permissions to delete the file, state is DELETABLE. If not, it's PROTECTED.
 
   zmodload -F zsh/stat b:zstat
 
