@@ -841,10 +841,78 @@ _p9k_right_prompt_segment() {
 
 function _p9k_prompt_segment() { "_p9k_${_p9k_prompt_side}_prompt_segment" "$@" }
 
+typeset -gr __p9k_prompt_segment_usage="Usage: p9k_prompt_segment [{+|-}re] [-s state] [-b bg] [-f fg] [-i icon] [-c cond] [-t text]
+
+Options:
+  -t text   segment's main content; will undergo prompt expansion: '%F{blue}%T%f' will
+            show as blue current time
+  -i icon   segment's icon
+  -r        icon is a symbolic reference that needs to be resolved; for example, 'LOCK_ICON'
+  +r        icon is already resolved and should be printed literally; for example, '⭐';
+            this is the default
+  -b bg     background color; for example, 'blue', '4', or '#0000ff'; empty value means
+            transparent background
+  -f fg     foreground color; for example, 'blue', '4', or '#0000ff'; empty value means
+            default foreground color ('%f')
+  -s state  segment's state for the purpose of applying styling options; if you want to
+            to be able to use POWERLEVEL9K parameters to specify different colors or icons
+            depending on some property, use different states for different values of that
+            property
+  -c        condition; if empty after parameter expansion and process substitution, the
+            segment is hidden; this is an advance feature, use with caution
+  -e        segment's main content will undergo parameter expansion and process
+            substitution; the content will be surrounded with double quotes and thus
+            should quote its own double quotes; this is an advance feature, use with
+            caution
+  +e        segment's main content should not undergo parameter expansion and process
+            substitution; this is the default
+  -h        print this help message and return
+
+Example: 'core' segment tells you if there is a file name 'core' in the current directory.
+
+- If you have permissions to delete the file, state is DELETABLE. If not, it's PROTECTED.
+- Segment's icon is '⭐'.
+- Segment's text is the file's size in bytes.
+
+  zmodload -F zsh/stat b:zstat
+
+  function prompt_core() {
+    local size=()
+    if ! zstat -A size +size core 2>/dev/null; then
+      # No 'core' file in the current directory.
+      return
+    fi
+    if [[ -w . ]]; then
+      local state=DELETABLE
+    else
+      local state=PROTECTED
+    fi
+    p9k_prompt_segment -s \$state -i '⭐' -b black -f blue -t \${size[1]}b
+  }
+
+To enable this segment, add 'core' to POWERLEVEL9K_LEFT_PROMPT_ELEMENTS or
+POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS.
+
+Example customizations:
+
+  # Override foreground.
+  POWERLEVEL9K_CORE_FOREGROUND=red
+
+  # Override background when DELETABLE.
+  POWERLEVEL9K_CORE_DELETABLE_BACKGROUND=green
+
+  # Override icon when PROTECTED.
+  POWERLEVEL9K_CORE_PROTECTED_VISUAL_IDENTIFIER_EXPANSION='❎'
+
+  # Don't show file size when PROTECTED.
+  POWERLEVEL9K_CORE_PROTECTED_CONTENT_EXPANSION=''
+"
+
+# Type `p9k_prompt_segment -h` for usage.
 function p9k_prompt_segment() {
   emulate -L zsh && setopt no_hist_expand extended_glob
-  local opt state bg fg icon cond text sym=0 expand=0
-  while getopts 's:b:f:i:c:t:se' opt; do
+  local opt state bg fg icon cond text ref=0 expand=0
+  while getopts ':s:b:f:i:c:t:re' opt; do
     case $opt in
       s) state=$OPTARG;;
       b) bg=$OPTARG;;
@@ -852,19 +920,19 @@ function p9k_prompt_segment() {
       i) icon=$OPTARG;;
       c) cond=${OPTARG:-'${:-}'};;
       t) text=$OPTARG;;
-      s) sym=1;;
+      r) ref=1;;
       e) expand=1;;
-      +s) sym=0;;
+      +r) ref=0;;
       +e) expand=0;;
-      ?) return 1;;
+      ?) echo -E - $__p9k_prompt_segment_usage >&2; return 1;;
       done) break;;
     esac
   done
   if (( OPTIND <= ARGC )) {
-    echo "usage: p9k_prompt_segment [{+|-}re] [-s state] [-b bg] [-f fg] [-i icon] [-c cond] [-t text]" >&2
+    echo -E - $__p9k_prompt_segment_usage >&2
     return 1
   }
-  (( sym )) || icon=$'\1'$icon
+  (( ref )) || icon=$'\1'$icon
   "_p9k_${_p9k_prompt_side}_prompt_segment" "prompt_${_p9k_segment_name}${state:+_${(U)state}}" \
       "$bg" "${fg:-$_p9k_color1}" "$icon" "$expand" "$cond" "$text"
   return 0
