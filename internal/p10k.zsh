@@ -2869,6 +2869,8 @@ _p9k_init_params() {
   _p9k_declare -a POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS -- status root_indicator background_jobs history time
   _p9k_declare -b POWERLEVEL9K_DISABLE_RPROMPT 0
   _p9k_declare -b POWERLEVEL9K_PROMPT_ADD_NEWLINE 0
+  _p9k_declare -b POWERLEVEL9K_PROMPT_ON_NEWLINE 0
+  _p9k_declare -b POWERLEVEL9K_RPROMPT_ON_NEWLINE 0
   _p9k_declare -b POWERLEVEL9K_SHOW_RULER 0
   _p9k_declare -i POWERLEVEL9K_PROMPT_ADD_NEWLINE_COUNT 1
   _p9k_declare -s POWERLEVEL9K_COLOR_SCHEME dark
@@ -3279,7 +3281,7 @@ _p9k_init_prompt() {
   # If affects most terminals when RPROMPT is non-empty and ZLE_RPROMPT_INDENT is zero.
   # We can work around it as long as RPROMPT ends with a space.
   if [[ -n $_P9K_LINE_SEGMENTS_RIGHT[-1] && $_P9K_LINE_NEVER_EMPTY_RIGHT[-1] == 0 &&
-        $ZLE_RPROMPT_INDENT == 0 && $POWERLEVEL9K_WHITESPACE_BETWEEN_RIGHT_SEGMENTS == ' ' &&
+        $ZLE_RPROMPT_INDENT == 0 && ${POWERLEVEL9K_WHITESPACE_BETWEEN_RIGHT_SEGMENTS:- } == ' ' &&
         -z $(typeset -m 'POWERLEVEL9K_*(RIGHT_RIGHT_WHITESPACE|RIGHT_PROMPT_LAST_SEGMENT_END_SYMBOL)') ]] &&
         ! is-at-least 5.7.2; then
     typeset -gi _P9K_EMULATE_ZERO_RPROMPT_INDENT=1

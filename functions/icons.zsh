@@ -1,7 +1,7 @@
 typeset -gA icons
 
 function _p9k_init_icons() {
-  [[ $+_p9k_icon_mode && $_p9k_icon_mode == $POWERLEVEL9K_MODE ]] && return
+  [[ $+_p9k_icon_mode == 1 && $_p9k_icon_mode == $POWERLEVEL9K_MODE ]] && return
   typeset -g _p9k_icon_mode=$POWERLEVEL9K_MODE
 
   local LC_ALL=C.UTF-8
