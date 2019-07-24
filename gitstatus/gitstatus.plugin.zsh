@@ -176,7 +176,8 @@ function _gitstatus_process_response() {
   typeset -g VCS_STATUS_RESULT
   (( timeout >= 0 )) && local -a t=(-t $timeout) || local -a t=()
   local -a resp
-  IFS=$'\x1f' read -rd $'\x1e' -u ${(P)resp_fd_var} $t -A resp || {
+  local IFS=$'\x1f'
+  read -rd $'\x1e' -u ${(P)resp_fd_var} $t -A resp || {
     VCS_STATUS_RESULT=tout
     return
   }
@@ -362,9 +363,9 @@ function gitstatus_start() {
     # We use `zsh -c` instead of plain {} or () to work around bugs in zplug. It hangs on startup.
     # Double fork is to daemonize. Some macOS users had issues when gitstatusd was a child process
     # of the interactive zsh. For example, https://github.com/romkatv/powerlevel10k/issues/123
-    # and https://github.com/romkatv/powerlevel10k/issues/97. If you are using macOS and seeing
-    # errors like `gitstatus_query:echo:32: write error: broken pipe`, install `setsid` utility
-    # by running `brew install util-linux`.
+    # and https://github.com/romkatv/powerlevel10k/issues/97. Note that on macOS setsid has to
+    # be installed manually by running  `brew install util-linux`. Unfortunately, none of these
+    # helped to resolve https://github.com/romkatv/powerlevel10k/issues/123.
     zsh -dfmxc $cmd <$req_fifo >$resp_fifo 2>$log_file 3<$lock_file &!
 
     sysopen -w -o cloexec,sync -u req_fd $req_fifo
@@ -379,9 +380,9 @@ function gitstatus_start() {
     }
     zle -F $resp_fd _gitstatus_process_response_${name}
 
-    local reply
+    local reply IFS=''
     echo -nE $'hello\x1f\x1e' >&$req_fd
-    IFS='' read -r -d $'\x1e' -u $resp_fd -t $timeout reply
+    read -r -d $'\x1e' -u $resp_fd -t $timeout reply
     [[ $reply == $'hello\x1f0' ]]
 
     function _gitstatus_cleanup_${ZSH_SUBSHELL}_${daemon_pid}() {
