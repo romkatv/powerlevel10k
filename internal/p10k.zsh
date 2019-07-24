@@ -1156,7 +1156,9 @@ prompt_custom() {
 ################################################################
 # Display the duration the command needed to run.
 prompt_command_execution_time() {
-  (( $+P9K_COMMAND_DURATION_SECONDS && P9K_COMMAND_DURATION_SECONDS >= _POWERLEVEL9K_COMMAND_EXECUTION_TIME_THRESHOLD )) || return
+  (( __p9k_timer_start )) || return
+  P9K_COMMAND_DURATION_SECONDS=$((__p9k_timer_end - __p9k_timer_start))
+  (( P9K_COMMAND_DURATION_SECONDS >= _POWERLEVEL9K_COMMAND_EXECUTION_TIME_THRESHOLD )) || return
 
   if (( P9K_COMMAND_DURATION_SECONDS < 60 )); then
     if (( !_POWERLEVEL9K_COMMAND_EXECUTION_TIME_PRECISION )); then
@@ -2009,31 +2011,31 @@ exit_code_or_status() {
 # Status: When an error occur, return the error code, or a cross icon if option is set
 # Display an ok icon when no error occur, or hide the segment if option is set to false
 prompt_status() {
-  if ! _p9k_cache_get "$0" "$2" "$_p9k_exit_code" "${(@)_p9k_pipe_exit_codes}"; then
+  if ! _p9k_cache_get "$0" "$2" "$__p9k_exit_code" "${(@)__p9k_pipe_exit_codes}"; then
     local ec_text
     local ec_sum
     local ec
 
     if (( _POWERLEVEL9K_STATUS_SHOW_PIPESTATUS )); then
-      if (( $#_p9k_pipe_exit_codes > 1 )); then
-        ec_sum=${_p9k_pipe_exit_codes[1]}
-        exit_code_or_status "${_p9k_pipe_exit_codes[1]}"
+      if (( $#__p9k_pipe_exit_codes > 1 )); then
+        ec_sum=${__p9k_pipe_exit_codes[1]}
+        exit_code_or_status "${__p9k_pipe_exit_codes[1]}"
 
       else
-        ec_sum=${_p9k_exit_code}
-        exit_code_or_status "${_p9k_exit_code}"
+        ec_sum=${__p9k_exit_code}
+        exit_code_or_status "${__p9k_exit_code}"
       fi
       ec_text=$_p9k_ret
-      for ec in "${(@)_p9k_pipe_exit_codes[2,-1]}"; do
+      for ec in "${(@)__p9k_pipe_exit_codes[2,-1]}"; do
         (( ec_sum += ec ))
         exit_code_or_status "$ec"
         ec_text+="|$_p9k_ret"
       done
     else
-      ec_sum=${_p9k_exit_code}
-      # We use _p9k_exit_code instead of the right-most _p9k_pipe_exit_codes item because
+      ec_sum=${__p9k_exit_code}
+      # We use __p9k_exit_code instead of the right-most __p9k_pipe_exit_codes item because
       # PIPE_FAIL may be set.
-      exit_code_or_status "${_p9k_exit_code}"
+      exit_code_or_status "${__p9k_exit_code}"
       ec_text=$_p9k_ret
     fi
 
@@ -2048,7 +2050,7 @@ prompt_status() {
     else
       return
     fi
-    if (( $#_p9k_pipe_exit_codes < 3 )); then
+    if (( $#__p9k_pipe_exit_codes < 3 )); then
       _p9k_cache_set "${(@)_p9k_cache_val}"
     fi
   fi
@@ -2056,7 +2058,7 @@ prompt_status() {
 }
 
 prompt_prompt_char() {
-  if (( _p9k_exit_code )); then
+  if (( __p9k_exit_code )); then
     $1_prompt_segment $0_ERROR_VIINS $2 "$_p9k_color1" 196 '' 0 '${${KEYMAP:-0}:#vicmd}' '❯'
     $1_prompt_segment $0_ERROR_VICMD $2 "$_p9k_color1" 196 '' 0 '${(M)${:-$KEYMAP$_p9k_region_active}:#vicmd0}' '❮'
     $1_prompt_segment $0_ERROR_VIVIS $2 "$_p9k_color1" 196 '' 0 '${(M)${:-$KEYMAP$_p9k_region_active}:#vicmd1}' 'Ⅴ'
@@ -2980,10 +2982,10 @@ function _p9k_set_prompt() {
   [[ -n $RPROMPT ]] && RPROMPT=$_p9k_prompt_prefix_right$RPROMPT$_p9k_prompt_suffix_right
 
   _p9k_real_zle_rprompt_indent=
+  (( $#_p9k_cache < _POWERLEVEL9K_MAX_CACHE_SIZE )) || _p9k_cache=()
 }
 
 function _p9k_update_prompt() {
-  (( __p9k_enabled )) || return
   _p9k_refresh_reason=$1
   _p9k_set_prompt
   _p9k_refresh_reason=''
@@ -2992,29 +2994,27 @@ function _p9k_update_prompt() {
 
 powerlevel9k_refresh_prompt_inplace() {
   emulate -L zsh && setopt no_hist_expand extended_glob
-  (( _p9k_initialized )) || _p9k_init
+  (( __p9k_enabled )) || return
   _p9k_refresh_reason=precmd
   _p9k_set_prompt
   _p9k_refresh_reason=''
-  (( $#_p9k_cache < _POWERLEVEL9K_MAX_CACHE_SIZE )) || _p9k_cache=()
 }
 
 powerlevel9k_prepare_prompts() {
-  _p9k_exit_code=$?
-  _p9k_pipe_exit_codes=( "$pipestatus[@]" )
-  if (( __p9k_timer_start )); then
-    typeset -gF P9K_COMMAND_DURATION_SECONDS=$((EPOCHREALTIME - __p9k_timer_start))
-    __p9k_timer_start=0
-  else
-    unset P9K_COMMAND_DURATION_SECONDS
-  fi
-  _p9k_region_active=0
+  __p9k_exit_code=$?
+  __p9k_pipe_exit_codes=( $pipestatus )
+  __p9k_timer_end=EPOCHREALTIME
+
+  _p9k_must_init && _p9k_init
 
   unsetopt localoptions
   prompt_opts=(cr percent sp subst)
   setopt nopromptbang prompt{cr,percent,sp,subst}
 
   powerlevel9k_refresh_prompt_inplace
+
+  __p9k_timer_start=0
+  _p9k_region_active=0
 }
 
 function _p9k_zle_keymap_select() {
@@ -3048,14 +3048,15 @@ _p9k_deinit_async_pump() {
 
 function _p9k_on_async_message() {
   emulate -L zsh && setopt no_hist_expand extended_glob
-  local msg=''
-  while IFS='' read -r -t -u $_p9k_async_pump_fd msg; do
-    eval $_p9k_async_pump_line$msg
+  (( ARGC == 1 )) || return
+  local msg='' IFS=''
+  while read -r -t -u $1 msg; do
+    [[ $__p9k_enabled == 1 && $1 == $_p9k_async_pump_fd ]] && eval $_p9k_async_pump_line$msg
     _p9k_async_pump_line=
     msg=
   done
   _p9k_async_pump_line+=$msg
-  zle && zle .reset-prompt && zle -R
+  [[ $__p9k_enabled == 1 && $1 == $_p9k_async_pump_fd ]] && zle && zle .reset-prompt && zle -R
 }
 
 function _p9k_async_pump() {
@@ -3187,6 +3188,7 @@ function _p9k_prompt_overflow_bug() {
 }
 
 _p9k_init_vars() {
+  typeset -g  _p9k_param_sig
   typeset -g  _p9k_ret
   typeset -g  _p9k_cache_key
   typeset -ga _p9k_cache_val
@@ -3195,11 +3197,9 @@ _p9k_init_vars() {
   typeset -g  _p9k_n
   typeset -gi _p9k_i
   typeset -g  _p9k_bg
-  typeset -ga _p9k_left_join=(1)
-  typeset -ga _p9k_right_join=(1)
+  typeset -ga _p9k_left_join
+  typeset -ga _p9k_right_join
   typeset -g  _p9k_public_ip
-  typeset -gi _p9k_exit_code
-  typeset -ga _p9k_pipe_exit_codes
   typeset -g  _p9k_todo_file
   # git workdir => the last prompt we've shown for it
   typeset -gA _p9k_last_git_prompt
@@ -3215,7 +3215,6 @@ _p9k_init_vars() {
   typeset -g  _p9k_refresh_reason
   typeset -gi _p9k_region_active
   typeset -g  _p9k_real_zle_rprompt_indent
-  typeset -gi _p9k_initialized
   typeset -g  _p9k_async_pump_line
   typeset -g  _p9k_async_pump_fifo
   typeset -g  _p9k_async_pump_lock
@@ -3261,17 +3260,13 @@ _p9k_init_vars() {
   typeset -gi _p9k_dir_len
   typeset -gi _p9k_num_cpus
 
-  typeset -g P9K_VISUAL_IDENTIFIER
-  typeset -g P9K_CONTENT
-  typeset -g P9K_GAP
+  typeset -gF P9K_COMMAND_DURATION_SECONDS
+  typeset -g  P9K_VISUAL_IDENTIFIER
+  typeset -g  P9K_CONTENT
+  typeset -g  P9K_GAP
 }
 
 _p9k_init_params() {
-  # POWERLEVEL9K_*
-  # _POWERLEVEL9K_*
-  # P9K_*
-  # _p9k_*
-  # TODO: DEFAULT_USER is also a config flag. ZLE_RPROMPT_INDENT transient_rprompt
   _p9k_declare -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS -- context dir vcs
   _p9k_declare -a POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS -- status root_indicator background_jobs history time
   _p9k_declare -b POWERLEVEL9K_DISABLE_RPROMPT 0
@@ -3766,56 +3761,68 @@ _p9k_init_ssh() {
   [[ $w =~ "\(?($ipv4|$ipv6|$hostname)\)?\$" ]] && _P9K_SSH=1
 }
 
+_p9k_must_init() {
+  emulate -L zsh && setopt no_hist_expand extended_glob
+  local -a param_keys=(${(o)parameters[(I)(POWERLEVEL9K_*|DEFAULT_USER|ZLE_RPROMPT_INDENT)]})
+  local IFS param_sig
+  IFS=$'\1' param_sig="${(@)param_keys:/(#b)(*)/$match[1]=\$$match[1]}"
+  IFS=$'\2' eval "param_sig=x\"$param_sig\""
+  [[ -o transient_rprompt ]] && param_sig+=t
+  [[ $param_sig == $_p9k_param_sig ]] && return 1
+  [[ -n $_p9k_param_sig ]] && _p9k_deinit
+  _p9k_param_sig=$param_sig
+}
+
+function _p9k_set_os() {
+  _p9k_os=$1
+  _p9k_get_icon prompt_os_icon $2
+  _p9k_os_icon=$_p9k_ret
+}
+
 _p9k_init() {
+  emulate -L zsh && setopt no_hist_expand extended_glob
+
   _p9k_init_icons
   _p9k_init_vars
   _p9k_init_params
   _p9k_init_prompt
   _p9k_init_ssh
 
-  function _$0_set_os() {
-    _p9k_os=$1
-    _p9k_get_icon prompt_os_icon $2
-    _p9k_os_icon=$_p9k_ret
-  }
-
-  trap "unfunction _$0_set_os" EXIT
-
   local uname=$(uname)
   if [[ $uname == Linux && $(uname -o 2>/dev/null) == Android ]]; then
-    _$0_set_os Android ANDROID_ICON
+    _p9k_set_os Android ANDROID_ICON
   else
     case $uname in
-      SunOS)                     _$0_set_os Solaris SUNOS_ICON;;
-      Darwin)                    _$0_set_os OSX     APPLE_ICON;;
-      CYGWIN_NT-* | MSYS_NT-*)   _$0_set_os Windows WINDOWS_ICON;;
-      FreeBSD|OpenBSD|DragonFly) _$0_set_os BSD     FREEBSD_ICON;;
+      SunOS)                     _p9k_set_os Solaris SUNOS_ICON;;
+      Darwin)                    _p9k_set_os OSX     APPLE_ICON;;
+      CYGWIN_NT-* | MSYS_NT-*)   _p9k_set_os Windows WINDOWS_ICON;;
+      FreeBSD|OpenBSD|DragonFly) _p9k_set_os BSD     FREEBSD_ICON;;
       Linux)
         _p9k_os='Linux'
         local os_release_id
         [[ -f /etc/os-release &&
           "${(f)$((</etc/os-release) 2>/dev/null)}" =~ "ID=([A-Za-z]+)" ]] && os_release_id="${match[1]}"
         case "$os_release_id" in
-          *arch*)                  _$0_set_os Linux LINUX_ARCH_ICON;;
-          *debian*)                _$0_set_os Linux LINUX_DEBIAN_ICON;;
-          *raspbian*)              _$0_set_os Linux LINUX_RASPBIAN_ICON;;
-          *ubuntu*)                _$0_set_os Linux LINUX_UBUNTU_ICON;;
-          *elementary*)            _$0_set_os Linux LINUX_ELEMENTARY_ICON;;
-          *fedora*)                _$0_set_os Linux LINUX_FEDORA_ICON;;
-          *coreos*)                _$0_set_os Linux LINUX_COREOS_ICON;;
-          *gentoo*)                _$0_set_os Linux LINUX_GENTOO_ICON;;
-          *mageia*)                _$0_set_os Linux LINUX_MAGEIA_ICON;;
-          *centos*)                _$0_set_os Linux LINUX_CENTOS_ICON;;
-          *opensuse*|*tumbleweed*) _$0_set_os Linux LINUX_OPENSUSE_ICON;;
-          *sabayon*)               _$0_set_os Linux LINUX_SABAYON_ICON;;
-          *slackware*)             _$0_set_os Linux LINUX_SLACKWARE_ICON;;
-          *linuxmint*)             _$0_set_os Linux LINUX_MINT_ICON;;
-          *alpine*)                _$0_set_os Linux LINUX_ALPINE_ICON;;
-          *aosc*)                  _$0_set_os Linux LINUX_AOSC_ICON;;
-          *nixos*)                 _$0_set_os Linux LINUX_NIXOS_ICON;;
-          *devuan*)                _$0_set_os Linux LINUX_DEVUAN_ICON;;
-          *manjaro*)               _$0_set_os Linux LINUX_MANJARO_ICON;;
-          *)                       _$0_set_os Linux LINUX_ICON;;
+          *arch*)                  _p9k_set_os Linux LINUX_ARCH_ICON;;
+          *debian*)                _p9k_set_os Linux LINUX_DEBIAN_ICON;;
+          *raspbian*)              _p9k_set_os Linux LINUX_RASPBIAN_ICON;;
+          *ubuntu*)                _p9k_set_os Linux LINUX_UBUNTU_ICON;;
+          *elementary*)            _p9k_set_os Linux LINUX_ELEMENTARY_ICON;;
+          *fedora*)                _p9k_set_os Linux LINUX_FEDORA_ICON;;
+          *coreos*)                _p9k_set_os Linux LINUX_COREOS_ICON;;
+          *gentoo*)                _p9k_set_os Linux LINUX_GENTOO_ICON;;
+          *mageia*)                _p9k_set_os Linux LINUX_MAGEIA_ICON;;
+          *centos*)                _p9k_set_os Linux LINUX_CENTOS_ICON;;
+          *opensuse*|*tumbleweed*) _p9k_set_os Linux LINUX_OPENSUSE_ICON;;
+          *sabayon*)               _p9k_set_os Linux LINUX_SABAYON_ICON;;
+          *slackware*)             _p9k_set_os Linux LINUX_SLACKWARE_ICON;;
+          *linuxmint*)             _p9k_set_os Linux LINUX_MINT_ICON;;
+          *alpine*)                _p9k_set_os Linux LINUX_ALPINE_ICON;;
+          *aosc*)                  _p9k_set_os Linux LINUX_AOSC_ICON;;
+          *nixos*)                 _p9k_set_os Linux LINUX_NIXOS_ICON;;
+          *devuan*)                _p9k_set_os Linux LINUX_DEVUAN_ICON;;
+          *manjaro*)               _p9k_set_os Linux LINUX_MANJARO_ICON;;
+          *)                       _p9k_set_os Linux LINUX_ICON;;
         esac
         ;;
     esac
@@ -3843,6 +3850,7 @@ _p9k_init() {
 
   local -i i=0
   local -a left_segments=(${(@0)_p9k_line_segments_left[@]})
+  _p9k_left_join=(1)
   for ((i = 2; i <= $#left_segments; ++i)); do
     local elem=$left_segments[i]
     if [[ $elem == *_joined ]]; then
@@ -3853,6 +3861,7 @@ _p9k_init() {
   done
 
   local -a right_segments=(${(@0)_p9k_line_segments_right[@]})
+  _p9k_right_join=(1)
   for ((i = 2; i <= $#right_segments; ++i)); do
     local elem=$right_segments[i]
     if [[ $elem == *_joined ]]; then
@@ -3959,8 +3968,12 @@ _p9k_init() {
   fi
 
   _p9k_wrap_zle_widget zle-keymap-select _p9k_zle_keymap_select
+}
 
-  _p9k_initialized=1
+_p9k_deinit() {
+  (( $+functions[gitstatus_stop] )) && gitstatus_stop POWERLEVEL9K
+  _p9k_deinit_async_pump
+  unset -m '(_POWERLEVEL9K_|P9K_|_p9k_)*'
 }
 
 typeset -gi __p9k_enabled=0
@@ -3968,10 +3981,13 @@ typeset -gi __p9k_enabled=0
 prompt_powerlevel9k_setup() {
   emulate -L zsh && setopt no_hist_expand extended_glob
   prompt_powerlevel9k_teardown
-  add-zsh-hook precmd powerlevel9k_prepare_prompts
-  add-zsh-hook preexec powerlevel9k_preexec
   __p9k_enabled=1
   typeset -gF __p9k_timer_start=0
+  typeset -gF __p9k_timer_end=0
+  typeset -gi __p9k_exit_code=0
+  typeset -ga __p9k_pipe_exit_codes=()
+  add-zsh-hook preexec powerlevel9k_preexec
+  add-zsh-hook precmd powerlevel9k_prepare_prompts
 }
 
 prompt_powerlevel9k_teardown() {
@@ -3981,9 +3997,7 @@ prompt_powerlevel9k_teardown() {
   PROMPT='%m%# '
   RPROMPT=
   if (( __p9k_enabled )); then
-    unset -m '(_POWERLEVEL9K_|P9K_|_p9k_)*'
-    _p9k_deinit_async_pump
-    (( $+functions[gitstatus_stop] )) && gitstatus_stop POWERLEVEL9K
+    _p9k_deinit
     __p9k_enabled=0
   fi
 }
