@@ -27,9 +27,229 @@ if ! autoload -Uz is-at-least || ! is-at-least 5.1; then
   return 1
 fi
 
-source "${__p9k_installation_dir}/functions/utilities.zsh"
+# For compatibility with Powerlevel9k. It's not recommended to use mnemonic color
+# names in the configuration except for colors 0-7 as these are standard.
+typeset -grA __p9k_colors=(
+            black 000               red 001             green 002            yellow 003
+             blue 004           magenta 005              cyan 006             white 007
+             grey 008            maroon 009              lime 010             olive 011
+             navy 012           fuchsia 013              aqua 014              teal 014
+           silver 015             grey0 016          navyblue 017          darkblue 018
+            blue3 020             blue1 021         darkgreen 022      deepskyblue4 025
+      dodgerblue3 026       dodgerblue2 027            green4 028      springgreen4 029
+       turquoise4 030      deepskyblue3 032       dodgerblue1 033          darkcyan 036
+    lightseagreen 037      deepskyblue2 038      deepskyblue1 039            green3 040
+     springgreen3 041             cyan3 043     darkturquoise 044        turquoise2 045
+           green1 046      springgreen2 047      springgreen1 048 mediumspringgreen 049
+            cyan2 050             cyan1 051           purple4 055           purple3 056
+       blueviolet 057            grey37 059     mediumpurple4 060        slateblue3 062
+       royalblue1 063       chartreuse4 064    paleturquoise4 066         steelblue 067
+       steelblue3 068    cornflowerblue 069     darkseagreen4 071         cadetblue 073
+         skyblue3 074       chartreuse3 076         seagreen3 078       aquamarine3 079
+  mediumturquoise 080        steelblue1 081         seagreen2 083         seagreen1 085
+   darkslategray2 087           darkred 088       darkmagenta 091           orange4 094
+       lightpink4 095             plum4 096     mediumpurple3 098        slateblue1 099
+           wheat4 101            grey53 102    lightslategrey 103      mediumpurple 104
+   lightslateblue 105           yellow4 106      darkseagreen 108     lightskyblue3 110
+         skyblue2 111       chartreuse2 112        palegreen3 114    darkslategray3 116
+         skyblue1 117       chartreuse1 118        lightgreen 120       aquamarine1 122
+   darkslategray1 123         deeppink4 125   mediumvioletred 126        darkviolet 128
+           purple 129     mediumorchid3 133      mediumorchid 134     darkgoldenrod 136
+        rosybrown 138            grey63 139     mediumpurple2 140     mediumpurple1 141
+        darkkhaki 143      navajowhite3 144            grey69 145   lightsteelblue3 146
+   lightsteelblue 147   darkolivegreen3 149     darkseagreen3 150        lightcyan3 152
+    lightskyblue1 153       greenyellow 154   darkolivegreen2 155        palegreen1 156
+    darkseagreen2 157    paleturquoise1 159              red3 160         deeppink3 162
+         magenta3 164       darkorange3 166         indianred 167          hotpink3 168
+         hotpink2 169            orchid 170           orange3 172      lightsalmon3 173
+       lightpink3 174             pink3 175             plum3 176            violet 177
+            gold3 178   lightgoldenrod3 179               tan 180        mistyrose3 181
+         thistle3 182             plum2 183           yellow3 184            khaki3 185
+     lightyellow3 187            grey84 188   lightsteelblue1 189           yellow2 190
+  darkolivegreen1 192     darkseagreen1 193         honeydew2 194        lightcyan1 195
+             red1 196         deeppink2 197         deeppink1 199          magenta2 200
+         magenta1 201        orangered1 202        indianred1 204           hotpink 206
+    mediumorchid1 207        darkorange 208           salmon1 209        lightcoral 210
+   palevioletred1 211           orchid2 212           orchid1 213           orange1 214
+       sandybrown 215      lightsalmon1 216        lightpink1 217             pink1 218
+            plum1 219             gold1 220   lightgoldenrod2 222      navajowhite1 223
+       mistyrose1 224          thistle1 225           yellow1 226   lightgoldenrod1 227
+           khaki1 228            wheat1 229         cornsilk1 230           grey100 231
+            grey3 232             grey7 233            grey11 234            grey15 235
+           grey19 236            grey23 237            grey27 238            grey30 239
+           grey35 240            grey39 241            grey42 242            grey46 243
+           grey50 244            grey54 245            grey58 246            grey62 247
+           grey66 248            grey70 249            grey74 250            grey78 251
+           grey82 252            grey85 253            grey89 254            grey93 255)
+
+# For compatibility with Powerlevel9k.
+#
+# Type `getColorCode background` or `getColorCode foreground` to see the list of predefined colors.
+function getColorCode() {
+  emulate -L zsh
+  if (( ARGC == 1 )); then
+    case $1 in 
+      foreground)
+        local k
+        for k in "${(k@)__p9k_colors}"; do
+          local v=${__p9k_colors[$k]}
+          print -P "%F{$v}$v - $k%f"
+        done
+        return
+        ;;
+      background)
+        local k
+        for k in "${(k@)__p9k_colors}"; do
+          local v=${__p9k_colors[$k]}
+          print -P "%K{$v}$v - $k%k"
+        done
+        return
+        ;;
+    esac
+  fi
+  echo "Usage: getColorCode background|foreground" >&2
+  return 1
+}
+
+# _p9k_declare <type> <uppercase-name> [default]...
+function _p9k_declare() {
+  local -i set=$+parameters[$2]
+  (( ARGC > 2 || set )) || return 0
+  case $1 in
+    -b)
+      if (( set )); then
+        [[ ${(P)2} == true ]] && typeset -gi _$2=1 || typeset -gi _$2=0
+      else
+        typeset -gi _$2=$3
+      fi
+      ;;
+    -a)
+      local -a v=(${(P)2})
+      if (( set )); then
+        eval "typeset -ga _${(q)2}=(${(@qq)v})";
+      else
+        if [[ $3 != '--' ]]; then
+          echo "internal error in _p9k_declare " "${(qqq)@}" >&2
+        fi
+        eval "typeset -ga _${(q)2}=(${(@qq)*[4,-1]})"
+      fi
+      ;;
+    -i)
+      (( set )) && typeset -gi _$2=$2 || typeset -gi _$2=$3
+      ;;
+    -F)
+      (( set )) && typeset -gF _$2=$2 || typeset -gF _$2=$3
+      ;;
+    -s)
+      (( set )) && typeset -g _$2=${(P)2} || typeset -g _$2=$3
+      ;;
+    -e)
+      if (( set )); then
+        local v=${(P)2}
+        typeset -g _$2=${(g::)v}
+      else
+        typeset -g _$2=${(g::)3}
+      fi
+      ;;
+    *)
+      echo "internal error in _p9k_declare " "${(qqq)@}" >&2
+  esac
+}
+
+# If we execute `print -P $1`, how many characters will be printed on the last line?
+# Assumes that `%{%}` and `%G` don't lie.
+#
+#   _p9k_prompt_length '' => 0
+#   _p9k_prompt_length 'abc' => 3
+#   _p9k_prompt_length $'abc\nxy' => 2
+#   _p9k_prompt_length $'\t' => 8
+#   _p9k_prompt_length '%F{red}abc' => 3
+#   _p9k_prompt_length $'%{a\b%Gb%}' => 1
+function _p9k_prompt_length() {
+  emulate -L zsh
+  local COLUMNS=1024
+  local -i x y=$#1 m
+  if (( y )); then
+    while (( ${${(%):-$1%$y(l.1.0)}[-1]} )); do
+      x=y
+      (( y *= 2 ));
+    done
+    local xy
+    while (( y > x + 1 )); do
+      m=$(( x + (y - x) / 2 ))
+      typeset ${${(%):-$1%$m(l.x.y)}[-1]}=$m
+    done
+  fi
+  _p9k_ret=$x
+}
+
+typeset -gr __p9k_byte_suffix=('B' 'K' 'M' 'G' 'T' 'P' 'E' 'Z' 'Y')
+
+# 42 => 42B
+# 1536 => 1.5K
+function _p9k_human_readable_bytes() {
+  typeset -F 2 n=$1
+  local suf
+  for suf in $__p9k_byte_suffix; do
+    (( n < 100 )) && break
+    (( n /= 1024 ))
+  done
+  _p9k_ret=$n$suf
+}
+
+# Determine if the passed segment is used in the prompt
+#
+# Pass the name of the segment to this function to test for its presence in
+# either the LEFT or RIGHT prompt arrays.
+#    * $1: The segment to be tested.
+segment_in_use() {
+  (( $_POWERLEVEL9K_LEFT_PROMPT_ELEMENTS[(I)$1(|_joined)] ||
+     $_POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS[(I)$1(|_joined)] ))
+}
+
+function _p9k_parse_ip() {
+  local desiredInterface=${1:-'^[^ ]+'}
+
+  if [[ $_p9k_os == OSX ]]; then
+    [[ -x /sbin/ifconfig ]] || return
+    local rawInterfaces && rawInterfaces="$(/sbin/ifconfig -l 2>/dev/null)" || return
+    local -a interfaces=(${(A)=rawInterfaces})
+    local pattern="${desiredInterface}[^ ]?"
+    local -a relevantInterfaces
+    for rawInterface in $interfaces; do
+      [[ "$rawInterface" =~ $pattern ]] && relevantInterfaces+=$MATCH
+    done
+    local newline=$'\n'
+    local interfaceName interface
+    for interfaceName in $relevantInterfaces; do
+      interface="$(/sbin/ifconfig $interfaceName 2>/dev/null)" || continue
+      [[ "${interface}" =~ "lo[0-9]*" ]] && continue
+      if [[ "${interface//${newline}/}" =~ "<([^>]*)>(.*)inet[ ]+([^ ]*)" ]]; then
+        local ipFound="${match[3]}"
+        local -a interfaceStates=(${(s:,:)match[1]})
+        if (( ${interfaceStates[(I)UP]} )); then
+          _p9k_ret=$ipFound
+          return
+        fi
+      fi
+    done
+  else
+    [[ -x /sbin/ip ]] || return
+    local -a interfaces=( "${(f)$(/sbin/ip -brief -4 a show 2>/dev/null)}" )
+    local pattern="^${desiredInterface}[[:space:]]+UP[[:space:]]+([^/ ]+)"
+    local interface
+    for interface in "${(@)interfaces}"; do
+      if [[ "$interface" =~ $pattern ]]; then
+        _p9k_ret=$match[1]
+        return
+      fi
+    done
+  fi
+
+  return 1
+}
+
 source "${__p9k_installation_dir}/functions/icons.zsh"
-source "${__p9k_installation_dir}/functions/colors.zsh"
 source "${__p9k_installation_dir}/functions/vcs.zsh"
 
 # Caching allows storing array-to-array associations. It should be used like this:
@@ -1969,6 +2189,171 @@ typeset -gA __p9k_vcs_states=(
   'UNTRACKED'     '2'
   'LOADING'       '8'
 )
+
+function +vi-git-untracked() {
+  [[ -z "${vcs_comm[gitdir]}" || "${vcs_comm[gitdir]}" == "." ]] && return
+
+  # get the root for the current repo or submodule
+  local repoTopLevel="$(command git rev-parse --show-toplevel 2> /dev/null)"
+  # dump out if we're outside a git repository (which includes being in the .git folder)
+  [[ $? != 0 || -z $repoTopLevel ]] && return
+
+  local untrackedFiles=$(command git ls-files --others --exclude-standard "${repoTopLevel}" 2> /dev/null)
+
+  if [[ -z $untrackedFiles && $_POWERLEVEL9K_VCS_SHOW_SUBMODULE_DIRTY == 1 ]]; then
+    untrackedFiles+=$(command git submodule foreach --quiet --recursive 'command git ls-files --others --exclude-standard' 2> /dev/null)
+  fi
+
+  [[ -z $untrackedFiles ]] && return
+
+  hook_com[unstaged]+=" $(print_icon 'VCS_UNTRACKED_ICON')"
+  VCS_WORKDIR_HALF_DIRTY=true
+}
+
+function +vi-git-aheadbehind() {
+    local ahead behind
+    local -a gitstatus
+
+    # for git prior to 1.7
+    # ahead=$(command git rev-list origin/${hook_com[branch]}..HEAD | wc -l)
+    ahead=$(command git rev-list --count "${hook_com[branch]}"@{upstream}..HEAD 2>/dev/null)
+    (( ahead )) && gitstatus+=( " $(print_icon 'VCS_OUTGOING_CHANGES_ICON')${ahead// /}" )
+
+    # for git prior to 1.7
+    # behind=$(command git rev-list HEAD..origin/${hook_com[branch]} | wc -l)
+    behind=$(command git rev-list --count HEAD.."${hook_com[branch]}"@{upstream} 2>/dev/null)
+    (( behind )) && gitstatus+=( " $(print_icon 'VCS_INCOMING_CHANGES_ICON')${behind// /}" )
+
+    hook_com[misc]+=${(j::)gitstatus}
+}
+
+function +vi-git-remotebranch() {
+    local remote
+    local branch_name="${hook_com[branch]}"
+
+    # Are we on a remote-tracking branch?
+    remote=${$(command git rev-parse --verify HEAD@{upstream} --symbolic-full-name 2>/dev/null)/refs\/(remotes|heads)\/}
+
+    if (( $+_POWERLEVEL9K_VCS_SHORTEN_LENGTH && $+_POWERLEVEL9K_VCS_SHORTEN_MIN_LENGTH )); then
+     if (( ${#hook_com[branch]} > _POWERLEVEL9K_VCS_SHORTEN_MIN_LENGTH && ${#hook_com[branch]} > _POWERLEVEL9K_VCS_SHORTEN_LENGTH )); then
+       case $_POWERLEVEL9K_VCS_SHORTEN_STRATEGY in
+         truncate_middle)
+           hook_com[branch]="${branch_name:0:$_POWERLEVEL9K_VCS_SHORTEN_LENGTH}${_POWERLEVEL9K_VCS_SHORTEN_DELIMITER}${branch_name: -$_POWERLEVEL9K_VCS_SHORTEN_LENGTH}"
+         ;;
+         truncate_from_right)
+           hook_com[branch]="${branch_name:0:$_POWERLEVEL9K_VCS_SHORTEN_LENGTH}${_POWERLEVEL9K_VCS_SHORTEN_DELIMITER}"
+         ;;
+       esac
+     fi
+    fi
+
+    if (( _POWERLEVEL9K_HIDE_BRANCH_ICON )); then
+      hook_com[branch]="${hook_com[branch]}"
+    else
+      hook_com[branch]="$(print_icon 'VCS_BRANCH_ICON')${hook_com[branch]}"
+    fi
+    # Always show the remote
+    #if [[ -n ${remote} ]] ; then
+    # Only show the remote if it differs from the local
+    if [[ -n ${remote} ]] && [[ "${remote#*/}" != "${branch_name}" ]] ; then
+        hook_com[branch]+="$(print_icon 'VCS_REMOTE_BRANCH_ICON')${remote// /}"
+    fi
+}
+
+function +vi-git-tagname() {
+  if (( !_POWERLEVEL9K_VCS_HIDE_TAGS )); then
+      # If we are on a tag, append the tagname to the current branch string.
+      local tag
+      tag=$(command git describe --tags --exact-match HEAD 2>/dev/null)
+
+      if [[ -n "${tag}" ]] ; then
+          # There is a tag that points to our current commit. Need to determine if we
+          # are also on a branch, or are in a DETACHED_HEAD state.
+          if [[ -z $(command git symbolic-ref HEAD 2>/dev/null) ]]; then
+              # DETACHED_HEAD state. We want to append the tag name to the commit hash
+              # and print it. Unfortunately, `vcs_info` blows away the hash when a tag
+              # exists, so we have to manually retrieve it and clobber the branch
+              # string.
+              local revision
+              revision=$(command git rev-list -n 1 --abbrev-commit --abbrev=${_POWERLEVEL9K_CHANGESET_HASH_LENGTH} HEAD)
+              if (( _POWERLEVEL9K_HIDE_BRANCH_ICON )); then
+                hook_com[branch]="${revision} $(print_icon 'VCS_TAG_ICON')${tag}"
+              else
+                hook_com[branch]="$(print_icon 'VCS_BRANCH_ICON')${revision} $(print_icon 'VCS_TAG_ICON')${tag}"
+              fi
+          else
+              # We are on both a tag and a branch; print both by appending the tag name.
+              hook_com[branch]+=" $(print_icon 'VCS_TAG_ICON')${tag}"
+          fi
+      fi
+  fi
+}
+
+# Show count of stashed changes
+# Port from https://github.com/whiteinge/dotfiles/blob/5dfd08d30f7f2749cfc60bc55564c6ea239624d9/.zsh_shouse_prompt#L268
+function +vi-git-stash() {
+  if [[ -s "${vcs_comm[gitdir]}/logs/refs/stash" ]] ; then
+    local -a stashes=( "${(@f)"$(<${vcs_comm[gitdir]}/logs/refs/stash)"}" )
+    hook_com[misc]+=" $(print_icon 'VCS_STASH_ICON')${#stashes}"
+  fi
+}
+
+function +vi-hg-bookmarks() {
+  if [[ -n "${hgbmarks[@]}" ]]; then
+    hook_com[hg-bookmark-string]=" $(print_icon 'VCS_BOOKMARK_ICON')${hgbmarks[@]}"
+
+    # To signal that we want to use the sting we just generated, set the special
+    # variable `ret' to something other than the default zero:
+    ret=1
+    return 0
+  fi
+}
+
+function +vi-vcs-detect-changes() {
+  if [[ "${hook_com[vcs]}" == "git" ]]; then
+
+    local remote=$(command git ls-remote --get-url 2> /dev/null)
+    if [[ "$remote" =~ "github" ]] then
+      vcs_visual_identifier='VCS_GIT_GITHUB_ICON'
+    elif [[ "$remote" =~ "bitbucket" ]] then
+      vcs_visual_identifier='VCS_GIT_BITBUCKET_ICON'
+    elif [[ "$remote" =~ "stash" ]] then
+      vcs_visual_identifier='VCS_GIT_BITBUCKET_ICON'
+    elif [[ "$remote" =~ "gitlab" ]] then
+      vcs_visual_identifier='VCS_GIT_GITLAB_ICON'
+    else
+      vcs_visual_identifier='VCS_GIT_ICON'
+    fi
+
+  elif [[ "${hook_com[vcs]}" == "hg" ]]; then
+    vcs_visual_identifier='VCS_HG_ICON'
+  elif [[ "${hook_com[vcs]}" == "svn" ]]; then
+    vcs_visual_identifier='VCS_SVN_ICON'
+  fi
+
+  if [[ -n "${hook_com[staged]}" ]] || [[ -n "${hook_com[unstaged]}" ]]; then
+    VCS_WORKDIR_DIRTY=true
+  else
+    VCS_WORKDIR_DIRTY=false
+  fi
+}
+
+function +vi-svn-detect-changes() {
+  local svn_status="$(svn status)"
+  if [[ -n "$(echo "$svn_status" | \grep \^\?)" ]]; then
+    hook_com[unstaged]+=" $(print_icon 'VCS_UNTRACKED_ICON')"
+    VCS_WORKDIR_HALF_DIRTY=true
+  fi
+  if [[ -n "$(echo "$svn_status" | \grep \^\M)" ]]; then
+    hook_com[unstaged]+=" $(print_icon 'VCS_UNSTAGED_ICON')"
+    VCS_WORKDIR_DIRTY=true
+  fi
+  if [[ -n "$(echo "$svn_status" | \grep \^\A)" ]]; then
+    hook_com[staged]+=" $(print_icon 'VCS_STAGED_ICON')"
+    VCS_WORKDIR_DIRTY=true
+  fi
+}
+
 
 powerlevel9k_vcs_init() {
   autoload -Uz vcs_info
