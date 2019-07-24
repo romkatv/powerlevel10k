@@ -97,7 +97,7 @@ segment_in_use() {
 function _p9k_parse_ip() {
   local desiredInterface=${1:-'^[^ ]+'}
 
-  if [[ $OS == OSX ]]; then
+  if [[ $_p9k_os == OSX ]]; then
     [[ -x /sbin/ifconfig ]] || return
     local rawInterfaces && rawInterfaces="$(/sbin/ifconfig -l 2>/dev/null)" || return
     local -a interfaces=(${(A)=rawInterfaces})
