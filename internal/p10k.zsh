@@ -27,6 +27,8 @@ if ! autoload -Uz is-at-least || ! is-at-least 5.1; then
   return 1
 fi
 
+source "${__p9k_installation_dir}/internal/icons.zsh"
+
 # For compatibility with Powerlevel9k. It's not recommended to use mnemonic color
 # names in the configuration except for colors 0-7 as these are standard.
 typeset -grA __p9k_colors=(
@@ -248,9 +250,6 @@ function _p9k_parse_ip() {
 
   return 1
 }
-
-source "${__p9k_installation_dir}/functions/icons.zsh"
-source "${__p9k_installation_dir}/functions/vcs.zsh"
 
 # Caching allows storing array-to-array associations. It should be used like this:
 #
