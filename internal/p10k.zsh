@@ -2884,12 +2884,13 @@ prompt_java_version() {
 }
 
 powerlevel9k_preexec() {
-  if (( _p9k_emulate_zero_rprompt_indent )); then
+  if (( $+_p9k_real_zle_rprompt_indent )); then
     if [[ -n $_p9k_real_zle_rprompt_indent ]]; then
       ZLE_RPROMPT_INDENT=$_p9k_real_zle_rprompt_indent
     else
       unset ZLE_RPROMPT_INDENT
     fi
+    unset _p9k_real_zle_rprompt_indent
   fi
   __p9k_timer_start=EPOCHREALTIME
 }
@@ -2981,7 +2982,6 @@ function _p9k_set_prompt() {
   PROMPT+=$_p9k_prompt_suffix_left
   [[ -n $RPROMPT ]] && RPROMPT=$_p9k_prompt_prefix_right$RPROMPT$_p9k_prompt_suffix_right
 
-  _p9k_real_zle_rprompt_indent=
   (( $#_p9k_cache < _POWERLEVEL9K_MAX_CACHE_SIZE )) || _p9k_cache=()
 }
 
@@ -3004,6 +3004,15 @@ powerlevel9k_prepare_prompts() {
   __p9k_exit_code=$?
   __p9k_pipe_exit_codes=( $pipestatus )
   __p9k_timer_end=EPOCHREALTIME
+
+  if (( $+_p9k_real_zle_rprompt_indent )); then
+    if [[ -n $_p9k_real_zle_rprompt_indent ]]; then
+      ZLE_RPROMPT_INDENT=$_p9k_real_zle_rprompt_indent
+    else
+      unset ZLE_RPROMPT_INDENT
+    fi
+    unset _p9k_real_zle_rprompt_indent
+  fi
 
   _p9k_must_init && _p9k_init
 
@@ -3214,7 +3223,6 @@ _p9k_init_vars() {
   typeset -gi _p9k_segment_index
   typeset -g  _p9k_refresh_reason
   typeset -gi _p9k_region_active
-  typeset -g  _p9k_real_zle_rprompt_indent
   typeset -g  _p9k_async_pump_line
   typeset -g  _p9k_async_pump_fifo
   typeset -g  _p9k_async_pump_lock
