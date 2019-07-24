@@ -356,12 +356,14 @@ function gitstatus_start() {
         ${(q)daemon}-static $daemon_args
       fi
       echo -nE $'bye\x1f0\x1e'"
-    cmd="setopt monitor; zsh -dfxc ${(q)cmd} &!"
+    cmd="${commands[setsid]:-} zsh -dfxc ${(q)cmd} &!"
     # We use `zsh -c` instead of plain {} or () to work around bugs in zplug. It hangs on startup.
     # Double fork is to daemonize. Some macOS users had issues when gitstatusd was a child process
     # of the interactive zsh. For example, https://github.com/romkatv/powerlevel10k/issues/123
-    # and https://github.com/romkatv/powerlevel10k/issues/97.
-    zsh -dfxc $cmd <$req_fifo >$resp_fifo 2>$log_file 3<$lock_file &!
+    # and https://github.com/romkatv/powerlevel10k/issues/97. If you are using macOS and seeing
+    # errors like `gitstatus_query:echo:32: write error: broken pipe`, install `setsid` utility
+    # by running `brew install util-linux`.
+    zsh -dfmxc $cmd <$req_fifo >$resp_fifo 2>$log_file 3<$lock_file &!
 
     sysopen -w -o cloexec,sync -u req_fd $req_fifo
     sysopen -r -o cloexec -u resp_fd $resp_fifo
