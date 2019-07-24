@@ -508,5 +508,5 @@ function gitstatus_check() {
   [[ -n ${(P)${:-GITSTATUS_DAEMON_PID_${1}}} ]]
 }
 
-(( ! p9k_lean_restore_aliases )) || setopt aliases
-'builtin' 'unset' 'p9k_lean_restore_aliases'
+(( ! _gitstatus_restore_aliases )) || setopt aliases
+'builtin' 'unset' '_gitstatus_restore_aliases'
