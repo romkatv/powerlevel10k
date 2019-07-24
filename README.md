@@ -213,7 +213,7 @@ visible changes except for performance. There are, however, several differences.
     respects all options. If you see different icons in Powerlevel9k and Powerlevel10k, you've
     probably defined `POWERLEVEL9K_MODE` before sourcing the theme. This parameter gets ignored
     by Powerlevel9k but not Powerlevel10k. If you want your prompt to look in Powerlevel10k the same
-    was as in Powerlevel9k, remove `POWERLEVEL9K_MODE`.
+    as in Powerlevel9k, remove `POWERLEVEL9K_MODE`.
   - There are
     [dozens more bugs](https://github.com/Powerlevel9k/powerlevel9k/issues/created_by/romkatv) in
     Powerlevel9k that don't exist in Powerlevel10k.
