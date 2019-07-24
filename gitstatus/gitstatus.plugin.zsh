@@ -347,21 +347,26 @@ function gitstatus_start() {
       --dirty-max-index-size=${(q)dirty_max_index_size}
       ${${log_level:#INFO}:+--log-level=$log_level})
 
-    # We use `zsh -c` instead of plain {} or () to work around bugs in zplug. It hangs on startup.
-    zsh -dfxc "
+    local cmd="
+      echo \$\$
       ${(q)daemon} $daemon_args
       if [[ \$? != (0|10) && \$? -le 128 &&
             -z ${(q)GITSTATUS_DAEMON:-} &&
             -f ${(q)daemon}-static ]]; then
         ${(q)daemon}-static $daemon_args
       fi
-      echo -nE $'bye\x1f0\x1e'
-    " <$req_fifo >$resp_fifo 2>$log_file 3<$lock_file &!
+      echo -nE $'bye\x1f0\x1e'"
+    cmd="setopt monitor; zsh -dfxc ${(q)cmd} &!"
+    # We use `zsh -c` instead of plain {} or () to work around bugs in zplug. It hangs on startup.
+    # Double fork is to daemonize. Some macOS users had issues when gitstatusd was a child process
+    # of the interactive zsh. For example, https://github.com/romkatv/powerlevel10k/issues/123
+    # and https://github.com/romkatv/powerlevel10k/issues/97.
+    zsh -dfxc $cmd <$req_fifo >$resp_fifo 2>$log_file 3<$lock_file &!
 
-    daemon_pid=$!
-    
     sysopen -w -o cloexec,sync -u req_fd $req_fifo
     sysopen -r -o cloexec -u resp_fd $resp_fifo
+
+    read -u $resp_fd daemon_pid
 
     rm -f $req_fifo $resp_fifo $lock_file
 
