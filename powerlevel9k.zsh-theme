@@ -12,9 +12,9 @@
 
 if [[ -o 'aliases' ]]; then
   'builtin' 'unsetopt' 'aliases'
-  local _p9k_restore_aliases=1
+  local __p9k_restore_aliases=1
 else
-  local _p9k_restore_aliases=0
+  local __p9k_restore_aliases=0
 fi
 
 () {
@@ -49,5 +49,5 @@ fi
   source $__p9k_installation_dir/internal/p10k.zsh || true
 }
 
-(( ! _p9k_restore_aliases )) || setopt aliases
-'builtin' 'unset' '_p9k_restore_aliases'
+(( ! __p9k_restore_aliases )) || setopt aliases
+'builtin' 'unset' '__p9k_restore_aliases'
