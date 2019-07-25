@@ -62,31 +62,32 @@ fi
       # time                  # current time
   )
 
-  # Basic style options that define the overall look of your prompt.
+  # Basic style options that define the overall look of your prompt. You probably don't want to
+  # change them.
   typeset -g POWERLEVEL9K_BACKGROUND=                            # transparent background
   typeset -g POWERLEVEL9K_{LEFT,RIGHT}_{LEFT,RIGHT}_WHITESPACE=  # no surrounding whitespace
   typeset -g POWERLEVEL9K_RPROMPT_ON_NEWLINE=false               # align the first left/right lines
   typeset -g POWERLEVEL9K_{LEFT,RIGHT}_SUBSEGMENT_SEPARATOR=' '  # separate segments with a space
   typeset -g POWERLEVEL9K_{LEFT,RIGHT}_SEGMENT_SEPARATOR=        # no end-of-line symbol
 
-  # To disable default icons for all segments, define POWERLEVEL9K_VISUAL_IDENTIFIER_EXPANSION=''.
+  # To disable default icons for all segments, set POWERLEVEL9K_VISUAL_IDENTIFIER_EXPANSION=''.
   #
   # To enable default icons for all segments, don't define POWERLEVEL9K_VISUAL_IDENTIFIER_EXPANSION
   # or set it to '${P9K_VISUAL_IDENTIFIER}'.
   #
-  # To enable default icons for one segment (e.g., dir), define
+  # To enable default icons for one segment (e.g., dir), set
   # POWERLEVEL9K_DIR_VISUAL_IDENTIFIER_EXPANSION='${P9K_VISUAL_IDENTIFIER}'.
   #
-  # To set a specific icon for one segment (e.g., dir), define
+  # To assign a specific icon to one segment (e.g., dir), set
   # POWERLEVEL9K_DIR_VISUAL_IDENTIFIER_EXPANSION='⭐'.
   #
-  # To set a specific icon for a segment in a given state (e.g., dir in state NOT_WRITABLE),
-  # define POWERLEVEL9K_DIR_NOT_WRITABLE_VISUAL_IDENTIFIER_EXPANSION='⭐'.
+  # To assign a specific icon to a segment in a given state (e.g., dir in state NOT_WRITABLE),
+  # set POWERLEVEL9K_DIR_NOT_WRITABLE_VISUAL_IDENTIFIER_EXPANSION='⭐'.
   #
   # When a segment is displaying its default icon, in addition to being able to chage it with
   # VISUAL_IDENTIFIER_EXPANSION as described above, you can also change it with an override
   # such as POWERLEVEL9K_LOCK_ICON='⭐'. This will change the icon in every segment that uses
-  # LOCK_ICON as default icon.
+  # LOCK_ICON as default icon. If this paragraph looks confusing, forget what it says.
   #
   # Note: Many default icons cannot be displayed with system fonts. You'll need to install a
   # Powerline font to use them. See POWERLEVEL9K_MODE below.
@@ -153,11 +154,13 @@ fi
     typeset -g POWERLEVEL9K_EMPTY_LINE_RIGHT_PROMPT_FIRST_SEGMENT_START_SYMBOL='%{%}'
   fi
 
+  #################################[ os_icon: os identifier ]##################################
   # OS identifier color.
   typeset -g POWERLEVEL9K_OS_ICON_FOREGROUND=212
-  # Want to display a different icon? Uncomment the next line and set the desired value.
-  # typeset -g POWERLEVEL9K_OS_ICON_CONTENT_EXPANSION=$'\uFB8A'
+  # Display this icon instead of the default.
+  # typeset -g POWERLEVEL9K_OS_ICON_CONTENT_EXPANSION='⭐'
 
+  ################################[ prompt_char: prompt symbol ]################################
   # Green prompt symbol if the last command succeeded.
   typeset -g POWERLEVEL9K_PROMPT_CHAR_OK_{VIINS,VICMD,VIVIS}_FOREGROUND=76
   # Red prompt symbol if the last command failed.
@@ -170,8 +173,7 @@ fi
   typeset -g POWERLEVEL9K_PROMPT_CHAR_{OK,ERROR}_VIVIS_CONTENT_EXPANSION='Ⅴ'
   typeset -g POWERLEVEL9K_PROMPT_CHAR_LEFT_PROMPT_LAST_SEGMENT_END_SYMBOL=''
 
-  # Enable special styling for non-writable directories.
-  typeset -g POWERLEVEL9K_DIR_SHOW_WRITABLE=true
+  ##################################[ dir: current directory ]##################################
   # Default current directory color.
   typeset -g POWERLEVEL9K_DIR_FOREGROUND=12
   # If directory is too long, shorten some of its segments to the shortest possible unique
@@ -200,6 +202,47 @@ fi
   # the full directory that was used in previous commands.
   typeset -g POWERLEVEL9K_DIR_HYPERLINK=false
 
+  # Enable special styling for non-writable directories.
+  typeset -g POWERLEVEL9K_DIR_SHOW_WRITABLE=true
+  # Show this icon when the current directory is not writable. POWERLEVEL9K_DIR_SHOW_WRITABLE
+  # above must be set to true for this parameter to have effect.
+  # POWERLEVEL9K_DIR_NOT_WRITABLE_VISUAL_IDENTIFIER_EXPANSION='⭐'
+
+  # POWERLEVEL9K_DIR_CLASSES allows you to specify custom icons for different directories.
+  # It must be an array with 3 * N elements. Each triplet consists of:
+  #
+  #   1. A pattern against which the current directory is matched. Matching is done with
+  #      extended_glob option enabled.
+  #   2. Directory class for the purpose of styling.
+  #   3. Icon.
+  #
+  # Triplets are tried in order. The first triplet whose pattern matches $PWD wins. If there
+  # are no matches, the directory will have no icon.
+  #
+  # Example:
+  #
+  #   typeset -g POWERLEVEL9K_DIR_CLASSES=(
+  #       '~/work(/*)#'  WORK     '(╯°□°）╯︵ ┻━┻'
+  #       '~(/*)#'       HOME     '⌂'
+  #       '*'            DEFAULT  '')
+  #
+  # With these settings, the current directory in the prompt may look like this:
+  #
+  #   (╯°□°）╯︵ ┻━┻ ~/work/projects/important/urgent
+  #
+  # Or like this:
+  #
+  #   ⌂ ~/best/powerlevel10k
+  #
+  # You can also set different colors for directories of different classes.
+  #
+  #   typeset -g POWERLEVEL9K_DIR_WORK_FOREGROUND=12
+  #   typeset -g POWERLEVEL9K_DIR_WORK_SHORTENED_FOREGROUND=4
+  #   typeset -g POWERLEVEL9K_DIR_WORK_ANCHOR_FOREGROUND=39
+  #
+  # typeset -g POWERLEVEL9K_DIR_CLASSES=()
+
+  #####################################[ vcs: git status ]######################################
   # Git status: feature:master#tag ⇣42⇡42 *42 merge ~42 +42 !42 ?42.
   # We are using parameters defined by the gitstatus plugin. See reference:
   # https://github.com/romkatv/gitstatus/blob/master/gitstatus.plugin.zsh.
@@ -231,7 +274,7 @@ fi
   # If P9K_CONTENT is not empty, leave it unchanged. It's either "loading" or from vcs_info.
   vcs="\${P9K_CONTENT:-$vcs}"
 
-  # No branch icon. Set this parameter to '\uF126 ' for the popular Powerline branch icon.
+  # Branch icon. Set this parameter to '\uF126 ' for the popular Powerline branch icon.
   typeset -g POWERLEVEL9K_VCS_BRANCH_ICON=
 
   # Disable the default Git status formatting.
@@ -262,14 +305,18 @@ fi
   typeset -g POWERLEVEL9K_VCS_UNSTAGED_ICON=$'%{\b!%}'
   typeset -g POWERLEVEL9K_VCS_STAGED_ICON=$'%{\b+%}'
 
-  # Don't show status on success.
+  ##########################[ status: exit code of the last command ]###########################
+  # Don't show status on success. Prompt symbol (prompt_char) indicates success with green color.
   typeset -g POWERLEVEL9K_STATUS_OK=false
   # Error status color.
   typeset -g POWERLEVEL9K_STATUS_ERROR_FOREGROUND=9
-  # Don't show status unless the last command was terminated by a signal.
-  # Show signals as "INT", "ABORT", "KILL", etc.
+  # Don't show status unless the last command was terminated by a signal. Your prompt symbol
+  # (prompt_char) indicates error by turning red. Error codes aren't usually interesting but
+  # signals are. This shows signals as "INT", "ABORT", "KILL", etc. You can remove this parameter
+  # for more verbose output.
   typeset -g POWERLEVEL9K_STATUS_ERROR_CONTENT_EXPANSION='${${P9K_CONTENT#SIG}//[!A-Z]}'
 
+  ###################[ command_execution_time: duration of the last command ]###################
   # Show duration of the last command if takes longer than this many seconds.
   typeset -g POWERLEVEL9K_COMMAND_EXECUTION_TIME_THRESHOLD=3
   # Show this many fractional digits. Zero means round to seconds.
@@ -279,6 +326,7 @@ fi
   # Duration format: 1d 2h 3m 4s.
   typeset -g POWERLEVEL9K_COMMAND_EXECUTION_TIME_FORMAT='d h m s'
 
+  #######################[ background_jobs: presence of background jobs ]#######################
   # Don't show the number of background jobs.
   typeset -g POWERLEVEL9K_BACKGROUND_JOBS_VERBOSE=false
   # Icon to show when there are background jobs.
@@ -286,11 +334,13 @@ fi
   # Background jobs icon color.
   typeset -g POWERLEVEL9K_BACKGROUND_JOBS_VISUAL_IDENTIFIER_COLOR=2
 
+  ##########[ nordvpn: nordvpn connection status, linux only (https://nordvpn.com/) ]###########
   # NordVPN connection indicator color when connected.
   typeset -g POWERLEVEL9K_NORDVPN_CONNECTED_FOREGROUND=4
   # NordVPN connection indicator color when disconnected.
   typeset -g POWERLEVEL9K_NORDVPN_DISCONNECTED_FOREGROUND=3
 
+  ####################################[ context: user@host ]####################################
   # Context format: user@host.
   typeset -g POWERLEVEL9K_CONTEXT_TEMPLATE='%n@%m'
   # Default context color.
@@ -301,6 +351,7 @@ fi
   typeset -g POWERLEVEL9K_CONTEXT_{DEFAULT,SUDO}_{CONTENT,VISUAL_IDENTIFIER}_EXPANSION=
   typeset -g POWERLEVEL9K_ALWAYS_SHOW_CONTEXT=true
 
+  ###[ virtualenv: python virtual environment (https://docs.python.org/3/library/venv.html) ]###
   # Python virtual environment color.
   typeset -g POWERLEVEL9K_VIRTUALENV_FOREGROUND=6
   # Show Python version next to the virtual environment name.
@@ -308,6 +359,7 @@ fi
   # Separate environment name from Python version only with a space.
   typeset -g POWERLEVEL9K_VIRTUALENV_{LEFT,RIGHT}_DELIMITER=
 
+  #####################[ anaconda: conda environment (https://conda.io/) ]######################
   # Anaconda environment color.
   typeset -g POWERLEVEL9K_ANACONDA_FOREGROUND=6
   # Show Python version next to the anaconda environment name.
@@ -315,27 +367,33 @@ fi
   # Separate environment name from Python version only with a space.
   typeset -g POWERLEVEL9K_ANACONDA_{LEFT,RIGHT}_DELIMITER=
 
+  ################[ pyenv: python environment (https://github.com/pyenv/pyenv) ]################
   # Pyenv color.
   typeset -g POWERLEVEL9K_PYENV_FOREGROUND=6
   # Don't show the current Python version if it's the same as global.
   typeset -g POWERLEVEL9K_PYENV_PROMPT_ALWAYS_SHOW=false
 
+  ##########[ nodenv: node.js version from nodenv (https://github.com/nodenv/nodenv) ]##########
   # Nodenv color.
   typeset -g POWERLEVEL9K_NODENV_FOREGROUND=2
   # Don't show node version if it's the same as global: $(nodenv version-name) == $(nodenv global).
   typeset -g POWERLEVEL9K_NODENV_PROMPT_ALWAYS_SHOW=false
 
+  ##############[ nvm: node.js version from nvm (https://github.com/nvm-sh/nvm) ]###############
   # Nvm color.
   typeset -g POWERLEVEL9K_NVM_FOREGROUND=2
 
+  ############[ nodeenv: node.js environment (https://github.com/ekalinin/nodeenv) ]############
   # Nodeenv color.
   typeset -g POWERLEVEL9K_NODEENV_FOREGROUND=2
 
+  ##############################[ node_version: node.js version ]###############################
   # Node version color.
   typeset -g POWERLEVEL9K_NODE_VERSION_FOREGROUND=2
   # Show node version only when in a directory tree containing package.json.
   typeset -g P9K_NODE_VERSION_PROJECT_ONLY=true
 
+  #############[ kubecontext: current kubernetes context (https://kubernetes.io/) ]#############
   # Kubernetes context classes for the purpose of using different colors with
   # different contexts.
   #
@@ -367,9 +425,11 @@ fi
   # Show the trailing "/default" in kubernetes context.
   typeset -g POWERLEVEL9K_KUBECONTEXT_SHOW_DEFAULT_NAMESPACE=true
 
+  ###############################[ public_ip: public IP address ]###############################
   # Public IP color.
   typeset -g POWERLEVEL9K_PUBLIC_IP_FOREGROUND=144
 
+  ################################[ battery: internal battery ]#################################
   # Show battery in red when it's below this level and not connected to power supply.
   typeset -g POWERLEVEL9K_BATTERY_LOW_THRESHOLD=20
   typeset -g POWERLEVEL9K_BATTERY_LOW_FOREGROUND=1
@@ -386,6 +446,7 @@ fi
   # Don't show the remaining time to charge/discharge.
   typeset -g POWERLEVEL9K_BATTERY_VERBOSE=false
 
+  ####################################[ time: current time ]####################################
   # Current time color.
   typeset -g POWERLEVEL9K_TIME_FOREGROUND=66
   # Format for the current time: 09:51:02. See `man 3 strftime`.
