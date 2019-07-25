@@ -53,6 +53,7 @@ fi
       # nodeenv               # node.js environment (https://github.com/ekalinin/nodeenv)
       # node_version          # node.js version
       # kubecontext           # current kubernetes context (https://kubernetes.io/)
+      # nordvpn               # nordvpn connection status, linux only (https://nordvpn.com/)
       context                 # user@host
       # =========================[ Line #2 ]=========================
       newline
@@ -68,15 +69,15 @@ fi
   typeset -g POWERLEVEL9K_{LEFT,RIGHT}_SUBSEGMENT_SEPARATOR=' '  # separate segments with a space
   typeset -g POWERLEVEL9K_{LEFT,RIGHT}_SEGMENT_SEPARATOR=        # no end-of-line symbol
 
-  # Disable segment icons by default.
+  # To disable default icons for all segments, define POWERLEVEL9K_VISUAL_IDENTIFIER_EXPANSION=''.
   #
-  # To enable default icons for all segments, don't set POWERLEVEL9K_VISUAL_IDENTIFIER_EXPANSION
+  # To enable default icons for all segments, don't define POWERLEVEL9K_VISUAL_IDENTIFIER_EXPANSION
   # or set it to '${P9K_VISUAL_IDENTIFIER}'.
   #
-  # To enable default segment icons for one segment (e.g., dir), define
+  # To enable default icons for one segment (e.g., dir), define
   # POWERLEVEL9K_DIR_VISUAL_IDENTIFIER_EXPANSION='${P9K_VISUAL_IDENTIFIER}'.
   #
-  # To set a specific icon for a segment (e.g., dir), define
+  # To set a specific icon for one segment (e.g., dir), define
   # POWERLEVEL9K_DIR_VISUAL_IDENTIFIER_EXPANSION='⭐'.
   #
   # To set a specific icon for a segment in a given state (e.g., dir in state NOT_WRITABLE),
@@ -284,6 +285,11 @@ fi
   typeset -g POWERLEVEL9K_BACKGROUND_JOBS_VISUAL_IDENTIFIER_EXPANSION='⇶'
   # Background jobs icon color.
   typeset -g POWERLEVEL9K_BACKGROUND_JOBS_VISUAL_IDENTIFIER_COLOR=2
+
+  # NordVPN connection indicator color when connected.
+  typeset -g POWERLEVEL9K_NORDVPN_CONNECTED_FOREGROUND=4
+  # NordVPN connection indicator color when disconnected.
+  typeset -g POWERLEVEL9K_NORDVPN_DISCONNECTED_FOREGROUND=3
 
   # Context format: user@host.
   typeset -g POWERLEVEL9K_CONTEXT_TEMPLATE='%n@%m'
