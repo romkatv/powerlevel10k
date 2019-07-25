@@ -2946,6 +2946,68 @@ prompt_java_version() {
   _p9k_prompt_segment "$0" "red" "white" "JAVA_ICON" 0 '' "${v//\%/%%}"
 }
 
+typeset -gra __p9k_nordvpn_tag=(
+  P9K_NORDVPN_STATUS
+  P9K_NORDVPN_PROTOCOL
+  P9K_NORDVPN_IP_ADDRESS
+  P9K_NORDVPN_SERVER
+  P9K_NORDVPN_COUNTRY
+  P9K_NORDVPN_CITY
+)
+
+function _p9k_fetch_nordvpn_status() {
+  setopt err_return
+  unset $__p9k_nordvpn_tag P9K_NORDVPN_COUNTRY_CODE
+  (( $+commands[nordvpn] ))
+  [[ -e /run/nordvpnd.sock ]]
+  local REPLY
+  zsocket /run/nordvpnd.sock 2>/dev/null
+  local -i fd=$REPLY
+  {
+    >&$fd echo -nE - $'PRI * HTTP/2.0\r\n\r\nSM\r\n\r\n\0\0\0\4\1\0\0\0\0\0\0N\1\4\0\0\0\1\203\206E\221bA\226\223\325\\k\337\31i=LnH\323j?A\223\266\243y\270\303\fYmLT{$\357]R.\203\223\257_\213\35u\320b\r&=LMedz\212\232\312\310\264\307`+\210K\203@\2te\206M\2035\5\261\37\0\0\5\0\1\0\0\0\1\0\0\0\0\0'
+    local tag len val
+    local -i n
+    IFS='' read -r tag <&3
+    tag=$'\015'
+    while true; do
+      tag=${__p9k_char2byte[${(q+)tag}]:-0}
+      (( (tag >>= 3) && tag <= $#__p9k_nordvpn_tag )) || break
+      tag=$__p9k_nordvpn_tag[tag]
+      sysread -c n -s 1 len <&3
+      (( n == 1 ))
+      len=${__p9k_char2byte[${(q+)len}]}
+      [[ -n $len ]]
+      val=
+      (( ! len )) || {
+        sysread -c n -s $len val <&3
+        (( n == len ))
+      }
+      typeset -g $tag=$val
+      sysread -c n -s 1 tag <&3
+      (( n < 2 ))
+    done
+  } always {
+    exec {fd}>&-
+    [[ $P9K_NORDVPN_SERVER != (#b)([[:alpha:]]##)[[:digit:]]##.nordvpn.com ]] || P9K_NORDVPN_COUNTRY_CODE=${(U)match[1]}
+  }
+}
+
+function prompt_nordvpn() {
+  _p9k_fetch_nordvpn_status
+  case $P9K_NORDVPN_STATUS in
+    '')
+      _p9k_prompt_segment $0_MISSING      blue white ''          0 '' '';;
+    Connected)
+      _p9k_prompt_segment $0_CONNECTED    blue white LOCK_ICON   0 '' "$P9K_NORDVPN_COUNTRY_CODE";;
+    Disconnected)
+      _p9k_get_icon $0_DISCONNECTED FAIL_ICON
+      _p9k_prompt_segment $0_DISCONNECTED yellow white LOCK_ICON 0 '' "$_p9k_ret";;
+    *)
+      _p9k_get_icon $0_OTHER FAIL_ICON
+      _p9k_prompt_segment $0_OTHER        yellow white LOCK_ICON 0 '' "$_p9k_ret";;
+  esac
+}
+
 _p9k_preexec() {
   if (( $+_p9k_real_zle_rprompt_indent )); then
     if [[ -n $_p9k_real_zle_rprompt_indent ]]; then
@@ -4041,6 +4103,17 @@ _p9k_init() {
     >&2 print -P 'Either install %F{green}jq%f or change the value of %BPOWERLEVEL9K_SHORTEN_STRATEGY%b.'
   fi
 
+  if (( !$+__p9k_char2byte )) && _p9k_segment_in_use nordvpn; then
+    typeset -gA __p9k_char2byte=()
+    local -i x=0 y=0
+    for x in {0..7}; do
+      for y in {0..7}; do
+        __p9k_char2byte[${(q+)${(g:o:):-\\$x$y}}]=$((8*x+y))
+      done
+    done
+    typeset -grA __p9k_char2byte
+  fi
+
   _p9k_wrap_zle_widget zle-keymap-select _p9k_zle_keymap_select
 }
 
@@ -4083,5 +4156,12 @@ zmodload zsh/datetime
 zmodload zsh/mathfunc
 zmodload zsh/system
 zmodload -F zsh/stat b:zstat
+zmodload -F zsh/net/socket b:zsocket
 
 prompt_powerlevel9k_setup
+
+# zsocket -v /run/nordvpnd.sock
+# echo -n $'PRI * HTTP/2.0\r\n\r\nSM\r\n\r\n\0\0\0\4\1\0\0\0\0\0\0N\1\4\0\0\0\1\203\206E\221bA\226\223\325\\k\337\31i=LnH\323j?A\223\266\243y\270\303\fYmLT{$\357]R.\203\223\257_\213\35u\320b\r&=LMedz\212\232\312\310\264\307`+\210K\203@\2te\206M\2035\5\261\37\0\0\5\0\1\0\0\0\1\0\0\0\0\0' >&3
+# cat <&3 > reply  # A\223\266\243y\270\303\fY         A\226\223\325\\k\337\31i         =LnH\323
+# exec 3>&-; hexdump -c <reply
+# \0\0\16\1\4\0\0\0\1\210_\213\35u\320b\r&=LMed\0\0_\0\0\0\0\0\1\0\0\0\0Z\n\tConnected\22\3UDP\32\01637.120.137.147\"\21ch131.nordvpn.com*\vSwitzerland2\6Zurich8\244\224\211\10@\242\315\305\1H\334\375\316\260\372\243\1\0\0\30\1\5\0\0\0\1@\210\232\312\310\262\0224\332\217\0010@\211\232\312\310\265%B\0071\177\0
