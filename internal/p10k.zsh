@@ -2957,43 +2957,43 @@ typeset -gra __p9k_nordvpn_tag=(
 
 function _p9k_fetch_nordvpn_status() {
   setopt err_return
-  unset $__p9k_nordvpn_tag P9K_NORDVPN_COUNTRY_CODE
-  (( $+commands[nordvpn] ))
-  [[ -e /run/nordvpnd.sock ]]
   local REPLY
-  zsocket /run/nordvpnd.sock 2>/dev/null
+  zsocket /run/nordvpnd.sock
   local -i fd=$REPLY
   {
     >&$fd echo -nE - $'PRI * HTTP/2.0\r\n\r\nSM\r\n\r\n\0\0\0\4\1\0\0\0\0\0\0N\1\4\0\0\0\1\203\206E\221bA\226\223\325\\k\337\31i=LnH\323j?A\223\266\243y\270\303\fYmLT{$\357]R.\203\223\257_\213\35u\320b\r&=LMedz\212\232\312\310\264\307`+\210K\203@\2te\206M\2035\5\261\37\0\0\5\0\1\0\0\0\1\0\0\0\0\0'
     local tag len val
     local -i n
-    IFS='' read -r tag <&3
+    IFS='' read -t 0.25 -r tag <&3
     tag=$'\015'
     while true; do
       tag=${__p9k_char2byte[${(q+)tag}]:-0}
       (( (tag >>= 3) && tag <= $#__p9k_nordvpn_tag )) || break
       tag=$__p9k_nordvpn_tag[tag]
-      sysread -c n -s 1 len <&3
-      (( n == 1 ))
+      sysread -c n -s 1 -t 0.25 len <&3
       len=${__p9k_char2byte[${(q+)len}]}
       [[ -n $len ]]
       val=
       (( ! len )) || {
-        sysread -c n -s $len val <&3
+        sysread -c n -s $len -t 0.25 val <&3
         (( n == len ))
       }
       typeset -g $tag=$val
-      sysread -c n -s 1 tag <&3
-      (( n < 2 ))
+      sysread -c n -s 1 -t 0.25 tag <&3
     done
   } always {
     exec {fd}>&-
-    [[ $P9K_NORDVPN_SERVER != (#b)([[:alpha:]]##)[[:digit:]]##.nordvpn.com ]] || P9K_NORDVPN_COUNTRY_CODE=${(U)match[1]}
   }
 }
 
 function prompt_nordvpn() {
-  _p9k_fetch_nordvpn_status
+  unset $__p9k_nordvpn_tag P9K_NORDVPN_COUNTRY_CODE
+  if [[ $+commands[nordvpn] == 1 && -e /run/nordvpnd.sock ]]; then
+    _p9k_fetch_nordvpn_status 2>/dev/null
+    if [[ $P9K_NORDVPN_SERVER == (#b)([[:alpha:]]##)[[:digit:]]##.nordvpn.com ]]; then
+      typeset -g P9K_NORDVPN_COUNTRY_CODE=${(U)match[1]}
+    fi
+  fi
   case $P9K_NORDVPN_STATUS in
     '')
       _p9k_prompt_segment $0_MISSING      blue white ''          0 '' '';;
