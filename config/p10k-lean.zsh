@@ -328,12 +328,6 @@ fi
   # like this: 1|0. prompt_char is green in this case.
   typeset -g POWERLEVEL9K_STATUS_OK_PIPE=true
   typeset -g POWERLEVEL9K_STATUS_OK_PIPE_FOREGROUND=9
-  
-  # Don't show status unless the last command was terminated by a signal. Your prompt symbol
-  # (prompt_char) indicates error by turning red. Error codes aren't usually interesting but
-  # signals are. This shows signals as "INT", "ABORT", "KILL", etc. You can remove this parameter
-  # for more verbose output.
-  typeset -g POWERLEVEL9K_STATUS_ERROR_CONTENT_EXPANSION='${${P9K_CONTENT#SIG}//[!A-Z]}'
 
   ###################[ command_execution_time: duration of the last command ]###################
   # Show duration of the last command if takes longer than this many seconds.
