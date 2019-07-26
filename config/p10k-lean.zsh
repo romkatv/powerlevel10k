@@ -337,8 +337,11 @@ fi
   ##########[ nordvpn: nordvpn connection status, linux only (https://nordvpn.com/) ]###########
   # NordVPN connection indicator color when connected.
   typeset -g POWERLEVEL9K_NORDVPN_CONNECTED_FOREGROUND=4
-  # NordVPN connection indicator color when disconnected.
-  typeset -g POWERLEVEL9K_NORDVPN_DISCONNECTED_FOREGROUND=3
+  # NordVPN connection indicator color when not connected.
+  typeset -g POWERLEVEL9K_NORDVPN_{DISCONNECTED,CONNECTING,DISCONNECTING}_FOREGROUND=3
+  # Uncomment these two lines to hide NordVPN connection indicator when not connected.
+  # typeset -g POWERLEVEL9K_NORDVPN_{DISCONNECTED,CONNECTING,DISCONNECTING}_CONTENT_EXPANSION=
+  # typeset -g POWERLEVEL9K_NORDVPN_{DISCONNECTED,CONNECTING,DISCONNECTING}_VISUAL_IDENTIFIER_EXPANSION=
 
   ####################################[ context: user@host ]####################################
   # Context format: user@host.

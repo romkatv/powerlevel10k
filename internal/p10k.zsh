@@ -2986,6 +2986,46 @@ function _p9k_fetch_nordvpn_status() {
   }
 }
 
+# Shows the state of NordVPN connection. Works only on Linux. Can be in the following 5 states.
+#
+# MISSING: NordVPN is not installed or nordvpnd is not running. By default the segment is not
+# shown in this state. To make it visible, override POWERLEVEL9K_NORDVPN_MISSING_CONTENT_EXPANSION
+# and/or POWERLEVEL9K_NORDVPN_MISSING_VISUAL_IDENTIFIER_EXPANSION.
+#
+#   # Display this icon when NordVPN is not installed or nordvpnd is not running
+#   POWERLEVEL9K_NORDVPN_MISSING_VISUAL_IDENTIFIER_EXPANSION='⭐'
+#
+# CONNECTED: NordVPN is connected. By default shows LOCK_ICON as icon and country code as content.
+# In addition, the following variables are set for the use by
+# POWERLEVEL9K_NORDVPN_CONNECTED_VISUAL_IDENTIFIER_EXPANSION and
+# POWERLEVEL9K_NORDVPN_CONNECTED_CONTENT_EXPANSION:
+#
+#   - P9K_NORDVPN_STATUS
+#   - P9K_NORDVPN_PROTOCOL
+#   - P9K_NORDVPN_IP_ADDRESS
+#   - P9K_NORDVPN_SERVER
+#   - P9K_NORDVPN_COUNTRY
+#   - P9K_NORDVPN_CITY
+#   - P9K_NORDVPN_COUNTRY_CODE
+#
+# The last variable is trivially derived from P9K_NORDVPN_SERVER. The rest correspond to the output
+# lines of `nordvpn status` command. Example of using these variables:
+#
+#   # Display the name of the city where VPN servers are located when connected to NordVPN.
+#   POWERLEVEL9K_NORDVPN_CONNECTED_CONTENT_EXPANSION='${P9K_NORDVPN_CITY}'
+#
+# DISCONNECTED, CONNECTING, DISCONNECTING: NordVPN is disconnected/connecting/disconnecting. By
+# default shows LOCK_ICON as icon and FAIL_ICON as content. In state CONNECTING the same
+# P9K_NORDVPN_* variables are set as in CONNECTED. In states DISCONNECTED and DISCONNECTING only
+# P9K_NORDVPN_STATUS is set. Example customizations:
+#
+#   # Hide NordVPN segment when disconnected (segments with no icon and no content are not shown).
+#   POWERLEVEL9K_NORDVPN_DISCONNECTED_CONTENT_EXPANSION=
+#   POWERLEVEL9K_NORDVPN_DISCONNECTED_VISUAL_IDENTIFIER_EXPANSION=
+#
+#   # When NordVPN is connecting, show country code on cyan background.
+#   POWERLEVEL9K_NORDVPN_CONNECTING_CONTENT_EXPANSION='${P9K_NORDVPN_COUNTRY_CODE}'
+#   POWERLEVEL9K_NORDVPN_CONNECTING_BACKGROUND=cyan
 function prompt_nordvpn() {
   unset $__p9k_nordvpn_tag P9K_NORDVPN_COUNTRY_CODE
   if [[ $+commands[nordvpn] == 1 && -e /run/nordvpnd.sock ]]; then
@@ -2995,16 +3035,14 @@ function prompt_nordvpn() {
     fi
   fi
   case $P9K_NORDVPN_STATUS in
-    '')
-      _p9k_prompt_segment $0_MISSING      blue white ''          0 '' '';;
     Connected)
-      _p9k_prompt_segment $0_CONNECTED    blue white LOCK_ICON   0 '' "$P9K_NORDVPN_COUNTRY_CODE";;
-    Disconnected)
-      _p9k_get_icon $0_DISCONNECTED FAIL_ICON
-      _p9k_prompt_segment $0_DISCONNECTED yellow white LOCK_ICON 0 '' "$_p9k_ret";;
+      _p9k_prompt_segment $0_CONNECTED blue   white LOCK_ICON 0 '' "$P9K_NORDVPN_COUNTRY_CODE";;
+    Disconnected|Connecting|Disconnecting)
+      local state=${(U)P9K_NORDVPN_STATUS}
+      _p9k_get_icon $0_$state FAIL_ICON
+      _p9k_prompt_segment $0_$state    yellow white LOCK_ICON 0 '' "$_p9k_ret";;
     *)
-      _p9k_get_icon $0_OTHER FAIL_ICON
-      _p9k_prompt_segment $0_OTHER        yellow white LOCK_ICON 0 '' "$_p9k_ret";;
+      _p9k_prompt_segment $0_MISSING   blue   white ''        0 '' '';;
   esac
 }
 
