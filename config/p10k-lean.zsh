@@ -3,7 +3,7 @@
 #
 # Once you've installed Powerlevel10k, run these commands to apply lean style.
 #
-#   curl -fsSL -O ~/p10k-lean.zsh https://raw.githubusercontent.com/romkatv/powerlevel10k/master/config/p10k-lean.zsh
+#   curl -fsSL -o ~/p10k-lean.zsh https://raw.githubusercontent.com/romkatv/powerlevel10k/master/config/p10k-lean.zsh
 #   echo 'source ~/p10k-lean.zsh' >>! ~/.zshrc
 #
 # To customize your prompt, open ~/p10k-lean.zsh in your favorite text editor, change it and
