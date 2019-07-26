@@ -2101,13 +2101,13 @@ prompt_status() {
 
 prompt_prompt_char() {
   if (( __p9k_exit_code )); then
-    _p9k_prompt_segment $0_ERROR_VIINS "$_p9k_color1" 196 '' 0 '${${KEYMAP:-0}:#vicmd}' '❯'
+    _p9k_prompt_segment $0_ERROR_VIINS "$_p9k_color1" 196 '' 0 '${${KEYMAP:-0}:#(vicmd|vivis|vivli)}' '❯'
     _p9k_prompt_segment $0_ERROR_VICMD "$_p9k_color1" 196 '' 0 '${(M)${:-$KEYMAP$_p9k_region_active}:#vicmd0}' '❮'
-    _p9k_prompt_segment $0_ERROR_VIVIS "$_p9k_color1" 196 '' 0 '${(M)${:-$KEYMAP$_p9k_region_active}:#vicmd1}' 'Ⅴ'
+    _p9k_prompt_segment $0_ERROR_VIVIS "$_p9k_color1" 196 '' 0 '${(M)${:-$KEYMAP$_p9k_region_active}:#(vicmd1|vivis?|vivli?)}' 'Ⅴ'
   else
-    _p9k_prompt_segment $0_OK_VIINS "$_p9k_color1" 76 '' 0 '${${KEYMAP:-0}:#vicmd}' '❯'
+    _p9k_prompt_segment $0_OK_VIINS "$_p9k_color1" 76 '' 0 '${${KEYMAP:-0}:#(vicmd|vivis|vivli)}' '❯'
     _p9k_prompt_segment $0_OK_VICMD "$_p9k_color1" 76 '' 0 '${(M)${:-$KEYMAP$_p9k_region_active}:#vicmd0}' '❮'
-    _p9k_prompt_segment $0_OK_VIVIS "$_p9k_color1" 76 '' 0 '${(M)${:-$KEYMAP$_p9k_region_active}:#vicmd1}' 'Ⅴ'
+    _p9k_prompt_segment $0_OK_VIVIS "$_p9k_color1" 76 '' 0 '${(M)${:-$KEYMAP$_p9k_region_active}:#(vicmd1|vivis?|vivli?)}' 'Ⅴ'
   fi
 }
 
@@ -2765,13 +2765,13 @@ prompt_vcs() {
 # Vi Mode: show editing mode (NORMAL|INSERT|VISUAL)
 prompt_vi_mode() {
   if [[ -n $_POWERLEVEL9K_VI_INSERT_MODE_STRING ]]; then
-    _p9k_prompt_segment $0_INSERT "$_p9k_color1" blue '' 0 '${${KEYMAP:-0}:#vicmd}' "$_POWERLEVEL9K_VI_INSERT_MODE_STRING"
+    _p9k_prompt_segment $0_INSERT "$_p9k_color1" blue '' 0 '${${KEYMAP:-0}:#(vicmd|vivis|vivli)}' "$_POWERLEVEL9K_VI_INSERT_MODE_STRING"
   fi
   if (( $+_POWERLEVEL9K_VI_VISUAL_MODE_STRING )); then
     _p9k_prompt_segment $0_NORMAL "$_p9k_color1" white '' 0 '${(M)${:-$KEYMAP$_p9k_region_active}:#vicmd0}' "$_POWERLEVEL9K_VI_COMMAND_MODE_STRING"
-    _p9k_prompt_segment $0_VISUAL "$_p9k_color1" white '' 0 '${(M)${:-$KEYMAP$_p9k_region_active}:#vicmd1}' "$_POWERLEVEL9K_VI_VISUAL_MODE_STRING"
+    _p9k_prompt_segment $0_VISUAL "$_p9k_color1" white '' 0 '${(M)${:-$KEYMAP$_p9k_region_active}:#(vicmd1|vivis?|vivli?)}' "$_POWERLEVEL9K_VI_VISUAL_MODE_STRING"
   else
-    _p9k_prompt_segment $0_NORMAL "$_p9k_color1" white '' 0 '${(M)KEYMAP:#vicmd}' "$_POWERLEVEL9K_VI_COMMAND_MODE_STRING"
+    _p9k_prompt_segment $0_NORMAL "$_p9k_color1" white '' 0 '${(M)KEYMAP:#(vicmd|vivis|vivli)}' "$_POWERLEVEL9K_VI_COMMAND_MODE_STRING"
   fi
 }
 
