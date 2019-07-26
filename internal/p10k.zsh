@@ -1190,7 +1190,7 @@ prompt_context() {
 ################################################################
 # User: user (who am I)
 prompt_user() {
-  if ! _p9k_cache_get $0 $1 $2; then
+  if ! _p9k_cache_get $0; then
     local user=$(whoami)
     if [[ $_POWERLEVEL9K_ALWAYS_SHOW_USER == 0 && $user == $DEFAULT_USER ]]; then
       _p9k_cache_set true
@@ -1468,7 +1468,7 @@ prompt_dir() {
 
   [[ $_POWERLEVEL9K_DIR_SHOW_WRITABLE == 1 && ! -w $PWD ]]
   local w=$?
-  if ! _p9k_cache_get $0 $2 $PWD $w $fake_first "${parts[@]}"; then
+  if ! _p9k_cache_get $0 $PWD $w $fake_first "${parts[@]}"; then
     local state=$0
     local icon=''
     if (( ! w )); then
@@ -2061,57 +2061,36 @@ prompt_ssh() {
   fi
 }
 
-_p9k_exit_code_or_status() {
-  local ec=$1
-  if (( _POWERLEVEL9K_STATUS_HIDE_SIGNAME || ec <= 128 )); then
-    _p9k_ret=$ec
-  else
-    _p9k_ret="SIG${signals[$((ec - 127))]}($((ec - 128)))"
-  fi
-}
-
 ################################################################
 # Status: When an error occur, return the error code, or a cross icon if option is set
 # Display an ok icon when no error occur, or hide the segment if option is set to false
 prompt_status() {
-  if ! _p9k_cache_get "$0" "$2" "$__p9k_exit_code" "${(@)__p9k_pipe_exit_codes}"; then
-    local ec_text
-    local ec_sum
-    local ec
-
-    if (( _POWERLEVEL9K_STATUS_SHOW_PIPESTATUS )); then
-      if (( $#__p9k_pipe_exit_codes > 1 )); then
-        ec_sum=${__p9k_pipe_exit_codes[1]}
-        _p9k_exit_code_or_status "${__p9k_pipe_exit_codes[1]}"
-
-      else
-        ec_sum=${__p9k_exit_code}
-        _p9k_exit_code_or_status "${__p9k_exit_code}"
+  if ! _p9k_cache_get $0 $__p9k_exit_code $__p9k_pipe_exit_codes; then
+    (( __p9k_exit_code )) && local state=ERROR || local state=OK
+    if (( _POWERLEVEL9K_STATUS_EXTENDED_STATES )); then
+      if (( __p9k_exit_code )); then
+        if (( $#__p9k_pipe_exit_codes > 1 )); then
+          state+=_PIPE
+        elif (( __p9k_exit_code > 128 )); then
+          state+=_SIGNAL
+        fi
+      elif [[ "$__p9k_pipe_exit_codes" == *[1-9]* ]]; then
+        state+=_PIPE
       fi
-      ec_text=$_p9k_ret
-      for ec in "${(@)__p9k_pipe_exit_codes[2,-1]}"; do
-        (( ec_sum += ec ))
-        _p9k_exit_code_or_status "$ec"
-        ec_text+="|$_p9k_ret"
-      done
-    else
-      ec_sum=${__p9k_exit_code}
-      # We use __p9k_exit_code instead of the right-most __p9k_pipe_exit_codes item because
-      # PIPE_FAIL may be set.
-      _p9k_exit_code_or_status "${__p9k_exit_code}"
-      ec_text=$_p9k_ret
     fi
-
-    if (( ec_sum > 0 )); then
-      if (( !_POWERLEVEL9K_STATUS_CROSS && _POWERLEVEL9K_STATUS_VERBOSE )); then
-        _p9k_cache_val=("$0_ERROR" red yellow1 CARRIAGE_RETURN_ICON 0 '' "$ec_text")
-      else
-        _p9k_cache_val=("$0_ERROR" "$_p9k_color1" red FAIL_ICON 0 '' '')
+    _p9k_cache_val=(:)
+    if (( _POWERLEVEL9K_STATUS_$state )); then
+      local text=${(j:|:)${(@)__p9k_pipe_exit_codes:/(#b)(*)/$_p9k_exitcode2str[$match[1]+1]}}
+      if (( __p9k_exit_code )); then
+        if (( !_POWERLEVEL9K_STATUS_CROSS && _POWERLEVEL9K_STATUS_VERBOSE )); then
+          _p9k_cache_val=($0_$state red yellow1 CARRIAGE_RETURN_ICON 0 '' "$text")
+        else
+          _p9k_cache_val=($0_$state $_p9k_color1 red FAIL_ICON 0 '' '')
+        fi
+      elif (( _POWERLEVEL9K_STATUS_VERBOSE || _POWERLEVEL9K_STATUS_OK_IN_NON_VERBOSE )); then
+        [[ $state == OK ]] && text=''
+        _p9k_cache_val=($0_$state "$_p9k_color1" green OK_ICON 0 '' "$text")
       fi
-    elif (( _POWERLEVEL9K_STATUS_OK && (_POWERLEVEL9K_STATUS_VERBOSE || _POWERLEVEL9K_STATUS_OK_IN_NON_VERBOSE) )); then
-      _p9k_cache_val=("$0_OK" "$_p9k_color1" green OK_ICON 0 '' '')
-    else
-      return
     fi
     if (( $#__p9k_pipe_exit_codes < 3 )); then
       _p9k_cache_set "${(@)_p9k_cache_val}"
@@ -3168,6 +3147,7 @@ p9k_refresh_prompt_inplace() { powerlevel9k_refresh_prompt_inplace }
 _p9k_precmd() {
   __p9k_exit_code=$?
   __p9k_pipe_exit_codes=( $pipestatus )
+  (( $#__p9k_pipe_exit_codes == 1 )) && __p9k_pipe_exit_codes[1]=$__p9k_exit_code
   __p9k_timer_end=EPOCHREALTIME
 
   if (( $+_p9k_real_zle_rprompt_indent )); then
@@ -3568,8 +3548,14 @@ _p9k_init_params() {
   _p9k_declare -b POWERLEVEL9K_CHRUBY_SHOW_ENGINE 1
   _p9k_declare -b POWERLEVEL9K_STATUS_CROSS 0
   _p9k_declare -b POWERLEVEL9K_STATUS_OK 1
+  _p9k_declare -b POWERLEVEL9K_STATUS_OK_PIPE 1
+  _p9k_declare -b POWERLEVEL9K_STATUS_ERROR 1
+  _p9k_declare -b POWERLEVEL9K_STATUS_ERROR_PIPE 1
+  _p9k_declare -b POWERLEVEL9K_STATUS_ERROR_SIGNAL 1
   _p9k_declare -b POWERLEVEL9K_STATUS_SHOW_PIPESTATUS 1
   _p9k_declare -b POWERLEVEL9K_STATUS_HIDE_SIGNAME 0
+  _p9k_declare -b POWERLEVEL9K_STATUS_VERBOSE_SIGNAME 1
+  _p9k_declare -b POWERLEVEL9K_STATUS_EXTENDED_STATES 0
   _p9k_declare -b POWERLEVEL9K_STATUS_VERBOSE 1
   _p9k_declare -b POWERLEVEL9K_STATUS_OK_IN_NON_VERBOSE 0
   # Format for the current time: 09:51:02. See `man 3 strftime`.
@@ -4150,6 +4136,18 @@ _p9k_init() {
       done
     done
     typeset -grA __p9k_char2byte
+  fi
+
+  if _p9k_segment_in_use status; then
+    typeset -g _p9k_exitcode2str=({0..255})
+    local -i i=2
+    if (( !_POWERLEVEL9K_STATUS_HIDE_SIGNAME )); then
+      for ((; i <= $#signals; ++i)); do
+        local sig=$signals[i]
+        (( _POWERLEVEL9K_STATUS_VERBOSE_SIGNAME )) && sig="SIG${sig}($((i-1)))"
+        _p9k_exitcode2str[$((128+i))]=$sig
+      done
+    fi
   fi
 
   _p9k_wrap_zle_widget zle-keymap-select _p9k_zle_keymap_select

@@ -306,10 +306,29 @@ fi
   typeset -g POWERLEVEL9K_VCS_STAGED_ICON=$'%{\b+%}'
 
   ##########################[ status: exit code of the last command ]###########################
-  # Don't show status on success. Prompt symbol (prompt_char) indicates success with green color.
+  # Enable OK_PIPE, ERROR_PIPE and ERROR_SIGNAL status states to allow us to enable, disable and
+  # style them independently from the regular OK and ERROR state.
+  typeset -g POWERLEVEL9K_STATUS_EXTENDED_STATES=true
+  # Don't show status on success. prompt_char already indicates success with green color.
   typeset -g POWERLEVEL9K_STATUS_OK=false
-  # Error status color.
+  # Don't show status when it's just an error code (e.g., '1'). prompt_char already indicates errors
+  # with red color and error codes aren't interesting enough to waste prompt real estate on them.
+  typeset -g POWERLEVEL9K_STATUS_ERROR=false
   typeset -g POWERLEVEL9K_STATUS_ERROR_FOREGROUND=9
+  # Show status when the last command was terminated by a signal.
+  typeset -g POWERLEVEL9K_STATUS_ERROR_SIGNAL=true
+  typeset -g POWERLEVEL9K_STATUS_ERROR_SIGNAL_FOREGROUND=9
+  # Use terse signal names: "INT" instead of "SIGINT(2)".
+  typeset -g POWERLEVEL9K_STATUS_VERBOSE_SIGNAME=false
+  # Show status when a pipe command fails and the overall exit status is non-zero. It may look
+  # like this: 0|1. prompt_char is red in this case.
+  typeset -g POWERLEVEL9K_STATUS_ERROR_PIPE=true
+  typeset -g POWERLEVEL9K_STATUS_ERROR_PIPE_FOREGROUND=9
+  # Show status when a pipe command fails and the overall exit status is zero. It may look
+  # like this: 1|0. prompt_char is green in this case.
+  typeset -g POWERLEVEL9K_STATUS_OK_PIPE=true
+  typeset -g POWERLEVEL9K_STATUS_OK_PIPE_FOREGROUND=9
+  
   # Don't show status unless the last command was terminated by a signal. Your prompt symbol
   # (prompt_char) indicates error by turning red. Error codes aren't usually interesting but
   # signals are. This shows signals as "INT", "ABORT", "KILL", etc. You can remove this parameter
