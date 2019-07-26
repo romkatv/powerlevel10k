@@ -93,11 +93,10 @@ fi
   # Powerline font to use them. See POWERLEVEL9K_MODE below.
   typeset -g POWERLEVEL9K_VISUAL_IDENTIFIER_EXPANSION=
 
-  # This option doesn't make a difference unless you've enabled default icons for all or some
-  # prompt segments (see POWERLEVEL9K_VISUAL_IDENTIFIER_EXPANSION above). Default icons depend on
-  # the value of POWERLEVEL9K_MODE. For example, LOCK_ICON can be printed as $'\uE0A2', $'\uE138'
-  # or $'\uF023' depending on POWERLEVEL9K_MODE. The correct value of this parameter depends on
-  # the provider of the font your terminal is using.
+  # This option makes a difference only when default icons are enabled for all or some prompt
+  # segments (see POWERLEVEL9K_VISUAL_IDENTIFIER_EXPANSION above). LOCK_ICON can be printed as
+  # $'\uE0A2', $'\uE138' or $'\uF023' depending on POWERLEVEL9K_MODE. The correct value of this
+  # parameter depends on the provider of the font your terminal is using.
   #
   #   Font Provider                    | POWERLEVEL9K_MODE
   #   ---------------------------------+-------------------
@@ -108,6 +107,13 @@ fi
   #   Awesome-Terminal Fonts (regular) | awesome-fontconfig
   #   Awesome-Terminal Fonts (patched) | awesome-patched
   #   Nerd Fonts                       | nerdfont-complete
+  #   Other                            | compatible
+  #
+  # If this looks overwhelming, either stick with a preinstalled system font and set
+  # POWERLEVEL9K_MODE=compatible, or install a font from https://github.com/ryanoasis/nerd-fonts
+  # and set POWERLEVEL9K_MODE=nerdfont-complete. "Meslo LG S Regular Nerd Font Complete Mono" from
+  # https://github.com/ryanoasis/nerd-fonts/tree/master/patched-fonts/Meslo/S/Regular/complete is
+  # very good.
   typeset -g POWERLEVEL9K_MODE=nerdfont-complete
 
   # When set to true, icons appear before content on both sides of the prompt. When set
