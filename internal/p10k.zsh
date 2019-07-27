@@ -850,22 +850,22 @@ typeset -gr __p9k_prompt_segment_usage="Usage: p9k_prompt_segment [{+|-}re] [-s 
 
 Options:
   -t text   segment's main content; will undergo prompt expansion: '%F{blue}%T%f' will
-            show as blue current time
-  -i icon   segment's icon
+            show as blue current time; default is empty
+  -i icon   segment's icon; default is empty
   -r        icon is a symbolic reference that needs to be resolved; for example, 'LOCK_ICON'
   +r        icon is already resolved and should be printed literally; for example, '⭐';
             this is the default; you can also use $'\u2B50' if you don't want to have
             non-ascii characters in source code
   -b bg     background color; for example, 'blue', '4', or '#0000ff'; empty value means
-            transparent background, as in '%k'
+            transparent background, as in '%k'; default is black
   -f fg     foreground color; for example, 'blue', '4', or '#0000ff'; empty value means
-            default foreground color, as in '%f'
+            default foreground color, as in '%f'; default is empty
   -s state  segment's state for the purpose of applying styling options; if you want to
             to be able to use POWERLEVEL9K parameters to specify different colors or icons
             depending on some property, use different states for different values of that
             property
   -c        condition; if empty after parameter expansion and process substitution, the
-            segment is hidden; this is an advanced feature, use with caution
+            segment is hidden; this is an advanced feature, use with caution; default is '1'
   -e        segment's main content will undergo parameter expansion and process
             substitution; the content will be surrounded with double quotes and thus
             should quote its own double quotes; this is an advanced feature, use with
@@ -916,7 +916,7 @@ Example customizations:
 # Type `p9k_prompt_segment -h` for usage.
 function p9k_prompt_segment() {
   emulate -L zsh && setopt no_hist_expand extended_glob
-  local opt state bg fg icon cond text ref=0 expand=0
+  local opt state bg=0 fg icon cond text ref=0 expand=0
   while getopts ':s:b:f:i:c:t:re' opt; do
     case $opt in
       s) state=$OPTARG;;
