@@ -911,8 +911,7 @@ Example customizations:
   POWERLEVEL9K_CORE_PROTECTED_VISUAL_IDENTIFIER_EXPANSION='❎'
 
   # Don't show file size when PROTECTED.
-  POWERLEVEL9K_CORE_PROTECTED_CONTENT_EXPANSION=''
-"
+  POWERLEVEL9K_CORE_PROTECTED_CONTENT_EXPANSION=''"
 
 # Type `p9k_prompt_segment -h` for usage.
 function p9k_prompt_segment() {
@@ -938,9 +937,11 @@ function p9k_prompt_segment() {
     echo -E - $__p9k_prompt_segment_usage >&2
     return 1
   }
-  (( ref )) || icon=$'\1'$icon
-  "_p9k_${_p9k_prompt_side}_prompt_segment" "prompt_${_p9k_segment_name}${state:+_${(U)state}}" \
-      "$bg" "${fg:-$_p9k_color1}" "$icon" "$expand" "$cond" "$text"
+  if [[ -n $_p9k_prompt_side ]]; then
+    (( ref )) || icon=$'\1'$icon
+    "_p9k_${_p9k_prompt_side}_prompt_segment" "prompt_${_p9k_segment_name}${state:+_${(U)state}}" \
+        "$bg" "${fg:-$_p9k_color1}" "$icon" "$expand" "$cond" "$text"
+  fi
   return 0
 }
 
@@ -3129,6 +3130,7 @@ function _p9k_set_prompt() {
   PROMPT+=$_p9k_prompt_suffix_left
   [[ -n $RPROMPT ]] && RPROMPT=$_p9k_prompt_prefix_right$RPROMPT$_p9k_prompt_suffix_right
 
+  _p9k_prompt_side=
   (( $#_p9k_cache < _POWERLEVEL9K_MAX_CACHE_SIZE )) || _p9k_cache=()
 }
 
