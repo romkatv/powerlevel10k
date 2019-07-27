@@ -1231,8 +1231,8 @@ _p9k_custom_prompt() {
 ################################################################
 # Display the duration the command needed to run.
 prompt_command_execution_time() {
-  (( __p9k_timer_start )) || return
-  P9K_COMMAND_DURATION_SECONDS=$((__p9k_timer_end - __p9k_timer_start))
+  (( _p9k_timer_start )) || return
+  P9K_COMMAND_DURATION_SECONDS=$((_p9k_timer_end - _p9k_timer_start))
   (( P9K_COMMAND_DURATION_SECONDS >= _POWERLEVEL9K_COMMAND_EXECUTION_TIME_THRESHOLD )) || return
 
   if (( P9K_COMMAND_DURATION_SECONDS < 60 )); then
@@ -2065,23 +2065,27 @@ prompt_ssh() {
 # Status: When an error occur, return the error code, or a cross icon if option is set
 # Display an ok icon when no error occur, or hide the segment if option is set to false
 prompt_status() {
-  if ! _p9k_cache_get $0 $__p9k_exit_code $__p9k_pipe_exit_codes; then
-    (( __p9k_exit_code )) && local state=ERROR || local state=OK
+  if ! _p9k_cache_get $0 $_p9k_status $_p9k_pipestatus; then
+    (( _p9k_status )) && local state=ERROR || local state=OK
     if (( _POWERLEVEL9K_STATUS_EXTENDED_STATES )); then
-      if (( __p9k_exit_code )); then
-        if (( $#__p9k_pipe_exit_codes > 1 )); then
+      if (( _p9k_status )); then
+        if (( $#_p9k_pipestatus > 1 )); then
           state+=_PIPE
-        elif (( __p9k_exit_code > 128 )); then
+        elif (( _p9k_status > 128 )); then
           state+=_SIGNAL
         fi
-      elif [[ "$__p9k_pipe_exit_codes" == *[1-9]* ]]; then
+      elif [[ "$_p9k_pipestatus" == *[1-9]* ]]; then
         state+=_PIPE
       fi
     fi
     _p9k_cache_val=(:)
     if (( _POWERLEVEL9K_STATUS_$state )); then
-      local text=${(j:|:)${(@)__p9k_pipe_exit_codes:/(#b)(*)/$_p9k_exitcode2str[$match[1]+1]}}
-      if (( __p9k_exit_code )); then
+      if (( _POWERLEVEL9K_STATUS_SHOW_PIPESTATUS )); then
+        local text=${(j:|:)${(@)_p9k_pipestatus:/(#b)(*)/$_p9k_exitcode2str[$match[1]+1]}}
+      else
+        local text=$_p9k_exitcode2str[_p9k_status+1]
+      fi
+      if (( _p9k_status )); then
         if (( !_POWERLEVEL9K_STATUS_CROSS && _POWERLEVEL9K_STATUS_VERBOSE )); then
           _p9k_cache_val=($0_$state red yellow1 CARRIAGE_RETURN_ICON 0 '' "$text")
         else
@@ -2092,7 +2096,7 @@ prompt_status() {
         _p9k_cache_val=($0_$state "$_p9k_color1" green OK_ICON 0 '' "$text")
       fi
     fi
-    if (( $#__p9k_pipe_exit_codes < 3 )); then
+    if (( $#_p9k_pipestatus < 3 )); then
       _p9k_cache_set "${(@)_p9k_cache_val}"
     fi
   fi
@@ -2100,7 +2104,7 @@ prompt_status() {
 }
 
 prompt_prompt_char() {
-  if (( __p9k_exit_code )); then
+  if (( _p9k_status )); then
     _p9k_prompt_segment $0_ERROR_VIINS "$_p9k_color1" 196 '' 0 '${${KEYMAP:-0}:#(vicmd|vivis|vivli)}' '❯'
     _p9k_prompt_segment $0_ERROR_VICMD "$_p9k_color1" 196 '' 0 '${(M)${:-$KEYMAP$_p9k_region_active}:#vicmd0}' '❮'
     _p9k_prompt_segment $0_ERROR_VIVIS "$_p9k_color1" 196 '' 0 '${(M)${:-$KEYMAP$_p9k_region_active}:#(vicmd1|vivis?|vivli?)}' 'Ⅴ'
@@ -2187,7 +2191,7 @@ prompt_time() {
       t=$_p9k_ret
       _p9k_escape $_POWERLEVEL9K_TIME_FORMAT
       _p9k_prompt_segment "$0" "$_p9k_color2" "$_p9k_color1" "TIME_ICON" 1 '' \
-          "\${_p9k_line_finish-$t}\${_p9k_line_finish+$_p9k_ret}"
+          "\${_p9k_line_finished-$t}\${_p9k_line_finished+$_p9k_ret}"
     else
       _p9k_prompt_segment "$0" "$_p9k_color2" "$_p9k_color1" "TIME_ICON" 0 '' $t
     fi
@@ -3034,7 +3038,8 @@ _p9k_preexec() {
     fi
     unset _p9k_real_zle_rprompt_indent
   fi
-  __p9k_timer_start=EPOCHREALTIME
+  _p9k_preexec_cmd=$2
+  _p9k_timer_start=EPOCHREALTIME
 }
 
 function _p9k_build_segment() {
@@ -3048,8 +3053,6 @@ function _p9k_build_segment() {
 }
 
 function _p9k_set_prompt() {
-  unset _p9k_line_finish
-  unset _p9k_rprompt_override
   PROMPT=$_p9k_prompt_prefix_left
   RPROMPT=
 
@@ -3079,7 +3082,9 @@ function _p9k_set_prompt() {
     left_idx=_p9k_segment_index
     _p9k_prompt+=$_p9k_line_suffix_left[i]
     if (( $+_p9k_dir || (i != num_lines && $#right) )); then
-      PROMPT+='${${:-${_p9k_d::=0}${_p9k_rprompt::=${_p9k_rprompt_override-'$right'}}${_p9k_lprompt::='$_p9k_prompt'}}+}'
+      PROMPT+='${${:-${_p9k_d::=0}${_p9k_rprompt::='
+      [[ -o transient_rprompt ]] && PROMPT+='${_p9k_line_finished-'$right'}' || PROMPT+=$right
+      PROMPT+='}${_p9k_lprompt::='$_p9k_prompt'}}+}'
       PROMPT+=$_p9k_gap_pre
       if (( $+_p9k_dir )); then
         if (( i == num_lines && (_POWERLEVEL9K_DIR_MIN_COMMAND_COLUMNS > 0 || _POWERLEVEL9K_DIR_MIN_COMMAND_COLUMNS_PCT > 0) )); then
@@ -3144,11 +3149,55 @@ powerlevel9k_refresh_prompt_inplace() {
 
 p9k_refresh_prompt_inplace() { powerlevel9k_refresh_prompt_inplace }
 
+typeset -ga __p9k_last_cmd_state
+
+_p9k_save_status() {
+  emulate -L zsh && setopt no_hist_expand extended_glob
+  local -i pipe
+  if (( !$+_p9k_line_finished )); then
+    :  # SIGINT
+  elif (( !$+_p9k_preexec_cmd )); then
+    # Empty line, comment or parse error.
+    #
+    # This case is handled incorrectly:
+    #
+    #   true | false
+    #   |
+    #
+    # Here status=1 and pipestatus=(0 1). Ideally we should ignore pipestatus but we won't.
+    #
+    # This works though (unless pipefail is set):
+    #
+    #   false | true
+    #   |
+    #
+    # We get status=1 and pipestatus=(1 0) and correctly ignore pipestatus.
+    (( _p9k_status == __p9k_last_cmd_state[2] )) && return
+  elif (( ${${__p9k_last_cmd_state[3,-1]}[(I)$__p9k_last_cmd_state[2]]} )); then  # just in case
+    local cmd=(${(z)_p9k_preexec_cmd})
+    if [[ $#cmd != 0 && $cmd[1] != '!' && ${(Q)cmd[1]} != coproc ]]; then
+      local arg
+      for arg in ${(z)_p9k_preexec_cmd}; do
+        # '()' is for functions, *';' is for complex commands.
+        if [[ $arg == ('()'|'&&'|'||'|'&'|'&|'|'&!'|*';') ]]; then
+          pipe=0
+          break
+        elif [[ $arg == *('|'|'|&')* ]]; then
+          pipe=1
+        fi
+      done
+    fi
+  fi
+  _p9k_status=$__p9k_last_cmd_state[2]
+  if (( pipe )); then
+    _p9k_pipestatus=($__p9k_last_cmd_state[3,-1])
+  else
+    _p9k_pipestatus=($__p9k_last_cmd_state[2])
+  fi
+}
+
 _p9k_precmd() {
-  __p9k_exit_code=$?
-  __p9k_pipe_exit_codes=( $pipestatus )
-  (( $#__p9k_pipe_exit_codes == 1 )) && __p9k_pipe_exit_codes[1]=$__p9k_exit_code
-  __p9k_timer_end=EPOCHREALTIME
+  __p9k_last_cmd_state=($EPOCHREALTIME $? $pipestatus)
 
   if (( $+_p9k_real_zle_rprompt_indent )); then
     if [[ -n $_p9k_real_zle_rprompt_indent ]]; then
@@ -3165,9 +3214,14 @@ _p9k_precmd() {
   prompt_opts=(cr percent sp subst)
   setopt nopromptbang prompt{cr,percent,sp,subst}
 
+  _p9k_timer_end=$__p9k_last_cmd_state[1]
+  _p9k_save_status
+
   powerlevel9k_refresh_prompt_inplace
 
-  __p9k_timer_start=0
+  unset _p9k_line_finished
+  unset _p9k_preexec_cmd
+  _p9k_timer_start=0
   _p9k_region_active=0
 }
 
@@ -3343,6 +3397,11 @@ function _p9k_prompt_overflow_bug() {
 }
 
 _p9k_init_vars() {
+  typeset -gi _p9k_reset_on_line_finish
+  typeset -gF _p9k_timer_start
+  typeset -gF _p9k_timer_end
+  typeset -gi _p9k_status
+  typeset -ga _p9k_pipestatus
   typeset -g  _p9k_param_sig
   typeset -g  _p9k_ret
   typeset -g  _p9k_cache_key
@@ -3657,9 +3716,8 @@ _p9k_wrap_zle_widget() {
 
 function _p9k_zle_line_finish() {
   (( __p9k_enabled )) || return
-  [[ ! -o TRANSIENT_RPROMPT ]] || _p9k_rprompt_override=
-  _p9k_line_finish=
-  zle && zle .reset-prompt && zle -R
+  _p9k_line_finished=
+  (( _p9k_reset_on_line_finish )) && zle && zle .reset-prompt && zle -R
 }
 
 function _p9k_zle_line_pre_redraw() {
@@ -3888,8 +3946,11 @@ _p9k_init_prompt() {
     _p9k_prompt_prefix_left+="%{$(iterm2_prompt_mark)%}"
   fi
 
-  if [[ -o TRANSIENT_RPROMPT && -n "$_p9k_line_segments_right[2,-1]" ]] || 
-     ( _p9k_segment_in_use time && (( _POWERLEVEL9K_TIME_UPDATE_ON_COMMAND )) ); then
+  [[ -o transient_rprompt && -n "$_p9k_line_segments_right[1,-2]" ]] ||
+     ( _p9k_segment_in_use time && (( _POWERLEVEL9K_TIME_UPDATE_ON_COMMAND )) )
+  _p9k_reset_on_line_finish=$((!$?))
+
+  if _p9k_reset_on_line_finish || _p9k_segment_in_use status; then
     _p9k_wrap_zle_widget zle-line-finish _p9k_zle_line_finish
   fi
 }
@@ -4165,10 +4226,6 @@ prompt_powerlevel9k_setup() {
   emulate -L zsh && setopt no_hist_expand extended_glob
   prompt_powerlevel9k_teardown
   __p9k_enabled=1
-  typeset -gF __p9k_timer_start=0
-  typeset -gF __p9k_timer_end=0
-  typeset -gi __p9k_exit_code=0
-  typeset -ga __p9k_pipe_exit_codes=()
   add-zsh-hook preexec _p9k_preexec
   add-zsh-hook precmd _p9k_precmd
 }
