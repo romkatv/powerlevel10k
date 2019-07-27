@@ -199,7 +199,7 @@ fi
   # Enable special styling for non-writable directories.
   typeset -g POWERLEVEL9K_DIR_SHOW_WRITABLE=true
   # Show this icon when the current directory is not writable. Empty for no icon. 
-  # POWERLEVEL9K_DIR_NOT_WRITABLE_VISUAL_IDENTIFIER_EXPANSION='⭐'
+  # typeset -g POWERLEVEL9K_DIR_NOT_WRITABLE_VISUAL_IDENTIFIER_EXPANSION='⭐'
 
   # POWERLEVEL9K_DIR_CLASSES allows you to specify custom icons for different directories.
   # It must be an array with 3 * N elements. Each triplet consists of:
