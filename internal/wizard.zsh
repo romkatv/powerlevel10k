@@ -1,125 +1,195 @@
+function _p9k_clear() {
+  if (( $+commands[clear] )); then
+    clear
+  elif zmodload zsh/termcap 2>/dev/null; then
+    echotc cl
+  else
+    print -n "\e[H\e[J"
+  fi
+}
 
+function _p9k_make_link() {
+  echo $'%{\e]8;;'${1//\%/%%}$'\a%}'${1//\%/%%}$'%{\e]8;;\a%}'
+}
 
-if [[ -n $AWESOME_GLYPHS_LOADED ]]; then
-  echo awesome-mapped-fontconfig
-else
-  echo $'\uE0B2\uE0B0'
-  echo "Does this look like a diamond (square rotated 45 degrees)?"
-  $'\uE0B2\uE0B0'
-  
-  if N; then
-    echo nothing
+function _p9k_ask_diamond() {
+  while true; do
+    _p9k_clear
+    print -P "This is %B%4FPowerlevel10k configuration wizard%f%b. You are seeing it because"
+    print -P "you haven't defined any Powerlevel10k configuration options. It will"
+    print -P "ask you a few questions and configure your prompt."
+    print -P ""
+    print -P "   %BDoes this look like a %2Fdiamond%f (square rotated 45 degrees)?%b"
+    print -P "       reference: $(_p9k_make_link https://graphemica.com/%E2%97%86)"
+    print -P ""
+    print -P "                   --->  %B\uE0B2\uE0B0%b  <---"
+    print -P ""
+    print -P "(%By%b)  Yes."
+    print -P ""
+    print -P "(%Bn%b)  No."
+    print -P ""
+    print -P "%248F(q)  Quit and do nothing.%f"
+    print -P ""
+
+    local key=
+    read -k key"?Choice [ynq]: " || return 1
+    case $key in
+      q) _p9k_configure_quit; return 1;;
+      y) typeset -gi _p9k_caps_diamond=1; break;;
+      n) typeset -gi _p9k_caps_diamond=0; break;;
+    esac
+  done
+}
+
+function _p9k_ask_lock() {
+  while true; do
+    _p9k_clear
+    print -P "      %BWhich of these icons looks like a %2Flock%f?%b"
+    print -P "  reference: $(_p9k_make_link https://fontawesome.com/icons/lock)"
+    print -P ""
+    print -P "                 Icon #1"
+    print -P ""
+    print -P "             --->  %B%3F\uE138%f%b  <---"
+    print -P ""
+    print -P "                 Icon #2"
+    print -P ""
+    print -P "             --->  %B%4F\uF023%f%b  <---"
+    print -P ""
+    print -P "(%B1%b)  Only icon #1 ( %B%3F\uE138%f%b )."
+    print -P ""
+    print -P "(%B2%b)  Only icon #2 ( %B%4F\uF023%f%b )."
+    print -P ""
+    print -P "(%Bn%b)  Neither."
+    print -P ""
+    print -P "(%Bb%b)  Both."
+    print -P ""
+    print -P "%248F(r)  Restart from the beginning.%f"
+    print -P ""
+    print -P "%248F(q)  Quit and do nothing.%f"
+    print -P ""
+
+    local key=
+    read -k key"?Choice [12nbrq]: " || return 1
+    case $key in
+      q) _p9k_configure_quit; return 1;;
+      r) return 2;;
+      1|2) typeset -g _p9k_caps_lock=$key; break;;
+      b) typeset -g _p9k_caps_lock=12; break;;
+      n) typeset -g _p9k_caps_lock=; break;;
+    esac
+  done
+}
+
+function _p9k_ask_python() {
+  while true; do
+    _p9k_clear
+    print -P "         %BDoes this look like a %2FPython logo%f?%b"
+    print -P "  reference: $(_p9k_make_link https://fontawesome.com/icons/python)"
+    print -P ""
+    print -P "                  --->  %B\uE63C%b  <---"
+    print -P ""
+    print -P "(%By%b)  Yes."
+    print -P ""
+    print -P "(%Bn%b)  No."
+    print -P ""
+    print -P "%248F(r)  Restart from the beginning.%f"
+    print -P ""
+    print -P "%248F(q)  Quit and do nothing.%f"
+    print -P ""
+
+    local key=
+    read -k key"?Choice [ynrq]: " || return 1
+    case $key in
+      q) _p9k_configure_quit; return 1;;
+      r) return 2;;
+      y) typeset -gi _p9k_caps_python=1; break;;
+      n) typeset -gi _p9k_caps_python=0; break;;
+    esac
+  done
+}
+
+function _p9k_ask_icon_width() {
+  if [[ $1 == (powerline|compatible) ]]; then
+    typeset -gi _p9k_caps_narrow_icons=0
     return
   fi
-  echo 1 $'\UE138'
-  echo 2 $'\UF023'
-  echo "Which of these looks like a lock?"
-  if neither; then
-    echo powerline
-    return
-  fi
-  if 1; then
-    echo awesome-patched
-    return
-  fi
-  echo $'\ue63c'
-  echo "Does it look like a Python logo? https://commons.wikimedia.org/wiki/File:Python-logo-notext.svg"
-  if yes; then
-    echo awesome-fontconfig
-    return
-  fi
-  echo nerfont-complete
-fi
+  local text=$(
+    POWERLEVEL9K_MODE=$1
+    _p9k_init_icons
+    echo -n "X%1F${icons[VCS_GIT_ICON]// }%fX"
+    echo -n "%2F${icons[VCS_GIT_GITHUB_ICON]// }%fX"
+    echo -n "%3F${icons[DATE_ICON]// }%fX"
+    echo -n "%4F${icons[TIME_ICON]// }%fX"
+    echo -n "%5F${icons[RUBY_ICON]// }%fX"
+    echo -n "%6F${icons[AWS_EB_ICON]// }%fX"
+  )
+  while true; do
+    _p9k_clear
+    print -P "      %BDo all these icons %2Ffit between the crosses%f?"
+    print -P ""
+    print -P "                  --->  %B$text%b  <---"
+    print -P ""
+    print -P "(%By%b)  Yes. Icons are very close to the crosses but there is %B%2Fno overlap%f%b."
+    print -P ""
+    print -P "(%Bn%b)  No. Some icons %B%2Foverlap%f%b neighbouring crosses."
+    print -P ""
+    print -P "%248F(r)  Restart from the beginning.%f"
+    print -P ""
+    print -P "%248F(q)  Quit and do nothing.%f"
+    print -P ""
 
-awesome-mapped-fontconfig)
-  has $AWESOME_GLYPHS_LOADED
+    local key=
+    read -k key"?Choice [ynrq]: " || return 1
+    case $key in
+      q) _p9k_configure_quit; return 1;;
+      r) return 2;;
+      y) typeset -gi _p9k_caps_narrow_icons=1; break;;
+      n) typeset -gi _p9k_caps_narrow_icons=2; break;;
+    esac
+  done
+}
 
-'flat'|'awesome-patched')
-  LOCK_ICON $'\UE138'
+function _p9k_configure_quit() {
+  _p9k_clear
+  print -P "Powerlevel10k configuration wizard will run again next time unless"
+  print -P "you define at least one Powerlevel10k configuration option. To define"
+  print -P "an option that does nothing except for disabling Powerlevel10k"
+  print -P "configuration wizard, type the following command:"
+  print -P ""
+  print -P "  %2Fecho%f %3F'POWERLEVEL9K_MODE='%f %15F>>! ${ZDOTDIR:-~}/.zshrc%f"
+  print -P ""
+}
 
-'awesome-fontconfig')
-  LOCK_ICON $'\UF023'
+function _p9k_configure() {
+  emulate -L zsh && setopt no_hist_expand extended_glob
 
-'nerdfont-complete'|'nerdfont-fontconfig')
-  LOCK_ICON $'\UF023'
+  local zd=${ZDOTDIR:-$HOME}
+  [[ -w $zd ]] || return 1
+  [[ -t 0 && -t 1 ]] || return 1
+  (( LINES > 20 && COLUMNS > 70 )) || return 1
 
-*)
- LOCK_ICON $'\UE0A2'
+  while true; do
+    _p9k_ask_diamond || { (( $? == 2 )) && continue || return }
+    local mode
+    if [[ -n $AWESOME_GLYPHS_LOADED ]]; then
+      mode=awesome-mapped-fontconfig
+    else
+      _p9k_ask_lock || { (( $? == 2 )) && continue || return }
+      if [[ $_p9k_caps_lock == 1 ]]; then
+        (( _p9k_caps_diamond )) && mode=awesome-patched || mode=flat
+      elif [[ -z $_p9k_caps_lock ]]; then
+        (( _p9k_caps_diamond )) && mode=powerline || mode=compatible
+      else
+        _p9k_ask_python || { (( $? == 2 )) && continue || return }
+        (( _p9k_caps_python )) && mode=awesome-fontconfig || mode=nerdfont-complete
+      fi
+    fi
+    _p9k_ask_icon_width $mode || { (( $? == 2 )) && continue || return }
+    break
+  done
+  _p9k_clear
 
-ROOT_ICON
-awesome-fontconfig \uF201
-nerfont            \uE614
-flat|awesome-patched               \uE801
+  typeset -p mode _p9k_caps_diamond _p9k_caps_narrow_icons
+}
 
-1. Nerd Fonts
-
-Lock: $'\UF023'
-
-2. Awesome Fontconfig (fallback strategy)
-
-Lock: $'\UF023'
-Lightning: $'\uF201'
-
-3. Awesome Fontconfig (patch strategy)
-
-Lock: $'\UE138'
-Lightning: $'\uE801'
-
----------------------------
-This is the Z Shell configuration function for new users,
-zsh-newuser-install.
-You are seeing this message because you have no zsh startup files
-(the files .zshenv, .zprofile, .zshrc, .zlogin in the directory
-~).  This function can help you with a few settings that should
-make your use of the shell easier.
-
-You can:
-
-(q)  Quit and do nothing.  The function will be run again next time.
-
-(0)  Exit, creating the file ~/.zshrc containing just a comment.
-     That will prevent this function being run again.
-
-(1)  Continue to the main menu.
-
-(2)  Populate your ~/.zshrc with the configuration recommended
-     by the system administrator and exit (you will need to edit
-     the file by hand, if so desired).
-
---- Type one of the keys in parentheses --- 
-
-Please pick one of the following options:
-
-(1)  Configure settings for history, i.e. command lines remembered
-     and saved by the shell.  (Recommended.)
-
-(2)  Configure the new completion system.  (Recommended.)
-
-(3)  Configure how keys behave when editing command lines.  (Recommended.)
-
-(4)  Pick some of the more common shell options.  These are simple "on"
-     or "off" switches controlling the shell's features.  
-
-(0)  Exit, creating a blank ~/.zshrc file.
-
-(a)  Abort all settings and start from scratch.  Note this will overwrite
-     any settings from zsh-newuser-install already in the startup file.
-     It will not alter any of your other settings, however.
-
-(q)  Quit and do nothing else.  The function will be run again next time.
---- Type one of the keys in parentheses --- 
-
-History configuration
-=====================
-
-# (1) Number of lines of history kept within the shell.
-HISTSIZE=1000                                                                                                                                                  (not yet saved)
-# (2) File where history is saved.
-HISTFILE=~/.histfile                                                                                                                                           (not yet saved)
-# (3) Number of lines of history to save to $HISTFILE.
-SAVEHIST=1000                                                                                                                                                  (not yet saved)
-
-# (0)  Remember edits and return to main menu (does not save file yet)
-# (q)  Abandon edits and return to main menu
-
---- Type one of the keys in parentheses --- 
+_p9k_configure
