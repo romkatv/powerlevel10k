@@ -54,6 +54,7 @@ fi
       # node_version          # node.js version
       # kubecontext           # current kubernetes context (https://kubernetes.io/)
       # nordvpn               # nordvpn connection status, linux only (https://nordvpn.com/)
+      # example               # example user-defined segment (see prompt_example function below)
       context                 # user@host
       # =========================[ Line #2 ]=========================
       newline
@@ -66,7 +67,6 @@ fi
   # change them.
   typeset -g POWERLEVEL9K_BACKGROUND=                            # transparent background
   typeset -g POWERLEVEL9K_{LEFT,RIGHT}_{LEFT,RIGHT}_WHITESPACE=  # no surrounding whitespace
-  typeset -g POWERLEVEL9K_RPROMPT_ON_NEWLINE=false               # align the first left/right lines
   typeset -g POWERLEVEL9K_{LEFT,RIGHT}_SUBSEGMENT_SEPARATOR=' '  # separate segments with a space
   typeset -g POWERLEVEL9K_{LEFT,RIGHT}_SEGMENT_SEPARATOR=        # no end-of-line symbol
 
@@ -74,6 +74,9 @@ fi
   #
   # To enable default icons for all segments, don't define POWERLEVEL9K_VISUAL_IDENTIFIER_EXPANSION
   # or set it to '${P9K_VISUAL_IDENTIFIER}'.
+  #
+  # To remove trailing space from all default icons, set POWERLEVEL9K_VISUAL_IDENTIFIER_EXPANSION
+  # to '${P9K_VISUAL_IDENTIFIER% }'.
   #
   # To enable default icons for one segment (e.g., dir), set
   # POWERLEVEL9K_DIR_VISUAL_IDENTIFIER_EXPANSION='${P9K_VISUAL_IDENTIFIER}'.
@@ -83,11 +86,6 @@ fi
   #
   # To assign a specific icon to a segment in a given state (e.g., dir in state NOT_WRITABLE),
   # set POWERLEVEL9K_DIR_NOT_WRITABLE_VISUAL_IDENTIFIER_EXPANSION='⭐'.
-  #
-  # When a segment is displaying its default icon, in addition to being able to chage it with
-  # VISUAL_IDENTIFIER_EXPANSION as described above, you can also change it with an override
-  # such as POWERLEVEL9K_LOCK_ICON='⭐'. This will change the icon in every segment that uses
-  # LOCK_ICON as default icon. If this paragraph looks confusing, forget what it says.
   #
   # Note: You can use $'\u2B50' instead of '⭐'. It's especially convenient when specifying
   # icons that your text editor cannot render. Don't forget to put $ and use single quotes when
@@ -121,14 +119,14 @@ fi
   typeset -g POWERLEVEL9K_MODE=nerdfont-complete
 
   # When set to true, icons appear before content on both sides of the prompt. When set
-  # to false, icons go after content. If not set, icons go before content in the left prompt
-  # and after content in the right prompt.
+  # to false, icons go after content. If empty or not set, icons go before content in the left
+  # prompt and after content in the right prompt.
   #
   # You can also override it for a specific segment:
   #
   #   POWERLEVEL9K_STATUS_ICON_BEFORE_CONTENT=false
   #
-  # Or for specific segment in specific state:
+  # Or for a specific segment in specific state:
   #
   #   POWERLEVEL9K_DIR_NOT_WRITABLE_ICON_BEFORE_CONTENT=false
   typeset -g POWERLEVEL9K_ICON_BEFORE_CONTENT=true
@@ -366,22 +364,20 @@ fi
   typeset -g POWERLEVEL9K_BACKGROUND_JOBS_VISUAL_IDENTIFIER_EXPANSION='⇶'
   # Background jobs icon color.
   typeset -g POWERLEVEL9K_BACKGROUND_JOBS_VISUAL_IDENTIFIER_COLOR=2
-  # Custom icon.
-  # typeset -g POWERLEVEL9K_BACKGROUND_JOBS_VISUAL_IDENTIFIER_EXPANSION='⭐'
 
   ##########[ nordvpn: nordvpn connection status, linux only (https://nordvpn.com/) ]###########
   # NordVPN connection indicator color when connected.
   typeset -g POWERLEVEL9K_NORDVPN_CONNECTED_FOREGROUND=4
   # NordVPN connection indicator color when not connected.
   typeset -g POWERLEVEL9K_NORDVPN_{DISCONNECTED,CONNECTING,DISCONNECTING}_FOREGROUND=3
-  # Uncomment these two lines to hide NordVPN connection indicator when not connected.
-  # typeset -g POWERLEVEL9K_NORDVPN_{DISCONNECTED,CONNECTING,DISCONNECTING}_CONTENT_EXPANSION=
-  # typeset -g POWERLEVEL9K_NORDVPN_{DISCONNECTED,CONNECTING,DISCONNECTING}_VISUAL_IDENTIFIER_EXPANSION=
   # Custom icons.
   # typeset -g POWERLEVEL9K_NORDVPN_CONNECTED_VISUAL_IDENTIFIER_EXPANSION='⭐'
   # typeset -g POWERLEVEL9K_NORDVPN_DISCONNECTED_VISUAL_IDENTIFIER_EXPANSION='⭐'
   # typeset -g POWERLEVEL9K_NORDVPN_CONNECTING_VISUAL_IDENTIFIER_EXPANSION='⭐'
   # typeset -g POWERLEVEL9K_NORDVPN_DISCONNECTING_VISUAL_IDENTIFIER_EXPANSION='⭐'
+  # Uncomment these two lines to hide NordVPN connection indicator when not connected.
+  # typeset -g POWERLEVEL9K_NORDVPN_{DISCONNECTED,CONNECTING,DISCONNECTING}_CONTENT_EXPANSION=
+  # typeset -g POWERLEVEL9K_NORDVPN_{DISCONNECTED,CONNECTING,DISCONNECTING}_VISUAL_IDENTIFIER_EXPANSION=
 
   ####################################[ context: user@host ]####################################
   # Context format: user@host.
@@ -476,7 +472,7 @@ fi
   # typeset -g POWERLEVEL9K_KUBECONTEXT_PROD_VISUAL_IDENTIFIER_EXPANSION='⭐'
   # typeset -g POWERLEVEL9K_KUBECONTEXT_TEST_FOREGROUND=2
   # typeset -g POWERLEVEL9K_KUBECONTEXT_TEST_VISUAL_IDENTIFIER_EXPANSION='⭐'
-  typeset -g POWERLEVEL9K_KUBECONTEXT_DEFAULT_FOREGROUND=3
+  typeset -g POWERLEVEL9K_KUBECONTEXT_DEFAULT_FOREGROUND=5
   # typeset -g POWERLEVEL9K_KUBECONTEXT_DEFAULT_VISUAL_IDENTIFIER_EXPANSION='⭐'
 
   # Kubernetes context too long? You can shorten it by defining an expansion. The original
@@ -513,9 +509,6 @@ fi
   typeset -g POWERLEVEL9K_BATTERY_CHARGED_{CONTENT,VISUAL_IDENTIFIER}_EXPANSION=
   # Don't show the remaining time to charge/discharge.
   typeset -g POWERLEVEL9K_BATTERY_VERBOSE=false
-  # Disable the default icon because POWERLEVEL9K_BATTERY_STAGES is enough to cue the meaning
-  # of this segment.
-  typeset -g POWERLEVEL9K_BATTERY_VISUAL_IDENTIFIER_EXPANSION=
 
   ####################################[ time: current time ]####################################
   # Current time color.
@@ -528,6 +521,19 @@ fi
   typeset -g POWERLEVEL9K_TIME_UPDATE_ON_COMMAND=false
   # Custom icon.
   # typeset -g POWERLEVEL9K_TIME_VISUAL_IDENTIFIER_EXPANSION='⭐'
+
+  # Example of a user-defined prompt segment. Function prompt_example will be called on every
+  # prompt if `example` prompt segment is added to POWERLEVEL9K_LEFT_PROMPT_ELEMENTS or
+  # POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS. It displays an icon and blue text greeting the user.
+  #
+  # Type `p9k_prompt_segment -h` for documentation and a more sophisticated example.
+  function prompt_example() {
+    p9k_prompt_segment -f 4 -i '⭐' -t 'hello, %n'
+  }
+
+  # User-defined prompt segments can be customized the same way as built-in segments.
+  typeset -g POWERLEVEL9K_EXAMPLE_FOREGROUND=4
+  typeset -g POWERLEVEL9K_EXAMPLE_VISUAL_IDENTIFIER_EXPANSION='${P9K_VISUAL_IDENTIFIER}'
 }
 
 (( ! p10k_lean_restore_aliases )) || setopt aliases
