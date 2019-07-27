@@ -1,3 +1,17 @@
+#!/usr/bin/env zsh
+
+emulate -L zsh
+setopt extended_glob noaliases
+
+readonly _p9k_root_dir=${1:-${0:h:h}}
+
+source $_p9k_root_dir/internal/icons.zsh || return
+
+readonly zd=${ZDOTDIR:-$HOME}
+readonly zdu=${zd/#(#b)$HOME(|\/*)/'~'$match[1]}
+
+POWERLEVEL9K_MODE=
+
 function _p9k_clear() {
   if (( $+commands[clear] )); then
     clear
@@ -109,23 +123,20 @@ function _p9k_ask_python() {
 }
 
 function _p9k_ask_icon_width() {
-  if [[ $1 == (powerline|compatible) ]]; then
+  if [[ $POWERLEVEL9K_MODE == (powerline|compatible) ]]; then
     typeset -gi _p9k_caps_narrow_icons=0
     return
   fi
-  local text=$(
-    POWERLEVEL9K_MODE=$1
-    _p9k_init_icons
-    echo -n "X%1F${icons[VCS_GIT_ICON]// }%fX"
-    echo -n "%2F${icons[VCS_GIT_GITHUB_ICON]// }%fX"
-    echo -n "%3F${icons[DATE_ICON]// }%fX"
-    echo -n "%4F${icons[TIME_ICON]// }%fX"
-    echo -n "%5F${icons[RUBY_ICON]// }%fX"
-    echo -n "%6F${icons[AWS_EB_ICON]// }%fX"
-  )
+  local text="X"
+  text+="X%1F${icons[VCS_GIT_ICON]// }%fX"
+  text+="%2F${icons[VCS_GIT_GITHUB_ICON]// }%fX"
+  text+="%3F${icons[DATE_ICON]// }%fX"
+  text+="%4F${icons[TIME_ICON]// }%fX"
+  text+="%5F${icons[RUBY_ICON]// }%fX"
+  text+="%6F${icons[AWS_EB_ICON]// }%fX"
   while true; do
     _p9k_clear
-    print -P "      %BDo all these icons %2Ffit between the crosses%f?"
+    print -P "      %BDo all these icons %2Ffit between the crosses%f?%b"
     print -P ""
     print -P "                  --->  %B$text%b  <---"
     print -P ""
@@ -156,13 +167,149 @@ function _p9k_configure_quit() {
   print -P "an option that does nothing except for disabling Powerlevel10k"
   print -P "configuration wizard, type the following command:"
   print -P ""
-  print -P "  %2Fecho%f %3F'POWERLEVEL9K_MODE='%f %15F>>! ${ZDOTDIR:-~}/.zshrc%f"
+  print -P "  %2Fecho%f %3F'POWERLEVEL9K_MODE='%f %15F>>! $zdu/.zshrc%f"
   print -P ""
 }
 
-function _p9k_configure() {
-  emulate -L zsh && setopt no_hist_expand extended_glob
+function _p9k_ask_style() {
+  if (( ! _p9k_caps_diamond )); then
+    typeset -g _p9k_style=lean
+    return
+  fi
+  while true; do
+    _p9k_clear
+    print -P "            %BChoose your prompt style%b"
+    print -P ""
+    print -P "                    %B%3FLean%f%b"
+    print -P ""
+    print -P "         %B%39F~%b%12F/%B%39Fpowerlevel10k%b %76Fmaster ⇡2%f"
+    print -P "         %76F❯%f █"
+    print -P ""
+    print -P "                  %B%3FClassic%f%b"
+    print -P ""
+    print -P "     %8F╭─%K{0} %B%39F~%b%K{0}%12F/%B%39Fpowerlevel10k%b%K{0} %244F\uE0B1 %76Fmaster ⇡2 %k%0F\uE0B0"
+    print -P "     %8F╰─%f █"
+    print -P ""
+    print -P "(%B1%b)  %B%3FLean%f%b."
+    print -P ""
+    print -P "(%B2%b)  %B%4FClassic%f%b."
+    print -P ""
+    print -P "%248F(r)  Restart from the beginning.%f"
+    print -P ""
+    print -P "%248F(q)  Quit and do nothing.%f"
+    print -P ""
 
+    local key=
+    read -k key"?Choice [12rq]: " || return 1
+    case $key in
+      q) _p9k_configure_quit; return 1;;
+      r) return 2;;
+      1) typeset -g _p9k_style=lean; break;;
+      2) typeset -g _p9k_style=classic; break;;
+    esac
+  done
+}
+
+function _p9k_ask_lines() {
+  while true; do
+    _p9k_clear
+    print -P "             %BOne or two prompt lines?%b"
+    print -P ""
+    print -P "                    %BOne Line%b"
+    print -P ""
+    if [[ $_p9k_style == lean ]]; then
+      print -P "         %B%39F~%b%12F/%B%39Fpowerlevel10k%b %76Fmaster ⇡2 %76F❯%f █"
+    else
+      print -P "       %K{0} %B%39F~%b%K{0}%12F/%B%39Fpowerlevel10k%b%K{0} %244F\uE0B1 %76Fmaster ⇡2 %k%0F\uE0B0%f █"
+    fi
+    print -P ""
+    print -P "                    %BTwo Lines%b"
+    print -P ""
+    if [[ $_p9k_style == lean ]]; then
+      print -P "         %B%39F~%b%12F/%B%39Fpowerlevel10k%b %76Fmaster ⇡2%f"
+      print -P "         %76F❯%f █"
+    else
+      print -P "     %8F╭─%K{0} %B%39F~%b%K{0}%12F/%B%39Fpowerlevel10k%b%K{0} %244F\uE0B1 %76Fmaster ⇡2 %k%0F\uE0B0"
+      print -P "     %8F╰─%f █"
+    fi
+    print -P ""
+    print -P "(%B1%b)  %BOne Line%b."
+    print -P ""
+    print -P "(%B2%b)  %BTwo lines%b."
+    print -P ""
+    print -P "%248F(r)  Restart from the beginning.%f"
+    print -P ""
+    print -P "%248F(q)  Quit and do nothing.%f"
+    print -P ""
+
+    local key=
+    read -k key"?Choice [12rq]: " || return 1
+    case $key in
+      q) _p9k_configure_quit; return 1;;
+      r) return 2;;
+      1|2) typeset -gi _p9k_lines=$key; break;;
+    esac
+  done
+}
+
+function _p9k_ask_overwrite() {
+  typeset -g _p9k_config_backup
+  if [[ ! -e $zd/.p10k.zsh ]]; then
+    typeset -gi _p9k_overwrite=1
+    return
+  fi
+  while true; do
+    _p9k_clear
+    print -P "      %BConfig already exists: %2F$zdu/.p10k.zsh%f%b"
+    print -P ""
+    print -P "(%Bw%b)  %B%2FOverwrite%f $zdu/.p10k.zsh%b with the new config."
+    print -P ""
+    print -P "(%Bk%b)  %B%2FKeep%f $zdu/.p10k.zsh%b and discard the new content."
+    print -P ""
+    print -P "%248F(r)  Restart from the beginning.%f"
+    print -P ""
+    print -P "%248F(q)  Quit and do nothing.%f"
+    print -P ""
+
+    local key=
+    read -k key"?Choice [wkrq]: " || return 1
+    case $key in
+      q) _p9k_configure_quit; return 1;;
+      r) return 2;;
+      w)
+        _p9k_config_backup=$(mktemp ${TMPDIR:-/tmp}/.p10k.zsh.XXXXXXXXXX) || return 1
+        cp $zd/.p10k.zsh $_p9k_config_backup
+        typeset -gi _p9k_overwrite=1
+        break
+        ;;
+      k) typeset -gi _p9k_overwrite=0; break;;
+    esac
+  done
+}
+
+function _p9k_generate_config() {
+  local -a cfg && cfg=("${(@f)$(< $_p9k_root_dir/config/p10k-$_p9k_style.zsh)}") || return
+  cfg=("${(@)cfg/#  typeset -g POWERLEVEL9K_MODE=*/  typeset -g POWERLEVEL9K_MODE=$POWERLEVEL9K_MODE}")
+  if [[ $POWERLEVEL9K_MODE == (powerline|compatible) && $_p9k_style == lean ]]; then
+    local exp="''"
+  elif (( _p9k_caps_narrow_icons )); then
+    local exp="'\${P9K_VISUAL_IDENTIFIER// }'"
+  else
+    local exp="'\${P9K_VISUAL_IDENTIFIER}'"
+  fi
+  cfg=("${(@)cfg/#  typeset -g POWERLEVEL9K_VISUAL_IDENTIFIER_EXPANSION=*/  typeset -g POWERLEVEL9K_VISUAL_IDENTIFIER_EXPANSION=$exp}")
+  if (( _p9k_lines == 1 )); then
+    local -a tmp
+    local line
+    for line in "$cfg[@]"; do
+      [[ $line == ('      newline'|*'===[ Line #'*) ]] || tmp+=$line
+    done
+    cfg=("$tmp[@]")
+  fi
+  print -lr -- "$cfg[@]" >$zd/.p10k.zsh
+}
+
+function _p9k_configure() {
   local zd=${ZDOTDIR:-$HOME}
   [[ -w $zd ]] || return 1
   [[ -t 0 && -t 1 ]] || return 1
@@ -170,26 +317,50 @@ function _p9k_configure() {
 
   while true; do
     _p9k_ask_diamond || { (( $? == 2 )) && continue || return }
-    local mode
     if [[ -n $AWESOME_GLYPHS_LOADED ]]; then
-      mode=awesome-mapped-fontconfig
+      POWERLEVEL9K_MODE=awesome-mapped-fontconfig
     else
       _p9k_ask_lock || { (( $? == 2 )) && continue || return }
       if [[ $_p9k_caps_lock == 1 ]]; then
-        (( _p9k_caps_diamond )) && mode=awesome-patched || mode=flat
+        (( _p9k_caps_diamond )) && POWERLEVEL9K_MODE=awesome-patched || POWERLEVEL9K_MODE=flat
       elif [[ -z $_p9k_caps_lock ]]; then
-        (( _p9k_caps_diamond )) && mode=powerline || mode=compatible
+        (( _p9k_caps_diamond )) && POWERLEVEL9K_MODE=powerline || POWERLEVEL9K_MODE=compatible
       else
         _p9k_ask_python || { (( $? == 2 )) && continue || return }
-        (( _p9k_caps_python )) && mode=awesome-fontconfig || mode=nerdfont-complete
+        (( _p9k_caps_python )) && POWERLEVEL9K_MODE=awesome-fontconfig || POWERLEVEL9K_MODE=nerdfont-complete
       fi
     fi
-    _p9k_ask_icon_width $mode || { (( $? == 2 )) && continue || return }
+    _p9k_init_icons
+    _p9k_ask_icon_width || { (( $? == 2 )) && continue || return }
+    _p9k_ask_style || { (( $? == 2 )) && continue || return }
+    _p9k_ask_lines || { (( $? == 2 )) && continue || return }
+    _p9k_ask_overwrite || { (( $? == 2 )) && continue || return }
     break
   done
+
   _p9k_clear
 
-  typeset -p mode _p9k_caps_diamond _p9k_caps_narrow_icons
+  if [[ -n $_p9k_config_backup ]]; then
+    print -P "The previous version of your %B%2F$zdu/.p10k.zsh%f%b has been moved"
+    print -P "to %B%2F$_p9k_config_backup%f%b."
+  fi
+
+  if (( _p9k_overwrite )); then
+    _p9k_generate_config || return
+  fi
+
+  local comments=(
+    "# Apply the personalized Powerlevel10k configuration."
+    "# You can customize your prompt by editing this file."
+    "# To run configuration wizard again, remove the next line."
+  )
+
+  print -lr -- "" $comments "source $zdu/.p10k.zsh" >>$zd/.zshrc
+
+  print -P ""
+  print -P "The following lines have been appended to your %B%2F$zdu/.zshrc%f%b:"
+  print -P ""
+  print -lP -- '  %8F'${^comments}'%f' "  %2Fsource%f %15F$zdu/.p10k.zsh%f"
 }
 
 _p9k_configure
