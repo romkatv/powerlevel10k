@@ -114,7 +114,7 @@ fi
   typeset -g POWERLEVEL9K_NODENV_PROMPT_ALWAYS_SHOW=false
 
   # Show node version only when in a directory tree containing package.json.
-  typeset -g P9K_NODE_VERSION_PROJECT_ONLY=true
+  typeset -g POWERLEVEL9K_NODE_VERSION_PROJECT_ONLY=true
 
   # Kubernetes context classes for the purpose of using different colors with
   # different contexts.
