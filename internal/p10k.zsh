@@ -3950,7 +3950,7 @@ _p9k_init_prompt() {
      ( _p9k_segment_in_use time && (( _POWERLEVEL9K_TIME_UPDATE_ON_COMMAND )) )
   _p9k_reset_on_line_finish=$((!$?))
 
-  if _p9k_reset_on_line_finish || _p9k_segment_in_use status; then
+  if (( _p9k_reset_on_line_finish )) || _p9k_segment_in_use status; then
     _p9k_wrap_zle_widget zle-line-finish _p9k_zle_line_finish
   fi
 }
