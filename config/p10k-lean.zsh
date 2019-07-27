@@ -75,8 +75,9 @@ fi
   # To enable default icons for all segments, don't define POWERLEVEL9K_VISUAL_IDENTIFIER_EXPANSION
   # or set it to '${P9K_VISUAL_IDENTIFIER}'.
   #
-  # To remove trailing space from all default icons, set POWERLEVEL9K_VISUAL_IDENTIFIER_EXPANSION
-  # to '${P9K_VISUAL_IDENTIFIER% }'.
+  # To remove spaces from all default icons, set POWERLEVEL9K_VISUAL_IDENTIFIER_EXPANSION
+  # to '${P9K_VISUAL_IDENTIFIER// }'. You'll know that you you need this option if you see extra
+  # spaces after icons.
   #
   # To enable default icons for one segment (e.g., dir), set
   # POWERLEVEL9K_DIR_VISUAL_IDENTIFIER_EXPANSION='${P9K_VISUAL_IDENTIFIER}'.
