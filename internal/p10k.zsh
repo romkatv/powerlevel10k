@@ -3149,7 +3149,8 @@ powerlevel9k_refresh_prompt_inplace() {
 
 p9k_refresh_prompt_inplace() { powerlevel9k_refresh_prompt_inplace }
 
-typeset -ga __p9k_last_cmd_state
+typeset -gi __p9k_new_status
+typeset -ga __p9k_new_pipestatus
 
 _p9k_save_status() {
   emulate -L zsh && setopt no_hist_expand extended_glob
@@ -3172,8 +3173,8 @@ _p9k_save_status() {
     #   |
     #
     # We get status=1 and pipestatus=(1 0) and correctly ignore pipestatus.
-    (( _p9k_status == __p9k_last_cmd_state[2] )) && return
-  elif (( ${${__p9k_last_cmd_state[3,-1]}[(I)$__p9k_last_cmd_state[2]]} )); then  # just in case
+    (( _p9k_status == __p9k_new_status )) && return
+  elif (( $__p9k_new_pipestatus[(I)$__p9k_new_status] )); then  # just in case
     local cmd=(${(z)_p9k_preexec_cmd})
     if [[ $#cmd != 0 && $cmd[1] != '!' && ${(Q)cmd[1]} != coproc ]]; then
       local arg
@@ -3188,16 +3189,17 @@ _p9k_save_status() {
       done
     fi
   fi
-  _p9k_status=$__p9k_last_cmd_state[2]
+  _p9k_status=$__p9k_new_status
   if (( pipe )); then
-    _p9k_pipestatus=($__p9k_last_cmd_state[3,-1])
+    _p9k_pipestatus=($__p9k_new_pipestatus)
   else
-    _p9k_pipestatus=($__p9k_last_cmd_state[2])
+    _p9k_pipestatus=($_p9k_status)
   fi
 }
 
 _p9k_precmd() {
-  __p9k_last_cmd_state=($EPOCHREALTIME $? $pipestatus)
+  __p9k_new_status=$?
+  __p9k_new_pipestatus=($pipestatus)
 
   if (( $+_p9k_real_zle_rprompt_indent )); then
     if [[ -n $_p9k_real_zle_rprompt_indent ]]; then
@@ -3214,7 +3216,7 @@ _p9k_precmd() {
   prompt_opts=(cr percent sp subst)
   setopt nopromptbang prompt{cr,percent,sp,subst}
 
-  _p9k_timer_end=$__p9k_last_cmd_state[1]
+  _p9k_timer_end=EPOCHREALTIME
   _p9k_save_status
 
   powerlevel9k_refresh_prompt_inplace
