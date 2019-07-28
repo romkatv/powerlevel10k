@@ -4,7 +4,27 @@ emulate -L zsh
 setopt extended_glob noaliases
 
 () {
-typeset -gr __p9k_root_dir=${1:-${0:h:h:A}}
+
+typeset -g __p9k_root_dir
+typeset -gi force=0
+
+local opt
+while getopts 'd:f' opt; do
+  case $opt in
+    d)  __p9k_root_dir=$OPTARG;;
+    f)  force=1;;
+    +f) force=0;;
+    '?') return 1;;
+  esac
+done
+
+if (( OPTIND <= ARGC )); then
+  print -lr -- "wizard.zsh: invalid arguments: $@" >&2
+  return 1
+fi
+
+: ${__p9k_root_dir:=${0:h:h:A}}
+
 source $__p9k_root_dir/internal/configure.zsh || return
 
 typeset -ra lean_left=(
@@ -30,7 +50,7 @@ typeset -ra classic_right=(
 typeset -ri prompt_indent=4
 
 local POWERLEVEL9K_MODE style config_backup gap_char
-local -i num_lines write_config flat_sep empty_line
+local -i num_lines write_config straight empty_line
 local -i cap_diamond cap_python cap_narrow_icons cap_lock
 
 function prompt_length() {
@@ -59,9 +79,10 @@ function print_prompt() {
     left=($left[2] $left[4])
     right=($right[1] $right[3])
   fi
-  if (( flat_sep )); then
-    left=("${(@)${(@)left//\\uE0B1/|}//\\uE0B0/▓▒░}")
-    right=("${(@)${(@)right//\\uE0B3/|}//\\uE0B2/░▒▓}")
+  if (( straight )); then
+    (( cap_diamond )) && local subsep='\uE0BD' || local subsep='|'
+    left=("${(@)${(@)left//\\uE0B1/$subsep}//\\uE0B0/▓▒░}")
+    right=("${(@)${(@)right//\\uE0B3/$subsep}//\\uE0B2/░▒▓}")
   fi
   local -i i
   for ((i = 1; i < $#left; i+=2)); do
@@ -98,21 +119,35 @@ function clear() {
 
 function quit() {
   clear
-  print -P "Powerlevel10k configuration wizard will run again next time unless"
-  print -P "you define at least one Powerlevel10k configuration option. To define"
-  print -P "an option that does nothing except for disabling Powerlevel10k"
-  print -P "configuration wizard, type the following command:"
-  print -P ""
-  print -P "  %2Fecho%f %3F'POWERLEVEL9K_MODE='%f %15F>>! $__p9k_zshrc_u%f"
-  print -P ""
+  if (( force )); then
+    print -P "Powerlevel10k configuration wizard has been aborted. To run it again, type:"
+    print -P ""
+    print -P "  %2Fp9k_configure%f"
+  else
+    print -P "Powerlevel10k configuration wizard will run again next time unless"
+    print -P "you define at least one Powerlevel10k configuration option. To define"
+    print -P "an option that does nothing except for disabling Powerlevel10k"
+    print -P "configuration wizard, type the following command:"
+    print -P ""
+    print -P "  %2Fecho%f %3F'POWERLEVEL9K_MODE='%f %15F>>! $__p9k_zshrc_u%f"
+    print -P ""
+    print -P "To run Powerlevel10k configuration wizard right now, type:"
+    print -P ""
+    print -P "  %2Fp9k_configure%f"
+  fi
 }
 
 function ask_diamond() {
   while true; do
     clear
-    print -P "This is %B%4FPowerlevel10k configuration wizard%f%b. You are seeing it because"
-    print -P "you haven't defined any Powerlevel10k configuration options. It will"
-    print -P "ask you a few questions and configure your prompt."
+    if (( force )); then
+      print -P "This is %B%4FPowerlevel10k configuration wizard%f%b. It will ask you a few"
+      print -P "questions and configure your prompt."
+    else
+      print -P "This is %B%4FPowerlevel10k configuration wizard%f%b. You are seeing it because"
+      print -P "you haven't defined any Powerlevel10k configuration options. It will"
+      print -P "ask you a few questions and configure your prompt."
+    fi
     print -P ""
     centered "%BDoes this look like a %2Fdiamond%f (square rotated 45 degrees)?%b"
     centered "reference: $(href https://graphemica.com/%E2%97%86)"
@@ -260,9 +295,9 @@ function ask_style() {
   done
 }
 
-function ask_flat_sep() {
+function ask_straight() {
   if [[ $style != classic || $cap_diamond == 0 ]]; then
-    flat_sep=1
+    straight=1
     return
   fi
   while true; do
@@ -271,11 +306,11 @@ function ask_flat_sep() {
     print -P ""
     print -P "%B(1)  Angled%b"
     print -P ""
-    flat_sep=0 print_prompt
+    straight=0 print_prompt
     print -P ""
-    print -P "%B(2)  Flat%b"
+    print -P "%B(2)  Straight%b"
     print -P ""
-    flat_sep=1 print_prompt
+    straight=1 print_prompt
     print -P ""
     print -P "%248F(r)  Restart from the beginning.%f"
     print -P ""
@@ -287,8 +322,8 @@ function ask_flat_sep() {
     case $key in
       q) quit; return 1;;
       r) return 2;;
-      1) flat_sep=0; break;;
-      2) flat_sep=1; break;;
+      1) straight=0; break;;
+      2) straight=1; break;;
     esac
   done
 }
@@ -456,14 +491,32 @@ function generate_config() {
   function sub() {
     lines=("${(@)lines/#  typeset -g POWERLEVEL9K_$1=*/  typeset -g POWERLEVEL9K_$1=$2}")
   }
+
   sub MODE $POWERLEVEL9K_MODE
-  if [[ $POWERLEVEL9K_MODE == (powerline|compatible) && $style == lean ]]; then
-    sub VISUAL_IDENTIFIER_EXPANSION "''"
-  elif (( cap_narrow_icons )); then
+
+  if (( cap_narrow_icons )); then
     sub VISUAL_IDENTIFIER_EXPANSION "'\${P9K_VISUAL_IDENTIFIER// }'"
+    sub BACKGROUND_JOBS_VISUAL_IDENTIFIER_EXPANSION "'\${P9K_VISUAL_IDENTIFIER// }'"
   else
     sub VISUAL_IDENTIFIER_EXPANSION "'\${P9K_VISUAL_IDENTIFIER}'"
+    sub BACKGROUND_JOBS_VISUAL_IDENTIFIER_EXPANSION "'\${P9K_VISUAL_IDENTIFIER}'"
   fi
+
+  if [[ $POWERLEVEL9K_MODE == compatible ]]; then
+    # Many fonts don't have the gear icon.
+    sub BACKGROUND_JOBS_VISUAL_IDENTIFIER_EXPANSION "'⇶'"
+  fi
+
+  if (( straight )); then
+    (( cap_diamond )) && local subsep='\uE0BD' || local subsep='|'
+    sub LEFT_SUBSEGMENT_SEPARATOR "'%244F$subsep'"
+    sub RIGHT_SUBSEGMENT_SEPARATOR "'%244F$subsep'"
+    sub LEFT_SEGMENT_SEPARATOR "'$subsep'"
+    sub RIGHT_SEGMENT_SEPARATOR "'$subsep'"
+    sub LEFT_PROMPT_LAST_SEGMENT_END_SYMBOL "'▓▒░'"
+    sub RIGHT_PROMPT_FIRST_SEGMENT_START_SYMBOL "'░▒▓'"
+  fi
+
   if (( num_lines == 1 )); then
     local -a tmp
     local line
@@ -472,6 +525,11 @@ function generate_config() {
     done
     lines=("$tmp[@]")
   fi
+
+  sub MULTILINE_FIRST_PROMPT_GAP_CHAR "'$gap_char'"
+
+  (( empty_line )) && sub PROMPT_ADD_NEWLINE true || sub PROMPT_ADD_NEWLINE false
+
   local header=${(%):-"# Generated by Powerlevel10k configuration wizard on %D{%Y-%m-%d at %H:%M %Z}."}$'\n'
   header+="# Based on romkatv/powerlevel10k/config/p10k-$style.zsh"
   if [[ $commands[sum] == ('/bin'|'/usr/bin'|'/usr/local/bin')'/sum' ]]; then
@@ -481,7 +539,21 @@ function generate_config() {
     fi
   fi
   header+=$'.\n'
-  header+="# Wizard options: font=$POWERLEVEL9K_MODE, lines=$num_lines, narrow-icons=$cap_narrow_icons."$'\n#'
+  header+="# Wizard options: $POWERLEVEL9K_MODE font"
+  (( cap_narrow_icons )) && header+=", narrow icons" || header+=", wide icons"
+  header+=", $style"
+  if [[ $style == classic ]]; then
+    (( straight )) && header+=", straight" || header+=", angled"
+  fi
+  (( num_lines == 1 )) && header+=", 1 line" || header+=", $num_lines lines"
+  case $gap_char in
+    ' ') header+=", disconnected";;
+    '·') header+=", dotted";;
+    '─') header+=", solid";;
+  esac
+  (( empty_line )) && header+=", sparse" || header+=", compact";
+  header+=$'.\n#'
+
   if [[ -e $__p9k_cfg_path ]]; then
     unlink $__p9k_cfg_path || return 1
   fi
@@ -506,7 +578,7 @@ function write_zshrc() {
 
   local comments=(
     "# You can customize your prompt by editing $__p9k_cfg_path_u."
-    "# To run configuration wizard again, remove the next line."
+    "# To run Powerlevel10k configuration wizard, type 'p9k_configure."
   )
   print -lr -- "" $comments "source $__p9k_cfg_path_u" >>$__p9k_zshrc
 
@@ -521,7 +593,7 @@ source $__p9k_root_dir/internal/icons.zsh || return
 
 while true; do
   ask_diamond || { (( $? == 2 )) && continue || return }
-  (( cap_diamond )) || flat_sep=1
+  (( cap_diamond )) || straight=1
   if [[ -n $AWESOME_GLYPHS_LOADED ]]; then
     POWERLEVEL9K_MODE=awesome-mapped-fontconfig
   else
@@ -541,7 +613,7 @@ while true; do
   _p9k_init_icons
   ask_narrow_icons     || { (( $? == 2 )) && continue || return }
   ask_style            || { (( $? == 2 )) && continue || return }
-  ask_flat_sep         || { (( $? == 2 )) && continue || return }
+  ask_straight         || { (( $? == 2 )) && continue || return }
   ask_num_lines        || { (( $? == 2 )) && continue || return }
   ask_gap_char         || { (( $? == 2 )) && continue || return }
   ask_empty_line       || { (( $? == 2 )) && continue || return }
