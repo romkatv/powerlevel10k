@@ -15,7 +15,6 @@ function _p9k_init_icons() {
         LEFT_SEGMENT_SEPARATOR         $'\uE0B0'              # 
         RIGHT_SEGMENT_SEPARATOR        $'\uE0B2'              # 
         LEFT_SEGMENT_END_SEPARATOR     ' '                    # Whitespace
-        RIGHT_SEGMENT_END_SEPARATOR    ''
         LEFT_SUBSEGMENT_SEPARATOR      $'\uE0B1'              # 
         RIGHT_SUBSEGMENT_SEPARATOR     $'\uE0B3'              # 
         CARRIAGE_RETURN_ICON           $'\u21B5'              # ↵
@@ -117,7 +116,6 @@ function _p9k_init_icons() {
         LEFT_SEGMENT_SEPARATOR         $'\uE0B0'              # 
         RIGHT_SEGMENT_SEPARATOR        $'\uE0B2'              # 
         LEFT_SEGMENT_END_SEPARATOR     ' '                    # Whitespace
-        RIGHT_SEGMENT_END_SEPARATOR    ''
         LEFT_SUBSEGMENT_SEPARATOR      $'\uE0B1'              # 
         RIGHT_SUBSEGMENT_SEPARATOR     $'\uE0B3'              # 
         CARRIAGE_RETURN_ICON           $'\u21B5'              # ↵
@@ -222,7 +220,6 @@ function _p9k_init_icons() {
         LEFT_SEGMENT_SEPARATOR         $'\uE0B0'                                      # 
         RIGHT_SEGMENT_SEPARATOR        $'\uE0B2'                                      # 
         LEFT_SEGMENT_END_SEPARATOR     ' '                                            # Whitespace
-        RIGHT_SEGMENT_END_SEPARATOR    ''
         LEFT_SUBSEGMENT_SEPARATOR      $'\uE0B1'                                      # 
         RIGHT_SUBSEGMENT_SEPARATOR     $'\uE0B3'                                      # 
         CARRIAGE_RETURN_ICON           $'\u21B5'                                      # ↵
@@ -317,7 +314,6 @@ function _p9k_init_icons() {
         LEFT_SEGMENT_SEPARATOR         $'\uE0B0'              # 
         RIGHT_SEGMENT_SEPARATOR        $'\uE0B2'              # 
         LEFT_SEGMENT_END_SEPARATOR     ' '                    # Whitespace
-        RIGHT_SEGMENT_END_SEPARATOR    ''
         LEFT_SUBSEGMENT_SEPARATOR      $'\uE0B1'              # 
         RIGHT_SUBSEGMENT_SEPARATOR     $'\uE0B3'              # 
         CARRIAGE_RETURN_ICON           $'\u21B5'              # ↵
@@ -415,20 +411,19 @@ function _p9k_init_icons() {
         LEFT_SEGMENT_SEPARATOR         $'\uE0B0'              # 
         RIGHT_SEGMENT_SEPARATOR        $'\uE0B2'              # 
         LEFT_SEGMENT_END_SEPARATOR     ' '                    # Whitespace
-        RIGHT_SEGMENT_END_SEPARATOR    ''
         LEFT_SUBSEGMENT_SEPARATOR      $'\uE0B1'              # 
         RIGHT_SUBSEGMENT_SEPARATOR     $'\uE0B3'              # 
         CARRIAGE_RETURN_ICON           $'\u21B5'              # ↵
         ROOT_ICON                      $'\u26A1'              # ⚡
         SUDO_ICON                      $'\uE0A2'              # 
-        RUBY_ICON                      ''
-        AWS_ICON                       'AWS:'
+        RUBY_ICON                      'Ruby'
+        AWS_ICON                       'AWS'
         AWS_EB_ICON                    $'\U1F331 '            # 🌱
         BACKGROUND_JOBS_ICON           $'\u2699'              # ⚙
         TEST_ICON                      ''
         TODO_ICON                      $'\u2611'              # ☑
         BATTERY_ICON                   $'\U1F50B'             # 🔋
-        DISK_ICON                      $'hdd '
+        DISK_ICON                      $'hdd'
         OK_ICON                        $'\u2714'              # ✔
         FAIL_ICON                      $'\u2718'              # ✘
         SYMFONY_ICON                   'SF'
@@ -489,14 +484,14 @@ function _p9k_init_icons() {
         VCS_HG_ICON                    ''
         VCS_SVN_ICON                   ''
         RUST_ICON                      'Rust'
-        PYTHON_ICON                    ''
+        PYTHON_ICON                    'Py'
         SWIFT_ICON                     'Swift'
         GO_ICON                        'Go'
         PUBLIC_IP_ICON                 ''
         LOCK_ICON                      $'\UE0A2'
-        EXECUTION_TIME_ICON            'Dur'
-        SSH_ICON                       '(ssh)'
-        VPN_ICON                       '(vpn)'
+        EXECUTION_TIME_ICON            $'\u29D7'              # ⧗
+        SSH_ICON                       'ssh'
+        VPN_ICON                       'vpn'
         KUBERNETES_ICON                $'\U2388'              # ⎈
         DROPBOX_ICON                   'Dropbox'
         DATE_ICON                      ''
