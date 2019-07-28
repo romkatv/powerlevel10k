@@ -326,6 +326,43 @@ function generate_config() {
   print -lr -- "$header" "$lines[@]" >$zd/$config_basename
 }
 
+if [[ ! -o multibyte ]]; then
+  print -P "%1F[ERROR]%f %Bp9k_configure%b: multibyte option is not set" >&2
+  return 1
+fi
+if [[ "${#$(print -P '\u276F' 2>/dev/null)}" != 1 ]]; then
+  print -P "%1F[ERROR]%f %Bp9k_configure%b: shell doesn't support unicode" >&2
+  return 1
+fi
+if [[ ! -w $zd ]]; then
+  print -P "%1F[ERROR]%f %Bp9k_configure%b: $zdu is not writable" >&2
+  return 1
+fi
+if [[ -d $zd/$config_basename ]]; then
+  print -P "%1F[ERROR]%f %Bp9k_configure%b: $zdu/$config_basename is a directory" >&2
+  return 1
+fi
+if [[ -e $zd/$config_basename && ! ( -f $zd/$config_basename || -h $zd/$config_basename ) ]]; then
+  print -P "%1F[ERROR]%f %Bp9k_configure%b: $zdu/$config_basename is a special file" >&2
+  return 1
+fi
+if [[ ! -t 0 || ! -t 1 ]]; then
+  print -P "%1F[ERROR]%f %Bp9k_configure%b: no TTY" >&2
+  return 1
+fi
+if (( LINES < 20 || COLUMNS < 70 )); then
+  print -P "%1F[ERROR]%f %Bp9k_configure%b: terminal size too small" >&2
+  return 1
+fi
+if [[ ! -r $p10k_root_dir/config/p10k-lean.zsh ]]; then
+  print -P "%1F[ERROR]%f %Bp9k_configure%b: cannot read $p10k_root_dir/config/p10k-lean.zsh" >&2
+  return 1
+fi
+if [[ ! -r $p10k_root_dir/config/p10k-classic.zsh ]]; then
+  print -P "%1F[ERROR]%f %Bp9k_configure%b: cannot read $p10k_root_dir/config/p10k-classic.zsh" >&2
+  return 1
+fi
+
 source $p10k_root_dir/internal/icons.zsh || return
 
 while true; do
