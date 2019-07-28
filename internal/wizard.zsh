@@ -80,7 +80,7 @@ function print_prompt() {
     right=($right[1] $right[3])
   fi
   if (( straight )); then
-    (( cap_diamond )) && local subsep='\uE0BD' || local subsep='|'
+    [[ $POWERLEVEL9K_MODE == nerdfont-complete ]] && local subsep='\uE0BD' || local subsep='|'
     left=("${(@)${(@)left//\\uE0B1/$subsep}//\\uE0B0/▓▒░}")
     right=("${(@)${(@)right//\\uE0B3/$subsep}//\\uE0B2/░▒▓}")
   fi
@@ -152,7 +152,7 @@ function ask_diamond() {
     centered "%BDoes this look like a %2Fdiamond%f (square rotated 45 degrees)?%b"
     centered "reference: $(href https://graphemica.com/%E2%97%86)"
     print -P ""
-    centered "--->  %B\uE0B2\uE0B0%b  <---"
+    centered "--->  \uE0B2\uE0B0  <---"
     print -P ""
     print -P "%B(y)  Yes.%b"
     print -P ""
@@ -178,7 +178,7 @@ function ask_lock() {
     centered "%BDoes this look like a %2Flock%f?%b"
     centered "reference: $(href https://fontawesome.com/icons/lock)"
     print -P ""
-    centered "--->  %B$1%b  <---"
+    centered "--->  $1  <---"
     print -P ""
     print -P "%B(y)  Yes.%b"
     print -P ""
@@ -206,7 +206,7 @@ function ask_python() {
     centered "%BDoes this look like a %2FPython logo%f?%b"
     centered "reference: $(href https://fontawesome.com/icons/python)"
     print -P ""
-    centered "--->  %B\uE63C%b  <---"
+    centered "--->  \uE63C  <---"
     print -P ""
     print -P "%B(y)  Yes.%b"
     print -P ""
@@ -244,7 +244,7 @@ function ask_narrow_icons() {
     clear
     centered "%BDo all these icons %2Ffit between the crosses%f?%b"
     print -P ""
-    centered "--->  %B$text%b  <---"
+    centered "--->  $text  <---"
     print -P ""
     print -P "%B(y)  Yes. Icons are very close to the crosses but there is %2Fno overlap%f%b."
     print -P ""
@@ -508,7 +508,7 @@ function generate_config() {
   fi
 
   if (( straight )); then
-    (( cap_diamond )) && local subsep='\uE0BD' || local subsep='|'
+    [[ $POWERLEVEL9K_MODE == nerdfont-complete ]] && local subsep='\uE0BD' || local subsep='|'
     sub LEFT_SUBSEGMENT_SEPARATOR "'%244F$subsep'"
     sub RIGHT_SUBSEGMENT_SEPARATOR "'%244F$subsep'"
     sub LEFT_SEGMENT_SEPARATOR "'$subsep'"
@@ -605,6 +605,8 @@ while true; do
       else
         (( cap_diamond )) && POWERLEVEL9K_MODE=powerline || POWERLEVEL9K_MODE=compatible
       fi
+    elif (( ! cap_diamond )); then
+      POWERLEVEL9K_MODE=awesome-fontconfig
     else
       ask_python || { (( $? == 2 )) && continue || return }
       (( cap_python )) && POWERLEVEL9K_MODE=awesome-fontconfig || POWERLEVEL9K_MODE=nerdfont-complete
