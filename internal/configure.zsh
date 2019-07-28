@@ -1,5 +1,5 @@
 typeset -gr __p9k_wizard_columns=70
-typeset -gr __p9k_wizard_lines=28
+typeset -gr __p9k_wizard_lines=25
 typeset -gr __p9k_zd=${${ZDOTDIR:-$HOME}:A}
 typeset -gr __p9k_zd_u=${${(q-)__p9k_zd}/#(#b)$HOME(|\/*)/'~'$match[1]}
 typeset -gr __p9k_cfg_basename=.p10k.zsh
@@ -42,4 +42,10 @@ function _p9k_can_configure() {
   } always {
     unfunction $0_error
   }
+}
+
+function p9k_configure() {
+  emulate -L zsh && setopt no_hist_expand extended_glob
+  $__p9k_root_dir/internal/wizard.zsh -d $__p9k_root_dir -f || return
+  source $__p9k_cfg_path
 }
