@@ -7,8 +7,84 @@ setopt extended_glob noaliases
 typeset -gr __p9k_root_dir=${1:-${0:h:h:A}}
 source $__p9k_root_dir/internal/configure.zsh || return
 
-local POWERLEVEL9K_MODE cap_lock style config_backup
-local -i cap_diamond cap_python cap_narrow_icons num_lines config_overwrite
+typeset -ra lean_left=(
+  '' '%B%39F~%b%12F/%B%39Fpowerlevel10k%b %76Fmaster ⇡2%f '
+  '' '%76F❯%f █'
+)
+
+typeset -ra lean_right=(
+  ' %5F⎈ minikube%f' ''
+  '' ''
+)
+
+typeset -ra classic_left=(
+  '%8F╭─' '%K{236} %B%39F~%b%K{236}%12F/%B%39Fpowerlevel10k%b%K{236} %244F\uE0B1 %76Fmaster ⇡2 %k%236F\uE0B0%f'
+  '%8F╰─' '%f █'
+)
+
+typeset -ra classic_right=(
+  '%236F\uE0B2%K{236}%13F minikube ⎈ %k%f' '%8F─╮%f'
+  '' '%8F─╯%f'
+)
+
+typeset -ri prompt_indent=4
+
+local POWERLEVEL9K_MODE style config_backup gap_char
+local -i num_lines write_config flat_sep empty_line
+local -i cap_diamond cap_python cap_narrow_icons cap_lock
+
+function prompt_length() {
+  local COLUMNS=1024
+  local -i x y=$#1 m
+  if (( y )); then
+    while (( ${${(%):-$1%$y(l.1.0)}[-1]} )); do
+      x=y
+      (( y *= 2 ));
+    done
+    local xy
+    while (( y > x + 1 )); do
+      m=$(( x + (y - x) / 2 ))
+      typeset ${${(%):-$1%$m(l.x.y)}[-1]}=$m
+    done
+  fi
+  print $x
+}
+
+function print_prompt() {
+  local left=${style}_left
+  local right=${style}_right
+  left=("${(@P)left}")
+  right=("${(@P)right}")
+  if (( num_lines == 1)); then
+    left=($left[2] $left[4])
+    right=($right[1] $right[3])
+  fi
+  if (( flat_sep )); then
+    left=("${(@)${(@)left//\\uE0B1/|}//\\uE0B0/▓▒░}")
+    right=("${(@)${(@)right//\\uE0B3/|}//\\uE0B2/░▒▓}")
+  fi
+  local -i i
+  for ((i = 1; i < $#left; i+=2)); do
+    local l=${(g::):-$left[i]$left[i+1]}
+    local r=${(g::):-$right[i]$right[i+1]}
+    local -i gap=$((__p9k_wizard_columns - 2 * prompt_indent - $(prompt_length $l$r)))
+    (( num_lines == 2 && i == 1 )) && local fill=${gap_char:-' '} || local fill=' '
+    print -n  -- ${(pl:$prompt_indent:: :)}
+    print -nP -- $l
+    print -nP -- "%8F${(pl:$gap::$fill:)}%f"
+    print -P  -- $r
+  done
+}
+
+function href() {
+  print -r -- $'%{\e]8;;'${1//\%/%%}$'\a%}'${1//\%/%%}$'%{\e]8;;\a%}'
+}
+
+function centered() {
+  local n=$(prompt_length ${(g::)1})
+  print -n -- ${(pl:$(((__p9k_wizard_columns - n) / 2)):: :)}
+  print -P -- $1
+}
 
 function clear() {
   if (( $+commands[clear] )); then
@@ -16,12 +92,19 @@ function clear() {
   elif zmodload zsh/termcap 2>/dev/null; then
     echotc cl
   else
-    print -n "\e[H\e[J"
+    print -n -- "\e[H\e[J"
   fi
 }
 
-function href() {
-  echo $'%{\e]8;;'${1//\%/%%}$'\a%}'${1//\%/%%}$'%{\e]8;;\a%}'
+function quit() {
+  clear
+  print -P "Powerlevel10k configuration wizard will run again next time unless"
+  print -P "you define at least one Powerlevel10k configuration option. To define"
+  print -P "an option that does nothing except for disabling Powerlevel10k"
+  print -P "configuration wizard, type the following command:"
+  print -P ""
+  print -P "  %2Fecho%f %3F'POWERLEVEL9K_MODE='%f %15F>>! $__p9k_zd_u/.zshrc%f"
+  print -P ""
 }
 
 function ask_diamond() {
@@ -31,14 +114,14 @@ function ask_diamond() {
     print -P "you haven't defined any Powerlevel10k configuration options. It will"
     print -P "ask you a few questions and configure your prompt."
     print -P ""
-    print -P "   %BDoes this look like a %2Fdiamond%f (square rotated 45 degrees)?%b"
-    print -P "       reference: $(href https://graphemica.com/%E2%97%86)"
+    centered "%BDoes this look like a %2Fdiamond%f (square rotated 45 degrees)?%b"
+    centered "reference: $(href https://graphemica.com/%E2%97%86)"
     print -P ""
-    print -P "                   --->  %B\uE0B2\uE0B0%b  <---"
+    centered "--->  %B\uE0B2\uE0B0%b  <---"
     print -P ""
-    print -P "(%By%b)  Yes."
+    print -P "%B(y)  Yes.%b"
     print -P ""
-    print -P "(%Bn%b)  No."
+    print -P "%B(n)  No.%b"
     print -P ""
     print -P "%248F(q)  Quit and do nothing.%f"
     print -P ""
@@ -56,24 +139,15 @@ function ask_diamond() {
 function ask_lock() {
   while true; do
     clear
-    print -P "      %BWhich of these icons looks like a %2Flock%f?%b"
-    print -P "  reference: $(href https://fontawesome.com/icons/lock)"
+    [[ -n $2 ]] && centered "$2"
+    centered "%BDoes this look like a %2Flock%f?%b"
+    centered "reference: $(href https://fontawesome.com/icons/lock)"
     print -P ""
-    print -P "                 Icon #1"
+    centered "--->  %B$1%b  <---"
     print -P ""
-    print -P "             --->  %B%3F\uE138%f%b  <---"
+    print -P "%B(y)  Yes.%b"
     print -P ""
-    print -P "                 Icon #2"
-    print -P ""
-    print -P "             --->  %B%4F\uF023%f%b  <---"
-    print -P ""
-    print -P "(%B1%b)  Only icon #1 ( %B%3F\uE138%f%b )."
-    print -P ""
-    print -P "(%B2%b)  Only icon #2 ( %B%4F\uF023%f%b )."
-    print -P ""
-    print -P "(%Bn%b)  Neither."
-    print -P ""
-    print -P "(%Bb%b)  Both."
+    print -P "%B(n)  No.%b"
     print -P ""
     print -P "%248F(r)  Restart from the beginning.%f"
     print -P ""
@@ -81,13 +155,12 @@ function ask_lock() {
     print -P ""
 
     local key=
-    read -k key"?Choice [12nbrq]: " || return 1
+    read -k key"?Choice [ynrq]: " || return 1
     case $key in
       q) quit; return 1;;
       r) return 2;;
-      1|2) cap_lock=$key; break;;
-      b) cap_lock=12; break;;
-      n) cap_lock=; break;;
+      y) cap_lock=1; break;;
+      n) cap_lock=0; break;;
     esac
   done
 }
@@ -95,14 +168,14 @@ function ask_lock() {
 function ask_python() {
   while true; do
     clear
-    print -P "         %BDoes this look like a %2FPython logo%f?%b"
-    print -P "  reference: $(href https://fontawesome.com/icons/python)"
+    centered "%BDoes this look like a %2FPython logo%f?%b"
+    centered "reference: $(href https://fontawesome.com/icons/python)"
     print -P ""
-    print -P "                  --->  %B\uE63C%b  <---"
+    centered "--->  %B\uE63C%b  <---"
     print -P ""
-    print -P "(%By%b)  Yes."
+    print -P "%B(y)  Yes.%b"
     print -P ""
-    print -P "(%Bn%b)  No."
+    print -P "%B(n)  No.%b"
     print -P ""
     print -P "%248F(r)  Restart from the beginning.%f"
     print -P ""
@@ -126,7 +199,7 @@ function ask_narrow_icons() {
     return
   fi
   local text="X"
-  text+="X%1F${icons[VCS_GIT_ICON]// }%fX"
+  text+="%1F${icons[VCS_GIT_ICON]// }%fX"
   text+="%2F${icons[VCS_GIT_GITHUB_ICON]// }%fX"
   text+="%3F${icons[DATE_ICON]// }%fX"
   text+="%4F${icons[TIME_ICON]// }%fX"
@@ -134,13 +207,13 @@ function ask_narrow_icons() {
   text+="%6F${icons[AWS_EB_ICON]// }%fX"
   while true; do
     clear
-    print -P "      %BDo all these icons %2Ffit between the crosses%f?%b"
+    centered "%BDo all these icons %2Ffit between the crosses%f?%b"
     print -P ""
-    print -P "                  --->  %B$text%b  <---"
+    centered "--->  %B$text%b  <---"
     print -P ""
-    print -P "(%By%b)  Yes. Icons are very close to the crosses but there is %B%2Fno overlap%f%b."
+    print -P "%B(y)  Yes. Icons are very close to the crosses but there is %2Fno overlap%f%b."
     print -P ""
-    print -P "(%Bn%b)  No. Some icons %B%2Foverlap%f%b neighbouring crosses."
+    print -P "%B(n)  No. Some icons %2Foverlap%f neighbouring crosses.%b"
     print -P ""
     print -P "%248F(r)  Restart from the beginning.%f"
     print -P ""
@@ -158,39 +231,18 @@ function ask_narrow_icons() {
   done
 }
 
-function quit() {
-  clear
-  print -P "Powerlevel10k configuration wizard will run again next time unless"
-  print -P "you define at least one Powerlevel10k configuration option. To define"
-  print -P "an option that does nothing except for disabling Powerlevel10k"
-  print -P "configuration wizard, type the following command:"
-  print -P ""
-  print -P "  %2Fecho%f %3F'POWERLEVEL9K_MODE='%f %15F>>! $__p9k_zd_u/.zshrc%f"
-  print -P ""
-}
-
 function ask_style() {
-  if (( ! cap_diamond )); then
-    style=lean
-    return
-  fi
   while true; do
     clear
-    print -P "            %BChoose your prompt style%b"
+    centered "%BPrompt Style%b"
     print -P ""
-    print -P "                    %BLean%b"
+    print -P "%B(1)  Lean.%b"
     print -P ""
-    print -P "         %B%39F~%b%12F/%B%39Fpowerlevel10k%b %76Fmaster ⇡2%f"
-    print -P "         %76F❯%f █"
+    style=lean print_prompt
     print -P ""
-    print -P "                  %BClassic%b"
+    print -P "%B(2)  Classic.%b"
     print -P ""
-    print -P "     %8F╭─%K{0} %B%39F~%b%K{0}%12F/%B%39Fpowerlevel10k%b%K{0} %244F\uE0B1 %76Fmaster ⇡2 %k%0F\uE0B0"
-    print -P "     %8F╰─%f █"
-    print -P ""
-    print -P "(%B1%b)  Lean."
-    print -P ""
-    print -P "(%B2%b)  Classic."
+    style=classic print_prompt
     print -P ""
     print -P "%248F(r)  Restart from the beginning.%f"
     print -P ""
@@ -208,32 +260,51 @@ function ask_style() {
   done
 }
 
+function ask_flat_sep() {
+  if [[ $style != classic || $cap_diamond == 0 ]]; then
+    flat_sep=1
+    return
+  fi
+  while true; do
+    clear
+    centered "%BPrompt Separators%b"
+    print -P ""
+    print -P "%B(1)  Angled%b"
+    print -P ""
+    flat_sep=0 print_prompt
+    print -P ""
+    print -P "%B(2)  Flat%b"
+    print -P ""
+    flat_sep=1 print_prompt
+    print -P ""
+    print -P "%248F(r)  Restart from the beginning.%f"
+    print -P ""
+    print -P "%248F(q)  Quit and do nothing.%f"
+    print -P ""
+
+    local key=
+    read -k key"?Choice [12rq]: " || return 1
+    case $key in
+      q) quit; return 1;;
+      r) return 2;;
+      1) flat_sep=0; break;;
+      2) flat_sep=1; break;;
+    esac
+  done
+}
+
 function ask_num_lines() {
   while true; do
     clear
-    print -P "             %BOne or two prompt lines?%b"
+    centered "%BPrompt Height%b"
     print -P ""
-    print -P "                    %BOne Line%b"
+    print -P "%B(1)  One Line%b"
     print -P ""
-    if [[ $style == lean ]]; then
-      print -P "         %B%39F~%b%12F/%B%39Fpowerlevel10k%b %76Fmaster ⇡2 %76F❯%f █"
-    else
-      print -P "       %K{0} %B%39F~%b%K{0}%12F/%B%39Fpowerlevel10k%b%K{0} %244F\uE0B1 %76Fmaster ⇡2 %k%0F\uE0B0%f █"
-    fi
+    num_lines=1 print_prompt
     print -P ""
-    print -P "                   %BTwo Lines%b"
+    print -P "%B(2)  Two Lines%b"
     print -P ""
-    if [[ $style == lean ]]; then
-      print -P "         %B%39F~%b%12F/%B%39Fpowerlevel10k%b %76Fmaster ⇡2%f"
-      print -P "         %76F❯%f █"
-    else
-      print -P "     %8F╭─%K{0} %B%39F~%b%K{0}%12F/%B%39Fpowerlevel10k%b%K{0} %244F\uE0B1 %76Fmaster ⇡2 %k%0F\uE0B0"
-      print -P "     %8F╰─%f █"
-    fi
-    print -P ""
-    print -P "(%B1%b)  %BOne Line%b."
-    print -P ""
-    print -P "(%B2%b)  %BTwo lines%b."
+    num_lines=2 print_prompt
     print -P ""
     print -P "%248F(r)  Restart from the beginning.%f"
     print -P ""
@@ -250,19 +321,26 @@ function ask_num_lines() {
   done
 }
 
-function ask_config_overwrite() {
-  config_backup=
-  if [[ ! -e $__p9k_cfg_path ]]; then
-    config_overwrite=1
+function ask_gap_char() {
+  if [[ $num_lines != 2 ]]; then
+    gap_char=" "
     return
   fi
   while true; do
     clear
-    print -P "      %BConfig already exists: $__p9k_cfg_path_u%b"
+    centered "%BPrompt Connection%b"
     print -P ""
-    print -P "(%Bw%b)  %B%1FOverwrite%f $__p9k_cfg_path_u%b with the new config."
+    print -P "%B(1)  Disconnected%b"
     print -P ""
-    print -P "(%Bk%b)  %B%2FKeep%f $__p9k_cfg_path_u%b and discard the new content."
+    gap_char=" " print_prompt
+    print -P ""
+    print -P "%B(2)  Dotted%b"
+    print -P ""
+    gap_char="·" print_prompt
+    print -P ""
+    print -P "%B(3)  Solid%b"
+    print -P ""
+    gap_char="─" print_prompt
     print -P ""
     print -P "%248F(r)  Restart from the beginning.%f"
     print -P ""
@@ -270,17 +348,104 @@ function ask_config_overwrite() {
     print -P ""
 
     local key=
-    read -k key"?Choice [wkrq]: " || return 1
+    read -k key"?Choice [12rq]: " || return 1
     case $key in
       q) quit; return 1;;
       r) return 2;;
-      w)
+      1) gap_char=" "; break;;
+      2) gap_char="·"; break;;
+      3) gap_char="─"; break;;
+    esac
+  done
+}
+
+function ask_empty_line() {
+  while true; do
+    clear
+    centered "%BPrompt Spacing%b"
+    print -P ""
+    print -P "%B(1)  Compact%b"
+    print -P ""
+    print_prompt
+    print_prompt
+    print -P ""
+    print -P "%B(2)  Sparse%b"
+    print -P ""
+    print_prompt
+    print -P ""
+    print_prompt
+    print -P ""
+    print -P "%248F(r)  Restart from the beginning.%f"
+    print -P ""
+    print -P "%248F(q)  Quit and do nothing.%f"
+    print -P ""
+
+    local key=
+    read -k key"?Choice [12rq]: " || return 1
+    case $key in
+      q) quit; return 1;;
+      r) return 2;;
+      1) empty_line=0; break;;
+      2) empty_line=1; break;;
+    esac
+  done
+}
+
+function ask_confirm() {
+  while true; do
+    clear
+    centered "%BLooks good?%b"
+    print -P ""
+    print_prompt
+    (( empty_line )) && print -P ""
+    print_prompt
+    print -P ""
+    print -P "%B(y)  Yes.%b"
+    print -P ""
+    print -P "%248F(r)  Restart from the beginning.%f"
+    print -P ""
+    print -P "%248F(q)  Quit and do nothing.%f"
+    print -P ""
+
+    local key=
+    read -k key"?Choice [yrq]: " || return 1
+    case $key in
+      q) quit; return 1;;
+      r) return 2;;
+      y) break;;
+    esac
+  done
+}
+
+function ask_config_overwrite() {
+  config_backup=
+  if [[ ! -e $__p9k_cfg_path ]]; then
+    write_config=1
+    return
+  fi
+  while true; do
+    clear
+    centered "Powerlevel10k config file already exists."
+    centered "%BOverwrite %2F$__p9k_cfg_path_u%f?%b"
+    print -P ""
+    print -P "%B(y)  Yes.%b"
+    print -P ""
+    print -P "%248F(r)  Restart from the beginning.%f"
+    print -P ""
+    print -P "%248F(q)  Quit and do nothing.%f"
+    print -P ""
+
+    local key=
+    read -k key"?Choice [yrq]: " || return 1
+    case $key in
+      q) quit; return 1;;
+      r) return 2;;
+      y)
         config_backup="$(mktemp ${TMPDIR:-/tmp}/$__p9k_cfg_basename.XXXXXXXXXX)" || return 1
         cp $__p9k_cfg_path $config_backup
-        config_overwrite=1
+        write_config=1
         break
         ;;
-      k) config_overwrite=0; break;;
     esac
   done
 }
@@ -328,23 +493,31 @@ source $__p9k_root_dir/internal/icons.zsh || return
 
 while true; do
   ask_diamond || { (( $? == 2 )) && continue || return }
+  (( cap_diamond )) || flat_sep=1
   if [[ -n $AWESOME_GLYPHS_LOADED ]]; then
     POWERLEVEL9K_MODE=awesome-mapped-fontconfig
   else
-    ask_lock || { (( $? == 2 )) && continue || return }
-    if [[ $cap_lock == 1 ]]; then
-      (( cap_diamond )) && POWERLEVEL9K_MODE=awesome-patched || POWERLEVEL9K_MODE=flat
-    elif [[ -z $cap_lock ]]; then
-      (( cap_diamond )) && POWERLEVEL9K_MODE=powerline || POWERLEVEL9K_MODE=compatible
+    ask_lock '\uF023' || { (( $? == 2 )) && continue || return }
+    if (( ! cap_lock )); then
+      ask_lock '\uE138' "Let's try another one." || { (( $? == 2 )) && continue || return }
+      if (( cap_lock )); then
+        (( cap_diamond )) && POWERLEVEL9K_MODE=awesome-patched || POWERLEVEL9K_MODE=flat
+      else
+        (( cap_diamond )) && POWERLEVEL9K_MODE=powerline || POWERLEVEL9K_MODE=compatible
+      fi
     else
       ask_python || { (( $? == 2 )) && continue || return }
       (( cap_python )) && POWERLEVEL9K_MODE=awesome-fontconfig || POWERLEVEL9K_MODE=nerdfont-complete
     fi
   fi
   _p9k_init_icons
-  ask_narrow_icons || { (( $? == 2 )) && continue || return }
-  ask_style || { (( $? == 2 )) && continue || return }
-  ask_num_lines || { (( $? == 2 )) && continue || return }
+  ask_narrow_icons     || { (( $? == 2 )) && continue || return }
+  ask_style            || { (( $? == 2 )) && continue || return }
+  ask_flat_sep         || { (( $? == 2 )) && continue || return }
+  ask_num_lines        || { (( $? == 2 )) && continue || return }
+  ask_gap_char         || { (( $? == 2 )) && continue || return }
+  ask_empty_line       || { (( $? == 2 )) && continue || return }
+  ask_confirm          || { (( $? == 2 )) && continue || return }
   ask_config_overwrite || { (( $? == 2 )) && continue || return }
   break
 done
@@ -352,17 +525,16 @@ done
 clear
 
 if [[ -n $config_backup ]]; then
-  print -P "The previous version of your %B%2F$__p9k_cfg_path_u%f%b has been moved"
+  print -P "The previous version of your %B%2F$__p9k_cfg_path_u%f%b has been copied"
   print -P "to %B%2F$config_backup%f%b."
 fi
 
-if (( config_overwrite )); then
+if (( write_config )); then
   generate_config || return
 fi
 
 local comments=(
-  "# Apply the personalized Powerlevel10k configuration."
-  "# You can customize your prompt by editing this file."
+  "# You can customize your prompt by editing $__p9k_cfg_path_u."
   "# To run configuration wizard again, remove the next line."
 )
 

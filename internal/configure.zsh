@@ -1,3 +1,5 @@
+typeset -gr __p9k_wizard_columns=70
+typeset -gr __p9k_wizard_lines=28
 typeset -gr __p9k_zd=${ZDOTDIR:-$HOME}
 typeset -gr __p9k_zd_u=${__p9k_zd/#(#b)$HOME(|\/*)/'~'$match[1]}
 typeset -gr __p9k_cfg_basename=.p10k.zsh
@@ -15,7 +17,6 @@ function _p9k_can_configure() {
   }
   {
     [[ -t 0 && -t 1 ]]                                || $0_error "no TTY"
-    (( LINES >= 20 && COLUMNS >= 70 ))                || $0_error "terminal size too small"
     [[ -o multibyte ]]                                || $0_error "multibyte option is not set"
     [[ "${#$(print -P '\u276F' 2>/dev/null)}" == 1 ]] || $0_error "shell doesn't support unicode"
     [[ -w $__p9k_zd ]]                                || $0_error "$__p9k_zd_u is not writable"
@@ -27,6 +28,9 @@ function _p9k_can_configure() {
       $0_error "cannot read $__p9k_root_dir_u/config/p10k-lean.zsh"
     [[ -r $__p9k_root_dir/config/p10k-classic.zsh ]] ||
       $0_error "cannot read $__p9k_root_dir_u/config/p10k-classic.zsh"
+
+    (( LINES >= __p9k_wizard_lines && COLUMNS >= __p9k_wizard_columns )) ||
+      $0_error "terminal size too small"
   } always {
     unfunction $0_error
   }
