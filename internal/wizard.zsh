@@ -4,11 +4,8 @@ emulate -L zsh
 setopt extended_glob noaliases
 
 () {
-
-readonly p10k_root_dir=${${1:-${0:h:h}}:A}
-readonly zd=${ZDOTDIR:-$HOME}
-readonly zdu=${zd/#(#b)$HOME(|\/*)/'~'$match[1]}
-readonly config_basename=.p10k.zsh
+typeset -gr __p9k_installation_dir=${1:-${0:h:h:A}}
+source $__p9k_installation_dir/internal/configure.zsh || return
 
 local POWERLEVEL9K_MODE cap_lock style config_backup
 local -i cap_diamond cap_python cap_narrow_icons num_lines config_overwrite
@@ -168,7 +165,7 @@ function quit() {
   print -P "an option that does nothing except for disabling Powerlevel10k"
   print -P "configuration wizard, type the following command:"
   print -P ""
-  print -P "  %2Fecho%f %3F'POWERLEVEL9K_MODE='%f %15F>>! $zdu/.zshrc%f"
+  print -P "  %2Fecho%f %3F'POWERLEVEL9K_MODE='%f %15F>>! $__p9k_zd_u/.zshrc%f"
   print -P ""
 }
 
@@ -255,17 +252,17 @@ function ask_num_lines() {
 
 function ask_config_overwrite() {
   config_backup=
-  if [[ ! -e $zd/$config_basename ]]; then
+  if [[ ! -e $__p9k_cfg_path ]]; then
     config_overwrite=1
     return
   fi
   while true; do
     clear
-    print -P "      %BConfig already exists: %2F$zdu/$config_basename%f%b"
+    print -P "      %BConfig already exists: $__p9k_cfg_path_u%b"
     print -P ""
-    print -P "(%Bw%b)  %B%2FOverwrite%f $zdu/$config_basename%b with the new config."
+    print -P "(%Bw%b)  %B%1FOverwrite%f $__p9k_cfg_path_u%b with the new config."
     print -P ""
-    print -P "(%Bk%b)  %B%2FKeep%f $zdu/$config_basename%b and discard the new content."
+    print -P "(%Bk%b)  %B%2FKeep%f $__p9k_cfg_path_u%b and discard the new content."
     print -P ""
     print -P "%248F(r)  Restart from the beginning.%f"
     print -P ""
@@ -278,8 +275,8 @@ function ask_config_overwrite() {
       q) quit; return 1;;
       r) return 2;;
       w)
-        config_backup=$(mktemp ${TMPDIR:-/tmp}/$config_basename.XXXXXXXXXX) || return 1
-        cp $zd/$config_basename $config_backup
+        config_backup="$(mktemp ${TMPDIR:-/tmp}/$__p9k_cfg_basename.XXXXXXXXXX)" || return 1
+        cp $__p9k_cfg_path $config_backup
         config_overwrite=1
         break
         ;;
@@ -289,7 +286,7 @@ function ask_config_overwrite() {
 }
 
 function generate_config() {
-  local base && base="$(<$p10k_root_dir/config/p10k-$style.zsh)" || return
+  local base && base="$(<$__p9k_installation_dir/config/p10k-$style.zsh)" || return
   local lines=("${(@f)base}")
   function sub() {
     lines=("${(@)lines/#  typeset -g POWERLEVEL9K_$1=*/  typeset -g POWERLEVEL9K_$1=$2}")
@@ -320,50 +317,14 @@ function generate_config() {
   fi
   header+=$'.\n'
   header+="# Wizard options: font=$POWERLEVEL9K_MODE, lines=$num_lines, narrow-icons=$cap_narrow_icons."$'\n#'
-  if [[ -e $zd/$config_basename ]]; then
-    unlink $zd/$config_basename || return 1
+  if [[ -e $__p9k_cfg_path ]]; then
+    unlink $__p9k_cfg_path || return 1
   fi
-  print -lr -- "$header" "$lines[@]" >$zd/$config_basename
+  print -lr -- "$header" "$lines[@]" >$__p9k_cfg_path
 }
 
-if [[ ! -o multibyte ]]; then
-  print -P "%1F[ERROR]%f %Bp9k_configure%b: multibyte option is not set" >&2
-  return 1
-fi
-if [[ "${#$(print -P '\u276F' 2>/dev/null)}" != 1 ]]; then
-  print -P "%1F[ERROR]%f %Bp9k_configure%b: shell doesn't support unicode" >&2
-  return 1
-fi
-if [[ ! -w $zd ]]; then
-  print -P "%1F[ERROR]%f %Bp9k_configure%b: $zdu is not writable" >&2
-  return 1
-fi
-if [[ -d $zd/$config_basename ]]; then
-  print -P "%1F[ERROR]%f %Bp9k_configure%b: $zdu/$config_basename is a directory" >&2
-  return 1
-fi
-if [[ -e $zd/$config_basename && ! ( -f $zd/$config_basename || -h $zd/$config_basename ) ]]; then
-  print -P "%1F[ERROR]%f %Bp9k_configure%b: $zdu/$config_basename is a special file" >&2
-  return 1
-fi
-if [[ ! -t 0 || ! -t 1 ]]; then
-  print -P "%1F[ERROR]%f %Bp9k_configure%b: no TTY" >&2
-  return 1
-fi
-if (( LINES < 20 || COLUMNS < 70 )); then
-  print -P "%1F[ERROR]%f %Bp9k_configure%b: terminal size too small" >&2
-  return 1
-fi
-if [[ ! -r $p10k_root_dir/config/p10k-lean.zsh ]]; then
-  print -P "%1F[ERROR]%f %Bp9k_configure%b: cannot read $p10k_root_dir/config/p10k-lean.zsh" >&2
-  return 1
-fi
-if [[ ! -r $p10k_root_dir/config/p10k-classic.zsh ]]; then
-  print -P "%1F[ERROR]%f %Bp9k_configure%b: cannot read $p10k_root_dir/config/p10k-classic.zsh" >&2
-  return 1
-fi
-
-source $p10k_root_dir/internal/icons.zsh || return
+_p9k_can_configure || return
+source $__p9k_installation_dir/internal/icons.zsh || return
 
 while true; do
   ask_diamond || { (( $? == 2 )) && continue || return }
@@ -391,7 +352,7 @@ done
 clear
 
 if [[ -n $config_backup ]]; then
-  print -P "The previous version of your %B%2F$zdu/$config_basename%f%b has been moved"
+  print -P "The previous version of your %B%2F$__p9k_cfg_path_u%f%b has been moved"
   print -P "to %B%2F$config_backup%f%b."
 fi
 
@@ -405,11 +366,11 @@ local comments=(
   "# To run configuration wizard again, remove the next line."
 )
 
-print -lr -- "" $comments "source $zdu/$config_basename" >>$zd/.zshrc
+print -lr -- "" $comments "source $__p9k_cfg_path_u" >>$__p9k_zd/.zshrc
 
 print -P ""
-print -P "The following lines have been appended to your %B%2F$zdu/.zshrc%f%b:"
+print -P "The following lines have been appended to your %B%2F$__p9k_zd_u/.zshrc%f%b:"
 print -P ""
-print -lP -- '  %8F'${^comments}'%f' "  %2Fsource%f %15F$zdu/$config_basename%f"
+print -lP -- '  %8F'${^comments}'%f' "  %2Fsource%f %15F$__p9k_cfg_path_u%f"
 
 } "$@"
