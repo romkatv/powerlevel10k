@@ -103,7 +103,7 @@ function quit() {
   print -P "an option that does nothing except for disabling Powerlevel10k"
   print -P "configuration wizard, type the following command:"
   print -P ""
-  print -P "  %2Fecho%f %3F'POWERLEVEL9K_MODE='%f %15F>>! $__p9k_zd_u/.zshrc%f"
+  print -P "  %2Fecho%f %3F'POWERLEVEL9K_MODE='%f %15F>>! $__p9k_zshrc_u%f"
   print -P ""
 }
 
@@ -488,6 +488,34 @@ function generate_config() {
   print -lr -- "$header" "$lines[@]" >$__p9k_cfg_path
 }
 
+function write_zshrc() {
+  if [[ -e $__p9k_zshrc ]]; then
+    local lines=(${(f)"$(<$__p9k_zshrc)"})
+    local f1=$__p9k_cfg_path
+    local f2=$__p9k_cfg_path_u
+    local f3=${__p9k_cfg_path_u/#\~\//\$HOME\/}
+    local f4=${__p9k_cfg_path_u/#\~\//\"\$HOME\"\/}
+    local f5="'$f1'"
+    local f6="\"$f1\""
+    local f7="\"$f3\""
+    if [[ -n ${(@M)lines:#(#b)source[[:space:]]##($f1|$f2|$f3|$f4|$f5|$f6|$f7)*} ]]; then
+      print -P "No changes have been made to %B%4F$__p9k_zshrc_u%f%b because it already sources %B%2F$__p9k_cfg_path_u%f%b."
+      return
+    fi
+  fi
+
+  local comments=(
+    "# You can customize your prompt by editing $__p9k_cfg_path_u."
+    "# To run configuration wizard again, remove the next line."
+  )
+  print -lr -- "" $comments "source $__p9k_cfg_path_u" >>$__p9k_zshrc
+
+  print -P ""
+  print -P "The following lines have been appended to your %B%4F$__p9k_zshrc_u%f%b:"
+  print -P ""
+  print -lP -- '  %8F'${^comments}'%f' "  %2Fsource%f %15F$__p9k_cfg_path_u%f"
+}
+
 _p9k_can_configure || return
 source $__p9k_root_dir/internal/icons.zsh || return
 
@@ -524,25 +552,15 @@ done
 
 clear
 
+print -P "Powerlevel10k configuration has been written to %B%2F$__p9k_cfg_path_u%f%b."
 if [[ -n $config_backup ]]; then
-  print -P "The previous version of your %B%2F$__p9k_cfg_path_u%f%b has been copied"
-  print -P "to %B%2F$config_backup%f%b."
+  print -P "The backup of the previuos version is at %B%3F$config_backup%f%b."
 fi
 
 if (( write_config )); then
   generate_config || return
 fi
 
-local comments=(
-  "# You can customize your prompt by editing $__p9k_cfg_path_u."
-  "# To run configuration wizard again, remove the next line."
-)
-
-print -lr -- "" $comments "source $__p9k_cfg_path_u" >>$__p9k_zd/.zshrc
-
-print -P ""
-print -P "The following lines have been appended to your %B%2F$__p9k_zd_u/.zshrc%f%b:"
-print -P ""
-print -lP -- '  %8F'${^comments}'%f' "  %2Fsource%f %15F$__p9k_cfg_path_u%f"
+write_zshrc || return
 
 } "$@"

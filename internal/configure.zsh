@@ -1,11 +1,13 @@
 typeset -gr __p9k_wizard_columns=70
 typeset -gr __p9k_wizard_lines=28
-typeset -gr __p9k_zd=${ZDOTDIR:-$HOME}
-typeset -gr __p9k_zd_u=${__p9k_zd/#(#b)$HOME(|\/*)/'~'$match[1]}
+typeset -gr __p9k_zd=${${ZDOTDIR:-$HOME}:A}
+typeset -gr __p9k_zd_u=${${(q-)__p9k_zd}/#(#b)$HOME(|\/*)/'~'$match[1]}
 typeset -gr __p9k_cfg_basename=.p10k.zsh
 typeset -gr __p9k_cfg_path=$__p9k_zd/$__p9k_cfg_basename
 typeset -gr __p9k_cfg_path_u=$__p9k_zd_u/$__p9k_cfg_basename
-typeset -gr __p9k_root_dir_u=${__p9k_root_dir/#(#b)$HOME(|\/*)/'~'$match[1]}
+typeset -gr __p9k_zshrc=$__p9k_zd/.zshrc
+typeset -gr __p9k_zshrc_u=$__p9k_zd_u/.zshrc
+typeset -gr __p9k_root_dir_u=${${(q-)__p9k_root_dir}/#(#b)$HOME(|\/*)/'~'$match[1]}
 
 function _p9k_can_configure() {
   emulate -L zsh
@@ -21,15 +23,21 @@ function _p9k_can_configure() {
     [[ "${#$(print -P '\u276F' 2>/dev/null)}" == 1 ]] || $0_error "shell doesn't support unicode"
     [[ -w $__p9k_zd ]]                                || $0_error "$__p9k_zd_u is not writable"
     [[ ! -d $__p9k_cfg_path ]]                        || $0_error "$__p9k_cfg_path_u is a directory"
+    [[ ! -d $__p9k_zshrc ]]                           || $0_error "$__p9k_zshrc_u is a directory"
 
     [[ ! -e $__p9k_cfg_path || -f $__p9k_cfg_path || -h $__p9k_cfg_path ]] ||
       $0_error "$__p9k_cfg_path_u is a special file"
-    [[ -r $__p9k_root_dir/config/p10k-lean.zsh ]] ||
+    [[ -r $__p9k_root_dir/config/p10k-lean.zsh ]]                          ||
       $0_error "cannot read $__p9k_root_dir_u/config/p10k-lean.zsh"
-    [[ -r $__p9k_root_dir/config/p10k-classic.zsh ]] ||
+    [[ -r $__p9k_root_dir/config/p10k-classic.zsh ]]                       ||
       $0_error "cannot read $__p9k_root_dir_u/config/p10k-classic.zsh"
-
-    (( LINES >= __p9k_wizard_lines && COLUMNS >= __p9k_wizard_columns )) ||
+    [[ ! -e $__p9k_zshrc || -f $__p9k_zshrc || -h $__p9k_zshrc ]]          ||
+      $0_error "$__p9k_zshrc_u a special file"
+    [[ ! -e $__p9k_zshrc || -r $__p9k_zshrc ]]                             ||
+      $0_error "$__p9k_zshrc_u is not readable"
+    [[ ! -e $__p9k_zshrc || -w $__p9k_zshrc ]]                             ||
+      $0_error "$__p9k_zshrc_u is not writable"
+    (( LINES >= __p9k_wizard_lines && COLUMNS >= __p9k_wizard_columns ))   ||
       $0_error "terminal size too small"
   } always {
     unfunction $0_error
