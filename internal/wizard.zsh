@@ -635,4 +635,6 @@ fi
 
 write_zshrc || return
 
+print -P ""
+
 } "$@"
