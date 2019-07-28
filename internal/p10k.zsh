@@ -28,6 +28,7 @@ if ! autoload -Uz is-at-least || ! is-at-least 5.1; then
 fi
 
 source "${__p9k_root_dir}/internal/icons.zsh"
+source "${__p9k_root_dir}/internal/configure.zsh"
 
 # For compatibility with Powerlevel9k. It's not recommended to use mnemonic color
 # names in the configuration except for colors 0-7 as these are standard.
@@ -930,13 +931,12 @@ function p9k_prompt_segment() {
       +r) ref=0;;
       +e) expand=0;;
       ?) echo -E - $__p9k_prompt_segment_usage >&2; return 1;;
-      done) break;;
     esac
   done
-  if (( OPTIND <= ARGC )) {
+  if (( OPTIND <= ARGC )); then
     echo -E - $__p9k_prompt_segment_usage >&2
     return 1
-  }
+  fi
   if [[ -n $_p9k_prompt_side ]]; then
     (( ref )) || icon=$'\1'$icon
     "_p9k_${_p9k_prompt_side}_prompt_segment" "prompt_${_p9k_segment_name}${state:+_${(U)state}}" \
