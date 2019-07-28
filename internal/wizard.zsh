@@ -290,15 +290,17 @@ function _p9k_ask_overwrite() {
 function _p9k_generate_config() {
   local base && base="$(< $_p9k_root_dir/config/p10k-$_p9k_style.zsh)" || return
   local lines=("${(@f)base}")
-  lines=("${(@)lines/#  typeset -g POWERLEVEL9K_MODE=*/  typeset -g POWERLEVEL9K_MODE=$POWERLEVEL9K_MODE}")
+  function _p9k_sub() {
+    lines=("${(@)lines/#  typeset -g POWERLEVEL9K_$1=*/  typeset -g POWERLEVEL9K_$1=$2}")
+  }
+  _p9k_sub MODE $POWERLEVEL9K_MODE
   if [[ $POWERLEVEL9K_MODE == (powerline|compatible) && $_p9k_style == lean ]]; then
-    local exp="''"
+    _p9k_sub VISUAL_IDENTIFIER_EXPANSION "''"
   elif (( _p9k_caps_narrow_icons )); then
-    local exp="'\${P9K_VISUAL_IDENTIFIER// }'"
+    _p9k_sub VISUAL_IDENTIFIER_EXPANSION "'\${P9K_VISUAL_IDENTIFIER// }'"
   else
-    local exp="'\${P9K_VISUAL_IDENTIFIER}'"
+    _p9k_sub VISUAL_IDENTIFIER_EXPANSION "'\${P9K_VISUAL_IDENTIFIER}'"
   fi
-  lines=("${(@)lines/#  typeset -g POWERLEVEL9K_VISUAL_IDENTIFIER_EXPANSION=*/  typeset -g POWERLEVEL9K_VISUAL_IDENTIFIER_EXPANSION=$exp}")
   if (( _p9k_lines == 1 )); then
     local -a tmp
     local line
