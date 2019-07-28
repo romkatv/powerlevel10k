@@ -4,8 +4,8 @@ emulate -L zsh
 setopt extended_glob noaliases
 
 () {
-typeset -gr __p9k_installation_dir=${1:-${0:h:h:A}}
-source $__p9k_installation_dir/internal/configure.zsh || return
+typeset -gr __p9k_root_dir=${1:-${0:h:h:A}}
+source $__p9k_root_dir/internal/configure.zsh || return
 
 local POWERLEVEL9K_MODE cap_lock style config_backup
 local -i cap_diamond cap_python cap_narrow_icons num_lines config_overwrite
@@ -286,7 +286,7 @@ function ask_config_overwrite() {
 }
 
 function generate_config() {
-  local base && base="$(<$__p9k_installation_dir/config/p10k-$style.zsh)" || return
+  local base && base="$(<$__p9k_root_dir/config/p10k-$style.zsh)" || return
   local lines=("${(@f)base}")
   function sub() {
     lines=("${(@)lines/#  typeset -g POWERLEVEL9K_$1=*/  typeset -g POWERLEVEL9K_$1=$2}")
@@ -324,7 +324,7 @@ function generate_config() {
 }
 
 _p9k_can_configure || return
-source $__p9k_installation_dir/internal/icons.zsh || return
+source $__p9k_root_dir/internal/icons.zsh || return
 
 while true; do
   ask_diamond || { (( $? == 2 )) && continue || return }

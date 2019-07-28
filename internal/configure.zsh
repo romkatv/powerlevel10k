@@ -3,7 +3,7 @@ typeset -gr __p9k_zd_u=${__p9k_zd/#(#b)$HOME(|\/*)/'~'$match[1]}
 typeset -gr __p9k_cfg_basename=.p10k.zsh
 typeset -gr __p9k_cfg_path=$__p9k_zd/$__p9k_cfg_basename
 typeset -gr __p9k_cfg_path_u=$__p9k_zd_u/$__p9k_cfg_basename
-typeset -gr __p9k_installation_dir_u=${__p9k_installation_dir/#(#b)$HOME(|\/*)/'~'$match[1]}
+typeset -gr __p9k_root_dir_u=${__p9k_root_dir/#(#b)$HOME(|\/*)/'~'$match[1]}
 
 function _p9k_can_configure() {
   emulate -L zsh
@@ -23,10 +23,10 @@ function _p9k_can_configure() {
 
     [[ ! -e $__p9k_cfg_path || -f $__p9k_cfg_path || -h $__p9k_cfg_path ]] ||
       $0_error "$__p9k_cfg_path_u is a special file"
-    [[ -r $__p9k_installation_dir/config/p10k-lean.zsh ]] ||
-      $0_error "cannot read $__p9k_installation_dir_u/config/p10k-lean.zsh"
-    [[ -r $__p9k_installation_dir/config/p10k-classic.zsh ]] ||
-      $0_error "cannot read $__p9k_installation_dir_u/config/p10k-classic.zsh"
+    [[ -r $__p9k_root_dir/config/p10k-lean.zsh ]] ||
+      $0_error "cannot read $__p9k_root_dir_u/config/p10k-lean.zsh"
+    [[ -r $__p9k_root_dir/config/p10k-classic.zsh ]] ||
+      $0_error "cannot read $__p9k_root_dir_u/config/p10k-classic.zsh"
   } always {
     unfunction $0_error
   }

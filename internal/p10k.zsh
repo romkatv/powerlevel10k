@@ -27,7 +27,7 @@ if ! autoload -Uz is-at-least || ! is-at-least 5.1; then
   return 1
 fi
 
-source "${__p9k_installation_dir}/internal/icons.zsh"
+source "${__p9k_root_dir}/internal/icons.zsh"
 
 # For compatibility with Powerlevel9k. It's not recommended to use mnemonic color
 # names in the configuration except for colors 0-7 as these are standard.
@@ -4126,7 +4126,7 @@ _p9k_init() {
   if _p9k_segment_in_use vcs; then
     _p9k_vcs_info_init
     if [[ $_POWERLEVEL9K_DISABLE_GITSTATUS == 0 && -n $_POWERLEVEL9K_VCS_BACKENDS[(r)git] ]]; then
-      source ${_POWERLEVEL9K_GITSTATUS_DIR:-${__p9k_installation_dir}/gitstatus}/gitstatus.plugin.zsh
+      source ${_POWERLEVEL9K_GITSTATUS_DIR:-${__p9k_root_dir}/gitstatus}/gitstatus.plugin.zsh
       gitstatus_start                                                                 \
         -s $_POWERLEVEL9K_VCS_STAGED_MAX_NUM       \
         -u $_POWERLEVEL9K_VCS_UNSTAGED_MAX_NUM     \
