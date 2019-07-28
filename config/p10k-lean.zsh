@@ -136,8 +136,7 @@ fi
   #   POWERLEVEL9K_DIR_NOT_WRITABLE_ICON_BEFORE_CONTENT=false
   typeset -g POWERLEVEL9K_ICON_BEFORE_CONTENT=true
 
-  # Add an empty line before each prompt. If you set it to false, you might want to
-  # set POWERLEVEL9K_SHOW_RULER=true or POWERLEVEL9K_MULTILINE_FIRST_PROMPT_GAP_CHAR='·' below.
+  # Add an empty line before each prompt.
   typeset -g POWERLEVEL9K_PROMPT_ADD_NEWLINE=true
 
   # Ruler, a.k.a. the horizontal line before each prompt. If you set it to true, you'll
@@ -365,10 +364,10 @@ fi
   #######################[ background_jobs: presence of background jobs ]#######################
   # Don't show the number of background jobs.
   typeset -g POWERLEVEL9K_BACKGROUND_JOBS_VERBOSE=false
+  # Background jobs color.
+  typeset -g POWERLEVEL9K_BACKGROUND_JOBS_FOREGROUND=2
   # Icon to show when there are background jobs.
-  typeset -g POWERLEVEL9K_BACKGROUND_JOBS_VISUAL_IDENTIFIER_EXPANSION='⇶'
-  # Background jobs icon color.
-  typeset -g POWERLEVEL9K_BACKGROUND_JOBS_VISUAL_IDENTIFIER_COLOR=2
+  typeset -g POWERLEVEL9K_BACKGROUND_JOBS_VISUAL_IDENTIFIER_EXPANSION='${P9K_VISUAL_IDENTIFIER}'
 
   ##########[ nordvpn: nordvpn connection status, linux only (https://nordvpn.com/) ]###########
   # NordVPN connection indicator color when connected.
