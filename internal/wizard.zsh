@@ -583,7 +583,7 @@ function write_zshrc() {
   print -lr -- "" $comments "source $__p9k_cfg_path_u" >>$__p9k_zshrc
 
   print -P ""
-  print -P "The following lines have been appended to your %B%4F$__p9k_zshrc_u%f%b:"
+  print -P "The following lines have been appended to %B%4F$__p9k_zshrc_u%f%b:"
   print -P ""
   print -lP -- '  %8F'${^comments}'%f' "  %2Fsource%f %15F$__p9k_cfg_path_u%f"
 }
