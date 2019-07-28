@@ -578,7 +578,7 @@ function write_zshrc() {
 
   local comments=(
     "# You can customize your prompt by editing $__p9k_cfg_path_u."
-    "# To run Powerlevel10k configuration wizard, type 'p9k_configure."
+    "# To run Powerlevel10k configuration wizard, type 'p9k_configure'."
   )
   print -lr -- "" $comments "source $__p9k_cfg_path_u" >>$__p9k_zshrc
 
