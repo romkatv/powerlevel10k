@@ -36,6 +36,7 @@ typeset -ri prompt_indent=2
 typeset -ra bg_color=(238 236 234)
 typeset -ra frame_color=(242 240 238)
 typeset -ra sep_color=(244 242 240)
+typeset -ra prefix_color=(248 246 244)
 
 typeset -ra lean_left=(
   '' '%31F$extra_icons[1]%B%39F~%b%31F/%B%39Fpowerlevel10k%b%f $prefixes[1]%76F$extra_icons[2]master ⇡2%f '
@@ -48,12 +49,12 @@ typeset -ra lean_right=(
 )
 
 typeset -ra classic_left=(
-  '%$frame_color[$color]F╭─' '%K{$bg_color[$color]} %31F$extra_icons[1]%B%39F~%b%K{$bg_color[$color]}%31F/%B%39Fpowerlevel10k%b%K{$bg_color[$color]} %$sep_color[$color]F\uE0B1%f $prefixes[1]%76F$extra_icons[2]master ⇡2 %k%$bg_color[$color]F\uE0B0%f'
+  '%$frame_color[$color]F╭─' '%K{$bg_color[$color]} %31F$extra_icons[1]%B%39F~%b%K{$bg_color[$color]}%31F/%B%39Fpowerlevel10k%b%K{$bg_color[$color]} %$sep_color[$color]F\uE0B1%f %$prefix_color[$color]F$prefixes[1]%76F$extra_icons[2]master ⇡2 %k%$bg_color[$color]F\uE0B0%f'
   '%$frame_color[$color]F╰─' '%f █'
 )
 
 typeset -ra classic_right=(
-  '%$bg_color[$color]F\uE0B2%K{$bg_color[$color]}%f $prefixes[2]%134Fminikube ⎈ %k%f' '%$frame_color[$color]F─╮%f'
+  '%$bg_color[$color]F\uE0B2%K{$bg_color[$color]}%f %$prefix_color[$color]F$prefixes[2]%134Fminikube ⎈ %k%f' '%$frame_color[$color]F─╮%f'
   '' '%$frame_color[$color]F─╯%f'
 )
 
@@ -680,15 +681,21 @@ function generate_config() {
     local right_start='\uE0B2'
 
     if (( straight )); then
-      [[ $POWERLEVEL9K_MODE == nerdfont-complete ]] && subsep='\uE0BD' || subsep='|'
+      if [[ $POWERLEVEL9K_MODE == nerdfont-complete ]]; then
+        left_subsep='\uE0BD'
+        right_subset='\uE0BD'
+      else
+        left_subsep='|'
+        right_subset'|'
+      fi
       left_end='▓▒░'
       right_start='░▒▓'
     fi
 
-    sub LEFT_SUBSEGMENT_SEPARATOR "'%$sep_color[$color]F$subsep'"
-    sub RIGHT_SUBSEGMENT_SEPARATOR "'%$sep_color[$color]F$subsep'"
-    sub LEFT_SEGMENT_SEPARATOR "'$subsep'"
-    sub RIGHT_SEGMENT_SEPARATOR "'$subsep'"
+    sub LEFT_SUBSEGMENT_SEPARATOR "'%$sep_color[$color]F$left_subsep'"
+    sub RIGHT_SUBSEGMENT_SEPARATOR "'%$sep_color[$color]F$right_subsep'"
+    sub LEFT_SEGMENT_SEPARATOR "'$left_subsep'"
+    sub RIGHT_SEGMENT_SEPARATOR "'$right_subsep'"
     sub LEFT_PROMPT_LAST_SEGMENT_END_SYMBOL "'$left_end'"
     sub RIGHT_PROMPT_FIRST_SEGMENT_START_SYMBOL "'$right_start'"
   fi
@@ -713,8 +720,14 @@ function generate_config() {
     uncomment 'typeset -g POWERLEVEL9K_CONTEXT_PREFIX'
     uncomment 'typeset -g POWERLEVEL9K_KUBECONTEXT_PREFIX'
     uncomment 'typeset -g POWERLEVEL9K_TIME_PREFIX'
-    sub CONTEXT_TEMPLATE "'%n%f at %180F%m'"
-    sub CONTEXT_ROOT_TEMPLATE "'%n%f at %227F%m'"
+    [[ $style == classic ]] && local fg="%$prefix_color[$color]F" || local fg="%f"
+    sub VCS_PREFIX "'${fg}on '"
+    sub COMMAND_EXECUTION_TIME_PREFIX "'${fg}took '"
+    sub CONTEXT_PREFIX "'${fg}with '"
+    sub KUBECONTEXT_PREFIX "'${fg}at '"
+    sub TIME_PREFIX "'${fg}at '"
+    sub CONTEXT_TEMPLATE "'%n$fg at %180F%m'"
+    sub CONTEXT_ROOT_TEMPLATE "'%n$fg at %227F%m'"
   fi
 
   if (( num_lines == 1 )); then
