@@ -676,17 +676,17 @@ function generate_config() {
     local left_sep='\uE0B0'
     local right_sep='\uE0B2'
     local left_subsep='\uE0B1'
-    local right_subset='\uE0B3'
+    local right_subsep='\uE0B3'
     local left_end='\uE0B0'
     local right_start='\uE0B2'
 
     if (( straight )); then
       if [[ $POWERLEVEL9K_MODE == nerdfont-complete ]]; then
         left_subsep='\uE0BD'
-        right_subset='\uE0BD'
+        right_subsep='\uE0BD'
       else
         left_subsep='|'
-        right_subset'|'
+        right_subsep'|'
       fi
       left_end='▓▒░'
       right_start='░▒▓'
