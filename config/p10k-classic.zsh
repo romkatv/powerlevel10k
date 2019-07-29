@@ -229,6 +229,9 @@ fi
   # Show this icon when the current directory is not writable. Empty for no icon. 
   # typeset -g POWERLEVEL9K_DIR_NOT_WRITABLE_VISUAL_IDENTIFIER_EXPANSION='⭐'
 
+  # Custom prefix.
+  # typeset -g POWERLEVEL9K_DIR_PREFIX='%fin '
+
   # POWERLEVEL9K_DIR_CLASSES allows you to specify custom icons for different directories.
   # It must be an array with 3 * N elements. Each triplet consists of:
   #
@@ -312,6 +315,8 @@ fi
 
   # Custom icon.
   # typeset -g POWERLEVEL9K_VCS_VISUAL_IDENTIFIER_EXPANSION='⭐'
+  # Custom prefix.
+  # typeset -g POWERLEVEL9K_VCS_PREFIX='%fon '
 
   # Show status of repositories of these types. You can add svn and/or hg if you are
   # using them. If you do, your prompt may become slow even when your current directory
@@ -379,6 +384,8 @@ fi
   typeset -g POWERLEVEL9K_COMMAND_EXECUTION_TIME_FORMAT='d h m s'
   # Custom icon.
   # typeset -g POWERLEVEL9K_COMMAND_EXECUTION_TIME_VISUAL_IDENTIFIER_EXPANSION='⭐'
+  # Custom prefix.
+  # typeset -g POWERLEVEL9K_COMMAND_EXECUTION_TIME_PREFIX='%ftook '
 
   #######################[ background_jobs: presence of background jobs ]#######################
   # Don't show the number of background jobs.
@@ -398,21 +405,24 @@ fi
   # typeset -g POWERLEVEL9K_NORDVPN_VISUAL_IDENTIFIER_EXPANSION='⭐'
 
   ####################################[ context: user@host ]####################################
-  # Default context format: %n is username, %m is hostname.
-  typeset -g POWERLEVEL9K_CONTEXT_TEMPLATE='%n@%m'
   # Default context color.
   typeset -g POWERLEVEL9K_CONTEXT_FOREGROUND=180
-  # Context format when running with privileges: %n is username, %m is hostname.
-  typeset -g POWERLEVEL9K_CONTEXT_ROOT_TEMPLATE='%n@%m'
+  # Default context format: %n is username, %m is hostname.
+  typeset -g POWERLEVEL9K_CONTEXT_TEMPLATE='%n@%m'
+
   # Context color when running with privileges.
   typeset -g POWERLEVEL9K_CONTEXT_ROOT_FOREGROUND=227
+  # Context format when running with privileges: %n is username, %m is hostname.
+  typeset -g POWERLEVEL9K_CONTEXT_ROOT_TEMPLATE='%n@%m'
+
   # Don't show context unless running with privileges on in SSH.
   typeset -g POWERLEVEL9K_CONTEXT_{DEFAULT,SUDO}_{CONTENT,VISUAL_IDENTIFIER}_EXPANSION=
   typeset -g POWERLEVEL9K_ALWAYS_SHOW_CONTEXT=true
+
   # Custom icon.
   # typeset -g POWERLEVEL9K_CONTEXT_VISUAL_IDENTIFIER_EXPANSION='⭐'
-  # Custom icon when root.
-  # typeset -g POWERLEVEL9K_CONTEXT_ROOT_VISUAL_IDENTIFIER_EXPANSION='⭐'
+  # Custom prefix.
+  # typeset -g POWERLEVEL9K_CONTEXT_PREFIX='%fwith '
 
   ###[ virtualenv: python virtual environment (https://docs.python.org/3/library/venv.html) ]###
   # Python virtual environment color.
@@ -507,6 +517,9 @@ fi
   # POWERLEVEL9K_KUBECONTEXT_CONTENT_EXPANSION by making the format of ${P9K_CONTENT} consistent.
   typeset -g POWERLEVEL9K_KUBECONTEXT_SHOW_DEFAULT_NAMESPACE=true
 
+  # Custom prefix.
+  # typeset -g POWERLEVEL9K_KUBECONTEXT_PREFIX='%fat '
+
   ###############################[ public_ip: public IP address ]###############################
   # Public IP color.
   typeset -g POWERLEVEL9K_PUBLIC_IP_FOREGROUND=94
@@ -541,6 +554,8 @@ fi
   typeset -g POWERLEVEL9K_TIME_UPDATE_ON_COMMAND=false
   # Custom icon.
   # typeset -g POWERLEVEL9K_TIME_VISUAL_IDENTIFIER_EXPANSION='⭐'
+  # Custom prefix.
+  # typeset -g POWERLEVEL9K_TIME_PREFIX='%fat '
 
   # Example of a user-defined prompt segment. Function prompt_example will be called on every
   # prompt if `example` prompt segment is added to POWERLEVEL9K_LEFT_PROMPT_ELEMENTS or
