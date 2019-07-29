@@ -2883,6 +2883,7 @@ prompt_dir_writable() {
 ################################################################
 # Kubernetes Current Context/Namespace
 prompt_kubecontext() {
+  unset P9K_KUBECONTEXT_{NAME,CLUSTER,NAMESPACE}
   (( $+commands[kubectl] )) || return
   local cfg
   local -a key
@@ -2893,29 +2894,68 @@ prompt_kubecontext() {
   done
 
   if ! _p9k_cache_get $0 "${key[@]}"; then
-    local ctx="$(kubectl config view -o=jsonpath='{.current-context}')"
-    if [[ -n $ctx ]]; then
-      local p="{.contexts[?(@.name==\"$ctx\")].context.namespace}"
-      local ns="${$(kubectl config view -o=jsonpath=$p):-default}"
-      if [[ $ctx != $ns && ($ns != default || $_POWERLEVEL9K_KUBECONTEXT_SHOW_DEFAULT_NAMESPACE == 1) ]]; then
-        ctx+="/$ns"
-      fi
+    local context cluster namespace
+    () {
+      local cfg && cfg=(${(f)"$(kubectl config view -o=yaml)"}) || return
+      local ctx=(${(@M)cfg:#current-context:[[:space:]]*})
+      (( $#ctx == 1 )) || return
+      context=${${ctx[1]}[(w)2]}  # TODO: figure out how values with spaces look in yaml
+      local -i pos=${cfg[(i)contexts:]}
+      (( pos <= $#cfg )) || return
+      shift $pos cfg
+      pos=${cfg[(i)  name: $context]}
+      (( pos <= $#cfg )) || return
+      (( --pos ))
+      for ((; pos > 0; --pos)); do
+        local line=$cfg[pos]
+        case $line in
+          '- context:')      return;;
+          '    cluster:'*)   cluster=${line[(w)2]};;
+          '    namespace:'*) namespace=${line[(w)2]};;
+        esac
+      done
+    }
+    local text=$context
+    local ns=${namespace:-default}
+    if [[ $context != $ns && ($ns != default || $_POWERLEVEL9K_KUBECONTEXT_SHOW_DEFAULT_NAMESPACE == 1) ]]; then
+      text+="/$ns"
     fi
+    local shorten
+    for shorten in $_POWERLEVEL9K_KUBECONTEXT_SHORTEN; do
+      case $shorten in
+        gke)
+          # gke_projectname_availability-zone_cluster-01 => cluster-01
+          if [[ $cluster == gke_* ]]; then
+            local parts=(${(s:_:)cluster})
+            (( $#parts > 3 )) && text=$parts[4,-1]
+            break
+          fi
+          ;;
+        eks)
+          # arn:aws:eks:us-east-1:XXXXXXXXXXXX:cluster/eks-infra
+          if [[ $cluster == (#b)arn:aws:eks:[[:alnum:]-]##:[[:digit:]]##:cluster/(*) ]]; then
+            [[ -n $match[1] ]] && text=$match[1]
+            break
+          fi
+      esac
+    done
     local suf
-    if [[ -n $ctx ]]; then
+    if [[ -n $text ]]; then
       local pat class
       for pat class in "${_POWERLEVEL9K_KUBECONTEXT_CLASSES[@]}"; do
-        if [[ $ctx == ${~pat} ]]; then
+        if [[ $text == ${~pat} ]]; then
           [[ -n $class ]] && suf=_${(U)class}
           break
         fi
       done
     fi
-    _p9k_cache_set "$ctx" "$suf"
+    _p9k_cache_set "$context" "$cluster" "$namespace" "$text" "$suf"
   fi
-
   [[ -n $_p9k_cache_val[1] ]] || return
-  _p9k_prompt_segment $0$_p9k_cache_val[2] magenta white KUBERNETES_ICON 0 '' "${_p9k_cache_val[1]//\%/%%}"
+  typeset -g P9K_KUBECONTEXT_NAME=$_p9k_cache_val[1]
+  typeset -g P9K_KUBECONTEXT_CLUSTER=$_p9k_cache_val[2]
+  typeset -g P9K_KUBECONTEXT_NAMESPACE=$_p9k_cache_val[3]
+  _p9k_prompt_segment $0$_p9k_cache_val[5] magenta white KUBERNETES_ICON 0 '' "${_p9k_cache_val[4]//\%/%%}"
 }
 
 ################################################################
@@ -3676,6 +3716,7 @@ _p9k_init_params() {
   _p9k_declare -e POWERLEVEL9K_NODEENV_LEFT_DELIMITER "["
   _p9k_declare -e POWERLEVEL9K_NODEENV_RIGHT_DELIMITER "]"
   _p9k_declare -b POWERLEVEL9K_KUBECONTEXT_SHOW_DEFAULT_NAMESPACE 1
+  _p9k_declare -a POWERLEVEL9K_KUBECONTEXT_SHORTEN -- gke eks
   # Defines context classes for the purpose of applying different styling to different contexts.
   #
   # POWERLEVEL9K_KUBECONTEXT_CLASSES must be an array with even number of elements. The first
