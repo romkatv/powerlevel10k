@@ -1956,8 +1956,10 @@ prompt_ram() {
       free_bytes=${${(A)=stat}[4]}
     ;;
     *)
-      local stat && stat=$(grep -F MemAvailable /proc/meminfo 2>/dev/null) || return
-      free_bytes=$(( ${${(A)=stat}[2]} * 1024 ))
+      [[ -r /proc/meminfo ]] || return
+      local stat && stat="$(</proc/meminfo)" || return
+      [[ $stat == (#b)*'MemAvailable:'[[:space:]]#(<->)* ]] || return
+      free_bytes=$(( $match[1] * 1024 ))
     ;;
   esac
 
