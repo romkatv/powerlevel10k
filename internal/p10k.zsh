@@ -4,19 +4,19 @@ if ! autoload -Uz is-at-least || ! is-at-least 5.1; then
     >&2 echo -E "Type 'echo \$ZSH_VERSION' to see your current zsh version."
     local def=${SHELL:c:A}
     local cur=${${ZSH_ARGZERO#-}:c:A}
-    local cur_v=$($cur -c 'echo -E $ZSH_VERSION' 2>/dev/null)
+    local cur_v="$($cur -c 'echo -E $ZSH_VERSION' 2>/dev/null)"
     if [[ $cur_v == $ZSH_VERSION && $cur != $def ]]; then
       >&2 echo -E "The shell you are currently running is likely $cur."
     fi
     local other=${${:-zsh}:c}
     if [[ -n $other ]] && $other -c 'autoload -Uz is-at-least && is-at-least 5.1' &>/dev/null; then
-      local other_v=$($other -c 'echo -E $ZSH_VERSION' 2>/dev/null)
+      local other_v="$($other -c 'echo -E $ZSH_VERSION' 2>/dev/null)"
       if [[ -n $other_v && $other_v != $ZSH_VERSION ]]; then
         >&2 echo -E "You have $other with version $other_v but this is not what you are using."
         if [[ -n $def && $def != ${other:A} ]]; then
           >&2 echo -E "To change your user shell, type the following command:"
           >&2 echo -E ""
-          if [[ $(grep -F $other /etc/shells 2>/dev/null) != $other ]]; then
+          if [[ "$(grep -F $other /etc/shells 2>/dev/null)" != $other ]]; then
             >&2 echo -E "  echo ${(q-)other} | sudo tee -a /etc/shells"
           fi
           >&2 echo -E "  chsh -s ${(q-)other}"
@@ -980,8 +980,9 @@ prompt_aws() {
 # Current Elastic Beanstalk environment
 prompt_aws_eb_env() {
   [[ -r .elasticbeanstalk/config.yml ]] || return
-  local v=${=$(grep environment .elasticbeanstalk/config.yml 2>/dev/null)[2]}
-  [[ -n $v ]] && _p9k_prompt_segment "$0" black green 'AWS_EB_ICON' 0 '' "${v//\%/%%}"
+  local v=($(grep environment .elasticbeanstalk/config.yml 2>/dev/null))
+  [[ $#v > 1 && -n $v[2] ]] || return
+  [[ -n $v ]] && _p9k_prompt_segment "$0" black green 'AWS_EB_ICON' 0 '' "${v[2]//\%/%%}"
 }
 
 ################################################################
@@ -1150,13 +1151,13 @@ prompt_public_ip() {
 ################################################################
 # Context: user@hostname (who am I and where am I)
 prompt_context() {
-  if ! _p9k_cache_get $0; then
+  if ! _p9k_cache_get $0 "${(%):-%#}"; then
     local -i enabled=1
     local content='' state=''
     if [[ $_POWERLEVEL9K_ALWAYS_SHOW_CONTEXT == 1 || -z $DEFAULT_USER || $_P9K_SSH == 1 ]]; then
       content=$_POWERLEVEL9K_CONTEXT_TEMPLATE
     else
-      local user=$(whoami)
+      local user="$(whoami)"
       if [[ $user != $DEFAULT_USER ]]; then
         content=$_POWERLEVEL9K_CONTEXT_TEMPLATE
       elif (( _POWERLEVEL9K_ALWAYS_SHOW_USER )); then
@@ -1191,8 +1192,8 @@ prompt_context() {
 ################################################################
 # User: user (who am I)
 prompt_user() {
-  if ! _p9k_cache_get $0; then
-    local user=$(whoami)
+  if ! _p9k_cache_get $0 "${(%):-%#}"; then
+    local user="$(whoami)"
     if [[ $_POWERLEVEL9K_ALWAYS_SHOW_USER == 0 && $user == $DEFAULT_USER ]]; then
       _p9k_cache_set true
     elif [[ "${(%):-%#}" == '#' ]]; then
@@ -1224,7 +1225,7 @@ _p9k_custom_prompt() {
   local command=POWERLEVEL9K_CUSTOM_${segment_name}
   local -a cmd=("${(@Q)${(z)${(P)command}}}")
   whence $cmd[1] &>/dev/null || return
-  local content=$("$cmd[@]")
+  local content="$("$cmd[@]")"
   [[ -n $content ]] || return
   _p9k_prompt_segment "prompt_custom_$segment_name" $_p9k_color2 $_p9k_color1 "CUSTOM_${segment_name}_ICON" 0 '' "$content"
 }
@@ -1347,7 +1348,7 @@ prompt_dir() {
             zstat -H stat -- $pkg_file 2>/dev/null || return
             if ! _p9k_cache_get $0_pkg $stat[inode] $stat[mtime] $stat[size]; then
               local pkg_name=''
-              pkg_name=$(jq -j '.name' <$pkg_file 2>/dev/null) || pkg_name=''
+              pkg_name="$(jq -j '.name' <$pkg_file 2>/dev/null)" || pkg_name=''
               _p9k_cache_set "$pkg_name"
             fi
             [[ -n $_p9k_cache_val[1] ]] || return
@@ -1613,7 +1614,7 @@ prompt_go_version() {
     if [[ -d $HOME/go ]]; then
       p=$HOME/go
     else
-      p=$(go env GOPATH 2>/dev/null) && [[ -n $p ]] || return
+      p="$(go env GOPATH 2>/dev/null)" && [[ -n $p ]] || return
     fi
   fi
   if [[ $PWD/ != $p/* ]]; then
@@ -1636,7 +1637,7 @@ prompt_history() {
 # Detection for virtualization (systemd based systems only)
 prompt_detect_virt() {
   (( $+commands[systemd-detect-virt] )) || return
-  local virt=$(systemd-detect-virt 2>/dev/null)
+  local virt="$(systemd-detect-virt 2>/dev/null)"
   if [[ "$virt" == "none" ]]; then
     [[ "$(ls -di /)" != "2 /" ]] && virt="chroot"
   fi
@@ -1684,7 +1685,7 @@ prompt_load() {
   case $_p9k_os in
     OSX|BSD)
       (( $+commands[sysctl] )) || return
-      load=$(sysctl -n vm.loadavg 2>/dev/null) || return
+      load="$(sysctl -n vm.loadavg 2>/dev/null)" || return
       load=${${(A)=load}[bucket+1]//,/.}
     ;;
     *)
@@ -1715,7 +1716,7 @@ function _p9k_cached_cmd_stdout() {
   zstat -H stat -- $cmd 2>/dev/null || return
   if ! _p9k_cache_get $0 $stat[inode] $stat[mtime] $stat[size] $stat[mode] $cmd "$@"; then
     local out
-    out=$($cmd "$@" 2>/dev/null)
+    out="$($cmd "$@" 2>/dev/null)"
     _p9k_cache_set $(( ! $? )) "$out"
   fi
   (( $_p9k_cache_val[1] )) || return
@@ -1730,7 +1731,7 @@ function _p9k_cached_cmd_stdout_stderr() {
   zstat -H stat -- $cmd 2>/dev/null || return
   if ! _p9k_cache_get $0 $stat[inode] $stat[mtime] $stat[size] $stat[mode] $cmd "$@"; then
     local out
-    out=$($cmd "$@" 2>&1)  # this line is the only diff with _p9k_cached_cmd_stdout
+    out="$($cmd "$@" 2>&1)"  # this line is the only diff with _p9k_cached_cmd_stdout
     _p9k_cache_set $(( ! $? )) "$out"
   fi
   (( $_p9k_cache_val[1] )) || return
@@ -1944,7 +1945,7 @@ prompt_ram() {
   case $_p9k_os in
     OSX)
       (( $+commands[vm_stat] )) || return
-      local stat && stat=$(vm_stat 2>/dev/null) || return
+      local stat && stat="$(vm_stat 2>/dev/null)" || return
       [[ $stat =~ 'Pages free:[[:space:]]+([0-9]+)' ]] || return
       (( free_bytes+=match[1] ))
       [[ $stat =~ 'Pages inactive:[[:space:]]+([0-9]+)' ]] || return
@@ -1952,7 +1953,7 @@ prompt_ram() {
       (( free_bytes *= 4096 ))
     ;;
     BSD)
-      local stat && stat=$(grep -F 'avail memory' /var/run/dmesg.boot 2>/dev/null) || return
+      local stat && stat="$(grep -F 'avail memory' /var/run/dmesg.boot 2>/dev/null)" || return
       free_bytes=${${(A)=stat}[4]}
     ;;
     *)
@@ -2135,7 +2136,7 @@ prompt_swap() {
       *) return;;
     esac
   else
-    local meminfo && meminfo=$(grep -F 'Swap' /proc/meminfo 2>/dev/null) || return
+    local meminfo && meminfo="$(grep -F 'Swap' /proc/meminfo 2>/dev/null)" || return
     [[ $meminfo =~ 'SwapTotal:[[:space:]]+([0-9]+)' ]] || return
     (( used_bytes+=match[1] ))
     [[ $meminfo =~ 'SwapFree:[[:space:]]+([0-9]+)' ]] || return
@@ -2247,10 +2248,10 @@ function +vi-git-untracked() {
   # dump out if we're outside a git repository (which includes being in the .git folder)
   [[ $? != 0 || -z $repoTopLevel ]] && return
 
-  local untrackedFiles=$(git ls-files --others --exclude-standard "${repoTopLevel}" 2> /dev/null)
+  local untrackedFiles="$(git ls-files --others --exclude-standard "${repoTopLevel}" 2> /dev/null)"
 
   if [[ -z $untrackedFiles && $_POWERLEVEL9K_VCS_SHOW_SUBMODULE_DIRTY == 1 ]]; then
-    untrackedFiles+=$(git submodule foreach --quiet --recursive 'git ls-files --others --exclude-standard' 2> /dev/null)
+    untrackedFiles+="$(git submodule foreach --quiet --recursive 'git ls-files --others --exclude-standard' 2> /dev/null)"
   fi
 
   [[ -z $untrackedFiles ]] && return
@@ -2265,12 +2266,12 @@ function +vi-git-aheadbehind() {
 
   # for git prior to 1.7
   # ahead=$(git rev-list origin/${hook_com[branch]}..HEAD | wc -l)
-  ahead=$(git rev-list --count "${hook_com[branch]}"@{upstream}..HEAD 2>/dev/null)
+  ahead="$(git rev-list --count "${hook_com[branch]}"@{upstream}..HEAD 2>/dev/null)"
   (( ahead )) && gitstatus+=( " $(print_icon 'VCS_OUTGOING_CHANGES_ICON')${ahead// /}" )
 
   # for git prior to 1.7
   # behind=$(git rev-list HEAD..origin/${hook_com[branch]} | wc -l)
-  behind=$(git rev-list --count HEAD.."${hook_com[branch]}"@{upstream} 2>/dev/null)
+  behind="$(git rev-list --count HEAD.."${hook_com[branch]}"@{upstream} 2>/dev/null)"
   (( behind )) && gitstatus+=( " $(print_icon 'VCS_INCOMING_CHANGES_ICON')${behind// /}" )
 
   hook_com[misc]+=${(j::)gitstatus}
@@ -2281,7 +2282,8 @@ function +vi-git-remotebranch() {
   local branch_name="${hook_com[branch]}"
 
   # Are we on a remote-tracking branch?
-  remote=${$(git rev-parse --verify HEAD@{upstream} --symbolic-full-name 2>/dev/null)/refs\/(remotes|heads)\/}
+  remote="$(git rev-parse --verify HEAD@{upstream} --symbolic-full-name 2>/dev/null)"
+  remote=${remote/refs\/(remotes|heads)\/}
 
   if (( $+_POWERLEVEL9K_VCS_SHORTEN_LENGTH && $+_POWERLEVEL9K_VCS_SHORTEN_MIN_LENGTH )); then
     if (( ${#hook_com[branch]} > _POWERLEVEL9K_VCS_SHORTEN_MIN_LENGTH && ${#hook_com[branch]} > _POWERLEVEL9K_VCS_SHORTEN_LENGTH )); then
@@ -2313,18 +2315,18 @@ function +vi-git-tagname() {
   if (( !_POWERLEVEL9K_VCS_HIDE_TAGS )); then
     # If we are on a tag, append the tagname to the current branch string.
     local tag
-    tag=$(git describe --tags --exact-match HEAD 2>/dev/null)
+    tag="$(git describe --tags --exact-match HEAD 2>/dev/null)"
 
     if [[ -n "${tag}" ]] ; then
       # There is a tag that points to our current commit. Need to determine if we
       # are also on a branch, or are in a DETACHED_HEAD state.
-      if [[ -z $(git symbolic-ref HEAD 2>/dev/null) ]]; then
+      if [[ -z "$(git symbolic-ref HEAD 2>/dev/null)" ]]; then
         # DETACHED_HEAD state. We want to append the tag name to the commit hash
         # and print it. Unfortunately, `vcs_info` blows away the hash when a tag
         # exists, so we have to manually retrieve it and clobber the branch
         # string.
         local revision
-        revision=$(git rev-list -n 1 --abbrev-commit --abbrev=${_POWERLEVEL9K_CHANGESET_HASH_LENGTH} HEAD)
+        revision="$(git rev-list -n 1 --abbrev-commit --abbrev=${_POWERLEVEL9K_CHANGESET_HASH_LENGTH} HEAD)"
         if (( _POWERLEVEL9K_HIDE_BRANCH_ICON )); then
           hook_com[branch]="${revision} $(print_icon 'VCS_TAG_ICON')${tag}"
         else
@@ -2361,7 +2363,7 @@ function +vi-hg-bookmarks() {
 function +vi-vcs-detect-changes() {
   if [[ "${hook_com[vcs]}" == "git" ]]; then
 
-    local remote=$(git ls-remote --get-url 2> /dev/null)
+    local remote="$(git ls-remote --get-url 2> /dev/null)"
     if [[ "$remote" =~ "github" ]] then
       vcs_visual_identifier='VCS_GIT_GITHUB_ICON'
     elif [[ "$remote" =~ "bitbucket" ]] then
@@ -2879,7 +2881,7 @@ prompt_kubecontext() {
   done
 
   if ! _p9k_cache_get $0 "${key[@]}"; then
-    local ctx=$(kubectl config view -o=jsonpath='{.current-context}')
+    local ctx="$(kubectl config view -o=jsonpath='{.current-context}')"
     if [[ -n $ctx ]]; then
       local p="{.contexts[?(@.name==\"$ctx\")].context.namespace}"
       local ns="${$(kubectl config view -o=jsonpath=$p):-default}"
@@ -3299,22 +3301,22 @@ function _p9k_async_pump() {
         case $method in
           dig)
             if (( $+commands[dig] )); then
-              ip=$(dig +tries=1 +short -4 A myip.opendns.com @resolver1.opendns.com 2>/dev/null)
+              ip="$(dig +tries=1 +short -4 A myip.opendns.com @resolver1.opendns.com 2>/dev/null)"
               [[ $ip == ';'* ]] && ip=
               if [[ -z $ip ]]; then
-                ip=$(dig +tries=1 +short -6 AAAA myip.opendns.com @resolver1.opendns.com 2>/dev/null)
+                ip="$(dig +tries=1 +short -6 AAAA myip.opendns.com @resolver1.opendns.com 2>/dev/null)"
                 [[ $ip == ';'* ]] && ip=
               fi
             fi
           ;;
           curl)
             if (( $+commands[curl] )); then
-              ip=$(curl --max-time 5 -w '\n' "$ip_url" 2>/dev/null)
+              ip="$(curl --max-time 5 -w '\n' "$ip_url" 2>/dev/null)"
             fi
           ;;
           wget)
             if (( $+commands[wget] )); then
-              ip=$(wget -T 5 -qO- "$ip_url" 2>/dev/null)
+              ip="$(wget -T 5 -qO- "$ip_url" 2>/dev/null)"
             fi
           ;;
         esac
@@ -3351,8 +3353,8 @@ _p9k_init_async_pump() {
   _p9k_start_async_pump() {
     setopt err_return no_bg_nice
 
-    _p9k_async_pump_lock=$(mktemp ${TMPDIR:-/tmp}/p9k-$$-async-pump-lock.XXXXXXXXXX)
-    _p9k_async_pump_fifo=$(mktemp -u ${TMPDIR:-/tmp}/p9k-$$-async-pump-fifo.XXXXXXXXXX)
+    _p9k_async_pump_lock="$(mktemp ${TMPDIR:-/tmp}/p9k-$$-async-pump-lock.XXXXXXXXXX)"
+    _p9k_async_pump_fifo="$(mktemp -u ${TMPDIR:-/tmp}/p9k-$$-async-pump-fifo.XXXXXXXXXX)"
     mkfifo $_p9k_async_pump_fifo
     sysopen -rw -o cloexec,sync -u _p9k_async_pump_fd $_p9k_async_pump_fifo
     zle -F $_p9k_async_pump_fd _p9k_on_async_message
@@ -3909,7 +3911,7 @@ _p9k_init_prompt() {
   # We can work around it as long as RPROMPT ends with a space.
   if [[ -n $_p9k_line_segments_right[-1] && $_p9k_line_never_empty_right[-1] == 0 &&
         $ZLE_RPROMPT_INDENT == 0 && ${POWERLEVEL9K_WHITESPACE_BETWEEN_RIGHT_SEGMENTS:- } == ' ' &&
-        -z $(typeset -m 'POWERLEVEL9K_*(RIGHT_RIGHT_WHITESPACE|RIGHT_PROMPT_LAST_SEGMENT_END_SYMBOL)') ]] &&
+        -z "$(typeset -m 'POWERLEVEL9K_*(RIGHT_RIGHT_WHITESPACE|RIGHT_PROMPT_LAST_SEGMENT_END_SYMBOL)')" ]] &&
         ! is-at-least 5.7.2; then
     _p9k_emulate_zero_rprompt_indent=1
     _p9k_prompt_prefix_left+='${${:-${_p9k_real_zle_rprompt_indent:=$ZLE_RPROMPT_INDENT}${ZLE_RPROMPT_INDENT::=1}${_p9k_ind::=0}}+}'
@@ -3977,7 +3979,7 @@ _p9k_init_ssh() {
   # When changing user on a remote system, the $SSH_CONNECTION environment variable can be lost.
   # Attempt detection via `who`.
   (( $+commands[who] )) || return
-  local w && w=$(who -m 2>/dev/null) || w=${(@M)${(f)"$(who 2>/dev/null)"}:#*[[:space:]]${TTY#/dev/}[[:space:]]*}
+  local w && w="$(who -m 2>/dev/null)" || w=${(@M)${(f)"$(who 2>/dev/null)"}:#*[[:space:]]${TTY#/dev/}[[:space:]]*}
 
   local ipv6='(([0-9a-fA-F]+:)|:){2,}[0-9a-fA-F]+'  # Simplified, only checks partial pattern.
   local ipv4='([0-9]{1,3}\.){3}[0-9]+'              # Simplified, allows invalid ranges.
@@ -4015,8 +4017,8 @@ _p9k_init() {
   _p9k_init_prompt
   _p9k_init_ssh
 
-  local uname=$(uname)
-  if [[ $uname == Linux && $(uname -o 2>/dev/null) == Android ]]; then
+  local uname="$(uname)"
+  if [[ $uname == Linux && "$(uname -o 2>/dev/null)" == Android ]]; then
     _p9k_set_os Android ANDROID_ICON
   else
     case $uname in
@@ -4142,7 +4144,7 @@ _p9k_init() {
     local todo=$commands[todo.sh]
     if [[ -n $todo ]]; then
       local bash=${commands[bash]:-:}
-      _p9k_todo_file=$($bash 2>/dev/null -c "
+      _p9k_todo_file="$($bash 2>/dev/null -c "
         [ -e \"\$TODOTXT_CFG_FILE\" ] || TODOTXT_CFG_FILE=\$HOME/.todo/config
         [ -e \"\$TODOTXT_CFG_FILE\" ] || TODOTXT_CFG_FILE=\$HOME/todo.cfg
         [ -e \"\$TODOTXT_CFG_FILE\" ] || TODOTXT_CFG_FILE=\$HOME/.todo.cfg
@@ -4151,15 +4153,15 @@ _p9k_init() {
         [ -e \"\$TODOTXT_CFG_FILE\" ] || TODOTXT_CFG_FILE=\${TODOTXT_GLOBAL_CFG_FILE:-/etc/todo/config}
         [ -r \"\$TODOTXT_CFG_FILE\" ] || exit
         source \"\$TODOTXT_CFG_FILE\" &>/dev/null
-        echo \"\$TODO_FILE\"")
+        echo \"\$TODO_FILE\"")"
     fi
   fi
 
   if _p9k_segment_in_use load; then
     case $_p9k_os in
-      OSX) (( $+commands[sysctl] )) && _p9k_num_cpus=$(sysctl -n hw.logicalcpu 2>/dev/null);;
-      BSD) (( $+commands[sysctl] )) && _p9k_num_cpus=$(sysctl -n hw.ncpu 2>/dev/null);;
-      *)   (( $+commands[nproc]  )) && _p9k_num_cpus=$(nproc 2>/dev/null);;
+      OSX) (( $+commands[sysctl] )) && _p9k_num_cpus="$(sysctl -n hw.logicalcpu 2>/dev/null)";;
+      BSD) (( $+commands[sysctl] )) && _p9k_num_cpus="$(sysctl -n hw.ncpu 2>/dev/null)";;
+      *)   (( $+commands[nproc]  )) && _p9k_num_cpus="$(nproc 2>/dev/null)";;
     esac
   fi
 
