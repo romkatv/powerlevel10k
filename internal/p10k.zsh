@@ -961,7 +961,7 @@ prompt_anaconda() {
   [[ -n $p ]] || return
   local msg=''
   if (( _POWERLEVEL9K_ANACONDA_SHOW_PYTHON_VERSION )) && _p9k_python_version; then
-    msg="$_p9k_ret "
+    msg="${_p9k_ret//\%//%%} "
   fi
   msg+="$_POWERLEVEL9K_ANACONDA_LEFT_DELIMITER${${p:t}//\%/%%}$_POWERLEVEL9K_ANACONDA_RIGHT_DELIMITER"
   _p9k_prompt_segment "$0" "blue" "$_p9k_color1" 'PYTHON_ICON' 0 '' "$msg"
@@ -1863,6 +1863,7 @@ _p9k_nvm_ls_current() {
 # Segment to display Node version from NVM
 # Only prints the segment if different than the default value
 prompt_nvm() {
+  (( $+commands[nvm] )) || return
   [[ -n $NVM_DIR ]] && _p9k_nvm_ls_current || return
   local current=$_p9k_ret
   ! _p9k_nvm_ls_default || [[ $_p9k_ret != $current ]] || return
@@ -1872,11 +1873,13 @@ prompt_nvm() {
 ################################################################
 # Segment to display NodeEnv
 prompt_nodeenv() {
-  if [[ -n "$NODE_VIRTUAL_ENV" ]]; then
-    _p9k_cached_cmd_stdout node --version || return
-    local info="${_p9k_ret}[${NODE_VIRTUAL_ENV:t}]"
-    _p9k_prompt_segment "$0" "black" "green" 'NODE_ICON' 0 '' "${info//\%/%%}"
+  [[ -n "$NODE_VIRTUAL_ENV" ]] || return
+  local msg
+  if (( _POWERLEVEL9K_NODEENV_SHOW_NODE_VERSION )) && _p9k_cached_cmd_stdout node --version; then
+    msg="${_p9k_ret//\%/%%} "
   fi
+  msg+="$_POWERLEVEL9K_NODEENV_LEFT_DELIMITER${${NODE_VIRTUAL_ENV:t}//\%/%%}$_POWERLEVEL9K_NODEENV_RIGHT_DELIMITER"
+  _p9k_prompt_segment "$0" "black" "green" 'NODE_ICON' 0 '' "$msg"
 }
 
 function _p9k_read_nodenv_version_file() {
@@ -2801,7 +2804,7 @@ prompt_virtualenv() {
   [[ -n $VIRTUAL_ENV ]] || return
   local msg=''
   if (( _POWERLEVEL9K_VIRTUALENV_SHOW_PYTHON_VERSION )) && _p9k_python_version; then
-    msg="$_p9k_ret "
+    msg="${_p9k_ret//\%/%%} "
   fi
   msg+="$_POWERLEVEL9K_VIRTUALENV_LEFT_DELIMITER${${VIRTUAL_ENV:t}//\%/%%}$_POWERLEVEL9K_VIRTUALENV_RIGHT_DELIMITER"
   _p9k_prompt_segment "$0" "blue" "$_p9k_color1" 'PYTHON_ICON' 0 '' "$msg"
@@ -3669,6 +3672,9 @@ _p9k_init_params() {
   _p9k_declare -e POWERLEVEL9K_VIRTUALENV_LEFT_DELIMITER "("
   _p9k_declare -e POWERLEVEL9K_VIRTUALENV_RIGHT_DELIMITER ")"
   _p9k_declare -b POWERLEVEL9K_PYENV_PROMPT_ALWAYS_SHOW 0
+  _p9k_declare -b POWERLEVEL9K_NODEENV_SHOW_NODE_VERSION 1
+  _p9k_declare -e POWERLEVEL9K_NODEENV_LEFT_DELIMITER "["
+  _p9k_declare -e POWERLEVEL9K_NODEENV_RIGHT_DELIMITER "]"
   _p9k_declare -b POWERLEVEL9K_KUBECONTEXT_SHOW_DEFAULT_NAMESPACE 1
   # Defines context classes for the purpose of applying different styling to different contexts.
   #
