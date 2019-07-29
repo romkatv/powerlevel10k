@@ -31,7 +31,11 @@ typeset -gri force
 
 source $__p9k_root_dir/internal/configure.zsh || return
 
-typeset -ri prompt_indent=4
+typeset -ri prompt_indent=2
+
+typeset -ra bg_color=(238 236 234)
+typeset -ra frame_color=(242 240 238)
+typeset -ra sep_color=(244 242 240)
 
 typeset -ra lean_left=(
   '' '%31F$extra_icons[1]%B%39F~%b%31F/%B%39Fpowerlevel10k%b%f $prefixes[1]%76F$extra_icons[2]master ⇡2%f '
@@ -44,13 +48,13 @@ typeset -ra lean_right=(
 )
 
 typeset -ra classic_left=(
-  '%240F╭─' '%K{236} %31F$extra_icons[1]%B%39F~%b%K{236}%31F/%B%39Fpowerlevel10k%b%K{236} %244F\uE0B1%f $prefixes[1]%76F$extra_icons[2]master ⇡2 %k%236F\uE0B0%f'
-  '%240F╰─' '%f █'
+  '%$frame_color[$color]F╭─' '%K{$bg_color[$color]} %31F$extra_icons[1]%B%39F~%b%K{$bg_color[$color]}%31F/%B%39Fpowerlevel10k%b%K{$bg_color[$color]} %$sep_color[$color]F\uE0B1%f $prefixes[1]%76F$extra_icons[2]master ⇡2 %k%$bg_color[$color]F\uE0B0%f'
+  '%$frame_color[$color]F╰─' '%f █'
 )
 
 typeset -ra classic_right=(
-  '%236F\uE0B2%K{236}%f $prefixes[2]%134Fminikube ⎈ %k%f' '%240F─╮%f'
-  '' '%240F─╯%f'
+  '%$bg_color[$color]F\uE0B2%K{$bg_color[$color]}%f $prefixes[2]%134Fminikube ⎈ %k%f' '%$frame_color[$color]F─╮%f'
+  '' '%$frame_color[$color]F─╯%f'
 )
 
 function prompt_length() {
@@ -97,7 +101,7 @@ function print_prompt() {
     (( num_lines == 2 && i == 1 )) && local fill=$gap_char || local fill=' '
     print -n  -- ${(pl:$prompt_indent:: :)}
     print -nP -- $l
-    print -nP -- "%240F${(pl:$gap::$fill:)}%f"
+    print -nP -- "%$frame_color[$color]F${(pl:$gap::$fill:)}%f"
     print -P  -- $r
   done
 }
@@ -266,7 +270,7 @@ function ask_narrow_icons() {
       q) quit; return 1;;
       r) return 2;;
       y) cap_narrow_icons=1; break;;
-      n) cap_narrow_icons=2; break;;
+      n) cap_narrow_icons=0; break;;
     esac
   done
 }
@@ -296,6 +300,39 @@ function ask_style() {
       r) return 2;;
       1) style=lean; break;;
       2) style=classic; break;;
+    esac
+  done
+}
+
+function ask_color() {
+  [[ $style != classic ]] && return
+  while true; do
+    clear
+    centered "%BPrompt Color%b"
+    print -P ""
+    print -P "%B(1)  Light.%b"
+    print -P ""
+    color=1 print_prompt
+    print -P ""
+    print -P "%B(2)  Medium.%b"
+    print -P ""
+    color=2 print_prompt
+    print -P ""
+    print -P "%B(3)  Dark.%b"
+    print -P ""
+    color=3 print_prompt
+    print -P ""
+    print -P "(r)  Restart from the beginning."
+    print -P ""
+    print -P "(q)  Quit and do nothing."
+    print -P ""
+
+    local key=
+    read -k key${(%):-"?%BChoice [123rq]: %b"} || return 1
+    case $key in
+      q) quit; return 1;;
+      r) return 2;;
+      1|2|3) color=$key; break;;
     esac
   done
 }
@@ -603,7 +640,7 @@ function generate_config() {
   local lines=("${(@f)base}")
 
   function sub() {
-    lines=("${(@)lines/#  typeset -g POWERLEVEL9K_$1=*/  typeset -g POWERLEVEL9K_$1=$2}")
+    lines=("${(@)lines/#(#b)([[:space:]]#)typeset -g POWERLEVEL9K_$1=*/$match[1]typeset -g POWERLEVEL9K_$1=$2}")
   }
 
   function uncomment() {
@@ -623,6 +660,37 @@ function generate_config() {
   if [[ $POWERLEVEL9K_MODE == compatible ]]; then
     # Many fonts don't have the gear icon.
     sub BACKGROUND_JOBS_VISUAL_IDENTIFIER_EXPANSION "'⇶'"
+  fi
+
+  if [[ $style == classic ]]; then
+    sub BACKGROUND $bg_color[$color]
+    sub MULTILINE_FIRST_PROMPT_GAP_FOREGROUND $frame_color[$color]
+    sub MULTILINE_FIRST_PROMPT_PREFIX "'%$frame_color[$color]F╭─'"
+    sub MULTILINE_NEWLINE_PROMPT_PREFIX "'%$frame_color[$color]F├─'"
+    sub MULTILINE_LAST_PROMPT_PREFIX "'%$frame_color[$color]F╰─'"
+    sub MULTILINE_FIRST_PROMPT_SUFFIX "'%$frame_color[$color]F─╮'"
+    sub MULTILINE_NEWLINE_PROMPT_SUFFIX "'%$frame_color[$color]F─┤'"
+    sub MULTILINE_LAST_PROMPT_SUFFIX "'%$frame_color[$color]F─╯'"
+
+    local left_sep='\uE0B0'
+    local right_sep='\uE0B2'
+    local left_subsep='\uE0B1'
+    local right_subset='\uE0B3'
+    local left_end='\uE0B0'
+    local right_start='\uE0B2'
+
+    if (( straight )); then
+      [[ $POWERLEVEL9K_MODE == nerdfont-complete ]] && subsep='\uE0BD' || subsep='|'
+      left_end='▓▒░'
+      right_start='░▒▓'
+    fi
+
+    sub LEFT_SUBSEGMENT_SEPARATOR "'%$sep_color[$color]F$subsep'"
+    sub RIGHT_SUBSEGMENT_SEPARATOR "'%$sep_color[$color]F$subsep'"
+    sub LEFT_SEGMENT_SEPARATOR "'$subsep'"
+    sub RIGHT_SEGMENT_SEPARATOR "'$subsep'"
+    sub LEFT_PROMPT_LAST_SEGMENT_END_SYMBOL "'$left_end'"
+    sub RIGHT_PROMPT_FIRST_SEGMENT_START_SYMBOL "'$right_start'"
   fi
 
   if [[ -n ${(j::)extra_icons} ]]; then
@@ -647,16 +715,6 @@ function generate_config() {
     uncomment 'typeset -g POWERLEVEL9K_TIME_PREFIX'
     sub CONTEXT_TEMPLATE "'%n%f at %180F%m'"
     sub CONTEXT_ROOT_TEMPLATE "'%n%f at %227F%m'"
-  fi
-
-  if (( straight )); then
-    [[ $POWERLEVEL9K_MODE == nerdfont-complete ]] && local subsep='\uE0BD' || local subsep='|'
-    sub LEFT_SUBSEGMENT_SEPARATOR "'%244F$subsep'"
-    sub RIGHT_SUBSEGMENT_SEPARATOR "'%244F$subsep'"
-    sub LEFT_SEGMENT_SEPARATOR "'$subsep'"
-    sub RIGHT_SEGMENT_SEPARATOR "'$subsep'"
-    sub LEFT_PROMPT_LAST_SEGMENT_END_SYMBOL "'▓▒░'"
-    sub RIGHT_PROMPT_FIRST_SEGMENT_START_SYMBOL "'░▒▓'"
   fi
 
   if (( num_lines == 1 )); then
@@ -697,6 +755,7 @@ function generate_config() {
   header+=$'.\n'
   header+="# Wizard options: $POWERLEVEL9K_MODE"
   (( cap_narrow_icons )) && header+=", small icons" || header+=", big icons"
+  [[ $style == classic ]] && header+=", color $color"
   [[ -n ${(j::)extra_icons} ]] && header+=", many icons" || header+=", few icons"
   [[ -n ${(j::)prefixes} ]] && header+=", fluent" || header+=", concise"
   if [[ $style == classic ]]; then
@@ -757,7 +816,7 @@ source $__p9k_root_dir/internal/icons.zsh || return
 
 while true; do
   local POWERLEVEL9K_MODE= style= config_backup= gap_char=' '
-  local -i num_lines=0 write_config=0 straight=0 empty_line=0 frame=1
+  local -i num_lines=0 write_config=0 straight=0 empty_line=0 frame=1 color=1
   local -i cap_diamond=0 cap_python=0 cap_narrow_icons=0 cap_lock=0
   local -a extra_icons=('' '')
   local -a prefixes=('' '')
@@ -785,6 +844,7 @@ while true; do
   _p9k_init_icons
   ask_narrow_icons     || { (( $? == 2 )) && continue || return }
   ask_style            || { (( $? == 2 )) && continue || return }
+  ask_color            || { (( $? == 2 )) && continue || return }
   ask_extra_icons      || { (( $? == 2 )) && continue || return }
   ask_prefixes         || { (( $? == 2 )) && continue || return }
   ask_straight         || { (( $? == 2 )) && continue || return }
