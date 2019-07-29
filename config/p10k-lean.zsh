@@ -389,10 +389,12 @@ fi
   # typeset -g POWERLEVEL9K_NORDVPN_VISUAL_IDENTIFIER_EXPANSION='⭐'
 
   ####################################[ context: user@host ]####################################
-  # Context format: user@host.
+  # Default context format: %n is username, %m is hostname.
   typeset -g POWERLEVEL9K_CONTEXT_TEMPLATE='%n@%m'
   # Default context color.
   typeset -g POWERLEVEL9K_CONTEXT_FOREGROUND=180
+  # Context format when running with privileges: %n is username, %m is hostname.
+  typeset -g POWERLEVEL9K_CONTEXT_ROOT_TEMPLATE='%n@%m'
   # Context color when running with privileges.
   typeset -g POWERLEVEL9K_CONTEXT_ROOT_FOREGROUND=227
   # Don't show context unless running with privileges on in SSH.
