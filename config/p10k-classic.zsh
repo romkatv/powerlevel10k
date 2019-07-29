@@ -54,7 +54,7 @@ fi
       nvm                     # node.js version from nvm (https://github.com/nvm-sh/nvm)
       nodeenv                 # node.js environment (https://github.com/ekalinin/nodeenv)
       # node_version          # node.js version
-      # kubecontext           # current kubernetes context (https://kubernetes.io/)
+      kubecontext             # current kubernetes context (https://kubernetes.io/)
       context                 # user@host
       # =========================[ Line #2 ]=========================
       newline
@@ -485,16 +485,29 @@ fi
   # typeset -g POWERLEVEL9K_NODE_VERSION_VISUAL_IDENTIFIER_EXPANSION='⭐'
 
   #############[ kubecontext: current kubernetes context (https://kubernetes.io/) ]#############
-  # Kubernetes context classes for the purpose of using different colors with
+  # Shorten gke and eks cluster names:
+  #
+  #   - gke_projectname_availability-zone_cluster-01         => cluster-01
+  #   - arn:aws:eks:us-east-1:XXXXXXXXXXXX:cluster/eks-infra => eks-infra
+  #
+  # This transformation is applied before class matching and content expansion (see below).
+  typeset -g POWERLEVEL9K_KUBECONTEXT_SHORTEN=(gke eks)
+  # Don't show the trailing "/default" in kubernetes context. This transformation is applied
+  # before class matching and content expansion (see below).
+  typeset -g POWERLEVEL9K_KUBECONTEXT_SHOW_DEFAULT_NAMESPACE=false
+
+  # Kubernetes context classes for the purpose of using different colors and/or icons with
   # different contexts.
   #
-  # POWERLEVEL9K_KUBECONTEXT_CLASSES is an array with even number of elements.
-  # The first element in each pair defines a pattern against which the current
-  # kubernetes context (in the format it is displayed in the prompt) gets matched.
-  # The second element defines the context class. Patterns are tried in order.
-  # The first match wins.
+  # POWERLEVEL9K_KUBECONTEXT_CLASSES is an array with even number of elements. The first element
+  # in each pair defines a pattern against which the current kubernetes context gets matched.
+  # More specifically, it's P9K_CONTENT prior to the application of context expansion (see below)
+  # that gets matched. If you aren't defining POWERLEVEL9K_KUBECONTEXT_*CONTENT_EXPANSION, then
+  # it's the same as the content shown in your prompt. The second element of
+  # POWERLEVEL9K_KUBECONTEXT_CLASSES defines the context class. Patterns are tried in order. The
+  # first match wins.
   #
-  # For example, if your current kubernetes context is "deathray-testing", its
+  # For example, if your current kubernetes context is displayed as "deathray-testing", its
   # class is TEST because "deathray-testing" doesn't match the pattern '*prod*'
   # but does match '*test*'. Hence it'll be shown with the color of
   # $POWERLEVEL9K_KUBECONTEXT_TEST_FOREGROUND.
@@ -509,20 +522,30 @@ fi
   typeset -g POWERLEVEL9K_KUBECONTEXT_DEFAULT_FOREGROUND=134
   # typeset -g POWERLEVEL9K_KUBECONTEXT_DEFAULT_VISUAL_IDENTIFIER_EXPANSION='⭐'
 
-  # Kubernetes context too long? You can shorten it by defining an expansion. The original
-  # Kubernetes context that you see in your prompt is stored in ${P9K_CONTENT} when
-  # the expansion is evaluated. To remove everything up to and including the last '/',
-  # set POWERLEVEL9K_KUBECONTEXT_CONTENT_EXPANSION='${P9K_CONTENT##*/}'. This is just,
-  # an example which isn't necessarily the right expansion for you. Parameter expansions
-  # are very flexible and fast, too. See reference:
+  # Kubernetes context too long? You can shorten it by defining an expansion. Within
+  # the expansion the following parameters are available:
+  #
+  #   - P9K_KUBECONTEXT_NAME       current context's name.
+  #   - P9K_KUBECONTEXT_NAMESPACE  current context's namespace.
+  #   - P9K_KUBECONTEXT_CLUSTER    current context's name.
+  #   - P9K_CONTENT                the original content of kubecontext segment, after
+  #                                the application of POWERLEVEL9K_KUBECONTEXT_SHORTEN
+  #                                and POWERLEVEL9K_KUBECONTEXT_SHOW_DEFAULT_NAMESPACE
+  #
+  # For example, to display the last two characters of the current context's cluster:
+  #
+  #   typeset -g POWERLEVEL9K_KUBECONTEXT_CONTENT_EXPANSION='${P9K_KUBECONTEXT_CLUSTER[-2,-1]}'
+  #
+  # This is just, an example which isn't necessarily the right expansion for you. Parameter
+  # expansions are very flexible and fast, too. See reference:
   # http://zsh.sourceforge.net/Doc/Release/Expansion.html#Parameter-Expansion.
-  typeset POWERLEVEL9K_KUBECONTEXT_CONTENT_EXPANSION='${P9K_CONTENT}'
-  # Show the trailing "/default" in kubernetes context. This makes it easier to define
-  # POWERLEVEL9K_KUBECONTEXT_CONTENT_EXPANSION by making the format of ${P9K_CONTENT} consistent.
-  typeset -g POWERLEVEL9K_KUBECONTEXT_SHOW_DEFAULT_NAMESPACE=true
+  #
+  # You can also define different expansions for different content classes:
+  #
+  #   typeset -g POWERLEVEL9K_KUBECONTEXT_PROD_CONTENT_EXPANSION='DANGER! ${P9K_KUBE_CLUSTER}'
 
   # Custom prefix.
-  # typeset -g POWERLEVEL9K_KUBECONTEXT_PREFIX='%248Fat '
+  # typeset -g POWERLEVEL9K_KUBECONTEXT_PREFIX='%fat '
 
   ###############################[ public_ip: public IP address ]###############################
   # Public IP color.
