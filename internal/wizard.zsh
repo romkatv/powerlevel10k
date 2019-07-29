@@ -26,37 +26,34 @@ fi
 
 : ${__p9k_root_dir:=${0:h:h:A}}
 
+typeset -gr __p9k_root_dir
+typeset -gri force
+
 source $__p9k_root_dir/internal/configure.zsh || return
 
 typeset -ri prompt_indent=4
 
-local POWERLEVEL9K_MODE style config_backup gap_char=' '
-local -i num_lines write_config straight empty_line frame=1
-local -i cap_diamond cap_python cap_narrow_icons cap_lock
-local -a extra_icons=('' '')
-
 typeset -ra lean_left=(
-  '' '%31F$extra_icons[1]%B%39F~%b%31F/%B%39Fpowerlevel10k%b %76F$extra_icons[2]master ⇡2%f '
+  '' '%31F$extra_icons[1]%B%39F~%b%31F/%B%39Fpowerlevel10k%b%f $prefixes[1]%76F$extra_icons[2]master ⇡2%f '
   '' '%76F❯%f █'
 )
 
 typeset -ra lean_right=(
-  ' %134F⎈ minikube%f' ''
+  ' $prefixes[2]%134F⎈ minikube%f' ''
   '' ''
 )
 
 typeset -ra classic_left=(
-  '%240F╭─' '%K{236} %31F$extra_icons[1]%B%39F~%b%K{236}%31F/%B%39Fpowerlevel10k%b%K{236} %244F\uE0B1 %76F$extra_icons[2]master ⇡2 %k%236F\uE0B0%f'
+  '%240F╭─' '%K{236} %31F$extra_icons[1]%B%39F~%b%K{236}%31F/%B%39Fpowerlevel10k%b%K{236} %244F\uE0B1%f $prefixes[1]%76F$extra_icons[2]master ⇡2 %k%236F\uE0B0%f'
   '%240F╰─' '%f █'
 )
 
 typeset -ra classic_right=(
-  '%236F\uE0B2%K{236}%134F minikube ⎈ %k%f' '%240F─╮%f'
+  '%236F\uE0B2%K{236}%f $prefixes[2]%134Fminikube ⎈ %k%f' '%240F─╮%f'
   '' '%240F─╯%f'
 )
 
 function prompt_length() {
-  # eval "1=\"$1\""
   local COLUMNS=1024
   local -i x y=$#1 m
   if (( y )); then
@@ -345,6 +342,36 @@ function ask_extra_icons() {
   done
 }
 
+function ask_prefixes() {
+  local fluent=('on ' 'at ')
+  while true; do
+    clear
+    centered "%BPrompt Flow%b"
+    print -P ""
+    print -P "%B(1)  Concise.%b"
+    print -P ""
+    prefixes=('' '') print_prompt
+    print -P ""
+    print -P "%B(2)  Fluent.%b"
+    print -P ""
+    prefixes=("$fluent[@]") print_prompt
+    print -P ""
+    print -P "(r)  Restart from the beginning."
+    print -P ""
+    print -P "(q)  Quit and do nothing."
+    print -P ""
+
+    local key=
+    read -k key${(%):-"?%BChoice [12rq]: %b"} || return 1
+    case $key in
+      q) quit; return 1;;
+      r) return 2;;
+      1) prefixes=('' ''); break;;
+      2) prefixes=("$fluent[@]"); break;;
+    esac
+  done
+}
+
 function ask_straight() {
   if [[ $style != classic || $cap_diamond == 0 ]]; then
     straight=1
@@ -612,6 +639,16 @@ function generate_config() {
     sub TIME_VISUAL_IDENTIFIER_EXPANSION ''
   fi
 
+  if [[ -n ${(j::)prefixes} ]]; then
+    uncomment 'typeset -g POWERLEVEL9K_VCS_PREFIX'
+    uncomment 'typeset -g POWERLEVEL9K_COMMAND_EXECUTION_TIME_PREFIX'
+    uncomment 'typeset -g POWERLEVEL9K_CONTEXT_PREFIX'
+    uncomment 'typeset -g POWERLEVEL9K_KUBECONTEXT_PREFIX'
+    uncomment 'typeset -g POWERLEVEL9K_TIME_PREFIX'
+    sub CONTEXT_TEMPLATE "'%n%f at %180F%m'"
+    sub CONTEXT_ROOT_TEMPLATE "'%n%f at %227F%m'"
+  fi
+
   if (( straight )); then
     [[ $POWERLEVEL9K_MODE == nerdfont-complete ]] && local subsep='\uE0BD' || local subsep='|'
     sub LEFT_SUBSEGMENT_SEPARATOR "'%244F$subsep'"
@@ -661,6 +698,7 @@ function generate_config() {
   header+="# Wizard options: $POWERLEVEL9K_MODE"
   (( cap_narrow_icons )) && header+=", small icons" || header+=", big icons"
   [[ -n ${(j::)extra_icons} ]] && header+=", many icons" || header+=", few icons"
+  [[ -n ${(j::)prefixes} ]] && header+=", fluent" || header+=", concise"
   if [[ $style == classic ]]; then
     (( straight )) && header+=", straight" || header+=", angled"
   fi
@@ -718,6 +756,12 @@ _p9k_can_configure || return
 source $__p9k_root_dir/internal/icons.zsh || return
 
 while true; do
+  local POWERLEVEL9K_MODE= style= config_backup= gap_char=' '
+  local -i num_lines=0 write_config=0 straight=0 empty_line=0 frame=1
+  local -i cap_diamond=0 cap_python=0 cap_narrow_icons=0 cap_lock=0
+  local -a extra_icons=('' '')
+  local -a prefixes=('' '')
+
   ask_diamond || { (( $? == 2 )) && continue || return }
   (( cap_diamond )) || straight=1
   if [[ -n $AWESOME_GLYPHS_LOADED ]]; then
@@ -742,6 +786,7 @@ while true; do
   ask_narrow_icons     || { (( $? == 2 )) && continue || return }
   ask_style            || { (( $? == 2 )) && continue || return }
   ask_extra_icons      || { (( $? == 2 )) && continue || return }
+  ask_prefixes         || { (( $? == 2 )) && continue || return }
   ask_straight         || { (( $? == 2 )) && continue || return }
   ask_num_lines        || { (( $? == 2 )) && continue || return }
   ask_gap_char         || { (( $? == 2 )) && continue || return }
