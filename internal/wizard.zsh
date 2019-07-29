@@ -236,16 +236,13 @@ function ask_narrow_icons() {
     cap_narrow_icons=0
     return
   fi
-  local text=$(
-    _p9k_init_icons
-    print -nr -- "X"
-    print -nr -- "%1F${icons[VCS_GIT_ICON]// }%fX"
-    print -nr -- "%2F${icons[VCS_GIT_GITHUB_ICON]// }%fX"
-    print -nr -- "%3F${icons[DATE_ICON]// }%fX"
-    print -nr -- "%4F${icons[TIME_ICON]// }%fX"
-    print -nr -- "%5F${icons[RUBY_ICON]// }%fX"
-    print -nr -- "%6F${icons[AWS_EB_ICON]// }%fX"
-  )
+  local text="X"
+  text+="%1F${icons[VCS_GIT_ICON]// }%fX"
+  text+="%2F${icons[VCS_GIT_GITHUB_ICON]// }%fX"
+  text+="%3F${icons[DATE_ICON]// }%fX"
+  text+="%4F${icons[TIME_ICON]// }%fX"
+  text+="%5F${icons[RUBY_ICON]// }%fX"
+  text+="%6F${icons[AWS_EB_ICON]// }%fX"
   while true; do
     clear
     centered "%BDo all these icons %b%2Ffit between the crosses%f%B?%b"
@@ -677,6 +674,7 @@ while true; do
       (( cap_python )) && POWERLEVEL9K_MODE=awesome-fontconfig || POWERLEVEL9K_MODE=nerdfont-complete
     fi
   fi
+  _p9k_init_icons
   ask_narrow_icons     || { (( $? == 2 )) && continue || return }
   ask_style            || { (( $? == 2 )) && continue || return }
   ask_straight         || { (( $? == 2 )) && continue || return }
