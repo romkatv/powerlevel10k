@@ -4165,8 +4165,8 @@ _p9k_init() {
 
   if _p9k_segment_in_use dir; then
     if (( $+_POWERLEVEL9K_DIR_CLASSES )); then
-      local -i i=0
-      for ((; i <= $#_POWERLEVEL9K_DIR_CLASSES; ++i)); do
+      local -i i=3
+      for ((; i <= $#_POWERLEVEL9K_DIR_CLASSES; i+=3)); do
         _POWERLEVEL9K_DIR_CLASSES[i]=${(g::)_POWERLEVEL9K_DIR_CLASSES[i]}
       done
     else
