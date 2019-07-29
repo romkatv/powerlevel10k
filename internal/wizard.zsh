@@ -1,9 +1,10 @@
 #!/usr/bin/env zsh
 
 emulate -L zsh
-setopt extended_glob noaliases
+setopt noaliases
 
 () {
+setopt extended_glob no_prompt_{bang,subst} prompt_{cr,percent,sp}
 
 typeset -g __p9k_root_dir
 typeset -gi force=0
@@ -27,8 +28,15 @@ fi
 
 source $__p9k_root_dir/internal/configure.zsh || return
 
+typeset -ri prompt_indent=4
+
+local POWERLEVEL9K_MODE style config_backup gap_char=' '
+local -i num_lines write_config straight empty_line frame=1
+local -i cap_diamond cap_python cap_narrow_icons cap_lock
+local -a extra_icons=('' '')
+
 typeset -ra lean_left=(
-  '' '%B%39F~%b%31F/%B%39Fpowerlevel10k%b %76Fmaster ⇡2%f '
+  '' '%31F$extra_icons[1]%B%39F~%b%31F/%B%39Fpowerlevel10k%b %76F$extra_icons[2]master ⇡2%f '
   '' '%76F❯%f █'
 )
 
@@ -38,7 +46,7 @@ typeset -ra lean_right=(
 )
 
 typeset -ra classic_left=(
-  '%240F╭─' '%K{236} %B%39F~%b%K{236}%31F/%B%39Fpowerlevel10k%b%K{236} %244F\uE0B1 %76Fmaster ⇡2 %k%236F\uE0B0%f'
+  '%240F╭─' '%K{236} %31F$extra_icons[1]%B%39F~%b%K{236}%31F/%B%39Fpowerlevel10k%b%K{236} %244F\uE0B1 %76F$extra_icons[2]master ⇡2 %k%236F\uE0B0%f'
   '%240F╰─' '%f █'
 )
 
@@ -47,13 +55,8 @@ typeset -ra classic_right=(
   '' '%240F─╯%f'
 )
 
-typeset -ri prompt_indent=4
-
-local POWERLEVEL9K_MODE style config_backup gap_char=' '
-local -i num_lines write_config straight empty_line frame=1
-local -i cap_diamond cap_python cap_narrow_icons cap_lock
-
 function prompt_length() {
+  # eval "1=\"$1\""
   local COLUMNS=1024
   local -i x y=$#1 m
   if (( y )); then
@@ -75,6 +78,8 @@ function print_prompt() {
   local right=${style}_right
   left=("${(@P)left}")
   right=("${(@P)right}")
+  eval "left=(${(@)left:/(#b)(*)/\"$match[1]\"})"
+  eval "right=(${(@)right:/(#b)(*)/\"$match[1]\"})"
   if (( num_lines == 1)); then
     left=($left[2] $left[4])
     right=($right[1] $right[3])
@@ -298,6 +303,48 @@ function ask_style() {
   done
 }
 
+function ask_extra_icons() {
+  if [[ $POWERLEVEL9K_MODE == (powerline|compatible) ]]; then
+    extra_icons=('' '')
+    return
+  fi
+  local dir_icon=${(g::)icons[HOME_SUB_ICON]}
+  local vcs_icon=${(g::)icons[VCS_GIT_GITHUB_ICON]}
+  local branch_icon=${(g::)icons[VCS_BRANCH_ICON]}
+  if (( cap_narrow_icons )); then
+    dir_icon=${dir_icon// }
+    vcs_icon=${vcs_icon// }
+    branch_icon=${branch_icon// }
+  fi
+  local many=("$dir_icon " "$vcs_icon $branch_icon ")
+  while true; do
+    clear
+    centered "%BIcons%b"
+    print -P ""
+    print -P "%B(1)  Few icons.%b"
+    print -P ""
+    extra_icons=('' '') print_prompt
+    print -P ""
+    print -P "%B(2)  Many icons.%b"
+    print -P ""
+    extra_icons=("$many[@]") print_prompt
+    print -P ""
+    print -P "(r)  Restart from the beginning."
+    print -P ""
+    print -P "(q)  Quit and do nothing."
+    print -P ""
+
+    local key=
+    read -k key${(%):-"?%BChoice [12rq]: %b"} || return 1
+    case $key in
+      q) quit; return 1;;
+      r) return 2;;
+      1) extra_icons=('' ''); break;;
+      2) extra_icons=("$many[@]"); break;;
+    esac
+  done
+}
+
 function ask_straight() {
   if [[ $style != classic || $cap_diamond == 0 ]]; then
     straight=1
@@ -307,11 +354,11 @@ function ask_straight() {
     clear
     centered "%BPrompt Separators%b"
     print -P ""
-    print -P "%B(1)  Angled%b"
+    print -P "%B(1)  Angled.%b"
     print -P ""
     straight=0 print_prompt
     print -P ""
-    print -P "%B(2)  Straight%b"
+    print -P "%B(2)  Straight.%b"
     print -P ""
     straight=1 print_prompt
     print -P ""
@@ -336,11 +383,11 @@ function ask_num_lines() {
     clear
     centered "%BPrompt Height%b"
     print -P ""
-    print -P "%B(1)  One line%b"
+    print -P "%B(1)  One line.%b"
     print -P ""
     num_lines=1 print_prompt
     print -P ""
-    print -P "%B(2)  Two lines%b"
+    print -P "%B(2)  Two lines.%b"
     print -P ""
     num_lines=2 print_prompt
     print -P ""
@@ -368,15 +415,15 @@ function ask_gap_char() {
     clear
     centered "%BPrompt Connection%b"
     print -P ""
-    print -P "%B(1)  Disconnected%b"
+    print -P "%B(1)  Disconnected.%b"
     print -P ""
     gap_char=" " print_prompt
     print -P ""
-    print -P "%B(2)  Dotted%b"
+    print -P "%B(2)  Dotted.%b"
     print -P ""
     gap_char="·" print_prompt
     print -P ""
-    print -P "%B(3)  Solid%b"
+    print -P "%B(3)  Solid.%b"
     print -P ""
     gap_char="─" print_prompt
     print -P ""
@@ -406,15 +453,15 @@ function ask_frame() {
     clear
     centered "%BPrompt Frame%b"
     print -P ""
-    print -P "%B(1)  No frame%b"
+    print -P "%B(1)  No frame.%b"
     print -P ""
     frame=0 print_prompt
     print -P ""
-    print -P "%B(2)  Only left%b"
+    print -P "%B(2)  Only left.%b"
     print -P ""
     frame=1 print_prompt
     print -P ""
-    print -P "%B(3)  Left and right%b"
+    print -P "%B(3)  Left and right.%b"
     print -P ""
     frame=2 print_prompt
     print -P ""
@@ -438,12 +485,12 @@ function ask_empty_line() {
     clear
     centered "%BPrompt Spacing%b"
     print -P ""
-    print -P "%B(1)  Compact%b"
+    print -P "%B(1)  Compact.%b"
     print -P ""
     print_prompt
     print_prompt
     print -P ""
-    print -P "%B(2)  Sparse%b"
+    print -P "%B(2)  Sparse.%b"
     print -P ""
     print_prompt
     print -P ""
@@ -533,7 +580,7 @@ function generate_config() {
   }
 
   function uncomment() {
-    lines=("${(@)lines/#(#b)([[:space:]]#)\# $1(|[[:space:]]*)/$match[1]$1${match[2]:=  $match[2]}}")
+    lines=("${(@)lines/#(#b)([[:space:]]#)\# $1(  |)/$match[1]$1$match[2]$match[2]}")
   }
 
   sub MODE $POWERLEVEL9K_MODE
@@ -549,6 +596,20 @@ function generate_config() {
   if [[ $POWERLEVEL9K_MODE == compatible ]]; then
     # Many fonts don't have the gear icon.
     sub BACKGROUND_JOBS_VISUAL_IDENTIFIER_EXPANSION "'⇶'"
+  fi
+
+  if [[ -n ${(j::)extra_icons} ]]; then
+    local branch_icon=$icons[VCS_BRANCH_ICON]
+    (( cap_narrow_icons )) && branch_icon=${branch_icon// }
+    sub VCS_BRANCH_ICON "'$branch_icon '"
+  else
+    uncomment 'typeset -g POWERLEVEL9K_DIR_CLASSES'
+    uncomment 'typeset -g POWERLEVEL9K_VCS_VISUAL_IDENTIFIER_EXPANSION'
+    uncomment 'typeset -g POWERLEVEL9K_COMMAND_EXECUTION_TIME_VISUAL_IDENTIFIER_EXPANSION'
+    uncomment 'typeset -g POWERLEVEL9K_TIME_VISUAL_IDENTIFIER_EXPANSION'
+    sub VCS_VISUAL_IDENTIFIER_EXPANSION ''
+    sub COMMAND_EXECUTION_TIME_VISUAL_IDENTIFIER_EXPANSION ''
+    sub TIME_VISUAL_IDENTIFIER_EXPANSION ''
   fi
 
   if (( straight )); then
@@ -572,7 +633,7 @@ function generate_config() {
 
   sub MULTILINE_FIRST_PROMPT_GAP_CHAR "'$gap_char'"
 
-  if (( frame < 2 )); then
+  if (( num_lines == 2 && frame < 2 )); then
     sub MULTILINE_FIRST_PROMPT_SUFFIX ''
     sub MULTILINE_NEWLINE_PROMPT_SUFFIX ''
     sub MULTILINE_LAST_PROMPT_SUFFIX ''
@@ -599,20 +660,23 @@ function generate_config() {
   header+=$'.\n'
   header+="# Wizard options: $POWERLEVEL9K_MODE"
   (( cap_narrow_icons )) && header+=", small icons" || header+=", big icons"
+  [[ -n ${(j::)extra_icons} ]] && header+=", many icons" || header+=", few icons"
   if [[ $style == classic ]]; then
     (( straight )) && header+=", straight" || header+=", angled"
   fi
   (( num_lines == 1 )) && header+=", 1 line" || header+=", $num_lines lines"
-  case $gap_char in
-    ' ') header+=", disconnected";;
-    '·') header+=", dotted";;
-    '─') header+=", solid";;
-  esac
-  case $frame in
-    0) header+=", no frame";;
-    1) header+=", left frame";;
-    2) header+=", full frame";;
-  esac
+  if (( num_lines == 2 )); then
+    case $gap_char in
+      ' ') header+=", disconnected";;
+      '·') header+=", dotted";;
+      '─') header+=", solid";;
+    esac
+    case $frame in
+      0) header+=", no frame";;
+      1) header+=", left frame";;
+      2) header+=", full frame";;
+    esac
+  fi
   (( empty_line )) && header+=", sparse" || header+=", compact";
   header+=$'.\n#'
 
@@ -677,6 +741,7 @@ while true; do
   _p9k_init_icons
   ask_narrow_icons     || { (( $? == 2 )) && continue || return }
   ask_style            || { (( $? == 2 )) && continue || return }
+  ask_extra_icons      || { (( $? == 2 )) && continue || return }
   ask_straight         || { (( $? == 2 )) && continue || return }
   ask_num_lines        || { (( $? == 2 )) && continue || return }
   ask_gap_char         || { (( $? == 2 )) && continue || return }
