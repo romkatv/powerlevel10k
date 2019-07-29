@@ -49,22 +49,22 @@ fi
       status                  # exit code of the last command
       command_execution_time  # duration of the last command
       background_jobs         # presence of background jobs
-      # virtualenv            # python virtual environment (https://docs.python.org/3/library/venv.html)
-      # anaconda              # conda environment (https://conda.io/)
-      # pyenv                 # python environment (https://github.com/pyenv/pyenv)
-      # nodenv                # node.js version from nodenv (https://github.com/nodenv/nodenv)
-      # nvm                   # node.js version from nvm (https://github.com/nvm-sh/nvm)
-      # nodeenv               # node.js environment (https://github.com/ekalinin/nodeenv)
+      virtualenv              # python virtual environment (https://docs.python.org/3/library/venv.html)
+      anaconda                # conda environment (https://conda.io/)
+      pyenv                   # python environment (https://github.com/pyenv/pyenv)
+      nodenv                  # node.js version from nodenv (https://github.com/nodenv/nodenv)
+      nvm                     # node.js version from nvm (https://github.com/nvm-sh/nvm)
+      nodeenv                 # node.js environment (https://github.com/ekalinin/nodeenv)
       # node_version          # node.js version
       # kubecontext           # current kubernetes context (https://kubernetes.io/)
-      # nordvpn               # nordvpn connection status, linux only (https://nordvpn.com/)
-      # example               # example user-defined segment (see prompt_example function below)
       context                 # user@host
       # =========================[ Line #2 ]=========================
       newline
+      # nordvpn               # nordvpn connection status, linux only (https://nordvpn.com/)
       # public_ip             # public IP address
       # battery               # internal battery
       # time                  # current time
+      # example               # example user-defined segment (see prompt_example function below)
   )
 
   # Basic style options that define the overall look of your prompt. You probably don't want to
@@ -418,8 +418,8 @@ fi
   ###[ virtualenv: python virtual environment (https://docs.python.org/3/library/venv.html) ]###
   # Python virtual environment color.
   typeset -g POWERLEVEL9K_VIRTUALENV_FOREGROUND=37
-  # Show Python version next to the virtual environment name.
-  typeset -g POWERLEVEL9K_VIRTUALENV_SHOW_PYTHON_VERSION=true
+  # Don't show Python version next to the virtual environment name.
+  typeset -g POWERLEVEL9K_VIRTUALENV_SHOW_PYTHON_VERSION=false
   # Separate environment name from Python version only with a space.
   typeset -g POWERLEVEL9K_VIRTUALENV_{LEFT,RIGHT}_DELIMITER=
   # Custom icon.
@@ -428,8 +428,8 @@ fi
   #####################[ anaconda: conda environment (https://conda.io/) ]######################
   # Anaconda environment color.
   typeset -g POWERLEVEL9K_ANACONDA_FOREGROUND=37
-  # Show Python version next to the anaconda environment name.
-  typeset -g POWERLEVEL9K_ANACONDA_SHOW_PYTHON_VERSION=true
+  # Don't show Python version next to the anaconda environment name.
+  typeset -g POWERLEVEL9K_ANACONDA_SHOW_PYTHON_VERSION=false
   # Separate environment name from Python version only with a space.
   typeset -g POWERLEVEL9K_ANACONDA_{LEFT,RIGHT}_DELIMITER=
   # Custom icon.
@@ -460,6 +460,10 @@ fi
   ############[ nodeenv: node.js environment (https://github.com/ekalinin/nodeenv) ]############
   # Nodeenv color.
   typeset -g POWERLEVEL9K_NODEENV_FOREGROUND=70
+  # Don't show Node version next to the environment name.
+  typeset -g POWERLEVEL9K_NODEENV_SHOW_NODE_VERSION=false
+  # Separate environment name from Node version only with a space.
+  typeset -g POWERLEVEL9K_NODEENV_{LEFT,RIGHT}_DELIMITER=
   # Custom icon.
   # typeset -g POWERLEVEL9K_NODEENV_VISUAL_IDENTIFIER_EXPANSION='⭐'
 
