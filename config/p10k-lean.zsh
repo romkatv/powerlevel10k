@@ -288,7 +288,7 @@ fi
   # If P9K_CONTENT is not empty, leave it unchanged. It's either "loading" or from vcs_info.
   vcs="\${P9K_CONTENT:-$vcs}"
 
-  # Branch icon. Set this parameter to $'\uF126 ' for the popular Powerline branch icon.
+  # Branch icon. Set this parameter to $'\uF126' for the popular Powerline branch icon.
   typeset -g POWERLEVEL9K_VCS_BRANCH_ICON=
 
   # Disable the default Git status formatting.
@@ -300,6 +300,9 @@ fi
   typeset -g POWERLEVEL9K_VCS_LOADING_FOREGROUND=244
   # Enable counters for staged, unstaged, etc.
   typeset -g POWERLEVEL9K_VCS_{STAGED,UNSTAGED,UNTRACKED,COMMITS_AHEAD,COMMITS_BEHIND}_MAX_NUM=-1
+
+  # Custom icon.
+  # typeset -g POWERLEVEL9K_VCS_VISUAL_IDENTIFIER_EXPANSION='⭐'
 
   # Show status of repositories of these types. You can add svn and/or hg if you are
   # using them. If you do, your prompt may become slow even when your current directory
