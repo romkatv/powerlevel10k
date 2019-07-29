@@ -11,7 +11,7 @@ typeset -gr __p9k_root_dir_u=${${(q-)__p9k_root_dir}/#(#b)$HOME(|\/*)/'~'$match[
 
 function _p9k_can_configure() {
   emulate -L zsh
-  setopt err_return
+  setopt err_return extended_glob no_prompt_{bang,subst} prompt_{cr,percent,sp}
   [[ $1 == '-q' ]] && local -i q=1 || local -i q=0
   function $0_error() {
     (( q )) || print -P "%1F[ERROR]%f %Bp9k_configure%b: $1" >&2
