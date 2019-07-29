@@ -1153,20 +1153,19 @@ prompt_public_ip() {
 prompt_context() {
   if ! _p9k_cache_get $0 "${(%):-%#}"; then
     local -i enabled=1
-    local content='' state=''
-    if [[ $_POWERLEVEL9K_ALWAYS_SHOW_CONTEXT == 1 || -z $DEFAULT_USER || $_P9K_SSH == 1 ]]; then
-      content=$_POWERLEVEL9K_CONTEXT_TEMPLATE
-    else
+    local content
+    if [[ $_POWERLEVEL9K_ALWAYS_SHOW_CONTEXT == 0 && -n $DEFAULT_USER && $_P9K_SSH == 0 ]]; then
       local user="$(whoami)"
-      if [[ $user != $DEFAULT_USER ]]; then
-        content=$_POWERLEVEL9K_CONTEXT_TEMPLATE
-      elif (( _POWERLEVEL9K_ALWAYS_SHOW_USER )); then
-        content="${user//\%/%%}"
-      else
-        enabled=0
+      if [[ $user == $DEFAULT_USER ]]; then
+        if (( _POWERLEVEL9K_ALWAYS_SHOW_USER )); then
+          content="${user//\%/%%}"
+        else
+          enabled=0
+        fi
       fi
     fi
 
+    local state
     if (( enabled )); then
       state="DEFAULT"
       if [[ "${(%):-%#}" == '#' ]]; then
@@ -1179,6 +1178,16 @@ prompt_context() {
         fi
       elif [[ -n "$SUDO_COMMAND" ]]; then
         state="SUDO"
+      fi
+
+      if [[ -z $content ]]; then
+        local var=POWERLEVEL9K_CONTEXT_${state}_TEMPLATE
+        if (( $+parameters[$var] )); then
+          content=${(P)var}
+          content=${(g::)content}
+        else
+          content=$_POWERLEVEL9K_CONTEXT_TEMPLATE
+        fi
       fi
     fi
 
