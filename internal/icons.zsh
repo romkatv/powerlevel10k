@@ -89,7 +89,7 @@ function _p9k_init_icons() {
         VCS_GIT_GITLAB_ICON            '\uE20E '              #
         VCS_HG_ICON                    '\uE1C3 '              # 
         VCS_SVN_ICON                   '(svn) '
-        RUST_ICON                      '(rust)'
+        RUST_ICON                      '(rust)'              # TODO: try 𝗥.
         PYTHON_ICON                    '\ue63c'              # 
         SWIFT_ICON                     ''
         GO_ICON                        ''
@@ -482,7 +482,7 @@ function _p9k_init_icons() {
         VCS_GIT_GITLAB_ICON            ''
         VCS_HG_ICON                    ''
         VCS_SVN_ICON                   ''
-        RUST_ICON                      'Rust'
+        RUST_ICON                      'Rust'                 # TODO: try 𝗥.
         PYTHON_ICON                    'Py'
         SWIFT_ICON                     'Swift'
         GO_ICON                        'Go'
