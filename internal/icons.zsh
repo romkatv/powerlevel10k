@@ -427,7 +427,7 @@ function _p9k_init_icons() {
         OK_ICON                        $'\u2714'              # ✔
         FAIL_ICON                      $'\u2718'              # ✘
         SYMFONY_ICON                   'SF'
-        NODE_ICON                      $'\u2B22'              # ⬢
+        NODE_ICON                      'Node'
         MULTILINE_FIRST_PROMPT_PREFIX  $'\u256D'$'\U2500'     # ╭─
         MULTILINE_NEWLINE_PROMPT_PREFIX  $'\u251C'$'\U2500'   # ├─
         MULTILINE_LAST_PROMPT_PREFIX   $'\u2570'$'\U2500 '    # ╰─
@@ -489,7 +489,7 @@ function _p9k_init_icons() {
         GO_ICON                        'Go'
         PUBLIC_IP_ICON                 ''
         LOCK_ICON                      $'\UE0A2'
-        EXECUTION_TIME_ICON            $'\u29D7'              # ⧗
+        EXECUTION_TIME_ICON            ''
         SSH_ICON                       'ssh'
         VPN_ICON                       'vpn'
         KUBERNETES_ICON                $'\U2388'              # ⎈
