@@ -129,7 +129,7 @@ function quit() {
     print -P "an option that does nothing except for disabling Powerlevel10k"
     print -P "configuration wizard, type the following command:"
     print -P ""
-    print -P "  %2Fecho%f %3F'POWERLEVEL9K_MODE='%f %15F>>! $__p9k_zshrc_u%f"
+    print -P "  %2Fecho%f %3F'POWERLEVEL9K_MODE='%f >>! $__p9k_zshrc_u"
     print -P ""
     print -P "To run Powerlevel10k configuration wizard right now, type:"
     print -P ""
@@ -141,15 +141,15 @@ function ask_diamond() {
   while true; do
     clear
     if (( force )); then
-      print -P "This is %B%4FPowerlevel10k configuration wizard%f%b. It will ask you a few"
+      print -P "This is %4FPowerlevel10k configuration wizard%f. It will ask you a few"
       print -P "questions and configure your prompt."
     else
-      print -P "This is %B%4FPowerlevel10k configuration wizard%f%b. You are seeing it because"
+      print -P "This is %4FPowerlevel10k configuration wizard%f. You are seeing it because"
       print -P "you haven't defined any Powerlevel10k configuration options. It will"
       print -P "ask you a few questions and configure your prompt."
     fi
     print -P ""
-    centered "%BDoes this look like a %2Fdiamond%f (square rotated 45 degrees)?%b"
+    centered "%BDoes this look like a %b%2Fdiamond%f%B (square rotated 45 degrees)?%b"
     centered "reference: $(href https://graphemica.com/%E2%97%86)"
     print -P ""
     centered "--->  \uE0B2\uE0B0  <---"
@@ -158,11 +158,11 @@ function ask_diamond() {
     print -P ""
     print -P "%B(n)  No.%b"
     print -P ""
-    print -P "%248F(q)  Quit and do nothing.%f"
+    print -P "(q)  Quit and do nothing."
     print -P ""
 
     local key=
-    read -k key"?Choice [ynq]: " || return 1
+    read -k key${(%):-"?%BChoice [ynq]: %b"} || return 1
     case $key in
       q) quit; return 1;;
       y) cap_diamond=1; break;;
@@ -175,7 +175,7 @@ function ask_lock() {
   while true; do
     clear
     [[ -n $2 ]] && centered "$2"
-    centered "%BDoes this look like a %2Flock%f?%b"
+    centered "%BDoes this look like a %b%2Flock%f%B?%b"
     centered "reference: $(href https://fontawesome.com/icons/lock)"
     print -P ""
     centered "--->  $1  <---"
@@ -184,13 +184,13 @@ function ask_lock() {
     print -P ""
     print -P "%B(n)  No.%b"
     print -P ""
-    print -P "%248F(r)  Restart from the beginning.%f"
+    print -P "(r)  Restart from the beginning."
     print -P ""
-    print -P "%248F(q)  Quit and do nothing.%f"
+    print -P "(q)  Quit and do nothing."
     print -P ""
 
     local key=
-    read -k key"?Choice [ynrq]: " || return 1
+    read -k key${(%):-"?%BChoice [ynrq]: %b"} || return 1
     case $key in
       q) quit; return 1;;
       r) return 2;;
@@ -203,7 +203,7 @@ function ask_lock() {
 function ask_python() {
   while true; do
     clear
-    centered "%BDoes this look like a %2FPython logo%f?%b"
+    centered "%BDoes this look like a %b%2FPython logo%f%B?%b"
     centered "reference: $(href https://fontawesome.com/icons/python)"
     print -P ""
     centered "--->  \uE63C  <---"
@@ -212,13 +212,13 @@ function ask_python() {
     print -P ""
     print -P "%B(n)  No.%b"
     print -P ""
-    print -P "%248F(r)  Restart from the beginning.%f"
+    print -P "(r)  Restart from the beginning."
     print -P ""
-    print -P "%248F(q)  Quit and do nothing.%f"
+    print -P "(q)  Quit and do nothing."
     print -P ""
 
     local key=
-    read -k key"?Choice [ynrq]: " || return 1
+    read -k key${(%):-"?%BChoice [ynrq]: %b"} || return 1
     case $key in
       q) quit; return 1;;
       r) return 2;;
@@ -242,21 +242,21 @@ function ask_narrow_icons() {
   text+="%6F${icons[AWS_EB_ICON]// }%fX"
   while true; do
     clear
-    centered "%BDo all these icons %2Ffit between the crosses%f?%b"
+    centered "%BDo all these icons %b%2Ffit between the crosses%f%B?%b"
     print -P ""
     centered "--->  $text  <---"
     print -P ""
-    print -P "%B(y)  Yes. Icons are very close to the crosses but there is %2Fno overlap%f%b."
+    print -P "%B(y)  Yes. Icons are very close to the crosses but there is %b%2Fno overlap%f%B.%b"
     print -P ""
-    print -P "%B(n)  No. Some icons %2Foverlap%f neighbouring crosses.%b"
+    print -P "%B(n)  No. Some icons %b%2Foverlap%f%B neighbouring crosses.%b"
     print -P ""
-    print -P "%248F(r)  Restart from the beginning.%f"
+    print -P "(r)  Restart from the beginning."
     print -P ""
-    print -P "%248F(q)  Quit and do nothing.%f"
+    print -P "(q)  Quit and do nothing."
     print -P ""
 
     local key=
-    read -k key"?Choice [ynrq]: " || return 1
+    read -k key${(%):-"?%BChoice [ynrq]: %b"} || return 1
     case $key in
       q) quit; return 1;;
       r) return 2;;
@@ -279,13 +279,13 @@ function ask_style() {
     print -P ""
     style=classic print_prompt
     print -P ""
-    print -P "%248F(r)  Restart from the beginning.%f"
+    print -P "(r)  Restart from the beginning."
     print -P ""
-    print -P "%248F(q)  Quit and do nothing.%f"
+    print -P "(q)  Quit and do nothing."
     print -P ""
 
     local key=
-    read -k key"?Choice [12rq]: " || return 1
+    read -k key${(%):-"?%BChoice [12rq]: %b"} || return 1
     case $key in
       q) quit; return 1;;
       r) return 2;;
@@ -312,13 +312,13 @@ function ask_straight() {
     print -P ""
     straight=1 print_prompt
     print -P ""
-    print -P "%248F(r)  Restart from the beginning.%f"
+    print -P "(r)  Restart from the beginning."
     print -P ""
-    print -P "%248F(q)  Quit and do nothing.%f"
+    print -P "(q)  Quit and do nothing."
     print -P ""
 
     local key=
-    read -k key"?Choice [12rq]: " || return 1
+    read -k key${(%):-"?%BChoice [12rq]: %b"} || return 1
     case $key in
       q) quit; return 1;;
       r) return 2;;
@@ -341,13 +341,13 @@ function ask_num_lines() {
     print -P ""
     num_lines=2 print_prompt
     print -P ""
-    print -P "%248F(r)  Restart from the beginning.%f"
+    print -P "(r)  Restart from the beginning."
     print -P ""
-    print -P "%248F(q)  Quit and do nothing.%f"
+    print -P "(q)  Quit and do nothing."
     print -P ""
 
     local key=
-    read -k key"?Choice [12rq]: " || return 1
+    read -k key${(%):-"?%BChoice [12rq]: %b"} || return 1
     case $key in
       q) quit; return 1;;
       r) return 2;;
@@ -377,13 +377,13 @@ function ask_gap_char() {
     print -P ""
     gap_char="─" print_prompt
     print -P ""
-    print -P "%248F(r)  Restart from the beginning.%f"
+    print -P "(r)  Restart from the beginning."
     print -P ""
-    print -P "%248F(q)  Quit and do nothing.%f"
+    print -P "(q)  Quit and do nothing."
     print -P ""
 
     local key=
-    read -k key"?Choice [12rq]: " || return 1
+    read -k key${(%):-"?%BChoice [123rq]: %b"} || return 1
     case $key in
       q) quit; return 1;;
       r) return 2;;
@@ -410,13 +410,13 @@ function ask_empty_line() {
     print -P ""
     print_prompt
     print -P ""
-    print -P "%248F(r)  Restart from the beginning.%f"
+    print -P "(r)  Restart from the beginning."
     print -P ""
-    print -P "%248F(q)  Quit and do nothing.%f"
+    print -P "(q)  Quit and do nothing."
     print -P ""
 
     local key=
-    read -k key"?Choice [12rq]: " || return 1
+    read -k key${(%):-"?%BChoice [12rq]: %b"} || return 1
     case $key in
       q) quit; return 1;;
       r) return 2;;
@@ -437,13 +437,13 @@ function ask_confirm() {
     print -P ""
     print -P "%B(y)  Yes.%b"
     print -P ""
-    print -P "%248F(r)  Restart from the beginning.%f"
+    print -P "(r)  Restart from the beginning."
     print -P ""
-    print -P "%248F(q)  Quit and do nothing.%f"
+    print -P "(q)  Quit and do nothing."
     print -P ""
 
     local key=
-    read -k key"?Choice [yrq]: " || return 1
+    read -k key${(%):-"?%BChoice [yrq]: %b"} || return 1
     case $key in
       q) quit; return 1;;
       r) return 2;;
@@ -461,17 +461,17 @@ function ask_config_overwrite() {
   while true; do
     clear
     centered "Powerlevel10k config file already exists."
-    centered "%BOverwrite %2F$__p9k_cfg_path_u%f?%b"
+    centered "%BOverwrite %b%2F$__p9k_cfg_path_u%f%B?%b"
     print -P ""
     print -P "%B(y)  Yes.%b"
     print -P ""
-    print -P "%248F(r)  Restart from the beginning.%f"
+    print -P "(r)  Restart from the beginning."
     print -P ""
-    print -P "%248F(q)  Quit and do nothing.%f"
+    print -P "(q)  Quit and do nothing."
     print -P ""
 
     local key=
-    read -k key"?Choice [yrq]: " || return 1
+    read -k key${(%):-"?%BChoice [yrq]: %b"} || return 1
     case $key in
       q) quit; return 1;;
       r) return 2;;
@@ -539,9 +539,8 @@ function generate_config() {
     fi
   fi
   header+=$'.\n'
-  header+="# Wizard options: $POWERLEVEL9K_MODE font"
+  header+="# Wizard options: $POWERLEVEL9K_MODE"
   (( cap_narrow_icons )) && header+=", narrow icons" || header+=", wide icons"
-  header+=", $style"
   if [[ $style == classic ]]; then
     (( straight )) && header+=", straight" || header+=", angled"
   fi
@@ -571,7 +570,7 @@ function write_zshrc() {
     local f6="\"$f1\""
     local f7="\"$f3\""
     if [[ -n ${(@M)lines:#(#b)source[[:space:]]##($f1|$f2|$f3|$f4|$f5|$f6|$f7)*} ]]; then
-      print -P "No changes have been made to %B%4F$__p9k_zshrc_u%f%b because it already sources %B%2F$__p9k_cfg_path_u%f%b."
+      print -P "No changes have been made to %4F$__p9k_zshrc_u%f because it already sources %2F$__p9k_cfg_path_u%f."
       return
     fi
   fi
@@ -583,9 +582,9 @@ function write_zshrc() {
   print -lr -- "" $comments "source $__p9k_cfg_path_u" >>$__p9k_zshrc
 
   print -P ""
-  print -P "The following lines have been appended to %B%4F$__p9k_zshrc_u%f%b:"
+  print -P "The following lines have been appended to %4F$__p9k_zshrc_u%f:"
   print -P ""
-  print -lP -- '  %240F'${^comments}'%f' "  %2Fsource%f %15F$__p9k_cfg_path_u%f"
+  print -lP -- '  %240F'${^comments}'%f' "  %2Fsource%f $__p9k_cfg_path_u"
 }
 
 _p9k_can_configure || return
@@ -626,9 +625,9 @@ done
 
 clear
 
-print -P "Powerlevel10k configuration has been written to %B%2F$__p9k_cfg_path_u%f%b."
+print -P "Powerlevel10k configuration has been written to %2F$__p9k_cfg_path_u%f."
 if [[ -n $config_backup ]]; then
-  print -P "The backup of the previuos version is at %B%3F$config_backup%f%b."
+  print -P "The backup of the previuos version is at %3F$config_backup%f."
 fi
 
 if (( write_config )); then
