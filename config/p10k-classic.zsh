@@ -333,7 +333,8 @@ fi
   # style them independently from the regular OK and ERROR state.
   typeset -g POWERLEVEL9K_STATUS_EXTENDED_STATES=true
 
-  # Status on success. No content, just an icon.
+  # Status on success. No content, just an icon. No need to show it if prompt_char is enabled as
+  # it will signify success by turning green.
   typeset -g POWERLEVEL9K_STATUS_OK=true
   typeset -g POWERLEVEL9K_STATUS_OK_FOREGROUND=70
   typeset -g POWERLEVEL9K_STATUS_OK_VISUAL_IDENTIFIER_EXPANSION='✔'
@@ -344,7 +345,8 @@ fi
   typeset -g POWERLEVEL9K_STATUS_OK_PIPE_FOREGROUND=70
   typeset -g POWERLEVEL9K_STATUS_OK_PIPE_VISUAL_IDENTIFIER_EXPANSION='✔'
 
-  # Status when it's just an error code (e.g., '1').
+  # Status when it's just an error code (e.g., '1'). No need to show it if prompt_char is enabled as
+  # it will signify error by turning red.
   typeset -g POWERLEVEL9K_STATUS_ERROR=true
   typeset -g POWERLEVEL9K_STATUS_ERROR_FOREGROUND=160
   typeset -g POWERLEVEL9K_STATUS_ERROR_VISUAL_IDENTIFIER_EXPANSION='↵'
