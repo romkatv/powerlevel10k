@@ -28,23 +28,23 @@ fi
 source $__p9k_root_dir/internal/configure.zsh || return
 
 typeset -ra lean_left=(
-  '' '%B%39F~%b%12F/%B%39Fpowerlevel10k%b %76Fmaster ⇡2%f '
+  '' '%B%39F~%b%31F/%B%39Fpowerlevel10k%b %76Fmaster ⇡2%f '
   '' '%76F❯%f █'
 )
 
 typeset -ra lean_right=(
-  ' %5F⎈ minikube%f' ''
+  ' %134F⎈ minikube%f' ''
   '' ''
 )
 
 typeset -ra classic_left=(
-  '%8F╭─' '%K{236} %B%39F~%b%K{236}%12F/%B%39Fpowerlevel10k%b%K{236} %244F\uE0B1 %76Fmaster ⇡2 %k%236F\uE0B0%f'
-  '%8F╰─' '%f █'
+  '%240F╭─' '%K{236} %B%39F~%b%K{236}%31F/%B%39Fpowerlevel10k%b%K{236} %244F\uE0B1 %76Fmaster ⇡2 %k%236F\uE0B0%f'
+  '%240F╰─' '%f █'
 )
 
 typeset -ra classic_right=(
-  '%236F\uE0B2%K{236}%13F minikube ⎈ %k%f' '%8F─╮%f'
-  '' '%8F─╯%f'
+  '%236F\uE0B2%K{236}%134F minikube ⎈ %k%f' '%240F─╮%f'
+  '' '%240F─╯%f'
 )
 
 typeset -ri prompt_indent=4
@@ -92,7 +92,7 @@ function print_prompt() {
     (( num_lines == 2 && i == 1 )) && local fill=${gap_char:-' '} || local fill=' '
     print -n  -- ${(pl:$prompt_indent:: :)}
     print -nP -- $l
-    print -nP -- "%8F${(pl:$gap::$fill:)}%f"
+    print -nP -- "%240F${(pl:$gap::$fill:)}%f"
     print -P  -- $r
   done
 }
@@ -585,7 +585,7 @@ function write_zshrc() {
   print -P ""
   print -P "The following lines have been appended to %B%4F$__p9k_zshrc_u%f%b:"
   print -P ""
-  print -lP -- '  %8F'${^comments}'%f' "  %2Fsource%f %15F$__p9k_cfg_path_u%f"
+  print -lP -- '  %240F'${^comments}'%f' "  %2Fsource%f %15F$__p9k_cfg_path_u%f"
 }
 
 _p9k_can_configure || return
