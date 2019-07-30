@@ -2897,7 +2897,7 @@ prompt_kubecontext() {
     local context cluster namespace
     () {
       local cfg && cfg=(${(f)"$(kubectl config view -o=yaml 2>/dev/null)"}) || return
-      local ctx=(${(@M)cfg:#current-context: [^\"\'|>]*})
+      local ctx=(${(@M)cfg:#current-context: [^\"\'\|\>]*})
       (( $#ctx == 1 )) || return
       context=${ctx[1]#current-context: }
       local -i pos=${cfg[(i)contexts:]}
