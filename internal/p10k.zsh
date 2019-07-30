@@ -3825,7 +3825,7 @@ _p9k_build_gap_post() {
     _p9k_ret+='${:-"'$exp'"}'
     style=1
   fi
-  _p9k_ret+='$_p9k_rprompt$_p9k_t[$((1+!_p9k_ind))]}:-\n}'
+  _p9k_ret+=$'$_p9k_rprompt$_p9k_t[$((1+!_p9k_ind))]}:-\n}'
   [[ -n $style ]] && _p9k_ret+='%b%k%f'
 }
 
