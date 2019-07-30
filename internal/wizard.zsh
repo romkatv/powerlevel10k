@@ -153,6 +153,7 @@ function quit() {
     print -P "  %2Fp9k_configure%f"
     print -P ""
   fi
+  exit 1
 }
 
 function ask_diamond() {
@@ -180,9 +181,9 @@ function ask_diamond() {
     print -P ""
 
     local key=
-    read -k key${(%):-"?%BChoice [ynq]: %b"} || return 1
+    read -k key${(%):-"?%BChoice [ynq]: %b"} || quit
     case $key in
-      q) quit; return 1;;
+      q) quit;;
       y) cap_diamond=1; break;;
       n) cap_diamond=0; break;;
     esac
@@ -208,10 +209,10 @@ function ask_lock() {
     print -P ""
 
     local key=
-    read -k key${(%):-"?%BChoice [ynrq]: %b"} || return 1
+    read -k key${(%):-"?%BChoice [ynrq]: %b"} || quit
     case $key in
-      q) quit; return 1;;
-      r) return 2;;
+      q) quit;;
+      r) return 1;;
       y) cap_lock=1; break;;
       n) cap_lock=0; break;;
     esac
@@ -236,10 +237,10 @@ function ask_python() {
     print -P ""
 
     local key=
-    read -k key${(%):-"?%BChoice [ynrq]: %b"} || return 1
+    read -k key${(%):-"?%BChoice [ynrq]: %b"} || quit
     case $key in
-      q) quit; return 1;;
-      r) return 2;;
+      q) quit;;
+      r) return 1;;
       y) cap_python=1; break;;
       n) cap_python=0; break;;
     esac
@@ -274,10 +275,10 @@ function ask_narrow_icons() {
     print -P ""
 
     local key=
-    read -k key${(%):-"?%BChoice [ynrq]: %b"} || return 1
+    read -k key${(%):-"?%BChoice [ynrq]: %b"} || quit
     case $key in
-      q) quit; return 1;;
-      r) return 2;;
+      q) quit;;
+      r) return 1;;
       y) cap_narrow_icons=1; options+='small icons'; break;;
       n) cap_narrow_icons=0; break;;
     esac
@@ -303,10 +304,10 @@ function ask_style() {
     print -P ""
 
     local key=
-    read -k key${(%):-"?%BChoice [12rq]: %b"} || return 1
+    read -k key${(%):-"?%BChoice [12rq]: %b"} || quit
     case $key in
-      q) quit; return 1;;
-      r) return 2;;
+      q) quit;;
+      r) return 1;;
       1) style=lean; options+=lean; break;;
       2) style=classic; options+=classic; break;;
     esac
@@ -337,10 +338,10 @@ function ask_color() {
     print -P ""
 
     local key=
-    read -k key${(%):-"?%BChoice [123rq]: %b"} || return 1
+    read -k key${(%):-"?%BChoice [123rq]: %b"} || quit
     case $key in
-      q) quit; return 1;;
-      r) return 2;;
+      q) quit;;
+      r) return 1;;
       1) color=1; options+=light; break;;
       2) color=2; options+=medium; break;;
       3) color=3; options+=dark; break;;
@@ -379,10 +380,10 @@ function ask_extra_icons() {
     print -P ""
 
     local key=
-    read -k key${(%):-"?%BChoice [12rq]: %b"} || return 1
+    read -k key${(%):-"?%BChoice [12rq]: %b"} || quit
     case $key in
-      q) quit; return 1;;
-      r) return 2;;
+      q) quit;;
+      r) return 1;;
       1) extra_icons=('' ''); options+='few icons'; break;;
       2) extra_icons=("$many[@]"); options+='many icons'; break;;
     esac
@@ -409,10 +410,10 @@ function ask_prefixes() {
     print -P ""
 
     local key=
-    read -k key${(%):-"?%BChoice [12rq]: %b"} || return 1
+    read -k key${(%):-"?%BChoice [12rq]: %b"} || quit
     case $key in
-      q) quit; return 1;;
-      r) return 2;;
+      q) quit;;
+      r) return 1;;
       1) prefixes=('' ''); break;;
       2) prefixes=("$fluent[@]"); options+=fluent; break;;
     esac
@@ -449,10 +450,10 @@ function ask_separators() {
     print -P ""
 
     local key=
-    read -k key${(%):-"?%BChoice [12${extra}rq]: %b"} || return 1
+    read -k key${(%):-"?%BChoice [12${extra}rq]: %b"} || quit
     case $key in
-      q) quit; return 1;;
-      r) return 2;;
+      q) quit;;
+      r) return 1;;
       1) left_sep=$right_angle;  right_sep=$left_angle; options+='angled sep'; break;;
       2) left_sep=$vertical_bar; right_sep=$vertical_bar; options+='vertical sep'; break;;
       3)
@@ -497,10 +498,10 @@ function ask_heads() {
     print -P ""
 
     local key=
-    read -k key${(%):-"?%BChoice [12rq]: %b"} || return 1
+    read -k key${(%):-"?%BChoice [12rq]: %b"} || quit
     case $key in
-      q) quit; return 1;;
-      r) return 2;;
+      q) quit;;
+      r) return 1;;
       1) left_head=$right_triangle; right_head=$left_triangle; options+='sharp heads';   break;;
       2) left_head=$fade_out;       right_head=$fade_in;       options+='blurred heads'; break;;
       3)
@@ -552,10 +553,10 @@ function ask_tails() {
     print -P ""
 
     local key=
-    read -k key${(%):-"?%BChoice [12${extra}rq]: %b"} || return 1
+    read -k key${(%):-"?%BChoice [12${extra}rq]: %b"} || quit
     case $key in
-      q) quit; return 1;;
-      r) return 2;;
+      q) quit;;
+      r) return 1;;
       1) left_tail='';       right_tail='';        options+='flat tails';    break;;
       2) left_tail=$fade_in; right_tail=$fade_out; options+='blurred tails'; break;;
       3)
@@ -597,10 +598,10 @@ function ask_num_lines() {
     print -P ""
 
     local key=
-    read -k key${(%):-"?%BChoice [12rq]: %b"} || return 1
+    read -k key${(%):-"?%BChoice [12rq]: %b"} || quit
     case $key in
-      q) quit; return 1;;
-      r) return 2;;
+      q) quit;;
+      r) return 1;;
       1) num_lines=1; options+='1 line'; break;;
       2) num_lines=2; options+='2 lines'; break;;
     esac
@@ -633,10 +634,10 @@ function ask_gap_char() {
     print -P ""
 
     local key=
-    read -k key${(%):-"?%BChoice [123rq]: %b"} || return 1
+    read -k key${(%):-"?%BChoice [123rq]: %b"} || quit
     case $key in
-      q) quit; return 1;;
-      r) return 2;;
+      q) quit;;
+      r) return 1;;
       1) gap_char=" "; options+=disconnected; break;;
       2) gap_char="·"; options+=dotted; break;;
       3) gap_char="─"; options+=solid; break;;
@@ -674,10 +675,10 @@ function ask_frame() {
     print -P ""
 
     local key=
-    read -k key${(%):-"?%BChoice [123rq]: %b"} || return 1
+    read -k key${(%):-"?%BChoice [123rq]: %b"} || quit
     case $key in
-      q) quit; return 1;;
-      r) return 2;;
+      q) quit;;
+      r) return 1;;
       1) left_frame=0; right_frame=0; options+='no frame';    break;;
       2) left_frame=1; right_frame=0; options+='left frame';  break;;
       3) left_frame=0; right_frame=1; options+='right frame'; break;;
@@ -708,10 +709,10 @@ function ask_empty_line() {
     print -P ""
 
     local key=
-    read -k key${(%):-"?%BChoice [12rq]: %b"} || return 1
+    read -k key${(%):-"?%BChoice [12rq]: %b"} || quit
     case $key in
-      q) quit; return 1;;
-      r) return 2;;
+      q) quit;;
+      r) return 1;;
       1) empty_line=0; options+='compact'; break;;
       2) empty_line=1; options+='sparse';  break;;
     esac
@@ -735,10 +736,10 @@ function ask_confirm() {
     print -P ""
 
     local key=
-    read -k key${(%):-"?%BChoice [yrq]: %b"} || return 1
+    read -k key${(%):-"?%BChoice [yrq]: %b"} || quit
     case $key in
-      q) quit; return 1;;
-      r) return 2;;
+      q) quit;;
+      r) return 1;;
       y) break;;
     esac
   done
@@ -763,10 +764,10 @@ function ask_config_overwrite() {
     print -P ""
 
     local key=
-    read -k key${(%):-"?%BChoice [yrq]: %b"} || return 1
+    read -k key${(%):-"?%BChoice [yrq]: %b"} || quit
     case $key in
-      q) quit; return 1;;
-      r) return 2;;
+      q) quit;;
+      r) return 1;;
       y)
         config_backup="$(mktemp ${TMPDIR:-/tmp}/$__p9k_cfg_basename.XXXXXXXXXX)" || return 1
         cp $__p9k_cfg_path $config_backup
@@ -927,7 +928,12 @@ function write_zshrc() {
   print -lP -- '  '${^comments} "  %2Fsource%f %B$__p9k_cfg_path_u%b"
 }
 
-_p9k_can_configure || return
+if (( force )); then
+  _p9k_can_configure || return
+else
+  _p9k_can_configure -q || return
+fi
+
 source $__p9k_root_dir/internal/icons.zsh || return
 
 while true; do
@@ -939,13 +945,13 @@ while true; do
   local -a prefixes=('' '')
   local -a options=()
 
-  ask_diamond || { (( $? == 2 )) && continue || return }
+  ask_diamond || continue
   if [[ -n $AWESOME_GLYPHS_LOADED ]]; then
     POWERLEVEL9K_MODE=awesome-mapped-fontconfig
   else
-    ask_lock '\uF023' || { (( $? == 2 )) && continue || return }
+    ask_lock '\uF023' || continue
     if (( ! cap_lock )); then
-      ask_lock '\uE138' "Let's try another one." || { (( $? == 2 )) && continue || return }
+      ask_lock '\uE138' "Let's try another one." || continue
       if (( cap_lock )); then
         (( cap_diamond )) && POWERLEVEL9K_MODE=awesome-patched || POWERLEVEL9K_MODE=flat
       else
@@ -954,7 +960,7 @@ while true; do
     elif (( ! cap_diamond )); then
       POWERLEVEL9K_MODE=awesome-fontconfig
     else
-      ask_python || { (( $? == 2 )) && continue || return }
+      ask_python || continue
       (( cap_python )) && POWERLEVEL9K_MODE=awesome-fontconfig || POWERLEVEL9K_MODE=nerdfont-complete
     fi
   fi
@@ -977,20 +983,20 @@ while true; do
     right_head=$fade_in
   fi
   _p9k_init_icons
-  ask_narrow_icons     || { (( $? == 2 )) && continue || return }
-  ask_style            || { (( $? == 2 )) && continue || return }
-  ask_color            || { (( $? == 2 )) && continue || return }
-  ask_separators       || { (( $? == 2 )) && continue || return }
-  ask_heads            || { (( $? == 2 )) && continue || return }
-  ask_tails            || { (( $? == 2 )) && continue || return }
-  ask_num_lines        || { (( $? == 2 )) && continue || return }
-  ask_gap_char         || { (( $? == 2 )) && continue || return }
-  ask_frame            || { (( $? == 2 )) && continue || return }
-  ask_empty_line       || { (( $? == 2 )) && continue || return }
-  ask_extra_icons      || { (( $? == 2 )) && continue || return }
-  ask_prefixes         || { (( $? == 2 )) && continue || return }
-  ask_confirm          || { (( $? == 2 )) && continue || return }
-  ask_config_overwrite || { (( $? == 2 )) && continue || return }
+  ask_narrow_icons     || continue
+  ask_style            || continue
+  ask_color            || continue
+  ask_separators       || continue
+  ask_heads            || continue
+  ask_tails            || continue
+  ask_num_lines        || continue
+  ask_gap_char         || continue
+  ask_frame            || continue
+  ask_empty_line       || continue
+  ask_extra_icons      || continue
+  ask_prefixes         || continue
+  ask_confirm          || continue
+  ask_config_overwrite || continue
   break
 done
 
