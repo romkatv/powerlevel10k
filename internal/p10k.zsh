@@ -2925,16 +2925,15 @@ prompt_kubecontext() {
       case $shorten in
         gke)
           # gke_projectname_availability-zone_cluster-01 => cluster-01
-          if [[ $cluster == gke_* ]]; then
-            local parts=(${(s:_:)cluster})
-            (( $#parts > 3 )) && text=$parts[4,-1]
+          if [[ $cluster == (#b)gke_[^_]#_[^_]#_(?*) ]]; then
+            text=$match[1]
             break
           fi
           ;;
         eks)
-          # arn:aws:eks:us-east-1:XXXXXXXXXXXX:cluster/eks-infra
-          if [[ $cluster == (#b)arn:aws:eks:[[:alnum:]-]##:[[:digit:]]##:cluster/(*) ]]; then
-            [[ -n $match[1] ]] && text=$match[1]
+          # arn:aws:eks:us-east-1:123456789012:cluster/eks-infra
+          if [[ $cluster == (#b)arn:aws:eks:[[:alnum:]-]##:[[:digit:]]##:cluster/(?*) ]]; then
+            text=$match[1]
             break
           fi
       esac
@@ -3716,7 +3715,7 @@ _p9k_init_params() {
   _p9k_declare -e POWERLEVEL9K_NODEENV_LEFT_DELIMITER "["
   _p9k_declare -e POWERLEVEL9K_NODEENV_RIGHT_DELIMITER "]"
   _p9k_declare -b POWERLEVEL9K_KUBECONTEXT_SHOW_DEFAULT_NAMESPACE 1
-  _p9k_declare -a POWERLEVEL9K_KUBECONTEXT_SHORTEN -- gke eks
+  _p9k_declare -a POWERLEVEL9K_KUBECONTEXT_SHORTEN --
   # Defines context classes for the purpose of applying different styling to different contexts.
   #
   # POWERLEVEL9K_KUBECONTEXT_CLASSES must be an array with even number of elements. The first
