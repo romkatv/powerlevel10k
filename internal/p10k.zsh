@@ -2896,10 +2896,10 @@ prompt_kubecontext() {
   if ! _p9k_cache_get $0 "${key[@]}"; then
     local context cluster namespace
     () {
-      local cfg && cfg=(${(f)"$(kubectl config view -o=yaml)"}) || return
-      local ctx=(${(@M)cfg:#current-context:[[:space:]]*})
+      local cfg && cfg=(${(f)"$(kubectl config view -o=yaml 2>/dev/null)"}) || return
+      local ctx=(${(@M)cfg:#current-context: [^\"\'|>]*})
       (( $#ctx == 1 )) || return
-      context=${${ctx[1]}[(w)2]}  # TODO: figure out how values with spaces look in yaml
+      context=${ctx[1]#current-context: }
       local -i pos=${cfg[(i)contexts:]}
       (( pos <= $#cfg )) || return
       shift $pos cfg
@@ -2908,11 +2908,13 @@ prompt_kubecontext() {
       (( --pos ))
       for ((; pos > 0; --pos)); do
         local line=$cfg[pos]
-        case $line in
-          '- context:')      return;;
-          '    cluster:'*)   cluster=${line[(w)2]};;
-          '    namespace:'*) namespace=${line[(w)2]};;
-        esac
+        if [[ $line == '- context:' ]]; then
+          return
+        elif [[ $line == (#b)'    cluster: '([^\"\'\|\>]*) ]]; then
+          cluster=$match[1]
+        elif [[ $line == (#b)'    namespace: '([^\"\'\|\>]*) ]]; then
+          namespace=$match[1]
+        fi
       done
     }
     local text=$context
