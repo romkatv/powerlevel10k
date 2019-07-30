@@ -493,7 +493,7 @@ fi
 
   ################################[ go_version: golang version ]################################
   # Golang version color.
-  typeset -g POWERLEVEL9K_NODE_VERSION_FOREGROUND=14
+  typeset -g POWERLEVEL9K_GO_VERSION_FOREGROUND=37
   # Custom icon.
   # typeset -g POWERLEVEL9K_GO_VERSION_VISUAL_IDENTIFIER_EXPANSION='⭐'
 
