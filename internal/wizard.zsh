@@ -139,10 +139,11 @@ function quit() {
     print -P "Powerlevel10k configuration wizard has been aborted. To run it again, type:"
     print -P ""
     print -P "  %2Fp9k_configure%f"
+    print -P ""
   else
-    print -P "Powerlevel10k configuration wizard will run again next time unless"
-    print -P "you define at least one Powerlevel10k configuration option. To define"
-    print -P "an option that does nothing except for disabling Powerlevel10k"
+    print -P "Powerlevel10k configuration wizard has been aborted. It will run again"
+    print -P "next time unless you define at least one Powerlevel10k configuration option."
+    print -P "To define an option that does nothing except for disabling Powerlevel10k"
     print -P "configuration wizard, type the following command:"
     print -P ""
     print -P "  %2Fecho%f %3F'POWERLEVEL9K_MODE='%f >>! $__p9k_zshrc_u"
@@ -150,6 +151,7 @@ function quit() {
     print -P "To run Powerlevel10k configuration wizard right now, type:"
     print -P ""
     print -P "  %2Fp9k_configure%f"
+    print -P ""
   fi
 }
 
