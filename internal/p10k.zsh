@@ -2918,6 +2918,7 @@ prompt_kubecontext() {
       done
     }
     if [[ -n $name ]]; then
+      : ${namespace:=default}
       # gke_my-account_us-east1-a_cluster-01
       if [[ $cluster == (#b)gke_(?*)_(asia|australia|europe|northamerica|southamerica|us)-([a-z]##<->-[a-z])_(?*) ]]; then
         cloud_name=gke
@@ -2939,9 +2940,8 @@ prompt_kubecontext() {
       fi
       if [[ -z $text ]]; then
         text=$name
-        local ns=${namespace:-default}
-        if [[ $_POWERLEVEL9K_KUBECONTEXT_SHOW_DEFAULT_NAMESPACE == 1 || $ns != (default|$name) ]]; then
-          text+="/$ns"
+        if [[ $_POWERLEVEL9K_KUBECONTEXT_SHOW_DEFAULT_NAMESPACE == 1 || $namespace != (default|$name) ]]; then
+          text+="/$namespace"
         fi
       fi
       local pat class
