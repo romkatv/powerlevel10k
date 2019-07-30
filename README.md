@@ -83,16 +83,8 @@ Add `antibody bundle romkatv/powerlevel10k` to your `~/.zshrc`.
 
 ### For new users
 
-If you are new to Powerlevel10k/9k and don't have your own config yet, start with the
-[lean](https://github.com/romkatv/powerlevel10k/blob/master/config/p10k-lean.zsh) style.
-
-```zsh
-curl -fsSL -o ~/p10k-lean.zsh https://raw.githubusercontent.com/romkatv/powerlevel10k/master/config/p10k-lean.zsh
-echo 'source ~/p10k-lean.zsh' >>! ~/.zshrc
-```
-
-That's it! Your have a fast and functional prompt. If you want to customize it, edit
-`~/p10k-lean.zsh` and restart ZSH.
+On the first run Powerlevel10k configuration wizard will ask you a few questions and configure
+your prompt. If it doesn't trigger automatically, type `p9k_configure`.
 
 ### For existing users
 
@@ -101,18 +93,35 @@ will pick them up and provide you with the same prompt UI you are used to. Power
 all configuration options used by Powerlevel9k. See Powerlevel9k
 [configuration guide](https://github.com/bhilburn/powerlevel9k#prompt-customization).
 
-If you aren't completely satisfied with your prompt or looking for something fresh, try
-[lean](https://github.com/romkatv/powerlevel10k/blob/master/config/p10k-lean.zsh) config.
+To go beyond the functionality of Powerlevel9k, type `p9k_configure` and explore unique styles and
+features Powerlevel10k has to offer.
 
 ## Fonts
 
-Depending on your configuration, you might need to install a Powerline font. Follow the
-[font installation guide](https://github.com/bhilburn/powerlevel9k/wiki/Install-Instructions#step-2-install-a-powerline-font)
-from Powerlevel9k.
+Powerlevel10k doesn't require custom fonts but it can take advantage of them if they are available.
+Some of the style options in Powerlevel10k are available only when using
+[Nerd Fonts](https://github.com/ryanoasis/nerd-fonts).
 
-[Lean](https://github.com/romkatv/powerlevel10k/blob/master/config/p10k-lean.zsh) config doesn't
-require custom fonts. It'll work even with regular system fonts. If you are having trouble with
-Powerline fonts, try this config.
+If you don't know which font to use, download
+[these 4 fonts](https://github.com/romkatv/dotfiles-public/tree/master/.local/share/fonts/NerdFonts)
+and install them. In most systems you can install fonts simply by clicking on the `ttf` files. Then
+change your terminal's font to `MesloLGS NF` (NF stands for Nerd Fonts).
+
+- **iTerm2**: Open *Preferences → Profiles → Text → Change Font*. Set *Font* to `MesloLGS NF`.
+- **GNOME**: Type this command:
+
+```zsh
+sudo apt install libglib2.0-bin
+gsettings set org.gnome.desktop.interface monospace-font-name 'MesloLGS NF 11'
+```
+
+- **Command Prompt** (the default terminal app) on Windows: Use
+  [this script](https://gist.github.com/romkatv/aa7a70fe656d8b655e3c324eb10f6a8b).
+- **Visual Studio Code** (builtin terminal): *Open File → Preferences → Settings*, enter
+  `terminal.integrated.fontFamily` in the search box and set the value to `MesloLGS NF`.
+
+(Using a different terminal and know how to set font for it? Share your knowledge by sending a PR
+expanding the list!)
 
 ## Try it in Docker
 
@@ -123,8 +132,6 @@ the theme. Once you exit zsh, the image is deleted.
 docker run -e LANG=C.UTF-8 -e LC_ALL=C.UTF-8 -e TERM -it --rm ubuntu bash -uexc '
   cd && apt update && apt install -y zsh git
   git clone https://github.com/romkatv/powerlevel10k.git
-  cp ~/powerlevel10k/config/p10k-lean.zsh ~/
-  echo "source ~/p10k-lean.zsh" >>~/.zshrc
   echo "source ~/powerlevel10k/powerlevel10k.zsh-theme" >>~/.zshrc
   cd ~/powerlevel10k
   exec zsh'
