@@ -2883,8 +2883,8 @@ prompt_dir_writable() {
 ################################################################
 # Kubernetes Current Context/Namespace
 prompt_kubecontext() {
-  unset P9K_KUBECONTEXT_{NAME,CLUSTER,NAMESPACE}
   (( $+commands[kubectl] )) || return
+
   local cfg
   local -a key
   for cfg in ${(s.:.)${KUBECONFIG:-$HOME/.kube/config}}; do
@@ -2894,16 +2894,16 @@ prompt_kubecontext() {
   done
 
   if ! _p9k_cache_get $0 "${key[@]}"; then
-    local context cluster namespace
+    local name namespace cluster cloud_name cloud_account cloud_zone cloud_cluster text state
     () {
       local cfg && cfg=(${(f)"$(kubectl config view -o=yaml 2>/dev/null)"}) || return
       local ctx=(${(@M)cfg:#current-context: [^\"\'\|\>]*})
       (( $#ctx == 1 )) || return
-      context=${ctx[1]#current-context: }
+      name=${ctx[1]#current-context: }
       local -i pos=${cfg[(i)contexts:]}
       (( pos <= $#cfg )) || return
       shift $pos cfg
-      pos=${cfg[(i)  name: $context]}
+      pos=${cfg[(i)  name: $name]}
       (( pos <= $#cfg )) || return
       (( --pos ))
       for ((; pos > 0; --pos)); do
@@ -2917,46 +2917,53 @@ prompt_kubecontext() {
         fi
       done
     }
-    local text=$context
-    local ns=${namespace:-default}
-    if [[ $context != $ns && ($ns != default || $_POWERLEVEL9K_KUBECONTEXT_SHOW_DEFAULT_NAMESPACE == 1) ]]; then
-      text+="/$ns"
-    fi
-    local shorten
-    for shorten in $_POWERLEVEL9K_KUBECONTEXT_SHORTEN; do
-      case $shorten in
-        gke)
-          # gke_projectname_availability-zone_cluster-01 => cluster-01
-          if [[ $cluster == (#b)gke_[^_]#_[^_]#_(?*) ]]; then
-            text=$match[1]
-            break
-          fi
-          ;;
-        eks)
-          # arn:aws:eks:us-east-1:123456789012:cluster/eks-infra
-          if [[ $cluster == (#b)arn:aws:eks:[[:alnum:]-]##:[[:digit:]]##:cluster/(?*) ]]; then
-            text=$match[1]
-            break
-          fi
-      esac
-    done
-    local suf
-    if [[ -n $text ]]; then
+    if [[ -n $name ]]; then
+      # gke_my-account_us-east1-a_cluster-01
+      if [[ $cluster == (#b)gke_(?*)_(asia|australia|europe|northamerica|southamerica|us)-([a-z]##<->-[a-z])_(?*) ]]; then
+        cloud_name=gke
+        cloud_account=$match[1]
+        cloud_zone=$match[2]-$match[3]
+        cloud_cluster=$match[4]
+        if (( $+_POWERLEVEL9K_KUBECONTEXT_SHORTEN[(I)gke] )); then
+          text=$cloud_cluster
+        fi
+      # arn:aws:eks:us-east-1:123456789012:cluster/cluster-01
+      elif [[ $cluster == (#b)arn:aws:eks:([[:alnum:]-]##):([[:digit:]]##):cluster/(?*) ]]; then
+        cloud_name=eks
+        cloud_zone=$match[1]
+        cloud_account=$match[2]
+        cloud_cluster=$match[3]
+        if (( $+_POWERLEVEL9K_KUBECONTEXT_SHORTEN[(I)eks] )); then
+          text=$cloud_cluster
+        fi
+      fi
+      if [[ -z $text ]]; then
+        text=$name
+        local ns=${namespace:-default}
+        if [[ $_POWERLEVEL9K_KUBECONTEXT_SHOW_DEFAULT_NAMESPACE == 1 || $ns != (default|$name) ]]; then
+          text+="/$ns"
+        fi
+      fi
       local pat class
       for pat class in "${_POWERLEVEL9K_KUBECONTEXT_CLASSES[@]}"; do
         if [[ $text == ${~pat} ]]; then
-          [[ -n $class ]] && suf=_${(U)class}
+          [[ -n $class ]] && state=_${(U)class}
           break
         fi
       done
     fi
-    _p9k_cache_set "$context" "$cluster" "$namespace" "$text" "$suf"
+    _p9k_cache_set "$name" "$namespace" "$cluster" "$cloud_name" "$cloud_account" "$cloud_zone" "$cloud_cluster" "$text" "$state"
   fi
-  [[ -n $_p9k_cache_val[1] ]] || return
+
   typeset -g P9K_KUBECONTEXT_NAME=$_p9k_cache_val[1]
-  typeset -g P9K_KUBECONTEXT_CLUSTER=$_p9k_cache_val[2]
-  typeset -g P9K_KUBECONTEXT_NAMESPACE=$_p9k_cache_val[3]
-  _p9k_prompt_segment $0$_p9k_cache_val[5] magenta white KUBERNETES_ICON 0 '' "${_p9k_cache_val[4]//\%/%%}"
+  typeset -g P9K_KUBECONTEXT_NAMESPACE=$_p9k_cache_val[2]
+  typeset -g P9K_KUBECONTEXT_CLUSTER=$_p9k_cache_val[3]
+  typeset -g P9K_KUBECONTEXT_CLOUD_NAME=$_p9k_cache_val[4]
+  typeset -g P9K_KUBECONTEXT_CLOUD_ACCOUNT=$_p9k_cache_val[5]
+  typeset -g P9K_KUBECONTEXT_CLOUD_ZONE=$_p9k_cache_val[6]
+  typeset -g P9K_KUBECONTEXT_CLOUD_CLUSTER=$_p9k_cache_val[7]
+  [[ -n $_p9k_cache_val[8] ]] || return
+  _p9k_prompt_segment $0$_p9k_cache_val[9] magenta white KUBERNETES_ICON 0 '' "${_p9k_cache_val[8]//\%/%%}"
 }
 
 ################################################################
