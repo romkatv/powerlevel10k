@@ -3277,7 +3277,18 @@ _p9k_precmd() {
     unset _p9k_real_zle_rprompt_indent
   fi
 
-  _p9k_must_init && _p9k_init
+  if _p9k_must_init; then
+    if (( !__p9k_configured )); then
+      __p9k_configured=1
+      if [[ -z ${parameters[(i)POWERLEVEL9K_*]} ]] && _p9k_can_configure -q; then
+        if $__p9k_root_dir/internal/wizard.zsh -d $__p9k_root_dir; then
+          source $__p9k_cfg_path
+          _p9k_must_init
+        fi
+      fi
+    fi
+    _p9k_init
+  fi
 
   unsetopt localoptions
   prompt_opts=(cr percent sp subst)
@@ -4294,6 +4305,7 @@ _p9k_deinit() {
 }
 
 typeset -gi __p9k_enabled=0
+typeset -gi __p9k_configured=0
 
 prompt_powerlevel9k_setup() {
   emulate -L zsh && setopt no_hist_expand extended_glob
