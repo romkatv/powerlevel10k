@@ -428,9 +428,9 @@ function ask_separators() {
     local extra=
     clear
     centered "%BPrompt Separators%b"
-    print -P ""
-    print -P "%B(1)  Angled.%b"
-    print -P ""
+    print -P "                 separator"
+    print -P "%B(1)  Angled.%b         |"
+    print -P "                     v"
     left_sep=$right_angle right_sep=$left_angle print_prompt
     print -P ""
     print -P "%B(2)  Vertical.%b"
