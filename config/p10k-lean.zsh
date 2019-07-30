@@ -476,64 +476,73 @@ fi
   # typeset -g POWERLEVEL9K_NODE_VERSION_VISUAL_IDENTIFIER_EXPANSION='⭐'
 
   #############[ kubecontext: current kubernetes context (https://kubernetes.io/) ]#############
-  # Shorten gke and eks cluster names:
-  #
-  #   - gke_projectname_availability-zone_cluster-01         => cluster-01
-  #   - arn:aws:eks:us-east-1:XXXXXXXXXXXX:cluster/eks-infra => eks-infra
-  #
-  # This transformation is applied before class matching and content expansion (see below).
-  typeset -g POWERLEVEL9K_KUBECONTEXT_SHORTEN=(gke eks)
-  # Don't show the trailing "/default" in kubernetes context. This transformation is applied
-  # before class matching and content expansion (see below).
-  typeset -g POWERLEVEL9K_KUBECONTEXT_SHOW_DEFAULT_NAMESPACE=false
-
-  # Kubernetes context classes for the purpose of using different colors and/or icons with
+  # Kubernetes context classes for the purpose of using different colors, icons and expansions with
   # different contexts.
   #
   # POWERLEVEL9K_KUBECONTEXT_CLASSES is an array with even number of elements. The first element
   # in each pair defines a pattern against which the current kubernetes context gets matched.
   # More specifically, it's P9K_CONTENT prior to the application of context expansion (see below)
-  # that gets matched. If you aren't defining POWERLEVEL9K_KUBECONTEXT_*CONTENT_EXPANSION, then
-  # it's the same as the content shown in your prompt. The second element of
+  # that gets matched. If you unset all POWERLEVEL9K_KUBECONTEXT_*CONTENT_EXPANSION parameters,
+  # you'll see this value in your prompt. The second element of each pair in
   # POWERLEVEL9K_KUBECONTEXT_CLASSES defines the context class. Patterns are tried in order. The
   # first match wins.
   #
-  # For example, if your current kubernetes context is displayed as "deathray-testing", its
-  # class is TEST because "deathray-testing" doesn't match the pattern '*prod*'
-  # but does match '*test*'. Hence it'll be shown with the color of
-  # $POWERLEVEL9K_KUBECONTEXT_TEST_FOREGROUND.
+  # For example, if your current kubernetes context is "deathray-testing/default", its class is TEST
+  # because "deathray-testing/default" doesn't match the pattern '*prod*' but does match '*test*'.
+  #
+  # You can define different colors, icons and content expansions for different classes:
+  #
+  #   typeset -g POWERLEVEL9K_KUBECONTEXT_TEST_FOREGROUND=2
+  #   typeset -g POWERLEVEL9K_KUBECONTEXT_TEST_VISUAL_IDENTIFIER_EXPANSION='⭐'
+  #   typeset -g POWERLEVEL9K_KUBECONTEXT_TEST_CONTENT_EXPANSION='> ${P9K_CONTENT} <'
   typeset -g POWERLEVEL9K_KUBECONTEXT_CLASSES=(
       # '*prod*'  PROD    # These values are examples that are unlikely
       # '*test*'  TEST    # to match your needs. Customize them as needed.
       '*'       DEFAULT)
-  # typeset -g POWERLEVEL9K_KUBECONTEXT_PROD_FOREGROUND=1
-  # typeset -g POWERLEVEL9K_KUBECONTEXT_PROD_VISUAL_IDENTIFIER_EXPANSION='⭐'
-  # typeset -g POWERLEVEL9K_KUBECONTEXT_TEST_FOREGROUND=2
-  # typeset -g POWERLEVEL9K_KUBECONTEXT_TEST_VISUAL_IDENTIFIER_EXPANSION='⭐'
   typeset -g POWERLEVEL9K_KUBECONTEXT_DEFAULT_FOREGROUND=134
   # typeset -g POWERLEVEL9K_KUBECONTEXT_DEFAULT_VISUAL_IDENTIFIER_EXPANSION='⭐'
 
-  # Kubernetes context too long? You can shorten it by defining an expansion. Within
-  # the expansion the following parameters are available:
+  # Use POWERLEVEL9K_KUBECONTEXT_CONTENT_EXPANSION to specify the content displayed by kubecontext
+  # segment.
   #
-  #   - P9K_KUBECONTEXT_NAME       current context's name.
-  #   - P9K_KUBECONTEXT_NAMESPACE  current context's namespace.
-  #   - P9K_KUBECONTEXT_CLUSTER    current context's name.
-  #   - P9K_CONTENT                the original content of kubecontext segment, after
-  #                                the application of POWERLEVEL9K_KUBECONTEXT_SHORTEN
-  #                                and POWERLEVEL9K_KUBECONTEXT_SHOW_DEFAULT_NAMESPACE
+  # Within the expansion the following parameters are always available:
   #
-  # For example, to display the last two characters of the current context's cluster:
+  # - P9K_CONTENT                The content that would've been displayed if there was no content
+  #                              expansion defined.
+  # - P9K_KUBECONTEXT_NAME       The current context's name. Corresponds to column NAME in the
+  #                              output of `kubectl config get-contexts`.
+  # - P9K_KUBECONTEXT_CLUSTER    The current context's cluster. Corresponds to column CLUSTER in the
+  #                              output of `kubectl config get-contexts`.
+  # - P9K_KUBECONTEXT_NAMESPACE  The current context's namespace. Corresponds to column NAMESPACE
+  #                              in the output of `kubectl config get-contexts`. If there is no
+  #                              namespace, the parameter is set to "default".
   #
-  #   typeset -g POWERLEVEL9K_KUBECONTEXT_CONTENT_EXPANSION='${P9K_KUBECONTEXT_CLUSTER[-2,-1]}'
+  # If the context points to GKE or EKS, the following extra parameters are available:
   #
-  # This is just, an example which isn't necessarily the right expansion for you. Parameter
-  # expansions are very flexible and fast, too. See reference:
+  # - P9K_KUBECONTEXT_CLOUD_NAME     Either "gke" or "eks".
+  # - P9K_KUBECONTEXT_CLOUD_ACCOUNT  Account/project ID.
+  # - P9K_KUBECONTEXT_CLOUD_ZONE     Availability zone.
+  # - P9K_KUBECONTEXT_CLOUD_CLUSTER  Cluster.
+  #
+  # P9K_KUBECONTEXT_CLOUD_* parameters are derived from P9K_KUBECONTEXT_CLUSTER. For example,
+  # if P9K_KUBECONTEXT_CLUSTER is "gke_my-account_us-east1-a_my-cluster-01":
+  #
+  #   - P9K_KUBECONTEXT_CLOUD_NAME=gke
+  #   - P9K_KUBECONTEXT_CLOUD_ACCOUNT=my-account
+  #   - P9K_KUBECONTEXT_CLOUD_ZONE=us-east1-a
+  #   - P9K_KUBECONTEXT_CLOUD_CLUSTER=my-cluster-01
+  #
+  # If P9K_KUBECONTEXT_CLUSTER is "arn:aws:eks:us-east-1:123456789012:cluster/my-cluster-01":
+  #
+  #   - P9K_KUBECONTEXT_CLOUD_NAME=eks
+  #   - P9K_KUBECONTEXT_CLOUD_ACCOUNT=123456789012
+  #   - P9K_KUBECONTEXT_CLOUD_ZONE=us-east-1
+  #   - P9K_KUBECONTEXT_CLOUD_CLUSTER=my-cluster-01
+  #
+  # The expansion below will show P9K_KUBECONTEXT_CLOUD_CLUSTER if it's not empty and fall back
+  # to P9K_KUBECONTEXT_NAME. Parameter expansions are very flexible and fast, too. See reference:
   # http://zsh.sourceforge.net/Doc/Release/Expansion.html#Parameter-Expansion.
-  #
-  # You can also define different expansions for different content classes:
-  #
-  #   typeset -g POWERLEVEL9K_KUBECONTEXT_PROD_CONTENT_EXPANSION='DANGER! ${P9K_KUBE_CLUSTER}'
+  typeset -g POWERLEVEL9K_KUBECONTEXT_DEFAULT_CONTENT_EXPANSION='${P9K_KUBECONTEXT_CLOUD_CLUSTER:-${P9K_KUBECONTEXT_NAME}}'
 
   # Custom prefix.
   # typeset -g POWERLEVEL9K_KUBECONTEXT_PREFIX='%fat '
