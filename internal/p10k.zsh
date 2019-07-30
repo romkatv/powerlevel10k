@@ -2921,11 +2921,12 @@ prompt_kubecontext() {
     if [[ -n $name ]]; then
       : ${namespace:=default}
       # gke_my-account_us-east1-a_cluster-01
-      if [[ $cluster == (#b)gke_(?*)_(asia|australia|europe|northamerica|southamerica|us)-([a-z]##<->-[a-z])_(?*) ]]; then
+      # gke_my-account_us-east1_cluster-01
+      if [[ $cluster == (#b)gke_(?*)_(asia|australia|europe|northamerica|southamerica|us)-([a-z]##<->)(-[a-z]|)_(?*) ]]; then
         cloud_name=gke
         cloud_account=$match[1]
-        cloud_zone=$match[2]-$match[3]
-        cloud_cluster=$match[4]
+        cloud_zone=$match[2]-$match[3]-$match[4]
+        cloud_cluster=$match[5]
         if (( ${_POWERLEVEL9K_KUBECONTEXT_SHORTEN[(I)gke]} )); then
           text=$cloud_cluster
         fi
