@@ -1,4 +1,4 @@
-typeset -gr __p9k_wizard_columns=70
+typeset -gr __p9k_wizard_columns=80
 typeset -gr __p9k_wizard_lines=27
 typeset -gr __p9k_zd=${${ZDOTDIR:-$HOME}:A}
 typeset -gr __p9k_zd_u=${${(q-)__p9k_zd}/#(#b)$HOME(|\/*)/'~'$match[1]}

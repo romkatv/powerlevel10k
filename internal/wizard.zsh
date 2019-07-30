@@ -35,8 +35,19 @@ typeset -ri prompt_indent=2
 
 typeset -ra bg_color=(238 236 234)
 typeset -ra frame_color=(242 240 238)
-typeset -ra sep_color=(244 242 240)
+typeset -ra sep_color=(246 244 242)
 typeset -ra prefix_color=(248 246 244)
+
+typeset -r left_triangle='\uE0B2'
+typeset -r right_triangle='\uE0B0'
+typeset -r left_angle='\uE0B3'
+typeset -r right_angle='\uE0B1'
+typeset -r down_triangle='\uE0BC'
+typeset -r up_triangle='\uE0BA'
+typeset -r fade_in='░▒▓'
+typeset -r fade_out='▓▒░'
+typeset -r vertical_bar='|'
+typeset -r slanted_bar='\uE0BD'
 
 typeset -ra lean_left=(
   '' '%31F$extra_icons[1]%B%39F~%b%31F/%B%39Fpowerlevel10k%b%f $prefixes[1]%76F$extra_icons[2]master ⇡2%f '
@@ -49,12 +60,12 @@ typeset -ra lean_right=(
 )
 
 typeset -ra classic_left=(
-  '%$frame_color[$color]F╭─' '%K{$bg_color[$color]} %31F$extra_icons[1]%B%39F~%b%K{$bg_color[$color]}%31F/%B%39Fpowerlevel10k%b%K{$bg_color[$color]} %$sep_color[$color]F\uE0B1%f %$prefix_color[$color]F$prefixes[1]%76F$extra_icons[2]master ⇡2 %k%$bg_color[$color]F\uE0B0%f'
+  '%$frame_color[$color]F╭─' '%F{$bg_color[$color]}$left_tail%K{$bg_color[$color]} %31F$extra_icons[1]%B%39F~%b%K{$bg_color[$color]}%31F/%B%39Fpowerlevel10k%b%K{$bg_color[$color]} %$sep_color[$color]F$left_sep%f %$prefix_color[$color]F$prefixes[1]%76F$extra_icons[2]master ⇡2 %k%$bg_color[$color]F$left_head%f'
   '%$frame_color[$color]F╰─' '%f █'
 )
 
 typeset -ra classic_right=(
-  '%$bg_color[$color]F\uE0B2%K{$bg_color[$color]}%f %$prefix_color[$color]F$prefixes[2]%134Fminikube ⎈ %k%f' '%$frame_color[$color]F─╮%f'
+  '%$bg_color[$color]F$right_head%K{$bg_color[$color]}%f %$prefix_color[$color]F$prefixes[2]%134Fminikube ⎈ %k%F{$bg_color[$color]}$right_tail%f' '%$frame_color[$color]F─╮%f'
   '' '%$frame_color[$color]F─╯%f'
 )
 
@@ -88,11 +99,6 @@ function print_prompt() {
   else
     (( left_frame )) || left=('' $left[2] '' '%76F❯%f █')
     (( right_frame )) || right=($right[1] '' '' '')
-  fi
-  if (( straight )); then
-    [[ $POWERLEVEL9K_MODE == nerdfont-complete ]] && local subsep='\uE0BD' || local subsep='|'
-    left=("${(@)${(@)left//\\uE0B1/$subsep}//\\uE0B0/▓▒░}")
-    right=("${(@)${(@)right//\\uE0B3/$subsep}//\\uE0B2/░▒▓}")
   fi
   local -i i
   for ((i = 1; i < $#left; i+=2)); do
@@ -270,7 +276,7 @@ function ask_narrow_icons() {
     case $key in
       q) quit; return 1;;
       r) return 2;;
-      y) cap_narrow_icons=1; break;;
+      y) cap_narrow_icons=1; options+='small icons'; break;;
       n) cap_narrow_icons=0; break;;
     esac
   done
@@ -299,8 +305,8 @@ function ask_style() {
     case $key in
       q) quit; return 1;;
       r) return 2;;
-      1) style=lean; break;;
-      2) style=classic; break;;
+      1) style=lean; options+=lean; break;;
+      2) style=classic; options+=classic; break;;
     esac
   done
 }
@@ -333,14 +339,15 @@ function ask_color() {
     case $key in
       q) quit; return 1;;
       r) return 2;;
-      1|2|3) color=$key; break;;
+      1) color=1; options+=light; break;;
+      2) color=2; options+=medium; break;;
+      3) color=3; options+=dark; break;;
     esac
   done
 }
 
 function ask_extra_icons() {
   if [[ $POWERLEVEL9K_MODE == (powerline|compatible) ]]; then
-    extra_icons=('' '')
     return
   fi
   local dir_icon=${(g::)icons[HOME_SUB_ICON]}
@@ -374,8 +381,8 @@ function ask_extra_icons() {
     case $key in
       q) quit; return 1;;
       r) return 2;;
-      1) extra_icons=('' ''); break;;
-      2) extra_icons=("$many[@]"); break;;
+      1) extra_icons=('' ''); options+='few icons'; break;;
+      2) extra_icons=("$many[@]"); options+='many icons'; break;;
     esac
   done
 }
@@ -405,27 +412,82 @@ function ask_prefixes() {
       q) quit; return 1;;
       r) return 2;;
       1) prefixes=('' ''); break;;
-      2) prefixes=("$fluent[@]"); break;;
+      2) prefixes=("$fluent[@]"); options+=fluent; break;;
     esac
   done
 }
 
-function ask_straight() {
-  if [[ $style != classic || $cap_diamond == 0 ]]; then
-    straight=1
+function ask_separators() {
+  if [[ $style != classic || $cap_diamond != 1 ]]; then
     return
   fi
   while true; do
+    local extra=
     clear
     centered "%BPrompt Separators%b"
     print -P ""
     print -P "%B(1)  Angled.%b"
     print -P ""
-    straight=0 print_prompt
+    left_sep=$right_angle right_sep=$left_angle print_prompt
     print -P ""
-    print -P "%B(2)  Straight.%b"
+    print -P "%B(2)  Vertical.%b"
     print -P ""
-    straight=1 print_prompt
+    left_sep=$vertical_bar right_sep=$vertical_bar print_prompt
+    print -P ""
+    if [[ $POWERLEVEL9K_MODE == nerdfont-complete ]]; then
+      extra+=3
+      print -P "%B(3)  Slanted.%b"
+      print -P ""
+      left_sep=$slanted_bar right_sep=$slanted_bar print_prompt
+      print -P ""
+    fi
+    print -P "(r)  Restart from the beginning."
+    print -P ""
+    print -P "(q)  Quit and do nothing."
+    print -P ""
+
+    local key=
+    read -k key${(%):-"?%BChoice [12${extra}rq]: %b"} || return 1
+    case $key in
+      q) quit; return 1;;
+      r) return 2;;
+      1) left_sep=$right_angle;  right_sep=$left_angle; options+='angled sep'; break;;
+      2) left_sep=$vertical_bar; right_sep=$vertical_bar; options+='vertical sep'; break;;
+      3)
+        if [[ $extra == *3* ]]; then
+          left_sep=$slanted_bar
+          right_sep=$slanted_bar
+          options+='slanted sep'
+          break
+        fi
+        ;;
+    esac
+  done
+}
+
+function ask_heads() {
+  if [[ $style != classic || $cap_diamond != 1 ]]; then
+    return
+  fi
+  while true; do
+    local extra=
+    clear
+    centered "%BPrompt Heads%b"
+    print -P ""
+    print -P "%B(1)  Sharp.%b"
+    print -P ""
+    left_head=$right_triangle right_head=$left_triangle print_prompt
+    print -P ""
+    print -P "%B(2)  Blurred.%b"
+    left_head=$fade_out right_head=$fade_in print_prompt
+    if [[ $POWERLEVEL9K_MODE == nerdfont-complete ]]; then
+      extra+=3
+      print -P ""
+      print -P "%B(3)  Slanted.%b"
+      print -P ""
+      left_head=$down_triangle right_head=$up_triangle print_prompt
+      print -P ""
+    fi
     print -P ""
     print -P "(r)  Restart from the beginning."
     print -P ""
@@ -437,8 +499,79 @@ function ask_straight() {
     case $key in
       q) quit; return 1;;
       r) return 2;;
-      1) straight=0; break;;
-      2) straight=1; break;;
+      1) left_head=$right_triangle; right_head=$left_triangle; options+='sharp heads';   break;;
+      2) left_head=$fade_out;       right_head=$fade_in;       options+='blurred heads'; break;;
+      3)
+        if [[ $extra == *3* ]]; then
+          left_head=$down_triangle
+          right_head=$up_triangle
+          options+='slanted heads'
+          break
+        fi
+        ;;
+    esac
+  done
+}
+
+function ask_tails() {
+  if [[ $style != classic ]]; then
+    return
+  fi
+  while true; do
+    local extra=
+    clear
+    centered "%BPrompt Tails%b"
+    print -P ""
+    print -P "%B(1)  Flat.%b"
+    print -P ""
+    left_tail='' right_tail='' print_prompt
+    print -P ""
+    print -P "%B(2)  Blurred.%b"
+    print -P ""
+    left_tail=$fade_in right_tail=$fade_out print_prompt
+    print -P ""
+    if (( cap_diamond )); then
+      extra+=3
+      print -P "%B(3)  Sharp.%b"
+      print -P ""
+      left_tail=$left_triangle right_tail=$right_triangle print_prompt
+      print -P ""
+      if [[ $POWERLEVEL9K_MODE == nerdfont-complete ]]; then
+        extra+=4
+        print -P "%B(4)  Slanted.%b"
+        print -P ""
+        left_tail=$up_triangle right_tail=$down_triangle print_prompt
+        print -P ""
+      fi
+    fi
+    print -P "(r)  Restart from the beginning."
+    print -P ""
+    print -P "(q)  Quit and do nothing."
+    print -P ""
+
+    local key=
+    read -k key${(%):-"?%BChoice [12${extra}rq]: %b"} || return 1
+    case $key in
+      q) quit; return 1;;
+      r) return 2;;
+      1) left_tail='';       right_tail='';        options+='flat tails';    break;;
+      2) left_tail=$fade_in; right_tail=$fade_out; options+='blurred tails'; break;;
+      3)
+        if [[ $extra == *3* ]]; then
+          left_tail=$left_triangle
+          right_tail=$right_triangle
+          options+='sharp tails'
+          break
+        fi
+        ;;
+      4)
+        if [[ $extra == *4* ]]; then
+          left_tail=$up_triangle
+          right_tail=$down_triangle
+          options+='slanted tails'
+          break
+        fi
+        ;;
     esac
   done
 }
@@ -466,14 +599,14 @@ function ask_num_lines() {
     case $key in
       q) quit; return 1;;
       r) return 2;;
-      1|2) num_lines=$key; break;;
+      1) num_lines=1; options+='1 line'; break;;
+      2) num_lines=2; options+='2 lines'; break;;
     esac
   done
 }
 
 function ask_gap_char() {
   if [[ $num_lines != 2 ]]; then
-    gap_char=" "
     return
   fi
   while true; do
@@ -502,17 +635,15 @@ function ask_gap_char() {
     case $key in
       q) quit; return 1;;
       r) return 2;;
-      1) gap_char=" "; break;;
-      2) gap_char="·"; break;;
-      3) gap_char="─"; break;;
+      1) gap_char=" "; options+=disconnected; break;;
+      2) gap_char="·"; options+=dotted; break;;
+      3) gap_char="─"; options+=solid; break;;
     esac
   done
 }
 
 function ask_frame() {
   if [[ $style != classic || $num_lines != 2 ]]; then
-    left_frame=1
-    right_frame=1
     return
   fi
   while true; do
@@ -523,15 +654,15 @@ function ask_frame() {
     print -P ""
     left_frame=0 right_frame=0 print_prompt
     print -P ""
-    print -P "%B(2)  Only left.%b"
+    print -P "%B(2)  Left.%b"
     print -P ""
     left_frame=1 right_frame=0 print_prompt
     print -P ""
-    print -P "%B(3)  Only right.%b"
+    print -P "%B(3)  Right.%b"
     print -P ""
     left_frame=0 right_frame=1 print_prompt
     print -P ""
-    print -P "%B(4)  Left and right.%b"
+    print -P "%B(4)  Full.%b"
     print -P ""
     left_frame=1 right_frame=1 print_prompt
     print -P ""
@@ -545,10 +676,10 @@ function ask_frame() {
     case $key in
       q) quit; return 1;;
       r) return 2;;
-      1) left_frame=0; right_frame=0; break;;
-      2) left_frame=1; right_frame=0; break;;
-      3) left_frame=0; right_frame=1; break;;
-      4) left_frame=1; right_frame=1; break;;
+      1) left_frame=0; right_frame=0; options+='no frame';    break;;
+      2) left_frame=1; right_frame=0; options+='left frame';  break;;
+      3) left_frame=0; right_frame=1; options+='right frame'; break;;
+      4) left_frame=1; right_frame=1; options+='full frame';  break;;
     esac
   done
 }
@@ -579,8 +710,8 @@ function ask_empty_line() {
     case $key in
       q) quit; return 1;;
       r) return 2;;
-      1) empty_line=0; break;;
-      2) empty_line=1; break;;
+      1) empty_line=0; options+='compact'; break;;
+      2) empty_line=1; options+='sparse';  break;;
     esac
   done
 }
@@ -680,32 +811,14 @@ function generate_config() {
     sub MULTILINE_FIRST_PROMPT_SUFFIX "'%$frame_color[$color]F─╮'"
     sub MULTILINE_NEWLINE_PROMPT_SUFFIX "'%$frame_color[$color]F─┤'"
     sub MULTILINE_LAST_PROMPT_SUFFIX "'%$frame_color[$color]F─╯'"
-
-    local left_sep='\uE0B0'
-    local right_sep='\uE0B2'
-    local left_subsep='\uE0B1'
-    local right_subsep='\uE0B3'
-    local left_end='\uE0B0'
-    local right_start='\uE0B2'
-
-    if (( straight )); then
-      if [[ $POWERLEVEL9K_MODE == nerdfont-complete ]]; then
-        left_subsep='\uE0BD'
-        right_subsep='\uE0BD'
-      else
-        left_subsep='|'
-        right_subsep'|'
-      fi
-      left_end='▓▒░'
-      right_start='░▒▓'
-    fi
-
-    sub LEFT_SUBSEGMENT_SEPARATOR "'%$sep_color[$color]F$left_subsep'"
-    sub RIGHT_SUBSEGMENT_SEPARATOR "'%$sep_color[$color]F$right_subsep'"
-    sub LEFT_SEGMENT_SEPARATOR "'$left_subsep'"
-    sub RIGHT_SEGMENT_SEPARATOR "'$right_subsep'"
-    sub LEFT_PROMPT_LAST_SEGMENT_END_SYMBOL "'$left_end'"
-    sub RIGHT_PROMPT_FIRST_SEGMENT_START_SYMBOL "'$right_start'"
+    sub LEFT_SUBSEGMENT_SEPARATOR "'%$sep_color[$color]F$left_sep'"
+    sub RIGHT_SUBSEGMENT_SEPARATOR "'%$sep_color[$color]F$right_sep'"
+    sub LEFT_SEGMENT_SEPARATOR "'$left_sep'"
+    sub RIGHT_SEGMENT_SEPARATOR "'$right_sep'"
+    sub LEFT_PROMPT_FIRST_SEGMENT_START_SYMBOL "'$left_tail'"
+    sub LEFT_PROMPT_LAST_SEGMENT_END_SYMBOL "'$left_head'"
+    sub RIGHT_PROMPT_FIRST_SEGMENT_START_SYMBOL "'$right_head'"
+    sub RIGHT_PROMPT_LAST_SEGMENT_END_SYMBOL "'$right_tail'"
   fi
 
   if [[ -n ${(j::)extra_icons} ]]; then
@@ -776,31 +889,7 @@ function generate_config() {
     fi
   fi
   header+=$'.\n'
-  header+="# Wizard options: $POWERLEVEL9K_MODE"
-  (( cap_narrow_icons )) && header+=", small icons" || header+=", big icons"
-  [[ $style == classic ]] && header+=", color $color"
-  [[ -n ${(j::)extra_icons} ]] && header+=", many icons" || header+=", few icons"
-  [[ -n ${(j::)prefixes} ]] && header+=", fluent" || header+=", concise"
-  if [[ $style == classic ]]; then
-    (( straight )) && header+=", straight" || header+=", angled"
-  fi
-  (( num_lines == 1 )) && header+=", 1 line" || header+=", $num_lines lines"
-  if (( num_lines == 2 )); then
-    case $gap_char in
-      ' ') header+=", disconnected";;
-      '·') header+=", dotted";;
-      '─') header+=", solid";;
-    esac
-    if [[ $style == classic ]]; then
-      case $left_frame$right_frame in
-        00) header+=", no frame";;
-        01) header+=", right frame";;
-        10) header+=", left frame";;
-        11) header+=", full frame";;
-      esac
-    fi
-  fi
-  (( empty_line )) && header+=", sparse" || header+=", compact";
+  header+="# Wizard options: ${(j:, :)options}"
   header+=$'.\n#'
 
   if [[ -e $__p9k_cfg_path ]]; then
@@ -841,13 +930,14 @@ source $__p9k_root_dir/internal/icons.zsh || return
 
 while true; do
   local POWERLEVEL9K_MODE= style= config_backup= gap_char=' '
-  local -i num_lines=0 write_config=0 straight=0 empty_line=0 left_frame=1 right_frame=1 color=1
+  local left_sep= right_sep= left_tail= right_tail= left_head= right_head=
+  local -i num_lines=0 write_config=0 empty_line=0 color=1 left_frame=1 right_frame=1
   local -i cap_diamond=0 cap_python=0 cap_narrow_icons=0 cap_lock=0
   local -a extra_icons=('' '')
   local -a prefixes=('' '')
+  local -a options=()
 
   ask_diamond || { (( $? == 2 )) && continue || return }
-  (( cap_diamond )) || straight=1
   if [[ -n $AWESOME_GLYPHS_LOADED ]]; then
     POWERLEVEL9K_MODE=awesome-mapped-fontconfig
   else
@@ -866,17 +956,37 @@ while true; do
       (( cap_python )) && POWERLEVEL9K_MODE=awesome-fontconfig || POWERLEVEL9K_MODE=nerdfont-complete
     fi
   fi
+  if [[ $POWERLEVEL9K_MODE == powerline ]]; then
+    options+=powerline
+  elif (( cap_diamond )); then
+    options+="$POWERLEVEL9K_MODE + powerline"
+  else
+    options+="$POWERLEVEL9K_MODE"
+  fi
+  if (( cap_diamond )); then
+    left_sep=$right_angle
+    right_sep=$left_angle
+    left_head=$right_triangle
+    right_head=$left_triangle
+  else
+    left_sep=$vertical_bar
+    right_sep=$vertical_bar
+    left_head=$fade_out
+    right_head=$fade_in
+  fi
   _p9k_init_icons
   ask_narrow_icons     || { (( $? == 2 )) && continue || return }
   ask_style            || { (( $? == 2 )) && continue || return }
   ask_color            || { (( $? == 2 )) && continue || return }
-  ask_extra_icons      || { (( $? == 2 )) && continue || return }
-  ask_prefixes         || { (( $? == 2 )) && continue || return }
-  ask_straight         || { (( $? == 2 )) && continue || return }
+  ask_separators       || { (( $? == 2 )) && continue || return }
+  ask_heads            || { (( $? == 2 )) && continue || return }
+  ask_tails            || { (( $? == 2 )) && continue || return }
   ask_num_lines        || { (( $? == 2 )) && continue || return }
   ask_gap_char         || { (( $? == 2 )) && continue || return }
   ask_frame            || { (( $? == 2 )) && continue || return }
   ask_empty_line       || { (( $? == 2 )) && continue || return }
+  ask_extra_icons      || { (( $? == 2 )) && continue || return }
+  ask_prefixes         || { (( $? == 2 )) && continue || return }
   ask_confirm          || { (( $? == 2 )) && continue || return }
   ask_config_overwrite || { (( $? == 2 )) && continue || return }
   break
