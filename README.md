@@ -117,7 +117,7 @@ gsettings set org.gnome.desktop.interface monospace-font-name 'MesloLGS NF 11'
 
 - **Windows Command Prompt** (the default terminal app): Use
   [this script](https://gist.github.com/romkatv/aa7a70fe656d8b655e3c324eb10f6a8b).
-- **Visual Studio Code** (builtin terminal): *Open File → Preferences → Settings*, enter
+- **Visual Studio Code** (builtin terminal): Open *File → Preferences → Settings*, enter
   `terminal.integrated.fontFamily` in the search box and set the value to `MesloLGS NF`.
 
 (Using a different terminal and know how to set font for it? Share your knowledge by sending a PR
