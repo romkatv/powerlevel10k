@@ -813,8 +813,7 @@ function write_zshrc() {
   fi
 
   local comments=(
-    "# You can customize your prompt by editing $__p9k_cfg_path_u."
-    "# To run Powerlevel10k configuration wizard, type 'p9k_configure'."
+    "# To customize prompt, run \`p9k_configure\` or edit $__p9k_cfg_path_u."
   )
   print -lr -- "" $comments "source $__p9k_cfg_path_u" >>$__p9k_zshrc
 
@@ -883,6 +882,9 @@ fi
 
 write_zshrc || return
 
+print -P ""
+print -P "File feature requests and bug reports at $(href https://github.com/romkatv/powerlevel10k/issues)."
+print -P "Send praise and complaints to $(href https://www.reddit.com/r/zsh)."
 print -P ""
 
 } "$@"
