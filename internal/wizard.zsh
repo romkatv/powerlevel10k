@@ -86,8 +86,8 @@ function print_prompt() {
     left=($left[2] $left[4])
     right=($right[1] $right[3])
   else
-    (( frame < 1 )) && left=('' $left[2] '' '%76F❯%f █')
-    (( frame < 2 )) && right=($right[1] '' '' '')
+    (( left_frame )) || left=('' $left[2] '' '%76F❯%f █')
+    (( right_frame )) || right=($right[1] '' '' '')
   fi
   if (( straight )); then
     [[ $POWERLEVEL9K_MODE == nerdfont-complete ]] && local subsep='\uE0BD' || local subsep='|'
@@ -511,7 +511,8 @@ function ask_gap_char() {
 
 function ask_frame() {
   if [[ $style != classic || $num_lines != 2 ]]; then
-    frame=0
+    left_frame=1
+    right_frame=1
     return
   fi
   while true; do
@@ -520,15 +521,19 @@ function ask_frame() {
     print -P ""
     print -P "%B(1)  No frame.%b"
     print -P ""
-    frame=0 print_prompt
+    left_frame=0 right_frame=0 print_prompt
     print -P ""
     print -P "%B(2)  Only left.%b"
     print -P ""
-    frame=1 print_prompt
+    left_frame=1 right_frame=0 print_prompt
     print -P ""
-    print -P "%B(3)  Left and right.%b"
+    print -P "%B(3)  Only right.%b"
     print -P ""
-    frame=2 print_prompt
+    left_frame=0 right_frame=1 print_prompt
+    print -P ""
+    print -P "%B(4)  Left and right.%b"
+    print -P ""
+    left_frame=1 right_frame=1 print_prompt
     print -P ""
     print -P "(r)  Restart from the beginning."
     print -P ""
@@ -540,7 +545,10 @@ function ask_frame() {
     case $key in
       q) quit; return 1;;
       r) return 2;;
-      1|2|3) frame=$((key-1)); break;;
+      1) left_frame=0; right_frame=0; break;;
+      2) left_frame=1; right_frame=0; break;;
+      3) left_frame=0; right_frame=1; break;;
+      4) left_frame=1; right_frame=1; break;;
     esac
   done
 }
@@ -741,11 +749,13 @@ function generate_config() {
 
   sub MULTILINE_FIRST_PROMPT_GAP_CHAR "'$gap_char'"
 
-  if (( num_lines == 2 && frame < 2 )); then
-    sub MULTILINE_FIRST_PROMPT_SUFFIX ''
-    sub MULTILINE_NEWLINE_PROMPT_SUFFIX ''
-    sub MULTILINE_LAST_PROMPT_SUFFIX ''
-    if (( frame < 1 )); then
+  if [[ $style == classic && $num_lines == 2 ]]; then
+    if (( ! right_frame )); then
+      sub MULTILINE_FIRST_PROMPT_SUFFIX ''
+      sub MULTILINE_NEWLINE_PROMPT_SUFFIX ''
+      sub MULTILINE_LAST_PROMPT_SUFFIX ''
+    fi
+    if (( ! left_frame )); then
       sub MULTILINE_FIRST_PROMPT_PREFIX ''
       sub MULTILINE_NEWLINE_PROMPT_PREFIX ''
       sub MULTILINE_LAST_PROMPT_PREFIX ''
@@ -781,11 +791,14 @@ function generate_config() {
       '·') header+=", dotted";;
       '─') header+=", solid";;
     esac
-    case $frame in
-      0) header+=", no frame";;
-      1) header+=", left frame";;
-      2) header+=", full frame";;
-    esac
+    if [[ $style == classic ]]; then
+      case $left_frame$right_frame in
+        00) header+=", no frame";;
+        01) header+=", right frame";;
+        10) header+=", left frame";;
+        11) header+=", full frame";;
+      esac
+    fi
   fi
   (( empty_line )) && header+=", sparse" || header+=", compact";
   header+=$'.\n#'
@@ -828,7 +841,7 @@ source $__p9k_root_dir/internal/icons.zsh || return
 
 while true; do
   local POWERLEVEL9K_MODE= style= config_backup= gap_char=' '
-  local -i num_lines=0 write_config=0 straight=0 empty_line=0 frame=1 color=1
+  local -i num_lines=0 write_config=0 straight=0 empty_line=0 left_frame=1 right_frame=1 color=1
   local -i cap_diamond=0 cap_python=0 cap_narrow_icons=0 cap_lock=0
   local -a extra_icons=('' '')
   local -a prefixes=('' '')
