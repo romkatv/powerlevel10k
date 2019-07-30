@@ -825,8 +825,9 @@ _p9k_right_prompt_segment() {
     p+='${_p9k_sss::='
     p+=$style_$right_space_
     [[ $right_space_ == *%* ]] && p+=$style_
-    p+=$end_sep_
-    [[ $end_sep_ == *%* ]] && p+=$style_
+    if [[ -n $end_sep_ ]]; then
+      p+="%k%F{$bg_color\}$end_sep_$style_"
+    fi
     p+='}'
 
     p+="\${_p9k_i::=$_p9k_segment_index}\${_p9k_bg::=$bg_color}"
