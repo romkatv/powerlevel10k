@@ -2926,7 +2926,7 @@ prompt_kubecontext() {
         cloud_account=$match[1]
         cloud_zone=$match[2]-$match[3]
         cloud_cluster=$match[4]
-        if (( $+_POWERLEVEL9K_KUBECONTEXT_SHORTEN[(I)gke] )); then
+        if (( ${_POWERLEVEL9K_KUBECONTEXT_SHORTEN[(I)gke]} )); then
           text=$cloud_cluster
         fi
       # arn:aws:eks:us-east-1:123456789012:cluster/cluster-01
@@ -2935,7 +2935,7 @@ prompt_kubecontext() {
         cloud_zone=$match[1]
         cloud_account=$match[2]
         cloud_cluster=$match[3]
-        if (( $+_POWERLEVEL9K_KUBECONTEXT_SHORTEN[(I)eks] )); then
+        if (( ${_POWERLEVEL9K_KUBECONTEXT_SHORTEN[(I)eks]} )); then
           text=$cloud_cluster
         fi
       fi
