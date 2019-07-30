@@ -54,6 +54,7 @@ fi
       nvm                     # node.js version from nvm (https://github.com/nvm-sh/nvm)
       nodeenv                 # node.js environment (https://github.com/ekalinin/nodeenv)
       # node_version          # node.js version
+      # go_version            # golang version
       kubecontext             # current kubernetes context (https://kubernetes.io/)
       context                 # user@host
       # =========================[ Line #2 ]=========================
@@ -232,7 +233,7 @@ fi
 
   # Enable special styling for non-writable directories.
   typeset -g POWERLEVEL9K_DIR_SHOW_WRITABLE=true
-  # Show this icon when the current directory is not writable. Empty for no icon. 
+  # Show this icon when the current directory is not writable. Empty for no icon.
   # typeset -g POWERLEVEL9K_DIR_NOT_WRITABLE_VISUAL_IDENTIFIER_EXPANSION='⭐'
 
   # Custom prefix.
@@ -489,6 +490,12 @@ fi
   typeset -g POWERLEVEL9K_NODE_VERSION_PROJECT_ONLY=true
   # Custom icon.
   # typeset -g POWERLEVEL9K_NODE_VERSION_VISUAL_IDENTIFIER_EXPANSION='⭐'
+
+  ################################[ go_version: golang version ]################################
+  # Golang version color.
+  typeset -g POWERLEVEL9K_GO_VERSION_FOREGROUND=37
+  # Custom icon.
+  # typeset -g POWERLEVEL9K_GO_VERSION_VISUAL_IDENTIFIER_EXPANSION='⭐'
 
   #############[ kubecontext: current kubernetes context (https://kubernetes.io/) ]#############
   # Kubernetes context classes for the purpose of using different colors, icons and expansions with
