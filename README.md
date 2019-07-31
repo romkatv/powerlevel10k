@@ -178,7 +178,8 @@ covered by the same license.
 Powerlevel10k uses [gitstatus](https://github.com/romkatv/gitstatus) as the backend behind `vcs`
 prompt; gitstatus spawns `gitstatusd` and `zsh`. See
 [gitstatus](https://github.com/romkatv/gitstatus) for details. Powerlevel10k may also spawn `zsh`
-to trigger async prompt refresh.
+to trigger async prompt refresh. To avoid security hazard, these background processes aren't shared
+by different interactive shells.
 
 ### Are there configuration options that make Powerlevel10k slow?
 
