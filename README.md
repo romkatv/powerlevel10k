@@ -99,29 +99,30 @@ features Powerlevel10k has to offer.
 ## Fonts
 
 Powerlevel10k doesn't require custom fonts but it can take advantage of them if they are available.
-Some of the style options in Powerlevel10k are available only when using
+It works well with [Nerd Fonts](https://github.com/ryanoasis/nerd-fonts),
+[Source Code Pro](https://github.com/adobe-fonts/source-code-pro),
+[Font Awesome](https://fontawesome.com/), [Powerline](https://github.com/powerline/fonts), and even
+the default system fonts. The full choice of style options is available only when using
 [Nerd Fonts](https://github.com/ryanoasis/nerd-fonts).
 
-If you don't know which font to use, download
-[these 4 fonts](https://github.com/romkatv/dotfiles-public/tree/master/.local/share/fonts/NerdFonts)
-and install them. In most systems you can install fonts simply by clicking on the `ttf` files. Then
-change your terminal's font to `MesloLGS NF` (NF stands for Nerd Fonts).
+Overwhelmed? Try the beautiful and powerful Meslo from Nerd Fonts. Download these
+[four ttf files](https://github.com/romkatv/dotfiles-public/tree/master/.local/share/fonts/NerdFonts),
+double-click on each and press "Install". This will make `MesloLGS NF` font available to all
+applications on your system. Configure your terminal to use `MesloLGS NF`:
 
-- **iTerm2**: Open *Preferences → Profiles → Text → Change Font*. Set *Font* to `MesloLGS NF`.
-- **GNOME**: Type this command:
-
+- **iTerm2**: Open *iTerm2 → Preferences → Profiles → Text → Change Font* and set *Family* to `MesloLGS NF`.
+- **Visual Studio Code**: Open *File → Preferences → Settings*, enter
+  `terminal.integrated.fontFamily` in the search box and set value to `MesloLGS NF`.
+- **Windows Command Prompt**: Use
+  [this script](https://gist.github.com/romkatv/aa7a70fe656d8b655e3c324eb10f6a8b).
+- **Linux/GNOME** (all terminals): Type this command:
 ```zsh
 sudo apt install libglib2.0-bin
 gsettings set org.gnome.desktop.interface monospace-font-name 'MesloLGS NF 11'
 ```
 
-- **Windows Command Prompt** (the default terminal app): Use
-  [this script](https://gist.github.com/romkatv/aa7a70fe656d8b655e3c324eb10f6a8b).
-- **Visual Studio Code** (builtin terminal): Open *File → Preferences → Settings*, enter
-  `terminal.integrated.fontFamily` in the search box and set the value to `MesloLGS NF`.
-
 (Using a different terminal and know how to set font for it? Share your knowledge by sending a PR
-expanding the list!)
+to expand the list!)
 
 ## Try it in Docker
 
