@@ -83,7 +83,7 @@ Add `antibody bundle romkatv/powerlevel10k` to your `~/.zshrc`.
 ### For new users
 
 On the first run Powerlevel10k configuration wizard will ask you a few questions and configure
-your prompt. If it doesn't trigger automatically, type `p9k_configure`.
+your prompt. If it doesn't trigger automatically, type `p10k configure`.
 
 ### For Powerlevel9k users
 
@@ -92,7 +92,7 @@ will pick them up and provide you with the same prompt UI you are used to. Power
 all configuration options used by Powerlevel9k. See Powerlevel9k
 [configuration guide](https://github.com/bhilburn/powerlevel9k#prompt-customization).
 
-To go beyond the functionality of Powerlevel9k, type `p9k_configure` and explore the unique styles
+To go beyond the functionality of Powerlevel9k, type `p10k configure` and explore the unique styles
 and features Powerlevel10k has to offer.
 
 ## Fonts
@@ -120,7 +120,7 @@ sudo apt install libglib2.0-bin
 gsettings set org.gnome.desktop.interface monospace-font-name 'MesloLGS NF 11'
 ```
 
-Run `p9k_configure` to pick the best style for your new font.
+Run `p10k configure` to pick the best style for your new font.
 
 _Using a different terminal and know how to set font for it? Share your knowledge by sending a PR
 to expand the list!_

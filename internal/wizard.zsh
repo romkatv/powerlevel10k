@@ -138,7 +138,7 @@ function quit() {
   if (( force )); then
     print -P "Powerlevel10k configuration wizard has been aborted. To run it again, type:"
     print -P ""
-    print -P "  %2Fp9k_configure%f"
+    print -P "  %2Fp10k%f %Bconfigure%b"
     print -P ""
   else
     print -P "Powerlevel10k configuration wizard has been aborted. It will run again"
@@ -150,7 +150,7 @@ function quit() {
     print -P ""
     print -P "To run Powerlevel10k configuration wizard right now, type:"
     print -P ""
-    print -P "  %2Fp9k_configure%f"
+    print -P "  %2Fp10k%f %Bconfigure%b"
     print -P ""
   fi
   exit 1
@@ -936,7 +936,7 @@ function write_zshrc() {
   fi
 
   local comments=(
-    "# To customize prompt, run \`p9k_configure\` or edit $__p9k_cfg_path_u."
+    "# To customize prompt, run \`p10k configure\` or edit $__p9k_cfg_path_u."
   )
   print -lr -- "" $comments "source $__p9k_cfg_path_u" >>$__p9k_zshrc
 

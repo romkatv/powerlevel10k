@@ -4329,6 +4329,16 @@ prompt_powerlevel9k_teardown() {
   fi
 }
 
+function p10k() {
+  emulate -L zsh && setopt no_hist_expand extended_glob
+  if [[ $# == 1 && $1 == configure ]]; then
+    p9k_configure
+  else
+    print -P "Usage: %2Fp10k%f %Bconfigure%b" >&2
+    return 1
+  fi
+}
+
 # Hook for zplugin.
 powerlevel10k_plugin_unload() { prompt_powerlevel9k_teardown; }
 
