@@ -4329,6 +4329,9 @@ prompt_powerlevel9k_teardown() {
   fi
 }
 
+# Hook for zplugin.
+powerlevel10k_plugin_unload() { prompt_powerlevel9k_teardown; }
+
 autoload -Uz colors && colors
 autoload -Uz add-zsh-hook
 
