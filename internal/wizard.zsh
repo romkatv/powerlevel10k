@@ -33,10 +33,10 @@ source $__p9k_root_dir/internal/configure.zsh || return
 
 typeset -ri prompt_indent=2
 
-typeset -ra bg_color=(238 236 234)
-typeset -ra frame_color=(242 240 238)
-typeset -ra sep_color=(246 244 242)
-typeset -ra prefix_color=(248 246 244)
+typeset -ra bg_color=(240 238 236 234)
+typeset -ra frame_color=(244 242 240 238)
+typeset -ra sep_color=(248 246 244 242)
+typeset -ra prefix_color=(250 248 246 244)
 
 typeset -r left_triangle='\uE0B2'
 typeset -r right_triangle='\uE0B0'
@@ -312,34 +312,44 @@ function ask_style() {
 
 function ask_color() {
   [[ $style != classic ]] && return
+  if [[ $LINES -lt 26 ]]; then
+    local nl=''
+  else
+    local nl=$'\n'
+  fi
   while true; do
     clear
     centered "%BPrompt Color%b"
-    print -P ""
-    print -P "%B(1)  Light.%b"
-    print -P ""
+    print -n $nl
+    print -P "%B(1)  Lightest.%b"
+    print -n $nl
     color=1 print_prompt
     print -P ""
-    print -P "%B(2)  Medium.%b"
-    print -P ""
+    print -P "%B(2)  Light.%b"
+    print -n $nl
     color=2 print_prompt
     print -P ""
     print -P "%B(3)  Dark.%b"
-    print -P ""
+    print -n $nl
     color=3 print_prompt
+    print -P ""
+    print -P "%B(4)  Darkest.%b"
+    print -n $nl
+    color=4 print_prompt
     print -P ""
     print -P "(r)  Restart from the beginning."
     print -P "(q)  Quit and do nothing."
     print -P ""
 
     local key=
-    read -k key${(%):-"?%BChoice [123rq]: %b"} || quit
+    read -k key${(%):-"?%BChoice [1234rq]: %b"} || quit
     case $key in
       q) quit;;
       r) return 1;;
-      1) color=1; options+=light; break;;
-      2) color=2; options+=medium; break;;
+      1) color=1; options+=lightest; break;;
+      2) color=2; options+=light; break;;
       3) color=3; options+=dark; break;;
+      4) color=4; options+=darkest; break;;
     esac
   done
 }
@@ -947,7 +957,7 @@ source $__p9k_root_dir/internal/icons.zsh || return
 while true; do
   local POWERLEVEL9K_MODE= style= config_backup= gap_char=' '
   local left_subsep= right_subsep= left_tail= right_tail= left_head= right_head=
-  local -i num_lines=0 write_config=0 empty_line=0 color=1 left_frame=1 right_frame=1
+  local -i num_lines=0 write_config=0 empty_line=0 color=2 left_frame=1 right_frame=1
   local -i cap_diamond=0 cap_python=0 cap_narrow_icons=0 cap_lock=0
   local -a extra_icons=('' '')
   local -a prefixes=('' '')
