@@ -57,9 +57,9 @@ fi
       # go_version            # golang version
       kubecontext             # current kubernetes context (https://kubernetes.io/)
       context                 # user@host
+      nordvpn                 # nordvpn connection status, linux only (https://nordvpn.com/)
       # =========================[ Line #2 ]=========================
       newline
-      # nordvpn               # nordvpn connection status, linux only (https://nordvpn.com/)
       # public_ip             # public IP address
       # battery               # internal battery
       # time                  # current time
