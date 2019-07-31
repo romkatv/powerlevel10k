@@ -204,7 +204,6 @@ function ask_lock() {
     print -P "%B(n)  No.%b"
     print -P ""
     print -P "(r)  Restart from the beginning."
-    print -P ""
     print -P "(q)  Quit and do nothing."
     print -P ""
 
@@ -232,7 +231,6 @@ function ask_python() {
     print -P "%B(n)  No.%b"
     print -P ""
     print -P "(r)  Restart from the beginning."
-    print -P ""
     print -P "(q)  Quit and do nothing."
     print -P ""
 
@@ -270,7 +268,6 @@ function ask_narrow_icons() {
     print -P "%B(n)  No. Some icons %b%2Foverlap%f%B neighbouring crosses.%b"
     print -P ""
     print -P "(r)  Restart from the beginning."
-    print -P ""
     print -P "(q)  Quit and do nothing."
     print -P ""
 
@@ -299,7 +296,6 @@ function ask_style() {
     style=classic print_prompt
     print -P ""
     print -P "(r)  Restart from the beginning."
-    print -P ""
     print -P "(q)  Quit and do nothing."
     print -P ""
 
@@ -333,7 +329,6 @@ function ask_color() {
     color=3 print_prompt
     print -P ""
     print -P "(r)  Restart from the beginning."
-    print -P ""
     print -P "(q)  Quit and do nothing."
     print -P ""
 
@@ -375,7 +370,6 @@ function ask_extra_icons() {
     extra_icons=("$many[@]") print_prompt
     print -P ""
     print -P "(r)  Restart from the beginning."
-    print -P ""
     print -P "(q)  Quit and do nothing."
     print -P ""
 
@@ -405,7 +399,6 @@ function ask_prefixes() {
     prefixes=("$fluent[@]") print_prompt
     print -P ""
     print -P "(r)  Restart from the beginning."
-    print -P ""
     print -P "(q)  Quit and do nothing."
     print -P ""
 
@@ -445,7 +438,6 @@ function ask_separators() {
       print -P ""
     fi
     print -P "(r)  Restart from the beginning."
-    print -P ""
     print -P "(q)  Quit and do nothing."
     print -P ""
 
@@ -498,18 +490,17 @@ function ask_heads() {
     left_head=$right_triangle right_head=$left_triangle print_prompt
     print -P ""
     print -P "%B(2)  Blurred.%b"
+    print -P ""
     left_head=$fade_out right_head=$fade_in print_prompt
+    print -P ""
     if [[ $POWERLEVEL9K_MODE == nerdfont-complete ]]; then
       extra+=3
-      print -P ""
       print -P "%B(3)  Slanted.%b"
       print -P ""
       left_head=$down_triangle right_head=$up_triangle print_prompt
       print -P ""
     fi
-    print -P ""
     print -P "(r)  Restart from the beginning."
-    print -P ""
     print -P "(q)  Quit and do nothing."
     print -P ""
 
@@ -536,35 +527,40 @@ function ask_tails() {
   if [[ $style != classic ]]; then
     return
   fi
+
+  if [[ $POWERLEVEL9K_MODE == nerdfont-complete && $LINES -lt 26 ]]; then
+    local nl=''
+  else
+    local nl=$'\n'
+  fi
   while true; do
     local extra=
     clear
     centered "%BPrompt Tails%b"
-    print -P ""
+    print -n $nl
     print -P "%B(1)  Flat.%b"
-    print -P ""
+    print -n $nl
     left_tail='' right_tail='' print_prompt
     print -P ""
     print -P "%B(2)  Blurred.%b"
-    print -P ""
+    print -n $nl
     left_tail=$fade_in right_tail=$fade_out print_prompt
     print -P ""
     if (( cap_diamond )); then
       extra+=3
       print -P "%B(3)  Sharp.%b"
-      print -P ""
+      print -n $nl
       left_tail=$left_triangle right_tail=$right_triangle print_prompt
       print -P ""
       if [[ $POWERLEVEL9K_MODE == nerdfont-complete ]]; then
         extra+=4
         print -P "%B(4)  Slanted.%b"
-        print -P ""
+        print -n $nl
         left_tail=$up_triangle right_tail=$down_triangle print_prompt
         print -P ""
       fi
     fi
     print -P "(r)  Restart from the beginning."
-    print -P ""
     print -P "(q)  Quit and do nothing."
     print -P ""
 
@@ -609,7 +605,6 @@ function ask_num_lines() {
     num_lines=2 print_prompt
     print -P ""
     print -P "(r)  Restart from the beginning."
-    print -P ""
     print -P "(q)  Quit and do nothing."
     print -P ""
 
@@ -645,7 +640,6 @@ function ask_gap_char() {
     gap_char="─" print_prompt
     print -P ""
     print -P "(r)  Restart from the beginning."
-    print -P ""
     print -P "(q)  Quit and do nothing."
     print -P ""
 
@@ -665,33 +659,34 @@ function ask_frame() {
   if [[ $style != classic || $num_lines != 2 ]]; then
     return
   fi
+
+  (( LINES >= 26 )) && local nl=$'\n' || local nl=''
   while true; do
     clear
     centered "%BPrompt Frame%b"
-    print -P ""
+    print -n $nl
     print -P "%B(1)  No frame.%b"
-    print -P ""
+    print -n $nl
     left_frame=0 right_frame=0 print_prompt
     print -P ""
     print -P "%B(2)  Left.%b"
-    print -P ""
+    print -n $nl
     left_frame=1 right_frame=0 print_prompt
     print -P ""
     print -P "%B(3)  Right.%b"
-    print -P ""
+    print -n $nl
     left_frame=0 right_frame=1 print_prompt
     print -P ""
     print -P "%B(4)  Full.%b"
-    print -P ""
+    print -n $nl
     left_frame=1 right_frame=1 print_prompt
     print -P ""
     print -P "(r)  Restart from the beginning."
-    print -P ""
     print -P "(q)  Quit and do nothing."
     print -P ""
 
     local key=
-    read -k key${(%):-"?%BChoice [123rq]: %b"} || quit
+    read -k key${(%):-"?%BChoice [1234rq]: %b"} || quit
     case $key in
       q) quit;;
       r) return 1;;
@@ -720,7 +715,6 @@ function ask_empty_line() {
     print_prompt
     print -P ""
     print -P "(r)  Restart from the beginning."
-    print -P ""
     print -P "(q)  Quit and do nothing."
     print -P ""
 
@@ -747,7 +741,6 @@ function ask_confirm() {
     print -P "%B(y)  Yes.%b"
     print -P ""
     print -P "(r)  Restart from the beginning."
-    print -P ""
     print -P "(q)  Quit and do nothing."
     print -P ""
 
@@ -775,7 +768,6 @@ function ask_config_overwrite() {
     print -P "%B(y)  Yes.%b"
     print -P ""
     print -P "(r)  Restart from the beginning."
-    print -P ""
     print -P "(q)  Quit and do nothing."
     print -P ""
 

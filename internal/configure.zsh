@@ -1,5 +1,5 @@
-typeset -gr __p9k_wizard_columns=80
-typeset -gr __p9k_wizard_lines=27
+typeset -gr __p9k_wizard_columns=76
+typeset -gr __p9k_wizard_lines=21
 typeset -gr __p9k_zd=${${ZDOTDIR:-$HOME}:A}
 typeset -gr __p9k_zd_u=${${(q-)__p9k_zd}/#(#b)$HOME(|\/*)/'~'$match[1]}
 typeset -gr __p9k_cfg_basename=.p10k.zsh
