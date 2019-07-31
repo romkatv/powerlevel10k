@@ -277,7 +277,7 @@ function ask_narrow_icons() {
       q) quit;;
       r) return 1;;
       y) cap_narrow_icons=1; options+='small icons'; break;;
-      n) cap_narrow_icons=0; break;;
+      n) cap_narrow_icons=0; options+='large icons'; break;;
     esac
   done
 }
@@ -417,7 +417,7 @@ function ask_prefixes() {
     case $key in
       q) quit;;
       r) return 1;;
-      1) prefixes=('' ''); break;;
+      1) prefixes=('' ''); options+=concise; break;;
       2) prefixes=("$fluent[@]"); options+=fluent; break;;
     esac
   done
@@ -461,7 +461,7 @@ function ask_separators() {
         right_sep=$left_triangle
         left_subsep=$right_angle
         right_subsep=$left_angle
-        options+='angled sep'
+        options+='angled separators'
         break
         ;;
       2)
@@ -469,7 +469,7 @@ function ask_separators() {
         right_sep=''
         left_subsep=$vertical_bar
         right_subsep=$vertical_bar
-        options+='vertical sep'
+        options+='vertical separators'
         break
         ;;
       3)
@@ -478,7 +478,7 @@ function ask_separators() {
           right_sep=$up_triangle
           left_subsep=$slanted_bar
           right_subsep=$slanted_bar
-          options+='slanted sep'
+          options+='slanted separators'
           break
         fi
         ;;
@@ -910,8 +910,19 @@ function generate_config() {
     fi
   fi
   header+=$'.\n'
-  header+="# Wizard options: ${(j:, :)options}"
-  header+=$'.\n#'
+  local line="# Wizard options: $options[1]"
+  local opt
+  for opt in $options[2,-1]; do
+    if (( $#line + $#opt > 85 )); then
+      header+=$line
+      header+=$',\n'
+      line="# $opt"
+    else
+      line+=", $opt"
+    fi
+  done
+  header+=$line
+  header+=$'.\n# Type `p10k configure` to generate another config.\n#'
 
   if [[ -e $__p9k_cfg_path ]]; then
     unlink $__p9k_cfg_path || return 1
