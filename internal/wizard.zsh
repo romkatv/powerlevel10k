@@ -31,7 +31,8 @@ typeset -gri force
 
 source $__p9k_root_dir/internal/configure.zsh || return
 
-typeset -ri prompt_indent=2
+typeset -i prompt_indent=2
+typeset -i rprompt_indent=2
 
 typeset -ra bg_color=(238 236 234)
 typeset -ra frame_color=(242 240 238)
@@ -104,7 +105,7 @@ function print_prompt() {
   for ((i = 1; i < $#left; i+=2)); do
     local l=${(g::):-$left[i]$left[i+1]}
     local r=${(g::):-$right[i]$right[i+1]}
-    local -i gap=$((__p9k_wizard_columns - 2 * prompt_indent - $(prompt_length $l$r)))
+    local -i gap=$((__p9k_wizard_columns - prompt_indent - rprompt_indent - $(prompt_length $l$r)))
     (( num_lines == 2 && i == 1 )) && local fill=$gap_char || local fill=' '
     print -n  -- ${(pl:$prompt_indent:: :)}
     print -nP -- $l
@@ -992,6 +993,97 @@ while true; do
   fi
   _p9k_init_icons
   ask_narrow_icons     || continue
+
+  local dir_icon=${(g::)icons[HOME_SUB_ICON]}
+  local vcs_icon=${(g::)icons[VCS_GIT_GITHUB_ICON]}
+  local branch_icon=${(g::)icons[VCS_BRANCH_ICON]}
+  if (( cap_narrow_icons )); then
+    dir_icon=${dir_icon// }
+    vcs_icon=${vcs_icon// }
+    branch_icon=${branch_icon// }
+  fi
+  local many=("$dir_icon " "$vcs_icon $branch_icon ")
+
+  # Set screen size to 70x20, run p9k_configure, answer 'yyny'.
+  reset
+  echo
+  centered "Lean Style"
+  (
+    style=lean
+    num_lines=1
+    prompt_indent=4
+    rprompt_indent=4
+    echo
+    print_prompt
+  )
+  echo
+  (
+    style=lean
+    extra_icons=($many)
+    prefixes=('on ' 'at ')
+    num_lines=2
+    prompt_indent=4
+    rprompt_indent=4
+    echo
+    print_prompt
+  )
+  echo
+  centered "Classic Style"
+  (
+    style=classic
+    num_lines=1
+    prompt_indent=4
+    rprompt_indent=4
+    echo
+    print_prompt
+  )
+  echo
+  (
+    style=classic
+    num_lines=2
+    # slanted sep
+    left_sep=$down_triangle
+    right_sep=$up_triangle
+    left_subsep=$slanted_bar
+    right_subsep=$slanted_bar
+    # blurred heads
+    left_head=$fade_out;       right_head=$fade_in;
+    # blurred tails
+    left_tail=$fade_in; right_tail=$fade_out;
+    gap_char="·"
+    prompt_indent=2
+    rprompt_indent=2
+    echo
+    print_prompt
+  )
+  (
+    style=classic
+    num_lines=2
+    # slanted sep
+    left_sep=$down_triangle
+    right_sep=$up_triangle
+    left_subsep=$slanted_bar
+    right_subsep=$slanted_bar
+    # slanted heads
+    left_head=$down_triangle
+    right_head=$up_triangle
+    # slanted tails
+    left_tail=$up_triangle
+    right_tail=$down_triangle
+    # gap_char="·"
+    # gap_char="─"
+    left_frame=0; right_frame=1
+    extra_icons=($many)
+    prompt_indent=4
+    rprompt_indent=2
+    echo
+    print_prompt
+  )
+  tput civis
+  read
+  tput cnorm
+  return 1
+
   ask_style            || continue
   ask_color            || continue
   ask_separators       || continue
