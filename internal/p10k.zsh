@@ -4069,7 +4069,8 @@ _p9k_init_ssh() {
 
 _p9k_must_init() {
   emulate -L zsh && setopt no_hist_expand extended_glob
-  local -a param_keys=(${(o)parameters[(I)(POWERLEVEL9K_*|DEFAULT_USER|ZLE_RPROMPT_INDENT)]})
+  local -a param_keys=(
+    ${(o)parameters[(I)(POWERLEVEL9K_*|GITSTATUS_LOG_LEVEL|GITSTATUS_ENABLE_LOGGING|GITSTATUS_DAEMON|GITSTATUS_NUM_THREADS|DEFAULT_USER|ZLE_RPROMPT_INDENT)]})
   local IFS param_sig
   IFS=$'\1' param_sig="${(@)param_keys:/(#b)(*)/$match[1]=\$$match[1]}"
   IFS=$'\2' eval "param_sig=x\"$param_sig\""
