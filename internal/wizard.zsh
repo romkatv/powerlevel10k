@@ -60,7 +60,7 @@ typeset -ra lean_right=(
 )
 
 typeset -ra classic_left=(
-  '%$frame_color[$color]F╭─' '%F{$bg_color[$color]}$left_tail%K{$bg_color[$color]} %31F$extra_icons[1]%B%39F~%b%K{$bg_color[$color]}%31F/%B%39Fpowerlevel10k%b%K{$bg_color[$color]} %$sep_color[$color]F$left_sep%f %$prefix_color[$color]F$prefixes[1]%76F$extra_icons[2]master ⇡2 %k%$bg_color[$color]F$left_head%f'
+  '%$frame_color[$color]F╭─' '%F{$bg_color[$color]}$left_tail%K{$bg_color[$color]} %31F$extra_icons[1]%B%39F~%b%K{$bg_color[$color]}%31F/%B%39Fpowerlevel10k%b%K{$bg_color[$color]} %$sep_color[$color]F$left_subsep%f %$prefix_color[$color]F$prefixes[1]%76F$extra_icons[2]master ⇡2 %k%$bg_color[$color]F$left_head%f'
   '%$frame_color[$color]F╰─' '%f █'
 )
 
@@ -431,17 +431,17 @@ function ask_separators() {
     print -P "                 separator"
     print -P "%B(1)  Angled.%b         |"
     print -P "                     v"
-    left_sep=$right_angle right_sep=$left_angle print_prompt
+    left_sep=$right_triangle right_sep=$left_triangle left_subsep=$right_angle right_subsep=$left_angle print_prompt
     print -P ""
     print -P "%B(2)  Vertical.%b"
     print -P ""
-    left_sep=$vertical_bar right_sep=$vertical_bar print_prompt
+    left_sep='' right_sep='' left_subsep=$vertical_bar right_subsep=$vertical_bar print_prompt
     print -P ""
     if [[ $POWERLEVEL9K_MODE == nerdfont-complete ]]; then
       extra+=3
       print -P "%B(3)  Slanted.%b"
       print -P ""
-      left_sep=$slanted_bar right_sep=$slanted_bar print_prompt
+      left_sep=$down_triangle right_sep=$up_triangle left_subsep=$slanted_bar right_subsep=$slanted_bar print_prompt
       print -P ""
     fi
     print -P "(r)  Restart from the beginning."
@@ -454,12 +454,28 @@ function ask_separators() {
     case $key in
       q) quit;;
       r) return 1;;
-      1) left_sep=$right_angle;  right_sep=$left_angle; options+='angled sep'; break;;
-      2) left_sep=$vertical_bar; right_sep=$vertical_bar; options+='vertical sep'; break;;
+      1)
+        left_sep=$right_triangle
+        right_sep=$left_triangle
+        left_subsep=$right_angle
+        right_subsep=$left_angle
+        options+='angled sep'
+        break
+        ;;
+      2)
+        left_sep=''
+        right_sep=''
+        left_subsep=$vertical_bar
+        right_subsep=$vertical_bar
+        options+='vertical sep'
+        break
+        ;;
       3)
         if [[ $extra == *3* ]]; then
-          left_sep=$slanted_bar
-          right_sep=$slanted_bar
+          left_sep=$down_triangle
+          right_sep=$up_triangle
+          left_subsep=$slanted_bar
+          right_subsep=$slanted_bar
           options+='slanted sep'
           break
         fi
@@ -814,8 +830,8 @@ function generate_config() {
     sub MULTILINE_FIRST_PROMPT_SUFFIX "'%$frame_color[$color]F─╮'"
     sub MULTILINE_NEWLINE_PROMPT_SUFFIX "'%$frame_color[$color]F─┤'"
     sub MULTILINE_LAST_PROMPT_SUFFIX "'%$frame_color[$color]F─╯'"
-    sub LEFT_SUBSEGMENT_SEPARATOR "'%$sep_color[$color]F$left_sep'"
-    sub RIGHT_SUBSEGMENT_SEPARATOR "'%$sep_color[$color]F$right_sep'"
+    sub LEFT_SUBSEGMENT_SEPARATOR "'%$sep_color[$color]F$left_subsep'"
+    sub RIGHT_SUBSEGMENT_SEPARATOR "'%$sep_color[$color]F$right_subsep'"
     sub LEFT_SEGMENT_SEPARATOR "'$left_sep'"
     sub RIGHT_SEGMENT_SEPARATOR "'$right_sep'"
     sub LEFT_PROMPT_FIRST_SEGMENT_START_SYMBOL "'$left_tail'"
@@ -938,7 +954,7 @@ source $__p9k_root_dir/internal/icons.zsh || return
 
 while true; do
   local POWERLEVEL9K_MODE= style= config_backup= gap_char=' '
-  local left_sep= right_sep= left_tail= right_tail= left_head= right_head=
+  local left_subsep= right_subsep= left_tail= right_tail= left_head= right_head=
   local -i num_lines=0 write_config=0 empty_line=0 color=1 left_frame=1 right_frame=1
   local -i cap_diamond=0 cap_python=0 cap_narrow_icons=0 cap_lock=0
   local -a extra_icons=('' '')
@@ -972,13 +988,13 @@ while true; do
     options+="$POWERLEVEL9K_MODE"
   fi
   if (( cap_diamond )); then
-    left_sep=$right_angle
-    right_sep=$left_angle
+    left_subsep=$right_angle
+    right_subsep=$left_angle
     left_head=$right_triangle
     right_head=$left_triangle
   else
-    left_sep=$vertical_bar
-    right_sep=$vertical_bar
+    left_subsep=$vertical_bar
+    right_subsep=$vertical_bar
     left_head=$fade_out
     right_head=$fade_in
   fi
