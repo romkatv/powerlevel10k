@@ -22,7 +22,7 @@ prompt.
    1. [Antibody](#antibody)
 1. [Configuration](#configuration)
    1. [For new users](#for-new-users)
-   1. [For existing users](#for-existing-users)
+   1. [For Powerlevel9k users](#for-powerlevel9k-users)
 1. [Fonts](#fonts)
 1. [Try it in Docker](#try-it-in-docker)
 1. [Is it really faster?](#is-it-really-fast)
@@ -85,7 +85,7 @@ Add `antibody bundle romkatv/powerlevel10k` to your `~/.zshrc`.
 On the first run Powerlevel10k configuration wizard will ask you a few questions and configure
 your prompt. If it doesn't trigger automatically, type `p9k_configure`.
 
-### For existing users
+### For Powerlevel9k users
 
 If you've been using Powerlevel9k before, **do not remove the configuration options**. Powerlevel10k
 will pick them up and provide you with the same prompt UI you are used to. Powerlevel10k recognized
