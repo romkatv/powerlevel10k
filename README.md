@@ -120,8 +120,10 @@ sudo apt install libglib2.0-bin
 gsettings set org.gnome.desktop.interface monospace-font-name 'MesloLGS NF 11'
 ```
 
-(Using a different terminal and know how to set font for it? Share your knowledge by sending a PR
-to expand the list!)
+Run `p9k_configure` to pick the best style for your new font.
+
+_Using a different terminal and know how to set font for it? Share your knowledge by sending a PR
+to expand the list!_
 
 ## Try it in Docker
 
