@@ -1,13 +1,12 @@
 # Powerlevel10k
 
-Powerlevel10k is a theme for ZSH. It's a backward-compatible modern reimplementation of
-[Powerlevel9k](https://github.com/bhilburn/powerlevel9k) with lower latency, better
-prompt responsiveness and scores of extra features.
+Powerlevel10k is a theme for ZSH. It's fast, flexible and easy to install and configure.
 
-Powerlevel10k can be used as a drop-in replacement for Powerlevel9k. When given the same
-configuration options it will generate
+Powerlevel10k can be used as a [fast](#is-it-really-fast) drop-in replacement for
+[Powerlevel9k](https://github.com/bhilburn/powerlevel9k). When given the same configuration options
+it will generate
 [the same](#does-powerlevel10k-always-render-exactly-the-same-prompt-as-powerlevel9k-given-the-same-config)
-prompt. It will be [much faster](#is-it-really-fast) though.
+prompt.
 
 ![Powerlevel10k](https://raw.githubusercontent.com/romkatv/powerlevel10k/master/powerlevel10k.png)
 
@@ -108,7 +107,7 @@ the default system fonts. The full choice of style options is available only whe
 Overwhelmed? Try the beautiful and powerful Meslo from Nerd Fonts. Download these
 [four ttf files](https://github.com/romkatv/dotfiles-public/tree/master/.local/share/fonts/NerdFonts),
 double-click on each and press "Install". This will make `MesloLGS NF` font available to all
-applications on your system. Configure your terminal to use `MesloLGS NF`:
+applications on your system. Configure your terminal to use this font:
 
 - **iTerm2**: Open *iTerm2 → Preferences → Profiles → Text → Change Font* and set *Family* to `MesloLGS NF`.
 - **Visual Studio Code**: Open *File → Preferences → Settings*, enter
