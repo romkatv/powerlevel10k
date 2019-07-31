@@ -610,9 +610,9 @@ fi
   # prompt if `example` prompt segment is added to POWERLEVEL9K_LEFT_PROMPT_ELEMENTS or
   # POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS. It displays an icon and orange text greeting the user.
   #
-  # Type `p9k_prompt_segment -h` for documentation and a more sophisticated example.
+  # Type `p10k help segment` for documentation and a more sophisticated example.
   function prompt_example() {
-    p9k_prompt_segment -f 208 -i '⭐' -t 'hello, %n'
+    p10k segment -f 208 -i '⭐' -t 'hello, %n'
   }
 
   # User-defined prompt segments can be customized the same way as built-in segments.

@@ -847,104 +847,7 @@ _p9k_right_prompt_segment() {
 }
 
 function _p9k_prompt_segment() { "_p9k_${_p9k_prompt_side}_prompt_segment" "$@" }
-
-typeset -gr __p9k_prompt_segment_usage="Usage: p9k_prompt_segment [{+|-}re] [-s state] [-b bg] [-f fg] [-i icon] [-c cond] [-t text]
-
-Options:
-  -t text   segment's main content; will undergo prompt expansion: '%F{blue}%T%f' will
-            show as blue current time; default is empty
-  -i icon   segment's icon; default is empty
-  -r        icon is a symbolic reference that needs to be resolved; for example, 'LOCK_ICON'
-  +r        icon is already resolved and should be printed literally; for example, '⭐';
-            this is the default; you can also use $'\u2B50' if you don't want to have
-            non-ascii characters in source code
-  -b bg     background color; for example, 'blue', '4', or '#0000ff'; empty value means
-            transparent background, as in '%k'; default is black
-  -f fg     foreground color; for example, 'blue', '4', or '#0000ff'; empty value means
-            default foreground color, as in '%f'; default is empty
-  -s state  segment's state for the purpose of applying styling options; if you want to
-            to be able to use POWERLEVEL9K parameters to specify different colors or icons
-            depending on some property, use different states for different values of that
-            property
-  -c        condition; if empty after parameter expansion and process substitution, the
-            segment is hidden; this is an advanced feature, use with caution; default is '1'
-  -e        segment's main content will undergo parameter expansion and process
-            substitution; the content will be surrounded with double quotes and thus
-            should quote its own double quotes; this is an advanced feature, use with
-            caution
-  +e        segment's main content should not undergo parameter expansion and process
-            substitution; this is the default
-  -h        print this help message and return
-
-Example: 'core' segment tells you if there is a file name 'core' in the current directory.
-
-- Segment's icon is '⭐'.
-- Segment's text is the file's size in bytes.
-- If you have permissions to delete the file, state is DELETABLE. If not, it's PROTECTED.
-
-  zmodload -F zsh/stat b:zstat
-
-  function prompt_core() {
-    local size=()
-    if ! zstat -A size +size core 2>/dev/null; then
-      # No 'core' file in the current directory.
-      return
-    fi
-    if [[ -w . ]]; then
-      local state=DELETABLE
-    else
-      local state=PROTECTED
-    fi
-    p9k_prompt_segment -s \$state -i '⭐' -b black -f blue -t \${size[1]}b
-  }
-
-To enable this segment, add 'core' to POWERLEVEL9K_LEFT_PROMPT_ELEMENTS or
-POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS.
-
-Example customizations:
-
-  # Override foreground.
-  POWERLEVEL9K_CORE_FOREGROUND=red
-
-  # Override background when DELETABLE.
-  POWERLEVEL9K_CORE_DELETABLE_BACKGROUND=green
-
-  # Override icon when PROTECTED.
-  POWERLEVEL9K_CORE_PROTECTED_VISUAL_IDENTIFIER_EXPANSION='❎'
-
-  # Don't show file size when PROTECTED.
-  POWERLEVEL9K_CORE_PROTECTED_CONTENT_EXPANSION=''"
-
-# Type `p9k_prompt_segment -h` for usage.
-function p9k_prompt_segment() {
-  emulate -L zsh && setopt no_hist_expand extended_glob
-  local opt state bg=0 fg icon cond text ref=0 expand=0
-  while getopts ':s:b:f:i:c:t:re' opt; do
-    case $opt in
-      s) state=$OPTARG;;
-      b) bg=$OPTARG;;
-      f) fg=$OPTARG;;
-      i) icon=$OPTARG;;
-      c) cond=${OPTARG:-'${:-}'};;
-      t) text=$OPTARG;;
-      r) ref=1;;
-      e) expand=1;;
-      +r) ref=0;;
-      +e) expand=0;;
-      ?) echo -E - $__p9k_prompt_segment_usage >&2; return 1;;
-    esac
-  done
-  if (( OPTIND <= ARGC )); then
-    echo -E - $__p9k_prompt_segment_usage >&2
-    return 1
-  fi
-  if [[ -n $_p9k_prompt_side ]]; then
-    (( ref )) || icon=$'\1'$icon
-    "_p9k_${_p9k_prompt_side}_prompt_segment" "prompt_${_p9k_segment_name}${state:+_${(U)state}}" \
-        "$bg" "${fg:-$_p9k_color1}" "$icon" "$expand" "$cond" "$text"
-  fi
-  return 0
-}
+function p9k_prompt_segment() { p10k segment "$@" }
 
 function _p9k_python_version() {
   _p9k_cached_cmd_stdout_stderr python --version || return
@@ -4329,14 +4232,157 @@ prompt_powerlevel9k_teardown() {
   fi
 }
 
+
+typeset -gr __p9k_p10k_usage="Usage: %2Fp10k%f %Bcommand%b [options]
+
+Commands:
+
+  %Bconfigure%b  run interactive configuration wizard
+  %Bsegment%b    print a user-defined prompt segment
+  %Bhelp%b       print this help message"
+
+typeset -gr __p9k_p10k_segment_usage="Usage: %2Fp10k%f %Bsegment%b [{+|-}re] [-s state] [-b bg] [-f fg] [-i icon] [-c cond] [-t text]
+
+Print a user-defined prompt segment.%1F\$error%f
+
+Options:
+  -t text   segment's main content; will undergo prompt expansion: '%%F{blue}%%*%%f' will
+            show as %F{blue}%*%f; default is empty
+  -i icon   segment's icon; default is empty
+  -r        icon is a symbolic reference that needs to be resolved; for example, 'LOCK_ICON'
+  +r        icon is already resolved and should be printed literally; for example, '⭐';
+            this is the default; you can also use \$'\u2B50' if you don't want to have
+            non-ascii characters in source code
+  -b bg     background color; for example, 'blue', '4', or '#0000ff'; empty value means
+            transparent background, as in '%%k'; default is black
+  -f fg     foreground color; for example, 'blue', '4', or '#0000ff'; empty value means
+            default foreground color, as in '%%f'; default is empty
+  -s state  segment's state for the purpose of applying styling options; if you want to
+            to be able to use POWERLEVEL9K parameters to specify different colors or icons
+            depending on some property, use different states for different values of that
+            property
+  -c        condition; if empty after parameter expansion and process substitution, the
+            segment is hidden; this is an advanced feature, use with caution; default is '1'
+  -e        segment's main content will undergo parameter expansion and process
+            substitution; the content will be surrounded with double quotes and thus
+            should quote its own double quotes; this is an advanced feature, use with
+            caution
+  +e        segment's main content should not undergo parameter expansion and process
+            substitution; this is the default
+  -h        print this help message
+
+Example: 'core' segment tells you if there is a file name 'core' in the current directory.
+
+- Segment's icon is '⭐'.
+- Segment's text is the file's size in bytes.
+- If you have permissions to delete the file, state is DELETABLE. If not, it's PROTECTED.
+
+  zmodload -F zsh/stat b:zstat
+
+  function prompt_core() {
+    local size=()
+    if ! zstat -A size +size core 2>/dev/null; then
+      # No 'core' file in the current directory.
+      return
+    fi
+    if [[ -w . ]]; then
+      local state=DELETABLE
+    else
+      local state=PROTECTED
+    fi
+    p10k segment -s \\\\\$state -i '⭐' -b black -f blue -t \\\\\${size[1]}b
+  }
+
+To enable this segment, add 'core' to POWERLEVEL9K_LEFT_PROMPT_ELEMENTS or
+POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS.
+
+Example customizations:
+
+  # Override foreground.
+  POWERLEVEL9K_CORE_FOREGROUND=red
+
+  # Override background when DELETABLE.
+  POWERLEVEL9K_CORE_DELETABLE_BACKGROUND=green
+
+  # Override icon when PROTECTED.
+  POWERLEVEL9K_CORE_PROTECTED_VISUAL_IDENTIFIER_EXPANSION='❎'
+
+  # Don't show file size when PROTECTED.
+  POWERLEVEL9K_CORE_PROTECTED_CONTENT_EXPANSION=''"
+
+typeset -gr __p9k_p10k_configure_usage="Usage: %2Fp10k%f %Bconfigure%b
+
+Run interactive configuration wizard."
+
 function p10k() {
-  emulate -L zsh && setopt no_hist_expand extended_glob
-  if [[ $# == 1 && $1 == configure ]]; then
-    p9k_configure
-  else
-    print -P "Usage: %2Fp10k%f %Bconfigure%b" >&2
+  emulate -L zsh
+  setopt no_hist_expand extended_glob prompt_percent prompt_subst
+
+  if (( !ARGC )); then
+    print -P -- $__p9k_p10k_usage >&2
     return 1
   fi
+
+  local error
+  case $1 in
+    segment)
+      if [[ -z $_p9k_prompt_side ]]; then
+        error=' Can be called only when Powerlevel10k is rendering prompt.'
+        print -P -- $__p9k_p10k_segment_usage >&2
+        return 1
+      fi
+      shift
+      local opt state bg=0 fg icon cond text ref=0 expand=0
+      while getopts ':s:b:f:i:c:t:reh' opt; do
+        case $opt in
+          s) state=$OPTARG;;
+          b) bg=$OPTARG;;
+          f) fg=$OPTARG;;
+          i) icon=$OPTARG;;
+          c) cond=${OPTARG:-'${:-}'};;
+          t) text=$OPTARG;;
+          r) ref=1;;
+          e) expand=1;;
+          +r) ref=0;;
+          +e) expand=0;;
+          h) print -P -- $__p9k_p10k_segment_usage; return 0;;
+          ?) print -P -- $__p9k_p10k_segment_usage >&2; return 1;;
+        esac
+      done
+      if (( OPTIND <= ARGC )); then
+        echo -E - $__p9k_p10k_segment_usage >&2
+        return 1
+      fi
+      (( ref )) || icon=$'\1'$icon
+      "_p9k_${_p9k_prompt_side}_prompt_segment" "prompt_${_p9k_segment_name}${state:+_${(U)state}}" \
+          "$bg" "${fg:-$_p9k_color1}" "$icon" "$expand" "$cond" "$text"
+      return 0
+      ;;
+    configure)
+      if (( ARGC > 1 )); then
+        print -P -- $__p9k_p10k_configure_usage >&2
+        return 1
+      fi
+      p9k_configure "$@"
+      ;;
+    help)
+      local var=__p9k_p10k_$2_usage
+      if (( $+parameters[$var] )); then
+        print -P -- ${(P)var}
+        return 0
+      elif (( ARGC == 1 )); then
+        print -P -- $__p9k_p10k_usage
+        return 0
+      else
+        print -P -- $__p9k_p10k_usage >&2
+        return 1
+      fi
+      ;;
+    *)
+      print -P -- $__p9k_p10k_usage >&2
+      return 1
+      ;;
+  esac
 }
 
 # Hook for zplugin.
