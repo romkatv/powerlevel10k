@@ -146,7 +146,7 @@ function quit() {
     print -P "To define an option that does nothing except for disabling Powerlevel10k"
     print -P "configuration wizard, type the following command:"
     print -P ""
-    print -P "  %2Fecho%f %3F'POWERLEVEL9K_MODE='%f >>! $__p9k_zshrc_u"
+    print -P "  %2Fecho%f %3F'POWERLEVEL9K_DISABLE_CONFIGURATION_WIZARD=true'%f >>! $__p9k_zshrc_u"
     print -P ""
     print -P "To run Powerlevel10k configuration wizard right now, type:"
     print -P ""

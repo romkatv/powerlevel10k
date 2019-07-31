@@ -3281,7 +3281,7 @@ _p9k_precmd() {
   if _p9k_must_init; then
     if (( !__p9k_configured )); then
       __p9k_configured=1
-      if [[ -z ${parameters[(i)POWERLEVEL9K_*]} ]] && _p9k_can_configure -q; then
+      if [[ "${parameters[(I)POWERLEVEL9K_*]}" == (POWERLEVEL9K_MODE|) ]] && _p9k_can_configure -q; then
         if $__p9k_root_dir/internal/wizard.zsh -d $__p9k_root_dir; then
           source $__p9k_cfg_path
           _p9k_must_init
