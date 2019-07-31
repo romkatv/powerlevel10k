@@ -98,7 +98,7 @@ features Powerlevel10k has to offer.
 
 ## Fonts
 
-Powerlevel10k doesn't require custom fonts but it can take advantage of them if they are available.
+Powerlevel10k doesn't require custom fonts but can take advantage of them if they are available.
 It works well with [Nerd Fonts](https://github.com/ryanoasis/nerd-fonts),
 [Source Code Pro](https://github.com/adobe-fonts/source-code-pro),
 [Font Awesome](https://fontawesome.com/), [Powerline](https://github.com/powerline/fonts), and even
@@ -212,17 +212,18 @@ This is the goal. You should be able to switch from Powerlevel9k to Powerlevel10
 visible changes except for performance. There are, however, several differences.
 
 - By default only `git` vcs backend is enabled in Powerlevel10k. If you need `svn` and `hg`, you'll
-  need to set `POWERLEVEL9K_VCS_BACKENDS`.
-- Powerlevel10k is bug-compatible with Powerlevel9k except for egregious bugs. If you accidentally
-  rely on these bugs, your prompt will differ between Powerlevel9k and Powerlevel10k. Some examples:
+  need to add them to `POWERLEVEL9K_VCS_BACKENDS`.
+- Powerlevel10k strives to be bug-compatible with Powerlevel9k but not when it comes to egregious
+  bugs. If you accidentally rely on these bugs, your prompt will differ between Powerlevel9k and
+  Powerlevel10k. Some examples:
   - Powerlevel9k doesn't respect `ZLE_RPROMPT_INDENT`. As a result, right prompt in Powerlevel10k
-    can have an extra space compared to Powerlevel9k. Set `ZLE_RPROMPT_INDENT=0` if you don't want
-    that space.
-  - Powerlevel9k ignores some options that are set after the theme is sources while Powerlevel10k
+    can have an extra space at the end compared to Powerlevel9k. Set `ZLE_RPROMPT_INDENT=0` if you
+    don't want that space.
+  - Powerlevel9k ignores some options that are set after the theme is sourced while Powerlevel10k
     respects all options. If you see different icons in Powerlevel9k and Powerlevel10k, you've
     probably defined `POWERLEVEL9K_MODE` before sourcing the theme. This parameter gets ignored
-    by Powerlevel9k but not Powerlevel10k. If you want your prompt to look in Powerlevel10k the same
-    as in Powerlevel9k, remove `POWERLEVEL9K_MODE`.
+    by Powerlevel9k but honored by Powerlevel10k. If you want your prompt to look in Powerlevel10k
+    the same as in Powerlevel9k, remove `POWERLEVEL9K_MODE`.
   - There are
     [dozens more bugs](https://github.com/Powerlevel9k/powerlevel9k/issues/created_by/romkatv) in
     Powerlevel9k that don't exist in Powerlevel10k.
