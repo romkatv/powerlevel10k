@@ -4241,9 +4241,9 @@ Commands:
   %Bsegment%b    print a user-defined prompt segment
   %Bhelp%b       print this help message"
 
-typeset -gr __p9k_p10k_segment_usage="Usage: %2Fp10k%f %Bsegment%b [{+|-}re] [-s state] [-b bg] [-f fg] [-i icon] [-c cond] [-t text]
+typeset -gr __p9k_p10k_segment_usage="Usage: %2Fp10k%f %Bsegment%b [-h] [{+|-}re] [-s state] [-b bg] [-f fg] [-i icon] [-c cond] [-t text]
 
-Print a user-defined prompt segment.%1F\$error%f
+Print a user-defined prompt segment. Can be called only during prompt rendering.
 
 Options:
   -t text   segment's main content; will undergo prompt expansion: '%%F{blue}%%*%%f' will
@@ -4290,7 +4290,7 @@ Example: 'core' segment tells you if there is a file name 'core' in the current 
     else
       local state=PROTECTED
     fi
-    p10k segment -s \\\\\$state -i '⭐' -b black -f blue -t \\\\\${size[1]}b
+    p10k segment -s \\\\\$state -i '⭐' -f blue -t \\\\\${size[1]}b
   }
 
 To enable this segment, add 'core' to POWERLEVEL9K_LEFT_PROMPT_ELEMENTS or
@@ -4298,10 +4298,10 @@ POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS.
 
 Example customizations:
 
-  # Override foreground.
+  # Override default foreground.
   POWERLEVEL9K_CORE_FOREGROUND=red
 
-  # Override background when DELETABLE.
+  # Override foreground when DELETABLE.
   POWERLEVEL9K_CORE_DELETABLE_BACKGROUND=green
 
   # Override icon when PROTECTED.
@@ -4323,15 +4323,10 @@ function p10k() {
     return 1
   fi
 
-  local error
   case $1 in
     segment)
-      if [[ -z $_p9k_prompt_side ]]; then
-        error=' Can be called only when Powerlevel10k is rendering prompt.'
-        print -P -- $__p9k_p10k_segment_usage >&2
-        return 1
-      fi
       shift
+      local -i num_opts=ARGC
       local opt state bg=0 fg icon cond text ref=0 expand=0
       while getopts ':s:b:f:i:c:t:reh' opt; do
         case $opt in
@@ -4350,7 +4345,17 @@ function p10k() {
         esac
       done
       if (( OPTIND <= ARGC )); then
-        echo -E - $__p9k_p10k_segment_usage >&2
+        print -P -- $__p9k_p10k_segment_usage >&2
+        return 1
+      fi
+      if [[ -z $_p9k_prompt_side ]]; then
+        print -P -- "%1F[ERROR]%f %Bp10k segment%b: can be called only during prompt rendering." >&2
+        if (( !ARGC )); then
+          print -P -- ""
+          print -P -- "For help, type:" >&2
+          print -P -- ""
+          print -P -- "  %2Fp10k%f %Bhelp%b %Bsegment%b" >&2
+        fi
         return 1
       fi
       (( ref )) || icon=$'\1'$icon
