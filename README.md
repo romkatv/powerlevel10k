@@ -92,8 +92,8 @@ will pick them up and provide you with the same prompt UI you are used to. Power
 all configuration options used by Powerlevel9k. See Powerlevel9k
 [configuration guide](https://github.com/bhilburn/powerlevel9k#prompt-customization).
 
-To go beyond the functionality of Powerlevel9k, type `p9k_configure` and explore unique styles and
-features Powerlevel10k has to offer.
+To go beyond the functionality of Powerlevel9k, type `p9k_configure` and explore the unique styles
+and features Powerlevel10k has to offer.
 
 ## Fonts
 
