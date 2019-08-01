@@ -949,12 +949,12 @@ function write_zshrc() {
   local comments=(
     "# To customize prompt, run \`p10k configure\` or edit $__p9k_cfg_path_u."
   )
-  print -lr -- "" $comments "source $__p9k_cfg_path_u" >>$__p9k_zshrc
+  print -lr -- "" $comments "[[ -f $__p9k_cfg_path_u ]] && source $__p9k_cfg_path_u" >>$__p9k_zshrc
 
   print -P ""
   print -P "The following lines have been appended to %4F$__p9k_zshrc_u%f:"
   print -P ""
-  print -lP -- '  '${^comments} "  %2Fsource%f %B$__p9k_cfg_path_u%b"
+  print -lP -- '  '${^comments} "  %3F[[%f %B-f $__p9k_cfg_path_u%b %3F]]%f && %2Fsource%f %B$__p9k_cfg_path_u%b"
 }
 
 if (( force )); then
