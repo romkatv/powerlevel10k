@@ -375,16 +375,16 @@ _p9k_vcs_style() {
 
     local var=POWERLEVEL9K_VCS_${1}_${2}FORMAT_FOREGROUND
     if (( $+parameters[$var] )); then
-      _p9k_ret=${(P)var}
+      _p9k_translate_color "${(P)var}"
     else
       var=POWERLEVEL9K_VCS_${2}FORMAT_FOREGROUND
       if (( $+parameters[$var] )); then
-        _p9k_ret=${(P)var}
+        _p9k_translate_color "${(P)var}"
       else
         _p9k_color prompt_vcs_$1 FOREGROUND "$_p9k_color1"
       fi
     fi
-    
+
     _p9k_foreground $_p9k_ret
     _p9k_ret=$style$_p9k_ret
     _p9k_cache[$key]=${_p9k_ret}.
