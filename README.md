@@ -109,7 +109,7 @@ the default system fonts. The full choice of style options is available only whe
 
 ### Recommended: Meslo Nerd Font patched for Powerlevel10k
 
-Install these
+Download these
 [four ttf files](https://github.com/romkatv/dotfiles-public/tree/master/.local/share/fonts/NerdFonts),
 double-click on each and press "Install". This will make `MesloLGS NF` font available to all
 applications on your system. Configure your terminal to use this font:
