@@ -104,12 +104,12 @@ It works well with [Nerd Fonts](https://github.com/ryanoasis/nerd-fonts),
 the default system fonts. The full choice of style options is available only when using
 [Nerd Fonts](https://github.com/ryanoasis/nerd-fonts).
 
-Overwhelmed? Try the beautiful and powerful Meslo from Nerd Fonts. Download these
+Try the beautiful and powerful Meslo Nerd Font with extra patches for Powerlevel10k. Download these
 [four ttf files](https://github.com/romkatv/dotfiles-public/tree/master/.local/share/fonts/NerdFonts),
 double-click on each and press "Install". This will make `MesloLGS NF` font available to all
 applications on your system. Configure your terminal to use this font:
 
-- **iTerm2**: Open *iTerm2 → Preferences → Profiles → Text → Change Font* and set *Family* to `MesloLGS NF`.
+- **iTerm2**: Open *iTerm2 → Preferences → Profiles → Text* and set *Font* to `MesloLGS NF`.
 - **Visual Studio Code**: Open *File → Preferences → Settings*, enter
   `terminal.integrated.fontFamily` in the search box and set value to `MesloLGS NF`.
 - **Windows Command Prompt**: Use
