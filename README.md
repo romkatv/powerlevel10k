@@ -174,6 +174,18 @@ covered by the same license.
 
 ## FAQ
 
+### Why my icons and/or powerline symbols look bad?
+
+It's likely your font's fault. [Install the recommended font](#fonts) and run `p10k configure`.
+
+### Why do I have a question mark symbol in my prompt? Is my font broken?
+
+If it looks like a regular `?`, that's normal. It means you have untracked files in the current Git
+repository. Type `git status` to see these files.
+
+You can change this symbol by editing `~/.p10k.zsh`. Search for `?` and replace it with something
+else.
+
 ### Why does Powerlevel10k spawn extra processes?
 
 Powerlevel10k uses [gitstatus](https://github.com/romkatv/gitstatus) as the backend behind `vcs`
