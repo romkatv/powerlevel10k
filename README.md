@@ -104,7 +104,7 @@ It works well with [Nerd Fonts](https://github.com/ryanoasis/nerd-fonts),
 the default system fonts. The full choice of style options is available only when using
 [Nerd Fonts](https://github.com/ryanoasis/nerd-fonts).
 
-Try the beautiful and powerful Meslo Nerd Font with extra patches for Powerlevel10k. Download these
+**Recommended:** Meslo Nerd Font with extra patches for Powerlevel10k. Download these
 [four ttf files](https://github.com/romkatv/dotfiles-public/tree/master/.local/share/fonts/NerdFonts),
 double-click on each and press "Install". This will make `MesloLGS NF` font available to all
 applications on your system. Configure your terminal to use this font:
