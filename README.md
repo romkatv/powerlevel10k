@@ -24,6 +24,7 @@ prompt.
    1. [For new users](#for-new-users)
    1. [For Powerlevel9k users](#for-powerlevel9k-users)
 1. [Fonts](#fonts)
+   1. [Recommended: Meslo Nerd Font patched for Powerlevel10k](#recommended-meslo-nerd-font-patched-for-powerlevel10k)
 1. [Try it in Docker](#try-it-in-docker)
 1. [Is it really faster?](#is-it-really-fast)
 1. [License](#license)
@@ -106,7 +107,9 @@ It works well with [Nerd Fonts](https://github.com/ryanoasis/nerd-fonts),
 the default system fonts. The full choice of style options is available only when using
 [Nerd Fonts](https://github.com/ryanoasis/nerd-fonts).
 
-**Recommended: Meslo Nerd Font patched for Powerlevel10k**. Download these
+### Recommended: Meslo Nerd Font patched for Powerlevel10k
+
+Install these
 [four ttf files](https://github.com/romkatv/dotfiles-public/tree/master/.local/share/fonts/NerdFonts),
 double-click on each and press "Install". This will make `MesloLGS NF` font available to all
 applications on your system. Configure your terminal to use this font:
@@ -178,7 +181,9 @@ covered by the same license.
 
 ### Why my icons and/or powerline symbols look bad?
 
-It's likely your font's fault. [Install the recommended font](#fonts) and run `p10k configure`.
+It's likely your font's fault.
+[Install the recommended font](#recommended-meslo-nerd-font-patched-for-powerlevel10k) and run
+`p10k configure`.
 
 ### Why do I have a question mark symbol in my prompt? Is my font broken?
 
