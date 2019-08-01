@@ -628,7 +628,7 @@ clear
 
 print -P "Powerlevel10k configuration has been written to %B%2F$__p9k_cfg_path_u%f%b."
 if [[ -n $config_backup ]]; then
-  print -P "The backup of the previuos version is at %B%3F$config_backup%f%b."
+  print -P "The backup of the previous version is at %B%3F$config_backup%f%b."
 fi
 
 if (( write_config )); then
