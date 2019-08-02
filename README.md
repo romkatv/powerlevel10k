@@ -192,8 +192,8 @@ It's likely your font's fault.
 If it looks like a regular `?`, that's normal. It means you have untracked files in the current Git
 repository. Type `git status` to see these files.
 
-You can change this symbol by editing `~/.p10k.zsh`. Search for `?` and replace it with something
-else.
+You can change this symbol or disable the display of untracked files altogether. Search for
+`untracked files` in `~/.p10k.zsh`.
 
 ### Why does Powerlevel10k spawn extra processes?
 

@@ -278,7 +278,10 @@ fi
 
   #####################################[ vcs: git status ]######################################
   # Git status: feature:master#tag ⇣42⇡42 *42 merge ~42 +42 !42 ?42.
-  # We are using parameters defined by the gitstatus plugin. See reference:
+  #
+  # You can edit the lines below to customize how Git status looks.
+  #
+  # VCS_STATUS parameters are set by gitstatus plugin. See reference:
   # https://github.com/romkatv/gitstatus/blob/master/gitstatus.plugin.zsh.
   local vcs=''
   # 'feature' or '@72f5c8a' if not on a branch.
@@ -303,13 +306,19 @@ fi
   vcs+='${${VCS_STATUS_NUM_STAGED:#0}:+ %227F+${VCS_STATUS_NUM_STAGED}}'
   # !42 if have unstaged changes.
   vcs+='${${VCS_STATUS_NUM_UNSTAGED:#0}:+ %227F!${VCS_STATUS_NUM_UNSTAGED}}'
-  # ?42 if have untracked files.
-  vcs+='${${VCS_STATUS_NUM_UNTRACKED:#0}:+ %39F?${VCS_STATUS_NUM_UNTRACKED}}'
+  # ?42 if have untracked files. It's really a question mark, your font isn't broken.
+  # See POWERLEVEL9K_VCS_UNTRACKED_ICON below if you want to use a different icon.
+  # Remove the next line if you don't want to see untracked files at all.
+  vcs+='${${VCS_STATUS_NUM_UNTRACKED:#0}:+ %39F${(g::)POWERLEVEL9K_VCS_UNTRACKED_ICON}${VCS_STATUS_NUM_UNTRACKED}}'
   # If P9K_CONTENT is not empty, leave it unchanged. It's either "loading" or from vcs_info.
   vcs="\${P9K_CONTENT:-$vcs}"
 
   # Branch icon. Set this parameter to $'\uF126' for the popular Powerline branch icon.
   typeset -g POWERLEVEL9K_VCS_BRANCH_ICON=
+
+  # Untracked files icon. It's really a question mark, your font isn't broken.
+  # Change the value of this parameter to show a different icon.
+  typeset -g POWERLEVEL9K_VCS_UNTRACKED_ICON='?'
 
   # Disable the default Git status formatting.
   typeset -g POWERLEVEL9K_VCS_DISABLE_GITSTATUS_FORMATTING=true
@@ -333,16 +342,9 @@ fi
 
   # These settings are used for respositories other than Git or when gitstatusd fails and
   # Powerlevel10k has to fall back to using vcs_info.
-  typeset -g POWERLEVEL9K_VCS_{CLEAN,MODIFIED,UNTRACKED}_FOREGROUND=76
-  typeset -g POWERLEVEL9K_VCS_REMOTE_BRANCH_ICON=':'
-  typeset -g POWERLEVEL9K_VCS_COMMIT_ICON='@'
-  typeset -g POWERLEVEL9K_VCS_INCOMING_CHANGES_ICON='⇣'
-  typeset -g POWERLEVEL9K_VCS_OUTGOING_CHANGES_ICON='⇡'
-  typeset -g POWERLEVEL9K_VCS_STASH_ICON='*'
-  typeset -g POWERLEVEL9K_VCS_TAG_ICON=$'%{\b#%}'
-  typeset -g POWERLEVEL9K_VCS_UNTRACKED_ICON=$'%{\b?%}'
-  typeset -g POWERLEVEL9K_VCS_UNSTAGED_ICON=$'%{\b!%}'
-  typeset -g POWERLEVEL9K_VCS_STAGED_ICON=$'%{\b+%}'
+  typeset -g POWERLEVEL9K_VCS_CLEAN_FOREGROUND=76
+  typeset -g POWERLEVEL9K_VCS_UNTRACKED_FOREGROUND=76
+  typeset -g POWERLEVEL9K_VCS_MODIFIED_FOREGROUND=227
 
   ##########################[ status: exit code of the last command ]###########################
   # Enable OK_PIPE, ERROR_PIPE and ERROR_SIGNAL status states to allow us to enable, disable and
