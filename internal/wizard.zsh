@@ -787,8 +787,9 @@ function ask_config_overwrite() {
       q) quit;;
       r) return 1;;
       y)
-        config_backup="$(mktemp ${TMPDIR:-/tmp}/$__p9k_cfg_basename.XXXXXXXXXX)" || return 1
-        cp $__p9k_cfg_path $config_backup
+        config_backup="$(mktemp ${TMPDIR:-/tmp}/$__p9k_cfg_basename.XXXXXXXXXX)" || exit 1
+        cp $__p9k_cfg_path $config_backup                                        || exit 1
+        config_backup_u=${${TMPDIR:+\$TMPDIR}:-/tmp}/${(q-)config_backup:t}
         write_config=1
         break
         ;;
@@ -966,7 +967,7 @@ fi
 source $__p9k_root_dir/internal/icons.zsh || return
 
 while true; do
-  local POWERLEVEL9K_MODE= style= config_backup= gap_char=' '
+  local POWERLEVEL9K_MODE= style= config_backup= config_backup_u= gap_char=' '
   local left_subsep= right_subsep= left_tail= right_tail= left_head= right_head=
   local -i num_lines=0 write_config=0 empty_line=0 color=2 left_frame=1 right_frame=1
   local -i cap_diamond=0 cap_python=0 cap_narrow_icons=0 cap_lock=0
@@ -1033,7 +1034,7 @@ clear
 
 print -P "Powerlevel10k configuration has been written to %2F$__p9k_cfg_path_u%f."
 if [[ -n $config_backup ]]; then
-  print -P "The backup of the previuos version is at %3F$config_backup%f."
+  print -P "The backup of the previuos version is at %3F$config_backup_u%f."
 fi
 
 if (( write_config )); then
