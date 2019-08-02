@@ -928,7 +928,7 @@ prompt_disk_usage() {
 
 function _p9k_read_file() {
   _p9k_ret=''
-  [[ -n $1 ]] && read -r _p9k_ret <$1
+  [[ -n $1 ]] && IFS='' read -r _p9k_ret <$1
   [[ -n $_p9k_ret ]]
 }
 
@@ -1674,9 +1674,11 @@ prompt_node_version() {
 function _p9k_nvm_ls_default() {
   local v=default
   local -a seen=($v)
-  local target
-  while [[ -r $NVM_DIR/alias/$v ]] && read target <$NVM_DIR/alias/$v; do
-    [[ -n $target && ${seen[(I)$target]} == 0 ]] || return
+  while [[ -r $NVM_DIR/alias/$v ]]; do
+    local target=
+    IFS='' read -r target <$NVM_DIR/alias/$v
+    [[ -z $target ]] && break
+    (( $seen[(I)$target] )) && return
     seen+=$target
     v=$target
   done
@@ -1886,9 +1888,8 @@ prompt_ram() {
 
 function _p9k_read_rbenv_version_file() {
   [[ -r $1 ]] || return
-  local content
-  read -r content <$1 2>/dev/null
-  _p9k_ret="${${(A)=content}[1]}"
+  local rest
+  read _p9k_ret rest <$1 2>/dev/null
   [[ -n $_p9k_ret ]]
 }
 
@@ -2717,7 +2718,7 @@ prompt_virtualenv() {
 function _p9k_read_pyenv_version_file() {
   [[ -r $1 ]] || return
   local content
-  read -rd $'\0' content <$1 2>/dev/null
+  IFS='' read -rd $'\0' content <$1 2>/dev/null
   _p9k_ret=${${(j.:.)${(@)${=content}#python-}:-system}}
 }
 
@@ -3025,6 +3026,8 @@ function _p9k_build_segment() {
 }
 
 function _p9k_set_prompt() {
+  local ifs=$IFS
+  IFS=$' \t\n\0'
   PROMPT=$_p9k_prompt_prefix_left
   RPROMPT=
 
@@ -3103,6 +3106,7 @@ function _p9k_set_prompt() {
 
   _p9k_prompt_side=
   (( $#_p9k_cache < _POWERLEVEL9K_MAX_CACHE_SIZE )) || _p9k_cache=()
+  IFS=$ifs
 }
 
 function _p9k_update_prompt() {
@@ -3352,7 +3356,7 @@ _p9k_init_async_pump() {
     cmd="$setsid zsh -dfxc ${(q)cmd} &!"
     zsh -dfmxc $cmd </dev/null >&$_p9k_async_pump_fd 2>/dev/null &!
 
-    read -t 5 -r -u $_p9k_async_pump_fd _p9k_async_pump_pid && (( _p9k_async_pump_pid ))
+    IFS='' read -t 5 -r -u $_p9k_async_pump_fd _p9k_async_pump_pid && (( _p9k_async_pump_pid ))
 
     _p9k_async_pump_subshell=$ZSH_SUBSHELL
     add-zsh-hook zshexit _p9k_kill_async_pump
