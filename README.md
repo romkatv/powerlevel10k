@@ -118,7 +118,7 @@ applications on your system. Configure your terminal to use this font:
 - **Visual Studio Code**: Open *File → Preferences → Settings*, enter
   `terminal.integrated.fontFamily` in the search box and set value to `MesloLGS NF`.
 - **Windows Command Prompt** (the old thing): Click the icon in the top left corner, then
-  *Properties → Font* and set *Font* to 'MesloLGS NF`.
+  *Properties → Font* and set *Font* to `MesloLGS NF`.
 - **Windows Terminal** (the new thing): Open *Settings* (`Ctrl+,`), search for `fontFace` and set
   value to `MesloLGS NF` for every profile.
 - **Linux/GNOME** (all terminals): Type this command:
