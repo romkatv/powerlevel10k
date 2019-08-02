@@ -117,8 +117,10 @@ applications on your system. Configure your terminal to use this font:
 - **iTerm2**: Open *iTerm2 → Preferences → Profiles → Text* and set *Font* to `MesloLGS NF`.
 - **Visual Studio Code**: Open *File → Preferences → Settings*, enter
   `terminal.integrated.fontFamily` in the search box and set value to `MesloLGS NF`.
-- **Windows Command Prompt**: Use
-  [this script](https://gist.github.com/romkatv/aa7a70fe656d8b655e3c324eb10f6a8b).
+- **Windows Command Prompt** (the old thing): Click the icon in the top left corner, then
+  *Properties → Font* and set *Font* to 'MesloLGS NF`.
+- **Windows Terminal** (the new thing): Open *Settings* (`Ctrl+,`), search for `fontFace` and set
+  value to `MesloLGS NF` for every profile.
 - **Linux/GNOME** (all terminals): Type this command:
 ```zsh
 sudo apt install libglib2.0-bin
