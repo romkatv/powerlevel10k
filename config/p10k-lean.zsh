@@ -60,7 +60,7 @@ fi
       # rbenv                 # ruby version from rbenv (https://github.com/rbenv/rbenv)
       kubecontext             # current kubernetes context (https://kubernetes.io/)
       context                 # user@host
-      nordvpn                 # nordvpn connection status, linux only (https://nordvpn.com/)
+      # nordvpn               # nordvpn connection status, linux only (https://nordvpn.com/)
       # =========================[ Line #2 ]=========================
       newline
       # public_ip             # public IP address
