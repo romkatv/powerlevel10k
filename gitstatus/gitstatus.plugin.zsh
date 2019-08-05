@@ -273,7 +273,7 @@ function gitstatus_start() {
   local -i max_num_untracked=1
   local -i dirty_max_index_size=-1
   while true; do
-    getopts "t:s:u:d:m:" opt || break
+    getopts "t:s:u:c:d:m:" opt || break
     case $opt in
       t) timeout=$OPTARG;;
       s) max_num_staged=$OPTARG;;
