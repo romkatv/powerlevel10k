@@ -773,7 +773,7 @@ function ask_config_overwrite() {
   while true; do
     clear
     centered "Powerlevel10k config file already exists."
-    centered "%BOverwrite %b%2F$__p9k_cfg_path_u%f%B?%b"
+    centered "%BOverwrite %b%2F${__p9k_cfg_path_u//\\/\\\\}%f%B?%b"
     print -P ""
     print -P "%B(y)  Yes.%b"
     print -P ""
@@ -942,7 +942,7 @@ function write_zshrc() {
     local f6="\"$f1\""
     local f7="\"$f3\""
     if [[ -n ${(@M)lines:#(#b)[^#]#([^[:IDENT:]]|)source[[:space:]]##($f1|$f2|$f3|$f4|$f5|$f6|$f7)*} ]]; then
-      print -P "No changes have been made to %4F$__p9k_zshrc_u%f because it already sources %2F$__p9k_cfg_path_u%f."
+      print -rP "No changes have been made to %4F$__p9k_zshrc_u%f because it already sources %2F$__p9k_cfg_path_u%f."
       return
     fi
   fi
@@ -950,12 +950,12 @@ function write_zshrc() {
   local comments=(
     "# To customize prompt, run \`p10k configure\` or edit $__p9k_cfg_path_u."
   )
-  print -lr -- "" $comments "[[ -f $__p9k_cfg_path_u ]] && source $__p9k_cfg_path_u" >>$__p9k_zshrc
+  print -lrP -- "" $comments "[[ -f $__p9k_cfg_path_u ]] && source $__p9k_cfg_path_u" >>$__p9k_zshrc
 
-  print -P ""
-  print -P "The following lines have been appended to %4F$__p9k_zshrc_u%f:"
-  print -P ""
-  print -lP -- '  '${^comments} "  %3F[[%f %B-f $__p9k_cfg_path_u%b %3F]]%f && %2Fsource%f %B$__p9k_cfg_path_u%b"
+  print -rP ""
+  print -rP "The following lines have been appended to %4F$__p9k_zshrc_u%f:"
+  print -rP ""
+  print -lrP -- '  '${^comments} "  %3F[[%f %B-f $__p9k_cfg_path_u%b %3F]]%f && %2Fsource%f %B$__p9k_cfg_path_u%b"
 }
 
 if (( force )); then
@@ -1032,9 +1032,9 @@ done
 
 clear
 
-print -P "Powerlevel10k configuration has been written to %2F$__p9k_cfg_path_u%f."
+print -rP "Powerlevel10k configuration has been written to %2F$__p9k_cfg_path_u%f."
 if [[ -n $config_backup ]]; then
-  print -P "The backup of the previuos version is at %3F$config_backup_u%f."
+  print -rP "The backup of the previuos version is at %3F$config_backup_u%f."
 fi
 
 if (( write_config )); then
@@ -1043,9 +1043,9 @@ fi
 
 write_zshrc || return
 
-print -P ""
-print -P "File feature requests and bug reports at $(href https://github.com/romkatv/powerlevel10k/issues)."
-print -P "Send praise and complaints to $(href https://www.reddit.com/r/zsh)."
-print -P ""
+print -rP ""
+print -rP "File feature requests and bug reports at $(href https://github.com/romkatv/powerlevel10k/issues)."
+print -rP "Send praise and complaints to $(href https://www.reddit.com/r/zsh)."
+print -rP ""
 
 } "$@"

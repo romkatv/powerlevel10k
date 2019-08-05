@@ -89,14 +89,14 @@ typeset -grA __p9k_colors=(
 #
 # Type `getColorCode background` or `getColorCode foreground` to see the list of predefined colors.
 function getColorCode() {
-  emulate -L zsh && setopt no_hist_expand extended_glob
+  emulate -L zsh && setopt no_hist_expand extended_glob no_prompt_bang prompt_{cr,percent,subst,sp}
   if (( ARGC == 1 )); then
     case $1 in 
       foreground)
         local k
         for k in "${(k@)__p9k_colors}"; do
           local v=${__p9k_colors[$k]}
-          print -P "%F{$v}$v - $k%f"
+          print -rP -- "%F{$v}$v - $k%f"
         done
         return
         ;;
@@ -104,7 +104,7 @@ function getColorCode() {
         local k
         for k in "${(k@)__p9k_colors}"; do
           local v=${__p9k_colors[$k]}
-          print -P "%K{$v}$v - $k%k"
+          print -rP -- "%K{$v}$v - $k%k"
         done
         return
         ;;
@@ -169,7 +169,7 @@ function _p9k_declare() {
 #   _p9k_prompt_length '%F{red}abc' => 3
 #   _p9k_prompt_length $'%{a\b%Gb%}' => 1
 function _p9k_prompt_length() {
-  emulate -L zsh && setopt no_hist_expand extended_glob
+  emulate -L zsh && setopt no_hist_expand extended_glob no_prompt_bang prompt_{cr,percent,subst,sp}
   local COLUMNS=1024
   local -i x y=$#1 m
   if (( y )); then
@@ -2578,7 +2578,7 @@ function _p9k_vcs_render() {
 }
 
 function _p9k_vcs_resume() {
-  emulate -L zsh && setopt no_hist_expand extended_glob
+  emulate -L zsh && setopt no_hist_expand extended_glob no_prompt_bang prompt_{cr,percent,subst,sp}
 
   if [[ $VCS_STATUS_RESULT == ok-async ]]; then
     local latency=$((EPOCHREALTIME - _p9k_gitstatus_start_time))
@@ -2615,7 +2615,6 @@ function _p9k_vcs_resume() {
 }
 
 function _p9k_vcs_gitstatus() {
-  (( _POWERLEVEL9K_DISABLE_GITSTATUS )) && return 1
   if [[ $_p9k_refresh_reason == precmd ]]; then
     if (( $+_p9k_next_vcs_dir )); then
       _p9k_next_vcs_dir=${${GIT_DIR:a}:-$PWD}
@@ -2658,7 +2657,7 @@ function _p9k_vcs_gitstatus() {
 
 prompt_vcs() {
   local -a backends=($_POWERLEVEL9K_VCS_BACKENDS)
-  if (( ${backends[(I)git]} )) && _p9k_vcs_gitstatus; then
+  if (( ${backends[(I)git]} && !_POWERLEVEL9K_DISABLE_GITSTATUS )) && _p9k_vcs_gitstatus; then
     _p9k_vcs_render && return
     backends=(${backends:#git})
   fi
@@ -3117,7 +3116,7 @@ function _p9k_update_prompt() {
 }
 
 powerlevel9k_refresh_prompt_inplace() {
-  emulate -L zsh && setopt no_hist_expand extended_glob
+  emulate -L zsh && setopt no_hist_expand extended_glob no_prompt_bang prompt_{cr,percent,subst,sp}
   (( __p9k_enabled )) || return
   _p9k_refresh_reason=precmd
   _p9k_set_prompt
@@ -3130,7 +3129,7 @@ typeset -gi __p9k_new_status
 typeset -ga __p9k_new_pipestatus
 
 _p9k_save_status() {
-  emulate -L zsh && setopt no_hist_expand extended_glob
+  emulate -L zsh && setopt no_hist_expand extended_glob no_prompt_bang prompt_{cr,percent,subst,sp}
   local -i pipe
   if (( !$+_p9k_line_finished )); then
     :  # SIGINT
@@ -3216,6 +3215,7 @@ _p9k_precmd() {
 }
 
 function _p9k_zle_keymap_select() {
+  emulate -L zsh && setopt no_hist_expand extended_glob no_prompt_bang prompt_{cr,percent,subst,sp}
   zle && zle .reset-prompt && zle -R
 }
 
@@ -3245,7 +3245,7 @@ _p9k_deinit_async_pump() {
 }
 
 function _p9k_on_async_message() {
-  emulate -L zsh && setopt no_hist_expand extended_glob
+  emulate -L zsh && setopt no_hist_expand extended_glob no_prompt_bang prompt_{cr,percent,subst,sp}
   (( ARGC == 1 )) || return
   local msg='' IFS=''
   while read -r -t -u $1 msg; do
@@ -3258,10 +3258,11 @@ function _p9k_on_async_message() {
 }
 
 function _p9k_async_pump() {
-  emulate -L zsh                                 || return
-  setopt noaliases no_hist_expand extended_glob  || return
-  zmodload zsh/system zsh/datetime               || return
-  echo $$                                        || return
+  emulate -L zsh                                       || return
+  setopt no_aliases no_hist_expand extended_glob       || return
+  setopt no_prompt_bang prompt_{cr,percent,subst,sp}   || return
+  zmodload zsh/system zsh/datetime                     || return
+  echo $$                                              || return
 
   local ip last_ip
   local -F next_ip_time
@@ -3320,7 +3321,7 @@ function _p9k_async_pump() {
 }
 
 function _p9k_kill_async_pump() {
-  emulate -L zsh && setopt no_hist_expand extended_glob
+  emulate -L zsh && setopt no_hist_expand extended_glob no_prompt_bang prompt_{cr,percent,subst,sp}
   if (( ZSH_SUBSHELL == _p9k_async_pump_subshell )); then
     _p9k_deinit_async_pump
   fi
@@ -3363,9 +3364,9 @@ _p9k_init_async_pump() {
   }
 
   if ! _p9k_start_async_pump ; then
-     >&2 print -P "%F{red}[ERROR]%f Powerlevel10k failed to start async worker. The following segments may malfunction: "
-    (( public_ip     )) &&  >&2 print -P "  - %F{green}public_ip%f"
-    (( time_realtime )) &&  >&2 print -P "  - %F{green}time%f"
+     >&2 print -rP -- "%F{red}[ERROR]%f Powerlevel10k failed to start async worker. The following segments may malfunction: "
+    (( public_ip     )) &&  >&2 print -rP -- "  - %F{green}public_ip%f"
+    (( time_realtime )) &&  >&2 print -rP -- "  - %F{green}time%f"
     _p9k_deinit_async_pump
   fi
 }
@@ -3711,7 +3712,10 @@ _p9k_wrap_zle_widget() {
 function _p9k_zle_line_finish() {
   (( __p9k_enabled )) || return
   _p9k_line_finished=
-  (( _p9k_reset_on_line_finish )) && zle && zle .reset-prompt && zle -R
+  if (( _p9k_reset_on_line_finish )); then
+    emulate -L zsh && setopt no_hist_expand extended_glob no_prompt_bang prompt_{cr,percent,subst,sp}
+    zle && zle .reset-prompt && zle -R
+  fi
 }
 
 function _p9k_zle_line_pre_redraw() {
@@ -3719,6 +3723,7 @@ function _p9k_zle_line_pre_redraw() {
   [[ ${KEYMAP:-} == vicmd ]] || return 0
   local region=${${REGION_ACTIVE:-0}/2/1}
   [[ $region != $_p9k_region_active ]] || return 0
+  emulate -L zsh && setopt no_hist_expand extended_glob no_prompt_bang prompt_{cr,percent,subst,sp}
   _p9k_region_active=$region
   zle && zle .reset-prompt && zle -R
 }
@@ -3733,8 +3738,8 @@ _p9k_build_gap_post() {
   local char=${_p9k_ret:- }
   _p9k_prompt_length $char
   if (( _p9k_ret != 1 || $#char != 1 )); then
-    print -P "%F{red}WARNING!%f %BMULTILINE_${(U)1}_PROMPT_GAP_CHAR%b is not one character long. Will use ' '."
-    print -P "Either change the value of %BPOWERLEVEL9K_MULTILINE_${(U)1}_PROMPT_GAP_CHAR%b or remove it."
+    print -rP -- "%F{red}WARNING!%f %BMULTILINE_${(U)1}_PROMPT_GAP_CHAR%b is not one character long. Will use ' '."
+    print -rP -- "Either change the value of %BPOWERLEVEL9K_MULTILINE_${(U)1}_PROMPT_GAP_CHAR%b or remove it."
     char=' '
   fi
   local style
@@ -3930,9 +3935,9 @@ _p9k_init_prompt() {
       _p9k_prompt_prefix_left+="\${(pl$sep$ruler_len$sep$sep${(q)ruler_char}$sep)}%k%f"
       _p9k_prompt_prefix_left+='$_p9k_t[$((1+!_p9k_ind))]'
     else
-      print -P "%F{red}WARNING!%f %BPOWERLEVEL9K_RULER_CHAR%b is not one character long. Ruler won't be rendered."
-      print -P "Either change the value of %BPOWERLEVEL9K_RULER_CHAR%b or set %BPOWERLEVEL9K_SHOW_RULER=false%b to"
-      print -P "disable ruler."
+      print -rP -- "%F{red}WARNING!%f %BPOWERLEVEL9K_RULER_CHAR%b is not one character long. Ruler won't be rendered."
+      print -rP -- "Either change the value of %BPOWERLEVEL9K_RULER_CHAR%b or set %BPOWERLEVEL9K_SHOW_RULER=false%b to"
+      print -rP -- "disable ruler."
     fi
   fi
 
@@ -3977,7 +3982,7 @@ _p9k_init_ssh() {
 }
 
 _p9k_must_init() {
-  emulate -L zsh && setopt no_hist_expand extended_glob
+  emulate -L zsh && setopt no_hist_expand extended_glob no_prompt_bang prompt_{cr,percent,subst,sp}
   local -a param_keys=(
     ${(o)parameters[(I)(POWERLEVEL9K_*|GITSTATUS_LOG_LEVEL|GITSTATUS_ENABLE_LOGGING|GITSTATUS_DAEMON|GITSTATUS_NUM_THREADS|DEFAULT_USER|ZLE_RPROMPT_INDENT)]})
   local IFS param_sig
@@ -3996,7 +4001,7 @@ function _p9k_set_os() {
 }
 
 _p9k_init() {
-  emulate -L zsh && setopt no_hist_expand extended_glob
+  emulate -L zsh && setopt no_hist_expand extended_glob no_prompt_bang prompt_{cr,percent,subst,sp}
 
   _p9k_init_icons
   _p9k_init_vars
@@ -4087,43 +4092,46 @@ _p9k_init() {
     fi
   done
 
-  if [[ -n $POWERLEVEL9K_RIGHT_SEGMENT_END_SEPARATOR ]]; then
-    print -P "%F{yellow}WARNING!%f %F{red}POWERLEVEL9K_RIGHT_SEGMENT_END_SEPARATOR%f is no longer supported!"
-    print -P ""
-    print -P "To fix your prompt, replace %F{red}POWERLEVEL9K_RIGHT_SEGMENT_END_SEPARATOR%f with"
-    print -P "%F{green}POWERLEVEL9K_RIGHT_PROMPT_FIRST_SEGMENT_START_SYMBOL%f."
-    print -P ""
-    print -P "  %F{red} - POWERLEVEL9K_RIGHT_SEGMENT_END_SEPARATOR=${(qqq)${POWERLEVEL9K_RIGHT_SEGMENT_END_SEPARATOR//\%/%%}}%f"
-    print -P "  %F{green} + POWERLEVEL9K_RIGHT_PROMPT_FIRST_SEGMENT_START_SYMBOL=${(qqq)${POWERLEVEL9K_RIGHT_SEGMENT_END_SEPARATOR//\%/%%}}%f"
-    if [[ -n $POWERLEVEL9K_LEFT_SEGMENT_END_SEPARATOR ]]; then
-      print -P ""
-      print -P "While at it, also replace %F{red}POWERLEVEL9K_LEFT_SEGMENT_END_SEPARATOR%f with"
-      print -P "%F{green}POWERLEVEL9K_LEFT_PROMPT_LAST_SEGMENT_END_SYMBOL%f. The new option, unlike"
-      print -P "the old, works correctly in multiline prompts."
-      print -P ""
-      print -P "  %F{red} - POWERLEVEL9K_LEFT_SEGMENT_END_SEPARATOR=${(qqq)${POWERLEVEL9K_LEFT_SEGMENT_END_SEPARATOR//\%/%%}}%f"
-      print -P "  %F{green} + POWERLEVEL9K_LEFT_PROMPT_LAST_SEGMENT_END_SYMBOL=${(qqq)${POWERLEVEL9K_LEFT_SEGMENT_END_SEPARATOR//\%/%%}}%f"
-    fi
-    print -P ""
-    print -P "To get rid of this warning without changing the appearance of your prompt,"
-    print -P "remove %F{red}POWERLEVEL9K_RIGHT_SEGMENT_END_SEPARATOR%f from your config"
-  fi
-
-  if _p9k_segment_in_use longstatus; then
-    print -P '%F{yellow}WARNING!%f The "longstatus" segment is deprecated. Use "%F{blue}status%f" instead.'
-    print -P 'For more informations, have a look at https://github.com/bhilburn/powerlevel9k/blob/master/CHANGELOG.md.'
-  fi
-
   if _p9k_segment_in_use vcs; then
     _p9k_vcs_info_init
+    local gitstatus_dir=${_POWERLEVEL9K_GITSTATUS_DIR:-${__p9k_root_dir}/gitstatus}
     if [[ $_POWERLEVEL9K_DISABLE_GITSTATUS == 0 && -n $_POWERLEVEL9K_VCS_BACKENDS[(r)git] ]]; then
-      source ${_POWERLEVEL9K_GITSTATUS_DIR:-${__p9k_root_dir}/gitstatus}/gitstatus.plugin.zsh
-      gitstatus_start                                                                 \
-        -s $_POWERLEVEL9K_VCS_STAGED_MAX_NUM       \
-        -u $_POWERLEVEL9K_VCS_UNSTAGED_MAX_NUM     \
-        -d $_POWERLEVEL9K_VCS_UNTRACKED_MAX_NUM    \
-        -m $_POWERLEVEL9K_VCS_MAX_INDEX_SIZE_DIRTY \
-        POWERLEVEL9K
+      if [[ -z $GITSTATUS_DAEMON && "$(uname -m)" == i686 && -z $gitstatus_dir/bin/*-i686(-static|)(#qN) ]]; then
+        _POWERLEVEL9K_DISABLE_GITSTATUS=1
+        >&2 echo -E - "${(%):-[%1FERROR%f]: %BPowerlevel10k%b is unable to use %Bgitstatus%b. Git prompt will be slow.}"
+        >&2 echo -E - ""
+        >&2 echo -E - "${(%):-Reason: There is no %Bgitstatusd%b binary for i686 (32-bit Intel architecture).}"
+        >&2 echo -E - ""
+        >&2 echo -E - "${(%):-You can:}"
+        >&2 echo -E - ""
+        >&2 echo -E - "${(%):-  - Do nothing.}"
+        >&2 echo -E - ""
+        >&2 echo -E - "${(%):-    * You %Bwill%b see this error message every time you start zsh.}"
+        >&2 echo -E - "${(%):-    * Git prompt will be %Bslow%b.}"
+        >&2 echo -E - ""
+        >&2 echo -E - "${(%):-  - Set %BPOWERLEVEL9K_DISABLE_GITSTATUS=true%b at the bottom of %B$__p9k_zshrc_u%b.}"
+        >&2 echo -E - "${(%):-    You can do this by running the following command:}"
+        >&2 echo -E - ""
+        >&2 echo -E - "${(%):-      %2Fecho%f %3F'POWERLEVEL9K_DISABLE_GITSTATUS=true'%f >>! $__p9k_zshrc_u}"
+        >&2 echo -E - ""
+        >&2 echo -E - "${(%):-    * You %Bwill not%b see this error message again.}"
+        >&2 echo -E - "${(%):-    * Git prompt will be %Bslow%b.}"
+        >&2 echo -E - ""
+        >&2 echo -E - "${(%):-  - Compile %Bgitstatusd%b and set %BGITSTATUS_DAEMON=/path/to/gitstatusd%b at}"
+        >&2 echo -E - "${(%):-    the bottom of %B$__p9k_zshrc_u%b. See instructions at}"
+        >&2 echo -E - "${(%):-    https://github.com/romkatv/gitstatus/blob/master/README.md#compiling.}"
+        >&2 echo -E - ""
+        >&2 echo -E - "${(%):-    * You %Bwill not%b see this error message again.}"
+        >&2 echo -E - "${(%):-    * Git prompt will be %Bfast%b.}"
+      else
+        source $gitstatus_dir/gitstatus.plugin.zsh
+        gitstatus_start                              \
+          -s $_POWERLEVEL9K_VCS_STAGED_MAX_NUM       \
+          -u $_POWERLEVEL9K_VCS_UNSTAGED_MAX_NUM     \
+          -d $_POWERLEVEL9K_VCS_UNTRACKED_MAX_NUM    \
+          -m $_POWERLEVEL9K_VCS_MAX_INDEX_SIZE_DIRTY \
+          POWERLEVEL9K || _POWERLEVEL9K_DISABLE_GITSTATUS=1
+      fi
     fi
   fi
 
@@ -4179,8 +4187,8 @@ _p9k_init() {
 
   if _p9k_segment_in_use dir &&
      [[ $_POWERLEVEL9K_SHORTEN_STRATEGY == truncate_with_package_name && $+commands[jq] == 0 ]]; then
-    >&2 print -P '%F{yellow}WARNING!%f %BPOWERLEVEL9K_SHORTEN_STRATEGY=truncate_with_package_name%b requires %F{green}jq%f.'
-    >&2 print -P 'Either install %F{green}jq%f or change the value of %BPOWERLEVEL9K_SHORTEN_STRATEGY%b.'
+    print -rP -- '%F{yellow}WARNING!%f %BPOWERLEVEL9K_SHORTEN_STRATEGY=truncate_with_package_name%b requires %F{green}jq%f.'
+    print -rP -- 'Either install %F{green}jq%f or change the value of %BPOWERLEVEL9K_SHORTEN_STRATEGY%b.'
   fi
 
   if (( !$+__p9k_char2byte )) && _p9k_segment_in_use nordvpn; then
@@ -4219,7 +4227,7 @@ typeset -gi __p9k_enabled=0
 typeset -gi __p9k_configured=0
 
 prompt_powerlevel9k_setup() {
-  emulate -L zsh && setopt no_hist_expand extended_glob
+  emulate -L zsh && setopt no_hist_expand extended_glob no_prompt_bang prompt_{cr,percent,subst,sp}
   prompt_powerlevel9k_teardown
   __p9k_enabled=1
   add-zsh-hook preexec _p9k_preexec
@@ -4227,7 +4235,7 @@ prompt_powerlevel9k_setup() {
 }
 
 prompt_powerlevel9k_teardown() {
-  emulate -L zsh && setopt no_hist_expand extended_glob
+  emulate -L zsh && setopt no_hist_expand extended_glob no_prompt_bang prompt_{cr,percent,subst,sp}
   add-zsh-hook -D precmd '(_p9k_|powerlevel9k_)*'
   add-zsh-hook -D preexec '(_p9k_|powerlevel9k_)*'
   PROMPT='%m%# '
@@ -4237,7 +4245,6 @@ prompt_powerlevel9k_teardown() {
     __p9k_enabled=0
   fi
 }
-
 
 typeset -gr __p9k_p10k_usage="Usage: %2Fp10k%f %Bcommand%b [options]
 
@@ -4296,7 +4303,7 @@ Example: 'core' segment tells you if there is a file name 'core' in the current 
     else
       local state=PROTECTED
     fi
-    p10k segment -s \\\\\$state -i '⭐' -f blue -t \\\\\${size[1]}b
+    p10k segment -s \\\$state -i '⭐' -f blue -t \\\${size[1]}b
   }
 
 To enable this segment, add 'core' to POWERLEVEL9K_LEFT_PROMPT_ELEMENTS or
@@ -4325,7 +4332,7 @@ function p10k() {
   setopt no_hist_expand extended_glob prompt_percent prompt_subst
 
   if (( !ARGC )); then
-    print -P -- $__p9k_p10k_usage >&2
+    print -rP -- $__p9k_p10k_usage >&2
     return 1
   fi
 
@@ -4346,21 +4353,21 @@ function p10k() {
           e) expand=1;;
           +r) ref=0;;
           +e) expand=0;;
-          h) print -P -- $__p9k_p10k_segment_usage; return 0;;
-          ?) print -P -- $__p9k_p10k_segment_usage >&2; return 1;;
+          h) print -rP -- $__p9k_p10k_segment_usage; return 0;;
+          ?) print -rP -- $__p9k_p10k_segment_usage >&2; return 1;;
         esac
       done
       if (( OPTIND <= ARGC )); then
-        print -P -- $__p9k_p10k_segment_usage >&2
+        print -rP -- $__p9k_p10k_segment_usage >&2
         return 1
       fi
       if [[ -z $_p9k_prompt_side ]]; then
-        print -P -- "%1F[ERROR]%f %Bp10k segment%b: can be called only during prompt rendering." >&2
+        print -rP -- "%1F[ERROR]%f %Bp10k segment%b: can be called only during prompt rendering." >&2
         if (( !ARGC )); then
-          print -P -- ""
-          print -P -- "For help, type:" >&2
-          print -P -- ""
-          print -P -- "  %2Fp10k%f %Bhelp%b %Bsegment%b" >&2
+          print -rP -- ""
+          print -rP -- "For help, type:" >&2
+          print -rP -- ""
+          print -rP -- "  %2Fp10k%f %Bhelp%b %Bsegment%b" >&2
         fi
         return 1
       fi
@@ -4371,7 +4378,7 @@ function p10k() {
       ;;
     configure)
       if (( ARGC > 1 )); then
-        print -P -- $__p9k_p10k_configure_usage >&2
+        print -rP -- $__p9k_p10k_configure_usage >&2
         return 1
       fi
       p9k_configure "$@"
@@ -4379,18 +4386,18 @@ function p10k() {
     help)
       local var=__p9k_p10k_$2_usage
       if (( $+parameters[$var] )); then
-        print -P -- ${(P)var}
+        print -rP -- ${(P)var}
         return 0
       elif (( ARGC == 1 )); then
-        print -P -- $__p9k_p10k_usage
+        print -rP -- $__p9k_p10k_usage
         return 0
       else
-        print -P -- $__p9k_p10k_usage >&2
+        print -rP -- $__p9k_p10k_usage >&2
         return 1
       fi
       ;;
     *)
-      print -P -- $__p9k_p10k_usage >&2
+      print -rP -- $__p9k_p10k_usage >&2
       return 1
       ;;
   esac

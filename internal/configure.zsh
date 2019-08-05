@@ -1,26 +1,28 @@
 typeset -gr __p9k_wizard_columns=76
 typeset -gr __p9k_wizard_lines=21
 typeset -gr __p9k_zd=${${ZDOTDIR:-$HOME}:A}
-typeset -gr __p9k_zd_u=${${(q-)__p9k_zd}/#(#b)$HOME(|\/*)/'~'$match[1]}
+typeset -gr __p9k_zd_u=${${${(q-)__p9k_zd}/#(#b)$HOME(|\/*)/'~'$match[1]}//\%/%%}
 typeset -gr __p9k_cfg_basename=.p10k.zsh
 typeset -gr __p9k_cfg_path=$__p9k_zd/$__p9k_cfg_basename
 typeset -gr __p9k_cfg_path_u=$__p9k_zd_u/$__p9k_cfg_basename
 typeset -gr __p9k_zshrc=$__p9k_zd/.zshrc
 typeset -gr __p9k_zshrc_u=$__p9k_zd_u/.zshrc
-typeset -gr __p9k_root_dir_u=${${(q-)__p9k_root_dir}/#(#b)$HOME(|\/*)/'~'$match[1]}
+typeset -gr __p9k_root_dir_u=${${${(q-)__p9k_root_dir}/#(#b)$HOME(|\/*)/'~'$match[1]}//\%/%%}
 
 function _p9k_can_configure() {
   emulate -L zsh
   setopt err_return extended_glob no_prompt_{bang,subst} prompt_{cr,percent,sp}
   [[ $1 == '-q' ]] && local -i q=1 || local -i q=0
   function $0_error() {
-    (( q )) || print -P "%1F[ERROR]%f %Bp10k configure%b: $1" >&2
+    (( q )) || print -rP "%1F[ERROR]%f %Bp10k configure%b: $1" >&2
     return 1
   }
   {
     [[ -t 0 && -t 1 ]]                                || $0_error "no TTY"
     [[ -o multibyte ]]                                || $0_error "multibyte option is not set"
-    [[ "${#$(print -P '\u276F' 2>/dev/null)}" == 1 ]] || $0_error "shell doesn't support unicode"
+    [[ "${#$(print '\u276F' 2>/dev/null)}" == 1 ]]    || $0_error "shell doesn't support unicode"
+    [[ -e $__p9k_zd ]]                                || $0_error "$__p9k_zd_u does not exist"
+    [[ -d $__p9k_zd ]]                                || $0_error "$__p9k_zd_u is not a directory"
     [[ -w $__p9k_zd ]]                                || $0_error "$__p9k_zd_u is not writable"
     [[ ! -d $__p9k_cfg_path ]]                        || $0_error "$__p9k_cfg_path_u is a directory"
     [[ ! -d $__p9k_zshrc ]]                           || $0_error "$__p9k_zshrc_u is a directory"

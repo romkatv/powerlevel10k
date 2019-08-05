@@ -19,6 +19,7 @@ fi
 
 () {
   emulate -L zsh
+  setopt no_hist_expand extended_glob no_prompt_{bang,subst} prompt_{cr,percent,sp}
 
   if (( $+__p9k_sourced )); then
     prompt_powerlevel9k_setup
