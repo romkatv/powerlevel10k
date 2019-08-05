@@ -4196,7 +4196,8 @@ _p9k_init() {
     print -rP -- 'Either install %F{green}jq%f or change the value of %BPOWERLEVEL9K_SHORTEN_STRATEGY%b.'
   fi
 
-  if (( !$+__p9k_char2byte )) && _p9k_segment_in_use nordvpn; then
+  # There is no q+ flag before 5.3.
+  if (( !$+__p9k_char2byte )) && _p9k_segment_in_use nordvpn && is-at-least 5.3; then
     typeset -gA __p9k_char2byte=()
     local -i x=0 y=0
     for x in {0..7}; do
