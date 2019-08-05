@@ -11,36 +11,48 @@ typeset -gr __p9k_root_dir_u=${${${(q-)__p9k_root_dir}/#(#b)$HOME(|\/*)/'~'$matc
 
 function _p9k_can_configure() {
   emulate -L zsh
-  setopt err_return extended_glob no_prompt_{bang,subst} prompt_{cr,percent,sp}
+  setopt extended_glob no_prompt_{bang,subst} prompt_{cr,percent,sp}
   [[ $1 == '-q' ]] && local -i q=1 || local -i q=0
   function $0_error() {
     (( q )) || print -rP "%1F[ERROR]%f %Bp10k configure%b: $1" >&2
-    return 1
   }
   {
-    [[ -t 0 && -t 1 ]]                                || $0_error "no TTY"
-    [[ -o multibyte ]]                                || $0_error "multibyte option is not set"
-    [[ "${#$(print '\u276F' 2>/dev/null)}" == 1 ]]    || $0_error "shell doesn't support unicode"
-    [[ -e $__p9k_zd ]]                                || $0_error "$__p9k_zd_u does not exist"
-    [[ -d $__p9k_zd ]]                                || $0_error "$__p9k_zd_u is not a directory"
-    [[ -w $__p9k_zd ]]                                || $0_error "$__p9k_zd_u is not writable"
-    [[ ! -d $__p9k_cfg_path ]]                        || $0_error "$__p9k_cfg_path_u is a directory"
-    [[ ! -d $__p9k_zshrc ]]                           || $0_error "$__p9k_zshrc_u is a directory"
+    [[ -t 0 && -t 1 ]]         || { $0_error "no TTY";                           return 1 }
+    [[ -o multibyte ]]         || { $0_error "multibyte option is not set";      return 1 }
+    [[ -e $__p9k_zd ]]         || { $0_error "$__p9k_zd_u does not exist";       return 1 }
+    [[ -d $__p9k_zd ]]         || { $0_error "$__p9k_zd_u is not a directory";   return 1 }
+    [[ -w $__p9k_zd ]]         || { $0_error "$__p9k_zd_u is not writable";      return 1 }
+    [[ ! -d $__p9k_cfg_path ]] || { $0_error "$__p9k_cfg_path_u is a directory"; return 1 }
+    [[ ! -d $__p9k_zshrc ]]    || { $0_error "$__p9k_zshrc_u is a directory";    return 1 }
 
-    [[ ! -e $__p9k_cfg_path || -f $__p9k_cfg_path || -h $__p9k_cfg_path ]] ||
+    [[ ! -e $__p9k_cfg_path || -f $__p9k_cfg_path || -h $__p9k_cfg_path ]] || {
       $0_error "$__p9k_cfg_path_u is a special file"
-    [[ -r $__p9k_root_dir/config/p10k-lean.zsh ]]                          ||
+      return 1
+    }
+    [[ -r $__p9k_root_dir/config/p10k-lean.zsh ]]                          || {
       $0_error "cannot read $__p9k_root_dir_u/config/p10k-lean.zsh"
-    [[ -r $__p9k_root_dir/config/p10k-classic.zsh ]]                       ||
+      return 1
+    }
+    [[ -r $__p9k_root_dir/config/p10k-classic.zsh ]]                       || {
       $0_error "cannot read $__p9k_root_dir_u/config/p10k-classic.zsh"
-    [[ ! -e $__p9k_zshrc || -f $__p9k_zshrc || -h $__p9k_zshrc ]]          ||
+      return 1
+    }
+    [[ ! -e $__p9k_zshrc || -f $__p9k_zshrc || -h $__p9k_zshrc ]]          || {
       $0_error "$__p9k_zshrc_u a special file"
-    [[ ! -e $__p9k_zshrc || -r $__p9k_zshrc ]]                             ||
+      return 1
+    }
+    [[ ! -e $__p9k_zshrc || -r $__p9k_zshrc ]]                             || {
       $0_error "$__p9k_zshrc_u is not readable"
-    [[ ! -e $__p9k_zshrc || -w $__p9k_zshrc ]]                             ||
+      return 1
+    }
+    [[ ! -e $__p9k_zshrc || -w $__p9k_zshrc ]]                             || {
       $0_error "$__p9k_zshrc_u is not writable"
-    (( LINES >= __p9k_wizard_lines && COLUMNS >= __p9k_wizard_columns ))   ||
+      return 1
+    }
+    (( LINES >= __p9k_wizard_lines && COLUMNS >= __p9k_wizard_columns ))   || {
       $0_error "terminal size too small; must be at least $__p9k_wizard_columns x $__p9k_wizard_lines"
+      return 1
+    }
   } always {
     unfunction $0_error
   }

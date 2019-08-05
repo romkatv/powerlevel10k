@@ -5,6 +5,7 @@ setopt noaliases
 
 () {
 setopt extended_glob no_prompt_{bang,subst} prompt_{cr,percent,sp}
+local LC_ALL=C.UTF-8
 
 typeset -g __p9k_root_dir
 typeset -gi force=0
