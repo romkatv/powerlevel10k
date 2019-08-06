@@ -195,6 +195,15 @@ repository. Type `git status` to see these files.
 You can change this symbol or disable the display of untracked files altogether. Search for
 `untracked files` in `~/.p10k.zsh`.
 
+### I've installed the recommended font but I still don't see the Python logo in the configuration wizard.
+
+When using a font from Nerd Fonts such as
+[the recommended font](#recommended-meslo-nerd-font-patched-for-powerlevel10k), the Python logo
+isn't supposed to render _in the configuration wizard_. Your telling the wizard that the logo
+doesn't render effectively says that you are using Nerd Fonts. As long as you correctly tell the
+wizard which icons render and which don't, it'll be able to figure out which font you are using.
+You'll get all icons in your prompt, including the Python logo.
+
 ### Why does Powerlevel10k spawn extra processes?
 
 Powerlevel10k uses [gitstatus](https://github.com/romkatv/gitstatus) as the backend behind `vcs`
