@@ -385,16 +385,16 @@ function gitstatus_start() {
     read -r -d $'\x1e' -u $resp_fd -t $timeout reply
     [[ $reply == $'hello\x1f0' ]]
 
-    function _gitstatus_cleanup_${ZSH_SUBSHELL}_${daemon_pid}() {
+    function _gitstatus_cleanup_$$_${ZSH_SUBSHELL}_${daemon_pid}() {
       emulate -L zsh
       setopt err_return no_unset
       local fname=${(%):-%N}
-      local prefix=_gitstatus_cleanup_${ZSH_SUBSHELL}_
+      local prefix=_gitstatus_cleanup_$$_${ZSH_SUBSHELL}_
       [[ $fname == ${prefix}* ]] || return 0
       local -i daemon_pid=${fname#$prefix}
       kill -- -$daemon_pid &>/dev/null || true
     }
-    add-zsh-hook zshexit _gitstatus_cleanup_${ZSH_SUBSHELL}_${daemon_pid}
+    add-zsh-hook zshexit _gitstatus_cleanup_$$_${ZSH_SUBSHELL}_${daemon_pid}
 
     [[ $stderr_fd == -1 ]] || {
       unsetopt xtrace
@@ -413,7 +413,7 @@ function gitstatus_start() {
     unset -f gitstatus_start_impl
   } || {
     unsetopt err_return
-    add-zsh-hook -d zshexit _gitstatus_cleanup_${ZSH_SUBSHELL}_${daemon_pid}
+    add-zsh-hook -d zshexit _gitstatus_cleanup_$$_${ZSH_SUBSHELL}_${daemon_pid}
     [[ $daemon_pid -gt 0 ]] && kill -- -$daemon_pid &>/dev/null
     [[ $stderr_fd  -ge 0 ]] && { exec 2>&$stderr_fd {stderr_fd}>&- }
     [[ $lock_fd    -ge 0 ]] && zsystem flock -u $lock_fd
@@ -482,7 +482,7 @@ function gitstatus_stop() {
   local lock_fd=${(P)lock_fd_var:-}
   local daemon_pid=${(P)daemon_pid_var:-}
 
-  local cleanup_func=_gitstatus_cleanup_${ZSH_SUBSHELL}_${daemon_pid}
+  local cleanup_func=_gitstatus_cleanup_$$_${ZSH_SUBSHELL}_${daemon_pid}
 
   [[ -n $daemon_pid ]] && kill -- -$daemon_pid &>/dev/null
   [[ -n $req_fd     ]] && exec {req_fd}>&-
