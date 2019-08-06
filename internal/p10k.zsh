@@ -3246,6 +3246,8 @@ _p9k_deinit_async_pump() {
     rm -f $_p9k_async_pump_lock
     _p9k_async_pump_lock=''
   fi
+  _p9k_async_pump_subshell=-1
+  _p9k_async_pump_shell_pid=-1
   add-zsh-hook -D zshexit _p9k_kill_async_pump
 }
 
@@ -3327,7 +3329,7 @@ function _p9k_async_pump() {
 
 function _p9k_kill_async_pump() {
   emulate -L zsh && setopt no_hist_expand extended_glob no_prompt_bang prompt_{cr,percent,subst,sp}
-  if (( ZSH_SUBSHELL == _p9k_async_pump_subshell )); then
+  if [[ $ZSH_SUBSHELL == $_p9k_async_pump_subshell && $$ == $_p9k_async_pump_shell_pid ]]; then
     _p9k_deinit_async_pump
   fi
 }
@@ -3365,6 +3367,7 @@ _p9k_init_async_pump() {
     IFS='' read -t 5 -r -u $_p9k_async_pump_fd _p9k_async_pump_pid && (( _p9k_async_pump_pid ))
 
     _p9k_async_pump_subshell=$ZSH_SUBSHELL
+    _p9k_async_pump_shell_pid=$$
     add-zsh-hook zshexit _p9k_kill_async_pump
   }
 
@@ -3431,6 +3434,7 @@ _p9k_init_vars() {
   typeset -gi _p9k_async_pump_fd
   typeset -gi _p9k_async_pump_pid
   typeset -gi _p9k_async_pump_subshell
+  typeset -gi _p9k_async_pump_shell_pid
   typeset -ga _p9k_line_segments_left
   typeset -ga _p9k_line_segments_right
   typeset -ga _p9k_line_prefix_left
