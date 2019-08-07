@@ -4037,9 +4037,12 @@ _p9k_init() {
       Linux)
         _p9k_os='Linux'
         local os_release_id
-        [[ -f /etc/os-release &&
-          "${(f)$((</etc/os-release) 2>/dev/null)}" =~ "ID=([A-Za-z]+)" ]] && os_release_id="${match[1]}"
-        case "$os_release_id" in
+        if [[ -r /etc/os-release ]]; then
+          local lines=(${(f)"$(</etc/os-release)"})
+          lines=(${(@M)lines:#ID=*})
+          (( $#lines == 1 )) && os_release_id=${lines[1]#ID=}
+        fi
+        case $os_release_id in
           *arch*)                  _p9k_set_os Linux LINUX_ARCH_ICON;;
           *debian*)                _p9k_set_os Linux LINUX_DEBIAN_ICON;;
           *raspbian*)              _p9k_set_os Linux LINUX_RASPBIAN_ICON;;

@@ -163,7 +163,7 @@ fi
 
   #################################[ os_icon: os identifier ]##################################
   # OS identifier color.
-  typeset -g POWERLEVEL9K_OS_ICON_FOREGROUND=212
+  typeset -g POWERLEVEL9K_OS_ICON_FOREGROUND=209
   # Display this icon instead of the default.
   # typeset -g POWERLEVEL9K_OS_ICON_CONTENT_EXPANSION='⭐'
 

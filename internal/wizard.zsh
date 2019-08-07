@@ -51,7 +51,7 @@ typeset -r vertical_bar='|'
 typeset -r slanted_bar='\uE0BD'
 
 typeset -ra lean_left=(
-  '' '%31F$extra_icons[1]%B%39F~%b%31F/%B%39Fpowerlevel10k%b%f $prefixes[1]%76F$extra_icons[2]master ⇡2%f '
+  '' '${extra_icons[1]:+%209F$extra_icons[1] }%31F$extra_icons[2]%B%39F~%b%31F/%B%39Fpowerlevel10k%b%f $prefixes[1]%76F$extra_icons[3]master ⇡2%f '
   '' '%76F❯%f █'
 )
 
@@ -61,7 +61,7 @@ typeset -ra lean_right=(
 )
 
 typeset -ra classic_left=(
-  '%$frame_color[$color]F╭─' '%F{$bg_color[$color]}$left_tail%K{$bg_color[$color]} %31F$extra_icons[1]%B%39F~%b%K{$bg_color[$color]}%31F/%B%39Fpowerlevel10k%b%K{$bg_color[$color]} %$sep_color[$color]F$left_subsep%f %$prefix_color[$color]F$prefixes[1]%76F$extra_icons[2]master ⇡2 %k%$bg_color[$color]F$left_head%f'
+  '%$frame_color[$color]F╭─' '%F{$bg_color[$color]}$left_tail%K{$bg_color[$color]} ${extra_icons[1]:+%209F$extra_icons[1] %$sep_color[$color]F$left_subsep%f }%31F$extra_icons[2]%B%39F~%b%K{$bg_color[$color]}%31F/%B%39Fpowerlevel10k%b%K{$bg_color[$color]} %$sep_color[$color]F$left_subsep%f %$prefix_color[$color]F$prefixes[1]%76F$extra_icons[3]master ⇡2 %k%$bg_color[$color]F$left_head%f'
   '%$frame_color[$color]F╰─' '%f █'
 )
 
@@ -101,11 +101,16 @@ function print_prompt() {
     (( left_frame )) || left=('' $left[2] '' '%76F❯%f █')
     (( right_frame )) || right=($right[1] '' '' '')
   fi
+  local -i right_indent=prompt_indent
+  local -i width=$(prompt_length ${(g::):-$left[1]$left[2]$right[1]$right[2]})
+  while (( __p9k_wizard_columns - width <= prompt_indent + right_indent )); do
+    (( --right_indent ))
+  done
   local -i i
   for ((i = 1; i < $#left; i+=2)); do
     local l=${(g::):-$left[i]$left[i+1]}
     local r=${(g::):-$right[i]$right[i+1]}
-    local -i gap=$((__p9k_wizard_columns - 2 * prompt_indent - $(prompt_length $l$r)))
+    local -i gap=$((__p9k_wizard_columns - prompt_indent - right_indent - $(prompt_length $l$r)))
     (( num_lines == 2 && i == 1 )) && local fill=$gap_char || local fill=' '
     print -n  -- ${(pl:$prompt_indent:: :)}
     print -nP -- $l
@@ -355,26 +360,72 @@ function ask_color() {
   done
 }
 
+function os_icon_name() {
+  local uname="$(uname)"
+  if [[ $uname == Linux && "$(uname -o 2>/dev/null)" == Android ]]; then
+    echo ANDROID_ICON
+  else
+    case $uname in
+      SunOS)                     echo SUNOS_ICON;;
+      Darwin)                    echo APPLE_ICON;;
+      CYGWIN_NT-* | MSYS_NT-*)   echo WINDOWS_ICON;;
+      FreeBSD|OpenBSD|DragonFly) echo FREEBSD_ICON;;
+      Linux)
+        local os_release_id
+        if [[ -r /etc/os-release ]]; then
+          local lines=(${(f)"$(</etc/os-release)"})
+          lines=(${(@M)lines:#ID=*})
+          (( $#lines == 1 )) && os_release_id=${lines[1]#ID=}
+        fi
+        case $os_release_id in
+          *arch*)                  echo LINUX_ARCH_ICON;;
+          *debian*)                echo LINUX_DEBIAN_ICON;;
+          *raspbian*)              echo LINUX_RASPBIAN_ICON;;
+          *ubuntu*)                echo LINUX_UBUNTU_ICON;;
+          *elementary*)            echo LINUX_ELEMENTARY_ICON;;
+          *fedora*)                echo LINUX_FEDORA_ICON;;
+          *coreos*)                echo LINUX_COREOS_ICON;;
+          *gentoo*)                echo LINUX_GENTOO_ICON;;
+          *mageia*)                echo LINUX_MAGEIA_ICON;;
+          *centos*)                echo LINUX_CENTOS_ICON;;
+          *opensuse*|*tumbleweed*) echo LINUX_OPENSUSE_ICON;;
+          *sabayon*)               echo LINUX_SABAYON_ICON;;
+          *slackware*)             echo LINUX_SLACKWARE_ICON;;
+          *linuxmint*)             echo LINUX_MINT_ICON;;
+          *alpine*)                echo LINUX_ALPINE_ICON;;
+          *aosc*)                  echo LINUX_AOSC_ICON;;
+          *nixos*)                 echo LINUX_NIXOS_ICON;;
+          *devuan*)                echo LINUX_DEVUAN_ICON;;
+          *manjaro*)               echo LINUX_MANJARO_ICON;;
+          *)                       echo LINUX_ICON;;
+        esac
+        ;;
+    esac
+  fi
+}
+
 function ask_extra_icons() {
   if [[ $POWERLEVEL9K_MODE == (powerline|compatible) ]]; then
     return
   fi
+  local os_icon=${(g::)icons[$(os_icon_name)]}
   local dir_icon=${(g::)icons[HOME_SUB_ICON]}
   local vcs_icon=${(g::)icons[VCS_GIT_GITHUB_ICON]}
   local branch_icon=${(g::)icons[VCS_BRANCH_ICON]}
   if (( cap_narrow_icons )); then
+    os_icon=${os_icon// }
     dir_icon=${dir_icon// }
     vcs_icon=${vcs_icon// }
     branch_icon=${branch_icon// }
   fi
-  local many=("$dir_icon " "$vcs_icon $branch_icon ")
+  local many=("$os_icon" "$dir_icon " "$vcs_icon $branch_icon ")
   while true; do
     clear
     centered "%BIcons%b"
     print -P ""
     print -P "%B(1)  Few icons.%b"
     print -P ""
-    extra_icons=('' '') print_prompt
+    extra_icons=('' '' '') print_prompt
     print -P ""
     print -P "%B(2)  Many icons.%b"
     print -P ""
@@ -389,7 +440,7 @@ function ask_extra_icons() {
     case $key in
       q) quit;;
       r) return 1;;
-      1) extra_icons=('' ''); options+='few icons'; break;;
+      1) extra_icons=('' '' ''); options+='few icons'; break;;
       2) extra_icons=("$many[@]"); options+='many icons'; break;;
     esac
   done
@@ -848,6 +899,7 @@ function generate_config() {
     local branch_icon=$icons[VCS_BRANCH_ICON]
     (( cap_narrow_icons )) && branch_icon=${branch_icon// }
     sub VCS_BRANCH_ICON "'$branch_icon '"
+    uncomment os_icon
   else
     uncomment 'typeset -g POWERLEVEL9K_DIR_CLASSES'
     uncomment 'typeset -g POWERLEVEL9K_VCS_VISUAL_IDENTIFIER_EXPANSION'
@@ -972,7 +1024,7 @@ while true; do
   local left_subsep= right_subsep= left_tail= right_tail= left_head= right_head=
   local -i num_lines=0 write_config=0 empty_line=0 color=2 left_frame=1 right_frame=1
   local -i cap_diamond=0 cap_python=0 cap_narrow_icons=0 cap_lock=0
-  local -a extra_icons=('' '')
+  local -a extra_icons=('' '' '')
   local -a prefixes=('' '')
   local -a options=()
 
