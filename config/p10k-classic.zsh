@@ -173,10 +173,10 @@ fi
   typeset -g POWERLEVEL9K_EMPTY_LINE_LEFT_PROMPT_LAST_SEGMENT_END_SYMBOL=
 
   #################################[ os_icon: os identifier ]##################################
-  # Foreground color.
-  typeset -g POWERLEVEL9K_OS_ICON_FOREGROUND=209
-  # Display this icon instead of the default.
-  # typeset -g POWERLEVEL9K_OS_ICON_CONTENT_EXPANSION='⭐'
+  # OS identifier color.
+  typeset -g POWERLEVEL9K_OS_ICON_FOREGROUND=255
+  # Make the icon bold.
+  typeset -g POWERLEVEL9K_OS_ICON_CONTENT_EXPANSION='%B${P9K_CONTENT}'
 
   ################################[ prompt_char: prompt symbol ]################################
   # Transparent background.

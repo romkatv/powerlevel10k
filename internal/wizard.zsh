@@ -51,7 +51,7 @@ typeset -r vertical_bar='|'
 typeset -r slanted_bar='\uE0BD'
 
 typeset -ra lean_left=(
-  '' '${extra_icons[1]:+%209F$extra_icons[1] }%31F$extra_icons[2]%B%39F~%b%31F/%B%39Fpowerlevel10k%b%f $prefixes[1]%76F$extra_icons[3]master ⇡2%f '
+  '' '${extra_icons[1]:+$extra_icons[1] }%31F$extra_icons[2]%B%39F~%b%31F/%B%39Fpowerlevel10k%b%f $prefixes[1]%76F$extra_icons[3]master ⇡2%f '
   '' '%76F❯%f █'
 )
 
@@ -61,7 +61,7 @@ typeset -ra lean_right=(
 )
 
 typeset -ra classic_left=(
-  '%$frame_color[$color]F╭─' '%F{$bg_color[$color]}$left_tail%K{$bg_color[$color]} ${extra_icons[1]:+%209F$extra_icons[1] %$sep_color[$color]F$left_subsep%f }%31F$extra_icons[2]%B%39F~%b%K{$bg_color[$color]}%31F/%B%39Fpowerlevel10k%b%K{$bg_color[$color]} %$sep_color[$color]F$left_subsep%f %$prefix_color[$color]F$prefixes[1]%76F$extra_icons[3]master ⇡2 %k%$bg_color[$color]F$left_head%f'
+  '%$frame_color[$color]F╭─' '%F{$bg_color[$color]}$left_tail%K{$bg_color[$color]} ${extra_icons[1]:+$extra_icons[1]%K{$bg_color[$color]\} %$sep_color[$color]F$left_subsep%f }%31F$extra_icons[2]%B%39F~%b%K{$bg_color[$color]}%31F/%B%39Fpowerlevel10k%b%K{$bg_color[$color]} %$sep_color[$color]F$left_subsep%f %$prefix_color[$color]F$prefixes[1]%76F$extra_icons[3]master ⇡2 %k%$bg_color[$color]F$left_head%f'
   '%$frame_color[$color]F╰─' '%f █'
 )
 
@@ -418,6 +418,12 @@ function ask_extra_icons() {
     vcs_icon=${vcs_icon// }
     branch_icon=${branch_icon// }
   fi
+  if [[ $style == classic ]]; then
+    os_icon="%255F$os_icon%f"
+  else
+    os_icon="%f$os_icon"
+  fi
+  os_icon="%B$os_icon%b"
   local many=("$os_icon" "$dir_icon " "$vcs_icon $branch_icon ")
   while true; do
     clear
