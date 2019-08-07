@@ -2030,14 +2030,15 @@ prompt_status() {
 }
 
 prompt_prompt_char() {
+  unset P9K_PROMPT_CHAR_STATE
   if (( _p9k_status )); then
-    _p9k_prompt_segment $0_ERROR_VIINS "$_p9k_color1" 196 '' 0 '${${KEYMAP:-0}:#(vicmd|vivis|vivli)}' '❯'
-    _p9k_prompt_segment $0_ERROR_VICMD "$_p9k_color1" 196 '' 0 '${(M)${:-$KEYMAP$_p9k_region_active}:#vicmd0}' '❮'
-    _p9k_prompt_segment $0_ERROR_VIVIS "$_p9k_color1" 196 '' 0 '${(M)${:-$KEYMAP$_p9k_region_active}:#(vicmd1|vivis?|vivli?)}' 'Ⅴ'
+    _p9k_prompt_segment $0_ERROR_VIINS "$_p9k_color1" 196 '' 0 '${${${KEYMAP:-0}:#(vicmd|vivis|vivli)}:+${P9K_PROMPT_CHAR_STATE::=ERROR_VIINS}}' '❯'
+    _p9k_prompt_segment $0_ERROR_VICMD "$_p9k_color1" 196 '' 0 '${${(M)${:-$KEYMAP$_p9k_region_active}:#vicmd0}:+${P9K_PROMPT_CHAR_STATE::=ERROR_VICMD}}' '❮'
+    _p9k_prompt_segment $0_ERROR_VIVIS "$_p9k_color1" 196 '' 0 '${${(M)${:-$KEYMAP$_p9k_region_active}:#(vicmd1|vivis?|vivli?)}:+${P9K_PROMPT_CHAR_STATE::=ERROR_VIVIS}}' 'Ⅴ'
   else
-    _p9k_prompt_segment $0_OK_VIINS "$_p9k_color1" 76 '' 0 '${${KEYMAP:-0}:#(vicmd|vivis|vivli)}' '❯'
-    _p9k_prompt_segment $0_OK_VICMD "$_p9k_color1" 76 '' 0 '${(M)${:-$KEYMAP$_p9k_region_active}:#vicmd0}' '❮'
-    _p9k_prompt_segment $0_OK_VIVIS "$_p9k_color1" 76 '' 0 '${(M)${:-$KEYMAP$_p9k_region_active}:#(vicmd1|vivis?|vivli?)}' 'Ⅴ'
+    _p9k_prompt_segment $0_OK_VIINS "$_p9k_color1" 76 '' 0 '${${${KEYMAP:-0}:#(vicmd|vivis|vivli)}:+${P9K_PROMPT_CHAR_STATE::=OK_VIINS}}' '❯'
+    _p9k_prompt_segment $0_OK_VICMD "$_p9k_color1" 76 '' 0 '${${(M)${:-$KEYMAP$_p9k_region_active}:#vicmd0}:+${P9K_PROMPT_CHAR_STATE::=OK_VICMD}}' '❮'
+    _p9k_prompt_segment $0_OK_VIVIS "$_p9k_color1" 76 '' 0 '${${(M)${:-$KEYMAP$_p9k_region_active}:#(vicmd1|vivis?|vivli?)}:+${P9K_PROMPT_CHAR_STATE::=OK_VIVIS}}' 'Ⅴ'
   fi
 }
 
