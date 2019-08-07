@@ -376,7 +376,13 @@ function gitstatus_start() {
     rm -f $req_fifo $resp_fifo $lock_file
 
     function _gitstatus_process_response_${name}() {
-      _gitstatus_process_response ${${(%)${:-%N}}#_gitstatus_process_response_} 0 ''
+      local name=${${(%):-%N}#_gitstatus_process_response_}
+      (( ARGC == 1 )) && {
+        _gitstatus_process_response $name 0 ''
+        true
+      } || {
+        gitstatus_stop $name
+      }
     }
     zle -F $resp_fd _gitstatus_process_response_${name}
 
@@ -414,11 +420,12 @@ function gitstatus_start() {
   } || {
     unsetopt err_return
     add-zsh-hook -d zshexit _gitstatus_cleanup_$$_${ZSH_SUBSHELL}_${daemon_pid}
-    [[ $daemon_pid -gt 0 ]] && kill -- -$daemon_pid &>/dev/null
-    [[ $stderr_fd  -ge 0 ]] && { exec 2>&$stderr_fd {stderr_fd}>&- }
-    [[ $lock_fd    -ge 0 ]] && zsystem flock -u $lock_fd
-    [[ $req_fd     -ge 0 ]] && exec {req_fd}>&-
     [[ $resp_fd    -ge 0 ]] && { zle -F $resp_fd; exec {resp_fd}>&- }
+    [[ $req_fd     -ge 0 ]] && exec {req_fd}>&-
+    [[ $lock_fd    -ge 0 ]] && zsystem flock -u $lock_fd
+    [[ $stderr_fd  -ge 0 ]] && { exec 2>&$stderr_fd {stderr_fd}>&- }
+    [[ $daemon_pid -gt 0 ]] && kill -- -$daemon_pid &>/dev/null
+
     rm -f $lock_file $req_fifo $resp_fifo
     unset -f gitstatus_start_impl
 
@@ -476,6 +483,7 @@ function gitstatus_stop() {
   local lock_fd_var=_GITSTATUS_LOCK_FD_${name}
   local daemon_pid_var=GITSTATUS_DAEMON_PID_${name}
   local client_pid_var=_GITSTATUS_CLIENT_PID_${name}
+  local dirty_size_var=_GITSTATUS_DIRTY_MAX_INDEX_SIZE_${name}
 
   local req_fd=${(P)req_fd_var:-}
   local resp_fd=${(P)resp_fd_var:-}
@@ -484,12 +492,12 @@ function gitstatus_stop() {
 
   local cleanup_func=_gitstatus_cleanup_$$_${ZSH_SUBSHELL}_${daemon_pid}
 
-  [[ -n $daemon_pid ]] && kill -- -$daemon_pid &>/dev/null
-  [[ -n $req_fd     ]] && exec {req_fd}>&-
   [[ -n $resp_fd    ]] && { zle -F $resp_fd; exec {resp_fd}>&- }
+  [[ -n $req_fd     ]] && exec {req_fd}>&-
   [[ -n $lock_fd    ]] && zsystem flock -u $lock_fd
+  [[ -n $daemon_pid ]] && kill -- -$daemon_pid &>/dev/null
 
-  unset $req_fd_var $resp_fd_var $lock_fd_var $daemon_pid_var $client_pid_var
+  unset $req_fd_var $resp_fd_var $lock_fd_var $daemon_pid_var $client_pid_var $dirty_size_var
 
   if (( $+functions[$cleanup_func] )); then
     add-zsh-hook -d zshexit $cleanup_func
