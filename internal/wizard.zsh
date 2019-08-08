@@ -251,6 +251,33 @@ function ask_python() {
   done
 }
 
+function ask_debian() {
+  while true; do
+    clear
+    centered "%BDoes this look like a %b%2FDebian logo%f%B (swirl/spiral)?%b"
+    centered "reference: $(href https://www.debian.org/logos/openlogo-nd-100.jpg)"
+    print -P ""
+    centered "--->  \uF306  <---"
+    print -P ""
+    print -P "%B(y)  Yes.%b"
+    print -P ""
+    print -P "%B(n)  No.%b"
+    print -P ""
+    print -P "(r)  Restart from the beginning."
+    print -P "(q)  Quit and do nothing."
+    print -P ""
+
+    local key=
+    read -k key${(%):-"?%BChoice [ynrq]: %b"} || quit
+    case $key in
+      q) quit;;
+      r) return 1;;
+      y) cap_debian=1; break;;
+      n) cap_debian=0; break;;
+    esac
+  done
+}
+
 function ask_narrow_icons() {
   if [[ $POWERLEVEL9K_MODE == (powerline|compatible) ]]; then
     cap_narrow_icons=0
@@ -882,6 +909,15 @@ function generate_config() {
     sub BACKGROUND_JOBS_VISUAL_IDENTIFIER_EXPANSION "'⇶'"
   fi
 
+  if [[ $POWERLEVEL9K_MODE == awesome-fontconfig && $cap_python == 0 ]]; then
+    uncomment 'typeset -g POWERLEVEL9K_VIRTUALENV_VISUAL_IDENTIFIER_EXPANSION'
+    uncomment 'typeset -g POWERLEVEL9K_ANACONDA_VISUAL_IDENTIFIER_EXPANSION'
+    uncomment 'typeset -g POWERLEVEL9K_PYENV_VISUAL_IDENTIFIER_EXPANSION'
+    sub VIRTUALENV_VISUAL_IDENTIFIER_EXPANSION '🐍'
+    sub ANACONDA_VISUAL_IDENTIFIER_EXPANSION '🐍'
+    sub PYENV_VISUAL_IDENTIFIER_EXPANSION '🐍'
+  fi
+
   if [[ $style == classic ]]; then
     sub BACKGROUND $bg_color[$color]
     sub MULTILINE_FIRST_PROMPT_GAP_FOREGROUND $frame_color[$color]
@@ -1029,7 +1065,7 @@ while true; do
   local POWERLEVEL9K_MODE= style= config_backup= config_backup_u= gap_char=' '
   local left_subsep= right_subsep= left_tail= right_tail= left_head= right_head=
   local -i num_lines=0 write_config=0 empty_line=0 color=2 left_frame=1 right_frame=1
-  local -i cap_diamond=0 cap_python=0 cap_narrow_icons=0 cap_lock=0
+  local -i cap_diamond=0 cap_python=0 cap_debian=0 cap_narrow_icons=0 cap_lock=0
   local -a extra_icons=('' '' '')
   local -a prefixes=('' '')
   local -a options=()
@@ -1049,8 +1085,13 @@ while true; do
     elif (( ! cap_diamond )); then
       POWERLEVEL9K_MODE=awesome-fontconfig
     else
-      ask_python || continue
-      (( cap_python )) && POWERLEVEL9K_MODE=awesome-fontconfig || POWERLEVEL9K_MODE=nerdfont-complete
+      ask_debian || continue
+      if (( cap_debian )); then
+        POWERLEVEL9K_MODE=nerdfont-complete
+      else
+        POWERLEVEL9K_MODE=awesome-fontconfig
+        ask_python || continue
+      fi
     fi
   fi
   if [[ $POWERLEVEL9K_MODE == powerline ]]; then
