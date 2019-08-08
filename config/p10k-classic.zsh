@@ -272,7 +272,7 @@ fi
   # typeset -g POWERLEVEL9K_DIR_CLASSES=()
 
   #####################################[ vcs: git status ]######################################
-  # Branch icon. Set this parameter to '\uF126' for the popular Powerline branch icon.
+  # Branch icon. Set this parameter to '\uF126 ' for the popular Powerline branch icon.
   typeset -g POWERLEVEL9K_VCS_BRANCH_ICON=
 
   # Untracked files icon. It's really a question mark, your font isn't broken.

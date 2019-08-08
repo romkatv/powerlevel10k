@@ -443,8 +443,8 @@ function ask_extra_icons() {
     os_icon=${os_icon// }
     dir_icon=${dir_icon// }
     vcs_icon=${vcs_icon// }
-    branch_icon=${branch_icon// }
   fi
+  branch_icon=${branch_icon// }
   if [[ $style == classic ]]; then
     os_icon="%255F$os_icon%f"
   else
@@ -938,8 +938,7 @@ function generate_config() {
   fi
 
   if [[ -n ${(j::)extra_icons} ]]; then
-    local branch_icon=$icons[VCS_BRANCH_ICON]
-    (( cap_narrow_icons )) && branch_icon=${branch_icon// }
+    local branch_icon=${icons[VCS_BRANCH_ICON]// }
     sub VCS_BRANCH_ICON "'$branch_icon '"
     uncomment os_icon
   else
