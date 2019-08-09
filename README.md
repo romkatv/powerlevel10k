@@ -30,6 +30,7 @@ prompt.
 1. [License](#license)
 1. [FAQ](#faq)
    1. [Why my icons and/or powerline symbols look bad?](#why-my-icons-andor-powerline-symbols-look-bad)
+   1. [I cannot install the recommended font. Help!](#i-cannot-install-the-recommended-font-help)
    1. [Why do I have a question mark symbol in my prompt? Is my font broken?](#why-do-i-have-a-question-mark-symbol-in-my-prompt-is-my-font-broken)
    1. [Why does Powerlevel10k spawn extra processes?](#why-does-powerlevel10k-spawn-extra-processes)
    1. [Are there configuration options that make Powerlevel10k slow?](#are-there-configuration-options-that-make-powerlevel10k-slow)
@@ -186,6 +187,11 @@ covered by the same license.
 It's likely your font's fault.
 [Install the recommended font](#recommended-meslo-nerd-font-patched-for-powerlevel10k) and run
 `p10k configure`.
+
+### I cannot install the recommended font. Help!
+
+Once you download [the recommended font](#recommended-meslo-nerd-font-patched-for-powerlevel10k),
+you can install it just like any other font. Google "how to install fonts on *your-OS*".
 
 ### Why do I have a question mark symbol in my prompt? Is my font broken?
 
