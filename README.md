@@ -31,7 +31,6 @@ prompt.
 1. [FAQ](#faq)
    1. [Why my icons and/or powerline symbols look bad?](#why-my-icons-andor-powerline-symbols-look-bad)
    1. [Why do I have a question mark symbol in my prompt? Is my font broken?](#why-do-i-have-a-question-mark-symbol-in-my-prompt-is-my-font-broken)
-   1. [I've installed the recommended font but I still don't see the Python logo in the configuration wizard.](#ive-installed-the-recommended-font-but-i-still-dont-see-the-python-logo-in-the-configuration-wizard)
    1. [Why does Powerlevel10k spawn extra processes?](#why-does-powerlevel10k-spawn-extra-processes)
    1. [Are there configuration options that make Powerlevel10k slow?](#are-there-configuration-options-that-make-powerlevel10k-slow)
    1. [Is Powerlevel10k fast to load?](#is-powerlevel10k-fast-to-load)
@@ -191,19 +190,13 @@ It's likely your font's fault.
 ### Why do I have a question mark symbol in my prompt? Is my font broken?
 
 If it looks like a regular `?`, that's normal. It means you have untracked files in the current Git
-repository. Type `git status` to see these files.
+repository. Type `git status` to see these files. You can change this symbol or disable the display
+of untracked files altogether. Search for `untracked files` in `~/.p10k.zsh`.
 
-You can change this symbol or disable the display of untracked files altogether. Search for
-`untracked files` in `~/.p10k.zsh`.
-
-### I've installed the recommended font but I still don't see the Python logo in the configuration wizard.
-
-When using a font from Nerd Fonts such as
-[the recommended font](#recommended-meslo-nerd-font-patched-for-powerlevel10k), the Python logo
-isn't supposed to render _in the configuration wizard_. Your telling the wizard that the logo
-doesn't render effectively says that you are using Nerd Fonts. As long as you correctly tell the
-wizard which icons render and which don't, it'll be able to figure out which font you are using.
-You'll get all icons in your prompt, including the Python logo.
+You can also get a weird-looking question mark in your prompt if your terminal's font is missing
+some glyphs. To fix this problem,
+[install the recommended font](#recommended-meslo-nerd-font-patched-for-powerlevel10k) and run
+`p10k configure`.
 
 ### Why does Powerlevel10k spawn extra processes?
 
