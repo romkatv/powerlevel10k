@@ -50,7 +50,7 @@ fi
       nodeenv                 # node.js environment (https://github.com/ekalinin/nodeenv)
       # node_version          # node.js version
       # go_version            # golang version
-      # rbenv                 # ruby version from rbenv (https://github.com/rbenv/rbenv)
+      rbenv                   # ruby version from rbenv (https://github.com/rbenv/rbenv)
       rvm                     # ruby version from rvm (https://rvm.io)
       kubecontext             # current kubernetes context (https://kubernetes.io/)
       context                 # user@host
