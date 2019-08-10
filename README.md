@@ -110,9 +110,13 @@ the default system fonts. The full choice of style options is available only whe
 
 ### Recommended: Meslo Nerd Font patched for Powerlevel10k
 
-Download these
-[four ttf files](https://github.com/romkatv/dotfiles-public/tree/master/.local/share/fonts/NerdFonts),
-double-click on each and press "Install". This will make `MesloLGS NF` font available to all
+Download these four ttf files:
+- [MesloLGS NF Regular.ttf](https://github.com/romkatv/dotfiles-public/raw/master/.local/share/fonts/NerdFonts/MesloLGS%20NF%20Regular.ttf)
+- [MesloLGS NF Bold.ttf](https://github.com/romkatv/dotfiles-public/raw/master/.local/share/fonts/NerdFonts/MesloLGS%20NF%20Bold.ttf)
+- [MesloLGS NF Italic.ttf](https://github.com/romkatv/dotfiles-public/raw/master/.local/share/fonts/NerdFonts/MesloLGS%20NF%20Italic.ttf)
+- [MesloLGS NF Bold Italic.ttf](https://github.com/romkatv/dotfiles-public/raw/master/.local/share/fonts/NerdFonts/MesloLGS%20NF%20Bold%20Italic.ttf)
+
+Double-click on each file and press "Install". This will make `MesloLGS NF` font available to all
 applications on your system. Configure your terminal to use this font:
 
 - **iTerm2**: Open *iTerm2 → Preferences → Profiles → Text* and set *Font* to `MesloLGS NF`.
