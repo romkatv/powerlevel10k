@@ -1974,7 +1974,9 @@ prompt_rspec_stats() {
 prompt_rvm() {
   (( $+commands[rvm-prompt] )) || return
   [[ $GEM_HOME == *rvm* && $ruby_string != $rvm_path/bin/ruby ]] || return
-  local v=${${${GEM_HOME:t}%%${rvm_gemset_separator:-@}*}#*-}
+  local v=${GEM_HOME:t}
+  (( _POWERLEVEL9K_RVM_SHOW_GEMSET )) || v=${v%%${rvm_gemset_separator:-@}*}
+  (( _POWERLEVEL9K_RVM_SHOW_PREFIX )) || v=${v#*-}
   [[ -n $v ]] || return
   _p9k_prompt_segment "$0" "240" "$_p9k_color1" 'RUBY_ICON' 0 '' "${v//\%/%%}"
 }
@@ -3608,6 +3610,8 @@ _p9k_init_params() {
   _p9k_declare -b POWERLEVEL9K_NODENV_PROMPT_ALWAYS_SHOW 0
   _p9k_declare -b POWERLEVEL9K_NODE_VERSION_PROJECT_ONLY 0
   _p9k_declare -b POWERLEVEL9K_RBENV_PROMPT_ALWAYS_SHOW 0
+  _p9k_declare -b POWERLEVEL9K_RVM_SHOW_GEMSET 0
+  _p9k_declare -b POWERLEVEL9K_RVM_SHOW_PREFIX 0
   _p9k_declare -b POWERLEVEL9K_CHRUBY_SHOW_VERSION 1
   _p9k_declare -b POWERLEVEL9K_CHRUBY_SHOW_ENGINE 1
   _p9k_declare -b POWERLEVEL9K_STATUS_CROSS 0
