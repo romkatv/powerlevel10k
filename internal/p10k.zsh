@@ -1956,6 +1956,11 @@ prompt_rust_version() {
   _p9k_cached_cmd_stdout rustc --version || return
   local v=${${_p9k_ret#rustc }%% *}
   [[ -n $v ]] || return
+  local dir=$_p9k_pwd_a
+  while [[ ! -e $dir/Cargo.toml ]]; do
+    [[ $dir == / ]] && return
+    dir=${dir:h}
+  done
   _p9k_prompt_segment "$0" "darkorange" "$_p9k_color1" 'RUST_ICON' 0 '' "${v//\%/%%}"
 }
 
