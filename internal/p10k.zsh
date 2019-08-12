@@ -1527,20 +1527,23 @@ prompt_go_version() {
   local -a match
   [[ $_p9k_ret == (#b)*go([[:digit:].]##)* ]] || return
   local v=$match[1]
-  local p=$GOPATH
-  if [[ -z $p ]]; then
-    if [[ -d $HOME/go ]]; then
-      p=$HOME/go
-    else
-      p="$(go env GOPATH 2>/dev/null)" && [[ -n $p ]] || return
+  if (( _POWERLEVEL9K_GO_VERSION_PROJECT_ONLY )); then
+    local p=$GOPATH
+    if [[ -z $p ]]; then
+      if [[ -d $HOME/go ]]; then
+        p=$HOME/go
+      else
+        p="$(go env GOPATH 2>/dev/null)" && [[ -n $p ]] || return
+      fi
     fi
-  fi
-  if [[ $_p9k_pwd/ != $p/* ]]; then
-    local dir=$_p9k_pwd
-    while [[ ! -e $dir/go.mod ]]; do
-      [[ $dir == / ]] && return
-      dir=${dir:h}
-    done
+    if [[ $_p9k_pwd/ != $p/* && $_p9k_pwd_a/ != $p/* ]]; then
+      local dir=$_p9k_pwd_a
+      while true; do
+        [[ $dir == / ]] && return
+        [[ -e $dir/go.mod ]] && break
+        dir=${dir:h}
+      done
+    fi
   fi
   _p9k_prompt_segment "$0" "green" "grey93" "GO_ICON" 0 '' "${v//\%/%%}"
 }
@@ -1821,7 +1824,7 @@ prompt_nodenv() {
   (( $+commands[nodenv] )) || return
   _p9k_ret=$NODENV_VERSION
   if [[ -z $_p9k_ret ]]; then
-    [[ $NODENV_DIR == /* ]] && local dir=$NODENV_DIR || local dir="$_p9k_pwd/$NODENV_DIR"
+    [[ $NODENV_DIR == /* ]] && local dir=$NODENV_DIR || local dir="$_p9k_pwd_a/$NODENV_DIR"
     while [[ $dir != //[^/]# ]]; do
       _p9k_read_nodenv_version_file $dir/.node-version && break
       [[ $dir == / ]] && break
@@ -1909,7 +1912,7 @@ prompt_rbenv() {
   (( $+commands[rbenv] )) || return
   local v=$RBENV_VERSION
   if [[ -z $v ]]; then
-    [[ $RBENV_DIR == /* ]] && local dir=$RBENV_DIR || local dir="$_p9k_pwd/$RBENV_DIR"
+    [[ $RBENV_DIR == /* ]] && local dir=$RBENV_DIR || local dir="$_p9k_pwd_a/$RBENV_DIR"
     while true; do
       if _p9k_read_rbenv_version_file $dir/.ruby-version; then
         v=$_p9k_ret
@@ -1956,11 +1959,14 @@ prompt_rust_version() {
   _p9k_cached_cmd_stdout rustc --version || return
   local v=${${_p9k_ret#rustc }%% *}
   [[ -n $v ]] || return
-  local dir=$_p9k_pwd_a
-  while [[ ! -e $dir/Cargo.toml ]]; do
-    [[ $dir == / ]] && return
-    dir=${dir:h}
-  done
+  if (( _POWERLEVEL9K_RUST_VERSION_PROJECT_ONLY )); then
+    local dir=$_p9k_pwd_a
+    while true; do
+      [[ $dir == / ]] && return
+      [[ -e $dir/Cargo.toml ]] && break
+      dir=${dir:h}
+    done
+  fi
   _p9k_prompt_segment "$0" "darkorange" "$_p9k_color1" 'RUST_ICON' 0 '' "${v//\%/%%}"
 }
 
@@ -2744,7 +2750,7 @@ prompt_pyenv() {
   (( $+commands[pyenv] )) || return
   local v=${(j.:.)${(@)${(s.:.)PYENV_VERSION}#python-}}
   if [[ -z $v ]]; then
-    [[ $PYENV_DIR == /* ]] && local dir=$PYENV_DIR || local dir="$_p9k_pwd/$PYENV_DIR"
+    [[ $PYENV_DIR == /* ]] && local dir=$PYENV_DIR || local dir="$_p9k_pwd_a/$PYENV_DIR"
     while true; do
       if _p9k_read_pyenv_version_file $dir/.python-version; then
         v=$_p9k_ret
@@ -3614,6 +3620,8 @@ _p9k_init_params() {
   _p9k_declare -i POWERLEVEL9K_LOAD_WHICH 5
   _p9k_declare -b POWERLEVEL9K_NODENV_PROMPT_ALWAYS_SHOW 0
   _p9k_declare -b POWERLEVEL9K_NODE_VERSION_PROJECT_ONLY 0
+  _p9k_declare -b POWERLEVEL9K_GO_VERSION_PROJECT_ONLY 1
+  _p9k_declare -b POWERLEVEL9K_RUST_VERSION_PROJECT_ONLY 1
   _p9k_declare -b POWERLEVEL9K_RBENV_PROMPT_ALWAYS_SHOW 0
   _p9k_declare -b POWERLEVEL9K_RVM_SHOW_GEMSET 0
   _p9k_declare -b POWERLEVEL9K_RVM_SHOW_PREFIX 0
