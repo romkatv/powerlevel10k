@@ -88,16 +88,16 @@ function _p9k_init_icons() {
         VCS_GIT_BITBUCKET_ICON         '\uE20E '              #
         VCS_GIT_GITLAB_ICON            '\uE20E '              #
         VCS_HG_ICON                    '\uE1C3 '              # 
-        VCS_SVN_ICON                   '(svn) '
-        RUST_ICON                      '(rust)'              # TODO: try 𝗥.
-        PYTHON_ICON                    '\ue63c'              # 
+        VCS_SVN_ICON                   'svn'
+        RUST_ICON                      'R'
+        PYTHON_ICON                    '\ue63c'               # 
         SWIFT_ICON                     ''
         GO_ICON                        ''
         PUBLIC_IP_ICON                 ''
         LOCK_ICON                      '\UE138'               # 
         EXECUTION_TIME_ICON            '\UE89C'               # 
-        SSH_ICON                       '(ssh)'
-        VPN_ICON                       '(vpn)'
+        SSH_ICON                       'ssh'
+        VPN_ICON                       'vpn'
         KUBERNETES_ICON                '\U2388'               # ⎈
         DROPBOX_ICON                   '\UF16B'               # 
         DATE_ICON                      '\uE184'               # 
@@ -185,7 +185,7 @@ function _p9k_init_icons() {
         VCS_GIT_BITBUCKET_ICON         '\uF171 '              # 
         VCS_GIT_GITLAB_ICON            '\uF296 '              # 
         VCS_HG_ICON                    '\uF0C3 '              # 
-        VCS_SVN_ICON                   '(svn) '
+        VCS_SVN_ICON                   'svn'
         RUST_ICON                      '\uE6A8'              # 
         PYTHON_ICON                    '\ue63c'              # 
         SWIFT_ICON                     ''
@@ -193,7 +193,7 @@ function _p9k_init_icons() {
         PUBLIC_IP_ICON                 ''
         LOCK_ICON                      '\UF023'               # 
         EXECUTION_TIME_ICON            '\uF253' 
-        SSH_ICON                       '(ssh)'
+        SSH_ICON                       'ssh'
         VPN_ICON                       '\uF023' 
         KUBERNETES_ICON                '\U2388'               # ⎈
         DROPBOX_ICON                   '\UF16B'               # 
@@ -287,14 +287,14 @@ function _p9k_init_icons() {
         VCS_GIT_BITBUCKET_ICON         '\u'$CODEPOINT_OF_AWESOME_BITBUCKET' '         # 
         VCS_GIT_GITLAB_ICON            '\u'$CODEPOINT_OF_AWESOME_GITLAB' '            # 
         VCS_HG_ICON                    '\u'$CODEPOINT_OF_AWESOME_FLASK' '             # 
-        VCS_SVN_ICON                   '(svn) '
+        VCS_SVN_ICON                   'svn'
         RUST_ICON                      '\uE6A8'                                       # 
-        PYTHON_ICON                    '\U1F40D'                                      # 🐍
+        PYTHON_ICON                    '🐍'
         SWIFT_ICON                     '\uE655'                                       # 
         PUBLIC_IP_ICON                 '\u'$CODEPOINT_OF_AWESOME_GLOBE                # 
         LOCK_ICON                      '\u'$CODEPOINT_OF_AWESOME_LOCK                 # 
         EXECUTION_TIME_ICON            '\u'$CODEPOINT_OF_AWESOME_HOURGLASS_END        # 
-        SSH_ICON                       '(ssh)'
+        SSH_ICON                       'ssh'
         VPN_ICON                       '\u'$CODEPOINT_OF_AWESOME_LOCK
         KUBERNETES_ICON                '\U2388'                                       # ⎈
         DROPBOX_ICON                   '\u'$CODEPOINT_OF_AWESOME_DROPBOX              # 
@@ -393,7 +393,7 @@ function _p9k_init_icons() {
         LOCK_ICON                      '\UF023'               # 
         EXECUTION_TIME_ICON            '\uF252'               # 
         SSH_ICON                       '\uF489'               # 
-        VPN_ICON                       '(vpn)'
+        VPN_ICON                       'vpn'
         KUBERNETES_ICON                '\U2388'               # ⎈
         DROPBOX_ICON                   '\UF16B'               # 
         DATE_ICON                      '\uF073 '              # 
@@ -482,7 +482,7 @@ function _p9k_init_icons() {
         VCS_GIT_GITLAB_ICON            ''
         VCS_HG_ICON                    ''
         VCS_SVN_ICON                   ''
-        RUST_ICON                      'Rust'                 # TODO: try 𝗥.
+        RUST_ICON                      'R'
         PYTHON_ICON                    'Py'
         SWIFT_ICON                     'Swift'
         GO_ICON                        'Go'
