@@ -49,7 +49,8 @@ fi
       nvm                     # node.js version from nvm (https://github.com/nvm-sh/nvm)
       nodeenv                 # node.js environment (https://github.com/ekalinin/nodeenv)
       # node_version          # node.js version
-      # go_version            # golang version
+      # go_version            # go version (https://golang.org)
+      # rust_version          # rustc version (https://www.rust-lang.org)
       rbenv                   # ruby version from rbenv (https://github.com/rbenv/rbenv)
       rvm                     # ruby version from rvm (https://rvm.io)
       kubecontext             # current kubernetes context (https://kubernetes.io/)
@@ -492,11 +493,17 @@ fi
   # Custom icon.
   # typeset -g POWERLEVEL9K_NODE_VERSION_VISUAL_IDENTIFIER_EXPANSION='⭐'
 
-  ################################[ go_version: golang version ]################################
+  #######################[ go_version: go version (https://golang.org) ]########################
   # Golang version color.
   typeset -g POWERLEVEL9K_GO_VERSION_FOREGROUND=37
   # Custom icon.
   # typeset -g POWERLEVEL9K_GO_VERSION_VISUAL_IDENTIFIER_EXPANSION='⭐'
+
+  #################[ rust_version: rustc version (https://www.rust-lang.org) ]##################
+  # Rust version color.
+  typeset -g POWERLEVEL9K_RUST_VERSION_FOREGROUND=37
+  # Custom icon.
+  # typeset -g POWERLEVEL9K_RUST_VERSION_VISUAL_IDENTIFIER_EXPANSION='⭐'
 
   #############[ rbenv: ruby version from rbenv (https://github.com/rbenv/rbenv) ]##############
   # Rbenv color.
