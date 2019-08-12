@@ -30,6 +30,8 @@ prompt.
 1. [License](#license)
 1. [FAQ](#faq)
    1. [Why my icons and/or powerline symbols look bad?](#why-my-icons-andor-powerline-symbols-look-bad)
+   1. [Why is my cursor in the wrong place?](#why-is-my-cursor-in-the-wrong-place)
+   1. [Why is my right prompt wrapping around in a weird way?](why-is-my-right-prompt-wrapping-around-in-a-weird-way)
    1. [I cannot install the recommended font. Help!](#i-cannot-install-the-recommended-font-help)
    1. [Why do I have a question mark symbol in my prompt? Is my font broken?](#why-do-i-have-a-question-mark-symbol-in-my-prompt-is-my-font-broken)
    1. [Why does Powerlevel10k spawn extra processes?](#why-does-powerlevel10k-spawn-extra-processes)
@@ -191,6 +193,32 @@ covered by the same license.
 It's likely your font's fault.
 [Install the recommended font](#recommended-meslo-nerd-font-patched-for-powerlevel10k) and run
 `p10k configure`.
+
+### Why is my cursor in the wrong place?
+
+It's likely your font's fault.
+[Install the recommended font](#recommended-meslo-nerd-font-patched-for-powerlevel10k) and run
+`p10k configure`.
+
+If this doesn't help, type `unset ZLE_RPROMPT_INDENT`. If fixes the issue, make the change
+permanent:
+
+```zsh
+echo 'unset ZLE_RPROMPT_INDENT' >>! ~/.zshrc
+```
+
+### Why is my right prompt wrapping around in a weird way?
+
+It's likely your font's fault.
+[Install the recommended font](#recommended-meslo-nerd-font-patched-for-powerlevel10k) and run
+`p10k configure`.
+
+If this doesn't help, type `unset ZLE_RPROMPT_INDENT`. If fixes the issue, make the change
+permanent:
+
+```zsh
+echo 'unset ZLE_RPROMPT_INDENT' >>! ~/.zshrc
+```
 
 ### I cannot install the recommended font. Help!
 
