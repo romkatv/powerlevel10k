@@ -1777,7 +1777,7 @@ _p9k_nvm_ls_current() {
 # Segment to display Node version from NVM
 # Only prints the segment if different than the default value
 prompt_nvm() {
-  (( $+commands[nvm] )) || return
+  (( $+commands[nvm] || $+functions[nvm] )) || return
   [[ -n $NVM_DIR ]] && _p9k_nvm_ls_current || return
   local current=$_p9k_ret
   ! _p9k_nvm_ls_default || [[ $_p9k_ret != $current ]] || return
@@ -1821,7 +1821,7 @@ function _p9k_nodenv_global_version() {
 # Segment to display nodenv information
 # https://github.com/nodenv/nodenv
 prompt_nodenv() {
-  (( $+commands[nodenv] )) || return
+  (( $+commands[nodenv] || $+functions[nodenv] )) || return
   _p9k_ret=$NODENV_VERSION
   if [[ -z $_p9k_ret ]]; then
     [[ $NODENV_DIR == /* ]] && local dir=$NODENV_DIR || local dir="$_p9k_pwd_a/$NODENV_DIR"
@@ -1909,7 +1909,7 @@ function _p9k_rbenv_global_version() {
 # Segment to display rbenv information
 # https://github.com/rbenv/rbenv#choosing-the-ruby-version
 prompt_rbenv() {
-  (( $+commands[rbenv] )) || return
+  (( $+commands[rbenv] || $+functions[rbenv] )) || return
   local v=$RBENV_VERSION
   if [[ -z $v ]]; then
     [[ $RBENV_DIR == /* ]] && local dir=$RBENV_DIR || local dir="$_p9k_pwd_a/$RBENV_DIR"
@@ -1983,7 +1983,7 @@ prompt_rspec_stats() {
 ################################################################
 # Segment to display Ruby Version Manager information
 prompt_rvm() {
-  (( $+commands[rvm-prompt] )) || return
+  (( $+commands[rvm-prompt] || $+functions[rvm-prompt] )) || return
   [[ $GEM_HOME == *rvm* && $ruby_string != $rvm_path/bin/ruby ]] || return
   local v=${GEM_HOME:t}
   (( _POWERLEVEL9K_RVM_SHOW_GEMSET )) || v=${v%%${rvm_gemset_separator:-@}*}
@@ -2747,7 +2747,7 @@ function _p9k_pyenv_global_version() {
 # Segment to display pyenv information
 # https://github.com/pyenv/pyenv#choosing-the-python-version
 prompt_pyenv() {
-  (( $+commands[pyenv] )) || return
+  (( $+commands[pyenv] || $+functions[pyenv] )) || return
   local v=${(j.:.)${(@)${(s.:.)PYENV_VERSION}#python-}}
   if [[ -z $v ]]; then
     [[ $PYENV_DIR == /* ]] && local dir=$PYENV_DIR || local dir="$_p9k_pwd_a/$PYENV_DIR"
