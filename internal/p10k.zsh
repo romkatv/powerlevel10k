@@ -1995,7 +1995,7 @@ prompt_rvm() {
 ################################################################
 # Segment to display SSH icon when connected
 prompt_ssh() {
-  if [[ -n "$SSH_CLIENT" || -n "$SSH_TTY" ]]; then
+  if (( _P9K_SSH )); then
     _p9k_prompt_segment "$0" "$_p9k_color1" "yellow" 'SSH_ICON' 0 '' ''
   fi
 }
@@ -2536,8 +2536,24 @@ function _p9k_vcs_render() {
     fi
 
     if [[ -n $VCS_STATUS_LOCAL_BRANCH ]]; then
-      (( _POWERLEVEL9K_HIDE_BRANCH_ICON )) && _p9k_ret='' || _p9k_get_icon prompt_vcs_$state VCS_BRANCH_ICON
-      _$0_fmt BRANCH "$ws$_p9k_ret${VCS_STATUS_LOCAL_BRANCH//\%/%%}"
+      local branch=$ws
+      if (( !_POWERLEVEL9K_HIDE_BRANCH_ICON )); then
+        _p9k_get_icon prompt_vcs_$state VCS_BRANCH_ICON
+        branch+=$_p9k_ret
+      fi
+      if (( $+_POWERLEVEL9K_VCS_SHORTEN_LENGTH && $+_POWERLEVEL9K_VCS_SHORTEN_MIN_LENGTH &&
+            $#VCS_STATUS_LOCAL_BRANCH > _POWERLEVEL9K_VCS_SHORTEN_MIN_LENGTH &&
+            $#VCS_STATUS_LOCAL_BRANCH > _POWERLEVEL9K_VCS_SHORTEN_LENGTH )) &&
+         [[ $_POWERLEVEL9K_VCS_SHORTEN_STRATEGY == (truncate_middle|truncate_from_right) ]]; then
+        branch+=${VCS_STATUS_LOCAL_BRANCH[1,_POWERLEVEL9K_VCS_SHORTEN_LENGTH]//\%/%%}${_POWERLEVEL9K_VCS_SHORTEN_DELIMITER}
+        if [[ $_POWERLEVEL9K_VCS_SHORTEN_STRATEGY == truncate_middle ]]; then
+          _p9k_vcs_style $state BRANCH
+          branch+=${_p9k_ret}${VCS_STATUS_LOCAL_BRANCH[-_POWERLEVEL9K_VCS_SHORTEN_LENGTH,-1]//\%/%%}
+        fi
+      else
+        branch+=${VCS_STATUS_LOCAL_BRANCH//\%/%%}
+      fi
+      _$0_fmt BRANCH $branch
     fi
 
     if [[ $_POWERLEVEL9K_VCS_HIDE_TAGS == 0 && -n $VCS_STATUS_TAG ]]; then
@@ -3511,7 +3527,7 @@ _p9k_init_params() {
   _p9k_declare -i POWERLEVEL9K_VCS_SHORTEN_LENGTH
   _p9k_declare -i POWERLEVEL9K_VCS_SHORTEN_MIN_LENGTH
   _p9k_declare -s POWERLEVEL9K_VCS_SHORTEN_STRATEGY
-  _p9k_declare -s POWERLEVEL9K_VCS_SHORTEN_DELIMITER
+  _p9k_declare -e POWERLEVEL9K_VCS_SHORTEN_DELIMITER '\u2026'
   _p9k_declare -b POWERLEVEL9K_HIDE_BRANCH_ICON 0
   _p9k_declare -b POWERLEVEL9K_VCS_HIDE_TAGS 0
   _p9k_declare -i POWERLEVEL9K_CHANGESET_HASH_LENGTH 8
