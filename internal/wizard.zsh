@@ -894,6 +894,10 @@ function generate_config() {
     lines=("${(@)lines/#(#b)([[:space:]]#)\# $1(  |)/$match[1]$1$match[2]$match[2]}")
   }
 
+  function rep() {
+    lines=("${(@)lines//$1/$2}")
+  }
+
   sub MODE $POWERLEVEL9K_MODE
 
   if (( cap_narrow_icons )); then
@@ -936,6 +940,8 @@ function generate_config() {
     sub LEFT_PROMPT_LAST_SEGMENT_END_SYMBOL "'$left_head'"
     sub RIGHT_PROMPT_FIRST_SEGMENT_START_SYMBOL "'$right_head'"
     sub RIGHT_PROMPT_LAST_SEGMENT_END_SYMBOL "'$right_tail'"
+    sub VCS_LOADING_FOREGROUND $sep_color[$color]
+    rep '%248F' "%$prefix_color[$color]F"
   fi
 
   if [[ -n ${(j::)extra_icons} ]]; then
