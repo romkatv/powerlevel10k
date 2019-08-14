@@ -26,7 +26,7 @@ prompt.
 1. [Fonts](#fonts)
    1. [Recommended: Meslo Nerd Font patched for Powerlevel10k](#recommended-meslo-nerd-font-patched-for-powerlevel10k)
 1. [Try it in Docker](#try-it-in-docker)
-1. [Is it really faster?](#is-it-really-fast)
+1. [Is it really fast?](#is-it-really-fast)
 1. [License](#license)
 1. [FAQ](#faq)
    1. [Why my icons and/or powerline symbols look bad?](#why-my-icons-andor-powerline-symbols-look-bad)
@@ -200,7 +200,7 @@ It's likely your font's fault.
 [Install the recommended font](#recommended-meslo-nerd-font-patched-for-powerlevel10k) and run
 `p10k configure`.
 
-If this doesn't help, type `unset ZLE_RPROMPT_INDENT`. If fixes the issue, make the change
+If this doesn't help, type `unset ZLE_RPROMPT_INDENT`. If it fixes the issue, make the change
 permanent:
 
 ```zsh
@@ -213,7 +213,7 @@ It's likely your font's fault.
 [Install the recommended font](#recommended-meslo-nerd-font-patched-for-powerlevel10k) and run
 `p10k configure`.
 
-If this doesn't help, type `unset ZLE_RPROMPT_INDENT`. If fixes the issue, make the change
+If this doesn't help, type `unset ZLE_RPROMPT_INDENT`. If it fixes the issue, make the change
 permanent:
 
 ```zsh
