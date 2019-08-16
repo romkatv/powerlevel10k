@@ -1151,8 +1151,7 @@ _p9k_custom_prompt() {
 ################################################################
 # Display the duration the command needed to run.
 prompt_command_execution_time() {
-  (( _p9k_timer_start )) || return
-  P9K_COMMAND_DURATION_SECONDS=$((_p9k_timer_end - _p9k_timer_start))
+  (( $+P9K_COMMAND_DURATION_SECONDS )) || return
   (( P9K_COMMAND_DURATION_SECONDS >= _POWERLEVEL9K_COMMAND_EXECUTION_TIME_THRESHOLD )) || return
 
   if (( P9K_COMMAND_DURATION_SECONDS < 60 )); then
@@ -3240,6 +3239,11 @@ _p9k_precmd() {
   setopt nopromptbang prompt{cr,percent,sp,subst}
 
   _p9k_timer_end=EPOCHREALTIME
+  if (( _p9k_timer_start )); then
+    typeset -gF P9K_COMMAND_DURATION_SECONDS=$((_p9k_timer_end - _p9k_timer_start))
+  else
+    unset P9K_COMMAND_DURATION_SECONDS
+  fi
   _p9k_save_status
 
   powerlevel9k_refresh_prompt_inplace
@@ -3506,7 +3510,6 @@ _p9k_init_vars() {
   typeset -g  _p9k_pwd
   typeset -g  _p9k_pwd_a
 
-  typeset -gF P9K_COMMAND_DURATION_SECONDS
   typeset -g  P9K_VISUAL_IDENTIFIER
   typeset -g  P9K_CONTENT
   typeset -g  P9K_GAP
