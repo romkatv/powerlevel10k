@@ -412,7 +412,7 @@ fi
   # Context format when running with privileges: %n is username, %m is hostname.
   typeset -g POWERLEVEL9K_CONTEXT_ROOT_TEMPLATE='%n@%m'
 
-  # Don't show context unless running with privileges on in SSH.
+  # Don't show context unless running with privileges or in SSH.
   typeset -g POWERLEVEL9K_CONTEXT_{DEFAULT,SUDO}_{CONTENT,VISUAL_IDENTIFIER}_EXPANSION=
   typeset -g POWERLEVEL9K_ALWAYS_SHOW_CONTEXT=true
 
