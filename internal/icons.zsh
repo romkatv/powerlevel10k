@@ -108,6 +108,7 @@ function _p9k_init_icons() {
         TIME_ICON                      '\uE12E'               # 
         JAVA_ICON                      '\U2615'               # ☕︎
         LARAVEL_ICON                   ''
+        RANGER_ICON                    '\u2B50'               # ⭐
       )
     ;;
     'awesome-fontconfig')
@@ -205,6 +206,7 @@ function _p9k_init_icons() {
         TIME_ICON                      '\uF017 '              # 
         JAVA_ICON                      '\U2615'               # ☕︎
         LARAVEL_ICON                   ''
+        RANGER_ICON                    '\u2B50'               # ⭐
       )
     ;;
     'awesome-mapped-fontconfig')
@@ -306,6 +308,7 @@ function _p9k_init_icons() {
         TIME_ICON                      '\uF017 '                                      # 
         JAVA_ICON                      '\U2615'                                       # ☕︎
         LARAVEL_ICON                   ''
+        RANGER_ICON                    '\u2B50'                                       # ⭐
       )
     ;;
     'nerdfont-complete'|'nerdfont-fontconfig')
@@ -404,6 +407,7 @@ function _p9k_init_icons() {
         TIME_ICON                      '\uF017 '              # 
         JAVA_ICON                      '\U2615'               # ☕︎
         LARAVEL_ICON                   '\ue73f '              # 
+        RANGER_ICON                    '\u2B50'               # ⭐
       )
     ;;
     *)
@@ -501,6 +505,7 @@ function _p9k_init_icons() {
         TIME_ICON                      ''
         JAVA_ICON                      '\U2615'               # ☕︎
         LARAVEL_ICON                   ''
+        RANGER_ICON                    '\u2B50'               # ⭐
       )
     ;;
   esac

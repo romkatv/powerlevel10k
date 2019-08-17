@@ -58,6 +58,7 @@ fi
       kubecontext             # current kubernetes context (https://kubernetes.io/)
       context                 # user@host
       nordvpn                 # nordvpn connection status, linux only (https://nordvpn.com/)
+      ranger                  # ranger shell (https://github.com/ranger/ranger)
       # =========================[ Line #2 ]=========================
       newline
       # public_ip             # public IP address
@@ -419,6 +420,12 @@ fi
   typeset -g POWERLEVEL9K_NORDVPN_{DISCONNECTED,CONNECTING,DISCONNECTING}_VISUAL_IDENTIFIER_EXPANSION=
   # Custom icon.
   # typeset -g POWERLEVEL9K_NORDVPN_VISUAL_IDENTIFIER_EXPANSION='⭐'
+
+  #################[ ranger: ranger shell (https://github.com/ranger/ranger) ]##################
+  # Ranger shell color.
+  typeset -g POWERLEVEL9K_RANGER_FOREGROUND=221
+  # Custom icon.
+  # typeset -g POWERLEVEL9K_RANGER_VISUAL_IDENTIFIER_EXPANSION='⭐'
 
   ####################################[ context: user@host ]####################################
   # Default context color.

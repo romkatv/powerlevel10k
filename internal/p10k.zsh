@@ -3034,6 +3034,11 @@ function prompt_nordvpn() {
   esac
 }
 
+function prompt_ranger() {
+  [[ -n $RANGER_LEVEL ]] || return
+  _p9k_prompt_segment $0 $_p9k_color1 yellow RANGER_ICON 0 '' $RANGER_LEVEL
+}
+
 _p9k_preexec() {
   if (( $+_p9k_real_zle_rprompt_indent )); then
     if [[ -n $_p9k_real_zle_rprompt_indent ]]; then
