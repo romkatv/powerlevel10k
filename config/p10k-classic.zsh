@@ -16,7 +16,9 @@ fi
 () {
   emulate -L zsh
   setopt no_unset
-  local LC_ALL=C.UTF-8
+  if [[ ${LC_ALL:-${LANG:-}} != *.(utf|UTF)(-|)8 ]]; then
+    local LC_ALL=${${(@M)$(locale -a):#*.(utf|UTF)(-|)8}[1]:-en_US.UTF-8}
+  fi
 
   # Unset all configuration options. This allows you to apply configiguration changes without
   # restarting zsh. Edit ~/.p10k.zsh and type `source ~/.p10k.zsh`.

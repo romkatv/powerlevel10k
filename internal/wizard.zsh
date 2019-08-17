@@ -5,7 +5,9 @@ setopt noaliases
 
 () {
 setopt extended_glob no_prompt_{bang,subst} prompt_{cr,percent,sp}
-local LC_ALL=C.UTF-8
+if [[ ${LC_ALL:-$LANG} != *.(utf|UTF)(-|)8 ]]; then
+  local LC_ALL=${${(@M)$(locale -a):#*.(utf|UTF)(-|)8}[1]:-en_US.UTF-8}
+fi
 
 typeset -g __p9k_root_dir
 typeset -gi force=0

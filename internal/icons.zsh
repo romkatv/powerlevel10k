@@ -3,6 +3,10 @@ typeset -gA icons
 function _p9k_init_icons() {
   [[ $+_p9k_icon_mode == 1 && $_p9k_icon_mode == $POWERLEVEL9K_MODE ]] && return
   typeset -g _p9k_icon_mode=$POWERLEVEL9K_MODE
+  typeset -g _p9k_locale=${LC_ALL:-$LANG}
+  if [[ $_p9k_locale != *.(utf|UTF)(-|)8 ]]; then
+    _p9k_locale=${${(@M)$(locale -a):#*.(utf|UTF)(-|)8}[1]:-en_US.UTF-8}
+  fi
 
   case $POWERLEVEL9K_MODE in
     'flat'|'awesome-patched')
@@ -521,6 +525,7 @@ function _p9k_init_icons() {
 function print_icon() {
   emulate -L zsh && setopt no_hist_expand extended_glob no_prompt_bang prompt_{cr,percent,subst,sp}
   _p9k_init_icons
+  local LC_ALL=$_p9k_locale
   local icon_name=$1
   local var_name=POWERLEVEL9K_${icon_name}
   if [[ -n "${(tP)var_name}" ]]; then
@@ -538,6 +543,7 @@ function print_icon() {
 function get_icon_names() {
   emulate -L zsh && setopt no_hist_expand extended_glob no_prompt_bang prompt_{cr,percent,subst,sp}
   _p9k_init_icons
+  local LC_ALL=$_p9k_locale
   # Iterate over a ordered list of keys of the icons array
   for key in ${(@kon)icons}; do
     echo -n "POWERLEVEL9K_$key: "
