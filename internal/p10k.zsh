@@ -3934,6 +3934,13 @@ _p9k_init_lines() {
   fi
 }
 
+_p9k_all_params_eq() {
+  local key
+  for key in ${parameters[(I)${~1}]}; do
+    [[ ${(P)key} == $2 ]] || return
+  done
+}
+
 _p9k_init_prompt() {
   _p9k_init_lines
 
@@ -3958,9 +3965,11 @@ _p9k_init_prompt() {
   # If affects most terminals when RPROMPT is non-empty and ZLE_RPROMPT_INDENT is zero.
   # We can work around it as long as RPROMPT ends with a space.
   if [[ -n $_p9k_line_segments_right[-1] && $_p9k_line_never_empty_right[-1] == 0 &&
-        $ZLE_RPROMPT_INDENT == 0 && ${POWERLEVEL9K_WHITESPACE_BETWEEN_RIGHT_SEGMENTS:- } == ' ' &&
-        -z "$(typeset -m 'POWERLEVEL9K_*(RIGHT_RIGHT_WHITESPACE|RIGHT_PROMPT_LAST_SEGMENT_END_SYMBOL)')" ]] &&
-        ! is-at-least 5.7.2; then
+        $ZLE_RPROMPT_INDENT == 0 ]] &&
+       _p9k_all_params_eq 'POWERLEVEL9K_*WHITESPACE_BETWEEN_RIGHT_SEGMENTS' ' ' &&
+       _p9k_all_params_eq 'POWERLEVEL9K_*RIGHT_RIGHT_WHITESPACE' ' ' &&
+       _p9k_all_params_eq 'POWERLEVEL9K_*RIGHT_PROMPT_LAST_SEGMENT_END_SYMBOL' '' &&
+       ! is-at-least 5.7.2; then
     _p9k_emulate_zero_rprompt_indent=1
     _p9k_prompt_prefix_left+='${${:-${_p9k_real_zle_rprompt_indent:=$ZLE_RPROMPT_INDENT}${ZLE_RPROMPT_INDENT::=1}${_p9k_ind::=0}}+}'
     _p9k_line_suffix_right[-1]='${_p9k_sss:+${_p9k_sss% }%E}'
