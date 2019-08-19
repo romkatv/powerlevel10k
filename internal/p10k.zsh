@@ -3048,6 +3048,7 @@ function prompt_terraform() {
     local f=${TF_DATA_DIR:-.terraform}/environment
     [[ -r $f ]] && _p9k_read_file $f && ws=$_p9k_ret
   fi
+  ws=${${ws##[[:space:]]#}%%[[:space:]]#}
   [[ $ws == default ]] || _p9k_prompt_segment $0 $_p9k_color1 blue TERRAFORM_ICON 0 '' $ws
 }
 
