@@ -253,8 +253,8 @@ fi
   # FOREGROUND, SHORTENED_FOREGROUND and ANCHOR_FOREGROUND for every directory class that you wish
   # to have its own color.
   #
-  #   typeset -g POWERLEVEL9K_DIR_WORK_FOREGROUND=12
-  #   typeset -g POWERLEVEL9K_DIR_WORK_SHORTENED_FOREGROUND=4
+  #   typeset -g POWERLEVEL9K_DIR_WORK_FOREGROUND=31
+  #   typeset -g POWERLEVEL9K_DIR_WORK_SHORTENED_FOREGROUND=103
   #   typeset -g POWERLEVEL9K_DIR_WORK_ANCHOR_FOREGROUND=39
   #
   # typeset -g POWERLEVEL9K_DIR_CLASSES=()
@@ -298,9 +298,9 @@ fi
   # ~42 if have merge conflicts.
   vcs+='${${VCS_STATUS_NUM_CONFLICTED:#0}:+ %196F~${VCS_STATUS_NUM_CONFLICTED}}'
   # +42 if have staged changes.
-  vcs+='${${VCS_STATUS_NUM_STAGED:#0}:+ %227F+${VCS_STATUS_NUM_STAGED}}'
+  vcs+='${${VCS_STATUS_NUM_STAGED:#0}:+ %178F+${VCS_STATUS_NUM_STAGED}}'
   # !42 if have unstaged changes.
-  vcs+='${${VCS_STATUS_NUM_UNSTAGED:#0}:+ %227F!${VCS_STATUS_NUM_UNSTAGED}}'
+  vcs+='${${VCS_STATUS_NUM_UNSTAGED:#0}:+ %178F!${VCS_STATUS_NUM_UNSTAGED}}'
   # ?42 if have untracked files. It's really a question mark, your font isn't broken.
   # See POWERLEVEL9K_VCS_UNTRACKED_ICON below if you want to use a different icon.
   # Remove the next line if you don't want to see untracked files at all.
@@ -334,7 +334,7 @@ fi
   # Powerlevel10k has to fall back to using vcs_info.
   typeset -g POWERLEVEL9K_VCS_CLEAN_FOREGROUND=76
   typeset -g POWERLEVEL9K_VCS_UNTRACKED_FOREGROUND=76
-  typeset -g POWERLEVEL9K_VCS_MODIFIED_FOREGROUND=227
+  typeset -g POWERLEVEL9K_VCS_MODIFIED_FOREGROUND=178
 
   ##########################[ status: exit code of the last command ]###########################
   # Status on success. No content, just an icon.
@@ -406,7 +406,7 @@ fi
 
   #################[ ranger: ranger shell (https://github.com/ranger/ranger) ]##################
   # Ranger shell color.
-  typeset -g POWERLEVEL9K_RANGER_FOREGROUND=221
+  typeset -g POWERLEVEL9K_RANGER_FOREGROUND=178
   # Custom icon.
   # typeset -g POWERLEVEL9K_RANGER_VISUAL_IDENTIFIER_EXPANSION='⭐'
 
@@ -417,7 +417,7 @@ fi
   typeset -g POWERLEVEL9K_CONTEXT_TEMPLATE='%n@%m'
 
   # Context color when running with privileges.
-  typeset -g POWERLEVEL9K_CONTEXT_ROOT_FOREGROUND=227
+  typeset -g POWERLEVEL9K_CONTEXT_ROOT_FOREGROUND=178
   # Context format when running with privileges: %n is username, %m is hostname.
   typeset -g POWERLEVEL9K_CONTEXT_ROOT_TEMPLATE='%n@%m'
 
@@ -540,7 +540,7 @@ fi
   #
   # You can define different colors, icons and content expansions for different classes:
   #
-  #   typeset -g POWERLEVEL9K_KUBECONTEXT_TEST_FOREGROUND=2
+  #   typeset -g POWERLEVEL9K_KUBECONTEXT_TEST_FOREGROUND=28
   #   typeset -g POWERLEVEL9K_KUBECONTEXT_TEST_VISUAL_IDENTIFIER_EXPANSION='⭐'
   #   typeset -g POWERLEVEL9K_KUBECONTEXT_TEST_CONTENT_EXPANSION='> ${P9K_CONTENT} <'
   typeset -g POWERLEVEL9K_KUBECONTEXT_CLASSES=(
@@ -604,7 +604,7 @@ fi
   ################################[ battery: internal battery ]#################################
   # Show battery in red when it's below this level and not connected to power supply.
   typeset -g POWERLEVEL9K_BATTERY_LOW_THRESHOLD=20
-  typeset -g POWERLEVEL9K_BATTERY_LOW_FOREGROUND=1
+  typeset -g POWERLEVEL9K_BATTERY_LOW_FOREGROUND=160
   # Show battery in green when it's charging.
   typeset -g POWERLEVEL9K_BATTERY_CHARGING_FOREGROUND=70
   # Show battery in yellow when not connected to power supply.
