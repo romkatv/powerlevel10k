@@ -510,7 +510,7 @@ function _p9k_init_icons() {
         JAVA_ICON                      '\U2615'               # ☕︎
         LARAVEL_ICON                   ''
         RANGER_ICON                    '\u2B50'               # ⭐
-        TERRAFORM_ICON                 'TF'
+        TERRAFORM_ICON                 '\U1F6E0\u00A0'        # 🛠️
       )
     ;;
   esac
