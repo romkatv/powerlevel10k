@@ -56,6 +56,7 @@ fi
       rbenv                   # ruby version from rbenv (https://github.com/rbenv/rbenv)
       rvm                     # ruby version from rvm (https://rvm.io)
       kubecontext             # current kubernetes context (https://kubernetes.io/)
+      terraform               # terraform workspace (https://www.terraform.io)
       context                 # user@host
       nordvpn                 # nordvpn connection status, linux only (https://nordvpn.com/)
       ranger                  # ranger shell (https://github.com/ranger/ranger)
@@ -594,6 +595,12 @@ fi
 
   # Custom prefix.
   # typeset -g POWERLEVEL9K_KUBECONTEXT_PREFIX='%fat '
+
+  ################[ terraform: terraform workspace (https://www.terraform.io) ]#################
+  # Terraform color.
+  typeset -g POWERLEVEL9K_TERRAFORM_FOREGROUND=38
+  # Custom icon.
+  # typeset -g POWERLEVEL9K_TERRAFORM_VISUAL_IDENTIFIER_EXPANSION='⭐'
 
   ###############################[ public_ip: public IP address ]###############################
   # Public IP color.

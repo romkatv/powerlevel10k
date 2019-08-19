@@ -3039,6 +3039,18 @@ function prompt_ranger() {
   _p9k_prompt_segment $0 $_p9k_color1 yellow RANGER_ICON 0 '' $RANGER_LEVEL
 }
 
+function prompt_terraform() {
+  (( $+commands[terraform] )) || return
+  local ws=default
+  if [[ -n $TF_WORKSPACE ]]; then
+    ws=$TF_WORKSPACE
+  else
+    local f=${TF_DATA_DIR:-.terraform}/environment
+    [[ -r $f ]] && _p9k_read_file $f && ws=$_p9k_ret
+  fi
+  [[ $ws == default ]] || _p9k_prompt_segment $0 $_p9k_color1 blue TERRAFORM_ICON 0 '' $ws
+}
+
 _p9k_preexec() {
   if (( $+_p9k_real_zle_rprompt_indent )); then
     if [[ -n $_p9k_real_zle_rprompt_indent ]]; then
