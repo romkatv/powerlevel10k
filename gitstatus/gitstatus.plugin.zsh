@@ -354,7 +354,7 @@ function gitstatus_start() {
       --max-num-conflicted=${(q)max_num_conflicted}
       --max-num-untracked=${(q)max_num_untracked}
       --dirty-max-index-size=${(q)dirty_max_index_size}
-      --log-level=${(q)log_level}
+      --log-level=${(q)log_level:-INFO}
       $recurse_untracked_dirs)
 
     local cmd="
