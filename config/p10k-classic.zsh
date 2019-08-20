@@ -16,7 +16,8 @@ fi
 () {
   emulate -L zsh
   setopt no_unset
-  if [[ ${LC_ALL:-${LANG:-}} != *.(utf|UTF)(-|)8 ]]; then
+  zmodload zsh/langinfo
+  if [[ ${langinfo[CODESET]:-} != (utf|UTF)(-|)8 ]]; then
     local LC_ALL=${${(@M)$(locale -a):#*.(utf|UTF)(-|)8}[1]:-en_US.UTF-8}
   fi
 
