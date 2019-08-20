@@ -264,6 +264,8 @@ function _gitstatus_process_response() {
 #
 #   -m INT    If a repo has more files in its index than this, override -u and -d (but not -s)
 #             with zeros. Negative value means infinity. Defaults to -1.
+#
+#   -e        Count files within untracked directories like `git status --untracked-files`.
 function gitstatus_start() {
   emulate -L zsh
   setopt err_return no_unset no_bg_nice
@@ -275,8 +277,9 @@ function gitstatus_start() {
   local -i max_num_conflicted=1
   local -i max_num_untracked=1
   local -i dirty_max_index_size=-1
+  local recurse_untracked_dirs
   while true; do
-    getopts "t:s:u:c:d:m:" opt || break
+    getopts "t:s:u:c:d:m:e" opt || break
     case $opt in
       t) timeout=$OPTARG;;
       s) max_num_staged=$OPTARG;;
@@ -284,6 +287,8 @@ function gitstatus_start() {
       c) max_num_conflicted=$OPTARG;;
       d) max_num_untracked=$OPTARG;;
       m) dirty_max_index_size=$OPTARG;;
+      e) recurse_untracked_dirs='--recurse-untracked-dirs';;
+      +e) recurse_untracked_dirs=;;
       ?) return 1;;
     esac
   done
@@ -349,7 +354,8 @@ function gitstatus_start() {
       --max-num-conflicted=${(q)max_num_conflicted}
       --max-num-untracked=${(q)max_num_untracked}
       --dirty-max-index-size=${(q)dirty_max_index_size}
-      ${${log_level:#INFO}:+--log-level=$log_level})
+      --log-level=${(q)log_level}
+      $recurse_untracked_dirs)
 
     local cmd="
       echo \$\$
