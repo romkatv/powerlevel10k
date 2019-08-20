@@ -2954,12 +2954,11 @@ function _p9k_fetch_nordvpn_status() {
     IFS='' read -t 0.25 -r tag <&3
     tag=$'\015'
     while true; do
-      tag=${__p9k_char2byte[${(q+)tag}]:-0}
+      tag=$((#tag))
       (( (tag >>= 3) && tag <= $#__p9k_nordvpn_tag )) || break
       tag=$__p9k_nordvpn_tag[tag]
       sysread -c n -s 1 -t 0.25 len <&3
-      len=${__p9k_char2byte[${(q+)len}]}
-      [[ -n $len ]]
+      len=$((#len))
       val=
       (( ! len )) || {
         sysread -c n -s $len -t 0.25 val <&3
@@ -4279,18 +4278,6 @@ _p9k_init() {
      [[ $_POWERLEVEL9K_SHORTEN_STRATEGY == truncate_with_package_name && $+commands[jq] == 0 ]]; then
     print -rP -- '%F{yellow}WARNING!%f %BPOWERLEVEL9K_SHORTEN_STRATEGY=truncate_with_package_name%b requires %F{green}jq%f.'
     print -rP -- 'Either install %F{green}jq%f or change the value of %BPOWERLEVEL9K_SHORTEN_STRATEGY%b.'
-  fi
-
-  # There is no q+ flag before 5.3.
-  if (( !$+__p9k_char2byte )) && _p9k_segment_in_use nordvpn && is-at-least 5.3; then
-    typeset -gA __p9k_char2byte=()
-    local -i x=0 y=0
-    for x in {0..7}; do
-      for y in {0..7}; do
-        __p9k_char2byte[${(q+)${(g:o:):-\\$x$y}}]=$((8*x+y))
-      done
-    done
-    typeset -grA __p9k_char2byte
   fi
 
   if _p9k_segment_in_use status; then
