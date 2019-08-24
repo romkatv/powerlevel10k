@@ -122,6 +122,7 @@ Double-click on each file and press "Install". This will make `MesloLGS NF` font
 applications on your system. Configure your terminal to use this font:
 
 - **iTerm2**: Open *iTerm2 → Preferences → Profiles → Text* and set *Font* to `MesloLGS NF`.
+- **Hyper**: Open *Hyper → Edit → Preferences* and change the value for `fontFamily` to `MesloLGS NF` under module.exports.config.
 - **Visual Studio Code**: Open *File → Preferences → Settings*, enter
   `terminal.integrated.fontFamily` in the search box and set value to `MesloLGS NF`.
 - **Windows Command Prompt** (the old thing): Click the icon in the top left corner, then
