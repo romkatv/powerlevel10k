@@ -21,27 +21,27 @@ function _p9k_init_icons() {
         LEFT_SEGMENT_END_SEPARATOR     ' '                    # Whitespace
         LEFT_SUBSEGMENT_SEPARATOR      '\uE0B1'               # 
         RIGHT_SUBSEGMENT_SEPARATOR     '\uE0B3'               # 
-        CARRIAGE_RETURN_ICON           '\u21B5'               # ↵
+        CARRIAGE_RETURN_ICON           '\u21B5 '              # ↵
         ROOT_ICON                      '\uE801'               # 
-        SUDO_ICON                      '\uF09C'               # 
+        SUDO_ICON                      '\uE0A2'               # 
         RUBY_ICON                      '\uE847 '              # 
-        AWS_ICON                       '\uE895'               # 
-        AWS_EB_ICON                    '\U1F331 '             # 🌱
+        AWS_ICON                       '\uE895 '              # 
+        AWS_EB_ICON                    '\U1F331'              # 🌱
         BACKGROUND_JOBS_ICON           '\uE82F '              # 
-        TEST_ICON                      '\uE891'               # 
+        TEST_ICON                      '\uE891 '              # 
         TODO_ICON                      '\u2611'               # ☑
-        BATTERY_ICON                   '\uE894'               # 
+        BATTERY_ICON                   '\uE894 '              # 
         DISK_ICON                      '\uE1AE '              # 
         OK_ICON                        '\u2714'               # ✔
         FAIL_ICON                      '\u2718'               # ✘
         SYMFONY_ICON                   'SF'
-        NODE_ICON                      '\u2B22'               # ⬢
+        NODE_ICON                      '\u2B22 '              # ⬢
         MULTILINE_FIRST_PROMPT_PREFIX  '\u256D\U2500'         # ╭─
         MULTILINE_NEWLINE_PROMPT_PREFIX '\u251C\U2500'        # ├─
         MULTILINE_LAST_PROMPT_PREFIX   '\u2570\U2500 '        # ╰─
         APPLE_ICON                     '\uE26E '              # 
         WINDOWS_ICON                   '\uE26F '              # 
-        FREEBSD_ICON                   '\U1F608 '             # 😈
+        FREEBSD_ICON                   '\U1F608'              # 😈
         ANDROID_ICON                   '\uE270 '              # 
         LINUX_ICON                     '\uE271 '              # 
         LINUX_ARCH_ICON                '\uE271 '              # 
@@ -63,19 +63,19 @@ function _p9k_init_icons() {
         LINUX_OPENSUSE_ICON            '\uE271 '              # 
         LINUX_SABAYON_ICON             '\uE271 '              # 
         LINUX_SLACKWARE_ICON           '\uE271 '              # 
-        SUNOS_ICON                     '\U1F31E '             # 🌞
-        HOME_ICON                      '\uE12C'               # 
-        HOME_SUB_ICON                  '\uE18D'               # 
-        FOLDER_ICON                    '\uE818'               # 
-        NETWORK_ICON                   '\uE1AD'               # 
-        ETC_ICON                       '\uE82F'               # 
+        SUNOS_ICON                     '\U1F31E'              # 🌞
+        HOME_ICON                      '\uE12C '              # 
+        HOME_SUB_ICON                  '\uE18D '              # 
+        FOLDER_ICON                    '\uE818 '              # 
+        NETWORK_ICON                   '\uE1AD '              # 
+        ETC_ICON                       '\uE82F '              # 
         LOAD_ICON                      '\uE190 '              # 
-        SWAP_ICON                      '\uE87D'               # 
+        SWAP_ICON                      '\uE87D '              # 
         RAM_ICON                       '\uE1E2 '              # 
-        SERVER_ICON                    '\uE895'               # 
-        VCS_UNTRACKED_ICON             '\uE16C'               # 
-        VCS_UNSTAGED_ICON              '\uE17C'               # 
-        VCS_STAGED_ICON                '\uE168'               # 
+        SERVER_ICON                    '\uE895 '              # 
+        VCS_UNTRACKED_ICON             '\uE16C '              # 
+        VCS_UNSTAGED_ICON              '\uE17C '              # 
+        VCS_STAGED_ICON                '\uE168 '              # 
         VCS_STASH_ICON                 '\uE133 '              # 
         #VCS_INCOMING_CHANGES_ICON     '\uE1EB '              # 
         #VCS_INCOMING_CHANGES_ICON     '\uE80D '              # 
@@ -96,18 +96,18 @@ function _p9k_init_icons() {
         VCS_HG_ICON                    '\uE1C3 '              # 
         VCS_SVN_ICON                   'svn'
         RUST_ICON                      'R'
-        PYTHON_ICON                    '\ue63c'               # 
-        SWIFT_ICON                     ''
-        GO_ICON                        ''
-        PUBLIC_IP_ICON                 ''
+        PYTHON_ICON                    '\uE63C '              #  (doesn't always work)
+        SWIFT_ICON                     'Swift'
+        GO_ICON                        'Go'
+        PUBLIC_IP_ICON                 'IP'
         LOCK_ICON                      '\UE138'               # 
-        EXECUTION_TIME_ICON            '\UE89C'               # 
+        EXECUTION_TIME_ICON            '\UE89C '              # 
         SSH_ICON                       'ssh'
         VPN_ICON                       'vpn'
-        KUBERNETES_ICON                '\U2388'               # ⎈
-        DROPBOX_ICON                   '\UF16B'               # 
-        DATE_ICON                      '\uE184'               # 
-        TIME_ICON                      '\uE12E'               # 
+        KUBERNETES_ICON                '\U2388 '              # ⎈
+        DROPBOX_ICON                   '\UF16B '              #  (doesn't always work)
+        DATE_ICON                      '\uE184 '              # 
+        TIME_ICON                      '\uE12E '              # 
         JAVA_ICON                      '\U2615'               # ☕︎
         LARAVEL_ICON                   ''
         RANGER_ICON                    '\u2B50'               # ⭐
@@ -125,13 +125,13 @@ function _p9k_init_icons() {
         LEFT_SUBSEGMENT_SEPARATOR      '\uE0B1'               # 
         RIGHT_SUBSEGMENT_SEPARATOR     '\uE0B3'               # 
         CARRIAGE_RETURN_ICON           '\u21B5'               # ↵
-        ROOT_ICON                      '\uF201'               # 
-        SUDO_ICON                      '\uF09C'               # 
+        ROOT_ICON                      '\uF201 '              # 
+        SUDO_ICON                      '\uF09C '              # 
         RUBY_ICON                      '\uF219 '              # 
-        AWS_ICON                       '\uF270'               # 
-        AWS_EB_ICON                    '\U1F331 '             # 🌱
+        AWS_ICON                       '\uF270 '              # 
+        AWS_EB_ICON                    '\U1F331'              # 🌱
         BACKGROUND_JOBS_ICON           '\uF013 '              # 
-        TEST_ICON                      '\uF291'               # 
+        TEST_ICON                      '\uF291 '              # 
         TODO_ICON                      '\u2611'               # ☑
         BATTERY_ICON                   '\U1F50B'              # 🔋
         DISK_ICON                      '\uF0A0 '              # 
@@ -144,8 +144,8 @@ function _p9k_init_icons() {
         MULTILINE_LAST_PROMPT_PREFIX   '\u2570\U2500 '        # ╰─
         APPLE_ICON                     '\uF179 '              # 
         WINDOWS_ICON                   '\uF17A '              # 
-        FREEBSD_ICON                   '\U1F608 '             # 😈
-        ANDROID_ICON                   '\uE17B '              # 
+        FREEBSD_ICON                   '\U1F608'              # 😈
+        ANDROID_ICON                   '\uE17B '              #  (doesn't always work)
         LINUX_ICON                     '\uF17C '              # 
         LINUX_ARCH_ICON                '\uF17C '              # 
         LINUX_DEBIAN_ICON              '\uF17C '              # 
@@ -167,23 +167,23 @@ function _p9k_init_icons() {
         LINUX_SABAYON_ICON             '\uF17C '              # 
         LINUX_SLACKWARE_ICON           '\uF17C '              # 
         SUNOS_ICON                     '\uF185 '              # 
-        HOME_ICON                      '\uF015'               # 
-        HOME_SUB_ICON                  '\uF07C'               # 
-        FOLDER_ICON                    '\uF115'               # 
+        HOME_ICON                      '\uF015 '              # 
+        HOME_SUB_ICON                  '\uF07C '              # 
+        FOLDER_ICON                    '\uF115 '              # 
         ETC_ICON                       '\uF013 '              # 
-        NETWORK_ICON                   '\uF09E'               # 
+        NETWORK_ICON                   '\uF09E '              # 
         LOAD_ICON                      '\uF080 '              # 
-        SWAP_ICON                      '\uF0E4'               # 
-        RAM_ICON                       '\uF0E4'               # 
-        SERVER_ICON                    '\uF233'               # 
-        VCS_UNTRACKED_ICON             '\uF059'               # 
-        VCS_UNSTAGED_ICON              '\uF06A'               # 
-        VCS_STAGED_ICON                '\uF055'               # 
+        SWAP_ICON                      '\uF0E4 '              # 
+        RAM_ICON                       '\uF0E4 '              # 
+        SERVER_ICON                    '\uF233 '              # 
+        VCS_UNTRACKED_ICON             '\uF059 '              # 
+        VCS_UNSTAGED_ICON              '\uF06A '              # 
+        VCS_STAGED_ICON                '\uF055 '              # 
         VCS_STASH_ICON                 '\uF01C '              # 
         VCS_INCOMING_CHANGES_ICON      '\uF01A '              # 
         VCS_OUTGOING_CHANGES_ICON      '\uF01B '              # 
         VCS_TAG_ICON                   '\uF217 '              # 
-        VCS_BOOKMARK_ICON              '\uF27B'               # 
+        VCS_BOOKMARK_ICON              '\uF27B '              # 
         VCS_COMMIT_ICON                '\uF221 '              # 
         VCS_BRANCH_ICON                '\uF126 '              # 
         VCS_REMOTE_BRANCH_ICON         '\u2192'               # →
@@ -194,17 +194,17 @@ function _p9k_init_icons() {
         VCS_GIT_GITLAB_ICON            '\uF296 '              # 
         VCS_HG_ICON                    '\uF0C3 '              # 
         VCS_SVN_ICON                   'svn'
-        RUST_ICON                      '\uE6A8'              # 
-        PYTHON_ICON                    '\ue63c'              # 
-        SWIFT_ICON                     ''
-        GO_ICON                        ''
-        PUBLIC_IP_ICON                 ''
+        RUST_ICON                      '\uE6A8'               # 
+        PYTHON_ICON                    '\uE63C '              # 
+        SWIFT_ICON                     'Swift'
+        GO_ICON                        'Go'
+        PUBLIC_IP_ICON                 'IP'
         LOCK_ICON                      '\UF023'               # 
-        EXECUTION_TIME_ICON            '\uF253' 
+        EXECUTION_TIME_ICON            '\uF253 '              # 
         SSH_ICON                       'ssh'
         VPN_ICON                       '\uF023' 
         KUBERNETES_ICON                '\U2388'               # ⎈
-        DROPBOX_ICON                   '\UF16B'               # 
+        DROPBOX_ICON                   '\UF16B '              # 
         DATE_ICON                      '\uF073 '              # 
         TIME_ICON                      '\uF017 '              # 
         JAVA_ICON                      '\U2615'               # ☕︎
@@ -232,24 +232,24 @@ function _p9k_init_icons() {
         RIGHT_SUBSEGMENT_SEPARATOR     '\uE0B3'                                       # 
         CARRIAGE_RETURN_ICON           '\u21B5'                                       # ↵
         ROOT_ICON                      '\u'$CODEPOINT_OF_OCTICONS_ZAP                 # 
-        SUDO_ICON                      '\u'$CODEPOINT_OF_AWESOME_UNLOCK               # 
+        SUDO_ICON                      '\u'$CODEPOINT_OF_AWESOME_UNLOCK' '            # 
         RUBY_ICON                      '\u'$CODEPOINT_OF_OCTICONS_RUBY' '             # 
-        AWS_ICON                       '\u'$CODEPOINT_OF_AWESOME_SERVER               # 
-        AWS_EB_ICON                    '\U1F331 '                                     # 🌱
+        AWS_ICON                       '\u'$CODEPOINT_OF_AWESOME_SERVER' '            # 
+        AWS_EB_ICON                    '\U1F331'                                      # 🌱
         BACKGROUND_JOBS_ICON           '\u'$CODEPOINT_OF_AWESOME_COG' '               # 
-        TEST_ICON                      '\u'$CODEPOINT_OF_AWESOME_BUG                  # 
-        TODO_ICON                      '\u'$CODEPOINT_OF_AWESOME_CHECK_SQUARE_O       # 
-        BATTERY_ICON                   '\U'$CODEPOINT_OF_AWESOME_BATTERY_FULL         # 
+        TEST_ICON                      '\u'$CODEPOINT_OF_AWESOME_BUG' '               # 
+        TODO_ICON                      '\u'$CODEPOINT_OF_AWESOME_CHECK_SQUARE_O' '    # 
+        BATTERY_ICON                   '\U'$CODEPOINT_OF_AWESOME_BATTERY_FULL' '      # 
         DISK_ICON                      '\u'$CODEPOINT_OF_AWESOME_HDD_O' '             # 
-        OK_ICON                        '\u'$CODEPOINT_OF_AWESOME_CHECK                # 
-        FAIL_ICON                      '\u'$CODEPOINT_OF_AWESOME_TIMES                # 
+        OK_ICON                        '\u'$CODEPOINT_OF_AWESOME_CHECK' '             # 
+        FAIL_ICON                      '\u'$CODEPOINT_OF_AWESOME_TIMES                # 
         SYMFONY_ICON                   'SF'
         NODE_ICON                      '\u2B22'                                       # ⬢
         MULTILINE_FIRST_PROMPT_PREFIX  '\u256D\U2500'                                 # ╭─
         MULTILINE_NEWLINE_PROMPT_PREFIX '\u251C\U2500'                                # ├─
         MULTILINE_LAST_PROMPT_PREFIX   '\u2570\U2500 '                                # ╰─
         APPLE_ICON                     '\u'$CODEPOINT_OF_AWESOME_APPLE' '             # 
-        FREEBSD_ICON                   '\U1F608 '                                     # 😈
+        FREEBSD_ICON                   '\U1F608'                                      # 😈
         LINUX_ICON                     '\u'$CODEPOINT_OF_AWESOME_LINUX' '             # 
         LINUX_ARCH_ICON                '\u'$CODEPOINT_OF_AWESOME_LINUX' '             # 
         LINUX_DEBIAN_ICON              '\u'$CODEPOINT_OF_AWESOME_LINUX' '             # 
@@ -271,18 +271,18 @@ function _p9k_init_icons() {
         LINUX_SABAYON_ICON             '\u'$CODEPOINT_OF_AWESOME_LINUX' '             # 
         LINUX_SLACKWARE_ICON           '\u'$CODEPOINT_OF_AWESOME_LINUX' '             # 
         SUNOS_ICON                     '\u'$CODEPOINT_OF_AWESOME_SUN_O' '             # 
-        HOME_ICON                      '\u'$CODEPOINT_OF_AWESOME_HOME                 # 
-        HOME_SUB_ICON                  '\u'$CODEPOINT_OF_AWESOME_FOLDER_OPEN          # 
-        FOLDER_ICON                    '\u'$CODEPOINT_OF_AWESOME_FOLDER_O             # 
+        HOME_ICON                      '\u'$CODEPOINT_OF_AWESOME_HOME' '              # 
+        HOME_SUB_ICON                  '\u'$CODEPOINT_OF_AWESOME_FOLDER_OPEN' '       # 
+        FOLDER_ICON                    '\u'$CODEPOINT_OF_AWESOME_FOLDER_O' '          # 
         ETC_ICON                       '\u'$CODEPOINT_OF_AWESOME_COG' '               # 
-        NETWORK_ICON                   '\u'$CODEPOINT_OF_AWESOME_RSS                  # 
+        NETWORK_ICON                   '\u'$CODEPOINT_OF_AWESOME_RSS' '               # 
         LOAD_ICON                      '\u'$CODEPOINT_OF_AWESOME_BAR_CHART' '         # 
-        SWAP_ICON                      '\u'$CODEPOINT_OF_AWESOME_DASHBOARD            # 
-        RAM_ICON                       '\u'$CODEPOINT_OF_AWESOME_DASHBOARD            # 
-        SERVER_ICON                    '\u'$CODEPOINT_OF_AWESOME_SERVER               # 
-        VCS_UNTRACKED_ICON             '\u'$CODEPOINT_OF_AWESOME_QUESTION_CIRCLE      # 
-        VCS_UNSTAGED_ICON              '\u'$CODEPOINT_OF_AWESOME_EXCLAMATION_CIRCLE   # 
-        VCS_STAGED_ICON                '\u'$CODEPOINT_OF_AWESOME_PLUS_CIRCLE          # 
+        SWAP_ICON                      '\u'$CODEPOINT_OF_AWESOME_DASHBOARD' '         # 
+        RAM_ICON                       '\u'$CODEPOINT_OF_AWESOME_DASHBOARD' '         # 
+        SERVER_ICON                    '\u'$CODEPOINT_OF_AWESOME_SERVER' '            # 
+        VCS_UNTRACKED_ICON             '\u'$CODEPOINT_OF_AWESOME_QUESTION_CIRCLE' '   # 
+        VCS_UNSTAGED_ICON              '\u'$CODEPOINT_OF_AWESOME_EXCLAMATION_CIRCLE' ' # 
+        VCS_STAGED_ICON                '\u'$CODEPOINT_OF_AWESOME_PLUS_CIRCLE' '       # 
         VCS_STASH_ICON                 '\u'$CODEPOINT_OF_AWESOME_INBOX' '             # 
         VCS_INCOMING_CHANGES_ICON      '\u'$CODEPOINT_OF_AWESOME_ARROW_CIRCLE_DOWN' ' # 
         VCS_OUTGOING_CHANGES_ICON      '\u'$CODEPOINT_OF_AWESOME_ARROW_CIRCLE_UP' '   # 
@@ -290,7 +290,7 @@ function _p9k_init_icons() {
         VCS_BOOKMARK_ICON              '\u'$CODEPOINT_OF_OCTICONS_BOOKMARK            # 
         VCS_COMMIT_ICON                '\u'$CODEPOINT_OF_OCTICONS_GIT_COMMIT' '       # 
         VCS_BRANCH_ICON                '\u'$CODEPOINT_OF_OCTICONS_GIT_BRANCH' '       # 
-        VCS_REMOTE_BRANCH_ICON         '\u'$CODEPOINT_OF_OCTICONS_REPO_PUSH           # 
+        VCS_REMOTE_BRANCH_ICON         '\u'$CODEPOINT_OF_OCTICONS_REPO_PUSH' '        # 
         VCS_LOADING_ICON               ''
         VCS_GIT_ICON                   '\u'$CODEPOINT_OF_AWESOME_GIT' '               # 
         VCS_GIT_GITHUB_ICON            '\u'$CODEPOINT_OF_AWESOME_GITHUB_ALT' '        # 
@@ -299,15 +299,15 @@ function _p9k_init_icons() {
         VCS_HG_ICON                    '\u'$CODEPOINT_OF_AWESOME_FLASK' '             # 
         VCS_SVN_ICON                   'svn'
         RUST_ICON                      '\uE6A8'                                       # 
-        PYTHON_ICON                    '🐍'
-        SWIFT_ICON                     '\uE655'                                       # 
-        PUBLIC_IP_ICON                 '\u'$CODEPOINT_OF_AWESOME_GLOBE                # 
+        PYTHON_ICON                    '\U1F40D'                                      # 🐍
+        SWIFT_ICON                     '\uE655 '                                      # 
+        PUBLIC_IP_ICON                 '\u'$CODEPOINT_OF_AWESOME_GLOBE' '             # 
         LOCK_ICON                      '\u'$CODEPOINT_OF_AWESOME_LOCK                 # 
-        EXECUTION_TIME_ICON            '\u'$CODEPOINT_OF_AWESOME_HOURGLASS_END        # 
+        EXECUTION_TIME_ICON            '\u'$CODEPOINT_OF_AWESOME_HOURGLASS_END' '     # 
         SSH_ICON                       'ssh'
         VPN_ICON                       '\u'$CODEPOINT_OF_AWESOME_LOCK
         KUBERNETES_ICON                '\U2388'                                       # ⎈
-        DROPBOX_ICON                   '\u'$CODEPOINT_OF_AWESOME_DROPBOX              # 
+        DROPBOX_ICON                   '\u'$CODEPOINT_OF_AWESOME_DROPBOX' '           # 
         DATE_ICON                      '\uF073 '                                      # 
         TIME_ICON                      '\uF017 '                                      # 
         JAVA_ICON                      '\U2615'                                       # ☕︎
@@ -328,36 +328,36 @@ function _p9k_init_icons() {
         LEFT_SUBSEGMENT_SEPARATOR      '\uE0B1'               # 
         RIGHT_SUBSEGMENT_SEPARATOR     '\uE0B3'               # 
         CARRIAGE_RETURN_ICON           '\u21B5'               # ↵
-        ROOT_ICON                      '\uE614 '              # 
-        SUDO_ICON                      '\uF09C'               # 
+        ROOT_ICON                      '\uE614'               # 
+        SUDO_ICON                      '\uF09C '              # 
         RUBY_ICON                      '\uF219 '              # 
-        AWS_ICON                       '\uF270'               # 
-        AWS_EB_ICON                    '\UF1BD  '             # 
+        AWS_ICON                       '\uF270 '              # 
+        AWS_EB_ICON                    '\UF1BD'               # 
         BACKGROUND_JOBS_ICON           '\uF013 '              # 
-        TEST_ICON                      '\uF188'               # 
-        TODO_ICON                      '\uF133'               # 
+        TEST_ICON                      '\uF188 '              # 
+        TODO_ICON                      '\uF133 '              # 
         BATTERY_ICON                   '\UF240 '              # 
-        DISK_ICON                      '\uF0A0'               # 
-        OK_ICON                        '\uF00C'               # 
+        DISK_ICON                      '\uF0A0 '              # 
+        OK_ICON                        '\uF00C '              # 
         FAIL_ICON                      '\uF00D'               # 
         SYMFONY_ICON                   '\uE757'               # 
         NODE_ICON                      '\uE617 '              # 
         MULTILINE_FIRST_PROMPT_PREFIX  '\u256D\U2500'         # ╭─
         MULTILINE_NEWLINE_PROMPT_PREFIX '\u251C\U2500'        # ├─
         MULTILINE_LAST_PROMPT_PREFIX   '\u2570\U2500 '        # ╰─
-        APPLE_ICON                     '\uF179 '              # 
+        APPLE_ICON                     '\uF179'               # 
         WINDOWS_ICON                   '\uF17A '              # 
         FREEBSD_ICON                   '\UF30C '              # 
-        ANDROID_ICON                   '\uF17B '              # 
-        LINUX_ARCH_ICON                '\uF303 '              # 
+        ANDROID_ICON                   '\uF17B'               # 
+        LINUX_ARCH_ICON                '\uF303'               # 
         LINUX_CENTOS_ICON              '\uF304 '              # 
         LINUX_COREOS_ICON              '\uF305 '              # 
-        LINUX_DEBIAN_ICON              '\uF306 '              # 
-        LINUX_RASPBIAN_ICON            '\uF315 '              # 
+        LINUX_DEBIAN_ICON              '\uF306'               # 
+        LINUX_RASPBIAN_ICON            '\uF315'               # 
         LINUX_ELEMENTARY_ICON          '\uF309 '              # 
         LINUX_FEDORA_ICON              '\uF30a '              # 
         LINUX_GENTOO_ICON              '\uF30d '              # 
-        LINUX_MAGEIA_ICON              '\uF310 '              # 
+        LINUX_MAGEIA_ICON              '\uF310'               # 
         LINUX_MINT_ICON                '\uF30e '              # 
         LINUX_NIXOS_ICON               '\uF313 '              # 
         LINUX_MANJARO_ICON             '\uF312 '              # 
@@ -368,20 +368,20 @@ function _p9k_init_icons() {
         LINUX_SABAYON_ICON             '\uF317 '              # 
         LINUX_SLACKWARE_ICON           '\uF319 '              # 
         LINUX_UBUNTU_ICON              '\uF31b '              # 
-        LINUX_ICON                     '\uF17C '              # 
+        LINUX_ICON                     '\uF17C'               # 
         SUNOS_ICON                     '\uF185 '              # 
-        HOME_ICON                      '\uF015'               # 
-        HOME_SUB_ICON                  '\uF07C'               # 
-        FOLDER_ICON                    '\uF115'               # 
-        ETC_ICON                       '\uF013'               # 
-        NETWORK_ICON                   '\uF1EB'               # 
+        HOME_ICON                      '\uF015 '              # 
+        HOME_SUB_ICON                  '\uF07C '              # 
+        FOLDER_ICON                    '\uF115 '              # 
+        ETC_ICON                       '\uF013 '              # 
+        NETWORK_ICON                   '\uF1EB '              # 
         LOAD_ICON                      '\uF080 '              # 
-        SWAP_ICON                      '\uF464'               # 
-        RAM_ICON                       '\uF0E4'               # 
-        SERVER_ICON                    '\uF0AE'               # 
-        VCS_UNTRACKED_ICON             '\uF059'               # 
-        VCS_UNSTAGED_ICON              '\uF06A'               # 
-        VCS_STAGED_ICON                '\uF055'               # 
+        SWAP_ICON                      '\uF464 '              # 
+        RAM_ICON                       '\uF0E4 '              # 
+        SERVER_ICON                    '\uF0AE '              # 
+        VCS_UNTRACKED_ICON             '\uF059 '              # 
+        VCS_UNSTAGED_ICON              '\uF06A '              # 
+        VCS_STAGED_ICON                '\uF055 '              # 
         VCS_STASH_ICON                 '\uF01C '              # 
         VCS_INCOMING_CHANGES_ICON      '\uF01A '              # 
         VCS_OUTGOING_CHANGES_ICON      '\uF01B '              # 
@@ -396,22 +396,22 @@ function _p9k_init_icons() {
         VCS_GIT_BITBUCKET_ICON         '\uE703 '              # 
         VCS_GIT_GITLAB_ICON            '\uF296 '              # 
         VCS_HG_ICON                    '\uF0C3 '              # 
-        VCS_SVN_ICON                   '\uE72D '              # 
-        RUST_ICON                      '\uE7A8 '              # 
+        VCS_SVN_ICON                   '\uE72D'               # 
+        RUST_ICON                      '\uE7A8'               # 
         PYTHON_ICON                    '\UE73C '              # 
         SWIFT_ICON                     '\uE755'               # 
         GO_ICON                        '\uE626'               # 
-        PUBLIC_IP_ICON                 '\UF0AC'               # 
+        PUBLIC_IP_ICON                 '\UF0AC '              # 
         LOCK_ICON                      '\UF023'               # 
-        EXECUTION_TIME_ICON            '\uF252'               # 
-        SSH_ICON                       '\uF489'               # 
+        EXECUTION_TIME_ICON            '\uF252 '              # 
+        SSH_ICON                       '\uF489 '              # 
         VPN_ICON                       'vpn'
         KUBERNETES_ICON                '\U2388'               # ⎈
-        DROPBOX_ICON                   '\UF16B'               # 
+        DROPBOX_ICON                   '\UF16B '              # 
         DATE_ICON                      '\uF073 '              # 
         TIME_ICON                      '\uF017 '              # 
         JAVA_ICON                      '\U2615'               # ☕︎
-        LARAVEL_ICON                   '\ue73f '              # 
+        LARAVEL_ICON                   '\ue73f'               # 
         RANGER_ICON                    '\u2B50'               # ⭐
         TERRAFORM_ICON                 '\U1F6E0\u00A0'        # 🛠️
       )
@@ -431,7 +431,7 @@ function _p9k_init_icons() {
         SUDO_ICON                      '\uE0A2'               # 
         RUBY_ICON                      'Ruby'
         AWS_ICON                       'AWS'
-        AWS_EB_ICON                    '\U1F331 '             # 🌱
+        AWS_EB_ICON                    '\U1F331'              # 🌱
         BACKGROUND_JOBS_ICON           '\u2699'               # ⚙
         TEST_ICON                      ''
         TODO_ICON                      '\u2611'               # ☑
@@ -500,7 +500,7 @@ function _p9k_init_icons() {
         PYTHON_ICON                    'Py'
         SWIFT_ICON                     'Swift'
         GO_ICON                        'Go'
-        PUBLIC_IP_ICON                 ''
+        PUBLIC_IP_ICON                 'IP'
         LOCK_ICON                      '\UE0A2' 
         EXECUTION_TIME_ICON            ''
         SSH_ICON                       'ssh'
