@@ -917,7 +917,7 @@ function generate_config() {
     sub BACKGROUND_JOBS_VISUAL_IDENTIFIER_EXPANSION "'⇶'"
   fi
 
-  if [[ $POWERLEVEL9K_MODE == awesome-fontconfig && $cap_python == 0 ]]; then
+  if [[ $POWERLEVEL9K_MODE == (awesome-patched|awesome-fontconfig) && $cap_python == 0 ]]; then
     uncomment 'typeset -g POWERLEVEL9K_VIRTUALENV_VISUAL_IDENTIFIER_EXPANSION'
     uncomment 'typeset -g POWERLEVEL9K_ANACONDA_VISUAL_IDENTIFIER_EXPANSION'
     uncomment 'typeset -g POWERLEVEL9K_PYENV_VISUAL_IDENTIFIER_EXPANSION'
@@ -1087,7 +1087,12 @@ while true; do
     if (( ! cap_lock )); then
       ask_lock '\uE138' "Let's try another one." || continue
       if (( cap_lock )); then
-        (( cap_diamond )) && POWERLEVEL9K_MODE=awesome-patched || POWERLEVEL9K_MODE=flat
+        if (( cap_diamond )); then
+          POWERLEVEL9K_MODE=awesome-patched
+          ask_python || continue
+        else
+          POWERLEVEL9K_MODE=flat
+        fi
       else
         (( cap_diamond )) && POWERLEVEL9K_MODE=powerline || POWERLEVEL9K_MODE=compatible
       fi
@@ -1110,6 +1115,7 @@ while true; do
   else
     options+="$POWERLEVEL9K_MODE"
   fi
+  (( cap_python )) && options[-1] += ' + python'
   if (( cap_diamond )); then
     left_subsep=$right_angle
     right_subsep=$left_angle
