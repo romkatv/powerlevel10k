@@ -3243,7 +3243,14 @@ _p9k_precmd() {
     if (( !__p9k_configured )); then
       __p9k_configured=1
       if [[ "${parameters[(I)POWERLEVEL9K_*]}" == (POWERLEVEL9K_MODE|) ]] && _p9k_can_configure -q; then
-        if $__p9k_root_dir/internal/wizard.zsh -d $__p9k_root_dir; then
+        (
+          local p=("${(@)parameters[(I)AWESOME_*|CODEPOINT_*]}")
+          if (( $#p )); then
+            typeset -x -- $p
+          fi
+          $__p9k_root_dir/internal/wizard.zsh -d $__p9k_root_dir -f $awesome
+        )
+        if (( !$? )); then
           source $__p9k_cfg_path
           _p9k_must_init
         fi

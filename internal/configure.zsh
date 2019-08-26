@@ -60,6 +60,12 @@ function _p9k_can_configure() {
 
 function p9k_configure() {
   emulate -L zsh && setopt no_hist_expand extended_glob
-  $__p9k_root_dir/internal/wizard.zsh -d $__p9k_root_dir -f || return
+  (
+    local p=("${(@)parameters[(I)AWESOME_*|CODEPOINT_*]}")
+    if (( $#p )); then
+      typeset -x -- $p
+    fi
+    $__p9k_root_dir/internal/wizard.zsh -d $__p9k_root_dir -f $awesome
+  ) || return
   source $__p9k_cfg_path
 }

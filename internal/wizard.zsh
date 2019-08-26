@@ -292,7 +292,10 @@ function ask_narrow_icons() {
   text+="%3F${icons[DATE_ICON]// }%fX"
   text+="%4F${icons[TIME_ICON]// }%fX"
   text+="%5F${icons[RUBY_ICON]// }%fX"
-  text+="%6F${icons[AWS_EB_ICON]// }%fX"
+  text+="%6F${icons[HOME_ICON]// }%fX"
+  text+="%1F${icons[HOME_SUB_ICON]// }%fX"
+  text+="%2F${icons[FOLDER_ICON]// }%fX"
+  text+="%3F${icons[RAM_ICON]// }%fX"
   while true; do
     clear
     centered "%BDo all these icons %b%2Ffit between the crosses%f%B?%b"
@@ -1080,7 +1083,7 @@ while true; do
   local -a options=()
 
   ask_diamond || continue
-  if [[ -n $AWESOME_GLYPHS_LOADED ]]; then
+  if [[ $AWESOME_GLYPHS_LOADED == 1 ]]; then
     POWERLEVEL9K_MODE=awesome-mapped-fontconfig
   else
     ask_lock '\uF023' || continue
