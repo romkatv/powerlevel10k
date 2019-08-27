@@ -1142,7 +1142,7 @@ _p9k_custom_prompt() {
   local segment_name=${1:u}
   local command=POWERLEVEL9K_CUSTOM_${segment_name}
   command=${(P)command}
-  local cmd="${(Q)${(z)command}[1]}"
+  local cmd="${(Q)${(Az)command}[1]}"
   (( $+functions[$cmd] || $+commands[$cmd] )) || return
   local content="$(eval $command)"
   [[ -n $content ]] || return
