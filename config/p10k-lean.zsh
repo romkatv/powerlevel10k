@@ -61,11 +61,11 @@ fi
       context                 # user@host
       nordvpn                 # nordvpn connection status, linux only (https://nordvpn.com/)
       ranger                  # ranger shell (https://github.com/ranger/ranger)
+      # time                  # current time
       # =========================[ Line #2 ]=========================
       newline
       # public_ip             # public IP address
       # battery               # internal battery
-      # time                  # current time
       # example               # example user-defined segment (see prompt_example function below)
   )
 
