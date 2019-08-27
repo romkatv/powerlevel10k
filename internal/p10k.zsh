@@ -3052,6 +3052,16 @@ function prompt_terraform() {
   [[ $ws == default ]] || _p9k_prompt_segment $0 $_p9k_color1 blue TERRAFORM_ICON 0 '' $ws
 }
 
+function prompt_proxy() {
+  local -U p=(
+    $all_proxy $http_proxy $https_proxy $ftp_proxy
+    $ALL_PROXY $HTTP_PROXY $HTTPS_PROXY $FTP_PROXY)
+  p=(${(@)${(@)${(@)p#*://}##*@}%%/*})
+  (( $#p )) || return
+  (( $#p == 1 )) || p=("")
+  _p9k_prompt_segment $0 $_p9k_color1 blue PROXY_ICON 0 '' "$p[1]"
+}
+
 _p9k_preexec() {
   if (( $+_p9k_real_zle_rprompt_indent )); then
     if [[ -n $_p9k_real_zle_rprompt_indent ]]; then

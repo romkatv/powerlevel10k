@@ -65,6 +65,7 @@ fi
       # =========================[ Line #2 ]=========================
       newline
       # public_ip             # public IP address
+      # proxy                 # system-wide http/https/ftp proxy
       # battery               # internal battery
       # example               # example user-defined segment (see prompt_example function below)
   )
@@ -625,6 +626,12 @@ fi
   typeset -g POWERLEVEL9K_PUBLIC_IP_FOREGROUND=94
   # Custom icon.
   # typeset -g POWERLEVEL9K_PUBLIC_IP_VISUAL_IDENTIFIER_EXPANSION='⭐'
+
+  #########################[ proxy: system-wide http/https/ftp proxy ]##########################
+  # Proxy color.
+  typeset -g POWERLEVEL9K_PROXY_FOREGROUND=68
+  # Custom icon.
+  # typeset -g POWERLEVEL9K_PROXY_VISUAL_IDENTIFIER_EXPANSION='⭐'
 
   ################################[ battery: internal battery ]#################################
   # Show battery in red when it's below this level and not connected to power supply.
