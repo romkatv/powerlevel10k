@@ -3619,7 +3619,24 @@ _p9k_init_params() {
   _p9k_declare -s POWERLEVEL9K_DIR_PATH_HIGHLIGHT_FOREGROUND
   _p9k_declare -s POWERLEVEL9K_DIR_ANCHOR_FOREGROUND
   _p9k_declare -s POWERLEVEL9K_DIR_SHORTENED_FOREGROUND
-  _p9k_declare -s POWERLEVEL9K_SHORTEN_FOLDER_MARKER "(.shorten_folder_marker|.bzr|CVS|.git|.hg|.svn|.terraform|.citc)"
+  local markers=(
+    .bzr
+    .citc
+    .git
+    .hg
+    .node-version
+    .python-version
+    .ruby-version
+    .shorten_folder_marker
+    .svn
+    .terraform
+    CVS
+    Cargo.toml
+    composer.json
+    go.mod
+    package.json
+  )
+  _p9k_declare -s POWERLEVEL9K_SHORTEN_FOLDER_MARKER "(${(j:|:)markers})"
   # Shorten directory if it's longer than this even if there is space for it.
   # The value can be either absolute (e.g., '80') or a percentage of terminal
   # width (e.g, '50%'). If empty, directory will be shortened only when prompt
