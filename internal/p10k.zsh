@@ -1225,24 +1225,30 @@ prompt_dir() {
       () {
         [[ $_POWERLEVEL9K_SHORTEN_STRATEGY == truncate_with_package_name &&
            $+commands[jq] == 1 && $#_POWERLEVEL9K_DIR_PACKAGE_FILES > 0 ]] || return
-        local pat="(${(j:|:)_POWERLEVEL9K_DIR_PACKAGE_FILES})"
+        local pats="(${(j:|:)_POWERLEVEL9K_DIR_PACKAGE_FILES})"
         local -i i=$#parts
         local dir=$_p9k_pwd
         for (( ; i > 0; --i )); do
-          local pkg_file=''
-          for pkg_file in $dir/${~pat}(N); do
-            local -H stat=()
-            zstat -H stat -- $pkg_file 2>/dev/null || return
-            if ! _p9k_cache_get $0_pkg $stat[inode] $stat[mtime] $stat[size]; then
-              local pkg_name=''
-              pkg_name="$(jq -j '.name' <$pkg_file 2>/dev/null)" || pkg_name=''
-              _p9k_cache_set "$pkg_name"
-            fi
-            [[ -n $_p9k_cache_val[1] ]] || return
-            parts[1,i]=($_p9k_cache_val[1])
-            fake_first=1
-            return
-          done
+          local markers=($dir/${~pats}(N))
+          if (( $#markers )); then
+            local pat= pkg_file=
+            for pat in $_POWERLEVEL9K_DIR_PACKAGE_FILES; do
+              for pkg_file in $markers; do
+                [[ $pkg_file == $dir/${~pat} ]] || continue
+                local -H stat=()
+                zstat -H stat -- $pkg_file 2>/dev/null || continue
+                if ! _p9k_cache_get $0_pkg $stat[inode] $stat[mtime] $stat[size]; then
+                  local pkg_name=''
+                  pkg_name="$(jq -j '.name | select(. != null)' <$pkg_file 2>/dev/null)" || pkg_name=''
+                  _p9k_cache_set "$pkg_name"
+                fi
+                [[ -n $_p9k_cache_val[1] ]] || continue
+                parts[1,i]=($_p9k_cache_val[1])
+                fake_first=1
+                return
+              done
+            done
+          fi
           dir=${dir:h}
         done
       }
