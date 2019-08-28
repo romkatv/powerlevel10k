@@ -3051,10 +3051,8 @@ _p9k_preexec() {
 }
 
 function _p9k_set_iface() {
-  if [[ ! -x /sbin/ifconfig ]]; then
-    _p9k_iface=()
-    return
-  fi
+  _p9k_iface=()
+  [[ -x /sbin/ifconfig ]] || return
   local line
   local iface
   for line in ${(f)"$(/sbin/ifconfig 2>/dev/null)"}; do
