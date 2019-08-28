@@ -3052,7 +3052,7 @@ function _p9k_set_iface() {
   local line
   local iface
   for line in ${(f)"$(/sbin/ifconfig 2>/dev/null)"}; do
-    if [[ $line == (#b)([^[:space:]:]##):[[:space:]]##flags=(<->)'<'* ]]; then
+    if [[ $line == (#b)([^[:space:]]##):[[:space:]]##flags=(<->)'<'* ]]; then
       [[ $match[2] == *[13579] ]] && iface=$match[1] || iface=
     elif [[ -n $iface && $line == (#b)[[:space:]]##inet[[:space:]]##([0-9.]##)* ]]; then
       _p9k_iface[$iface]=$match[1]
