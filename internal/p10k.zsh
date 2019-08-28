@@ -212,44 +212,13 @@ _p9k_segment_in_use() {
 }
 
 function _p9k_parse_ip() {
-  local desiredInterface=${1:-'^[^ ]+'}
-
-  if [[ $_p9k_os == OSX ]]; then
-    [[ -x /sbin/ifconfig ]] || return
-    local rawInterfaces && rawInterfaces="$(/sbin/ifconfig -l 2>/dev/null)" || return
-    local -a interfaces=(${(A)=rawInterfaces})
-    local pattern="${desiredInterface}[^ ]?"
-    local -a relevantInterfaces
-    for rawInterface in $interfaces; do
-      [[ "$rawInterface" =~ $pattern ]] && relevantInterfaces+=$MATCH
-    done
-    local newline=$'\n'
-    local interfaceName interface
-    for interfaceName in $relevantInterfaces; do
-      interface="$(/sbin/ifconfig $interfaceName 2>/dev/null)" || continue
-      [[ "${interface}" =~ "lo[0-9]*" ]] && continue
-      if [[ "${interface//${newline}/}" =~ "<([^>]*)>(.*)inet[ ]+([^ ]*)" ]]; then
-        local ipFound="${match[3]}"
-        local -a interfaceStates=(${(s:,:)match[1]})
-        if (( ${interfaceStates[(I)UP]} )); then
-          _p9k_ret=$ipFound
-          return
-        fi
-      fi
-    done
-  else
-    [[ -x /sbin/ip ]] || return
-    local -a interfaces=( "${(f)$(/sbin/ip -brief -4 a show 2>/dev/null)}" )
-    local pattern="^${desiredInterface}[[:space:]]+UP[[:space:]]+([^/ ]+)"
-    local interface
-    for interface in "${(@)interfaces}"; do
-      if [[ "$interface" =~ $pattern ]]; then
-        _p9k_ret=$match[1]
-        return
-      fi
-    done
-  fi
-
+  local iface_regex="^${1:-.*}\$" iface ip
+  for iface ip in "${(@kv)_p9k_iface}"; do
+    if [[ $iface =~ $iface_regex ]]; then
+      _p9k_ret=$ip
+      return 0
+    fi
+  done
   return 1
 }
 
@@ -3075,6 +3044,23 @@ _p9k_preexec() {
   _p9k_timer_start=EPOCHREALTIME
 }
 
+function _p9k_set_iface() {
+  if [[ ! -x /sbin/ifconfig ]]; then
+    _p9k_iface=()
+    return
+  fi
+  local line
+  local iface
+  for line in ${(f)"$(/sbin/ifconfig 2>/dev/null)"}; do
+    if [[ $line == (#b)([^[:space:]:]##):[[:space:]]##flags=(<->)'<'* ]]; then
+      [[ $match[2] == *[13579] ]] && iface=$match[1] || iface=
+    elif [[ -n $iface && $line == (#b)[[:space:]]##inet[[:space:]]##([0-9.]##)* ]]; then
+      _p9k_iface[$iface]=$match[1]
+      iface=
+    fi
+  done
+}
+
 function _p9k_build_segment() {
   _p9k_segment_name=${_p9k_segment_name%_joined}
   if [[ $_p9k_segment_name == custom_* ]]; then
@@ -3092,6 +3078,8 @@ function _p9k_set_prompt() {
   _p9k_pwd_a=${_p9k_pwd:A}
   PROMPT=$_p9k_prompt_prefix_left
   RPROMPT=
+
+  (( _p9k_fetch_iface )) && _p9k_set_iface
 
   local -i left_idx=1 right_idx=1 num_lines=$#_p9k_line_segments_left i
   for i in {1..$num_lines}; do
@@ -3544,6 +3532,8 @@ _p9k_init_vars() {
   typeset -gi _p9k_num_cpus
   typeset -g  _p9k_pwd
   typeset -g  _p9k_pwd_a
+  typeset -gA _p9k_iface
+  typeset -gi _p9k_fetch_iface
 
   typeset -g  P9K_VISUAL_IDENTIFIER
   typeset -g  P9K_CONTENT
@@ -3686,7 +3676,7 @@ _p9k_init_params() {
   _p9k_declare -i POWERLEVEL9K_SHORTEN_DELIMITER_LENGTH
   _p9k_declare -e POWERLEVEL9K_SHORTEN_DELIMITER
   _p9k_declare -i POWERLEVEL9K_SHORTEN_DIR_LENGTH
-  _p9k_declare -s POWERLEVEL9K_IP_INTERFACE "^[^ ]+"
+  _p9k_declare -s POWERLEVEL9K_IP_INTERFACE ""
   _p9k_declare -s POWERLEVEL9K_VPN_IP_INTERFACE "tun"
   _p9k_declare -i POWERLEVEL9K_LOAD_WHICH 5
   _p9k_declare -b POWERLEVEL9K_NODENV_PROMPT_ALWAYS_SHOW 0
@@ -4328,6 +4318,11 @@ _p9k_init() {
   fi
 
   _p9k_wrap_zle_widget zle-keymap-select _p9k_zle_keymap_select
+
+  if [[ -n $_POWERLEVEL9K_PUBLIC_IP_VPN_INTERFACE ]] && _p9k_segment_in_use public_ip ||
+     _p9k_segment_in_use ip || _p9k_segment_in_use vpn_ip; then
+     _p9k_fetch_iface=1
+  fi
 }
 
 _p9k_deinit() {
