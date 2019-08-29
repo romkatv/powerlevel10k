@@ -4098,6 +4098,7 @@ _p9k_must_init() {
   IFS=$'\1' param_sig="${(@)param_keys:/(#b)(*)/$match[1]=\$$match[1]}"
   IFS=$'\2' eval "param_sig=x\"$param_sig\""
   [[ -o transient_rprompt ]] && param_sig+=t
+  [[ -o auto_name_dirs ]] && param_sig+=d
   [[ $param_sig == $_p9k_param_sig ]] && return 1
   [[ -n $_p9k_param_sig ]] && _p9k_deinit
   _p9k_param_sig=$param_sig
