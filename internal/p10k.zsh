@@ -1594,11 +1594,11 @@ prompt_load() {
   (( _p9k_num_cpus )) || return
 
   if (( load > 0.7 * _p9k_num_cpus )); then
-    local state=critical bg=red
+    local state=CRITICAL bg=red
   elif (( load > 0.5 * _p9k_num_cpus )); then
-    local state=warning bg=yellow
+    local state=WARNING bg=yellow
   else
-    local state=normal bg=green
+    local state=NORMAL bg=green
   fi
 
   _p9k_prompt_segment $0_$state $bg "$_p9k_color1" LOAD_ICON 0 '' $load
