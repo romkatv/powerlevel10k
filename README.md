@@ -238,6 +238,15 @@ some glyphs. To fix this problem,
 [install the recommended font](#recommended-meslo-nerd-font-patched-for-powerlevel10k) and run
 `p10k configure`.
 
+### Why is my current directory displayed as `~_p9k_pwd`?
+
+This is the intended effect of `auto_name_dirs` option. You can disable this option with the
+following command:
+
+```zsh
+echo 'unsetopt auto_name_dirs' >>! ~/.zshrc
+```
+
 ### Why does Powerlevel10k spawn extra processes?
 
 Powerlevel10k uses [gitstatus](https://github.com/romkatv/gitstatus) as the backend behind `vcs`
