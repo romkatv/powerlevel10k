@@ -34,6 +34,7 @@ prompt.
    1. [Why is my right prompt wrapping around in a weird way?](#why-is-my-right-prompt-wrapping-around-in-a-weird-way)
    1. [I cannot install the recommended font. Help!](#i-cannot-install-the-recommended-font-help)
    1. [Why do I have a question mark symbol in my prompt? Is my font broken?](#why-do-i-have-a-question-mark-symbol-in-my-prompt-is-my-font-broken)
+   1. [Why is my current directory displayed as `~_p9k_pwd`?](#why-is-my-current-directory-displayed-as-_p9k_pwd)
    1. [Why does Powerlevel10k spawn extra processes?](#why-does-powerlevel10k-spawn-extra-processes)
    1. [Are there configuration options that make Powerlevel10k slow?](#are-there-configuration-options-that-make-powerlevel10k-slow)
    1. [Is Powerlevel10k fast to load?](#is-powerlevel10k-fast-to-load)
