@@ -228,6 +228,12 @@ fi
   # be either absolute (e.g., '80') or a percentage of terminal width (e.g, '50%'). If empty,
   # directory will be shortened only when prompt doesn't fit.
   typeset -g POWERLEVEL9K_DIR_MAX_LENGTH=80
+  # When `dir` segment is on the last prompt line, try to shorten it enough to leave at least this
+  # many columns for typing commands.
+  typeset -g POWERLEVEL9K_DIR_MIN_COMMAND_COLUMNS=40
+  # When `dir` segment is on the last prompt line, try to shorten it enough to leave at least
+  # COLUMNS * POWERLEVEL9K_DIR_MIN_COMMAND_COLUMNS_PCT * 0.01 columns for typing commands.
+  typeset -g POWERLEVEL9K_DIR_MIN_COMMAND_COLUMNS_PCT=50
   # If set to true, embed a hyperlink into the directory. Useful for quickly
   # opening a directory in the file manager simply by clicking the link.
   # Can also be handy when the directory is shortened, as it allows you to see
