@@ -305,8 +305,10 @@ fi
   # If on a branch...
   vcs+='${${VCS_STATUS_LOCAL_BRANCH:+%76F'${(g::)POWERLEVEL9K_VCS_BRANCH_ICON}
   # If local branch name is at most 32 characters long, show it in full.
+  # This is the equivalent of POWERLEVEL9K_VCS_SHORTEN_MIN_LENGTH=32.
   vcs+='${${${$(($#VCS_STATUS_LOCAL_BRANCH<=32)):#0}:+${VCS_STATUS_LOCAL_BRANCH//\%/%%}}'
-  # If local branch name is over 32 characters long, show the first 12 … the last 12.
+  # If local branch name is over 32 characters long, show the first 12 … the last 12. The same as
+  # POWERLEVEL9K_VCS_SHORTEN_LENGTH=12 with POWERLEVEL9K_VCS_SHORTEN_STRATEGY=truncate_middle.
   vcs+=':-${VCS_STATUS_LOCAL_BRANCH[1,12]//\%/%%}%28F…%76F${VCS_STATUS_LOCAL_BRANCH[-12,-1]//\%/%%}}}'
   # '@72f5c8a' if not on a branch.
   vcs+=':-%f@%76F${VCS_STATUS_COMMIT[1,8]}}'
