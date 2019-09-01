@@ -1156,7 +1156,7 @@ while true; do
   else
     options+="$POWERLEVEL9K_MODE"
   fi
-  (( cap_python )) && options[-1] += ' + python'
+  (( cap_python )) && options[-1]+=' + python'
   if (( cap_diamond )); then
     left_subsep=$right_angle
     right_subsep=$left_angle
