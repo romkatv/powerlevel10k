@@ -54,22 +54,22 @@ typeset -r vertical_bar='|'
 typeset -r slanted_bar='\uE0BD'
 
 typeset -ra lean_left=(
-  '' '${extra_icons[1]:+$extra_icons[1] }%31F$extra_icons[2]%B%39F~%b%31F/%B%39Fpowerlevel10k%b%f $prefixes[1]%76F$extra_icons[3]master ⇡2%f '
+  '' '${extra_icons[1]:+$extra_icons[1] }%31F$extra_icons[2]%B%39F~%b%31F/%B%39Fsrc%b%f $prefixes[1]%76F$extra_icons[3]master%f '
   '' '%76F❯%f █'
 )
 
 typeset -ra lean_right=(
-  ' $prefixes[2]%134F⎈ minikube%f' ''
+  ' $prefixes[2]%101F$extra_icons[4]3s%f${show_time:+ $prefixes[3]%66F$extra_icons[5]16:23:42%f}' ''
   '' ''
 )
 
 typeset -ra classic_left=(
-  '%$frame_color[$color]F╭─' '%F{$bg_color[$color]}$left_tail%K{$bg_color[$color]} ${extra_icons[1]:+$extra_icons[1]%K{$bg_color[$color]\} %$sep_color[$color]F$left_subsep%f }%31F$extra_icons[2]%B%39F~%b%K{$bg_color[$color]}%31F/%B%39Fpowerlevel10k%b%K{$bg_color[$color]} %$sep_color[$color]F$left_subsep%f %$prefix_color[$color]F$prefixes[1]%76F$extra_icons[3]master ⇡2 %k%$bg_color[$color]F$left_head%f'
+  '%$frame_color[$color]F╭─' '%F{$bg_color[$color]}$left_tail%K{$bg_color[$color]} ${extra_icons[1]:+$extra_icons[1]%K{$bg_color[$color]\} %$sep_color[$color]F$left_subsep%f }%31F$extra_icons[2]%B%39F~%b%K{$bg_color[$color]}%31F/%B%39Fsrc%b%K{$bg_color[$color]} %$sep_color[$color]F$left_subsep%f %$prefix_color[$color]F$prefixes[1]%76F$extra_icons[3]master %k%$bg_color[$color]F$left_head%f'
   '%$frame_color[$color]F╰─' '%f █'
 )
 
 typeset -ra classic_right=(
-  '%$bg_color[$color]F$right_head%K{$bg_color[$color]}%f %$prefix_color[$color]F$prefixes[2]%134Fminikube ⎈ %k%F{$bg_color[$color]}$right_tail%f' '%$frame_color[$color]F─╮%f'
+  '%$bg_color[$color]F$right_head%K{$bg_color[$color]}%f %$prefix_color[$color]F$prefixes[2]%101F3s $extra_icons[4]${show_time:+%$sep_color[$color]F$right_subsep %$prefix_color[$color]F$prefixes[3]%66F16:23:42 $extra_icons[5]}%k%F{$bg_color[$color]}$right_tail%f' '%$frame_color[$color]F─╮%f'
   '' '%$frame_color[$color]F─╯%f'
 )
 
@@ -169,12 +169,12 @@ function ask_diamond() {
   while true; do
     clear
     if (( force )); then
-      print -P "This is %4FPowerlevel10k configuration wizard%f. It will ask you a few"
-      print -P "questions and configure your prompt."
+      centered "This is %4FPowerlevel10k configuration wizard%f. It will ask you a few questions and"
+      centered "configure your prompt."
     else
-      print -P "This is %4FPowerlevel10k configuration wizard%f. You are seeing it because"
-      print -P "you haven't defined any Powerlevel10k configuration options. It will"
-      print -P "ask you a few questions and configure your prompt."
+      centered "This is %4FPowerlevel10k configuration wizard%f. You are seeing it because you"
+      centered "haven't defined any Powerlevel10k configuration options. It will ask you a few"
+      centered "questions and configure your prompt."
     fi
     print -P ""
     centered "%BDoes this look like a %b%2Fdiamond%f%B (square rotated 45 degrees)?%b"
@@ -393,6 +393,34 @@ function ask_color() {
   done
 }
 
+function ask_time() {
+  while true; do
+    clear
+    centered "%BShow current time?%b"
+    print -P ""
+    print -P "%B(y)  Yes.%b"
+    print -P ""
+    show_time=1 print_prompt
+    print -P ""
+    print -P "%B(n)  No.%b"
+    print -P ""
+    show_time= print_prompt
+    print -P ""
+    print -P "(r)  Restart from the beginning."
+    print -P "(q)  Quit and do nothing."
+    print -P ""
+
+    local key=
+    read -k key${(%):-"?%BChoice [ynrq]: %b"} || quit
+    case $key in
+      q) quit;;
+      r) return 1;;
+      y) show_time=1; break;;
+      n) show_time=; break;;
+    esac
+  done
+}
+
 function os_icon_name() {
   local uname="$(uname)"
   if [[ $uname == Linux && "$(uname -o 2>/dev/null)" == Android ]]; then
@@ -445,10 +473,14 @@ function ask_extra_icons() {
   local dir_icon=${(g::)icons[HOME_SUB_ICON]}
   local vcs_icon=${(g::)icons[VCS_GIT_GITHUB_ICON]}
   local branch_icon=${(g::)icons[VCS_BRANCH_ICON]}
+  local duration_icon=${(g::)icons[EXECUTION_TIME_ICON]}
+  local time_icon=${(g::)icons[TIME_ICON]}
   if (( cap_narrow_icons )); then
     os_icon=${os_icon// }
     dir_icon=${dir_icon// }
     vcs_icon=${vcs_icon// }
+    duration_icon=${duration_icon// }
+    time_icon=${time_icon// }
   fi
   branch_icon=${branch_icon// }
   if [[ $style == classic ]]; then
@@ -457,14 +489,15 @@ function ask_extra_icons() {
     os_icon="%f$os_icon"
   fi
   os_icon="%B$os_icon%b"
-  local many=("$os_icon" "$dir_icon " "$vcs_icon $branch_icon ")
+  local few=('' '' '' '' '')
+  local many=("$os_icon" "$dir_icon " "$vcs_icon $branch_icon " "$duration_icon " "$time_icon ")
   while true; do
     clear
     centered "%BIcons%b"
     print -P ""
     print -P "%B(1)  Few icons.%b"
     print -P ""
-    extra_icons=('' '' '') print_prompt
+    extra_icons=("$few[@]") print_prompt
     print -P ""
     print -P "%B(2)  Many icons.%b"
     print -P ""
@@ -479,21 +512,22 @@ function ask_extra_icons() {
     case $key in
       q) quit;;
       r) return 1;;
-      1) extra_icons=('' '' ''); options+='few icons'; break;;
+      1) extra_icons=("$few[@]"); options+='few icons'; break;;
       2) extra_icons=("$many[@]"); options+='many icons'; break;;
     esac
   done
 }
 
 function ask_prefixes() {
-  local fluent=('on ' 'at ')
+  local concise=('' '' '')
+  local fluent=('on ' 'took ' 'at ')
   while true; do
     clear
     centered "%BPrompt Flow%b"
     print -P ""
     print -P "%B(1)  Concise.%b"
     print -P ""
-    prefixes=('' '') print_prompt
+    prefixes=("$concise[@]") print_prompt
     print -P ""
     print -P "%B(2)  Fluent.%b"
     print -P ""
@@ -508,7 +542,7 @@ function ask_prefixes() {
     case $key in
       q) quit;;
       r) return 1;;
-      1) prefixes=('' ''); options+=concise; break;;
+      1) prefixes=("$concise[@]"); options+=concise; break;;
       2) prefixes=("$fluent[@]"); options+=fluent; break;;
     esac
   done
@@ -522,9 +556,9 @@ function ask_separators() {
     local extra=
     clear
     centered "%BPrompt Separators%b"
-    print -P "                 separator"
-    print -P "%B(1)  Angled.%b         |"
-    print -P "                     v"
+    print -P "              separator"
+    print -P "%B(1)  Angled.%b /"
+    print -P "            /"
     left_sep=$right_triangle right_sep=$left_triangle left_subsep=$right_angle right_subsep=$left_angle print_prompt
     print -P ""
     print -P "%B(2)  Vertical.%b"
@@ -585,9 +619,9 @@ function ask_heads() {
     local extra=
     clear
     centered "%BPrompt Heads%b"
-    print -P ""
-    print -P "%B(1)  Sharp.%b"
-    print -P ""
+    print -P "                   head"
+    print -P "%B(1)  Sharp.%b         |"
+    print -P "                    v"
     left_head=$right_triangle right_head=$left_triangle print_prompt
     print -P ""
     print -P "%B(2)  Blurred.%b"
@@ -950,6 +984,10 @@ function generate_config() {
     rep '%248F' "%$prefix_color[$color]F"
   fi
 
+  if [[ -n $show_time ]]; then
+    uncomment time
+  fi
+
   if [[ -n ${(j::)extra_icons} ]]; then
     local branch_icon=${icons[VCS_BRANCH_ICON]// }
     sub VCS_BRANCH_ICON "'$branch_icon '"
@@ -1075,7 +1113,7 @@ source $__p9k_root_dir/internal/icons.zsh || return
 
 while true; do
   local POWERLEVEL9K_MODE= style= config_backup= config_backup_u= gap_char=' '
-  local left_subsep= right_subsep= left_tail= right_tail= left_head= right_head=
+  local left_subsep= right_subsep= left_tail= right_tail= left_head= right_head= show_time=
   local -i num_lines=0 write_config=0 empty_line=0 color=2 left_frame=1 right_frame=1
   local -i cap_diamond=0 cap_python=0 cap_debian=0 cap_narrow_icons=0 cap_lock=0
   local -a extra_icons=('' '' '')
@@ -1134,6 +1172,7 @@ while true; do
   ask_narrow_icons     || continue
   ask_style            || continue
   ask_color            || continue
+  ask_time             || continue
   ask_separators       || continue
   ask_heads            || continue
   ask_tails            || continue

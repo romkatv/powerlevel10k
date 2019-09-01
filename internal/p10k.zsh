@@ -3250,7 +3250,7 @@ _p9k_precmd() {
           if (( $#p )); then
             typeset -x -- $p
           fi
-          $__p9k_root_dir/internal/wizard.zsh -d $__p9k_root_dir -f $awesome
+          $__p9k_root_dir/internal/wizard.zsh -d $__p9k_root_dir
         )
         if (( !$? )); then
           source $__p9k_cfg_path

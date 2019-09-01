@@ -65,7 +65,7 @@ function p9k_configure() {
     if (( $#p )); then
       typeset -x -- $p
     fi
-    $__p9k_root_dir/internal/wizard.zsh -d $__p9k_root_dir -f $awesome
+    $__p9k_root_dir/internal/wizard.zsh -d $__p9k_root_dir -f
   ) || return
   source $__p9k_cfg_path
 }
