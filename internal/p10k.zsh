@@ -3262,9 +3262,10 @@ _p9k_precmd() {
   fi
 
   unsetopt localoptions
-  prompt_opts=(cr percent subst)
+  prompt_opts=(percent subst)
   [[ ! -o prompt_sp ]] || prompt_opts+=sp
-  setopt nopromptbang prompt{cr,percent,subst}
+  [[ ! -o prompt_cr ]] || prompt_opts+=cr
+  setopt nopromptbang prompt{percent,subst}
 
   _p9k_timer_end=EPOCHREALTIME
   if (( _p9k_timer_start )); then
