@@ -35,6 +35,8 @@ typeset -gri force
 
 source $__p9k_root_dir/internal/configure.zsh || return
 
+typeset -ri wizard_columns=$((COLUMNS < 80 ? COLUMNS : 80))
+
 typeset -ri prompt_indent=2
 
 typeset -ra bg_color=(240 238 236 234)
@@ -106,14 +108,14 @@ function print_prompt() {
   fi
   local -i right_indent=prompt_indent
   local -i width=$(prompt_length ${(g::):-$left[1]$left[2]$right[1]$right[2]})
-  while (( __p9k_wizard_columns - width <= prompt_indent + right_indent )); do
+  while (( wizard_columns - width <= prompt_indent + right_indent )); do
     (( --right_indent ))
   done
   local -i i
   for ((i = 1; i < $#left; i+=2)); do
     local l=${(g::):-$left[i]$left[i+1]}
     local r=${(g::):-$right[i]$right[i+1]}
-    local -i gap=$((__p9k_wizard_columns - prompt_indent - right_indent - $(prompt_length $l$r)))
+    local -i gap=$((wizard_columns - prompt_indent - right_indent - $(prompt_length $l$r)))
     (( num_lines == 2 && i == 1 )) && local fill=$gap_char || local fill=' '
     print -n  -- ${(pl:$prompt_indent:: :)}
     print -nP -- $l
@@ -128,7 +130,7 @@ function href() {
 
 function centered() {
   local n=$(prompt_length ${(g::)1})
-  print -n -- ${(pl:$(((__p9k_wizard_columns - n) / 2)):: :)}
+  (( n < wizard_columns )) && print -n -- ${(pl:$(((wizard_columns - n) / 2)):: :)}
   print -P -- $1
 }
 
@@ -168,14 +170,7 @@ function quit() {
 function ask_diamond() {
   while true; do
     clear
-    if (( force )); then
-      centered "This is %4FPowerlevel10k configuration wizard%f. It will ask you a few questions and"
-      centered "configure your prompt."
-    else
-      centered "This is %4FPowerlevel10k configuration wizard%f. You are seeing it because you"
-      centered "haven't defined any Powerlevel10k configuration options. It will ask you a few"
-      centered "questions and configure your prompt."
-    fi
+    centered "%4FPowerlevel10k configuration wizard%f."
     print -P ""
     centered "%BDoes this look like a %b%2Fdiamond%f%B (square rotated 45 degrees)?%b"
     centered "reference: $(href https://graphemica.com/%E2%97%86)"
@@ -394,6 +389,11 @@ function ask_color() {
 }
 
 function ask_time() {
+  if (( wizard_columns < 80 )); then
+    show_time=
+    return
+  fi
+
   while true; do
     clear
     centered "%BShow current time?%b"
@@ -415,7 +415,7 @@ function ask_time() {
     case $key in
       q) quit;;
       r) return 1;;
-      y) show_time=1; break;;
+      y) show_time=1; options+=time; break;;
       n) show_time=; break;;
     esac
   done
@@ -521,6 +521,11 @@ function ask_extra_icons() {
 function ask_prefixes() {
   local concise=('' '' '')
   local fluent=('on ' 'took ' 'at ')
+  if (( wizard_columns < 80 )); then
+    prefixes=("$concise[@]")
+    options+=concise
+    return
+  fi
   while true; do
     clear
     centered "%BPrompt Flow%b"
