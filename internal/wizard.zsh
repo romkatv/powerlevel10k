@@ -322,9 +322,9 @@ function install_font() {
           "Set :\"New Bookmarks\":0:$k $v" ~/Library/Preferences/com.googlecode.iterm2.plist
       done
       print -P " %2FOK%f"
-      run_command "Updating %BiTerm2%b settings cache" defaults read com.googlecode.iterm2
+      run_command "Updating %BiTerm2%b settings cache" /usr/bin/defaults read com.googlecode.iterm2
       clear
-      print -P "%2FMeslo Nerd Font%f successfully  installed."
+      print -P "%2FMeslo Nerd Font%f successfully installed."
       print -P ""
       print -P "Please %Brestart iTerm2%b for the changes to take effect."
       print -P ""
