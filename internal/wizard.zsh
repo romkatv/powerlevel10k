@@ -129,9 +129,22 @@ function href() {
 }
 
 function centered() {
-  local n=$(prompt_length ${(g::)1})
-  (( n < wizard_columns )) && print -n -- ${(pl:$(((wizard_columns - n) / 2)):: :)}
-  print -P -- $1
+  local line word lines=()
+  for word in "$@"; do
+    local n=$(prompt_length ${(g::):-"$line $word"})
+    if (( n > wizard_columns )); then
+      [[ -z $line ]] || lines+=$line
+      line=
+    fi
+    [[ -z $line ]] || line+=' '
+    line+=$word
+  done
+  [[ -z $line ]] || lines+=$line
+  for line in $lines; do
+    local n=$(prompt_length ${(g::)line})
+    (( n < wizard_columns )) && print -n -- ${(pl:$(((wizard_columns - n) / 2)):: :)}
+    print -P -- $line
+  done
 }
 
 function clear() {
@@ -170,9 +183,17 @@ function quit() {
 function ask_diamond() {
   while true; do
     clear
-    centered "%4FPowerlevel10k configuration wizard%f."
+    if (( force )); then
+      centered This is %4FPowerlevel10k configuration wizard%f. \
+               It will ask you a few questions and configure your prompt.
+    else
+      centered This is %4FPowerlevel10k configuration wizard%f.   \
+               You are seeing it because you haven\'t defined any \
+               Powerlevel10k configuration options. It will ask   \
+               you a few questions and configure your prompt.
+    fi
     print -P ""
-    centered "%BDoes this look like a %b%2Fdiamond%f%B (square rotated 45 degrees)?%b"
+    centered "%BDoes this look like a %b%2Fdiamond%f%B (rotated square)?%b"
     centered "reference: $(href https://graphemica.com/%E2%97%86)"
     print -P ""
     centered "--->  \uE0B2\uE0B0  <---"
@@ -253,7 +274,7 @@ function ask_debian() {
   while true; do
     clear
     centered "%BDoes this look like a %b%2FDebian logo%f%B (swirl/spiral)?%b"
-    centered "reference: $(href https://www.debian.org/logos/openlogo-nd-100.jpg)"
+    centered "reference: $(href https://debian.org/logos/openlogo-nd.svg)"
     print -P ""
     centered "--->  \uF306  <---"
     print -P ""
