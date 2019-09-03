@@ -35,6 +35,7 @@ typeset -gri force
 
 source $__p9k_root_dir/internal/configure.zsh || return
 
+typeset -r font_base_url='https://github.com/romkatv/dotfiles-public/raw/master/.local/share/fonts/NerdFonts'
 typeset -ri wizard_columns=$((COLUMNS < 80 ? COLUMNS : 80))
 
 typeset -ri prompt_indent=2
@@ -177,7 +178,11 @@ function clear() {
 }
 
 function quit() {
-  clear
+  if [[ $1 == '-c' ]]; then
+    print -P ""
+  else
+    clear
+  fi
   if (( force )); then
     print -P "Powerlevel10k configuration wizard has been aborted. To run it again, type:"
     print -P ""
@@ -199,19 +204,93 @@ function quit() {
   exit 1
 }
 
-function ask_diamond() {
+local -i greeting_printed=0
+
+function print_greeting() {
+  (( greeting_printed )) && return
+  if (( force )); then
+    flowing -c This is %4FPowerlevel10k configuration wizard%f. \
+               It will ask you a few questions and configure your prompt.
+  else
+    flowing -c This is %4FPowerlevel10k configuration wizard%f.   \
+               You are seeing it because you haven\'t defined any \
+               Powerlevel10k configuration options. It will ask   \
+               you a few questions and configure your prompt.
+  fi
+  print -P ""
+}
+
+function can_install_font() {
+  [[ $P9K_SSH == 0 ]] || return
+  if [[ "$(uname)" == Linux && "$(uname -o)" == Android ]]; then
+    (( $+commands[termux-reload-settings] )) || return
+    (( $+commands[curl] )) || return
+    [[ ! -f ~/.termux/font.ttf ]] || return
+    if [[ -f ~/.termux ]]; then
+      [[ -d ~/.termux && -w ~/.termux ]] || return
+    else
+      [[ -w ~ ]] || return
+    fi
+    return
+  fi
+  return 1
+}
+
+function run_command() {
+  print -nP -- "$1 ..."
+  shift
+  local err && err="$("$@" 2>&1)" || {
+    print -P " %1FERROR%f"
+    print -P ""
+    print -P "%BCommand:%b" "${(@q)*}"
+    if [[ -n $err ]]; then
+      print -P ""
+      print -r -- $err
+    fi
+    quit -c
+  }
+  print -P " %2FOK%f"
+}
+
+function install_font() {
+  clear
+  mkdir -p ~/.termux || quit -c
+  run_command "Downloading %2FMesloLGS NF Regular.ttf%f" \
+    curl -fsSL -o ~/.termux/font.ttf "$font_base_url/MesloLGS%20NF%20Regular.ttf"
+  run_command "Reloading Termux settings" termux-reload-settings
+}
+
+function ask_font() {
+  can_install_font || return 0
   while true; do
     clear
-    if (( force )); then
-      flowing -c This is %4FPowerlevel10k configuration wizard%f. \
-                 It will ask you a few questions and configure your prompt.
-    else
-      flowing -c This is %4FPowerlevel10k configuration wizard%f.   \
-                 You are seeing it because you haven\'t defined any \
-                 Powerlevel10k configuration options. It will ask   \
-                 you a few questions and configure your prompt.
-    fi
+    print_greeting
+    flowing -c "%BInstall %b%2FMeslo Nerd Font%f%B?%b"
     print -P ""
+    print -P ""
+    print -P "%B(y)  Yes (recommended).%b"
+    print -P ""
+    print -P "%B(n)  No. Use the current font.%b"
+    print -P ""
+    print -P "(q)  Quit and do nothing."
+    print -P ""
+
+    local key=
+    read -k key${(%):-"?%BChoice [ynq]: %b"} || quit
+    case $key in
+      q) quit;;
+      y) install_font; break;;
+      n) break;;
+    esac
+  done
+  greeting_printed=1
+}
+
+function ask_diamond() {
+  while true; do
+    local extra=
+    clear
+    print_greeting
     flowing -c "%BDoes this look like a %b%2Fdiamond%f%B (rotated square)?%b"
     flowing -c "reference: $(href https://graphemica.com/%E2%97%86)"
     print -P ""
@@ -221,17 +300,23 @@ function ask_diamond() {
     print -P ""
     print -P "%B(n)  No.%b"
     print -P ""
+    if can_install_font; then
+      extra+=r
+      print -P "(r)  Restart from the beginning."
+    fi
     print -P "(q)  Quit and do nothing."
     print -P ""
 
     local key=
-    read -k key${(%):-"?%BChoice [ynq]: %b"} || quit
+    read -k key${(%):-"?%BChoice [yn${extra}q]: %b"} || quit
     case $key in
       q) quit;;
+      r) [[ $extra == *r* ]] && { greeting_printed=1; return 1 };;
       y) cap_diamond=1; break;;
       n) cap_diamond=0; break;;
     esac
   done
+  greeting_printed=1
 }
 
 function ask_lock() {
@@ -1225,6 +1310,7 @@ while true; do
   local -a prefixes=('' '')
   local -a options=()
 
+  ask_font || continue
   ask_diamond || continue
   if [[ $AWESOME_GLYPHS_LOADED == 1 ]]; then
     POWERLEVEL9K_MODE=awesome-mapped-fontconfig
