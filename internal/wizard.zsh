@@ -128,7 +128,18 @@ function href() {
   print -r -- $'%{\e]8;;'${1//\%/%%}$'\a%}'${1//\%/%%}$'%{\e]8;;\a%}'
 }
 
-function centered() {
+function flowing() {
+  local opt
+  local -i centered indentation
+  while getopts 'ci:' opt; do
+    case $opt in
+      i)  indentation=$OPTARG;;
+      c)  centered=1;;
+      +c) centered=0;;
+      \?) exit 1;;
+    esac
+  done
+  shift $((OPTIND-1))
   local line word lines=()
   for word in "$@"; do
     local n=$(prompt_length ${(g::):-"$line $word"})
@@ -136,13 +147,17 @@ function centered() {
       [[ -z $line ]] || lines+=$line
       line=
     fi
-    [[ -z $line ]] || line+=' '
+    if [[ -n $line ]]; then
+      line+=' '
+    elif (( $#lines )); then
+      line=${(pl:$indentation:: :)}
+    fi
     line+=$word
   done
   [[ -z $line ]] || lines+=$line
   for line in $lines; do
     local n=$(prompt_length ${(g::)line})
-    (( n < wizard_columns )) && print -n -- ${(pl:$(((wizard_columns - n) / 2)):: :)}
+    (( centered && n < wizard_columns )) && print -n -- ${(pl:$(((wizard_columns - n) / 2)):: :)}
     print -P -- $line
   done
 }
@@ -184,19 +199,19 @@ function ask_diamond() {
   while true; do
     clear
     if (( force )); then
-      centered This is %4FPowerlevel10k configuration wizard%f. \
-               It will ask you a few questions and configure your prompt.
+      flowing -c This is %4FPowerlevel10k configuration wizard%f. \
+                 It will ask you a few questions and configure your prompt.
     else
-      centered This is %4FPowerlevel10k configuration wizard%f.   \
-               You are seeing it because you haven\'t defined any \
-               Powerlevel10k configuration options. It will ask   \
-               you a few questions and configure your prompt.
+      flowing -c This is %4FPowerlevel10k configuration wizard%f.   \
+                 You are seeing it because you haven\'t defined any \
+                 Powerlevel10k configuration options. It will ask   \
+                 you a few questions and configure your prompt.
     fi
     print -P ""
-    centered "%BDoes this look like a %b%2Fdiamond%f%B (rotated square)?%b"
-    centered "reference: $(href https://graphemica.com/%E2%97%86)"
+    flowing -c "%BDoes this look like a %b%2Fdiamond%f%B (rotated square)?%b"
+    flowing -c "reference: $(href https://graphemica.com/%E2%97%86)"
     print -P ""
-    centered "--->  \uE0B2\uE0B0  <---"
+    flowing -c -- "--->  \uE0B2\uE0B0  <---"
     print -P ""
     print -P "%B(y)  Yes.%b"
     print -P ""
@@ -218,11 +233,11 @@ function ask_diamond() {
 function ask_lock() {
   while true; do
     clear
-    [[ -n $2 ]] && centered "$2"
-    centered "%BDoes this look like a %b%2Flock%f%B?%b"
-    centered "reference: $(href https://fontawesome.com/icons/lock)"
+    [[ -n $2 ]] && flowing -c "$2"
+    flowing -c "%BDoes this look like a %b%2Flock%f%B?%b"
+    flowing -c "reference: $(href https://fontawesome.com/icons/lock)"
     print -P ""
-    centered "--->  $1  <---"
+    flowing -c -- "--->  $1  <---"
     print -P ""
     print -P "%B(y)  Yes.%b"
     print -P ""
@@ -246,10 +261,10 @@ function ask_lock() {
 function ask_python() {
   while true; do
     clear
-    centered "%BDoes this look like a %b%2FPython logo%f%B?%b"
-    centered "reference: $(href https://fontawesome.com/icons/python)"
+    flowing -c "%BDoes this look like a %b%2FPython logo%f%B?%b"
+    flowing -c "reference: $(href https://fontawesome.com/icons/python)"
     print -P ""
-    centered "--->  \uE63C  <---"
+    flowing -c -- "--->  \uE63C  <---"
     print -P ""
     print -P "%B(y)  Yes.%b"
     print -P ""
@@ -273,10 +288,10 @@ function ask_python() {
 function ask_debian() {
   while true; do
     clear
-    centered "%BDoes this look like a %b%2FDebian logo%f%B (swirl/spiral)?%b"
-    centered "reference: $(href https://debian.org/logos/openlogo-nd.svg)"
+    flowing -c "%BDoes this look like a %b%2FDebian logo%f%B (swirl/spiral)?%b"
+    flowing -c "reference: $(href https://debian.org/logos/openlogo-nd.svg)"
     print -P ""
-    centered "--->  \uF306  <---"
+    flowing -c -- "--->  \uF306  <---"
     print -P ""
     print -P "%B(y)  Yes.%b"
     print -P ""
@@ -314,11 +329,11 @@ function ask_narrow_icons() {
   text+="%3F${icons[RAM_ICON]// }%fX"
   while true; do
     clear
-    centered "%BDo all these icons %b%2Ffit between the crosses%f%B?%b"
+    flowing -c "%BDo all these icons %b%2Ffit between the crosses%f%B?%b"
     print -P ""
-    centered "--->  $text  <---"
+    flowing -c -- "--->  $text  <---"
     print -P ""
-    print -P "%B(y)  Yes. Icons are very close to the crosses but there is %b%2Fno overlap%f%B.%b"
+    flowing +c -i 5 "%B(y)  Yes." Icons are very close to the crosses but there is "%b%2Fno overlap%f%B.%b"
     print -P ""
     print -P "%B(n)  No. Some icons %b%2Foverlap%f%B neighbouring crosses.%b"
     print -P ""
@@ -340,7 +355,7 @@ function ask_narrow_icons() {
 function ask_style() {
   while true; do
     clear
-    centered "%BPrompt Style%b"
+    flowing -c "%BPrompt Style%b"
     print -P ""
     print -P "%B(1)  Lean.%b"
     print -P ""
@@ -374,7 +389,7 @@ function ask_color() {
   fi
   while true; do
     clear
-    centered "%BPrompt Color%b"
+    flowing -c "%BPrompt Color%b"
     print -n $nl
     print -P "%B(1)  Lightest.%b"
     print -n $nl
@@ -417,7 +432,7 @@ function ask_time() {
 
   while true; do
     clear
-    centered "%BShow current time?%b"
+    flowing -c "%BShow current time?%b"
     print -P ""
     print -P "%B(y)  Yes.%b"
     print -P ""
@@ -514,7 +529,7 @@ function ask_extra_icons() {
   local many=("$os_icon" "$dir_icon " "$vcs_icon $branch_icon " "$duration_icon " "$time_icon ")
   while true; do
     clear
-    centered "%BIcons%b"
+    flowing -c "%BIcons%b"
     print -P ""
     print -P "%B(1)  Few icons.%b"
     print -P ""
@@ -549,7 +564,7 @@ function ask_prefixes() {
   fi
   while true; do
     clear
-    centered "%BPrompt Flow%b"
+    flowing -c "%BPrompt Flow%b"
     print -P ""
     print -P "%B(1)  Concise.%b"
     print -P ""
@@ -581,7 +596,7 @@ function ask_separators() {
   while true; do
     local extra=
     clear
-    centered "%BPrompt Separators%b"
+    flowing -c "%BPrompt Separators%b"
     print -P "              separator"
     print -P "%B(1)  Angled.%b /"
     print -P "            /"
@@ -644,7 +659,7 @@ function ask_heads() {
   while true; do
     local extra=
     clear
-    centered "%BPrompt Heads%b"
+    flowing -c "%BPrompt Heads%b"
     print -P "                   head"
     print -P "%B(1)  Sharp.%b         |"
     print -P "                    v"
@@ -697,7 +712,7 @@ function ask_tails() {
   while true; do
     local extra=
     clear
-    centered "%BPrompt Tails%b"
+    flowing -c "%BPrompt Tails%b"
     print -n $nl
     print -P "%B(1)  Flat.%b"
     print -n $nl
@@ -755,7 +770,7 @@ function ask_tails() {
 function ask_num_lines() {
   while true; do
     clear
-    centered "%BPrompt Height%b"
+    flowing -c "%BPrompt Height%b"
     print -P ""
     print -P "%B(1)  One line.%b"
     print -P ""
@@ -786,7 +801,7 @@ function ask_gap_char() {
   fi
   while true; do
     clear
-    centered "%BPrompt Connection%b"
+    flowing -c "%BPrompt Connection%b"
     print -P ""
     print -P "%B(1)  Disconnected.%b"
     print -P ""
@@ -824,7 +839,7 @@ function ask_frame() {
   (( LINES >= 26 )) && local nl=$'\n' || local nl=''
   while true; do
     clear
-    centered "%BPrompt Frame%b"
+    flowing -c "%BPrompt Frame%b"
     print -n $nl
     print -P "%B(1)  No frame.%b"
     print -n $nl
@@ -862,7 +877,7 @@ function ask_frame() {
 function ask_empty_line() {
   while true; do
     clear
-    centered "%BPrompt Spacing%b"
+    flowing -c "%BPrompt Spacing%b"
     print -P ""
     print -P "%B(1)  Compact.%b"
     print -P ""
@@ -893,7 +908,7 @@ function ask_empty_line() {
 function ask_confirm() {
   while true; do
     clear
-    centered "%BLooks good?%b"
+    flowing -c "%BLooks good?%b"
     print -P ""
     print_prompt
     (( empty_line )) && print -P ""
@@ -923,8 +938,8 @@ function ask_config_overwrite() {
   fi
   while true; do
     clear
-    centered "Powerlevel10k config file already exists."
-    centered "%BOverwrite %b%2F${__p9k_cfg_path_u//\\/\\\\}%f%B?%b"
+    flowing -c "Powerlevel10k config file already exists."
+    flowing -c "%BOverwrite" "%b%2F${__p9k_cfg_path_u//\\/\\\\}%f%B?%b"
     print -P ""
     print -P "%B(y)  Yes.%b"
     print -P ""
