@@ -4,7 +4,7 @@ emulate -L zsh
 setopt noaliases
 
 () {
-setopt extended_glob no_prompt_{bang,subst} prompt_{cr,percent,sp}
+setopt extended_glob no_prompt_{bang,subst} prompt_{cr,percent,sp} typeset_silent
 zmodload zsh/langinfo
 if [[ ${langinfo[CODESET]:-} != (utf|UTF)(-|)8 ]]; then
   local LC_ALL=${${(@M)$(locale -a):#*.(utf|UTF)(-|)8}[1]:-en_US.UTF-8}
@@ -19,7 +19,7 @@ while getopts 'd:f' opt; do
     d)  __p9k_root_dir=$OPTARG;;
     f)  force=1;;
     +f) force=0;;
-    '?') return 1;;
+    \?) return 1;;
   esac
 done
 
@@ -220,6 +220,12 @@ function print_greeting() {
   print -P ""
 }
 
+function iterm_get() {
+  /usr/libexec/PlistBuddy -c "Print :$1" ~/Library/Preferences/com.googlecode.iterm2.plist
+}
+
+local terminal iterm2_font_size
+
 function can_install_font() {
   [[ $P9K_SSH == 0 ]] || return
   if [[ "$(uname)" == Linux && "$(uname -o)" == Android ]]; then
@@ -231,33 +237,99 @@ function can_install_font() {
     else
       [[ -w ~ ]] || return
     fi
+    terminal=Termux
+    return
+  fi
+  if [[ "$(uname)" == Darwin && $TERM_PROGRAM == iTerm.app ]]; then
+    [[ $TERM_PROGRAM_VERSION == (2|3)* ]] || return
+    if [[ -f ~/Library/Fonts ]]; then
+      [[ -d ~/Library/Fonts && -w ~/Library/Fonts ]] || return
+    else
+      [[ -d ~/Library && -w ~/Library ]] || return
+    fi
+    [[ -x /usr/libexec/PlistBuddy ]] || return
+    [[ -x /usr/bin/plutil ]] || return
+    [[ -x /usr/bin/defaults ]] || return
+    [[ -f ~/Library/Preferences/com.googlecode.iterm2.plist ]] || return
+    [[ -r ~/Library/Preferences/com.googlecode.iterm2.plist ]] || return
+    [[ -w ~/Library/Preferences/com.googlecode.iterm2.plist ]] || return
+    local guid1 && guid1="$(iterm_get '"Default Bookmark Guid"' 2>/dev/null)" || return
+    local guid2 && guid2="$(iterm_get '"New Bookmarks":0:"Guid"' 2>/dev/null)" || return
+    local font && font="$(iterm_get '"New Bookmarks":0:"Normal Font"' 2>/dev/null)" || return
+    [[ $guid1 == $guid2 ]] || return
+    [[ $font != 'MesloLGSNer-Regular '<-> ]] || return
+    [[ $font == (#b)*' '(<->) ]] || return
+    iterm2_font_size=$match[1]
+    terminal=iTerm2
     return
   fi
   return 1
 }
 
 function run_command() {
-  print -nP -- "$1 ..."
+  local msg=$1
   shift
+  [[ -n $msg ]] && print -nP -- "$msg ..."
   local err && err="$("$@" 2>&1)" || {
     print -P " %1FERROR%f"
     print -P ""
-    print -P "%BCommand:%b" "${(@q)*}"
+    print -nP "%BCommand:%b "
+    print -r -- "${(@q)*}"
     if [[ -n $err ]]; then
       print -P ""
       print -r -- $err
     fi
     quit -c
   }
-  print -P " %2FOK%f"
+  [[ -n $msg ]] && print -P " %2FOK%f"
 }
 
 function install_font() {
   clear
-  mkdir -p ~/.termux || quit -c
-  run_command "Downloading %2FMesloLGS NF Regular.ttf%f" \
-    curl -fsSL -o ~/.termux/font.ttf "$font_base_url/MesloLGS%20NF%20Regular.ttf"
-  run_command "Reloading Termux settings" termux-reload-settings
+  case $terminal in
+    Termux)
+      mkdir -p ~/.termux || quit -c
+      run_command "Downloading %BMesloLGS NF Regular.ttf%b" \
+        curl -fsSL -o ~/.termux/font.ttf "$font_base_url/MesloLGS%20NF%20Regular.ttf"
+      run_command "Reloading %BTermux%b settings" termux-reload-settings
+    ;;
+    iTerm2)
+      mkdir -p ~/Library/Fonts || quit -c
+      local style
+      for style in Regular Bold Italic 'Bold Italic'; do
+        local file="MesloLGS NF ${style}.ttf"
+        run_command "Downloading %B$file%b" \
+          curl -fsSL -o ~/Library/Fonts/$file "$font_base_url/${file// /%20}"
+      done
+      print -nP -- "Changing %BiTerm2%b settings ..."
+      local k v settings=(
+        '"Normal Font"' '"MesloLGSNer-Regular '$iterm2_font_size'"'
+        '"Horizontal Spacing"' 1
+        '"Vertical Spacing"' 1
+        '"Use Bold Font"' 1
+        '"Use Bright Bold"' 1
+        '"Use Italic Font"' 1
+        '"Use Non-ASCII Font"' 0
+        '"Ambiguous Double Width"' 0
+        '"Terminal Type"' '"xterm-256color"'
+      )
+      for k v in $settings; do
+        run_command "" /usr/libexec/PlistBuddy -c \
+          "Set :\"New Bookmarks\":0:$k $v" ~/Library/Preferences/com.googlecode.iterm2.plist
+      done
+      print -P " %2FOK%f"
+      run_command "Updating %BiTerm2%b settings cache" defaults read com.googlecode.iterm2
+      clear
+      print -P "%2FMeslo Nerd Font%f successfully  installed."
+      print -P ""
+      print -P "Please %Brestart iTerm2%b for the changes to take effect."
+      print -P ""
+      flowing +c -i 5 "  1. Click" "%BiTerm2 → Quit iTerm2%b" or press "%B⌘ Q%b."
+      flowing +c -i 5 "  2. Open %BiTerm2%b."
+      print -P ""
+      exit 0
+    ;;
+  esac
 }
 
 function ask_font() {
@@ -276,7 +348,7 @@ function ask_font() {
     print -P ""
 
     local key=
-    read -k key${(%):-"?%BChoice [ynq]: %b"} || quit
+    read -k key${(%):-"?%BChoice [ynq]: %b"} || quit -c
     case $key in
       q) quit;;
       y) install_font; break;;
@@ -308,7 +380,7 @@ function ask_diamond() {
     print -P ""
 
     local key=
-    read -k key${(%):-"?%BChoice [yn${extra}q]: %b"} || quit
+    read -k key${(%):-"?%BChoice [yn${extra}q]: %b"} || quit -c
     case $key in
       q) quit;;
       r) [[ $extra == *r* ]] && { greeting_printed=1; return 1 };;
@@ -337,7 +409,7 @@ function ask_lock() {
     print -P ""
 
     local key=
-    read -k key${(%):-"?%BChoice [ynrq]: %b"} || quit
+    read -k key${(%):-"?%BChoice [ynrq]: %b"} || quit -c
     case $key in
       q) quit;;
       r) return 1;;
@@ -364,7 +436,7 @@ function ask_python() {
     print -P ""
 
     local key=
-    read -k key${(%):-"?%BChoice [ynrq]: %b"} || quit
+    read -k key${(%):-"?%BChoice [ynrq]: %b"} || quit -c
     case $key in
       q) quit;;
       r) return 1;;
@@ -391,7 +463,7 @@ function ask_debian() {
     print -P ""
 
     local key=
-    read -k key${(%):-"?%BChoice [ynrq]: %b"} || quit
+    read -k key${(%):-"?%BChoice [ynrq]: %b"} || quit -c
     case $key in
       q) quit;;
       r) return 1;;
@@ -431,7 +503,7 @@ function ask_narrow_icons() {
     print -P ""
 
     local key=
-    read -k key${(%):-"?%BChoice [ynrq]: %b"} || quit
+    read -k key${(%):-"?%BChoice [ynrq]: %b"} || quit -c
     case $key in
       q) quit;;
       r) return 1;;
@@ -459,7 +531,7 @@ function ask_style() {
     print -P ""
 
     local key=
-    read -k key${(%):-"?%BChoice [12rq]: %b"} || quit
+    read -k key${(%):-"?%BChoice [12rq]: %b"} || quit -c
     case $key in
       q) quit;;
       r) return 1;;
@@ -501,7 +573,7 @@ function ask_color() {
     print -P ""
 
     local key=
-    read -k key${(%):-"?%BChoice [1234rq]: %b"} || quit
+    read -k key${(%):-"?%BChoice [1234rq]: %b"} || quit -c
     case $key in
       q) quit;;
       r) return 1;;
@@ -536,7 +608,7 @@ function ask_time() {
     print -P ""
 
     local key=
-    read -k key${(%):-"?%BChoice [ynrq]: %b"} || quit
+    read -k key${(%):-"?%BChoice [ynrq]: %b"} || quit -c
     case $key in
       q) quit;;
       r) return 1;;
@@ -633,7 +705,7 @@ function ask_extra_icons() {
     print -P ""
 
     local key=
-    read -k key${(%):-"?%BChoice [12rq]: %b"} || quit
+    read -k key${(%):-"?%BChoice [12rq]: %b"} || quit -c
     case $key in
       q) quit;;
       r) return 1;;
@@ -668,7 +740,7 @@ function ask_prefixes() {
     print -P ""
 
     local key=
-    read -k key${(%):-"?%BChoice [12rq]: %b"} || quit
+    read -k key${(%):-"?%BChoice [12rq]: %b"} || quit -c
     case $key in
       q) quit;;
       r) return 1;;
@@ -721,7 +793,7 @@ function ask_separators() {
     print -P ""
 
     local key=
-    read -k key${(%):-"?%BChoice [12${extra}rq]: %b"} || quit
+    read -k key${(%):-"?%BChoice [12${extra}rq]: %b"} || quit -c
     case $key in
       q) quit;;
       r) return 1;;
@@ -808,7 +880,7 @@ function ask_heads() {
     print -P ""
 
     local key=
-    read -k key${(%):-"?%BChoice [12${extra}rq]: %b"} || quit
+    read -k key${(%):-"?%BChoice [12${extra}rq]: %b"} || quit -c
     case $key in
       q) quit;;
       r) return 1;;
@@ -882,7 +954,7 @@ function ask_tails() {
     print -P ""
 
     local key=
-    read -k key${(%):-"?%BChoice [12${extra}rq]: %b"} || quit
+    read -k key${(%):-"?%BChoice [12${extra}rq]: %b"} || quit -c
     case $key in
       q) quit;;
       r) return 1;;
@@ -934,7 +1006,7 @@ function ask_num_lines() {
     print -P ""
 
     local key=
-    read -k key${(%):-"?%BChoice [12rq]: %b"} || quit
+    read -k key${(%):-"?%BChoice [12rq]: %b"} || quit -c
     case $key in
       q) quit;;
       r) return 1;;
@@ -969,7 +1041,7 @@ function ask_gap_char() {
     print -P ""
 
     local key=
-    read -k key${(%):-"?%BChoice [123rq]: %b"} || quit
+    read -k key${(%):-"?%BChoice [123rq]: %b"} || quit -c
     case $key in
       q) quit;;
       r) return 1;;
@@ -1011,7 +1083,7 @@ function ask_frame() {
     print -P ""
 
     local key=
-    read -k key${(%):-"?%BChoice [1234rq]: %b"} || quit
+    read -k key${(%):-"?%BChoice [1234rq]: %b"} || quit -c
     case $key in
       q) quit;;
       r) return 1;;
@@ -1044,7 +1116,7 @@ function ask_empty_line() {
     print -P ""
 
     local key=
-    read -k key${(%):-"?%BChoice [12rq]: %b"} || quit
+    read -k key${(%):-"?%BChoice [12rq]: %b"} || quit -c
     case $key in
       q) quit;;
       r) return 1;;
@@ -1070,7 +1142,7 @@ function ask_confirm() {
     print -P ""
 
     local key=
-    read -k key${(%):-"?%BChoice [yrq]: %b"} || quit
+    read -k key${(%):-"?%BChoice [yrq]: %b"} || quit -c
     case $key in
       q) quit;;
       r) return 1;;
@@ -1097,7 +1169,7 @@ function ask_config_overwrite() {
     print -P ""
 
     local key=
-    read -k key${(%):-"?%BChoice [yrq]: %b"} || quit
+    read -k key${(%):-"?%BChoice [yrq]: %b"} || quit -c
     case $key in
       q) quit;;
       r) return 1;;
