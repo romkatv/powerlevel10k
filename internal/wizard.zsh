@@ -1192,7 +1192,7 @@ function write_zshrc() {
     local f6="\"$f1\""
     local f7="\"$f3\""
     if [[ -n ${(@M)lines:#(#b)[^#]#([^[:IDENT:]]|)source[[:space:]]##($f1|$f2|$f3|$f4|$f5|$f6|$f7)*} ]]; then
-      print -rP "No changes have been made to %4F$__p9k_zshrc_u%f because it already sources %2F$__p9k_cfg_path_u%f."
+      flowing +c No changes have been made to %4F$__p9k_zshrc_u%f because it already sources %2F$__p9k_cfg_path_u%f.
       return
     fi
   fi
@@ -1203,7 +1203,7 @@ function write_zshrc() {
   print -lrP -- "" $comments "[[ -f $__p9k_cfg_path_u ]] && source $__p9k_cfg_path_u" >>$__p9k_zshrc
 
   print -rP ""
-  print -rP "The following lines have been appended to %4F$__p9k_zshrc_u%f:"
+  flowing +c The following lines have been appended to %4F$__p9k_zshrc_u%f:
   print -rP ""
   print -lrP -- '  '${^comments} "  %3F[[%f %B-f $__p9k_cfg_path_u%b %3F]]%f && %2Fsource%f %B$__p9k_cfg_path_u%b"
 }
@@ -1294,9 +1294,9 @@ done
 
 clear
 
-print -rP "Powerlevel10k configuration has been written to %2F$__p9k_cfg_path_u%f."
+flowing +c Powerlevel10k configuration has been written to %2F$__p9k_cfg_path_u%f.
 if [[ -n $config_backup ]]; then
-  print -rP "The backup of the previuos version is at %3F$config_backup_u%f."
+  flowing +c The backup of the previuos version is at %3F$config_backup_u%f.
 fi
 
 if (( write_config )); then
@@ -1306,8 +1306,7 @@ fi
 write_zshrc || return
 
 print -rP ""
-print -rP "File feature requests and bug reports at $(href https://github.com/romkatv/powerlevel10k/issues)."
-print -rP "Send praise and complaints to $(href https://www.reddit.com/r/zsh)."
+flowing +c File feature requests and bug reports at "$(href https://github.com/romkatv/powerlevel10k/issues)."
 print -rP ""
 
 } "$@"
