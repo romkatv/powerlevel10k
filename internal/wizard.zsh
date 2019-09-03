@@ -231,7 +231,11 @@ function can_install_font() {
   if [[ "$(uname)" == Linux && "$(uname -o)" == Android ]]; then
     (( $+commands[termux-reload-settings] )) || return
     (( $+commands[curl] )) || return
-    [[ ! -f ~/.termux/font.ttf ]] || return
+    if [[ -f ~/.termux/font.ttf ]]; then
+      [[ -r ~/.termux/font.ttf ]] || return
+      [[ -w ~/.termux/font.ttf ]] || return
+      ! grep -q 'MesloLGS NF' ~/.termux/font.ttf 2>/dev/null || return
+    fi
     if [[ -f ~/.termux ]]; then
       [[ -d ~/.termux && -w ~/.termux ]] || return
     else
