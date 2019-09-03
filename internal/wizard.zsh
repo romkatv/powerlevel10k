@@ -44,6 +44,10 @@ typeset -ra frame_color=(244 242 240 238)
 typeset -ra sep_color=(248 246 244 242)
 typeset -ra prefix_color=(250 248 246 244)
 
+typeset -r left_circle='\uE0B6'
+typeset -r right_circle='\uE0B4'
+typeset -r left_arc='\uE0B7'
+typeset -r right_arc='\uE0B5'
 typeset -r left_triangle='\uE0B2'
 typeset -r right_triangle='\uE0B0'
 typeset -r left_angle='\uE0B3'
@@ -593,24 +597,38 @@ function ask_separators() {
   if [[ $style != classic || $cap_diamond != 1 ]]; then
     return
   fi
+  if [[ $POWERLEVEL9K_MODE == nerdfont-complete && $LINES -lt 26 ]]; then
+    local nl=''
+  else
+    local nl=$'\n'
+  fi
   while true; do
     local extra=
     clear
     flowing -c "%BPrompt Separators%b"
-    print -P "              separator"
-    print -P "%B(1)  Angled.%b /"
-    print -P "            /"
+    if [[ -n $nl ]]; then
+      print -P "              separator"
+      print -P "%B(1)  Angled.%b /"
+      print -P "            /"
+    else
+      print -P "%B(1)  Angled.%b"
+    fi
     left_sep=$right_triangle right_sep=$left_triangle left_subsep=$right_angle right_subsep=$left_angle print_prompt
     print -P ""
     print -P "%B(2)  Vertical.%b"
-    print -P ""
+    print -n $nl
     left_sep='' right_sep='' left_subsep=$vertical_bar right_subsep=$vertical_bar print_prompt
     print -P ""
     if [[ $POWERLEVEL9K_MODE == nerdfont-complete ]]; then
       extra+=3
       print -P "%B(3)  Slanted.%b"
-      print -P ""
+      print -n $nl
       left_sep=$down_triangle right_sep=$up_triangle left_subsep=$slanted_bar right_subsep=$slanted_bar print_prompt
+      print -P ""
+      extra+=4
+      print -P "%B(4)  Round.%b"
+      print -n $nl
+      left_sep=$right_circle right_sep=$left_circle left_subsep=$right_arc right_subsep=$left_arc print_prompt
       print -P ""
     fi
     print -P "(r)  Restart from the beginning."
@@ -648,6 +666,16 @@ function ask_separators() {
           break
         fi
         ;;
+      4)
+        if [[ $extra == *4* ]]; then
+          left_sep=$right_circle
+          right_sep=$left_circle
+          left_subsep=$right_arc
+          right_subsep=$left_arc
+          options+='round separators'
+          break
+        fi
+        ;;
     esac
   done
 }
@@ -656,24 +684,38 @@ function ask_heads() {
   if [[ $style != classic || $cap_diamond != 1 ]]; then
     return
   fi
+  if [[ $POWERLEVEL9K_MODE == nerdfont-complete && $LINES -lt 26 ]]; then
+    local nl=''
+  else
+    local nl=$'\n'
+  fi
   while true; do
     local extra=
     clear
     flowing -c "%BPrompt Heads%b"
-    print -P "                   head"
-    print -P "%B(1)  Sharp.%b         |"
-    print -P "                    v"
+    if [[ -n $nl ]]; then
+      print -P "                   head"
+      print -P "%B(1)  Sharp.%b         |"
+      print -P "                    v"
+    else
+      print -P "%B(1)  Sharp.%b"
+    fi
     left_head=$right_triangle right_head=$left_triangle print_prompt
     print -P ""
     print -P "%B(2)  Blurred.%b"
-    print -P ""
+    print -n $nl
     left_head=$fade_out right_head=$fade_in print_prompt
     print -P ""
     if [[ $POWERLEVEL9K_MODE == nerdfont-complete ]]; then
       extra+=3
       print -P "%B(3)  Slanted.%b"
-      print -P ""
+      print -n $nl
       left_head=$down_triangle right_head=$up_triangle print_prompt
+      print -P ""
+      extra+=4
+      print -P "%B(4)  Round.%b"
+      print -n $nl
+      left_head=$right_circle right_head=$left_circle print_prompt
       print -P ""
     fi
     print -P "(r)  Restart from the beginning."
@@ -681,7 +723,7 @@ function ask_heads() {
     print -P ""
 
     local key=
-    read -k key${(%):-"?%BChoice [12rq]: %b"} || quit
+    read -k key${(%):-"?%BChoice [12${extra}rq]: %b"} || quit
     case $key in
       q) quit;;
       r) return 1;;
@@ -695,6 +737,14 @@ function ask_heads() {
           break
         fi
         ;;
+      4)
+        if [[ $extra == *4* ]]; then
+          left_head=$right_circle
+          right_head=$left_circle
+          options+='round heads'
+          break
+        fi
+        ;;
     esac
   done
 }
@@ -703,8 +753,7 @@ function ask_tails() {
   if [[ $style != classic ]]; then
     return
   fi
-
-  if [[ $POWERLEVEL9K_MODE == nerdfont-complete && $LINES -lt 26 ]]; then
+  if [[ $POWERLEVEL9K_MODE == nerdfont-complete && $LINES -lt 31 ]]; then
     local nl=''
   else
     local nl=$'\n'
@@ -734,6 +783,13 @@ function ask_tails() {
         print -n $nl
         left_tail=$up_triangle right_tail=$down_triangle print_prompt
         print -P ""
+        if (( LINES >= 25 )); then
+          extra+=5
+          print -P "%B(5)  Round.%b"
+          print -n $nl
+          left_tail=$left_circle right_tail=$right_circle print_prompt
+          print -P ""
+        fi
       fi
     fi
     print -P "(r)  Restart from the beginning."
@@ -760,6 +816,14 @@ function ask_tails() {
           left_tail=$up_triangle
           right_tail=$down_triangle
           options+='slanted tails'
+          break
+        fi
+        ;;
+      5)
+        if [[ $extra == *5* ]]; then
+          left_tail=$left_circle
+          right_tail=$right_circle
+          options+='round tails'
           break
         fi
         ;;
