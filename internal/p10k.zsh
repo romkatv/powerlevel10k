@@ -1169,30 +1169,37 @@ function _p9k_shorten_delim_len() {
 ################################################################
 # Dir: current working directory
 prompt_dir() {
-  (( _POWERLEVEL9K_DIR_PATH_ABSOLUTE )) && local p=$_p9k_pwd || local p=${(%):-%~}
-
-  if [[ $p == '~['* ]]; then
-    # If "${(%):-%~}" expands to "~[a]/]/b", is the first component "~[a]" or "~[a]/]"?
-    # One would expect "${(%):-%-1~}" to give the right answer but alas it always simply
-    # gives the segment before the first slash, which would be "~[a]" in this case. Worse,
-    # for "~[a/b]" it'll give the nonsensical "~[a". To solve this problem we have to
-    # repeat what "${(%):-%~}" does and hope that it produces the same result.
-    local func=''
-    local -a parts=()
-    for func in zsh_directory_name $zsh_directory_name_functions; do
-      if (( $+functions[$func] )) && $func d $_p9k_pwd && [[ $p == '~['$reply[1]']'* ]]; then
-        parts+='~['$reply[1]']'
-        break
-      fi
-    done
-    if (( $#parts )); then
-      parts+=(${(s:/:)${p#$parts[1]}})
-    else
-      p=$_p9k_pwd
-      parts=("${(s:/:)p}")
-    fi
-  else
+  if (( _POWERLEVEL9K_DIR_PATH_ABSOLUTE )); then
+    local p=$_p9k_pwd
     local -a parts=("${(s:/:)p}")
+  elif [[ -o auto_name_dirs ]]; then
+    local p=${_p9k_pwd/#(#b)$HOME(|\/*)/'~'$match[1]}
+    local -a parts=("${(s:/:)p}")
+  else
+    local p=${(%):-%~}
+    if [[ $p == '~['* ]]; then
+      # If "${(%):-%~}" expands to "~[a]/]/b", is the first component "~[a]" or "~[a]/]"?
+      # One would expect "${(%):-%-1~}" to give the right answer but alas it always simply
+      # gives the segment before the first slash, which would be "~[a]" in this case. Worse,
+      # for "~[a/b]" it'll give the nonsensical "~[a". To solve this problem we have to
+      # repeat what "${(%):-%~}" does and hope that it produces the same result.
+      local func=''
+      local -a parts=()
+      for func in zsh_directory_name $zsh_directory_name_functions; do
+        if (( $+functions[$func] )) && $func d $_p9k_pwd && [[ $p == '~['$reply[1]']'* ]]; then
+          parts+='~['$reply[1]']'
+          break
+        fi
+      done
+      if (( $#parts )); then
+        parts+=(${(s:/:)${p#$parts[1]}})
+      else
+        p=$_p9k_pwd
+        parts=("${(s:/:)p}")
+      fi
+    else
+      local -a parts=("${(s:/:)p}")
+    fi
   fi
 
   local -i fake_first=0 expand=0
@@ -1363,7 +1370,7 @@ prompt_dir() {
 
   [[ $_POWERLEVEL9K_DIR_SHOW_WRITABLE == 1 && ! -w $_p9k_pwd ]]
   local w=$?
-  if ! _p9k_cache_get $0 $_p9k_pwd $w $fake_first "${parts[@]}"; then
+  if ! _p9k_cache_get $0 $_p9k_pwd $p $w $fake_first "${parts[@]}"; then
     local state=$0
     local icon=''
     if (( ! w )); then
@@ -4100,7 +4107,6 @@ _p9k_must_init() {
   IFS=$'\1' param_sig="${(@)param_keys:/(#b)(*)/$match[1]=\$$match[1]}"
   IFS=$'\2' eval "param_sig=x\"$param_sig\""
   [[ -o transient_rprompt ]] && param_sig+=t
-  [[ -o auto_name_dirs ]] && param_sig+=d
   [[ $param_sig == $_p9k_param_sig ]] && return 1
   [[ -n $_p9k_param_sig ]] && _p9k_deinit
   _p9k_param_sig=$param_sig
