@@ -245,7 +245,7 @@ function can_install_font() {
     return
   fi
   if [[ "$(uname)" == Darwin && $TERM_PROGRAM == iTerm.app ]]; then
-    [[ $TERM_PROGRAM_VERSION == (2|3)* ]] || return
+    [[ $TERM_PROGRAM_VERSION == [2-9]* ]] || return
     if [[ -f ~/Library/Fonts ]]; then
       [[ -d ~/Library/Fonts && -w ~/Library/Fonts ]] || return
     else
