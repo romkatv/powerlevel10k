@@ -331,7 +331,7 @@ function install_font() {
       flowing +c -i 5 "  1. Click" "%BiTerm2 → Quit iTerm2%b" or press "%B⌘ Q%b."
       flowing +c -i 5 "  2. Open %BiTerm2%b."
       print -P ""
-      exit 0
+      exit 69
     ;;
   esac
 }

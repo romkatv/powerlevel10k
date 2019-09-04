@@ -66,6 +66,11 @@ function p9k_configure() {
       typeset -x -- $p
     fi
     $__p9k_root_dir/internal/wizard.zsh -d $__p9k_root_dir -f
-  ) || return
-  source $__p9k_cfg_path
+  )
+  local ret=$?
+  case $ret in
+    0)  source $__p9k_cfg_path;;
+    69) return 0;;
+    *)  return $ret;;
+  esac
 }
