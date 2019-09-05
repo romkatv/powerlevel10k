@@ -319,7 +319,7 @@ function gitstatus_start() {
     local arch && arch=$(uname -m) && [[ -n $arch ]]
 
     local daemon=${GITSTATUS_DAEMON:-$dir/bin/gitstatusd-${os:l}-${arch:l}}
-    [[ -f $daemon ]]
+    [[ -x $daemon ]]
 
     lock_file=$(mktemp "${TMPDIR:-/tmp}"/gitstatus.$$.lock.XXXXXXXXXX)
     zsystem flock -f lock_fd $lock_file
@@ -367,7 +367,7 @@ function gitstatus_start() {
       fi
       echo -nE $'bye\x1f0\x1e'"
     local setsid=${commands[setsid]:-/usr/local/opt/util-linux/bin/setsid}
-    [[ -f $setsid ]] && setsid=${(q)setsid} || setsid=
+    [[ -x $setsid ]] && setsid=${(q)setsid} || setsid=
     cmd="cd /; $setsid zsh -dfxc ${(q)cmd} &!"
     # We use `zsh -c` instead of plain {} or () to work around bugs in zplug. It hangs on startup.
     # Double fork is to daemonize. Some macOS users had issues when gitstatusd was a child process
