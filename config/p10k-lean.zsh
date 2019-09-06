@@ -122,10 +122,9 @@ fi
   #   Other                            | compatible
   #
   # If this looks overwhelming, either stick with a preinstalled system font and set
-  # POWERLEVEL9K_MODE=compatible, or install a font from https://github.com/ryanoasis/nerd-fonts
-  # and set POWERLEVEL9K_MODE=nerdfont-complete. "Meslo LG S Regular Nerd Font Complete Mono" from
-  # https://github.com/ryanoasis/nerd-fonts/tree/master/patched-fonts/Meslo/S/Regular/complete is
-  # very good.
+  # POWERLEVEL9K_MODE=compatible, or install the recommended Powerlevel10k font from
+  # https://github.com/romkatv/powerlevel10k/#recommended-meslo-nerd-font-patched-for-powerlevel10k
+  # and set POWERLEVEL9K_MODE=nerdfont-complete.
   typeset -g POWERLEVEL9K_MODE=nerdfont-complete
 
   # When set to true, icons appear before content on both sides of the prompt. When set
