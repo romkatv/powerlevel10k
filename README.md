@@ -122,19 +122,17 @@ Double-click on each file and press "Install". This will make `MesloLGS NF` font
 applications on your system. Configure your terminal to use this font:
 
 - **iTerm2**: Open *iTerm2 → Preferences → Profiles → Text* and set *Font* to `MesloLGS NF`.
-- **Hyper**: Open *Hyper → Edit → Preferences* and change the value for `fontFamily` to
-  `MesloLGS NF` under `module.exports.config`.
+- **Hyper**: Open *Hyper → Edit → Preferences* and change the value of `fontFamily` under
+  `module.exports.config` to `MesloLGS NF`.
 - **Visual Studio Code**: Open *File → Preferences → Settings*, enter
-  `terminal.integrated.fontFamily` in the search box and set value to `MesloLGS NF`.
+  `terminal.integrated.fontFamily` in the search box and set the value to `MesloLGS NF`.
+- **GNOME Terminal** (the default Ubuntu terminal): Run:
+  `sudo apt install libglib2.0-bin && gsettings set org.gnome.desktop.interface monospace-font-name 'MesloLGS NF 11'`.
 - **Windows Console Host** (the old thing): Click the icon in the top left corner, then
   *Properties → Font* and set *Font* to `MesloLGS NF`.
 - **Windows Terminal** (the new thing): Open *Settings* (`Ctrl+,`), search for `fontFace` and set
   value to `MesloLGS NF` for every profile.
-- **Linux/GNOME** (all terminals): Type this command:
-```zsh
-sudo apt install libglib2.0-bin
-gsettings set org.gnome.desktop.interface monospace-font-name 'MesloLGS NF 11'
-```
+- **Termux**: Type `p10k configure` and answer `Yes` when asked whether to install *Meslo Nerd Font*.
 
 Run `p10k configure` to pick the best style for your new font.
 
