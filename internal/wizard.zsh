@@ -1349,11 +1349,10 @@ function write_zshrc() {
     local f0=$__p9k_cfg_path
     local f1=${(q)f0}
     local f2=${(q-)f0}
-    local f3=${(q+)f0}
-    local f4=${(qq)f0}
-    local f5=${(qqq)f0}
+    local f3=${(qq)f0}
+    local f4=${(qqq)f0}
     local g1=${${(q)__p9k_cfg_path}/#(#b)${(q)HOME}\//'~/'}
-    if [[ -n ${(@M)lines:#(#b)[^#]#([^[:IDENT:]]|)source[[:space:]]##($f1|$f2|$f3|$f4|$f5|$g1)(|[[:space:]]*|'#'*)} ]]; then
+    if [[ -n ${(@M)lines:#(#b)[^#]#([^[:IDENT:]]|)source[[:space:]]##($f1|$f2|$f3|$f4|$g1)(|[[:space:]]*|'#'*)} ]]; then
       flowing +c No changes have been made to %4F$__p9k_zshrc_u%f because it already sources %2F$__p9k_cfg_path_u%f.
       return
     fi
