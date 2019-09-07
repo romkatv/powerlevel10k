@@ -693,7 +693,7 @@ fi
   typeset -g POWERLEVEL9K_BATTERY_LOW_THRESHOLD=20
   typeset -g POWERLEVEL9K_BATTERY_LOW_FOREGROUND=160
   # Show battery in green when it's charging.
-  typeset -g POWERLEVEL9K_BATTERY_CHARGING_FOREGROUND=2
+  typeset -g POWERLEVEL9K_BATTERY_CHARGING_FOREGROUND=70
   # Show battery in yellow when not connected to power supply.
   typeset -g POWERLEVEL9K_BATTERY_DISCONNECTED_FOREGROUND=178
   # Battery pictograms going from low to high level of charge.
