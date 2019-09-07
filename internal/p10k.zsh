@@ -3785,6 +3785,30 @@ _p9k_init_params() {
   #
   # These correspond to `java -fullversion` and `java -version` respectively.
   _p9k_declare -b POWERLEVEL9K_JAVA_VERSION_FULL 1
+
+  local -i i=1
+  while (( i <= $#_POWERLEVEL9K_LEFT_PROMPT_ELEMENTS )); do
+    local segment=${(U)_POWERLEVEL9K_LEFT_PROMPT_ELEMENTS[i]}
+    local var=POWERLEVEL9K_${segment}_LEFT_DISABLED
+    (( $+parameters[$var] )) || var=POWERLEVEL9K_${segment}_DISABLED
+    if [[ ${(P)var} == true ]]; then
+      _POWERLEVEL9K_LEFT_PROMPT_ELEMENTS[i,i]=()
+    else
+      (( ++i ))
+    fi
+  done
+
+  local -i i=1
+  while (( i <= $#_POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS )); do
+    local segment=${(U)_POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS[i]}
+    local var=POWERLEVEL9K_${segment}_RIGHT_DISABLED
+    (( $+parameters[$var] )) || var=POWERLEVEL9K_${segment}_DISABLED
+    if [[ ${(P)var} == true ]]; then
+      _POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS[i,i]=()
+    else
+      (( ++i ))
+    fi
+  done
 }
 
 typeset -ga __p9k_wrapped_zle_widgets
