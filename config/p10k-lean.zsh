@@ -245,7 +245,7 @@ fi
   typeset -g POWERLEVEL9K_DIR_SHOW_WRITABLE=true
   # Show this icon when the current directory is not writable. POWERLEVEL9K_DIR_SHOW_WRITABLE
   # above must be set to true for this parameter to have effect.
-  # POWERLEVEL9K_DIR_NOT_WRITABLE_VISUAL_IDENTIFIER_EXPANSION='⭐'
+  # typeset -g POWERLEVEL9K_DIR_NOT_WRITABLE_VISUAL_IDENTIFIER_EXPANSION='⭐'
 
   # Custom prefix.
   # typeset -g POWERLEVEL9K_DIR_PREFIX='%fin '

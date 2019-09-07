@@ -1217,8 +1217,10 @@ function generate_config() {
   fi
 
   if [[ $POWERLEVEL9K_MODE == compatible ]]; then
-    # Many fonts don't have the gear icon.
+    # Many fonts don't have the gear or the lock icon.
     sub BACKGROUND_JOBS_VISUAL_IDENTIFIER_EXPANSION "'⇶'"
+    uncomment 'typeset -g POWERLEVEL9K_DIR_NOT_WRITABLE_VISUAL_IDENTIFIER_EXPANSION'
+    sub DIR_NOT_WRITABLE_VISUAL_IDENTIFIER_EXPANSION "'∅'"
   fi
 
   if [[ $POWERLEVEL9K_MODE == (awesome-patched|awesome-fontconfig) && $cap_python == 0 ]]; then

@@ -432,7 +432,7 @@ function _p9k_init_icons() {
         RIGHT_SUBSEGMENT_SEPARATOR     '\uE0B3'               # 
         CARRIAGE_RETURN_ICON           '\u21B5'               # ↵
         ROOT_ICON                      '\u26A1'               # ⚡
-        SUDO_ICON                      '\uE0A2'               # 
+        SUDO_ICON                      ''
         RUBY_ICON                      'Ruby'
         AWS_ICON                       'AWS'
         AWS_EB_ICON                    '\U1F331'              # 🌱
