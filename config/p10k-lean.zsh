@@ -582,7 +582,14 @@ fi
   # POWERLEVEL9K_KUBECONTEXT_CLASSES defines the context class. Patterns are tried in order. The
   # first match wins.
   #
-  # For example, if your current kubernetes context is "deathray-testing/default", its class is TEST
+  # For example, given these settings:
+  #
+  #   typeset -g POWERLEVEL9K_KUBECONTEXT_CLASSES=(
+  #     '*prod*'  PROD
+  #     '*test*'  TEST
+  #     '*'       DEFAULT)
+  #
+  # If your current kubernetes context is "deathray-testing/default", its class is TEST
   # because "deathray-testing/default" doesn't match the pattern '*prod*' but does match '*test*'.
   #
   # You can define different colors, icons and content expansions for different classes:
@@ -612,7 +619,8 @@ fi
   #                              in the output of `kubectl config get-contexts`. If there is no
   #                              namespace, the parameter is set to "default".
   #
-  # If the context points to GKE or EKS, the following extra parameters are available:
+  # If the context points to Google Kubernetes Engine (GKE) or Elastic Kubernetes Service (EKS),
+  # the following extra parameters are available:
   #
   # - P9K_KUBECONTEXT_CLOUD_NAME     Either "gke" or "eks".
   # - P9K_KUBECONTEXT_CLOUD_ACCOUNT  Account/project ID.
