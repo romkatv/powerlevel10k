@@ -15,7 +15,7 @@ fi
 
 () {
   emulate -L zsh
-  setopt no_unset
+  setopt no_unset extended_glob
   zmodload zsh/langinfo
   if [[ ${langinfo[CODESET]:-} != (utf|UTF)(-|)8 ]]; then
     local LC_ALL=${${(@M)$(locale -a):#*.(utf|UTF)(-|)8}[1]:-en_US.UTF-8}
@@ -342,7 +342,7 @@ fi
   # Install our own Git status formatter.
   typeset -g POWERLEVEL9K_VCS_{CLEAN,UNTRACKED,MODIFIED}_CONTENT_EXPANSION=$vcs
   # When Git status is being refreshed asynchronously, display the last known repo status in grey.
-  typeset -g POWERLEVEL9K_VCS_LOADING_CONTENT_EXPANSION=${${vcs//\%f}//\%<->F}
+  typeset -g POWERLEVEL9K_VCS_LOADING_CONTENT_EXPANSION=${${${vcs//\%f}//\%<->F}//\%F\{(\#|)[[:xdigit:]]#(\\|)\}}
   # Enable counters for staged, unstaged, etc.
   typeset -g POWERLEVEL9K_VCS_{STAGED,UNSTAGED,UNTRACKED,CONFLICTED,COMMITS_AHEAD,COMMITS_BEHIND}_MAX_NUM=-1
 
