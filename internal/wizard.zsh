@@ -1227,9 +1227,13 @@ function generate_config() {
     uncomment 'typeset -g POWERLEVEL9K_VIRTUALENV_VISUAL_IDENTIFIER_EXPANSION'
     uncomment 'typeset -g POWERLEVEL9K_ANACONDA_VISUAL_IDENTIFIER_EXPANSION'
     uncomment 'typeset -g POWERLEVEL9K_PYENV_VISUAL_IDENTIFIER_EXPANSION'
-    sub VIRTUALENV_VISUAL_IDENTIFIER_EXPANSION '🐍'
-    sub ANACONDA_VISUAL_IDENTIFIER_EXPANSION '🐍'
-    sub PYENV_VISUAL_IDENTIFIER_EXPANSION '🐍'
+    sub VIRTUALENV_VISUAL_IDENTIFIER_EXPANSION "'🐍'"
+    sub ANACONDA_VISUAL_IDENTIFIER_EXPANSION "'🐍'"
+    sub PYENV_VISUAL_IDENTIFIER_EXPANSION "'🐍'"
+  fi
+
+  if [[ $POWERLEVEL9K_MODE == nerdfont-complete ]]; then
+    sub BATTERY_STAGES "\$'\uf58d\uf579\uf57a\uf57b\uf57c\uf57d\uf57e\uf57f\uf580\uf581\uf578'"
   fi
 
   if [[ $style == classic ]]; then
