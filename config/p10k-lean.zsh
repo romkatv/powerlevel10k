@@ -1,4 +1,4 @@
-# Config for Powerlevel10k with classic powerline prompt style. Type `p10k configure` to generate
+# Config for Powerlevel10k with lean prompt style. Type `p10k configure` to generate
 # your own config based on it.
 #
 # Tip: Looking for a nice color? Here's a one-liner to print colormap.
