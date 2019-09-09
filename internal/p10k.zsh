@@ -922,7 +922,12 @@ prompt_battery() {
 
       case "${${(s:; :)raw_data}[2]}" in
         'charging'|'finishing charge'|'AC attached')
-          state=CHARGING
+          if (( bat_percent == 100 )); then
+            state=CHARGED
+            remain=''
+          else
+            state=CHARGING
+          fi
         ;;
         'discharging')
           (( bat_percent < _POWERLEVEL9K_BATTERY_LOW_THRESHOLD )) && state=LOW || state=DISCONNECTED
