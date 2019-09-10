@@ -9,6 +9,7 @@
 # The replication of Pure prompt achieved with this config is almost exact. Apart from the
 # differences listed above, prompt is identical to Pure. This includes even the bad parts.
 # For example, just like in Pure, prompt will provide no indication of Git status being stale.
+# When prompt doesn't fit on one line, it'll wrap around with no attempt to shorten anything.
 # This is likely to make user experience worse than with any other Powerlevel10k config. If
 # you like the general style of Pure but not particularly attached to all its quirks, type
 # `p10k configure` while having Powerlevel10k theme active and pick lean style.
