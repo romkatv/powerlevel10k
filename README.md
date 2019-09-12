@@ -4,9 +4,7 @@ Powerlevel10k is a theme for ZSH. It's fast, flexible and easy to install and co
 
 Powerlevel10k can be used as a [fast](#is-it-really-fast) drop-in replacement for
 [Powerlevel9k](https://github.com/bhilburn/powerlevel9k). When given the same configuration options
-it will generate
-[the same](#does-powerlevel10k-always-render-exactly-the-same-prompt-as-powerlevel9k-given-the-same-config)
-prompt.
+it will generate the same prompt.
 
 ![Powerlevel10k](https://raw.githubusercontent.com/romkatv/powerlevel10k/master/powerlevel10k.png)
 
@@ -96,7 +94,7 @@ your prompt. If it doesn't trigger automatically, type `p10k configure`.
 If you've been using Powerlevel9k before, **do not remove the configuration options**. Powerlevel10k
 will pick them up and provide you with the same prompt UI you are used to. Powerlevel10k recognized
 all configuration options used by Powerlevel9k. See Powerlevel9k
-[configuration guide](https://github.com/bhilburn/powerlevel9k#prompt-customization).
+[configuration guide](https://github.com/Powerlevel9k/powerlevel9k/blob/master/README.md#prompt-customization).
 
 To go beyond the functionality of Powerlevel9k, type `p10k configure` and explore the unique styles
 and features Powerlevel10k has to offer.
