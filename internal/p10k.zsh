@@ -3244,33 +3244,49 @@ _p9k_precmd() {
   __p9k_new_status=$?
   __p9k_new_pipestatus=($pipestatus)
 
-  if (( $+_p9k_real_zle_rprompt_indent )); then
-    if [[ -n $_p9k_real_zle_rprompt_indent ]]; then
-      ZLE_RPROMPT_INDENT=$_p9k_real_zle_rprompt_indent
-    else
-      unset ZLE_RPROMPT_INDENT
+  if ! zle; then
+    if (( $+_p9k_real_zle_rprompt_indent )); then
+      if [[ -n $_p9k_real_zle_rprompt_indent ]]; then
+        ZLE_RPROMPT_INDENT=$_p9k_real_zle_rprompt_indent
+      else
+        unset ZLE_RPROMPT_INDENT
+      fi
+      unset _p9k_real_zle_rprompt_indent
     fi
-    unset _p9k_real_zle_rprompt_indent
-  fi
 
-  if _p9k_must_init; then
-    if (( !__p9k_configured )); then
-      __p9k_configured=1
-      if [[ "${parameters[(I)POWERLEVEL9K_*]}" == (POWERLEVEL9K_MODE|) ]] && _p9k_can_configure -q; then
-        (
-          local p=("${(@)parameters[(I)AWESOME_*|CODEPOINT_*]}")
-          if (( $#p )); then
-            typeset -x -- $p
+    if _p9k_must_init; then
+      if (( !__p9k_configured )); then
+        __p9k_configured=1
+        if [[ "${parameters[(I)POWERLEVEL9K_*]}" == (POWERLEVEL9K_MODE|) ]] && _p9k_can_configure -q; then
+          (
+            local p=("${(@)parameters[(I)AWESOME_*|CODEPOINT_*]}")
+            if (( $#p )); then
+              typeset -x -- $p
+            fi
+            $__p9k_root_dir/internal/wizard.zsh -d $__p9k_root_dir
+          )
+          if (( !$? )); then
+            source $__p9k_cfg_path
+            _p9k_must_init
           fi
-          $__p9k_root_dir/internal/wizard.zsh -d $__p9k_root_dir
-        )
-        if (( !$? )); then
-          source $__p9k_cfg_path
-          _p9k_must_init
         fi
       fi
+      _p9k_init
     fi
-    _p9k_init
+
+    _p9k_timer_end=EPOCHREALTIME
+    if (( _p9k_timer_start )); then
+      typeset -gF P9K_COMMAND_DURATION_SECONDS=$((_p9k_timer_end - _p9k_timer_start))
+    else
+      unset P9K_COMMAND_DURATION_SECONDS
+    fi
+    _p9k_save_status
+
+    _p9k_timer_start=0
+    _p9k_region_active=0
+
+    unset _p9k_line_finished
+    unset _p9k_preexec_cmd
   fi
 
   unsetopt localoptions
@@ -3279,20 +3295,7 @@ _p9k_precmd() {
   [[ ! -o prompt_cr ]] || prompt_opts+=cr
   setopt nopromptbang prompt{percent,subst}
 
-  _p9k_timer_end=EPOCHREALTIME
-  if (( _p9k_timer_start )); then
-    typeset -gF P9K_COMMAND_DURATION_SECONDS=$((_p9k_timer_end - _p9k_timer_start))
-  else
-    unset P9K_COMMAND_DURATION_SECONDS
-  fi
-  _p9k_save_status
-
   powerlevel9k_refresh_prompt_inplace
-
-  unset _p9k_line_finished
-  unset _p9k_preexec_cmd
-  _p9k_timer_start=0
-  _p9k_region_active=0
 }
 
 function _p9k_zle_keymap_select() {
