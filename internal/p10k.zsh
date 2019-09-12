@@ -89,7 +89,7 @@ typeset -grA __p9k_colors=(
 #
 # Type `getColorCode background` or `getColorCode foreground` to see the list of predefined colors.
 function getColorCode() {
-  emulate -L zsh && setopt no_hist_expand extended_glob no_prompt_bang prompt_{cr,percent,subst,sp}
+  emulate -L zsh && setopt no_hist_expand extended_glob no_prompt_bang prompt_{percent,subst}
   if (( ARGC == 1 )); then
     case $1 in 
       foreground)
@@ -170,7 +170,7 @@ function _p9k_declare() {
 #   _p9k_prompt_length '%F{red}abc' => 3
 #   _p9k_prompt_length $'%{a\b%Gb%}' => 1
 function _p9k_prompt_length() {
-  emulate -L zsh && setopt no_hist_expand extended_glob no_prompt_bang prompt_{cr,percent,subst,sp}
+  emulate -L zsh && setopt no_hist_expand extended_glob no_prompt_bang prompt_{percent,subst}
   local COLUMNS=1024
   local -i x y=$#1 m
   if (( y )); then
@@ -2599,7 +2599,7 @@ function _p9k_vcs_render() {
 }
 
 function _p9k_vcs_resume() {
-  emulate -L zsh && setopt no_hist_expand extended_glob no_prompt_bang prompt_{cr,percent,subst,sp}
+  emulate -L zsh && setopt no_hist_expand extended_glob no_prompt_bang prompt_{percent,subst}
 
   if [[ $VCS_STATUS_RESULT == ok-async ]]; then
     local latency=$((EPOCHREALTIME - _p9k_gitstatus_start_time))
@@ -3183,7 +3183,7 @@ function _p9k_update_prompt() {
 }
 
 powerlevel9k_refresh_prompt_inplace() {
-  emulate -L zsh && setopt no_hist_expand extended_glob no_prompt_bang prompt_{cr,percent,subst,sp}
+  emulate -L zsh && setopt no_hist_expand extended_glob no_prompt_bang prompt_{percent,subst}
   (( __p9k_enabled )) || return
   _p9k_refresh_reason=precmd
   _p9k_set_prompt
@@ -3196,7 +3196,7 @@ typeset -gi __p9k_new_status
 typeset -ga __p9k_new_pipestatus
 
 _p9k_save_status() {
-  emulate -L zsh && setopt no_hist_expand extended_glob no_prompt_bang prompt_{cr,percent,subst,sp}
+  emulate -L zsh && setopt no_hist_expand extended_glob no_prompt_bang prompt_{percent,subst}
   local -i pipe
   if (( !$+_p9k_line_finished )); then
     :  # SIGINT
@@ -3296,7 +3296,7 @@ _p9k_precmd() {
 }
 
 function _p9k_zle_keymap_select() {
-  emulate -L zsh && setopt no_hist_expand extended_glob no_prompt_bang prompt_{cr,percent,subst,sp}
+  emulate -L zsh && setopt no_hist_expand extended_glob no_prompt_bang prompt_{percent,subst}
   zle && zle .reset-prompt && zle -R
 }
 
@@ -3328,7 +3328,7 @@ _p9k_deinit_async_pump() {
 }
 
 function _p9k_on_async_message() {
-  emulate -L zsh && setopt no_hist_expand extended_glob no_prompt_bang prompt_{cr,percent,subst,sp}
+  emulate -L zsh && setopt no_hist_expand extended_glob no_prompt_bang prompt_{percent,subst}
   (( ARGC == 1 )) || return
   local msg='' IFS=''
   while read -r -t -u $1 msg; do
@@ -3341,11 +3341,11 @@ function _p9k_on_async_message() {
 }
 
 function _p9k_async_pump() {
-  emulate -L zsh                                       || return
-  setopt no_aliases no_hist_expand extended_glob       || return
-  setopt no_prompt_bang prompt_{cr,percent,subst,sp}   || return
-  zmodload zsh/system zsh/datetime                     || return
-  echo $$                                              || return
+  emulate -L zsh                                 || return
+  setopt no_aliases no_hist_expand extended_glob || return
+  setopt no_prompt_bang prompt_{percent,subst}   || return
+  zmodload zsh/system zsh/datetime               || return
+  echo $$                                        || return
 
   local ip last_ip
   local -F next_ip_time
@@ -3404,7 +3404,7 @@ function _p9k_async_pump() {
 }
 
 function _p9k_kill_async_pump() {
-  emulate -L zsh && setopt no_hist_expand extended_glob no_prompt_bang prompt_{cr,percent,subst,sp}
+  emulate -L zsh && setopt no_hist_expand extended_glob no_prompt_bang prompt_{percent,subst}
   if [[ $ZSH_SUBSHELL == $_p9k_async_pump_subshell && $$ == $_p9k_async_pump_shell_pid ]]; then
     _p9k_deinit_async_pump
   fi
@@ -3848,7 +3848,7 @@ function _p9k_zle_line_finish() {
   (( __p9k_enabled )) || return
   _p9k_line_finished=
   if (( _p9k_reset_on_line_finish )); then
-    emulate -L zsh && setopt no_hist_expand extended_glob no_prompt_bang prompt_{cr,percent,subst,sp}
+    emulate -L zsh && setopt no_hist_expand extended_glob no_prompt_bang prompt_{percent,subst}
     zle && zle .reset-prompt && zle -R
   fi
 }
@@ -3858,7 +3858,7 @@ function _p9k_zle_line_pre_redraw() {
   [[ ${KEYMAP:-} == vicmd ]] || return 0
   local region=${${REGION_ACTIVE:-0}/2/1}
   [[ $region != $_p9k_region_active ]] || return 0
-  emulate -L zsh && setopt no_hist_expand extended_glob no_prompt_bang prompt_{cr,percent,subst,sp}
+  emulate -L zsh && setopt no_hist_expand extended_glob no_prompt_bang prompt_{percent,subst}
   _p9k_region_active=$region
   zle && zle .reset-prompt && zle -R
 }
@@ -4129,7 +4129,7 @@ _p9k_init_ssh() {
 }
 
 _p9k_must_init() {
-  emulate -L zsh && setopt no_hist_expand extended_glob no_prompt_bang prompt_{cr,percent,subst,sp}
+  emulate -L zsh && setopt no_hist_expand extended_glob no_prompt_bang prompt_{percent,subst}
   local -a param_keys=(
     ${(o)parameters[(I)(POWERLEVEL9K_*|GITSTATUS_LOG_LEVEL|GITSTATUS_ENABLE_LOGGING|GITSTATUS_DAEMON|GITSTATUS_NUM_THREADS|DEFAULT_USER|ZLE_RPROMPT_INDENT)]})
   local IFS param_sig
@@ -4148,7 +4148,7 @@ function _p9k_set_os() {
 }
 
 _p9k_init() {
-  emulate -L zsh && setopt no_hist_expand extended_glob no_prompt_bang prompt_{cr,percent,subst,sp}
+  emulate -L zsh && setopt no_hist_expand extended_glob no_prompt_bang prompt_{percent,subst}
 
   _p9k_init_icons
   _p9k_init_vars
@@ -4377,7 +4377,7 @@ typeset -gi __p9k_enabled=0
 typeset -gi __p9k_configured=0
 
 prompt_powerlevel9k_setup() {
-  emulate -L zsh && setopt no_hist_expand extended_glob no_prompt_bang prompt_{cr,percent,subst,sp}
+  emulate -L zsh && setopt no_hist_expand extended_glob no_prompt_bang prompt_{percent,subst}
   prompt_powerlevel9k_teardown
   __p9k_enabled=1
   add-zsh-hook preexec _p9k_preexec
@@ -4385,7 +4385,7 @@ prompt_powerlevel9k_setup() {
 }
 
 prompt_powerlevel9k_teardown() {
-  emulate -L zsh && setopt no_hist_expand extended_glob no_prompt_bang prompt_{cr,percent,subst,sp}
+  emulate -L zsh && setopt no_hist_expand extended_glob no_prompt_bang prompt_{percent,subst}
   add-zsh-hook -D precmd '(_p9k_|powerlevel9k_)*'
   add-zsh-hook -D preexec '(_p9k_|powerlevel9k_)*'
   PROMPT='%m%# '
