@@ -3245,6 +3245,8 @@ _p9k_precmd() {
   __p9k_new_pipestatus=($pipestatus)
 
   if ! zle; then
+    print -rn ${_p9k_prompt_newline:-}
+
     if (( $+_p9k_real_zle_rprompt_indent )); then
       if [[ -n $_p9k_real_zle_rprompt_indent ]]; then
         ZLE_RPROMPT_INDENT=$_p9k_real_zle_rprompt_indent
@@ -3532,6 +3534,7 @@ _p9k_init_vars() {
   typeset -gi _p9k_g
   typeset -gi _p9k_ind
   typeset -g  _p9k_gap_pre
+  typeset -g  _p9k_prompt_newline
   typeset -g  _p9k_prompt_prefix_left
   typeset -g  _p9k_prompt_prefix_right
   typeset -g  _p9k_prompt_suffix_left
@@ -4061,7 +4064,7 @@ _p9k_init_prompt() {
   fi
 
   if (( _POWERLEVEL9K_PROMPT_ADD_NEWLINE )); then
-    repeat $_POWERLEVEL9K_PROMPT_ADD_NEWLINE_COUNT _p9k_prompt_prefix_left+=$'\n'
+    repeat $_POWERLEVEL9K_PROMPT_ADD_NEWLINE_COUNT _p9k_prompt_newline+=$'\n'
   fi
 
   _p9k_t=($'\n' '')
