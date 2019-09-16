@@ -2031,13 +2031,13 @@ prompt_status() {
 
 prompt_prompt_char() {
   if (( _p9k_status )); then
-    _p9k_prompt_segment $0_ERROR_VIINS "$_p9k_color1" 196 '' 0 '${${KEYMAP:-0}:#(vicmd|vivis|vivli)}' '❯'
-    _p9k_prompt_segment $0_ERROR_VICMD "$_p9k_color1" 196 '' 0 '${(M)${:-$KEYMAP$_p9k_region_active}:#vicmd0}' '❮'
-    _p9k_prompt_segment $0_ERROR_VIVIS "$_p9k_color1" 196 '' 0 '${(M)${:-$KEYMAP$_p9k_region_active}:#(vicmd1|vivis?|vivli?)}' 'Ⅴ'
+    _p9k_prompt_segment $0_ERROR_VIINS "$_p9k_color1" 196 '' 0 '${${${KEYMAP:-$_p9k_keymap}:-0}:#(vicmd|vivis|vivli)}' '❯'
+    _p9k_prompt_segment $0_ERROR_VICMD "$_p9k_color1" 196 '' 0 '${(M)${:-${KEYMAP:-$_p9k_keymap}$_p9k_region_active}:#vicmd0}' '❮'
+    _p9k_prompt_segment $0_ERROR_VIVIS "$_p9k_color1" 196 '' 0 '${(M)${:-${KEYMAP:-$_p9k_keymap}$_p9k_region_active}:#(vicmd1|vivis?|vivli?)}' 'Ⅴ'
   else
-    _p9k_prompt_segment $0_OK_VIINS "$_p9k_color1" 76 '' 0 '${${KEYMAP:-0}:#(vicmd|vivis|vivli)}' '❯'
-    _p9k_prompt_segment $0_OK_VICMD "$_p9k_color1" 76 '' 0 '${(M)${:-$KEYMAP$_p9k_region_active}:#vicmd0}' '❮'
-    _p9k_prompt_segment $0_OK_VIVIS "$_p9k_color1" 76 '' 0 '${(M)${:-$KEYMAP$_p9k_region_active}:#(vicmd1|vivis?|vivli?)}' 'Ⅴ'
+    _p9k_prompt_segment $0_OK_VIINS "$_p9k_color1" 76 '' 0 '${${${KEYMAP:-$_p9k_keymap}:-0}:#(vicmd|vivis|vivli)}' '❯'
+    _p9k_prompt_segment $0_OK_VICMD "$_p9k_color1" 76 '' 0 '${(M)${:-${KEYMAP:-$_p9k_keymap}$_p9k_region_active}:#vicmd0}' '❮'
+    _p9k_prompt_segment $0_OK_VIVIS "$_p9k_color1" 76 '' 0 '${(M)${:-${KEYMAP:-$_p9k_keymap}$_p9k_region_active}:#(vicmd1|vivis?|vivli?)}' 'Ⅴ'
   fi
 }
 
@@ -2711,13 +2711,13 @@ prompt_vcs() {
 # Vi Mode: show editing mode (NORMAL|INSERT|VISUAL)
 prompt_vi_mode() {
   if [[ -n $_POWERLEVEL9K_VI_INSERT_MODE_STRING ]]; then
-    _p9k_prompt_segment $0_INSERT "$_p9k_color1" blue '' 0 '${${KEYMAP:-0}:#(vicmd|vivis|vivli)}' "$_POWERLEVEL9K_VI_INSERT_MODE_STRING"
+    _p9k_prompt_segment $0_INSERT "$_p9k_color1" blue '' 0 '${${${KEYMAP:-$_p9k_keymap}:-0}:#(vicmd|vivis|vivli)}' "$_POWERLEVEL9K_VI_INSERT_MODE_STRING"
   fi
   if (( $+_POWERLEVEL9K_VI_VISUAL_MODE_STRING )); then
-    _p9k_prompt_segment $0_NORMAL "$_p9k_color1" white '' 0 '${(M)${:-$KEYMAP$_p9k_region_active}:#vicmd0}' "$_POWERLEVEL9K_VI_COMMAND_MODE_STRING"
-    _p9k_prompt_segment $0_VISUAL "$_p9k_color1" white '' 0 '${(M)${:-$KEYMAP$_p9k_region_active}:#(vicmd1|vivis?|vivli?)}' "$_POWERLEVEL9K_VI_VISUAL_MODE_STRING"
+    _p9k_prompt_segment $0_NORMAL "$_p9k_color1" white '' 0 '${(M)${:-${KEYMAP:-$_p9k_keymap}$_p9k_region_active}:#vicmd0}' "$_POWERLEVEL9K_VI_COMMAND_MODE_STRING"
+    _p9k_prompt_segment $0_VISUAL "$_p9k_color1" white '' 0 '${(M)${:-${KEYMAP:-$_p9k_keymap}$_p9k_region_active}:#(vicmd1|vivis?|vivli?)}' "$_POWERLEVEL9K_VI_VISUAL_MODE_STRING"
   else
-    _p9k_prompt_segment $0_NORMAL "$_p9k_color1" white '' 0 '${(M)KEYMAP:#(vicmd|vivis|vivli)}' "$_POWERLEVEL9K_VI_COMMAND_MODE_STRING"
+    _p9k_prompt_segment $0_NORMAL "$_p9k_color1" white '' 0 '${(M)${KEYMAP:-$_p9k_keymap}:#(vicmd|vivis|vivli)}' "$_POWERLEVEL9K_VI_COMMAND_MODE_STRING"
   fi
 }
 
@@ -3289,6 +3289,7 @@ _p9k_precmd() {
 
     unset _p9k_line_finished
     unset _p9k_preexec_cmd
+    _p9k_keymap=main
   fi
 
   unsetopt localoptions
@@ -3302,6 +3303,7 @@ _p9k_precmd() {
 
 function _p9k_zle_keymap_select() {
   emulate -L zsh && setopt no_hist_expand extended_glob no_prompt_bang prompt_{percent,subst}
+  _p9k_keymap=$KEYMAP
   zle && zle .reset-prompt && zle -R
 }
 
@@ -3558,6 +3560,7 @@ _p9k_init_vars() {
   typeset -g  _p9k_pwd_a
   typeset -gA _p9k_iface
   typeset -gi _p9k_fetch_iface
+  typeset -g  _p9k_keymap
 
   typeset -g  P9K_VISUAL_IDENTIFIER
   typeset -g  P9K_CONTENT
