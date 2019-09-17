@@ -124,8 +124,13 @@ applications on your system. Configure your terminal to use this font:
   `module.exports.config` to `MesloLGS NF`.
 - **Visual Studio Code**: Open *File → Preferences → Settings*, enter
   `terminal.integrated.fontFamily` in the search box and set the value to `MesloLGS NF`.
-- **GNOME Terminal** (the default Ubuntu terminal): Run:
-  `sudo apt install libglib2.0-bin && gsettings set org.gnome.desktop.interface monospace-font-name 'MesloLGS NF 11'`.
+- **GNOME Terminal** (the default Ubuntu terminal): Open *Terminal → Preferences* and click on the
+  selected profile under *Profiles*. Check *Custom font* under *Text Appearance* and select
+  `MesloLGS NF Regular`.
+- **Konsole**: Open *Settings → Edit Current Profile → Appearance*, click *Select Font* and select
+  `MesloLGS NF Regular`.
+- **Tilix**: Open *Tilix → Preferences* and click on the selected profile under *Profiles*. Check
+  *Custom font* under *Text Appearance* and select `MesloLGS NF Regular`.
 - **Windows Console Host** (the old thing): Click the icon in the top left corner, then
   *Properties → Font* and set *Font* to `MesloLGS NF`.
 - **Windows Terminal** (the new thing): Open *Settings* (`Ctrl+,`), search for `fontFace` and set
