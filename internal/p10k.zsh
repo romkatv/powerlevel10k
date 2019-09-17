@@ -3245,7 +3245,7 @@ _p9k_precmd() {
   __p9k_new_pipestatus=($pipestatus)
 
   if ! zle; then
-    print -rn ${_p9k_prompt_newline:-}
+    print -rn "${_p9k_prompt_newline:-}"
 
     if (( $+_p9k_real_zle_rprompt_indent )); then
       if [[ -n $_p9k_real_zle_rprompt_indent ]]; then
@@ -3263,12 +3263,12 @@ _p9k_precmd() {
           (
             local p=("${(@)parameters[(I)AWESOME_*|CODEPOINT_*]}")
             if (( $#p )); then
-              typeset -x -- $p
+              typeset -x -- "$p"
             fi
-            $__p9k_root_dir/internal/wizard.zsh -d $__p9k_root_dir
+            "$__p9k_root_dir"/internal/wizard.zsh -d "$__p9k_root_dir"
           )
-          if (( !$? )); then
-            source $__p9k_cfg_path
+          if (( ! $? )); then
+            source "$__p9k_cfg_path"
             _p9k_must_init
           fi
         fi
