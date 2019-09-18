@@ -2160,6 +2160,7 @@ typeset -gA __p9k_vcs_states=(
   'MODIFIED'      '3'
   'UNTRACKED'     '2'
   'LOADING'       '8'
+  'CONFLICTING'   '3'
 )
 
 function +vi-git-untracked() {
@@ -2441,7 +2442,9 @@ function _p9k_vcs_render() {
 
   if (( _POWERLEVEL9K_VCS_DISABLE_GITSTATUS_FORMATTING )); then
     if [[ -z $state ]]; then
-      if [[ $VCS_STATUS_HAS_STAGED != 0 || $VCS_STATUS_HAS_UNSTAGED != 0 ]]; then
+      if [[ $VCS_STATUS_HAS_CONFLICTED == 1 && $_POWERLEVEL9K_VCS_CONFLICTING_STATE == 1 ]]; then
+        state=CONFLICTING
+      elif [[ $VCS_STATUS_HAS_STAGED != 0 || $VCS_STATUS_HAS_UNSTAGED != 0 ]]; then
         state=MODIFIED
       elif [[ $VCS_STATUS_HAS_UNTRACKED != 0 ]]; then
         state=UNTRACKED
@@ -2474,6 +2477,7 @@ function _p9k_vcs_render() {
     "$VCS_STATUS_NUM_STAGED"
     "$VCS_STATUS_NUM_UNSTAGED"
     "$VCS_STATUS_NUM_UNTRACKED"
+    "$VCS_STATUS_HAS_CONFLICTED"
     "$VCS_STATUS_HAS_STAGED"
     "$VCS_STATUS_HAS_UNSTAGED"
     "$VCS_STATUS_HAS_UNTRACKED"
@@ -2491,7 +2495,9 @@ function _p9k_vcs_render() {
     local content
 
     if (( ${_POWERLEVEL9K_VCS_GIT_HOOKS[(I)vcs-detect-changes]} )); then
-      if [[ $VCS_STATUS_HAS_STAGED != 0 || $VCS_STATUS_HAS_UNSTAGED != 0 ]]; then
+      if [[ $VCS_STATUS_HAS_CONFLICTED == 1 && $_POWERLEVEL9K_VCS_CONFLICTING_STATE == 1 ]]; then
+        : ${state:=CONFLICTING}
+      elif [[ $VCS_STATUS_HAS_STAGED != 0 || $VCS_STATUS_HAS_UNSTAGED != 0 ]]; then
         : ${state:=MODIFIED}
       elif [[ $VCS_STATUS_HAS_UNTRACKED != 0 ]]; then
         : ${state:=UNTRACKED}
@@ -3583,6 +3589,7 @@ _p9k_init_params() {
   _p9k_declare -i POWERLEVEL9K_VCS_SHORTEN_MIN_LENGTH
   _p9k_declare -s POWERLEVEL9K_VCS_SHORTEN_STRATEGY
   _p9k_declare -e POWERLEVEL9K_VCS_SHORTEN_DELIMITER '\u2026'
+  _p9k_declare -b POWERLEVEL9K_VCS_CONFLICTING_STATE 0
   _p9k_declare -b POWERLEVEL9K_HIDE_BRANCH_ICON 0
   _p9k_declare -b POWERLEVEL9K_VCS_HIDE_TAGS 0
   _p9k_declare -i POWERLEVEL9K_CHANGESET_HASH_LENGTH 8
