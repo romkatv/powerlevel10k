@@ -2031,11 +2031,21 @@ prompt_status() {
 
 prompt_prompt_char() {
   if (( _p9k_status )); then
-    _p9k_prompt_segment $0_ERROR_VIINS "$_p9k_color1" 196 '' 0 '${_p9k_keymap:#(vicmd|vivis|vivli)}' '❯'
+    if (( _POWERLEVEL9K_PROMPT_CHAR_OVERWRITE_STATE )); then
+      _p9k_prompt_segment $0_ERROR_VIINS "$_p9k_color1" 196 '' 0 '${${:-$_p9k_keymap.$_p9k_zle_state}:#(vicmd.*|vivis.*|vivli.*|*.*overwrite*)}' '❯'
+      _p9k_prompt_segment $0_ERROR_VIOWR "$_p9k_color1" 196 '' 0 '${${:-$_p9k_keymap.$_p9k_zle_state}:#(vicmd.*|vivis.*|vivli.*|*.*insert*)}' '▶'
+    else
+      _p9k_prompt_segment $0_ERROR_VIINS "$_p9k_color1" 196 '' 0 '${_p9k_keymap:#(vicmd|vivis|vivli)}' '❯'
+    fi
     _p9k_prompt_segment $0_ERROR_VICMD "$_p9k_color1" 196 '' 0 '${(M)${:-$_p9k_keymap$_p9k_region_active}:#vicmd0}' '❮'
     _p9k_prompt_segment $0_ERROR_VIVIS "$_p9k_color1" 196 '' 0 '${(M)${:-$_p9k_keymap$_p9k_region_active}:#(vicmd1|vivis?|vivli?)}' 'Ⅴ'
   else
-    _p9k_prompt_segment $0_OK_VIINS "$_p9k_color1" 76 '' 0 '${_p9k_keymap:#(vicmd|vivis|vivli)}' '❯'
+    if (( _POWERLEVEL9K_PROMPT_CHAR_OVERWRITE_STATE )); then
+      _p9k_prompt_segment $0_OK_VIINS "$_p9k_color1" 76 '' 0 '${${:-$_p9k_keymap.$_p9k_zle_state}:#(vicmd.*|vivis.*|vivli.*|*.*overwrite*)}' '❯'
+      _p9k_prompt_segment $0_OK_VIOWR "$_p9k_color1" 76 '' 0 '${${:-$_p9k_keymap.$_p9k_zle_state}:#(vicmd.*|vivis.*|vivli.*|*.*insert*)}' '▶'
+    else
+      _p9k_prompt_segment $0_OK_VIINS "$_p9k_color1" 76 '' 0 '${_p9k_keymap:#(vicmd|vivis|vivli)}' '❯'
+    fi
     _p9k_prompt_segment $0_OK_VICMD "$_p9k_color1" 76 '' 0 '${(M)${:-$_p9k_keymap$_p9k_region_active}:#vicmd0}' '❮'
     _p9k_prompt_segment $0_OK_VIVIS "$_p9k_color1" 76 '' 0 '${(M)${:-$_p9k_keymap$_p9k_region_active}:#(vicmd1|vivis?|vivli?)}' 'Ⅴ'
   fi
@@ -2716,9 +2726,17 @@ prompt_vcs() {
 ################################################################
 # Vi Mode: show editing mode (NORMAL|INSERT|VISUAL)
 prompt_vi_mode() {
-  if [[ -n $_POWERLEVEL9K_VI_INSERT_MODE_STRING ]]; then
-    _p9k_prompt_segment $0_INSERT "$_p9k_color1" blue '' 0 '${_p9k_keymap:#(vicmd|vivis|vivli)}' "$_POWERLEVEL9K_VI_INSERT_MODE_STRING"
+  if (( $+_POWERLEVEL9K_VI_OVERWRITE_MODE_STRING )); then
+    if [[ -n $_POWERLEVEL9K_VI_INSERT_MODE_STRING ]]; then
+      _p9k_prompt_segment $0_INSERT "$_p9k_color1" blue '' 0 '${${:-$_p9k_keymap.$_p9k_zle_state}:#(vicmd.*|vivis.*|vivli.*|*.*overwrite*)}' "$_POWERLEVEL9K_VI_INSERT_MODE_STRING"
+    fi
+    _p9k_prompt_segment $0_OVERWRITE "$_p9k_color1" blue '' 0 '${${:-$_p9k_keymap.$_p9k_zle_state}:#(vicmd.*|vivis.*|vivli.*|*.*insert*)}' "$_POWERLEVEL9K_VI_OVERWRITE_MODE_STRING"
+  else
+    if [[ -n $_POWERLEVEL9K_VI_INSERT_MODE_STRING ]]; then
+      _p9k_prompt_segment $0_INSERT "$_p9k_color1" blue '' 0 '${_p9k_keymap:#(vicmd|vivis|vivli)}' "$_POWERLEVEL9K_VI_INSERT_MODE_STRING"
+    fi
   fi
+
   if (( $+_POWERLEVEL9K_VI_VISUAL_MODE_STRING )); then
     _p9k_prompt_segment $0_NORMAL "$_p9k_color1" white '' 0 '${(M)${:-$_p9k_keymap$_p9k_region_active}:#vicmd0}' "$_POWERLEVEL9K_VI_COMMAND_MODE_STRING"
     _p9k_prompt_segment $0_VISUAL "$_p9k_color1" white '' 0 '${(M)${:-$_p9k_keymap$_p9k_region_active}:#(vicmd1|vivis?|vivli?)}' "$_POWERLEVEL9K_VI_VISUAL_MODE_STRING"
@@ -3296,6 +3314,7 @@ _p9k_precmd() {
     unset _p9k_line_finished
     unset _p9k_preexec_cmd
     _p9k_keymap=main
+    _p9k_zle_state=insert
   fi
 
   unsetopt localoptions
@@ -3309,7 +3328,11 @@ _p9k_precmd() {
 
 function _p9k_zle_keymap_select() {
   emulate -L zsh && setopt no_hist_expand extended_glob no_prompt_bang prompt_{percent,subst}
-  _p9k_keymap=$KEYMAP
+  zle && zle .reset-prompt && zle -R
+}
+
+function _p9k_zle_state_changed() {
+  emulate -L zsh && setopt no_hist_expand extended_glob no_prompt_bang prompt_{percent,subst}
   zle && zle .reset-prompt && zle -R
 }
 
@@ -3567,6 +3590,7 @@ _p9k_init_vars() {
   typeset -gA _p9k_iface
   typeset -gi _p9k_fetch_iface
   typeset -g  _p9k_keymap
+  typeset -g  _p9k_zle_state
 
   typeset -g  P9K_VISUAL_IDENTIFIER
   typeset -g  P9K_CONTENT
@@ -3766,6 +3790,8 @@ _p9k_init_params() {
   _p9k_declare -e POWERLEVEL9K_VI_COMMAND_MODE_STRING "NORMAL"
   # VISUAL mode is shown as NORMAL unless POWERLEVEL9K_VI_VISUAL_MODE_STRING is explicitly set.
   _p9k_declare -e POWERLEVEL9K_VI_VISUAL_MODE_STRING
+  # OVERWRITE mode is shown as INSERT unless POWERLEVEL9K_VI_OVERWRITE_MODE_STRING is explicitly set.
+  _p9k_declare -e POWERLEVEL9K_VI_OVERWRITE_MODE_STRING
   _p9k_declare -b POWERLEVEL9K_VIRTUALENV_SHOW_PYTHON_VERSION 1
   _p9k_declare -e POWERLEVEL9K_VIRTUALENV_LEFT_DELIMITER "("
   _p9k_declare -e POWERLEVEL9K_VIRTUALENV_RIGHT_DELIMITER ")"
@@ -3806,6 +3832,7 @@ _p9k_init_params() {
   #
   # These correspond to `java -fullversion` and `java -version` respectively.
   _p9k_declare -b POWERLEVEL9K_JAVA_VERSION_FULL 1
+  _p9k_declare -b POWERLEVEL9K_PROMPT_CHAR_OVERWRITE_STATE 0
 
   local -i i=1
   while (( i <= $#_POWERLEVEL9K_LEFT_PROMPT_ELEMENTS )); do
@@ -4054,7 +4081,13 @@ _p9k_init_prompt() {
   _p9k_prompt_suffix_left='${${COLUMNS::=$_p9k_clm}+}'
   _p9k_prompt_suffix_right='${${COLUMNS::=$_p9k_clm}+}'
 
-  _p9k_prompt_prefix_left+='${${_p9k_keymap::=${KEYMAP:-$_p9k_keymap}}+}'
+  if _p9k_segment_in_use vi_mode && (( $+_POWERLEVEL9K_VI_VISUAL_MODE_STRING )) || _p9k_segment_in_use prompt_char; then
+    _p9k_prompt_prefix_left+='${${_p9k_keymap::=${KEYMAP:-$_p9k_keymap}}+}'
+  fi
+  if { _p9k_segment_in_use vi_mode && (( $+_POWERLEVEL9K_VI_OVERWRITE_MODE_STRING )) } ||
+     { _p9k_segment_in_use prompt_char && (( _POWERLEVEL9K_PROMPT_CHAR_OVERWRITE_STATE )) }; then
+    _p9k_prompt_prefix_left+='${${_p9k_zle_state::=${ZLE_STATE:-$_p9k_zle_state}}+}'
+  fi
   _p9k_prompt_prefix_left+='%b%k%f'
 
   # Bug fixed in: https://github.com/zsh-users/zsh/commit/3eea35d0853bddae13fa6f122669935a01618bf9.
@@ -4356,6 +4389,12 @@ _p9k_init() {
 
   if _p9k_segment_in_use vi_mode && (( $+_POWERLEVEL9K_VI_VISUAL_MODE_STRING )) || _p9k_segment_in_use prompt_char; then
     _p9k_wrap_zle_widget zle-line-pre-redraw _p9k_zle_line_pre_redraw
+  fi
+
+  if { _p9k_segment_in_use vi_mode && (( $+_POWERLEVEL9K_VI_OVERWRITE_MODE_STRING )) } ||
+     { _p9k_segment_in_use prompt_char && (( _POWERLEVEL9K_PROMPT_CHAR_OVERWRITE_STATE )) }; then
+    _p9k_wrap_zle_widget overwrite-mode _p9k_zle_state_changed
+    _p9k_wrap_zle_widget vi-replace _p9k_zle_state_changed
   fi
 
   if _p9k_segment_in_use dir &&
