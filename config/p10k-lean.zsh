@@ -61,6 +61,7 @@ fi
       context                 # user@host
       nordvpn                 # nordvpn connection status, linux only (https://nordvpn.com/)
       ranger                  # ranger shell (https://github.com/ranger/ranger)
+      # vpn_ip                # virtual private network indicator
       # ram                   # free RAM
       # load                  # CPU load
       # time                  # current time
@@ -664,6 +665,17 @@ fi
   typeset -g POWERLEVEL9K_PUBLIC_IP_FOREGROUND=94
   # Custom icon.
   # typeset -g POWERLEVEL9K_PUBLIC_IP_VISUAL_IDENTIFIER_EXPANSION='⭐'
+
+  ########################[ vpn_ip: virtual private network indicator ]#########################
+  # VPN IP color.
+  typeset -g POWERLEVEL9K_VPN_IP_FOREGROUND=81
+  # When on VPN, show just an icon without the IP address.
+  typeset -g POWERLEVEL9K_VPN_IP_CONTENT_EXPANSION=
+  # Regular expression for the VPN network interface. Run ifconfig while on VPN to see the
+  # name of the interface.
+  typeset -g POWERLEVEL9K_VPN_IP_INTERFACE='(wg|(.*tun))[0-9]*'
+  # Custom icon.
+  # typeset -g POWERLEVEL9K_VPN_IP_VISUAL_IDENTIFIER_EXPANSION='⭐'
 
   #########################[ proxy: system-wide http/https/ftp proxy ]##########################
   # Proxy color.
