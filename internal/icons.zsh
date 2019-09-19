@@ -103,7 +103,7 @@ function _p9k_init_icons() {
         LOCK_ICON                      '\UE138'               # 
         EXECUTION_TIME_ICON            '\UE89C '              # 
         SSH_ICON                       'ssh'
-        VPN_ICON                       'vpn'
+        VPN_ICON                       '\UE138'
         KUBERNETES_ICON                '\U2388 '              # ⎈
         DROPBOX_ICON                   '\UF16B '              #  (doesn't always work)
         DATE_ICON                      '\uE184 '              # 
@@ -408,7 +408,7 @@ function _p9k_init_icons() {
         LOCK_ICON                      '\UF023'               # 
         EXECUTION_TIME_ICON            '\uF252 '              # 
         SSH_ICON                       '\uF489 '              # 
-        VPN_ICON                       'vpn'
+        VPN_ICON                       '\UF023'
         KUBERNETES_ICON                '\U2388'               # ⎈
         DROPBOX_ICON                   '\UF16B '              # 
         DATE_ICON                      '\uF073 '              # 
