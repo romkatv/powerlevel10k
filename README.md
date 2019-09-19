@@ -72,7 +72,7 @@ somewhere after it.
 
 ### Zplug
 
-Add `zplug romkatv/powerlevel10k, use:powerlevel10k.zsh-theme` to your `~/.zshrc`.
+Add `zplug "romkatv/powerlevel10k", as:theme` to your `~/.zshrc`.
 
 ### Zgen
 
