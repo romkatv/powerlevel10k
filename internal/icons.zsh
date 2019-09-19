@@ -112,7 +112,7 @@ function _p9k_init_icons() {
         LARAVEL_ICON                   ''
         RANGER_ICON                    '\u2B50'               # ⭐
         TERRAFORM_ICON                 '\U1F6E0\u00A0'        # 🛠️
-        PROXY_ICON                     '\u21AF'               # ↯
+        PROXY_ICON                     '\u2B82'               # ⮂
       )
     ;;
     'awesome-fontconfig')
@@ -212,7 +212,7 @@ function _p9k_init_icons() {
         LARAVEL_ICON                   ''
         RANGER_ICON                    '\u2B50'               # ⭐
         TERRAFORM_ICON                 '\U1F6E0\u00A0'        # 🛠️
-        PROXY_ICON                     '\u21AF'               # ↯
+        PROXY_ICON                     '\u2B82'               # ⮂
       )
     ;;
     'awesome-mapped-fontconfig')
@@ -316,7 +316,7 @@ function _p9k_init_icons() {
         LARAVEL_ICON                   ''
         RANGER_ICON                    '\u2B50'                                       # ⭐
         TERRAFORM_ICON                 '\U1F6E0\u00A0'                                # 🛠️
-        PROXY_ICON                     '\u21AF'               # ↯
+        PROXY_ICON                     '\u2B82'                                       # ⮂
       )
     ;;
     'nerdfont-complete'|'nerdfont-fontconfig')
@@ -417,7 +417,7 @@ function _p9k_init_icons() {
         LARAVEL_ICON                   '\ue73f'               # 
         RANGER_ICON                    '\u2B50'               # ⭐
         TERRAFORM_ICON                 '\U1F6E0\u00A0'        # 🛠️
-        PROXY_ICON                     '\u21AF'               # ↯
+        PROXY_ICON                     '\u2B82'               # ⮂
       )
     ;;
     *)
@@ -517,7 +517,7 @@ function _p9k_init_icons() {
         LARAVEL_ICON                   ''
         RANGER_ICON                    '\u2B50'               # ⭐
         TERRAFORM_ICON                 '\U1F6E0\u00A0'        # 🛠️
-        PROXY_ICON                     '\u21AF'               # ↯
+        PROXY_ICON                     '\u2B82'               # ⮂
       )
     ;;
   esac
