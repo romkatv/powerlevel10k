@@ -18,6 +18,7 @@ it will generate the same prompt.
    1. [Zplug](#zplug)
    1. [Zgen](#zgen)
    1. [Antibody](#antibody)
+   1. [Zplugin](#zplugin)
 1. [Configuration](#configuration)
    1. [For new users](#for-new-users)
    1. [For Powerlevel9k users](#for-powerlevel9k-users)
@@ -81,6 +82,10 @@ Add `zgen load romkatv/powerlevel10k powerlevel10k` to your `~/.zshrc`.
 ### Antibody
 
 Add `antibody bundle romkatv/powerlevel10k` to your `~/.zshrc`.
+
+### Zplugin
+
+Add `zplugin light romkatv/powerlevel10k` to your `~/.zshrc`.
 
 ## Configuration
 
