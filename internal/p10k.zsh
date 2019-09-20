@@ -3438,7 +3438,10 @@ _p9k_deinit_async_pump() {
 function _p9k_on_async_message() {
   emulate -L zsh
   setopt no_hist_expand extended_glob no_prompt_bang prompt_{percent,subst}
-  (( ARGC == 1 )) || return
+  if (( ARGC != 1 )); then
+    _p9k_deinit_async_pump
+    return
+  fi
   local msg='' IFS=''
   while read -r -t -u $1 msg; do
     [[ $__p9k_enabled == 1 && $1 == $_p9k_async_pump_fd ]] && eval $_p9k_async_pump_line$msg
