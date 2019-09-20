@@ -87,6 +87,8 @@ Add `antibody bundle romkatv/powerlevel10k` to your `~/.zshrc`.
 
 Add `zplugin light romkatv/powerlevel10k` to your `~/.zshrc`.
 
+The use of `zplugin ice` with Powerlevel10k is neither recommended nor officially supported.
+
 ## Configuration
 
 ### For new users
