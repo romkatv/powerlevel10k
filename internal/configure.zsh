@@ -11,7 +11,7 @@ typeset -gr __p9k_root_dir_u=${${${(q)__p9k_root_dir}/#(#b)${(q)HOME}(|\/*)/'~'$
 
 function _p9k_can_configure() {
   emulate -L zsh
-  setopt extended_glob no_prompt_{bang,subst} prompt_{cr,percent,sp}
+  setopt extended_glob no_prompt_{bang,subst} prompt_percent
   [[ $1 == '-q' ]] && local -i q=1 || local -i q=0
   function $0_error() {
     (( q )) || print -rP "%1F[ERROR]%f %Bp10k configure%b: $1" >&2
@@ -59,7 +59,8 @@ function _p9k_can_configure() {
 }
 
 function p9k_configure() {
-  emulate -L zsh && setopt no_hist_expand extended_glob
+  emulate -L zsh
+  setopt no_hist_expand extended_glob
   (
     local p=("${(@)parameters[(I)AWESOME_*|CODEPOINT_*]}")
     if (( $#p )); then

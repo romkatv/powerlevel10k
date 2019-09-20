@@ -5,13 +5,12 @@
 #
 #   for i in {0..255}; do print -Pn "%${i}F${(l:3::0:)i}%f " ${${(M)$((i%8)):#7}:+$'\n'}; done
 
-if [[ -o 'aliases' ]]; then
-  # Temporarily disable aliases.
-  'builtin' 'unsetopt' 'aliases'
-  local p9k_classic_restore_aliases=1
-else
-  local p9k_classic_restore_aliases=0
-fi
+# Temporarily change options.
+local p10k_config_opts=()
+[[ ! -o 'aliases'         ]] || p10k_config_opts+=('aliases')
+[[ ! -o 'sh_glob'         ]] || p10k_config_opts+=('sh_glob')
+[[ ! -o 'no_brace_expand' ]] || p10k_config_opts+=('no_brace_expand')
+'builtin' 'setopt' 'no_aliases' 'no_sh_glob' 'brace_expand'
 
 () {
   emulate -L zsh
@@ -329,16 +328,16 @@ fi
   vcs+='${${VCS_STATUS_LOCAL_BRANCH:+%76F'${(g::)POWERLEVEL9K_VCS_BRANCH_ICON}
   # If local branch name is at most 32 characters long, show it in full.
   # This is the equivalent of POWERLEVEL9K_VCS_SHORTEN_MIN_LENGTH=32.
-  vcs+='${${${$(($#VCS_STATUS_LOCAL_BRANCH<=32)):#0}:+${VCS_STATUS_LOCAL_BRANCH//\%/%%}}'
+  vcs+='${${${$(( ${#VCS_STATUS_LOCAL_BRANCH}<=32 )):#0}:+${VCS_STATUS_LOCAL_BRANCH//\%/%%}}'
   # If local branch name is over 32 characters long, show the first 12 … the last 12. The same as
   # POWERLEVEL9K_VCS_SHORTEN_LENGTH=12 with POWERLEVEL9K_VCS_SHORTEN_STRATEGY=truncate_middle.
-  vcs+=':-${VCS_STATUS_LOCAL_BRANCH[1,12]//\%/%%}%28F…%76F${VCS_STATUS_LOCAL_BRANCH[-12,-1]//\%/%%}}}'
+  vcs+=':-${${VCS_STATUS_LOCAL_BRANCH:0:12}//\%/%%}%28F…%76F${${VCS_STATUS_LOCAL_BRANCH: -12}//\%/%%}}}'
   # '@72f5c8a' if not on a branch.
-  vcs+=':-%248F@%76F${VCS_STATUS_COMMIT[1,8]}}'
+  vcs+=':-%f@%76F${VCS_STATUS_COMMIT:0:8}}'
   # ':master' if the tracking branch name differs from local branch.
-  vcs+='${${VCS_STATUS_REMOTE_BRANCH:#$VCS_STATUS_LOCAL_BRANCH}:+%248F:%76F${VCS_STATUS_REMOTE_BRANCH//\%/%%}}'
+  vcs+='${${VCS_STATUS_REMOTE_BRANCH:#$VCS_STATUS_LOCAL_BRANCH}:+%f:%76F${VCS_STATUS_REMOTE_BRANCH//\%/%%}}'
   # '#tag' if on a tag.
-  vcs+='${VCS_STATUS_TAG:+%248F#%76F${VCS_STATUS_TAG//\%/%%}}'
+  vcs+='${VCS_STATUS_TAG:+%f#%76F${VCS_STATUS_TAG//\%/%%}}'
   # ⇣42 if behind the remote.
   vcs+='${${VCS_STATUS_COMMITS_BEHIND:#0}:+ %76F⇣${VCS_STATUS_COMMITS_BEHIND}}'
   # ⇡42 if ahead of the remote; no leading space if also behind the remote: ⇣42⇡42.
@@ -745,5 +744,5 @@ fi
   typeset -g POWERLEVEL9K_EXAMPLE_VISUAL_IDENTIFIER_EXPANSION='${P9K_VISUAL_IDENTIFIER}'
 }
 
-(( ! p9k_classic_restore_aliases )) || setopt aliases
-'builtin' 'unset' 'p9k_classic_restore_aliases'
+setopt ${p10k_config_opts[@]}
+'builtin' 'unset' 'p10k_config_opts'

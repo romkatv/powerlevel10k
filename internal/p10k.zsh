@@ -89,7 +89,8 @@ typeset -grA __p9k_colors=(
 #
 # Type `getColorCode background` or `getColorCode foreground` to see the list of predefined colors.
 function getColorCode() {
-  emulate -L zsh && setopt no_hist_expand extended_glob no_prompt_bang prompt_{percent,subst}
+  emulate -L zsh
+  setopt no_hist_expand extended_glob no_prompt_bang prompt_{percent,subst}
   if (( ARGC == 1 )); then
     case $1 in 
       foreground)
@@ -170,7 +171,6 @@ function _p9k_declare() {
 #   _p9k_prompt_length '%F{red}abc' => 3
 #   _p9k_prompt_length $'%{a\b%Gb%}' => 1
 function _p9k_prompt_length() {
-  emulate -L zsh && setopt no_hist_expand extended_glob no_prompt_bang prompt_{percent,subst}
   local COLUMNS=1024
   local -i x y=$#1 m
   if (( y )); then
@@ -456,7 +456,7 @@ _p9k_left_prompt_segment() {
     #     4
     #   fi
 
-    local t=$#_p9k_t
+    local t=$(($#_p9k_t - __p9k_ksh_arrays))
     _p9k_t+=$start_sep$style$left_space              # 1
     _p9k_t+=$style                                   # 2
     if [[ -n $fg_color && $fg_color == $bg_color ]]; then
@@ -477,10 +477,15 @@ _p9k_left_prompt_segment() {
 
     local p=
     p+="\${_p9k_n::=}"
-    p+="\${\${\${_p9k_bg:-0}:#NONE}:-\${_p9k_n::=$((t+1))}}"                             # 1
-    p+="\${_p9k_n:=\${\${\$(($join)):#0}:+$((t+2))}}"                                    # 2
-    p+="\${_p9k_n:=\${\${(M)\${:-x$bg_color}:#x(\$_p9k_bg|\${_p9k_bg:-0})}:+$((t+3))}}"  # 3
-    p+="\${_p9k_n:=$((t+4))}"                                                            # 4
+    p+="\${\${\${_p9k_bg:-0}:#NONE}:-\${_p9k_n::=$((t+1))}}"                               # 1
+    p+="\${_p9k_n:=\${\${\$(($join)):#0}:+$((t+2))}}"                                      # 2
+    if (( __p9k_sh_glob )); then
+      p+="\${_p9k_n:=\${\${(M)\${:-x$bg_color}:#x\$_p9k_bg}:+$((t+3))}}"                   # 3
+      p+="\${_p9k_n:=\${\${(M)\${:-x$bg_color}:#x\$${_p9k_bg:-0}}:+$((t+3))}}"             # 3
+    else
+      p+="\${_p9k_n:=\${\${(M)\${:-x$bg_color}:#x(\$_p9k_bg|\${_p9k_bg:-0})}:+$((t+3))}}"  # 3
+    fi
+    p+="\${_p9k_n:=$((t+4))}"                                                              # 4
 
     _p9k_param $1 VISUAL_IDENTIFIER_EXPANSION '${P9K_VISUAL_IDENTIFIER}'
     local icon_exp_=${_p9k_ret:+\"$_p9k_ret\"}
@@ -666,7 +671,7 @@ _p9k_right_prompt_segment() {
     #     4
     #   fi
 
-    local t=$#_p9k_t
+    local t=$(($#_p9k_t - __p9k_ksh_arrays))
     _p9k_t+=$start_sep$style$left_space           # 1
     _p9k_t+=$w$style                              # 2
     _p9k_t+=$w$subsep$style$left_space            # 3
@@ -678,10 +683,15 @@ _p9k_right_prompt_segment() {
 
     local p=
     p+="\${_p9k_n::=}"
-    p+="\${\${\${_p9k_bg:-0}:#NONE}:-\${_p9k_n::=$((t+1))}}"                                     # 1
-    p+="\${_p9k_n:=\${\${\$(($join)):#0}:+$((t+2))}}"                                            # 2
-    p+="\${_p9k_n:=\${\${(M)\${:-x\$_p9k_bg}:#x(${(b)bg_color}|${(b)bg_color:-0})}:+$((t+3))}}"  # 3
-    p+="\${_p9k_n:=$((t+4))}"                                                                    # 4
+    p+="\${\${\${_p9k_bg:-0}:#NONE}:-\${_p9k_n::=$((t+1))}}"                                      # 1
+    p+="\${_p9k_n:=\${\${\$(($join)):#0}:+$((t+2))}}"                                             # 2
+    if (( __p9k_sh_glob )); then
+      p+="\${_p9k_n:=\${\${(M)\${:-x\$_p9k_bg}:#x${(b)bg_color}}:+$((t+3))}}"                     # 3
+      p+="\${_p9k_n:=\${\${(M)\${:-x\$_p9k_bg}:#x${(b)bg_color:-0}}:+$((t+3))}}"                  # 3
+    else
+      p+="\${_p9k_n:=\${\${(M)\${:-x\$_p9k_bg}:#x(${(b)bg_color}|${(b)bg_color:-0})}:+$((t+3))}}" # 3
+    fi
+    p+="\${_p9k_n:=$((t+4))}"                                                                     # 4
 
     _p9k_param $1 VISUAL_IDENTIFIER_EXPANSION '${P9K_VISUAL_IDENTIFIER}'
     local icon_exp_=${_p9k_ret:+\"$_p9k_ret\"}
@@ -2030,24 +2040,46 @@ prompt_status() {
 }
 
 prompt_prompt_char() {
-  if (( _p9k_status )); then
-    if (( _POWERLEVEL9K_PROMPT_CHAR_OVERWRITE_STATE )); then
-      _p9k_prompt_segment $0_ERROR_VIINS "$_p9k_color1" 196 '' 0 '${${:-$_p9k_keymap.$_p9k_zle_state}:#(vicmd.*|vivis.*|vivli.*|*.*overwrite*)}' '❯'
-      _p9k_prompt_segment $0_ERROR_VIOWR "$_p9k_color1" 196 '' 0 '${${:-$_p9k_keymap.$_p9k_zle_state}:#(vicmd.*|vivis.*|vivli.*|*.*insert*)}' '▶'
+  if (( __p9k_sh_glob )); then
+    if (( _p9k_status )); then
+      if (( _POWERLEVEL9K_PROMPT_CHAR_OVERWRITE_STATE )); then
+        _p9k_prompt_segment $0_ERROR_VIINS "$_p9k_color1" 196 '' 0 '${${${${${${:-$_p9k_keymap.$_p9k_zle_state}:#vicmd.*}:#vivis.*}:#vivli.*}:#*.*overwrite*}}' '❯'
+        _p9k_prompt_segment $0_ERROR_VIOWR "$_p9k_color1" 196 '' 0 '${${${${${${:-$_p9k_keymap.$_p9k_zle_state}:#vicmd.*}:#vivis.*}:#vivli.*}:#*.*insert*}}' '▶'
+      else
+        _p9k_prompt_segment $0_ERROR_VIINS "$_p9k_color1" 196 '' 0 '${${${${_p9k_keymap:#vicmd}:#vivis}:#vivli}}' '❯'
+      fi
+      _p9k_prompt_segment $0_ERROR_VICMD "$_p9k_color1" 196 '' 0 '${(M)${:-$_p9k_keymap$_p9k_region_active}:#vicmd0}' '❮'
+      _p9k_prompt_segment $0_ERROR_VIVIS "$_p9k_color1" 196 '' 0 '${$((! ${#${${${${:-$_p9k_keymap$_p9k_region_active}:#vicmd1}:#vivis?}:#vivli?}})):#0}' 'Ⅴ'
     else
-      _p9k_prompt_segment $0_ERROR_VIINS "$_p9k_color1" 196 '' 0 '${_p9k_keymap:#(vicmd|vivis|vivli)}' '❯'
+      if (( _POWERLEVEL9K_PROMPT_CHAR_OVERWRITE_STATE )); then
+        _p9k_prompt_segment $0_OK_VIINS "$_p9k_color1" 76 '' 0 '${${${${${${:-$_p9k_keymap.$_p9k_zle_state}:#vicmd.*}:#vivis.*}:#vivli.*}:#*.*overwrite*}}' '❯'
+        _p9k_prompt_segment $0_OK_VIOWR "$_p9k_color1" 76 '' 0 '${${${${${${:-$_p9k_keymap.$_p9k_zle_state}:#vicmd.*}:#vivis.*}:#vivli.*}:#*.*insert*}}' '▶'
+      else
+        _p9k_prompt_segment $0_OK_VIINS "$_p9k_color1" 76 '' 0 '${${${${_p9k_keymap:#vicmd}:#vivis}:#vivli}}' '❯'
+      fi
+      _p9k_prompt_segment $0_OK_VICMD "$_p9k_color1" 76 '' 0 '${(M)${:-$_p9k_keymap$_p9k_region_active}:#vicmd0}' '❮'
+      _p9k_prompt_segment $0_OK_VIVIS "$_p9k_color1" 76 '' 0 '${$((! ${#${${${${:-$_p9k_keymap$_p9k_region_active}:#vicmd1}:#vivis?}:#vivli?}})):#0}' 'Ⅴ'
     fi
-    _p9k_prompt_segment $0_ERROR_VICMD "$_p9k_color1" 196 '' 0 '${(M)${:-$_p9k_keymap$_p9k_region_active}:#vicmd0}' '❮'
-    _p9k_prompt_segment $0_ERROR_VIVIS "$_p9k_color1" 196 '' 0 '${(M)${:-$_p9k_keymap$_p9k_region_active}:#(vicmd1|vivis?|vivli?)}' 'Ⅴ'
   else
-    if (( _POWERLEVEL9K_PROMPT_CHAR_OVERWRITE_STATE )); then
-      _p9k_prompt_segment $0_OK_VIINS "$_p9k_color1" 76 '' 0 '${${:-$_p9k_keymap.$_p9k_zle_state}:#(vicmd.*|vivis.*|vivli.*|*.*overwrite*)}' '❯'
-      _p9k_prompt_segment $0_OK_VIOWR "$_p9k_color1" 76 '' 0 '${${:-$_p9k_keymap.$_p9k_zle_state}:#(vicmd.*|vivis.*|vivli.*|*.*insert*)}' '▶'
+    if (( _p9k_status )); then
+      if (( _POWERLEVEL9K_PROMPT_CHAR_OVERWRITE_STATE )); then
+        _p9k_prompt_segment $0_ERROR_VIINS "$_p9k_color1" 196 '' 0 '${${:-$_p9k_keymap.$_p9k_zle_state}:#(vicmd.*|vivis.*|vivli.*|*.*overwrite*)}' '❯'
+        _p9k_prompt_segment $0_ERROR_VIOWR "$_p9k_color1" 196 '' 0 '${${:-$_p9k_keymap.$_p9k_zle_state}:#(vicmd.*|vivis.*|vivli.*|*.*insert*)}' '▶'
+      else
+        _p9k_prompt_segment $0_ERROR_VIINS "$_p9k_color1" 196 '' 0 '${_p9k_keymap:#(vicmd|vivis|vivli)}' '❯'
+      fi
+      _p9k_prompt_segment $0_ERROR_VICMD "$_p9k_color1" 196 '' 0 '${(M)${:-$_p9k_keymap$_p9k_region_active}:#vicmd0}' '❮'
+      _p9k_prompt_segment $0_ERROR_VIVIS "$_p9k_color1" 196 '' 0 '${(M)${:-$_p9k_keymap$_p9k_region_active}:#(vicmd1|vivis?|vivli?)}' 'Ⅴ'
     else
-      _p9k_prompt_segment $0_OK_VIINS "$_p9k_color1" 76 '' 0 '${_p9k_keymap:#(vicmd|vivis|vivli)}' '❯'
+      if (( _POWERLEVEL9K_PROMPT_CHAR_OVERWRITE_STATE )); then
+        _p9k_prompt_segment $0_OK_VIINS "$_p9k_color1" 76 '' 0 '${${:-$_p9k_keymap.$_p9k_zle_state}:#(vicmd.*|vivis.*|vivli.*|*.*overwrite*)}' '❯'
+        _p9k_prompt_segment $0_OK_VIOWR "$_p9k_color1" 76 '' 0 '${${:-$_p9k_keymap.$_p9k_zle_state}:#(vicmd.*|vivis.*|vivli.*|*.*insert*)}' '▶'
+      else
+        _p9k_prompt_segment $0_OK_VIINS "$_p9k_color1" 76 '' 0 '${_p9k_keymap:#(vicmd|vivis|vivli)}' '❯'
+      fi
+      _p9k_prompt_segment $0_OK_VICMD "$_p9k_color1" 76 '' 0 '${(M)${:-$_p9k_keymap$_p9k_region_active}:#vicmd0}' '❮'
+      _p9k_prompt_segment $0_OK_VIVIS "$_p9k_color1" 76 '' 0 '${(M)${:-$_p9k_keymap$_p9k_region_active}:#(vicmd1|vivis?|vivli?)}' 'Ⅴ'
     fi
-    _p9k_prompt_segment $0_OK_VICMD "$_p9k_color1" 76 '' 0 '${(M)${:-$_p9k_keymap$_p9k_region_active}:#vicmd0}' '❮'
-    _p9k_prompt_segment $0_OK_VIVIS "$_p9k_color1" 76 '' 0 '${(M)${:-$_p9k_keymap$_p9k_region_active}:#(vicmd1|vivis?|vivli?)}' 'Ⅴ'
   fi
 }
 
@@ -2615,7 +2647,8 @@ function _p9k_vcs_render() {
 }
 
 function _p9k_vcs_resume() {
-  emulate -L zsh && setopt no_hist_expand extended_glob no_prompt_bang prompt_{percent,subst}
+  emulate -L zsh
+  setopt no_hist_expand extended_glob no_prompt_bang prompt_{percent,subst}
 
   if [[ $VCS_STATUS_RESULT == ok-async ]]; then
     local latency=$((EPOCHREALTIME - _p9k_gitstatus_start_time))
@@ -2726,22 +2759,42 @@ prompt_vcs() {
 ################################################################
 # Vi Mode: show editing mode (NORMAL|INSERT|VISUAL)
 prompt_vi_mode() {
-  if (( $+_POWERLEVEL9K_VI_OVERWRITE_MODE_STRING )); then
-    if [[ -n $_POWERLEVEL9K_VI_INSERT_MODE_STRING ]]; then
-      _p9k_prompt_segment $0_INSERT "$_p9k_color1" blue '' 0 '${${:-$_p9k_keymap.$_p9k_zle_state}:#(vicmd.*|vivis.*|vivli.*|*.*overwrite*)}' "$_POWERLEVEL9K_VI_INSERT_MODE_STRING"
+  if (( __p9k_sh_glob )); then
+    if (( $+_POWERLEVEL9K_VI_OVERWRITE_MODE_STRING )); then
+      if [[ -n $_POWERLEVEL9K_VI_INSERT_MODE_STRING ]]; then
+        _p9k_prompt_segment $0_INSERT "$_p9k_color1" blue '' 0 '${${${${${${:-$_p9k_keymap.$_p9k_zle_state}:#vicmd.*}:#vivis.*}:#vivli.*}:#*.*overwrite*}}' "$_POWERLEVEL9K_VI_INSERT_MODE_STRING"
+      fi
+      _p9k_prompt_segment $0_OVERWRITE "$_p9k_color1" blue '' 0 '${${${${${${:-$_p9k_keymap.$_p9k_zle_state}:#vicmd.*}:#vivis.*}:#vivli.*}:#*.*insert*}}' "$_POWERLEVEL9K_VI_OVERWRITE_MODE_STRING"
+    else
+      if [[ -n $_POWERLEVEL9K_VI_INSERT_MODE_STRING ]]; then
+        _p9k_prompt_segment $0_INSERT "$_p9k_color1" blue '' 0 '${${${${_p9k_keymap:#vicmd}:#vivis}:#vivli}}' "$_POWERLEVEL9K_VI_INSERT_MODE_STRING"
+      fi
     fi
-    _p9k_prompt_segment $0_OVERWRITE "$_p9k_color1" blue '' 0 '${${:-$_p9k_keymap.$_p9k_zle_state}:#(vicmd.*|vivis.*|vivli.*|*.*insert*)}' "$_POWERLEVEL9K_VI_OVERWRITE_MODE_STRING"
-  else
-    if [[ -n $_POWERLEVEL9K_VI_INSERT_MODE_STRING ]]; then
-      _p9k_prompt_segment $0_INSERT "$_p9k_color1" blue '' 0 '${_p9k_keymap:#(vicmd|vivis|vivli)}' "$_POWERLEVEL9K_VI_INSERT_MODE_STRING"
-    fi
-  fi
 
-  if (( $+_POWERLEVEL9K_VI_VISUAL_MODE_STRING )); then
-    _p9k_prompt_segment $0_NORMAL "$_p9k_color1" white '' 0 '${(M)${:-$_p9k_keymap$_p9k_region_active}:#vicmd0}' "$_POWERLEVEL9K_VI_COMMAND_MODE_STRING"
-    _p9k_prompt_segment $0_VISUAL "$_p9k_color1" white '' 0 '${(M)${:-$_p9k_keymap$_p9k_region_active}:#(vicmd1|vivis?|vivli?)}' "$_POWERLEVEL9K_VI_VISUAL_MODE_STRING"
+    if (( $+_POWERLEVEL9K_VI_VISUAL_MODE_STRING )); then
+      _p9k_prompt_segment $0_NORMAL "$_p9k_color1" white '' 0 '${(M)${:-$_p9k_keymap$_p9k_region_active}:#vicmd0}' "$_POWERLEVEL9K_VI_COMMAND_MODE_STRING"
+      _p9k_prompt_segment $0_VISUAL "$_p9k_color1" white '' 0 '${$((! ${#${${${${:-$_p9k_keymap$_p9k_region_active}:#vicmd1}:#vivis?}:#vivli?}})):#0}' "$_POWERLEVEL9K_VI_VISUAL_MODE_STRING"
+    else
+      _p9k_prompt_segment $0_NORMAL "$_p9k_color1" white '' 0 '${$((! ${#${${${_p9k_keymap:#vicmd}:#vivis}:#vivli}})):#0}' "$_POWERLEVEL9K_VI_COMMAND_MODE_STRING"
+    fi
   else
-    _p9k_prompt_segment $0_NORMAL "$_p9k_color1" white '' 0 '${(M)_p9k_keymap:#(vicmd|vivis|vivli)}' "$_POWERLEVEL9K_VI_COMMAND_MODE_STRING"
+    if (( $+_POWERLEVEL9K_VI_OVERWRITE_MODE_STRING )); then
+      if [[ -n $_POWERLEVEL9K_VI_INSERT_MODE_STRING ]]; then
+        _p9k_prompt_segment $0_INSERT "$_p9k_color1" blue '' 0 '${${:-$_p9k_keymap.$_p9k_zle_state}:#(vicmd.*|vivis.*|vivli.*|*.*overwrite*)}' "$_POWERLEVEL9K_VI_INSERT_MODE_STRING"
+      fi
+      _p9k_prompt_segment $0_OVERWRITE "$_p9k_color1" blue '' 0 '${${:-$_p9k_keymap.$_p9k_zle_state}:#(vicmd.*|vivis.*|vivli.*|*.*insert*)}' "$_POWERLEVEL9K_VI_OVERWRITE_MODE_STRING"
+    else
+      if [[ -n $_POWERLEVEL9K_VI_INSERT_MODE_STRING ]]; then
+        _p9k_prompt_segment $0_INSERT "$_p9k_color1" blue '' 0 '${_p9k_keymap:#(vicmd|vivis|vivli)}' "$_POWERLEVEL9K_VI_INSERT_MODE_STRING"
+      fi
+    fi
+
+    if (( $+_POWERLEVEL9K_VI_VISUAL_MODE_STRING )); then
+      _p9k_prompt_segment $0_NORMAL "$_p9k_color1" white '' 0 '${(M)${:-$_p9k_keymap$_p9k_region_active}:#vicmd0}' "$_POWERLEVEL9K_VI_COMMAND_MODE_STRING"
+      _p9k_prompt_segment $0_VISUAL "$_p9k_color1" white '' 0 '${(M)${:-$_p9k_keymap$_p9k_region_active}:#(vicmd1|vivis?|vivli?)}' "$_POWERLEVEL9K_VI_VISUAL_MODE_STRING"
+    else
+      _p9k_prompt_segment $0_NORMAL "$_p9k_color1" white '' 0 '${(M)_p9k_keymap:#(vicmd|vivis|vivli)}' "$_POWERLEVEL9K_VI_COMMAND_MODE_STRING"
+    fi
   fi
 }
 
@@ -3203,11 +3256,12 @@ function _p9k_update_prompt() {
   _p9k_refresh_reason=$1
   _p9k_set_prompt
   _p9k_refresh_reason=''
-  zle && zle .reset-prompt && zle -R
+  _p9k_reset_prompt
 }
 
 powerlevel9k_refresh_prompt_inplace() {
-  emulate -L zsh && setopt no_hist_expand extended_glob no_prompt_bang prompt_{percent,subst}
+  emulate -L zsh
+  setopt no_hist_expand extended_glob no_prompt_bang prompt_{percent,subst}
   (( __p9k_enabled )) || return
   _p9k_refresh_reason=precmd
   _p9k_set_prompt
@@ -3216,11 +3270,12 @@ powerlevel9k_refresh_prompt_inplace() {
 
 p9k_refresh_prompt_inplace() { powerlevel9k_refresh_prompt_inplace }
 
+typeset -gi __p9k_sh_glob
+typeset -gi __p9k_ksh_arrays
 typeset -gi __p9k_new_status
 typeset -ga __p9k_new_pipestatus
 
 _p9k_save_status() {
-  emulate -L zsh && setopt no_hist_expand extended_glob no_prompt_bang prompt_{percent,subst}
   local -i pipe
   if (( !$+_p9k_line_finished )); then
     :  # SIGINT
@@ -3264,9 +3319,11 @@ _p9k_save_status() {
   fi
 }
 
-_p9k_precmd() {
-  __p9k_new_status=$?
-  __p9k_new_pipestatus=($pipestatus)
+_p9k_precmd_impl() {
+  emulate -L zsh
+  setopt no_hist_expand extended_glob no_prompt_bang prompt_{percent,subst}
+
+  (( __p9k_enabled )) || return
 
   if ! zle; then
     print -rn "${_p9k_prompt_newline:-}"
@@ -3317,23 +3374,38 @@ _p9k_precmd() {
     _p9k_zle_state=insert
   fi
 
+  _p9k_refresh_reason=precmd
+  _p9k_set_prompt
+  _p9k_refresh_reason=''
+}
+
+_p9k_precmd() {
+  __p9k_new_status=$?
+  __p9k_new_pipestatus=($pipestatus)
+  [[ -o ksh_arrays ]] && __p9k_ksh_arrays=1 || __p9k_ksh_arrays=0
+  [[ -o sh_glob ]] && __p9k_sh_glob=1 || __p9k_sh_glob=0
+
   unsetopt localoptions
   prompt_opts=(percent subst)
   [[ ! -o prompt_sp ]] || prompt_opts+=sp
   [[ ! -o prompt_cr ]] || prompt_opts+=cr
-  setopt nopromptbang prompt{percent,subst}
+  setopt nopromptbang prompt_percent prompt_subst
 
-  powerlevel9k_refresh_prompt_inplace
+  _p9k_precmd_impl
+}
+
+function _p9k_reset_prompt() {
+  (( __p9k_ksh_arrays )) && setopt ksh_arrays
+  (( __p9k_sh_glob )) && setopt sh_glob
+  zle && zle .reset-prompt && zle -R
 }
 
 function _p9k_zle_keymap_select() {
-  emulate -L zsh && setopt no_hist_expand extended_glob no_prompt_bang prompt_{percent,subst}
-  zle && zle .reset-prompt && zle -R
+  _p9k_reset_prompt
 }
 
 function _p9k_zle_state_changed() {
-  emulate -L zsh && setopt no_hist_expand extended_glob no_prompt_bang prompt_{percent,subst}
-  zle && zle .reset-prompt && zle -R
+  _p9k_reset_prompt
 }
 
 _p9k_deinit_async_pump() {
@@ -3364,7 +3436,8 @@ _p9k_deinit_async_pump() {
 }
 
 function _p9k_on_async_message() {
-  emulate -L zsh && setopt no_hist_expand extended_glob no_prompt_bang prompt_{percent,subst}
+  emulate -L zsh
+  setopt no_hist_expand extended_glob no_prompt_bang prompt_{percent,subst}
   (( ARGC == 1 )) || return
   local msg='' IFS=''
   while read -r -t -u $1 msg; do
@@ -3373,7 +3446,7 @@ function _p9k_on_async_message() {
     msg=
   done
   _p9k_async_pump_line+=$msg
-  [[ $__p9k_enabled == 1 && $1 == $_p9k_async_pump_fd ]] && zle && zle .reset-prompt && zle -R
+  [[ $__p9k_enabled == 1 && $1 == $_p9k_async_pump_fd ]] && _p9k_reset_prompt
 }
 
 function _p9k_async_pump() {
@@ -3440,7 +3513,8 @@ function _p9k_async_pump() {
 }
 
 function _p9k_kill_async_pump() {
-  emulate -L zsh && setopt no_hist_expand extended_glob no_prompt_bang prompt_{percent,subst}
+  emulate -L zsh
+  setopt no_hist_expand extended_glob no_prompt_bang prompt_{percent,subst}
   if [[ $ZSH_SUBSHELL == $_p9k_async_pump_subshell && $$ == $_p9k_async_pump_shell_pid ]]; then
     _p9k_deinit_async_pump
   fi
@@ -3880,7 +3954,9 @@ _p9k_wrap_zle_widget() {
 
   local wrapper=_p9k_wrapper_$widget_$hook
   eval "function ${(q)wrapper}() {
-    ${(q)hook} \"\$@\"
+    emulate -L zsh
+    setopt no_hist_expand extended_glob no_prompt_bang prompt_{percent,subst}
+    (( __p9k_enabled )) && ${(q)hook} \"\$@\"
     (( \$+widgets[${(q)orig}] )) && zle ${(q)orig} -- \"\$@\"
   }"
 
@@ -3888,22 +3964,18 @@ _p9k_wrap_zle_widget() {
 }
 
 function _p9k_zle_line_finish() {
-  (( __p9k_enabled )) || return
   _p9k_line_finished=
   if (( _p9k_reset_on_line_finish )); then
-    emulate -L zsh && setopt no_hist_expand extended_glob no_prompt_bang prompt_{percent,subst}
-    zle && zle .reset-prompt && zle -R
+    _p9k_reset_prompt
   fi
 }
 
 function _p9k_zle_line_pre_redraw() {
-  (( __p9k_enabled )) || return
   [[ ${KEYMAP:-} == vicmd ]] || return 0
   local region=${${REGION_ACTIVE:-0}/2/1}
   [[ $region != $_p9k_region_active ]] || return 0
-  emulate -L zsh && setopt no_hist_expand extended_glob no_prompt_bang prompt_{percent,subst}
   _p9k_region_active=$region
-  zle && zle .reset-prompt && zle -R
+  _p9k_reset_prompt
 }
 
 prompt__p9k_internal_nothing() {
@@ -3938,7 +4010,11 @@ _p9k_build_gap_post() {
     _p9k_ret+='${:-"'$exp'"}'
     style=1
   fi
-  _p9k_ret+=$'$_p9k_rprompt$_p9k_t[$((1+!_p9k_ind))]}:-\n}'
+  if (( __p9k_ksh_arrays )); then
+    _p9k_ret+=$'$_p9k_rprompt${_p9k_t[$((!_p9k_ind))]}}:-\n}'
+  else
+    _p9k_ret+=$'$_p9k_rprompt${_p9k_t[$((1+!_p9k_ind))]}}:-\n}'
+  fi
   [[ -n $style ]] && _p9k_ret+='%b%k%f'
 }
 
@@ -4128,7 +4204,11 @@ _p9k_init_prompt() {
       [[ $ruler_char == '.' ]] && local sep=',' || local sep='.'
       local ruler_len='${$((_p9k_clm-_p9k_ind))/#-*/0}'
       _p9k_prompt_prefix_left+="\${(pl$sep$ruler_len$sep$sep${(q)ruler_char}$sep)}%k%f"
-      _p9k_prompt_prefix_left+='$_p9k_t[$((1+!_p9k_ind))]'
+      if (( __p9k_ksh_arrays )); then
+        _p9k_prompt_prefix_left+='${_p9k_t[$((!_p9k_ind))]}'
+      else
+        _p9k_prompt_prefix_left+='${_p9k_t[$((1+!_p9k_ind))]}'
+      fi
     else
       print -rP -- "%F{red}WARNING!%f %BPOWERLEVEL9K_RULER_CHAR%b is not one character long. Ruler won't be rendered."
       print -rP -- "Either change the value of %BPOWERLEVEL9K_RULER_CHAR%b or set %BPOWERLEVEL9K_SHOW_RULER=false%b to"
@@ -4179,12 +4259,11 @@ _p9k_init_ssh() {
 }
 
 _p9k_must_init() {
-  emulate -L zsh && setopt no_hist_expand extended_glob no_prompt_bang prompt_{percent,subst}
   local -a param_keys=(
     ${(o)parameters[(I)(POWERLEVEL9K_*|GITSTATUS_LOG_LEVEL|GITSTATUS_ENABLE_LOGGING|GITSTATUS_DAEMON|GITSTATUS_NUM_THREADS|DEFAULT_USER|ZLE_RPROMPT_INDENT)]})
   local IFS param_sig
   IFS=$'\1' param_sig="${(@)param_keys:/(#b)(*)/$match[1]=\$$match[1]}"
-  IFS=$'\2' eval "param_sig=x\"$param_sig\""
+  IFS=$'\2' eval "param_sig=$__p9k_ksh_arrays$__p9k_sh_glob\"$param_sig\""
   [[ -o transient_rprompt ]] && param_sig+=t
   [[ $param_sig == $_p9k_param_sig ]] && return 1
   [[ -n $_p9k_param_sig ]] && _p9k_deinit
@@ -4198,8 +4277,6 @@ function _p9k_set_os() {
 }
 
 _p9k_init() {
-  emulate -L zsh && setopt no_hist_expand extended_glob no_prompt_bang prompt_{percent,subst}
-
   _p9k_init_icons
   _p9k_init_vars
   _p9k_init_params
@@ -4433,7 +4510,8 @@ typeset -gi __p9k_enabled=0
 typeset -gi __p9k_configured=0
 
 prompt_powerlevel9k_setup() {
-  emulate -L zsh && setopt no_hist_expand extended_glob no_prompt_bang prompt_{percent,subst}
+  emulate -L zsh
+  setopt no_hist_expand extended_glob no_prompt_bang prompt_{percent,subst}
   prompt_powerlevel9k_teardown
   __p9k_enabled=1
   add-zsh-hook preexec _p9k_preexec
@@ -4441,7 +4519,8 @@ prompt_powerlevel9k_setup() {
 }
 
 prompt_powerlevel9k_teardown() {
-  emulate -L zsh && setopt no_hist_expand extended_glob no_prompt_bang prompt_{percent,subst}
+  emulate -L zsh
+  setopt no_hist_expand extended_glob no_prompt_bang prompt_{percent,subst}
   add-zsh-hook -D precmd '(_p9k_|powerlevel9k_)*'
   add-zsh-hook -D preexec '(_p9k_|powerlevel9k_)*'
   PROMPT='%m%# '

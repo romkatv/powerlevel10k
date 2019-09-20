@@ -17,11 +17,11 @@ else
   local __p9k_restore_aliases=0
 fi
 
-typeset -g __p9k_root_dir=${POWERLEVEL9K_INSTALLATION_DIR:-${${(%):-%x}:A:h}}
+typeset -g __p9k_root_dir="${POWERLEVEL9K_INSTALLATION_DIR:-${${(%):-%x}:A:h}}"
 
 () {
   emulate -L zsh
-  setopt no_hist_expand extended_glob no_prompt_{bang,subst} prompt_{cr,percent,sp}
+  setopt no_hist_expand extended_glob no_prompt_bang no_prompt_subst prompt_percent
   if (( $+__p9k_sourced )); then
     prompt_powerlevel9k_setup
     return
