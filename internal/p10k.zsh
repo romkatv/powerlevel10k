@@ -3325,7 +3325,12 @@ _p9k_precmd_impl() {
 
   (( __p9k_enabled )) || return
 
-  if ! zle; then
+  if ! zle || [[ -z $_p9k_param_sig ]]; then
+    if zle; then
+      __p9k_new_status=0
+      __p9k_new_pipestatus=(0)
+    fi
+
     print -rn "${_p9k_prompt_newline:-}"
 
     if (( $+_p9k_real_zle_rprompt_indent )); then
@@ -4270,7 +4275,7 @@ _p9k_must_init() {
   [[ -o transient_rprompt ]] && param_sig+=t
   [[ $param_sig == $_p9k_param_sig ]] && return 1
   [[ -n $_p9k_param_sig ]] && _p9k_deinit
-  _p9k_param_sig=$param_sig
+  typeset -g _p9k_param_sig=$param_sig
 }
 
 function _p9k_set_os() {
