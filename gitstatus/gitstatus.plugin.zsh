@@ -72,7 +72,7 @@ zmodload zsh/datetime zsh/system
 #             VCS_STATUS_RESULT=tout and return 0.
 #   -p        Don't compute anything that requires reading Git index. If this option is used,
 #             the following parameters will be 0: VCS_STATUS_INDEX_SIZE,
-#             VCS_STATUS_{NUM,HAS}_{STAGED,UNSTAGED,UNTRACKED}.
+#             VCS_STATUS_{NUM,HAS}_{STAGED,UNSTAGED,UNTRACKED,CONFLICTED}.
 #
 # On success sets VCS_STATUS_RESULT to one of the following values:
 #
@@ -369,12 +369,9 @@ function gitstatus_start() {
     local setsid=${commands[setsid]:-/usr/local/opt/util-linux/bin/setsid}
     [[ -x $setsid ]] && setsid=${(q)setsid} || setsid=
     cmd="cd /; $setsid zsh -dfxc ${(q)cmd} &!"
-    # We use `zsh -c` instead of plain {} or () to work around bugs in zplug. It hangs on startup.
-    # Double fork is to daemonize. Some macOS users had issues when gitstatusd was a child process
-    # of the interactive zsh. For example, https://github.com/romkatv/powerlevel10k/issues/123
-    # and https://github.com/romkatv/powerlevel10k/issues/97. Note that on macOS setsid has to
-    # be installed manually by running  `brew install util-linux`. Unfortunately, none of these
-    # helped to resolve https://github.com/romkatv/powerlevel10k/issues/123.
+    # We use `zsh -c` instead of plain {} or () to work around bugs in zplug (it hangs on startup).
+    # Double fork is to daemonize, and so is `setsid`. Note that on macOS `setsid` has to
+    # be installed manually by running  `brew install util-linux`.
     zsh -dfmxc $cmd <$req_fifo >$resp_fifo 2>$log_file 3<$lock_file &!
 
     sysopen -w -o cloexec,sync -u req_fd $req_fifo
