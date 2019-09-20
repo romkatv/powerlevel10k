@@ -48,13 +48,12 @@
 
 [[ -o 'interactive' ]] || 'return'
 
-# Temporarily disable aliases.
-if [[ -o 'aliases' ]]; then
-  'builtin' 'unsetopt' 'aliases'
-  local _gitstatus_restore_aliases=1
-else
-  local _gitstatus_restore_aliases=0
-fi
+# Temporarily change options.
+'builtin' 'local' '-a' '_gitstatus_opts'
+[[ ! -o 'aliases'         ]] || _gitstatus_opts+=('aliases')
+[[ ! -o 'sh_glob'         ]] || _gitstatus_opts+=('sh_glob')
+[[ ! -o 'no_brace_expand' ]] || _gitstatus_opts+=('no_brace_expand')
+'builtin' 'setopt' 'no_aliases' 'no_sh_glob' 'brace_expand'
 
 autoload -Uz add-zsh-hook
 zmodload zsh/datetime zsh/system
@@ -523,5 +522,5 @@ function gitstatus_check() {
   [[ -n ${(P)${:-GITSTATUS_DAEMON_PID_${1}}} ]]
 }
 
-(( ! _gitstatus_restore_aliases )) || setopt aliases
-'builtin' 'unset' '_gitstatus_restore_aliases'
+setopt ${_gitstatus_opts[@]}
+'builtin' 'unset' '_gitstatus_opts'
