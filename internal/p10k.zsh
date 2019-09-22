@@ -2808,7 +2808,7 @@ prompt_virtualenv() {
   if (( _POWERLEVEL9K_VIRTUALENV_SHOW_PYTHON_VERSION )) && _p9k_python_version; then
     msg="${_p9k_ret//\%/%%} "
   fi
-  msg+="$_POWERLEVEL9K_VIRTUALENV_LEFT_DELIMITER${${VIRTUAL_ENV:t}//\%/%%}$_POWERLEVEL9K_VIRTUALENV_RIGHT_DELIMITER"
+  msg+="$_POWERLEVEL9K_VIRTUALENV_LEFT_DELIMITER${${${VIRTUAL_ENV:t}%-*}//\%/%%}$_POWERLEVEL9K_VIRTUALENV_RIGHT_DELIMITER"
   _p9k_prompt_segment "$0" "blue" "$_p9k_color1" 'PYTHON_ICON' 0 '' "$msg"
 }
 
