@@ -14,13 +14,12 @@
 # you like the general style of Pure but not particularly attached to all its quirks, type
 # `p10k configure` while having Powerlevel10k theme active and pick lean style.
 
-# Temporarily disable aliases.
-if [[ -o 'aliases' ]]; then
-  'builtin' 'unsetopt' 'aliases'
-  local p10k_pure_restore_aliases=1
-else
-  local p10k_pure_restore_aliases=0
-fi
+# Temporarily change options.
+'builtin' 'local' '-a' 'p10k_config_opts'
+[[ ! -o 'aliases'         ]] || p10k_config_opts+=('aliases')
+[[ ! -o 'sh_glob'         ]] || p10k_config_opts+=('sh_glob')
+[[ ! -o 'no_brace_expand' ]] || p10k_config_opts+=('no_brace_expand')
+'builtin' 'setopt' 'no_aliases' 'no_sh_glob' 'brace_expand'
 
 () {
   emulate -L zsh
@@ -101,5 +100,5 @@ fi
   typeset -g POWERLEVEL9K_COMMAND_EXECUTION_TIME_FOREGROUND=yellow
 }
 
-(( ! p10k_pure_restore_aliases )) || setopt aliases
-'builtin' 'unset' 'p10k_pure_restore_aliases'
+setopt ${p10k_config_opts[@]}
+'builtin' 'unset' 'p10k_config_opts'
