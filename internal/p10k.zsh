@@ -857,8 +857,8 @@ prompt_anaconda() {
 ################################################################
 # AWS Profile
 prompt_aws() {
-  local aws_profile="${AWS_PROFILE:-$AWS_DEFAULT_PROFILE}"
-  if [[ -n "$aws_profile" ]]; then
+  local aws_profile="${AWS_VAULT:-${AWS_PROFILE:-$AWS_DEFAULT_PROFILE}}"
+  if [[ "$aws_profile" != (default|) ]]; then
     _p9k_prompt_segment "$0" red white 'AWS_ICON' 0 '' "${aws_profile//\%/%%}"
   fi
 }
@@ -1859,6 +1859,7 @@ prompt_dotnet_version() {
   _p9k_cached_cmd_stdout dotnet --version || return
   _p9k_prompt_segment "$0" "magenta" "white" 'DOTNET_ICON' 0 '' "$_p9k_ret"
 }
+
 
 ################################################################
 # Segment to print a little OS icon
