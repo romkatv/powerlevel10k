@@ -53,6 +53,7 @@
       # node_version          # node.js version
       # go_version            # go version (https://golang.org)
       # rust_version          # rustc version (https://www.rust-lang.org)
+      # dotnet_version        # .NET version (https://dotnet.microsoft.com)
       rbenv                   # ruby version from rbenv (https://github.com/rbenv/rbenv)
       rvm                     # ruby version from rvm (https://rvm.io)
       kubecontext             # current kubernetes context (https://kubernetes.io/)
@@ -553,6 +554,14 @@
   typeset -g POWERLEVEL9K_RUST_VERSION_PROJECT_ONLY=true
   # Custom icon.
   # typeset -g POWERLEVEL9K_RUST_VERSION_VISUAL_IDENTIFIER_EXPANSION='⭐'
+
+  ###############[ dotnet_version: .NET version (https://dotnet.microsoft.com) ]################
+  # .NET version color.
+  typeset -g POWERLEVEL9K_DOTNET_VERSION_FOREGROUND=134
+  # Show .NET version only when in a .NET project subdirectory.
+  typeset -g POWERLEVEL9K_DOTNET_VERSION_PROJECT_ONLY=true
+  # Custom icon.
+  # typeset -g POWERLEVEL9K_DOTNET_VERSION_VISUAL_IDENTIFIER_EXPANSION='⭐'
 
   #############[ rbenv: ruby version from rbenv (https://github.com/rbenv/rbenv) ]##############
   # Rbenv color.

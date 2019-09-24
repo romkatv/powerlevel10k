@@ -1627,7 +1627,7 @@ prompt_load() {
 }
 
 function _p9k_cached_cmd_stdout() {
-  local cmd=$commands[$1]
+  local cmd=${commands[$1]:A}
   [[ -n $cmd ]] || return
   shift
   local -H stat
@@ -1642,7 +1642,7 @@ function _p9k_cached_cmd_stdout() {
 }
 
 function _p9k_cached_cmd_stdout_stderr() {
-  local cmd=$commands[$1]
+  local cmd=${commands[$1]:A}
   [[ -n $cmd ]] || return
   shift
   local -H stat
@@ -1842,6 +1842,22 @@ prompt_nodenv() {
   fi
 
   _p9k_prompt_segment "$0" "black" "green" 'NODE_ICON' 0 '' "${v//\%/%%}"
+}
+
+prompt_dotnet_version() {
+  (( $+commands[dotnet] )) || return
+
+  if (( _POWERLEVEL9K_DOTNET_VERSION_PROJECT_ONLY )); then
+    local dir=$_p9k_pwd
+    while true; do
+      [[ $dir == / ]] && return
+      [[ -n $dir/(project.json|global.json|packet.dependencies|*.csproj|*.fsproj|*.xproj|*.sln)(#qN^/) ]] && break
+      dir=${dir:h}
+    done
+  fi
+
+  _p9k_cached_cmd_stdout dotnet --version || return
+  _p9k_prompt_segment "$0" "magenta" "white" 'DOTNET_ICON' 0 '' "$_p9k_ret"
 }
 
 ################################################################
@@ -3821,6 +3837,7 @@ _p9k_init_params() {
   _p9k_declare -i POWERLEVEL9K_LOAD_WHICH 5
   _p9k_declare -b POWERLEVEL9K_NODENV_PROMPT_ALWAYS_SHOW 0
   _p9k_declare -b POWERLEVEL9K_NODE_VERSION_PROJECT_ONLY 0
+  _p9k_declare -b POWERLEVEL9K_DOTNET_VERSION_PROJECT_ONLY 1
   _p9k_declare -b POWERLEVEL9K_GO_VERSION_PROJECT_ONLY 1
   _p9k_declare -b POWERLEVEL9K_RUST_VERSION_PROJECT_ONLY 1
   _p9k_declare -b POWERLEVEL9K_RBENV_PROMPT_ALWAYS_SHOW 0

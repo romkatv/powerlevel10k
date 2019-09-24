@@ -113,6 +113,7 @@ function _p9k_init_icons() {
         RANGER_ICON                    '\u2B50'               # ⭐
         TERRAFORM_ICON                 '\U1F6E0\u00A0'        # 🛠️
         PROXY_ICON                     '\u2B82'               # ⮂
+        DOTNET_ICON                    '.NET'
       )
     ;;
     'awesome-fontconfig')
@@ -213,6 +214,7 @@ function _p9k_init_icons() {
         RANGER_ICON                    '\u2B50'               # ⭐
         TERRAFORM_ICON                 '\U1F6E0\u00A0'        # 🛠️
         PROXY_ICON                     '\u2B82'               # ⮂
+        DOTNET_ICON                    '.NET'
       )
     ;;
     'awesome-mapped-fontconfig')
@@ -317,6 +319,7 @@ function _p9k_init_icons() {
         RANGER_ICON                    '\u2B50'                                       # ⭐
         TERRAFORM_ICON                 '\U1F6E0\u00A0'                                # 🛠️
         PROXY_ICON                     '\u2B82'                                       # ⮂
+        DOTNET_ICON                    '.NET'
       )
     ;;
     'nerdfont-complete'|'nerdfont-fontconfig')
@@ -418,6 +421,7 @@ function _p9k_init_icons() {
         RANGER_ICON                    '\u2B50'               # ⭐
         TERRAFORM_ICON                 '\U1F6E0\u00A0'        # 🛠️
         PROXY_ICON                     '\u2B82'               # ⮂
+        DOTNET_ICON                    '\uE77F'               # 
       )
     ;;
     *)
@@ -518,6 +522,7 @@ function _p9k_init_icons() {
         RANGER_ICON                    '\u2B50'               # ⭐
         TERRAFORM_ICON                 '\U1F6E0\u00A0'        # 🛠️
         PROXY_ICON                     '\u2B82'               # ⮂
+        DOTNET_ICON                    '.NET'
       )
     ;;
   esac
