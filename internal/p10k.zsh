@@ -4183,7 +4183,7 @@ _p9k_init_prompt() {
   _p9k_prompt_suffix_left='${${COLUMNS::=$_p9k_clm}+}'
   _p9k_prompt_suffix_right='${${COLUMNS::=$_p9k_clm}+}'
 
-  if _p9k_segment_in_use vi_mode && (( $+_POWERLEVEL9K_VI_VISUAL_MODE_STRING )) || _p9k_segment_in_use prompt_char; then
+  if _p9k_segment_in_use vi_mode || _p9k_segment_in_use prompt_char; then
     _p9k_prompt_prefix_left+='${${_p9k_keymap::=${KEYMAP:-$_p9k_keymap}}+}'
   fi
   if { _p9k_segment_in_use vi_mode && (( $+_POWERLEVEL9K_VI_OVERWRITE_MODE_STRING )) } ||
@@ -4490,6 +4490,10 @@ _p9k_init() {
 
   _p9k_init_async_pump
 
+  if _p9k_segment_in_use vi_mode || _p9k_segment_in_use prompt_char; then
+    _p9k_wrap_zle_widget zle-keymap-select _p9k_zle_keymap_select
+  fi
+
   if _p9k_segment_in_use vi_mode && (( $+_POWERLEVEL9K_VI_VISUAL_MODE_STRING )) || _p9k_segment_in_use prompt_char; then
     _p9k_wrap_zle_widget zle-line-pre-redraw _p9k_zle_line_pre_redraw
   fi
@@ -4517,8 +4521,6 @@ _p9k_init() {
       done
     fi
   fi
-
-  _p9k_wrap_zle_widget zle-keymap-select _p9k_zle_keymap_select
 
   if [[ -n $_POWERLEVEL9K_PUBLIC_IP_VPN_INTERFACE ]] && _p9k_segment_in_use public_ip ||
      _p9k_segment_in_use ip || _p9k_segment_in_use vpn_ip; then
