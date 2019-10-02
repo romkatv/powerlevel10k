@@ -1218,7 +1218,6 @@ prompt_dir() {
   fi
 
   local -i fake_first=0 expand=0
-  [[ -z $_p9k_locale ]] || local LC_ALL=$_p9k_locale
   local delim=${_POWERLEVEL9K_SHORTEN_DELIMITER-$'\u2026'}
   local -i shortenlen=${_POWERLEVEL9K_SHORTEN_DIR_LENGTH:--1}
 
@@ -2745,7 +2744,7 @@ function _p9k_vcs_gitstatus() {
 
 prompt_vcs() {
   local -a backends=($_POWERLEVEL9K_VCS_BACKENDS)
-  if (( ${backends[(I)git]} && !_p9k_gitstatus_disabled )) && _p9k_vcs_gitstatus; then
+  if (( ${backends[(I)git]} && !_POWERLEVEL9K_DISABLE_GITSTATUS )) && _p9k_vcs_gitstatus; then
     _p9k_vcs_render && return
     backends=(${backends:#git})
   fi
@@ -3337,37 +3336,11 @@ _p9k_save_status() {
   fi
 }
 
-function _p9k_dump_state() {
-  local dir=${XDG_CACHE_HOME:-$HOME/.cache}
-  [[ -d $dir ]] || mkdir -pm 0700 $dir || return
-  [[ -w $dir && -z $dir(#qNR) ]] || return
-  local tmp=$dir/p10k-state-$USER.zsh.$$-$EPOCHREALTIME-$RANDOM
-  local -i fd
-  sysopen -a -m 600 -o creat,trunc -u fd $tmp || return
-  {
-    print -r -- "# $_p9k_param_sig" >&$fd || return
-    typeset -pm '(_POWERLEVEL9K_|_p9k_)*~(_p9k_async_pump*)' >&$fd || return
-  } always {
-    exec {fd}>&-
-  }
-  zf_mv -f $tmp $dir/p10k-state-$USER.zsh
-}
-
-function _p9k_restore_state() {
-  local file=${XDG_CACHE_HOME:-$HOME/.cache}/p10k-state-$USER.zsh
-  [[ -r $file && -z $file(#qNW) ]] || return
-  local content && content="$(<$file)"
-  [[ $content == '# '$_p9k_param_sig$'\n'* ]] || return
-  eval $content
-}
-
 _p9k_precmd_impl() {
   emulate -L zsh
   setopt no_hist_expand extended_glob no_prompt_bang prompt_{percent,subst}
 
   (( __p9k_enabled )) || return
-
-  local -i init=0
 
   if ! zle || [[ -z $_p9k_param_sig ]]; then
     if zle; then
@@ -3404,7 +3377,6 @@ _p9k_precmd_impl() {
         fi
       fi
       _p9k_init
-      local -i init=1
     fi
 
     _p9k_timer_end=EPOCHREALTIME
@@ -3427,8 +3399,6 @@ _p9k_precmd_impl() {
   _p9k_refresh_reason=precmd
   _p9k_set_prompt
   _p9k_refresh_reason=''
-
-  (( init )) && _p9k_dump_state
 }
 
 _p9k_precmd() {
@@ -3584,9 +3554,8 @@ _p9k_init_async_pump() {
   _p9k_start_async_pump() {
     setopt err_return no_bg_nice
 
-    _p9k_async_pump_lock=${TMPDIR:-/tmp}/p9k-$$-async-pump-lock.$EPOCHREALTIME.$RANDOM
-    _p9k_async_pump_fifo=${TMPDIR:-/tmp}/p9k-$$-async-pump-fifo.$EPOCHREALTIME.$RANDOM
-    echo -n >$_p9k_async_pump_lock
+    _p9k_async_pump_lock="$(mktemp ${TMPDIR:-/tmp}/p9k-$$-async-pump-lock.XXXXXXXXXX)"
+    _p9k_async_pump_fifo="$(mktemp -u ${TMPDIR:-/tmp}/p9k-$$-async-pump-fifo.XXXXXXXXXX)"
     mkfifo $_p9k_async_pump_fifo
     sysopen -rw -o cloexec,sync -u _p9k_async_pump_fd $_p9k_async_pump_fifo
     zle -F $_p9k_async_pump_fd _p9k_on_async_message
@@ -3721,10 +3690,6 @@ _p9k_init_vars() {
   typeset -gi _p9k_fetch_iface
   typeset -g  _p9k_keymap
   typeset -g  _p9k_zle_state
-  typeset -g  _p9k_uname
-  typeset -g  _p9k_uname_o
-  typeset -g  _p9k_uname_m
-  typeset -gi _p9k_gitstatus_disabled
 
   typeset -g  P9K_VISUAL_IDENTIFIER
   typeset -g  P9K_CONTENT
@@ -4324,7 +4289,7 @@ _p9k_must_init() {
     ${(o)parameters[(I)(POWERLEVEL9K_*|GITSTATUS_LOG_LEVEL|GITSTATUS_ENABLE_LOGGING|GITSTATUS_DAEMON|GITSTATUS_NUM_THREADS|DEFAULT_USER|ZLE_RPROMPT_INDENT)]})
   local IFS param_sig
   IFS=$'\1' param_sig="${(@)param_keys:/(#b)(*)/$match[1]=\$$match[1]}"
-  IFS=$'\2' eval "param_sig=0.$USER.$P9K_SSH$__p9k_ksh_arrays$__p9k_sh_glob\"$param_sig\""
+  IFS=$'\2' eval "param_sig=$__p9k_ksh_arrays$__p9k_sh_glob\"$param_sig\""
   [[ -o transient_rprompt ]] && param_sig+=t
   [[ $param_sig == $_p9k_param_sig ]] && return 1
   [[ -n $_p9k_param_sig ]] && _p9k_deinit
@@ -4337,19 +4302,17 @@ function _p9k_set_os() {
   _p9k_os_icon=$_p9k_ret
 }
 
-function _p9k_init_cacheable() {
+_p9k_init() {
   _p9k_init_icons
+  _p9k_init_vars
   _p9k_init_params
   _p9k_init_prompt
 
-  _p9k_uname="$(uname)"
-  [[ $_p9k_uname == Linux ]] && _p9k_uname_o="$(uname -o 2>/dev/null)"
-  _p9k_uname_m="$(uname -m)"
-
-  if [[ $_p9k_uname == Linux && _p9k_uname_o == Android ]]; then
+  local uname="$(uname)"
+  if [[ $uname == Linux && "$(uname -o 2>/dev/null)" == Android ]]; then
     _p9k_set_os Android ANDROID_ICON
   else
-    case $_p9k_uname in
+    case $uname in
       SunOS)                     _p9k_set_os Solaris SUNOS_ICON;;
       Darwin)                    _p9k_set_os OSX     APPLE_ICON;;
       CYGWIN_NT-* | MSYS_NT-*)   _p9k_set_os Windows WINDOWS_ICON;;
@@ -4431,60 +4394,12 @@ function _p9k_init_cacheable() {
     fi
   done
 
-  case $_p9k_os in
-    OSX) (( $+commands[sysctl] )) && _p9k_num_cpus="$(sysctl -n hw.logicalcpu 2>/dev/null)";;
-    BSD) (( $+commands[sysctl] )) && _p9k_num_cpus="$(sysctl -n hw.ncpu 2>/dev/null)";;
-    *)   (( $+commands[nproc]  )) && _p9k_num_cpus="$(nproc 2>/dev/null)";;
-  esac
-
-  if _p9k_segment_in_use dir; then
-    if (( $+_POWERLEVEL9K_DIR_CLASSES )); then
-      [[ -z $_p9k_locale ]] || local LC_ALL=$_p9k_locale
-      local -i i=3
-      for ((; i <= $#_POWERLEVEL9K_DIR_CLASSES; i+=3)); do
-        _POWERLEVEL9K_DIR_CLASSES[i]=${(g::)_POWERLEVEL9K_DIR_CLASSES[i]}
-      done
-    else
-      typeset -ga _POWERLEVEL9K_DIR_CLASSES=()
-      _p9k_get_icon prompt_dir_ETC ETC_ICON
-      _POWERLEVEL9K_DIR_CLASSES+=('/etc|/etc/*' ETC "$_p9k_ret")
-      _p9k_get_icon prompt_dir_HOME HOME_ICON
-      _POWERLEVEL9K_DIR_CLASSES+=('~' HOME "$_p9k_ret")
-      _p9k_get_icon prompt_dir_HOME_SUBFOLDER HOME_SUB_ICON
-      _POWERLEVEL9K_DIR_CLASSES+=('~/*' HOME_SUBFOLDER "$_p9k_ret")
-      _p9k_get_icon prompt_dir_DEFAULT FOLDER_ICON
-      _POWERLEVEL9K_DIR_CLASSES+=('*' DEFAULT "$_p9k_ret")
-    fi
-  fi
-
-  if _p9k_segment_in_use status; then
-    typeset -g _p9k_exitcode2str=({0..255})
-    local -i i=2
-    if (( !_POWERLEVEL9K_STATUS_HIDE_SIGNAME )); then
-      for ((; i <= $#signals; ++i)); do
-        local sig=$signals[i]
-        (( _POWERLEVEL9K_STATUS_VERBOSE_SIGNAME )) && sig="SIG${sig}($((i-1)))"
-        _p9k_exitcode2str[$((128+i))]=$sig
-      done
-    fi
-  fi
-
-  if [[ -n $_POWERLEVEL9K_PUBLIC_IP_VPN_INTERFACE ]] && _p9k_segment_in_use public_ip ||
-     _p9k_segment_in_use ip || _p9k_segment_in_use vpn_ip; then
-     _p9k_fetch_iface=1
-  fi
-}
-
-_p9k_init() {
-  _p9k_init_vars
-  _p9k_restore_state || _p9k_init_cacheable
-
   if _p9k_segment_in_use vcs; then
     _p9k_vcs_info_init
+    local gitstatus_dir=${_POWERLEVEL9K_GITSTATUS_DIR:-${__p9k_root_dir}/gitstatus}
     if [[ $_POWERLEVEL9K_DISABLE_GITSTATUS == 0 && -n $_POWERLEVEL9K_VCS_BACKENDS[(r)git] ]]; then
-      local gitstatus_dir=${_POWERLEVEL9K_GITSTATUS_DIR:-${__p9k_root_dir}/gitstatus}
-      if [[ -z $GITSTATUS_DAEMON && $_p9k_uname == i686 && -z $gitstatus_dir/bin/*-i686(-static|)(#qN) ]]; then
-        _p9k_gitstatus_disabled=1
+      if [[ -z $GITSTATUS_DAEMON && "$(uname -m)" == i686 && -z $gitstatus_dir/bin/*-i686(-static|)(#qN) ]]; then
+        _POWERLEVEL9K_DISABLE_GITSTATUS=1
         >&2 echo -E - "${(%):-[%1FERROR%f]: %BPowerlevel10k%b is unable to use %Bgitstatus%b. Git prompt will be slow.}"
         >&2 echo -E - ""
         >&2 echo -E - "${(%):-Reason: There is no %Bgitstatusd%b binary for i686 (32-bit Intel architecture).}"
@@ -4516,19 +4431,6 @@ _p9k_init() {
         >&2 echo -E - "${(%):-    * You %Bwill not%b see this error message again.}"
         >&2 echo -E - "${(%):-    * Git prompt will be %Bfast%b.}"
       else
-        local -i daemon threads
-        if (( ! $+GITSTATUS_DAEMON )); then
-          local os=$_p9k_uname
-          [[ $_p9k_uname == Linux && _p9k_uname_o == Android ]] && os=Android
-          typeset -g GITSTATUS_DAEMON=$gitstatus_dir/bin/gitstatusd-${os:l}-${_p9k_uname_m:l}
-          daemon=1
-        fi
-        if (( ! $+GITSTATUS_NUM_THREADS )); then
-          typeset -gi GITSTATUS_NUM_THREADS=$(( _p9k_num_cpus * 2 ))
-          (( GITSTATUS_NUM_THREADS > 0 )) || GITSTATUS_NUM_THREADS=8
-          (( GITSTATUS_NUM_THREADS <= 32 )) || GITSTATUS_NUM_THREADS=32
-          threads=1
-        fi
         source $gitstatus_dir/gitstatus.plugin.zsh
         gitstatus_start                              \
           -s $_POWERLEVEL9K_VCS_STAGED_MAX_NUM       \
@@ -4536,9 +4438,7 @@ _p9k_init() {
           -d $_POWERLEVEL9K_VCS_UNTRACKED_MAX_NUM    \
           -c $_POWERLEVEL9K_VCS_CONFLICTED_MAX_NUM   \
           -m $_POWERLEVEL9K_VCS_MAX_INDEX_SIZE_DIRTY \
-          POWERLEVEL9K || _p9k_gitstatus_disabled=1
-        (( daemon )) && unset GITSTATUS_DAEMON
-        (( threads )) && unset GITSTATUS_NUM_THREADS
+          POWERLEVEL9K || _POWERLEVEL9K_DISABLE_GITSTATUS=1
       fi
     fi
   fi
@@ -4560,6 +4460,36 @@ _p9k_init() {
     fi
   fi
 
+  if _p9k_segment_in_use load; then
+    case $_p9k_os in
+      OSX) (( $+commands[sysctl] )) && _p9k_num_cpus="$(sysctl -n hw.logicalcpu 2>/dev/null)";;
+      BSD) (( $+commands[sysctl] )) && _p9k_num_cpus="$(sysctl -n hw.ncpu 2>/dev/null)";;
+      *)   (( $+commands[nproc]  )) && _p9k_num_cpus="$(nproc 2>/dev/null)";;
+    esac
+  fi
+
+  if _p9k_segment_in_use dir; then
+    if (( $+_POWERLEVEL9K_DIR_CLASSES )); then
+      [[ -z $_p9k_locale ]] || local LC_ALL=$_p9k_locale
+      local -i i=3
+      for ((; i <= $#_POWERLEVEL9K_DIR_CLASSES; i+=3)); do
+        _POWERLEVEL9K_DIR_CLASSES[i]=${(g::)_POWERLEVEL9K_DIR_CLASSES[i]}
+      done
+    else
+      typeset -ga _POWERLEVEL9K_DIR_CLASSES=()
+      _p9k_get_icon prompt_dir_ETC ETC_ICON
+      _POWERLEVEL9K_DIR_CLASSES+=('/etc|/etc/*' ETC "$_p9k_ret")
+      _p9k_get_icon prompt_dir_HOME HOME_ICON
+      _POWERLEVEL9K_DIR_CLASSES+=('~' HOME "$_p9k_ret")
+      _p9k_get_icon prompt_dir_HOME_SUBFOLDER HOME_SUB_ICON
+      _POWERLEVEL9K_DIR_CLASSES+=('~/*' HOME_SUBFOLDER "$_p9k_ret")
+      _p9k_get_icon prompt_dir_DEFAULT FOLDER_ICON
+      _POWERLEVEL9K_DIR_CLASSES+=('*' DEFAULT "$_p9k_ret")
+    fi
+  fi
+
+  _p9k_init_async_pump
+
   if _p9k_segment_in_use vi_mode || _p9k_segment_in_use prompt_char; then
     _p9k_wrap_zle_widget zle-keymap-select _p9k_zle_keymap_select
   fi
@@ -4580,7 +4510,22 @@ _p9k_init() {
     print -rP -- 'Either install %F{green}jq%f or change the value of %BPOWERLEVEL9K_SHORTEN_STRATEGY%b.'
   fi
 
-  _p9k_init_async_pump
+  if _p9k_segment_in_use status; then
+    typeset -g _p9k_exitcode2str=({0..255})
+    local -i i=2
+    if (( !_POWERLEVEL9K_STATUS_HIDE_SIGNAME )); then
+      for ((; i <= $#signals; ++i)); do
+        local sig=$signals[i]
+        (( _POWERLEVEL9K_STATUS_VERBOSE_SIGNAME )) && sig="SIG${sig}($((i-1)))"
+        _p9k_exitcode2str[$((128+i))]=$sig
+      done
+    fi
+  fi
+
+  if [[ -n $_POWERLEVEL9K_PUBLIC_IP_VPN_INTERFACE ]] && _p9k_segment_in_use public_ip ||
+     _p9k_segment_in_use ip || _p9k_segment_in_use vpn_ip; then
+     _p9k_fetch_iface=1
+  fi
 }
 
 _p9k_deinit() {
@@ -4782,7 +4727,6 @@ zmodload zsh/mathfunc
 zmodload zsh/system
 zmodload -F zsh/stat b:zstat
 zmodload -F zsh/net/socket b:zsocket
-zmodload -F zsh/files b:zf_mv
 
 _p9k_init_ssh
 prompt_powerlevel9k_setup
