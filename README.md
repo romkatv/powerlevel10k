@@ -262,8 +262,9 @@ prompt latency when using Powerlevel10k, please
 
 ### Is Powerlevel10k fast to load?
 
-The short answer is no. The amount of time it takes for Powerlevel10k to render the first prompt
-is in the same ballpark as for Powerlevel9k.
+The amount of time it takes for Powerlevel10k to render the first prompt is singnificantly higher
+than for the subsequent prompts. In comparison to other ZSH themes, Powerlevel10k loading latency
+is unremarkable. Powerlevel10k is neither fast nor slow to load.
 
 Time to first prompt can be measured with the following benchmark:
 
@@ -271,13 +272,13 @@ Time to first prompt can be measured with the following benchmark:
 time (repeat 100 zsh -dfis <<< 'source ~/powerlevel10k/powerlevel10k.zsh-theme')
 ```
 
-On the same machine as in the [prompt benchmark](#is-it-really-fast) this results in 147 ms per
+On the same machine as in the [prompt benchmark](#is-it-really-fast) this results in 59.7 ms per
 invocation when executed in a small git repository (I used the `powerlevel10k` repo itself). For
-comparison, the same benchmark gives 170 ms for powerlevel9k/master and 505 ms for
+comparison, the same benchmark gives 171 ms for powerlevel9k/master and 505 ms for
 powerlevel9k/next.
 
-If your workflow requires that you open a terminal tab, type a command or two and close the tab,
-Powerlevel10k isn't the best choice. Powerlevel10k is optimized for long-lived ZSH sessions.
+*Note: Powerlevel10k startup latency can be reduced by about 15% by compiling its source files with
+`zcompile`.*
 
 ### Does Powerlevel10k always render exactly the same prompt as Powerlevel9k given the same config?
 
