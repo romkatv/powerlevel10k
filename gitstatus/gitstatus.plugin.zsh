@@ -316,9 +316,9 @@ function gitstatus_start() {
       setopt xtrace
     }
 
-    local daemon=${GITSTATUS_DAEMON:-}
+    local daemon=${GITSTATUS_DAEMON:-} os
     [[ -n $daemon ]] || {
-      local os arch
+      local arch
       os="$(uname -s)"
       [[ -n $os ]]
       [[ $os != Linux || "$(uname -o)" != Android ]] || os=Android
@@ -344,6 +344,7 @@ function gitstatus_start() {
     local -i threads=${GITSTATUS_NUM_THREADS:-0}
     (( threads > 0)) || {
       threads=8
+      [[ -n $os ]] || { os="$(uname -s)" && [[ -n $os ]] }
       case $os in
         FreeBSD) (( ! $+commands[sysctl] )) || threads=$(( 2 * $(sysctl -n hw.ncpu) ));;
         *) (( ! $+commands[getconf] )) || threads=$(( 2 * $(getconf _NPROCESSORS_ONLN) ));;
