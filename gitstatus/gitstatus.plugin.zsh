@@ -19,32 +19,34 @@
 #
 # Example: Start gitstatusd, send it a request, wait for response and print it.
 #
-#   source gitstatus.plugin.zsh
+#   source ~/gitstatus/gitstatus.plugin.zsh
 #   gitstatus_start MY
 #   gitstatus_query -d $PWD MY
-#   set | egrep '^VCS_STATUS'
+#   typeset -m 'VCS_STATUS_*'
 #
 # Output:
 #
 #   VCS_STATUS_ACTION=''
-#   VCS_STATUS_COMMIT=6e86ec135bf77875e222463cbac8ef72a7e8d823
+#   VCS_STATUS_COMMIT=c000eddcff0fb38df2d0137efe24d9d2d900f209
 #   VCS_STATUS_COMMITS_AHEAD=0
 #   VCS_STATUS_COMMITS_BEHIND=0
-#   VCS_STATUS_INDEX_SIZE=42
-#   VCS_STATUS_NUM_STAGED=0
-#   VCS_STATUS_NUM_UNSTAGED=2
-#   VCS_STATUS_NUM_UNTRACKED=3
+#   VCS_STATUS_HAS_CONFLICTED=0
 #   VCS_STATUS_HAS_STAGED=0
 #   VCS_STATUS_HAS_UNSTAGED=1
 #   VCS_STATUS_HAS_UNTRACKED=1
+#   VCS_STATUS_INDEX_SIZE=33
 #   VCS_STATUS_LOCAL_BRANCH=master
+#   VCS_STATUS_NUM_CONFLICTED=0
+#   VCS_STATUS_NUM_STAGED=0
+#   VCS_STATUS_NUM_UNSTAGED=1
+#   VCS_STATUS_NUM_UNTRACKED=1
 #   VCS_STATUS_REMOTE_BRANCH=master
 #   VCS_STATUS_REMOTE_NAME=origin
 #   VCS_STATUS_REMOTE_URL=git@github.com:romkatv/powerlevel10k.git
 #   VCS_STATUS_RESULT=ok-sync
 #   VCS_STATUS_STASHES=0
 #   VCS_STATUS_TAG=''
-#   VCS_STATUS_WORKDIR=/home/romka/.oh-my-zsh/custom/themes/powerlevel10k
+#   VCS_STATUS_WORKDIR=/home/romka/powerlevel10k
 
 [[ -o 'interactive' ]] || 'return'
 
@@ -57,6 +59,7 @@
 
 autoload -Uz add-zsh-hook
 zmodload zsh/datetime zsh/system
+zmodload -F zsh/files b:zf_rm
 
 # Retrives status of a git repo from a directory under its working tree.
 #
@@ -307,30 +310,34 @@ function gitstatus_start() {
     [[ -n $log_level || ${GITSTATUS_ENABLE_LOGGING:-0} != 1 ]] || log_level=INFO
 
     [[ -z $log_level ]] || {
-      xtrace_file=$(mktemp "${TMPDIR:-/tmp}"/gitstatus.$$.xtrace.XXXXXXXXXX)
+      xtrace_file=${TMPDIR:-/tmp}/gitstatus.$$.xtrace.$EPOCHREALTIME.$RANDOM
       typeset -g GITSTATUS_XTRACE_${name}=$xtrace_file
       exec {stderr_fd}>&2 2>$xtrace_file
       setopt xtrace
     }
 
-    local os && os=$(uname -s) && [[ -n $os ]]
-    [[ $os != Linux || $(uname -o) != Android ]] || os=Android
-    local arch && arch=$(uname -m) && [[ -n $arch ]]
-
-    local daemon=${GITSTATUS_DAEMON:-$dir/bin/gitstatusd-${os:l}-${arch:l}}
+    local daemon=${GITSTATUS_DAEMON:-}
+    [[ -n $daemon ]] || {
+      local os arch
+      os="$(uname -s)"
+      [[ -n $os ]]
+      [[ $os != Linux || "$(uname -o)" != Android ]] || os=Android
+      arch="$(uname -m)"
+      [[ -n $arch ]]
+      daemon=$dir/bin/gitstatusd-${os:l}-${arch:l}
+    }
     [[ -x $daemon ]]
 
-    lock_file=$(mktemp "${TMPDIR:-/tmp}"/gitstatus.$$.lock.XXXXXXXXXX)
+    lock_file=${TMPDIR:-/tmp}/gitstatus.$$.lock.$EPOCHREALTIME.$RANDOM
+    echo -n >$lock_file
     zsystem flock -f lock_fd $lock_file
 
-    req_fifo=$(mktemp -u "${TMPDIR:-/tmp}"/gitstatus.$$.pipe.req.XXXXXXXXXX)
-    mkfifo $req_fifo
-
-    resp_fifo=$(mktemp -u "${TMPDIR:-/tmp}"/gitstatus.$$.pipe.resp.XXXXXXXXXX)
-    mkfifo $resp_fifo
+    req_fifo=${TMPDIR:-/tmp}/gitstatus.$$.req.$EPOCHREALTIME.$RANDOM
+    resp_fifo=${TMPDIR:-/tmp}/gitstatus.$$.resp.$EPOCHREALTIME.$RANDOM
+    mkfifo $req_fifo $resp_fifo
 
     [[ -n $log_level ]] &&
-      log_file=$(mktemp "${TMPDIR:-/tmp}"/gitstatus.$$.daemon-log.XXXXXXXXXX) ||
+      log_file=${TMPDIR:-/tmp}/gitstatus.$$.daemon-log.$EPOCHREALTIME.$RANDOM ||
       log_file=/dev/null
     typeset -g GITSTATUS_DAEMON_LOG_${name}=$log_file
 
@@ -359,9 +366,7 @@ function gitstatus_start() {
     local cmd="
       echo \$\$
       ${(q)daemon} $daemon_args
-      if [[ \$? != (0|10) && \$? -le 128 &&
-            -z ${(q)GITSTATUS_DAEMON:-} &&
-            -f ${(q)daemon}-static ]]; then
+      if [[ \$? != (0|10) && \$? -le 128 && -f ${(q)daemon}-static ]]; then
         ${(q)daemon}-static $daemon_args
       fi
       echo -nE $'bye\x1f0\x1e'"
@@ -378,7 +383,7 @@ function gitstatus_start() {
 
     read -u $resp_fd daemon_pid
 
-    rm -f $req_fifo $resp_fifo $lock_file
+    zf_rm -f $req_fifo $resp_fifo $lock_file
 
     function _gitstatus_process_response_${name}() {
       local name=${${(%):-%N}#_gitstatus_process_response_}
