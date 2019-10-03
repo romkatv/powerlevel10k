@@ -10,12 +10,12 @@
 # https://github.com/robbyrussell/oh-my-zsh/blob/74177c5320b2a1b2f8c4c695c05984b57fd7c6ea/themes/agnoster.zsh-theme
 ################################################################
 
-if [[ -o 'aliases' ]]; then
-  'builtin' 'unsetopt' 'aliases'
-  local __p9k_restore_aliases=1
-else
-  local __p9k_restore_aliases=0
-fi
+# Temporarily change options.
+'builtin' 'local' '-a' '_p9k_src_opts'
+[[ ! -o 'aliases'         ]] || _p9k_src_opts+=('aliases')
+[[ ! -o 'sh_glob'         ]] || _p9k_src_opts+=('sh_glob')
+[[ ! -o 'no_brace_expand' ]] || _p9k_src_opts+=('no_brace_expand')
+'builtin' 'setopt' 'no_aliases' 'no_sh_glob' 'brace_expand'
 
 typeset -g __p9k_root_dir="${POWERLEVEL9K_INSTALLATION_DIR:-${${(%):-%x}:A:h}}"
 
@@ -34,5 +34,5 @@ typeset -g __p9k_root_dir="${POWERLEVEL9K_INSTALLATION_DIR:-${${(%):-%x}:A:h}}"
   source $__p9k_root_dir/internal/p10k.zsh || true
 }
 
-(( ! __p9k_restore_aliases )) || setopt aliases
-'builtin' 'unset' '__p9k_restore_aliases'
+(( ${#_p9k_src_opts} )) && setopt ${_p9k_src_opts[@]}
+'builtin' 'unset' '_p9k_src_opts'
