@@ -27,6 +27,10 @@ typeset -g __p9k_root_dir="${POWERLEVEL9K_INSTALLATION_DIR:-${${(%):-%x}:A:h}}"
     return
   fi
   typeset -gr __p9k_sourced=1
+  local f
+  for f in $__p9k_root_dir/{powerlevel9k.zsh-theme,powerlevel10k.zsh-theme,internal/p10k.zsh,internal/icons.zsh,internal/configure.zsh,gitstatus/gitstatus.plugin.zsh}; do
+    [[ $f.zwc -nt $f ]] || zcompile $f
+  done
   source $__p9k_root_dir/internal/p10k.zsh || true
 }
 
