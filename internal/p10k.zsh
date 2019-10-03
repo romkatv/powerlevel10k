@@ -3379,7 +3379,9 @@ function _p9k_dump_state() {
     exec {fd}>&-
   }
   zf_mv -f $tmp $__p9k_dump_file || return
-  zcompile $__p9k_dump_file || zf_rm -f $__p9k_dump_file.zwc
+  if [[ ${(%):-%#} == % ]]; then
+    zcompile $__p9k_dump_file || zf_rm -f $__p9k_dump_file.zwc
+  fi
 }
 
 function _p9k_restore_state() {
