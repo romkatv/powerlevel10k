@@ -3366,30 +3366,29 @@ function _p9k_dump_state() {
   local -i fd
   sysopen -a -m 600 -o creat,trunc -u fd $tmp || return
   {
-    print -r -- $_p9k_param_sig >&$fd || return
     local include='_POWERLEVEL9K_*|_p9k_*|icons|OS|DEFAULT_COLOR|DEFAULT_COLOR_INVERTED'
     local exclude='_p9k_gitstatus_*|_p9k_param_sig|_p9k_public_ip|_p9k_prompt|_p9k_prompt_idx'
+    local _p9k_cached_param_sig=$_p9k_param_sig
+    typeset -p _p9k_cached_param_sig >&$fd || return
+    print -r -- '_p9k_restore_state_impl() {' >&$fd || return
     typeset -pm "($include)~($exclude)" >&$fd || return
+    print -r -- '}' >&$fd || return
   } always {
     exec {fd}>&-
   }
   zf_mv -f $tmp $_p9k_state_file
+  zcompile $_p9k_state_file
 }
 
 function _p9k_restore_state() {
-  [[ -z $_p9k_state_file(#qNW) ]] || return
-  local tmp=$_p9k_state_file.$$-$EPOCHREALTIME-$RANDOM
-  zf_mv -f $_p9k_state_file $tmp 2>/dev/null || return
-  {
-    [[ -r $tmp ]] || return
-    local sig
-    IFS='' read -r sig <$tmp || return
-    [[ $sig == $_p9k_param_sig ]] || return
-    source $tmp || return
-    _p9k_state_restored=1
-  } always {
-    zf_mv -f $tmp $_p9k_state_file 2>/dev/null
-  }
+  [[ -z $_p9k_state_file(.zwc|)(#qNW) ]] || return
+  unset _p9k_cached_param_sig
+  (( $+functions[_p9k_restore_state_impl] )) && unfunction _p9k_restore_state_impl
+  source $_p9k_state_file 2>/dev/null || return
+  [[ $_p9k_cached_param_sig == $_p9k_param_sig ]] || return
+  (( $+functions[_p9k_restore_state_impl] )) || return
+  _p9k_restore_state_impl
+  _p9k_state_restored=1
 }
 
 _p9k_precmd_impl() {
@@ -4362,7 +4361,7 @@ _p9k_must_init() {
     '${GITSTATUS_ENABLE_LOGGING}' '${GITSTATUS_DAEMON}' '${GITSTATUS_NUM_THREADS}'
     '${DEFAULT_USER}' '${ZLE_RPROMPT_INDENT}' '${P9K_SSH}' '${__p9k_ksh_arrays}'
     '${__p9k_sh_glob}' '${parameters[transient_rprompt]}' 'v0')
-  IFS=$'\2' param_sig="#${(e)param_sig}"
+  IFS=$'\2' param_sig="${(e)param_sig}"
   [[ $param_sig == $_p9k_param_sig ]] && return 1
   [[ -n $_p9k_param_sig ]] && _p9k_deinit
   typeset -g _p9k_param_sig=$param_sig
