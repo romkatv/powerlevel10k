@@ -528,5 +528,5 @@ function gitstatus_check() {
   [[ -n ${(P)${:-GITSTATUS_DAEMON_PID_${1}}} ]]
 }
 
-setopt ${_gitstatus_opts[@]}
+(( ${#_gitstatus_opts} )) && setopt ${_gitstatus_opts[@]}
 'builtin' 'unset' '_gitstatus_opts'
