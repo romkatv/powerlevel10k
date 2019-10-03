@@ -3359,36 +3359,42 @@ _p9k_save_status() {
 
 function _p9k_dump_state() {
   is-at-least 5.3 || return
-  local dir=${_p9k_state_file:h}
+  local dir=${__p9k_dump_file:h}
   [[ -d $dir ]] || mkdir -pm 0700 $dir || return
   [[ -w $dir && -z $dir(#qNR) ]] || return
-  local tmp=$_p9k_state_file.$$-$EPOCHREALTIME-$RANDOM
+  local tmp=$__p9k_dump_file.$$-$EPOCHREALTIME-$RANDOM
   local -i fd
   sysopen -a -m 600 -o creat,trunc -u fd $tmp || return
   {
     local include='_POWERLEVEL9K_*|_p9k_*|icons|OS|DEFAULT_COLOR|DEFAULT_COLOR_INVERTED'
     local exclude='_p9k_gitstatus_*|_p9k_param_sig|_p9k_public_ip|_p9k_prompt|_p9k_prompt_idx'
-    local _p9k_cached_param_sig=$_p9k_param_sig
-    typeset -p _p9k_cached_param_sig >&$fd || return
+    typeset -g __p9k_cached_param_sig=$_p9k_param_sig
+    typeset -p __p9k_cached_param_sig >&$fd || return
+    unset __p9k_cached_param_sig
+    (( $+functions[_p9k_preinit] )) && functions _p9k_preinit >&$fd || return
     print -r -- '_p9k_restore_state_impl() {' >&$fd || return
     typeset -pm "($include)~($exclude)" >&$fd || return
     print -r -- '}' >&$fd || return
   } always {
     exec {fd}>&-
   }
-  zf_mv -f $tmp $_p9k_state_file
-  zcompile $_p9k_state_file
+  zf_mv -f $tmp $__p9k_dump_file || return
+  zcompile $__p9k_dump_file || zf_rm -f $__p9k_dump_file.zwc
 }
 
 function _p9k_restore_state() {
-  [[ -z $_p9k_state_file(.zwc|)(#qNW) ]] || return
-  unset _p9k_cached_param_sig
-  (( $+functions[_p9k_restore_state_impl] )) && unfunction _p9k_restore_state_impl
-  source $_p9k_state_file 2>/dev/null || return
-  [[ $_p9k_cached_param_sig == $_p9k_param_sig ]] || return
-  (( $+functions[_p9k_restore_state_impl] )) || return
-  _p9k_restore_state_impl
-  _p9k_state_restored=1
+  {
+    [[ $__p9k_cached_param_sig == $_p9k_param_sig ]] || return
+    (( $+functions[_p9k_restore_state_impl] )) || return
+    _p9k_restore_state_impl
+    _p9k_state_restored=1
+  } always {
+    unset __p9k_cached_param_sig
+    if (( !_p9k_state_restored && $+functions[_p9k_preinit] )); then
+      unfunction _p9k_preinit
+      (( $+functions[gitstatus_stop] )) && gitstatus_stop POWERLEVEL9K
+    fi
+  }
 }
 
 _p9k_precmd_impl() {
@@ -4515,74 +4521,89 @@ function _p9k_init_cacheable() {
   fi
 }
 
+_p9k_init_vcs() {
+  _p9k_segment_in_use vcs || return
+  _p9k_vcs_info_init
+  if (( $+functions[_p9k_preinit] )); then
+    (( $+parameters[GITSTATUS_DAEMON_PID_POWERLEVEL9K] )) && gitstatus_start POWERLEVEL9K || _p9k_gitstatus_disabled=1
+    return
+  fi
+  (( _POWERLEVEL9K_DISABLE_GITSTATUS )) && return
+  (( $_POWERLEVEL9K_VCS_BACKENDS[(I)git] )) || return
+
+  local gitstatus_dir=${_POWERLEVEL9K_GITSTATUS_DIR:-${__p9k_root_dir}/gitstatus}
+  if [[ -z $GITSTATUS_DAEMON && $_p9k_uname == i686 && -z $gitstatus_dir/bin/*-i686(-static|)(#qN) ]]; then
+    _p9k_gitstatus_disabled=1
+    >&2 echo -E - "${(%):-[%1FERROR%f]: %BPowerlevel10k%b is unable to use %Bgitstatus%b. Git prompt will be slow.}"
+    >&2 echo -E - ""
+    >&2 echo -E - "${(%):-Reason: There is no %Bgitstatusd%b binary for i686 (32-bit Intel architecture).}"
+    >&2 echo -E - ""
+    >&2 echo -E - "${(%):-You can:}"
+    >&2 echo -E - ""
+    >&2 echo -E - "${(%):-  - Do nothing.}"
+    >&2 echo -E - ""
+    >&2 echo -E - "${(%):-    * You %Bwill%b see this error message every time you start zsh.}"
+    >&2 echo -E - "${(%):-    * Git prompt will be %Bslow%b.}"
+    >&2 echo -E - ""
+    >&2 echo -E - "${(%):-  - Set %BPOWERLEVEL9K_DISABLE_GITSTATUS=true%b at the bottom of %B$__p9k_zshrc_u%b.}"
+    >&2 echo -E - "${(%):-    You can do this by running the following command:}"
+    >&2 echo -E - ""
+    >&2 echo -E - "${(%):-      %2Fecho%f %3F'POWERLEVEL9K_DISABLE_GITSTATUS=true'%f >>! $__p9k_zshrc_u}"
+    >&2 echo -E - ""
+    >&2 echo -E - "${(%):-    * You %Bwill not%b see this error message again.}"
+    >&2 echo -E - "${(%):-    * Git prompt will be %Bslow%b.}"
+    >&2 echo -E - ""
+    >&2 echo -E - "${(%):-  - Upgrade to a 64-bit OS.}"
+    >&2 echo -E - ""
+    >&2 echo -E - "${(%):-    * You %Bwill not%b see this error message again.}"
+    >&2 echo -E - "${(%):-    * Git prompt will be %Bfast%b.}"
+    >&2 echo -E - ""
+    >&2 echo -E - "${(%):-  - Compile %Bgitstatusd%b and set %BGITSTATUS_DAEMON=/path/to/gitstatusd%b at}"
+    >&2 echo -E - "${(%):-    the bottom of %B$__p9k_zshrc_u%b. See instructions at}"
+    >&2 echo -E - "${(%):-    https://github.com/romkatv/gitstatus/blob/master/README.md#compiling.}"
+    >&2 echo -E - ""
+    >&2 echo -E - "${(%):-    * You %Bwill not%b see this error message again.}"
+    >&2 echo -E - "${(%):-    * Git prompt will be %Bfast%b.}"
+    return
+  fi
+
+  local daemon=${GITSTATUS_DAEMON}
+  if [[ -z $daemon ]]; then
+    daemon=$gitstatus_dir/bin/gitstatusd-
+    [[ _p9k_uname_o == Android ]] && daemon+=android || daemon+=${_p9k_uname:l}
+    daemon+=-${_p9k_uname_m:l}
+  fi
+  local -i threads=${GITSTATUS_NUM_THREADS:-0}
+  if (( threads <= 0 )); then
+    threads=$(( _p9k_num_cpus * 2 ))
+    (( threads > 0 )) || threads=8
+    (( threads <= 32 )) || threads=32
+  fi
+  eval "function _p9k_preinit() {
+    source ${(q)gitstatus_dir}/gitstatus.plugin.zsh
+    GITSTATUS_DAEMON=${(q)daemon} GITSTATUS_NUM_THREADS=$threads            \
+    GITSTATUS_LOG_LEVEL=${(q)GITSTATUS_LOG_LEVEL}                           \
+    GITSTATUS_ENABLE_LOGGING=${(q)GITSTATUS_ENABLE_LOGGING} gitstatus_start \
+      -s $_POWERLEVEL9K_VCS_STAGED_MAX_NUM                                  \
+      -u $_POWERLEVEL9K_VCS_UNSTAGED_MAX_NUM                                \
+      -d $_POWERLEVEL9K_VCS_UNTRACKED_MAX_NUM                               \
+      -c $_POWERLEVEL9K_VCS_CONFLICTED_MAX_NUM                              \
+      -m $_POWERLEVEL9K_VCS_MAX_INDEX_SIZE_DIRTY                            \
+      -a POWERLEVEL9K
+  }"
+  source ${gitstatus_dir}/gitstatus.plugin.zsh
+  GITSTATUS_DAEMON=$daemon GITSTATUS_NUM_THREADS=$threads gitstatus_start \
+    -s $_POWERLEVEL9K_VCS_STAGED_MAX_NUM       \
+    -u $_POWERLEVEL9K_VCS_UNSTAGED_MAX_NUM     \
+    -d $_POWERLEVEL9K_VCS_UNTRACKED_MAX_NUM    \
+    -c $_POWERLEVEL9K_VCS_CONFLICTED_MAX_NUM   \
+    -m $_POWERLEVEL9K_VCS_MAX_INDEX_SIZE_DIRTY \
+    POWERLEVEL9K || _p9k_gitstatus_disabled=1
+}
+
 _p9k_init() {
   _p9k_init_vars
-  typeset -g _p9k_state_file=${XDG_CACHE_HOME:-~/.cache}/p10k-state-${(%):-%n}.zsh
   _p9k_restore_state || _p9k_init_cacheable
-
-  if _p9k_segment_in_use vcs; then
-    _p9k_vcs_info_init
-    if [[ $_POWERLEVEL9K_DISABLE_GITSTATUS == 0 && -n $_POWERLEVEL9K_VCS_BACKENDS[(r)git] ]]; then
-      local gitstatus_dir=${_POWERLEVEL9K_GITSTATUS_DIR:-${__p9k_root_dir}/gitstatus}
-      if [[ -z $GITSTATUS_DAEMON && $_p9k_uname == i686 && -z $gitstatus_dir/bin/*-i686(-static|)(#qN) ]]; then
-        _p9k_gitstatus_disabled=1
-        >&2 echo -E - "${(%):-[%1FERROR%f]: %BPowerlevel10k%b is unable to use %Bgitstatus%b. Git prompt will be slow.}"
-        >&2 echo -E - ""
-        >&2 echo -E - "${(%):-Reason: There is no %Bgitstatusd%b binary for i686 (32-bit Intel architecture).}"
-        >&2 echo -E - ""
-        >&2 echo -E - "${(%):-You can:}"
-        >&2 echo -E - ""
-        >&2 echo -E - "${(%):-  - Do nothing.}"
-        >&2 echo -E - ""
-        >&2 echo -E - "${(%):-    * You %Bwill%b see this error message every time you start zsh.}"
-        >&2 echo -E - "${(%):-    * Git prompt will be %Bslow%b.}"
-        >&2 echo -E - ""
-        >&2 echo -E - "${(%):-  - Set %BPOWERLEVEL9K_DISABLE_GITSTATUS=true%b at the bottom of %B$__p9k_zshrc_u%b.}"
-        >&2 echo -E - "${(%):-    You can do this by running the following command:}"
-        >&2 echo -E - ""
-        >&2 echo -E - "${(%):-      %2Fecho%f %3F'POWERLEVEL9K_DISABLE_GITSTATUS=true'%f >>! $__p9k_zshrc_u}"
-        >&2 echo -E - ""
-        >&2 echo -E - "${(%):-    * You %Bwill not%b see this error message again.}"
-        >&2 echo -E - "${(%):-    * Git prompt will be %Bslow%b.}"
-        >&2 echo -E - ""
-        >&2 echo -E - "${(%):-  - Upgrade to a 64-bit OS.}"
-        >&2 echo -E - ""
-        >&2 echo -E - "${(%):-    * You %Bwill not%b see this error message again.}"
-        >&2 echo -E - "${(%):-    * Git prompt will be %Bfast%b.}"
-        >&2 echo -E - ""
-        >&2 echo -E - "${(%):-  - Compile %Bgitstatusd%b and set %BGITSTATUS_DAEMON=/path/to/gitstatusd%b at}"
-        >&2 echo -E - "${(%):-    the bottom of %B$__p9k_zshrc_u%b. See instructions at}"
-        >&2 echo -E - "${(%):-    https://github.com/romkatv/gitstatus/blob/master/README.md#compiling.}"
-        >&2 echo -E - ""
-        >&2 echo -E - "${(%):-    * You %Bwill not%b see this error message again.}"
-        >&2 echo -E - "${(%):-    * Git prompt will be %Bfast%b.}"
-      else
-        local -i daemon threads
-        if (( ! $+GITSTATUS_DAEMON )); then
-          local os=$_p9k_uname
-          [[ $_p9k_uname == Linux && _p9k_uname_o == Android ]] && os=Android
-          typeset -g GITSTATUS_DAEMON=$gitstatus_dir/bin/gitstatusd-${os:l}-${_p9k_uname_m:l}
-          daemon=1
-        fi
-        if (( ! $+GITSTATUS_NUM_THREADS )); then
-          typeset -gi GITSTATUS_NUM_THREADS=$(( _p9k_num_cpus * 2 ))
-          (( GITSTATUS_NUM_THREADS > 0 )) || GITSTATUS_NUM_THREADS=8
-          (( GITSTATUS_NUM_THREADS <= 32 )) || GITSTATUS_NUM_THREADS=32
-          threads=1
-        fi
-        source $gitstatus_dir/gitstatus.plugin.zsh
-        gitstatus_start                              \
-          -s $_POWERLEVEL9K_VCS_STAGED_MAX_NUM       \
-          -u $_POWERLEVEL9K_VCS_UNSTAGED_MAX_NUM     \
-          -d $_POWERLEVEL9K_VCS_UNTRACKED_MAX_NUM    \
-          -c $_POWERLEVEL9K_VCS_CONFLICTED_MAX_NUM   \
-          -m $_POWERLEVEL9K_VCS_MAX_INDEX_SIZE_DIRTY \
-          POWERLEVEL9K || _p9k_gitstatus_disabled=1
-        (( daemon )) && unset GITSTATUS_DAEMON
-        (( threads )) && unset GITSTATUS_NUM_THREADS
-      fi
-    fi
-  fi
 
   if _p9k_segment_in_use todo; then
     local todo=$commands[todo.sh]
@@ -4622,6 +4643,7 @@ _p9k_init() {
   fi
 
   _p9k_init_async_pump
+  _p9k_init_vcs
 }
 
 _p9k_deinit() {
@@ -4824,7 +4846,7 @@ zmodload zsh/parameter
 zmodload zsh/system
 zmodload -F zsh/stat b:zstat
 zmodload -F zsh/net/socket b:zsocket
-zmodload -F zsh/files b:zf_mv
+zmodload -F zsh/files b:zf_mv b:zf_rm
 
 _p9k_init_ssh
 prompt_powerlevel9k_setup
