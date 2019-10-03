@@ -544,7 +544,7 @@ function _p9k_init_icons() {
 }
 
 # Sadly, this is a part of public API. Its use is emphatically discouraged.
-function print_icon() {
+function _p9k_print_icon() {
   emulate -L zsh
   setopt no_hist_expand extended_glob no_prompt_bang prompt_{percent,subst}
   _p9k_init_icons
@@ -563,7 +563,7 @@ function print_icon() {
 #   * $1 string - If "original", then the original icons are printed,
 #                 otherwise "print_icon" is used, which takes the users
 #                 overrides into account.
-function get_icon_names() {
+function _p9k_get_icon_names() {
   emulate -L zsh
   setopt no_hist_expand extended_glob no_prompt_bang prompt_{percent,subst}
   _p9k_init_icons

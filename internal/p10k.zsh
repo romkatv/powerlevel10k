@@ -27,7 +27,6 @@ if ! autoload -Uz is-at-least || ! is-at-least 5.1; then
   return 1
 fi
 
-source "${__p9k_root_dir}/internal/icons.zsh"
 source "${__p9k_root_dir}/internal/configure.zsh"
 
 # For compatibility with Powerlevel9k. It's not recommended to use mnemonic color
@@ -113,6 +112,26 @@ function getColorCode() {
   fi
   echo "Usage: getColorCode background|foreground" >&2
   return 1
+}
+
+# Sadly, this is a part of public API. Its use is emphatically discouraged.
+function print_icon() {
+  emulate -L zsh
+  setopt no_hist_expand extended_glob no_prompt_bang prompt_{percent,subst} no_aliases
+  (( $+functions[_p9k_print_icon] )) || source "${__p9k_root_dir}/internal/icons.zsh"
+  _p9k_print_icon "$@"
+}
+
+# Prints a list of configured icons.
+#
+#   * $1 string - If "original", then the original icons are printed,
+#                 otherwise "print_icon" is used, which takes the users
+#                 overrides into account.
+function get_icon_names() {
+  emulate -L zsh
+  setopt no_hist_expand extended_glob no_prompt_bang prompt_{percent,subst} no_aliases
+  (( $+functions[_p9k_get_icon_names] )) || source "${__p9k_root_dir}/internal/icons.zsh"
+  _p9k_get_icon_names "$@"
 }
 
 # _p9k_declare <type> <uppercase-name> [default]...
@@ -2488,7 +2507,7 @@ function _p9k_vcs_icon() {
 function _p9k_vcs_render() {
   local state
 
-  if (( $+_p9k_next_vcs_dir )); then
+  if (( $+_p9k_gitstatus_next_dir )); then
     if _p9k_vcs_status_for_dir ${${GIT_DIR:A}:-$_p9k_pwd_a}; then
       _p9k_vcs_status_restore $_p9k_ret
       state=LOADING
@@ -2678,23 +2697,23 @@ function _p9k_vcs_resume() {
     _p9k_vcs_status_save
   fi
 
-  if [[ -z $_p9k_next_vcs_dir ]]; then
-    unset _p9k_next_vcs_dir
+  if [[ -z $_p9k_gitstatus_next_dir ]]; then
+    unset _p9k_gitstatus_next_dir
     case $VCS_STATUS_RESULT in
       norepo-async) (( $1 )) && _p9k_vcs_status_purge ${${GIT_DIR:A}:-$_p9k_pwd_a};;
-      ok-async) (( $1 )) || _p9k_next_vcs_dir=${${GIT_DIR:A}:-$_p9k_pwd_a};;
+      ok-async) (( $1 )) || _p9k_gitstatus_next_dir=${${GIT_DIR:A}:-$_p9k_pwd_a};;
     esac
   fi
 
-  if [[ -n $_p9k_next_vcs_dir ]]; then
-    if ! gitstatus_query -d $_p9k_next_vcs_dir -t 0 -c '_p9k_vcs_resume 1' POWERLEVEL9K; then
-      unset _p9k_next_vcs_dir
+  if [[ -n $_p9k_gitstatus_next_dir ]]; then
+    if ! gitstatus_query -d $_p9k_gitstatus_next_dir -t 0 -c '_p9k_vcs_resume 1' POWERLEVEL9K; then
+      unset _p9k_gitstatus_next_dir
       unset VCS_STATUS_RESULT
     else
       case $VCS_STATUS_RESULT in
-        tout) _p9k_next_vcs_dir=''; _p9k_gitstatus_start_time=$EPOCHREALTIME;;
-        norepo-sync) _p9k_vcs_status_purge $_p9k_next_vcs_dir; unset _p9k_next_vcs_dir;;
-        ok-sync) _p9k_vcs_status_save; unset _p9k_next_vcs_dir;;
+        tout) _p9k_gitstatus_next_dir=''; _p9k_gitstatus_start_time=$EPOCHREALTIME;;
+        norepo-sync) _p9k_vcs_status_purge $_p9k_gitstatus_next_dir; unset _p9k_gitstatus_next_dir;;
+        ok-sync) _p9k_vcs_status_save; unset _p9k_gitstatus_next_dir;;
       esac
     fi
   fi
@@ -2704,15 +2723,15 @@ function _p9k_vcs_resume() {
 
 function _p9k_vcs_gitstatus() {
   if [[ $_p9k_refresh_reason == precmd ]]; then
-    if (( $+_p9k_next_vcs_dir )); then
-      _p9k_next_vcs_dir=${${GIT_DIR:A}:-$_p9k_pwd_a}
+    if (( $+_p9k_gitstatus_next_dir )); then
+      _p9k_gitstatus_next_dir=${${GIT_DIR:A}:-$_p9k_pwd_a}
     else
       local dir=${${GIT_DIR:A}:-$_p9k_pwd_a}
       local -F timeout=_POWERLEVEL9K_VCS_MAX_SYNC_LATENCY_SECONDS
       if ! _p9k_vcs_status_for_dir $dir; then
         gitstatus_query -d $dir -t $timeout -p -c '_p9k_vcs_resume 0' POWERLEVEL9K || return 1
         case $VCS_STATUS_RESULT in
-          tout) _p9k_next_vcs_dir=''; _p9k_gitstatus_start_time=$EPOCHREALTIME; return 0;;
+          tout) _p9k_gitstatus_next_dir=''; _p9k_gitstatus_start_time=$EPOCHREALTIME; return 0;;
           norepo-sync) return 0;;
           ok-sync) _p9k_vcs_status_save;;
         esac
@@ -2726,12 +2745,13 @@ function _p9k_vcs_gitstatus() {
         done
         dir=${${GIT_DIR:A}:-$_p9k_pwd_a}
       fi
+      (( _p9k_prompt_idx == 1 )) && timeout=0
       if ! gitstatus_query -d $dir -t $timeout -c '_p9k_vcs_resume 1' POWERLEVEL9K; then
         unset VCS_STATUS_RESULT
         return 1
       fi
       case $VCS_STATUS_RESULT in
-        tout) _p9k_next_vcs_dir=''; _p9k_gitstatus_start_time=$EPOCHREALTIME;;
+        tout) _p9k_gitstatus_next_dir=''; _p9k_gitstatus_start_time=$EPOCHREALTIME;;
         norepo-sync) _p9k_vcs_status_purge $dir;;
         ok-sync) _p9k_vcs_status_save;;
       esac
@@ -3338,27 +3358,38 @@ _p9k_save_status() {
 }
 
 function _p9k_dump_state() {
-  local dir=${XDG_CACHE_HOME:-$HOME/.cache}
+  is-at-least 5.3 || return
+  local dir=${_p9k_state_file:h}
   [[ -d $dir ]] || mkdir -pm 0700 $dir || return
   [[ -w $dir && -z $dir(#qNR) ]] || return
-  local tmp=$dir/p10k-state-$USER.zsh.$$-$EPOCHREALTIME-$RANDOM
+  local tmp=$_p9k_state_file.$$-$EPOCHREALTIME-$RANDOM
   local -i fd
   sysopen -a -m 600 -o creat,trunc -u fd $tmp || return
   {
-    print -r -- "# $_p9k_param_sig" >&$fd || return
-    typeset -pm '(_POWERLEVEL9K_|_p9k_)*~(_p9k_async_pump*)' >&$fd || return
+    print -r -- $_p9k_param_sig >&$fd || return
+    local include='_POWERLEVEL9K_*|_p9k_*|icons|OS|DEFAULT_COLOR|DEFAULT_COLOR_INVERTED'
+    local exclude='_p9k_gitstatus_*|_p9k_param_sig|_p9k_public_ip|_p9k_prompt|_p9k_prompt_idx'
+    typeset -pm "($include)~($exclude)" >&$fd || return
   } always {
     exec {fd}>&-
   }
-  zf_mv -f $tmp $dir/p10k-state-$USER.zsh
+  zf_mv -f $tmp $_p9k_state_file
 }
 
 function _p9k_restore_state() {
-  local file=${XDG_CACHE_HOME:-$HOME/.cache}/p10k-state-$USER.zsh
-  [[ -r $file && -z $file(#qNW) ]] || return
-  local content && content="$(<$file)"
-  [[ $content == '# '$_p9k_param_sig$'\n'* ]] || return
-  eval $content
+  [[ -z $_p9k_state_file(#qNW) ]] || return
+  local tmp=$_p9k_state_file.$$-$EPOCHREALTIME-$RANDOM
+  zf_mv -f $_p9k_state_file $tmp 2>/dev/null || return
+  {
+    [[ -r $tmp ]] || return
+    local sig
+    IFS='' read -r sig <$tmp || return
+    [[ $sig == $_p9k_param_sig ]] || return
+    source $tmp || return
+    _p9k_state_restored=1
+  } always {
+    zf_mv -f $tmp $_p9k_state_file 2>/dev/null
+  }
 }
 
 _p9k_precmd_impl() {
@@ -3366,8 +3397,6 @@ _p9k_precmd_impl() {
   setopt no_hist_expand extended_glob no_prompt_bang prompt_{percent,subst}
 
   (( __p9k_enabled )) || return
-
-  local -i init=0
 
   if ! zle || [[ -z $_p9k_param_sig ]]; then
     if zle; then
@@ -3404,12 +3433,10 @@ _p9k_precmd_impl() {
         fi
       fi
       _p9k_init
-      local -i init=1
     fi
 
-    _p9k_timer_end=EPOCHREALTIME
     if (( _p9k_timer_start )); then
-      typeset -gF P9K_COMMAND_DURATION_SECONDS=$((_p9k_timer_end - _p9k_timer_start))
+      typeset -gF P9K_COMMAND_DURATION_SECONDS=$((EPOCHREALTIME - _p9k_timer_start))
     else
       unset P9K_COMMAND_DURATION_SECONDS
     fi
@@ -3422,13 +3449,19 @@ _p9k_precmd_impl() {
     unset _p9k_preexec_cmd
     _p9k_keymap=main
     _p9k_zle_state=insert
+
+    if ! zle; then
+      (( ++_p9k_prompt_idx ))
+    fi
   fi
 
   _p9k_refresh_reason=precmd
   _p9k_set_prompt
   _p9k_refresh_reason=''
 
-  (( init )) && _p9k_dump_state
+  if ! zle && (( _p9k_prompt_idx == 1 && !_p9k_state_restored || _p9k_prompt_idx == 2 )); then
+    _p9k_dump_state
+  fi
 }
 
 _p9k_precmd() {
@@ -3638,9 +3671,10 @@ function _p9k_prompt_overflow_bug() {
 }
 
 _p9k_init_vars() {
+  typeset -gi _p9k_prompt_idx
+  typeset -gi _p9k_state_restored
   typeset -gi _p9k_reset_on_line_finish
   typeset -gF _p9k_timer_start
-  typeset -gF _p9k_timer_end
   typeset -gi _p9k_status
   typeset -ga _p9k_pipestatus
   typeset -g  _p9k_param_sig
@@ -3660,6 +3694,7 @@ _p9k_init_vars() {
   typeset -gA _p9k_last_git_prompt
   # git workdir => 1 if gitstatus is slow on it, 0 if it's fast.
   typeset -gA _p9k_git_slow
+  typeset -gi _p9k_gitstatus_disabled
   typeset -gF _p9k_gitstatus_start_time
   typeset -g  _p9k_prompt
   typeset -g  _p9k_rprompt
@@ -3724,7 +3759,6 @@ _p9k_init_vars() {
   typeset -g  _p9k_uname
   typeset -g  _p9k_uname_o
   typeset -g  _p9k_uname_m
-  typeset -gi _p9k_gitstatus_disabled
 
   typeset -g  P9K_VISUAL_IDENTIFIER
   typeset -g  P9K_CONTENT
@@ -4320,12 +4354,15 @@ _p9k_init_ssh() {
 }
 
 _p9k_must_init() {
-  local -a param_keys=(
-    ${(o)parameters[(I)(POWERLEVEL9K_*|GITSTATUS_LOG_LEVEL|GITSTATUS_ENABLE_LOGGING|GITSTATUS_DAEMON|GITSTATUS_NUM_THREADS|DEFAULT_USER|ZLE_RPROMPT_INDENT)]})
+  local -a param_keys=(${(o)parameters[(I)POWERLEVEL9K_*]})
   local IFS param_sig
   IFS=$'\1' param_sig="${(@)param_keys:/(#b)(*)/$match[1]=\$$match[1]}"
-  IFS=$'\2' eval "param_sig=0.$USER.$P9K_SSH$__p9k_ksh_arrays$__p9k_sh_glob\"$param_sig\""
-  [[ -o transient_rprompt ]] && param_sig+=t
+  param_sig+=(
+    '${ZSH_VERSION}' '${ZSH_PATCHLEVEL}' '${(%):-%n}' '${GITSTATUS_LOG_LEVEL}'
+    '${GITSTATUS_ENABLE_LOGGING}' '${GITSTATUS_DAEMON}' '${GITSTATUS_NUM_THREADS}'
+    '${DEFAULT_USER}' '${ZLE_RPROMPT_INDENT}' '${P9K_SSH}' '${__p9k_ksh_arrays}'
+    '${__p9k_sh_glob}' '${parameters[transient_rprompt]}' 'v0')
+  IFS=$'\2' param_sig="#${(e)param_sig}"
   [[ $param_sig == $_p9k_param_sig ]] && return 1
   [[ -n $_p9k_param_sig ]] && _p9k_deinit
   typeset -g _p9k_param_sig=$param_sig
@@ -4338,6 +4375,10 @@ function _p9k_set_os() {
 }
 
 function _p9k_init_cacheable() {
+  (( $+functions[_p9k_init_icons] )) || {
+    setopt no_aliases
+    source "${__p9k_root_dir}/internal/icons.zsh"
+  }
   _p9k_init_icons
   _p9k_init_params
   _p9k_init_prompt
@@ -4477,6 +4518,7 @@ function _p9k_init_cacheable() {
 
 _p9k_init() {
   _p9k_init_vars
+  typeset -g _p9k_state_file=${XDG_CACHE_HOME:-~/.cache}/p10k-state-${(%):-%n}.zsh
   _p9k_restore_state || _p9k_init_cacheable
 
   if _p9k_segment_in_use vcs; then
@@ -4779,6 +4821,7 @@ autoload -Uz add-zsh-hook
 
 zmodload zsh/datetime
 zmodload zsh/mathfunc
+zmodload zsh/parameter
 zmodload zsh/system
 zmodload -F zsh/stat b:zstat
 zmodload -F zsh/net/socket b:zsocket
