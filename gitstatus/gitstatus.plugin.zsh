@@ -59,7 +59,6 @@
 
 autoload -Uz add-zsh-hook
 zmodload zsh/datetime zsh/system
-zmodload -F zsh/files b:zf_rm
 
 # Retrives status of a git repo from a directory under its working tree.
 #
@@ -384,7 +383,7 @@ function gitstatus_start() {
         echo -nE $'bye\x1f0\x1e'"
       local setsid=${commands[setsid]:-/usr/local/opt/util-linux/bin/setsid}
       [[ -x $setsid ]] && setsid=${(q)setsid} || setsid=
-      cmd="cd /; $setsid zsh -dfxc ${(q)cmd} &!"
+      cmd="cd /; read; $setsid zsh -dfxc ${(q)cmd} &!; rm -f ${(q)req_fifo} ${(q)resp_fifo} ${(q)lock_file}"
       # We use `zsh -c` instead of plain {} or () to work around bugs in zplug (it hangs on
       # startup). Double fork is to daemonize, and so is `setsid`. Note that on macOS `setsid` has
       # to be installed manually by running  `brew install util-linux`.
@@ -392,8 +391,7 @@ function gitstatus_start() {
 
       sysopen -w -o cloexec,sync -u req_fd $req_fifo
       sysopen -r -o cloexec -u resp_fd $resp_fifo
-      zf_rm -f $req_fifo $resp_fifo $lock_file
-      echo -nE $'hello\x1f\x1e' >&$req_fd
+      echo -nE $'0\nhello\x1f\x1e' >&$req_fd
     }
 
     (( async )) && {
