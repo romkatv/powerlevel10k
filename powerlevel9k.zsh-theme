@@ -22,7 +22,7 @@ typeset -g __p9k_dump_file=${XDG_CACHE_HOME:-~/.cache}/p10k-dump-${(%):-%n}.zsh
 
 () {
   emulate -L zsh
-  setopt no_hist_expand extended_glob no_prompt_bang no_prompt_subst prompt_percent
+  setopt no_hist_expand extended_glob no_prompt_bang no_prompt_subst prompt_percent no_aliases
   if (( $+__p9k_sourced )); then
     prompt_powerlevel9k_setup
     return
