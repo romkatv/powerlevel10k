@@ -3361,7 +3361,7 @@ function _p9k_dump_state() {
   is-at-least 5.4 || return  # `typeset -g` doesn't roundtrip in zsh prior to 5.4.
   local dir=${__p9k_dump_file:h}
   [[ -d $dir ]] || mkdir -pm 0700 $dir || return
-  [[ -w $dir && -z $dir(#qNR) ]] || return
+  [[ -w $dir ]] || return
   local tmp=$__p9k_dump_file.$$-$EPOCHREALTIME-$RANDOM
   local -i fd
   sysopen -a -m 600 -o creat,trunc -u fd $tmp || return
