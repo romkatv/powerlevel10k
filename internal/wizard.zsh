@@ -1464,7 +1464,7 @@ clear
 
 flowing +c Powerlevel10k configuration has been written to %2F$__p9k_cfg_path_u%f.
 if [[ -n $config_backup ]]; then
-  flowing +c The backup of the previuos version is at %3F$config_backup_u%f.
+  flowing +c The backup of the previous version is at %3F$config_backup_u%f.
 fi
 
 if (( write_config )); then
