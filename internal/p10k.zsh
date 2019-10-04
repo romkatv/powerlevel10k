@@ -1513,7 +1513,7 @@ prompt_dir() {
       content=$pref$content$suf
     fi
 
-    (( expand )) && eval "_p9k_prompt_length \"\${\${_p9k_d::=0}+}$content\"" || _p9k_ret=
+    (( expand )) && _p9k_prompt_length "${(e):-"\${\${_p9k_d::=0}+}$content"}" || _p9k_ret=
     _p9k_cache_set "$state" "$icon" "$expand" "$content" $_p9k_ret
   fi
 
