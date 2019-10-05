@@ -17,8 +17,6 @@
 [[ ! -o 'no_brace_expand' ]] || __p9k_src_opts+=('no_brace_expand')
 'builtin' 'setopt' 'no_aliases' 'no_sh_glob' 'brace_expand'
 
-echo saved ${__p9k_src_opts[@]}
-
 typeset -g __p9k_root_dir=${POWERLEVEL9K_INSTALLATION_DIR:-${${(%):-%x}:A:h}}
 typeset -g __p9k_dump_file=${XDG_CACHE_HOME:-~/.cache}/p10k-dump-${(%):-%n}.zsh
 
@@ -42,6 +40,5 @@ typeset -g __p9k_dump_file=${XDG_CACHE_HOME:-~/.cache}/p10k-dump-${(%):-%n}.zsh
   source $__p9k_root_dir/internal/p10k.zsh || true
 }
 
-echo setopt ${__p9k_src_opts[@]}
 (( ${#__p9k_src_opts} )) && setopt ${__p9k_src_opts[@]}
 'builtin' 'unset' '__p9k_src_opts'
