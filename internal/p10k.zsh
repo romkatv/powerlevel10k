@@ -3371,7 +3371,7 @@ function _p9k_dump_state() {
     typeset -g __p9k_cached_param_sig=$_p9k_param_sig
     typeset -p __p9k_cached_param_sig >&$fd || return
     unset __p9k_cached_param_sig
-    (( $+functions[_p9k_preinit] )) && functions _p9k_preinit >&$fd || return
+    (( $+functions[_p9k_preinit] )) && { functions _p9k_preinit >&$fd || return }
     print -r -- '_p9k_restore_state_impl() {' >&$fd || return
     typeset -pm "($include)~($exclude)" >&$fd || return
     print -r -- '}' >&$fd || return
