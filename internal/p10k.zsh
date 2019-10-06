@@ -3359,6 +3359,10 @@ _p9k_save_status() {
 
 function _p9k_dump_state() {
   is-at-least 5.4 || return  # `typeset -g` doesn't roundtrip in zsh prior to 5.4.
+  if [[ $POWERLEVEL9K_DEBUG_DUMP_STATE == true && -z $__p9k_debug_dump_state ]]; then
+    __p9k_debug_dump_state=done
+    setopt xtrace
+  fi
   local dir=${__p9k_dump_file:h}
   [[ -d $dir ]] || mkdir -pm 0700 $dir || return
   [[ -w $dir ]] || return
