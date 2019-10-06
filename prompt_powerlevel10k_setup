@@ -1,1 +1,1 @@
-prompt_powerlevel9k_setup
+'builtin' 'source' "${POWERLEVEL9K_INSTALLATION_DIR:-${${(%):-%x}:A:h}}/powerlevel10k.zsh-theme"
