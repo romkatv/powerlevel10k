@@ -3367,11 +3367,11 @@ function _p9k_dump_state() {
   sysopen -a -m 600 -o creat,trunc -u fd $tmp || return
   {
     local include='_POWERLEVEL9K_*|_p9k_*|icons|OS|DEFAULT_COLOR|DEFAULT_COLOR_INVERTED'
-    local exclude='_p9k_gitstatus_*|_p9k_param_sig|_p9k_public_ip|_p9k_prompt|_p9k_prompt_idx'
+    local exclude='_p9k_gitstatus_*|_p9k_param_sig|_p9k_public_ip|_p9k_prompt|_p9k_prompt_idx|_p9k_async_pump_*'
     typeset -g __p9k_cached_param_sig=$_p9k_param_sig
     typeset -p __p9k_cached_param_sig >&$fd || return
     unset __p9k_cached_param_sig
-    (( $+functions[_p9k_preinit] )) && { functions _p9k_preinit >&$fd || return }
+    (( $+_p9k_preinit )) && { print -r -- $_p9k_preinit >&$fd || return }
     print -r -- '_p9k_restore_state_impl() {' >&$fd || return
     typeset -pm "($include)~($exclude)" >&$fd || return
     print -r -- '}' >&$fd || return
@@ -4368,7 +4368,7 @@ _p9k_must_init() {
     '${ZSH_VERSION}' '${ZSH_PATCHLEVEL}' '${(%):-%n}' '${GITSTATUS_LOG_LEVEL}'
     '${GITSTATUS_ENABLE_LOGGING}' '${GITSTATUS_DAEMON}' '${GITSTATUS_NUM_THREADS}'
     '${DEFAULT_USER}' '${ZLE_RPROMPT_INDENT}' '${P9K_SSH}' '${__p9k_ksh_arrays}'
-    '${__p9k_sh_glob}' '${parameters[transient_rprompt]}' 'v0')
+    '${__p9k_sh_glob}' '${parameters[transient_rprompt]}' 'v1')
   IFS=$'\2' param_sig="${(e)param_sig}"
   [[ $param_sig == $_p9k_param_sig ]] && return 1
   [[ -n $_p9k_param_sig ]] && _p9k_deinit
@@ -4527,7 +4527,7 @@ _p9k_init_vcs() {
   _p9k_segment_in_use vcs || return
   _p9k_vcs_info_init
   if (( $+functions[_p9k_preinit] )); then
-    (( $+parameters[GITSTATUS_DAEMON_PID_POWERLEVEL9K] )) && gitstatus_start POWERLEVEL9K || _p9k_gitstatus_disabled=1
+    (( $+GITSTATUS_DAEMON_PID_POWERLEVEL9K )) && gitstatus_start POWERLEVEL9K || _p9k_gitstatus_disabled=1
     return
   fi
   (( _POWERLEVEL9K_DISABLE_GITSTATUS )) && return
@@ -4581,7 +4581,7 @@ _p9k_init_vcs() {
     (( threads > 0 )) || threads=8
     (( threads <= 32 )) || threads=32
   fi
-  eval "function _p9k_preinit() {
+  typeset -g _p9k_preinit="function _p9k_preinit() {
     source ${(q)gitstatus_dir}/gitstatus.plugin.zsh
     GITSTATUS_DAEMON=${(q)daemon} GITSTATUS_NUM_THREADS=$threads            \
     GITSTATUS_LOG_LEVEL=${(q)GITSTATUS_LOG_LEVEL}                           \
