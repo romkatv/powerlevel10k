@@ -294,65 +294,107 @@
   #####################################[ vcs: git status ]######################################
   # Branch icon. Set this parameter to '\uF126 ' for the popular Powerline branch icon.
   typeset -g POWERLEVEL9K_VCS_BRANCH_ICON=
+  POWERLEVEL9K_VCS_BRANCH_ICON=${(g::)POWERLEVEL9K_VCS_BRANCH_ICON}
 
   # Untracked files icon. It's really a question mark, your font isn't broken.
   # Change the value of this parameter to show a different icon.
   typeset -g POWERLEVEL9K_VCS_UNTRACKED_ICON='?'
+  POWERLEVEL9K_VCS_UNTRACKED_ICON=${(g::)POWERLEVEL9K_VCS_UNTRACKED_ICON}
 
-  # Git status: feature:master#tag ⇣42⇡42 *42 merge ~42 +42 !42 ?42.
+  # Formatter for Git status.
   #
-  # You can edit the lines below to customize how Git status looks.
+  # Example output: master ⇣42⇡42 *42 merge ~42 +42 !42 ?42.
   #
-  # VCS_STATUS parameters are set by gitstatus plugin. See reference:
+  # You can edit the function to customize how Git status looks.
+  #
+  # VCS_STATUS_* parameters are set by gitstatus plugin. See reference:
   # https://github.com/romkatv/gitstatus/blob/master/gitstatus.plugin.zsh.
-  local vcs=''
-  # If on a branch...
-  vcs+='${${VCS_STATUS_LOCAL_BRANCH:+%76F'${(g::)POWERLEVEL9K_VCS_BRANCH_ICON}
-  # If local branch name is at most 32 characters long, show it in full.
-  # This is the equivalent of POWERLEVEL9K_VCS_SHORTEN_MIN_LENGTH=32.
-  vcs+='${${${$(( ${#VCS_STATUS_LOCAL_BRANCH}<=32 )):#0}:+${VCS_STATUS_LOCAL_BRANCH//\%/%%}}'
-  # If local branch name is over 32 characters long, show the first 12 … the last 12. The same as
-  # POWERLEVEL9K_VCS_SHORTEN_LENGTH=12 with POWERLEVEL9K_VCS_SHORTEN_STRATEGY=truncate_middle.
-  vcs+=':-${${VCS_STATUS_LOCAL_BRANCH:0:12}//\%/%%}%28F…%76F${${VCS_STATUS_LOCAL_BRANCH: -12}//\%/%%}}}'
-  # '@72f5c8a' if not on a branch.
-  vcs+=':-%f@%76F${VCS_STATUS_COMMIT:0:8}}'
-  # ':master' if the tracking branch name differs from local branch.
-  vcs+='${${VCS_STATUS_REMOTE_BRANCH:#$VCS_STATUS_LOCAL_BRANCH}:+%f:%76F${VCS_STATUS_REMOTE_BRANCH//\%/%%}}'
-  # '#tag' if on a tag.
-  vcs+='${VCS_STATUS_TAG:+%f#%76F${VCS_STATUS_TAG//\%/%%}}'
-  # ⇣42 if behind the remote.
-  vcs+='${${VCS_STATUS_COMMITS_BEHIND:#0}:+ %76F⇣${VCS_STATUS_COMMITS_BEHIND}}'
-  # ⇡42 if ahead of the remote; no leading space if also behind the remote: ⇣42⇡42.
-  # If you want '⇣42 ⇡42' instead, replace '${${(M)VCS_STATUS_COMMITS_BEHIND:#0}:+ }' with ' '.
-  vcs+='${${VCS_STATUS_COMMITS_AHEAD:#0}:+${${(M)VCS_STATUS_COMMITS_BEHIND:#0}:+ }%76F⇡${VCS_STATUS_COMMITS_AHEAD}}'
-  # *42 if have stashes.
-  vcs+='${${VCS_STATUS_STASHES:#0}:+ %76F*${VCS_STATUS_STASHES}}'
-  # 'merge' if the repo is in an unusual state.
-  vcs+='${VCS_STATUS_ACTION:+ %196F${VCS_STATUS_ACTION//\%/%%}}'
-  # ~42 if have merge conflicts.
-  vcs+='${${VCS_STATUS_NUM_CONFLICTED:#0}:+ %196F~${VCS_STATUS_NUM_CONFLICTED}}'
-  # +42 if have staged changes.
-  vcs+='${${VCS_STATUS_NUM_STAGED:#0}:+ %178F+${VCS_STATUS_NUM_STAGED}}'
-  # !42 if have unstaged changes.
-  vcs+='${${VCS_STATUS_NUM_UNSTAGED:#0}:+ %178F!${VCS_STATUS_NUM_UNSTAGED}}'
-  # ?42 if have untracked files. It's really a question mark, your font isn't broken.
-  # See POWERLEVEL9K_VCS_UNTRACKED_ICON above if you want to use a different icon.
-  # Remove the next line if you don't want to see untracked files at all.
-  vcs+='${${VCS_STATUS_NUM_UNTRACKED:#0}:+ %39F'${(g::)POWERLEVEL9K_VCS_UNTRACKED_ICON}'${VCS_STATUS_NUM_UNTRACKED}}'
-  # If P9K_CONTENT is not empty, leave it unchanged. It's either "loading" or from vcs_info.
-  vcs="\${P9K_CONTENT:-$vcs}"
+  function my_git_formatter() {
+    emulate -L zsh
+
+    if [[ -n $P9K_CONTENT ]]; then
+      # If P9K_CONTENT is not empty, use it. It's either "loading" or from vcs_info (not from
+      # gitstatus plugin). VCS_STATUS_* parameters are not available in this case.
+      typeset -g my_git_format=$P9K_CONTENT
+      return
+    fi
+
+    if (( $1 )); then
+      # Styling for up-to-date Git status.
+      local       meta='%f'     # default foreground
+      local      clean='%76F'   # green foreground
+      local   modified='%178F'  # yellow foreground
+      local  untracked='%39F'   # blue foreground
+      local conflicted='%196F'  # red foreground
+      local    loading='%244F'  # grey foreground
+    else
+      # Styling for incomplete and stale Git status.
+      local       meta='%244F'  # grey foreground
+      local      clean='%244F'  # grey foreground
+      local   modified='%244F'  # grey foreground
+      local  untracked='%244F'  # grey foreground
+      local conflicted='%244F'  # grey foreground
+      local    loading='%244F'  # grey foreground
+    fi
+
+    local res
+    local where  # branch name, tag or commit
+    if [[ -n $VCS_STATUS_LOCAL_BRANCH ]]; then
+      res+="${clean}${POWERLEVEL9K_VCS_BRANCH_ICON}"
+      where=${(V)VCS_STATUS_LOCAL_BRANCH}
+    elif [[ -n $VCS_STATUS_TAG ]]; then
+      res+="${meta}#"
+      where=${(V)VCS_STATUS_TAG}
+    else
+      res+="${meta}@"
+      where=${VCS_STATUS_COMMIT[1,8]}
+    fi
+
+    # If local branch name or tag is at most 32 characters long, show it in full.
+    # Otherwise show the first 12 … the last 12.
+    (( $#where > 32 )) && where[13,-13]="…"
+    res+="${clean}${where//\%/%%}"  # escape %
+
+    # Show tracking branch name if it differs from local branch.
+    if [[ -n ${VCS_STATUS_REMOTE_BRANCH:#$VCS_STATUS_LOCAL_BRANCH} ]]; then
+      res+="${meta}:${clean}${(V)VCS_STATUS_REMOTE_BRANCH//\%/%%}"  # escape %
+    fi
+
+    # ⇣42 if behind the remote.
+    (( VCS_STATUS_COMMITS_BEHIND )) && res+=" ${clean}⇣${VCS_STATUS_COMMITS_BEHIND}"
+    # ⇡42 if ahead of the remote; no leading space if also behind the remote: ⇣42⇡42.
+    (( VCS_STATUS_COMMITS_AHEAD && !VCS_STATUS_COMMITS_BEHIND )) && res+=" "
+    (( VCS_STATUS_COMMITS_AHEAD  )) && res+="${clean}⇡${VCS_STATUS_COMMITS_AHEAD}"
+    # *42 if have stashes.
+    (( VCS_STATUS_STASHES        )) && res+=" ${clean}*${VCS_STATUS_STASHES}"
+    # 'merge' if the repo is in an unusual state.
+    [[ -n $VCS_STATUS_ACTION     ]] && res+=" ${conflicted}${VCS_STATUS_ACTION}"
+    # ~42 if have merge conflicts.
+    (( VCS_STATUS_NUM_CONFLICTED )) && res+=" ${conflicted}~${VCS_STATUS_NUM_CONFLICTED}"
+    # +42 if have staged changes.
+    (( VCS_STATUS_NUM_STAGED     )) && res+=" ${modified}+${VCS_STATUS_NUM_STAGED}"
+    # !42 if have unstaged changes.
+    (( VCS_STATUS_NUM_UNSTAGED   )) && res+=" ${modified}!${VCS_STATUS_NUM_UNSTAGED}"
+    # ?42 if have untracked files. It's really a question mark, your font isn't broken.
+    # See POWERLEVEL9K_VCS_UNTRACKED_ICON above if you want to use a different icon.
+    # Remove the next line if you don't want to see untracked files at all.
+    (( VCS_STATUS_NUM_UNTRACKED  )) && res+=" ${untracked}${POWERLEVEL9K_VCS_UNTRACKED_ICON}${VCS_STATUS_NUM_UNTRACKED}"
+
+    typeset -g my_git_format=$res
+  }
+  functions +M -m my_git_formatter && functions -M my_git_formatter
 
   # Disable the default Git status formatting.
   typeset -g POWERLEVEL9K_VCS_DISABLE_GITSTATUS_FORMATTING=true
   # Install our own Git status formatter.
-  typeset -g POWERLEVEL9K_VCS_CONTENT_EXPANSION=$vcs
-  # When Git status is being refreshed asynchronously, display the last known repo status in grey.
-  typeset -g POWERLEVEL9K_VCS_LOADING_CONTENT_EXPANSION=${${${vcs//\%f}//\%<->F}//\%F\{(\#|)[[:xdigit:]]#(\\|)\}}
+  typeset -g POWERLEVEL9K_VCS_CONTENT_EXPANSION='${$((my_git_formatter(1)))+${my_git_format}}'
+  typeset -g POWERLEVEL9K_VCS_LOADING_CONTENT_EXPANSION='${$((my_git_formatter(0)))+${my_git_format}}'
   # Enable counters for staged, unstaged, etc.
   typeset -g POWERLEVEL9K_VCS_{STAGED,UNSTAGED,UNTRACKED,CONFLICTED,COMMITS_AHEAD,COMMITS_BEHIND}_MAX_NUM=-1
 
   # Icon color.
   typeset -g POWERLEVEL9K_VCS_VISUAL_IDENTIFIER_COLOR=76
+  typeset -g POWERLEVEL9K_VCS_LOADING_VISUAL_IDENTIFIER_COLOR=244
   # Custom icon.
   # typeset -g POWERLEVEL9K_VCS_VISUAL_IDENTIFIER_EXPANSION='⭐'
   # Custom prefix.
@@ -363,7 +405,6 @@
   # isn't in an svn or hg reposotiry.
   typeset -g POWERLEVEL9K_VCS_BACKENDS=(git)
 
-  typeset -g POWERLEVEL9K_VCS_LOADING_FOREGROUND=244
   # These settings are used for respositories other than Git or when gitstatusd fails and
   # Powerlevel10k has to fall back to using vcs_info.
   typeset -g POWERLEVEL9K_VCS_CLEAN_FOREGROUND=76
