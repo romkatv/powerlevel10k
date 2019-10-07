@@ -46,7 +46,7 @@ it will generate the same prompt.
 ### Manual
 
 ```zsh
-git clone https://github.com/romkatv/powerlevel10k.git ~/powerlevel10k
+git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ~/powerlevel10k
 echo 'source ~/powerlevel10k/powerlevel10k.zsh-theme' >>! ~/.zshrc
 ```
 
@@ -73,7 +73,7 @@ somewhere after it.
 
 ### Zplug
 
-Add `zplug "romkatv/powerlevel10k", as:theme` to your `~/.zshrc`.
+Add `zplug romkatv/powerlevel10k, as:theme, depth:1` to your `~/.zshrc`.
 
 ### Zgen
 
@@ -85,9 +85,10 @@ Add `antibody bundle romkatv/powerlevel10k` to your `~/.zshrc`.
 
 ### Zplugin
 
-Add `zplugin light romkatv/powerlevel10k` to your `~/.zshrc`.
+Add `zplugin ice depth=1; zplugin light romkatv/powerlevel10k` to your `~/.zshrc`.
 
-The use of `zplugin ice` with Powerlevel10k is neither recommended nor officially supported.
+The use of `depth` ice is optional. Other types of ice are neither recommended nor officially
+supported by Powerlevel10k.
 
 ## Configuration
 
