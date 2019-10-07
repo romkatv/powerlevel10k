@@ -12,7 +12,7 @@ readonly -a IGNORE=(pull-upstream.zsh README.md)
 () {
   local repo && repo="$(mktemp -d ${TMPDIR:-/tmp}/gitstatus-pull-upstream.XXXXXXXXXX)"
   trap "rm -rf ${(q)repo}" EXIT
-  git clone --depth 1 --single-branch $GITSTATUS_URL $repo
+  git clone --depth 1 $GITSTATUS_URL $repo
 
   local dst
   for dst in $GITSTATUS_DIR/**/*(.,@); do
