@@ -60,6 +60,8 @@
 autoload -Uz add-zsh-hook
 zmodload zsh/datetime zsh/system
 
+typeset -g _gitstatus_plugin_dir=${${(%):-%x}:A:h}
+
 # Retrives status of a git repo from a directory under its working tree.
 #
 ## Usage: gitstatus_query [OPTION]... NAME
@@ -338,8 +340,7 @@ function gitstatus_start() {
         os="$(uname -s)" && [[ -n $os ]]
         [[ $os != Linux || "$(uname -o)" != Android ]] || os=Android
         local arch && arch="$(uname -m)" && [[ -n $arch ]]
-        local dir && dir=${${(%):-%x}:A:h}
-        daemon=$dir/bin/gitstatusd-${os:l}-${arch:l}
+        daemon=$_gitstatus_plugin_dir/bin/gitstatusd-${os:l}-${arch:l}
       }
       [[ -x $daemon ]]
 
