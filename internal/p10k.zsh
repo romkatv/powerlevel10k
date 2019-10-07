@@ -4530,7 +4530,10 @@ _p9k_init_vcs() {
     (( $+GITSTATUS_DAEMON_PID_POWERLEVEL9K )) && gitstatus_start POWERLEVEL9K || _p9k_gitstatus_disabled=1
     return
   fi
-  (( _POWERLEVEL9K_DISABLE_GITSTATUS )) && return
+  if (( _POWERLEVEL9K_DISABLE_GITSTATUS )); then
+    _p9k_gitstatus_disabled=1
+    return
+  fi
   (( $_POWERLEVEL9K_VCS_BACKENDS[(I)git] )) || return
 
   local gitstatus_dir=${_POWERLEVEL9K_GITSTATUS_DIR:-${__p9k_root_dir}/gitstatus}
