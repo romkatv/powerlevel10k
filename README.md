@@ -319,7 +319,7 @@ theme (so that you end up with no theme) and then installing Powerlevel10k manua
 - **oh-my-zsh:** Open `~/.zshrc` and remove the line that sets `ZSH_THEME`, such as
   `ZSH_THEME=powerlevel9k/powerlevel9k`.
 - **antigen:** Open `~/.zshrc` and remove the line that sets `antigen theme`, such as
-  `antigen theme bhilburn/powerlevel9k powerlevel9k`.
+  `antigen theme powerlevel9k/powerlevel9k`.
 
 2. Install Powerlevel10k manually.
 
