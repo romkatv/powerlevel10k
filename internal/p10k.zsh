@@ -4585,16 +4585,17 @@ _p9k_init_vcs() {
     (( threads <= 32 )) || threads=32
   fi
   typeset -g _p9k_preinit="function _p9k_preinit() {
-    source ${(q)gitstatus_dir}/gitstatus.plugin.zsh
-    GITSTATUS_DAEMON=${(q)daemon} GITSTATUS_NUM_THREADS=$threads            \
-    GITSTATUS_LOG_LEVEL=${(q)GITSTATUS_LOG_LEVEL}                           \
-    GITSTATUS_ENABLE_LOGGING=${(q)GITSTATUS_ENABLE_LOGGING} gitstatus_start \
-      -s $_POWERLEVEL9K_VCS_STAGED_MAX_NUM                                  \
-      -u $_POWERLEVEL9K_VCS_UNSTAGED_MAX_NUM                                \
-      -d $_POWERLEVEL9K_VCS_UNTRACKED_MAX_NUM                               \
-      -c $_POWERLEVEL9K_VCS_CONFLICTED_MAX_NUM                              \
-      -m $_POWERLEVEL9K_VCS_MAX_INDEX_SIZE_DIRTY                            \
-      -a POWERLEVEL9K
+    [[ -r ${(q)gitstatus_dir}/gitstatus.plugin.zsh ]] || return
+    source ${(q)gitstatus_dir}/gitstatus.plugin.zsh   || return
+    GITSTATUS_DAEMON=${(q)daemon} GITSTATUS_NUM_THREADS=$threads              \
+      GITSTATUS_LOG_LEVEL=${(q)GITSTATUS_LOG_LEVEL}                           \
+      GITSTATUS_ENABLE_LOGGING=${(q)GITSTATUS_ENABLE_LOGGING} gitstatus_start \
+        -s $_POWERLEVEL9K_VCS_STAGED_MAX_NUM                                  \
+        -u $_POWERLEVEL9K_VCS_UNSTAGED_MAX_NUM                                \
+        -d $_POWERLEVEL9K_VCS_UNTRACKED_MAX_NUM                               \
+        -c $_POWERLEVEL9K_VCS_CONFLICTED_MAX_NUM                              \
+        -m $_POWERLEVEL9K_VCS_MAX_INDEX_SIZE_DIRTY                            \
+        -a POWERLEVEL9K
   }"
   source ${gitstatus_dir}/gitstatus.plugin.zsh
   GITSTATUS_DAEMON=$daemon GITSTATUS_NUM_THREADS=$threads gitstatus_start \
