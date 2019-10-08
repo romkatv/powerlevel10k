@@ -59,6 +59,7 @@
       kubecontext             # current kubernetes context (https://kubernetes.io/)
       terraform               # terraform workspace (https://www.terraform.io)
       aws                     # aws profile (https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-profiles.html)
+      # azure                 # azure account name (https://docs.microsoft.com/en-us/cli/azure)
       context                 # user@hostname
       nordvpn                 # nordvpn connection status, linux only (https://nordvpn.com/)
       ranger                  # ranger shell (https://github.com/ranger/ranger)
@@ -717,6 +718,12 @@
   typeset -g POWERLEVEL9K_AWS_FOREGROUND=208
   # Custom icon.
   # typeset -g POWERLEVEL9K_AWS_VISUAL_IDENTIFIER_EXPANSION='⭐'
+
+  ##########[ azure: azure account name (https://docs.microsoft.com/en-us/cli/azure) ]##########
+  # Azure account name color.
+  typeset -g POWERLEVEL9K_AZURE_FOREGROUND=32
+  # Custom icon.
+  # typeset -g POWERLEVEL9K_AZURE_VISUAL_IDENTIFIER_EXPANSION='⭐'
 
   ###############################[ public_ip: public IP address ]###############################
   # Public IP color.

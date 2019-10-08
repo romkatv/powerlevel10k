@@ -3035,6 +3035,21 @@ prompt_java_version() {
   _p9k_prompt_segment "$0" "red" "white" "JAVA_ICON" 0 '' "${v//\%/%%}"
 }
 
+prompt_azure() {
+  (( $+commands[az] )) || return
+  local cfg=${AZURE_CONFIG_DIR:-$HOME/.azure}/azureProfile.json
+  local -H stat
+  zstat -H stat -- $cfg 2>/dev/null || return
+  local sig="$stat[inode].$stat[mtime].$stat[size].$stat[mode]"
+  if ! _p9k_cache_get $0 || [[ $_p9k_cache_val[1] != $sig ]]; then
+    local name
+    name="$(az account show --query name --output tsv 2>/dev/null)" || name=
+    _p9k_cache_set "$sig" "$name"
+  fi
+  [[ -n $_p9k_cache_val[2] ]] || return
+  _p9k_prompt_segment "$0" "blue" "white" "AZURE_ICON" 0 '' "${_p9k_cache_val[2]//\%/%%}"
+}
+
 typeset -gra __p9k_nordvpn_tag=(
   P9K_NORDVPN_STATUS
   P9K_NORDVPN_TECHNOLOGY
