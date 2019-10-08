@@ -4368,7 +4368,7 @@ _p9k_must_init() {
     '${ZSH_VERSION}' '${ZSH_PATCHLEVEL}' '${(%):-%n}' '${GITSTATUS_LOG_LEVEL}'
     '${GITSTATUS_ENABLE_LOGGING}' '${GITSTATUS_DAEMON}' '${GITSTATUS_NUM_THREADS}'
     '${DEFAULT_USER}' '${ZLE_RPROMPT_INDENT}' '${P9K_SSH}' '${__p9k_ksh_arrays}'
-    '${__p9k_sh_glob}' '${parameters[transient_rprompt]}' 'v1')
+    '${__p9k_sh_glob}' '${parameters[transient_rprompt]}' 'v2')
   IFS=$'\2' param_sig="${(e)param_sig}"
   [[ $param_sig == $_p9k_param_sig ]] && return 1
   [[ -n $_p9k_param_sig ]] && _p9k_deinit
