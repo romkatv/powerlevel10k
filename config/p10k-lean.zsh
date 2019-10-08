@@ -384,7 +384,7 @@
 
     typeset -g my_git_format=$res
   }
-  functions +M -m my_git_formatter && functions -M my_git_formatter
+  functions -M my_git_formatter 2>/dev/null
 
   # Disable the default Git status formatting.
   typeset -g POWERLEVEL9K_VCS_DISABLE_GITSTATUS_FORMATTING=true
