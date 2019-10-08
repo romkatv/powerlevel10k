@@ -3055,9 +3055,8 @@ prompt_java_version() {
 
 prompt_azure() {
   (( $+commands[az] )) || return
-  local cfg=${AZURE_CONFIG_DIR:-$HOME/.azure}/azureProfile.json
   local -H stat
-  zstat -H stat -- $cfg 2>/dev/null || return
+  zstat -H stat -- ${AZURE_CONFIG_DIR:-$HOME/.azure}/azureProfile.json 2>/dev/null || return
   local sig="$stat[inode].$stat[mtime].$stat[size].$stat[mode]"
   if ! _p9k_cache_get $0 || [[ $_p9k_cache_val[1] != $sig ]]; then
     local name
