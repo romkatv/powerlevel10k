@@ -59,6 +59,7 @@
       kubecontext             # current kubernetes context (https://kubernetes.io/)
       terraform               # terraform workspace (https://www.terraform.io)
       aws                     # aws profile (https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-profiles.html)
+      # aws_eb_env            # aws elastic beanstalk environment (https://aws.amazon.com/elasticbeanstalk/)
       # azure                 # azure account name (https://docs.microsoft.com/en-us/cli/azure)
       context                 # user@hostname
       nordvpn                 # nordvpn connection status, linux only (https://nordvpn.com/)
@@ -718,6 +719,12 @@
   typeset -g POWERLEVEL9K_AWS_FOREGROUND=208
   # Custom icon.
   # typeset -g POWERLEVEL9K_AWS_VISUAL_IDENTIFIER_EXPANSION='⭐'
+
+  #[ aws_eb_env: aws elastic beanstalk environment (https://aws.amazon.com/elasticbeanstalk/) ]#
+  # AWS Elastic Beanstalk environment color.
+  typeset -g POWERLEVEL9K_AWS_EB_ENV_FOREGROUND=70
+  # Custom icon.
+  # typeset -g POWERLEVEL9K_AWS_EB_ENV_VISUAL_IDENTIFIER_EXPANSION='⭐'
 
   ##########[ azure: azure account name (https://docs.microsoft.com/en-us/cli/azure) ]##########
   # Azure account name color.

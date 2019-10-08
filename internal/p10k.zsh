@@ -885,10 +885,26 @@ prompt_aws() {
 ################################################################
 # Current Elastic Beanstalk environment
 prompt_aws_eb_env() {
-  [[ -r .elasticbeanstalk/config.yml ]] || return
-  local v=($(grep environment .elasticbeanstalk/config.yml 2>/dev/null))
-  [[ $#v > 1 && -n $v[2] ]] || return
-  [[ -n $v ]] && _p9k_prompt_segment "$0" black green 'AWS_EB_ICON' 0 '' "${v[2]//\%/%%}"
+  (( $+commands[eb] )) || return
+
+  local dir=$_p9k_pwd
+  while true; do
+    [[ $dir == / ]] && return
+    [[ -d $dir/.elasticbeanstalk ]] && break
+    dir=${dir:h}
+  done
+
+  local -H stat
+  zstat -H stat -- $dir/.elasticbeanstalk/config.yml 2>/dev/null || return
+  local sig="$stat[inode].$stat[mtime].$stat[size].$stat[mode]"
+  if ! _p9k_cache_get $0 $dir || [[ $_p9k_cache_val[1] != $sig ]]; then
+    local env
+    env="$(command eb list 2>/dev/null)" || env=
+    env="${${(@M)${(@f)env}:#\* *}#\* }"
+    _p9k_cache_set "$sig" "$env"
+  fi
+  [[ -n $_p9k_cache_val[2] ]] || return
+  _p9k_prompt_segment "$0" black green 'AWS_EB_ICON' 0 '' "${_p9k_cache_val[2]//\%/%%}"
 }
 
 ################################################################
