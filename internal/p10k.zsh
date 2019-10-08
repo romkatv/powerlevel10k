@@ -3251,7 +3251,7 @@ function _p9k_set_prompt() {
           PROMPT+='${${_p9k_g::=0}+}'
         fi
         if [[ $_POWERLEVEL9K_DIR_MAX_LENGTH == <->('%'|) ]]; then
-          local lim
+          local lim=
           if [[ $_POWERLEVEL9K_DIR_MAX_LENGTH[-1] == '%' ]]; then
             lim="$_p9k_dir_len-$((0.01*$_POWERLEVEL9K_DIR_MAX_LENGTH[1,-2]))*_p9k_clm"
           else
