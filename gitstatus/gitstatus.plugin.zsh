@@ -39,6 +39,7 @@
 #   VCS_STATUS_NUM_CONFLICTED=0
 #   VCS_STATUS_NUM_STAGED=0
 #   VCS_STATUS_NUM_UNSTAGED=1
+#   VCS_STATUS_NUM_UNSTAGED_DELETED=0
 #   VCS_STATUS_NUM_UNTRACKED=1
 #   VCS_STATUS_REMOTE_BRANCH=master
 #   VCS_STATUS_REMOTE_NAME=origin
@@ -114,6 +115,11 @@ typeset -g _gitstatus_plugin_dir=${${(%):-%x}:A:h}
 #   VCS_STATUS_STASHES         Number of stashes. Non-negative integer.
 #   VCS_STATUS_TAG             The last tag (in lexicographical order) that points to the same
 #                              commit as HEAD.
+#
+# Experimental variables. May disappear or have their semantics changed without notice:
+#
+#   VCS_STATUS_NUM_UNSTAGED_DELETED The number of unstaged deleted files. Note that renamed files
+#                                   are reported as deleted plus added.
 #
 # The point of reporting -1 as unstaged and untracked is to allow the command to skip scanning
 # files in large repos. See -m flag of gitstatus_start.
@@ -210,6 +216,7 @@ function _gitstatus_process_response() {
     typeset -gi VCS_STATUS_COMMITS_BEHIND="${resp[16]}"
     typeset -gi VCS_STATUS_STASHES="${resp[17]}"
     typeset -g  VCS_STATUS_TAG="${resp[18]}"
+    typeset -gi VCS_STATUS_NUM_UNSTAGED_DELETED="${resp[19]:-0}"
     typeset -gi VCS_STATUS_HAS_STAGED=$((VCS_STATUS_NUM_STAGED > 0))
     (( dirty_max_index_size >= 0 && VCS_STATUS_INDEX_SIZE > dirty_max_index_size )) && {
       typeset -gi VCS_STATUS_HAS_UNSTAGED=-1
@@ -242,6 +249,7 @@ function _gitstatus_process_response() {
     unset VCS_STATUS_COMMITS_BEHIND
     unset VCS_STATUS_STASHES
     unset VCS_STATUS_TAG
+    unset VCS_STATUS_NUM_UNSTAGED_DELETED
   }
 
   (( ! ours )) && (( #header )) && emulate -L zsh && "${header[@]}" || true
