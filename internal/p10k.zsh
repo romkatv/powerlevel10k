@@ -2460,7 +2460,7 @@ $z$VCS_STATUS_HAS_STAGED$z$VCS_STATUS_HAS_UNSTAGED$z$VCS_STATUS_HAS_UNTRACKED\
 $z$VCS_STATUS_INDEX_SIZE$z$VCS_STATUS_LOCAL_BRANCH$z$VCS_STATUS_NUM_CONFLICTED\
 $z$VCS_STATUS_NUM_STAGED$z$VCS_STATUS_NUM_UNSTAGED$z$VCS_STATUS_NUM_UNTRACKED\
 $z$VCS_STATUS_REMOTE_BRANCH$z$VCS_STATUS_REMOTE_NAME$z$VCS_STATUS_REMOTE_URL\
-$z$VCS_STATUS_RESULT$z$VCS_STATUS_STASHES$z$VCS_STATUS_TAG$VCS_STATUS_NUM_UNSTAGED_DELETED
+$z$VCS_STATUS_RESULT$z$VCS_STATUS_STASHES$z$VCS_STATUS_TAG$z$VCS_STATUS_NUM_UNSTAGED_DELETED
 }
 
 function _p9k_vcs_status_restore() {
@@ -4385,7 +4385,7 @@ _p9k_must_init() {
     '${ZSH_VERSION}' '${ZSH_PATCHLEVEL}' '${(%):-%n}' '${GITSTATUS_LOG_LEVEL}'
     '${GITSTATUS_ENABLE_LOGGING}' '${GITSTATUS_DAEMON}' '${GITSTATUS_NUM_THREADS}'
     '${DEFAULT_USER}' '${ZLE_RPROMPT_INDENT}' '${P9K_SSH}' '${__p9k_ksh_arrays}'
-    '${__p9k_sh_glob}' '${parameters[transient_rprompt]}' 'v3')
+    '${__p9k_sh_glob}' '${parameters[transient_rprompt]}' 'v4')
   IFS=$'\2' param_sig="${(e)param_sig}"
   [[ $param_sig == $_p9k_param_sig ]] && return 1
   [[ -n $_p9k_param_sig ]] && _p9k_deinit
