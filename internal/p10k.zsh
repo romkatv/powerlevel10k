@@ -269,6 +269,63 @@ _p9k_cache_get() {
   [[ -n $v ]] && _p9k_cache_val=("${(@0)${v[1,-2]}}")
 }
 
+_p9k_cache_stat_get() {
+  local -H stat
+  local label=$1 f
+  shift
+
+  _p9k_cache_stat_meta=
+  _p9k_cache_stat_fprint=
+
+  for f; do
+    if zstat -H stat -- $f 2>/dev/null; then
+      _p9k_cache_stat_meta+="${(q)f} $stat[inode] $stat[mtime] $stat[size] $stat[mode]; "
+    fi
+  done
+
+  if _p9k_cache_get $0 $label meta "$@" && [[ $_p9k_cache_val[1] == $_p9k_cache_stat_meta ]]; then
+    _p9k_cache_stat_fprint=$_p9k_cache_val[2]
+    local -a key=($0 $label fprint "$@" "$_p9k_cache_stat_fprint")
+    _p9k_cache_fprint_key="${(pj:\0:)key}"
+    shift 2 _p9k_cache_val
+    return
+  fi
+
+  if (( $+commands[md5] )); then
+    local -a md5=(md5 -q)
+  elif (( $+commands[md5sum] )); then
+    local -a md5=(md5sum -b)
+  else
+    return 1
+  fi
+
+  local fprint
+  for f; do
+    if fprint="$($md5 $f 2>/dev/null)"; then
+      _p9k_cache_stat_fprint+="${(q)fprint} "
+    fi
+  done
+
+  local meta_key=$_p9k_cache_key
+  if _p9k_cache_get $0 $label fprint "$@" "$_p9k_cache_stat_fprint"; then
+    _p9k_cache_fprint_key=$_p9k_cache_key
+    _p9k_cache_key=$meta_key
+    _p9k_cache_set "$_p9k_cache_stat_meta" "$_p9k_cache_stat_fprint" "$_p9k_cache_val[@]"
+    shift 2 _p9k_cache_val
+    return
+  fi
+
+  _p9k_cache_fprint_key=$_p9k_cache_key
+  _p9k_cache_key=$meta_key
+  return 1
+}
+
+_p9k_cache_stat_set() {
+  _p9k_cache_set "$_p9k_cache_stat_meta" "$_p9k_cache_stat_fprint" "$@"
+  _p9k_cache_key=$_p9k_cache_fprint_key
+  _p9k_cache_set "$@"
+}
+
 # _p9k_param prompt_foo_BAR BACKGROUND red
 _p9k_param() {
   local key="_p9k_param ${(pj:\0:)*}"
@@ -895,17 +952,14 @@ prompt_aws_eb_env() {
     dir=${dir:h}
   done
 
-  local -H stat
-  zstat -H stat -- $dir/.elasticbeanstalk/config.yml 2>/dev/null || return
-  local sig="$stat[inode].$stat[mtime].$stat[size].$stat[mode]"
-  if ! _p9k_cache_get $0 $dir || [[ $_p9k_cache_val[1] != $sig ]]; then
+  if ! _p9k_cache_stat_get $0 $dir/.elasticbeanstalk/config.yml; then
     local env
     env="$(command eb list 2>/dev/null)" || env=
     env="${${(@M)${(@f)env}:#\* *}#\* }"
-    _p9k_cache_set "$sig" "$env"
+    _p9k_cache_stat_set "$env"
   fi
-  [[ -n $_p9k_cache_val[2] ]] || return
-  _p9k_prompt_segment "$0" black green 'AWS_EB_ICON' 0 '' "${_p9k_cache_val[2]//\%/%%}"
+  [[ -n $_p9k_cache_val[1] ]] || return
+  _p9k_prompt_segment "$0" black green 'AWS_EB_ICON' 0 '' "${_p9k_cache_val[1]//\%/%%}"
 }
 
 ################################################################
@@ -1294,12 +1348,10 @@ prompt_dir() {
             for pat in $_POWERLEVEL9K_DIR_PACKAGE_FILES; do
               for pkg_file in $markers; do
                 [[ $pkg_file == $dir/${~pat} ]] || continue
-                local -H stat=()
-                zstat -H stat -- $pkg_file 2>/dev/null || continue
-                if ! _p9k_cache_get $0_pkg $stat[inode] $stat[mtime] $stat[size]; then
+                if ! _p9k_cache_stat_get $0_pkg $pkg_file; then
                   local pkg_name=''
                   pkg_name="$(jq -j '.name | select(. != null)' <$pkg_file 2>/dev/null)" || pkg_name=''
-                  _p9k_cache_set "$pkg_name"
+                  _p9k_cache_stat_set "$pkg_name"
                 fi
                 [[ -n $_p9k_cache_val[1] ]] || continue
                 parts[1,i]=($_p9k_cache_val[1])
@@ -1667,12 +1719,10 @@ function _p9k_cached_cmd_stdout() {
   local cmd=${commands[$1]:A}
   [[ -n $cmd ]] || return
   shift
-  local -H stat
-  zstat -H stat -- $cmd 2>/dev/null || return
-  if ! _p9k_cache_get $0 $stat[inode] $stat[mtime] $stat[size] $stat[mode] $cmd "$@"; then
+  if ! _p9k_cache_stat_get $0" ${(q)*}" $cmd; then
     local out
     out="$($cmd "$@" 2>/dev/null)"
-    _p9k_cache_set $(( ! $? )) "$out"
+    _p9k_cache_stat_set $(( ! $? )) "$out"
   fi
   (( $_p9k_cache_val[1] )) || return
   _p9k_ret=$_p9k_cache_val[2]
@@ -1682,12 +1732,10 @@ function _p9k_cached_cmd_stdout_stderr() {
   local cmd=${commands[$1]:A}
   [[ -n $cmd ]] || return
   shift
-  local -H stat
-  zstat -H stat -- $cmd 2>/dev/null || return
-  if ! _p9k_cache_get $0 $stat[inode] $stat[mtime] $stat[size] $stat[mode] $cmd "$@"; then
+  if ! _p9k_cache_stat_get $0" ${(q)*}" $cmd; then
     local out
     out="$($cmd "$@" 2>&1)"  # this line is the only diff with _p9k_cached_cmd_stdout
-    _p9k_cache_set $(( ! $? )) "$out"
+    _p9k_cache_stat_set $(( ! $? )) "$out"
   fi
   (( $_p9k_cache_val[1] )) || return
   _p9k_ret=$_p9k_cache_val[2]
@@ -2232,14 +2280,12 @@ prompt_date() {
 prompt_todo() {
   local todo=$commands[todo.sh]
   [[ -n $todo && -r $_p9k_todo_file ]] || return
-  local -H stat
-  zstat -H stat -- $_p9k_todo_file 2>/dev/null || return
-  if ! _p9k_cache_get $0 $stat[inode] $stat[mtime] $stat[size]; then
+  if ! _p9k_cache_stat_get $0 $_p9k_todo_file; then
     local count="$($todo -p ls | tail -1)"
     if [[ $count == (#b)'TODO: '[[:digit:]]##' of '([[:digit:]]##)' '* ]]; then
-      _p9k_cache_set 1 $match[1]
+      _p9k_cache_stat_set 1 $match[1]
     else
-      _p9k_cache_set 0 0
+      _p9k_cache_stat_set 0 0
     fi
   fi
   (( $_p9k_cache_val[1] )) || return
@@ -2944,15 +2990,7 @@ prompt_dir_writable() {
 prompt_kubecontext() {
   (( $+commands[kubectl] )) || return
 
-  local cfg
-  local -a key
-  for cfg in ${(s.:.)${KUBECONFIG:-$HOME/.kube/config}}; do
-    local -H stat
-    zstat -H stat -- $cfg 2>/dev/null || continue
-    key+=($cfg $stat[inode] $stat[mtime] $stat[size] $stat[mode])
-  done
-
-  if ! _p9k_cache_get $0 "${key[@]}"; then
+  if ! _p9k_cache_stat_get $0 ${(s.:.)${KUBECONFIG:-$HOME/.kube/config}}; then
     local name namespace cluster cloud_name cloud_account cloud_zone cloud_cluster text state
     () {
       local cfg && cfg=(${(f)"$(kubectl config view -o=yaml 2>/dev/null)"}) || return
@@ -3012,7 +3050,7 @@ prompt_kubecontext() {
         fi
       done
     fi
-    _p9k_cache_set "$name" "$namespace" "$cluster" "$cloud_name" "$cloud_account" "$cloud_zone" "$cloud_cluster" "$text" "$state"
+    _p9k_cache_stat_set "$name" "$namespace" "$cluster" "$cloud_name" "$cloud_account" "$cloud_zone" "$cloud_cluster" "$text" "$state"
   fi
 
   typeset -g P9K_KUBECONTEXT_NAME=$_p9k_cache_val[1]
@@ -3056,16 +3094,13 @@ prompt_java_version() {
 
 prompt_azure() {
   (( $+commands[az] )) || return
-  local -H stat
-  zstat -H stat -- ${AZURE_CONFIG_DIR:-$HOME/.azure}/azureProfile.json 2>/dev/null || return
-  local sig="$stat[inode].$stat[mtime].$stat[size].$stat[mode]"
-  if ! _p9k_cache_get $0 || [[ $_p9k_cache_val[1] != $sig ]]; then
+  if ! _p9k_cache_stat_get $0 ${AZURE_CONFIG_DIR:-$HOME/.azure}/azureProfile.json; then
     local name
     name="$(az account show --query name --output tsv 2>/dev/null)" || name=
-    _p9k_cache_set "$sig" "$name"
+    _p9k_cache_stat_set "$name"
   fi
-  [[ -n $_p9k_cache_val[2] ]] || return
-  _p9k_prompt_segment "$0" "blue" "white" "AZURE_ICON" 0 '' "${_p9k_cache_val[2]//\%/%%}"
+  [[ -n $_p9k_cache_val[1] ]] || return
+  _p9k_prompt_segment "$0" "blue" "white" "AZURE_ICON" 0 '' "${_p9k_cache_val[1]//\%/%%}"
 }
 
 typeset -gra __p9k_nordvpn_tag=(
@@ -3400,7 +3435,7 @@ function _p9k_dump_state() {
   sysopen -a -m 600 -o creat,trunc -u fd $tmp || return
   {
     local include='_POWERLEVEL9K_*|_p9k_*|icons|OS|DEFAULT_COLOR|DEFAULT_COLOR_INVERTED'
-    local exclude='_p9k_gitstatus_*|_p9k_param_sig|_p9k_public_ip|_p9k_prompt|_p9k_prompt_idx|_p9k_dump_pid|_p9k_dump_scheduled|_p9k_async_pump_*'
+    local exclude='_p9k_gitstatus_*|_p9k_cache_stat_meta|_p9k_cache_stat_fprint|_p9k_cache_fprint_key|_p9k_param_sig|_p9k_public_ip|_p9k_prompt|_p9k_prompt_idx|_p9k_dump_pid|_p9k_dump_scheduled|_p9k_async_pump_*'
     typeset -g __p9k_cached_param_sig=$_p9k_param_sig
     typeset -p __p9k_cached_param_sig >&$fd || return
     unset __p9k_cached_param_sig
@@ -3731,6 +3766,9 @@ _p9k_init_vars() {
   typeset -g  _p9k_ret
   typeset -g  _p9k_cache_key
   typeset -ga _p9k_cache_val
+  typeset -g  _p9k_cache_stat_meta
+  typeset -g  _p9k_cache_stat_fprint
+  typeset -g  _p9k_cache_fprint_key
   typeset -gA _p9k_cache
   typeset -ga _p9k_t
   typeset -g  _p9k_n
