@@ -292,7 +292,7 @@ _p9k_cache_stat_get() {
   fi
 
   if (( $+commands[md5] )); then
-    local -a md5=(md5 -q)
+    local -a md5=(md5)
   elif (( $+commands[md5sum] )); then
     local -a md5=(md5sum -b)
   else
