@@ -260,6 +260,7 @@ _p9k_cache_set() {
   # echo "caching: ${(@0q)_p9k_cache_key} => (${(q)@})" >&2
   _p9k_cache[$_p9k_cache_key]="${(pj:\0:)*}0"
   _p9k_cache_val=("$@")
+  _p9k_dump_scheduled=1
 }
 
 _p9k_cache_get() {
@@ -3399,7 +3400,7 @@ function _p9k_dump_state() {
   sysopen -a -m 600 -o creat,trunc -u fd $tmp || return
   {
     local include='_POWERLEVEL9K_*|_p9k_*|icons|OS|DEFAULT_COLOR|DEFAULT_COLOR_INVERTED'
-    local exclude='_p9k_gitstatus_*|_p9k_param_sig|_p9k_public_ip|_p9k_prompt|_p9k_prompt_idx|_p9k_async_pump_*'
+    local exclude='_p9k_gitstatus_*|_p9k_param_sig|_p9k_public_ip|_p9k_prompt|_p9k_prompt_idx|_p9k_dump_pid|_p9k_dump_scheduled|_p9k_async_pump_*'
     typeset -g __p9k_cached_param_sig=$_p9k_param_sig
     typeset -p __p9k_cached_param_sig >&$fd || return
     unset __p9k_cached_param_sig
@@ -3498,8 +3499,16 @@ _p9k_precmd_impl() {
   _p9k_set_prompt
   _p9k_refresh_reason=''
 
-  if ! zle && (( _p9k_prompt_idx == 1 && !_p9k_state_restored || _p9k_prompt_idx == 2 )); then
-    _p9k_dump_state
+  if ! zle && { (( ! _p9k_dump_pid )) || ! kill -0 $_p9k_dump_pid 2>/dev/null }; then
+    _p9k_dump_pid=0
+    if (( _p9k_prompt_idx == 1 && !_p9k_state_restored )); then
+      _p9k_dump_state
+      _p9k_dump_scheduled=0
+    elif (( _p9k_dump_scheduled )); then
+      _p9k_dump_state &!
+      _p9k_dump_pid=$!
+      _p9k_dump_scheduled=0
+    fi
   fi
 }
 
@@ -3710,6 +3719,8 @@ function _p9k_prompt_overflow_bug() {
 }
 
 _p9k_init_vars() {
+  typeset -gi _p9k_dump_scheduled
+  typeset -gi _p9k_dump_pid
   typeset -gi _p9k_prompt_idx
   typeset -gi _p9k_state_restored
   typeset -gi _p9k_reset_on_line_finish
@@ -4687,6 +4698,7 @@ _p9k_init() {
 _p9k_deinit() {
   (( $+functions[gitstatus_stop] )) && gitstatus_stop POWERLEVEL9K
   _p9k_deinit_async_pump
+  (( _p9k_dump_pid )) && wait $_p9k_dump_pid 2>/dev/null
   unset -m '(_POWERLEVEL9K_|P9K_|_p9k_)*~P9K_SSH'
 }
 
