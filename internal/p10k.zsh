@@ -3094,9 +3094,14 @@ prompt_java_version() {
 
 prompt_azure() {
   (( $+commands[az] )) || return
-  if ! _p9k_cache_stat_get $0 ${AZURE_CONFIG_DIR:-$HOME/.azure}/azureProfile.json; then
+  local cfg=${AZURE_CONFIG_DIR:-$HOME/.azure}/azureProfile.json
+  if ! _p9k_cache_stat_get $0 $cfg; then
     local name
-    name="$(az account show --query name --output tsv 2>/dev/null)" || name=
+    if (( $+commands[jq] )) && name="$(jq -r '[.subscriptions[]|select(.isDefault==true)|.name][]|strings' $cfg 2>/dev/null)"; then
+      name=${name%%$'\n'*}
+    elif ! name="$(az account show --query name --output tsv 2>/dev/null)"; then
+      name=
+    fi
     _p9k_cache_stat_set "$name"
   fi
   [[ -n $_p9k_cache_val[1] ]] || return
@@ -4449,7 +4454,7 @@ _p9k_must_init() {
     '${ZSH_VERSION}' '${ZSH_PATCHLEVEL}' '${(%):-%n}' '${GITSTATUS_LOG_LEVEL}'
     '${GITSTATUS_ENABLE_LOGGING}' '${GITSTATUS_DAEMON}' '${GITSTATUS_NUM_THREADS}'
     '${DEFAULT_USER}' '${ZLE_RPROMPT_INDENT}' '${P9K_SSH}' '${__p9k_ksh_arrays}'
-    '${__p9k_sh_glob}' '${parameters[transient_rprompt]}' 'v5')
+    '${__p9k_sh_glob}' '${parameters[transient_rprompt]}' 'v6')
   IFS=$'\2' param_sig="${(e)param_sig}"
   [[ $param_sig == $_p9k_param_sig ]] && return 1
   [[ -n $_p9k_param_sig ]] && _p9k_deinit
