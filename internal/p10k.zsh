@@ -2470,7 +2470,7 @@ _p9k_vcs_info_init() {
 
 function _p9k_vcs_status_save() {
   local z=$'\0'
-  _p9k_last_git_prompt[$VCS_STATUS_WORKDIR]=$VCS_STATUS_ACTION$z$VCS_STATUS_COMMIT\
+  _p9k_gitstatus_last[$VCS_STATUS_WORKDIR]=$VCS_STATUS_ACTION$z$VCS_STATUS_COMMIT\
 $z$VCS_STATUS_COMMITS_AHEAD$z$VCS_STATUS_COMMITS_BEHIND$z$VCS_STATUS_HAS_CONFLICTED\
 $z$VCS_STATUS_HAS_STAGED$z$VCS_STATUS_HAS_UNSTAGED$z$VCS_STATUS_HAS_UNTRACKED\
 $z$VCS_STATUS_INDEX_SIZE$z$VCS_STATUS_LOCAL_BRANCH$z$VCS_STATUS_NUM_CONFLICTED\
@@ -2493,7 +2493,7 @@ function _p9k_vcs_status_restore() {
 function _p9k_vcs_status_for_dir() {
   local dir=$1
   while true; do
-    _p9k_ret=$_p9k_last_git_prompt[$dir]
+    _p9k_ret=$_p9k_gitstatus_last[$dir]
     [[ -n $_p9k_ret ]] && return 0
     [[ $dir == / ]] && return 1
     dir=${dir:h}
@@ -2504,7 +2504,7 @@ function _p9k_vcs_status_purge() {
   local dir=$1
   while true; do
     # unset doesn't work if $dir contains weird shit
-    _p9k_last_git_prompt[$dir]=""
+    _p9k_gitstatus_last[$dir]=""
     _p9k_git_slow[$dir]=""
     [[ $dir == / ]] && break
     dir=${dir:h}
@@ -3729,10 +3729,10 @@ _p9k_init_vars() {
   typeset -ga _p9k_right_join
   typeset -g  _p9k_public_ip
   typeset -g  _p9k_todo_file
-  # git workdir => the last prompt we've shown for it
-  typeset -gA _p9k_last_git_prompt
   # git workdir => 1 if gitstatus is slow on it, 0 if it's fast.
   typeset -gA _p9k_git_slow
+  # git workdir => the last state we've seen for it
+  typeset -gA _p9k_gitstatus_last
   typeset -gi _p9k_gitstatus_disabled
   typeset -gF _p9k_gitstatus_start_time
   typeset -g  _p9k_prompt
@@ -4400,7 +4400,7 @@ _p9k_must_init() {
     '${ZSH_VERSION}' '${ZSH_PATCHLEVEL}' '${(%):-%n}' '${GITSTATUS_LOG_LEVEL}'
     '${GITSTATUS_ENABLE_LOGGING}' '${GITSTATUS_DAEMON}' '${GITSTATUS_NUM_THREADS}'
     '${DEFAULT_USER}' '${ZLE_RPROMPT_INDENT}' '${P9K_SSH}' '${__p9k_ksh_arrays}'
-    '${__p9k_sh_glob}' '${parameters[transient_rprompt]}' 'v4')
+    '${__p9k_sh_glob}' '${parameters[transient_rprompt]}' 'v5')
   IFS=$'\2' param_sig="${(e)param_sig}"
   [[ $param_sig == $_p9k_param_sig ]] && return 1
   [[ -n $_p9k_param_sig ]] && _p9k_deinit
