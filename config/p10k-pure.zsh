@@ -1,5 +1,7 @@
 # Config file for Powerlevel10k with the style of Pure (https://github.com/sindresorhus/pure).
 #
+# Installation: simply source this file from ~/.zshrc.
+#
 # Differences from Pure:
 #
 #   - Git:
@@ -10,9 +12,10 @@
 # even the bad parts. For example, just like in Pure, prompt provides no indication of Git status
 # being stale; prompt symbol is the same in command, visual and overwrite vi modes; when prompt
 # doesn't fit on one line, it wraps around with no attempt to shorten anything. This behavior is
-# likely to make user experience worse than with any other Powerlevel10k config. If you like the
-# general style of Pure but not particularly attached to all its quirks, type `p10k configure`
-# while having Powerlevel10k theme active and pick lean style.
+# likely to make user experience worse than with any other Powerlevel10k config.
+#
+# If you like the general style of Pure but not particularly attached to all its quirks,
+# type `p10k configure` while having Powerlevel10k theme active and pick lean style.
 
 # Temporarily change options.
 'builtin' 'local' '-a' 'p10k_config_opts'
@@ -28,6 +31,7 @@
   # Unset all configuration options.
   unset -m 'POWERLEVEL9K_*'
 
+  # Left prompt segments.
   typeset -g POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(
       dir                       # current directory
       vcs                       # git status
@@ -37,6 +41,8 @@
       virtualenv                # python virtual environment
       prompt_char               # prompt symbol
   )
+
+  # Right prompt segments.
   typeset -g POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=()
 
   # Basic style options that define the overall prompt look.
@@ -44,7 +50,7 @@
   typeset -g POWERLEVEL9K_{LEFT,RIGHT}_{LEFT,RIGHT}_WHITESPACE=  # no surrounding whitespace
   typeset -g POWERLEVEL9K_{LEFT,RIGHT}_SUBSEGMENT_SEPARATOR=' '  # separate segments with a space
   typeset -g POWERLEVEL9K_{LEFT,RIGHT}_SEGMENT_SEPARATOR=        # no end-of-line symbol
-  typeset -g POWERLEVEL9K_VISUAL_IDENTIFIER_EXPANSION=           # disable segment icons
+  typeset -g POWERLEVEL9K_VISUAL_IDENTIFIER_EXPANSION=           # no segment icons
 
   # Add an empty line before each prompt except the first. This doesn't emulate the bug
   # in Pure that makes prompt drift down whenever you use the ALT-C binding from fzf or similar.
@@ -73,6 +79,22 @@
 
   # Blue current directory.
   typeset -g POWERLEVEL9K_DIR_FOREGROUND=blue
+
+  # Context format when root: user@host. The first part white, the rest grey.
+  typeset -g POWERLEVEL9K_CONTEXT_ROOT_TEMPLATE='%7F%n%f%242F@%m%f'
+  # Context format when not root: user@host. The whole thing grey.
+  typeset -g POWERLEVEL9K_CONTEXT_TEMPLATE='%242F%n@%m%f'
+  # Don't show context unless root or in SSH.
+  typeset -g POWERLEVEL9K_CONTEXT_{DEFAULT,SUDO}_CONTENT_EXPANSION=
+
+  # Show previous command duration only if it's >= 5s.
+  typeset -g POWERLEVEL9K_COMMAND_EXECUTION_TIME_THRESHOLD=5
+  # Don't show fractional seconds. Thus, 7s rather than 7.3s.
+  typeset -g POWERLEVEL9K_COMMAND_EXECUTION_TIME_PRECISION=0
+  # Duration format: 1d 2h 3m 4s.
+  typeset -g POWERLEVEL9K_COMMAND_EXECUTION_TIME_FORMAT='d h m s'
+  # Yellow previous command duration.
+  typeset -g POWERLEVEL9K_COMMAND_EXECUTION_TIME_FOREGROUND=yellow
 
   # Grey Git prompt. This makes stale prompts indistinguishable from up-to-date ones. This is
   # unlikely to be desired by anyone but that's how Pure does it.
@@ -107,22 +129,6 @@
   typeset -g POWERLEVEL9K_VCS_{COMMITS_AHEAD,COMMITS_BEHIND}_MAX_NUM=1
   # Remove space between '⇣' and '⇡', and get rid of $' \b'.
   typeset -g POWERLEVEL9K_VCS_CONTENT_EXPANSION=$'${${P9K_CONTENT/⇣* ⇡/⇣⇡}// \b}'
-
-  # Context format when root: user@host. The first part white, the rest grey.
-  typeset -g POWERLEVEL9K_CONTEXT_ROOT_TEMPLATE='%7F%n%f%242F@%m%f'
-  # Context format when not root: user@host. The whole thing grey.
-  typeset -g POWERLEVEL9K_CONTEXT_TEMPLATE='%242F%n@%m%f'
-  # Don't show context unless root or in SSH.
-  typeset -g POWERLEVEL9K_CONTEXT_{DEFAULT,SUDO}_CONTENT_EXPANSION=
-
-  # Show previous command duration only if it's >= 5s.
-  typeset -g POWERLEVEL9K_COMMAND_EXECUTION_TIME_THRESHOLD=5
-  # Don't show fractional seconds. Thus, 7s rather than 7.3s.
-  typeset -g POWERLEVEL9K_COMMAND_EXECUTION_TIME_PRECISION=0
-  # Duration format: 1d 2h 3m 4s.
-  typeset -g POWERLEVEL9K_COMMAND_EXECUTION_TIME_FORMAT='d h m s'
-  # Yellow previous command duration.
-  typeset -g POWERLEVEL9K_COMMAND_EXECUTION_TIME_FOREGROUND=yellow
 }
 
 (( ${#p10k_config_opts} )) && setopt ${p10k_config_opts[@]}
