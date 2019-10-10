@@ -1,7 +1,5 @@
 # Config file for Powerlevel10k with the style of Pure (https://github.com/sindresorhus/pure).
 #
-# Installation: simply source this file from ~/.zshrc.
-#
 # Differences from Pure:
 #
 #   - Git:
@@ -9,13 +7,12 @@
 #     - No automatic `git fetch` (the same as in Pure with `PURE_GIT_PULL=0`).
 #
 # Apart from the differences listed above, the replication of Pure prompt is exact. This includes
-# even the bad parts. For example, just like in Pure, prompt provides no indication of Git status
+# even the questionable parts. For example, just like in Pure, there is no indication of Git status
 # being stale; prompt symbol is the same in command, visual and overwrite vi modes; when prompt
-# doesn't fit on one line, it wraps around with no attempt to shorten anything. This behavior is
-# likely to make user experience worse than with any other Powerlevel10k config.
+# doesn't fit on one line, it wraps around with no attempt to shorten it.
 #
-# If you like the general style of Pure but not particularly attached to all its quirks,
-# type `p10k configure` while having Powerlevel10k theme active and pick lean style.
+# If you like the general style of Pure but not particularly attached to all its quirks, type
+# `p10k configure` while having Powerlevel10k theme active and pick "Lean" style.
 
 # Temporarily change options.
 'builtin' 'local' '-a' 'p10k_config_opts'
@@ -96,17 +93,15 @@
   # Yellow previous command duration.
   typeset -g POWERLEVEL9K_COMMAND_EXECUTION_TIME_FOREGROUND=yellow
 
-  # Grey Git prompt. This makes stale prompts indistinguishable from up-to-date ones. This is
-  # unlikely to be desired by anyone but that's how Pure does it.
+  # Grey Git prompt. This makes stale prompts indistinguishable from up-to-date ones.
   typeset -g POWERLEVEL9K_VCS_FOREGROUND=242
 
   # Disable async loading indicator to make directories that aren't Git repositories
-  # indistinguishable from large Git repositories without known state. This is unlikely
-  # to be desired by anyone but that's how Pure does it.
+  # indistinguishable from large Git repositories without known state.
   typeset -g POWERLEVEL9K_VCS_LOADING_TEXT=
 
-  # Don't wait for Git status even for a millisecond, so that prompt always updates asynchronously
-  # when Git state changes. This is unlikely to be desired by anyone but that's how Pure does it.
+  # Don't wait for Git status even for a millisecond, so that prompt always updates
+  # asynchronously when Git state changes.
   typeset -g POWERLEVEL9K_VCS_MAX_SYNC_LATENCY_SECONDS=0
 
   # Cyan ahead/behind arrows.
