@@ -80,6 +80,16 @@ typeset -ra classic_right=(
   '' '%$frame_color[$color]F─╯%f'
 )
 
+typeset -ra pure_left=(
+  '' '%4F~/src%f %242Fmaster%f'
+  '' '%5F❯%f █'
+)
+
+typeset -ra pure_right=(
+  '' ''
+  '' ''
+)
+
 function prompt_length() {
   local COLUMNS=1024
   local -i x y=$#1 m
@@ -531,17 +541,22 @@ function ask_style() {
     print -P ""
     style=classic print_prompt
     print -P ""
+    print -P "%B(3)  Pure.%b"
+    print -P ""
+    style=pure print_prompt
+    print -P ""
     print -P "(r)  Restart from the beginning."
     print -P "(q)  Quit and do nothing."
     print -P ""
 
     local key=
-    read -k key${(%):-"?%BChoice [12rq]: %b"} || quit -c
+    read -k key${(%):-"?%BChoice [123rq]: %b"} || quit -c
     case $key in
       q) quit;;
       r) return 1;;
       1) style=lean; options+=lean; break;;
       2) style=classic; options+=classic; break;;
+      3) style=pure; options+=pure; break;;
     esac
   done
 }
@@ -1190,6 +1205,14 @@ function ask_config_overwrite() {
 }
 
 function generate_config() {
+  if [[ $style == pure ]]; then
+    if [[ -e $__p9k_cfg_path ]]; then
+      unlink $__p9k_cfg_path || return
+    fi
+    cp $__p9k_root_dir/config/p10k-$style.zsh $__p9k_cfg_path || return
+    return
+  fi
+
   local base && base="$(<$__p9k_root_dir/config/p10k-$style.zsh)" || return
   local lines=("${(@f)base}")
 
@@ -1444,17 +1467,22 @@ while true; do
   _p9k_init_icons
   ask_narrow_icons     || continue
   ask_style            || continue
-  ask_color            || continue
-  ask_time             || continue
-  ask_separators       || continue
-  ask_heads            || continue
-  ask_tails            || continue
-  ask_num_lines        || continue
-  ask_gap_char         || continue
-  ask_frame            || continue
-  ask_empty_line       || continue
-  ask_extra_icons      || continue
-  ask_prefixes         || continue
+  if [[ $style == pure ]]; then
+    empty_line=1
+    options+='sparse'
+  else
+    ask_color          || continue
+    ask_time           || continue
+    ask_separators     || continue
+    ask_heads          || continue
+    ask_tails          || continue
+    ask_num_lines      || continue
+    ask_gap_char       || continue
+    ask_frame          || continue
+    ask_empty_line     || continue
+    ask_extra_icons    || continue
+    ask_prefixes       || continue
+  fi
   ask_confirm          || continue
   ask_config_overwrite || continue
   break
