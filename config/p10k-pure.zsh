@@ -78,10 +78,15 @@
   # unlikely to be desired by anyone but that's how Pure does it.
   typeset -g POWERLEVEL9K_VCS_FOREGROUND=242
 
-  # Disable async loading indicator to make directories that aren't git repositories
-  # indistinguishable from large git repositories without known state. This is unlikely
+  # Disable async loading indicator to make directories that aren't Git repositories
+  # indistinguishable from large Git repositories without known state. This is unlikely
   # to be desired by anyone but that's how Pure does it.
   typeset -g POWERLEVEL9K_VCS_LOADING_TEXT=
+
+  # Don't wait for Git status even for a millisecond, so that prompt always updates asynchronously
+  # when Git state changes. This is unlikely to be desired by anyone but that's how Pure does it.
+  typeset -g POWERLEVEL9K_VCS_MAX_SYNC_LATENCY_SECONDS=0
+
   # Cyan ahead/behind arrows.
   typeset -g POWERLEVEL9K_VCS_{INCOMING,OUTGOING}_CHANGESFORMAT_FOREGROUND=cyan
   # Don't show remote branch, current tag or stashes.
