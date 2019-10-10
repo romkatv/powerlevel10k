@@ -90,6 +90,16 @@ typeset -ra pure_right=(
   '' ''
 )
 
+typeset -ra p9k_left=(
+  '' '%K{0}%F{3} user@host %K{4}%F{0}$right_triangle%F{0} $extra_icons[2]~/src %K{2}%F{4}$right_triangle%F{0} $extra_icons[3]master %k%F{2}$right_triangle%f'
+  '' ' █'
+)
+
+typeset -ra p9k_right=(
+  '%F{0}$left_triangle%K{0}%F{2} ${(g::)icons[OK_ICON]} %F{8}$left_triangle%K{8}%F{0} 42 %F{7}$left_triangle%K{7}%F{0} 16:23:42 $extra_icons[5]%k%f' ''
+  '' ''
+)
+
 function prompt_length() {
   local COLUMNS=1024
   local -i x y=$#1 m
@@ -529,34 +539,67 @@ function ask_narrow_icons() {
 }
 
 function ask_style() {
+  if (( cap_diamond && LINES < 25 )); then
+    local nl=''
+  else
+    local nl=$'\n'
+  fi
   while true; do
     clear
+    local extra=
     flowing -c "%BPrompt Style%b"
-    print -P ""
-    print -P "%B(1)  Lean.%b"
-    print -P ""
+    print -n $nl
+    print -P "%B(1)  Lean (recommended).%b"
+    print -n $nl
     style=lean print_prompt
     print -P ""
-    print -P "%B(2)  Classic.%b"
-    print -P ""
+    print -P "%B(2)  Classic (recommended).%b"
+    print -n $nl
     style=classic print_prompt
     print -P ""
     print -P "%B(3)  Pure.%b"
-    print -P ""
+    print -n $nl
     style=pure print_prompt
     print -P ""
+    if (( cap_diamond )); then
+      extra+=4
+      print -P "%B(4)  Powerlevel9k.%b"
+      print -P ""
+      local dir_icon=${(g::)icons[HOME_SUB_ICON]}
+      local vcs_icon=${(g::)icons[VCS_GIT_GITHUB_ICON]}
+      local branch_icon=${(g::)icons[VCS_BRANCH_ICON]}
+      local time_icon=${(g::)icons[TIME_ICON]}
+      if (( cap_narrow_icons )); then
+        dir_icon=${dir_icon// }
+        vcs_icon=${vcs_icon// }
+        duration_icon=${duration_icon// }
+        time_icon=${time_icon// }
+      fi
+      branch_icon=${branch_icon// }
+      local many_icons=("" "$dir_icon " "$vcs_icon $branch_icon " " " "$time_icon ")
+      extra_icons=("$many_icons[@]") style=p9k num_lines=1 print_prompt
+      print -P ""
+    fi
     print -P "(r)  Restart from the beginning."
     print -P "(q)  Quit and do nothing."
     print -P ""
 
     local key=
-    read -k key${(%):-"?%BChoice [123rq]: %b"} || quit -c
+    read -k key${(%):-"?%BChoice [123${extra}rq]: %b"} || quit -c
     case $key in
       q) quit;;
       r) return 1;;
       1) style=lean; options+=lean; break;;
       2) style=classic; options+=classic; break;;
-      3) style=pure; options+=pure; break;;
+      3) style=pure; empty_line=1; options+=pure; break;;
+      4) if [[ $extra == *4* ]]; then
+           style=p9k
+           num_lines=1
+           extra_icons=("$many_icons[@]")
+           options+=p9k
+           break
+         fi
+         ;;
     esac
   done
 }
@@ -1231,9 +1274,22 @@ function generate_config() {
   sub MODE $POWERLEVEL9K_MODE
 
   if (( cap_narrow_icons )); then
+    uncomment 'typeset -g POWERLEVEL9K_VISUAL_IDENTIFIER_EXPANSION'
     sub VISUAL_IDENTIFIER_EXPANSION "'\${P9K_VISUAL_IDENTIFIER// }'"
     sub BACKGROUND_JOBS_VISUAL_IDENTIFIER_EXPANSION "'\${P9K_VISUAL_IDENTIFIER// }'"
     sub OS_ICON_CONTENT_EXPANSION "'%B\${P9K_CONTENT// }'"
+    uncomment 'typeset -g POWERLEVEL9K_VCS_UNTRACKED_ICON'
+    uncomment 'typeset -g POWERLEVEL9K_VCS_UNSTAGED_ICON'
+    uncomment 'typeset -g POWERLEVEL9K_VCS_STAGED_ICON'
+    uncomment 'typeset -g POWERLEVEL9K_VCS_STASH_ICON'
+    uncomment 'typeset -g POWERLEVEL9K_VCS_INCOMING_CHANGES_ICON'
+    uncomment 'typeset -g POWERLEVEL9K_VCS_OUTGOING_CHANGES_ICON'
+    sub VCS_UNTRACKED_ICON "'${icons[VCS_UNTRACKED_ICON]// }'"
+    sub VCS_UNSTAGED_ICON "'${icons[VCS_UNSTAGED_ICON]// }'"
+    sub VCS_STAGED_ICON "'${icons[VCS_STAGED_ICON]// }'"
+    sub VCS_STASH_ICON "'${icons[VCS_STASH_ICON]// }'"
+    sub VCS_INCOMING_CHANGES_ICON "'${icons[VCS_INCOMING_CHANGES_ICON]// }'"
+    sub VCS_OUTGOING_CHANGES_ICON "'${icons[VCS_OUTGOING_CHANGES_ICON]// }'"
   else
     sub VISUAL_IDENTIFIER_EXPANSION "'\${P9K_VISUAL_IDENTIFIER}'"
     sub BACKGROUND_JOBS_VISUAL_IDENTIFIER_EXPANSION "'\${P9K_VISUAL_IDENTIFIER}'"
@@ -1250,9 +1306,11 @@ function generate_config() {
     uncomment 'typeset -g POWERLEVEL9K_VIRTUALENV_VISUAL_IDENTIFIER_EXPANSION'
     uncomment 'typeset -g POWERLEVEL9K_ANACONDA_VISUAL_IDENTIFIER_EXPANSION'
     uncomment 'typeset -g POWERLEVEL9K_PYENV_VISUAL_IDENTIFIER_EXPANSION'
+    uncomment 'typeset -g POWERLEVEL9K_PYTHON_ICON'
     sub VIRTUALENV_VISUAL_IDENTIFIER_EXPANSION "'🐍'"
     sub ANACONDA_VISUAL_IDENTIFIER_EXPANSION "'🐍'"
     sub PYENV_VISUAL_IDENTIFIER_EXPANSION "'🐍'"
+    sub PYTHON_ICON "'🐍'"
   fi
 
   if [[ $POWERLEVEL9K_MODE == nerdfont-complete ]]; then
@@ -1467,10 +1525,7 @@ while true; do
   _p9k_init_icons
   ask_narrow_icons     || continue
   ask_style            || continue
-  if [[ $style == pure ]]; then
-    empty_line=1
-    options+='sparse'
-  else
+  if [[ $style == (lean|classic) ]]; then
     ask_color          || continue
     ask_time           || continue
     ask_separators     || continue
