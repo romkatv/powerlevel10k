@@ -1278,18 +1278,20 @@ function generate_config() {
     sub VISUAL_IDENTIFIER_EXPANSION "'\${P9K_VISUAL_IDENTIFIER// }'"
     sub BACKGROUND_JOBS_VISUAL_IDENTIFIER_EXPANSION "'\${P9K_VISUAL_IDENTIFIER// }'"
     sub OS_ICON_CONTENT_EXPANSION "'%B\${P9K_CONTENT// }'"
-    uncomment 'typeset -g POWERLEVEL9K_VCS_UNTRACKED_ICON'
-    uncomment 'typeset -g POWERLEVEL9K_VCS_UNSTAGED_ICON'
-    uncomment 'typeset -g POWERLEVEL9K_VCS_STAGED_ICON'
-    uncomment 'typeset -g POWERLEVEL9K_VCS_STASH_ICON'
-    uncomment 'typeset -g POWERLEVEL9K_VCS_INCOMING_CHANGES_ICON'
-    uncomment 'typeset -g POWERLEVEL9K_VCS_OUTGOING_CHANGES_ICON'
-    sub VCS_UNTRACKED_ICON "'${icons[VCS_UNTRACKED_ICON]// }'"
-    sub VCS_UNSTAGED_ICON "'${icons[VCS_UNSTAGED_ICON]// }'"
-    sub VCS_STAGED_ICON "'${icons[VCS_STAGED_ICON]// }'"
-    sub VCS_STASH_ICON "'${icons[VCS_STASH_ICON]// }'"
-    sub VCS_INCOMING_CHANGES_ICON "'${icons[VCS_INCOMING_CHANGES_ICON]// }'"
-    sub VCS_OUTGOING_CHANGES_ICON "'${icons[VCS_OUTGOING_CHANGES_ICON]// }'"
+    if [[ $style == p9k ]]; then
+      uncomment 'typeset -g POWERLEVEL9K_VCS_UNTRACKED_ICON'
+      uncomment 'typeset -g POWERLEVEL9K_VCS_UNSTAGED_ICON'
+      uncomment 'typeset -g POWERLEVEL9K_VCS_STAGED_ICON'
+      uncomment 'typeset -g POWERLEVEL9K_VCS_STASH_ICON'
+      uncomment 'typeset -g POWERLEVEL9K_VCS_INCOMING_CHANGES_ICON'
+      uncomment 'typeset -g POWERLEVEL9K_VCS_OUTGOING_CHANGES_ICON'
+      sub VCS_UNTRACKED_ICON "'${icons[VCS_UNTRACKED_ICON]// }'"
+      sub VCS_UNSTAGED_ICON "'${icons[VCS_UNSTAGED_ICON]// }'"
+      sub VCS_STAGED_ICON "'${icons[VCS_STAGED_ICON]// }'"
+      sub VCS_STASH_ICON "'${icons[VCS_STASH_ICON]// }'"
+      sub VCS_INCOMING_CHANGES_ICON "'${icons[VCS_INCOMING_CHANGES_ICON]// }'"
+      sub VCS_OUTGOING_CHANGES_ICON "'${icons[VCS_OUTGOING_CHANGES_ICON]// }'"
+    fi
   else
     sub VISUAL_IDENTIFIER_EXPANSION "'\${P9K_VISUAL_IDENTIFIER}'"
     sub BACKGROUND_JOBS_VISUAL_IDENTIFIER_EXPANSION "'\${P9K_VISUAL_IDENTIFIER}'"
