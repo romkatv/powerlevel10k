@@ -96,7 +96,7 @@ typeset -ra rainbow_left=(
 )
 
 typeset -ra rainbow_right=(
-  '%3F$right_head%K{3} %0F$prefixes[2]5s $extra_icons[4]%1F${show_time:+%7F$right_sep%K{7\} %0F$prefixes[3]16:23:42 $extra_icons[5]%7F}%k$right_tail%f' '%$frame_color[$color]F─╮%f'
+  '%3F$right_head%K{3} %0F$prefixes[2]5s $extra_icons[4]%3F${show_time:+%7F$right_sep%K{7\} %0F$prefixes[3]16:23:42 $extra_icons[5]%7F}%k$right_tail%f' '%$frame_color[$color]F─╮%f'
   '' '%$frame_color[$color]F─╯%f'
 )
 
