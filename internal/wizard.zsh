@@ -91,7 +91,7 @@ typeset -ra pure_right=(
 )
 
 typeset -ra rainbow_left=(
-  '%$frame_color[$color]F╭─' '%F{${${extra_icons[1]:+0}:-4}}$left_tail${extra_icons[1]:+%K{0\} $extra_icons[1] %K{4\}%0F$left_sep}%K{4}%0F $extra_icons[2]%B~%b%K{4}%0F/%Bsrc%b%K{4} %K{2}%4F$left_sep %0F$prefixes[1]$extra_icons[3]master %k%2F$left_head%f'
+  '%$frame_color[$color]F╭─' '%F{${${extra_icons[1]:+0}:-4}}$left_tail${extra_icons[1]:+%K{0\} $extra_icons[1] %K{4\}%0F$left_sep}%K{4}%254F $extra_icons[2]%B%255F~%b%K{4}%254F/%B%255Fsrc%b%K{4} %K{2}%4F$left_sep %0F$prefixes[1]$extra_icons[3]master %k%2F$left_head%f'
   '%$frame_color[$color]F╰─' '%f █'
 )
 
