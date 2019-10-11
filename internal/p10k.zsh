@@ -1115,7 +1115,14 @@ prompt_battery() {
     bg=$_POWERLEVEL9K_BATTERY_LEVEL_BACKGROUND[idx]
   fi
 
-  _p9k_prompt_segment $0_$state "$bg" "$_p9k_battery_states[$state]" $icon 0 '' $msg
+  local fg=$_p9k_battery_states[$state]
+  if (( $#_POWERLEVEL9K_BATTERY_LEVEL_FOREGROUND )); then
+    local -i idx=$#_POWERLEVEL9K_BATTERY_LEVEL_FOREGROUND
+    (( bat_percent < 100 )) && idx=$((bat_percent * $#_POWERLEVEL9K_BATTERY_LEVEL_FOREGROUND / 100 + 1))
+    fg=$_POWERLEVEL9K_BATTERY_LEVEL_FOREGROUND[idx]
+  fi
+
+  _p9k_prompt_segment $0_$state "$bg" "$fg" $icon 0 '' $msg
 }
 
 ################################################################
@@ -3893,6 +3900,7 @@ _p9k_init_params() {
   _p9k_declare -i POWERLEVEL9K_BATTERY_LOW_THRESHOLD 10
   _p9k_declare -i POWERLEVEL9K_BATTERY_HIDE_ABOVE_THRESHOLD 999
   _p9k_declare -a POWERLEVEL9K_BATTERY_LEVEL_BACKGROUND --
+  _p9k_declare -a POWERLEVEL9K_BATTERY_LEVEL_FOREGROUND --
   _p9k_declare -b POWERLEVEL9K_BATTERY_VERBOSE 1
   if [[ $parameters[POWERLEVEL9K_BATTERY_STAGES] == scalar ]]; then
     _p9k_declare -e POWERLEVEL9K_BATTERY_STAGES
