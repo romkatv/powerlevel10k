@@ -91,38 +91,37 @@ typeset -g _gitstatus_plugin_dir=${${(%):-%x}:A:h}
 #
 # If VCS_STATUS_RESULT is ok-sync or ok-async, additional variables are set:
 #
-#   VCS_STATUS_WORKDIR         Git repo working directory. Not empty.
-#   VCS_STATUS_COMMIT          Commit hash that HEAD is pointing to. Either 40 hex digits or empty
-#                              if there is no HEAD (empty repo).
-#   VCS_STATUS_LOCAL_BRANCH    Local branch name or empty if not on a branch.
-#   VCS_STATUS_REMOTE_NAME     The remote name, e.g. "upstream" or "origin".
-#   VCS_STATUS_REMOTE_BRANCH   Upstream branch name. Can be empty.
-#   VCS_STATUS_REMOTE_URL      Remote URL. Can be empty.
-#   VCS_STATUS_ACTION          Repository state, A.K.A. action. Can be empty.
-#   VCS_STATUS_INDEX_SIZE      The number of files in the index.
-#   VCS_STATUS_NUM_STAGED      The number of staged changes.
-#   VCS_STATUS_NUM_CONFLICTED  The number of unstaged changes.
-#   VCS_STATUS_NUM_UNSTAGED    The number of unstaged changes.
-#   VCS_STATUS_NUM_UNTRACKED   The number of untracked files.
-#   VCS_STATUS_HAS_STAGED      1 if there are staged changes, 0 otherwise.
-#   VCS_STATUS_HAS_CONFLICTED  1 if there are conflicted changes, 0 otherwise.
-#   VCS_STATUS_HAS_UNSTAGED    1 if there are unstaged changes, 0 if there aren't, -1 if unknown.
-#   VCS_STATUS_HAS_UNTRACKED   1 if there are untracked files, 0 if there aren't, -1 if unknown.
-#   VCS_STATUS_COMMITS_AHEAD   Number of commits the current branch is ahead of upstream.
-#                              Non-negative integer.
-#   VCS_STATUS_COMMITS_BEHIND  Number of commits the current branch is behind upstream. Non-negative
-#                              integer.
-#   VCS_STATUS_STASHES         Number of stashes. Non-negative integer.
-#   VCS_STATUS_TAG             The last tag (in lexicographical order) that points to the same
-#                              commit as HEAD.
-#
-# Experimental variables. May disappear or have their semantics changed without notice:
-#
+#   VCS_STATUS_WORKDIR              Git repo working directory. Not empty.
+#   VCS_STATUS_COMMIT               Commit hash that HEAD is pointing to. Either 40 hex digits or
+#                                   empty if there is no HEAD (empty repo).
+#   VCS_STATUS_LOCAL_BRANCH         Local branch name or empty if not on a branch.
+#   VCS_STATUS_REMOTE_NAME          The remote name, e.g. "upstream" or "origin".
+#   VCS_STATUS_REMOTE_BRANCH        Upstream branch name. Can be empty.
+#   VCS_STATUS_REMOTE_URL           Remote URL. Can be empty.
+#   VCS_STATUS_ACTION               Repository state, A.K.A. action. Can be empty.
+#   VCS_STATUS_INDEX_SIZE           The number of files in the index.
+#   VCS_STATUS_NUM_STAGED           The number of staged changes.
+#   VCS_STATUS_NUM_CONFLICTED       The number of conflicted changes.
+#   VCS_STATUS_NUM_UNSTAGED         The number of unstaged changes.
+#   VCS_STATUS_NUM_UNTRACKED        The number of untracked files.
+#   VCS_STATUS_HAS_STAGED           1 if there are staged changes, 0 otherwise.
+#   VCS_STATUS_HAS_CONFLICTED       1 if there are conflicted changes, 0 otherwise.
+#   VCS_STATUS_HAS_UNSTAGED         1 if there are unstaged changes, 0 if there aren't, -1 if
+#                                   unknown.
 #   VCS_STATUS_NUM_UNSTAGED_DELETED The number of unstaged deleted files. Note that renamed files
 #                                   are reported as deleted plus added.
+#   VCS_STATUS_HAS_UNTRACKED        1 if there are untracked files, 0 if there aren't, -1 if
+#                                   unknown.
+#   VCS_STATUS_COMMITS_AHEAD        Number of commits the current branch is ahead of upstream.
+#                                   Non-negative integer.
+#   VCS_STATUS_COMMITS_BEHIND       Number of commits the current branch is behind upstream.
+#                                   Non-negative integer.
+#   VCS_STATUS_STASHES              Number of stashes. Non-negative integer.
+#   VCS_STATUS_TAG                  The last tag (in lexicographical order) that points to the same
+#                                   commit as HEAD.
 #
-# The point of reporting -1 as unstaged and untracked is to allow the command to skip scanning
-# files in large repos. See -m flag of gitstatus_start.
+# The point of reporting -1 via VCS_STATUS_HAS_* is to allow the command to skip scanning files in
+# large repos. See -m flag of gitstatus_start.
 #
 # gitstatus_query returns an error if gitstatus_start hasn't been called in the same shell or
 # the call had failed.
@@ -467,6 +466,13 @@ function gitstatus_start() {
 
     rm -f $lock_file $req_fifo $resp_fifo
     unset -f gitstatus_start_impl
+
+    unset GITSTATUS_DAEMON_PID_${name}
+    unset _GITSTATUS_REQ_FD_${name}
+    unset _GITSTATUS_RESP_FD_${name}
+    unset _GITSTATUS_LOCK_FD_${name}
+    unset _GITSTATUS_CLIENT_PID_${name}
+    unset _GITSTATUS_DIRTY_MAX_INDEX_SIZE_${name}
 
     >&2 print -P '[%F{red}ERROR%f]: gitstatus failed to initialize.'
     >&2 echo -E ''
