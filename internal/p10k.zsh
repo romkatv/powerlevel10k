@@ -387,9 +387,9 @@ _p9k_get_icon() {
 
 _p9k_translate_color() {
   if [[ $1 == <-> ]]; then                  # decimal color code: 255
-    _p9k_ret=$1
+    _p9k_ret=${(l.3..0.)1}
   elif [[ $1 == '#'[[:xdigit:]]## ]]; then  # hexademical color code: #ffffff
-    _p9k_ret=$1
+    _p9k_ret=${(L)1}
   else                                      # named color: red
     # Strip prifixes if there are any.
     _p9k_ret=$__p9k_colors[${${${1#bg-}#fg-}#br}]
