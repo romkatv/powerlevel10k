@@ -4458,7 +4458,7 @@ _p9k_must_init() {
     '${ZSH_VERSION}' '${ZSH_PATCHLEVEL}' '${(%):-%n}' '${GITSTATUS_LOG_LEVEL}'
     '${GITSTATUS_ENABLE_LOGGING}' '${GITSTATUS_DAEMON}' '${GITSTATUS_NUM_THREADS}'
     '${DEFAULT_USER}' '${ZLE_RPROMPT_INDENT}' '${P9K_SSH}' '${__p9k_ksh_arrays}'
-    '${__p9k_sh_glob}' '${parameters[transient_rprompt]}' 'v7')
+    '${__p9k_sh_glob}' '${parameters[transient_rprompt]}' 'v8')
   IFS=$'\2' param_sig="${(e)param_sig}"
   [[ $param_sig == $_p9k_param_sig ]] && return 1
   [[ -n $_p9k_param_sig ]] && _p9k_deinit
@@ -4665,7 +4665,7 @@ _p9k_init_vcs() {
   local daemon=${GITSTATUS_DAEMON}
   if [[ -z $daemon ]]; then
     daemon=$gitstatus_dir/bin/gitstatusd-
-    [[ _p9k_uname_o == Android ]] && daemon+=android || daemon+=${_p9k_uname:l}
+    [[ $_p9k_uname_o == Android ]] && daemon+=android || daemon+=${_p9k_uname:l}
     daemon+=-${_p9k_uname_m:l}
   fi
   local -i threads=${GITSTATUS_NUM_THREADS:-0}
