@@ -329,7 +329,6 @@
       local   modified='%178F'  # yellow foreground
       local  untracked='%39F'   # blue foreground
       local conflicted='%196F'  # red foreground
-      local    loading='%244F'  # grey foreground
     else
       # Styling for incomplete and stale Git status.
       local       meta='%244F'  # grey foreground
@@ -337,7 +336,6 @@
       local   modified='%244F'  # grey foreground
       local  untracked='%244F'  # grey foreground
       local conflicted='%244F'  # grey foreground
-      local    loading='%244F'  # grey foreground
     fi
 
     local res
@@ -746,8 +744,8 @@
   # Regular expression for the VPN network interface. Run ifconfig while on VPN to see the
   # name of the interface.
   typeset -g POWERLEVEL9K_VPN_IP_INTERFACE='(wg|(.*tun))[0-9]*'
-  # Custom icon.
-  # typeset -g POWERLEVEL9K_VPN_IP_VISUAL_IDENTIFIER_EXPANSION='⭐'
+  # Icon to show when on VPN.
+  typeset -g POWERLEVEL9K_VPN_IP_VISUAL_IDENTIFIER_EXPANSION='${P9K_VISUAL_IDENTIFIER}'
 
   #########################[ proxy: system-wide http/https/ftp proxy ]##########################
   # Proxy color.

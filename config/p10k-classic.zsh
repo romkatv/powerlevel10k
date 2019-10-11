@@ -25,7 +25,7 @@
   unset -m 'POWERLEVEL9K_*'
 
   # The list of segments shown on the left. Fill it with the most important segments.
-  typeset -ga POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(
+  typeset -g POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(
       # =========================[ Line #1 ]=========================
       # os_icon               # os identifier
       dir                     # current directory
@@ -344,12 +344,11 @@
 
     if (( $1 )); then
       # Styling for up-to-date Git status.
-      local       meta='%f'     # default foreground
+      local       meta='%248F'  # grey foreground
       local      clean='%76F'   # green foreground
       local   modified='%178F'  # yellow foreground
       local  untracked='%39F'   # blue foreground
       local conflicted='%196F'  # red foreground
-      local    loading='%244F'  # grey foreground
     else
       # Styling for incomplete and stale Git status.
       local       meta='%244F'  # grey foreground
@@ -357,7 +356,6 @@
       local   modified='%244F'  # grey foreground
       local  untracked='%244F'  # grey foreground
       local conflicted='%244F'  # grey foreground
-      local    loading='%244F'  # grey foreground
     fi
 
     local res
@@ -471,7 +469,6 @@
   typeset -g POWERLEVEL9K_STATUS_ERROR_PIPE_VISUAL_IDENTIFIER_EXPANSION='↵'
 
   ###################[ command_execution_time: duration of the last command ]###################
-  # Background color.
   # Show duration of the last command if takes longer than this many seconds.
   typeset -g POWERLEVEL9K_COMMAND_EXECUTION_TIME_THRESHOLD=3
   # Show this many fractional digits. Zero means round to seconds.
@@ -534,7 +531,7 @@
 
   # Context color when running with privileges.
   typeset -g POWERLEVEL9K_CONTEXT_ROOT_FOREGROUND=178
-  # Context format when running with privileges: bold user@hostname.
+  # Context format when running with privileges: %n is username, %m is hostname, %B for bold.
   typeset -g POWERLEVEL9K_CONTEXT_ROOT_TEMPLATE='%B%n@%m'
 
   # Don't show context unless running with privileges or in SSH.
@@ -767,8 +764,8 @@
   # Regular expression for the VPN network interface. Run ifconfig while on VPN to see the
   # name of the interface.
   typeset -g POWERLEVEL9K_VPN_IP_INTERFACE='(wg|(.*tun))[0-9]*'
-  # Custom icon.
-  # typeset -g POWERLEVEL9K_VPN_IP_VISUAL_IDENTIFIER_EXPANSION='⭐'
+  # Icon to show when on VPN.
+  typeset -g POWERLEVEL9K_VPN_IP_VISUAL_IDENTIFIER_EXPANSION='${P9K_VISUAL_IDENTIFIER}'
 
   #########################[ proxy: system-wide http/https/ftp proxy ]##########################
   # Proxy color.
