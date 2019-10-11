@@ -66,7 +66,7 @@ typeset -ra lean_left=(
 )
 
 typeset -ra lean_right=(
-  ' $prefixes[2]%101F$extra_icons[4]3s%f${show_time:+ $prefixes[3]%66F$extra_icons[5]16:23:42%f}' ''
+  ' $prefixes[2]%101F$extra_icons[4]5s%f${show_time:+ $prefixes[3]%66F$extra_icons[5]16:23:42%f}' ''
   '' ''
 )
 
@@ -76,12 +76,12 @@ typeset -ra classic_left=(
 )
 
 typeset -ra classic_right=(
-  '%$bg_color[$color]F$right_head%K{$bg_color[$color]}%f %$prefix_color[$color]F$prefixes[2]%101F3s $extra_icons[4]${show_time:+%$sep_color[$color]F$right_subsep %$prefix_color[$color]F$prefixes[3]%66F16:23:42 $extra_icons[5]}%k%F{$bg_color[$color]}$right_tail%f' '%$frame_color[$color]F─╮%f'
+  '%$bg_color[$color]F$right_head%K{$bg_color[$color]}%f %$prefix_color[$color]F$prefixes[2]%101F5s $extra_icons[4]${show_time:+%$sep_color[$color]F$right_subsep %$prefix_color[$color]F$prefixes[3]%66F16:23:42 $extra_icons[5]}%k%F{$bg_color[$color]}$right_tail%f' '%$frame_color[$color]F─╮%f'
   '' '%$frame_color[$color]F─╯%f'
 )
 
 typeset -ra pure_left=(
-  '' '%4F~/src%f %242Fmaster%f'
+  '' '%4F~/src%f %242Fmaster%f %3F5s%f'
   '' '%5F❯%f █'
 )
 
@@ -90,14 +90,14 @@ typeset -ra pure_right=(
   '' ''
 )
 
-typeset -ra p9k_left=(
-  '' '%K{0}%F{3} user@host %K{4}%F{0}$right_triangle%F{0} $extra_icons[2]~/src %K{2}%F{4}$right_triangle%F{0} $extra_icons[3]master %k%F{2}$right_triangle%f'
-  '' ' █'
+typeset -ra rainbow_left=(
+  '%$frame_color[$color]F╭─' '%F{${${extra_icons[1]:+0}:-4}}$left_tail${extra_icons[1]:+%K{0\} $extra_icons[1] %K{4\}%0F$left_sep}%K{4}%0F $extra_icons[2]%B~%b%K{4}%0F/%Bsrc%b%K{4} %K{2}%4F$left_sep %0F$prefixes[1]$extra_icons[3]master %k%2F$left_head%f'
+  '%$frame_color[$color]F╰─' '%f █'
 )
 
-typeset -ra p9k_right=(
-  '%F{0}$left_triangle%K{0}%F{2} ${(g::)icons[OK_ICON]} %F{8}$left_triangle%K{8}%F{0} 42 %F{7}$left_triangle%K{7}%F{0} 16:23:42 $extra_icons[5]%k%f' ''
-  '' ''
+typeset -ra rainbow_right=(
+  '%3F$right_head%K{3} %0F$prefixes[2]5s $extra_icons[4]%1F${show_time:+%7F$right_sep%K{7\} %0F$prefixes[3]16:23:42 $extra_icons[5]%7F}%k$right_tail%f' '%$frame_color[$color]F─╮%f'
+  '' '%$frame_color[$color]F─╯%f'
 )
 
 function prompt_length() {
@@ -539,67 +539,44 @@ function ask_narrow_icons() {
 }
 
 function ask_style() {
-  if (( cap_diamond && LINES < 25 )); then
+  if (( cap_diamond && LINES < 26 )); then
     local nl=''
   else
     local nl=$'\n'
   fi
   while true; do
     clear
-    local extra=
     flowing -c "%BPrompt Style%b"
     print -n $nl
-    print -P "%B(1)  Lean (recommended).%b"
+    print -P "%B(1)  Lean.%b"
     print -n $nl
     style=lean print_prompt
     print -P ""
-    print -P "%B(2)  Classic (recommended).%b"
+    print -P "%B(2)  Classic.%b"
     print -n $nl
     style=classic print_prompt
     print -P ""
-    print -P "%B(3)  Pure.%b"
+    print -P "%B(3)  Rainbow.%b"
+    print -n $nl
+    style=rainbow print_prompt
+    print -P ""
+    print -P "%B(4)  Pure.%b"
     print -n $nl
     style=pure print_prompt
     print -P ""
-    if (( cap_diamond )); then
-      extra+=4
-      print -P "%B(4)  Powerlevel9k.%b"
-      print -P ""
-      local dir_icon=${(g::)icons[HOME_SUB_ICON]}
-      local vcs_icon=${(g::)icons[VCS_GIT_GITHUB_ICON]}
-      local branch_icon=${(g::)icons[VCS_BRANCH_ICON]}
-      local time_icon=${(g::)icons[TIME_ICON]}
-      if (( cap_narrow_icons )); then
-        dir_icon=${dir_icon// }
-        vcs_icon=${vcs_icon// }
-        duration_icon=${duration_icon// }
-        time_icon=${time_icon// }
-      fi
-      branch_icon=${branch_icon// }
-      local many_icons=("" "$dir_icon " "$vcs_icon $branch_icon " " " "$time_icon ")
-      extra_icons=("$many_icons[@]") style=p9k num_lines=1 print_prompt
-      print -P ""
-    fi
     print -P "(r)  Restart from the beginning."
     print -P "(q)  Quit and do nothing."
     print -P ""
 
     local key=
-    read -k key${(%):-"?%BChoice [123${extra}rq]: %b"} || quit -c
+    read -k key${(%):-"?%BChoice [1234rq]: %b"} || quit -c
     case $key in
       q) quit;;
       r) return 1;;
       1) style=lean; options+=lean; break;;
       2) style=classic; options+=classic; break;;
-      3) style=pure; empty_line=1; options+=pure; break;;
-      4) if [[ $extra == *4* ]]; then
-           style=p9k
-           num_lines=1
-           extra_icons=("$many_icons[@]")
-           options+=p9k
-           break
-         fi
-         ;;
+      3) style=rainbow; options+=rainbow; break;;
+      4) style=pure; empty_line=1; options+=pure; break;;
     esac
   done
 }
@@ -614,6 +591,51 @@ function ask_color() {
   while true; do
     clear
     flowing -c "%BPrompt Color%b"
+    print -n $nl
+    print -P "%B(1)  Lightest.%b"
+    print -n $nl
+    color=1 print_prompt
+    print -P ""
+    print -P "%B(2)  Light.%b"
+    print -n $nl
+    color=2 print_prompt
+    print -P ""
+    print -P "%B(3)  Dark.%b"
+    print -n $nl
+    color=3 print_prompt
+    print -P ""
+    print -P "%B(4)  Darkest.%b"
+    print -n $nl
+    color=4 print_prompt
+    print -P ""
+    print -P "(r)  Restart from the beginning."
+    print -P "(q)  Quit and do nothing."
+    print -P ""
+
+    local key=
+    read -k key${(%):-"?%BChoice [1234rq]: %b"} || quit -c
+    case $key in
+      q) quit;;
+      r) return 1;;
+      1) color=1; options+=lightest; break;;
+      2) color=2; options+=light; break;;
+      3) color=3; options+=dark; break;;
+      4) color=4; options+=darkest; break;;
+    esac
+  done
+}
+
+function ask_frame_color() {
+  [[ $style != rainbow || $num_lines == 1 ]] && return
+  [[ $gap_char == ' ' && $left_frame == 0 && $right_frame == 0 ]] && return
+  if [[ $LINES -lt 26 ]]; then
+    local nl=''
+  else
+    local nl=$'\n'
+  fi
+  while true; do
+    clear
+    flowing -c "%BFrame Color%b"
     print -n $nl
     print -P "%B(1)  Lightest.%b"
     print -n $nl
@@ -743,7 +765,7 @@ function ask_extra_icons() {
     time_icon=${time_icon// }
   fi
   branch_icon=${branch_icon// }
-  if [[ $style == classic ]]; then
+  if [[ $style == (classic|rainbow) ]]; then
     os_icon="%255F$os_icon%f"
   else
     os_icon="%f$os_icon"
@@ -814,7 +836,7 @@ function ask_prefixes() {
 }
 
 function ask_separators() {
-  if [[ $style != classic || $cap_diamond != 1 ]]; then
+  if [[ $style != (classic|rainbow) || $cap_diamond != 1 ]]; then
     return
   fi
   if [[ $POWERLEVEL9K_MODE == nerdfont-complete && $LINES -lt 26 ]]; then
@@ -901,7 +923,7 @@ function ask_separators() {
 }
 
 function ask_heads() {
-  if [[ $style != classic || $cap_diamond != 1 ]]; then
+  if [[ $style != (classic|rainbow) || $cap_diamond != 1 ]]; then
     return
   fi
   if [[ $POWERLEVEL9K_MODE == nerdfont-complete && $LINES -lt 26 ]]; then
@@ -970,7 +992,7 @@ function ask_heads() {
 }
 
 function ask_tails() {
-  if [[ $style != classic ]]; then
+  if [[ $style != (classic|rainbow) ]]; then
     return
   fi
   if [[ $POWERLEVEL9K_MODE == nerdfont-complete && $LINES -lt 31 ]]; then
@@ -1116,7 +1138,7 @@ function ask_gap_char() {
 }
 
 function ask_frame() {
-  if [[ $style != classic || $num_lines != 2 ]]; then
+  if [[ $style != (classic|rainbow) || $num_lines != 2 ]]; then
     return
   fi
 
@@ -1277,24 +1299,12 @@ function generate_config() {
     uncomment 'typeset -g POWERLEVEL9K_VISUAL_IDENTIFIER_EXPANSION'
     sub VISUAL_IDENTIFIER_EXPANSION "'\${P9K_VISUAL_IDENTIFIER// }'"
     sub BACKGROUND_JOBS_VISUAL_IDENTIFIER_EXPANSION "'\${P9K_VISUAL_IDENTIFIER// }'"
+    sub VPN_IP_VISUAL_IDENTIFIER_EXPANSION "'\${P9K_VISUAL_IDENTIFIER// }'"
     sub OS_ICON_CONTENT_EXPANSION "'%B\${P9K_CONTENT// }'"
-    if [[ $style == p9k ]]; then
-      uncomment 'typeset -g POWERLEVEL9K_VCS_UNTRACKED_ICON'
-      uncomment 'typeset -g POWERLEVEL9K_VCS_UNSTAGED_ICON'
-      uncomment 'typeset -g POWERLEVEL9K_VCS_STAGED_ICON'
-      uncomment 'typeset -g POWERLEVEL9K_VCS_STASH_ICON'
-      uncomment 'typeset -g POWERLEVEL9K_VCS_INCOMING_CHANGES_ICON'
-      uncomment 'typeset -g POWERLEVEL9K_VCS_OUTGOING_CHANGES_ICON'
-      sub VCS_UNTRACKED_ICON "'${icons[VCS_UNTRACKED_ICON]// }'"
-      sub VCS_UNSTAGED_ICON "'${icons[VCS_UNSTAGED_ICON]// }'"
-      sub VCS_STAGED_ICON "'${icons[VCS_STAGED_ICON]// }'"
-      sub VCS_STASH_ICON "'${icons[VCS_STASH_ICON]// }'"
-      sub VCS_INCOMING_CHANGES_ICON "'${icons[VCS_INCOMING_CHANGES_ICON]// }'"
-      sub VCS_OUTGOING_CHANGES_ICON "'${icons[VCS_OUTGOING_CHANGES_ICON]// }'"
-    fi
   else
     sub VISUAL_IDENTIFIER_EXPANSION "'\${P9K_VISUAL_IDENTIFIER}'"
     sub BACKGROUND_JOBS_VISUAL_IDENTIFIER_EXPANSION "'\${P9K_VISUAL_IDENTIFIER}'"
+    sub VPN_IP_VISUAL_IDENTIFIER_EXPANSION "'\${P9K_VISUAL_IDENTIFIER}'"
   fi
 
   if [[ $POWERLEVEL9K_MODE == compatible ]]; then
@@ -1319,8 +1329,17 @@ function generate_config() {
     sub BATTERY_STAGES "\$'\uf58d\uf579\uf57a\uf57b\uf57c\uf57d\uf57e\uf57f\uf580\uf581\uf578'"
   fi
 
-  if [[ $style == classic ]]; then
-    sub BACKGROUND $bg_color[$color]
+  if [[ $style == (classic|rainbow) ]]; then
+    if [[ $style == classic ]]; then
+      sub BACKGROUND $bg_color[$color]
+      sub LEFT_SUBSEGMENT_SEPARATOR "'%$sep_color[$color]F$left_subsep'"
+      sub RIGHT_SUBSEGMENT_SEPARATOR "'%$sep_color[$color]F$right_subsep'"
+      sub VCS_LOADING_FOREGROUND $sep_color[$color]
+      rep '%248F' "%$prefix_color[$color]F"
+    else
+      sub LEFT_SUBSEGMENT_SEPARATOR "'$left_subsep'"
+      sub RIGHT_SUBSEGMENT_SEPARATOR "'$right_subsep'"
+    fi
     sub MULTILINE_FIRST_PROMPT_GAP_FOREGROUND $frame_color[$color]
     sub MULTILINE_FIRST_PROMPT_PREFIX "'%$frame_color[$color]F╭─'"
     sub MULTILINE_NEWLINE_PROMPT_PREFIX "'%$frame_color[$color]F├─'"
@@ -1328,16 +1347,12 @@ function generate_config() {
     sub MULTILINE_FIRST_PROMPT_SUFFIX "'%$frame_color[$color]F─╮'"
     sub MULTILINE_NEWLINE_PROMPT_SUFFIX "'%$frame_color[$color]F─┤'"
     sub MULTILINE_LAST_PROMPT_SUFFIX "'%$frame_color[$color]F─╯'"
-    sub LEFT_SUBSEGMENT_SEPARATOR "'%$sep_color[$color]F$left_subsep'"
-    sub RIGHT_SUBSEGMENT_SEPARATOR "'%$sep_color[$color]F$right_subsep'"
     sub LEFT_SEGMENT_SEPARATOR "'$left_sep'"
     sub RIGHT_SEGMENT_SEPARATOR "'$right_sep'"
     sub LEFT_PROMPT_FIRST_SEGMENT_START_SYMBOL "'$left_tail'"
     sub LEFT_PROMPT_LAST_SEGMENT_END_SYMBOL "'$left_head'"
     sub RIGHT_PROMPT_FIRST_SEGMENT_START_SYMBOL "'$right_head'"
     sub RIGHT_PROMPT_LAST_SEGMENT_END_SYMBOL "'$right_tail'"
-    sub VCS_LOADING_FOREGROUND $sep_color[$color]
-    rep '%248F' "%$prefix_color[$color]F"
   fi
 
   if [[ -n $show_time ]]; then
@@ -1364,14 +1379,19 @@ function generate_config() {
     uncomment 'typeset -g POWERLEVEL9K_CONTEXT_PREFIX'
     uncomment 'typeset -g POWERLEVEL9K_KUBECONTEXT_PREFIX'
     uncomment 'typeset -g POWERLEVEL9K_TIME_PREFIX'
-    [[ $style == classic ]] && local fg="%$prefix_color[$color]F" || local fg="%f"
-    sub VCS_PREFIX "'${fg}on '"
-    sub COMMAND_EXECUTION_TIME_PREFIX "'${fg}took '"
-    sub CONTEXT_PREFIX "'${fg}with '"
-    sub KUBECONTEXT_PREFIX "'${fg}at '"
-    sub TIME_PREFIX "'${fg}at '"
-    sub CONTEXT_TEMPLATE "'%n$fg at %180F%m'"
-    sub CONTEXT_ROOT_TEMPLATE "'%n$fg at %227F%m'"
+    if [[ $style == (lean|classic) ]]; then
+      [[ $style == classic ]] && local fg="%$prefix_color[$color]F" || local fg="%f"
+      sub VCS_PREFIX "'${fg}on '"
+      sub COMMAND_EXECUTION_TIME_PREFIX "'${fg}took '"
+      sub CONTEXT_PREFIX "'${fg}with '"
+      sub KUBECONTEXT_PREFIX "'${fg}at '"
+      sub TIME_PREFIX "'${fg}at '"
+      sub CONTEXT_TEMPLATE "'%n$fg at %180F%m'"
+      sub CONTEXT_ROOT_TEMPLATE "'%n$fg at %227F%m'"
+    else
+      sub CONTEXT_TEMPLATE "'%n at %m'"
+      sub CONTEXT_ROOT_TEMPLATE "'%n at %m'"
+    fi
   fi
 
   if (( num_lines == 1 )); then
@@ -1385,7 +1405,7 @@ function generate_config() {
 
   sub MULTILINE_FIRST_PROMPT_GAP_CHAR "'$gap_char'"
 
-  if [[ $style == classic && $num_lines == 2 ]]; then
+  if [[ $style == (classic|rainbow) && $num_lines == 2 ]]; then
     if (( ! right_frame )); then
       sub MULTILINE_FIRST_PROMPT_SUFFIX ''
       sub MULTILINE_NEWLINE_PROMPT_SUFFIX ''
@@ -1514,11 +1534,15 @@ while true; do
   fi
   (( cap_python )) && options[-1]+=' + python'
   if (( cap_diamond )); then
+    left_sep=$right_triangle
+    right_sep=$left_triangle
     left_subsep=$right_angle
     right_subsep=$left_angle
     left_head=$right_triangle
     right_head=$left_triangle
   else
+    left_sep=
+    right_sep=
     left_subsep=$vertical_bar
     right_subsep=$vertical_bar
     left_head=$fade_out
@@ -1527,7 +1551,7 @@ while true; do
   _p9k_init_icons
   ask_narrow_icons     || continue
   ask_style            || continue
-  if [[ $style == (lean|classic) ]]; then
+  if [[ $style != pure ]]; then
     ask_color          || continue
     ask_time           || continue
     ask_separators     || continue
@@ -1536,6 +1560,7 @@ while true; do
     ask_num_lines      || continue
     ask_gap_char       || continue
     ask_frame          || continue
+    ask_frame_color    || continue
     ask_empty_line     || continue
     ask_extra_icons    || continue
     ask_prefixes       || continue
