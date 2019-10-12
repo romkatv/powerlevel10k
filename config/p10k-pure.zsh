@@ -123,7 +123,7 @@
   # Don't show the number of commits next to the ahead/behind arrows.
   typeset -g POWERLEVEL9K_VCS_{COMMITS_AHEAD,COMMITS_BEHIND}_MAX_NUM=1
   # Remove space between '⇣' and '⇡', and get rid of $' \b'.
-  typeset -g POWERLEVEL9K_VCS_CONTENT_EXPANSION=$'${${P9K_CONTENT/⇣* ⇡/⇣⇡}// \b}'
+  typeset -g POWERLEVEL9K_VCS_CONTENT_EXPANSION="\${\${P9K_CONTENT/⇣* ⇡/⇣⇡}// \b}"
 }
 
 (( ${#p10k_config_opts} )) && setopt ${p10k_config_opts[@]}
