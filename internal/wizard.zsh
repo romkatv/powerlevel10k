@@ -1552,22 +1552,25 @@ while true; do
   _p9k_init_icons
   ask_narrow_icons     || continue
 
-  local dir_icon=${(g::)icons[HOME_SUB_ICON]}
-  local vcs_icon=${(g::)icons[VCS_GIT_GITHUB_ICON]}
-  local branch_icon=${(g::)icons[VCS_BRANCH_ICON]}
-  if (( cap_narrow_icons )); then
-    dir_icon=${dir_icon// }
-    vcs_icon=${vcs_icon// }
-    branch_icon=${branch_icon// }
-  fi
-  local many=("$dir_icon " "$vcs_icon $branch_icon ")
+  # Set screen size to 80x25, run `p10k configure`, answer "yyyy22".
+  local few_icons=("$extra_icons[@]")
+  ask_extra_icons      || continue
+  local many_icons=("$extra_icons[@]")
 
-  # Set screen size to 70x20, run p9k_configure, answer 'yyny'.
+  local concise=("$prefixes[@]")
+  ask_prefixes         || continue
+  local fluent=("$prefixes[@]")
+
+  color=3
+
   reset
   echo
-  centered "Lean Style"
+  flowing -c "Lean Style"
   (
     style=lean
+    extra_icons=("$few_icons[@]")
+    prefixes=("$concise[@]")
+    show_time=
     num_lines=1
     prompt_indent=4
     rprompt_indent=4
@@ -1577,8 +1580,9 @@ while true; do
   echo
   (
     style=lean
-    extra_icons=($many)
-    prefixes=('on ' 'at ')
+    extra_icons=("$many_icons[@]")
+    prefixes=("$fluent[@]")
+    show_time=1
     num_lines=2
     prompt_indent=4
     rprompt_indent=4
@@ -1586,9 +1590,12 @@ while true; do
     print_prompt
   )
   echo
-  centered "Classic Style"
+  flowing -c "Classic Style"
   (
     style=classic
+    extra_icons=("$few_icons[@]")
+    prefixes=("$concise[@]")
+    show_time=
     num_lines=1
     prompt_indent=4
     rprompt_indent=4
@@ -1598,6 +1605,9 @@ while true; do
   echo
   (
     style=classic
+    extra_icons=("$many_icons[@]")
+    prefixes=("$fluent[@]")
+    show_time=1
     num_lines=2
     # slanted sep
     left_sep=$down_triangle
@@ -1614,8 +1624,25 @@ while true; do
     echo
     print_prompt
   )
+  echo
+  flowing -c "Rainbow Style"
   (
-    style=classic
+    style=rainbow
+    extra_icons=("$few_icons[@]")
+    prefixes=("$concise[@]")
+    show_time=
+    num_lines=1
+    prompt_indent=4
+    rprompt_indent=4
+    echo
+    print_prompt
+  )
+  echo
+  (
+    style=rainbow
+    extra_icons=("$many_icons[@]")
+    prefixes=("$fluent[@]")
+    show_time=1
     num_lines=2
     # slanted sep
     left_sep=$down_triangle
@@ -1629,17 +1656,16 @@ while true; do
     left_tail=$up_triangle
     right_tail=$down_triangle
     # gap_char="·"
-    # gap_char="─"
+    gap_char="─"
     left_frame=0; right_frame=1
-    extra_icons=($many)
     prompt_indent=4
     rprompt_indent=2
     echo
     print_prompt
   )
   tput civis
+  trap 'tput cnorm' EXIT INT
   read
-  tput cnorm
   return 1
 
   ask_style            || continue
