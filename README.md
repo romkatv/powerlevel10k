@@ -1,15 +1,12 @@
 # Powerlevel10k
 
-Powerlevel10k is a theme for ZSH. It's a backward-compatible modern reimplementation of
-[Powerlevel9k](https://github.com/bhilburn/powerlevel9k) with lower latency, better
-prompt responsiveness and scores of extra features.
+Powerlevel10k is a theme for ZSH. It's fast, flexible and easy to install and configure.
 
-Powerlevel10k can be used as a drop-in replacement for Powerlevel9k. When given the same
-configuration options it will generate
-[the same](#does-powerlevel10k-always-render-exactly-the-same-prompt-as-powerlevel9k-given-the-same-config)
-prompt. It will be [much faster](#is-it-really-fast) though.
+Powerlevel10k can be used as a [fast](#is-it-really-fast) drop-in replacement for
+[Powerlevel9k](https://github.com/bhilburn/powerlevel9k). When given the same configuration options
+it will generate the same prompt.
 
-![p10k-lean](https://raw.githubusercontent.com/romkatv/powerlevel10k/master/config/p10k-lean.png)
+![Powerlevel10k](https://raw.githubusercontent.com/romkatv/powerlevel10k/master/powerlevel10k.png)
 
 ## Table of Contents
 
@@ -21,14 +18,21 @@ prompt. It will be [much faster](#is-it-really-fast) though.
    1. [Zplug](#zplug)
    1. [Zgen](#zgen)
    1. [Antibody](#antibody)
+   1. [Zplugin](#zplugin)
 1. [Configuration](#configuration)
    1. [For new users](#for-new-users)
-   1. [For existing users](#for-existing-users)
+   1. [For Powerlevel9k users](#for-powerlevel9k-users)
 1. [Fonts](#fonts)
+   1. [Recommended: Meslo Nerd Font patched for Powerlevel10k](#recommended-meslo-nerd-font-patched-for-powerlevel10k)
 1. [Try it in Docker](#try-it-in-docker)
-1. [Is it really faster?](#is-it-really-fast)
+1. [Is it really fast?](#is-it-really-fast)
 1. [License](#license)
 1. [FAQ](#faq)
+   1. [Why my icons and/or powerline symbols look bad?](#why-my-icons-andor-powerline-symbols-look-bad)
+   1. [Why is my cursor in the wrong place?](#why-is-my-cursor-in-the-wrong-place)
+   1. [Why is my right prompt wrapping around in a weird way?](#why-is-my-right-prompt-wrapping-around-in-a-weird-way)
+   1. [I cannot install the recommended font. Help!](#i-cannot-install-the-recommended-font-help)
+   1. [Why do I have a question mark symbol in my prompt? Is my font broken?](#why-do-i-have-a-question-mark-symbol-in-my-prompt-is-my-font-broken)
    1. [Why does Powerlevel10k spawn extra processes?](#why-does-powerlevel10k-spawn-extra-processes)
    1. [Are there configuration options that make Powerlevel10k slow?](#are-there-configuration-options-that-make-powerlevel10k-slow)
    1. [Is Powerlevel10k fast to load?](#is-powerlevel10k-fast-to-load)
@@ -42,7 +46,7 @@ prompt. It will be [much faster](#is-it-really-fast) though.
 ### Manual
 
 ```zsh
-git clone https://github.com/romkatv/powerlevel10k.git ~/powerlevel10k
+git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ~/powerlevel10k
 echo 'source ~/powerlevel10k/powerlevel10k.zsh-theme' >>! ~/.zshrc
 ```
 
@@ -69,7 +73,7 @@ somewhere after it.
 
 ### Zplug
 
-Add `zplug romkatv/powerlevel10k, use:powerlevel10k.zsh-theme` to your `~/.zshrc`.
+Add `zplug romkatv/powerlevel10k, as:theme, depth:1` to your `~/.zshrc`.
 
 ### Zgen
 
@@ -79,50 +83,72 @@ Add `zgen load romkatv/powerlevel10k powerlevel10k` to your `~/.zshrc`.
 
 Add `antibody bundle romkatv/powerlevel10k` to your `~/.zshrc`.
 
+### Zplugin
+
+Add `zplugin ice depth=1; zplugin light romkatv/powerlevel10k` to your `~/.zshrc`.
+
+The use of `depth` ice is optional. Other types of ice are neither recommended nor officially
+supported by Powerlevel10k.
+
 ## Configuration
 
 ### For new users
 
 On the first run Powerlevel10k configuration wizard will ask you a few questions and configure
-your prompt. If it doesn't trigger automatically, type `p9k_configure`.
+your prompt. If it doesn't trigger automatically, type `p10k configure`.
 
-### For existing users
+### For Powerlevel9k users
 
 If you've been using Powerlevel9k before, **do not remove the configuration options**. Powerlevel10k
 will pick them up and provide you with the same prompt UI you are used to. Powerlevel10k recognized
 all configuration options used by Powerlevel9k. See Powerlevel9k
-[configuration guide](https://github.com/bhilburn/powerlevel9k#prompt-customization).
+[configuration guide](https://github.com/Powerlevel9k/powerlevel9k/blob/master/README.md#prompt-customization).
 
-To go beyond the functionality of Powerlevel9k, type `p9k_configure` and explore unique styles and
-features Powerlevel10k has to offer.
+To go beyond the functionality of Powerlevel9k, type `p10k configure` and explore the unique styles
+and features Powerlevel10k has to offer.
 
 ## Fonts
 
-Powerlevel10k doesn't require custom fonts but it can take advantage of them if they are available.
+Powerlevel10k doesn't require custom fonts but can take advantage of them if they are available.
 It works well with [Nerd Fonts](https://github.com/ryanoasis/nerd-fonts),
 [Source Code Pro](https://github.com/adobe-fonts/source-code-pro),
 [Font Awesome](https://fontawesome.com/), [Powerline](https://github.com/powerline/fonts), and even
 the default system fonts. The full choice of style options is available only when using
 [Nerd Fonts](https://github.com/ryanoasis/nerd-fonts).
 
-Overwhelmed? Try the beautiful and powerful Meslo from Nerd Fonts. Download these
-[four ttf files](https://github.com/romkatv/dotfiles-public/tree/master/.local/share/fonts/NerdFonts),
-double-click on each and press "Install". This will make `MesloLGS NF` font available to all
-applications on your system. Configure your terminal to use `MesloLGS NF`:
+### Recommended: Meslo Nerd Font patched for Powerlevel10k
 
-- **iTerm2**: Open *iTerm2 → Preferences → Profiles → Text → Change Font* and set *Family* to `MesloLGS NF`.
+Download these four ttf files:
+- [MesloLGS NF Regular.ttf](https://github.com/romkatv/dotfiles-public/raw/master/.local/share/fonts/NerdFonts/MesloLGS%20NF%20Regular.ttf)
+- [MesloLGS NF Bold.ttf](https://github.com/romkatv/dotfiles-public/raw/master/.local/share/fonts/NerdFonts/MesloLGS%20NF%20Bold.ttf)
+- [MesloLGS NF Italic.ttf](https://github.com/romkatv/dotfiles-public/raw/master/.local/share/fonts/NerdFonts/MesloLGS%20NF%20Italic.ttf)
+- [MesloLGS NF Bold Italic.ttf](https://github.com/romkatv/dotfiles-public/raw/master/.local/share/fonts/NerdFonts/MesloLGS%20NF%20Bold%20Italic.ttf)
+
+Double-click on each file and press "Install". This will make `MesloLGS NF` font available to all
+applications on your system. Configure your terminal to use this font:
+
+- **iTerm2**: Open *iTerm2 → Preferences → Profiles → Text* and set *Font* to `MesloLGS NF`.
+- **Hyper**: Open *Hyper → Edit → Preferences* and change the value of `fontFamily` under
+  `module.exports.config` to `MesloLGS NF`.
 - **Visual Studio Code**: Open *File → Preferences → Settings*, enter
-  `terminal.integrated.fontFamily` in the search box and set value to `MesloLGS NF`.
-- **Windows Command Prompt**: Use
-  [this script](https://gist.github.com/romkatv/aa7a70fe656d8b655e3c324eb10f6a8b).
-- **Linux/GNOME** (all terminals): Type this command:
-```zsh
-sudo apt install libglib2.0-bin
-gsettings set org.gnome.desktop.interface monospace-font-name 'MesloLGS NF 11'
-```
+  `terminal.integrated.fontFamily` in the search box and set the value to `MesloLGS NF`.
+- **GNOME Terminal** (the default Ubuntu terminal): Open *Terminal → Preferences* and click on the
+  selected profile under *Profiles*. Check *Custom font* under *Text Appearance* and select
+  `MesloLGS NF Regular`.
+- **Konsole**: Open *Settings → Edit Current Profile → Appearance*, click *Select Font* and select
+  `MesloLGS NF Regular`.
+- **Tilix**: Open *Tilix → Preferences* and click on the selected profile under *Profiles*. Check
+  *Custom font* under *Text Appearance* and select `MesloLGS NF Regular`.
+- **Windows Console Host** (the old thing): Click the icon in the top left corner, then
+  *Properties → Font* and set *Font* to `MesloLGS NF`.
+- **Windows Terminal** (the new thing): Open *Settings* (`Ctrl+,`), search for `fontFace` and set
+  value to `MesloLGS NF` for every profile.
+- **Termux**: Type `p10k configure` and answer `Yes` when asked whether to install *Meslo Nerd Font*.
 
-(Using a different terminal and know how to set font for it? Share your knowledge by sending a PR
-to expand the list!)
+Run `p10k configure` to pick the best style for your new font.
+
+_Using a different terminal and know how to set font for it? Share your knowledge by sending a PR
+to expand the list!_
 
 ## Try it in Docker
 
@@ -130,9 +156,9 @@ Try Powerlevel10k in Docker. You can safely make any changes to the file system 
 the theme. Once you exit zsh, the image is deleted.
 
 ```zsh
-docker run -e LANG=C.UTF-8 -e LC_ALL=C.UTF-8 -e TERM -it --rm ubuntu bash -uexc '
-  cd && apt update && apt install -y zsh git
-  git clone https://github.com/romkatv/powerlevel10k.git
+docker run -e LANG=en_US.utf8 -e TERM -it --rm archlinux/base bash -uexc '
+  pacman -Sy --noconfirm zsh git
+  git clone https://github.com/romkatv/powerlevel10k.git ~/powerlevel10k
   echo "source ~/powerlevel10k/powerlevel10k.zsh-theme" >>~/.zshrc
   cd ~/powerlevel10k
   exec zsh'
@@ -173,6 +199,54 @@ covered by the same license.
 
 ## FAQ
 
+### Why my icons and/or powerline symbols look bad?
+
+It's likely your font's fault.
+[Install the recommended font](#recommended-meslo-nerd-font-patched-for-powerlevel10k) and run
+`p10k configure`.
+
+### Why is my cursor in the wrong place?
+
+It's likely your font's fault.
+[Install the recommended font](#recommended-meslo-nerd-font-patched-for-powerlevel10k) and run
+`p10k configure`.
+
+If this doesn't help, type `unset ZLE_RPROMPT_INDENT`. If it fixes the issue, make the change
+permanent:
+
+```zsh
+echo 'unset ZLE_RPROMPT_INDENT' >>! ~/.zshrc
+```
+
+### Why is my right prompt wrapping around in a weird way?
+
+It's likely your font's fault.
+[Install the recommended font](#recommended-meslo-nerd-font-patched-for-powerlevel10k) and run
+`p10k configure`.
+
+If this doesn't help, type `unset ZLE_RPROMPT_INDENT`. If it fixes the issue, make the change
+permanent:
+
+```zsh
+echo 'unset ZLE_RPROMPT_INDENT' >>! ~/.zshrc
+```
+
+### I cannot install the recommended font. Help!
+
+Once you download [the recommended font](#recommended-meslo-nerd-font-patched-for-powerlevel10k),
+you can install it just like any other font. Google "how to install fonts on *your-OS*".
+
+### Why do I have a question mark symbol in my prompt? Is my font broken?
+
+If it looks like a regular `?`, that's normal. It means you have untracked files in the current Git
+repository. Type `git status` to see these files. You can change this symbol or disable the display
+of untracked files altogether. Search for `untracked files` in `~/.p10k.zsh`.
+
+You can also get a weird-looking question mark in your prompt if your terminal's font is missing
+some glyphs. To fix this problem,
+[install the recommended font](#recommended-meslo-nerd-font-patched-for-powerlevel10k) and run
+`p10k configure`.
+
 ### Why does Powerlevel10k spawn extra processes?
 
 Powerlevel10k uses [gitstatus](https://github.com/romkatv/gitstatus) as the backend behind `vcs`
@@ -189,22 +263,17 @@ prompt latency when using Powerlevel10k, please
 
 ### Is Powerlevel10k fast to load?
 
-The short answer is no. The amount of time it takes for Powerlevel10k to render the first prompt
-is in the same ballpark as for Powerlevel9k.
+Yes, provided that you are using ZSH >= 5.4.
 
-Time to first prompt can be measured with the following benchmark:
+Loading time, or time to first prompt, can be measured with the following benchmark:
 
 ```zsh
-time (repeat 100 zsh -dfis <<< 'source ~/powerlevel10k/powerlevel10k.zsh-theme')
+time (repeat 1000 zsh -dfis <<< 'source ~/powerlevel10k/powerlevel10k.zsh-theme')
 ```
 
-On the same machine as in the [prompt benchmark](#is-it-really-fast) this results in 147 ms per
-invocation when executed in a small git repository (I used the `powerlevel10k` repo itself). For
-comparison, the same benchmark gives 170 ms for powerlevel9k/master and 505 ms for
-powerlevel9k/next.
-
-If your workflow requires that you open a terminal tab, type a command or two and close the tab,
-Powerlevel10k isn't the best choice. Powerlevel10k is optimized for long-lived ZSH sessions.
+Running this command with `~/powerlevel10k` as the current directory on the same machine as in the
+[prompt benchmark](#is-it-really-fast) takes 29 seconds (29 ms per invocation). This is about 6
+times faster than powerlevel9k/master and 17 times faster than powerlevel9k/next.
 
 ### Does Powerlevel10k always render exactly the same prompt as Powerlevel9k given the same config?
 
@@ -212,17 +281,18 @@ This is the goal. You should be able to switch from Powerlevel9k to Powerlevel10
 visible changes except for performance. There are, however, several differences.
 
 - By default only `git` vcs backend is enabled in Powerlevel10k. If you need `svn` and `hg`, you'll
-  need to set `POWERLEVEL9K_VCS_BACKENDS`.
-- Powerlevel10k is bug-compatible with Powerlevel9k except for egregious bugs. If you accidentally
-  rely on these bugs, your prompt will differ between Powerlevel9k and Powerlevel10k. Some examples:
+  need to add them to `POWERLEVEL9K_VCS_BACKENDS`.
+- Powerlevel10k strives to be bug-compatible with Powerlevel9k but not when it comes to egregious
+  bugs. If you accidentally rely on these bugs, your prompt will differ between Powerlevel9k and
+  Powerlevel10k. Some examples:
   - Powerlevel9k doesn't respect `ZLE_RPROMPT_INDENT`. As a result, right prompt in Powerlevel10k
-    can have an extra space compared to Powerlevel9k. Set `ZLE_RPROMPT_INDENT=0` if you don't want
-    that space.
-  - Powerlevel9k ignores some options that are set after the theme is sources while Powerlevel10k
+    can have an extra space at the end compared to Powerlevel9k. Set `ZLE_RPROMPT_INDENT=0` if you
+    don't want that space.
+  - Powerlevel9k ignores some options that are set after the theme is sourced while Powerlevel10k
     respects all options. If you see different icons in Powerlevel9k and Powerlevel10k, you've
     probably defined `POWERLEVEL9K_MODE` before sourcing the theme. This parameter gets ignored
-    by Powerlevel9k but not Powerlevel10k. If you want your prompt to look in Powerlevel10k the same
-    as in Powerlevel9k, remove `POWERLEVEL9K_MODE`.
+    by Powerlevel9k but honored by Powerlevel10k. If you want your prompt to look in Powerlevel10k
+    the same as in Powerlevel9k, remove `POWERLEVEL9K_MODE`.
   - There are
     [dozens more bugs](https://github.com/Powerlevel9k/powerlevel9k/issues/created_by/romkatv) in
     Powerlevel9k that don't exist in Powerlevel10k.
@@ -250,7 +320,7 @@ theme (so that you end up with no theme) and then installing Powerlevel10k manua
 - **oh-my-zsh:** Open `~/.zshrc` and remove the line that sets `ZSH_THEME`, such as
   `ZSH_THEME=powerlevel9k/powerlevel9k`.
 - **antigen:** Open `~/.zshrc` and remove the line that sets `antigen theme`, such as
-  `antigen theme bhilburn/powerlevel9k powerlevel9k`.
+  `antigen theme powerlevel9k/powerlevel9k`.
 
 2. Install Powerlevel10k manually.
 
