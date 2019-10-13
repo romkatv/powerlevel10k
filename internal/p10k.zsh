@@ -4484,7 +4484,7 @@ function _p9k_init_cacheable() {
   [[ $_p9k_uname == Linux ]] && _p9k_uname_o="$(uname -o 2>/dev/null)"
   _p9k_uname_m="$(uname -m)"
 
-  if [[ $_p9k_uname == Linux && _p9k_uname_o == Android ]]; then
+  if [[ $_p9k_uname == Linux && $_p9k_uname_o == Android ]]; then
     _p9k_set_os Android ANDROID_ICON
   else
     case $_p9k_uname in
