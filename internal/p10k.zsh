@@ -4413,7 +4413,7 @@ _p9k_init_prompt() {
   fi
 
   if [[ $ITERM_SHELL_INTEGRATION_INSTALLED == Yes ]]; then
-    _p9k_prompt_prefix_left+="%{$(iterm2_prompt_mark)%}"
+    _p9k_prompt_prefix_left+=$'%{\e]133;A\a%}'
   fi
 
   [[ -o transient_rprompt && -n "$_p9k_line_segments_right[1,-2]" ]] ||
@@ -4458,7 +4458,8 @@ _p9k_must_init() {
     '${ZSH_VERSION}' '${ZSH_PATCHLEVEL}' '${(%):-%n}' '${GITSTATUS_LOG_LEVEL}'
     '${GITSTATUS_ENABLE_LOGGING}' '${GITSTATUS_DAEMON}' '${GITSTATUS_NUM_THREADS}'
     '${DEFAULT_USER}' '${ZLE_RPROMPT_INDENT}' '${P9K_SSH}' '${__p9k_ksh_arrays}'
-    '${__p9k_sh_glob}' '${parameters[transient_rprompt]}' 'v8')
+    '${__p9k_sh_glob}' '${parameters[transient_rprompt]}' '${ITERM_SHELL_INTEGRATION_INSTALLED}'
+    'v8')
   IFS=$'\2' param_sig="${(e)param_sig}"
   [[ $param_sig == $_p9k_param_sig ]] && return 1
   [[ -n $_p9k_param_sig ]] && _p9k_deinit
