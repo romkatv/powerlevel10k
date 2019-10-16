@@ -935,7 +935,7 @@ prompt_anaconda() {
 # AWS Profile
 prompt_aws() {
   local aws_profile="${AWS_VAULT:-${AWSUME_PROFILE:-${AWS_PROFILE:-$AWS_DEFAULT_PROFILE}}}"
-  if [[ "$aws_profile" != (default|) ]]; then
+  if [[ ! -z "$aws_profile" ]]; then
     _p9k_prompt_segment "$0" red white 'AWS_ICON' 0 '' "${aws_profile//\%/%%}"
   fi
 }
