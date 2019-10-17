@@ -2698,7 +2698,7 @@ function _p9k_vcs_render() {
     cache_key+=$VCS_STATUS_COMMIT
   fi
 
-  if ! _p9k_cache_get "$state" "${(@)cache_key}"; then
+  if ! _p9k_cache_ephemeral_get "$state" "${(@)cache_key}"; then
     local icon
     local content
 
@@ -2805,7 +2805,7 @@ function _p9k_vcs_render() {
       fi
     fi
 
-    _p9k_cache_set "prompt_vcs_$state" "${__p9k_vcs_states[$state]}" "$_p9k_color1" "$icon" 0 '' "$content"
+    _p9k_cache_ephemeral_set "prompt_vcs_$state" "${__p9k_vcs_states[$state]}" "$_p9k_color1" "$icon" 0 '' "$content"
   fi
 
   _p9k_prompt_segment "$_p9k_cache_val[@]"
