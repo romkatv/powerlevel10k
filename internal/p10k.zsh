@@ -3444,91 +3444,121 @@ function _p9k_set_prompt() {
   IFS=$ifs
 }
 
-_p9k_dump_instant_prompt() {
-  is-at-least 5.4 || return  # `typeset -g` doesn't roundtrip in zsh prior to 5.4.
-  local dir=${__p9k_dump_file:h}
-  local file=$dir/p10k-instant-prompt-${(%):-%n}.zsh
-  [[ -d $dir ]] || mkdir $dir || return
-  [[ -w $dir ]] || return
-  local tmp=$file.$$-$EPOCHREALTIME-$RANDOM
-  local -i fd
-  sysopen -a -m 600 -o creat,trunc -u fd $tmp || return
-  {
-    >&$fd print -rn -- "() {
-  emulate zsh
-  [[ \$ZSH_VERSION == ${(q)ZSH_VERSION} && \$ZSH_PATCHLEVEL == ${(q)ZSH_PATCHLEVEL} ]] || return 0
-  local -i ZLE_RPROMPT_INDENT=${ZLE_RPROMPT_INDENT:-1}
-  local PROMPT_EOL_MARK=${(q)PROMPT_EOL_MARK-%B%S%#%s%b}
-  [[ -n \$SSH_CLIENT || -n \$SSH_TTY || -n \$SSH_CONNECTION ]] && local ssh=1 || local ssh=0
-  local key=\${(%):-%/}\$'\0'\$ssh\$'\0'\${(%):-%#}
-  local cr=\$'\r' lf=\$'\n' esc=\$'\e['
-  local -i height=$_POWERLEVEL9K_INSTANT_PROMPT_COMMAND_LINES
-  zmodload zsh/langinfo
-  if [[ \${langinfo[CODESET]:-} != (utf|UTF)(-|)8 ]]; then
-    local LC_ALL=\${\${(@M)\$(locale -a 2>/dev/null):#*.(utf|UTF)(-|)8}[1]:-en_US.UTF-8}
-  fi
-  "
-    >&$fd typeset -p __p9k_instant_prompt _p9k_t
-    >&$fd print -r -- '
-  local prompts=("${(@e)${(@0)__p9k_instant_prompt[$key]}}")
-  (( $#prompts == 3 )) || { unset _p9k_t; return }
-  zmodload zsh/terminfo
-  (( $+terminfo[cuu] && $+terminfo[cuf] && $+terminfo[sgr0] && $+terminfo[ed] && $+terminfo[sc] && $+terminfo[rc] )) || { unset _p9k_t; return }
-  local _p9k_ret=
-  function _p9k_prompt_length() {
-    local COLUMNS=1024
-    local -i x y=$#1 m
-    if (( y )); then
-      while (( ${${(%):-$1%$y(l.1.0)}[-1]} )); do
-        x=y
-        (( y *= 2 ));
-      done
-      local xy
-      while (( y > x + 1 )); do
-        m=$(( x + (y - x) / 2 ))
-        typeset ${${(%):-$1%$m(l.x.y)}[-1]}=$m
-      done
-    fi
-    _p9k_ret=$x
-  }
-  unsetopt localoptions prompt_cr prompt_sp
-  _p9k_prompt_length "$PROMPT_EOL_MARK"
-  local -i fill=$((COLUMNS-_p9k_ret))
-  : ${prompts[1]//$lf/$((++height))}
-  local out="${(%):-$eol_mark${(pl.$fill.. .)}$cr%b%k%f%E}${(pl.$height..$lf.)}$esc${height}A$terminfo[sc]"
-  out+=${(%):-"$prompts[1]$prompts[2]"}
-  if [[ -n $prompts[3] ]]; then
-    _p9k_prompt_length "$prompts[2]"
-    local -i left_len=_p9k_ret
-    _p9k_prompt_length "$prompts[3]"
-    local -i gap=$((COLUMNS - left_len - _p9k_ret - ZLE_RPROMPT_INDENT))
-    if (( gap >= 40 )); then
-      out+="${(pl.$gap.. .)}${(%)${prompts[3]}}$terminfo[sgr0]$cr$esc${left_len}C"
-    fi
-  fi
-  print -rn -- "$out"
-  unset _p9k_t
-  unset -f _p9k_prompt_length
-  p10k-unsafe-first-prompt-hook() {
-    unsetopt localoptions
-    setopt prompt_cr prompt_sp
-    print -rn -- "${terminfo[rc]}${terminfo[sgr0]}${terminfo[ed]}"
-  }
-}'
-  } always {
-    exec {fd}>&-
-  }
-  zf_mv -f $tmp $file || return
-  zcompile $file || zf_rm -f $file.zwc
-}
-
 _p9k_set_instant_prompt() {
   local saved_prompt=$PROMPT
   local saved_rprompt=$RPROMPT
   _p9k_set_prompt instant_
-  __p9k_instant_prompt[$_p9k_instant_prompt_sig]=$PROMPT$'\0'$_p9k_prompt$'\0'$RPROMPT
+  typeset -g _p9k_instant_prompt=$PROMPT$'\x1f'$_p9k_prompt$'\x1f'$RPROMPT
   PROMPT=$saved_prompt
   RPROMPT=$saved_rprompt
+}
+
+_p9k_dump_instant_prompt() {
+  is-at-least 5.4 || return  # `typeset -g` doesn't roundtrip in zsh prior to 5.4.
+  local user=${(%):-%n}
+  local root_dir=${__p9k_dump_file:h}
+  local prompt_dir=${root_dir}/powerlevel10k-$user
+  local root_file=$root_dir/p10k-instant-prompt-$user.zsh
+  local prompt_file=$prompt_dir/prompt-${#_p9k_pwd}
+  [[ -d $prompt_dir ]] || mkdir -p $prompt_dir || return
+  [[ -w $root_dir && -w $prompt_dir ]] || return
+
+  if [[ ! -e $root_file ]]; then
+    local tmp=$root_file.tmp.$$
+    local -i fd
+    sysopen -a -o creat,trunc -u fd $tmp || return
+    {
+      >&$fd print -r -- "() {
+    emulate -L zsh
+    (( ! \$+__p9k_instant_prompt_disabled )) || return
+    typeset -gi __p9k_instant_prompt_disabled=1 __p9k_instant_prompt_sourced=1
+    [[ -t 0 && -t 1 && -t 2 && \$ZSH_VERSION == ${(q)ZSH_VERSION} && \$ZSH_PATCHLEVEL == ${(q)ZSH_PATCHLEVEL} ]] || return
+    local -i ZLE_RPROMPT_INDENT=${ZLE_RPROMPT_INDENT:-1}
+    local PROMPT_EOL_MARK=${(q)PROMPT_EOL_MARK-%B%S%#%s%b}
+    [[ -n \$SSH_CLIENT || -n \$SSH_TTY || -n \$SSH_CONNECTION ]] && local ssh=1 || local ssh=0
+    local cr=\$'\r' lf=\$'\n' esc=\$'\e[' rs=$'\x1e' us=$'\x1f'
+    local -i height=$_POWERLEVEL9K_INSTANT_PROMPT_COMMAND_LINES
+    local prompt_dir=${(q)prompt_dir}
+    zmodload zsh/langinfo
+    if [[ \${langinfo[CODESET]:-} != (utf|UTF)(-|)8 ]]; then
+      local lc=${(q)${${${_p9k_locale:-${(M)LC_CTYPE:#*.(utf|UTF)(-|)8}}:-${(M)LC_ALL:#*.(utf|UTF)(-|)8}}}:-${(M)LANG:#*.(utf|UTF)(-|)8}}
+      local LC_ALL=\${lc:-\${\${(@M)\$(locale -a 2>/dev/null):#*.(utf|UTF)(-|)8}[1]:-en_US.UTF-8}}
+    fi"
+      >&$fd print -r -- '
+    zmodload zsh/terminfo
+    (( $+terminfo[cuu] && $+terminfo[cuf] && $+terminfo[sgr0] && $+terminfo[ed] && $+terminfo[sc] && $+terminfo[rc] )) || return
+    local pwd=${(%):-%/}
+    local prompt_file=$prompt_dir/prompt-${#pwd}
+    local key=$pwd:$ssh:${(%):-%#}
+    local content
+    { content="$(<$prompt_file)" } 2>/dev/null || return
+    local tail=${content##*$rs$key$us}
+    [[ ${#tail} != ${#content} ]] || return
+    local -a _p9k_t=("${(@ps:$us:)${tail%%$rs*}}")
+    typeset -ga __p9k_used_instant_prompt=("${(@e)_p9k_t[-3,-1]}")
+    local _p9k_ret=
+    function _p9k_prompt_length() {
+      local COLUMNS=1024
+      local -i x y=$#1 m
+      if (( y )); then
+        while (( ${${(%):-$1%$y(l.1.0)}[-1]} )); do
+          x=y
+          (( y *= 2 ));
+        done
+        local xy
+        while (( y > x + 1 )); do
+          m=$(( x + (y - x) / 2 ))
+          typeset ${${(%):-$1%$m(l.x.y)}[-1]}=$m
+        done
+      fi
+      _p9k_ret=$x
+    }
+    _p9k_prompt_length "$PROMPT_EOL_MARK"
+    local -i fill=$((COLUMNS-_p9k_ret))
+    : ${__p9k_used_instant_prompt[1]//$lf/$((++height))}
+    local out="${(%):-$PROMPT_EOL_MARK${(pl.$fill.. .)}$cr%b%k%f%E}${(pl.$height..$lf.)}$esc${height}A$terminfo[sc]"
+    out+=${(%):-"$__p9k_used_instant_prompt[1]$__p9k_used_instant_prompt[2]"}
+    if [[ -n $__p9k_used_instant_prompt[3] ]]; then
+      _p9k_prompt_length "$__p9k_used_instant_prompt[2]"
+      local -i left_len=_p9k_ret
+      _p9k_prompt_length "$__p9k_used_instant_prompt[3]"
+      local -i gap=$((COLUMNS - left_len - _p9k_ret - ZLE_RPROMPT_INDENT))
+      if (( gap >= 40 )); then
+        out+="${(pl.$gap.. .)}${(%)${__p9k_used_instant_prompt[3]}}$terminfo[sgr0]$cr$esc${left_len}C"
+      fi
+    fi
+    { echo -n >${TMPDIR:-/tmp}/p10k-instant-prompt-output-$$ } || return
+    print -rn -- "$out" || return
+    exec {__p9k_fd_1}>&1 {__p9k_fd_2}>&2 1>${TMPDIR:-/tmp}/p10k-instant-prompt-output-$$
+    exec 2>&1
+    typeset -gi __p9k_instant_prompt_active=1
+    function _p9k_instant_prompt_precmd_first() {
+      emulate -L zsh
+      function _p9k_instant_prompt_sched_last() {
+        emulate -L zsh
+        
+      }
+      zmodload zsh/sched
+      sched +0 _p9k_instant_prompt_sched_last
+      precmd_functions=(${(@)precmd_functions:#_p9k_instant_prompt_precmd_first})
+    }
+    precmd_functions=(_p9k_instant_prompt_precmd_first $precmd_functions)
+  } && unsetopt prompt_cr prompt_sp'
+    } always {
+      exec {fd}>&-
+    }
+    zf_mv -f $tmp $root_file || return
+    zcompile $root_file || return
+  fi
+
+  local tmp=$prompt_file.tmp.$$
+  zf_mv -f $prompt_file $tmp 2>/dev/null
+  if [[ "$(<$prompt_file)" == *$'\x1e'$_p9k_instant_prompt_sig$'\x1f'* ]] 2>/dev/null; then
+    echo -n >$tmp || return
+  fi
+
+  { print -rn -- entry=$'\x1e'$_p9k_instant_prompt_sig$'\x1f'${(pj:\x1f:)_p9k_t}$'\x1f'$_p9k_instant_prompt >>$tmp } 2>/dev/null || return
+  zf_mv -f $tmp $prompt_file 2>/dev/null || return
 }
 
 function _p9k_update_prompt() {
@@ -3620,7 +3650,7 @@ function _p9k_dump_state() {
     exec {fd}>&-
   }
   zf_mv -f $tmp $__p9k_dump_file || return
-  zcompile $__p9k_dump_file || zf_rm -f $__p9k_dump_file.zwc
+  zcompile $__p9k_dump_file
 }
 
 function _p9k_restore_state() {
@@ -3631,11 +3661,26 @@ function _p9k_restore_state() {
     _p9k_state_restored=1
   } always {
     unset __p9k_cached_param_sig
-    if (( !_p9k_state_restored && $+functions[_p9k_preinit] )); then
-      unfunction _p9k_preinit
-      (( $+functions[gitstatus_stop] )) && gitstatus_stop POWERLEVEL9K
+    if (( !_p9k_state_restored )); then
+      if (( $+functions[_p9k_preinit] )); then
+        unfunction _p9k_preinit
+        (( $+functions[gitstatus_stop] )) && gitstatus_stop POWERLEVEL9K
+      fi
+      local user=${(%):-%n}
+      local root_dir=${__p9k_dump_file:h}
+      zf_rm -f -- $root_dir/p10k-instant-prompt-$user.zsh{,.zwc} ${root_dir}/powerlevel10k-$user/prompt-*(N) 2>/dev/null
     fi
   }
+}
+
+function _p9k_clear_instant_prompt() {
+  (( $+__p9k_instant_prompt_active )) || return
+  exec 1>&$__p9k_fd_1 2>&$__p9k_fd_2 {__p9k_fd_1}>&- {__p9k_fd_2}>&-
+  unset __p9k_fd_1 __p9k_fd_2 __p9k_instant_prompt_active
+  print -rn -- $terminfo[rc]$terminfo[sgr0]$terminfo[ed]
+  if [[ -s ${TMPDIR:-/tmp}/p10k-instant-prompt-output-$$ ]]; then
+    cat ${TMPDIR:-/tmp}/p10k-instant-prompt-output-$$
+  fi
 }
 
 _p9k_precmd_impl() {
@@ -3696,35 +3741,46 @@ _p9k_precmd_impl() {
     _p9k_keymap=main
     _p9k_zle_state=insert
 
-    if ! zle; then
-      (( ++_p9k_prompt_idx ))
-    fi
+    (( ++_p9k_prompt_idx ))
   fi
 
   _p9k_refresh_reason=precmd
   _p9k_set_prompt
   _p9k_refresh_reason=''
 
-  _p9k_instant_prompt_sig=$_p9k_pwd$'\0'$P9K_SSH$'\0'${(%):-%#}
+  if (( $+__p9k_instant_prompt_active )); then
+    functions -M _p9k_clear_instant_prompt
+    PROMPT='${$((_p9k_clear_instant_prompt()))+}'$PROMPT
+  fi
 
-  if ! zle && { (( ! _p9k_dump_pid )) || ! kill -0 $_p9k_dump_pid 2>/dev/null }; then
+  _p9k_instant_prompt_sig=$_p9k_pwd:$P9K_SSH:${(%):-%#}
+
+  if (( ! _p9k_dump_pid )) || ! kill -0 $_p9k_dump_pid 2>/dev/null; then
     _p9k_dump_pid=0
-    if (( _p9k_prompt_idx == 1 && !_p9k_state_restored )); then
+    if (( _p9k_prompt_idx == 1 )) then
       _p9k_set_instant_prompt
-      _p9k_dump_instant_prompt
-      _p9k_dump_state
-      _p9k_state_dump_scheduled=0
-    else
-      local -i instant=0
-      if [[ -z $__p9k_instant_prompt[$_p9k_instant_prompt_sig] ]]; then
-        _p9k_set_instant_prompt
-        instant=1
-      fi
-      if (( _p9k_state_dump_scheduled || instant )); then
-        ( (( instant )) && _p9k_dump_instant_prompt; _p9k_dump_state ) &!
-        _p9k_dump_pid=$!
+      if (( !_p9k_state_restored )); then
+        _p9k_dump_instant_prompt
+        _p9k_dump_state
         _p9k_state_dump_scheduled=0
+        _p9k_dumped_instant_prompt_sigs[$_p9k_instant_prompt_sig]=1
+      elif [[ "${(j::)__p9k_used_instant_prompt}" != $_p9k_instant_prompt ]]; then
+        _p9k_dump_instant_prompt
+        _p9k_dumped_instant_prompt_sigs[$_p9k_instant_prompt_sig]=1
       fi
+    elif (( _p9k_state_dump_scheduled || ! $+_p9k_dumped_instant_prompt_sigs[$_p9k_instant_prompt_sig] )); then
+      (
+        if (( ! $+_p9k_dumped_instant_prompt_sigs[$_p9k_instant_prompt_sig] )); then
+          _p9k_set_instant_prompt
+          _p9k_dump_instant_prompt
+        fi
+        if (( _p9k_state_dump_scheduled )); then
+          _p9k_dump_state
+        fi
+      ) &!
+      _p9k_dump_pid=$!
+      _p9k_state_dump_scheduled=0
+      _p9k_dumped_instant_prompt_sigs[$_p9k_instant_prompt_sig]=1
     fi
   fi
 }
@@ -3736,6 +3792,7 @@ _p9k_precmd() {
   [[ -o sh_glob ]] && __p9k_sh_glob=1 || __p9k_sh_glob=0
 
   unsetopt localoptions
+  (( $+__p9k_instant_prompt_active )) && setopt prompt_sp prompt_cr
   prompt_opts=(percent subst)
   [[ ! -o prompt_sp ]] || prompt_opts+=sp
   [[ ! -o prompt_cr ]] || prompt_opts+=cr
@@ -3936,7 +3993,9 @@ function _p9k_prompt_overflow_bug() {
 }
 
 _p9k_init_vars() {
+  typeset -gA _p9k_dumped_instant_prompt_sigs
   typeset -g  _p9k_instant_prompt_sig
+  typeset -g  _p9k_instant_prompt
   typeset -gi _p9k_state_dump_scheduled
   typeset -gi _p9k_dump_pid
   typeset -gi _p9k_prompt_idx
@@ -4035,8 +4094,6 @@ _p9k_init_vars() {
   typeset -g  P9K_VISUAL_IDENTIFIER
   typeset -g  P9K_CONTENT
   typeset -g  P9K_GAP
-
-  typeset -gA __p9k_instant_prompt
 }
 
 _p9k_init_params() {
@@ -4638,7 +4695,7 @@ _p9k_must_init() {
     '${GITSTATUS_ENABLE_LOGGING}' '${GITSTATUS_DAEMON}' '${GITSTATUS_NUM_THREADS}'
     '${DEFAULT_USER}' '${ZLE_RPROMPT_INDENT}' '${P9K_SSH}' '${__p9k_ksh_arrays}'
     '${__p9k_sh_glob}' '${parameters[transient_rprompt]}' '${ITERM_SHELL_INTEGRATION_INSTALLED}'
-    'v8')
+    'v9')
   IFS=$'\2' param_sig="${(e)param_sig}"
   [[ $param_sig == $_p9k_param_sig ]] && return 1
   [[ -n $_p9k_param_sig ]] && _p9k_deinit
@@ -4935,6 +4992,7 @@ _p9k_deinit() {
 
 typeset -gi __p9k_enabled=0
 typeset -gi __p9k_configured=0
+typeset -gri __p9k_instant_prompt_disabled=1
 
 prompt_powerlevel9k_setup() {
   emulate -L zsh
