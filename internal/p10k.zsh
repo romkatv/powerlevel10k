@@ -91,7 +91,7 @@ function getColorCode() {
   emulate -L zsh
   setopt no_hist_expand extended_glob no_prompt_bang prompt_{percent,subst}
   if (( ARGC == 1 )); then
-    case $1 in 
+    case $1 in
       foreground)
         local k
         for k in "${(k@)__p9k_colors}"; do
@@ -444,11 +444,10 @@ _p9k_background() {
 }
 
 _p9k_foreground() {
-  case $1 in
-    '')   _p9k_ret="%f";;
-    '#'*) _p9k_ret="%F{$1}";;
-    *)    _p9k_ret="%${1}F";;
-  esac
+  # Note: This code used to produce `%1F` instead of `%F{1}` because it's more efficient.
+  # Unfortunately, this triggers a bug in zsh. Namely, `%1F{2}` gets percent-expanded as if
+  # it was `%F{2}`.
+  [[ -n $1 ]] && _p9k_ret="%F{$1}" || _p9k_ret="%k"
 }
 
 _p9k_escape_style() {
