@@ -3555,9 +3555,10 @@ _p9k_dump_instant_prompt() {
       out+="${(pl.$gap.. .)}${(%)${__p9k_used_instant_prompt[3]}}$terminfo[sgr0]$cr$esc${left_len}C"
     fi
   fi
-  { echo -n >${TMPDIR:-/tmp}/p10k-instant-prompt-output-$$ } || return
+  typeset -g __p9k_instant_prompt_output=${TMPDIR:-/tmp}/p10k-instant-prompt-output-${(%):-%n}-$$
+  { echo -n > $__p9k_instant_prompt_output } || return
   print -rn -- "$out" || return
-  exec {__p9k_fd_1}>&1 {__p9k_fd_2}>&2 1>${TMPDIR:-/tmp}/p10k-instant-prompt-output-$$
+  exec {__p9k_fd_1}>&1 {__p9k_fd_2}>&2 1>$__p9k_instant_prompt_output
   exec 2>&1
   typeset -gi __p9k_instant_prompt_active=1
   function _p9k_instant_prompt_precmd_first() {
@@ -3569,11 +3570,11 @@ _p9k_dump_instant_prompt() {
         unset __p9k_fd_1 __p9k_fd_2 __p9k_instant_prompt_active
         typeset -gi __p9k_instant_prompt_erased=1
         print -rn -- $terminfo[rc]$terminfo[sgr0]$terminfo[ed]
-        if [[ -s ${TMPDIR:-/tmp}/p10k-instant-prompt-output-$$ ]]; then
-          cat ${TMPDIR:-/tmp}/p10k-instant-prompt-output-$$
+        if [[ -s $__p9k_instant_prompt_output ]]; then
+          cat $__p9k_instant_prompt_output 2>/dev/null
         fi
         zmodload -F zsh/files b:zf_rm
-        zf_rm -f -- ${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh{,.zwc} 2>/dev/null
+        zf_rm -f -- $__p9k_instant_prompt_output ${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh{,.zwc} 2>/dev/null
         setopt prompt_cr prompt_sp
       fi
     }
@@ -3720,9 +3721,10 @@ function _p9k_clear_instant_prompt() {
   exec 1>&$__p9k_fd_1 2>&$__p9k_fd_2 {__p9k_fd_1}>&- {__p9k_fd_2}>&-
   unset __p9k_fd_1 __p9k_fd_2 __p9k_instant_prompt_active
   print -rn -- $terminfo[rc]$terminfo[sgr0]$terminfo[ed]
-  if [[ -s ${TMPDIR:-/tmp}/p10k-instant-prompt-output-$$ ]]; then
-    cat ${TMPDIR:-/tmp}/p10k-instant-prompt-output-$$
+  if [[ -s $__p9k_instant_prompt_output ]]; then
+    cat $__p9k_instant_prompt_output 2>/dev/null
   fi
+  zf_rm -f -- $__p9k_instant_prompt_output 2>/dev/null
 }
 
 _p9k_precmd_impl() {
@@ -5043,6 +5045,7 @@ _p9k_init() {
 
   if (( $+__p9k_instant_prompt_erased )); then
     unset __p9k_instant_prompt_erased
+    >&2 print -- ""
     >&2 print -- ${(%):-"%F{red}[ERROR]%f When using instant prompt, Powerlevel10k must be loaded before the first prompt."}
     >&2 print -- ""
     >&2 print -- "You can:"
@@ -5052,7 +5055,7 @@ _p9k_init() {
     >&2 print -- ${(%):-"    See \e]8;;https://github.com/romkatv/powerlevel10k/blob/master/README.md#installation\ahttps://github.com/romkatv/powerlevel10k/blob/master/README.md#installation\e]8;;\a"}
     if (( ! $+functins[zplugin] )); then
       >&2 print -- ""
-      >&2 print -- ${(%):-"    If using %2Fzplugin%f to load romkatv/powerlevel10k, %Bdo not apply%b %1Fice wait%f."}
+      >&2 print -- ${(%):-"    NOTE: If using %2Fzplugin%f to load %3F'romkatv/powerlevel10k'%f, %Bdo not apply%b %1Fice wait%f."}
     fi
     >&2 print -- ""
     >&2 print -- "  - Disable instant prompt. Zsh will start slowly."
