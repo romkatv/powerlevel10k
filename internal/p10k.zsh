@@ -3736,11 +3736,14 @@ function _p9k_clear_instant_prompt() {
   (( $+__p9k_instant_prompt_active )) || return
   exec 1>&$__p9k_fd_1 2>&$__p9k_fd_2 {__p9k_fd_1}>&- {__p9k_fd_2}>&-
   unset __p9k_fd_1 __p9k_fd_2 __p9k_instant_prompt_active
-  print -rn -- $terminfo[rc]$terminfo[sgr0]$terminfo[ed]
   if [[ -s $__p9k_instant_prompt_output ]]; then
+    print -rn -- $terminfo[rc]$terminfo[sgr0]$terminfo[ed]
     cat $__p9k_instant_prompt_output 2>/dev/null
+    zf_rm -f -- $__p9k_instant_prompt_output 2>/dev/null
+  else
+    zf_rm -f -- $__p9k_instant_prompt_output 2>/dev/null
+    print -rn -- $terminfo[rc]$terminfo[sgr0]$terminfo[ed]
   fi
-  zf_rm -f -- $__p9k_instant_prompt_output 2>/dev/null
 }
 
 _p9k_precmd_impl() {
@@ -3810,7 +3813,7 @@ _p9k_precmd_impl() {
 
   if (( $+__p9k_instant_prompt_active )); then
     functions -M _p9k_clear_instant_prompt
-    PROMPT='${$((_p9k_clear_instant_prompt()))+}'$PROMPT
+    PROMPT+='${$((_p9k_clear_instant_prompt()))+}'
   fi
 
   (( __p9k_dumps_enabled )) || return 0
