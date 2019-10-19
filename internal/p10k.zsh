@@ -533,6 +533,8 @@ _p9k_left_prompt_segment() {
 
     local s='<_p9k_s>' ss='<_p9k_ss>'
 
+    local -i non_hermetic=0
+
     # Segment separator logic:
     #
     #   if [[ $_p9k_bg == NONE ]]; then
@@ -585,9 +587,11 @@ _p9k_left_prompt_segment() {
     p+="\${_p9k_n:=$((t+4))}"                                                              # 4
 
     _p9k_param $1 VISUAL_IDENTIFIER_EXPANSION '${P9K_VISUAL_IDENTIFIER}'
+    [[ $_p9k_ret == (|*[^\\])'$('* ]] && non_hermetic=1
     local icon_exp_=${_p9k_ret:+\"$_p9k_ret\"}
 
     _p9k_param $1 CONTENT_EXPANSION '${P9K_CONTENT}'
+    [[ $_p9k_ret == (|*[^\\])'$('* ]] && non_hermetic=1
     local content_exp_=${_p9k_ret:+\"$_p9k_ret\"}
 
     if [[ ( $icon_exp_ != '"${P9K_VISUAL_IDENTIFIER}"' && $icon_exp_ == *'$'* ) ||
@@ -691,8 +695,10 @@ _p9k_left_prompt_segment() {
 
     p+='}'
 
-    _p9k_cache_set "$p"
+    _p9k_cache_set "$p" $non_hermetic
   fi
+
+  _p9k_non_hermetic_expansion=$_p9k_cache_val[2]
 
   (( $5 )) && _p9k_ret=\"$7\" || _p9k_escape $7
   if [[ -z $6 ]]; then
@@ -756,6 +762,8 @@ _p9k_right_prompt_segment() {
 
     local w='<_p9k_w>' s='<_p9k_s>'
 
+    local -i non_hermetic=0
+
     # Segment separator logic:
     #
     #   if [[ $_p9k_bg == NONE ]]; then
@@ -797,9 +805,11 @@ _p9k_right_prompt_segment() {
     p+="\${_p9k_n:=$((t+4))}"                                                                     # 4
 
     _p9k_param $1 VISUAL_IDENTIFIER_EXPANSION '${P9K_VISUAL_IDENTIFIER}'
+    [[ $_p9k_ret == (|*[^\\])'$('* ]] && non_hermetic=1
     local icon_exp_=${_p9k_ret:+\"$_p9k_ret\"}
 
     _p9k_param $1 CONTENT_EXPANSION '${P9K_CONTENT}'
+    [[ $_p9k_ret == (|*[^\\])'$('* ]] && non_hermetic=1
     local content_exp_=${_p9k_ret:+\"$_p9k_ret\"}
 
     if [[ ( $icon_exp_ != '"${P9K_VISUAL_IDENTIFIER}"' && $icon_exp_ == *'$'* ) ||
@@ -921,8 +931,10 @@ _p9k_right_prompt_segment() {
     p+='}+}'
     p+='}'
 
-    _p9k_cache_set "$p"
+    _p9k_cache_set "$p" $non_hermetic
   fi
+
+  _p9k_non_hermetic_expansion=$_p9k_cache_val[2]
 
   (( $5 )) && _p9k_ret=\"$7\" || _p9k_escape $7
   if [[ -z $6 ]]; then
@@ -3373,8 +3385,12 @@ function _p9k_build_segment() {
 function _p9k_build_instant_segment() {
   _p9k_segment_name=${_p9k_segment_name%_joined}
   if (( $+functions[instant_prompt_$_p9k_segment_name] )); then
-    # TODO: Drop segment if it has '$(' in CONTEXT_EXPANSION or VISUAL_IDENTIFIER_EXPANSION.
+    local -i len=$#_p9k_prompt
+    _p9k_non_hermetic_expansion=0
     instant_prompt_$_p9k_segment_name
+    if (( _p9k_non_hermetic_expansion )); then
+      _p9k_prompt[len+1,-1]=
+    fi
   fi
   ((++_p9k_segment_index))
 }
@@ -4046,6 +4062,7 @@ function _p9k_prompt_overflow_bug() {
 }
 
 _p9k_init_vars() {
+  typeset -gi _p9k_non_hermetic_expansion
   typeset -g  _p9k_time
   typeset -g  _p9k_date
   typeset -gA _p9k_dumped_instant_prompt_sigs
