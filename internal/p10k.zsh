@@ -2095,6 +2095,8 @@ prompt_root_indicator() {
   _p9k_prompt_segment "$0" "$_p9k_color1" "yellow" 'ROOT_ICON' 0 '${${(%):-%#}:#%}' ''
 }
 
+instant_prompt_root_indicator() { prompt_root_indicator; }
+
 ################################################################
 # Segment to display Rust version number
 prompt_rust_version() {
@@ -2310,32 +2312,50 @@ prompt_time() {
   if (( _POWERLEVEL9K_EXPERIMENTAL_TIME_REALTIME )); then
     _p9k_prompt_segment "$0" "$_p9k_color2" "$_p9k_color1" "TIME_ICON" 0 '' "$_POWERLEVEL9K_TIME_FORMAT"
   else
-    local t=${${(%)_POWERLEVEL9K_TIME_FORMAT}//\%/%%}
+    if [[ $_p9k_refresh_reason == precmd ]]; then
+      if [[ $+__p9k_instant_prompt_active == 1 && $__p9k_instant_prompt_time_format == $_POWERLEVEL9K_TIME_FORMAT ]]; then
+        _p9k_time=${__p9k_instant_prompt_time//\%/%%}
+      else
+        _p9k_time=${${(%)_POWERLEVEL9K_TIME_FORMAT}//\%/%%}
+      fi
+    fi
     if (( _POWERLEVEL9K_TIME_UPDATE_ON_COMMAND )); then
-      _p9k_escape $t
-      t=$_p9k_ret
+      _p9k_escape $_p9k_time
+      local t=$_p9k_ret
       _p9k_escape $_POWERLEVEL9K_TIME_FORMAT
       _p9k_prompt_segment "$0" "$_p9k_color2" "$_p9k_color1" "TIME_ICON" 1 '' \
           "\${_p9k_line_finished-$t}\${_p9k_line_finished+$_p9k_ret}"
     else
-      _p9k_prompt_segment "$0" "$_p9k_color2" "$_p9k_color1" "TIME_ICON" 0 '' $t
+      _p9k_prompt_segment "$0" "$_p9k_color2" "$_p9k_color1" "TIME_ICON" 0 '' $_p9k_time
     fi
   fi
 }
 
 instant_prompt_time() {
-  _p9k_prompt_segment prompt_time "$_p9k_color2" "$_p9k_color1" "TIME_ICON" 0 '' "$_POWERLEVEL9K_TIME_FORMAT"
+  _p9k_escape $_POWERLEVEL9K_TIME_FORMAT
+  local stash='${${__p9k_instant_prompt_time::=${(%)${__p9k_instant_prompt_time_format::='$_p9k_ret'}}}+}'
+  _p9k_escape $_POWERLEVEL9K_TIME_FORMAT
+  _p9k_prompt_segment prompt_time "$_p9k_color2" "$_p9k_color1" "TIME_ICON" 1 '' $stash$_p9k_ret
 }
 
 ################################################################
 # System date
 prompt_date() {
-  local d=${${(%)_POWERLEVEL9K_DATE_FORMAT}//\%/%%}
-  _p9k_prompt_segment "$0" "$_p9k_color2" "$_p9k_color1" "DATE_ICON" 0 '' "$d"
+  if [[ $_p9k_refresh_reason == precmd ]]; then
+    if [[ $+__p9k_instant_prompt_active == 1 && $__p9k_instant_prompt_date_format == $_POWERLEVEL9K_DATE_FORMAT ]]; then
+      _p9k_date=${__p9k_instant_prompt_date//\%/%%}
+    else
+      _p9k_date=${${(%)_POWERLEVEL9K_DATE_FORMAT}//\%/%%}
+    fi
+  fi
+  _p9k_prompt_segment "$0" "$_p9k_color2" "$_p9k_color1" "DATE_ICON" 0 '' "$_p9k_date"
 }
 
 instant_prompt_date() {
-  _p9k_prompt_segment prompt_date "$_p9k_color2" "$_p9k_color1" "DATE_ICON" 0 '' "$_POWERLEVEL9K_DATE_FORMAT"
+  _p9k_escape $_POWERLEVEL9K_DATE_FORMAT
+  local stash='${${__p9k_instant_prompt_date::=${(%)${__p9k_instant_prompt_date_format::='$_p9k_ret'}}}+}'
+  _p9k_escape $_POWERLEVEL9K_DATE_FORMAT
+  _p9k_prompt_segment prompt_date "$_p9k_color2" "$_p9k_color1" "DATE_ICON" 1 '' $stash$_p9k_ret
 }
 
 ################################################################
@@ -3054,6 +3074,8 @@ prompt_dir_writable() {
   fi
 }
 
+instant_prompt_dir_writable() { prompt_dir_writable; }
+
 ################################################################
 # Kubernetes Current Context/Namespace
 prompt_kubecontext() {
@@ -3456,7 +3478,7 @@ _p9k_dump_instant_prompt() {
   is-at-least 5.4 || return  # `typeset -g` doesn't roundtrip in zsh prior to 5.4.
   local user=${(%):-%n}
   local root_dir=${__p9k_dump_file:h}
-  local prompt_dir=${root_dir}/powerlevel10k-$user
+  local prompt_dir=${root_dir}/p10k-$user
   local root_file=$root_dir/p10k-instant-prompt-$user.zsh
   local prompt_file=$prompt_dir/prompt-${#_p9k_pwd}
   [[ -d $prompt_dir ]] || mkdir -p $prompt_dir || return
@@ -3535,7 +3557,17 @@ _p9k_dump_instant_prompt() {
       emulate -L zsh
       function _p9k_instant_prompt_sched_last() {
         emulate -L zsh
-        
+        if (( $+__p9k_instant_prompt_active )); then
+          exec 1>&$__p9k_fd_1 2>&$__p9k_fd_2 {__p9k_fd_1}>&- {__p9k_fd_2}>&-
+          unset __p9k_fd_1 __p9k_fd_2 __p9k_instant_prompt_active
+          typeset -gi __p9k_instant_prompt_erased=1
+          print -rn -- $terminfo[rc]$terminfo[sgr0]$terminfo[ed]
+          if [[ -s ${TMPDIR:-/tmp}/p10k-instant-prompt-output-$$ ]]; then
+            cat ${TMPDIR:-/tmp}/p10k-instant-prompt-output-$$
+          fi
+          zmodload -F zsh/files b:zf_rm
+          zf_rm -f -- ${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh{,.zwc} 2>/dev/null
+        fi
       }
       zmodload zsh/sched
       sched +0 _p9k_instant_prompt_sched_last
@@ -3667,7 +3699,7 @@ function _p9k_restore_state() {
       fi
       local user=${(%):-%n}
       local root_dir=${__p9k_dump_file:h}
-      zf_rm -f -- $root_dir/p10k-instant-prompt-$user.zsh{,.zwc} ${root_dir}/powerlevel10k-$user/prompt-*(N) 2>/dev/null
+      zf_rm -f -- $root_dir/p10k-instant-prompt-$user.zsh{,.zwc} ${root_dir}/p10k-$user/prompt-*(N) 2>/dev/null
     fi
   }
 }
@@ -3754,6 +3786,8 @@ _p9k_precmd_impl() {
 
   _p9k_instant_prompt_sig=$_p9k_pwd:$P9K_SSH:${(%):-%#}
 
+  # TODO: use _POWERLEVEL9K_DISABLE_INSTANT_PROMPT.
+
   if (( ! _p9k_dump_pid )) || ! kill -0 $_p9k_dump_pid 2>/dev/null; then
     _p9k_dump_pid=0
     if (( _p9k_prompt_idx == 1 )) then
@@ -3763,19 +3797,22 @@ _p9k_precmd_impl() {
         _p9k_dump_state
         _p9k_state_dump_scheduled=0
         _p9k_dumped_instant_prompt_sigs[$_p9k_instant_prompt_sig]=1
-      elif [[ "${(j::)__p9k_used_instant_prompt}" != $_p9k_instant_prompt ]]; then
+      elif [[ "${(pj:\x1f:)__p9k_used_instant_prompt}" != "${(e)_p9k_instant_prompt}" ]]; then
         _p9k_dump_instant_prompt
-        _p9k_dumped_instant_prompt_sigs[$_p9k_instant_prompt_sig]=1
+        if (( ! $+_p9k_dumped_instant_prompt_sigs[$_p9k_instant_prompt_sig] )); then
+          _p9k_dump_state
+          _p9k_state_dump_scheduled=0
+          _p9k_dumped_instant_prompt_sigs[$_p9k_instant_prompt_sig]=1
+        fi
       fi
     elif (( _p9k_state_dump_scheduled || ! $+_p9k_dumped_instant_prompt_sigs[$_p9k_instant_prompt_sig] )); then
       (
         if (( ! $+_p9k_dumped_instant_prompt_sigs[$_p9k_instant_prompt_sig] )); then
           _p9k_set_instant_prompt
           _p9k_dump_instant_prompt
+          _p9k_dumped_instant_prompt_sigs[$_p9k_instant_prompt_sig]=1
         fi
-        if (( _p9k_state_dump_scheduled )); then
-          _p9k_dump_state
-        fi
+        _p9k_dump_state
       ) &!
       _p9k_dump_pid=$!
       _p9k_state_dump_scheduled=0
@@ -3992,6 +4029,8 @@ function _p9k_prompt_overflow_bug() {
 }
 
 _p9k_init_vars() {
+  typeset -g  _p9k_time
+  typeset -g  _p9k_date
   typeset -gA _p9k_dumped_instant_prompt_sigs
   typeset -g  _p9k_instant_prompt_sig
   typeset -g  _p9k_instant_prompt
@@ -4096,6 +4135,7 @@ _p9k_init_vars() {
 }
 
 _p9k_init_params() {
+  _p9k_declare -b POWERLEVEL9K_DISABLE_INSTANT_PROMPT 0
   _p9k_declare -i POWERLEVEL9K_INSTANT_PROMPT_COMMAND_LINES 3
   _p9k_declare -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS -- context dir vcs
   _p9k_declare -a POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS -- status root_indicator background_jobs history time
@@ -4980,6 +5020,33 @@ _p9k_init() {
 
   _p9k_init_async_pump
   _p9k_init_vcs
+
+  if (( _POWERLEVEL9K_DISABLE_INSTANT_PROMPT )); then
+    unset __p9k_instant_prompt_erased
+    zf_rm -f -- $root_dir/p10k-instant-prompt-$user.zsh{,.zwc} 2>/dev/null
+  fi
+
+  if (( $+__p9k_instant_prompt_erased )); then
+    unset __p9k_instant_prompt_erased
+    >&2 print -- ${(%):-"%F{red}[ERROR]%f When using instant prompt, Powerlevel10k must be loaded before the first prompt."}
+    >&2 print -- ""
+    >&2 print -- "You can:"
+    >&2 print -- ""
+    >&2 print -- ${(%):-"  - %BRecommended%b: Change the way Powerlevel10k is loaded from zshrc. Zsh will start quickly."}
+    >&2 print -- ""
+    >&2 print -- ${(%):-"    See \e]8;;https://github.com/romkatv/powerlevel10k/blob/master/README.md#installation\ahttps://github.com/romkatv/powerlevel10k/blob/master/README.md#installation\e]8;;\a"}
+    if (( ! $+functins[zplugin] )); then
+      >&2 print -- ""
+      >&2 print -- ${(%):-"    If using %2Fzplugin%f to load romkatv/powerlevel10k, %Bdo not apply%b %1Fice wait%f."}
+    fi
+    >&2 print -- ""
+    >&2 print -- "  - Disable instant prompt. Zsh will start slowly."
+    >&2 print -- ""
+    >&2 print -r -- ${(%):-"    %2Fecho%f %3F'POWERLEVEL9K_DISABLE_INSTANT_PROMPT=true'%f >>! "}${(D)${ZDOTDIR:-$HOME}}/.zshrc
+    >&2 print -- ""
+    >&2 print -- "  - Do nothing. Every time you start zsh, prompt will flicker and you will see this error."
+    >&2 print -- ""
+  fi
 }
 
 _p9k_deinit() {
