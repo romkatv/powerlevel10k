@@ -3603,7 +3603,7 @@ _p9k_dump_instant_prompt() {
   if source $__p9k_instant_prompt_dump_file 2>/dev/null && (( $+functions[_p9k_preinit] )); then
     _p9k_preinit
   fi
-} || true'
+} && unsetopt prompt_cr prompt_sp || true'
     } always {
       exec {fd}>&-
     }
