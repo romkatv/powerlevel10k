@@ -3490,7 +3490,7 @@ _p9k_set_instant_prompt() {
   RPROMPT=$saved_rprompt
 }
 
-typeset -gri __p9k_instant_prompt_version=1
+typeset -gri __p9k_instant_prompt_version=2
 
 _p9k_dump_instant_prompt() {
   local user=${(%):-%n}
