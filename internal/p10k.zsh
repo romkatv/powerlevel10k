@@ -4840,7 +4840,10 @@ function _p9k_init_cacheable() {
   )
 
   local -i i=0
-  local -a left_segments=(${(@0)_p9k_line_segments_left[@]})
+  # This simpler construct doesn't work on zsh-5.1 with multi-line prompt:
+  #
+  #   ${(@0)_p9k_line_segments_left[@]}
+  local -a left_segments=(${(@0)${(pj:\0:)_p9k_line_segments_left}})
   _p9k_left_join=(1)
   for ((i = 2; i <= $#left_segments; ++i)); do
     local elem=$left_segments[i]
@@ -4851,7 +4854,7 @@ function _p9k_init_cacheable() {
     fi
   done
 
-  local -a right_segments=(${(@0)_p9k_line_segments_right[@]})
+  local -a right_segments=(${(@0)${(pj:\0:)_p9k_line_segments_right}})
   _p9k_right_join=(1)
   for ((i = 2; i <= $#right_segments; ++i)); do
     local elem=$right_segments[i]
