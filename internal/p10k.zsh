@@ -3577,6 +3577,10 @@ _p9k_dump_instant_prompt() {
   exec {__p9k_fd_1}>&1 {__p9k_fd_2}>&2 1>$__p9k_instant_prompt_output
   exec 2>&1
   typeset -gi __p9k_instant_prompt_active=1
+  typeset -g __p9k_instant_prompt_dump_file=${XDG_CACHE_HOME:-~/.cache}/p10k-dump-${(%):-%n}.zsh
+  if source $__p9k_instant_prompt_dump_file 2>/dev/null && (( $+functions[_p9k_preinit] )); then
+    _p9k_preinit
+  fi
   function _p9k_instant_prompt_precmd_first() {
     emulate -L zsh
     function _p9k_instant_prompt_sched_last() {
@@ -3600,10 +3604,7 @@ _p9k_dump_instant_prompt() {
     precmd_functions=(${(@)precmd_functions:#_p9k_instant_prompt_precmd_first})
   }
   precmd_functions=(_p9k_instant_prompt_precmd_first $precmd_functions)
-  typeset -g __p9k_instant_prompt_dump_file=${XDG_CACHE_HOME:-~/.cache}/p10k-dump-${(%):-%n}.zsh
-  if source $__p9k_instant_prompt_dump_file 2>/dev/null && (( $+functions[_p9k_preinit] )); then
-    _p9k_preinit
-  fi
+  
 } && unsetopt prompt_cr prompt_sp || true'
     } always {
       exec {fd}>&-
@@ -5345,6 +5346,10 @@ zmodload zsh/system
 zmodload -F zsh/stat b:zstat
 zmodload -F zsh/net/socket b:zsocket
 zmodload -F zsh/files b:zf_mv b:zf_rm
+
+if [[ $__p9k_dump_file != $__p9k_instant_prompt_dump_file && -n $__p9k_instant_prompt_dump_file ]]; then
+  zf_rm -f $__p9k_instant_prompt_dump_file 2>/dev/null
+fi
 
 _p9k_init_ssh
 prompt_powerlevel9k_setup
