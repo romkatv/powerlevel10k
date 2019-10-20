@@ -10,6 +10,8 @@ if [[ ${langinfo[CODESET]:-} != (utf|UTF)(-|)8 ]]; then
   local LC_ALL=${${(@M)$(locale -a):#*.(utf|UTF)(-|)8}[1]:-en_US.UTF-8}
 fi
 
+zmodload -F zsh/files b:zf_mv b:zf_rm
+
 typeset -g __p9k_root_dir
 typeset -gi force=0
 
@@ -1238,8 +1240,8 @@ function ask_confirm() {
 
 function ask_config_overwrite() {
   config_backup=
+  config_backup_u=0
   if [[ ! -e $__p9k_cfg_path ]]; then
-    write_config=1
     return
   fi
   while true; do
@@ -1262,9 +1264,71 @@ function ask_config_overwrite() {
         config_backup="$(mktemp ${TMPDIR:-/tmp}/$__p9k_cfg_basename.XXXXXXXXXX)" || exit 1
         cp $__p9k_cfg_path $config_backup                                        || exit 1
         config_backup_u=${${TMPDIR:+\$TMPDIR}:-/tmp}/${(q-)config_backup:t}
-        write_config=1
         break
         ;;
+    esac
+  done
+}
+
+function ask_zshrc_edit() {
+  zshrc_content=
+  zshrc_backup=
+  zshrc_backup_u=
+  zshrc_has_cfg=0
+  zshrc_has_pre=0
+  zshrc_has_post=0
+  write_zshrc=0
+
+  if [[ -e $__p9k_zshrc ]]; then
+    zshrc_content="$(<$__p9k_zshrc)" || quit -c
+    local lines=(${(f)zshrc_content})
+    local f0=$__p9k_cfg_path
+    local f1=${(q)f0}
+    local f2=${(q-)f0}
+    local f3=${(qq)f0}
+    local f4=${(qqq)f0}
+    local g1=${${(q)__p9k_cfg_path}/#(#b)${(q)HOME}\//'~/'}
+    if [[ -n ${(@M)lines:#(#b)[^#]#([^[:IDENT:]]|)source[[:space:]]##($f1|$f2|$f3|$f4|$g1)(|[[:space:]]*|'#'*)} ]]; then
+      zshrc_has_cfg=1
+    fi
+    local pre='${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh'
+    if [[ -n ${(@M)lines:#(#b)[^#]#([^[:IDENT:]]|)source[[:space:]]##($pre|\"$pre\")(|[[:space:]]*|'#'*)} ]]; then
+      zshrc_has_pre=1
+    fi
+    if [[ -n ${(@M)lines:#(#b)[^#]#([^[:IDENT:]]|)p10k-instant-prompt-finalize([^[:IDENT:]]*|)} ]]; then
+      zshrc_has_post=1
+    fi
+    (( zshrc_has_cfg && zshrc_has_pre && zshrc_has_post )) && return
+  fi
+
+  while true; do
+    clear
+    flowing -c "%BApply changes to %b%2F${__p9k_zshrc_u//\\/\\\\}%f%B?%b"
+    print -P ""
+    print -P "%B(y)  Yes (recommended).%b"
+    print -P ""
+    print -P "%B(n)  No. I know which changes to apply and will do it myself.%b"
+    print -P ""
+    print -P "(r)  Restart from the beginning."
+    print -P "(q)  Quit and do nothing."
+    print -P ""
+
+    local key=
+    read -k key${(%):-"?%BChoice [ynrq]: %b"} || quit -c
+    case $key in
+      q) quit;;
+      r) return 1;;
+      n) return 0;;
+      y)
+        write_zshrc=1
+        if [[ -n $zshrc_content ]]; then
+          zshrc_backup="$(mktemp ${TMPDIR:-/tmp}/.zshrc.XXXXXXXXXX)" || quit -c
+          cp -p $__p9k_zshrc $zshrc_backup                           || quit -c
+          print -r -- $zshrc_content >$zshrc_backup                  || quit -c
+          zshrc_backup_u=${${TMPDIR:+\$TMPDIR}:-/tmp}/${(q-)zshrc_backup:t}
+          break
+        fi
+      ;;
     esac
   done
 }
@@ -1447,35 +1511,52 @@ function generate_config() {
   header+=$'.\n# Type `p10k configure` to generate another config.\n#'
 
   if [[ -e $__p9k_cfg_path ]]; then
-    unlink $__p9k_cfg_path || return 1
+    unlink $__p9k_cfg_path || return
   fi
   print -lr -- "$header" "$lines[@]" >$__p9k_cfg_path
 }
 
-function write_zshrc() {
-  if [[ -e $__p9k_zshrc ]]; then
-    local lines=(${(f)"$(<$__p9k_zshrc)"})
-    local f0=$__p9k_cfg_path
-    local f1=${(q)f0}
-    local f2=${(q-)f0}
-    local f3=${(qq)f0}
-    local f4=${(qqq)f0}
-    local g1=${${(q)__p9k_cfg_path}/#(#b)${(q)HOME}\//'~/'}
-    if [[ -n ${(@M)lines:#(#b)[^#]#([^[:IDENT:]]|)source[[:space:]]##($f1|$f2|$f3|$f4|$g1)(|[[:space:]]*|'#'*)} ]]; then
-      flowing +c No changes have been made to %4F$__p9k_zshrc_u%f because it already sources %2F$__p9k_cfg_path_u%f.
-      return
+function change_zshrc() {
+  (( write_zshrc )) || return 0
+
+  local tmp=$__p9k_zshrc.${(%):-%n}.tmp.$$
+  [[ ! -e $__p9k_zshrc ]] || cp -p $__p9k_zshrc $tmp || return
+
+  {
+    print -n >$tmp || return
+
+    if (( !zshrc_has_pre )); then
+      >>$tmp print -r -- "# Enable Powerlevel10k instant prompt. Should stay at the top of ${(%)__p9k_zshrc_u}.
+if [[ -r \"\${XDG_CACHE_HOME:-\$HOME/.cache}/p10k-instant-prompt-\${(%):-%n}.zsh\" ]]; then
+  source \"\${XDG_CACHE_HOME:-\$HOME/.cache}/p10k-instant-prompt-\${(%):-%n}.zsh\"
+fi" || return
     fi
+    if [[ -n $zshrc_content ]]; then
+      (( zshrc_has_pre )) || print >>$tmp || return
+      >>$tmp print -r -- $zshrc_content || return
+    fi
+    if (( !zshrc_has_cfg )); then
+      >>$tmp print -r -- "
+# To customize prompt, run \`p10k configure\` or edit ${(%)__p9k_cfg_path_u}.
+[[ ! -f ${(%)__p9k_cfg_path_u} ]] || source ${(%)__p9k_cfg_path_u}" || return
+    fi
+    if (( !zshrc_has_post )); then
+    >>$tmp print -r -- "
+# Finalize Powerlevel10k instant prompt. Should stay at the bottom of ${(%)__p9k_zshrc_u}.
+(( ! \${+functions[p10k-instant-prompt-finalize]} )) || p10k-instant-prompt-finalize" || return
+    fi
+    zf_mv -f -- $tmp $__p9k_zshrc || return
+  } always {
+    zf_rm -f -- $tmp
+  }
+
+  if [[ -n $zshrc_backup_u ]]; then
+    print -rP ""
+    flowing +c See "%B${__p9k_zshrc_u//\\/\\\\}%b" changes:
+    print -rP  "
+  %2Fdiff%f %B$zshrc_backup_u%b %B$__p9k_zshrc_u%b"
   fi
-
-  local comments=(
-    "# To customize prompt, run \`p10k configure\` or edit $__p9k_cfg_path_u."
-  )
-  print -lrP -- "" $comments "[[ -f $__p9k_cfg_path_u ]] && source $__p9k_cfg_path_u" >>$__p9k_zshrc
-
-  print -rP ""
-  flowing +c The following lines have been appended to %4F$__p9k_zshrc_u%f:
-  print -rP ""
-  print -lrP -- '  '${^comments} "  %3F[[%f %B-f $__p9k_cfg_path_u%b %3F]]%f && %2Fsource%f %B$__p9k_cfg_path_u%b"
+  return 0
 }
 
 if (( force )); then
@@ -1487,9 +1568,11 @@ fi
 source $__p9k_root_dir/internal/icons.zsh || return
 
 while true; do
+  local zshrc_content= zshrc_backup= zshrc_backup_u=
+  local -i zshrc_has_cfg=0 zshrc_has_pre=0 zshrc_has_post=0 write_zshrc=0
   local POWERLEVEL9K_MODE= style= config_backup= config_backup_u= gap_char=' '
   local left_subsep= right_subsep= left_tail= right_tail= left_head= right_head= show_time=
-  local -i num_lines=0 write_config=0 empty_line=0 color=2 left_frame=1 right_frame=1
+  local -i num_lines=0 empty_line=0 color=2 left_frame=1 right_frame=1
   local -i cap_diamond=0 cap_python=0 cap_debian=0 cap_narrow_icons=0 cap_lock=0
   local -a extra_icons=('' '' '')
   local -a prefixes=('' '')
@@ -1567,21 +1650,22 @@ while true; do
   fi
   ask_confirm          || continue
   ask_config_overwrite || continue
+  ask_zshrc_edit       || continue
   break
 done
 
 clear
 
-flowing +c Powerlevel10k configuration has been written to %2F$__p9k_cfg_path_u%f.
+flowing +c New config: "%B${__p9k_cfg_path_u//\\/\\\\}%b."
 if [[ -n $config_backup ]]; then
-  flowing +c The backup of the previous version is at %3F$config_backup_u%f.
+  flowing +c Backup of the old config: "%B${config_backup_u//\\/\\\\}%b."
+fi
+if [[ -n $zshrc_backup ]]; then
+  flowing +c Backup of "%B${__p9k_zshrc_u//\\/\\\\}%b:" "%B${zshrc_backup_u//\\/\\\\}%b."
 fi
 
-if (( write_config )); then
-  generate_config || return
-fi
-
-write_zshrc || return
+generate_config || return
+change_zshrc || return
 
 print -rP ""
 flowing +c File feature requests and bug reports at "$(href https://github.com/romkatv/powerlevel10k/issues)."

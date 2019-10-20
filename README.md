@@ -87,7 +87,7 @@ Add `antibody bundle romkatv/powerlevel10k` to your `~/.zshrc`.
 
 Add `zplugin ice depth=1; zplugin light romkatv/powerlevel10k` to your `~/.zshrc`.
 
-The use of `depth` ice is optional. Other types of ice are neither recommended nor officially
+The use of `depth=1` ice is optional. Other types of ice are neither recommended nor officially
 supported by Powerlevel10k.
 
 ## Configuration

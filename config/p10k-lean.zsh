@@ -792,6 +792,9 @@
   # User-defined prompt segments can be customized the same way as built-in segments.
   typeset -g POWERLEVEL9K_EXAMPLE_FOREGROUND=208
   typeset -g POWERLEVEL9K_EXAMPLE_VISUAL_IDENTIFIER_EXPANSION='${P9K_VISUAL_IDENTIFIER}'
+
+  # When instant prompt is disabled, prompt won't appear until zsh is fully initialized.
+  # typeset -g POWERLEVEL9K_DISABLE_INSTANT_PROMPT=true
 }
 
 (( ${#p10k_config_opts} )) && setopt ${p10k_config_opts[@]}
