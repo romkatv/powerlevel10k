@@ -3490,7 +3490,7 @@ _p9k_set_instant_prompt() {
   RPROMPT=$saved_rprompt
 }
 
-typeset -gri __p9k_instant_prompt_version=3
+typeset -gri __p9k_instant_prompt_version=4
 
 _p9k_dump_instant_prompt() {
   local user=${(%):-%n}
@@ -3604,7 +3604,7 @@ _p9k_dump_instant_prompt() {
     precmd_functions=(${(@)precmd_functions:#_p9k_instant_prompt_precmd_first})
   }
   precmd_functions=(_p9k_instant_prompt_precmd_first $precmd_functions)
-  
+  function p10k-instant-prompt-finalize() { unsetopt localoptions prompt_cr; }
 } && unsetopt prompt_cr prompt_sp || true'
     } always {
       exec {fd}>&-
@@ -3755,10 +3755,15 @@ function _p9k_clear_instant_prompt() {
       >&2 echo -E - ""
       >&2 echo -E - "${(%):-You can:}"
       >&2 echo -E - ""
-      >&2 echo -E - "${(%):-  - %BRecommended%b: unset %Bprompt_cr%b at the bottom of %B$__p9k_zshrc_u%b.}"
+      >&2 echo -E - "${(%):-  - %BRecommended%b: call %Bp10k-instant-prompt-finalize%b at the end of %B$__p9k_zshrc_u%b.}"
       >&2 echo -E - "${(%):-    You can do this by running the following command:}"
       >&2 echo -E - ""
-      >&2 echo -E - "${(%):-      %2Fecho%f %3F'unsetopt prompt_cr'%f >>! $__p9k_zshrc_u}"
+      >&2 echo -E - "${(%):-      %2Fecho%f %3F'(( ! \${+functions[p10k-instant-prompt-finalize]\} )) || p10k-instant-prompt-finalize'%f >>! $__p9k_zshrc_u}"
+      >&2 echo -E - ""
+      >&2 echo -E - "${(%):-    * You %Bwill not%b see this error message again.}"
+      >&2 echo -E - "${(%):-    * Zsh will start %Bquickly%b and %Bwithout%b prompt flickering.}"
+      >&2 echo -E - ""
+      >&2 echo -E - "${(%):-  - Find where %Bprompt_cr%b option gets sets in your zsh configs and stop setting it.}"
       >&2 echo -E - ""
       >&2 echo -E - "${(%):-    * You %Bwill not%b see this error message again.}"
       >&2 echo -E - "${(%):-    * Zsh will start %Bquickly%b and %Bwithout%b prompt flickering.}"
