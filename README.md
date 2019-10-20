@@ -160,7 +160,7 @@ the theme. Once you exit zsh, the image is deleted.
 ```zsh
 docker run -e LANG=en_US.utf8 -e TERM -it --rm archlinux/base bash -uexc '
   pacman -Sy --noconfirm zsh git
-  git clone https://github.com/romkatv/powerlevel10k.git ~/powerlevel10k
+  git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ~/powerlevel10k
   echo "source ~/powerlevel10k/powerlevel10k.zsh-theme" >>~/.zshrc
   cd ~/powerlevel10k
   exec zsh'
