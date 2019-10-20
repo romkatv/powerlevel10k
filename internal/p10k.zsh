@@ -3604,7 +3604,6 @@ _p9k_dump_instant_prompt() {
     precmd_functions=(${(@)precmd_functions:#_p9k_instant_prompt_precmd_first})
   }
   precmd_functions=(_p9k_instant_prompt_precmd_first $precmd_functions)
-  function p10k-instant-prompt-finalize() { unsetopt localoptions prompt_cr; }
 } && unsetopt prompt_cr prompt_sp || true'
     } always {
       exec {fd}>&-
@@ -5341,6 +5340,10 @@ function p10k() {
 
 # Hook for zplugin.
 powerlevel10k_plugin_unload() { prompt_powerlevel9k_teardown; }
+
+function p10k-instant-prompt-finalize() {
+  (( ! __p9k_instant_prompt_active )) || unsetopt localoptions prompt_cr
+}
 
 autoload -Uz add-zsh-hook
 
