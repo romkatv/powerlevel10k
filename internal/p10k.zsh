@@ -3490,7 +3490,7 @@ _p9k_set_instant_prompt() {
   RPROMPT=$saved_rprompt
 }
 
-typeset -gri __p9k_instant_prompt_version=5
+typeset -gri __p9k_instant_prompt_version=6
 
 _p9k_dump_instant_prompt() {
   local user=${(%):-%n}
@@ -3536,7 +3536,7 @@ _p9k_dump_instant_prompt() {
   local -a _p9k_t=("${(@ps:$us:)${tail%%$rs*}}")'
       (( __p9k_ksh_arrays )) && >&$fd print -r -- '  setopt ksh_arrays'
       (( __p9k_sh_glob )) && >&$fd print -r -- '  setopt sh_glob'
-      >&$fd print -r -- '  /bin/true
+      >&$fd print -r -- '  [[ -x /bin/stty ]] && /bin/stty size >/dev/null
   typeset -ga __p9k_used_instant_prompt=("${(@e)_p9k_t[-3,-1]}")'
       (( __p9k_ksh_arrays )) && >&$fd print -r -- '  unsetopt ksh_arrays'
       (( __p9k_sh_glob )) && >&$fd print -r -- '  unsetopt sh_glob'
