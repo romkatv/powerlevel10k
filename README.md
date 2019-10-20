@@ -233,6 +233,9 @@ call `zcompile`, don't redirect output, etc. Just copy the lines and restart zsh
 To disable instant prompt, define `POWERLEVEL9K_DISABLE_INSTANT_PROMPT=true` together with the rest
 of your `POWERLEVEL9K` parameters. `~/.p10k.zsh` already has a line that you can simply uncomment.
 
+*NOTE: Instant prompt requires ZSH >= 5.4. It's OK to enable it even when using an older ZSH version
+but it won't do anything.*
+
 ### Why my icons and/or powerline symbols look bad?
 
 It's likely your font's fault.
