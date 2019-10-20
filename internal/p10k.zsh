@@ -3734,17 +3734,52 @@ function _p9k_restore_state() {
 }
 
 function _p9k_clear_instant_prompt() {
-  (( $+__p9k_instant_prompt_active )) || return
-  exec 1>&$__p9k_fd_1 2>&$__p9k_fd_2 {__p9k_fd_1}>&- {__p9k_fd_2}>&-
-  unset __p9k_fd_1 __p9k_fd_2 __p9k_instant_prompt_active
-  if [[ -s $__p9k_instant_prompt_output ]]; then
-    print -rn -- $terminfo[rc]$terminfo[sgr0]$terminfo[ed]
-    cat $__p9k_instant_prompt_output 2>/dev/null
-    zf_rm -f -- $__p9k_instant_prompt_output 2>/dev/null
-  else
-    zf_rm -f -- $__p9k_instant_prompt_output 2>/dev/null
-    print -rn -- $terminfo[rc]$terminfo[sgr0]$terminfo[ed]
-  fi
+  (( $+__p9k_instant_prompt_active )) || return 0
+  () {
+    emulate -L zsh
+    exec 1>&$__p9k_fd_1 2>&$__p9k_fd_2 {__p9k_fd_1}>&- {__p9k_fd_2}>&-
+    unset __p9k_fd_1 __p9k_fd_2 __p9k_instant_prompt_active
+    if [[ -s $__p9k_instant_prompt_output ]]; then
+      print -rn -- $terminfo[rc]$terminfo[sgr0]$terminfo[ed]
+      cat $__p9k_instant_prompt_output 2>/dev/null
+      zf_rm -f -- $__p9k_instant_prompt_output 2>/dev/null
+    else
+      zf_rm -f -- $__p9k_instant_prompt_output 2>/dev/null
+      print -rn -- $terminfo[rc]$terminfo[sgr0]$terminfo[ed]
+    fi
+    prompt_opts=(percent subst sp cr)
+    if [[ $_POWERLEVEL9K_DISABLE_INSTANT_PROMPT == 0 && -o prompt_cr ]]; then
+      >&2 echo -E - ""
+      >&2 echo -E - "${(%):-[%1FERROR%f]: When using Powerlevel10k with instant prompt, %Bprompt_cr%b must be unset.}"
+      >&2 echo -E - ""
+      >&2 echo -E - "${(%):-You can:}"
+      >&2 echo -E - ""
+      >&2 echo -E - "${(%):-  - %BRecommended%b: unset %Bprompt_cr%b at the bottom of %B$__p9k_zshrc_u%b.}"
+      >&2 echo -E - "${(%):-    You can do this by running the following command:}"
+      >&2 echo -E - ""
+      >&2 echo -E - "${(%):-      %2Fecho%f %3F'unsetopt prompt_cr'%f >>! $__p9k_zshrc_u}"
+      >&2 echo -E - ""
+      >&2 echo -E - "${(%):-    * You %Bwill not%b see this error message again.}"
+      >&2 echo -E - "${(%):-    * Zsh will start %Bquickly%b and %Bwithout%b prompt flickering.}"
+      >&2 echo -E - ""
+      >&2 echo -E - "${(%):-  - Set %BPOWERLEVEL9K_DISABLE_INSTANT_PROMPT=true%b at the bottom of %B$__p9k_zshrc_u%b.}"
+      >&2 echo -E - "${(%):-    You can do this by running the following command:}"
+      >&2 echo -E - ""
+      >&2 echo -E - "${(%):-      %2Fecho%f %3F'POWERLEVEL9K_DISABLE_INSTANT_PROMPT=true'%f >>! $__p9k_zshrc_u}"
+      >&2 echo -E - ""
+      >&2 echo -E - "${(%):-    * You %Bwill not%b see this error message again.}"
+      >&2 echo -E - "${(%):-    * Zsh will start %Bslowly%b.}"
+      >&2 echo -E - ""
+      >&2 echo -E - "${(%):-  - Do nothing.}"
+      >&2 echo -E - ""
+      >&2 echo -E - "${(%):-    * You %Bwill%b see this error message every time you start zsh.}"
+      >&2 echo -E - "${(%):-    * Zsh will start %Bquckly%b but %Bwith%b prompt flickering.}"
+      >&2 echo -E - ""
+    fi
+  }
+
+  unsetopt localoptions
+  setopt prompt_sp prompt_cr
 }
 
 _p9k_precmd_impl() {
@@ -3865,10 +3900,6 @@ _p9k_precmd() {
   [[ -o sh_glob ]] && __p9k_sh_glob=1 || __p9k_sh_glob=0
 
   unsetopt localoptions
-  if (( $+__p9k_instant_prompt_active )); then
-    setopt prompt_sp prompt_cr
-    prompt_opts=(percent subst sp cr)
-  fi
   setopt nopromptbang prompt_percent prompt_subst
 
   _p9k_precmd_impl
@@ -5069,25 +5100,33 @@ _p9k_init() {
 
   if (( $+__p9k_instant_prompt_erased )); then
     unset __p9k_instant_prompt_erased
-    >&2 print -- ""
-    >&2 print -- ${(%):-"%F{red}[ERROR]%f When using instant prompt, Powerlevel10k must be loaded before the first prompt."}
-    >&2 print -- ""
-    >&2 print -- "You can:"
-    >&2 print -- ""
-    >&2 print -- ${(%):-"  - %BRecommended%b: Change the way Powerlevel10k is loaded from zshrc. Zsh will start quickly."}
-    >&2 print -- ""
-    >&2 print -- ${(%):-"    See \e]8;;https://github.com/romkatv/powerlevel10k/blob/master/README.md#installation\ahttps://github.com/romkatv/powerlevel10k/blob/master/README.md#installation\e]8;;\a"}
+    >&2 echo -E - ""
+    >&2 echo -E - "${(%):-[%1FERROR%f]: When using instant prompt, Powerlevel10k must be loaded before the first prompt.}"
+    >&2 echo -E - ""
+    >&2 echo -E - "${(%):-You can:}"
+    >&2 echo -E - ""
+    >&2 echo -E - "${(%):-  - %BRecommended%b: Change the way Powerlevel10k is loaded from %B$__p9k_zshrc_u%b.}"
+    >&2 echo    - "${(%):-    See \e]8;;https://github.com/romkatv/powerlevel10k/blob/master/README.md#installation\ahttps://github.com/romkatv/powerlevel10k/blob/master/README.md#installation\e]8;;\a.}"
     if (( ! $+functins[zplugin] )); then
-      >&2 print -- ""
-      >&2 print -- ${(%):-"    NOTE: If using %2Fzplugin%f to load %3F'romkatv/powerlevel10k'%f, %Bdo not apply%b %1Fice wait%f."}
+      >&2 echo -E - "${(%):-    NOTE: If using %2Fzplugin%f to load %3F'romkatv/powerlevel10k'%f, %Bdo not apply%b %1Fice wait%f.}"
     fi
-    >&2 print -- ""
-    >&2 print -- "  - Disable instant prompt. Zsh will start slowly."
-    >&2 print -- ""
-    >&2 print -- "    POWERLEVEL9K_DISABLE_INSTANT_PROMPT=true"
-    >&2 print -- ""
-    >&2 print -- "  - Do nothing. Every time you start zsh, prompt will flicker and you will see this error."
-    >&2 print -- ""
+    >&2 echo -E - ""
+    >&2 echo -E - "${(%):-    * You %Bwill not%b see this error message again.}"
+    >&2 echo -E - "${(%):-    * Zsh will start %Bquickly%b.}"
+    >&2 echo -E - ""
+    >&2 echo -E - "${(%):-  - Set %BPOWERLEVEL9K_DISABLE_INSTANT_PROMPT=true%b at the bottom of %B$__p9k_zshrc_u%b.}"
+    >&2 echo -E - "${(%):-    You can do this by running the following command:}"
+    >&2 echo -E - ""
+    >&2 echo -E - "${(%):-      %2Fecho%f %3F'POWERLEVEL9K_DISABLE_INSTANT_PROMPT=true'%f >>! $__p9k_zshrc_u}"
+    >&2 echo -E - ""
+    >&2 echo -E - "${(%):-    * You %Bwill not%b see this error message again.}"
+    >&2 echo -E - "${(%):-    * Zsh will start %Bslowly%b.}"
+    >&2 echo -E - ""
+    >&2 echo -E - "${(%):-  - Do nothing.}"
+    >&2 echo -E - ""
+    >&2 echo -E - "${(%):-    * You %Bwill%b see this error message every time you start zsh.}"
+    >&2 echo -E - "${(%):-    * Zsh will start %Bslowly%b.}"
+    >&2 echo -E - ""
   fi
 }
 
