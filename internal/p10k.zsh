@@ -3490,7 +3490,7 @@ _p9k_set_instant_prompt() {
   RPROMPT=$saved_rprompt
 }
 
-typeset -gri __p9k_instant_prompt_version=2
+typeset -gri __p9k_instant_prompt_version=3
 
 _p9k_dump_instant_prompt() {
   local user=${(%):-%n}
@@ -3511,7 +3511,7 @@ _p9k_dump_instant_prompt() {
   emulate -L zsh
   (( ! \$+__p9k_instant_prompt_disabled )) || return
   typeset -gi __p9k_instant_prompt_disabled=1 __p9k_instant_prompt_sourced=$__p9k_instant_prompt_version
-  [[ -t 0 && -t 1 && -t 2 && \$ZSH_VERSION == ${(q)ZSH_VERSION} && \$ZSH_PATCHLEVEL == ${(q)ZSH_PATCHLEVEL} ]] || return
+  [[ -t 0 && -t 1 && -t 2 && \$ZSH_VERSION == ${(q)ZSH_VERSION} && \$ZSH_PATCHLEVEL == ${(q)ZSH_PATCHLEVEL} && \$POWERLEVEL9K_DISABLE_INSTANT_PROMPT != 'true' ]] || return
   local -i ZLE_RPROMPT_INDENT=${ZLE_RPROMPT_INDENT:-1}
   local PROMPT_EOL_MARK=${(q)PROMPT_EOL_MARK-%B%S%#%s%b}
   [[ -n \$SSH_CLIENT || -n \$SSH_TTY || -n \$SSH_CONNECTION ]] && local ssh=1 || local ssh=0
@@ -3540,7 +3540,7 @@ _p9k_dump_instant_prompt() {
       (( __p9k_ksh_arrays )) && >&$fd print -r -- '  unsetopt ksh_arrays'
       (( __p9k_sh_glob )) && >&$fd print -r -- '  unsetopt sh_glob'
       >&$fd print -r -- '
-  local _p9k_ret=
+  local _p9k_ret
   function _p9k_prompt_length() {
     local COLUMNS=1024
     local -i x y=$#1 m
@@ -3557,7 +3557,7 @@ _p9k_dump_instant_prompt() {
     fi
     _p9k_ret=$x
   }
-  _p9k_prompt_length "$PROMPT_EOL_MARK"
+  [[ $PROMPT_EOL_MARK == "%B%S%#%s%b" ]] && _p9k_ret=1 || _p9k_prompt_length $PROMPT_EOL_MARK
   local -i fill=$((COLUMNS-_p9k_ret))
   : ${__p9k_used_instant_prompt[1]//$lf/$((++height))}
   local out="${(%):-$PROMPT_EOL_MARK${(pl.$fill.. .)}$cr%b%k%f%E}${(pl.$height..$lf.)}$esc${height}A$terminfo[sc]"
@@ -3580,8 +3580,9 @@ _p9k_dump_instant_prompt() {
   function _p9k_instant_prompt_precmd_first() {
     emulate -L zsh
     function _p9k_instant_prompt_sched_last() {
-      emulate -L zsh
-      if (( $+__p9k_instant_prompt_active )); then
+      (( $+__p9k_instant_prompt_active )) || return 0
+      () {
+        emulate -L zsh
         exec 1>&$__p9k_fd_1 2>&$__p9k_fd_2 {__p9k_fd_1}>&- {__p9k_fd_2}>&-
         unset __p9k_fd_1 __p9k_fd_2 __p9k_instant_prompt_active
         typeset -gi __p9k_instant_prompt_erased=1
@@ -3591,8 +3592,8 @@ _p9k_dump_instant_prompt() {
         fi
         zmodload -F zsh/files b:zf_rm
         zf_rm -f -- $__p9k_instant_prompt_output ${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh{,.zwc} 2>/dev/null
-        setopt prompt_cr prompt_sp
-      fi
+      }
+      setopt prompt_cr prompt_sp
     }
     zmodload zsh/sched
     sched +0 _p9k_instant_prompt_sched_last
@@ -3864,10 +3865,10 @@ _p9k_precmd() {
   [[ -o sh_glob ]] && __p9k_sh_glob=1 || __p9k_sh_glob=0
 
   unsetopt localoptions
-  (( $+__p9k_instant_prompt_active )) && setopt prompt_sp prompt_cr
-  prompt_opts=(percent subst)
-  [[ ! -o prompt_sp ]] || prompt_opts+=sp
-  [[ ! -o prompt_cr ]] || prompt_opts+=cr
+  if (( $+__p9k_instant_prompt_active )); then
+    setopt prompt_sp prompt_cr
+    prompt_opts=(percent subst sp cr)
+  fi
   setopt nopromptbang prompt_percent prompt_subst
 
   _p9k_precmd_impl
@@ -5083,7 +5084,7 @@ _p9k_init() {
     >&2 print -- ""
     >&2 print -- "  - Disable instant prompt. Zsh will start slowly."
     >&2 print -- ""
-    >&2 print -r -- ${(%):-"    %2Fecho%f %3F'POWERLEVEL9K_DISABLE_INSTANT_PROMPT=true'%f >>! "}${(D)${ZDOTDIR:-$HOME}}/.zshrc
+    >&2 print -- "    POWERLEVEL9K_DISABLE_INSTANT_PROMPT=true"
     >&2 print -- ""
     >&2 print -- "  - Do nothing. Every time you start zsh, prompt will flicker and you will see this error."
     >&2 print -- ""
@@ -5109,6 +5110,12 @@ else
 fi
 
 prompt_powerlevel9k_setup() {
+  prompt_opts=(percent subst)
+  (( $+__p9k_instant_prompt_active )) || {
+    [[ ! -o prompt_sp ]] || prompt_opts+=sp
+    [[ ! -o prompt_cr ]] || prompt_opts+=cr
+  }
+
   emulate -L zsh
   setopt no_hist_expand extended_glob no_prompt_bang prompt_{percent,subst}
   prompt_powerlevel9k_teardown
