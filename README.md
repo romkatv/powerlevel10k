@@ -203,9 +203,10 @@ covered by the same license.
 
 ### What is instant prompt?
 
-*Instant Prompt* is an optional feature of Powerlevel10k. When enabled, Powerlevel10k prompt will
-appear instantly after you start zsh, allowing you to get hacking right away. It's an effective
-solution to the problem of slow zsh startup.
+*Instant Prompt* is an optional feature of Powerlevel10k. When enabled, it gives you a limited
+prompt within 10 milliseconds of staring zsh, alowing you to start hacking right away while zsh
+is initializing. Once the initialization is complete, the full-featured Powerlevel10k will
+seamlessly replace instant prompt.
 
 When you run `p10k configure`, Powerlevel10k will automatically enable instant prompt for you if
 it hasn't been already enabled. You can also enable it manually by adding two code snippets to
@@ -369,6 +370,9 @@ Loading time, or time to first prompt, can be measured with the following benchm
 ```zsh
 time (repeat 1000 zsh -dfis <<< 'source ~/powerlevel10k/powerlevel10k.zsh-theme')
 ```
+
+NOTE: This measures time to first *complete prompt*. Powerlevel10k can also display a
+[limited prompt](#what-is-instant-prompt) before the full-featured prompt is ready.
 
 Running this command with `~/powerlevel10k` as the current directory on the same machine as in the
 [prompt benchmark](#is-it-really-fast) takes 29 seconds (29 ms per invocation). This is about 6
