@@ -28,9 +28,11 @@ it will generate the same prompt.
 1. [Is it really fast?](#is-it-really-fast)
 1. [License](#license)
 1. [FAQ](#faq)
+   1. [What is instant prompt?](#what-is-instant-prompt)
    1. [Why my icons and/or powerline symbols look bad?](#why-my-icons-andor-powerline-symbols-look-bad)
    1. [Why is my cursor in the wrong place?](#why-is-my-cursor-in-the-wrong-place)
    1. [Why is my right prompt wrapping around in a weird way?](#why-is-my-right-prompt-wrapping-around-in-a-weird-way)
+   1. [Why is my right prompt in the wrong place?](#why-is-my-right-prompt-in-the-wrong-place)
    1. [I cannot install the recommended font. Help!](#i-cannot-install-the-recommended-font-help)
    1. [Why do I have a question mark symbol in my prompt? Is my font broken?](#why-do-i-have-a-question-mark-symbol-in-my-prompt-is-my-font-broken)
    1. [Why does Powerlevel10k spawn extra processes?](#why-does-powerlevel10k-spawn-extra-processes)
@@ -199,6 +201,38 @@ covered by the same license.
 
 ## FAQ
 
+### What is instant prompt?
+
+*Instant Prompt* is an optional feature of Powerlevel10k. When enabled, Powerlevel10k prompt will
+appear instantly after you start zsh, allowing you to get hacking right away. It's an effective
+solution to the problem of slow zsh startup.
+
+When you run `p10k configure`, Powerlevel10k will automatically enable instant prompt for you if
+it hasn't been already enabled. You can also enable it manually by adding two code snippets to
+`~/.zshrc`.
+
+At the very top of `~/.zshrc`:
+
+```zsh
+# Enable Powerlevel10k instant prompt. Should stay at the top of ~/.zshrc.
+if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
+  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
+fi
+```
+
+And at the very bottom of `~/.zshrc`:
+
+```zsh
+# Finalize Powerlevel10k instant prompt. Should stay at the bottom of ~/.zshrc.
+(( ! ${+functions[p10k-instant-prompt-finalize]} )) || p10k-instant-prompt-finalize
+```
+
+It's important that you copy the lines verbatim. Don't replace `source` with something else, don't
+call `zcompile`, don't redirect output, etc. Just copy the lines and restart zsh.
+
+To disable instant prompt, define `POWERLEVEL9K_DISABLE_INSTANT_PROMPT=true` together with the rest
+of your `POWERLEVEL9K` parameters. `~/.p10k.zsh` already has a line that you can simply uncomment.
+
 ### Why my icons and/or powerline symbols look bad?
 
 It's likely your font's fault.
@@ -207,29 +241,91 @@ It's likely your font's fault.
 
 ### Why is my cursor in the wrong place?
 
-It's likely your font's fault.
-[Install the recommended font](#recommended-meslo-nerd-font-patched-for-powerlevel10k) and run
+Type `echo '\u276F'`. If you get an error saying "zsh: character not in range",
+your locale doesn't support UTF-8. You need to fix it.
+
+If the `echo` command prints `❯` but the cursor is still in the wrong place, install
+[the recommended font](#recommended-meslo-nerd-font-patched-for-powerlevel10k) and run
 `p10k configure`.
 
-If this doesn't help, type `unset ZLE_RPROMPT_INDENT`. If it fixes the issue, make the change
-permanent:
+If this doesn't help, add `unset ZLE_RPROMPT_INDENT` at the bottom of `~/.zshrc`.
+
+Still broken? Run the following command to diagnose the problem:
 
 ```zsh
-echo 'unset ZLE_RPROMPT_INDENT' >>! ~/.zshrc
+() {
+  emulate -L zsh
+  setopt err_return no_unset
+  local text
+  print -rl -- 'Select a part of your prompt from the terminal window and paste it below.' ''
+  read -r '?Prompt: ' text
+  local -i len=${(m)#text}
+  local frame="+-${(pl.$len..-.):-}-+"
+  print -lr -- $frame "| $text |" $frame
+}
 ```
 
-### Why is my right prompt wrapping around in a weird way?
+**If the prompt line aligns with the frame**
 
-It's likely your font's fault.
-[Install the recommended font](#recommended-meslo-nerd-font-patched-for-powerlevel10k) and run
-`p10k configure`.
+```
++------------------------------+
+| romka@adam ✓ ~/powerlevel10k |
++------------------------------+
+```
 
-If this doesn't help, type `unset ZLE_RPROMPT_INDENT`. If it fixes the issue, make the change
-permanent:
+If the output of the command is aligned for every part of your prompt (left and right), this
+indicates a bug in the theme or your config. Use this command to diagnose it:
 
 ```zsh
-echo 'unset ZLE_RPROMPT_INDENT' >>! ~/.zshrc
+print -rl -- ${(eq+)PROMPT} ${(eq+)RPROMPT}
 ```
+
+Look for `%{...%}` and backslash escapes in the output. If there are any, they are the likely
+culprits. Open an issue if you get stuck.
+
+**If the prompt line is longer than the frame**
+
+```
++-----------------------------+
+| romka@adam ✓ ~/powerlevel10k |
++-----------------------------+
+```
+
+This is usually caused by a terminal bug or misconfiguration that makes it print ambiguous-width
+characters as double-width instead of single width. For example,
+[this issue](https://github.com/romkatv/powerlevel10k/issues/165).
+
+**If the prompt line is shorter than the frame and is mangled**
+
+```
++------------------------------+
+| romka@adam ✓~/powerlevel10k |
++------------------------------+
+```
+
+Note that this prompt is different from the original as it's missing a space after the checkmark.
+
+This can be caused by a low-level bug in macOS. See
+[this issue](https://github.com/romkatv/powerlevel10k/issues/241).
+
+**If the prompt line is shorter than the frame and is not mangled**
+
+```
++--------------------------------+
+| romka@adam ✓ ~/powerlevel10k |
++--------------------------------+
+```
+
+This can be caused by misconfigured locale. See
+[this issue](https://github.com/romkatv/powerlevel10k/issues/251).
+
+### Why is my prompt wrapping around in a weird way?
+
+See [Why is my cursor in the wrong place?](#why-is-my-cursor-in-the-wrong-place)
+
+### Why is my right prompt in the wrong place?
+
+See [Why is my cursor in the wrong place?](#why-is-my-cursor-in-the-wrong-place)
 
 ### I cannot install the recommended font. Help!
 
