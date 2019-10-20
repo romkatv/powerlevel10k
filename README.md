@@ -371,8 +371,8 @@ Loading time, or time to first prompt, can be measured with the following benchm
 time (repeat 1000 zsh -dfis <<< 'source ~/powerlevel10k/powerlevel10k.zsh-theme')
 ```
 
-NOTE: This measures time to first *complete prompt*. Powerlevel10k can also display a
-[limited prompt](#what-is-instant-prompt) before the full-featured prompt is ready.
+*NOTE: This measures time to first complete prompt. Powerlevel10k can also display a
+[limited prompt](#what-is-instant-prompt) before the full-featured prompt is ready.*
 
 Running this command with `~/powerlevel10k` as the current directory on the same machine as in the
 [prompt benchmark](#is-it-really-fast) takes 29 seconds (29 ms per invocation). This is about 6
