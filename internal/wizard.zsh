@@ -1275,8 +1275,8 @@ function ask_zshrc_edit() {
   zshrc_backup=
   zshrc_backup_u=
   zshrc_has_cfg=0
-  zshrc_has_pre=0
-  zshrc_has_post=0
+  zshrc_has_pre=1
+  zshrc_has_post=1
   write_zshrc=0
 
   if [[ -e $__p9k_zshrc ]]; then
