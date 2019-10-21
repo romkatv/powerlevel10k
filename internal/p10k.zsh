@@ -3490,7 +3490,7 @@ _p9k_set_instant_prompt() {
   RPROMPT=$saved_rprompt
 }
 
-typeset -gri __p9k_instant_prompt_version=6
+typeset -gri __p9k_instant_prompt_version=7
 
 _p9k_dump_instant_prompt() {
   local user=${(%):-%n}
@@ -3536,7 +3536,23 @@ _p9k_dump_instant_prompt() {
   local -a _p9k_t=("${(@ps:$us:)${tail%%$rs*}}")'
       (( __p9k_ksh_arrays )) && >&$fd print -r -- '  setopt ksh_arrays'
       (( __p9k_sh_glob )) && >&$fd print -r -- '  setopt sh_glob'
-      >&$fd print -r -- '  [[ -x /bin/stty ]] && /bin/stty size >/dev/null
+      >&$fd print -r -- ' if [[ $LINES == (24|0) && $COLUMNS == (80|0) && -x /bin/stty ]]; then
+    setopt monitor trapsasync
+    zmodload zsh/datetime
+    zmodload zsh/system
+    local -F deadline=$((EPOCHREALTIME+0.03))
+    local -i fd pid
+    trap "kill -- -\$pid 2>/dev/null" WINCH
+    exec {fd}< <(
+      echo $sysparams[pid]
+      while [[ $LINES == (24|0) && $COLUMNS == (80|0) && $EPOCHREALTIME -lt $deadline &&
+              "$(/bin/stty size 2>/dev/null)" == (24|0)\ (80|0) ]]; do
+      done)
+    IFS= read -u $fd pid
+    ( read -u $fd ) 2>/dev/null
+    exec {fd}>&-
+    trap - WINCH
+  fi
   typeset -ga __p9k_used_instant_prompt=("${(@e)_p9k_t[-3,-1]}")'
       (( __p9k_ksh_arrays )) && >&$fd print -r -- '  unsetopt ksh_arrays'
       (( __p9k_sh_glob )) && >&$fd print -r -- '  unsetopt sh_glob'
