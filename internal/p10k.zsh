@@ -2373,18 +2373,21 @@ instant_prompt_date() {
 ################################################################
 # todo.sh: shows the number of tasks in your todo.sh file
 prompt_todo() {
+  unset P9K_TODO_TOTAL_TASK_COUNT P9K_TODO_FILTERED_TASK_COUNT
   local todo=$commands[todo.sh]
   [[ -n $todo && -r $_p9k_todo_file ]] || return
   if ! _p9k_cache_stat_get $0 $_p9k_todo_file; then
     local count="$($todo -p ls | tail -1)"
-    if [[ $count == (#b)'TODO: '[[:digit:]]##' of '([[:digit:]]##)' '* ]]; then
-      _p9k_cache_stat_set 1 $match[1]
+    if [[ $count == (#b)'TODO: '([[:digit:]]##)' of '([[:digit:]]##)' '* ]]; then
+      _p9k_cache_stat_set 1 $match[1] $match[2]
     else
-      _p9k_cache_stat_set 0 0
+      _p9k_cache_stat_set 0
     fi
   fi
   (( $_p9k_cache_val[1] )) || return
-  _p9k_prompt_segment "$0" "grey50" "$_p9k_color1" 'TODO_ICON' 0 '' "${_p9k_cache_val[2]}"
+  typeset -gi P9K_TODO_FILTERED_TASK_COUNT=$_p9k_cache_val[2]
+  typeset -gi P9K_TODO_TOTAL_TASK_COUNT=$_p9k_cache_val[3]
+  _p9k_prompt_segment "$0" "grey50" "$_p9k_color1" 'TODO_ICON' 0 '' "$P9K_TODO_TOTAL_TASK_COUNT"
 }
 
 ################################################################
