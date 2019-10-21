@@ -203,6 +203,10 @@ covered by the same license.
 
 ### What is instant prompt?
 
+**IMPORTANT UPDATE**: Instant prompt is incompatible with zsh startup configs that may require
+console input. This includes asking for a keyring password and *[Y/N]* confirmations. It is
+currently **NOT RECOMMENDED** that you enable instant prompt.
+
 *Instant Prompt* is an optional feature of Powerlevel10k. When enabled, it gives you a limited
 prompt within 10 milliseconds of staring zsh, alowing you to start hacking right away while zsh
 is initializing. Once the initialization is complete, the full-featured Powerlevel10k will
