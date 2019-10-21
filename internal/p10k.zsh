@@ -3490,7 +3490,7 @@ _p9k_set_instant_prompt() {
   RPROMPT=$saved_rprompt
 }
 
-typeset -gri __p9k_instant_prompt_version=7
+typeset -gri __p9k_instant_prompt_version=8
 
 _p9k_dump_instant_prompt() {
   local user=${(%):-%n}
@@ -3511,7 +3511,7 @@ _p9k_dump_instant_prompt() {
   emulate -L zsh
   (( ! \$+__p9k_instant_prompt_disabled )) || return
   typeset -gi __p9k_instant_prompt_disabled=1 __p9k_instant_prompt_sourced=$__p9k_instant_prompt_version
-  [[ -t 0 && -t 1 && -t 2 && \$ZSH_VERSION == ${(q)ZSH_VERSION} && \$ZSH_PATCHLEVEL == ${(q)ZSH_PATCHLEVEL} && \$POWERLEVEL9K_DISABLE_INSTANT_PROMPT != 'true' ]] || return
+  [[ -t 0 && -t 1 && -t 2 && \$ZSH_VERSION == ${(q)ZSH_VERSION} && \$ZSH_PATCHLEVEL == ${(q)ZSH_PATCHLEVEL} && \$+VTE_VERSION == $+VTE_VERSION && \$POWERLEVEL9K_DISABLE_INSTANT_PROMPT != 'true' ]] || return
   local -i ZLE_RPROMPT_INDENT=${ZLE_RPROMPT_INDENT:-1}
   local PROMPT_EOL_MARK=${(q)PROMPT_EOL_MARK-%B%S%#%s%b}
   [[ -n \$SSH_CLIENT || -n \$SSH_TTY || -n \$SSH_CONNECTION ]] && local ssh=1 || local ssh=0
@@ -3536,7 +3536,8 @@ _p9k_dump_instant_prompt() {
   local -a _p9k_t=("${(@ps:$us:)${tail%%$rs*}}")'
       (( __p9k_ksh_arrays )) && >&$fd print -r -- '  setopt ksh_arrays'
       (( __p9k_sh_glob )) && >&$fd print -r -- '  setopt sh_glob'
-      >&$fd print -r -- ' if [[ $LINES == (24|0) && $COLUMNS == (80|0) && -x /bin/stty ]]; then
+      if (( $+VTE_VERSION )); then
+        >&$fd print -r -- ' if [[ $LINES == (24|0) && $COLUMNS == (80|0) && -x /bin/stty ]]; then
     setopt monitor trapsasync
     zmodload zsh/datetime
     zmodload zsh/system
@@ -3552,8 +3553,9 @@ _p9k_dump_instant_prompt() {
     ( read -u $fd ) 2>/dev/null
     exec {fd}>&-
     trap - WINCH
-  fi
-  typeset -ga __p9k_used_instant_prompt=("${(@e)_p9k_t[-3,-1]}")'
+  fi'
+      fi
+      >&$fd print -r -- '  typeset -ga __p9k_used_instant_prompt=("${(@e)_p9k_t[-3,-1]}")'
       (( __p9k_ksh_arrays )) && >&$fd print -r -- '  unsetopt ksh_arrays'
       (( __p9k_sh_glob )) && >&$fd print -r -- '  unsetopt sh_glob'
       >&$fd print -r -- '
