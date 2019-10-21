@@ -4841,7 +4841,7 @@ function _p9k_set_os() {
 }
 
 function _p9k_init_cacheable() {
-  (( $+functions[_p9k_init_icons] )) || "${__p9k_root_dir}/internal/icons.zsh"
+  (( $+functions[_p9k_init_icons] )) || source "${__p9k_root_dir}/internal/icons.zsh"
   _p9k_init_icons
   _p9k_init_params
   _p9k_init_prompt
