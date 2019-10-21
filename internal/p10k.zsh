@@ -89,7 +89,7 @@ typeset -grA __p9k_colors=(
 # Type `getColorCode background` or `getColorCode foreground` to see the list of predefined colors.
 function getColorCode() {
   emulate -L zsh
-  setopt no_hist_expand extended_glob no_prompt_bang prompt_{percent,subst}
+  setopt no_hist_expand extended_glob no_prompt_bang prompt_{percent,subst} no_aliases
   if (( ARGC == 1 )); then
     case $1 in
       foreground)
@@ -2845,7 +2845,7 @@ function _p9k_vcs_render() {
 
 function _p9k_vcs_resume() {
   emulate -L zsh
-  setopt no_hist_expand extended_glob no_prompt_bang prompt_{percent,subst}
+  setopt no_hist_expand extended_glob no_prompt_bang prompt_{percent,subst} no_aliases
 
   if [[ $VCS_STATUS_RESULT == ok-async ]]; then
     local latency=$((EPOCHREALTIME - _p9k_gitstatus_start_time))
@@ -3648,7 +3648,7 @@ function _p9k_update_prompt() {
 
 powerlevel9k_refresh_prompt_inplace() {
   emulate -L zsh
-  setopt no_hist_expand extended_glob no_prompt_bang prompt_{percent,subst}
+  setopt no_hist_expand extended_glob no_prompt_bang prompt_{percent,subst} no_aliases
   (( __p9k_enabled )) || return
   _p9k_refresh_reason=precmd
   _p9k_set_prompt
@@ -3806,7 +3806,7 @@ function _p9k_clear_instant_prompt() {
 
 _p9k_precmd_impl() {
   emulate -L zsh
-  setopt no_hist_expand extended_glob no_prompt_bang prompt_{percent,subst}
+  setopt no_hist_expand extended_glob no_prompt_bang prompt_{percent,subst} no_aliases
 
   (( __p9k_enabled )) || return
 
@@ -3970,7 +3970,7 @@ _p9k_deinit_async_pump() {
 
 function _p9k_on_async_message() {
   emulate -L zsh
-  setopt no_hist_expand extended_glob no_prompt_bang prompt_{percent,subst}
+  setopt no_hist_expand extended_glob no_prompt_bang prompt_{percent,subst} no_aliases
   if (( ARGC != 1 )); then
     _p9k_deinit_async_pump
     return
@@ -4050,7 +4050,7 @@ function _p9k_async_pump() {
 
 function _p9k_kill_async_pump() {
   emulate -L zsh
-  setopt no_hist_expand extended_glob no_prompt_bang prompt_{percent,subst}
+  setopt no_hist_expand extended_glob no_prompt_bang prompt_{percent,subst} no_aliases
   if [[ $ZSH_SUBSHELL == $_p9k_async_pump_subshell && $$ == $_p9k_async_pump_shell_pid ]]; then
     _p9k_deinit_async_pump
   fi
@@ -4839,10 +4839,7 @@ function _p9k_set_os() {
 }
 
 function _p9k_init_cacheable() {
-  (( $+functions[_p9k_init_icons] )) || {
-    setopt no_aliases
-    source "${__p9k_root_dir}/internal/icons.zsh"
-  }
+  (( $+functions[_p9k_init_icons] )) || "${__p9k_root_dir}/internal/icons.zsh"
   _p9k_init_icons
   _p9k_init_params
   _p9k_init_prompt
@@ -5178,7 +5175,7 @@ prompt_powerlevel9k_setup() {
   }
 
   emulate -L zsh
-  setopt no_hist_expand extended_glob no_prompt_bang prompt_{percent,subst}
+  setopt no_hist_expand extended_glob no_prompt_bang prompt_{percent,subst} no_aliases
   prompt_powerlevel9k_teardown
   __p9k_enabled=1
   add-zsh-hook preexec _p9k_preexec
@@ -5187,7 +5184,7 @@ prompt_powerlevel9k_setup() {
 
 prompt_powerlevel9k_teardown() {
   emulate -L zsh
-  setopt no_hist_expand extended_glob no_prompt_bang prompt_{percent,subst}
+  setopt no_hist_expand extended_glob no_prompt_bang prompt_{percent,subst} no_aliases
   add-zsh-hook -D precmd '(_p9k_|powerlevel9k_)*'
   add-zsh-hook -D preexec '(_p9k_|powerlevel9k_)*'
   PROMPT='%m%# '
@@ -5281,7 +5278,7 @@ Run interactive configuration wizard."
 
 function p10k() {
   emulate -L zsh
-  setopt no_hist_expand extended_glob prompt_percent prompt_subst
+  setopt no_hist_expand extended_glob prompt_percent prompt_subst no_aliases
 
   if (( !ARGC )); then
     print -rP -- $__p9k_p10k_usage >&2
