@@ -3596,7 +3596,7 @@ _p9k_dump_instant_prompt() {
   typeset -g __p9k_instant_prompt_output=${TMPDIR:-/tmp}/p10k-instant-prompt-output-${(%):-%n}-$$
   { echo -n > $__p9k_instant_prompt_output } || return
   print -rn -- "$out" || return
-  exec {__p9k_fd_1}>&1 {__p9k_fd_2}>&2 1>$__p9k_instant_prompt_output
+  exec {__p9k_fd_0}<&0 {__p9k_fd_1}>&1 {__p9k_fd_2}>&2 0</dev/null 1>$__p9k_instant_prompt_output
   exec 2>&1
   typeset -gi __p9k_instant_prompt_active=1
   typeset -g __p9k_instant_prompt_dump_file=${XDG_CACHE_HOME:-~/.cache}/p10k-dump-${(%):-%n}.zsh
@@ -3609,8 +3609,8 @@ _p9k_dump_instant_prompt() {
       (( $+__p9k_instant_prompt_active )) || return 0
       () {
         emulate -L zsh
-        exec 1>&$__p9k_fd_1 2>&$__p9k_fd_2 {__p9k_fd_1}>&- {__p9k_fd_2}>&-
-        unset __p9k_fd_1 __p9k_fd_2 __p9k_instant_prompt_active
+        exec 0<&$__p9k_fd_0 1>&$__p9k_fd_1 2>&$__p9k_fd_2 {__p9k_fd_0}>&- {__p9k_fd_1}>&- {__p9k_fd_2}>&-
+        unset __p9k_fd_0 __p9k_fd_1 __p9k_fd_2 __p9k_instant_prompt_active
         typeset -gi __p9k_instant_prompt_erased=1
         print -rn -- $terminfo[rc]$terminfo[sgr0]$terminfo[ed]
         if [[ -s $__p9k_instant_prompt_output ]]; then
@@ -3759,6 +3759,10 @@ function _p9k_clear_instant_prompt() {
   (( $+__p9k_instant_prompt_active )) || return 0
   () {
     emulate -L zsh
+    if (( $+__p9k_fd_0 )); then
+      exec 0<&$__p9k_fd_0 {__p9k_fd_0}>&-
+      unset __p9k_fd_0
+    fi
     exec 1>&$__p9k_fd_1 2>&$__p9k_fd_2 {__p9k_fd_1}>&- {__p9k_fd_2}>&-
     unset __p9k_fd_1 __p9k_fd_2 __p9k_instant_prompt_active
     if [[ -s $__p9k_instant_prompt_output ]]; then
