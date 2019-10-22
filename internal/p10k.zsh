@@ -3909,6 +3909,7 @@ _p9k_precmd_impl() {
         fi
       fi
     elif (( _p9k_state_dump_scheduled || ! (_POWERLEVEL9K_DISABLE_INSTANT_PROMPT || $+_p9k_dumped_instant_prompt_sigs[$_p9k_instant_prompt_sig]) )); then
+      setopt no_bg_nice
       (
         if ! (( _POWERLEVEL9K_DISABLE_INSTANT_PROMPT || $+_p9k_dumped_instant_prompt_sigs[$_p9k_instant_prompt_sig] )); then
           _p9k_set_instant_prompt
@@ -4093,8 +4094,8 @@ _p9k_init_async_pump() {
 
     local setsid=${commands[setsid]:-/usr/local/opt/util-linux/bin/setsid}
     [[ -f $setsid ]] && setsid=${(q)setsid} || setsid=
-    cmd="$setsid zsh -dfxc ${(q)cmd} &!"
-    zsh -dfmxc $cmd </dev/null >&$_p9k_async_pump_fd 2>/dev/null &!
+    cmd="$setsid zsh -dfc ${(q)cmd} &!"
+    zsh --nobgnice -dfmc $cmd </dev/null >&$_p9k_async_pump_fd 2>/dev/null &!
 
     IFS='' read -t 5 -r -u $_p9k_async_pump_fd _p9k_async_pump_pid && (( _p9k_async_pump_pid ))
 
