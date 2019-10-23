@@ -237,83 +237,83 @@ function _p9k_init_icons() {
         LEFT_SUBSEGMENT_SEPARATOR      '\uE0B1'                                       # 
         RIGHT_SUBSEGMENT_SEPARATOR     '\uE0B3'                                       # 
         CARRIAGE_RETURN_ICON           '\u21B5'                                       # ↵
-        ROOT_ICON                      '\u'$CODEPOINT_OF_OCTICONS_ZAP                 # 
-        SUDO_ICON                      '\u'$CODEPOINT_OF_AWESOME_UNLOCK' '            # 
-        RUBY_ICON                      '\u'$CODEPOINT_OF_OCTICONS_RUBY' '             # 
-        AWS_ICON                       '\u'$CODEPOINT_OF_AWESOME_SERVER' '            # 
+        ROOT_ICON                      "${CODEPOINT_OF_OCTICONS_ZAP:+\\u$CODEPOINT_OF_OCTICONS_ZAP}"
+        SUDO_ICON                      "${CODEPOINT_OF_AWESOME_UNLOCK:+\\u$CODEPOINT_OF_AWESOME_UNLOCK }"
+        RUBY_ICON                      "${CODEPOINT_OF_OCTICONS_RUBY:+\\u$CODEPOINT_OF_OCTICONS_RUBY }"
+        AWS_ICON                       "${CODEPOINT_OF_AWESOME_SERVER:+\\u$CODEPOINT_OF_AWESOME_SERVER }"
         AWS_EB_ICON                    '\U1F331'                                      # 🌱
-        BACKGROUND_JOBS_ICON           '\u'$CODEPOINT_OF_AWESOME_COG' '               # 
-        TEST_ICON                      '\u'$CODEPOINT_OF_AWESOME_BUG' '               # 
-        TODO_ICON                      '\u'$CODEPOINT_OF_AWESOME_CHECK_SQUARE_O' '    # 
-        BATTERY_ICON                   '\U'$CODEPOINT_OF_AWESOME_BATTERY_FULL' '      # 
-        DISK_ICON                      '\u'$CODEPOINT_OF_AWESOME_HDD_O' '             # 
-        OK_ICON                        '\u'$CODEPOINT_OF_AWESOME_CHECK' '             # 
-        FAIL_ICON                      '\u'$CODEPOINT_OF_AWESOME_TIMES                # 
+        BACKGROUND_JOBS_ICON           "${CODEPOINT_OF_AWESOME_COG:+\\u$CODEPOINT_OF_AWESOME_COG }"
+        TEST_ICON                      "${CODEPOINT_OF_AWESOME_BUG:+\\u$CODEPOINT_OF_AWESOME_BUG }"
+        TODO_ICON                      "${CODEPOINT_OF_AWESOME_CHECK_SQUARE_O:+\\u$CODEPOINT_OF_AWESOME_CHECK_SQUARE_O }"
+        BATTERY_ICON                   "${CODEPOINT_OF_AWESOME_BATTERY_FULL:+\\U$CODEPOINT_OF_AWESOME_BATTERY_FULL }"
+        DISK_ICON                      "${CODEPOINT_OF_AWESOME_HDD_O:+\\u$CODEPOINT_OF_AWESOME_HDD_O }"
+        OK_ICON                        "${CODEPOINT_OF_AWESOME_CHECK:+\\u$CODEPOINT_OF_AWESOME_CHECK }"
+        FAIL_ICON                      "${CODEPOINT_OF_AWESOME_TIMES:+\\u$CODEPOINT_OF_AWESOME_TIMES}"
         SYMFONY_ICON                   'SF'
         NODE_ICON                      '\u2B22'                                       # ⬢
         MULTILINE_FIRST_PROMPT_PREFIX  '\u256D\U2500'                                 # ╭─
         MULTILINE_NEWLINE_PROMPT_PREFIX '\u251C\U2500'                                # ├─
         MULTILINE_LAST_PROMPT_PREFIX   '\u2570\U2500 '                                # ╰─
-        APPLE_ICON                     '\u'$CODEPOINT_OF_AWESOME_APPLE' '             # 
+        APPLE_ICON                     "${CODEPOINT_OF_AWESOME_APPLE:+\\u$CODEPOINT_OF_AWESOME_APPLE }"
         FREEBSD_ICON                   '\U1F608'                                      # 😈
-        LINUX_ICON                     '\u'$CODEPOINT_OF_AWESOME_LINUX' '             # 
-        LINUX_ARCH_ICON                '\u'$CODEPOINT_OF_AWESOME_LINUX' '             # 
-        LINUX_DEBIAN_ICON              '\u'$CODEPOINT_OF_AWESOME_LINUX' '             # 
-        LINUX_RASPBIAN_ICON            '\u'$CODEPOINT_OF_AWESOME_LINUX' '             # 
-        LINUX_UBUNTU_ICON              '\u'$CODEPOINT_OF_AWESOME_LINUX' '             # 
-        LINUX_CENTOS_ICON              '\u'$CODEPOINT_OF_AWESOME_LINUX' '             # 
-        LINUX_COREOS_ICON              '\u'$CODEPOINT_OF_AWESOME_LINUX' '             # 
-        LINUX_ELEMENTARY_ICON          '\u'$CODEPOINT_OF_AWESOME_LINUX' '             # 
-        LINUX_MINT_ICON                '\u'$CODEPOINT_OF_AWESOME_LINUX' '             # 
-        LINUX_FEDORA_ICON              '\u'$CODEPOINT_OF_AWESOME_LINUX' '             # 
-        LINUX_GENTOO_ICON              '\u'$CODEPOINT_OF_AWESOME_LINUX' '             # 
-        LINUX_MAGEIA_ICON              '\u'$CODEPOINT_OF_AWESOME_LINUX' '             # 
-        LINUX_NIXOS_ICON               '\u'$CODEPOINT_OF_AWESOME_LINUX' '             # 
-        LINUX_MANJARO_ICON             '\u'$CODEPOINT_OF_AWESOME_LINUX' '             # 
-        LINUX_DEVUAN_ICON              '\u'$CODEPOINT_OF_AWESOME_LINUX' '             # 
-        LINUX_ALPINE_ICON              '\u'$CODEPOINT_OF_AWESOME_LINUX' '             # 
-        LINUX_AOSC_ICON                '\u'$CODEPOINT_OF_AWESOME_LINUX' '             # 
-        LINUX_OPENSUSE_ICON            '\u'$CODEPOINT_OF_AWESOME_LINUX' '             # 
-        LINUX_SABAYON_ICON             '\u'$CODEPOINT_OF_AWESOME_LINUX' '             # 
-        LINUX_SLACKWARE_ICON           '\u'$CODEPOINT_OF_AWESOME_LINUX' '             # 
-        SUNOS_ICON                     '\u'$CODEPOINT_OF_AWESOME_SUN_O' '             # 
-        HOME_ICON                      '\u'$CODEPOINT_OF_AWESOME_HOME' '              # 
-        HOME_SUB_ICON                  '\u'$CODEPOINT_OF_AWESOME_FOLDER_OPEN' '       # 
-        FOLDER_ICON                    '\u'$CODEPOINT_OF_AWESOME_FOLDER_O' '          # 
-        ETC_ICON                       '\u'$CODEPOINT_OF_AWESOME_COG' '               # 
-        NETWORK_ICON                   '\u'$CODEPOINT_OF_AWESOME_RSS' '               # 
-        LOAD_ICON                      '\u'$CODEPOINT_OF_AWESOME_BAR_CHART' '         # 
-        SWAP_ICON                      '\u'$CODEPOINT_OF_AWESOME_DASHBOARD' '         # 
-        RAM_ICON                       '\u'$CODEPOINT_OF_AWESOME_DASHBOARD' '         # 
-        SERVER_ICON                    '\u'$CODEPOINT_OF_AWESOME_SERVER' '            # 
-        VCS_UNTRACKED_ICON             '\u'$CODEPOINT_OF_AWESOME_QUESTION_CIRCLE' '   # 
-        VCS_UNSTAGED_ICON              '\u'$CODEPOINT_OF_AWESOME_EXCLAMATION_CIRCLE' ' # 
-        VCS_STAGED_ICON                '\u'$CODEPOINT_OF_AWESOME_PLUS_CIRCLE' '       # 
-        VCS_STASH_ICON                 '\u'$CODEPOINT_OF_AWESOME_INBOX' '             # 
-        VCS_INCOMING_CHANGES_ICON      '\u'$CODEPOINT_OF_AWESOME_ARROW_CIRCLE_DOWN' ' # 
-        VCS_OUTGOING_CHANGES_ICON      '\u'$CODEPOINT_OF_AWESOME_ARROW_CIRCLE_UP' '   # 
-        VCS_TAG_ICON                   '\u'$CODEPOINT_OF_AWESOME_TAG' '               # 
-        VCS_BOOKMARK_ICON              '\u'$CODEPOINT_OF_OCTICONS_BOOKMARK            # 
-        VCS_COMMIT_ICON                '\u'$CODEPOINT_OF_OCTICONS_GIT_COMMIT' '       # 
-        VCS_BRANCH_ICON                '\u'$CODEPOINT_OF_OCTICONS_GIT_BRANCH' '       # 
-        VCS_REMOTE_BRANCH_ICON         '\u'$CODEPOINT_OF_OCTICONS_REPO_PUSH' '        # 
+        LINUX_ICON                     "${CODEPOINT_OF_AWESOME_LINUX:+\\u$CODEPOINT_OF_AWESOME_LINUX }"
+        LINUX_ARCH_ICON                "${CODEPOINT_OF_AWESOME_LINUX:+\\u$CODEPOINT_OF_AWESOME_LINUX }"
+        LINUX_DEBIAN_ICON              "${CODEPOINT_OF_AWESOME_LINUX:+\\u$CODEPOINT_OF_AWESOME_LINUX }"
+        LINUX_RASPBIAN_ICON            "${CODEPOINT_OF_AWESOME_LINUX:+\\u$CODEPOINT_OF_AWESOME_LINUX }"
+        LINUX_UBUNTU_ICON              "${CODEPOINT_OF_AWESOME_LINUX:+\\u$CODEPOINT_OF_AWESOME_LINUX }"
+        LINUX_CENTOS_ICON              "${CODEPOINT_OF_AWESOME_LINUX:+\\u$CODEPOINT_OF_AWESOME_LINUX }"
+        LINUX_COREOS_ICON              "${CODEPOINT_OF_AWESOME_LINUX:+\\u$CODEPOINT_OF_AWESOME_LINUX }"
+        LINUX_ELEMENTARY_ICON          "${CODEPOINT_OF_AWESOME_LINUX:+\\u$CODEPOINT_OF_AWESOME_LINUX }"
+        LINUX_MINT_ICON                "${CODEPOINT_OF_AWESOME_LINUX:+\\u$CODEPOINT_OF_AWESOME_LINUX }"
+        LINUX_FEDORA_ICON              "${CODEPOINT_OF_AWESOME_LINUX:+\\u$CODEPOINT_OF_AWESOME_LINUX }"
+        LINUX_GENTOO_ICON              "${CODEPOINT_OF_AWESOME_LINUX:+\\u$CODEPOINT_OF_AWESOME_LINUX }"
+        LINUX_MAGEIA_ICON              "${CODEPOINT_OF_AWESOME_LINUX:+\\u$CODEPOINT_OF_AWESOME_LINUX }"
+        LINUX_NIXOS_ICON               "${CODEPOINT_OF_AWESOME_LINUX:+\\u$CODEPOINT_OF_AWESOME_LINUX }"
+        LINUX_MANJARO_ICON             "${CODEPOINT_OF_AWESOME_LINUX:+\\u$CODEPOINT_OF_AWESOME_LINUX }"
+        LINUX_DEVUAN_ICON              "${CODEPOINT_OF_AWESOME_LINUX:+\\u$CODEPOINT_OF_AWESOME_LINUX }"
+        LINUX_ALPINE_ICON              "${CODEPOINT_OF_AWESOME_LINUX:+\\u$CODEPOINT_OF_AWESOME_LINUX }"
+        LINUX_AOSC_ICON                "${CODEPOINT_OF_AWESOME_LINUX:+\\u$CODEPOINT_OF_AWESOME_LINUX }"
+        LINUX_OPENSUSE_ICON            "${CODEPOINT_OF_AWESOME_LINUX:+\\u$CODEPOINT_OF_AWESOME_LINUX }"
+        LINUX_SABAYON_ICON             "${CODEPOINT_OF_AWESOME_LINUX:+\\u$CODEPOINT_OF_AWESOME_LINUX }"
+        LINUX_SLACKWARE_ICON           "${CODEPOINT_OF_AWESOME_LINUX:+\\u$CODEPOINT_OF_AWESOME_LINUX }"
+        SUNOS_ICON                     "${CODEPOINT_OF_AWESOME_SUN_O:+\\u$CODEPOINT_OF_AWESOME_SUN_O }"
+        HOME_ICON                      "${CODEPOINT_OF_AWESOME_HOME:+\\u$CODEPOINT_OF_AWESOME_HOME }"
+        HOME_SUB_ICON                  "${CODEPOINT_OF_AWESOME_FOLDER_OPEN:+\\u$CODEPOINT_OF_AWESOME_FOLDER_OPEN }"
+        FOLDER_ICON                    "${CODEPOINT_OF_AWESOME_FOLDER_O:+\\u$CODEPOINT_OF_AWESOME_FOLDER_O }"
+        ETC_ICON                       "${CODEPOINT_OF_AWESOME_COG:+\\u$CODEPOINT_OF_AWESOME_COG }"
+        NETWORK_ICON                   "${CODEPOINT_OF_AWESOME_RSS:+\\u$CODEPOINT_OF_AWESOME_RSS }"
+        LOAD_ICON                      "${CODEPOINT_OF_AWESOME_BAR_CHART:+\\u$CODEPOINT_OF_AWESOME_BAR_CHART }"
+        SWAP_ICON                      "${CODEPOINT_OF_AWESOME_DASHBOARD:+\\u$CODEPOINT_OF_AWESOME_DASHBOARD }"
+        RAM_ICON                       "${CODEPOINT_OF_AWESOME_DASHBOARD:+\\u$CODEPOINT_OF_AWESOME_DASHBOARD }"
+        SERVER_ICON                    "${CODEPOINT_OF_AWESOME_SERVER:+\\u$CODEPOINT_OF_AWESOME_SERVER }"
+        VCS_UNTRACKED_ICON             "${CODEPOINT_OF_AWESOME_QUESTION_CIRCLE:+\\u$CODEPOINT_OF_AWESOME_QUESTION_CIRCLE }"
+        VCS_UNSTAGED_ICON              "${CODEPOINT_OF_AWESOME_EXCLAMATION_CIRCLE:+\\u$CODEPOINT_OF_AWESOME_EXCLAMATION_CIRCLE }"
+        VCS_STAGED_ICON                "${CODEPOINT_OF_AWESOME_PLUS_CIRCLE:+\\u$CODEPOINT_OF_AWESOME_PLUS_CIRCLE }"
+        VCS_STASH_ICON                 "${CODEPOINT_OF_AWESOME_INBOX:+\\u$CODEPOINT_OF_AWESOME_INBOX }"
+        VCS_INCOMING_CHANGES_ICON      "${CODEPOINT_OF_AWESOME_ARROW_CIRCLE_DOWN:+\\u$CODEPOINT_OF_AWESOME_ARROW_CIRCLE_DOWN }"
+        VCS_OUTGOING_CHANGES_ICON      "${CODEPOINT_OF_AWESOME_ARROW_CIRCLE_UP:+\\u$CODEPOINT_OF_AWESOME_ARROW_CIRCLE_UP }"
+        VCS_TAG_ICON                   "${CODEPOINT_OF_AWESOME_TAG:+\\u$CODEPOINT_OF_AWESOME_TAG }"
+        VCS_BOOKMARK_ICON              "${CODEPOINT_OF_OCTICONS_BOOKMARK:+\\u$CODEPOINT_OF_OCTICONS_BOOKMARK}"
+        VCS_COMMIT_ICON                "${CODEPOINT_OF_OCTICONS_GIT_COMMIT:+\\u$CODEPOINT_OF_OCTICONS_GIT_COMMIT }"
+        VCS_BRANCH_ICON                "${CODEPOINT_OF_OCTICONS_GIT_BRANCH:+\\u$CODEPOINT_OF_OCTICONS_GIT_BRANCH }"
+        VCS_REMOTE_BRANCH_ICON         "${CODEPOINT_OF_OCTICONS_REPO_PUSH:+\\u$CODEPOINT_OF_OCTICONS_REPO_PUSH }"
         VCS_LOADING_ICON               ''
-        VCS_GIT_ICON                   '\u'$CODEPOINT_OF_AWESOME_GIT' '               # 
-        VCS_GIT_GITHUB_ICON            '\u'$CODEPOINT_OF_AWESOME_GITHUB_ALT' '        # 
-        VCS_GIT_BITBUCKET_ICON         '\u'$CODEPOINT_OF_AWESOME_BITBUCKET' '         # 
-        VCS_GIT_GITLAB_ICON            '\u'$CODEPOINT_OF_AWESOME_GITLAB' '            # 
-        VCS_HG_ICON                    '\u'$CODEPOINT_OF_AWESOME_FLASK' '             # 
+        VCS_GIT_ICON                   "${CODEPOINT_OF_AWESOME_GIT:+\\u$CODEPOINT_OF_AWESOME_GIT }"
+        VCS_GIT_GITHUB_ICON            "${CODEPOINT_OF_AWESOME_GITHUB_ALT:+\\u$CODEPOINT_OF_AWESOME_GITHUB_ALT }"
+        VCS_GIT_BITBUCKET_ICON         "${CODEPOINT_OF_AWESOME_BITBUCKET:+\\u$CODEPOINT_OF_AWESOME_BITBUCKET }"
+        VCS_GIT_GITLAB_ICON            "${CODEPOINT_OF_AWESOME_GITLAB:+\\u$CODEPOINT_OF_AWESOME_GITLAB }"
+        VCS_HG_ICON                    "${CODEPOINT_OF_AWESOME_FLASK:+\\u$CODEPOINT_OF_AWESOME_FLASK }"
         VCS_SVN_ICON                   'svn'
         RUST_ICON                      '\uE6A8'                                       # 
         PYTHON_ICON                    '\U1F40D'                                      # 🐍
         SWIFT_ICON                     '\uE655 '                                      # 
-        PUBLIC_IP_ICON                 '\u'$CODEPOINT_OF_AWESOME_GLOBE' '             # 
-        LOCK_ICON                      '\u'$CODEPOINT_OF_AWESOME_LOCK                 # 
-        EXECUTION_TIME_ICON            '\u'$CODEPOINT_OF_AWESOME_HOURGLASS_END' '     # 
+        PUBLIC_IP_ICON                 "${CODEPOINT_OF_AWESOME_GLOBE:+\\u$CODEPOINT_OF_AWESOME_GLOBE }"
+        LOCK_ICON                      "${CODEPOINT_OF_AWESOME_LOCK:+\\u$CODEPOINT_OF_AWESOME_LOCK}"
+        EXECUTION_TIME_ICON            "${CODEPOINT_OF_AWESOME_HOURGLASS_END:+\\u$CODEPOINT_OF_AWESOME_HOURGLASS_END }"
         SSH_ICON                       'ssh'
-        VPN_ICON                       '\u'$CODEPOINT_OF_AWESOME_LOCK
+        VPN_ICON                       "${CODEPOINT_OF_AWESOME_LOCK:+\\u$CODEPOINT_OF_AWESOME_LOCK}"
         KUBERNETES_ICON                '\U2388'                                       # ⎈
-        DROPBOX_ICON                   '\u'$CODEPOINT_OF_AWESOME_DROPBOX' '           # 
+        DROPBOX_ICON                   "${CODEPOINT_OF_AWESOME_DROPBOX:+\\u$CODEPOINT_OF_AWESOME_DROPBOX }"
         DATE_ICON                      '\uF073 '                                      # 
         TIME_ICON                      '\uF017 '                                      # 
         JAVA_ICON                      '\U2615'                                       # ☕︎
