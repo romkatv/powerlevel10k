@@ -4428,6 +4428,7 @@ _p9k_init_params() {
   _p9k_declare -i POWERLEVEL9K_VCS_CONFLICTED_MAX_NUM 1
   _p9k_declare -i POWERLEVEL9K_VCS_COMMITS_AHEAD_MAX_NUM -1
   _p9k_declare -i POWERLEVEL9K_VCS_COMMITS_BEHIND_MAX_NUM -1
+  _p9k_declare -b POWERLEVEL9K_VCS_RECURSE_UNTRACKED_DIRS 0
   _p9k_declare -b POWERLEVEL9K_DISABLE_GITSTATUS 0
   _p9k_declare -e POWERLEVEL9K_VI_INSERT_MODE_STRING "INSERT"
   _p9k_declare -e POWERLEVEL9K_VI_COMMAND_MODE_STRING "NORMAL"
@@ -5063,15 +5064,17 @@ _p9k_init_vcs() {
         -d $_POWERLEVEL9K_VCS_UNTRACKED_MAX_NUM                               \
         -c $_POWERLEVEL9K_VCS_CONFLICTED_MAX_NUM                              \
         -m $_POWERLEVEL9K_VCS_MAX_INDEX_SIZE_DIRTY                            \
+        ${${_POWERLEVEL9K_VCS_RECURSE_UNTRACKED_DIRS:#0}:+-e}                 \
         -a POWERLEVEL9K
   }"
   source ${gitstatus_dir}/gitstatus.plugin.zsh
   GITSTATUS_DAEMON=$daemon GITSTATUS_NUM_THREADS=$threads gitstatus_start \
-    -s $_POWERLEVEL9K_VCS_STAGED_MAX_NUM       \
-    -u $_POWERLEVEL9K_VCS_UNSTAGED_MAX_NUM     \
-    -d $_POWERLEVEL9K_VCS_UNTRACKED_MAX_NUM    \
-    -c $_POWERLEVEL9K_VCS_CONFLICTED_MAX_NUM   \
-    -m $_POWERLEVEL9K_VCS_MAX_INDEX_SIZE_DIRTY \
+    -s $_POWERLEVEL9K_VCS_STAGED_MAX_NUM                                  \
+    -u $_POWERLEVEL9K_VCS_UNSTAGED_MAX_NUM                                \
+    -d $_POWERLEVEL9K_VCS_UNTRACKED_MAX_NUM                               \
+    -c $_POWERLEVEL9K_VCS_CONFLICTED_MAX_NUM                              \
+    -m $_POWERLEVEL9K_VCS_MAX_INDEX_SIZE_DIRTY                            \
+    ${${_POWERLEVEL9K_VCS_RECURSE_UNTRACKED_DIRS:#0}:+-e}                 \
     POWERLEVEL9K || _p9k_gitstatus_disabled=1
 }
 
