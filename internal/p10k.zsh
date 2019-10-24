@@ -5164,6 +5164,7 @@ _p9k_init() {
 }
 
 _p9k_deinit() {
+  (( $+functions[_p9k_preinit] )) && unfunction _p9k_preinit
   (( $+functions[gitstatus_stop] )) && gitstatus_stop POWERLEVEL9K
   _p9k_deinit_async_pump
   (( _p9k_dump_pid )) && wait $_p9k_dump_pid 2>/dev/null
