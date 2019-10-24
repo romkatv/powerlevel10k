@@ -5183,6 +5183,8 @@ else
 fi
 
 prompt_powerlevel9k_setup() {
+  (( __p9k_enabled )) && return
+
   prompt_opts=(percent subst)
   (( $+__p9k_instant_prompt_active )) || {
     [[ ! -o prompt_sp ]] || prompt_opts+=sp
