@@ -3504,6 +3504,7 @@ _p9k_dump_instant_prompt() {
   [[ -d $prompt_dir ]] || mkdir -p $prompt_dir || return
   [[ -w $root_dir && -w $prompt_dir ]] || return
 
+  # TODO: Use the old $TERM if unset.
   if [[ ! -e $root_file ||
         ($+__p9k_instant_prompt_sourced == 1 && $__p9k_instant_prompt_sourced != $__p9k_instant_prompt_version) ]]; then
     local tmp=$root_file.tmp.$$
