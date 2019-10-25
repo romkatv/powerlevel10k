@@ -3436,9 +3436,7 @@ function _p9k_set_prompt() {
     left_idx=_p9k_segment_index
     _p9k_prompt+=$_p9k_line_suffix_left[i]
     if (( $+_p9k_dir || (i != num_lines && $#right) )); then
-      local p='${${:-${_p9k_d::=0}${_p9k_rprompt::='
-      [[ -o transient_rprompt ]] && p+='${_p9k_line_finished-'$right'}' || p+=$right
-      _p9k_prompt=$p'}${_p9k_lprompt::='$_p9k_prompt'}}+}'
+      _p9k_prompt='${${:-${_p9k_d::=0}${_p9k_rprompt::=${__p9k_x_right-'$right'}}${_p9k_lprompt::='$_p9k_prompt'}}+}'
       _p9k_prompt+=$_p9k_gap_pre
       if (( $+_p9k_dir )); then
         if (( i == num_lines && (_POWERLEVEL9K_DIR_MIN_COMMAND_COLUMNS > 0 || _POWERLEVEL9K_DIR_MIN_COMMAND_COLUMNS_PCT > 0) )); then
@@ -3721,7 +3719,7 @@ function _p9k_dump_state() {
   sysopen -a -m 600 -o creat,trunc -u fd $tmp || return
   {
     local include='_POWERLEVEL9K_*|_p9k_*|icons|OS|DEFAULT_COLOR|DEFAULT_COLOR_INVERTED'
-    local exclude='_p9k_instant_prompt_sig|_p9k_gitstatus_*|_p9k_cache_stat_meta|_p9k_cache_stat_fprint|_p9k_cache_fprint_key|_p9k_param_sig|_p9k_public_ip|_p9k_prompt|_p9k_prompt_idx|_p9k_dump_pid|_p9k_state_dump_scheduled|_p9k_line_finished|_p9k_preexec_cmd|_p9k_status|_p9k_pipestatus|_p9k_timer_start|_p9k_region_active|_p9k_keymap|_p9k_zle_state|_p9k_async_pump_*|_p9k_cache_ephemeral'
+    local exclude='_p9k__transient_rprompt_active|_p9k_instant_prompt_sig|_p9k_gitstatus_*|_p9k_cache_stat_meta|_p9k_cache_stat_fprint|_p9k_cache_fprint_key|_p9k_param_sig|_p9k_public_ip|_p9k_prompt|_p9k_prompt_idx|_p9k_dump_pid|_p9k_state_dump_scheduled|_p9k_line_finished|_p9k_preexec_cmd|_p9k_status|_p9k_pipestatus|_p9k_timer_start|_p9k_region_active|_p9k_keymap|_p9k_zle_state|_p9k_async_pump_*|_p9k_cache_ephemeral'
     typeset -g __p9k_cached_param_sig=$_p9k_param_sig
     typeset -p __p9k_cached_param_sig >&$fd || return
     unset __p9k_cached_param_sig
@@ -3827,6 +3825,11 @@ _p9k_precmd_impl() {
     fi
 
     print -rn "${_p9k_prompt_newline:-}"
+
+    if (( _p9k__transient_rprompt_active )); then
+      _p9k__transient_rprompt_active=0
+      unset __p9k_x_right
+    fi
 
     if (( $+_p9k_real_zle_rprompt_indent )); then
       if [[ -n $_p9k_real_zle_rprompt_indent ]]; then
@@ -4231,6 +4234,8 @@ _p9k_init_vars() {
   typeset -g  _p9k_uname_o
   typeset -g  _p9k_uname_m
 
+  typeset -gi _p9k__transient_rprompt_active
+
   typeset -g  P9K_VISUAL_IDENTIFIER
   typeset -g  P9K_CONTENT
   typeset -g  P9K_GAP
@@ -4535,7 +4540,11 @@ _p9k_wrap_zle_widget() {
 
 function _p9k_zle_line_finish() {
   _p9k_line_finished=
-  if (( _p9k_reset_on_line_finish )); then
+  if [[ -o transient_rprompt ]]; then
+    __p9k_x_right=
+    _p9k__transient_rprompt_active=1
+    _p9k_reset_prompt
+  elif (( _p9k_reset_on_line_finish )); then
     _p9k_reset_prompt
   fi
 }
@@ -4789,8 +4798,7 @@ _p9k_init_prompt() {
     _p9k_prompt_prefix_left+=$'%{\e]133;A\a%}'
   fi
 
-  [[ -o transient_rprompt && -n "$_p9k_line_segments_right[1,-2]" ]] ||
-     ( _p9k_segment_in_use time && (( _POWERLEVEL9K_TIME_UPDATE_ON_COMMAND )) )
+  ( _p9k_segment_in_use time && (( _POWERLEVEL9K_TIME_UPDATE_ON_COMMAND )) )
   _p9k_reset_on_line_finish=$((!$?))
 
   _p9k_t+=$_p9k_gap_pre
@@ -5099,7 +5107,7 @@ _p9k_init() {
     fi
   fi
 
-  if (( _p9k_reset_on_line_finish )) || _p9k_segment_in_use status; then
+  if (( _p9k_reset_on_line_finish )) || _p9k_segment_in_use status || [[ -o transient_rprompt ]]; then
     _p9k_wrap_zle_widget zle-line-finish _p9k_zle_line_finish
   fi
 
