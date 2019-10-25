@@ -97,7 +97,8 @@ supported by Powerlevel10k.
 ### For new users
 
 On the first run Powerlevel10k configuration wizard will ask you a few questions and configure
-your prompt. If it doesn't trigger automatically, type `p10k configure`.
+your prompt. If it doesn't trigger automatically, type `p10k configure`. You can further customize
+your prompt by editing `~/.p10k.zsh`.
 
 ### For Powerlevel9k users
 
@@ -107,7 +108,8 @@ all configuration options used by Powerlevel9k. See Powerlevel9k
 [configuration guide](https://github.com/Powerlevel9k/powerlevel9k/blob/master/README.md#prompt-customization).
 
 To go beyond the functionality of Powerlevel9k, type `p10k configure` and explore the unique styles
-and features Powerlevel10k has to offer.
+and features Powerlevel10k has to offer. You can further customize your prompt by editing
+`~/.p10k.zsh`.
 
 ## Fonts
 
