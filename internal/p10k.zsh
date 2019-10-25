@@ -3504,7 +3504,6 @@ _p9k_dump_instant_prompt() {
   [[ -d $prompt_dir ]] || mkdir -p $prompt_dir || return
   [[ -w $root_dir && -w $prompt_dir ]] || return
 
-  # TODO: Use the old $TERM if unset.
   if [[ ! -e $root_file ||
         ($+__p9k_instant_prompt_sourced == 1 && $__p9k_instant_prompt_sourced != $__p9k_instant_prompt_version) ]]; then
     local tmp=$root_file.tmp.$$
@@ -3515,7 +3514,8 @@ _p9k_dump_instant_prompt() {
   emulate -L zsh
   (( ! \$+__p9k_instant_prompt_disabled )) || return
   typeset -gi __p9k_instant_prompt_disabled=1 __p9k_instant_prompt_sourced=$__p9k_instant_prompt_version
-  [[ -t 0 && -t 1 && -t 2 && \$ZSH_VERSION == ${(q)ZSH_VERSION} && \$ZSH_PATCHLEVEL == ${(q)ZSH_PATCHLEVEL} && \$+VTE_VERSION == $+VTE_VERSION && \$POWERLEVEL9K_DISABLE_INSTANT_PROMPT != 'true' ]] || return
+  [[ -t 0 && -t 1 && -t 2 && \$ZSH_VERSION == ${(q)ZSH_VERSION} && \$ZSH_PATCHLEVEL == ${(q)ZSH_PATCHLEVEL} &&
+     \$+VTE_VERSION == $+VTE_VERSION && \$POWERLEVEL9K_DISABLE_INSTANT_PROMPT != 'true' ]] || return
   local -i ZLE_RPROMPT_INDENT=${ZLE_RPROMPT_INDENT:-1}
   local PROMPT_EOL_MARK=${(q)PROMPT_EOL_MARK-%B%S%#%s%b}
   [[ -n \$SSH_CLIENT || -n \$SSH_TTY || -n \$SSH_CONNECTION ]] && local ssh=1 || local ssh=0
@@ -4837,7 +4837,7 @@ _p9k_must_init() {
     '${GITSTATUS_ENABLE_LOGGING}' '${GITSTATUS_DAEMON}' '${GITSTATUS_NUM_THREADS}'
     '${DEFAULT_USER}' '${ZLE_RPROMPT_INDENT}' '${P9K_SSH}' '${__p9k_ksh_arrays}'
     '${__p9k_sh_glob}' '${parameters[transient_rprompt]}' '${ITERM_SHELL_INTEGRATION_INSTALLED}'
-    '${PROMPT_EOL_MARK}' 'LANG' 'LC_ALL' 'LC_CTYPE' 'va')
+    '${PROMPT_EOL_MARK}' '${LANG}' '${LC_ALL}' '${LC_CTYPE}' '${+VTE_VERSION}' 'va')
   IFS=$'\2' param_sig="${(e)param_sig}"
   [[ $param_sig == $_p9k_param_sig ]] && return 1
   [[ -n $_p9k_param_sig ]] && _p9k_deinit
