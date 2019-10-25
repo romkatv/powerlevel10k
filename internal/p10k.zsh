@@ -3467,7 +3467,7 @@ function _p9k_set_prompt() {
       ((i != num_lines && $#right)) && _p9k__prompt+=$_p9k_line_gap_post[i]
     fi
     if (( i == num_lines )); then
-      [[ -n $right ]] && RPROMPT=$_p9k_prompt_prefix_right$right$_p9k_prompt_suffix_right
+      [[ -n $right ]] && RPROMPT='${__p9k_x_right-'$_p9k_prompt_prefix_right$right$_p9k_prompt_suffix_right'}'
       _p9k__prompt+=$_p9k_prompt_suffix_left
       [[ $1 == instant_ ]] || PROMPT+=$_p9k__prompt
     else
