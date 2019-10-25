@@ -5174,7 +5174,7 @@ _p9k_deinit() {
   (( $+functions[gitstatus_stop] )) && gitstatus_stop POWERLEVEL9K
   _p9k_deinit_async_pump
   (( _p9k__dump_pid )) && wait $_p9k__dump_pid 2>/dev/null
-  unset -m '(_POWERLEVEL9K_|P9K_|_p9k_[^_])*~P9K_SSH'
+  unset -m '(_POWERLEVEL9K_|P9K_|_p9k_)*~P9K_SSH'
 }
 
 typeset -gi __p9k_enabled=0
