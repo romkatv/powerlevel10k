@@ -3491,7 +3491,7 @@ _p9k_set_instant_prompt() {
   RPROMPT=$saved_rprompt
 }
 
-typeset -gri __p9k_instant_prompt_version=8
+typeset -gri __p9k_instant_prompt_version=9
 
 _p9k_dump_instant_prompt() {
   local user=${(%):-%n}
@@ -3539,28 +3539,31 @@ _p9k_dump_instant_prompt() {
       (( __p9k_ksh_arrays )) && >&$fd print -r -- '  setopt ksh_arrays'
       (( __p9k_sh_glob )) && >&$fd print -r -- '  setopt sh_glob'
       if (( $+VTE_VERSION )); then
-        >&$fd print -r -- ' if [[ $LINES == (24|0) && $COLUMNS == (80|0) && -x /bin/stty ]]; then
-    setopt monitor trapsasync
+        >&$fd print -r -- '
+  if (( LINES == 24 && COLUMNS == 80 )); then
     zmodload zsh/datetime
-    zmodload zsh/system
-    local -F deadline=$((EPOCHREALTIME+0.03))
-    local -i fd pid
-    trap "kill -- -\$pid 2>/dev/null" WINCH
-    exec {fd}< <(
-      echo $sysparams[pid]
-      while [[ $LINES == (24|0) && $COLUMNS == (80|0) && $EPOCHREALTIME -lt $deadline &&
-              "$(/bin/stty size 2>/dev/null)" == (24|0)\ (80|0) ]]; do
-      done)
-    IFS= read -u $fd pid
-    ( read -u $fd ) 2>/dev/null
-    exec {fd}>&-
-    trap - WINCH
+    local -F deadline=$((EPOCHREALTIME+0.025))
+    local tty_size
+    while true; do
+      if (( EPOCHREALTIME > deadline )) || ! tty_size="$(/bin/stty size 2>/dev/null)" || [[ $tty_size != <->" "<-> ]]; then
+        local __p9k_x_gap=
+        local __p9k_x_right=
+        break
+      fi
+      if [[ $tty_size != "24 80" ]]; then
+        local lines_columns=(${=tty_size})
+        local LINES=$lines_columns[1]
+        local COLUMNS=$lines_columns[2]
+        break
+      fi
+    done
   fi'
       fi
       >&$fd print -r -- '  typeset -ga __p9k_used_instant_prompt=("${(@e)_p9k_t[-3,-1]}")'
       (( __p9k_ksh_arrays )) && >&$fd print -r -- '  unsetopt ksh_arrays'
       (( __p9k_sh_glob )) && >&$fd print -r -- '  unsetopt sh_glob'
       >&$fd print -r -- '
+  : ${__p9k_used_instant_prompt[1]//$lf/$((++height))}
   local _p9k_ret
   function _p9k_prompt_length() {
     local COLUMNS=1024
@@ -3578,10 +3581,15 @@ _p9k_dump_instant_prompt() {
     fi
     _p9k_ret=$x
   }
+  local out'
+       (( $+VTE_VERSION )) && >&$fd print -r -- '  if (( ! $+__p9k_x_gap )); then'
+       >&$fd print -r -- '
   [[ $PROMPT_EOL_MARK == "%B%S%#%s%b" ]] && _p9k_ret=1 || _p9k_prompt_length $PROMPT_EOL_MARK
-  local -i fill=$((COLUMNS-_p9k_ret))
-  : ${__p9k_used_instant_prompt[1]//$lf/$((++height))}
-  local out="${(%):-$PROMPT_EOL_MARK${(pl.$fill.. .)}$cr%b%k%f%E}${(pl.$height..$lf.)}$esc${height}A$terminfo[sc]"
+  local -i fill=$((COLUMNS > _p9k_ret ? COLUMNS - _p9k_ret : 0))
+  out+="${(%):-$PROMPT_EOL_MARK${(pl.$fill.. .)}$cr%b%k%f%E}"'
+        (( $+VTE_VERSION )) && >&$fd print -r -- '  fi'
+        >&$fd print -r -- '
+  out+="${(pl.$height..$lf.)}$esc${height}A$terminfo[sc]"
   out+=${(%):-"$__p9k_used_instant_prompt[1]$__p9k_used_instant_prompt[2]"}
   if [[ -n $__p9k_used_instant_prompt[3] ]]; then
     _p9k_prompt_length "$__p9k_used_instant_prompt[2]"
@@ -4575,10 +4583,12 @@ _p9k_build_gap_post() {
   _p9k_color prompt_multiline_$1_prompt_gap FOREGROUND ""
   [[ -n $_p9k_ret ]] && _p9k_foreground $_p9k_ret
   style+=$_p9k_ret
+  _p9k_escape_style $style
+  style=$_p9k_ret
   local exp=POWERLEVEL9K_MULTILINE_${(U)1}_PROMPT_GAP_EXPANSION
   (( $+parameters[$exp] )) && exp=${(P)exp} || exp='${P9K_GAP}'
   [[ $char == '.' ]] && local s=',' || local s='.'
-  _p9k_ret=$style'${${${_p9k_m:#-*}:+'
+  _p9k_ret=$'${${__p9k_x_gap+\n}:-'$style'${${${_p9k_m:#-*}:+'
   if [[ $exp == '${P9K_GAP}' ]]; then
     _p9k_ret+='${(pl'$s'$((_p9k_m+1))'$s$s$char$s$')}'
   else
@@ -4592,6 +4602,7 @@ _p9k_build_gap_post() {
     _p9k_ret+=$'$_p9k_rprompt${_p9k_t[$((1+!_p9k_ind))]}}:-\n}'
   fi
   [[ -n $style ]] && _p9k_ret+='%b%k%f'
+  _p9k_ret+='}'
 }
 
 _p9k_init_lines() {
