@@ -17,7 +17,6 @@ function _p9k_can_configure() {
     (( q )) || print -rP "%1F[ERROR]%f %Bp10k configure%b: $1" >&2
   }
   {
-    [[ -t 0 && -t 1 ]]         || { $0_error "no TTY";                           return 1 }
     [[ -o multibyte ]]         || { $0_error "multibyte option is not set";      return 1 }
     [[ -e $__p9k_zd ]]         || { $0_error "$__p9k_zd_u does not exist";       return 1 }
     [[ -d $__p9k_zd ]]         || { $0_error "$__p9k_zd_u is not a directory";   return 1 }
@@ -53,6 +52,8 @@ function _p9k_can_configure() {
       $0_error "terminal size too small; must be at least $__p9k_wizard_columns x $__p9k_wizard_lines"
       return 1
     }
+    [[ -t 0 && -t 1 ]]         || { $0_error "no TTY";                           return 2 }
+    return 0
   } always {
     unfunction $0_error
   }

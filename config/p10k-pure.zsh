@@ -124,6 +124,18 @@
   typeset -g POWERLEVEL9K_VCS_{COMMITS_AHEAD,COMMITS_BEHIND}_MAX_NUM=1
   # Remove space between '⇣' and '⇡'.
   typeset -g POWERLEVEL9K_VCS_CONTENT_EXPANSION='${P9K_CONTENT/⇣* ⇡/⇣⇡}'
+
+  # Instant prompt mode.
+  #
+  #   - off:     Disable instant prompt. Choose this if you've tried instant prompt and found
+  #              it incompatible with your zsh configuration files.
+  #   - quiet:   Enable instant prompt and don't print warnings when detecting console output
+  #              during zsh initialization. Choose this if you've read and understood
+  #              https://github.com/romkatv/powerlevel10k/blob/master/README.md#instant-prompt.
+  #   - verbose: Enable instant prompt and print a warning when detecting console output during
+  #              zsh initialization. Choose this if you've never tried instant prompt, haven't
+  #              seen the warning, or if you are unsure what this all means.
+  typeset -g POWERLEVEL9K_INSTANT_PROMPT=verbose
 }
 
 (( ${#p10k_config_opts} )) && setopt ${p10k_config_opts[@]}

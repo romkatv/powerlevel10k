@@ -41,7 +41,7 @@ it will generate the same prompt.
    1. [Does Powerlevel10k always render exactly the same prompt as Powerlevel9k given the same config?](#does-powerlevel10k-always-render-exactly-the-same-prompt-as-powerlevel9k-given-the-same-config)
    1. [Is there an AUR package for Powerlevel10k?](#is-there-an-aur-package-for-powerlevel10k)
    1. [I cannot make Powerlevel10k work with my plugin manager. Help!](#i-cannot-make-powerlevel10k-work-with-my-plugin-manager-help)
-   1. [What is the minimum supported ZSH version?](#what-is-the-minimum-supported-zsh-version)
+   1. [What is the minimum supported zsh version?](#what-is-the-minimum-supported-zsh-version)
 
 ## Installation
 
@@ -160,7 +160,7 @@ Try Powerlevel10k in Docker. You can safely make any changes to the file system 
 the theme. Once you exit zsh, the image is deleted.
 
 ```zsh
-docker run -e LANG=en_US.utf8 -e TERM -it --rm archlinux/base bash -uexc '
+docker run -e TERM -it --rm archlinux/base bash -uexc '
   pacman -Sy --noconfirm zsh git
   git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ~/powerlevel10k
   echo "source ~/powerlevel10k/powerlevel10k.zsh-theme" >>~/.zshrc
@@ -203,44 +203,69 @@ covered by the same license.
 
 ## FAQ
 
-### What is instant prompt?
-
-**IMPORTANT UPDATE**: Instant prompt is incompatible with zsh startup configs that may require
-console input. This includes asking for a keyring password and *[Y/N]* confirmations. It is
-currently **NOT RECOMMENDED** that you enable instant prompt.
+### <a name='instant-prompt'></a>What is instant prompt?
 
 *Instant Prompt* is an optional feature of Powerlevel10k. When enabled, it gives you a limited
-prompt within 10 milliseconds of staring zsh, alowing you to start hacking right away while zsh
-is initializing. Once the initialization is complete, the full-featured Powerlevel10k will
+prompt within a few milliseconds of staring zsh, alowing you to start hacking right away while zsh
+is initializing. Once initialization is complete, the full-featured Powerlevel10k prompt will
 seamlessly replace instant prompt.
 
-When you run `p10k configure`, Powerlevel10k will automatically enable instant prompt for you if
-it hasn't been already enabled. You can also enable it manually by adding two code snippets to
-`~/.zshrc`.
-
-At the very top of `~/.zshrc`:
+You can enable instant prompt either by running `p10k configure` or by manually adding the following
+code snippet at the top of `~/.zshrc`:
 
 ```zsh
-# Enable Powerlevel10k instant prompt. Should stay at the top of ~/.zshrc.
+# Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
+# Initialization code that may require console input (password prompts, [y/n]
+# confirmations, etc.) must go above this block, everything else may go below.
 if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
   source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
 ```
 
-And at the very bottom of `~/.zshrc`:
+It's important that you copy the lines verbatim. Don't replace `source` with something else, don't
+call `zcompile`, don't redirect output, etc.
+
+When instant prompt is enabled, for the duration of zsh initialization standard input is redirected
+to `/dev/null` and standard output with standard error are redirected to a temporary file. Once zsh
+is fully initialized, standard file descriptors are restored and the content of the temporary file
+is printed out.
+
+When using instant prompt, you should carefully check any output that appears on zsh startup as it
+may indicate that initialization has been altered, or perhaps even broken, by instant prompt.
+Initialization code that may require console input, such as asking for a keyring password or for a
+*[y/n]* confirmation, must be moved above the instant prompt preamble in `~/.zshrc`. Initialization
+code that merely prints to console but never reads from it will work correctly with instant prompt,
+although output that normally has colors may appear uncolored. You can either leave it be, suppress
+the output, or move it above the instant prompt preamble. Here's an example of `~/.zshrc` that
+breaks when instant prompt is enabled.
 
 ```zsh
-# Finalize Powerlevel10k instant prompt. Should stay at the bottom of ~/.zshrc.
-(( ! ${+functions[p10k-instant-prompt-finalize]} )) || p10k-instant-prompt-finalize
+if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
+  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
+fi
+keychain id_rsa --agents ssh  # asks for password
+chatty-script                 # spams to stdout even when everything is fine
 ```
 
-It's important that you copy the lines verbatim. Don't replace `source` with something else, don't
-call `zcompile`, don't redirect output, etc. Just copy the lines and restart zsh.
+Fixed version:
 
-To disable instant prompt, define `POWERLEVEL9K_DISABLE_INSTANT_PROMPT=true` together with the rest
-of your `POWERLEVEL9K` parameters. `~/.p10k.zsh` already has a line that you can simply uncomment.
+```zsh
+keychain id_rsa --agents ssh  # moved before instant prompt
+if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
+  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
+fi
+chatty-script >/dev/null      # spam output suppressed
+```
 
-*NOTE: Instant prompt requires ZSH >= 5.4. It's OK to enable it even when using an older ZSH version
+If `POWERLEVEL9K_INSTANT_PROMPT` is unset or set to `verbose`, Powerlevel10k will print a warning
+when it detects console output during initialization to bring attention to potential issues. You can
+silence this warning (without suppressing console output) with `POWERLEVEL9K_INSTANT_PROMPT=quiet`.
+This is recommended if some initialization code in `~/.zshrc` prints to console and it's infeasible
+to move it above the instant prompt preamble or to suppress its output. You can completely disable
+instant prompt with `POWERLEVEL9K_INSTANT_PROMPT=off`. Do this if instant prompt breaks zsh
+initialization and you don't know how to fix it.
+
+*NOTE: Instant prompt requires zsh >= 5.4. It's OK to enable it even when using an older zsh version
 but it won't do anything.*
 
 ### Why my icons and/or powerline symbols look bad?
@@ -369,7 +394,7 @@ prompt latency when using Powerlevel10k, please
 
 ### Is Powerlevel10k fast to load?
 
-Yes, provided that you are using ZSH >= 5.4.
+Yes, provided that you are using zsh >= 5.4.
 
 Loading time, or time to first prompt, can be measured with the following benchmark:
 
@@ -440,9 +465,9 @@ echo 'source ~/powerlevel10k/powerlevel10k.zsh-theme' >>! ~/.zshrc
 
 This method of installation won't make anything slower or otherwise sub-par.
 
-### What is the minimum supported ZSH version?
+### What is the minimum supported zsh version?
 
-ZSH 5.1 or newer should work.
+Zsh 5.1 or newer should work.
 
 However, there are too many version, OS, platform, terminal and option configurations to test. If
 Powerlevel10k doesn't work for you, please open an issue.

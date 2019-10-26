@@ -839,8 +839,17 @@
   # typeset -g POWERLEVEL9K_EXAMPLE_FOREGROUND=4
   typeset -g POWERLEVEL9K_EXAMPLE_VISUAL_IDENTIFIER_EXPANSION='${P9K_VISUAL_IDENTIFIER}'
 
-  # When instant prompt is disabled, prompt won't appear until zsh is fully initialized.
-  # typeset -g POWERLEVEL9K_DISABLE_INSTANT_PROMPT=true
+  # Instant prompt mode.
+  #
+  #   - off:     Disable instant prompt. Choose this if you've tried instant prompt and found
+  #              it incompatible with your zsh configuration files.
+  #   - quiet:   Enable instant prompt and don't print warnings when detecting console output
+  #              during zsh initialization. Choose this if you've read and understood
+  #              https://github.com/romkatv/powerlevel10k/blob/master/README.md#instant-prompt.
+  #   - verbose: Enable instant prompt and print a warning when detecting console output during
+  #              zsh initialization. Choose this if you've never tried instant prompt, haven't
+  #              seen the warning, or if you are unsure what this all means.
+  typeset -g POWERLEVEL9K_INSTANT_PROMPT=verbose
 }
 
 (( ${#p10k_config_opts} )) && setopt ${p10k_config_opts[@]}
