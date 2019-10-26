@@ -241,12 +241,9 @@ the output, or move it above the instant prompt preamble.
 Here's an example of `~/.zshrc` that breaks when instant prompt is enabled:
 
 ```zsh
-# OK to perform console I/O before this point.
 if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
   source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
-# From this point on, until zsh is fully initialized, console input won't work and
-# console output may appear uncolored.
 
 keychain id_rsa --agents ssh  # asks for password
 chatty-script                 # spams to stdout even when everything is fine
