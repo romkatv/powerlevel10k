@@ -3627,10 +3627,10 @@ _p9k_dump_instant_prompt() {
         print -rn -- $terminfo[rc]${(%):-%b%k%f%s%u}$terminfo[ed]
         if [[ -s $__p9k_instant_prompt_output ]]; then
           cat $__p9k_instant_prompt_output 2>/dev/null
-          local _p9k_ret
-          [[ $PROMPT_EOL_MARK == "%B%S%#%s%b" ]] && _p9k_ret=1 || _p9k_prompt_length $PROMPT_EOL_MARK
+          local _p9k_ret mark="${PROMPT_EOL_MARK-%B%S%#%s%b}"
+          _p9k_prompt_length $mark
           local -i fill=$((COLUMNS > _p9k_ret ? COLUMNS - _p9k_ret : 0))
-          echo -nE - "${(%):-$PROMPT_EOL_MARK${(pl.$fill.. .)}$cr%b%k%f%s%u%E}"
+          echo -nE - "${(%):-$mark${(pl.$fill.. .)}$cr%b%k%f%s%u%E}"
         fi
         zmodload -F zsh/files b:zf_rm
         zf_rm -f -- $__p9k_instant_prompt_output ${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh{,.zwc} 2>/dev/null
@@ -3783,9 +3783,10 @@ function _p9k_clear_instant_prompt() {
       {
         local content
         [[ $_POWERLEVEL9K_INSTANT_PROMPT == verbose ]] && content="$(<$__p9k_instant_prompt_output)"
-        _p9k_prompt_length $PROMPT_EOL_MARK
+        local mark="${PROMPT_EOL_MARK-%B%S%#%s%b}"
+        _p9k_prompt_length $mark
         local -i fill=$((COLUMNS > _p9k_ret ? COLUMNS - _p9k_ret : 0))
-        local sp="${(%):-$PROMPT_EOL_MARK${(pl.$fill.. .)}$cr%b%k%f%s%u%E}"
+        local sp="${(%):-$mark${(pl.$fill.. .)}$cr%b%k%f%s%u%E}"
         print -rn -- $terminfo[rc]${(%):-%b%k%f%s%u}$terminfo[ed]
         if [[ -n ${(S)content//$'\e'*$'\a'} ]]; then
           echo -E - ""
