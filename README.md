@@ -236,8 +236,9 @@ Initialization code that may require console input, such as asking for a keyring
 *[y/n]* confirmation, must be moved above the instant prompt preamble in `~/.zshrc`. Initialization
 code that merely prints to console but never reads from it will work correctly with instant prompt,
 although output that normally has colors may appear uncolored. You can either leave it be, suppress
-the output, or move it above the instant prompt preamble. Here's an example of `~/.zshrc` that
-breaks when instant prompt is enabled.
+the output, or move it above the instant prompt preamble.
+
+Here's an example of `~/.zshrc` that breaks when instant prompt is enabled:
 
 ```zsh
 if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
@@ -251,9 +252,14 @@ Fixed version:
 
 ```zsh
 keychain id_rsa --agents ssh  # moved before instant prompt
+
+# OK to perform console I/O before this point.
 if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
   source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
+# From this point on, until zsh is fully initialized, console input won't work and
+# console output may appear uncolored.
+
 chatty-script >/dev/null      # spam output suppressed
 ```
 
@@ -265,8 +271,8 @@ to move it above the instant prompt preamble or to suppress its output. You can 
 instant prompt with `POWERLEVEL9K_INSTANT_PROMPT=off`. Do this if instant prompt breaks zsh
 initialization and you don't know how to fix it.
 
-*NOTE: Instant prompt requires zsh >= 5.4. It's OK to enable it even when using an older zsh version
-but it won't do anything.*
+*NOTE: Instant prompt requires zsh >= 5.4. It's OK to enable it even when using an older version of
+zsh but it won't do anything.*
 
 ### Why my icons and/or powerline symbols look bad?
 
