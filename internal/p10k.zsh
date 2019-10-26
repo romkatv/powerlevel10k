@@ -3550,6 +3550,7 @@ _p9k_dump_instant_prompt() {
       local tty_size
       while true; do
         if (( EPOCHREALTIME > deadline )) || ! tty_size="$(/bin/stty size 2>/dev/null)" || [[ $tty_size != <->" "<-> ]]; then
+          local __p9k_x_ruler=
           local __p9k_x_gap=
           local __p9k_x_right=
           break
@@ -4868,11 +4869,14 @@ _p9k_init_prompt() {
     local ruler_char=$_p9k_ret
     _p9k_prompt_length $ruler_char
     if (( _p9k_ret == 1 && $#ruler_char == 1 )); then
+      _p9k_prompt_prefix_left+=$'${${__p9k_x_ruler+\n}:-'
       _p9k_color prompt_ruler BACKGROUND ""
       _p9k_background $_p9k_ret
+      _p9k_escape_style $_p9k_ret
       _p9k_prompt_prefix_left+=%b$_p9k_ret
       _p9k_color prompt_ruler FOREGROUND ""
       _p9k_foreground $_p9k_ret
+      _p9k_escape_style $_p9k_ret
       _p9k_prompt_prefix_left+=$_p9k_ret
       [[ $ruler_char == '.' ]] && local sep=',' || local sep='.'
       local ruler_len='${$((_p9k_clm-_p9k_ind))/#-*/0}'
@@ -4882,6 +4886,7 @@ _p9k_init_prompt() {
       else
         _p9k_prompt_prefix_left+='${_p9k_t[$((1+!_p9k_ind))]}'
       fi
+      _p9k_prompt_prefix_left+='}'
     else
       print -rP -- "%F{red}WARNING!%f %BPOWERLEVEL9K_RULER_CHAR%b is not one character long. Ruler won't be rendered."
       print -rP -- "Either change the value of %BPOWERLEVEL9K_RULER_CHAR%b or set %BPOWERLEVEL9K_SHOW_RULER=false%b to"
@@ -4940,7 +4945,7 @@ _p9k_must_init() {
     '${GITSTATUS_ENABLE_LOGGING}' '${GITSTATUS_DAEMON}' '${GITSTATUS_NUM_THREADS}'
     '${DEFAULT_USER}' '${ZLE_RPROMPT_INDENT}' '${P9K_SSH}' '${__p9k_ksh_arrays}'
     '${__p9k_sh_glob}' '${options[transient_rprompt]}' '${ITERM_SHELL_INTEGRATION_INSTALLED}'
-    '${PROMPT_EOL_MARK}' '${LANG}' '${LC_ALL}' '${LC_CTYPE}' 'vc')
+    '${PROMPT_EOL_MARK}' '${LANG}' '${LC_ALL}' '${LC_CTYPE}' 'vd')
   IFS=$'\2' param_sig="${(e)param_sig}"
   [[ $param_sig == $_p9k__param_sig ]] && return 1
   [[ -n $_p9k__param_sig ]] && _p9k_deinit
