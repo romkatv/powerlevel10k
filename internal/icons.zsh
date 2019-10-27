@@ -446,7 +446,7 @@ function _p9k_init_icons() {
         AWS_EB_ICON                    '\U1F331'              # 🌱
         BACKGROUND_JOBS_ICON           '\u2699'               # ⚙
         TEST_ICON                      ''
-        TODO_ICON                      '\u2611'               # ☑
+        TODO_ICON                      '\u2611'               # ☑ (portable alternatives: ▼ ∆)
         BATTERY_ICON                   '\U1F50B'              # 🔋
         DISK_ICON                      'hdd' 
         OK_ICON                        '\u2714'               # ✔
