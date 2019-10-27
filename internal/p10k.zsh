@@ -3352,10 +3352,20 @@ function prompt_proxy() {
 }
 
 function prompt_direnv() {
-  _p9k_prompt_segment $0 $_p9k_color1 yellow DIRENV_ICON 0 '$DIRENV_DIR' ''
+  if [[ -n $DIRENV_DIR ]]; then
+    _p9k_prompt_segment $0 $_p9k_color1 yellow DIRENV_ICON 0 '' ''
+  elif [[ $precmd_functions[-1] != _p9k_precmd ]]; then
+    # DIRENV_DIR is set in a precmd hook. If our hook isn't the last, DIRENV_DIR might
+    # still get set before prompt is expanded.
+    _p9k_prompt_segment $0 $_p9k_color1 yellow DIRENV_ICON 0 '$DIRENV_DIR' ''
+  fi
 }
 
-function instant_prompt_direnv() { prompt_direnv; }
+function instant_prompt_direnv() {
+  if [[ -n $DIRENV_DIR && $precmd_functions[-1] == _p9k_precmd ]]; then
+    _p9k_prompt_segment prompt_direnv $_p9k_color1 yellow DIRENV_ICON 0 '' ''
+  fi
+}
 
 _p9k_preexec() {
   if (( $+_p9k_real_zle_rprompt_indent )); then
@@ -3949,9 +3959,6 @@ _p9k_precmd_impl() {
       fi
       _p9k_init
       _p9k__instant_prompt_disabled=$((_POWERLEVEL9K_DISABLE_INSTANT_PROMPT || instant_prompt_disabled))
-      if (( $+precmd_functions && precmd_functions[(I)_p9k_precmd] )); then
-        precmd_functions=(${(@)precmd_functions:#_p9k_precmd} _p9k_precmd)
-      fi
     fi
 
     if (( _p9k__timer_start )); then
@@ -3975,6 +3982,10 @@ _p9k_precmd_impl() {
   _p9k_refresh_reason=precmd
   _p9k_set_prompt
   _p9k_refresh_reason=''
+
+  if [[ $precmd_functions[-1] != _p9k_precmd && $precmd_functions[(I)_p9k_precmd] != 0 ]]; then
+    precmd_functions=(${(@)precmd_functions:#_p9k_precmd} _p9k_precmd)
+  fi
 
   if (( $+__p9k_instant_prompt_active )); then
     functions -M _p9k_clear_instant_prompt
