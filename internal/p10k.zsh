@@ -3742,9 +3742,10 @@ function _p9k_dump_state() {
   local -i fd
   sysopen -a -m 600 -o creat,trunc -u fd $tmp || return
   {
+    typeset -g __p9k_cached_param_pat=$_p9k__param_pat
     typeset -g __p9k_cached_param_sig=$_p9k__param_sig
-    typeset -p __p9k_cached_param_sig >&$fd || return
-    unset __p9k_cached_param_sig
+    typeset -pm __p9k_cached_param_pat __p9k_cached_param_sig >&$fd || return
+    unset __p9k_cached_param_pat __p9k_cached_param_sig
     (( $+_p9k_preinit )) && { print -r -- $_p9k_preinit >&$fd || return }
     print -r -- '_p9k_restore_state_impl() {' >&$fd || return
     typeset -pm '_POWERLEVEL9K_*|_p9k_[^_]*|icons|OS|DEFAULT_COLOR|DEFAULT_COLOR_INVERTED' >&$fd || return
@@ -3758,7 +3759,7 @@ function _p9k_dump_state() {
 
 function _p9k_restore_state() {
   {
-    [[ $__p9k_cached_param_sig == $_p9k__param_sig ]] || return
+    [[ $__p9k_cached_param_pat == $_p9k__param_pat && $__p9k_cached_param_sig == $_p9k__param_sig ]] || return
     (( $+functions[_p9k_restore_state_impl] )) || return
     _p9k_restore_state_impl
     _p9k_state_restored=1
@@ -4220,6 +4221,9 @@ function _p9k_prompt_overflow_bug() {
   is-at-least 5.5 && ! is-at-least 5.7.2
 }
 
+typeset -g  _p9k__param_pat
+typeset -g  _p9k__param_sig
+
 _p9k_init_vars() {
   typeset -gi _p9k__instant_prompt_disabled
   typeset -gi _p9k_non_hermetic_expansion
@@ -4236,7 +4240,6 @@ _p9k_init_vars() {
   typeset -gF _p9k__timer_start
   typeset -gi _p9k__status
   typeset -ga _p9k__pipestatus
-  typeset -g  _p9k__param_sig
   typeset -g  _p9k_ret
   typeset -g  _p9k_cache_key
   typeset -ga _p9k_cache_val
@@ -4946,19 +4949,21 @@ _p9k_init_ssh() {
 }
 
 _p9k_must_init() {
-  local -a param_keys=(${(o)parameters[(I)POWERLEVEL9K_*]})
-  local IFS param_sig
-  IFS=$'\1' param_sig="${(@)param_keys:/(#b)(*)/$match[1]=\$$match[1]}"
-  param_sig+=(
-    '${ZSH_VERSION}' '${ZSH_PATCHLEVEL}' '${(%):-%n}' '${GITSTATUS_LOG_LEVEL}'
-    '${GITSTATUS_ENABLE_LOGGING}' '${GITSTATUS_DAEMON}' '${GITSTATUS_NUM_THREADS}'
-    '${DEFAULT_USER}' '${ZLE_RPROMPT_INDENT}' '${P9K_SSH}' '${__p9k_ksh_arrays}'
-    '${__p9k_sh_glob}' '${options[transient_rprompt]}' '${ITERM_SHELL_INTEGRATION_INSTALLED}'
-    '${PROMPT_EOL_MARK}' '${LANG}' '${LC_ALL}' '${LC_CTYPE}' 'vd')
-  IFS=$'\2' param_sig="${(e)param_sig}"
-  [[ $param_sig == $_p9k__param_sig ]] && return 1
-  [[ -n $_p9k__param_sig ]] && _p9k_deinit
-  typeset -g _p9k__param_sig=$param_sig
+  local IFS sig
+  if [[ -n $_p9k__param_sig ]]; then
+    IFS=$'\2' sig="${(e)_p9k__param_pat}"
+    [[ $sig == $_p9k__param_sig ]] && return 1
+    _p9k_deinit
+  fi
+  _p9k__param_pat=$'v0\1'${ZSH_VERSION}$'\1'${ZSH_PATCHLEVEL}$'\1'
+  _p9k__param_pat+=$'${#parameters[(I)POWERLEVEL9K_*]}\1${(%):-%n%#}\1$GITSTATUS_LOG_LEVEL\1'
+  _p9k__param_pat+=$'$GITSTATUS_ENABLE_LOGGING\1$GITSTATUS_DAEMON\1$GITSTATUS_NUM_THREADS\1'
+  _p9k__param_pat+=$'$DEFAULT_USER\1${ZLE_RPROMPT_INDENT:-1}\1$P9K_SSH\1$__p9k_ksh_arrays'
+  _p9k__param_pat+=$'$__p9k_sh_glob\1${options[transient_rprompt]}\1$ITERM_SHELL_INTEGRATION_INSTALLED\1'
+  _p9k__param_pat+=$'${PROMPT_EOL_MARK-%B%S%#%s%b}\1$LANG\1$LC_ALL\1$LC_CTYPE\1'
+  local MATCH
+  IFS=$'\1' _p9k__param_pat+="${(@)${(@o)parameters[(I)POWERLEVEL9K_*]}:/(#m)*/\${${(q)MATCH}-$IFS\}}"
+  IFS=$'\2' _p9k__param_sig="${(e)_p9k__param_pat}"
 }
 
 function _p9k_set_os() {
