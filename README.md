@@ -474,7 +474,4 @@ This method of installation won't make anything slower or otherwise sub-par.
 
 ### What is the minimum supported zsh version?
 
-Zsh 5.1 or newer should work.
-
-However, there are too many version, OS, platform, terminal and option configurations to test. If
-Powerlevel10k doesn't work for you, please open an issue.
+Zsh 5.1 or newer should work. Fast startup requires zsh >= 5.4.
