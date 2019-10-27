@@ -3938,6 +3938,9 @@ _p9k_precmd_impl() {
       fi
       _p9k_init
       _p9k__instant_prompt_disabled=$((_POWERLEVEL9K_DISABLE_INSTANT_PROMPT || instant_prompt_disabled))
+      if (( $+precmd_functions && precmd_functions[(I)_p9k_precmd] )); then
+        precmd_functions=(${(@)precmd_functions:#_p9k_precmd} _p9k_precmd)
+      fi
     fi
 
     if (( _p9k__timer_start )); then
