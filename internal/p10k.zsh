@@ -3347,6 +3347,12 @@ function prompt_proxy() {
   _p9k_prompt_segment $0 $_p9k_color1 blue PROXY_ICON 0 '' "$p[1]"
 }
 
+function prompt_direnv() {
+  _p9k_prompt_segment $0 $_p9k_color1 yellow DIRENV_ICON 0 '$DIRENV_DIR' ''
+}
+
+function instant_prompt_direnv() { prompt_direnv; }
+
 _p9k_preexec() {
   if (( $+_p9k_real_zle_rprompt_indent )); then
     if [[ -n $_p9k_real_zle_rprompt_indent ]]; then

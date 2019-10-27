@@ -114,7 +114,8 @@ function _p9k_init_icons() {
         TERRAFORM_ICON                 '\U1F6E0\u00A0'        # 🛠️
         PROXY_ICON                     '\u2B82'               # ⮂
         DOTNET_ICON                    '.NET'
-        AZURE_ICON                    '\u2601'                # ☁
+        AZURE_ICON                     '\u2601'               # ☁
+        DIRENV_ICON                    '\u25BC'               # ▼
       )
     ;;
     'awesome-fontconfig')
@@ -216,7 +217,8 @@ function _p9k_init_icons() {
         TERRAFORM_ICON                 '\U1F6E0\u00A0'        # 🛠️
         PROXY_ICON                     '\u2B82'               # ⮂
         DOTNET_ICON                    '.NET'
-        AZURE_ICON                    '\u2601'                # ☁
+        AZURE_ICON                     '\u2601'               # ☁
+        DIRENV_ICON                    '\u25BC'               # ▼
       )
     ;;
     'awesome-mapped-fontconfig')
@@ -323,6 +325,7 @@ function _p9k_init_icons() {
         PROXY_ICON                     '\u2B82'                                       # ⮂
         DOTNET_ICON                    '.NET'
         AZURE_ICON                     '\u2601'                                       # ☁
+        DIRENV_ICON                    '\u25BC'                                       # ▼
       )
     ;;
     'nerdfont-complete'|'nerdfont-fontconfig')
@@ -426,6 +429,7 @@ function _p9k_init_icons() {
         PROXY_ICON                     '\u2B82'               # ⮂
         DOTNET_ICON                    '\uE77F'               # 
         AZURE_ICON                     '\uFD03'               # ﴃ
+        DIRENV_ICON                    '\u25BC'               # ▼
       )
     ;;
     *)
@@ -446,7 +450,7 @@ function _p9k_init_icons() {
         AWS_EB_ICON                    '\U1F331'              # 🌱
         BACKGROUND_JOBS_ICON           '\u2699'               # ⚙
         TEST_ICON                      ''
-        TODO_ICON                      '\u2611'               # ☑ (portable alternatives: ▼ ∆)
+        TODO_ICON                      '\u2611'               # ☑ (portable alternative: ∆)
         BATTERY_ICON                   '\U1F50B'              # 🔋
         DISK_ICON                      'hdd' 
         OK_ICON                        '\u2714'               # ✔
@@ -525,9 +529,10 @@ function _p9k_init_icons() {
         LARAVEL_ICON                   ''
         RANGER_ICON                    '\u2B50'               # ⭐
         TERRAFORM_ICON                 '\U1F6E0\u00A0'        # 🛠️
-        PROXY_ICON                     '\u2B82'               # ⮂
+        PROXY_ICON                     '\u2194'               # ↔
         DOTNET_ICON                    '.NET'
         AZURE_ICON                     '\u2601'               # ☁
+        DIRENV_ICON                    '\u25BC'               # ▼
       )
     ;;
   esac

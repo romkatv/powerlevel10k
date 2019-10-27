@@ -44,6 +44,7 @@
       status                  # exit code of the last command
       command_execution_time  # duration of the last command
       background_jobs         # presence of background jobs
+      direnv                  # direnv status (https://direnv.net/)
       virtualenv              # python virtual environment (https://docs.python.org/3/library/venv.html)
       anaconda                # conda environment (https://conda.io/)
       pyenv                   # python environment (https://github.com/pyenv/pyenv)
@@ -489,6 +490,12 @@
   typeset -g POWERLEVEL9K_BACKGROUND_JOBS_FOREGROUND=37
   # Icon to show when there are background jobs.
   typeset -g POWERLEVEL9K_BACKGROUND_JOBS_VISUAL_IDENTIFIER_EXPANSION='${P9K_VISUAL_IDENTIFIER}'
+
+  #######################[ direnv: direnv status (https://direnv.net/) ]########################
+  # Direnv color.
+  typeset -g POWERLEVEL9K_DIRENV_FOREGROUND=178
+  # Icon to show when direnv is active.
+  typeset -g POWERLEVEL9K_DIRENV_VISUAL_IDENTIFIER_EXPANSION='${P9K_VISUAL_IDENTIFIER}'
 
   ##########[ nordvpn: nordvpn connection status, linux only (https://nordvpn.com/) ]###########
   # NordVPN connection indicator color.
