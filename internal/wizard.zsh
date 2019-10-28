@@ -1238,8 +1238,8 @@ function ask_instant_prompt() {
       understood the documentation linked above.
     print -n $nl
     flowing +c -i 5 "%B(3)  Verbose.%b"  Enable instant prompt and %Bprint a warning%b when       \
-      detecting console output during zsh initialization. Choose this if you\'ve never tried      \
-      instant prompt, haven\'t seen the warning, or if you are unsure what this all means.
+      detecting console output during zsh initialization. %BChoose this if you\'ve never tried    \
+      instant prompt, haven\'t seen the warning, or if you are unsure what this all means%b.
     print -P ""
     print -P "(r)  Restart from the beginning."
     print -P "(q)  Quit and do nothing."
