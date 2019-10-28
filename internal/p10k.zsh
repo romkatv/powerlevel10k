@@ -2007,7 +2007,6 @@ prompt_dotnet_version() {
     zstat -A mtimes +mtime -- $dirs 2>/dev/null || mtimes=()
     local key="${(pj.:.)mtimes}"
     if ! _p9k_cache_ephemeral_get $0 $_p9k_pwd || [[ $key != $_p9k_cache_val[1] ]] ; then
-      echo big miss
       local -i i found
       for i in {1..$#dirs}; do
         local dir=$dirs[i] mtime=$mtimes[i]
@@ -2015,7 +2014,6 @@ prompt_dotnet_version() {
         if [[ $pair == ${mtime:-x}:* ]]; then
           (( $pair[-1] )) && found=1
         else
-          echo miss $dir
           [[ -z $dir/(project.json|global.json|packet.dependencies|*.csproj|*.fsproj|*.xproj|*.sln)(#qN^/) ]]
           local -i has=$?
           (( has )) && found=1
