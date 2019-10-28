@@ -5399,7 +5399,12 @@ Commands:
 
   %Bconfigure%b  run interactive configuration wizard
   %Bsegment%b    print a user-defined prompt segment
-  %Bhelp%b       print this help message"
+  %Bdisplay%b    show, hide or toggle prompt parts
+  %Bhelp%b       print this help message
+
+Print help for a specific command:
+
+  %2Fp10k%f %Bhelp%b command"
 
 typeset -gr __p9k_p10k_segment_usage="Usage: %2Fp10k%f %Bsegment%b [-h] [{+|-}re] [-s state] [-b bg] [-f fg] [-i icon] [-c cond] [-t text]
 
@@ -5478,6 +5483,27 @@ typeset -gr __p9k_p10k_finalize_usage="Usage: %2Fp10k%f %Bfinalize%b
 
 Perform the final stage of initialization. Must be called at the very end of zshrc."
 
+typeset -gr __p9k_p10k_display_usage="Usage: %2Fp10k%f %Bdisplay%b [-h] [[+|-]part]...
+
+Show, hide or toggle prompt parts. If called from zle, the current
+prompt gets refreshed.
+
+Options:
+  part      toggle the designated prompt part
+  +part     show the designated prompt part
+  -part     hide the designated prompt part
+  -h        print this help message
+
+Parts:
+  right     right prompt
+  s:name    segment with the given name (e.g., s:kubecontext)
+
+Example: Bind Ctrl+P to toggle right prompt.
+
+  function toggle-right-prompt() { p10k display right; }
+  zle -N toggle-right-prompt
+  bindkey '^P' toggle-right-prompt"
+
 function p10k() {
   [[ $# != 1 || $1 != finalize ]] || { p10k-instant-prompt-finalize; return }
 
@@ -5492,7 +5518,6 @@ function p10k() {
   case $1 in
     segment)
       shift
-      local -i num_opts=ARGC
       local opt state bg=0 fg icon cond text ref=0 expand=0
       while getopts ':s:b:f:i:c:t:reh' opt; do
         case $opt in
@@ -5528,6 +5553,63 @@ function p10k() {
       "_p9k_${_p9k_prompt_side}_prompt_segment" "prompt_${_p9k_segment_name}${state:+_${(U)state}}" \
           "$bg" "${fg:-$_p9k_color1}" "$icon" "$expand" "$cond" "$text"
       return 0
+      ;;
+    display)
+      if (( ARGC == 1 )); then
+        print -rP -- $__p9k_p10k_display_usage >&2
+        return 1
+      fi
+      shift
+      local opt
+      local -i reset
+      for opt; do
+        case $opt in
+          -h) print -rP -- $__p9k_p10k_display_usage >&2; return 0;;
+          +right)
+            if (( $+__p9k_x_right )); then
+              reset=1
+              unset __p9k_x_right __p9k_x_gap
+            fi
+            ;;
+          -right)
+            if (( ! $+__p9k_x_right )); then
+              reset=1
+              __p9k_x_gap=
+              __p9k_x_right=
+            fi
+            ;;
+          right)
+            reset=1
+            if (( $+__p9k_x_right )); then
+              unset __p9k_x_right __p9k_x_gap
+            else
+              typeset -g __p9k_x_right=
+              typeset -g __p9k_x_gap=
+            fi
+          ;;
+          +s:*)
+            if (( $+parameters[__p9k_s_${opt:3 }] )); then
+              reset=1
+              unset __p9k_s_${opt:3 }
+            fi
+            ;;
+          -s:*)
+            if (( ! $+parameters[__p9k_s_${opt:3 }] )); then
+              reset=1
+              typeset -g __p9k_s_${opt:3 }=
+            fi
+            ;;
+          s:*)
+            reset=1
+            if (( $+parameters[__p9k_s_${opt:2 }] )); then
+              unset __p9k_s_${opt:2 }
+            else
+              typeset -g __p9k_s_${opt:2 }=
+            fi
+          ;;
+        esac
+      done
+      (( reset )) && zle && _p9k_reset_prompt || true
       ;;
     configure)
       if (( ARGC > 1 )); then
