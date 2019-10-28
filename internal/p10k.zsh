@@ -1459,7 +1459,7 @@ prompt_dir() {
       else
         local mtime='good'
       fi
-      if ! _p9k_cache_ephemeral_get $0 "${parts[@]}" || [[ -z $mtime || $mtime != $_p9k_cache_val[1] ]] ; then
+      if ! _p9k_cache_ephemeral_get $0 $e $i $_p9k_pwd || [[ -z $mtime || $mtime != $_p9k_cache_val[1] ]] ; then
         _p9k_prompt_length $delim
         local -i real_delim_len=_p9k_ret q=0
         [[ -n $parts[i-1] ]] && parts[i-1]="\${(Q)\${:-${(qqq)${(q)parts[i-1]}}}}"$'\2'
