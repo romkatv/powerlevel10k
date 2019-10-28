@@ -1447,26 +1447,26 @@ prompt_dir() {
     truncate_to_unique)
       expand=1
       delim=${_POWERLEVEL9K_SHORTEN_DELIMITER-'*'}
-      local -i i=2
+      shortenlen=${_POWERLEVEL9K_SHORTEN_DIR_LENGTH:-1}
+      (( shortenlen >= 0 )) || shortenlen=1
+      local -i i=2 e=$(($#parts - shortenlen))
       [[ $p[1] == / ]] && (( ++i ))
       local parent="${_p9k_pwd%/${(pj./.)parts[i,-1]}}"
-      if (( i <= $#parts )); then
-        local mtime=()
-        zstat -A mtime +mtime -- ${(@)${:-{$i..$#parts}}/(#b)(*)/$parent/${(pj./.)parts[i,$match[1]]}} 2>/dev/null || mtime=()
+      if (( i <= e )); then
+        local MATCH= mtime=()
+        zstat -A mtime +mtime -- ${(@)${:-{$i..$e}}/(#m)*/$parent/${(pj./.)parts[i,$MATCH]}} 2>/dev/null || mtime=()
         mtime="${(pj:\1:)mtime}"
       else
         local mtime='good'
       fi
       if ! _p9k_cache_ephemeral_get $0 "${parts[@]}" || [[ -z $mtime || $mtime != $_p9k_cache_val[1] ]] ; then
         _p9k_prompt_length $delim
-        local -i real_delim_len=_p9k_ret n=1 q=0
+        local -i real_delim_len=_p9k_ret q=0
         [[ -n $parts[i-1] ]] && parts[i-1]="\${(Q)\${:-${(qqq)${(q)parts[i-1]}}}}"$'\2'
         [[ $p[i,-1] == *["~!#\$^&*()\\\"'<>?{}[]"]* ]] && q=1
         local -i d=${_POWERLEVEL9K_SHORTEN_DELIMITER_LENGTH:--1}
         (( d >= 0 )) || d=real_delim_len
-        shortenlen=${_POWERLEVEL9K_SHORTEN_DIR_LENGTH:-1}
-        (( shortenlen >= 0 )) && n=shortenlen
-        for (( ; i <= $#parts - n; ++i )); do
+        for (( ; i <= $#parts - shortenlen; ++i )); do
           local dir=$parts[i]
           if [[ -n $_POWERLEVEL9K_SHORTEN_FOLDER_MARKER &&
                 -n $parent/$dir/${~_POWERLEVEL9K_SHORTEN_FOLDER_MARKER}(#qN) ]]; then
