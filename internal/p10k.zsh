@@ -1990,12 +1990,41 @@ prompt_dotnet_version() {
   (( $+commands[dotnet] )) || return
 
   if (( _POWERLEVEL9K_DOTNET_VERSION_PROJECT_ONLY )); then
-    local dir=$_p9k_pwd
-    while true; do
-      [[ $dir == / ]] && return
-      [[ -n $dir/(project.json|global.json|packet.dependencies|*.csproj|*.fsproj|*.xproj|*.sln)(#qN^/) ]] && break
-      dir=${dir:h}
-    done
+    case $_p9k_pwd in
+      ~|/) return;;
+      ~/*)
+        local parent=~/
+        local parts=(${(s./.)_p9k_pwd#$parent})
+      ;;
+      *)
+        local parent=/
+        local parts=(${(s./.)_p9k_pwd})
+      ;;
+    esac
+    local MATCH
+    local dirs=(${(@)${:-{1..$#parts}}/(#m)*/$parent${(pj./.)parts[i,$MATCH]}})
+    local mtimes=()
+    zstat -A mtimes +mtime -- $dirs 2>/dev/null || mtimes=()
+    local key="${(pj.:.)mtimes}"
+    if ! _p9k_cache_ephemeral_get $0 $_p9k_pwd || [[ $key != $_p9k_cache_val[1] ]] ; then
+      echo big miss
+      local -i i found
+      for i in {1..$#dirs}; do
+        local dir=$dirs[i] mtime=$mtimes[i]
+        local pair=$_p9k__dotnet_cache[$dir]
+        if [[ $pair == ${mtime:-x}:* ]]; then
+          (( $pair[-1] )) && found=1
+        else
+          echo miss $dir
+          [[ -z $dir/(project.json|global.json|packet.dependencies|*.csproj|*.fsproj|*.xproj|*.sln)(#qN^/) ]]
+          local -i has=$?
+          (( has )) && found=1
+          [[ -n $mtime ]] && _p9k__dotnet_cache[$dir]="$mtime:$has"
+        fi
+      done
+      [[ -n $key ]] && _p9k_cache_ephemeral_set "$key" $found
+    fi
+    (( _p9k_cache_val[2] )) || return
   fi
 
   _p9k_cached_cmd_stdout dotnet --version || return
@@ -4349,6 +4378,7 @@ _p9k_init_vars() {
   typeset -g  _p9k_uname_m
 
   typeset -gi _p9k__transient_rprompt_active
+  typeset -gA _p9k__dotnet_cache
 
   typeset -g  P9K_VISUAL_IDENTIFIER
   typeset -g  P9K_CONTENT
@@ -4977,7 +5007,7 @@ _p9k_must_init() {
     [[ $sig == $_p9k__param_sig ]] && return 1
     _p9k_deinit
   fi
-  _p9k__param_pat=$'v0\1'${ZSH_VERSION}$'\1'${ZSH_PATCHLEVEL}$'\1'
+  _p9k__param_pat=$'v1\1'${ZSH_VERSION}$'\1'${ZSH_PATCHLEVEL}$'\1'
   _p9k__param_pat+=$'${#parameters[(I)POWERLEVEL9K_*]}\1${(%):-%n%#}\1$GITSTATUS_LOG_LEVEL\1'
   _p9k__param_pat+=$'$GITSTATUS_ENABLE_LOGGING\1$GITSTATUS_DAEMON\1$GITSTATUS_NUM_THREADS\1'
   _p9k__param_pat+=$'$DEFAULT_USER\1${ZLE_RPROMPT_INDENT:-1}\1$P9K_SSH\1$__p9k_ksh_arrays'
