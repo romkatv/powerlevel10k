@@ -3511,7 +3511,7 @@ _p9k_set_instant_prompt() {
   RPROMPT=$saved_rprompt
 }
 
-typeset -gri __p9k_instant_prompt_version=9
+typeset -gri __p9k_instant_prompt_version=10
 
 _p9k_dump_instant_prompt() {
   local user=${(%):-%n}
@@ -3527,13 +3527,15 @@ _p9k_dump_instant_prompt() {
     local -i fd
     sysopen -a -o creat,trunc -u fd $tmp || return
     {
+      [[ $TERM_PROGRAM == Hyper ]] && local hyper='==' || local hyper='!='
       >&$fd print -r -- "() {
   emulate -L zsh
   (( ! \$+__p9k_instant_prompt_disabled )) || return
   typeset -gi __p9k_instant_prompt_disabled=1 __p9k_instant_prompt_sourced=$__p9k_instant_prompt_version
   [[ -t 0 && -t 1 && -t 2 && \$ZSH_VERSION == ${(q)ZSH_VERSION} && \$ZSH_PATCHLEVEL == ${(q)ZSH_PATCHLEVEL} &&
-     \$+VTE_VERSION == $+VTE_VERSION && \$POWERLEVEL9K_DISABLE_INSTANT_PROMPT != 'true' &&
-     \$POWERLEVEL9K_INSTANT_PROMPT != 'off' ]] || return
+     \$TERM_PROGRAM $hyper 'Hyper' && \$+VTE_VERSION == $+VTE_VERSION &&
+     \$POWERLEVEL9K_DISABLE_INSTANT_PROMPT != 'true' &&
+     \$POWERLEVEL9K_INSTANT_PROMPT != 'off' ]] || { __p9k_instant_prompt_sourced=0; return; }
   local -i ZLE_RPROMPT_INDENT=${ZLE_RPROMPT_INDENT:-1}
   local PROMPT_EOL_MARK=${(q)PROMPT_EOL_MARK-%B%S%#%s%b}
   [[ -n \$SSH_CLIENT || -n \$SSH_TTY || -n \$SSH_CONNECTION ]] && local ssh=1 || local ssh=0
@@ -3558,9 +3560,14 @@ _p9k_dump_instant_prompt() {
   local -a _p9k_t=("${(@ps:$us:)${tail%%$rs*}}")'
       (( __p9k_ksh_arrays )) && >&$fd print -r -- '  setopt ksh_arrays'
       (( __p9k_sh_glob )) && >&$fd print -r -- '  setopt sh_glob'
-      if (( $+VTE_VERSION )); then
+      if [[ $+VTE_VERSION == 1 || $TERM_PROGRAM == Hyper ]]; then
+        if [[ $TERM_PROGRAM == Hyper ]]; then
+          local bad_lines=40 bad_columns=100
+        else
+          local bad_lines=24 bad_columns=80
+        fi
         >&$fd print -r -- '
-  if (( LINES == 24 && COLUMNS == 80 )); then
+  if (( LINES == '$bad_lines' && COLUMNS == '$bad_columns' )); then
     zmodload -F zsh/stat b:zstat
     zmodload zsh/datetime
     local -a tty_ctime
@@ -3575,7 +3582,7 @@ _p9k_dump_instant_prompt() {
           local __p9k_x_right=
           break
         fi
-        if [[ $tty_size != "24 80" ]]; then
+        if [[ $tty_size != "'$bad_lines' '$bad_columns'" ]]; then
           local lines_columns=(${=tty_size})
           local LINES=$lines_columns[1]
           local COLUMNS=$lines_columns[2]
@@ -3608,12 +3615,12 @@ _p9k_dump_instant_prompt() {
     _p9k_ret=$x
   }
   local out'
-       (( $+VTE_VERSION )) && >&$fd print -r -- '  if (( ! $+__p9k_x_gap )); then'
+       [[ $+VTE_VERSION == 1 || $TERM_PROGRAM == Hyper ]] && >&$fd print -r -- '  if (( ! $+__p9k_x_gap )); then'
        >&$fd print -r -- '
   [[ $PROMPT_EOL_MARK == "%B%S%#%s%b" ]] && _p9k_ret=1 || _p9k_prompt_length $PROMPT_EOL_MARK
   local -i fill=$((COLUMNS > _p9k_ret ? COLUMNS - _p9k_ret : 0))
   out+="${(%):-%b%k%f%s%u$PROMPT_EOL_MARK${(pl.$fill.. .)}$cr%b%k%f%s%u%E}"'
-        (( $+VTE_VERSION )) && >&$fd print -r -- '  fi'
+        [[ $+VTE_VERSION == 1 || $TERM_PROGRAM == Hyper ]] && >&$fd print -r -- '  fi'
         >&$fd print -r -- '
   out+="${(pl.$height..$lf.)}$esc${height}A$terminfo[sc]"
   out+=${(%):-"$__p9k_used_instant_prompt[1]$__p9k_used_instant_prompt[2]"}
