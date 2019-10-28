@@ -1453,51 +1453,59 @@ prompt_dir() {
       [[ $p[1] == / ]] && (( ++i ))
       local parent="${_p9k_pwd%/${(pj./.)parts[i,-1]}}"
       if (( i <= e )); then
-        local MATCH= mtime=()
-        zstat -A mtime +mtime -- ${(@)${:-{$i..$e}}/(#m)*/$parent/${(pj./.)parts[i,$MATCH]}} 2>/dev/null || mtime=()
-        mtime="${(pj:\1:)mtime}"
+        local MATCH= mtimes=()
+        zstat -A mtimes +mtime -- ${(@)${:-{$i..$e}}/(#m)*/$parent/${(pj./.)parts[i,$MATCH]}} 2>/dev/null || mtimes=()
+        local key="${(pj.:.)mtimes}"
       else
-        local mtime='good'
+        local key='good'
       fi
-      if ! _p9k_cache_ephemeral_get $0 $e $i $_p9k_pwd || [[ -z $mtime || $mtime != $_p9k_cache_val[1] ]] ; then
+      if ! _p9k_cache_ephemeral_get $0 $e $i $_p9k_pwd || [[ $key != $_p9k_cache_val[1] ]] ; then
         _p9k_prompt_length $delim
-        local -i real_delim_len=_p9k_ret q=0
+        local -i real_delim_len=_p9k_ret
         [[ -n $parts[i-1] ]] && parts[i-1]="\${(Q)\${:-${(qqq)${(q)parts[i-1]}}}}"$'\2'
-        [[ $p[i,-1] == *["~!#\$^&*()\\\"'<>?{}[]"]* ]] && q=1
         local -i d=${_POWERLEVEL9K_SHORTEN_DELIMITER_LENGTH:--1}
         (( d >= 0 )) || d=real_delim_len
-        for (( ; i <= $#parts - shortenlen; ++i )); do
-          local dir=$parts[i]
-          if [[ -n $_POWERLEVEL9K_SHORTEN_FOLDER_MARKER &&
-                -n $parent/$dir/${~_POWERLEVEL9K_SHORTEN_FOLDER_MARKER}(#qN) ]]; then
-            parent+=/$dir
-            (( q )) && parts[i]="\${(Q)\${:-${(qqq)${(q)dir}}}}"
-            parts[i]+=$'\2'
-            continue
-          fi
-          local -i j=1
-          for (( ; j + d < $#dir; ++j )); do
-            local -a matching=($parent/$dir[1,j]*/(N))
-            (( $#matching == 1 )) && break
-          done
-          local -i saved=$(($#dir - j - d))
-          if (( saved > 0 )); then
-            if (( q )); then
-              parts[i]='${${${_p9k_d:#-*}:+${(Q)${:-'${(qqq)${(q)dir}}'}}}:-${(Q)${:-'
-              parts[i]+=$'\3'${(qqq)${(q)dir[1,j]}}$'}}\1\3''${$((_p9k_d+='$saved'))+}}'
-            else
-              parts[i]='${${${_p9k_d:#-*}:+'$dir$'}:-\3'$dir[1,j]$'\1\3''${$((_p9k_d+='$saved'))+}}'
-            fi
+        local -i m=1
+        for (( ; i <= e; ++i, ++m )); do
+          local sub=$parts[i]
+          local dir=$parent/$sub mtime=$mtimes[m]
+          local pair=$_p9k__dir_stat_cache[$dir]
+          if [[ $pair == ${mtime:-x}:* ]]; then
+            parts[i]=${pair#*:}
           else
-            (( q )) && parts[i]="\${(Q)\${:-${(qqq)${(q)dir}}}}"
+            [[ $sub != *["~!#\$^&*()\\\"'<>?{}[]"]* ]]
+            local -i q=$?
+            if [[ -n $_POWERLEVEL9K_SHORTEN_FOLDER_MARKER &&
+                  -n $parent/$sub/${~_POWERLEVEL9K_SHORTEN_FOLDER_MARKER}(#qN) ]]; then
+              (( q )) && parts[i]="\${(Q)\${:-${(qqq)${(q)sub}}}}"
+              parts[i]+=$'\2'
+            else
+              local -i j=1
+              for (( ; j + d < $#sub; ++j )); do
+                local -a matching=($parent/$sub[1,j]*/(N))
+                (( $#matching == 1 )) && break
+              done
+              local -i saved=$(($#sub - j - d))
+              if (( saved > 0 )); then
+                if (( q )); then
+                  parts[i]='${${${_p9k_d:#-*}:+${(Q)${:-'${(qqq)${(q)sub}}'}}}:-${(Q)${:-'
+                  parts[i]+=$'\3'${(qqq)${(q)sub[1,j]}}$'}}\1\3''${$((_p9k_d+='$saved'))+}}'
+                else
+                  parts[i]='${${${_p9k_d:#-*}:+'$sub$'}:-\3'$sub[1,j]$'\1\3''${$((_p9k_d+='$saved'))+}}'
+                fi
+              else
+                (( q )) && parts[i]="\${(Q)\${:-${(qqq)${(q)sub}}}}"
+              fi
+            fi
+            [[ -n $mtime ]] && _p9k__dir_stat_cache[$dir]="$mtime:$parts[i]"
           fi
-          parent+=/$dir
+          parent+=/$sub
         done
         for ((; i <= $#parts; ++i)); do
-          (( q )) && parts[i]='${(Q)${:-'${(qqq)${(q)parts[i]}}'}}'
+          [[ $parts[i] == *["~!#\$^&*()\\\"'<>?{}[]"]* ]] && parts[i]='${(Q)${:-'${(qqq)${(q)parts[i]}}'}}'
           parts[i]+=$'\2'
         done
-        _p9k_cache_ephemeral_set "$mtime" "${parts[@]}"
+        [[ -n $key ]] && _p9k_cache_ephemeral_set "$key" "${parts[@]}"
       fi
       parts=("${(@)_p9k_cache_val[2,-1]}")
     ;;
@@ -2010,14 +2018,14 @@ prompt_dotnet_version() {
       local -i i found
       for i in {1..$#dirs}; do
         local dir=$dirs[i] mtime=$mtimes[i]
-        local pair=$_p9k__dotnet_cache[$dir]
+        local pair=$_p9k__dotnet_stat_cache[$dir]
         if [[ $pair == ${mtime:-x}:* ]]; then
           (( $pair[-1] )) && found=1
         else
           [[ -z $dir/(project.json|global.json|packet.dependencies|*.csproj|*.fsproj|*.xproj|*.sln)(#qN^/) ]]
           local -i has=$?
           (( has )) && found=1
-          [[ -n $mtime ]] && _p9k__dotnet_cache[$dir]="$mtime:$has"
+          [[ -n $mtime ]] && _p9k__dotnet_stat_cache[$dir]="$mtime:$has"
         fi
       done
       [[ -n $key ]] && _p9k_cache_ephemeral_set "$key" $found
@@ -4376,7 +4384,8 @@ _p9k_init_vars() {
   typeset -g  _p9k_uname_m
 
   typeset -gi _p9k__transient_rprompt_active
-  typeset -gA _p9k__dotnet_cache
+  typeset -gA _p9k__dotnet_stat_cache
+  typeset -gA _p9k__dir_stat_cache
 
   typeset -g  P9K_VISUAL_IDENTIFIER
   typeset -g  P9K_CONTENT
