@@ -3952,13 +3952,13 @@ _p9k_precmd_impl() {
     if zle; then
       __p9k_new_status=0
       __p9k_new_pipestatus=(0)
+    else
+      print -rn "${_p9k_prompt_newline:-}"
     fi
-
-    print -rn "${_p9k_prompt_newline:-}"
 
     if (( _p9k__transient_rprompt_active )); then
       _p9k__transient_rprompt_active=0
-      unset __p9k_x_right
+      unset __p9k_x_right __p9k_x_gap
     fi
 
     if (( $+_p9k_real_zle_rprompt_indent )); then
@@ -4706,6 +4706,7 @@ function _p9k_zle_line_finish() {
   _p9k__line_finished=
   if [[ -o transient_rprompt ]]; then
     __p9k_x_right=
+    __p9k_x_gap=
     _p9k__transient_rprompt_active=1
     _p9k_reset_prompt
   elif (( _p9k_reset_on_line_finish )); then
@@ -4942,20 +4943,24 @@ _p9k_init_prompt() {
     if (( _p9k_ret == 1 && $#ruler_char == 1 )); then
       _p9k_prompt_prefix_left+=$'${${__p9k_x_ruler+\n}:-'
       _p9k_color prompt_ruler BACKGROUND ""
-      _p9k_background $_p9k_ret
-      _p9k_escape_style $_p9k_ret
-      _p9k_prompt_prefix_left+=%b$_p9k_ret
-      _p9k_color prompt_ruler FOREGROUND ""
-      _p9k_foreground $_p9k_ret
-      _p9k_escape_style $_p9k_ret
-      _p9k_prompt_prefix_left+=$_p9k_ret
-      [[ $ruler_char == '.' ]] && local sep=',' || local sep='.'
-      local ruler_len='${$((_p9k_clm-_p9k_ind))/#-*/0}'
-      _p9k_prompt_prefix_left+="\${(pl$sep$ruler_len$sep$sep${(q)ruler_char}$sep)}%k%f"
-      if (( __p9k_ksh_arrays )); then
-        _p9k_prompt_prefix_left+='${_p9k_t[$((!_p9k_ind))]}'
+      if [[ -z $_p9k_ret && $ruler_char == ' ' ]]; then
+        _p9k_prompt_prefix_left+=$'\n'
       else
-        _p9k_prompt_prefix_left+='${_p9k_t[$((1+!_p9k_ind))]}'
+        _p9k_background $_p9k_ret
+        _p9k_escape_style $_p9k_ret
+        _p9k_prompt_prefix_left+=%b$_p9k_ret
+        _p9k_color prompt_ruler FOREGROUND ""
+        _p9k_foreground $_p9k_ret
+        _p9k_escape_style $_p9k_ret
+        _p9k_prompt_prefix_left+=$_p9k_ret
+        [[ $ruler_char == '.' ]] && local sep=',' || local sep='.'
+        local ruler_len='${$((_p9k_clm-_p9k_ind))/#-*/0}'
+        _p9k_prompt_prefix_left+="\${(pl$sep$ruler_len$sep$sep${(q)ruler_char}$sep)}%k%f"
+        if (( __p9k_ksh_arrays )); then
+          _p9k_prompt_prefix_left+='${_p9k_t[$((!_p9k_ind))]}'
+        else
+          _p9k_prompt_prefix_left+='${_p9k_t[$((1+!_p9k_ind))]}'
+        fi
       fi
       _p9k_prompt_prefix_left+='}'
     else
@@ -5014,7 +5019,7 @@ _p9k_must_init() {
     [[ $sig == $_p9k__param_sig ]] && return 1
     _p9k_deinit
   fi
-  _p9k__param_pat=$'v1\1'${ZSH_VERSION}$'\1'${ZSH_PATCHLEVEL}$'\1'
+  _p9k__param_pat=$'v2\1'${ZSH_VERSION}$'\1'${ZSH_PATCHLEVEL}$'\1'
   _p9k__param_pat+=$'${#parameters[(I)POWERLEVEL9K_*]}\1${(%):-%n%#}\1$GITSTATUS_LOG_LEVEL\1'
   _p9k__param_pat+=$'$GITSTATUS_ENABLE_LOGGING\1$GITSTATUS_DAEMON\1$GITSTATUS_NUM_THREADS\1'
   _p9k__param_pat+=$'$DEFAULT_USER\1${ZLE_RPROMPT_INDENT:-1}\1$P9K_SSH\1$__p9k_ksh_arrays'
