@@ -1,0 +1,57 @@
+p10k display
+  dir=short|long|auto
+  right=hide|show
+  empty_line=print|show|hide
+  ruler=print|show|hide
+  segment:kubecontext=show|hide
+  gap=show|hide
+
+`print` controls all future prompts; it's weird to use it in POWERLEVEL9K_DISPLAY_PAST but it's not contradictory
+
+# default values
+POWERLEVEL9K_DISPLAY_NEW_TTY=()
+POWERLEVEL9K_DISPLAY_CURRENT=()
+POWERLEVEL9K_DISPLAY_PAST=()
+POWERLEVEL9K_NEW_TTY_MAX_AGE_SECONDS=inf
+
+# new way to show empty line
+POWERLEVEL9K_DISPLAY_NEW_TTY=(empty_line=hide)
+POWERLEVEL9K_DISPLAY_CURRENT=(empty_line=print)
+POWERLEVEL9K_NEW_TTY_MAX_AGE_SECONDS=5
+
+# deprecated.
+POWERLEVEL9K_SHOW_RULER
+POWERLEVEL9K_PROMPT_ADD_NEWLINE
+
+if POWERLEVEL9K_PROMPT_ADD_NEWLINE is true; then
+  if any of the new flags are set {
+    print a warning and do nothing
+  } else {
+    POWERLEVEL9K_DISPLAY_NEW_TTY=(empty_line=hide)
+    POWERLEVEL9K_DISPLAY_CURRENT=(empty_line=print)
+  }
+fi
+
+if POWERLEVEL9K_SHOW_RULER is true; then
+  if any of the new flags are set {
+    print a warning and do nothing
+  } else {
+    POWERLEVEL9K_DISPLAY_CURRENT=(ruler=show)
+  }
+fi
+
+POWERLEVEL9K_DISPLAY_CURRENT=(ruler=show segment:kubecontext=hide segment:time=hide)
+POWERLEVEL9K_DISPLAY_PAST=(ruler=hide segment:time=show)
+POWERLEVEL9K_DISPLAY_NEW_TTY=(ruler=hide)
+POWERLEVEL9K_NEW_TTY_MAX_AGE_SECONDS=5
+POWERLEVEL9K_TIME_UPDATE_ON_COMMAND=true
+
+# $BUFFER  current buffer
+# $1       the first word in $BUFFER after alias expansion
+function p10k-on-buffer-change() {
+  if [[ $2 == (|*/)kubectl ]]; then
+    p10k display segment:kubecontext=show
+  else
+    p10k display segment:kubecontext=hide
+  fi
+}
