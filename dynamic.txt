@@ -5,6 +5,7 @@ p10k display
   ruler=print|show|hide
   segment:kubecontext=show|hide
   gap=show|hide
+  line1=show|hide
 
 `print` controls all future prompts; it's weird to use it in POWERLEVEL9K_DISPLAY_PAST but it's not contradictory
 
