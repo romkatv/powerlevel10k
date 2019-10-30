@@ -5221,7 +5221,7 @@ _p9k_init_vcs() {
   (( $_POWERLEVEL9K_VCS_BACKENDS[(I)git] )) || return
 
   local gitstatus_dir=${_POWERLEVEL9K_GITSTATUS_DIR:-${__p9k_root_dir}/gitstatus}
-  if [[ -z $GITSTATUS_DAEMON && $_p9k_uname == i686 && -z $gitstatus_dir/bin/*-i686(-static|)(#qN) ]]; then
+  if [[ -z $GITSTATUS_DAEMON && $_p9k_uname_m == i686 && -z $gitstatus_dir/bin/*-i686(-static|)(#qN) ]]; then
     _p9k__gitstatus_disabled=1
     >&2 echo -E - "${(%):-[%1FERROR%f]: %BPowerlevel10k%b is unable to use %Bgitstatus%b. Git prompt will be slow.}"
     >&2 echo -E - ""
