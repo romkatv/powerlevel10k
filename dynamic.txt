@@ -47,12 +47,29 @@ POWERLEVEL9K_DISPLAY_NEW_TTY=(ruler=hide)
 POWERLEVEL9K_NEW_TTY_MAX_AGE_SECONDS=5
 POWERLEVEL9K_TIME_UPDATE_ON_COMMAND=true
 
-# $BUFFER  current buffer
-# $1       the first word in $BUFFER after alias expansion
+# $BUFFER       current command line
+# $P9K_COMMAND  the first word in $BUFFER after alias expansion
 function p10k-on-buffer-change() {
-  if [[ $2 == (|*/)kubectl ]]; then
-    p10k display segment:kubecontext=show
-  else
-    p10k display segment:kubecontext=hide
-  fi
+  case ${P9K_COMMAND:t} in
+    kubectl)   p10k display segment:kubecontext=show;;
+    az)        p10k display segment:azure=show;;
+    terraform) p10k display segment:azure=show segment:kubecontext=show;;
+    *)         p10k display segment:azure=hide segment:kubecontext=hide;;
+  esac
+}
+
+# $P9K_PROMPT_TYPE  instant|regular
+# $P9K_TTY_TYPE     new|old
+function p10k-on-pre-prompt() {
+  p10k display segment:kubecontext=hide segment:azure=hide
+  p10k display line1=show right=show segment:time=hide
+  if [[ $P9K_TTY_TYPE == new ]]; then
+    p10k display empty_line=hide
+  else
+    p10k display empty_line=show
+  fi
+}
+
+function p10k-on-post-prompt() {
+  p10k display line1=hide right=hide segment:time=show
 }

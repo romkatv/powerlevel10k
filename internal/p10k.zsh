@@ -616,7 +616,7 @@ _p9k_left_prompt_segment() {
     fi
 
     p+="\${_p9k_c::=$content_exp_}"
-    p+='${_p9k_e::=${${__p9k_s_'${${1#prompt_}%%[A-Z_]#}'+00}:-'
+    p+='${_p9k_e::=${${${__p9k_display[s/'${${1#prompt_}%%[A-Z_]#}']:#show}:+00}:-'
     if (( has_icon == -1 )); then
       p+='${${(%):-$_p9k_c%1(l.1.0)}[-1]}${${(%):-$_p9k_v%1(l.1.0)}[-1]}}'
     else
@@ -837,7 +837,7 @@ _p9k_right_prompt_segment() {
     fi
 
     p+="\${_p9k_c::=$content_exp_}"
-    p+='${_p9k_e::=${${__p9k_s_'${${1#prompt_}%%[A-Z_]#}'+00}:-'
+    p+='${_p9k_e::=${${${__p9k_display[s/'${${1#prompt_}%%[A-Z_]#}']:#show}:+00}:-'
     if (( has_icon == -1 )); then
       p+='${${(%):-$_p9k_c%1(l.1.0)}[-1]}${${(%):-$_p9k_v%1(l.1.0)}[-1]}}'
     else
@@ -3587,6 +3587,7 @@ _p9k_dump_instant_prompt() {
       >&$fd print -r -- '
   zmodload zsh/terminfo
   (( $+terminfo[cuu] && $+terminfo[cuf] && $+terminfo[ed] && $+terminfo[sc] && $+terminfo[rc] )) || return
+  local -A __p9k_display
   local pwd=${(%):-%/}
   local prompt_file=$prompt_dir/prompt-${#pwd}
   local key=$pwd:$ssh:${(%):-%#}
@@ -5538,6 +5539,11 @@ Example: Bind Ctrl+P to toggle right prompt.
   zle -N toggle-right-prompt
   bindkey '^P' toggle-right-prompt"
 
+# 0  -- reset-prompt not blocked
+# 1  -- reset-prompt blocked and not needed
+# 2  -- reset-prompt blocked and needed
+typeset -gi __p9k_reset_state
+
 function p10k() {
   [[ $# != 1 || $1 != finalize ]] || { p10k-instant-prompt-finalize; return }
 
@@ -5593,57 +5599,34 @@ function p10k() {
         print -rP -- $__p9k_p10k_display_usage >&2
         return 1
       fi
+      if [[ $2 == -h ]]; then
+        print -rP -- $__p9k_p10k_display_usage >&2
+        return 0
+      fi
       shift
       local opt
-      local -i reset
       for opt; do
-        case $opt in
-          -h) print -rP -- $__p9k_p10k_display_usage >&2; return 0;;
-          +right)
-            if (( $+__p9k_x_right )); then
-              reset=1
-              unset __p9k_x_right __p9k_x_gap
-            fi
-            ;;
-          -right)
-            if (( ! $+__p9k_x_right )); then
-              reset=1
-              __p9k_x_gap=
-              __p9k_x_right=
-            fi
-            ;;
-          right)
-            reset=1
-            if (( $+__p9k_x_right )); then
-              unset __p9k_x_right __p9k_x_gap
-            else
-              typeset -g __p9k_x_right=
-              typeset -g __p9k_x_gap=
-            fi
-          ;;
-          +s:*)
-            if (( $+parameters[__p9k_s_${opt:3 }] )); then
-              reset=1
-              unset __p9k_s_${opt:3 }
-            fi
-            ;;
-          -s:*)
-            if (( ! $+parameters[__p9k_s_${opt:3 }] )); then
-              reset=1
-              typeset -g __p9k_s_${opt:3 }=
-            fi
-            ;;
-          s:*)
-            reset=1
-            if (( $+parameters[__p9k_s_${opt:2 }] )); then
-              unset __p9k_s_${opt:2 }
-            else
-              typeset -g __p9k_s_${opt:2 }=
-            fi
-          ;;
-        esac
+        local pair=(${(s:=:)opt})
+        local name=${pair[1]/#segment/s}
+        local prev=$__p9k_display[$name]
+        if [[ $pair[2] == *,* ]]; then  # branch purely for optimization
+          local list=(${(s:,:)${pair[2]}})
+          local new=${list[list[(I)cur]+1]:-$list[1]}
+        else
+          local new=$pair[2]
+        fi
+        [[ $prev == $new ]] && continue
+        __p9k_display[$name]=$new
+        if (( __p9k_reset_state > 0 )); then
+          __p9k_reset_state=2
+        else
+          __p9k_reset_state=-1
+        fi
       done
-      (( reset )) && zle && _p9k_reset_prompt || true
+      if (( __p9k_reset_state == -1 )); then
+        _p9k_reset_prompt
+        __p9k_reset_state=0
+      fi
       ;;
     configure)
       if (( ARGC > 1 )); then
