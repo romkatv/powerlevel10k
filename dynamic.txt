@@ -70,6 +70,20 @@ function p10k-on-pre-prompt() {
   fi
 }
 
+${_p9k__'$_p9k_line_index'r-'$right'}
+
 function p10k-on-post-prompt() {
   p10k display line1=hide right=hide segment:time=show
 }
+
+TODO: support -1/left
+TODO: hiding gap kills right prompt; this is bad; implement it like ruler, with 3 values in _p9k_t?
+TODO: add 1/right/frame
+
+empty_line
+ruler
+1
+1/gap
+1/left
+1/right
+1/right/time

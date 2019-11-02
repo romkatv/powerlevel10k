@@ -616,7 +616,7 @@ _p9k_left_prompt_segment() {
     fi
 
     p+="\${_p9k_c::=$content_exp_}"
-    p+='${_p9k_e::=${${${__p9k_display[s/'${${1#prompt_}%%[A-Z_]#}']:#show}:+00}:-'
+    p+='${_p9k_e::=${${_p9k__'${_p9k_line_index}l${${1#prompt_}%%[A-Z_]#}'+00}:-'
     if (( has_icon == -1 )); then
       p+='${${(%):-$_p9k_c%1(l.1.0)}[-1]}${${(%):-$_p9k_v%1(l.1.0)}[-1]}}'
     else
@@ -837,7 +837,7 @@ _p9k_right_prompt_segment() {
     fi
 
     p+="\${_p9k_c::=$content_exp_}"
-    p+='${_p9k_e::=${${${__p9k_display[s/'${${1#prompt_}%%[A-Z_]#}']:#show}:+00}:-'
+    p+='${_p9k_e::=${${_p9k__'${_p9k_line_index}r${${1#prompt_}%%[A-Z_]#}'+00}:-'
     if (( has_icon == -1 )); then
       p+='${${(%):-$_p9k_c%1(l.1.0)}[-1]}${${(%):-$_p9k_v%1(l.1.0)}[-1]}}'
     else
@@ -3465,38 +3465,38 @@ function _p9k_set_prompt() {
 
   (( _p9k_fetch_iface )) && _p9k_set_iface
 
-  local -i left_idx=1 right_idx=1 num_lines=$#_p9k_line_segments_left i
-  for i in {1..$num_lines}; do
+  local -i left_idx=1 right_idx=1 num_lines=$#_p9k_line_segments_left
+  for _p9k_line_index in {1..$num_lines}; do
     local right=
     if (( !_POWERLEVEL9K_DISABLE_RPROMPT )); then
       _p9k_dir=
       _p9k__prompt=
       _p9k_segment_index=right_idx
       _p9k_prompt_side=right
-      for _p9k_segment_name in ${(@0)_p9k_line_segments_right[i]}; do
+      for _p9k_segment_name in ${(@0)_p9k_line_segments_right[_p9k_line_index]}; do
         _p9k_build_${1}segment
       done
       _p9k__prompt=${${_p9k__prompt//$' %{\b'/'%{%G'}//$' \b'}
       right_idx=_p9k_segment_index
-      if [[ -n $_p9k__prompt || $_p9k_line_never_empty_right[i] == 1 ]]; then
-        right=$_p9k_line_prefix_right[i]$_p9k__prompt$_p9k_line_suffix_right[i]
+      if [[ -n $_p9k__prompt || $_p9k_line_never_empty_right[_p9k_line_index] == 1 ]]; then
+        right=$_p9k_line_prefix_right[_p9k_line_index]$_p9k__prompt$_p9k_line_suffix_right[_p9k_line_index]
       fi
     fi
     unset _p9k_dir
-    _p9k__prompt=$_p9k_line_prefix_left[i]
+    _p9k__prompt=$_p9k_line_prefix_left[_p9k_line_index]
     _p9k_segment_index=left_idx
     _p9k_prompt_side=left
-    for _p9k_segment_name in ${(@0)_p9k_line_segments_left[i]}; do
+    for _p9k_segment_name in ${(@0)_p9k_line_segments_left[_p9k_line_index]}; do
       _p9k_build_${1}segment
     done
     _p9k__prompt=${${_p9k__prompt//$' %{\b'/'%{%G'}//$' \b'}
     left_idx=_p9k_segment_index
-    _p9k__prompt+=$_p9k_line_suffix_left[i]
-    if (( $+_p9k_dir || (i != num_lines && $#right) )); then
-      _p9k__prompt='${${:-${_p9k_d::=0}${_p9k_rprompt::=${__p9k_x_right-'$right'}}${_p9k_lprompt::='$_p9k__prompt'}}+}'
+    _p9k__prompt+=$_p9k_line_suffix_left[_p9k_line_index]
+    if (( $+_p9k_dir || (_p9k_line_index != num_lines && $#right) )); then
+      _p9k__prompt='${${:-${_p9k_d::=0}${_p9k_rprompt::='$right'}${_p9k_lprompt::='$_p9k__prompt'}}+}'
       _p9k__prompt+=$_p9k_gap_pre
       if (( $+_p9k_dir )); then
-        if (( i == num_lines && (_POWERLEVEL9K_DIR_MIN_COMMAND_COLUMNS > 0 || _POWERLEVEL9K_DIR_MIN_COMMAND_COLUMNS_PCT > 0) )); then
+        if (( _p9k_line_index == num_lines && (_POWERLEVEL9K_DIR_MIN_COMMAND_COLUMNS > 0 || _POWERLEVEL9K_DIR_MIN_COMMAND_COLUMNS_PCT > 0) )); then
           local a=$_POWERLEVEL9K_DIR_MIN_COMMAND_COLUMNS
           local f=$((0.01*_POWERLEVEL9K_DIR_MIN_COMMAND_COLUMNS_PCT))'*_p9k_clm'
           _p9k__prompt+="\${\${_p9k_g::=$((($a<$f)*$f+($a>=$f)*$a))}+}"
@@ -3521,15 +3521,15 @@ function _p9k_set_prompt() {
       else
         _p9k__prompt+='${_p9k_lprompt}'
       fi
-      ((i != num_lines && $#right)) && _p9k__prompt+=$_p9k_line_gap_post[i]
+      ((_p9k_line_index != num_lines && $#right)) && _p9k__prompt+=$_p9k_line_gap_post[_p9k_line_index]
     fi
-    if (( i == num_lines )); then
-      [[ -n $right ]] && RPROMPT='${__p9k_x_right-'$_p9k_prompt_prefix_right$right$_p9k_prompt_suffix_right'}'
-      _p9k__prompt+=$_p9k_prompt_suffix_left
+    if (( _p9k_line_index == num_lines )); then
+      [[ -n $right ]] && RPROMPT=$_p9k_prompt_prefix_right$right$_p9k_prompt_suffix_right
+      _p9k__prompt='${_p9k__'$_p9k_line_index'-'$_p9k__prompt'}'$_p9k_prompt_suffix_left
       [[ $1 == instant_ ]] || PROMPT+=$_p9k__prompt
     else
-      PROMPT+=$_p9k__prompt
-      [[ -n $right ]] || PROMPT+=$'\n'
+      [[ -n $right ]] || _p9k__prompt+=$'\n'
+      PROMPT+='${_p9k__'$_p9k_line_index'-'$_p9k__prompt'}'
     fi
   done
 
@@ -3579,6 +3579,7 @@ _p9k_dump_instant_prompt() {
   local cr=\$'\r' lf=\$'\n' esc=\$'\e[' rs=$'\x1e' us=$'\x1f'
   local -i height=$_POWERLEVEL9K_INSTANT_PROMPT_COMMAND_LINES
   local prompt_dir=${(q)prompt_dir}
+  local -i _p9k__empty_line_i=3 _p9k__ruler_i=3
   zmodload zsh/langinfo
   if [[ \${langinfo[CODESET]:-} != (utf|UTF)(-|)8 ]]; then
     local lc=${(q)${${${_p9k_locale:-${(M)LC_CTYPE:#*.(utf|UTF)(-|)8}}:-${(M)LC_ALL:#*.(utf|UTF)(-|)8}}}:-${(M)LANG:#*.(utf|UTF)(-|)8}}
@@ -3587,7 +3588,10 @@ _p9k_dump_instant_prompt() {
       >&$fd print -r -- '
   zmodload zsh/terminfo
   (( $+terminfo[cuu] && $+terminfo[cuf] && $+terminfo[ed] && $+terminfo[sc] && $+terminfo[rc] )) || return
-  local -A __p9k_display
+  function p10k() {
+    emulate -L zsh
+    # TODO
+  }
   local pwd=${(%):-%/}
   local prompt_file=$prompt_dir/prompt-${#pwd}
   local key=$pwd:$ssh:${(%):-%#}
@@ -3596,8 +3600,6 @@ _p9k_dump_instant_prompt() {
   local tail=${content##*$rs$key$us}
   [[ ${#tail} != ${#content} ]] || return
   local -a _p9k_t=("${(@ps:$us:)${tail%%$rs*}}")'
-      (( __p9k_ksh_arrays )) && >&$fd print -r -- '  setopt ksh_arrays'
-      (( __p9k_sh_glob )) && >&$fd print -r -- '  setopt sh_glob'
       if [[ $+VTE_VERSION == 1 || $TERM_PROGRAM == Hyper ]]; then
         if [[ $TERM_PROGRAM == Hyper ]]; then
           local bad_lines=40 bad_columns=100
@@ -3605,6 +3607,7 @@ _p9k_dump_instant_prompt() {
           local bad_lines=24 bad_columns=80
         fi
         >&$fd print -r -- '
+  local -i tty_size_known=1
   if (( LINES == '$bad_lines' && COLUMNS == '$bad_columns' )); then
     zmodload -F zsh/stat b:zstat
     zmodload zsh/datetime
@@ -3615,9 +3618,8 @@ _p9k_dump_instant_prompt() {
       local tty_size
       while true; do
         if (( EPOCHREALTIME > deadline )) || ! tty_size="$(/bin/stty size 2>/dev/null)" || [[ $tty_size != <->" "<-> ]]; then
-          local __p9k_x_ruler=
-          local __p9k_x_gap=
-          local __p9k_x_right=
+          p10k display ruler=hide "*/gap"=hide "*/right"=hide
+          tty_size_known=0
           break
         fi
         if [[ $tty_size != "'$bad_lines' '$bad_columns'" ]]; then
@@ -3630,6 +3632,8 @@ _p9k_dump_instant_prompt() {
     fi
   fi'
       fi
+      (( __p9k_ksh_arrays )) && >&$fd print -r -- '  setopt ksh_arrays'
+      (( __p9k_sh_glob )) && >&$fd print -r -- '  setopt sh_glob'
       >&$fd print -r -- '  typeset -ga __p9k_used_instant_prompt=("${(@e)_p9k_t[-3,-1]}")'
       (( __p9k_ksh_arrays )) && >&$fd print -r -- '  unsetopt ksh_arrays'
       (( __p9k_sh_glob )) && >&$fd print -r -- '  unsetopt sh_glob'
@@ -3653,7 +3657,7 @@ _p9k_dump_instant_prompt() {
     _p9k_ret=$x
   }
   local out'
-       [[ $+VTE_VERSION == 1 || $TERM_PROGRAM == Hyper ]] && >&$fd print -r -- '  if (( ! $+__p9k_x_gap )); then'
+       [[ $+VTE_VERSION == 1 || $TERM_PROGRAM == Hyper ]] && >&$fd print -r -- '  if (( tty_size_known )); then'
        >&$fd print -r -- '
   [[ $PROMPT_EOL_MARK == "%B%S%#%s%b" ]] && _p9k_ret=1 || _p9k_prompt_length $PROMPT_EOL_MARK
   local -i fill=$((COLUMNS > _p9k_ret ? COLUMNS - _p9k_ret : 0))
@@ -3980,8 +3984,6 @@ function _p9k_maybe_dump() {
   fi
 }
 
-typeset -gA __p9k_display
-
 function _p9k_on_expand() {
   (( _p9k__expanded && ! $+__p9k_instant_prompt_active )) && return
 
@@ -3995,8 +3997,8 @@ function _p9k_on_expand() {
     (( _p9k__expanded )) && return
     _p9k__expanded=1
 
-    [[ $__p9k_display[empty_line] == print ]] && print -rn -- $_p9k_t[_p9k_empty_line_idx]
-    if [[ $__p9k_display[ruler] == print ]]; then
+    [[ $_p9k__display[empty_line] == print ]] && print -rn -- $_p9k_t[_p9k_empty_line_idx]
+    if [[ $_p9k__display[ruler] == print ]]; then
       local ruler=$_p9k_t[_p9k_ruler_idx]
       () {
         (( __p9k_ksh_arrays )) && setopt ksh_arrays
@@ -4027,11 +4029,6 @@ _p9k_precmd_impl() {
       _p9k__expanded=1
     else
       _p9k__expanded=0
-    fi
-
-    if (( _p9k__transient_rprompt_active )); then
-      _p9k__transient_rprompt_active=0
-      unset __p9k_x_right __p9k_x_gap
     fi
 
     if (( $+_p9k_real_zle_rprompt_indent )); then
@@ -4353,6 +4350,7 @@ _p9k_init_vars() {
   typeset -g  _p9k_prompt_side
   typeset -g  _p9k_segment_name
   typeset -gi _p9k_segment_index
+  typeset -gi _p9k_line_index
   typeset -g  _p9k_refresh_reason
   typeset -gi _p9k__region_active
   typeset -g  _p9k__async_pump_line
@@ -4381,9 +4379,9 @@ _p9k_init_vars() {
   typeset -gi _p9k_g
   typeset -gi _p9k_ind
   typeset -g  _p9k_gap_pre
-  typeset -gi _p9k_ruler_i
+  typeset -gi _p9k__ruler_i=3
   typeset -gi _p9k_ruler_idx
-  typeset -gi _p9k_empty_line_i
+  typeset -gi _p9k__empty_line_i=3
   typeset -gi _p9k_empty_line_idx
   typeset -g  _p9k_prompt_prefix_left
   typeset -g  _p9k_prompt_prefix_right
@@ -4413,8 +4411,8 @@ _p9k_init_vars() {
   typeset -g  _p9k_uname
   typeset -g  _p9k_uname_o
   typeset -g  _p9k_uname_m
+  typeset -gA _p9k__display
 
-  typeset -gi _p9k__transient_rprompt_active
   typeset -gA _p9k__dotnet_stat_cache
   typeset -gA _p9k__dir_stat_cache
   typeset -gi _p9k__expanded
@@ -4737,12 +4735,7 @@ _p9k_wrap_zle_widget() {
 
 function _p9k_zle_line_finish() {
   _p9k__line_finished=
-  if [[ -o transient_rprompt ]]; then
-    __p9k_x_right=
-    __p9k_x_gap=
-    _p9k__transient_rprompt_active=1
-    _p9k_reset_prompt
-  elif (( _p9k_reset_on_line_finish )); then
+  if (( _p9k_reset_on_line_finish )); then
     _p9k_reset_prompt
   fi
 }
@@ -4758,29 +4751,30 @@ function _p9k_zle_line_pre_redraw() {
 prompt__p9k_internal_nothing() { _p9k__prompt+='${_p9k_sss::=}'; }
 instant_prompt__p9k_internal_nothing() { prompt__p9k_internal_nothing; }
 
-# _p9k_build_gap_post <first|newline>
+# _p9k_build_gap_post line_number
 _p9k_build_gap_post() {
-  _p9k_get_icon '' MULTILINE_${(U)1}_PROMPT_GAP_CHAR
+  [[ $1 == 1 ]] && local kind=first || local kind=newline
+  _p9k_get_icon '' MULTILINE_${(U)kind}_PROMPT_GAP_CHAR
   local char=${_p9k_ret:- }
   _p9k_prompt_length $char
   if (( _p9k_ret != 1 || $#char != 1 )); then
-    print -rP -- "%F{red}WARNING!%f %BMULTILINE_${(U)1}_PROMPT_GAP_CHAR%b is not one character long. Will use ' '."
-    print -rP -- "Either change the value of %BPOWERLEVEL9K_MULTILINE_${(U)1}_PROMPT_GAP_CHAR%b or remove it."
+    print -rP -- "%F{red}WARNING!%f %BMULTILINE_${(U)kind}_PROMPT_GAP_CHAR%b is not one character long. Will use ' '."
+    print -rP -- "Either change the value of %BPOWERLEVEL9K_MULTILINE_${(U)kind}_PROMPT_GAP_CHAR%b or remove it."
     char=' '
   fi
   local style
-  _p9k_color prompt_multiline_$1_prompt_gap BACKGROUND ""
+  _p9k_color prompt_multiline_${kind}_prompt_gap BACKGROUND ""
   [[ -n $_p9k_ret ]] && _p9k_background $_p9k_ret
   style+=$_p9k_ret
-  _p9k_color prompt_multiline_$1_prompt_gap FOREGROUND ""
+  _p9k_color prompt_multiline_${kind}_prompt_gap FOREGROUND ""
   [[ -n $_p9k_ret ]] && _p9k_foreground $_p9k_ret
   style+=$_p9k_ret
   _p9k_escape_style $style
   style=$_p9k_ret
-  local exp=POWERLEVEL9K_MULTILINE_${(U)1}_PROMPT_GAP_EXPANSION
+  local exp=POWERLEVEL9K_MULTILINE_${(U)kind}_PROMPT_GAP_EXPANSION
   (( $+parameters[$exp] )) && exp=${(P)exp} || exp='${P9K_GAP}'
   [[ $char == '.' ]] && local s=',' || local s='.'
-  _p9k_ret=$'${${__p9k_x_gap+\n}:-'$style'${${${_p9k_m:#-*}:+'
+  _p9k_ret='${${_p9k__'$1$'g+\n}:-'$style'${${${_p9k_m:#-*}:+'
   if [[ $exp == '${P9K_GAP}' ]]; then
     _p9k_ret+='${(pl'$s'$((_p9k_m+1))'$s$s$char$s$')}'
   else
@@ -4820,7 +4814,8 @@ _p9k_init_lines() {
     local -i num_lines=num_left_lines
   fi
 
-  repeat $num_lines; do
+  local -i i
+  for i in {1..$num_lines}; do
     local -i left_end=${left_segments[(i)newline]}
     local -i right_end=${right_segments[(i)newline]}
     _p9k_line_segments_left+="${(pj:\0:)left_segments[1,left_end-1]}"
@@ -4831,13 +4826,13 @@ _p9k_init_lines() {
     _p9k_get_icon '' LEFT_SEGMENT_SEPARATOR
     _p9k_get_icon 'prompt_empty_line' LEFT_PROMPT_LAST_SEGMENT_END_SYMBOL $_p9k_ret
     _p9k_escape $_p9k_ret
-    _p9k_line_prefix_left+='${${:-${_p9k_bg::=NONE}${_p9k_i::=0}${_p9k_sss::=%f'$_p9k_ret'}}+}'
-    _p9k_line_suffix_left+='%b%k$_p9k_sss%b%k%f'
+    _p9k_line_prefix_left+='${_p9k__'$i'l-${${:-${_p9k_bg::=NONE}${_p9k_i::=0}${_p9k_sss::=%f'$_p9k_ret'}}+}'
+    _p9k_line_suffix_left+='%b%k$_p9k_sss%b%k%f}'
 
     _p9k_escape ${(g::)POWERLEVEL9K_EMPTY_LINE_RIGHT_PROMPT_FIRST_SEGMENT_START_SYMBOL}
     [[ -n $_p9k_ret ]] && _p9k_line_never_empty_right+=1 || _p9k_line_never_empty_right+=0
-    _p9k_line_prefix_right+='${${:-${_p9k_bg::=NONE}${_p9k_i::=0}${_p9k_sss::='$_p9k_ret'}}+}'
-    _p9k_line_suffix_right+='$_p9k_sss%b%k%f'  # gets overridden for _p9k_emulate_zero_rprompt_indent
+    _p9k_line_prefix_right+='${_p9k__'$i'r-${${:-${_p9k_bg::=NONE}${_p9k_i::=0}${_p9k_sss::='$_p9k_ret'}}+}'
+    _p9k_line_suffix_right+='$_p9k_sss%b%k%f}'  # gets overridden for _p9k_emulate_zero_rprompt_indent
   done
 
   _p9k_get_icon '' LEFT_SEGMENT_END_SEPARATOR
@@ -4853,8 +4848,10 @@ _p9k_init_lines() {
   fi
 
   if (( num_lines > 1 )); then
-    _p9k_build_gap_post first
-    _p9k_line_gap_post[1]=$_p9k_ret
+    for i in {1..$((num_lines-1))}; do
+      _p9k_build_gap_post $i
+      _p9k_line_gap_post+=$_p9k_ret
+    done
 
     if [[ $+POWERLEVEL9K_MULTILINE_FIRST_PROMPT_PREFIX == 1 || $_POWERLEVEL9K_PROMPT_ON_NEWLINE == 1 ]]; then
       _p9k_get_icon '' MULTILINE_FIRST_PROMPT_PREFIX
@@ -4889,9 +4886,6 @@ _p9k_init_lines() {
     fi
 
     if (( num_lines > 2 )); then
-      _p9k_build_gap_post newline
-      _p9k_line_gap_post[2,-2]=(${${:-{3..num_lines}}:/*/$_p9k_ret})
-
       if [[ $+POWERLEVEL9K_MULTILINE_NEWLINE_PROMPT_PREFIX == 1 || $_POWERLEVEL9K_PROMPT_ON_NEWLINE == 1 ]]; then
         _p9k_get_icon '' MULTILINE_NEWLINE_PROMPT_PREFIX
         [[ _p9k_ret == *%* ]] && _p9k_ret+=%b%k%f
@@ -4918,6 +4912,25 @@ _p9k_all_params_eq() {
   done
 }
 
+_p9k_init_display() {
+  local name
+  local -i i
+  _p9k__display[empty_line]=hide
+  _p9k__display[ruler]=hide
+  for i in {1..$#_p9k_line_segments_left}; do
+    _p9k__display[$i]=show
+    _p9k__display[$i/left]=show
+    _p9k__display[$i/right]=show
+    _p9k__display[$i/gap]=show
+    for name in ${(@0)_p9k_line_segments_left[i]}; do
+      _p9k__display[$i/left/$name]=show
+    done
+    for name in ${(@0)_p9k_line_segments_right[i]}; do
+      _p9k__display[$i/right/$name]=show
+    done
+  done
+}
+
 _p9k_init_prompt() {
   _p9k_t=($'\n' '' '')
   _p9k_prompt_overflow_bug && _p9k_t[2]='%{%G%}'
@@ -4935,9 +4948,9 @@ _p9k_init_prompt() {
   _p9k_gap_pre+='}+}'
 
   _p9k_prompt_prefix_left='${${_p9k_clm::=$COLUMNS}+}${${COLUMNS::=1024}+}'
-  _p9k_prompt_prefix_right='${${_p9k_clm::=$COLUMNS}+}${${COLUMNS::=1024}+}'
+  _p9k_prompt_prefix_right='${_p9k__'$#_p9k_line_segments_left'-${${_p9k_clm::=$COLUMNS}+}${${COLUMNS::=1024}+}'
   _p9k_prompt_suffix_left='${${COLUMNS::=$_p9k_clm}+}'
-  _p9k_prompt_suffix_right='${${COLUMNS::=$_p9k_clm}+}'
+  _p9k_prompt_suffix_right='${${COLUMNS::=$_p9k_clm}+}}'
 
   if _p9k_segment_in_use vi_mode || _p9k_segment_in_use prompt_char; then
     _p9k_prompt_prefix_left+='${${_p9k__keymap::=${KEYMAP:-$_p9k__keymap}}+}'
@@ -4959,7 +4972,7 @@ _p9k_init_prompt() {
        ! is-at-least 5.7.2; then
     _p9k_emulate_zero_rprompt_indent=1
     _p9k_prompt_prefix_left+='${${:-${_p9k_real_zle_rprompt_indent:=$ZLE_RPROMPT_INDENT}${ZLE_RPROMPT_INDENT::=1}${_p9k_ind::=0}}+}'
-    _p9k_line_suffix_right[-1]='${_p9k_sss:+${_p9k_sss% }%E}'
+    _p9k_line_suffix_right[-1]='${_p9k_sss:+${_p9k_sss% }%E}}'
   else
     _p9k_emulate_zero_rprompt_indent=0
     _p9k_prompt_prefix_left+='${${_p9k_ind::=${${ZLE_RPROMPT_INDENT:-1}/#-*/0}}+}'
@@ -4971,8 +4984,11 @@ _p9k_init_prompt() {
     _p9k_t+=''
   fi
   _p9k_empty_line_idx=$#_p9k_t
-  _p9k_empty_line_i=3
-  _p9k_prompt_prefix_left+='${_p9k_t[_p9k_empty_line_i-__p9k_ksh_arrays]}'
+  if (( __p9k_ksh_arrays )); then
+    _p9k_prompt_prefix_left+='${_p9k_t[_p9k__empty_line_i-1]}'
+  else
+    _p9k_prompt_prefix_left+='${_p9k_t[_p9k__empty_line_i]}'
+  fi
 
   _p9k_get_icon '' RULER_CHAR
   local ruler_char=$_p9k_ret
@@ -4997,8 +5013,11 @@ _p9k_init_prompt() {
   fi
   _p9k_t+=$ruler
   _p9k_ruler_idx=$#_p9k_t
-  _p9k_ruler_i=3
-  _p9k_prompt_prefix_left+='${(e)_p9k_t[_p9k_ruler_i-__p9k_ksh_arrays]}'
+  if (( __p9k_ksh_arrays )); then
+    _p9k_prompt_prefix_left+='${(e)_p9k_t[_p9k__ruler_i-1]}'
+  else
+    _p9k_prompt_prefix_left+='${(e)_p9k_t[_p9k__ruler_i]}'
+  fi
 
   if [[ $ITERM_SHELL_INTEGRATION_INSTALLED == Yes ]]; then
     _p9k_prompt_prefix_left+=$'%{\e]133;A\a%}'
@@ -5053,7 +5072,7 @@ _p9k_must_init() {
   _p9k__param_pat+=$'${#parameters[(I)POWERLEVEL9K_*]}\1${(%):-%n%#}\1$GITSTATUS_LOG_LEVEL\1'
   _p9k__param_pat+=$'$GITSTATUS_ENABLE_LOGGING\1$GITSTATUS_DAEMON\1$GITSTATUS_NUM_THREADS\1'
   _p9k__param_pat+=$'$DEFAULT_USER\1${ZLE_RPROMPT_INDENT:-1}\1$P9K_SSH\1$__p9k_ksh_arrays'
-  _p9k__param_pat+=$'$__p9k_sh_glob\1${options[transient_rprompt]}\1$ITERM_SHELL_INTEGRATION_INSTALLED\1'
+  _p9k__param_pat+=$'$__p9k_sh_glob\1$ITERM_SHELL_INTEGRATION_INSTALLED\1'
   _p9k__param_pat+=$'${PROMPT_EOL_MARK-%B%S%#%s%b}\1$LANG\1$LC_ALL\1$LC_CTYPE\1'
   local MATCH
   IFS=$'\1' _p9k__param_pat+="${(@)${(@o)parameters[(I)POWERLEVEL9K_*]}:/(#m)*/\${${(q)MATCH}-$IFS\}}"
@@ -5298,6 +5317,8 @@ _p9k_init() {
   _p9k_init_vars
   _p9k_restore_state || _p9k_init_cacheable
 
+  _p9k_init_display
+
   if _p9k_segment_in_use todo; then
     local todo=$commands[todo.sh]
     if [[ -n $todo ]]; then
@@ -5315,7 +5336,7 @@ _p9k_init() {
     fi
   fi
 
-  if (( _p9k_reset_on_line_finish )) || _p9k_segment_in_use status || [[ -o transient_rprompt ]]; then
+  if (( _p9k_reset_on_line_finish )) || _p9k_segment_in_use status ; then
     _p9k_wrap_zle_widget zle-line-finish _p9k_zle_line_finish
   fi
 
@@ -5604,24 +5625,28 @@ function p10k() {
         return 0
       fi
       shift
-      local opt
+      local opt match name
       for opt; do
         local pair=(${(s:=:)opt})
-        local name=${pair[1]/#segment/s}
-        local prev=$__p9k_display[$name]
-        if [[ $pair[2] == *,* ]]; then  # branch purely for optimization
-          local list=(${(s:,:)${pair[2]}})
+        local list=(${(s:,:)${pair[2]}})
+        for name in ${_p9k__display[(I)$pair[1]]}; do
+          local prev=$_p9k__display[$name]
           local new=${list[list[(I)cur]+1]:-$list[1]}
-        else
-          local new=$pair[2]
-        fi
-        [[ $prev == $new ]] && continue
-        __p9k_display[$name]=$new
-        if (( __p9k_reset_state > 0 )); then
-          __p9k_reset_state=2
-        else
-          __p9k_reset_state=-1
-        fi
+          [[ $prev == $new ]] && continue
+          _p9k__display[$name]=$new
+          if [[ $name == (empty_line|ruler) ]]; then
+            [[ $new == show ]] && local v=v2=_p9k_${name}_idx || local v=3
+            typeset -gi _p9k__${name}_i=$v
+          elif [[ $name == (#b)(<->)([[:IDENT:]/]#) ]]; then
+            local var=_p9k__${match[1]}${${${${match[2]//\/}/#left/l}/#right/r}/#gap/g}
+            [[ $new == hide ]] && typeset -g $var= || unset $var
+          fi
+          if (( __p9k_reset_state > 0 )); then
+            __p9k_reset_state=2
+          else
+            __p9k_reset_state=-1
+          fi
+        done
       done
       if (( __p9k_reset_state == -1 )); then
         _p9k_reset_prompt
