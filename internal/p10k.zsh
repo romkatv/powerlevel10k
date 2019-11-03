@@ -4144,10 +4144,21 @@ _p9k_precmd() {
   [[ -o ksh_arrays ]] && __p9k_ksh_arrays=1 || __p9k_ksh_arrays=0
   [[ -o sh_glob ]] && __p9k_sh_glob=1 || __p9k_sh_glob=0
 
+  _p9k_precmd_impl
+
   unsetopt localoptions
   setopt nopromptbang prompt_percent prompt_subst
 
-  _p9k_precmd_impl
+  if (( ! $+functions[TRAPINT] )); then
+    function TRAPINT() {
+      if (( __p9k_enabled )); then
+        emulate -L zsh
+        setopt no_hist_expand extended_glob no_prompt_bang prompt_{percent,subst}
+        _p9k_zle_line_finish
+      fi
+      return 130
+    }
+  fi
 }
 
 function _p9k_reset_prompt() {
@@ -5404,9 +5415,7 @@ _p9k_init() {
     fi
   fi
 
-  if (( _p9k_reset_on_line_finish )) || _p9k_segment_in_use status ; then
-    _p9k_wrap_zle_widget zle-line-finish _p9k_zle_line_finish
-  fi
+  _p9k_wrap_zle_widget zle-line-finish _p9k_zle_line_finish
 
   if _p9k_segment_in_use vi_mode || _p9k_segment_in_use prompt_char; then
     _p9k_wrap_zle_widget zle-keymap-select _p9k_zle_keymap_select
