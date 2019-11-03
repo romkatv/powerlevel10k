@@ -3565,6 +3565,9 @@ _p9k_dump_instant_prompt() {
     sysopen -a -o creat,trunc -u fd $tmp || return
     {
       [[ $TERM_PROGRAM == Hyper ]] && local hyper='==' || local hyper='!='
+      local -a display_v=("${_p9k__display_v[@]}")
+      local -i i
+      for ((i = 6; i <= $#display_v; i+=2)); do display_v[i]=show; done
       >&$fd print -r -- "() {
   emulate -L zsh
   (( ! \$+__p9k_instant_prompt_disabled )) || return
@@ -3579,7 +3582,6 @@ _p9k_dump_instant_prompt() {
   local cr=\$'\r' lf=\$'\n' esc=\$'\e[' rs=$'\x1e' us=$'\x1f'
   local -i height=$_POWERLEVEL9K_INSTANT_PROMPT_COMMAND_LINES
   local prompt_dir=${(q)prompt_dir}
-  local -i _p9k__empty_line_i=3 _p9k__ruler_i=3
   zmodload zsh/langinfo
   if [[ \${langinfo[CODESET]:-} != (utf|UTF)(-|)8 ]]; then
     local lc=${(q)${${${_p9k_locale:-${(M)LC_CTYPE:#*.(utf|UTF)(-|)8}}:-${(M)LC_ALL:#*.(utf|UTF)(-|)8}}}:-${(M)LANG:#*.(utf|UTF)(-|)8}}
@@ -3588,10 +3590,6 @@ _p9k_dump_instant_prompt() {
       >&$fd print -r -- '
   zmodload zsh/terminfo
   (( $+terminfo[cuu] && $+terminfo[cuf] && $+terminfo[ed] && $+terminfo[sc] && $+terminfo[rc] )) || return
-  function p10k() {
-    emulate -L zsh
-    # TODO
-  }
   local pwd=${(%):-%/}
   local prompt_file=$prompt_dir/prompt-${#pwd}
   local key=$pwd:$ssh:${(%):-%#}
@@ -3599,6 +3597,65 @@ _p9k_dump_instant_prompt() {
   { content="$(<$prompt_file)" } 2>/dev/null || return
   local tail=${content##*$rs$key$us}
   [[ ${#tail} != ${#content} ]] || return
+  local P9K_PROMPT=instant
+  if (( ! $+P9K_TTY )); then'
+      if (( _POWERLEVEL9K_NEW_TTY_MAX_AGE_SECONDS < 0 )); then
+        >&$fd print -r -- '    typeset -gx P9K_TTY=new'
+      else
+        >&$fd print -r -- '
+    typeset -gx P9K_TTY=old
+    zmodload -F zsh/stat b:zstat
+    zmodload zsh/datetime
+    local -a stat
+    if zstat -A stat +ctime -- $TTY 2>/dev/null &&
+      (( EPOCHREALTIME - stat[1] < '$_POWERLEVEL9K_NEW_TTY_MAX_AGE_SECONDS' )); then
+      P9K_TTY=new
+    fi'
+      fi
+      >&$fd print -r -- '  fi
+  local -i _p9k__empty_line_i=3 _p9k__ruler_i=3
+  local -A _p9k__display_k=('${(j: :)${(@q)${(kv)_p9k__display_k}}}')
+  local -a _p9k__display_v=('${(j: :)${(@q)display_v}}')
+  function p10k() {
+    emulate -L zsh
+    setopt no_hist_expand extended_glob prompt_percent prompt_subst no_aliases
+    [[ $1 == display ]] || return
+    shift
+    local opt match MATCH
+    local -i k
+    for opt; do
+      local pair=(${(s:=:)opt})
+      local list=(${(s:,:)${pair[2]}})
+      for k in ${(u@)_p9k__display_k[(I)$pair[1]]:/(#m)*/$_p9k__display_k[$MATCH]}; do
+        local prev=$_p9k__display_v[k+1]
+        local new=${list[list[(I)$prev]+1]:-$list[1]}
+        [[ $prev == $new ]] && continue
+        _p9k__display_v[k+1]=$new
+        local name=$_p9k__display_v[k]
+        if [[ $name == (empty_line|ruler) ]]; then
+          local var=_p9k__${name}_i
+          [[ $new == hide ]] && typeset -gi $var=3 || unset $var
+        elif [[ $name == (#b)(<->)([[:IDENT:]/]#) ]]; then
+          local var=_p9k__${match[1]}${${${${match[2]//\/}/#left/l}/#right/r}/#gap/g}
+          [[ $new == hide ]] && typeset -g $var= || unset $var
+        fi
+      done
+    done
+  }'
+      if (( _POWERLEVEL9K_PROMPT_ADD_NEWLINE )); then
+        >&$fd print -r -- '  [[ $P9K_TTY == old ]] && p10k display empty_line=print'
+      fi
+      if (( _POWERLEVEL9K_SHOW_RULER )); then
+        >&$fd print -r -- '[[ $P9K_TTY == old ]] && p10k display ruler=print'
+      fi
+      if (( $+functions[p10k-on-pre-prompt] )); then
+        >&$fd print -r -- '
+  p10k-on-pre-prompt() { '$functions[p10k-on-pre-prompt]' }
+  p10k-on-pre-prompt
+  unfunction p10k-on-pre-prompt'
+      fi
+      >&$fd print -r -- '
+  trap "unset -m _p9k__\*; unfunction p10k" EXIT
   local -a _p9k_t=("${(@ps:$us:)${tail%%$rs*}}")'
       if [[ $+VTE_VERSION == 1 || $TERM_PROGRAM == Hyper ]]; then
         if [[ $TERM_PROGRAM == Hyper ]]; then
@@ -3607,19 +3664,18 @@ _p9k_dump_instant_prompt() {
           local bad_lines=24 bad_columns=80
         fi
         >&$fd print -r -- '
-  local -i tty_size_known=1
   if (( LINES == '$bad_lines' && COLUMNS == '$bad_columns' )); then
     zmodload -F zsh/stat b:zstat
     zmodload zsh/datetime
     local -a tty_ctime
-    if ! zstat -A tty_ctime +ctime -- $TTY 2>/dev/null || (( $tty_ctime[1] + 2 > EPOCHREALTIME )); then
+    if ! zstat -A tty_ctime +ctime -- $TTY 2>/dev/null || (( tty_ctime[1] + 2 > EPOCHREALTIME )); then
       zmodload zsh/datetime
       local -F deadline=$((EPOCHREALTIME+0.025))
       local tty_size
       while true; do
         if (( EPOCHREALTIME > deadline )) || ! tty_size="$(/bin/stty size 2>/dev/null)" || [[ $tty_size != <->" "<-> ]]; then
-          p10k display ruler=hide "*/gap"=hide "*/right"=hide
-          tty_size_known=0
+          (( $+_p9k__ruler_i )) || local -i _p9k__ruler_i=1
+          local _p9k__g= _p9k__'$#_p9k_line_segments_right'r= _p9k__'$#_p9k_line_segments_right'r_frame=
           break
         fi
         if [[ $tty_size != "'$bad_lines' '$bad_columns'" ]]; then
@@ -3657,7 +3713,7 @@ _p9k_dump_instant_prompt() {
     _p9k_ret=$x
   }
   local out'
-       [[ $+VTE_VERSION == 1 || $TERM_PROGRAM == Hyper ]] && >&$fd print -r -- '  if (( tty_size_known )); then'
+       [[ $+VTE_VERSION == 1 || $TERM_PROGRAM == Hyper ]] && >&$fd print -r -- '  if (( ! $+_p9k__g )); then'
        >&$fd print -r -- '
   [[ $PROMPT_EOL_MARK == "%B%S%#%s%b" ]] && _p9k_ret=1 || _p9k_prompt_length $PROMPT_EOL_MARK
   local -i fill=$((COLUMNS > _p9k_ret ? COLUMNS - _p9k_ret : 0))
@@ -3998,7 +4054,7 @@ function _p9k_on_expand() {
     _p9k__expanded=1
 
     if (( ! $+P9K_TTY )); then
-      typeset -g P9K_TTY=old
+      typeset -gx P9K_TTY=old
       if (( _POWERLEVEL9K_NEW_TTY_MAX_AGE_SECONDS < 0 )); then
         P9K_TTY=new
       else
@@ -4027,6 +4083,8 @@ function _p9k_on_expand() {
         p10k display ruler=print
       fi
     fi
+
+    typeset -g P9K_PROMPT=regular
 
     if (( $+functions[p10k-on-pre-prompt] )); then
       p10k-on-pre-prompt
@@ -5153,6 +5211,7 @@ _p9k_must_init() {
   _p9k__param_pat+=$'$DEFAULT_USER\1${ZLE_RPROMPT_INDENT:-1}\1$P9K_SSH\1$__p9k_ksh_arrays'
   _p9k__param_pat+=$'$__p9k_sh_glob\1$ITERM_SHELL_INTEGRATION_INSTALLED\1'
   _p9k__param_pat+=$'${PROMPT_EOL_MARK-%B%S%#%s%b}\1$LANG\1$LC_ALL\1$LC_CTYPE\1'
+  _p9k__param_pat+=$'$functions[p10k-on-pre-prompt]\1'
   local MATCH
   IFS=$'\1' _p9k__param_pat+="${(@)${(@o)parameters[(I)POWERLEVEL9K_*]}:/(#m)*/\${${(q)MATCH}-$IFS\}}"
   IFS=$'\2' _p9k__param_sig="${(e)_p9k__param_pat}"
