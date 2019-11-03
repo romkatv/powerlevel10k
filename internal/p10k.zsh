@@ -3997,8 +3997,8 @@ function _p9k_on_expand() {
     (( _p9k__expanded )) && return
     _p9k__expanded=1
 
-    [[ $_p9k__display[empty_line] == print ]] && print -rn -- $_p9k_t[_p9k_empty_line_idx]
-    if [[ $_p9k__display[ruler] == print ]]; then
+    [[ $_p9k__display_v[2] == print ]] && print -rn -- $_p9k_t[_p9k_empty_line_idx]
+    if [[ $_p9k__display_v[4] == print ]]; then
       local ruler=$_p9k_t[_p9k_ruler_idx]
       () {
         (( __p9k_ksh_arrays )) && setopt ksh_arrays
@@ -4411,8 +4411,8 @@ _p9k_init_vars() {
   typeset -g  _p9k_uname
   typeset -g  _p9k_uname_o
   typeset -g  _p9k_uname_m
-  typeset -gA _p9k__display
-  typeset -ga _p9k__display_neg
+  typeset -gA _p9k__display_k
+  typeset -ga _p9k__display_v
 
   typeset -gA _p9k__dotnet_stat_cache
   typeset -gA _p9k__dir_stat_cache
@@ -4914,27 +4914,29 @@ _p9k_all_params_eq() {
 }
 
 _p9k_init_display() {
+  _p9k__display_k=(empty_line 1 ruler 3)
+  _p9k__display_v=(empty_line hide ruler hide)
+  local -i n=3 i
   local name
-  local -i i
-  _p9k__display[empty_line]=hide
-  _p9k__display[ruler]=hide
   for i in {1..$#_p9k_line_segments_left}; do
     local -i j=$((-$#_p9k_line_segments_left+i-1))
-    _p9k__display[$i]=show
-    _p9k__display_neg+=($j $i)
-    _p9k__display[$i/left]=show
-    _p9k__display_neg+=($j/left $i/left)
-    _p9k__display[$i/right]=show
-    _p9k__display_neg+=($j/right $i/right)
-    _p9k__display[$i/gap]=show
-    _p9k__display_neg+=($j/gap $i/gap)
+    _p9k__display_k+=(
+      $i       $((n+=2)) $j       $n
+      $i/left  $((n+=2)) $j/left  $n
+      $i/right $((n+=2)) $j/right $n
+      $i/gap   $((n+=2)) $j/gap   $n)
+    _p9k__display_v+=(
+      $i       show
+      $i/left  show
+      $i/right show
+      $i/gap   show)
     for name in ${(@0)_p9k_line_segments_left[i]}; do
-      _p9k__display[$i/left/$name]=show
-      _p9k__display_neg+=($j/left/$name $i/left/$name)
+      _p9k__display_k+=($i/left/$name $((n+=2)) $j/left/$name $n)
+      _p9k__display_v+=($i/left/$name show)
     done
     for name in ${(@0)_p9k_line_segments_right[i]}; do
-      _p9k__display[$i/right/$name]=show
-      _p9k__display_neg+=($j/right/$name $i/right/$name)
+      _p9k__display_k+=($i/right/$name $((n+=2)) $j/right/$name $n)
+      _p9k__display_v+=($i/right/$name show)
     done
   done
 }
@@ -5633,18 +5635,17 @@ function p10k() {
         return 0
       fi
       shift
-      local opt match name MATCH
+      local opt match MATCH
+      local -i k
       for opt; do
         local pair=(${(s:=:)opt})
         local list=(${(s:,:)${pair[2]}})
-        local -au names=(
-          $_p9k__display[(I)$pair[1]]
-          ${(@)_p9k__display_neg[(I)$pair[1]]:/(#m)*/$_p9k__display_neg[MATCH+1]})
-        for name in $names; do
-          local prev=$_p9k__display[$name]
-          local new=${list[list[(I)cur]+1]:-$list[1]}
+        for k in ${(u@)_p9k__display_k[(I)$pair[1]]:/(#m)*/$_p9k__display_k[$MATCH]}; do
+          local prev=$_p9k__display_v[k+1]
+          local new=${list[list[(I)$prev]+1]:-$list[1]}
           [[ $prev == $new ]] && continue
-          _p9k__display[$name]=$new
+          _p9k__display_v[k+1]=$new
+          local name=$_p9k__display_v[k]
           if [[ $name == (empty_line|ruler) ]]; then
             [[ $new == show ]] && local v=v2=_p9k_${name}_idx || local v=3
             typeset -gi _p9k__${name}_i=$v
