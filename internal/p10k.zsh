@@ -4775,7 +4775,18 @@ _p9k_wrap_zle_widget() {
 
 function _p9k_zle_line_finish() {
   _p9k__line_finished=
-  if (( _p9k_reset_on_line_finish )); then
+  local -i reset=_p9k_reset_on_line_finish
+
+  if (( $+functions[p10k-on-post-prompt] )); then
+    __p9k_reset_state=1
+    p10k-on-post-prompt
+    if (( __p9k_reset_state == 2 )); then
+      reset=1
+    fi
+    __p9k_reset_state=0
+  fi
+
+  if (( reset )); then
     _p9k_reset_prompt
   fi
 }
