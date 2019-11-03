@@ -3997,6 +3997,44 @@ function _p9k_on_expand() {
     (( _p9k__expanded )) && return
     _p9k__expanded=1
 
+    if (( ! $+P9K_TTY )); then
+      typeset -g P9K_TTY=old
+      if (( _POWERLEVEL9K_NEW_TTY_MAX_AGE_SECONDS < 0 )); then
+        P9K_TTY=new
+      else
+        local -a stat
+        if zstat -A stat +ctime -- $TTY 2>/dev/null &&
+          (( EPOCHREALTIME - stat[1] < _POWERLEVEL9K_NEW_TTY_MAX_AGE_SECONDS )); then
+          P9K_TTY=new
+        fi
+      fi
+    fi
+
+    __p9k_reset_state=1
+
+    if (( _POWERLEVEL9K_PROMPT_ADD_NEWLINE )); then
+      if [[ $P9K_TTY == new ]]; then
+        p10k display empty_line=hide
+      else
+        p10k display empty_line=print
+      fi
+    fi
+
+    if (( _POWERLEVEL9K_SHOW_RULER )); then
+      if [[ $P9K_TTY == new ]]; then
+        p10k display ruler=hide
+      else
+        p10k display ruler=print
+      fi
+    fi
+
+    if (( $+functions[p10k-on-pre-prompt] )); then
+      p10k-on-pre-prompt
+    fi
+
+    __p9k_reset_state=0
+    P9K_TTY=old
+
     [[ $_p9k__display_v[2] == print ]] && print -rn -- $_p9k_t[_p9k_empty_line_idx]
     if [[ $_p9k__display_v[4] == print ]]; then
       local ruler=$_p9k_t[_p9k_ruler_idx]
@@ -4438,6 +4476,7 @@ _p9k_init_params() {
     fi
   fi
 
+  _p9k_declare -F POWERLEVEL9K_NEW_TTY_MAX_AGE_SECONDS -1
   _p9k_declare -i POWERLEVEL9K_INSTANT_PROMPT_COMMAND_LINES 3
   _p9k_declare -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS -- context dir vcs
   _p9k_declare -a POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS -- status root_indicator background_jobs history time
@@ -5423,7 +5462,7 @@ _p9k_deinit() {
   (( $+functions[gitstatus_stop] )) && gitstatus_stop POWERLEVEL9K
   _p9k_deinit_async_pump
   (( _p9k__dump_pid )) && wait $_p9k__dump_pid 2>/dev/null
-  unset -m '(_POWERLEVEL9K_|P9K_|_p9k_)*~P9K_SSH'
+  unset -m '(_POWERLEVEL9K_|P9K_|_p9k_)*~(P9K_SSH|P9K_TTY)'
 }
 
 typeset -gi __p9k_enabled=0
