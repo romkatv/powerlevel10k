@@ -4995,9 +4995,9 @@ _p9k_init_prompt() {
   fi
   _p9k_empty_line_idx=$#_p9k_t
   if (( __p9k_ksh_arrays )); then
-    _p9k_prompt_prefix_left+='${_p9k_t[_p9k__empty_line_i-1]}'
+    _p9k_prompt_prefix_left+='${_p9k_t[${_p9k__empty_line_i:-'$#_p9k_t'}-1]}'
   else
-    _p9k_prompt_prefix_left+='${_p9k_t[_p9k__empty_line_i]}'
+    _p9k_prompt_prefix_left+='${_p9k_t[${_p9k__empty_line_i:-'$#_p9k_t'}]}'
   fi
 
   _p9k_get_icon '' RULER_CHAR
@@ -5024,9 +5024,9 @@ _p9k_init_prompt() {
   _p9k_t+=$ruler
   _p9k_ruler_idx=$#_p9k_t
   if (( __p9k_ksh_arrays )); then
-    _p9k_prompt_prefix_left+='${(e)_p9k_t[_p9k__ruler_i-1]}'
+    _p9k_prompt_prefix_left+='${(e)_p9k_t[${_p9k__ruler_i:-'$#_p9k_t'}-1]}'
   else
-    _p9k_prompt_prefix_left+='${(e)_p9k_t[_p9k__ruler_i]}'
+    _p9k_prompt_prefix_left+='${(e)_p9k_t[${_p9k__ruler_i:-'$#_p9k_t'}]}'
   fi
 
   if [[ $ITERM_SHELL_INTEGRATION_INSTALLED == Yes ]]; then
