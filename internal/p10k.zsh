@@ -4775,14 +4775,16 @@ _p9k_build_gap_post() {
   local exp=POWERLEVEL9K_MULTILINE_${(U)kind}_PROMPT_GAP_EXPANSION
   (( $+parameters[$exp] )) && exp=${(P)exp} || exp='${P9K_GAP}'
   [[ $char == '.' ]] && local s=',' || local s='.'
-  _p9k_ret='${${_p9k__'$1$'g+\n}:-'$style'${${${_p9k_m:#-*}:+'
+  _p9k_ret=$'${${_p9k__g+\n}:-'$style'${${${_p9k_m:#-*}:+'
+  _p9k_ret+='${${_p9k__'$1'g+${(pl.$((_p9k_m+1)).. .)}}:-'
   if [[ $exp == '${P9K_GAP}' ]]; then
-    _p9k_ret+='${(pl'$s'$((_p9k_m+1))'$s$s$char$s$')}'
+    _p9k_ret+='${(pl'$s'$((_p9k_m+1))'$s$s$char$s')}'
   else
-    _p9k_ret+='${${P9K_GAP::=${(pl'$s'$((_p9k_m+1))'$s$s$char$s$')}}+}'
+    _p9k_ret+='${${P9K_GAP::=${(pl'$s'$((_p9k_m+1))'$s$s$char$s')}}+}'
     _p9k_ret+='${:-"'$exp'"}'
     style=1
   fi
+  _p9k_ret+='}'
   if (( __p9k_ksh_arrays )); then
     _p9k_ret+=$'$_p9k_rprompt${_p9k_t[$((!_p9k_ind))]}}:-\n}'
   else
@@ -4828,7 +4830,7 @@ _p9k_init_lines() {
     _p9k_get_icon 'prompt_empty_line' LEFT_PROMPT_LAST_SEGMENT_END_SYMBOL $_p9k_ret
     _p9k_escape $_p9k_ret
     _p9k_line_prefix_left+='${_p9k__'$i'l-${${:-${_p9k_bg::=NONE}${_p9k_i::=0}${_p9k_sss::=%f'$_p9k_ret'}}+}'
-    _p9k_line_suffix_left+='%b%k$_p9k_sss%b%k%f}'
+    _p9k_line_suffix_left+='%b%k$_p9k_sss%b%k%f'
 
     _p9k_escape ${(g::)POWERLEVEL9K_EMPTY_LINE_RIGHT_PROMPT_FIRST_SEGMENT_START_SYMBOL}
     [[ -n $_p9k_ret ]] && _p9k_line_never_empty_right+=1 || _p9k_line_never_empty_right+=0
@@ -4848,6 +4850,8 @@ _p9k_init_lines() {
     fi
   fi
 
+  for i in {1..$num_lines}; do _p9k_line_suffix_left[i]+='}'; done
+
   if (( num_lines > 1 )); then
     for i in {1..$((num_lines-1))}; do
       _p9k_build_gap_post $i
@@ -4858,7 +4862,7 @@ _p9k_init_lines() {
       _p9k_get_icon '' MULTILINE_FIRST_PROMPT_PREFIX
       [[ _p9k_ret == *%* ]] && _p9k_ret+=%b%k%f
       # Not escaped for historical reasons.
-      _p9k_ret='${:-"'$_p9k_ret'"}'
+      _p9k_ret='${_p9k__1l_frame-"'$_p9k_ret'"}'
       _p9k_line_prefix_left[1]=$_p9k_ret$_p9k_line_prefix_left[1]
     fi
 
@@ -4866,23 +4870,21 @@ _p9k_init_lines() {
       _p9k_get_icon '' MULTILINE_LAST_PROMPT_PREFIX
       [[ _p9k_ret == *%* ]] && _p9k_ret+=%b%k%f
       # Not escaped for historical reasons.
-    _p9k_ret='${:-"'$_p9k_ret'"}'
+      _p9k_ret='${_p9k__'$num_lines'l_frame-"'$_p9k_ret'"}'
       _p9k_line_prefix_left[-1]=$_p9k_ret$_p9k_line_prefix_left[-1]
     fi
 
     _p9k_get_icon '' MULTILINE_FIRST_PROMPT_SUFFIX
     if [[ -n $_p9k_ret ]]; then
       [[ _p9k_ret == *%* ]] && _p9k_ret+=%b%k%f
-      _p9k_escape $_p9k_ret
-      _p9k_line_suffix_right[1]+=$_p9k_ret
+      _p9k_line_suffix_right[1]+='${_p9k__1r_frame-'${(qqq)_p9k_ret}'}'
       _p9k_line_never_empty_right[1]=1
     fi
 
     _p9k_get_icon '' MULTILINE_LAST_PROMPT_SUFFIX
     if [[ -n $_p9k_ret ]]; then
       [[ _p9k_ret == *%* ]] && _p9k_ret+=%b%k%f
-      _p9k_escape $_p9k_ret
-      _p9k_line_suffix_right[-1]+=$_p9k_ret
+      _p9k_line_suffix_right[-1]+='${_p9k__'$num_lines'r_frame-'${(qqq)_p9k_ret}'}'
       _p9k_line_never_empty_right[-1]=1
     fi
 
@@ -4890,16 +4892,18 @@ _p9k_init_lines() {
       if [[ $+POWERLEVEL9K_MULTILINE_NEWLINE_PROMPT_PREFIX == 1 || $_POWERLEVEL9K_PROMPT_ON_NEWLINE == 1 ]]; then
         _p9k_get_icon '' MULTILINE_NEWLINE_PROMPT_PREFIX
         [[ _p9k_ret == *%* ]] && _p9k_ret+=%b%k%f
-        # Not escaped for historical reasons.
-        _p9k_ret='${:-"'$_p9k_ret'"}'
-        _p9k_line_prefix_left[2,-2]=$_p9k_ret${^_p9k_line_prefix_left[2,-2]}
+        for i in {2..$((num_lines-1))}; do
+          # Not escaped for historical reasons.
+          _p9k_line_prefix_left[i]='${_p9k__'$i'l_frame-"'$_p9k_ret'"}'$_p9k_line_prefix_left[i]
+        done
       fi
 
       _p9k_get_icon '' MULTILINE_NEWLINE_PROMPT_SUFFIX
       if [[ -n $_p9k_ret ]]; then
         [[ _p9k_ret == *%* ]] && _p9k_ret+=%b%k%f
-        _p9k_escape $_p9k_ret
-        _p9k_line_suffix_right[2,-2]=${^_p9k_line_suffix_right[2,-2]}$_p9k_ret
+        for i in {2..$((num_lines-1))}; do
+          _p9k_line_suffix_right[i]+='${_p9k__'$i'r_frame-'${(qqq)_p9k_ret}'}'
+        done
         _p9k_line_never_empty_right[2,-2]=${(@)_p9k_line_never_empty_right[2,-2]/0/1}
       fi
     fi
@@ -4921,15 +4925,19 @@ _p9k_init_display() {
   for i in {1..$#_p9k_line_segments_left}; do
     local -i j=$((-$#_p9k_line_segments_left+i-1))
     _p9k__display_k+=(
-      $i       $((n+=2)) $j       $n
-      $i/left  $((n+=2)) $j/left  $n
-      $i/right $((n+=2)) $j/right $n
-      $i/gap   $((n+=2)) $j/gap   $n)
+      $i              $((n+=2)) $j             $n
+      $i/left_frame   $((n+=2)) $j/left_frame  $n
+      $i/right_frame  $((n+=2)) $j/right_frame $n
+      $i/left         $((n+=2)) $j/left        $n
+      $i/right        $((n+=2)) $j/right       $n
+      $i/gap          $((n+=2)) $j/gap         $n)
     _p9k__display_v+=(
-      $i       show
-      $i/left  show
-      $i/right show
-      $i/gap   show)
+      $i             show
+      $i/left_frame  show
+      $i/right_frame show
+      $i/left        show
+      $i/right       show
+      $i/gap         show)
     for name in ${(@0)_p9k_line_segments_left[i]}; do
       _p9k__display_k+=($i/left/$name $((n+=2)) $j/left/$name $n)
       _p9k__display_v+=($i/left/$name show)
