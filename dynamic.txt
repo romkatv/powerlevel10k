@@ -76,9 +76,9 @@ function p10k-on-post-prompt() {
   p10k display line1=hide right=hide segment:time=show
 }
 
-TODO: support -1/left
 TODO: hiding gap kills right prompt; this is bad; implement it like ruler, with 3 values in _p9k_t?
-TODO: add 1/right/frame
+TODO: add 1/right_frame
+TODO: 2/left should kill the trailing space.
 
 empty_line
 ruler
