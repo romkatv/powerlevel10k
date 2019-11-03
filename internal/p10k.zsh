@@ -4412,6 +4412,7 @@ _p9k_init_vars() {
   typeset -g  _p9k_uname_o
   typeset -g  _p9k_uname_m
   typeset -gA _p9k__display
+  typeset -ga _p9k__display_neg
 
   typeset -gA _p9k__dotnet_stat_cache
   typeset -gA _p9k__dir_stat_cache
@@ -4918,15 +4919,22 @@ _p9k_init_display() {
   _p9k__display[empty_line]=hide
   _p9k__display[ruler]=hide
   for i in {1..$#_p9k_line_segments_left}; do
+    local -i j=$((-$#_p9k_line_segments_left+i-1))
     _p9k__display[$i]=show
+    _p9k__display_neg+=($j $i)
     _p9k__display[$i/left]=show
+    _p9k__display_neg+=($j/left $i/left)
     _p9k__display[$i/right]=show
+    _p9k__display_neg+=($j/right $i/right)
     _p9k__display[$i/gap]=show
+    _p9k__display_neg+=($j/gap $i/gap)
     for name in ${(@0)_p9k_line_segments_left[i]}; do
       _p9k__display[$i/left/$name]=show
+      _p9k__display_neg+=($j/left/$name $i/left/$name)
     done
     for name in ${(@0)_p9k_line_segments_right[i]}; do
       _p9k__display[$i/right/$name]=show
+      _p9k__display_neg+=($j/right/$name $i/right/$name)
     done
   done
 }
@@ -5625,11 +5633,14 @@ function p10k() {
         return 0
       fi
       shift
-      local opt match name
+      local opt match name MATCH
       for opt; do
         local pair=(${(s:=:)opt})
         local list=(${(s:,:)${pair[2]}})
-        for name in ${_p9k__display[(I)$pair[1]]}; do
+        local -au names=(
+          $_p9k__display[(I)$pair[1]]
+          ${(@)_p9k__display_neg[(I)$pair[1]]:/(#m)*/$_p9k__display_neg[MATCH+1]})
+        for name in $names; do
           local prev=$_p9k__display[$name]
           local new=${list[list[(I)cur]+1]:-$list[1]}
           [[ $prev == $new ]] && continue
