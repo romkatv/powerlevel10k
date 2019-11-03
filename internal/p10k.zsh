@@ -5647,8 +5647,8 @@ function p10k() {
           _p9k__display_v[k+1]=$new
           local name=$_p9k__display_v[k]
           if [[ $name == (empty_line|ruler) ]]; then
-            [[ $new == show ]] && local v=v2=_p9k_${name}_idx || local v=3
-            typeset -gi _p9k__${name}_i=$v
+            local var=_p9k__${name}_i
+            [[ $new == show ]] && unset $var || typeset -gi $var=3
           elif [[ $name == (#b)(<->)([[:IDENT:]/]#) ]]; then
             local var=_p9k__${match[1]}${${${${match[2]//\/}/#left/l}/#right/r}/#gap/g}
             [[ $new == hide ]] && typeset -g $var= || unset $var

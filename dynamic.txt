@@ -70,8 +70,6 @@ function p10k-on-pre-prompt() {
   fi
 }
 
-${_p9k__'$_p9k_line_index'r-'$right'}
-
 function p10k-on-post-prompt() {
   p10k display line1=hide right=hide segment:time=show
 }
