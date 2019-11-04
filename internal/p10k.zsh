@@ -3568,6 +3568,8 @@ _p9k_dump_instant_prompt() {
       local -a display_v=("${_p9k__display_v[@]}")
       local -i i
       for ((i = 6; i <= $#display_v; i+=2)); do display_v[i]=show; done
+      display_v[2]=hide
+      display_v[4]=hide
       >&$fd print -r -- "() {
   emulate -L zsh
   (( ! \$+__p9k_instant_prompt_disabled )) || return
@@ -3621,32 +3623,36 @@ _p9k_dump_instant_prompt() {
     setopt no_hist_expand extended_glob prompt_percent prompt_subst no_aliases
     [[ $1 == display ]] || return
     shift
-    local opt match MATCH
+    local opt match MATCH prev new pair list name var
     local -i k
     for opt; do
-      local pair=(${(s:=:)opt})
-      local list=(${(s:,:)${pair[2]}})
+      pair=(${(s:=:)opt})
+      list=(${(s:,:)${pair[2]}})
       for k in ${(u@)_p9k__display_k[(I)$pair[1]]:/(#m)*/$_p9k__display_k[$MATCH]}; do
-        local prev=$_p9k__display_v[k+1]
-        local new=${list[list[(I)$prev]+1]:-$list[1]}
-        [[ $prev == $new ]] && continue
+        if (( $#list == 1 )); then
+          [[ $_p9k__display_v[k+1] == $list[1] ]] && continue
+          new=$list[1]
+        else
+          new=${list[list[(I)$_p9k__display_v[k+1]]+1]:-$list[1]}
+          [[ $_p9k__display_v[k+1] == $new ]] && continue
+        fi
         _p9k__display_v[k+1]=$new
-        local name=$_p9k__display_v[k]
+        name=$_p9k__display_v[k]
         if [[ $name == (empty_line|ruler) ]]; then
-          local var=_p9k__${name}_i
+          var=_p9k__${name}_i
           [[ $new == hide ]] && typeset -gi $var=3 || unset $var
-        elif [[ $name == (#b)(<->)([[:IDENT:]/]#) ]]; then
-          local var=_p9k__${match[1]}${${${${match[2]//\/}/#left/l}/#right/r}/#gap/g}
+        elif [[ $name == (#b)(<->)(*) ]]; then
+          var=_p9k__${match[1]}${${${${match[2]//\/}/#left/l}/#right/r}/#gap/g}
           [[ $new == hide ]] && typeset -g $var= || unset $var
         fi
       done
     done
   }'
       if (( _POWERLEVEL9K_PROMPT_ADD_NEWLINE )); then
-        >&$fd print -r -- '  [[ $P9K_TTY == old ]] && p10k display empty_line=print'
+        >&$fd print -r -- '  [[ $P9K_TTY == old ]] && { unset _p9k__empty_line_i; _p9k__display_v[2]=print }'
       fi
       if (( _POWERLEVEL9K_SHOW_RULER )); then
-        >&$fd print -r -- '[[ $P9K_TTY == old ]] && p10k display ruler=print'
+        >&$fd print -r -- '[[ $P9K_TTY == old ]] && { unset _p9k__ruler_i; _p9k__display_v[4]=print }'
       fi
       if (( $+functions[p10k-on-pre-prompt] )); then
         >&$fd print -r -- '
@@ -4069,18 +4075,20 @@ function _p9k_on_expand() {
     __p9k_reset_state=1
 
     if (( _POWERLEVEL9K_PROMPT_ADD_NEWLINE )); then
+      _p9k__empty_line_i=3
       if [[ $P9K_TTY == new ]]; then
-        p10k display empty_line=hide
+        _p9k__display_v[2]=hide
       else
-        p10k display empty_line=print
+        _p9k__display_v[2]=print
       fi
     fi
 
     if (( _POWERLEVEL9K_SHOW_RULER )); then
+      _p9k__ruler_i=3
       if [[ $P9K_TTY == new ]]; then
-        p10k display ruler=hide
+        _p9k__display_v[4]=hide
       else
-        p10k display ruler=print
+        _p9k__display_v[4]=print
       fi
     fi
 
