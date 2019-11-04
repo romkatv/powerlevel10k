@@ -1368,8 +1368,8 @@ function ask_zshrc_edit() {
           cp -p $__p9k_zshrc $zshrc_backup                           || quit -c
           print -r -- $zshrc_content >$zshrc_backup                  || quit -c
           zshrc_backup_u=${${TMPDIR:+\$TMPDIR}:-/tmp}/${(q-)zshrc_backup:t}
-          break
         fi
+        break
       ;;
     esac
   done
