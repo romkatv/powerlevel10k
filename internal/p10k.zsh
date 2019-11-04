@@ -4837,18 +4837,17 @@ _p9k_wrap_zle_widget() {
       zle -N $orig ${widgets[$widget]#user:}
       ;;
     builtin)
-      eval "_p9k_orig_${(q)widget}() { zle .${(q)widget} }"
+      functions[_p9k_orig_$widget]="zle .${(q)widget}"
       zle -N $orig _p9k_orig_$widget
       ;;
   esac
 
   local wrapper=_p9k_wrapper_$widget_$hook
-  eval "function ${(q)wrapper}() {
+  functions[$wrapper]="
     emulate -L zsh
     setopt no_hist_expand extended_glob no_prompt_bang prompt_{percent,subst}
     (( __p9k_enabled )) && ${(q)hook} \"\$@\"
-    (( \$+widgets[${(q)orig}] )) && zle ${(q)orig} -- \"\$@\"
-  }"
+    (( \$+widgets[${(q)orig}] )) && zle ${(q)orig} -- \"\$@\""
 
   zle -N -- $widget $wrapper
 }
