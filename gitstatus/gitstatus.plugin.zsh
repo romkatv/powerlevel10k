@@ -361,7 +361,7 @@ function gitstatus_start() {
       [[ -n $daemon ]] || {
         os="$(uname -s)" && [[ -n $os ]]
         [[ $os != Linux || "$(uname -o)" != Android ]] || os=Android
-        [[ $os != MSYS_NT-10.0-* ]] || os=MSYS_NT-10.0
+        [[ $os != (MINGW64_NT-10.0|MSYS_NT-10.0-*) ]]  || os=MSYS_NT-10.0
         local arch && arch="$(uname -m)" && [[ -n $arch ]]
         daemon=$_gitstatus_plugin_dir/bin/gitstatusd-${os:l}-${arch:l}
       }
