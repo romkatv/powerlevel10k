@@ -4204,6 +4204,14 @@ _p9k_precmd_impl() {
   fi
 }
 
+_p9k_trapint() {
+  if (( __p9k_enabled )); then
+    emulate -L zsh
+    setopt no_hist_expand extended_glob no_prompt_bang prompt_{percent,subst}
+    _p9k_zle_line_finish
+  fi
+}
+
 _p9k_precmd() {
   __p9k_new_status=$?
   __p9k_new_pipestatus=($pipestatus)
@@ -4216,14 +4224,7 @@ _p9k_precmd() {
   setopt nopromptbang prompt_percent prompt_subst
 
   if (( ! $+functions[TRAPINT] )); then
-    function TRAPINT() {
-      if (( __p9k_enabled )); then
-        emulate -L zsh
-        setopt no_hist_expand extended_glob no_prompt_bang prompt_{percent,subst}
-        _p9k_zle_line_finish
-      fi
-      return 130
-    }
+    trap '_p9k_trapint; return 130' INT
   fi
 }
 
