@@ -5764,22 +5764,26 @@ function p10k() {
         return 0
       fi
       shift
-      local opt match MATCH
+      local opt match MATCH prev new pair list name var
       local -i k
       for opt; do
-        local pair=(${(s:=:)opt})
-        local list=(${(s:,:)${pair[2]}})
+        pair=(${(s:=:)opt})
+        list=(${(s:,:)${pair[2]}})
         for k in ${(u@)_p9k__display_k[(I)$pair[1]]:/(#m)*/$_p9k__display_k[$MATCH]}; do
-          local prev=$_p9k__display_v[k+1]
-          local new=${list[list[(I)$prev]+1]:-$list[1]}
-          [[ $prev == $new ]] && continue
+          if (( $#list == 1 )); then  # this branch is purely for optimization
+            [[ $_p9k__display_v[k+1] == $list[1] ]] && continue
+            new=$list[1]
+          else
+            new=${list[list[(I)$_p9k__display_v[k+1]]+1]:-$list[1]}
+            [[ $_p9k__display_v[k+1] == $new ]] && continue
+          fi
           _p9k__display_v[k+1]=$new
-          local name=$_p9k__display_v[k]
+          name=$_p9k__display_v[k]
           if [[ $name == (empty_line|ruler) ]]; then
-            local var=_p9k__${name}_i
+            var=_p9k__${name}_i
             [[ $new == show ]] && unset $var || typeset -gi $var=3
-          elif [[ $name == (#b)(<->)([[:IDENT:]/]#) ]]; then
-            local var=_p9k__${match[1]}${${${${match[2]//\/}/#left/l}/#right/r}/#gap/g}
+          elif [[ $name == (#b)(<->)(*) ]]; then
+            var=_p9k__${match[1]}${${${${match[2]//\/}/#left/l}/#right/r}/#gap/g}
             [[ $new == hide ]] && typeset -g $var= || unset $var
           fi
           if (( __p9k_reset_state > 0 )); then
