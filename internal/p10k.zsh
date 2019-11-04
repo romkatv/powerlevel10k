@@ -5234,7 +5234,13 @@ _p9k_init_vcs() {
   local daemon=${GITSTATUS_DAEMON}
   if [[ -z $daemon ]]; then
     daemon=$gitstatus_dir/bin/gitstatusd-
-    [[ $_p9k_uname_o == Android ]] && daemon+=android || daemon+=${_p9k_uname:l}
+    if [[ $_p9k_uname_o == Android ]]; then
+      daemon+=android
+    elif [[ $_p9k_uname == MSYS_NT-10.0-* ]]; then
+      daemon+=msys_nt-10.0
+    else
+      daemon+=${_p9k_uname:l}
+    fi
     daemon+=-${_p9k_uname_m:l}
   fi
   local -i threads=${GITSTATUS_NUM_THREADS:-0}
