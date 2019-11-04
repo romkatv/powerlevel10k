@@ -24,7 +24,7 @@
   setopt no_hist_expand extended_glob no_prompt_bang no_prompt_subst prompt_percent no_aliases
   if (( $+__p9k_sourced )); then
     prompt_powerlevel9k_setup
-    return
+    return 0
   fi
   typeset -gr __p9k_dump_file=${XDG_CACHE_HOME:-~/.cache}/p10k-dump-${(%):-%n}.zsh
   if [[ $__p9k_dump_file != $__p9k_instant_prompt_dump_file ]] && (( ! $+functions[_p9k_preinit] )) && source $__p9k_dump_file 2>/dev/null && (( $+functions[_p9k_preinit] )); then

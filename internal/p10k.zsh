@@ -98,7 +98,7 @@ function getColorCode() {
           local v=${__p9k_colors[$k]}
           print -rP -- "%F{$v}$v - $k%f"
         done
-        return
+        return 0
         ;;
       background)
         local k
@@ -106,7 +106,7 @@ function getColorCode() {
           local v=${__p9k_colors[$k]}
           print -rP -- "%K{$v}$v - $k%k"
         done
-        return
+        return 0
         ;;
     esac
   fi
@@ -301,7 +301,7 @@ _p9k_cache_stat_get() {
     local -a key=($0 $label fprint "$@" "$_p9k__cache_stat_fprint")
     _p9k__cache_fprint_key="${(pj:\0:)key}"
     shift 2 _p9k_cache_val
-    return
+    return 0
   fi
 
   if (( $+commands[md5] )); then
@@ -325,7 +325,7 @@ _p9k_cache_stat_get() {
     _p9k_cache_key=$meta_key
     _p9k_cache_set "$_p9k__cache_stat_meta" "$_p9k__cache_stat_fprint" "$_p9k_cache_val[@]"
     shift 2 _p9k_cache_val
-    return
+    return 0
   fi
 
   _p9k__cache_fprint_key=$_p9k_cache_key
@@ -1134,7 +1134,7 @@ prompt_battery() {
     ;;
 
     *)
-      return
+      return 0
     ;;
   esac
 
@@ -1411,7 +1411,7 @@ prompt_dir() {
                 [[ -n $_p9k_cache_val[1] ]] || continue
                 parts[1,i]=($_p9k_cache_val[1])
                 fake_first=1
-                return
+                return 0
               done
             done
           fi
@@ -1844,7 +1844,7 @@ function _p9k_nvm_ls_default() {
     ;;
     system|v)
       _p9k_ret=system
-      return
+      return 0
     ;;
     iojs-[0-9]*)
       v=iojs-v${v#iojs-}
@@ -1857,10 +1857,10 @@ function _p9k_nvm_ls_default() {
   if [[ $v == v*.*.* ]]; then
     if [[ -x $NVM_DIR/versions/node/$v/bin/node || -x $NVM_DIR/$v/bin/node ]]; then
       _p9k_ret=$v
-      return
+      return 0
     elif [[ -x $NVM_DIR/versions/io.js/$v/bin/node ]]; then
       _p9k_ret=iojs-$v
-      return
+      return 0
     else
       return 1
     fi
@@ -1999,7 +1999,7 @@ prompt_dotnet_version() {
 
   if (( _POWERLEVEL9K_DOTNET_VERSION_PROJECT_ONLY )); then
     case $_p9k_pwd in
-      ~|/) return;;
+      ~|/) return 0;;
       ~/*)
         local parent=~/
         local parts=(${(s./.)_p9k_pwd#$parent})
@@ -2307,7 +2307,7 @@ prompt_swap() {
       'M') (( used_bytes *= 1048576 ));;
       'G') (( used_bytes *= 1073741824 ));;
       'T') (( used_bytes *= 1099511627776 ));;
-      *) return;;
+      *) return 0;;
     esac
   else
     local meminfo && meminfo="$(grep -F 'Swap' /proc/meminfo 2>/dev/null)" || return
@@ -3151,7 +3151,7 @@ prompt_kubecontext() {
       for ((; pos > 0; --pos)); do
         local line=$cfg[pos]
         if [[ $line == '- context:' ]]; then
-          return
+          return 0
         elif [[ $line == (#b)'    cluster: '([^\"\'\|\>]*) ]]; then
           cluster=$match[1]
         elif [[ $line == (#b)'    namespace: '([^\"\'\|\>]*) ]]; then
@@ -4220,9 +4220,12 @@ _p9k_precmd() {
 }
 
 function _p9k_reset_prompt() {
-  (( __p9k_ksh_arrays )) && setopt ksh_arrays
-  (( __p9k_sh_glob )) && setopt sh_glob
-  zle && zle .reset-prompt && zle -R
+  if zle; then
+    (( __p9k_ksh_arrays )) && setopt ksh_arrays
+    (( __p9k_sh_glob )) && setopt sh_glob
+    zle .reset-prompt
+    zle -R
+  fi
 }
 
 function _p9k_zle_keymap_select() {
@@ -4265,7 +4268,7 @@ function _p9k_on_async_message() {
   setopt no_hist_expand extended_glob no_prompt_bang prompt_{percent,subst} no_aliases
   if (( ARGC != 1 )); then
     _p9k_deinit_async_pump
-    return
+    return 0
   fi
   local msg='' IFS=''
   while read -r -t -u $1 msg; do
@@ -5179,7 +5182,7 @@ _p9k_init_ssh() {
   typeset -gix P9K_SSH=0
   if [[ -n $SSH_CLIENT || -n $SSH_TTY || -n $SSH_CONNECTION ]]; then
     P9K_SSH=1
-    return
+    return 0
   fi
 
   # When changing user on a remote system, the $SSH_CONNECTION environment variable can be lost.
@@ -5370,11 +5373,11 @@ _p9k_init_vcs() {
   _p9k_vcs_info_init
   if (( $+functions[_p9k_preinit] )); then
     (( $+GITSTATUS_DAEMON_PID_POWERLEVEL9K )) && gitstatus_start POWERLEVEL9K || _p9k__gitstatus_disabled=1
-    return
+    return 0
   fi
   if (( _POWERLEVEL9K_DISABLE_GITSTATUS )); then
     _p9k__gitstatus_disabled=1
-    return
+    return 0
   fi
   (( $_POWERLEVEL9K_VCS_BACKENDS[(I)git] )) || return
 
@@ -5411,7 +5414,7 @@ _p9k_init_vcs() {
     >&2 echo -E - ""
     >&2 echo -E - "${(%):-    * You %Bwill not%b see this error message again.}"
     >&2 echo -E - "${(%):-    * Git prompt will be %Bfast%b.}"
-    return
+    return 0
   fi
 
   local daemon=${GITSTATUS_DAEMON}
@@ -5702,7 +5705,7 @@ Example: Bind Ctrl+P to toggle right prompt.
 typeset -gi __p9k_reset_state
 
 function p10k() {
-  [[ $# != 1 || $1 != finalize ]] || { p10k-instant-prompt-finalize; return }
+  [[ $# != 1 || $1 != finalize ]] || { p10k-instant-prompt-finalize; return 0 }
 
   emulate -L zsh
   setopt no_hist_expand extended_glob prompt_percent prompt_subst no_aliases

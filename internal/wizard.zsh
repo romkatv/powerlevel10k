@@ -264,7 +264,7 @@ function can_install_font() {
       [[ -w ~ ]] || return
     fi
     terminal=Termux
-    return
+    return 0
   fi
   if [[ "$(uname)" == Darwin && $TERM_PROGRAM == iTerm.app ]]; then
     (( $+commands[curl] )) || return
@@ -288,7 +288,7 @@ function can_install_font() {
     [[ $font == (#b)*' '(<->) ]] || return
     iterm2_font_size=$match[1]
     terminal=iTerm2
-    return
+    return 0
   fi
   return 1
 }
@@ -503,7 +503,7 @@ function ask_debian() {
 function ask_narrow_icons() {
   if [[ $POWERLEVEL9K_MODE == (powerline|compatible) ]]; then
     cap_narrow_icons=0
-    return
+    return 0
   fi
   local text="X"
   text+="%1F${icons[VCS_GIT_ICON]// }%fX"
@@ -675,7 +675,7 @@ function ask_frame_color() {
 function ask_time() {
   if (( wizard_columns < 80 )); then
     show_time=
-    return
+    return 0
   fi
 
   while true; do
@@ -751,7 +751,7 @@ function os_icon_name() {
 
 function ask_extra_icons() {
   if [[ $POWERLEVEL9K_MODE == (powerline|compatible) ]]; then
-    return
+    return 0
   fi
   local os_icon=${(g::)icons[$(os_icon_name)]}
   local dir_icon=${(g::)icons[HOME_SUB_ICON]}
@@ -808,7 +808,7 @@ function ask_prefixes() {
   if (( wizard_columns < 80 )); then
     prefixes=("$concise[@]")
     options+=concise
-    return
+    return 0
   fi
   while true; do
     clear
@@ -839,7 +839,7 @@ function ask_prefixes() {
 
 function ask_separators() {
   if [[ $style != (classic|rainbow) || $cap_diamond != 1 ]]; then
-    return
+    return 0
   fi
   if [[ $POWERLEVEL9K_MODE == nerdfont-complete && $LINES -lt 26 ]]; then
     local nl=''
@@ -926,7 +926,7 @@ function ask_separators() {
 
 function ask_heads() {
   if [[ $style != (classic|rainbow) || $cap_diamond != 1 ]]; then
-    return
+    return 0
   fi
   if [[ $POWERLEVEL9K_MODE == nerdfont-complete && $LINES -lt 26 ]]; then
     local nl=''
@@ -995,7 +995,7 @@ function ask_heads() {
 
 function ask_tails() {
   if [[ $style != (classic|rainbow) ]]; then
-    return
+    return 0
   fi
   if [[ $POWERLEVEL9K_MODE == nerdfont-complete && $LINES -lt 31 ]]; then
     local nl=''
@@ -1105,7 +1105,7 @@ function ask_num_lines() {
 
 function ask_gap_char() {
   if [[ $num_lines != 2 ]]; then
-    return
+    return 0
   fi
   while true; do
     clear
@@ -1141,7 +1141,7 @@ function ask_gap_char() {
 
 function ask_frame() {
   if [[ $style != (classic|rainbow) || $num_lines != 2 ]]; then
-    return
+    return 0
   fi
 
   (( LINES >= 26 )) && local nl=$'\n' || local nl=''
@@ -1217,7 +1217,7 @@ function ask_instant_prompt() {
   autoload -Uz is-at-least
   if ! is-at-least 5.4; then
     instant_prompt=off
-    return
+    return 0
   fi
   if (( LINES < 24 )); then
     local nl=''
@@ -1286,7 +1286,7 @@ function ask_config_overwrite() {
   config_backup=
   config_backup_u=0
   if [[ ! -e $__p9k_cfg_path ]]; then
-    return
+    return 0
   fi
   while true; do
     clear
@@ -1381,7 +1381,7 @@ function generate_config() {
       unlink $__p9k_cfg_path || return
     fi
     cp $__p9k_root_dir/config/p10k-$style.zsh $__p9k_cfg_path || return
-    return
+    return 0
   fi
 
   local base && base="$(<$__p9k_root_dir/config/p10k-$style.zsh)" || return
