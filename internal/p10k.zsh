@@ -5236,7 +5236,7 @@ _p9k_init_vcs() {
     daemon=$gitstatus_dir/bin/gitstatusd-
     if [[ $_p9k_uname_o == Android ]]; then
       daemon+=android
-    elif [[ $_p9k_uname == MSYS_NT-10.0-* ]]; then
+    elif [[ $_p9k_uname == (MINGW_64-10.0|MSYS_NT-10.0-*) ]]; then
       daemon+=msys_nt-10.0
     else
       daemon+=${_p9k_uname:l}
