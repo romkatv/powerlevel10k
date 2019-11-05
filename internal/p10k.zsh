@@ -3704,7 +3704,7 @@ _p9k_dump_instant_prompt() {
       (( __p9k_ksh_arrays )) && >&$fd print -r -- '  unsetopt ksh_arrays'
       (( __p9k_sh_glob )) && >&$fd print -r -- '  unsetopt sh_glob'
       >&$fd print -r -- '
-  : ${__p9k_used_instant_prompt[1]//$lf/$((++height))}
+  (( height += ${#${__p9k_used_instant_prompt[1]//[^$lf]}} ))
   local _p9k_ret
   function _p9k_prompt_length() {
     local COLUMNS=1024
@@ -5085,7 +5085,7 @@ _p9k_init_display() {
 
 _p9k_init_prompt() {
   _p9k_t=($'\n' '' '')
-  _p9k_prompt_overflow_bug && _p9k_t[2]='%{%G%}'
+  _p9k_prompt_overflow_bug && _p9k_t[2]=$'%{%G\n%}'
 
   _p9k_init_lines
 
