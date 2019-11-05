@@ -1368,8 +1368,8 @@ function ask_zshrc_edit() {
           cp -p $__p9k_zshrc $zshrc_backup                           || quit -c
           print -r -- $zshrc_content >$zshrc_backup                  || quit -c
           zshrc_backup_u=${${TMPDIR:+\$TMPDIR}:-/tmp}/${(q-)zshrc_backup:t}
-          break
         fi
+        break
       ;;
     esac
   done
@@ -1538,9 +1538,16 @@ function generate_config() {
       sub MULTILINE_FIRST_PROMPT_PREFIX ''
       sub MULTILINE_NEWLINE_PROMPT_PREFIX ''
       sub MULTILINE_LAST_PROMPT_PREFIX ''
-      uncomment prompt_char
       sub STATUS_OK false
       sub STATUS_ERROR false
+    fi
+  fi
+
+  if [[ $style == (classic|rainbow) ]]; then
+    if (( num_lines == 2 && ! left_frame )); then
+      uncomment prompt_char
+    else
+      uncomment vi_mode
     fi
   fi
 

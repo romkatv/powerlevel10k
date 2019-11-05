@@ -273,10 +273,19 @@ function _gitstatus_process_response() {
 #   -d INT    Report at most this many untracked files; negative value means infinity.
 #             Defaults to 1.
 #
-#   -m INT    If a repo has more files in its index than this, override -u and -d (but not -s)
-#             with zeros. Negative value means infinity. Defaults to -1.
+#   -m INT    Report -1 unstaged, untracked and conflicted if there are more than this many
+#             files in the index. Negative value means infinity. Defaults to -1.
 #
 #   -e        Count files within untracked directories like `git status --untracked-files`.
+#
+#   -U        Unless this option is specified, report zero untracked files for repositories
+#             with status.showUntrackedFiles = false.
+#
+#   -W        Unless this option is specified, report zero untracked files for repositories
+#             with bash.showUntrackedFiles = false.
+#
+#   -D        Unless this option is specified, report zero staged, unstaged and conflicted
+#             changes for repositories with bash.showDirtyState = false.
 function gitstatus_start() {
   emulate -L zsh
   setopt err_return no_unset no_bg_nice
@@ -289,9 +298,9 @@ function gitstatus_start() {
   local -i max_num_untracked=1
   local -i dirty_max_index_size=-1
   local -i async
-  local recurse_untracked_dirs
+  local -a extra_flags=()
   while true; do
-    getopts "t:s:u:c:d:m:ea" opt || break
+    getopts "t:s:u:c:d:m:eaUWD" opt || break
     case $opt in
       a) async=1;;
       t) timeout=$OPTARG;;
@@ -300,8 +309,14 @@ function gitstatus_start() {
       c) max_num_conflicted=$OPTARG;;
       d) max_num_untracked=$OPTARG;;
       m) dirty_max_index_size=$OPTARG;;
-      e) recurse_untracked_dirs='--recurse-untracked-dirs';;
-      +e) recurse_untracked_dirs=;;
+      e) extra_flags+='--recurse-untracked-dirs';;
+      +e) extra_flags=(${(@)extra_flags:#--recurse-untracked-dirs});;
+      U) extra_flags+='--ignore-status-show-untracked-files';;
+      +U) extra_flags=(${(@)extra_flags:#--ignore-status-show-untracked-files});;
+      W) extra_flags+='--ignore-bash-show-untracked-files';;
+      +W) extra_flags=(${(@)extra_flags:#--ignore-bash-show-untracked-files});;
+      D) extra_flags+='--ignore-bash-show-dirty-state';;
+      +D) extra_flags=(${(@)extra_flags:#--ignore-bash-show-dirty-state});;
       ?) return 1;;
     esac
   done
@@ -346,6 +361,7 @@ function gitstatus_start() {
       [[ -n $daemon ]] || {
         os="$(uname -s)" && [[ -n $os ]]
         [[ $os != Linux || "$(uname -o)" != Android ]] || os=Android
+        [[ $os != (MINGW64_NT-10.0|MSYS_NT-10.0-*) ]]  || os=MSYS_NT-10.0
         local arch && arch="$(uname -m)" && [[ -n $arch ]]
         daemon=$_gitstatus_plugin_dir/bin/gitstatusd-${os:l}-${arch:l}
       }
@@ -380,7 +396,7 @@ function gitstatus_start() {
         --max-num-untracked=${(q)max_num_untracked}
         --dirty-max-index-size=${(q)dirty_max_index_size}
         --log-level=${(q)log_level:-INFO}
-        $recurse_untracked_dirs)
+        $extra_flags)
 
       local cmd="
         exec >&4

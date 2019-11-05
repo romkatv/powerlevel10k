@@ -3432,6 +3432,8 @@ function _p9k_set_iface() {
 
 function _p9k_build_segment() {
   _p9k_segment_name=${_p9k_segment_name%_joined}
+  local disabled=POWERLEVEL9K_${(U)_p9k_segment_name}_DISABLED_DIR_PATTERN
+  [[ $_p9k_pwd == ${(P)~disabled} ]] && return
   if [[ $_p9k_segment_name == custom_* ]]; then
     _p9k_custom_prompt $_p9k_segment_name[8,-1]
   elif (( $+functions[prompt_$_p9k_segment_name] )); then
@@ -3442,6 +3444,8 @@ function _p9k_build_segment() {
 
 function _p9k_build_instant_segment() {
   _p9k_segment_name=${_p9k_segment_name%_joined}
+  local disabled=POWERLEVEL9K_${(U)_p9k_segment_name}_DISABLED_DIR_PATTERN
+  [[ $_p9k_pwd == ${(P)~disabled} ]] && return
   if (( $+functions[instant_prompt_$_p9k_segment_name] )); then
     local -i len=$#_p9k__prompt
     _p9k_non_hermetic_expansion=0
@@ -5428,7 +5432,13 @@ _p9k_init_vcs() {
   local daemon=${GITSTATUS_DAEMON}
   if [[ -z $daemon ]]; then
     daemon=$gitstatus_dir/bin/gitstatusd-
-    [[ $_p9k_uname_o == Android ]] && daemon+=android || daemon+=${_p9k_uname:l}
+    if [[ $_p9k_uname_o == Android ]]; then
+      daemon+=android
+    elif [[ $_p9k_uname == (MINGW_64-10.0|MSYS_NT-10.0-*) ]]; then
+      daemon+=msys_nt-10.0
+    else
+      daemon+=${_p9k_uname:l}
+    fi
     daemon+=-${_p9k_uname_m:l}
   fi
   local -i threads=${GITSTATUS_NUM_THREADS:-0}
