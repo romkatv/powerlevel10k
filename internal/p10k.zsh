@@ -4562,7 +4562,7 @@ _p9k_init_params() {
   fi
 
   _p9k_declare -F POWERLEVEL9K_NEW_TTY_MAX_AGE_SECONDS 5
-  _p9k_declare -i POWERLEVEL9K_INSTANT_PROMPT_COMMAND_LINES 3
+  _p9k_declare -i POWERLEVEL9K_INSTANT_PROMPT_COMMAND_LINES 1
   _p9k_declare -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS -- context dir vcs
   _p9k_declare -a POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS -- status root_indicator background_jobs history time
   _p9k_declare -b POWERLEVEL9K_DISABLE_RPROMPT 0
