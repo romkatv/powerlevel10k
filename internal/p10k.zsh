@@ -347,15 +347,15 @@ _p9k_param() {
     _p9k_ret[-1,-1]=''
   else
     if [[ $1 == (#b)prompt_([a-z0-9_]#)(*) ]]; then
-      local var=POWERLEVEL9K_${(U)match[1]}$match[2]_$2
+      local var=_POWERLEVEL9K_${(U)match[1]}$match[2]_$2
       if (( $+parameters[$var] )); then
         _p9k_ret=${(P)var}
       else
-        var=POWERLEVEL9K_${(U)match[1]%_}_$2
+        var=_POWERLEVEL9K_${(U)match[1]%_}_$2
         if (( $+parameters[$var] )); then
           _p9k_ret=${(P)var}
         else
-          var=POWERLEVEL9K_$2
+          var=_POWERLEVEL9K_$2
           if (( $+parameters[$var] )); then
             _p9k_ret=${(P)var}
           else
@@ -364,7 +364,7 @@ _p9k_param() {
         fi
       fi
     else
-      local var=POWERLEVEL9K_$2
+      local var=_POWERLEVEL9K_$2
       if (( $+parameters[$var] )); then
         _p9k_ret=${(P)var}
       else
@@ -434,11 +434,11 @@ _p9k_vcs_style() {
     _p9k_background $_p9k_ret
     style+=$_p9k_ret
 
-    local var=POWERLEVEL9K_VCS_${1}_${2}FORMAT_FOREGROUND
+    local var=_POWERLEVEL9K_VCS_${1}_${2}FORMAT_FOREGROUND
     if (( $+parameters[$var] )); then
       _p9k_translate_color "${(P)var}"
     else
-      var=POWERLEVEL9K_VCS_${2}FORMAT_FOREGROUND
+      var=_POWERLEVEL9K_VCS_${2}FORMAT_FOREGROUND
       if (( $+parameters[$var] )); then
         _p9k_translate_color "${(P)var}"
       else
@@ -1212,7 +1212,7 @@ prompt_context() {
       fi
 
       if [[ -z $content ]]; then
-        local var=POWERLEVEL9K_CONTEXT_${state}_TEMPLATE
+        local var=_POWERLEVEL9K_CONTEXT_${state}_TEMPLATE
         if (( $+parameters[$var] )); then
           [[ -z $_p9k_locale ]] || local LC_ALL=$_p9k_locale
           content=${(P)var}
@@ -1269,7 +1269,7 @@ instant_prompt_host() { prompt_host; }
 # the output in a segment.
 _p9k_custom_prompt() {
   local segment_name=${1:u}
-  local command=POWERLEVEL9K_CUSTOM_${segment_name}
+  local command=_POWERLEVEL9K_CUSTOM_${segment_name}
   command=${(P)command}
   local cmd="${(Q)${(Az)command}[1]}"
   (( $+functions[$cmd] || $+commands[$cmd] )) || return
@@ -3432,7 +3432,7 @@ function _p9k_set_iface() {
 
 function _p9k_build_segment() {
   _p9k_segment_name=${_p9k_segment_name%_joined}
-  local disabled=POWERLEVEL9K_${(U)_p9k_segment_name}_DISABLED_DIR_PATTERN
+  local disabled=_POWERLEVEL9K_${(U)_p9k_segment_name}_DISABLED_DIR_PATTERN
   [[ $_p9k_pwd == ${(P)~disabled} ]] && return
   if [[ $_p9k_segment_name == custom_* ]]; then
     _p9k_custom_prompt $_p9k_segment_name[8,-1]
@@ -3444,7 +3444,7 @@ function _p9k_build_segment() {
 
 function _p9k_build_instant_segment() {
   _p9k_segment_name=${_p9k_segment_name%_joined}
-  local disabled=POWERLEVEL9K_${(U)_p9k_segment_name}_DISABLED_DIR_PATTERN
+  local disabled=_POWERLEVEL9K_${(U)_p9k_segment_name}_DISABLED_DIR_PATTERN
   [[ $_p9k_pwd == ${(P)~disabled} ]] && return
   if (( $+functions[instant_prompt_$_p9k_segment_name] )); then
     local -i len=$#_p9k__prompt
@@ -4839,6 +4839,12 @@ _p9k_init_params() {
       (( ++i ))
     fi
   done
+
+  local var=
+  for var in ${parameters[(I)POWERLEVEL9K_*]}; do
+    local _var=_$var
+    (( $+parameters[$_var] )) || typeset -g $_var=${(P)var}
+  done
 }
 
 typeset -ga __p9k_wrapped_zle_widgets
@@ -4933,7 +4939,7 @@ _p9k_build_gap_post() {
   style+=$_p9k_ret
   _p9k_escape_style $style
   style=$_p9k_ret
-  local exp=POWERLEVEL9K_MULTILINE_${(U)kind}_PROMPT_GAP_EXPANSION
+  local exp=_POWERLEVEL9K_MULTILINE_${(U)kind}_PROMPT_GAP_EXPANSION
   (( $+parameters[$exp] )) && exp=${(P)exp} || exp='${P9K_GAP}'
   [[ $char == '.' ]] && local s=',' || local s='.'
   _p9k_ret=$'${${_p9k__g+\n}:-'$style'${${${_p9k_m:#-*}:+'
@@ -4993,7 +4999,7 @@ _p9k_init_lines() {
     _p9k_line_prefix_left+='${_p9k__'$i'l-${${:-${_p9k_bg::=NONE}${_p9k_i::=0}${_p9k_sss::=%f'$_p9k_ret'}}+}'
     _p9k_line_suffix_left+='%b%k$_p9k_sss%b%k%f'
 
-    _p9k_escape ${(g::)POWERLEVEL9K_EMPTY_LINE_RIGHT_PROMPT_FIRST_SEGMENT_START_SYMBOL}
+    _p9k_escape ${(g::)_POWERLEVEL9K_EMPTY_LINE_RIGHT_PROMPT_FIRST_SEGMENT_START_SYMBOL}
     [[ -n $_p9k_ret ]] && _p9k_line_never_empty_right+=1 || _p9k_line_never_empty_right+=0
     _p9k_line_prefix_right+='${_p9k__'$i'r-${${:-${_p9k_bg::=NONE}${_p9k_i::=0}${_p9k_sss::='$_p9k_ret'}}+}'
     _p9k_line_suffix_right+='$_p9k_sss%b%k%f}'  # gets overridden for _p9k_emulate_zero_rprompt_indent
@@ -5019,7 +5025,7 @@ _p9k_init_lines() {
       _p9k_line_gap_post+=$_p9k_ret
     done
 
-    if [[ $+POWERLEVEL9K_MULTILINE_FIRST_PROMPT_PREFIX == 1 || $_POWERLEVEL9K_PROMPT_ON_NEWLINE == 1 ]]; then
+    if [[ $+_POWERLEVEL9K_MULTILINE_FIRST_PROMPT_PREFIX == 1 || $_POWERLEVEL9K_PROMPT_ON_NEWLINE == 1 ]]; then
       _p9k_get_icon '' MULTILINE_FIRST_PROMPT_PREFIX
       [[ _p9k_ret == *%* ]] && _p9k_ret+=%b%k%f
       # Not escaped for historical reasons.
@@ -5027,7 +5033,7 @@ _p9k_init_lines() {
       _p9k_line_prefix_left[1]=$_p9k_ret$_p9k_line_prefix_left[1]
     fi
 
-    if [[ $+POWERLEVEL9K_MULTILINE_LAST_PROMPT_PREFIX == 1 || $_POWERLEVEL9K_PROMPT_ON_NEWLINE == 1 ]]; then
+    if [[ $+_POWERLEVEL9K_MULTILINE_LAST_PROMPT_PREFIX == 1 || $_POWERLEVEL9K_PROMPT_ON_NEWLINE == 1 ]]; then
       _p9k_get_icon '' MULTILINE_LAST_PROMPT_PREFIX
       [[ _p9k_ret == *%* ]] && _p9k_ret+=%b%k%f
       # Not escaped for historical reasons.
@@ -5050,7 +5056,7 @@ _p9k_init_lines() {
     fi
 
     if (( num_lines > 2 )); then
-      if [[ $+POWERLEVEL9K_MULTILINE_NEWLINE_PROMPT_PREFIX == 1 || $_POWERLEVEL9K_PROMPT_ON_NEWLINE == 1 ]]; then
+      if [[ $+_POWERLEVEL9K_MULTILINE_NEWLINE_PROMPT_PREFIX == 1 || $_POWERLEVEL9K_PROMPT_ON_NEWLINE == 1 ]]; then
         _p9k_get_icon '' MULTILINE_NEWLINE_PROMPT_PREFIX
         [[ _p9k_ret == *%* ]] && _p9k_ret+=%b%k%f
         for i in {2..$((num_lines-1))}; do
@@ -5145,9 +5151,9 @@ _p9k_init_prompt() {
   # We can work around it as long as RPROMPT ends with a space.
   if [[ -n $_p9k_line_segments_right[-1] && $_p9k_line_never_empty_right[-1] == 0 &&
         $ZLE_RPROMPT_INDENT == 0 ]] &&
-       _p9k_all_params_eq 'POWERLEVEL9K_*WHITESPACE_BETWEEN_RIGHT_SEGMENTS' ' ' &&
-       _p9k_all_params_eq 'POWERLEVEL9K_*RIGHT_RIGHT_WHITESPACE' ' ' &&
-       _p9k_all_params_eq 'POWERLEVEL9K_*RIGHT_PROMPT_LAST_SEGMENT_END_SYMBOL' '' &&
+       _p9k_all_params_eq '_POWERLEVEL9K_*WHITESPACE_BETWEEN_RIGHT_SEGMENTS' ' ' &&
+       _p9k_all_params_eq '_POWERLEVEL9K_*RIGHT_RIGHT_WHITESPACE' ' ' &&
+       _p9k_all_params_eq '_POWERLEVEL9K_*RIGHT_PROMPT_LAST_SEGMENT_END_SYMBOL' '' &&
        ! is-at-least 5.7.2; then
     _p9k_emulate_zero_rprompt_indent=1
     _p9k_prompt_prefix_left+='${${:-${_p9k_real_zle_rprompt_indent:=$ZLE_RPROMPT_INDENT}${ZLE_RPROMPT_INDENT::=1}${_p9k_ind::=0}}+}'
