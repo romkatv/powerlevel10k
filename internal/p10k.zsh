@@ -5866,7 +5866,8 @@ function p10k() {
         print -rP -- $__p9k_p10k_configure_usage >&2
         return 1
       fi
-      p9k_configure "$@"
+      p9k_configure "$@" || return
+      _p9k_deinit
       ;;
     help)
       local var=__p9k_p10k_$2_usage
