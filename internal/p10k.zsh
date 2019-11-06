@@ -4543,7 +4543,7 @@ _p9k_init_vars() {
   typeset -g  _p9k_uname_o
   typeset -g  _p9k_uname_m
   typeset -g  _p9k_transient_prompt
-  typeset -g  _p9k_last_prompt_pwd
+  typeset -g  _p9k__last_prompt_pwd
   typeset -gA _p9k__display_k
   typeset -ga _p9k__display_v
 
@@ -4893,12 +4893,12 @@ function _p9k_zle_line_finish() {
   fi
 
   if [[ -n $_p9k_transient_prompt ]]; then
-    if [[ $_POWERLEVEL9K_TRANSIENT_PROMPT == always || $_p9k_pwd == $_p9k_last_prompt_pwd ]]; then
+    if [[ $_POWERLEVEL9K_TRANSIENT_PROMPT == always || $_p9k_pwd == $_p9k__last_prompt_pwd ]]; then
       RPROMPT=
       PROMPT=$_p9k_transient_prompt
       reset=1
     else
-      _p9k_last_prompt_pwd=$_p9k_pwd
+      _p9k__last_prompt_pwd=$_p9k_pwd
     fi
   fi
 
