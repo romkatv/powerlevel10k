@@ -4175,7 +4175,7 @@ _p9k_precmd_impl() {
                 instant_prompt_disabled=1
               else
                 source "$__p9k_cfg_path"
-                _p9k_must_init
+                _POWERLEVEL9K_DISABLE_HOT_RELOAD=0 _p9k_must_init
               fi
             ;;
             2)
