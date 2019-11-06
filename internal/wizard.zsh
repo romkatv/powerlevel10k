@@ -339,6 +339,9 @@ function install_font() {
         '"Use Non-ASCII Font"' 0
         '"Ambiguous Double Width"' 0
         '"Terminal Type"' '"xterm-256color"'
+        '"Minimum Contrast"' 0.000000
+        '"ASCII Anti Aliased"' 1
+        '"Non-ASCII Anti Aliased"' 1
       )
       for k v in $settings; do
         run_command "" /usr/libexec/PlistBuddy -c \
