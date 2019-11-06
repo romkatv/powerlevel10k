@@ -409,7 +409,7 @@ _p9k_translate_color() {
   fi
 }
 
-# _p9k_param prompt_foo_BAR BACKGROUND red
+# _p9k_color prompt_foo_BAR BACKGROUND red
 _p9k_color() {
   local key="_p9k_color ${(pj:\0:)*}"
   _p9k_ret=$_p9k_cache[$key]
@@ -4079,20 +4079,28 @@ function _p9k_on_expand() {
     __p9k_reset_state=1
 
     if (( _POWERLEVEL9K_PROMPT_ADD_NEWLINE )); then
-      _p9k__empty_line_i=3
       if [[ $P9K_TTY == new ]]; then
+        _p9k__empty_line_i=3
         _p9k__display_v[2]=hide
-      else
+      elif [[ -z $_p9k_transient_prompt ]]; then
+        _p9k__empty_line_i=3
         _p9k__display_v[2]=print
+      else
+        unset _p9k__empty_line_i
+        _p9k__display_v[2]=show
       fi
     fi
 
     if (( _POWERLEVEL9K_SHOW_RULER )); then
-      _p9k__ruler_i=3
       if [[ $P9K_TTY == new ]]; then
+        _p9k__ruler_i=3
         _p9k__display_v[4]=hide
-      else
+      elif [[ -z $_p9k_transient_prompt ]]; then
+        _p9k__ruler_i=3
         _p9k__display_v[4]=print
+      else
+        unset _p9k__ruler_i
+        _p9k__display_v[4]=show
       fi
     fi
 
@@ -4534,6 +4542,8 @@ _p9k_init_vars() {
   typeset -g  _p9k_uname
   typeset -g  _p9k_uname_o
   typeset -g  _p9k_uname_m
+  typeset -g  _p9k_transient_prompt
+  typeset -g  _p9k_last_prompt_pwd
   typeset -gA _p9k__display_k
   typeset -ga _p9k__display_v
 
@@ -4560,6 +4570,9 @@ _p9k_init_params() {
       _POWERLEVEL9K_INSTANT_PROMPT=verbose
     fi
   fi
+
+  _p9k_declare -s POWERLEVEL9K_TRANSIENT_PROMPT off
+  [[ $_POWERLEVEL9K_TRANSIENT_PROMPT == (off|always|same-dir) ]] || _POWERLEVEL9K_TRANSIENT_PROMPT=off
 
   _p9k_declare -F POWERLEVEL9K_NEW_TTY_MAX_AGE_SECONDS 5
   _p9k_declare -i POWERLEVEL9K_INSTANT_PROMPT_COMMAND_LINES 1
@@ -4868,6 +4881,16 @@ function _p9k_zle_line_finish() {
       reset=1
     fi
     __p9k_reset_state=0
+  fi
+
+  if [[ -n $_p9k_transient_prompt ]]; then
+    if [[ $_POWERLEVEL9K_TRANSIENT_PROMPT == always || $_p9k_pwd == $_p9k_last_prompt_pwd ]]; then
+      RPROMPT=
+      PROMPT=$_p9k_transient_prompt
+      reset=1
+    else
+      _p9k_last_prompt_pwd=$_p9k_pwd
+    fi
   fi
 
   if (( reset )); then
@@ -5243,6 +5266,16 @@ function _p9k_init_cacheable() {
   _p9k_init_icons
   _p9k_init_params
   _p9k_init_prompt
+
+  if [[ $_POWERLEVEL9K_TRANSIENT_PROMPT != off ]]; then
+    _p9k_transient_prompt='%b%k%s%u%F{%(?.'
+    _p9k_color prompt_prompt_char_OK_VIINS FOREGROUND 76
+    _p9k_transient_prompt+=$_p9k_ret'.'
+    _p9k_color prompt_prompt_char_ERROR_VIINS FOREGROUND 196
+    _p9k_transient_prompt+=$_p9k_ret')}${${P9K_CONTENT::="❯"}+}'
+    _p9k_param prompt_prompt_char_OK_VIINS CONTENT_EXPANSION '${P9K_CONTENT}'
+    _p9k_transient_prompt+='${:-"'$_p9k_ret'"}%b%k%f%s%u '
+  fi
 
   _p9k_uname="$(uname)"
   [[ $_p9k_uname == Linux ]] && _p9k_uname_o="$(uname -o 2>/dev/null)"
