@@ -4241,7 +4241,7 @@ _p9k_precmd() {
 }
 
 function _p9k_reset_prompt() {
-  if zle; then
+  if zle && [[ -z $_p9k__line_finished ]]; then
     (( __p9k_ksh_arrays )) && setopt ksh_arrays
     (( __p9k_sh_glob )) && setopt sh_glob
     zle .reset-prompt
@@ -4871,6 +4871,8 @@ _p9k_wrap_zle_widget() {
 }
 
 function _p9k_zle_line_finish() {
+  (( $+_p9k__line_finished )) && return
+
   _p9k__line_finished=
   local -i reset=_p9k_reset_on_line_finish
 
@@ -4896,6 +4898,8 @@ function _p9k_zle_line_finish() {
   if (( reset )); then
     _p9k_reset_prompt
   fi
+
+  _p9k__line_finished='%{%}'
 }
 
 function _p9k_zle_line_pre_redraw() {
