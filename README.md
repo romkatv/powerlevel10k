@@ -59,7 +59,7 @@ make sure to disable your current theme in your plugin manager. See
 ### Oh My Zsh
 
 ```zsh
-git clone https://github.com/romkatv/powerlevel10k.git $ZSH_CUSTOM/themes/powerlevel10k
+git clone --depth=1 https://github.com/romkatv/powerlevel10k.git $ZSH_CUSTOM/themes/powerlevel10k
 ```
 
 Set `ZSH_THEME=powerlevel10k/powerlevel10k` in your `~/.zshrc`.
