@@ -5118,7 +5118,7 @@ _p9k_init_display() {
 }
 
 _p9k_init_prompt() {
-  _p9k_t=($'\n' '' '')
+  _p9k_t=($'\n' $'%{\n%}' '')
   _p9k_prompt_overflow_bug && _p9k_t[2]=$'%{%G\n%}'
 
   _p9k_init_lines
