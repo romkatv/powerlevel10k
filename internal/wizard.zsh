@@ -64,7 +64,7 @@ typeset -r slanted_bar='\uE0BD'
 
 typeset -ra lean_left=(
   '' '${extra_icons[1]:+$extra_icons[1] }%31F$extra_icons[2]%B%39F~%b%31F/%B%39Fsrc%b%f $prefixes[1]%76F$extra_icons[3]master%f '
-  '' '%76F❯%f █'
+  '' '%76F❯%f ${buffer:-█}'
 )
 
 typeset -ra lean_right=(
@@ -74,7 +74,7 @@ typeset -ra lean_right=(
 
 typeset -ra classic_left=(
   '%$frame_color[$color]F╭─' '%F{$bg_color[$color]}$left_tail%K{$bg_color[$color]} ${extra_icons[1]:+$extra_icons[1]%K{$bg_color[$color]\} %$sep_color[$color]F$left_subsep%f }%31F$extra_icons[2]%B%39F~%b%K{$bg_color[$color]}%31F/%B%39Fsrc%b%K{$bg_color[$color]} %$sep_color[$color]F$left_subsep%f %$prefix_color[$color]F$prefixes[1]%76F$extra_icons[3]master %k%$bg_color[$color]F$left_head%f'
-  '%$frame_color[$color]F╰─' '%f █'
+  '%$frame_color[$color]F╰─' '%f ${buffer:-█}'
 )
 
 typeset -ra classic_right=(
@@ -84,7 +84,7 @@ typeset -ra classic_right=(
 
 typeset -ra pure_left=(
   '' '%4F~/src%f %242Fmaster%f %3F5s%f'
-  '' '%5F❯%f █'
+  '' '%5F❯%f ${buffer:-█}'
 )
 
 typeset -ra pure_right=(
@@ -94,7 +94,7 @@ typeset -ra pure_right=(
 
 typeset -ra rainbow_left=(
   '%$frame_color[$color]F╭─' '%F{${${extra_icons[1]:+0}:-4}}$left_tail${extra_icons[1]:+%K{0\} $extra_icons[1] %K{4\}%0F$left_sep}%K{4}%254F $extra_icons[2]%B%255F~%b%K{4}%254F/%B%255Fsrc%b%K{4} %K{2}%4F$left_sep %0F$prefixes[1]$extra_icons[3]master %k%2F$left_head%f'
-  '%$frame_color[$color]F╰─' '%f █'
+  '%$frame_color[$color]F╰─' '%f ${buffer:-█}'
 )
 
 typeset -ra rainbow_right=(
@@ -116,7 +116,7 @@ function prompt_length() {
       typeset ${${(%):-$1%$m(l.x.y)}[-1]}=$m
     done
   fi
-  print $x
+  REPLY=$x
 }
 
 function print_prompt() {
@@ -124,17 +124,19 @@ function print_prompt() {
   local right=${style}_right
   left=("${(@P)left}")
   right=("${(@P)right}")
+  (( disable_rprompt )) && right=()
   eval "left=(${(@)left:/(#b)(*)/\"$match[1]\"})"
   eval "right=(${(@)right:/(#b)(*)/\"$match[1]\"})"
   if (( num_lines == 1)); then
     left=($left[2] $left[4])
     right=($right[1] $right[3])
   else
-    (( left_frame )) || left=('' $left[2] '' '%76F❯%f █')
+    (( left_frame )) || left=('' $left[2] '' "%76F❯%f ${buffer:-█}")
     (( right_frame )) || right=($right[1] '' '' '')
   fi
   local -i right_indent=prompt_indent
-  local -i width=$(prompt_length ${(g::):-$left[1]$left[2]$right[1]$right[2]})
+  prompt_length ${(g::):-$left[1]$left[2]$right[1]$right[2]}
+  local -i width=REPLY
   while (( wizard_columns - width <= prompt_indent + right_indent )); do
     (( --right_indent ))
   done
@@ -142,7 +144,8 @@ function print_prompt() {
   for ((i = 1; i < $#left; i+=2)); do
     local l=${(g::):-$left[i]$left[i+1]}
     local r=${(g::):-$right[i]$right[i+1]}
-    local -i gap=$((wizard_columns - prompt_indent - right_indent - $(prompt_length $l$r)))
+    prompt_length $l$r
+    local -i gap=$((wizard_columns - prompt_indent - right_indent - REPLY))
     (( num_lines == 2 && i == 1 )) && local fill=$gap_char || local fill=' '
     print -n  -- ${(pl:$prompt_indent:: :)}
     print -nP -- $l
@@ -169,8 +172,8 @@ function flowing() {
   shift $((OPTIND-1))
   local line word lines=()
   for word in "$@"; do
-    local n=$(prompt_length ${(g::):-"$line $word"})
-    if (( n > wizard_columns )); then
+    prompt_length ${(g::):-"$line $word"}
+    if (( REPLY > wizard_columns )); then
       [[ -z $line ]] || lines+=$line
       line=
     fi
@@ -183,8 +186,8 @@ function flowing() {
   done
   [[ -z $line ]] || lines+=$line
   for line in $lines; do
-    local n=$(prompt_length ${(g::)line})
-    (( centered && n < wizard_columns )) && print -n -- ${(pl:$(((wizard_columns - n) / 2)):: :)}
+    prompt_length ${(g::)line}
+    (( centered && REPLY < wizard_columns )) && print -n -- ${(pl:$(((wizard_columns - REPLY) / 2)):: :)}
     print -P -- $line
   done
 }
@@ -1260,27 +1263,51 @@ function ask_instant_prompt() {
   done
 }
 
-function ask_confirm() {
+function ask_transient_prompt() {
+  local disable_rprompt=$((num_lines == 1))
   while true; do
     clear
-    flowing -c "%BLooks good?%b"
-    print -P ""
-    print_prompt
-    (( empty_line )) && print -P ""
-    print_prompt
+    flowing -c "%BEnable Transient Prompt?%b"
     print -P ""
     print -P "%B(y)  Yes.%b"
+    if (( LINES >= 25 || num_lines == 1 )); then
+      print -P ""
+      print -P "${(pl:$prompt_indent:: :)}%76F❯%f %2Fgit%f pull"
+    elif (( LINES < 23 )); then
+      print -P ""
+    else
+      print -P "${(pl:$prompt_indent:: :)}%76F❯%f %2Fgit%f pull"
+    fi
+    print -P "${(pl:$prompt_indent:: :)}%76F❯%f %2Fgit%f branch x"
+    (( empty_line )) && echo
+    buffer="%2Fgit%f checkout x█" print_prompt
+    print -P ""
+    print -P "%B(n)  No.%b"
+    if (( LINES >= 25 || num_lines == 1 )); then
+      print -P ""
+      buffer="%2Fgit%f pull" print_prompt
+      (( empty_line )) && echo
+    elif (( LINES < 23 )); then
+      print -P ""
+    else
+      buffer="%2Fgit%f pull" print_prompt
+      (( empty_line )) && echo
+    fi
+    buffer="%2Fgit%f branch x" print_prompt
+    (( empty_line )) && echo
+    buffer="%2Fgit%f checkout x█" print_prompt
     print -P ""
     print -P "(r)  Restart from the beginning."
     print -P "(q)  Quit and do nothing."
     print -P ""
 
     local key=
-    read -k key${(%):-"?%BChoice [yrq]: %b"} || quit -c
+    read -k key${(%):-"?%BChoice [ynrq]: %b"} || quit -c
     case $key in
       q) quit;;
       r) return 1;;
-      y) break;;
+      y) transient_prompt=1; break;;
+      n) transient_prompt=0; break;;
     esac
   done
 }
@@ -1558,6 +1585,8 @@ function generate_config() {
 
   sub INSTANT_PROMPT $instant_prompt
 
+  (( transient_prompt )) && sub TRANSIENT_PROMPT same-dir
+
   local header=${(%):-"# Generated by Powerlevel10k configuration wizard on %D{%Y-%m-%d at %H:%M %Z}."}$'\n'
   header+="# Based on romkatv/powerlevel10k/config/p10k-$style.zsh"
   if [[ $commands[sum] == ('/bin'|'/usr/bin'|'/usr/local/bin')'/sum' ]]; then
@@ -1640,7 +1669,7 @@ while true; do
   local -i zshrc_has_cfg=0 zshrc_has_instant_prompt=0 write_zshrc=0
   local POWERLEVEL9K_MODE= style= config_backup= config_backup_u= gap_char=' '
   local left_subsep= right_subsep= left_tail= right_tail= left_head= right_head= show_time=
-  local -i num_lines=0 empty_line=0 color=2 left_frame=1 right_frame=1
+  local -i num_lines=0 empty_line=0 color=2 left_frame=1 right_frame=1 transient_prompt=0
   local -i cap_diamond=0 cap_python=0 cap_debian=0 cap_narrow_icons=0 cap_lock=0
   local -a extra_icons=('' '' '')
   local -a prefixes=('' '')
@@ -1716,7 +1745,7 @@ while true; do
     ask_extra_icons    || continue
     ask_prefixes       || continue
   fi
-  ask_confirm          || continue
+  ask_transient_prompt || continue
   ask_instant_prompt   || continue
   ask_config_overwrite || continue
   ask_zshrc_edit       || continue
