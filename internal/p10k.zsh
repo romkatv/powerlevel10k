@@ -4815,7 +4815,6 @@ _p9k_init_params() {
   # These correspond to `java -fullversion` and `java -version` respectively.
   _p9k_declare -b POWERLEVEL9K_JAVA_VERSION_FULL 1
   _p9k_declare -b POWERLEVEL9K_PROMPT_CHAR_OVERWRITE_STATE 0
-  _p9k_declare -F POWERLEVEL9K_NEW_TTY_MAX_AGE_SECONDS
 
   local -i i=1
   while (( i <= $#_POWERLEVEL9K_LEFT_PROMPT_ELEMENTS )); do
