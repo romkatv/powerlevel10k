@@ -1265,6 +1265,8 @@ function ask_instant_prompt() {
 
 function ask_transient_prompt() {
   local disable_rprompt=$((num_lines == 1))
+  local prompt_char='%76F❯%f'
+  [[ $style == pure ]] && prompt_char='%5F❯%f'
   while true; do
     clear
     flowing -c "%BEnable Transient Prompt?%b"
@@ -1272,13 +1274,13 @@ function ask_transient_prompt() {
     print -P "%B(y)  Yes.%b"
     if (( LINES >= 25 || num_lines == 1 )); then
       print -P ""
-      print -P "${(pl:$prompt_indent:: :)}%76F❯%f %2Fgit%f pull"
+      print -P "${(pl:$prompt_indent:: :)}$prompt_char %2Fgit%f pull"
     elif (( LINES < 23 )); then
       print -P ""
     else
-      print -P "${(pl:$prompt_indent:: :)}%76F❯%f %2Fgit%f pull"
+      print -P "${(pl:$prompt_indent:: :)}$prompt_char %2Fgit%f pull"
     fi
-    print -P "${(pl:$prompt_indent:: :)}%76F❯%f %2Fgit%f branch x"
+    print -P "${(pl:$prompt_indent:: :)}$prompt_char %2Fgit%f branch x"
     (( empty_line )) && echo
     buffer="%2Fgit%f checkout x█" print_prompt
     print -P ""
