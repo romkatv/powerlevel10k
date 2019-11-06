@@ -4574,6 +4574,7 @@ _p9k_init_params() {
   _p9k_declare -s POWERLEVEL9K_TRANSIENT_PROMPT off
   [[ $_POWERLEVEL9K_TRANSIENT_PROMPT == (off|always|same-dir) ]] || _POWERLEVEL9K_TRANSIENT_PROMPT=off
 
+  _p9k_declare -b POWERLEVEL9K_DISABLE_HOT_RELOAD 0
   _p9k_declare -F POWERLEVEL9K_NEW_TTY_MAX_AGE_SECONDS 5
   _p9k_declare -i POWERLEVEL9K_INSTANT_PROMPT_COMMAND_LINES 1
   _p9k_declare -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS -- context dir vcs
@@ -5247,6 +5248,7 @@ _p9k_init_ssh() {
 }
 
 _p9k_must_init() {
+  (( _POWERLEVEL9K_DISABLE_HOT_RELOAD )) && return 1
   local IFS sig
   if [[ -n $_p9k__param_sig ]]; then
     IFS=$'\2' sig="${(e)_p9k__param_pat}"
