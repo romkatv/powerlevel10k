@@ -1406,14 +1406,6 @@ function ask_zshrc_edit() {
 }
 
 function generate_config() {
-  if [[ $style == pure ]]; then
-    if [[ -e $__p9k_cfg_path ]]; then
-      unlink $__p9k_cfg_path || return
-    fi
-    cp $__p9k_root_dir/config/p10k-$style.zsh $__p9k_cfg_path || return
-    return 0
-  fi
-
   local base && base="$(<$__p9k_root_dir/config/p10k-$style.zsh)" || return
   local lines=("${(@f)base}")
 
@@ -1429,162 +1421,163 @@ function generate_config() {
     lines=("${(@)lines//$1/$2}")
   }
 
-  sub MODE $POWERLEVEL9K_MODE
+  if [[ $style != pure ]]; then
+    sub MODE $POWERLEVEL9K_MODE
 
-  if (( cap_narrow_icons )); then
-    uncomment 'typeset -g POWERLEVEL9K_VISUAL_IDENTIFIER_EXPANSION'
-    sub VISUAL_IDENTIFIER_EXPANSION "'\${P9K_VISUAL_IDENTIFIER// }'"
-    sub BACKGROUND_JOBS_VISUAL_IDENTIFIER_EXPANSION "'\${P9K_VISUAL_IDENTIFIER// }'"
-    sub VPN_IP_VISUAL_IDENTIFIER_EXPANSION "'\${P9K_VISUAL_IDENTIFIER// }'"
-    sub OS_ICON_CONTENT_EXPANSION "'%B\${P9K_CONTENT// }'"
-  else
-    sub VISUAL_IDENTIFIER_EXPANSION "'\${P9K_VISUAL_IDENTIFIER}'"
-    sub BACKGROUND_JOBS_VISUAL_IDENTIFIER_EXPANSION "'\${P9K_VISUAL_IDENTIFIER}'"
-    sub VPN_IP_VISUAL_IDENTIFIER_EXPANSION "'\${P9K_VISUAL_IDENTIFIER}'"
-  fi
-
-  if [[ $POWERLEVEL9K_MODE == (compatible|powerline) ]]; then
-    # Many fonts don't have the default icons.
-    [[ $POWERLEVEL9K_MODE == compatible ]] && local error='х' || local error='✘'
-    uncomment 'typeset -g POWERLEVEL9K_STATUS_ERROR_VISUAL_IDENTIFIER_EXPANSION'
-    sub STATUS_ERROR_VISUAL_IDENTIFIER_EXPANSION "'$error'"
-    uncomment 'typeset -g POWERLEVEL9K_STATUS_ERROR_SIGNAL_VISUAL_IDENTIFIER_EXPANSION'
-    sub STATUS_ERROR_SIGNAL_VISUAL_IDENTIFIER_EXPANSION "'$error'"
-    uncomment 'typeset -g POWERLEVEL9K_STATUS_ERROR_PIPE_VISUAL_IDENTIFIER_EXPANSION'
-    sub STATUS_ERROR_PIPE_VISUAL_IDENTIFIER_EXPANSION "'$error'"
-    uncomment 'typeset -g POWERLEVEL9K_DIR_NOT_WRITABLE_VISUAL_IDENTIFIER_EXPANSION'
-    sub DIR_NOT_WRITABLE_VISUAL_IDENTIFIER_EXPANSION "'∅'"
-    uncomment 'typeset -g POWERLEVEL9K_TERRAFORM_VISUAL_IDENTIFIER_EXPANSION'
-    sub TERRAFORM_VISUAL_IDENTIFIER_EXPANSION "'tf'"
-    uncomment 'typeset -g POWERLEVEL9K_RANGER_VISUAL_IDENTIFIER_EXPANSION'
-    sub RANGER_VISUAL_IDENTIFIER_EXPANSION "'▲'"
-    uncomment 'typeset -g POWERLEVEL9K_KUBECONTEXT_DEFAULT_VISUAL_IDENTIFIER_EXPANSION'
-    sub KUBECONTEXT_DEFAULT_VISUAL_IDENTIFIER_EXPANSION "'○'"
-    uncomment 'typeset -g POWERLEVEL9K_AZURE_VISUAL_IDENTIFIER_EXPANSION'
-    sub AZURE_VISUAL_IDENTIFIER_EXPANSION "'az'"
-    uncomment 'typeset -g POWERLEVEL9K_AWS_EB_ENV_VISUAL_IDENTIFIER_EXPANSION'
-    sub AWS_EB_ENV_VISUAL_IDENTIFIER_EXPANSION "'eb'"
-    sub BACKGROUND_JOBS_VISUAL_IDENTIFIER_EXPANSION "'≡'"
-  fi
-
-  if [[ $POWERLEVEL9K_MODE == (awesome-patched|awesome-fontconfig) && $cap_python == 0 ]]; then
-    uncomment 'typeset -g POWERLEVEL9K_VIRTUALENV_VISUAL_IDENTIFIER_EXPANSION'
-    uncomment 'typeset -g POWERLEVEL9K_ANACONDA_VISUAL_IDENTIFIER_EXPANSION'
-    uncomment 'typeset -g POWERLEVEL9K_PYENV_VISUAL_IDENTIFIER_EXPANSION'
-    uncomment 'typeset -g POWERLEVEL9K_PYTHON_ICON'
-    sub VIRTUALENV_VISUAL_IDENTIFIER_EXPANSION "'🐍'"
-    sub ANACONDA_VISUAL_IDENTIFIER_EXPANSION "'🐍'"
-    sub PYENV_VISUAL_IDENTIFIER_EXPANSION "'🐍'"
-    sub PYTHON_ICON "'🐍'"
-  fi
-
-  if [[ $POWERLEVEL9K_MODE == nerdfont-complete ]]; then
-    sub BATTERY_STAGES "\$'\uf58d\uf579\uf57a\uf57b\uf57c\uf57d\uf57e\uf57f\uf580\uf581\uf578'"
-  fi
-
-  if [[ $style == (classic|rainbow) ]]; then
-    if [[ $style == classic ]]; then
-      sub BACKGROUND $bg_color[$color]
-      sub LEFT_SUBSEGMENT_SEPARATOR "'%$sep_color[$color]F$left_subsep'"
-      sub RIGHT_SUBSEGMENT_SEPARATOR "'%$sep_color[$color]F$right_subsep'"
-      sub VCS_LOADING_FOREGROUND $sep_color[$color]
-      rep '%248F' "%$prefix_color[$color]F"
+    if (( cap_narrow_icons )); then
+      uncomment 'typeset -g POWERLEVEL9K_VISUAL_IDENTIFIER_EXPANSION'
+      sub VISUAL_IDENTIFIER_EXPANSION "'\${P9K_VISUAL_IDENTIFIER// }'"
+      sub BACKGROUND_JOBS_VISUAL_IDENTIFIER_EXPANSION "'\${P9K_VISUAL_IDENTIFIER// }'"
+      sub VPN_IP_VISUAL_IDENTIFIER_EXPANSION "'\${P9K_VISUAL_IDENTIFIER// }'"
+      sub OS_ICON_CONTENT_EXPANSION "'%B\${P9K_CONTENT// }'"
     else
-      sub LEFT_SUBSEGMENT_SEPARATOR "'$left_subsep'"
-      sub RIGHT_SUBSEGMENT_SEPARATOR "'$right_subsep'"
+      sub VISUAL_IDENTIFIER_EXPANSION "'\${P9K_VISUAL_IDENTIFIER}'"
+      sub BACKGROUND_JOBS_VISUAL_IDENTIFIER_EXPANSION "'\${P9K_VISUAL_IDENTIFIER}'"
+      sub VPN_IP_VISUAL_IDENTIFIER_EXPANSION "'\${P9K_VISUAL_IDENTIFIER}'"
     fi
-    sub MULTILINE_FIRST_PROMPT_GAP_FOREGROUND $frame_color[$color]
-    sub MULTILINE_FIRST_PROMPT_PREFIX "'%$frame_color[$color]F╭─'"
-    sub MULTILINE_NEWLINE_PROMPT_PREFIX "'%$frame_color[$color]F├─'"
-    sub MULTILINE_LAST_PROMPT_PREFIX "'%$frame_color[$color]F╰─'"
-    sub MULTILINE_FIRST_PROMPT_SUFFIX "'%$frame_color[$color]F─╮'"
-    sub MULTILINE_NEWLINE_PROMPT_SUFFIX "'%$frame_color[$color]F─┤'"
-    sub MULTILINE_LAST_PROMPT_SUFFIX "'%$frame_color[$color]F─╯'"
-    sub LEFT_SEGMENT_SEPARATOR "'$left_sep'"
-    sub RIGHT_SEGMENT_SEPARATOR "'$right_sep'"
-    sub LEFT_PROMPT_FIRST_SEGMENT_START_SYMBOL "'$left_tail'"
-    sub LEFT_PROMPT_LAST_SEGMENT_END_SYMBOL "'$left_head'"
-    sub RIGHT_PROMPT_FIRST_SEGMENT_START_SYMBOL "'$right_head'"
-    sub RIGHT_PROMPT_LAST_SEGMENT_END_SYMBOL "'$right_tail'"
-  fi
 
-  if [[ -n $show_time ]]; then
-    uncomment time
-  fi
+    if [[ $POWERLEVEL9K_MODE == (compatible|powerline) ]]; then
+      # Many fonts don't have the default icons.
+      [[ $POWERLEVEL9K_MODE == compatible ]] && local error='х' || local error='✘'
+      uncomment 'typeset -g POWERLEVEL9K_STATUS_ERROR_VISUAL_IDENTIFIER_EXPANSION'
+      sub STATUS_ERROR_VISUAL_IDENTIFIER_EXPANSION "'$error'"
+      uncomment 'typeset -g POWERLEVEL9K_STATUS_ERROR_SIGNAL_VISUAL_IDENTIFIER_EXPANSION'
+      sub STATUS_ERROR_SIGNAL_VISUAL_IDENTIFIER_EXPANSION "'$error'"
+      uncomment 'typeset -g POWERLEVEL9K_STATUS_ERROR_PIPE_VISUAL_IDENTIFIER_EXPANSION'
+      sub STATUS_ERROR_PIPE_VISUAL_IDENTIFIER_EXPANSION "'$error'"
+      uncomment 'typeset -g POWERLEVEL9K_DIR_NOT_WRITABLE_VISUAL_IDENTIFIER_EXPANSION'
+      sub DIR_NOT_WRITABLE_VISUAL_IDENTIFIER_EXPANSION "'∅'"
+      uncomment 'typeset -g POWERLEVEL9K_TERRAFORM_VISUAL_IDENTIFIER_EXPANSION'
+      sub TERRAFORM_VISUAL_IDENTIFIER_EXPANSION "'tf'"
+      uncomment 'typeset -g POWERLEVEL9K_RANGER_VISUAL_IDENTIFIER_EXPANSION'
+      sub RANGER_VISUAL_IDENTIFIER_EXPANSION "'▲'"
+      uncomment 'typeset -g POWERLEVEL9K_KUBECONTEXT_DEFAULT_VISUAL_IDENTIFIER_EXPANSION'
+      sub KUBECONTEXT_DEFAULT_VISUAL_IDENTIFIER_EXPANSION "'○'"
+      uncomment 'typeset -g POWERLEVEL9K_AZURE_VISUAL_IDENTIFIER_EXPANSION'
+      sub AZURE_VISUAL_IDENTIFIER_EXPANSION "'az'"
+      uncomment 'typeset -g POWERLEVEL9K_AWS_EB_ENV_VISUAL_IDENTIFIER_EXPANSION'
+      sub AWS_EB_ENV_VISUAL_IDENTIFIER_EXPANSION "'eb'"
+      sub BACKGROUND_JOBS_VISUAL_IDENTIFIER_EXPANSION "'≡'"
+    fi
 
-  if [[ -n ${(j::)extra_icons} ]]; then
-    local branch_icon=${icons[VCS_BRANCH_ICON]// }
-    sub VCS_BRANCH_ICON "'$branch_icon '"
-    uncomment os_icon
-  else
-    uncomment 'typeset -g POWERLEVEL9K_DIR_CLASSES'
-    uncomment 'typeset -g POWERLEVEL9K_VCS_VISUAL_IDENTIFIER_EXPANSION'
-    uncomment 'typeset -g POWERLEVEL9K_COMMAND_EXECUTION_TIME_VISUAL_IDENTIFIER_EXPANSION'
-    uncomment 'typeset -g POWERLEVEL9K_TIME_VISUAL_IDENTIFIER_EXPANSION'
-    sub VCS_VISUAL_IDENTIFIER_EXPANSION ''
-    sub COMMAND_EXECUTION_TIME_VISUAL_IDENTIFIER_EXPANSION ''
-    sub TIME_VISUAL_IDENTIFIER_EXPANSION ''
-  fi
+    if [[ $POWERLEVEL9K_MODE == (awesome-patched|awesome-fontconfig) && $cap_python == 0 ]]; then
+      uncomment 'typeset -g POWERLEVEL9K_VIRTUALENV_VISUAL_IDENTIFIER_EXPANSION'
+      uncomment 'typeset -g POWERLEVEL9K_ANACONDA_VISUAL_IDENTIFIER_EXPANSION'
+      uncomment 'typeset -g POWERLEVEL9K_PYENV_VISUAL_IDENTIFIER_EXPANSION'
+      uncomment 'typeset -g POWERLEVEL9K_PYTHON_ICON'
+      sub VIRTUALENV_VISUAL_IDENTIFIER_EXPANSION "'🐍'"
+      sub ANACONDA_VISUAL_IDENTIFIER_EXPANSION "'🐍'"
+      sub PYENV_VISUAL_IDENTIFIER_EXPANSION "'🐍'"
+      sub PYTHON_ICON "'🐍'"
+    fi
 
-  if [[ -n ${(j::)prefixes} ]]; then
-    uncomment 'typeset -g POWERLEVEL9K_VCS_PREFIX'
-    uncomment 'typeset -g POWERLEVEL9K_COMMAND_EXECUTION_TIME_PREFIX'
-    uncomment 'typeset -g POWERLEVEL9K_CONTEXT_PREFIX'
-    uncomment 'typeset -g POWERLEVEL9K_KUBECONTEXT_PREFIX'
-    uncomment 'typeset -g POWERLEVEL9K_TIME_PREFIX'
-    if [[ $style == (lean|classic) ]]; then
-      [[ $style == classic ]] && local fg="%$prefix_color[$color]F" || local fg="%f"
-      sub VCS_PREFIX "'${fg}on '"
-      sub COMMAND_EXECUTION_TIME_PREFIX "'${fg}took '"
-      sub CONTEXT_PREFIX "'${fg}with '"
-      sub KUBECONTEXT_PREFIX "'${fg}at '"
-      sub TIME_PREFIX "'${fg}at '"
-      sub CONTEXT_TEMPLATE "'%n$fg at %180F%m'"
-      sub CONTEXT_ROOT_TEMPLATE "'%n$fg at %227F%m'"
+    if [[ $POWERLEVEL9K_MODE == nerdfont-complete ]]; then
+      sub BATTERY_STAGES "\$'\uf58d\uf579\uf57a\uf57b\uf57c\uf57d\uf57e\uf57f\uf580\uf581\uf578'"
+    fi
+
+    if [[ $style == (classic|rainbow) ]]; then
+      if [[ $style == classic ]]; then
+        sub BACKGROUND $bg_color[$color]
+        sub LEFT_SUBSEGMENT_SEPARATOR "'%$sep_color[$color]F$left_subsep'"
+        sub RIGHT_SUBSEGMENT_SEPARATOR "'%$sep_color[$color]F$right_subsep'"
+        sub VCS_LOADING_FOREGROUND $sep_color[$color]
+        rep '%248F' "%$prefix_color[$color]F"
+      else
+        sub LEFT_SUBSEGMENT_SEPARATOR "'$left_subsep'"
+        sub RIGHT_SUBSEGMENT_SEPARATOR "'$right_subsep'"
+      fi
+      sub MULTILINE_FIRST_PROMPT_GAP_FOREGROUND $frame_color[$color]
+      sub MULTILINE_FIRST_PROMPT_PREFIX "'%$frame_color[$color]F╭─'"
+      sub MULTILINE_NEWLINE_PROMPT_PREFIX "'%$frame_color[$color]F├─'"
+      sub MULTILINE_LAST_PROMPT_PREFIX "'%$frame_color[$color]F╰─'"
+      sub MULTILINE_FIRST_PROMPT_SUFFIX "'%$frame_color[$color]F─╮'"
+      sub MULTILINE_NEWLINE_PROMPT_SUFFIX "'%$frame_color[$color]F─┤'"
+      sub MULTILINE_LAST_PROMPT_SUFFIX "'%$frame_color[$color]F─╯'"
+      sub LEFT_SEGMENT_SEPARATOR "'$left_sep'"
+      sub RIGHT_SEGMENT_SEPARATOR "'$right_sep'"
+      sub LEFT_PROMPT_FIRST_SEGMENT_START_SYMBOL "'$left_tail'"
+      sub LEFT_PROMPT_LAST_SEGMENT_END_SYMBOL "'$left_head'"
+      sub RIGHT_PROMPT_FIRST_SEGMENT_START_SYMBOL "'$right_head'"
+      sub RIGHT_PROMPT_LAST_SEGMENT_END_SYMBOL "'$right_tail'"
+    fi
+
+    if [[ -n $show_time ]]; then
+      uncomment time
+    fi
+
+    if [[ -n ${(j::)extra_icons} ]]; then
+      local branch_icon=${icons[VCS_BRANCH_ICON]// }
+      sub VCS_BRANCH_ICON "'$branch_icon '"
+      uncomment os_icon
     else
-      sub CONTEXT_TEMPLATE "'%n at %m'"
-      sub CONTEXT_ROOT_TEMPLATE "'%n at %m'"
+      uncomment 'typeset -g POWERLEVEL9K_DIR_CLASSES'
+      uncomment 'typeset -g POWERLEVEL9K_VCS_VISUAL_IDENTIFIER_EXPANSION'
+      uncomment 'typeset -g POWERLEVEL9K_COMMAND_EXECUTION_TIME_VISUAL_IDENTIFIER_EXPANSION'
+      uncomment 'typeset -g POWERLEVEL9K_TIME_VISUAL_IDENTIFIER_EXPANSION'
+      sub VCS_VISUAL_IDENTIFIER_EXPANSION ''
+      sub COMMAND_EXECUTION_TIME_VISUAL_IDENTIFIER_EXPANSION ''
+      sub TIME_VISUAL_IDENTIFIER_EXPANSION ''
     fi
-  fi
 
-  if (( num_lines == 1 )); then
-    local -a tmp
-    local line
-    for line in "$lines[@]"; do
-      [[ $line == ('      newline'|*'===[ Line #'*) ]] || tmp+=$line
-    done
-    lines=("$tmp[@]")
-  fi
-
-  sub MULTILINE_FIRST_PROMPT_GAP_CHAR "'$gap_char'"
-
-  if [[ $style == (classic|rainbow) && $num_lines == 2 ]]; then
-    if (( ! right_frame )); then
-      sub MULTILINE_FIRST_PROMPT_SUFFIX ''
-      sub MULTILINE_NEWLINE_PROMPT_SUFFIX ''
-      sub MULTILINE_LAST_PROMPT_SUFFIX ''
+    if [[ -n ${(j::)prefixes} ]]; then
+      uncomment 'typeset -g POWERLEVEL9K_VCS_PREFIX'
+      uncomment 'typeset -g POWERLEVEL9K_COMMAND_EXECUTION_TIME_PREFIX'
+      uncomment 'typeset -g POWERLEVEL9K_CONTEXT_PREFIX'
+      uncomment 'typeset -g POWERLEVEL9K_KUBECONTEXT_PREFIX'
+      uncomment 'typeset -g POWERLEVEL9K_TIME_PREFIX'
+      if [[ $style == (lean|classic) ]]; then
+        [[ $style == classic ]] && local fg="%$prefix_color[$color]F" || local fg="%f"
+        sub VCS_PREFIX "'${fg}on '"
+        sub COMMAND_EXECUTION_TIME_PREFIX "'${fg}took '"
+        sub CONTEXT_PREFIX "'${fg}with '"
+        sub KUBECONTEXT_PREFIX "'${fg}at '"
+        sub TIME_PREFIX "'${fg}at '"
+        sub CONTEXT_TEMPLATE "'%n$fg at %180F%m'"
+        sub CONTEXT_ROOT_TEMPLATE "'%n$fg at %227F%m'"
+      else
+        sub CONTEXT_TEMPLATE "'%n at %m'"
+        sub CONTEXT_ROOT_TEMPLATE "'%n at %m'"
+      fi
     fi
-    if (( ! left_frame )); then
-      sub MULTILINE_FIRST_PROMPT_PREFIX ''
-      sub MULTILINE_NEWLINE_PROMPT_PREFIX ''
-      sub MULTILINE_LAST_PROMPT_PREFIX ''
-      sub STATUS_OK false
-      sub STATUS_ERROR false
-    fi
-  fi
 
-  if [[ $style == (classic|rainbow) ]]; then
-    if (( num_lines == 2 && ! left_frame )); then
-      uncomment prompt_char
-    else
-      uncomment vi_mode
+    if (( num_lines == 1 )); then
+      local -a tmp
+      local line
+      for line in "$lines[@]"; do
+        [[ $line == ('      newline'|*'===[ Line #'*) ]] || tmp+=$line
+      done
+      lines=("$tmp[@]")
     fi
-  fi
 
-  (( empty_line )) && sub PROMPT_ADD_NEWLINE true || sub PROMPT_ADD_NEWLINE false
+    sub MULTILINE_FIRST_PROMPT_GAP_CHAR "'$gap_char'"
+
+    if [[ $style == (classic|rainbow) && $num_lines == 2 ]]; then
+      if (( ! right_frame )); then
+        sub MULTILINE_FIRST_PROMPT_SUFFIX ''
+        sub MULTILINE_NEWLINE_PROMPT_SUFFIX ''
+        sub MULTILINE_LAST_PROMPT_SUFFIX ''
+      fi
+      if (( ! left_frame )); then
+        sub MULTILINE_FIRST_PROMPT_PREFIX ''
+        sub MULTILINE_NEWLINE_PROMPT_PREFIX ''
+        sub MULTILINE_LAST_PROMPT_PREFIX ''
+        sub STATUS_OK false
+        sub STATUS_ERROR false
+      fi
+    fi
+
+    if [[ $style == (classic|rainbow) ]]; then
+      if (( num_lines == 2 && ! left_frame )); then
+        uncomment prompt_char
+      else
+        uncomment vi_mode
+      fi
+    fi
+
+    (( empty_line )) && sub PROMPT_ADD_NEWLINE true || sub PROMPT_ADD_NEWLINE false
+  fi
 
   sub INSTANT_PROMPT $instant_prompt
-
   (( transient_prompt )) && sub TRANSIENT_PROMPT always
 
   local header=${(%):-"# Generated by Powerlevel10k configuration wizard on %D{%Y-%m-%d at %H:%M %Z}."}$'\n'
