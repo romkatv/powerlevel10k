@@ -5752,24 +5752,34 @@ typeset -gr __p9k_p10k_finalize_usage="Usage: %2Fp10k%f %Bfinalize%b
 
 Perform the final stage of initialization. Must be called at the very end of zshrc."
 
-typeset -gr __p9k_p10k_display_usage="Usage: %2Fp10k%f %Bdisplay%b [-h] [[+|-]part]...
+typeset -gr __p9k_p10k_display_usage="Usage: %2Fp10k%f %Bdisplay%b part-pattern=state-list...
 
 Show, hide or toggle prompt parts. If called from zle, the current
-prompt gets refreshed.
-
-Options:
-  part      toggle the designated prompt part
-  +part     show the designated prompt part
-  -part     hide the designated prompt part
-  -h        print this help message
+prompt is refreshed.
 
 Parts:
-  right     right prompt
-  s:name    segment with the given name (e.g., s:kubecontext)
+  empty_line    empty line (duh)
+  ruler         ruler; if POWERLEVEL9K_RULER_CHAR=' ', it's essentially another new_line
+  N             prompt line number N, 1-based; counting from the top if positive,
+                from the bottom if negative
+  N/left_frame  left frame on the Nth line
+  N/left        left prompt on the Nth line
+  N/gap         gap between left and right prompts on the Nth line
+  N/right       right prompt on the Nth line
+  N/right_frame right frame on the Nth line
+  N/left/S      segment S within N/left (dir, time, etc.)
+  N/right/S     segment S within N/right (dir, time, etc.)
+
+Part States:
+  show          the part is displayed
+  hide          the part is not displayed
+  print         the part is printed in precmd; only applicable to empty_line and
+                ruler; looks better than show after clear; unlike show, the effects
+                of print cannot be undone with hide
 
 Example: Bind Ctrl+P to toggle right prompt.
 
-  function toggle-right-prompt() { p10k display right; }
+  function toggle-right-prompt() { p10k display '*/right'=hide,show; }
   zle -N toggle-right-prompt
   bindkey '^P' toggle-right-prompt"
 
