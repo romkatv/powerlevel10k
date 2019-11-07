@@ -63,13 +63,13 @@ typeset -r vertical_bar='|'
 typeset -r slanted_bar='\uE0BD'
 
 typeset -ra lean_left=(
-  '' '${extra_icons[1]:+$extra_icons[1] }%31F$extra_icons[2]%B%39F~%b%31F/%B%39Fsrc%b%f $prefixes[1]%76F$extra_icons[3]master%f '
-  '' '%76F❯%f ${buffer:-█}'
+  '%$frame_color[$color]F╭─ ' '${extra_icons[1]:+$extra_icons[1] }%31F$extra_icons[2]%B%39F~%b%31F/%B%39Fsrc%b%f $prefixes[1]%76F$extra_icons[3]master%f '
+  '%$frame_color[$color]F╰─ ' '%76F❯%f ${buffer:-█}'
 )
 
 typeset -ra lean_right=(
-  ' $prefixes[2]%101F$extra_icons[4]5s%f${show_time:+ $prefixes[3]%66F$extra_icons[5]16:23:42%f}' ''
-  '' ''
+  ' $prefixes[2]%101F$extra_icons[4]5s%f${show_time:+ $prefixes[3]%66F$extra_icons[5]16:23:42%f}' ' %$frame_color[$color]F─╮%f'
+  '' ' %$frame_color[$color]F─╯%f'
 )
 
 typeset -ra classic_left=(
@@ -558,7 +558,7 @@ function ask_style() {
     print -n $nl
     print -P "%B(1)  Lean.%b"
     print -n $nl
-    style=lean print_prompt
+    style=lean left_frame=0 right_frame=0 print_prompt
     print -P ""
     print -P "%B(2)  Classic.%b"
     print -n $nl
@@ -581,7 +581,7 @@ function ask_style() {
     case $key in
       q) quit;;
       r) return 1;;
-      1) style=lean; options+=lean; break;;
+      1) style=lean; left_frame=0; right_frame=0; options+=lean; break;;
       2) style=classic; options+=classic; break;;
       3) style=rainbow; options+=rainbow; break;;
       4) style=pure; empty_line=1; options+=pure; break;;
@@ -633,8 +633,8 @@ function ask_color() {
   done
 }
 
-function ask_frame_color() {
-  [[ $style != rainbow || $num_lines == 1 ]] && return
+function ask_ornaments_color() {
+  [[ $style != (rainbow|lean) || $num_lines == 1 ]] && return
   [[ $gap_char == ' ' && $left_frame == 0 && $right_frame == 0 ]] && return
   if [[ $LINES -lt 26 ]]; then
     local nl=''
@@ -643,7 +643,7 @@ function ask_frame_color() {
   fi
   while true; do
     clear
-    flowing -c "%BFrame Color%b"
+    flowing -c "%BOrnaments Color%b"
     print -n $nl
     print -P "%B(1)  Lightest.%b"
     print -n $nl
@@ -1146,7 +1146,7 @@ function ask_gap_char() {
 }
 
 function ask_frame() {
-  if [[ $style != (classic|rainbow) || $num_lines != 2 ]]; then
+  if [[ $style != (classic|rainbow|lean) || $num_lines != 2 ]]; then
     return 0
   fi
 
@@ -1568,6 +1568,22 @@ function generate_config() {
       fi
     fi
 
+    if [[ $style == lean ]]; then
+      sub MULTILINE_FIRST_PROMPT_GAP_FOREGROUND $frame_color[$color]
+      if (( right_frame )); then
+        sub MULTILINE_FIRST_PROMPT_SUFFIX "'%$frame_color[$color]F─╮'"
+        sub MULTILINE_NEWLINE_PROMPT_SUFFIX "'%$frame_color[$color]F─┤'"
+        sub MULTILINE_LAST_PROMPT_SUFFIX "'%$frame_color[$color]F─╯'"
+        sub RIGHT_PROMPT_LAST_SEGMENT_END_SYMBOL "' '"
+      fi
+      if (( left_frame )); then
+        sub MULTILINE_FIRST_PROMPT_PREFIX "'%$frame_color[$color]F╭─'"
+        sub MULTILINE_NEWLINE_PROMPT_PREFIX "'%$frame_color[$color]F├─'"
+        sub MULTILINE_LAST_PROMPT_PREFIX "'%$frame_color[$color]F╰─'"
+        sub LEFT_PROMPT_FIRST_SEGMENT_START_SYMBOL "' '"
+      fi
+    fi
+
     if [[ $style == (classic|rainbow) ]]; then
       if (( num_lines == 2 && ! left_frame )); then
         uncomment prompt_char
@@ -1724,26 +1740,26 @@ while true; do
     right_head=$fade_in
   fi
   _p9k_init_icons
-  ask_narrow_icons     || continue
-  ask_style            || continue
+  ask_narrow_icons      || continue
+  ask_style             || continue
   if [[ $style != pure ]]; then
-    ask_color          || continue
-    ask_time           || continue
-    ask_separators     || continue
-    ask_heads          || continue
-    ask_tails          || continue
-    ask_num_lines      || continue
-    ask_gap_char       || continue
-    ask_frame          || continue
-    ask_frame_color    || continue
-    ask_empty_line     || continue
-    ask_extra_icons    || continue
-    ask_prefixes       || continue
+    ask_color           || continue
+    ask_time            || continue
+    ask_separators      || continue
+    ask_heads           || continue
+    ask_tails           || continue
+    ask_num_lines       || continue
+    ask_gap_char        || continue
+    ask_frame           || continue
+    ask_ornaments_color || continue
+    ask_empty_line      || continue
+    ask_extra_icons     || continue
+    ask_prefixes        || continue
   fi
-  ask_transient_prompt || continue
-  ask_instant_prompt   || continue
-  ask_config_overwrite || continue
-  ask_zshrc_edit       || continue
+  ask_transient_prompt  || continue
+  ask_instant_prompt    || continue
+  ask_config_overwrite  || continue
+  ask_zshrc_edit        || continue
   break
 done
 
