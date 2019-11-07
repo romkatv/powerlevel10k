@@ -5039,18 +5039,22 @@ _p9k_init_lines() {
 
     if [[ $+_POWERLEVEL9K_MULTILINE_FIRST_PROMPT_PREFIX == 1 || $_POWERLEVEL9K_PROMPT_ON_NEWLINE == 1 ]]; then
       _p9k_get_icon '' MULTILINE_FIRST_PROMPT_PREFIX
-      [[ _p9k_ret == *%* ]] && _p9k_ret+=%b%k%f
-      # Not escaped for historical reasons.
-      _p9k_ret='${_p9k__1l_frame-"'$_p9k_ret'"}'
-      _p9k_line_prefix_left[1]=$_p9k_ret$_p9k_line_prefix_left[1]
+      if [[ -n $_p9k_ret ]]; then
+        [[ _p9k_ret == *%* ]] && _p9k_ret+=%b%k%f
+        # Not escaped for historical reasons.
+        _p9k_ret='${_p9k__1l_frame-"'$_p9k_ret'"}'
+        _p9k_line_prefix_left[1]=$_p9k_ret$_p9k_line_prefix_left[1]
+      fi
     fi
 
     if [[ $+_POWERLEVEL9K_MULTILINE_LAST_PROMPT_PREFIX == 1 || $_POWERLEVEL9K_PROMPT_ON_NEWLINE == 1 ]]; then
       _p9k_get_icon '' MULTILINE_LAST_PROMPT_PREFIX
-      [[ _p9k_ret == *%* ]] && _p9k_ret+=%b%k%f
-      # Not escaped for historical reasons.
-      _p9k_ret='${_p9k__'$num_lines'l_frame-"'$_p9k_ret'"}'
-      _p9k_line_prefix_left[-1]=$_p9k_ret$_p9k_line_prefix_left[-1]
+      if [[ -n $_p9k_ret ]]; then
+        [[ _p9k_ret == *%* ]] && _p9k_ret+=%b%k%f
+        # Not escaped for historical reasons.
+        _p9k_ret='${_p9k__'$num_lines'l_frame-"'$_p9k_ret'"}'
+        _p9k_line_prefix_left[-1]=$_p9k_ret$_p9k_line_prefix_left[-1]
+      fi
     fi
 
     _p9k_get_icon '' MULTILINE_FIRST_PROMPT_SUFFIX
@@ -5070,11 +5074,13 @@ _p9k_init_lines() {
     if (( num_lines > 2 )); then
       if [[ $+_POWERLEVEL9K_MULTILINE_NEWLINE_PROMPT_PREFIX == 1 || $_POWERLEVEL9K_PROMPT_ON_NEWLINE == 1 ]]; then
         _p9k_get_icon '' MULTILINE_NEWLINE_PROMPT_PREFIX
-        [[ _p9k_ret == *%* ]] && _p9k_ret+=%b%k%f
-        for i in {2..$((num_lines-1))}; do
-          # Not escaped for historical reasons.
-          _p9k_line_prefix_left[i]='${_p9k__'$i'l_frame-"'$_p9k_ret'"}'$_p9k_line_prefix_left[i]
-        done
+        if [[ -n $_p9k_ret ]]; then
+          [[ _p9k_ret == *%* ]] && _p9k_ret+=%b%k%f
+          for i in {2..$((num_lines-1))}; do
+            # Not escaped for historical reasons.
+            _p9k_line_prefix_left[i]='${_p9k__'$i'l_frame-"'$_p9k_ret'"}'$_p9k_line_prefix_left[i]
+          done
+        fi
       fi
 
       _p9k_get_icon '' MULTILINE_NEWLINE_PROMPT_SUFFIX
@@ -5266,7 +5272,7 @@ _p9k_must_init() {
     [[ $sig == $_p9k__param_sig ]] && return 1
     _p9k_deinit
   fi
-  _p9k__param_pat=$'v3\1'${ZSH_VERSION}$'\1'${ZSH_PATCHLEVEL}$'\1'
+  _p9k__param_pat=$'v4\1'${ZSH_VERSION}$'\1'${ZSH_PATCHLEVEL}$'\1'
   _p9k__param_pat+=$'${#parameters[(I)POWERLEVEL9K_*]}\1${(%):-%n%#}\1$GITSTATUS_LOG_LEVEL\1'
   _p9k__param_pat+=$'$GITSTATUS_ENABLE_LOGGING\1$GITSTATUS_DAEMON\1$GITSTATUS_NUM_THREADS\1'
   _p9k__param_pat+=$'$DEFAULT_USER\1${ZLE_RPROMPT_INDENT:-1}\1$P9K_SSH\1$__p9k_ksh_arrays'
