@@ -2885,9 +2885,17 @@ function _p9k_vcs_render() {
   return 0
 }
 
+function _p9k_maybe_ignore_git_repo() {
+  if [[ $VCS_STATUS_RESULT == ok-* && $VCS_STATUS_WORKDIR == $~_POWERLEVEL9K_VCS_DISABLED_WORKDIR_PATTERN ]]; then
+    VCS_STATUS_RESULT=norepo${VCS_STATUS_RESULT#ok}
+  fi
+}
+
 function _p9k_vcs_resume() {
   emulate -L zsh
   setopt no_hist_expand extended_glob no_prompt_bang prompt_{percent,subst} no_aliases
+
+  _p9k_maybe_ignore_git_repo
 
   if [[ $VCS_STATUS_RESULT == ok-async ]]; then
     local latency=$((EPOCHREALTIME - _p9k__gitstatus_start_time))
@@ -2912,6 +2920,7 @@ function _p9k_vcs_resume() {
       unset _p9k__gitstatus_next_dir
       unset VCS_STATUS_RESULT
     else
+      _p9k_maybe_ignore_git_repo
       case $VCS_STATUS_RESULT in
         tout) _p9k__gitstatus_next_dir=''; _p9k__gitstatus_start_time=$EPOCHREALTIME;;
         norepo-sync) _p9k_vcs_status_purge $_p9k__gitstatus_next_dir; unset _p9k__gitstatus_next_dir;;
@@ -2932,6 +2941,7 @@ function _p9k_vcs_gitstatus() {
       local -F timeout=_POWERLEVEL9K_VCS_MAX_SYNC_LATENCY_SECONDS
       if ! _p9k_vcs_status_for_dir $dir; then
         gitstatus_query -d $dir -t $timeout -p -c '_p9k_vcs_resume 0' POWERLEVEL9K || return 1
+        _p9k_maybe_ignore_git_repo
         case $VCS_STATUS_RESULT in
           tout) _p9k__gitstatus_next_dir=''; _p9k__gitstatus_start_time=$EPOCHREALTIME; return 0;;
           norepo-sync) return 0;;
@@ -2952,6 +2962,7 @@ function _p9k_vcs_gitstatus() {
         unset VCS_STATUS_RESULT
         return 1
       fi
+      _p9k_maybe_ignore_git_repo
       case $VCS_STATUS_RESULT in
         tout) _p9k__gitstatus_next_dir=''; _p9k__gitstatus_start_time=$EPOCHREALTIME;;
         norepo-sync) _p9k_vcs_status_purge $dir;;
@@ -4587,6 +4598,7 @@ _p9k_init_params() {
   _p9k_declare -i POWERLEVEL9K_PROMPT_ADD_NEWLINE_COUNT 1
   _p9k_declare -s POWERLEVEL9K_COLOR_SCHEME dark
   _p9k_declare -s POWERLEVEL9K_GITSTATUS_DIR ""
+  _p9k_declare -s POWERLEVEL9K_VCS_DISABLED_WORKDIR_PATTERN
   _p9k_declare -b POWERLEVEL9K_VCS_SHOW_SUBMODULE_DIRTY 0
   _p9k_declare -i POWERLEVEL9K_VCS_SHORTEN_LENGTH
   _p9k_declare -i POWERLEVEL9K_VCS_SHORTEN_MIN_LENGTH
