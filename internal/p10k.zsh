@@ -5646,6 +5646,8 @@ else
   typeset -gri __p9k_dumps_enabled=0
 fi
 
+_p9k_do_nothing() { true; }
+
 prompt_powerlevel9k_setup() {
   (( __p9k_enabled )) && return
 
@@ -5660,6 +5662,7 @@ prompt_powerlevel9k_setup() {
   prompt_powerlevel9k_teardown
   __p9k_enabled=1
   add-zsh-hook preexec _p9k_preexec
+  add-zsh-hook precmd _p9k_do_nothing
   add-zsh-hook precmd _p9k_precmd
 }
 
