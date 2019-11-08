@@ -12,7 +12,7 @@ it will generate the same prompt.
 
 1. [Installation](#installation)
    1. [Manual](#manual)
-   1. [Oh-My-Zsh](#oh-my-zsh)
+   1. [Oh My Zsh](#oh-my-zsh)
    1. [Prezto](#prezto)
    1. [Antigen](#antigen)
    1. [Zplug](#zplug)
@@ -52,7 +52,9 @@ git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ~/powerlevel10k
 echo 'source ~/powerlevel10k/powerlevel10k.zsh-theme' >>! ~/.zshrc
 ```
 
-This is the simplest kind of installation and it works even if you are using a plugin manager. Just make sure to disable your current theme in your plugin manager. See [FAQ](#i-cannot-make-powerlevel10k-work-with-my-plugin-manager-help) for help.
+This is the simplest kind of installation and it works even if you are using a plugin manager. Just
+make sure to disable your current theme in your plugin manager. See
+[FAQ](#i-cannot-make-powerlevel10k-work-with-my-plugin-manager-help) for help.
 
 ### Oh My Zsh
 
@@ -129,7 +131,9 @@ Download these four ttf files:
 Double-click on each file and press "Install". This will make `MesloLGS NF` font available to all
 applications on your system. Configure your terminal to use this font:
 
-- **iTerm2**: Open *iTerm2 → Preferences... → Profiles → Text* and set *Font* to `MesloLGS NF`.
+- **iTerm2**: Open *iTerm2 → Preferences → Profiles → Text* and set *Font* to `MesloLGS NF`.
+- **macOS Terminal** Open *Terminal → Preferences → Profiles → Text*, click *Change* under *Font*
+  and select `MesloLGS NF` family.
 - **Hyper**: Open *Hyper → Edit → Preferences* and change the value of `fontFamily` under
   `module.exports.config` to `MesloLGS NF`.
 - **Visual Studio Code**: Open *File → Preferences → Settings*, enter
@@ -145,7 +149,6 @@ applications on your system. Configure your terminal to use this font:
   *Properties → Font* and set *Font* to `MesloLGS NF`.
 - **Windows Terminal** (the new thing): Open *Settings* (`Ctrl+,`), search for `fontFace` and set
   value to `MesloLGS NF` for every profile.
-- **macOS Terminal** Open *Terminal → Preferences... → Profiles → Text* and look for the *Font* setting and select the button labeled *Change...*. Search for `MesloLGS NF` and select it.
 - **Termux**: Type `p10k configure` and answer `Yes` when asked whether to install *Meslo Nerd Font*.
 
 Run `p10k configure` to pick the best style for your new font.
@@ -173,7 +176,9 @@ Yes.
 
 [![asciicast](https://asciinema.org/a/NHRjK3BMePw66jtRVY2livHwZ.svg)](https://asciinema.org/a/NHRjK3BMePw66jtRVY2livHwZ)
 
-Benchmark results obtained with [zsh-prompt-benchmark](https://github.com/romkatv/zsh-prompt-benchmark) on an Intel i9-7900X running Ubuntu 18.04 with the config from the demo.
+Benchmark results obtained with
+[zsh-prompt-benchmark](https://github.com/romkatv/zsh-prompt-benchmark) on on Intel i9-7900X
+running Ubuntu 18.04 with the config from the demo.
 
 | Theme               | Prompt Latency |
 |---------------------|---------------:|
@@ -183,7 +188,14 @@ Benchmark results obtained with [zsh-prompt-benchmark](https://github.com/romkat
 
 Powerlevel10k is over 100 times faster than Powerlevel9k in this benchmark.
 
-In fairness, Powerlevel9k has acceptable latency when given a spartan configuration. If all you need is the current directory without truncation or shortening, Powerlevel9k can render it for you in 17 ms. Powerlevel10k can do the same 30 times faster, but it won't matter in practice because 17 ms is fast enough (the threshold where latency becomes noticeable is around 50 ms) You have to be careful with Powerlevel9k configuration as it's all too easy to make prompt frustratingly slow. Powerlevel10k, on the other hand, doesn't require trading latency for utility — it's virtually instant with any configuration. It stays well below the 50 ms mark, leaving most of the latency budget for other plugins you might install.
+In fairness, Powerlevel9k has acceptable latency when given a spartan configuration. If all you need
+is the current directory without truncation or shortening, Powerlevel9k can render it for you in
+17 ms. Powerlevel10k can do the same 30 times faster but it won't matter in practice because 17 ms
+is fast enough (the threshold where latency becomes noticeable is around 50 ms). You have to be
+careful with Powerlevel9k configuration as it's all too easy to make prompt frustratingly slow.
+Powerlevel10k, on the other hand, doesn't require trading latency for utility -- it's virtually
+instant with any configuration. It stays well below the 50 ms mark, leaving most of the latency
+budget for other plugins you might install.
 
 ## License
 
@@ -195,9 +207,13 @@ covered by the same license.
 
 ### <a name='instant-prompt'></a>What is instant prompt?
 
-*Instant Prompt* is an optional feature of Powerlevel10k. When enabled, it gives you a limitedprompt within a few milliseconds of staring zsh, alowing you to start hacking right away while zsh is initializing. Once initialization is complete, the full-featured Powerlevel10k prompt will seamlessly replace instant prompt.
+*Instant Prompt* is an optional feature of Powerlevel10k. When enabled, it gives you a limited
+prompt within a few milliseconds of staring zsh, alowing you to start hacking right away while zsh
+is initializing. Once initialization is complete, the full-featured Powerlevel10k prompt will
+seamlessly replace instant prompt.
 
-You can enable instant prompt either by running `p10k configure` or by manually adding the following code snippet at the top of `~/.zshrc`:
+You can enable instant prompt either by running `p10k configure` or by manually adding the following
+code snippet at the top of `~/.zshrc`:
 
 ```zsh
 # Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
@@ -208,11 +224,21 @@ if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]
 fi
 ```
 
-It's important that you copy the lines verbatim. Don't replace `source` with something else, don't call `zcompile`, don't redirect output, etc.
+It's important that you copy the lines verbatim. Don't replace `source` with something else, don't
+call `zcompile`, don't redirect output, etc.
 
-When instant prompt is enabled, for the duration of zsh initialization standard input is redirected to `/dev/null` and standard output with standard error are redirected to a temporary file. Once zsh is fully initialized, standard file descriptors are restored and the content of the temporary file is printed out.
+When instant prompt is enabled, for the duration of zsh initialization standard input is redirected
+to `/dev/null` and standard output with standard error are redirected to a temporary file. Once zsh
+is fully initialized, standard file descriptors are restored and the content of the temporary file
+is printed out.
 
-When using instant prompt, you should carefully check any output that appears on zsh startup as it may indicate that initialization has been altered, or perhaps even broken, by instant prompt. Initialization code that may require console input, such as asking for a keyring password or for a *[y/n]* confirmation, must be moved above the instant prompt preamble in `~.zshrc`. Initialization code that merely prints to console but never reads from it will work correctly with instant prompt, although output that normally has colors may appear uncolored. You can either leave it be, suppress the output, or move it above the instant prompt preamble.
+When using instant prompt, you should carefully check any output that appears on zsh startup as it
+may indicate that initialization has been altered, or perhaps even broken, by instant prompt.
+Initialization code that may require console input, such as asking for a keyring password or for a
+*[y/n]* confirmation, must be moved above the instant prompt preamble in `~/.zshrc`. Initialization
+code that merely prints to console but never reads from it will work correctly with instant prompt,
+although output that normally has colors may appear uncolored. You can either leave it be, suppress
+the output, or move it above the instant prompt preamble.
 
 Here's an example of `~/.zshrc` that breaks when instant prompt is enabled:
 
@@ -253,14 +279,18 @@ zsh but it won't do anything.*
 
 ### Why do my icons and/or powerline symbols look bad?
 
-It likely a problem with your font. [Install the recommended font](#recommended-meslo-nerd-font-patched-for-powerlevel10k) and run `p10k configure`.
+It's likely your font's fault.
+[Install the recommended font](#recommended-meslo-nerd-font-patched-for-powerlevel10k) and run
+`p10k configure`.
 
 ### Why is my cursor in the wrong place?
 
 Type `echo '\u276F'`. If you get an error saying "zsh: character not in range",
-your locale doesn't support UTF-8.
+your locale doesn't support UTF-8. You need to fix it.
 
-If the `echo` command prints `❯` but the cursor is still in the wrong place, install [the recommended font](#recommended-meslo-nerd-font-patched-for-powerlevel10k) and run `p10k configure`.
+If the `echo` command prints `❯` but the cursor is still in the wrong place, install
+[the recommended font](#recommended-meslo-nerd-font-patched-for-powerlevel10k) and run
+`p10k configure`.
 
 If this doesn't help, add `unset ZLE_RPROMPT_INDENT` at the bottom of `~/.zshrc`.
 
@@ -287,13 +317,15 @@ Still having issues? Run the following command to diagnose the problem:
 +------------------------------+
 ```
 
-If the output of the command is aligned for every part of your prompt (left and right), this indicates a bug in the theme or your config. Use this command to diagnose it:
+If the output of the command is aligned for every part of your prompt (left and right), this
+indicates a bug in the theme or your config. Use this command to diagnose it:
 
 ```zsh
 print -rl -- ${(eq+)PROMPT} ${(eq+)RPROMPT}
 ```
 
-Look for `%{...%}` and backslash escapes in the output. If there are any, they are the likely culprits. Open an issue if you get stuck.
+Look for `%{...%}` and backslash escapes in the output. If there are any, they are the likely
+culprits. Open an issue if you get stuck.
 
 #### If the prompt line is longer than the frame
 
@@ -303,7 +335,9 @@ Look for `%{...%}` and backslash escapes in the output. If there are any, they a
 +-----------------------------+
 ```
 
-This is usually caused by a terminal bug or misconfiguration that makes it print ambiguous-width characters as double-width instead of single width. For example, [this issue](https://github.com/romkatv/powerlevel10k/issues/165).
+This is usually caused by a terminal bug or misconfiguration that makes it print ambiguous-width
+characters as double-width instead of single width. For example,
+[this issue](https://github.com/romkatv/powerlevel10k/issues/165).
 
 #### If the prompt line is shorter than the frame and is mangled
 
@@ -326,7 +360,8 @@ This can be caused by a low-level bug in macOS. See
 +--------------------------------+
 ```
 
-This can be caused by misconfigured locale. See [this issue](https://github.com/romkatv/powerlevel10k/issues/251).
+This can be caused by misconfigured locale. See
+[this issue](https://github.com/romkatv/powerlevel10k/issues/251).
 
 ### Why is my prompt wrapping around in a weird way?
 
@@ -338,14 +373,19 @@ See [Why is my cursor in the wrong place?](#why-is-my-cursor-in-the-wrong-place)
 
 ### I cannot install the recommended font. Help!
 
-Once you download [the recommended font](#recommended-meslo-nerd-font-patched-for-powerlevel10k), you can install it just like any other font. Google "how to install fonts on *your OS*".
+Once you download [the recommended font](#recommended-meslo-nerd-font-patched-for-powerlevel10k),
+you can install it just like any other font. Google "how to install fonts on *your OS*".
 
 ### Why do I have a question mark symbol in my prompt? Is my font broken?
 
-If it looks like a regular `?`, that's normal. It means you have untracked files in the current Git repository. Type `git status` to see these files. You can change this symbol or disable the display
+If it looks like a regular `?`, that's normal. It means you have untracked files in the current Git
+repository. Type `git status` to see these files. You can change this symbol or disable the display
 of untracked files altogether. Search for `untracked files` in `~/.p10k.zsh`.
 
-You can also get a weird-looking question mark in your prompt if your terminal's font is missing some glyphs. To fix this problem, [install the recommended font](#recommended-meslo-nerd-font-patched-for-powerlevel10k) and run `p10k configure`.
+You can also get a weird-looking question mark in your prompt if your terminal's font is missing
+some glyphs. To fix this problem,
+[install the recommended font](#recommended-meslo-nerd-font-patched-for-powerlevel10k) and run
+`p10k configure`.
 
 ### Why does Powerlevel10k spawn extra processes?
 
@@ -405,11 +445,13 @@ Powerlevel10k, please [open an issue](https://github.com/romkatv/powerlevel10k/i
 
 ### Is there an AUR package for Powerlevel10k?
 
-Yes, [zsh-theme-powerlevel10k-git](https://aur.archlinux.org/packages/zsh-theme-powerlevel10k-git/). This package is owned by an unaffiliated volunteer.
+Yes, [zsh-theme-powerlevel10k-git](https://aur.archlinux.org/packages/zsh-theme-powerlevel10k-git/).
+This package is owned by an unaffiliated volunteer.
 
 ### I cannot make Powerlevel10k work with my plugin manager. Help!
 
-If the [installation instructions](#installation) didn't work for you, try disabling your current theme (so that you end up with no theme) and then installing Powerlevel10k manually.
+If the [installation instructions](#installation) didn't work for you, try disabling your current
+theme (so that you end up with no theme) and then installing Powerlevel10k manually.
 
 1. Disable the current theme in your framework / plugin manager.
 
@@ -425,10 +467,10 @@ If the [installation instructions](#installation) didn't work for you, try disab
 
 2. Install Powerlevel10k manually.
 
-  ```zsh
-  git clone https://github.com/romkatv/powerlevel10k.git ~/powerlevel10k
-  echo 'source ~/powerlevel10k/powerlevel10k.zsh-theme' >>! ~/.zshrc
-  ```
+```zsh
+git clone https://github.com/romkatv/powerlevel10k.git ~/powerlevel10k
+echo 'source ~/powerlevel10k/powerlevel10k.zsh-theme' >>! ~/.zshrc
+```
 
 This method of installation won't make anything slower or otherwise sub-par.
 
