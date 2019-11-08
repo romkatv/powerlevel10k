@@ -131,7 +131,9 @@ Download these four ttf files:
 Double-click on each file and press "Install". This will make `MesloLGS NF` font available to all
 applications on your system. Configure your terminal to use this font:
 
-- **iTerm2**: Open *iTerm2 → Preferences → Profiles → Text* and set *Font* to `MesloLGS NF`.
+- **iTerm2**: Type `p10k configure`, answer `Yes` when asked whether to install
+  *Meslo Nerd Font* and restart iTerm2 for the changes to take effect. Alternatively, open
+  *iTerm2 → Preferences → Profiles → Text* and set *Font* to `MesloLGS NF`.
 - **macOS Terminal** Open *Terminal → Preferences → Profiles → Text*, click *Change* under *Font*
   and select `MesloLGS NF` family.
 - **Hyper**: Open *Hyper → Edit → Preferences* and change the value of `fontFamily` under
@@ -149,7 +151,8 @@ applications on your system. Configure your terminal to use this font:
   *Properties → Font* and set *Font* to `MesloLGS NF`.
 - **Windows Terminal** (the new thing): Open *Settings* (`Ctrl+,`), search for `fontFace` and set
   value to `MesloLGS NF` for every profile.
-- **Termux**: Type `p10k configure` and answer `Yes` when asked whether to install *Meslo Nerd Font*.
+- **Termux**: Type `p10k configure` and answer `Yes` when asked whether to install
+  *Meslo Nerd Font*.
 
 Run `p10k configure` to pick the best style for your new font.
 
