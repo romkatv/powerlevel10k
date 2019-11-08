@@ -3934,6 +3934,7 @@ function _p9k_clear_instant_prompt() {
       local mark="${PROMPT_EOL_MARK-%B%S%#%s%b}"
       _p9k_prompt_length $mark
       local -i fill=$((COLUMNS > _p9k_ret ? COLUMNS - _p9k_ret : 0))
+      local cr=$'\r'
       local sp="${(%):-%b%k%f%s%u$mark${(pl.$fill.. .)}$cr%b%k%f%s%u%E}"
       print -rn -- $terminfo[rc]${(%):-%b%k%f%s%u}$terminfo[ed]
       if [[ -n ${(S)content//$'\e'*$'\a'} ]]; then
