@@ -3980,7 +3980,7 @@ function _p9k_clear_instant_prompt() {
       fi
       cat $__p9k_instant_prompt_output
       echo -nE - $sp
-      if [[ $POWERLEVEL9K_DEBUG_ISSUE_315 == true ]]; then
+      if [[ -n ${(S)content//$'\e'*$'\a'} && $POWERLEVEL9K_DEBUG_ISSUE_315 == true ]]; then
         typeset content
         ls -l $__p9k_instant_prompt_output
         (( $+commands[hexdump] )) && hexdump -c $__p9k_instant_prompt_output
