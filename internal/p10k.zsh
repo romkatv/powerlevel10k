@@ -231,7 +231,7 @@ _p9k_segment_in_use() {
 }
 
 function _p9k_parse_ip() {
-  local iface_regex="^${1:-.*}\$" iface ip
+  local iface_regex="^(${1:-.*})\$" iface ip
   for iface ip in "${(@kv)_p9k_iface}"; do
     if [[ $iface =~ $iface_regex ]]; then
       _p9k_ret=$ip
