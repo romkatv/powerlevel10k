@@ -3428,17 +3428,29 @@ _p9k_preexec() {
 
 function _p9k_set_iface() {
   _p9k_iface=()
-  [[ -x /sbin/ifconfig ]] || return
-  local line
-  local iface
-  for line in ${(f)"$(/sbin/ifconfig 2>/dev/null)"}; do
-    if [[ $line == (#b)([^[:space:]]##):[[:space:]]##flags=(<->)'<'* ]]; then
-      [[ $match[2] == *[13579] ]] && iface=$match[1] || iface=
-    elif [[ -n $iface && $line == (#b)[[:space:]]##inet[[:space:]]##([0-9.]##)* ]]; then
-      _p9k_iface[$iface]=$match[1]
-      iface=
-    fi
-  done
+  if [[ -x /sbin/ifconfig ]]; then
+    local line
+    local iface
+    for line in ${(f)"$(/sbin/ifconfig 2>/dev/null)"}; do
+      if [[ $line == (#b)([^[:space:]]##):[[:space:]]##flags=(<->)'<'* ]]; then
+        [[ $match[2] == *[13579] ]] && iface=$match[1] || iface=
+      elif [[ -n $iface && $line == (#b)[[:space:]]##inet[[:space:]]##([0-9.]##)* ]]; then
+        _p9k_iface[$iface]=$match[1]
+        iface=
+      fi
+    done
+  elif [[ -x /sbin/ip ]]; then
+    local line
+    local iface
+    for line in ${(f)"$(/sbin/ip -4 a show 2>/dev/null)"}; do
+      if [[ $line == (#b)<->:[[:space:]]##([^:]##):[[:space:]]##\<([^\>]#)\>* ]]; then
+        [[ ,$match[2], == *,UP,* ]] && iface=$match[1] || iface=
+      elif [[ -n $iface && $line == (#b)[[:space:]]##inet[[:space:]]##([0-9.]##)* ]]; then
+        _p9k_iface[$iface]=$match[1]
+        iface=
+      fi
+    done
+  fi
 }
 
 function _p9k_build_segment() {
