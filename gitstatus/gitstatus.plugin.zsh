@@ -67,8 +67,8 @@ typeset -g _gitstatus_plugin_dir=${${(%):-%x}:A:h}
 #
 ## Usage: gitstatus_query [OPTION]... NAME
 #
-#   -d STR    Directory to query. Must be absolute. Defaults to $GIT_DIR or the current
-#             directory if GIT_DIR is not set.
+#   -d STR    Directory to query. Defaults to the current directory. Has no effect if GIT_DIR
+#             is set.
 #   -c STR    Callback function to call once the results are available. Called only after
 #             gitstatus_query returns 0 with VCS_STATUS_RESULT=tout.
 #   -t FLOAT  Timeout in seconds. Will block for at most this long. If no results are
@@ -135,7 +135,7 @@ function gitstatus_query() {
   setopt err_return no_unset
 
   local opt
-  local dir=${GIT_DIR:-}
+  local dir
   local callback
   local -F timeout=-1
   local no_diff=0
@@ -160,7 +160,13 @@ function gitstatus_query() {
   local client_pid_var=_GITSTATUS_CLIENT_PID_${name}
   [[ ${(P)client_pid_var} == $$ ]]
 
-  [[ $dir == /* ]] || dir=${(%):-%/}/$dir
+  if [[ -z ${GIT_DIR:-} ]]; then
+    [[ $dir == /* ]] || dir=${(%):-%/}/$dir
+  elif [[ $GIT_DIR == /* ]]; then
+    dir=:$GIT_DIR
+  else
+    dir=:${(%):-%/}/$GIT_DIR
+  fi
 
   local req_fd_var=_GITSTATUS_REQ_FD_${name}
   local -i req_fd=${(P)req_fd_var}
