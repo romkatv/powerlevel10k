@@ -2654,7 +2654,8 @@ _p9k_vcs_info_init() {
 
 function _p9k_vcs_status_save() {
   local z=$'\0'
-  _p9k__gitstatus_last[$VCS_STATUS_WORKDIR]=$VCS_STATUS_ACTION$z$VCS_STATUS_COMMIT\
+  _p9k__gitstatus_last[${${_p9k__git_dir:+GIT_DIR:$_p9k__git_dir}:-$VCS_STATUS_WORKDIR}]=\
+$VCS_STATUS_ACTION$z$VCS_STATUS_COMMIT\
 $z$VCS_STATUS_COMMITS_AHEAD$z$VCS_STATUS_COMMITS_BEHIND$z$VCS_STATUS_HAS_CONFLICTED\
 $z$VCS_STATUS_HAS_STAGED$z$VCS_STATUS_HAS_UNSTAGED$z$VCS_STATUS_HAS_UNTRACKED\
 $z$VCS_STATUS_INDEX_SIZE$z$VCS_STATUS_LOCAL_BRANCH$z$VCS_STATUS_NUM_CONFLICTED\
@@ -2675,24 +2676,33 @@ function _p9k_vcs_status_restore() {
 }
 
 function _p9k_vcs_status_for_dir() {
-  local dir=$1
-  while true; do
-    _p9k_ret=$_p9k__gitstatus_last[$dir]
-    [[ -n $_p9k_ret ]] && return 0
-    [[ $dir == / ]] && return 1
-    dir=${dir:h}
-  done
+  if [[ -n $GIT_DIR ]]; then
+    _p9k_ret=$_p9k__gitstatus_last[GIT_DIR:$GIT_DIR]
+    [[ -n $_p9k_ret ]]
+  else
+    local dir=$_p9k_pwd_a
+    while true; do
+      _p9k_ret=$_p9k__gitstatus_last[$dir]
+      [[ -n $_p9k_ret ]] && return 0
+      [[ $dir == / ]] && return 1
+      dir=${dir:h}
+    done
+  fi
 }
 
 function _p9k_vcs_status_purge() {
-  local dir=$1
-  while true; do
-    # unset doesn't work if $dir contains weird shit
-    _p9k__gitstatus_last[$dir]=""
-    _p9k_git_slow[$dir]=""
-    [[ $dir == / ]] && break
-    dir=${dir:h}
-  done
+  if [[ -n $_p9k__git_dir ]]; then
+    _p9k__gitstatus_last[GIT_DIR:$_p9k__git_dir]=""
+  else
+    local dir=$1
+    while true; do
+      # unset doesn't work if $dir contains weird shit
+      _p9k__gitstatus_last[$dir]=""
+      _p9k_git_slow[$dir]=""
+      [[ $dir == / ]] && break
+      dir=${dir:h}
+    done
+  fi
 }
 
 function _p9k_vcs_icon() {
@@ -2709,7 +2719,7 @@ function _p9k_vcs_render() {
   local state
 
   if (( $+_p9k__gitstatus_next_dir )); then
-    if _p9k_vcs_status_for_dir ${${GIT_DIR:A}:-$_p9k_pwd_a}; then
+    if _p9k_vcs_status_for_dir; then
       _p9k_vcs_status_restore $_p9k_ret
       state=LOADING
     else
@@ -2900,9 +2910,9 @@ function _p9k_vcs_resume() {
   if [[ $VCS_STATUS_RESULT == ok-async ]]; then
     local latency=$((EPOCHREALTIME - _p9k__gitstatus_start_time))
     if (( latency > _POWERLEVEL9K_VCS_MAX_SYNC_LATENCY_SECONDS )); then
-      _p9k_git_slow[$VCS_STATUS_WORKDIR]=1
+      _p9k_git_slow[${${_p9k__git_dir:+GIT_DIR:$_p9k__git_dir}:-$VCS_STATUS_WORKDIR}]=1
     elif (( $1 && latency < 0.8 * _POWERLEVEL9K_VCS_MAX_SYNC_LATENCY_SECONDS )); then  # 0.8 to avoid flip-flopping
-      _p9k_git_slow[$VCS_STATUS_WORKDIR]=0
+      _p9k_git_slow[${${_p9k__git_dir:+GIT_DIR:$_p9k__git_dir}:-$VCS_STATUS_WORKDIR}]=0
     fi
     _p9k_vcs_status_save
   fi
@@ -2910,12 +2920,13 @@ function _p9k_vcs_resume() {
   if [[ -z $_p9k__gitstatus_next_dir ]]; then
     unset _p9k__gitstatus_next_dir
     case $VCS_STATUS_RESULT in
-      norepo-async) (( $1 )) && _p9k_vcs_status_purge ${${GIT_DIR:A}:-$_p9k_pwd_a};;
-      ok-async) (( $1 )) || _p9k__gitstatus_next_dir=${${GIT_DIR:A}:-$_p9k_pwd_a};;
+      norepo-async) (( $1 )) && _p9k_vcs_status_purge $_p9k_pwd_a;;
+      ok-async) (( $1 )) || _p9k__gitstatus_next_dir=$_p9k_pwd_a;;
     esac
   fi
 
   if [[ -n $_p9k__gitstatus_next_dir ]]; then
+    _p9k__git_dir=$GIT_DIR
     if ! gitstatus_query -d $_p9k__gitstatus_next_dir -t 0 -c '_p9k_vcs_resume 1' POWERLEVEL9K; then
       unset _p9k__gitstatus_next_dir
       unset VCS_STATUS_RESULT
@@ -2935,12 +2946,12 @@ function _p9k_vcs_resume() {
 function _p9k_vcs_gitstatus() {
   if [[ $_p9k_refresh_reason == precmd ]]; then
     if (( $+_p9k__gitstatus_next_dir )); then
-      _p9k__gitstatus_next_dir=${${GIT_DIR:A}:-$_p9k_pwd_a}
+      _p9k__gitstatus_next_dir=$_p9k_pwd_a
     else
-      local dir=${${GIT_DIR:A}:-$_p9k_pwd_a}
       local -F timeout=_POWERLEVEL9K_VCS_MAX_SYNC_LATENCY_SECONDS
-      if ! _p9k_vcs_status_for_dir $dir; then
-        gitstatus_query -d $dir -t $timeout -p -c '_p9k_vcs_resume 0' POWERLEVEL9K || return 1
+      if ! _p9k_vcs_status_for_dir; then
+        _p9k__git_dir=$GIT_DIR
+        gitstatus_query -d $_p9k_pwd_a -t $timeout -p -c '_p9k_vcs_resume 0' POWERLEVEL9K || return 1
         _p9k_maybe_ignore_git_repo
         case $VCS_STATUS_RESULT in
           tout) _p9k__gitstatus_next_dir=''; _p9k__gitstatus_start_time=$EPOCHREALTIME; return 0;;
@@ -2948,24 +2959,29 @@ function _p9k_vcs_gitstatus() {
           ok-sync) _p9k_vcs_status_save;;
         esac
       else
-        while true; do
-          case $_p9k_git_slow[$dir] in
-            "") [[ $dir == / ]] && break; dir=${dir:h};;
-            0) break;;
-            1) timeout=0; break;;
-          esac
-        done
-        dir=${${GIT_DIR:A}:-$_p9k_pwd_a}
+        if [[ -n $GIT_DIR ]]; then
+          [[ $_p9k_git_slow[GIT_DIR:$GIT_DIR] == 1 ]] && timeout=0
+        else
+          local dir=$_p9k_pwd_a
+          while true; do
+            case $_p9k_git_slow[$dir] in
+              "") [[ $dir == / ]] && break; dir=${dir:h};;
+              0) break;;
+              1) timeout=0; break;;
+            esac
+          done
+        fi
       fi
       (( _p9k__prompt_idx == 1 )) && timeout=0
-      if ! gitstatus_query -d $dir -t $timeout -c '_p9k_vcs_resume 1' POWERLEVEL9K; then
+      _p9k__git_dir=$GIT_DIR
+      if ! gitstatus_query -d $_p9k_pwd_a -t $timeout -c '_p9k_vcs_resume 1' POWERLEVEL9K; then
         unset VCS_STATUS_RESULT
         return 1
       fi
       _p9k_maybe_ignore_git_repo
       case $VCS_STATUS_RESULT in
         tout) _p9k__gitstatus_next_dir=''; _p9k__gitstatus_start_time=$EPOCHREALTIME;;
-        norepo-sync) _p9k_vcs_status_purge $dir;;
+        norepo-sync) _p9k_vcs_status_purge $_p9k_pwd_a;;
         ok-sync) _p9k_vcs_status_save;;
       esac
     fi
@@ -4501,6 +4517,7 @@ _p9k_init_vars() {
   typeset -ga _p9k_right_join
   typeset -g  _p9k__public_ip
   typeset -g  _p9k_todo_file
+  typeset -g  _p9k__git_dir
   # git workdir => 1 if gitstatus is slow on it, 0 if it's fast.
   typeset -gA _p9k_git_slow
   # git workdir => the last state we've seen for it
