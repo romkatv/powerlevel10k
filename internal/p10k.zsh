@@ -3965,7 +3965,7 @@ function _p9k_clear_instant_prompt() {
       local cr=$'\r'
       local sp="${(%):-%b%k%f%s%u$mark${(pl.$fill.. .)}$cr%b%k%f%s%u%E}"
       print -rn -- $terminfo[rc]${(%):-%b%k%f%s%u}$terminfo[ed]
-      if [[ -n ${(S)content//$'\e'*$'\a'} ]]; then
+      if [[ -n ${(S)content//$'\e'*($'\a'|$'\e\\')} ]]; then
         echo -E - ""
         echo -E - "${(%):-[%3FWARNING%f]: Console output during zsh initialization detected.}"
         echo -E - ""
