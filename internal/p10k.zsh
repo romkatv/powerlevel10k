@@ -4806,7 +4806,7 @@ _p9k_init_params() {
   _p9k_declare -a POWERLEVEL9K_VCS_SVN_HOOKS -- vcs-detect-changes svn-detect-changes
   # If it takes longer than this to fetch git repo status, display the prompt with a greyed out
   # vcs segment and fix it asynchronously when the results come it.
-  _p9k_declare -F POWERLEVEL9K_VCS_MAX_SYNC_LATENCY_SECONDS 0.05
+  _p9k_declare -F POWERLEVEL9K_VCS_MAX_SYNC_LATENCY_SECONDS 0.02
   _p9k_declare -a POWERLEVEL9K_VCS_BACKENDS -- git
   _p9k_declare -b POWERLEVEL9K_VCS_DISABLE_GITSTATUS_FORMATTING 0
   _p9k_declare -i POWERLEVEL9K_VCS_MAX_INDEX_SIZE_DIRTY -1
