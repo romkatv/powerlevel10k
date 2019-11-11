@@ -3954,9 +3954,6 @@ function _p9k_clear_instant_prompt() {
   unset __p9k_fd_1 __p9k_fd_2
   if [[ -s $__p9k_instant_prompt_output ]]; then
     {
-      if [[ $POWERLEVEL9K_DEBUG_ISSUE_315 == true ]]; then
-        exec 2>&1
-      fi
       local content
       [[ $_POWERLEVEL9K_INSTANT_PROMPT == verbose ]] && content="$(<$__p9k_instant_prompt_output)"
       local mark="${PROMPT_EOL_MARK-%B%S%#%s%b}"
@@ -4009,11 +4006,6 @@ function _p9k_clear_instant_prompt() {
       fi
       cat $__p9k_instant_prompt_output
       echo -nE - $sp
-      if [[ $POWERLEVEL9K_DEBUG_ISSUE_315 == true && -n ${(S)content//$'\e'*$'\a'} ]]; then
-        typeset content
-        ls -l $__p9k_instant_prompt_output
-        (( $+commands[hexdump] )) && hexdump -c $__p9k_instant_prompt_output
-      fi
       zf_rm -f -- $__p9k_instant_prompt_output
     } 2>/dev/null
   else
