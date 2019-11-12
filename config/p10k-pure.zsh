@@ -61,11 +61,9 @@
   typeset -g POWERLEVEL9K_PROMPT_CHAR_{OK,ERROR}_VIINS_CONTENT_EXPANSION='❯'
   # Prompt symbol in command vi mode.
   typeset -g POWERLEVEL9K_PROMPT_CHAR_{OK,ERROR}_VICMD_CONTENT_EXPANSION='❮'
-  # Prompt symbol in visual vi mode is the same as in command mode. This is unlikely
-  # to be desired by anyone but that's how Pure does it.
+  # Prompt symbol in visual vi mode is the same as in command mode.
   typeset -g POWERLEVEL9K_PROMPT_CHAR_{OK,ERROR}_VIVIS_CONTENT_EXPANSION='❮'
-  # Prompt symbol in overwrite vi mode is the same as in command mode. This is unlikely
-  # to be desired by anyone but that's how Pure does it.
+  # Prompt symbol in overwrite vi mode is the same as in command mode.
   typeset -g POWERLEVEL9K_PROMPT_CHAR_OVERWRITE_STATE=false
 
   # Grey Python Virtual Environment.
