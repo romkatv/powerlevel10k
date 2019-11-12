@@ -4254,6 +4254,9 @@ _p9k_precmd_impl() {
   if [[ $precmd_functions[-1] != _p9k_precmd && $precmd_functions[(I)_p9k_precmd] != 0 ]]; then
     precmd_functions=(${(@)precmd_functions:#_p9k_precmd} _p9k_precmd)
   fi
+  if [[ $precmd_functions[1] != _p9k_do_nothing && $precmd_functions[(I)_p9k_do_nothing] != 0 ]]; then
+    precmd_functions=(_p9k_do_nothing ${(@)precmd_functions:#_p9k_do_nothing})
+  fi
 }
 
 _p9k_trapint() {
@@ -5684,8 +5687,7 @@ prompt_powerlevel9k_setup() {
   prompt_powerlevel9k_teardown
   __p9k_enabled=1
   add-zsh-hook preexec _p9k_preexec
-  add-zsh-hook precmd _p9k_do_nothing
-  add-zsh-hook precmd _p9k_precmd
+  typeset -ga precmd_functions=(_p9k_do_nothing $precmd_functions _p9k_precmd)
 }
 
 prompt_powerlevel9k_teardown() {
