@@ -5338,6 +5338,9 @@ function _p9k_init_cacheable() {
     _p9k_transient_prompt+=$_p9k_ret')}${${P9K_CONTENT::="❯"}+}'
     _p9k_param prompt_prompt_char_OK_VIINS CONTENT_EXPANSION '${P9K_CONTENT}'
     _p9k_transient_prompt+='${:-"'$_p9k_ret'"}%b%k%f%s%u '
+    if [[ $ITERM_SHELL_INTEGRATION_INSTALLED == Yes ]]; then
+      _p9k_transient_prompt=$'%{\e]133;A\a%}'$_p9k_transient_prompt$'%{\e]133;B\a%}'
+    fi
   fi
 
   _p9k_uname="$(uname)"
