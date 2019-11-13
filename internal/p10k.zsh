@@ -5966,7 +5966,7 @@ autoload -Uz add-zsh-hook
 
 zmodload zsh/datetime
 zmodload zsh/mathfunc
-zmodload zsh/parameter
+zmodload zsh/parameter 2>/dev/null  # https://github.com/romkatv/gitstatus/issues/58#issuecomment-553407177
 zmodload zsh/system
 zmodload -F zsh/stat b:zstat
 zmodload -F zsh/net/socket b:zsocket
