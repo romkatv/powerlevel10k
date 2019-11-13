@@ -5257,7 +5257,7 @@ _p9k_init_prompt() {
 
   if [[ $ITERM_SHELL_INTEGRATION_INSTALLED == Yes ]]; then
     _p9k_prompt_prefix_left+=$'%{\e]133;A\a%}'
-    [[ $TERM_PROGRAM == iTerm.app ]] && _p9k_prompt_suffix_left+=$'%{\e]133;B\a%}'
+    _p9k_prompt_suffix_left+=$'%{\e]133;B\a%}'
   fi
 
   ( _p9k_segment_in_use time && (( _POWERLEVEL9K_TIME_UPDATE_ON_COMMAND )) )
@@ -5310,7 +5310,7 @@ _p9k_must_init() {
   _p9k__param_pat+=$'${#parameters[(I)POWERLEVEL9K_*]}\1${(%):-%n%#}\1$GITSTATUS_LOG_LEVEL\1'
   _p9k__param_pat+=$'$GITSTATUS_ENABLE_LOGGING\1$GITSTATUS_DAEMON\1$GITSTATUS_NUM_THREADS\1'
   _p9k__param_pat+=$'$DEFAULT_USER\1${ZLE_RPROMPT_INDENT:-1}\1$P9K_SSH\1$__p9k_ksh_arrays'
-  _p9k__param_pat+=$'$__p9k_sh_glob\1$ITERM_SHELL_INTEGRATION_INSTALLED\1$TERM_PROGRAM\1'
+  _p9k__param_pat+=$'$__p9k_sh_glob\1$ITERM_SHELL_INTEGRATION_INSTALLED\1'
   _p9k__param_pat+=$'${PROMPT_EOL_MARK-%B%S%#%s%b}\1$LANG\1$LC_ALL\1$LC_CTYPE\1'
   _p9k__param_pat+=$'$functions[p10k-on-pre-prompt]\1'
   local MATCH
@@ -5339,8 +5339,7 @@ function _p9k_init_cacheable() {
     _p9k_param prompt_prompt_char_OK_VIINS CONTENT_EXPANSION '${P9K_CONTENT}'
     _p9k_transient_prompt+='${:-"'$_p9k_ret'"}%b%k%f%s%u '
     if [[ $ITERM_SHELL_INTEGRATION_INSTALLED == Yes ]]; then
-      _p9k_transient_prompt=$'%{\e]133;A\a%}'$_p9k_transient_prompt
-      [[ $TERM_PROGRAM == iTerm.app ]] && _p9k_transient_prompt+=$'%{\e]133;B\a%}'
+      _p9k_transient_prompt=$'%{\e]133;A\a%}'$_p9k_transient_prompt$'%{\e]133;B\a%}'
     fi
   fi
 
