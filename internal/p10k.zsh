@@ -5586,7 +5586,7 @@ _p9k_init() {
   fi
   if (( $+functions[iterm2_precmd] )); then
     _p9k__iterm2_precmd=$functions[iterm2_precmd]
-    functions[iterm2_precmd]='local _p9k_status=$?; zle || return; () { return $_p9k_status; }; '$_p9k__iterm2_precmd
+    functions[iterm2_precmd]='local _p9k_status=$?; zle && return; () { return $_p9k_status; }; '$_p9k__iterm2_precmd
   fi
 
   if _p9k_segment_in_use todo; then
