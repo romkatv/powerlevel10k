@@ -5257,6 +5257,7 @@ _p9k_init_prompt() {
 
   if [[ $ITERM_SHELL_INTEGRATION_INSTALLED == Yes ]]; then
     _p9k_prompt_prefix_left+=$'%{\e]133;A\a%}'
+    _p9k_prompt_suffix_left+=$'%{\e]133;B\a%}'
   fi
 
   ( _p9k_segment_in_use time && (( _POWERLEVEL9K_TIME_UPDATE_ON_COMMAND )) )
@@ -5573,6 +5574,18 @@ _p9k_init() {
 
   _p9k_init_display
 
+  if (( $+functions[iterm2_decorate_prompt] )); then
+    _p9k__iterm2_decorate_prompt=$functions[iterm2_decorate_prompt]
+    function iterm2_decorate_prompt() {
+      typeset -g ITERM2_PRECMD_PS1=
+      typeset -g ITERM2_SHOULD_DECORATE_PROMPT=
+    }
+  fi
+  if (( $+functions[iterm2_precmd] )); then
+    _p9k__iterm2_precmd=$functions[iterm2_precmd]
+    functions[iterm2_precmd]='local _p9k_status=$?; zle || return; () { return $_p9k_status; }; '$_p9k__iterm2_precmd
+  fi
+
   if _p9k_segment_in_use todo; then
     local todo=$commands[todo.sh]
     if [[ -n $todo ]]; then
@@ -5657,6 +5670,8 @@ _p9k_deinit() {
   (( $+functions[gitstatus_stop] )) && gitstatus_stop POWERLEVEL9K
   _p9k_deinit_async_pump
   (( _p9k__dump_pid )) && wait $_p9k__dump_pid 2>/dev/null
+  (( $+_p9k__iterm2_precmd )) && functions[iterm2_precmd]=$_p9k__iterm2_precmd
+  (( $+_p9k__iterm2_decorate_prompt )) && functions[iterm2_decorate_prompt]=$_p9k__iterm2_decorate_prompt
   unset -m '(_POWERLEVEL9K_|P9K_|_p9k_)*~(P9K_SSH|P9K_TTY)'
 }
 
