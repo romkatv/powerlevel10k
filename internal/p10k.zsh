@@ -5305,7 +5305,7 @@ _p9k_must_init() {
     [[ $sig == $_p9k__param_sig ]] && return 1
     _p9k_deinit
   fi
-  _p9k__param_pat=$'v5\1'${ZSH_VERSION}$'\1'${ZSH_PATCHLEVEL}$'\1'
+  _p9k__param_pat=$'v6\1'${ZSH_VERSION}$'\1'${ZSH_PATCHLEVEL}$'\1'
   _p9k__param_pat+=$'${#parameters[(I)POWERLEVEL9K_*]}\1${(%):-%n%#}\1$GITSTATUS_LOG_LEVEL\1'
   _p9k__param_pat+=$'$GITSTATUS_ENABLE_LOGGING\1$GITSTATUS_DAEMON\1$GITSTATUS_NUM_THREADS\1'
   _p9k__param_pat+=$'$DEFAULT_USER\1${ZLE_RPROMPT_INDENT:-1}\1$P9K_SSH\1$__p9k_ksh_arrays'
@@ -5529,7 +5529,7 @@ _p9k_init_vcs() {
     daemon=$gitstatus_dir/bin/gitstatusd-
     if [[ $_p9k_uname_o == Android ]]; then
       daemon+=android
-    elif [[ $_p9k_uname == (MINGW_64-10.0|MSYS_NT-10.0)* ]]; then
+    elif [[ ${(L)_p9k_uname} == (mingw|msys)* ]]; then
       daemon+=msys_nt-10.0
     else
       daemon+=${_p9k_uname:l}
