@@ -978,7 +978,15 @@ prompt_anaconda() {
 prompt_aws() {
   local aws_profile="${AWS_VAULT:-${AWSUME_PROFILE:-${AWS_PROFILE:-$AWS_DEFAULT_PROFILE}}}"
   if [[ -n "$aws_profile" ]]; then
-    _p9k_prompt_segment "$0" red white 'AWS_ICON' 0 '' "${aws_profile//\%/%%}"
+    local pat class
+    for pat class in "${_POWERLEVEL9K_AWS_CLASSES[@]}"; do
+      if [[ $aws_profile == ${~pat} ]]; then
+        [[ -n $class ]] && state=_${(U)class}
+        break
+      fi
+    done
+
+    _p9k_prompt_segment "$0$state" red white 'AWS_ICON' 0 '' "${aws_profile//\%/%%}"
   fi
 }
 
@@ -1085,7 +1093,7 @@ prompt_battery() {
       local -a bats=( /sys/class/power_supply/(BAT*|battery)/(FN) )
       (( $#bats )) || return
 
-      local -i energy_now energy_full power_now 
+      local -i energy_now energy_full power_now
       local -i is_full=1 is_calculating is_charching
       local dir
       for dir in $bats; do
@@ -4439,7 +4447,7 @@ _p9k_init_async_pump() {
       local ip_url=$_POWERLEVEL9K_PUBLIC_IP_HOST
       local lock=$_p9k__async_pump_lock
       local fifo=$_p9k__async_pump_fifo
-      $functions[_p9k_async_pump]" 
+      $functions[_p9k_async_pump]"
 
     local setsid=${commands[setsid]:-/usr/local/opt/util-linux/bin/setsid}
     [[ -f $setsid ]] && setsid=${(q)setsid} || setsid=
@@ -4602,7 +4610,7 @@ _p9k_init_vars() {
 
 _p9k_init_params() {
   # invarint:  _POWERLEVEL9K_INSTANT_PROMPT == (verbose|quiet|off)
-  # invariant: [[ ($_POWERLEVEL9K_INSTANT_PROMPT == off) == $_POWERLEVEL9K_DISABLE_INSTANT_PROMPT ]] 
+  # invariant: [[ ($_POWERLEVEL9K_INSTANT_PROMPT == off) == $_POWERLEVEL9K_DISABLE_INSTANT_PROMPT ]]
   _p9k_declare -s POWERLEVEL9K_INSTANT_PROMPT  # verbose, quiet, off
   if [[ $_POWERLEVEL9K_INSTANT_PROMPT == off ]]; then
     typeset -gi _POWERLEVEL9K_DISABLE_INSTANT_PROMPT=1
@@ -4852,6 +4860,7 @@ _p9k_init_params() {
   #   POWERLEVEL9K_KUBECONTEXT_TESTING_BACKGROUND=green
   #   POWERLEVEL9K_KUBECONTEXT_OTHER_BACKGROUND=yellow
   _p9k_declare -a POWERLEVEL9K_KUBECONTEXT_CLASSES --
+  _p9k_declare -a POWERLEVEL9K_AWS_CLASSES --
   # Specifies the format of java version.
   #
   #   POWERLEVEL9K_JAVA_VERSION_FULL=true  => 1.8.0_212-8u212-b03-0ubuntu1.18.04.1-b03
