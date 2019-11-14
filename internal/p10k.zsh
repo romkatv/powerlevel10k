@@ -5214,6 +5214,11 @@ _p9k_init_prompt() {
     _p9k_prompt_prefix_left+='${${_p9k_ind::=${${ZLE_RPROMPT_INDENT:-1}/#-*/0}}+}'
   fi
 
+  if [[ $ITERM_SHELL_INTEGRATION_INSTALLED == Yes ]]; then
+    _p9k_prompt_prefix_left+=$'%{\e]133;A\a%}'
+    _p9k_prompt_suffix_left+=$'%{\e]133;B\a%}'
+  fi
+
   if (( _POWERLEVEL9K_PROMPT_ADD_NEWLINE_COUNT > 0 )); then
     _p9k_t+=${(pl.$_POWERLEVEL9K_PROMPT_ADD_NEWLINE_COUNT..\n.)}
   else
@@ -5253,11 +5258,6 @@ _p9k_init_prompt() {
     _p9k_prompt_prefix_left+='${(e)_p9k_t[${_p9k__ruler_i:-'$#_p9k_t'}-1]}'
   else
     _p9k_prompt_prefix_left+='${(e)_p9k_t[${_p9k__ruler_i:-'$#_p9k_t'}]}'
-  fi
-
-  if [[ $ITERM_SHELL_INTEGRATION_INSTALLED == Yes ]]; then
-    _p9k_prompt_prefix_left+=$'%{\e]133;A\a%}'
-    _p9k_prompt_suffix_left+=$'%{\e]133;B\a%}'
   fi
 
   ( _p9k_segment_in_use time && (( _POWERLEVEL9K_TIME_UPDATE_ON_COMMAND )) )
