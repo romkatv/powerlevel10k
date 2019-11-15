@@ -1749,7 +1749,6 @@ while true; do
     ask_time            || continue
     ask_separators      || continue
     ask_heads           || continue
-    ask_extra_icons     || continue
     ask_tails           || continue
     ask_num_lines       || continue
     ask_gap_char        || continue
