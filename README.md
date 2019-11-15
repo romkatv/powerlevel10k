@@ -288,8 +288,10 @@ It's likely your font's fault.
 
 ### Why is my cursor in the wrong place?
 
-Type `echo '\u276F'`. If you get an error saying "zsh: character not in range",
-your locale doesn't support UTF-8. You need to fix it.
+Type `echo '\u276F'`. If you get an error saying "zsh: character not in range", your locale
+doesn't support UTF-8. You need to fix it. If you are running zsh over SSH, see
+[this](https://github.com/romkatv/powerlevel10k/issues/153#issuecomment-518347833). If you are
+running zsh locally, Google "set UTF-8 locale in *your OS*".
 
 If the `echo` command prints `❯` but the cursor is still in the wrong place, install
 [the recommended font](#recommended-meslo-nerd-font-patched-for-powerlevel10k) and run
