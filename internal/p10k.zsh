@@ -2111,18 +2111,23 @@ function _p9k_rbenv_global_version() {
 # https://github.com/rbenv/rbenv#choosing-the-ruby-version
 prompt_rbenv() {
   (( $+commands[rbenv] || $+functions[rbenv] )) || return
-  local v=$RBENV_VERSION
-  if [[ -z $v ]]; then
+  if [[ -n $RBENV_VERSION ]]; then
+    (( ${_POWERLEVEL9K_RBENV_SOURCES[(I)shell]} )) || return
+    local v=$RBENV_VERSION
+  else
+    (( ${_POWERLEVEL9K_RBENV_SOURCES[(I)local|global]} )) || return
     [[ $RBENV_DIR == /* ]] && local dir=$RBENV_DIR || local dir="$_p9k_pwd_a/$RBENV_DIR"
     while true; do
       if _p9k_read_rbenv_version_file $dir/.ruby-version; then
-        v=$_p9k_ret
+        (( ${_POWERLEVEL9K_RBENV_SOURCES[(I)local]} )) || return
+        local v=$_p9k_ret
         break
       fi
       if [[ $dir == / ]]; then
         (( _POWERLEVEL9K_RBENV_PROMPT_ALWAYS_SHOW )) || return
+        (( ${_POWERLEVEL9K_RBENV_SOURCES[(I)global]} )) || return
         _p9k_rbenv_global_version
-        v=$_p9k_ret
+        local v=$_p9k_ret
         break
       fi
       dir=${dir:h}
@@ -4776,6 +4781,7 @@ _p9k_init_params() {
   _p9k_declare -b POWERLEVEL9K_GO_VERSION_PROJECT_ONLY 1
   _p9k_declare -b POWERLEVEL9K_RUST_VERSION_PROJECT_ONLY 1
   _p9k_declare -b POWERLEVEL9K_RBENV_PROMPT_ALWAYS_SHOW 0
+  _p9k_declare -a POWERLEVEL9K_RBENV_SOURCES -- shell local global
   _p9k_declare -b POWERLEVEL9K_RVM_SHOW_GEMSET 0
   _p9k_declare -b POWERLEVEL9K_RVM_SHOW_PREFIX 0
   _p9k_declare -b POWERLEVEL9K_CHRUBY_SHOW_VERSION 1
@@ -5315,7 +5321,7 @@ _p9k_must_init() {
     [[ $sig == $_p9k__param_sig ]] && return 1
     _p9k_deinit
   fi
-  _p9k__param_pat=$'v8\1'${ZSH_VERSION}$'\1'${ZSH_PATCHLEVEL}$'\1'
+  _p9k__param_pat=$'v9\1'${ZSH_VERSION}$'\1'${ZSH_PATCHLEVEL}$'\1'
   _p9k__param_pat+=$'${#parameters[(I)POWERLEVEL9K_*]}\1${(%):-%n%#}\1$GITSTATUS_LOG_LEVEL\1'
   _p9k__param_pat+=$'$GITSTATUS_ENABLE_LOGGING\1$GITSTATUS_DAEMON\1$GITSTATUS_NUM_THREADS\1'
   _p9k__param_pat+=$'$DEFAULT_USER\1${ZLE_RPROMPT_INDENT:-1}\1$P9K_SSH\1$__p9k_ksh_arrays'

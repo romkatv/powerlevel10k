@@ -631,7 +631,10 @@
   #############[ rbenv: ruby version from rbenv (https://github.com/rbenv/rbenv) ]##############
   # Rbenv color.
   typeset -g POWERLEVEL9K_RBENV_FOREGROUND=168
-  # Don't show ruby version if it's the same as global: $(rbenv version-name) == $(rbenv global).
+  # Hide ruby version if it doesn't come from one of these sources.
+  typeset -g POWERLEVEL9K_RBENV_SOURCES=(shell local global)
+  # If set to false, hide ruby version if it's the same as global:
+  # $(rbenv version-name) == $(rbenv global).
   typeset -g POWERLEVEL9K_RBENV_PROMPT_ALWAYS_SHOW=false
   # Custom icon.
   # typeset -g POWERLEVEL9K_RBENV_VISUAL_IDENTIFIER_EXPANSION='⭐'
