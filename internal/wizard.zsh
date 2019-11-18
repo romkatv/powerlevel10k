@@ -641,9 +641,12 @@ function ask_ornaments_color() {
   else
     local nl=$'\n'
   fi
+  local ornaments=()
+  [[ $gap_char != ' ' ]]          && ornaments+=Connection
+  (( left_frame || right_frame )) && ornaments+=Frame
   while true; do
     clear
-    flowing -c "%BOrnaments Color%b"
+    flowing -c "%B${(j: & :)ornaments} Color%b"
     print -n $nl
     print -P "%B(1)  Lightest.%b"
     print -n $nl
