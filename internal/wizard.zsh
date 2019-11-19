@@ -1443,15 +1443,13 @@ function generate_config() {
       sub VPN_IP_VISUAL_IDENTIFIER_EXPANSION "'\${P9K_VISUAL_IDENTIFIER}'"
     fi
 
+    if [[ $POWERLEVEL9K_MODE == compatible ]]; then
+      sub STATUS_ERROR_VISUAL_IDENTIFIER_EXPANSION "'х'"
+      sub STATUS_ERROR_SIGNAL_VISUAL_IDENTIFIER_EXPANSION "'х'"
+      sub STATUS_ERROR_PIPE_VISUAL_IDENTIFIER_EXPANSION "'х'"
+    fi
+
     if [[ $POWERLEVEL9K_MODE == (compatible|powerline) ]]; then
-      # Many fonts don't have the default icons.
-      [[ $POWERLEVEL9K_MODE == compatible ]] && local error='х' || local error='✘'
-      uncomment 'typeset -g POWERLEVEL9K_STATUS_ERROR_VISUAL_IDENTIFIER_EXPANSION'
-      sub STATUS_ERROR_VISUAL_IDENTIFIER_EXPANSION "'$error'"
-      uncomment 'typeset -g POWERLEVEL9K_STATUS_ERROR_SIGNAL_VISUAL_IDENTIFIER_EXPANSION'
-      sub STATUS_ERROR_SIGNAL_VISUAL_IDENTIFIER_EXPANSION "'$error'"
-      uncomment 'typeset -g POWERLEVEL9K_STATUS_ERROR_PIPE_VISUAL_IDENTIFIER_EXPANSION'
-      sub STATUS_ERROR_PIPE_VISUAL_IDENTIFIER_EXPANSION "'$error'"
       uncomment 'typeset -g POWERLEVEL9K_DIR_NOT_WRITABLE_VISUAL_IDENTIFIER_EXPANSION'
       sub DIR_NOT_WRITABLE_VISUAL_IDENTIFIER_EXPANSION "'∅'"
       uncomment 'typeset -g POWERLEVEL9K_TERRAFORM_VISUAL_IDENTIFIER_EXPANSION'
