@@ -332,23 +332,25 @@ function install_font() {
           curl -fsSL -o ~/Library/Fonts/$file "$font_base_url/${file// /%20}"
       done
       print -nP -- "Changing %BiTerm2%b settings ..."
-      local k v settings=(
-        '"Normal Font"' '"MesloLGSNer-Regular '$iterm2_font_size'"'
-        '"Horizontal Spacing"' 1
-        '"Vertical Spacing"' 1
-        '"Use Bold Font"' 1
-        '"Use Bright Bold"' 1
-        '"Use Italic Font"' 1
-        '"Use Non-ASCII Font"' 0
-        '"Ambiguous Double Width"' 0
-        '"Terminal Type"' '"xterm-256color"'
-        # '"Minimum Contrast"' 0.000000
-        '"ASCII Anti Aliased"' 1
-        '"Non-ASCII Anti Aliased"' 1
+      local k t v settings=(
+        '"Normal Font"'            string '"MesloLGSNer-Regular '$iterm2_font_size'"'
+        '"Terminal Type"'          string '"xterm-256color"'
+        '"Horizontal Spacing"'     real   1
+        '"Vertical Spacing"'       real   1
+        '"Minimum Contrast"'       real   0
+        '"Use Bold Font"'          bool   1
+        '"Use Bright Bold"'        bool   1
+        '"Use Italic Font"'        bool   1
+        '"ASCII Anti Aliased"'     bool   1
+        '"Non-ASCII Anti Aliased"' bool   1
+        '"Use Non-ASCII Font"'     bool   0
+        '"Ambiguous Double Width"' bool   0
       )
-      for k v in $settings; do
+      for k t v in $settings; do
+        /usr/libexec/PlistBuddy -c "Set :\"New Bookmarks\":0:$k $v" \
+          ~/Library/Preferences/com.googlecode.iterm2.plist && continue
         run_command "" /usr/libexec/PlistBuddy -c \
-          "Set :\"New Bookmarks\":0:$k $v" ~/Library/Preferences/com.googlecode.iterm2.plist
+          "Add :\"New Bookmarks\":0:$k $t $v" ~/Library/Preferences/com.googlecode.iterm2.plist
       done
       print -P " %2FOK%f"
       run_command "Updating %BiTerm2%b settings cache" /usr/bin/defaults read com.googlecode.iterm2
