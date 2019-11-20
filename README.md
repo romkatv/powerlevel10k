@@ -30,6 +30,7 @@ it will generate the same prompt.
 1. [FAQ](#faq)
    1. [What is instant prompt?](#what-is-instant-prompt)
    1. [Why do my icons and/or powerline symbols look bad?](#why-do-my-icons-andor-powerline-symbols-look-bad)
+   1. [I'm getting "character not in range" error. What gives?](#im-getting-character-not-in-range-error-what-gives)
    1. [Why is my cursor in the wrong place?](#why-is-my-cursor-in-the-wrong-place)
    1. [Why is my prompt wrapping around in a weird way?](#why-is-my-prompt-wrapping-around-in-a-weird-way)
    1. [Why is my right prompt in the wrong place?](#why-is-my-right-prompt-in-the-wrong-place)
@@ -286,12 +287,17 @@ It's likely your font's fault.
 [Install the recommended font](#recommended-meslo-nerd-font-patched-for-powerlevel10k) and run
 `p10k configure`.
 
-### Why is my cursor in the wrong place?
+### I'm getting "character not in range" error. What gives?
 
 Type `echo '\u276F'`. If you get an error saying "zsh: character not in range", your locale
 doesn't support UTF-8. You need to fix it. If you are running zsh over SSH, see
 [this](https://github.com/romkatv/powerlevel10k/issues/153#issuecomment-518347833). If you are
 running zsh locally, Google "set UTF-8 locale in *your OS*".
+
+### Why is my cursor in the wrong place?
+
+Type `echo '\u276F'`. If you get an error saying "zsh: character not in range", see the
+[previous question](#im-getting-character-not-in-range-error-what-gives).
 
 If the `echo` command prints `❯` but the cursor is still in the wrong place, install
 [the recommended font](#recommended-meslo-nerd-font-patched-for-powerlevel10k) and run
