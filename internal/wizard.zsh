@@ -1261,9 +1261,9 @@ function ask_instant_prompt() {
     case $key in
       q) quit;;
       r) return 1;;
-      1) instant_prompt=off; break;;
-      2) instant_prompt=quiet; break;;
-      3) instant_prompt=verbose; break;;
+      1) instant_prompt=off; options+=instant_prompt=off; break;;
+      2) instant_prompt=quiet; options+=instant_prompt=quiet; break;;
+      3) instant_prompt=verbose; options+=instant_prompt=verbose; break;;
     esac
   done
 }
@@ -1313,7 +1313,7 @@ function ask_transient_prompt() {
     case $key in
       q) quit;;
       r) return 1;;
-      y) transient_prompt=1; break;;
+      y) transient_prompt=1; options+=transient_prompt; break;;
       n) transient_prompt=0; break;;
     esac
   done
