@@ -71,7 +71,7 @@ function p9k_configure() {
   )
   local ret=$?
   case $ret in
-    0)  source $__p9k_cfg_path;;
+    0)  source $__p9k_cfg_path; _p9k__force_must_init=1;;
     69) return 0;;
     *)  return $ret;;
   esac

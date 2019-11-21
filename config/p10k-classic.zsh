@@ -912,6 +912,10 @@
   # can slow down prompt by 1-2 milliseconds, so it's better to keep it turned off unless you
   # really need it.
   typeset -g POWERLEVEL9K_DISABLE_HOT_RELOAD=true
+
+  # If p10k is already loaded, reload configuration.
+  # This works even with POWERLEVEL9K_DISABLE_HOT_RELOAD=true.
+  (( ! $+functions[p10k] )) || p10k reload
 }
 
 (( ${#p10k_config_opts} )) && setopt ${p10k_config_opts[@]}

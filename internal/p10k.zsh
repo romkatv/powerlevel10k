@@ -4228,7 +4228,8 @@ _p9k_precmd_impl() {
                 instant_prompt_disabled=1
               else
                 source "$__p9k_cfg_path"
-                _POWERLEVEL9K_DISABLE_HOT_RELOAD=0 _p9k_must_init
+                _p9k__force_must_init=1
+                _p9k_must_init
               fi
             ;;
             2)
@@ -4607,6 +4608,7 @@ _p9k_init_vars() {
   typeset -gA _p9k__dotnet_stat_cache
   typeset -gA _p9k__dir_stat_cache
   typeset -gi _p9k__expanded
+  typeset -gi _p9k__force_must_init
 
   typeset -g  P9K_VISUAL_IDENTIFIER
   typeset -g  P9K_CONTENT
@@ -5314,7 +5316,8 @@ _p9k_init_ssh() {
 }
 
 _p9k_must_init() {
-  (( _POWERLEVEL9K_DISABLE_HOT_RELOAD )) && return 1
+  (( _POWERLEVEL9K_DISABLE_HOT_RELOAD && !_p9k__force_must_init )) && return 1
+  _p9k__force_must_init=0
   local IFS sig
   if [[ -n $_p9k__param_sig ]]; then
     IFS=$'\2' sig="${(e)_p9k__param_pat}"
@@ -5741,6 +5744,7 @@ typeset -gr __p9k_p10k_usage="Usage: %2Fp10k%f %Bcommand%b [options]
 Commands:
 
   %Bconfigure%b  run interactive configuration wizard
+  %Breload%b     reload configuration
   %Bsegment%b    print a user-defined prompt segment
   %Bdisplay%b    show, hide or toggle prompt parts
   %Bhelp%b       print this help message
@@ -5821,6 +5825,10 @@ Example customizations:
 typeset -gr __p9k_p10k_configure_usage="Usage: %2Fp10k%f %Bconfigure%b
 
 Run interactive configuration wizard."
+
+typeset -gr __p9k_p10k_reload_usage="Usage: %2Fp10k%f %Breload%b
+
+Reload configuration."
 
 typeset -gr __p9k_p10k_finalize_usage="Usage: %2Fp10k%f %Bfinalize%b
 
@@ -5962,7 +5970,14 @@ function p10k() {
         return 1
       fi
       p9k_configure "$@" || return
-      _p9k_deinit
+      ;;
+    reload)
+      if (( ARGC > 1 )); then
+        print -rP -- $__p9k_p10k_reload_usage >&2
+        return 1
+      fi
+      (( $+_p9k__force_must_init )) || return 0
+      _p9k__force_must_init=1
       ;;
     help)
       local var=__p9k_p10k_$2_usage
