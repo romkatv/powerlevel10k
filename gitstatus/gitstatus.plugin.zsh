@@ -160,13 +160,11 @@ function gitstatus_query() {
   local client_pid_var=_GITSTATUS_CLIENT_PID_${name}
   [[ ${(P)client_pid_var} == $$ ]]
 
-  if [[ -z ${GIT_DIR:-} ]]; then
+  [[ -z ${GIT_DIR:-} ]] && {
     [[ $dir == /* ]] || dir=${(%):-%/}/$dir
-  elif [[ $GIT_DIR == /* ]]; then
-    dir=:$GIT_DIR
-  else
-    dir=:${(%):-%/}/$GIT_DIR
-  fi
+  } || {
+    [[ $GIT_DIR == /* ]] && dir=:$GIT_DIR || dir=:${(%):-%/}/$GIT_DIR
+  }
 
   local req_fd_var=_GITSTATUS_REQ_FD_${name}
   local -i req_fd=${(P)req_fd_var}
