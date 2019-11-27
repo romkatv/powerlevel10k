@@ -49,8 +49,8 @@ it will generate the same prompt.
 ### Manual
 
 ```zsh
-git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ~/powerlevel10k
-echo 'source ~/powerlevel10k/powerlevel10k.zsh-theme' >>! ~/.zshrc
+git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ~/.oh-my-zsh/themes/powerlevel10k
+echo 'source ~/.oh-my-zsh/themes/powerlevel10k/powerlevel10k.zsh-theme' >>! ~/.zshrc
 ```
 
 This is the simplest kind of installation and it works even if you are using a plugin manager. Just
@@ -60,10 +60,16 @@ make sure to disable your current theme in your plugin manager. See
 ### Oh My Zsh
 
 ```zsh
-git clone --depth=1 https://github.com/romkatv/powerlevel10k.git $ZSH_CUSTOM/themes/powerlevel10k
+git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ~/.oh-my-zsh/themes/powerlevel10k
 ```
 
-Set `ZSH_THEME=powerlevel10k/powerlevel10k` in your `~/.zshrc`.
+Set 
+
+`ZSH_THEME=powerlevel10k/powerlevel10k` 
+and
+`source ~/.oh-my-zsh/themes/powerlevel10k/powerlevel10k.zsh-theme`
+
+in your `~/.zshrc`.
 
 ### Prezto
 
