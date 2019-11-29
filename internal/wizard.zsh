@@ -1,5 +1,3 @@
-#!/usr/bin/env zsh
-
 emulate -L zsh
 setopt noaliases
 
@@ -12,13 +10,11 @@ fi
 
 zmodload -F zsh/files b:zf_mv b:zf_rm
 
-typeset -g __p9k_root_dir
-typeset -gi force=0
+local -i force=0
 
 local opt
-while getopts 'd:f' opt; do
+while getopts 'f' opt; do
   case $opt in
-    d)  __p9k_root_dir=$OPTARG;;
     f)  force=1;;
     +f) force=0;;
     \?) return 1;;
@@ -30,74 +26,69 @@ if (( OPTIND <= ARGC )); then
   return 1
 fi
 
-: ${__p9k_root_dir:=${0:h:h:A}}
+local -ri force
 
-typeset -gr __p9k_root_dir
-typeset -gri force
+local -r font_base_url='https://github.com/romkatv/dotfiles-public/raw/master/.local/share/fonts/NerdFonts'
+local -ri wizard_columns=$((COLUMNS < 80 ? COLUMNS : 80))
 
-source $__p9k_root_dir/internal/configure.zsh || return
+local -ri prompt_indent=2
 
-typeset -r font_base_url='https://github.com/romkatv/dotfiles-public/raw/master/.local/share/fonts/NerdFonts'
-typeset -ri wizard_columns=$((COLUMNS < 80 ? COLUMNS : 80))
+local -ra bg_color=(240 238 236 234)
+local -ra frame_color=(244 242 240 238)
+local -ra sep_color=(248 246 244 242)
+local -ra prefix_color=(250 248 246 244)
 
-typeset -ri prompt_indent=2
+local -r left_circle='\uE0B6'
+local -r right_circle='\uE0B4'
+local -r left_arc='\uE0B7'
+local -r right_arc='\uE0B5'
+local -r left_triangle='\uE0B2'
+local -r right_triangle='\uE0B0'
+local -r left_angle='\uE0B3'
+local -r right_angle='\uE0B1'
+local -r down_triangle='\uE0BC'
+local -r up_triangle='\uE0BA'
+local -r fade_in='░▒▓'
+local -r fade_out='▓▒░'
+local -r vertical_bar='|'
+local -r slanted_bar='\uE0BD'
 
-typeset -ra bg_color=(240 238 236 234)
-typeset -ra frame_color=(244 242 240 238)
-typeset -ra sep_color=(248 246 244 242)
-typeset -ra prefix_color=(250 248 246 244)
-
-typeset -r left_circle='\uE0B6'
-typeset -r right_circle='\uE0B4'
-typeset -r left_arc='\uE0B7'
-typeset -r right_arc='\uE0B5'
-typeset -r left_triangle='\uE0B2'
-typeset -r right_triangle='\uE0B0'
-typeset -r left_angle='\uE0B3'
-typeset -r right_angle='\uE0B1'
-typeset -r down_triangle='\uE0BC'
-typeset -r up_triangle='\uE0BA'
-typeset -r fade_in='░▒▓'
-typeset -r fade_out='▓▒░'
-typeset -r vertical_bar='|'
-typeset -r slanted_bar='\uE0BD'
-
-typeset -ra lean_left=(
+local -ra lean_left=(
   '%$frame_color[$color]F╭─ ' '${extra_icons[1]:+$extra_icons[1] }%31F$extra_icons[2]%B%39F~%b%31F/%B%39Fsrc%b%f $prefixes[1]%76F$extra_icons[3]master%f '
   '%$frame_color[$color]F╰─ ' '%76F❯%f ${buffer:-█}'
 )
 
-typeset -ra lean_right=(
+local -ra lean_right=(
   ' $prefixes[2]%101F$extra_icons[4]5s%f${show_time:+ $prefixes[3]%66F$extra_icons[5]16:23:42%f}' ' %$frame_color[$color]F─╮%f'
   '' ' %$frame_color[$color]F─╯%f'
 )
 
-typeset -ra classic_left=(
+local -ra classic_left=(
   '%$frame_color[$color]F╭─' '%F{$bg_color[$color]}$left_tail%K{$bg_color[$color]} ${extra_icons[1]:+$extra_icons[1]%K{$bg_color[$color]\} %$sep_color[$color]F$left_subsep%f }%31F$extra_icons[2]%B%39F~%b%K{$bg_color[$color]}%31F/%B%39Fsrc%b%K{$bg_color[$color]} %$sep_color[$color]F$left_subsep%f %$prefix_color[$color]F$prefixes[1]%76F$extra_icons[3]master %k%$bg_color[$color]F$left_head%f'
   '%$frame_color[$color]F╰─' '%f ${buffer:-█}'
 )
 
-typeset -ra classic_right=(
+local -ra classic_right=(
   '%$bg_color[$color]F$right_head%K{$bg_color[$color]}%f %$prefix_color[$color]F$prefixes[2]%101F5s $extra_icons[4]${show_time:+%$sep_color[$color]F$right_subsep %$prefix_color[$color]F$prefixes[3]%66F16:23:42 $extra_icons[5]}%k%F{$bg_color[$color]}$right_tail%f' '%$frame_color[$color]F─╮%f'
   '' '%$frame_color[$color]F─╯%f'
 )
 
-typeset -ra pure_left=(
+local -ra pure_left=(
   '' '%4F~/src%f %242Fmaster%f %3F5s%f'
   '' '%5F❯%f ${buffer:-█}'
 )
 
-typeset -ra pure_right=(
+local -ra pure_right=(
   '' ''
   '' ''
 )
 
-typeset -ra rainbow_left=(
+local -ra rainbow_left=(
   '%$frame_color[$color]F╭─' '%F{${${extra_icons[1]:+7}:-4}}$left_tail${extra_icons[1]:+%K{7\} $extra_icons[1] %K{4\}%7F$left_sep}%K{4}%254F $extra_icons[2]%B%255F~%b%K{4}%254F/%B%255Fsrc%b%K{4} %K{2}%4F$left_sep %0F$prefixes[1]$extra_icons[3]master %k%2F$left_head%f'
   '%$frame_color[$color]F╰─' '%f ${buffer:-█}'
 )
 
-typeset -ra rainbow_right=(
+local -ra rainbow_right=(
   '%3F$right_head%K{3} %0F$prefixes[2]5s $extra_icons[4]%3F${show_time:+%7F$right_sep%K{7\} %0F$prefixes[3]16:23:42 $extra_icons[5]%7F}%k$right_tail%f' '%$frame_color[$color]F─╮%f'
   '' '%$frame_color[$color]F─╯%f'
 )

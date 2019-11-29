@@ -4220,11 +4220,7 @@ _p9k_precmd_impl() {
           case $? in
             0)
               (
-                local p=("${(@)parameters[(I)AWESOME_*|CODEPOINT_*]}")
-                if (( $#p )); then
-                  typeset -x -- "$p"
-                fi
-                "$__p9k_root_dir"/internal/wizard.zsh -d "$__p9k_root_dir"
+                source "$__p9k_root_dir"/internal/wizard.zsh
               )
               if (( $? )); then
                 instant_prompt_disabled=1

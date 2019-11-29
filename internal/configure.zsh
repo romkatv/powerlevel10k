@@ -63,11 +63,8 @@ function p9k_configure() {
   emulate -L zsh
   setopt no_hist_expand extended_glob
   (
-    local p=("${(@)parameters[(I)AWESOME_*|CODEPOINT_*]}")
-    if (( $#p )); then
-      typeset -x -- $p
-    fi
-    $__p9k_root_dir/internal/wizard.zsh -d $__p9k_root_dir -f
+    set -- -f
+    source $__p9k_root_dir/internal/wizard.zsh
   )
   local ret=$?
   case $ret in
