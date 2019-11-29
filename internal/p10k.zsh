@@ -1,4 +1,4 @@
-if ! autoload -Uz is-at-least || ! is-at-least $ZSH_VERSION 2>/dev/null; then
+if ! autoload -Uz is-at-least || ! is-at-least 5.1; then
   () {
     >&2 echo -E "You are using ZSH version $ZSH_VERSION. The minimum required version for Powerlevel10k is 5.1."
     >&2 echo -E "Type 'echo \$ZSH_VERSION' to see your current zsh version."
