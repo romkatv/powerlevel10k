@@ -4455,8 +4455,10 @@ _p9k_init_async_pump() {
 
     local setsid=${commands[setsid]:-/usr/local/opt/util-linux/bin/setsid}
     [[ -f $setsid ]] && setsid=${(q)setsid} || setsid=
-    cmd="$setsid zsh -dfc ${(q)cmd} &!"
-    zsh --nobgnice -dfmc $cmd </dev/null >&$_p9k__async_pump_fd 2>/dev/null &!
+    local zsh=${${:-/proc/self/exe}:A}
+    [[ -x $zsh ]] || zsh=zsh
+    cmd="$setsid ${(q)zsh} -dfc ${(q)cmd} &!"
+    $zsh --nobgnice -dfmc $cmd </dev/null >&$_p9k__async_pump_fd 2>/dev/null &!
 
     IFS='' read -t 5 -r -u $_p9k__async_pump_fd _p9k__async_pump_pid && (( _p9k__async_pump_pid ))
 
