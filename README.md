@@ -212,7 +212,7 @@ covered by the same license.
 ### <a name='instant-prompt'></a>What is instant prompt?
 
 *Instant Prompt* is an optional feature of Powerlevel10k. When enabled, it gives you a limited
-prompt within a few milliseconds of staring zsh, alowing you to start hacking right away while zsh
+prompt within a few milliseconds of starting zsh, alowing you to start hacking right away while zsh
 is initializing. Once initialization is complete, the full-featured Powerlevel10k prompt will
 seamlessly replace instant prompt.
 
