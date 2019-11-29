@@ -1,4 +1,4 @@
-if ! autoload -Uz is-at-least || ! is-at-least 5.1; then
+if ! autoload -Uz is-at-least || ! is-at-least $ZSH_VERSION 2>/dev/null; then
   () {
     >&2 echo -E "You are using ZSH version $ZSH_VERSION. The minimum required version for Powerlevel10k is 5.1."
     >&2 echo -E "Type 'echo \$ZSH_VERSION' to see your current zsh version."
@@ -5323,7 +5323,7 @@ _p9k_must_init() {
     [[ $sig == $_p9k__param_sig ]] && return 1
     _p9k_deinit
   fi
-  _p9k__param_pat=$'v10\1'${ZSH_VERSION}$'\1'${ZSH_PATCHLEVEL}$'\1'
+  _p9k__param_pat=$'v11\1'${ZSH_VERSION}$'\1'${ZSH_PATCHLEVEL}$'\1'
   _p9k__param_pat+=$'${#parameters[(I)POWERLEVEL9K_*]}\1${(%):-%n%#}\1$GITSTATUS_LOG_LEVEL\1'
   _p9k__param_pat+=$'$GITSTATUS_ENABLE_LOGGING\1$GITSTATUS_DAEMON\1$GITSTATUS_NUM_THREADS\1'
   _p9k__param_pat+=$'$DEFAULT_USER\1${ZLE_RPROMPT_INDENT:-1}\1$P9K_SSH\1$__p9k_ksh_arrays'
@@ -5564,6 +5564,7 @@ _p9k_init_vcs() {
     (( threads <= 32 )) || threads=32
   fi
   typeset -g _p9k_preinit="function _p9k_preinit() {
+    [[ \$ZSH_VERSION == ${(q)ZSH_VERSION} ]]          || return
     [[ -r ${(q)gitstatus_dir}/gitstatus.plugin.zsh ]] || return
     source ${(q)gitstatus_dir}/gitstatus.plugin.zsh   || return
     GITSTATUS_DAEMON=${(q)daemon} GITSTATUS_NUM_THREADS=$threads              \
