@@ -51,6 +51,7 @@
       virtualenv              # python virtual environment (https://docs.python.org/3/library/venv.html)
       anaconda                # conda environment (https://conda.io/)
       pyenv                   # python environment (https://github.com/pyenv/pyenv)
+      goenv                   # go environment (https://github.com/syndbg/goenv)
       nodenv                  # node.js version from nodenv (https://github.com/nodenv/nodenv)
       nvm                     # node.js version from nvm (https://github.com/nvm-sh/nvm)
       nodeenv                 # node.js environment (https://github.com/ekalinin/nodeenv)
@@ -619,6 +620,15 @@
   typeset -g POWERLEVEL9K_PYENV_PROMPT_ALWAYS_SHOW=false
   # Custom icon.
   # typeset -g POWERLEVEL9K_PYENV_VISUAL_IDENTIFIER_EXPANSION='⭐'
+
+  ################[ goenv: go environment (https://github.com/syndbg/goenv) ]################
+  # Goenv color.
+  # typeset -g POWERLEVEL9K_GOENV_FOREGROUND=0
+  # typeset -g POWERLEVEL9K_GOENV_BACKGROUND=4
+  # Don't show the current Go version if it's the same as global.
+  typeset -g POWERLEVEL9K_GOENV_PROMPT_ALWAYS_SHOW=false
+  # Custom icon.
+  # typeset -g POWERLEVEL9K_GOENV_VISUAL_IDENTIFIER_EXPANSION='⭐'
 
   ##########[ nodenv: node.js version from nodenv (https://github.com/nodenv/nodenv) ]##########
   # Nodenv color.

@@ -3142,6 +3142,47 @@ prompt_pyenv() {
   _p9k_prompt_segment "$0" "blue" "$_p9k_color1" 'PYTHON_ICON' 0 '' "${v//\%/%%}"
 }
 
+function _p9k_read_goenv_version_file() {
+  [[ -r $1 ]] || return
+  local content
+  IFS='' read -rd $'\0' content <$1 2>/dev/null
+  _p9k_ret=${${(j.:.)${=content}:-system}}
+}
+
+function _p9k_goenv_global_version() {
+  _p9k_read_goenv_version_file ${GOENV_ROOT:-$HOME/.goenv}/version || _p9k_ret=system
+}
+
+################################################################
+# Segment to display goenv information: https://github.com/syndbg/goenv
+prompt_goenv() {
+  (( $+commands[goenv] || $+functions[goenv] )) || return
+  local v=${(j.:.)${(s.:.)GOENV_VERSION}}
+  if [[ -z $v ]]; then
+    [[ $GOENV_DIR == /* ]] && local dir=$GOENV_DIR || local dir="$_p9k_pwd_a/$GOENV_DIR"
+    while true; do
+      if _p9k_read_goenv_version_file $dir/.go-version; then
+        v=$_p9k_ret
+        break
+      fi
+      if [[ $dir == / ]]; then
+        (( _POWERLEVEL9K_GOENV_PROMPT_ALWAYS_SHOW )) || return
+        _p9k_goenv_global_version
+        v=$_p9k_ret
+        break
+      fi
+      dir=${dir:h}
+    done
+  fi
+
+  if (( !_POWERLEVEL9K_GOENV_PROMPT_ALWAYS_SHOW )); then
+    _p9k_goenv_global_version
+    [[ $v == $_p9k_ret ]] && return
+  fi
+
+  _p9k_prompt_segment "$0" "blue" "$_p9k_color1" 'GO_ICON' 0 '' "${v//\%/%%}"
+}
+
 ################################################################
 # Display openfoam information
 prompt_openfoam() {
@@ -4849,6 +4890,7 @@ _p9k_init_params() {
   _p9k_declare -e POWERLEVEL9K_VIRTUALENV_RIGHT_DELIMITER ")"
   _p9k_declare -a POWERLEVEL9K_VIRTUALENV_GENERIC_NAMES -- virtualenv venv .venv
   _p9k_declare -b POWERLEVEL9K_PYENV_PROMPT_ALWAYS_SHOW 0
+  _p9k_declare -b POWERLEVEL9K_GOENV_PROMPT_ALWAYS_SHOW 0
   _p9k_declare -b POWERLEVEL9K_NODEENV_SHOW_NODE_VERSION 1
   _p9k_declare -e POWERLEVEL9K_NODEENV_LEFT_DELIMITER "["
   _p9k_declare -e POWERLEVEL9K_NODEENV_RIGHT_DELIMITER "]"
@@ -5334,7 +5376,7 @@ _p9k_must_init() {
     [[ $sig == $_p9k__param_sig ]] && return 1
     _p9k_deinit
   fi
-  _p9k__param_pat=$'v11\1'${ZSH_VERSION}$'\1'${ZSH_PATCHLEVEL}$'\1'
+  _p9k__param_pat=$'v12\1'${ZSH_VERSION}$'\1'${ZSH_PATCHLEVEL}$'\1'
   _p9k__param_pat+=$'${#parameters[(I)POWERLEVEL9K_*]}\1${(%):-%n%#}\1$GITSTATUS_LOG_LEVEL\1'
   _p9k__param_pat+=$'$GITSTATUS_ENABLE_LOGGING\1$GITSTATUS_DAEMON\1$GITSTATUS_NUM_THREADS\1'
   _p9k__param_pat+=$'$DEFAULT_USER\1${ZLE_RPROMPT_INDENT:-1}\1$P9K_SSH\1$__p9k_ksh_arrays'
