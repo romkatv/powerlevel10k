@@ -3405,6 +3405,15 @@ function instant_prompt_ranger() {
   _p9k_prompt_segment prompt_ranger $_p9k_color1 yellow RANGER_ICON 1 '$RANGER_LEVEL' '$RANGER_LEVEL'
 }
 
+function prompt_midnight_commander() {
+  [[ -n $MC_TMPDIR ]] || return
+  _p9k_prompt_segment $0 $_p9k_color1 yellow MIDNIGHT_COMMANDER_ICON 0 '' ''
+}
+
+function instant_prompt_midnight_commander() {
+  _p9k_prompt_segment prompt_midnight_commander $_p9k_color1 yellow MIDNIGHT_COMMANDER_ICON 0 '$MC_TMPDIR' ''
+}
+
 function prompt_terraform() {
   (( $+commands[terraform] )) || return
   local ws=default

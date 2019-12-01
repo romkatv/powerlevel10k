@@ -68,6 +68,7 @@
       context                 # user@hostname
       nordvpn                 # nordvpn connection status, linux only (https://nordvpn.com/)
       ranger                  # ranger shell (https://github.com/ranger/ranger)
+      # midnight_commander    # midnight commander shell (https://midnight-commander.org/)
       vi_mode                 # vi mode (you don't need this if you've enabled prompt_char)
       # vpn_ip                # virtual private network indicator
       # ram                   # free RAM
@@ -516,6 +517,12 @@
   typeset -g POWERLEVEL9K_RANGER_FOREGROUND=178
   # Custom icon.
   # typeset -g POWERLEVEL9K_RANGER_VISUAL_IDENTIFIER_EXPANSION='⭐'
+
+  ######[ midnight_commander: midnight commander shell (https://midnight-commander.org/) ]######
+  # Midnight Commander shell color.
+  typeset -g POWERLEVEL9K_MIDNIGHT_COMMANDER_FOREGROUND=178
+  # Custom icon.
+  # typeset -g POWERLEVEL9K_MIDNIGHT_COMMANDER_VISUAL_IDENTIFIER_EXPANSION='⭐'
 
   ###########[ vi_mode: vi mode (you don't need this if you've enabled prompt_char) ]###########
   # Text and color for normal (a.k.a. command) vi mode.
