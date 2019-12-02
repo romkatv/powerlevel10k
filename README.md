@@ -184,7 +184,7 @@ Yes.
 [![asciicast](https://asciinema.org/a/NHRjK3BMePw66jtRVY2livHwZ.svg)](https://asciinema.org/a/NHRjK3BMePw66jtRVY2livHwZ)
 
 Benchmark results obtained with
-[zsh-prompt-benchmark](https://github.com/romkatv/zsh-prompt-benchmark) on on Intel i9-7900X
+[zsh-prompt-benchmark](https://github.com/romkatv/zsh-prompt-benchmark) on an Intel i9-7900X
 running Ubuntu 18.04 with the config from the demo.
 
 | Theme               | Prompt Latency |
