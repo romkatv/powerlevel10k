@@ -38,6 +38,7 @@ it will generate the same prompt.
    1. [Why do I have a question mark symbol in my prompt? Is my font broken?](#why-do-i-have-a-question-mark-symbol-in-my-prompt-is-my-font-broken)
    1. [What do different symbols in Git status mean?](#what-do-different-symbols-in-git-status-mean)
    1. [How do I change the format of Git status?](#how-do-i-change-the-format-of-git-status)
+   1. [How do I add username and/or hostname to prompt?](#how-do-i-add-username-andor-hostname-to-prompt)
    1. [Why does Powerlevel10k spawn extra processes?](#why-does-powerlevel10k-spawn-extra-processes)
    1. [Are there configuration options that make Powerlevel10k slow?](#are-there-configuration-options-that-make-powerlevel10k-slow)
    1. [Is Powerlevel10k fast to load?](#is-powerlevel10k-fast-to-load)
@@ -427,6 +428,42 @@ See also: [How do I change the format of Git status?](#how-do-i-change-the-forma
 
 To change the format of Git status, open `~/.p10k.zsh`, search for `my_git_formatter` and edit its
 source code.
+
+### How do I add username and/or hostname to prompt?
+
+When using *Lean*, *Classic* or *Rainbow* style, prompt shows `username@hostname` when you are
+logged in as root or via SSH. There is little value showing `username` or `hostname` when you are
+logged in to your local machine as a normal user. So the absence of `username@hostname` in your
+prompt is an indication that you are working locally and that you aren't root. You can change it,
+however.
+
+Open `~/.p10k.zsh`. Close to the top you can see the most important parameters that define which
+segments are shown in your prompt. All generally useful prompt segments are listed in there. Some of
+them are enabled, others are commented out. One of them is of interest to you.
+
+```zsh
+typeset -g POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(
+  ...
+  context                 # user@hostname
+  ...
+)
+```
+
+Search for `context` to find the section in the config that lists parameters specific to this prompt
+segment. You should see the following lines there:
+
+```zsh
+# Don't show context unless running with privileges or in SSH.
+# Tip: Remove the next line to always show context.
+typeset -g POWERLEVEL9K_CONTEXT_{DEFAULT,SUDO}_{CONTENT,VISUAL_IDENTIFIER}_EXPANSION=
+```
+
+If you follow the tip and remove (or comment out) the last line, you'll always see
+`username@hostname` in prompt. You can change the format to just `username`, or change the color, by
+adjusting the values of parameters nearby. There are plenty of comments to help you navigate.
+
+Finally, you can move `context` segment to where you want it to be in your prompt. Perhaps somewhere
+within `POWERLEVEL9K_LEFT_PROMPT_ELEMENTS`.
 
 ### Why does Powerlevel10k spawn extra processes?
 
