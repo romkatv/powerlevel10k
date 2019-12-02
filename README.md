@@ -432,7 +432,7 @@ source code.
 ### How do I add username and/or hostname to prompt?
 
 When using *Lean*, *Classic* or *Rainbow* style, prompt shows `username@hostname` when you are
-logged in as root or via SSH. There is little value showing `username` or `hostname` when you are
+logged in as root or via SSH. There is little value in showing `username` or `hostname` when you are
 logged in to your local machine as a normal user. So the absence of `username@hostname` in your
 prompt is an indication that you are working locally and that you aren't root. You can change it,
 however.
@@ -450,7 +450,7 @@ typeset -g POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(
 ```
 
 Search for `context` to find the section in the config that lists parameters specific to this prompt
-segment. You should see the following lines there:
+segment. You should see the following lines:
 
 ```zsh
 # Don't show context unless running with privileges or in SSH.
