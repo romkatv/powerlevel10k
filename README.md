@@ -36,6 +36,8 @@ it will generate the same prompt.
    1. [Why is my right prompt in the wrong place?](#why-is-my-right-prompt-in-the-wrong-place)
    1. [I cannot install the recommended font. Help!](#i-cannot-install-the-recommended-font-help)
    1. [Why do I have a question mark symbol in my prompt? Is my font broken?](#why-do-i-have-a-question-mark-symbol-in-my-prompt-is-my-font-broken)
+   1. [What do different symbols in Git status mean?](#what-do-different-symbols-in-git-status-mean)
+   1. [How do I change the format of Git status?](#how-do-i-change-the-format-of-git-status)
    1. [Why does Powerlevel10k spawn extra processes?](#why-does-powerlevel10k-spawn-extra-processes)
    1. [Are there configuration options that make Powerlevel10k slow?](#are-there-configuration-options-that-make-powerlevel10k-slow)
    1. [Is Powerlevel10k fast to load?](#is-powerlevel10k-fast-to-load)
@@ -397,6 +399,34 @@ You can also get a weird-looking question mark in your prompt if your terminal's
 some glyphs. To fix this problem,
 [install the recommended font](#recommended-meslo-nerd-font-patched-for-powerlevel10k) and run
 `p10k configure`.
+
+### What do different symbols in Git status mean?
+
+When using *Lean*, *Classic* or *Rainbow* style, Git status may look like this:
+
+```text
+feature:master ⇣42⇡42 *42 merge ~42 +42 !42 ?42
+```
+
+| Symbol    | Meaning                                                              | Source                                                 |
+| --------- | -------------------------------------------------------------------- | ------------------------------------------------------ |
+| `feature` | current branch; replaced with `#tag` or `@commit` if not on a branch | `git status`                                           |
+| `master`  | remote tracking branch; only shown if different from local branch    | `git rev-parse --abbrev-ref --symbolic-full-name @{u}` |
+| `⇣42`     | this many commits behind the remote                                  | `git status`                                           |
+| `⇡42`     | this many commits ahead of the remote                                | `git status`                                           |
+| `*42`     | this many stashes                                                    | `git stash list`                                       |
+| `merge`   | repository state                                                     | `git status`                                           |
+| `~42`     | this many merge conflicts                                            | `git status`                                           |
+| `+42`     | this many staged changes                                             | `git status`                                           |
+| `!42`     | this many unstaged changes                                           | `git status`                                           |
+| `?42`     | this many untracked files                                            | `git status`                                           |
+
+See also: [How do I change the format of Git status?](#how-do-i-change-the-format-of-git-status)
+
+### How do I change the format of Git status?
+
+To change the format of Git status, open `~/.p10k.zsh`, search for `my_git_formatter` and edit its
+source code.
 
 ### Why does Powerlevel10k spawn extra processes?
 
