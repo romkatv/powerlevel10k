@@ -112,6 +112,7 @@ function _p9k_init_icons() {
         LARAVEL_ICON                   ''
         RANGER_ICON                    '\u2B50'               # ⭐
         MIDNIGHT_COMMANDER_ICON        'mc'
+        VIM_ICON                       'vim'
         TERRAFORM_ICON                 '\U1F6E0\u00A0'        # 🛠️
         PROXY_ICON                     '\u2B82'               # ⮂
         DOTNET_ICON                    '.NET'
@@ -216,6 +217,7 @@ function _p9k_init_icons() {
         LARAVEL_ICON                   ''
         RANGER_ICON                    '\u2B50'               # ⭐
         MIDNIGHT_COMMANDER_ICON        'mc'
+        VIM_ICON                       'vim'
         TERRAFORM_ICON                 '\U1F6E0\u00A0'        # 🛠️
         PROXY_ICON                     '\u2B82'               # ⮂
         DOTNET_ICON                    '.NET'
@@ -324,6 +326,7 @@ function _p9k_init_icons() {
         LARAVEL_ICON                   ''
         RANGER_ICON                    '\u2B50'                                       # ⭐
         MIDNIGHT_COMMANDER_ICON        'mc'
+        VIM_ICON                       'vim'
         TERRAFORM_ICON                 '\U1F6E0\u00A0'                                # 🛠️
         PROXY_ICON                     '\u2B82'                                       # ⮂
         DOTNET_ICON                    '.NET'
@@ -429,6 +432,7 @@ function _p9k_init_icons() {
         LARAVEL_ICON                   '\ue73f'               # 
         RANGER_ICON                    '\u2B50'               # ⭐
         MIDNIGHT_COMMANDER_ICON        'mc'
+        VIM_ICON                       '\uE62B'               # 
         TERRAFORM_ICON                 '\U1F6E0\u00A0'        # 🛠️
         PROXY_ICON                     '\u2B82'               # ⮂
         DOTNET_ICON                    '\uE77F'               # 
@@ -533,6 +537,7 @@ function _p9k_init_icons() {
         LARAVEL_ICON                   ''
         RANGER_ICON                    '\u2B50'               # ⭐
         MIDNIGHT_COMMANDER_ICON        'mc'
+        VIM_ICON                       'vim'
         TERRAFORM_ICON                 '\U1F6E0\u00A0'        # 🛠️
         PROXY_ICON                     '\u2194'               # ↔
         DOTNET_ICON                    '.NET'

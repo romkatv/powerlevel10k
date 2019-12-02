@@ -69,6 +69,7 @@
       context                 # user@hostname
       nordvpn                 # nordvpn connection status, linux only (https://nordvpn.com/)
       ranger                  # ranger shell (https://github.com/ranger/ranger)
+      vim_shell               # vim shell indicator (:sh)
       # midnight_commander    # midnight commander shell (https://midnight-commander.org/)
       # vpn_ip                # virtual private network indicator
       # ram                   # free RAM
@@ -511,6 +512,12 @@
   typeset -g POWERLEVEL9K_RANGER_FOREGROUND=178
   # Custom icon.
   # typeset -g POWERLEVEL9K_RANGER_VISUAL_IDENTIFIER_EXPANSION='⭐'
+
+  ###########################[ vim_shell: vim shell indicator (:sh) ]###########################
+  # Vim shell indicator color.
+  typeset -g POWERLEVEL9K_VIM_SHELL_FOREGROUND=34
+  # Custom icon.
+  # typeset -g POWERLEVEL9K_VIM_SHELL_VISUAL_IDENTIFIER_EXPANSION='⭐'
 
   ######[ midnight_commander: midnight commander shell (https://midnight-commander.org/) ]######
   # Midnight Commander shell color.

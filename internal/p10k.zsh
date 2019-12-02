@@ -3455,6 +3455,15 @@ function instant_prompt_midnight_commander() {
   _p9k_prompt_segment prompt_midnight_commander $_p9k_color1 yellow MIDNIGHT_COMMANDER_ICON 0 '$MC_TMPDIR' ''
 }
 
+function prompt_vim_shell() {
+  [[ -n $VIMRUNTIME ]] || return
+  _p9k_prompt_segment $0 green $_p9k_color1 VIM_ICON 0 '' ''
+}
+
+function instant_prompt_vim_shell() {
+  _p9k_prompt_segment prompt_vim_shell green $_p9k_color1 VIM_ICON 0 '$VIMRUNTIME' ''
+}
+
 function prompt_terraform() {
   (( $+commands[terraform] )) || return
   local ws=default
@@ -5376,7 +5385,7 @@ _p9k_must_init() {
     [[ $sig == $_p9k__param_sig ]] && return 1
     _p9k_deinit
   fi
-  _p9k__param_pat=$'v12\1'${ZSH_VERSION}$'\1'${ZSH_PATCHLEVEL}$'\1'
+  _p9k__param_pat=$'v13\1'${ZSH_VERSION}$'\1'${ZSH_PATCHLEVEL}$'\1'
   _p9k__param_pat+=$'${#parameters[(I)POWERLEVEL9K_*]}\1${(%):-%n%#}\1$GITSTATUS_LOG_LEVEL\1'
   _p9k__param_pat+=$'$GITSTATUS_ENABLE_LOGGING\1$GITSTATUS_DAEMON\1$GITSTATUS_NUM_THREADS\1'
   _p9k__param_pat+=$'$DEFAULT_USER\1${ZLE_RPROMPT_INDENT:-1}\1$P9K_SSH\1$__p9k_ksh_arrays'
