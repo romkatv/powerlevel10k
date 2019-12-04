@@ -523,15 +523,15 @@
   # Vim shell indicator color.
   # typeset -g POWERLEVEL9K_VIM_SHELL_FOREGROUND=0
   # typeset -g POWERLEVEL9K_VIM_SHELL_BACKGROUND=2
-  # Custom icon.
-  # typeset -g POWERLEVEL9K_VIM_SHELL_VISUAL_IDENTIFIER_EXPANSION='⭐'
+  # Icon to show when in a vim shell.
+  typeset -g POWERLEVEL9K_VIM_SHELL_VISUAL_IDENTIFIER_EXPANSION='${P9K_VISUAL_IDENTIFIER}'
 
   ######[ midnight_commander: midnight commander shell (https://midnight-commander.org/) ]######
   # Midnight Commander shell color.
   # typeset -g POWERLEVEL9K_MIDNIGHT_COMMANDER_FOREGROUND=3
   # typeset -g POWERLEVEL9K_MIDNIGHT_COMMANDER_BACKGROUND=0
-  # Custom icon.
-  # typeset -g POWERLEVEL9K_MIDNIGHT_COMMANDER_VISUAL_IDENTIFIER_EXPANSION='⭐'
+  # Icon to show when in a midnight commander shell.
+  typeset -g POWERLEVEL9K_MIDNIGHT_COMMANDER_VISUAL_IDENTIFIER_EXPANSION='${P9K_VISUAL_IDENTIFIER}'
 
   ###########[ vi_mode: vi mode (you don't need this if you've enabled prompt_char) ]###########
   # Foreground color.
