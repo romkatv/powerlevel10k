@@ -67,6 +67,7 @@
       aws                     # aws profile (https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-profiles.html)
       # aws_eb_env            # aws elastic beanstalk environment (https://aws.amazon.com/elasticbeanstalk/)
       # azure                 # azure account name (https://docs.microsoft.com/en-us/cli/azure)
+      # gcloud                # google cloud acccount and project (https://cloud.google.com/)
       context                 # user@hostname
       nordvpn                 # nordvpn connection status, linux only (https://nordvpn.com/)
       ranger                  # ranger shell (https://github.com/ranger/ranger)
@@ -784,6 +785,18 @@
   # typeset -g POWERLEVEL9K_AZURE_BACKGROUND=4
   # Custom icon.
   # typeset -g POWERLEVEL9K_AZURE_VISUAL_IDENTIFIER_EXPANSION='⭐'
+
+  ##########[ gcloud: google cloud acccount and project (https://cloud.google.com/) ]###########
+  # Google cloud color.
+  # typeset -g POWERLEVEL9K_GCLOUD_FOREGROUND=7
+  # typeset -g POWERLEVEL9K_GCLOUD_BACKGROUND=4
+
+  # Google cloud format. Uncomment and edit the next line if the default is too verbose.
+  # Note: ${X//\%/%%} is the same as $X but with all occurences of % replaced with %%.
+  # typeset -g POWERLEVEL9K_GCLOUD_CONTENT_EXPANSION='${P9K_GCLOUD_ACCOUNT//\%/%%}:${P9K_GCLOUD_PROJECT//\%/%%}'
+
+  # Custom icon.
+  # typeset -g POWERLEVEL9K_GCLOUD_VISUAL_IDENTIFIER_EXPANSION='⭐'
 
   #############[ kubecontext: current kubernetes context (https://kubernetes.io/) ]#############
   # Kubernetes context classes for the purpose of using different colors, icons and expansions with

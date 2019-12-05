@@ -119,6 +119,7 @@ function _p9k_init_icons() {
         AZURE_ICON                     '\u2601'               # ☁
         DIRENV_ICON                    '\u25BC'               # ▼
         FLUTTER_ICON                   'F'
+        GCLOUD_ICON                    'G'
       )
     ;;
     'awesome-fontconfig')
@@ -225,6 +226,7 @@ function _p9k_init_icons() {
         AZURE_ICON                     '\u2601'               # ☁
         DIRENV_ICON                    '\u25BC'               # ▼
         FLUTTER_ICON                   'F'
+        GCLOUD_ICON                    'G'
       )
     ;;
     'awesome-mapped-fontconfig')
@@ -335,6 +337,7 @@ function _p9k_init_icons() {
         AZURE_ICON                     '\u2601'                                       # ☁
         DIRENV_ICON                    '\u25BC'                                       # ▼
         FLUTTER_ICON                   'F'
+        GCLOUD_ICON                    'G'
       )
     ;;
     'nerdfont-complete'|'nerdfont-fontconfig')
@@ -442,6 +445,7 @@ function _p9k_init_icons() {
         AZURE_ICON                     '\uFD03'               # ﴃ
         DIRENV_ICON                    '\u25BC'               # ▼
         FLUTTER_ICON                   'F'
+        GCLOUD_ICON                    '\uF7B7'               # 
       )
     ;;
     *)
@@ -548,6 +552,7 @@ function _p9k_init_icons() {
         AZURE_ICON                     '\u2601'               # ☁
         DIRENV_ICON                    '\u25BC'               # ▼
         FLUTTER_ICON                   'F'
+        GCLOUD_ICON                    'G'
       )
     ;;
   esac

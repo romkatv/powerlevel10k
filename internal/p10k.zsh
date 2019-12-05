@@ -3351,6 +3351,19 @@ prompt_azure() {
   _p9k_prompt_segment "$0" "blue" "white" "AZURE_ICON" 0 '' "${_p9k_cache_val[1]//\%/%%}"
 }
 
+prompt_gcloud() {
+  unset P9K_GCLOUD_PROJECT P9K_GCLOUD_ACCOUNT
+  (( $+commands[gcloud] )) || return
+  local cfg=${AZURE_CONFIG_DIR:-$HOME/.azure}/azureProfile.json
+  if ! _p9k_cache_stat_get $0 ~/.config/gcloud/active_config ~/.config/gcloud/configurations/config_default; then
+    _p9k_cache_stat_set "$(gcloud config get-value account 2>/dev/null)" "$(gcloud config get-value project 2>/dev/null)"
+  fi
+  [[ -n $_p9k_cache_val[1] || -n $_p9k_cache_val[2] ]] || return
+  P9K_GCLOUD_ACCOUNT=$_p9k_cache_val[1]
+  P9K_GCLOUD_PROJECT=$_p9k_cache_val[2]
+  _p9k_prompt_segment "$0" "blue" "white" "GCLOUD_ICON" 0 '' "${P9K_GCLOUD_ACCOUNT//\%/%%}:${P9K_GCLOUD_PROJECT//\%/%%}"
+}
+
 typeset -gra __p9k_nordvpn_tag=(
   P9K_NORDVPN_STATUS
   P9K_NORDVPN_TECHNOLOGY
