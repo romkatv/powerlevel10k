@@ -1055,6 +1055,21 @@ function _p9k_read_file() {
   [[ -n $_p9k_ret ]]
 }
 
+prompt_fvm() {
+  (( $+commands[fvm] )) || return
+  local dir=$_p9k_pwd_a
+  while [[ $dir != / ]]; do
+    local link=$dir/fvm
+    if [[ -L $link ]]; then
+      if [[ ${link:A} == (#b)*/versions/([^/]##)/bin/flutter ]]; then
+        _p9k_prompt_segment $0 blue $_p9k_color1 FLUTTER_ICON 0 '' ${match[1]//\%/%%}
+      fi
+      return
+    fi
+    dir=${dir:h}
+  done
+}
+
 ################################################################
 # Segment that displays the battery status in levels and colors
 prompt_battery() {

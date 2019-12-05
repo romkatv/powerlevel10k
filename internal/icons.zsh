@@ -118,6 +118,7 @@ function _p9k_init_icons() {
         DOTNET_ICON                    '.NET'
         AZURE_ICON                     '\u2601'               # ☁
         DIRENV_ICON                    '\u25BC'               # ▼
+        FLUTTER_ICON                   'F'
       )
     ;;
     'awesome-fontconfig')
@@ -223,6 +224,7 @@ function _p9k_init_icons() {
         DOTNET_ICON                    '.NET'
         AZURE_ICON                     '\u2601'               # ☁
         DIRENV_ICON                    '\u25BC'               # ▼
+        FLUTTER_ICON                   'F'
       )
     ;;
     'awesome-mapped-fontconfig')
@@ -332,6 +334,7 @@ function _p9k_init_icons() {
         DOTNET_ICON                    '.NET'
         AZURE_ICON                     '\u2601'                                       # ☁
         DIRENV_ICON                    '\u25BC'                                       # ▼
+        FLUTTER_ICON                   'F'
       )
     ;;
     'nerdfont-complete'|'nerdfont-fontconfig')
@@ -438,6 +441,7 @@ function _p9k_init_icons() {
         DOTNET_ICON                    '\uE77F'               # 
         AZURE_ICON                     '\uFD03'               # ﴃ
         DIRENV_ICON                    '\u25BC'               # ▼
+        FLUTTER_ICON                   'F'
       )
     ;;
     *)
@@ -543,6 +547,7 @@ function _p9k_init_icons() {
         DOTNET_ICON                    '.NET'
         AZURE_ICON                     '\u2601'               # ☁
         DIRENV_ICON                    '\u25BC'               # ▼
+        FLUTTER_ICON                   'F'
       )
     ;;
   esac
