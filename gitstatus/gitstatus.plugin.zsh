@@ -39,6 +39,8 @@
 #   VCS_STATUS_NUM_CONFLICTED=0
 #   VCS_STATUS_NUM_STAGED=0
 #   VCS_STATUS_NUM_UNSTAGED=1
+#   VCS_STATUS_NUM_STAGED_NEW=0
+#   VCS_STATUS_NUM_STAGED_DELETED=0
 #   VCS_STATUS_NUM_UNSTAGED_DELETED=0
 #   VCS_STATUS_NUM_UNTRACKED=1
 #   VCS_STATUS_REMOTE_BRANCH=master
@@ -108,8 +110,12 @@ typeset -g _gitstatus_plugin_dir=${${(%):-%x}:A:h}
 #   VCS_STATUS_HAS_CONFLICTED       1 if there are conflicted changes, 0 otherwise.
 #   VCS_STATUS_HAS_UNSTAGED         1 if there are unstaged changes, 0 if there aren't, -1 if
 #                                   unknown.
+#   VCS_STATUS_NUM_STAGED_NEW       The number of staged new files. Note that renamed files
+#                                   are reported as deleted plus new.
+#   VCS_STATUS_NUM_STAGED_DELETED   The number of staged deleted files. Note that renamed files
+#                                   are reported as deleted plus new.
 #   VCS_STATUS_NUM_UNSTAGED_DELETED The number of unstaged deleted files. Note that renamed files
-#                                   are reported as deleted plus added.
+#                                   are reported as deleted plus new.
 #   VCS_STATUS_HAS_UNTRACKED        1 if there are untracked files, 0 if there aren't, -1 if
 #                                   unknown.
 #   VCS_STATUS_COMMITS_AHEAD        Number of commits the current branch is ahead of upstream.
@@ -219,7 +225,9 @@ function _gitstatus_process_response() {
     typeset -gi VCS_STATUS_COMMITS_BEHIND="${resp[16]}"
     typeset -gi VCS_STATUS_STASHES="${resp[17]}"
     typeset -g  VCS_STATUS_TAG="${resp[18]}"
-    typeset -gi VCS_STATUS_NUM_UNSTAGED_DELETED="${resp[19]:-0}"
+    typeset -gi VCS_STATUS_NUM_UNSTAGED_DELETED="${resp[19]}"
+    typeset -gi VCS_STATUS_NUM_STAGED_NEW="${resp[20]:-0}"
+    typeset -gi VCS_STATUS_NUM_STAGED_DELETED="${resp[21]:-0}"
     typeset -gi VCS_STATUS_HAS_STAGED=$((VCS_STATUS_NUM_STAGED > 0))
     (( dirty_max_index_size >= 0 && VCS_STATUS_INDEX_SIZE > dirty_max_index_size )) && {
       typeset -gi VCS_STATUS_HAS_UNSTAGED=-1
@@ -253,6 +261,8 @@ function _gitstatus_process_response() {
     unset VCS_STATUS_STASHES
     unset VCS_STATUS_TAG
     unset VCS_STATUS_NUM_UNSTAGED_DELETED
+    unset VCS_STATUS_NUM_STAGED_NEW
+    unset VCS_STATUS_NUM_STAGED_DELETED
   }
 
   (( ! ours )) && (( #header )) && emulate -L zsh && "${header[@]}" || true
