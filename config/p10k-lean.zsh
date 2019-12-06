@@ -296,8 +296,8 @@
   # Example:
   #
   #   typeset -g POWERLEVEL9K_DIR_CLASSES=(
-  #       '~/work(/*)#'  WORK     '(╯°□°）╯︵ ┻━┻'
-  #       '~(/*)#'       HOME     '⌂'
+  #       '~/work(|/*)'  WORK     '(╯°□°）╯︵ ┻━┻'
+  #       '~(|/*)'       HOME     '⌂'
   #       '*'            DEFAULT  '')
   #
   # With these settings, the current directory in the prompt may look like this:
