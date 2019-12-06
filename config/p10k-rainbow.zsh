@@ -791,8 +791,13 @@
   # typeset -g POWERLEVEL9K_GCLOUD_FOREGROUND=7
   # typeset -g POWERLEVEL9K_GCLOUD_BACKGROUND=4
 
-  # Google cloud format. Uncomment and edit the next line if the default is too verbose.
-  # Note: ${X//\%/%%} is the same as $X but with all occurences of % replaced with %%.
+  # Google cloud format. Uncomment POWERLEVEL9K_GCLOUD_CONTENT_EXPANSION and edit its value if the
+  # default is too verbose.
+  #
+  #   P9K_GCLOUD_ACCOUNT: the output of `gcloud config get-value account`
+  #   P9K_GCLOUD_PROJECT: the output of `gcloud config get-value project`
+  #   ${VARIABLE//\%/%%}: ${VARIABLE} with all occurences of '%' replaced with '%%'.
+  #
   # typeset -g POWERLEVEL9K_GCLOUD_CONTENT_EXPANSION='${P9K_GCLOUD_ACCOUNT//\%/%%}:${P9K_GCLOUD_PROJECT//\%/%%}'
 
   # Custom icon.
