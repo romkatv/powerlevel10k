@@ -369,22 +369,23 @@
     local conflicted='%1F' # red foreground
 
     local res
-    local where  # branch name, tag or commit
+    local where  # branch or tag
     if [[ -n $VCS_STATUS_LOCAL_BRANCH ]]; then
       res+="${clean}${POWERLEVEL9K_VCS_BRANCH_ICON}"
       where=${(V)VCS_STATUS_LOCAL_BRANCH}
     elif [[ -n $VCS_STATUS_TAG ]]; then
       res+="${meta}#"
       where=${(V)VCS_STATUS_TAG}
-    else
-      res+="${meta}@"
-      where=${VCS_STATUS_COMMIT[1,8]}
     fi
 
     # If local branch name or tag is at most 32 characters long, show it in full.
     # Otherwise show the first 12 … the last 12.
     (( $#where > 32 )) && where[13,-13]="…"
     res+="${clean}${where//\%/%%}"  # escape %
+
+    # Display the current Git commit if there is no branch or tag.
+    # Tip: To always display the current Git commit, remove `[[ -z $where ]] &&` from the next line.
+    [[ -z $where ]] && res+="${meta}@${clean}${VCS_STATUS_COMMIT[1,8]}"
 
     # Show tracking branch name if it differs from local branch.
     if [[ -n ${VCS_STATUS_REMOTE_BRANCH:#$VCS_STATUS_LOCAL_BRANCH} ]]; then
