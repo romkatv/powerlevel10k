@@ -327,7 +327,7 @@
   # typeset -g POWERLEVEL9K_DIR_CLASSES=()
 
   #####################################[ vcs: git status ]######################################
-  # Versio control system colors.
+  # Version control system colors.
   # typeset -g POWERLEVEL9K_VCS_CLEAN_BACKGROUND=2
   # typeset -g POWERLEVEL9K_VCS_MODIFIED_BACKGROUND=3
   # typeset -g POWERLEVEL9K_VCS_UNTRACKED_BACKGROUND=2
