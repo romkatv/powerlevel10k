@@ -630,7 +630,10 @@
   # Pyenv color.
   # typeset -g POWERLEVEL9K_PYENV_FOREGROUND=0
   # typeset -g POWERLEVEL9K_PYENV_BACKGROUND=4
-  # Don't show the current Python version if it's the same as global.
+  # Hide python version if it doesn't come from one of these sources.
+  typeset -g POWERLEVEL9K_PYENV_SOURCES=(shell local global)
+  # If set to false, hide python version if it's the same as global:
+  # $(pyenv version-name) == $(pyenv global).
   typeset -g POWERLEVEL9K_PYENV_PROMPT_ALWAYS_SHOW=false
   # Custom icon.
   # typeset -g POWERLEVEL9K_PYENV_VISUAL_IDENTIFIER_EXPANSION='⭐'

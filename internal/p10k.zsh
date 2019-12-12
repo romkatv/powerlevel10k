@@ -3149,15 +3149,20 @@ function _p9k_pyenv_global_version() {
 prompt_pyenv() {
   (( $+commands[pyenv] || $+functions[pyenv] )) || return
   local v=${(j.:.)${(@)${(s.:.)PYENV_VERSION}#python-}}
-  if [[ -z $v ]]; then
+  if [[ -n $v ]]; then
+    (( ${_POWERLEVEL9K_PYENV_SOURCES[(I)shell]} )) || return
+  else
+    (( ${_POWERLEVEL9K_PYENV_SOURCES[(I)local|global]} )) || return
     [[ $PYENV_DIR == /* ]] && local dir=$PYENV_DIR || local dir="$_p9k_pwd_a/$PYENV_DIR"
     while true; do
       if _p9k_read_pyenv_version_file $dir/.python-version; then
+        (( ${_POWERLEVEL9K_PYENV_SOURCES[(I)local]} )) || return
         v=$_p9k_ret
         break
       fi
       if [[ $dir == / ]]; then
         (( _POWERLEVEL9K_PYENV_PROMPT_ALWAYS_SHOW )) || return
+        (( ${_POWERLEVEL9K_PYENV_SOURCES[(I)global]} )) || return
         _p9k_pyenv_global_version
         v=$_p9k_ret
         break
@@ -4944,6 +4949,7 @@ _p9k_init_params() {
   _p9k_declare -e POWERLEVEL9K_VIRTUALENV_RIGHT_DELIMITER ")"
   _p9k_declare -a POWERLEVEL9K_VIRTUALENV_GENERIC_NAMES -- virtualenv venv .venv
   _p9k_declare -b POWERLEVEL9K_PYENV_PROMPT_ALWAYS_SHOW 0
+  _p9k_declare -a POWERLEVEL9K_PYENV_SOURCES -- shell local global
   _p9k_declare -b POWERLEVEL9K_GOENV_PROMPT_ALWAYS_SHOW 0
   _p9k_declare -b POWERLEVEL9K_NODEENV_SHOW_NODE_VERSION 1
   _p9k_declare -e POWERLEVEL9K_NODEENV_LEFT_DELIMITER "["
@@ -5430,7 +5436,7 @@ _p9k_must_init() {
     [[ $sig == $_p9k__param_sig ]] && return 1
     _p9k_deinit
   fi
-  _p9k__param_pat=$'v14\1'${ZSH_VERSION}$'\1'${ZSH_PATCHLEVEL}$'\1'
+  _p9k__param_pat=$'v15\1'${ZSH_VERSION}$'\1'${ZSH_PATCHLEVEL}$'\1'
   _p9k__param_pat+=$'${#parameters[(I)POWERLEVEL9K_*]}\1${(%):-%n%#}\1$GITSTATUS_LOG_LEVEL\1'
   _p9k__param_pat+=$'$GITSTATUS_ENABLE_LOGGING\1$GITSTATUS_DAEMON\1$GITSTATUS_NUM_THREADS\1'
   _p9k__param_pat+=$'$DEFAULT_USER\1${ZLE_RPROMPT_INDENT:-1}\1$P9K_SSH\1$__p9k_ksh_arrays'
