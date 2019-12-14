@@ -2985,7 +2985,10 @@ function _p9k_vcs_resume() {
     fi
   fi
 
-  _p9k_update_prompt gitstatus
+  _p9k_refresh_reason=gitstatus
+  _p9k_set_prompt
+  _p9k_refresh_reason=''
+  _p9k_reset_prompt
 }
 
 function _p9k_vcs_gitstatus() {
@@ -3959,13 +3962,6 @@ _p9k_dump_instant_prompt() {
   zf_mv -f $tmp $prompt_file 2>/dev/null || return
 }
 
-function _p9k_update_prompt() {
-  _p9k_refresh_reason=$1
-  _p9k_set_prompt
-  _p9k_refresh_reason=''
-  _p9k_reset_prompt
-}
-
 powerlevel9k_refresh_prompt_inplace() {
   emulate -L zsh
   setopt no_hist_expand extended_glob no_prompt_bang prompt_{percent,subst} no_aliases
@@ -4076,6 +4072,10 @@ function _p9k_clear_instant_prompt() {
   fi
   exec 1>&$__p9k_fd_1 2>&$__p9k_fd_2 {__p9k_fd_1}>&- {__p9k_fd_2}>&-
   unset __p9k_fd_1 __p9k_fd_2
+  if (( _p9k__can_hide_cursor )); then
+    echoti civis
+    _p9k__cursor_hidden=1
+  fi
   if [[ -s $__p9k_instant_prompt_output ]]; then
     {
       local content
@@ -4408,8 +4408,10 @@ function _p9k_reset_prompt() {
   if zle && [[ -z $_p9k__line_finished ]]; then
     (( __p9k_ksh_arrays )) && setopt ksh_arrays
     (( __p9k_sh_glob )) && setopt sh_glob
+    (( _p9k__can_hide_cursor )) && echoti civis
     zle .reset-prompt
     zle -R
+    (( _p9k__can_hide_cursor )) && echoti cnorm
   fi
 }
 
@@ -4604,6 +4606,8 @@ typeset -g  _p9k__param_pat
 typeset -g  _p9k__param_sig
 
 _p9k_init_vars() {
+  typeset -gi _p9k__can_hide_cursor=$(( $+terminfo[civis] && $+terminfo[cnorm] ))
+  typeset -gi _p9k__cursor_hidden
   typeset -gi _p9k__instant_prompt_disabled
   typeset -gi _p9k_non_hermetic_expansion
   typeset -g  _p9k_time
@@ -5050,6 +5054,12 @@ _p9k_wrap_zle_widget() {
   zle -N -- $widget $wrapper
 }
 
+function _p9k_zle_line_init() {
+  (( _p9k__cursor_hidden )) || return 0
+  _p9k__cursor_hidden=0
+  echoti cnorm
+}
+
 function _p9k_zle_line_finish() {
   (( $+_p9k__line_finished )) && return
 
@@ -5076,6 +5086,10 @@ function _p9k_zle_line_finish() {
   fi
 
   if (( reset )); then
+    if zle && (( $+termcap[up] )); then
+      (( _p9k__can_hide_cursor )) && local hide=$terminfo[civis] || local hide=
+      echo -nE - $hide$'\n'$termcap[up]
+    fi
     _p9k_reset_prompt
   fi
 
@@ -5738,6 +5752,7 @@ _p9k_init() {
   fi
 
   _p9k_wrap_zle_widget zle-line-finish _p9k_zle_line_finish
+  _p9k_wrap_zle_widget zle-line-init _p9k_zle_line_init
 
   if _p9k_segment_in_use vi_mode || _p9k_segment_in_use prompt_char; then
     _p9k_wrap_zle_widget zle-keymap-select _p9k_zle_keymap_select
@@ -6129,6 +6144,8 @@ zmodload zsh/datetime
 zmodload zsh/mathfunc
 zmodload zsh/parameter 2>/dev/null  # https://github.com/romkatv/gitstatus/issues/58#issuecomment-553407177
 zmodload zsh/system
+zmodload zsh/termcap
+zmodload zsh/terminfo
 zmodload -F zsh/stat b:zstat
 zmodload -F zsh/net/socket b:zsocket
 zmodload -F zsh/files b:zf_mv b:zf_rm
