@@ -4306,7 +4306,14 @@ function prompt_terraform() {
     [[ -r $f ]] && _p9k_read_file $f && ws=$_p9k_ret
   fi
   ws=${${ws##[[:space:]]#}%%[[:space:]]#}
-  [[ $ws == default ]] || _p9k_prompt_segment $0 $_p9k_color1 blue TERRAFORM_ICON 0 '' $ws
+  local pat class
+  for pat class in "${_POWERLEVEL9K_TERRAFORM_CLASSES[@]}"; do
+    if [[ $ws == ${~pat} ]]; then
+      [[ -n $class ]] && state=_${(U)class}
+      break
+    fi
+  done
+  [[ $ws == default ]] || _p9k_prompt_segment "$0$state" $_p9k_color1 blue TERRAFORM_ICON 0 '' $ws
 }
 
 _p9k_prompt_terraform_init() {
@@ -5887,6 +5894,7 @@ _p9k_init_params() {
   #   POWERLEVEL9K_KUBECONTEXT_OTHER_BACKGROUND=yellow
   _p9k_declare -a POWERLEVEL9K_KUBECONTEXT_CLASSES --
   _p9k_declare -a POWERLEVEL9K_AWS_CLASSES --
+  _p9k_declare -a POWERLEVEL9K_TERRAFORM_CLASSES --
   _p9k_declare -a POWERLEVEL9K_GOOGLE_APP_CRED_CLASSES -- 'service_account:*' SERVICE_ACCOUNT
   # Specifies the format of java version.
   #
