@@ -67,7 +67,7 @@
       aws                     # aws profile (https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-profiles.html)
       # aws_eb_env            # aws elastic beanstalk environment (https://aws.amazon.com/elasticbeanstalk/)
       # azure                 # azure account name (https://docs.microsoft.com/en-us/cli/azure)
-      # gcloud                # google cloud acccount and project (https://cloud.google.com/)
+      # gcloud                # google cloud cli acccount and project (https://cloud.google.com/)
       # gcloud_app            # google cloud application credentials (https://cloud.google.com/docs/authentication/getting-started#setting_the_environment_variable)
       context                 # user@hostname
       nordvpn                 # nordvpn connection status, linux only (https://nordvpn.com/)

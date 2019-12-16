@@ -3389,7 +3389,7 @@ prompt_gcloud() {
 }
 
 prompt_gcloud_app() {
-  unset P9K_GCLOUD_APP_EMAIL
+  unset P9K_GCLOUD_APP_EMAIL P9K_GCLOUD_APP_ACCOUNT_TYPE P9K_GCLOUD_APP_ACCOUNT_TYPE_SHORT
   (( $+commands[gcloud] )) || return
   [[ ! -z $GOOGLE_APPLICATION_CREDENTIALS ]] || return
 
