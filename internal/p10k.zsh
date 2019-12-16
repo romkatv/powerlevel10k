@@ -3379,7 +3379,6 @@ prompt_azure() {
 prompt_gcloud() {
   unset P9K_GCLOUD_PROJECT P9K_GCLOUD_ACCOUNT
   (( $+commands[gcloud] )) || return
-  local cfg=${AZURE_CONFIG_DIR:-$HOME/.azure}/azureProfile.json
   if ! _p9k_cache_stat_get $0 ~/.config/gcloud/active_config ~/.config/gcloud/configurations/config_default; then
     _p9k_cache_stat_set "$(gcloud config get-value account 2>/dev/null)" "$(gcloud config get-value project 2>/dev/null)"
   fi
@@ -3387,6 +3386,29 @@ prompt_gcloud() {
   P9K_GCLOUD_ACCOUNT=$_p9k_cache_val[1]
   P9K_GCLOUD_PROJECT=$_p9k_cache_val[2]
   _p9k_prompt_segment "$0" "blue" "white" "GCLOUD_ICON" 0 '' "${P9K_GCLOUD_ACCOUNT//\%/%%}:${P9K_GCLOUD_PROJECT//\%/%%}"
+}
+
+prompt_gcloud_app() {
+  unset P9K_GCLOUD_APP_EMAIL
+  (( $+commands[gcloud] )) || return
+  [[ ! -z $GOOGLE_APPLICATION_CREDENTIALS ]] || return
+
+  if ! _p9k_cache_stat_get $0 $GOOGLE_APPLICATION_CREDENTIALS; then
+    local email="$(cat $GOOGLE_APPLICATION_CREDENTIALS | jq -r '.client_email')"
+    local account_type="$(cat $GOOGLE_APPLICATION_CREDENTIALS | jq -r '.type')"
+    local account_type_short
+    if [[ "$account_type" == "service_account" ]]; then
+      account_type_short="sa:"
+    fi
+
+    # Service account name may contain only alpha-numeric chars and hyphens, so splitting by `.` gives us `service-account-name@project-id`
+    _p9k_cache_stat_set "${email%%.*}" "$account_type" "$account_type_short"
+  fi
+  [[ -n $_p9k_cache_val[1] || -n $_p9k_cache_val[2] || -n $_p9k_cache_val[3] ]] || return
+  P9K_GCLOUD_APP_EMAIL=$_p9k_cache_val[1]
+  P9K_GCLOUD_APP_ACCOUNT_TYPE=$_p9k_cache_val[2]
+  P9K_GCLOUD_APP_ACCOUNT_TYPE_SHORT=$_p9k_cache_val[3]
+  _p9k_prompt_segment "$0" "blue" "white" "GCLOUD_ICON" 0 '' "${P9K_GCLOUD_APP_ACCOUNT_TYPE_SHORT//\%/%%}${P9K_GCLOUD_APP_EMAIL//\%/%%}"
 }
 
 typeset -gra __p9k_nordvpn_tag=(

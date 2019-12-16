@@ -67,7 +67,8 @@
       aws                     # aws profile (https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-profiles.html)
       # aws_eb_env            # aws elastic beanstalk environment (https://aws.amazon.com/elasticbeanstalk/)
       # azure                 # azure account name (https://docs.microsoft.com/en-us/cli/azure)
-      # gcloud                # google cloud acccount and project (https://cloud.google.com/)
+      # gcloud                # google cloud cli acccount and project (https://cloud.google.com/)
+      # gcloud_app            # google cloud application credentials (https://cloud.google.com/docs/authentication/getting-started#setting_the_environment_variable)
       context                 # user@hostname
       nordvpn                 # nordvpn connection status, linux only (https://nordvpn.com/)
       ranger                  # ranger shell (https://github.com/ranger/ranger)
@@ -784,6 +785,23 @@
 
   # Custom icon.
   # typeset -g POWERLEVEL9K_GCLOUD_VISUAL_IDENTIFIER_EXPANSION='⭐'
+
+  ##########[ gcloud_app: google cloud application credentials (https://cloud.google.com/docs/authentication/getting-started#setting_the_environment_variable) ]###########
+  # Google cloud color.
+  typeset -g POWERLEVEL9K_GCLOUD_APP_FOREGROUND=32
+
+  # Google cloud format. Uncomment POWERLEVEL9K_GCLOUD_APP_CONTENT_EXPANSION and edit its value if the
+  # default is too verbose.
+  #
+  #   P9K_GCLOUD_APP_EMAIL: `.client_email` field of keyfile
+  #   P9K_GCLOUD_APP_ACCOUNT_TYPE: `.type` field of keyfile
+  #   P9K_GCLOUD_APP_ACCOUNT_TYPE_SHORT: `sa` if `type=service_account`, empty otherwise
+  #   ${VARIABLE//\%/%%}: ${VARIABLE} with all occurences of '%' replaced with '%%'.
+  #
+  # typeset -g POWERLEVEL9K_GCLOUD_APP_CONTENT_EXPANSION='${P9K_GCLOUD_APP_ACCOUNT_TYPE_SHORT//\%/%%}${P9K_GCLOUD_APP_EMAIL//\%/%%}'
+
+  # Custom icon.
+  # typeset -g POWERLEVEL9K_GCLOUD_APP_VISUAL_IDENTIFIER_EXPANSION='⭐'
 
   #############[ kubecontext: current kubernetes context (https://kubernetes.io/) ]#############
   # Kubernetes context classes for the purpose of using different colors, icons and expansions with
