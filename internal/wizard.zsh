@@ -350,10 +350,17 @@ function install_font() {
       print -P ""
       print -P "Please %Brestart iTerm2%b for the changes to take effect."
       print -P ""
-      flowing +c -i 5 "  1. Click" "%BiTerm2 → Quit iTerm2%b" or press "%B⌘ Q%b."
-      flowing +c -i 5 "  2. Open %BiTerm2%b."
-      print -P ""
-      exit 69
+      while true; do
+        flowing +c -i 5 "  1. Click" "%BiTerm2 → Quit iTerm2%b" or press "%B⌘ Q%b."
+        flowing +c -i 5 "  2. Open %BiTerm2%b."
+        print -P ""
+        local key=
+        read -k key${(%):-"?%BWill you restart iTerm2 before proceeding? [yN]: %b" || quit -c
+        [[ $key = (y|Y) ]] && exit 69
+        print -P ""
+        print -P "It's important to %Brestart iTerm2%b for the changes to take effect."
+        print -P ""
+      done
     ;;
   esac
 }
