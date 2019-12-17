@@ -356,7 +356,12 @@ function install_font() {
         print -P ""
         local key=
         read -k key${(%):-"?%BWill you restart iTerm2 before proceeding? [yN]: %b"} || quit -c
-        [[ $key = (y|Y) ]] && exit 69
+        if [[ $key = (y|Y) ]]; then
+          print -P ""
+          print -P ""
+          exit 69
+        fi
+        print -P ""
         print -P ""
         print -P "It's important to %Brestart iTerm2%b for the changes to take effect."
         print -P ""
