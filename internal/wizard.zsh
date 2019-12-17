@@ -355,7 +355,7 @@ function install_font() {
         flowing +c -i 5 "  2. Open %BiTerm2%b."
         print -P ""
         local key=
-        read -k key${(%):-"?%BWill you restart iTerm2 before proceeding? [yN]: %b" || quit -c
+        read -k key${(%):-"?%BWill you restart iTerm2 before proceeding? [yN]: %b"} || quit -c
         [[ $key = (y|Y) ]] && exit 69
         print -P ""
         print -P "It's important to %Brestart iTerm2%b for the changes to take effect."
