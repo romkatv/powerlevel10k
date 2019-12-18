@@ -100,7 +100,7 @@ supported by Powerlevel10k.
 
 ### For new users
 
-On the first run Powerlevel10k configuration wizard will ask you a few questions and configure
+On the first run, Powerlevel10k configuration wizard will ask you a few questions and configure
 your prompt. If it doesn't trigger automatically, type `p10k configure`. You can further customize
 your prompt by editing `~/.p10k.zsh`.
 
@@ -160,7 +160,7 @@ applications on your system. Configure your terminal to use this font:
 
 Run `p10k configure` to pick the best style for your new font.
 
-_Using a different terminal and know how to set font for it? Share your knowledge by sending a PR
+_Using a different terminal and know how to set the font for it? Share your knowledge by sending a PR
 to expand the list!_
 
 ## Try it in Docker
@@ -215,7 +215,7 @@ covered by the same license.
 ### <a name='instant-prompt'></a>What is instant prompt?
 
 *Instant Prompt* is an optional feature of Powerlevel10k. When enabled, it gives you a limited
-prompt within a few milliseconds of starting zsh, alowing you to start hacking right away while zsh
+prompt within a few milliseconds of starting zsh, allowing you to start hacking right away while zsh
 is initializing. Once initialization is complete, the full-featured Powerlevel10k prompt will
 seamlessly replace instant prompt.
 
