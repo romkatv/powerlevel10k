@@ -100,7 +100,7 @@ supported by Powerlevel10k.
 
 ### For new users
 
-On the first run Powerlevel10k configuration wizard will ask you a few questions and configure
+On the first run, Powerlevel10k configuration wizard will ask you a few questions and configure
 your prompt. If it doesn't trigger automatically, type `p10k configure`. You can further customize
 your prompt by editing `~/.p10k.zsh`.
 
@@ -160,7 +160,7 @@ applications on your system. Configure your terminal to use this font:
 
 Run `p10k configure` to pick the best style for your new font.
 
-_Using a different terminal and know how to set font for it? Share your knowledge by sending a PR
+_Using a different terminal and know how to set the font for it? Share your knowledge by sending a PR
 to expand the list!_
 
 ## Try it in Docker
@@ -177,7 +177,7 @@ docker run -e TERM -it --rm archlinux/base bash -uexc '
   exec zsh'
 ```
 
-## Is it really fast?
+## Is it fast?
 
 Yes.
 
@@ -215,7 +215,7 @@ covered by the same license.
 ### <a name='instant-prompt'></a>What is instant prompt?
 
 *Instant Prompt* is an optional feature of Powerlevel10k. When enabled, it gives you a limited
-prompt within a few milliseconds of starting zsh, alowing you to start hacking right away while zsh
+prompt within a few milliseconds of starting zsh, allowing you to start hacking right away while zsh
 is initializing. Once initialization is complete, the full-featured Powerlevel10k prompt will
 seamlessly replace instant prompt.
 
@@ -231,17 +231,17 @@ if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]
 fi
 ```
 
-It's important that you copy the lines verbatim. Don't replace `source` with something else, don't
+You must copy the lines verbatim. Don't replace `source` with something else, don't
 call `zcompile`, don't redirect output, etc.
 
-When instant prompt is enabled, for the duration of zsh initialization standard input is redirected
-to `/dev/null` and standard output with standard error are redirected to a temporary file. Once zsh
+When the instant prompt is enabled, for the duration of zsh initialization standard input is redirected
+to `/dev/null` and a standard output with standard error are redirected to a temporary file. Once zsh
 is fully initialized, standard file descriptors are restored and the content of the temporary file
 is printed out.
 
 When using instant prompt, you should carefully check any output that appears on zsh startup as it
 may indicate that initialization has been altered, or perhaps even broken, by instant prompt.
-Initialization code that may require console input, such as asking for a keyring password or for a
+Initialization code that may require console input, such as asking for a keyring password or a
 *[y/n]* confirmation, must be moved above the instant prompt preamble in `~/.zshrc`. Initialization
 code that merely prints to console but never reads from it will work correctly with instant prompt,
 although output that normally has colors may appear uncolored. You can either leave it be, suppress
@@ -308,7 +308,7 @@ If the `echo` command prints `❯` but the cursor is still in the wrong place, i
 
 If this doesn't help, add `unset ZLE_RPROMPT_INDENT` at the bottom of `~/.zshrc`.
 
-Still having issues? Run the following command to diagnose the problem:
+Still, having issues? Run the following command to diagnose the problem:
 
 ```zsh
 () {
@@ -350,7 +350,7 @@ culprits. Open an issue if you get stuck.
 ```
 
 This is usually caused by a terminal bug or misconfiguration that makes it print ambiguous-width
-characters as double-width instead of single width. For example,
+characters as double-width instead of a single width. For example,
 [this issue](https://github.com/romkatv/powerlevel10k/issues/165).
 
 #### If the prompt line is shorter than the frame and is mangled
@@ -426,7 +426,7 @@ See also: [How do I change the format of Git status?](#how-do-i-change-the-forma
 
 ### How do I change the format of Git status?
 
-To change the format of Git status, open `~/.p10k.zsh`, search for `my_git_formatter` and edit its
+To change the format of Git status, open `~/.p10k.zsh`, Search for `my_git_formatter` and edit its
 source code.
 
 ### How do I add username and/or hostname to prompt?
@@ -434,7 +434,7 @@ source code.
 When using *Lean*, *Classic* or *Rainbow* style, prompt shows `username@hostname` when you are
 logged in as root or via SSH. There is little value in showing `username` or `hostname` when you are
 logged in to your local machine as a normal user. So the absence of `username@hostname` in your
-prompt is an indication that you are working locally and that you aren't root. You can change it,
+prompt is an indication that you are working locally and that you aren't rooted. You can change it,
 however.
 
 Open `~/.p10k.zsh`. Close to the top you can see the most important parameters that define which
@@ -462,7 +462,7 @@ If you follow the tip and remove (or comment out) the last line, you'll always s
 `username@hostname` in prompt. You can change the format to just `username`, or change the color, by
 adjusting the values of parameters nearby. There are plenty of comments to help you navigate.
 
-Finally, you can move `context` segment to where you want it to be in your prompt. Perhaps somewhere
+Finally, you can move the `context` segment to where you want it to be in your prompt. Perhaps somewhere
 within `POWERLEVEL9K_LEFT_PROMPT_ELEMENTS`.
 
 ### Why does Powerlevel10k spawn extra processes?
@@ -483,7 +483,7 @@ prompt latency when using Powerlevel10k, please
 
 Yes, provided that you are using zsh >= 5.4.
 
-Loading time, or time to first prompt, can be measured with the following benchmark:
+Loading time, or time to the first prompt, can be measured with the following benchmark:
 
 ```zsh
 time (repeat 1000 zsh -dfis <<< 'source ~/powerlevel10k/powerlevel10k.zsh-theme')
@@ -496,62 +496,4 @@ Running this command with `~/powerlevel10k` as the current directory on the same
 [prompt benchmark](#is-it-really-fast) takes 29 seconds (29 ms per invocation). This is about 6
 times faster than powerlevel9k/master and 17 times faster than powerlevel9k/next.
 
-### Does Powerlevel10k always render exactly the same prompt as Powerlevel9k given the same config?
-
-This is the goal. You should be able to switch from Powerlevel9k to Powerlevel10k with no
-visible changes except for performance. There are, however, several differences.
-
-- By default only `git` vcs backend is enabled in Powerlevel10k. If you need `svn` and `hg`, you'll
-  need to add them to `POWERLEVEL9K_VCS_BACKENDS`.
-- Powerlevel10k strives to be bug-compatible with Powerlevel9k but not when it comes to egregious
-  bugs. If you accidentally rely on these bugs, your prompt will differ between Powerlevel9k and
-  Powerlevel10k. Some examples:
-  - Powerlevel9k doesn't respect `ZLE_RPROMPT_INDENT`. As a result, right prompt in Powerlevel10k
-    can have an extra space at the end compared to Powerlevel9k. Set `ZLE_RPROMPT_INDENT=0` if you
-    don't want that space.
-  - Powerlevel9k ignores some options that are set after the theme is sourced while Powerlevel10k
-    respects all options. If you see different icons in Powerlevel9k and Powerlevel10k, you've
-    probably defined `POWERLEVEL9K_MODE` before sourcing the theme. This parameter gets ignored
-    by Powerlevel9k but honored by Powerlevel10k. If you want your prompt to look in Powerlevel10k
-    the same as in Powerlevel9k, remove `POWERLEVEL9K_MODE`.
-  - There are
-    [dozens more bugs](https://github.com/Powerlevel9k/powerlevel9k/issues/created_by/romkatv) in
-    Powerlevel9k that don't exist in Powerlevel10k.
-
-If you notice any other changes in prompt appearance when switching from Powerlevel9k to
-Powerlevel10k, please [open an issue](https://github.com/romkatv/powerlevel10k/issues).
-
-### Is there an AUR package for Powerlevel10k?
-
-Yes, [zsh-theme-powerlevel10k-git](https://aur.archlinux.org/packages/zsh-theme-powerlevel10k-git/).
-This package is owned by an unaffiliated volunteer.
-
-### I cannot make Powerlevel10k work with my plugin manager. Help!
-
-If the [installation instructions](#installation) didn't work for you, try disabling your current
-theme (so that you end up with no theme) and then installing Powerlevel10k manually.
-
-1. Disable the current theme in your framework / plugin manager.
-
-- **zplug:** Open `~/.zshrc` and remove the `zplug` command that refers to your current theme. For
-  example, if you are currently using Powerlevel9k, look for
-  `zplug bhilburn/powerlevel9k, use:powerlevel9k.zsh-theme`.
-- **prezto:** Open `~/.zpreztorc` and put `zstyle :prezto:module:prompt theme off` in it. Remove
-  any other command that sets `theme` such as `zstyle :prezto:module:prompt theme powerlevel9k`.
-- **oh-my-zsh:** Open `~/.zshrc` and remove the line that sets `ZSH_THEME`, such as
-  `ZSH_THEME=powerlevel9k/powerlevel9k`.
-- **antigen:** Open `~/.zshrc` and remove the line that sets `antigen theme`, such as
-  `antigen theme powerlevel9k/powerlevel9k`.
-
-2. Install Powerlevel10k manually.
-
-```zsh
-git clone https://github.com/romkatv/powerlevel10k.git ~/powerlevel10k
-echo 'source ~/powerlevel10k/powerlevel10k.zsh-theme' >>! ~/.zshrc
-```
-
-This method of installation won't make anything slower or otherwise sub-par.
-
-### What is the minimum supported zsh version?
-
-Zsh 5.1 or newer should work. Fast startup requires zsh >= 5.4.
+### 
