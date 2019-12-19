@@ -4283,7 +4283,7 @@ function _p9k_on_expand() {
       () {
         (( __p9k_ksh_arrays )) && setopt ksh_arrays
         (( __p9k_sh_glob )) && setopt sh_glob
-        print -rP -- $ruler
+        print -rnP -- $ruler
       }
     fi
   }
