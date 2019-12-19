@@ -3388,27 +3388,28 @@ prompt_gcloud() {
   _p9k_prompt_segment "$0" "blue" "white" "GCLOUD_ICON" 0 '' "${P9K_GCLOUD_ACCOUNT//\%/%%}:${P9K_GCLOUD_PROJECT//\%/%%}"
 }
 
-prompt_gcloud_app() {
-  unset P9K_GCLOUD_APP_EMAIL P9K_GCLOUD_APP_ACCOUNT_TYPE P9K_GCLOUD_APP_ACCOUNT_TYPE_SHORT
-  (( $+commands[gcloud] )) || return
-  [[ ! -z $GOOGLE_APPLICATION_CREDENTIALS ]] || return
+prompt_google_app_cred() {
+  unset P9K_GOOGLE_APP_CRED_{TYPE,PROJECT_ID,CLIENT_EMAIL}
+  [[ -n $GOOGLE_APPLICATION_CREDENTIALS ]] || return
+  (( $+commands[jq] )) || return
 
   if ! _p9k_cache_stat_get $0 $GOOGLE_APPLICATION_CREDENTIALS; then
-    local email="$(cat $GOOGLE_APPLICATION_CREDENTIALS | jq -r '.client_email')"
-    local account_type="$(cat $GOOGLE_APPLICATION_CREDENTIALS | jq -r '.type')"
-    local account_type_short
-    if [[ "$account_type" == "service_account" ]]; then
-      account_type_short="sa:"
+    local -a lines
+    local q='[.type//"", .project_id//"", .client_email//"", 0][]'
+    if lines=("${(@f)$(jq -r $q <$GOOGLE_APPLICATION_CREDENTIALS 2>/dev/null)}") && (( $#lines == 4 )); then
+      _p9k_cache_stat_set 1 "${(@)lines[1,-2]}"
+    else
+      _p9k_cache_stat_set 0
     fi
-
-    # Service account name may contain only alpha-numeric chars and hyphens, so splitting by `.` gives us `service-account-name@project-id`
-    _p9k_cache_stat_set "${email%%.*}" "$account_type" "$account_type_short"
   fi
-  [[ -n $_p9k_cache_val[1] || -n $_p9k_cache_val[2] || -n $_p9k_cache_val[3] ]] || return
-  P9K_GCLOUD_APP_EMAIL=$_p9k_cache_val[1]
-  P9K_GCLOUD_APP_ACCOUNT_TYPE=$_p9k_cache_val[2]
-  P9K_GCLOUD_APP_ACCOUNT_TYPE_SHORT=$_p9k_cache_val[3]
-  _p9k_prompt_segment "$0" "blue" "white" "GCLOUD_ICON" 0 '' "${P9K_GCLOUD_APP_ACCOUNT_TYPE_SHORT//\%/%%}${P9K_GCLOUD_APP_EMAIL//\%/%%}"
+
+  (( _p9k_cache_val[1] )) || return
+  P9K_GOOGLE_APP_CRED_TYPE=$_p9k_cache_val[2]
+  P9K_GOOGLE_APP_CRED_PROJECT_ID=$_p9k_cache_val[3]
+  P9K_GOOGLE_APP_CRED_CLIENT_EMAIL=$_p9k_cache_val[4]
+
+  [[ -n $P9K_GOOGLE_APP_CRED_TYPE ]] && local state=_${(U)P9K_GOOGLE_APP_CRED_TYPE} || local state
+  _p9k_prompt_segment "$0$state" "blue" "white" "GCLOUD_ICON" 0 '' "${${P9K_GOOGLE_APP_CRED_CLIENT_EMAIL%%.*}//\%/%%}"
 }
 
 typeset -gra __p9k_nordvpn_tag=(

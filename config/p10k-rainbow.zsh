@@ -68,7 +68,7 @@
       # aws_eb_env            # aws elastic beanstalk environment (https://aws.amazon.com/elasticbeanstalk/)
       # azure                 # azure account name (https://docs.microsoft.com/en-us/cli/azure)
       # gcloud                # google cloud cli acccount and project (https://cloud.google.com/)
-      # gcloud_app            # google cloud application credentials (https://cloud.google.com/docs/authentication/getting-started#setting_the_environment_variable)
+      # google_app_cred       # google application credentials (https://cloud.google.com/docs/authentication/production)
       context                 # user@hostname
       nordvpn                 # nordvpn connection status, linux only (https://nordvpn.com/)
       ranger                  # ranger shell (https://github.com/ranger/ranger)
@@ -811,22 +811,37 @@
   # Custom icon.
   # typeset -g POWERLEVEL9K_GCLOUD_VISUAL_IDENTIFIER_EXPANSION='⭐'
 
-  ##########[ gcloud_app: google cloud application credentials (https://cloud.google.com/docs/authentication/getting-started#setting_the_environment_variable) ]###########
-  # Google cloud color.
-  typeset -g POWERLEVEL9K_GCLOUD_APP_FOREGROUND=32
+  #[ google_app_cred: google application credentials (https://cloud.google.com/docs/authentication/production) ]#
+  # Default google application credentials color.
+  # typeset -g POWERLEVEL9K_GOOGLE_APP_CRED_FOREGROUND=7
+  # typeset -g POWERLEVEL9K_GOOGLE_APP_CRED_BACKGROUND=4
+  # Google application credentials color for service accounts.
+  # typeset -g POWERLEVEL9K_GOOGLE_APP_CRED_SERVICE_ACCOUNT_FOREGROUND=7
+  # typeset -g POWERLEVEL9K_GOOGLE_APP_CRED_SERVICE_ACCOUNT_BACKGROUND=4
 
-  # Google cloud format. Uncomment POWERLEVEL9K_GCLOUD_APP_CONTENT_EXPANSION and edit its value if the
-  # default is too verbose.
+  # Google application credentials format. Uncomment POWERLEVEL9K_GOOGLE_APP_CRED_CONTENT_EXPANSION
+  # and edit its value if the default is too verbose. You can use the following parameters in the
+  # expansion. Each of them corresponds to one of the fields in the JSON file pointed to by
+  # GOOGLE_APPLICATION_CREDENTIALS.
   #
-  #   P9K_GCLOUD_APP_EMAIL: `.client_email` field of keyfile
-  #   P9K_GCLOUD_APP_ACCOUNT_TYPE: `.type` field of keyfile
-  #   P9K_GCLOUD_APP_ACCOUNT_TYPE_SHORT: `sa` if `type=service_account`, empty otherwise
-  #   ${VARIABLE//\%/%%}: ${VARIABLE} with all occurences of '%' replaced with '%%'.
+  #   Parameter                        | JSON key file field
+  #   ---------------------------------+---------------
+  #   P9K_GOOGLE_APP_CRED_TYPE         | type
+  #   P9K_GOOGLE_APP_CRED_PROJECT_ID   | project_id
+  #   P9K_GOOGLE_APP_CRED_CLIENT_EMAIL | client_email
   #
-  # typeset -g POWERLEVEL9K_GCLOUD_APP_CONTENT_EXPANSION='${P9K_GCLOUD_APP_ACCOUNT_TYPE_SHORT//\%/%%}${P9K_GCLOUD_APP_EMAIL//\%/%%}'
+  # Note: ${VARIABLE%%.*} expands to ${VARIABLE} up to but not including the first period ('.').
+  # Note: ${VARIABLE//\%/%%} expands to ${VARIABLE} with all occurences of '%' replaced with '%%'.
+  #
+  # typeset -g POWERLEVEL9K_GOOGLE_APP_CRED_CONTENT_EXPANSION='${${P9K_GOOGLE_APP_CRED_CLIENT_EMAIL%%.*}//\%/%%}'
+  #
+  # You can also define content expansion specifically for service accounts by defining
+  # POWERLEVEL9K_GOOGLE_APP_CRED_SERVICE_ACCOUNT_CONTENT_EXPANSION.
 
-  # Custom icon.
-  # typeset -g POWERLEVEL9K_GCLOUD_APP_VISUAL_IDENTIFIER_EXPANSION='⭐'
+  # Default google application credentials icon.
+  # typeset -g POWERLEVEL9K_GOOGLE_APP_CRED_VISUAL_IDENTIFIER_EXPANSION='⭐'
+  # Google application credentials icon for service accounts.
+  # typeset -g POWERLEVEL9K_GOOGLE_APP_CRED_SERVICE_ACCOUNT_VISUAL_IDENTIFIER_EXPANSION='⭐'
 
   #############[ kubecontext: current kubernetes context (https://kubernetes.io/) ]#############
   # Kubernetes context classes for the purpose of using different colors, icons and expansions with
