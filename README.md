@@ -34,6 +34,7 @@ it will generate the same prompt.
    1. [Why is my cursor in the wrong place?](#why-is-my-cursor-in-the-wrong-place)
    1. [Why is my prompt wrapping around in a weird way?](#why-is-my-prompt-wrapping-around-in-a-weird-way)
    1. [Why is my right prompt in the wrong place?](#why-is-my-right-prompt-in-the-wrong-place)
+   1. [Why does the configuration wizard run automatically every time I start zsh?](#why-does-the-configuration-wizard-run-automatically-every-time-i-start-zsh)
    1. [I cannot install the recommended font. Help!](#i-cannot-install-the-recommended-font-help)
    1. [Why do I have a question mark symbol in my prompt? Is my font broken?](#why-do-i-have-a-question-mark-symbol-in-my-prompt-is-my-font-broken)
    1. [What do different symbols in Git status mean?](#what-do-different-symbols-in-git-status-mean)
@@ -384,6 +385,20 @@ See [Why is my cursor in the wrong place?](#why-is-my-cursor-in-the-wrong-place)
 ### Why is my right prompt in the wrong place?
 
 See [Why is my cursor in the wrong place?](#why-is-my-cursor-in-the-wrong-place)
+
+### Why does the configuration wizard run automatically every time I start zsh?
+
+When Powerlevel10k starts, it automatically runs `p10k configure` if no `POWERLEVEL9K_*`
+parameters are defined. Based on your prompt style choices, the configuration wizard creates
+`~/.p10k.zsh` with a bunch of `POWERLEVEL9K_*` parameters in it and adds a line to `~/.zshrc` to
+source this file. The next time you start zsh, the configuration wizard shouldn't run automatically.
+If it does, this means the evaluation of `~/.zshrc` terminates prematurely before it reaches the
+line that sources `~/.p10k.zsh`. This most often happens due to syntax errors in `~/.zshrc`. These
+errors get hidden by the configuration wizard screen, so you don't notice them. Scroll up in the
+first configuration wizard screen to see these errors. Alternatively, type
+`POWERLEVEL9K_DISABLE_CONFIGURATION_WIZARD=true zsh` to start zsh without automatically running the
+configuration wizard. Once you can see the errors, fix `~/.zshrc` to get rid of them and to ensure
+that the whole file gets evaluated when you start zsh.
 
 ### I cannot install the recommended font. Help!
 
