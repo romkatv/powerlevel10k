@@ -395,10 +395,9 @@ source this file. The next time you start zsh, the configuration wizard shouldn'
 If it does, this means the evaluation of `~/.zshrc` terminates prematurely before it reaches the
 line that sources `~/.p10k.zsh`. This most often happens due to syntax errors in `~/.zshrc`. These
 errors get hidden by the configuration wizard screen, so you don't notice them. Scroll up in the
-first configuration wizard screen to see these errors. Alternatively, type
+first configuration wizard screen to see these errors. Alternatively, run
 `POWERLEVEL9K_DISABLE_CONFIGURATION_WIZARD=true zsh` to start zsh without automatically running the
-configuration wizard. Once you can see the errors, fix `~/.zshrc` to get rid of them and to ensure
-that the whole file gets evaluated when you start zsh.
+configuration wizard. Once you can see the errors, fix `~/.zshrc` to get rid of them.
 
 ### I cannot install the recommended font. Help!
 
