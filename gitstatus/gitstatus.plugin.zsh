@@ -544,8 +544,23 @@ function gitstatus_start() {
       >&2 echo -E ''
       >&2 echo -E '  Run the following command to retry with extra diagnostics:'
       >&2 print -P '%F{green}'
-      >&2 echo -E "    GITSTATUS_LOG_LEVEL=DEBUG gitstatus_start ${(@q-)*}"
-      >&2 print -nP '%f'
+      local env="GITSTATUS_LOG_LEVEL=DEBUG"
+      if [[ -n ${GITSTATUS_NUM_THREADS:-} ]]; then
+        env+=" GITSTATUS_NUM_THREADS=${(q)GITSTATUS_NUM_THREADS}"
+      fi
+      if [[ -n ${GITSTATUS_DAEMON:-} ]]; then
+        env+=" GITSTATUS_DAEMON=${(q)GITSTATUS_DAEMON}"
+      fi
+      >&2 echo -nE "    ${env} gitstatus_start ${(@q-)*}"
+      >&2 print -P '%f'
+      >&2 echo -E ''
+      local zshrc='~/.zshrc'
+      [[ -n ${ZDOTDIR:-} ]] && zshrc=${(D):-$ZDOTDIR/.zshrc}
+      >&2 echo -E "  If this command produces no output, add the following parameter to $zshrc:"
+      >&2 echo -E ''
+      >&2 print -P '%F{green}    GITSTATUS_LOG_LEVEL=DEBUG%f'
+      >&2 echo -E ''
+      >&2 echo -E '  With this parameter, gitstatus will print additional information on error.'
     fi
 
     return 1
