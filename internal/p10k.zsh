@@ -4263,6 +4263,7 @@ function _p9k_on_expand() {
       fi
     fi
 
+    _p9k__last_tty=$P9K_TTY
     __p9k_reset_state=1
 
     if (( _POWERLEVEL9K_PROMPT_ADD_NEWLINE )); then
@@ -4300,14 +4301,16 @@ function _p9k_on_expand() {
     __p9k_reset_state=0
     P9K_TTY=old
 
-    [[ $_p9k__display_v[2] == print ]] && print -rn -- $_p9k_t[_p9k_empty_line_idx]
-    if [[ $_p9k__display_v[4] == print ]]; then
-      local ruler=$_p9k_t[_p9k_ruler_idx]
-      () {
-        (( __p9k_ksh_arrays )) && setopt ksh_arrays
-        (( __p9k_sh_glob )) && setopt sh_glob
-        print -rnP -- $ruler
-      }
+    if ! zle; then
+      [[ $_p9k__display_v[2] == print ]] && print -rn -- $_p9k_t[_p9k_empty_line_idx]
+      if [[ $_p9k__display_v[4] == print ]]; then
+        local ruler=$_p9k_t[_p9k_ruler_idx]
+        () {
+          (( __p9k_ksh_arrays )) && setopt ksh_arrays
+          (( __p9k_sh_glob )) && setopt sh_glob
+          print -rnP -- $ruler
+        }
+      fi
     fi
   }
 
@@ -4332,6 +4335,7 @@ _p9k_precmd_impl() {
       _p9k__expanded=1
     else
       _p9k__expanded=0
+      _p9k__must_restore_prompt=0
     fi
 
     if (( $+_p9k_real_zle_rprompt_indent )); then
@@ -4407,8 +4411,9 @@ _p9k_trapint() {
   if (( __p9k_enabled )); then
     emulate -L zsh
     setopt no_hist_expand extended_glob no_prompt_bang prompt_{percent,subst}
-    _p9k_zle_line_finish
+    zle && _p9k_zle_line_finish int
   fi
+  return 0
 }
 
 _p9k_precmd() {
@@ -4629,6 +4634,9 @@ typeset -g  _p9k__param_pat
 typeset -g  _p9k__param_sig
 
 _p9k_init_vars() {
+  typeset -g  _p9k__last_tty
+  typeset -gi _p9k__must_restore_prompt
+  typeset -gi _p9k__restore_prompt_fd
   typeset -gi _p9k__can_hide_cursor=$(( $+terminfo[civis] && $+terminfo[cnorm] ))
   typeset -gi _p9k__cursor_hidden
   typeset -gi _p9k__instant_prompt_disabled
@@ -5083,7 +5091,32 @@ function _p9k_zle_line_init() {
   echoti cnorm
 }
 
+function _p9k_restore_prompt() {
+  emulate -L zsh
+  setopt no_hist_expand extended_glob no_prompt_bang prompt_{percent,subst}
+  {
+    (( _p9k__must_restore_prompt )) || return
+    _p9k__must_restore_prompt=0
+
+    unset _p9k__line_finished
+    _p9k_refresh_reason=restore
+    _p9k_set_prompt
+    _p9k_refresh_reason=
+
+    local tty=$P9K_TTY
+    P9K_TTY=$_p9k__last_tty
+    _p9k__expanded=0
+    _p9k_reset_prompt
+    P9K_TTY=$tty
+  } always {
+    zle -F $1
+    exec {1}>&-
+    _p9k__restore_prompt_fd=0
+  }
+}
+
 function _p9k_zle_line_finish() {
+  [[ -z $1 && $CONTEXT != start ]] && _p9k__must_restore_prompt=0
   (( $+_p9k__line_finished )) && return
 
   _p9k__line_finished=
@@ -5109,7 +5142,14 @@ function _p9k_zle_line_finish() {
   fi
 
   if (( reset )); then
-    if zle && (( $+termcap[up] )); then
+    if [[ $1 == int ]]; then
+      _p9k__must_restore_prompt=1
+      if (( !_p9k__restore_prompt_fd )); then
+        exec {_p9k__restore_prompt_fd}</dev/null
+        zle -F $_p9k__restore_prompt_fd _p9k_restore_prompt
+      fi
+    fi
+    if (( $+termcap[up] )); then
       (( _p9k__can_hide_cursor )) && local hide=$terminfo[civis] || local hide=
       echo -nE - $hide$'\n'$termcap[up]
     fi
