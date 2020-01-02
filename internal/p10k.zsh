@@ -3678,6 +3678,15 @@ function instant_prompt_midnight_commander() {
   _p9k_prompt_segment prompt_midnight_commander $_p9k_color1 yellow MIDNIGHT_COMMANDER_ICON 0 '$MC_TMPDIR' ''
 }
 
+function prompt_nnn() {
+  [[ $NNNLVL == (0|) ]] && return
+  _p9k_prompt_segment $0 6 $_p9k_color1 NNN_ICON 0 '' $NNNLVL
+}
+
+function instant_prompt_nnn() {
+  _p9k_prompt_segment prompt_nnn 6 $_p9k_color1 NNN_ICON 1 '${NNNLVL:#0}' '$NNNLVL'
+}
+
 function prompt_vim_shell() {
   [[ -n $VIMRUNTIME ]] || return
   _p9k_prompt_segment $0 green $_p9k_color1 VIM_ICON 0 '' ''
