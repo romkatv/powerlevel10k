@@ -63,6 +63,7 @@
       rvm                     # ruby version from rvm (https://rvm.io)
       fvm                     # flutter version management (https://github.com/leoafarias/fvm)
       luaenv                  # lua version from luaenv (https://github.com/cehoffman/luaenv)
+      jenv                    # java version from jenv (https://github.com/jenv/jenv)
       kubecontext             # current kubernetes context (https://kubernetes.io/)
       terraform               # terraform workspace (https://www.terraform.io)
       aws                     # aws profile (https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-profiles.html)
@@ -731,6 +732,17 @@
   typeset -g POWERLEVEL9K_LUAENV_PROMPT_ALWAYS_SHOW=false
   # Custom icon.
   # typeset -g POWERLEVEL9K_LUAENV_VISUAL_IDENTIFIER_EXPANSION='⭐'
+
+  ###############[ jenv: java version from jenv (https://github.com/jenv/jenv) ]################
+  # Java color.
+  typeset -g POWERLEVEL9K_JENV_FOREGROUND=32
+  # Hide java version if it doesn't come from one of these sources.
+  typeset -g POWERLEVEL9K_JENV_SOURCES=(shell local global)
+  # If set to false, hide java version if it's the same as global:
+  # $(jenv version-name) == $(jenv global).
+  typeset -g POWERLEVEL9K_JENV_PROMPT_ALWAYS_SHOW=false
+  # Custom icon.
+  # typeset -g POWERLEVEL9K_JENV_VISUAL_IDENTIFIER_EXPANSION='⭐'
 
   ################[ terraform: terraform workspace (https://www.terraform.io) ]#################
   # Terraform color.
