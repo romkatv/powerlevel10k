@@ -3397,7 +3397,15 @@ prompt_google_app_cred() {
     local -a lines
     local q='[.type//"", .project_id//"", .client_email//"", 0][]'
     if lines=("${(@f)$(jq -r $q <$GOOGLE_APPLICATION_CREDENTIALS 2>/dev/null)}") && (( $#lines == 4 )); then
-      _p9k_cache_stat_set 1 "${(@)lines[1,-2]}"
+      local text="${(j.:.)lines[1,-2]}"
+      local pat class state
+      for pat class in "${_POWERLEVEL9K_GOOGLE_APP_CRED_CLASSES[@]}"; do
+        if [[ $text == ${~pat} ]]; then
+          [[ -n $class ]] && state=_${(U)class}
+          break
+        fi
+      done
+      _p9k_cache_stat_set 1 "${(@)lines[1,-2]}" "$text" "$state"
     else
       _p9k_cache_stat_set 0
     fi
@@ -3407,9 +3415,7 @@ prompt_google_app_cred() {
   P9K_GOOGLE_APP_CRED_TYPE=$_p9k_cache_val[2]
   P9K_GOOGLE_APP_CRED_PROJECT_ID=$_p9k_cache_val[3]
   P9K_GOOGLE_APP_CRED_CLIENT_EMAIL=$_p9k_cache_val[4]
-
-  [[ -n $P9K_GOOGLE_APP_CRED_TYPE ]] && local state=_${(U)P9K_GOOGLE_APP_CRED_TYPE} || local state
-  _p9k_prompt_segment "$0$state" "blue" "white" "GCLOUD_ICON" 0 '' "${${P9K_GOOGLE_APP_CRED_CLIENT_EMAIL%%.*}//\%/%%}"
+  _p9k_prompt_segment "$0$_p9k_cache_val[6]" "blue" "white" "GCLOUD_ICON" 0 '' "$_p9k_cache_val[5]"
 }
 
 typeset -gra __p9k_nordvpn_tag=(
@@ -5016,6 +5022,7 @@ _p9k_init_params() {
   #   POWERLEVEL9K_KUBECONTEXT_OTHER_BACKGROUND=yellow
   _p9k_declare -a POWERLEVEL9K_KUBECONTEXT_CLASSES --
   _p9k_declare -a POWERLEVEL9K_AWS_CLASSES --
+  _p9k_declare -a POWERLEVEL9K_GOOGLE_APP_CRED_CLASSES -- 'service_account:*' SERVICE_ACCOUNT
   # Specifies the format of java version.
   #
   #   POWERLEVEL9K_JAVA_VERSION_FULL=true  => 1.8.0_212-8u212-b03-0ubuntu1.18.04.1-b03
@@ -5513,7 +5520,7 @@ _p9k_must_init() {
     [[ $sig == $_p9k__param_sig ]] && return 1
     _p9k_deinit
   fi
-  _p9k__param_pat=$'v17\1'${ZSH_VERSION}$'\1'${ZSH_PATCHLEVEL}$'\1'
+  _p9k__param_pat=$'v18\1'${ZSH_VERSION}$'\1'${ZSH_PATCHLEVEL}$'\1'
   _p9k__param_pat+=$'${#parameters[(I)POWERLEVEL9K_*]}\1${(%):-%n%#}\1$GITSTATUS_LOG_LEVEL\1'
   _p9k__param_pat+=$'$GITSTATUS_ENABLE_LOGGING\1$GITSTATUS_DAEMON\1$GITSTATUS_NUM_THREADS\1'
   _p9k__param_pat+=$'$DEFAULT_USER\1${ZLE_RPROMPT_INDENT:-1}\1$P9K_SSH\1$__p9k_ksh_arrays'
