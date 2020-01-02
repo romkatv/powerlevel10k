@@ -62,6 +62,7 @@
       rbenv                   # ruby version from rbenv (https://github.com/rbenv/rbenv)
       rvm                     # ruby version from rvm (https://rvm.io)
       fvm                     # flutter version management (https://github.com/leoafarias/fvm)
+      luaenv                  # lua version from luaenv (https://github.com/cehoffman/luaenv)
       kubecontext             # current kubernetes context (https://kubernetes.io/)
       terraform               # terraform workspace (https://www.terraform.io)
       aws                     # aws profile (https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-profiles.html)
@@ -695,6 +696,17 @@
   typeset -g POWERLEVEL9K_FVM_FOREGROUND=38
   # Custom icon.
   # typeset -g POWERLEVEL9K_FVM_VISUAL_IDENTIFIER_EXPANSION='⭐'
+
+  ##########[ luaenv: lua version from luaenv (https://github.com/cehoffman/luaenv) ]###########
+  # Lua color.
+  typeset -g POWERLEVEL9K_LUAENV_FOREGROUND=32
+  # Hide lua version if it doesn't come from one of these sources.
+  typeset -g POWERLEVEL9K_LUAENV_SOURCES=(shell local global)
+  # If set to false, hide lua version if it's the same as global:
+  # $(luaenv version-name) == $(luaenv global).
+  typeset -g POWERLEVEL9K_LUAENV_PROMPT_ALWAYS_SHOW=false
+  # Custom icon.
+  # typeset -g POWERLEVEL9K_LUAENV_VISUAL_IDENTIFIER_EXPANSION='⭐'
 
   #############[ kubecontext: current kubernetes context (https://kubernetes.io/) ]#############
   # Kubernetes context classes for the purpose of using different colors, icons and expansions with
