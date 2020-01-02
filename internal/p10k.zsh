@@ -2215,6 +2215,53 @@ function _p9k_jenv_global_version() {
   _p9k_read_jenv_version_file ${JENV_ROOT:-$HOME/.jenv}/version || _p9k_ret=system
 }
 
+function _p9k_read_plenv_version_file() {
+  [[ -r $1 ]] || return
+  local rest
+  read _p9k_ret rest <$1 2>/dev/null
+  [[ -n $_p9k_ret ]]
+}
+
+function _p9k_plenv_global_version() {
+  _p9k_read_plenv_version_file ${PLENV_ROOT:-$HOME/.plenv}/version || _p9k_ret=system
+}
+
+################################################################
+# Segment to display plenv information
+# https://github.com/plenv/plenv#choosing-the-perl-version
+prompt_plenv() {
+  (( $+commands[plenv] || $+functions[plenv] )) || return
+  if [[ -n $PLENV_VERSION ]]; then
+    (( ${_POWERLEVEL9K_PLENV_SOURCES[(I)shell]} )) || return
+    local v=$PLENV_VERSION
+  else
+    (( ${_POWERLEVEL9K_PLENV_SOURCES[(I)local|global]} )) || return
+    [[ $PLENV_DIR == /* ]] && local dir=$PLENV_DIR || local dir="$_p9k_pwd_a/$PLENV_DIR"
+    while true; do
+      if _p9k_read_plenv_version_file $dir/.perl-version; then
+        (( ${_POWERLEVEL9K_PLENV_SOURCES[(I)local]} )) || return
+        local v=$_p9k_ret
+        break
+      fi
+      if [[ $dir == / ]]; then
+        (( _POWERLEVEL9K_PLENV_PROMPT_ALWAYS_SHOW )) || return
+        (( ${_POWERLEVEL9K_PLENV_SOURCES[(I)global]} )) || return
+        _p9k_plenv_global_version
+        local v=$_p9k_ret
+        break
+      fi
+      dir=${dir:h}
+    done
+  fi
+
+  if (( !_POWERLEVEL9K_PLENV_PROMPT_ALWAYS_SHOW )); then
+    _p9k_plenv_global_version
+    [[ $v == $_p9k_ret ]] && return
+  fi
+
+  _p9k_prompt_segment "$0" "blue" "$_p9k_color1" 'PERL_ICON' 0 '' "${v//\%/%%}"
+}
+
 ################################################################
 # Segment to display jenv information
 # https://github.com/jenv/jenv
@@ -5032,6 +5079,8 @@ _p9k_init_params() {
   _p9k_declare -a POWERLEVEL9K_LUAENV_SOURCES -- shell local global
   _p9k_declare -b POWERLEVEL9K_JENV_PROMPT_ALWAYS_SHOW 0
   _p9k_declare -a POWERLEVEL9K_JENV_SOURCES -- shell local global
+  _p9k_declare -b POWERLEVEL9K_PLENV_PROMPT_ALWAYS_SHOW 0
+  _p9k_declare -a POWERLEVEL9K_PLENV_SOURCES -- shell local global
   _p9k_declare -b POWERLEVEL9K_RVM_SHOW_GEMSET 0
   _p9k_declare -b POWERLEVEL9K_RVM_SHOW_PREFIX 0
   _p9k_declare -b POWERLEVEL9K_CHRUBY_SHOW_VERSION 1
@@ -5618,7 +5667,7 @@ _p9k_must_init() {
     [[ $sig == $_p9k__param_sig ]] && return 1
     _p9k_deinit
   fi
-  _p9k__param_pat=$'v20\1'${ZSH_VERSION}$'\1'${ZSH_PATCHLEVEL}$'\1'
+  _p9k__param_pat=$'v21\1'${ZSH_VERSION}$'\1'${ZSH_PATCHLEVEL}$'\1'
   _p9k__param_pat+=$'${#parameters[(I)POWERLEVEL9K_*]}\1${(%):-%n%#}\1$GITSTATUS_LOG_LEVEL\1'
   _p9k__param_pat+=$'$GITSTATUS_ENABLE_LOGGING\1$GITSTATUS_DAEMON\1$GITSTATUS_NUM_THREADS\1'
   _p9k__param_pat+=$'$DEFAULT_USER\1${ZLE_RPROMPT_INDENT:-1}\1$P9K_SSH\1$__p9k_ksh_arrays'

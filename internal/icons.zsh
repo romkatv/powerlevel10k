@@ -121,6 +121,7 @@ function _p9k_init_icons() {
         FLUTTER_ICON                   'F'
         GCLOUD_ICON                    'G'
         LUA_ICON                       'lua'
+        PERL_ICON                      'perl'
       )
     ;;
     'awesome-fontconfig')
@@ -229,6 +230,7 @@ function _p9k_init_icons() {
         FLUTTER_ICON                   'F'
         GCLOUD_ICON                    'G'
         LUA_ICON                       'lua'
+        PERL_ICON                      'perl'
       )
     ;;
     'awesome-mapped-fontconfig')
@@ -341,6 +343,7 @@ function _p9k_init_icons() {
         FLUTTER_ICON                   'F'
         GCLOUD_ICON                    'G'
         LUA_ICON                       'lua'
+        PERL_ICON                      'perl'
       )
     ;;
     'nerdfont-complete'|'nerdfont-fontconfig')
@@ -450,6 +453,7 @@ function _p9k_init_icons() {
         FLUTTER_ICON                   'F'
         GCLOUD_ICON                    '\uF7B7'               # 
         LUA_ICON                       '\uE620'               # 
+        PERL_ICON                      '\uE769'               # 
       )
     ;;
     *)
@@ -558,6 +562,7 @@ function _p9k_init_icons() {
         FLUTTER_ICON                   'F'
         GCLOUD_ICON                    'G'
         LUA_ICON                       'lua'
+        PERL_ICON                      'perl'
       )
     ;;
   esac

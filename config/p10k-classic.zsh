@@ -64,6 +64,7 @@
       fvm                     # flutter version management (https://github.com/leoafarias/fvm)
       luaenv                  # lua version from luaenv (https://github.com/cehoffman/luaenv)
       jenv                    # java version from jenv (https://github.com/jenv/jenv)
+      plenv                   # perl version from plenv (https://github.com/tokuhirom/plenv)
       kubecontext             # current kubernetes context (https://kubernetes.io/)
       terraform               # terraform workspace (https://www.terraform.io)
       aws                     # aws profile (https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-profiles.html)
@@ -743,6 +744,17 @@
   typeset -g POWERLEVEL9K_JENV_PROMPT_ALWAYS_SHOW=false
   # Custom icon.
   # typeset -g POWERLEVEL9K_JENV_VISUAL_IDENTIFIER_EXPANSION='⭐'
+
+  ###########[ plenv: perl version from plenv (https://github.com/tokuhirom/plenv) ]############
+  # Perl color.
+  typeset -g POWERLEVEL9K_PLENV_FOREGROUND=67
+  # Hide perl version if it doesn't come from one of these sources.
+  typeset -g POWERLEVEL9K_PLENV_SOURCES=(shell local global)
+  # If set to false, hide perl version if it's the same as global:
+  # $(plenv version-name) == $(plenv global).
+  typeset -g POWERLEVEL9K_PLENV_PROMPT_ALWAYS_SHOW=false
+  # Custom icon.
+  # typeset -g POWERLEVEL9K_PLENV_VISUAL_IDENTIFIER_EXPANSION='⭐'
 
   ################[ terraform: terraform workspace (https://www.terraform.io) ]#################
   # Terraform color.
