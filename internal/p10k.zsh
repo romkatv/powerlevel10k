@@ -5964,7 +5964,7 @@ _p9k_init() {
     local todo=$commands[todo.sh]
     if [[ -n $todo ]]; then
       local bash=${commands[bash]:-:}
-      _p9k_todo_file="$($bash 2>/dev/null -c "
+      _p9k_todo_file="$(exec -a $todo $bash 2>/dev/null -c "
         [ -e \"\$TODOTXT_CFG_FILE\" ] || TODOTXT_CFG_FILE=\$HOME/.todo/config
         [ -e \"\$TODOTXT_CFG_FILE\" ] || TODOTXT_CFG_FILE=\$HOME/todo.cfg
         [ -e \"\$TODOTXT_CFG_FILE\" ] || TODOTXT_CFG_FILE=\$HOME/.todo.cfg
