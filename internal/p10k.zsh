@@ -3905,7 +3905,7 @@ _p9k_set_instant_prompt() {
   RPROMPT=$saved_rprompt
 }
 
-typeset -gri __p9k_instant_prompt_version=13
+typeset -gri __p9k_instant_prompt_version=14
 
 _p9k_dump_instant_prompt() {
   local user=${(%):-%n}
@@ -4131,6 +4131,7 @@ _p9k_dump_instant_prompt() {
     precmd_functions=(${(@)precmd_functions:#_p9k_instant_prompt_precmd_first})
   }
   precmd_functions=(_p9k_instant_prompt_precmd_first $precmd_functions)
+  DISABLE_UPDATE_PROMPT=true
 } && unsetopt prompt_cr prompt_sp || true'
     } always {
       exec {fd}>&-
