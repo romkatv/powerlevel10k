@@ -14,6 +14,7 @@ it will generate the same prompt.
    1. [Manual](#manual)
    1. [Oh My Zsh](#oh-my-zsh)
    1. [Prezto](#prezto)
+   1. [Zim](#zim)
    1. [Antigen](#antigen)
    1. [Zplug](#zplug)
    1. [Zgen](#zgen)
@@ -72,6 +73,10 @@ Set `ZSH_THEME=powerlevel10k/powerlevel10k` in your `~/.zshrc`.
 ### Prezto
 
 Add `zstyle :prezto:module:prompt theme powerlevel10k` to your `~/.zpreztorc`.
+
+### Zim
+
+Add `zmodule romkatv/powerlevel10k` to your `.zimrc` and run `zimfw install`.
 
 ### Antigen
 
