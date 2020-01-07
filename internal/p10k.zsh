@@ -3905,7 +3905,7 @@ _p9k_set_instant_prompt() {
   RPROMPT=$saved_rprompt
 }
 
-typeset -gri __p9k_instant_prompt_version=13
+typeset -gri __p9k_instant_prompt_version=14
 
 _p9k_dump_instant_prompt() {
   local user=${(%):-%n}
@@ -4131,6 +4131,7 @@ _p9k_dump_instant_prompt() {
     precmd_functions=(${(@)precmd_functions:#_p9k_instant_prompt_precmd_first})
   }
   precmd_functions=(_p9k_instant_prompt_precmd_first $precmd_functions)
+  DISABLE_UPDATE_PROMPT=true
 } && unsetopt prompt_cr prompt_sp || true'
     } always {
       exec {fd}>&-
@@ -4273,47 +4274,53 @@ function _p9k_clear_instant_prompt() {
       local cr=$'\r'
       local sp="${(%):-%b%k%f%s%u$mark${(pl.$fill.. .)}$cr%b%k%f%s%u%E}"
       print -rn -- $terminfo[rc]${(%):-%b%k%f%s%u}$terminfo[ed]
-      if [[ -n ${(S)content//$'\e'*($'\a'|$'\e\\')} ]]; then
-        echo -E - ""
-        echo -E - "${(%):-[%3FWARNING%f]: Console output during zsh initialization detected.}"
-        echo -E - ""
-        echo -E - "${(%):-When using Powerlevel10k with instant prompt, console output during zsh}"
-        echo -E - "${(%):-initialization may indicate issues.}"
-        echo -E - ""
-        echo -E - "${(%):-You can:}"
-        echo -E - ""
-        echo -E - "${(%):-  - %BRecommended%b: Change %B$__p9k_zshrc_u%b so that it does not perform console I/O}"
-        echo -E - "${(%):-    after the instant prompt preamble. See the link below for details.}"
-        echo -E - ""
-        echo -E - "${(%):-    * You %Bwill not%b see this error message again.}"
-        echo -E - "${(%):-    * Zsh will start %Bquickly%b and prompt will update %Bsmoothly%b.}"
-        echo -E - ""
-        echo -E - "${(%):-  - Suppress this warning either by running %Bp10k configure%b or by manually}"
-        echo -E - "${(%):-    defining the following parameter:}"
-        echo -E - ""
-        echo -E - "${(%):-      %3Ftypeset%f -g POWERLEVEL9K_INSTANT_PROMPT=quiet}"
-        echo -E - ""
-        echo -E - "${(%):-    * You %Bwill not%b see this error message again.}"
-        echo -E - "${(%):-    * Zsh will start %Bquickly%b but prompt will %Bjump down%b after initialization.}"
-        echo -E - ""
-        echo -E - "${(%):-  - Disable instant prompt either by running %Bp10k configure%b or by manually}"
-        echo -E - "${(%):-    defining the following parameter:}"
-        echo -E - ""
-        echo -E - "${(%):-      %3Ftypeset%f -g POWERLEVEL9K_INSTANT_PROMPT=off}"
-        echo -E - ""
-        echo -E - "${(%):-    * You %Bwill not%b see this error message again.}"
-        echo -E - "${(%):-    * Zsh will start %Bslowly%b.}"
-        echo -E - ""
-        echo -E - "${(%):-  - Do nothing.}"
-        echo -E - ""
-        echo -E - "${(%):-    * You %Bwill%b see this error message every time you start zsh.}"
-        echo -E - "${(%):-    * Zsh will start %Bquickly%b but prompt will %Bjump down%b after initialization.}"
-        echo -E - ""
-        echo -E - "${(%):-For details, see:}"
-        echo    - "${(%):-\e]8;;https://github.com/romkatv/powerlevel10k/blob/master/README.md#instant-prompt\ahttps://github.com/romkatv/powerlevel10k/blob/master/README.md#instant-prompt\e]8;;\a}"
-        echo -E - ""
-        echo    - "${(%):-%3F-- console output produced during zsh initialization follows --%f}"
-        echo -E - ""
+      local unexpected=${(S)content//$'\e'*($'\a'|$'\e\\')}
+      if [[ -n $unexpected ]]; then
+        local omz1='[Oh My Zsh] Would you like to update? [Y/n]: '
+        local omz2='Updating Oh My Zsh'
+        local omz3='https://shop.planetargon.com/collections/oh-my-zsh'
+        if [[ -n ${${unexpected/$omz1}/$omz2*$omz3($'\n'|)} ]]; then
+          echo -E - ""
+          echo -E - "${(%):-[%3FWARNING%f]: Console output during zsh initialization detected.}"
+          echo -E - ""
+          echo -E - "${(%):-When using Powerlevel10k with instant prompt, console output during zsh}"
+          echo -E - "${(%):-initialization may indicate issues.}"
+          echo -E - ""
+          echo -E - "${(%):-You can:}"
+          echo -E - ""
+          echo -E - "${(%):-  - %BRecommended%b: Change %B$__p9k_zshrc_u%b so that it does not perform console I/O}"
+          echo -E - "${(%):-    after the instant prompt preamble. See the link below for details.}"
+          echo -E - ""
+          echo -E - "${(%):-    * You %Bwill not%b see this error message again.}"
+          echo -E - "${(%):-    * Zsh will start %Bquickly%b and prompt will update %Bsmoothly%b.}"
+          echo -E - ""
+          echo -E - "${(%):-  - Suppress this warning either by running %Bp10k configure%b or by manually}"
+          echo -E - "${(%):-    defining the following parameter:}"
+          echo -E - ""
+          echo -E - "${(%):-      %3Ftypeset%f -g POWERLEVEL9K_INSTANT_PROMPT=quiet}"
+          echo -E - ""
+          echo -E - "${(%):-    * You %Bwill not%b see this error message again.}"
+          echo -E - "${(%):-    * Zsh will start %Bquickly%b but prompt will %Bjump down%b after initialization.}"
+          echo -E - ""
+          echo -E - "${(%):-  - Disable instant prompt either by running %Bp10k configure%b or by manually}"
+          echo -E - "${(%):-    defining the following parameter:}"
+          echo -E - ""
+          echo -E - "${(%):-      %3Ftypeset%f -g POWERLEVEL9K_INSTANT_PROMPT=off}"
+          echo -E - ""
+          echo -E - "${(%):-    * You %Bwill not%b see this error message again.}"
+          echo -E - "${(%):-    * Zsh will start %Bslowly%b.}"
+          echo -E - ""
+          echo -E - "${(%):-  - Do nothing.}"
+          echo -E - ""
+          echo -E - "${(%):-    * You %Bwill%b see this error message every time you start zsh.}"
+          echo -E - "${(%):-    * Zsh will start %Bquickly%b but prompt will %Bjump down%b after initialization.}"
+          echo -E - ""
+          echo -E - "${(%):-For details, see:}"
+          echo    - "${(%):-\e]8;;https://github.com/romkatv/powerlevel10k/blob/master/README.md#instant-prompt\ahttps://github.com/romkatv/powerlevel10k/blob/master/README.md#instant-prompt\e]8;;\a}"
+          echo -E - ""
+          echo    - "${(%):-%3F-- console output produced during zsh initialization follows --%f}"
+          echo -E - ""
+        fi
       fi
       cat $__p9k_instant_prompt_output
       echo -nE - $sp
