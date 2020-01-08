@@ -5327,7 +5327,7 @@ function _p9k_widget_hook() {
 }
 
 function _p9k_widget() {
-  (( ! ${+widgets[_p9k_orig_$1]} )) || zle _p9k_orig_$1 "${@:2}"
+  (( ! ${+widgets[._p9k_orig_$1]} )) || zle ._p9k_orig_$1 "${@:2}"
   local res=$?
   (( ! __p9k_enabled )) || _p9k_widget_hook "$@"
   return res
@@ -5348,7 +5348,8 @@ function _p9k_wrap_widgets() {
     local widget
     for widget in ${(u)${${(f)"$(<$tmp)"}##* }:#(*\"|.*)}; do
       functions[_p9k_widget_$widget]='_p9k_widget '${(q)widget}' "$@"'
-      zle -A $widget _p9k_orig_$widget
+      # The leading dot is to work around bugs in zsh-syntax-highlighting.
+      zle -A $widget ._p9k_orig_$widget
       zle -N $widget _p9k_widget_$widget
     done 2>/dev/null  # `zle -A` fails for inexisting widgets and complains to stderr
   } always {
