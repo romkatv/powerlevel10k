@@ -4011,6 +4011,12 @@ _p9k_dump_instant_prompt() {
       if (( _POWERLEVEL9K_SHOW_RULER )); then
         >&$fd print -r -- '[[ $P9K_TTY == old ]] && { unset _p9k__ruler_i; _p9k__display_v[4]=print }'
       fi
+      if (( $+functions[p10k-on-init] )); then
+        >&$fd print -r -- '
+  p10k-on-init() { '$functions[p10k-on-init]' }
+  p10k-on-init
+  unfunction p10k-on-init'
+      fi
       if (( $+functions[p10k-on-pre-prompt] )); then
         >&$fd print -r -- '
   p10k-on-pre-prompt() { '$functions[p10k-on-pre-prompt]' }
@@ -4434,7 +4440,6 @@ function _p9k_on_expand() {
       fi
     fi
 
-    _p9k__last_tty=$P9K_TTY
     __p9k_reset_state=1
 
     if (( _POWERLEVEL9K_PROMPT_ADD_NEWLINE )); then
@@ -4463,13 +4468,16 @@ function _p9k_on_expand() {
       fi
     fi
 
-    typeset -g P9K_PROMPT=regular
+    if [[ -z $_p9k__last_tty && $+functions[p10k-on-init] == 1 ]]; then
+      p10k-on-init
+    fi
 
     if (( $+functions[p10k-on-pre-prompt] )); then
       p10k-on-pre-prompt
     fi
 
     __p9k_reset_state=0
+    _p9k__last_tty=$P9K_TTY
     P9K_TTY=old
 
     if ! zle; then
@@ -4928,6 +4936,7 @@ _p9k_init_vars() {
   typeset -g  P9K_VISUAL_IDENTIFIER
   typeset -g  P9K_CONTENT
   typeset -g  P9K_GAP
+  typeset -g  P9K_PROMPT=regular
 }
 
 _p9k_init_params() {
