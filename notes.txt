@@ -18,3 +18,16 @@ time ( repeat 1000 ( () {
 } ) )  # 2.774s
 
 time ( repeat 1000 ( () {} ) )  # 0.960s
+
+Hooks:
+
+  p10k-on-init
+  p10k-on-pre-prompt
+  p10k-on-post-prompt
+  p10k-on-buffer-change
+
+Parameters accessible from hooks:
+
+  P9K_PROMPT=regular|instant
+  P9K_TTY=old|new
+  P9K_COMMAND (only in p10k-on-post-prompt)
