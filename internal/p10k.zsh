@@ -4468,13 +4468,12 @@ function _p9k_on_expand() {
       fi
     fi
 
-    if [[ -z $_p9k__last_tty && $+functions[p10k-on-init] == 1 ]]; then
-      p10k-on-init
+    if [[ -z $_p9k__last_tty ]]; then
+      _p9k_wrap_widgets
+      (( $+functions[p10k-on-init] )) && p10k-on-init
     fi
 
-    if (( $+functions[p10k-on-pre-prompt] )); then
-      p10k-on-pre-prompt
-    fi
+    (( $+functions[p10k-on-pre-prompt] )) && p10k-on-pre-prompt
 
     __p9k_reset_state=0
     _p9k__last_tty=$P9K_TTY
@@ -4590,7 +4589,7 @@ _p9k_trapint() {
   if (( __p9k_enabled )); then
     emulate -L zsh
     setopt no_hist_expand extended_glob no_prompt_bang prompt_{percent,subst}
-    zle && _p9k_zle_line_finish int
+    zle && _p9k_on_widget_zle-line-finish int
   fi
   return 0
 }
@@ -4620,14 +4619,6 @@ function _p9k_reset_prompt() {
     zle -R
     (( _p9k__can_hide_cursor )) && echoti cnorm
   fi
-}
-
-function _p9k_zle_keymap_select() {
-  _p9k_reset_prompt
-}
-
-function _p9k_zle_state_changed() {
-  _p9k_reset_prompt
 }
 
 _p9k_deinit_async_pump() {
@@ -5245,66 +5236,17 @@ _p9k_init_params() {
   done
 }
 
-typeset -ga __p9k_wrapped_zle_widgets
+function _p9k_on_widget_zle-keymap-select() { _p9k_reset_prompt; }
+function _p9k_on_widget_overwrite-mode()    { _p9k_reset_prompt; }
+function _p9k_on_widget_vi-replace()        { _p9k_reset_prompt; }
 
-# _p9k_wrap_zle_widget zle-keymap-select _p9k_zle_keymap_select
-_p9k_wrap_zle_widget() {
-  local widget=$1
-  local hook=$2
-  (( __p9k_wrapped_zle_widgets[(I)$widget:$hook] )) && return
-  __p9k_wrapped_zle_widgets+=$widget:$hook
-  local orig=p9k-orig-$widget
-  case $widgets[$widget] in
-    user:*)
-      zle -N $orig ${widgets[$widget]#user:}
-      ;;
-    builtin)
-      functions[_p9k_orig_$widget]="zle .${(q)widget}"
-      zle -N $orig _p9k_orig_$widget
-      ;;
-  esac
-
-  local wrapper=_p9k_wrapper_$widget_$hook
-  functions[$wrapper]="
-    emulate -L zsh
-    setopt no_hist_expand extended_glob no_prompt_bang prompt_{percent,subst}
-    (( __p9k_enabled )) && ${(q)hook} \"\$@\"
-    (( \$+widgets[${(q)orig}] )) && zle ${(q)orig} -- \"\$@\""
-
-  zle -N -- $widget $wrapper
-}
-
-function _p9k_zle_line_init() {
+function _p9k_on_widget_zle-line-init() {
   (( _p9k__cursor_hidden )) || return 0
   _p9k__cursor_hidden=0
   echoti cnorm
 }
 
-function _p9k_restore_prompt() {
-  emulate -L zsh
-  setopt no_hist_expand extended_glob no_prompt_bang prompt_{percent,subst}
-  {
-    (( _p9k__must_restore_prompt )) || return
-    _p9k__must_restore_prompt=0
-
-    unset _p9k__line_finished
-    _p9k_refresh_reason=restore
-    _p9k_set_prompt
-    _p9k_refresh_reason=
-
-    local tty=$P9K_TTY
-    P9K_TTY=$_p9k__last_tty
-    _p9k__expanded=0
-    _p9k_reset_prompt
-    P9K_TTY=$tty
-  } always {
-    zle -F $1
-    exec {1}>&-
-    _p9k__restore_prompt_fd=0
-  }
-}
-
-function _p9k_zle_line_finish() {
+function _p9k_on_widget_zle-line-finish() {
   [[ -z $1 && $CONTEXT != start ]] && _p9k__must_restore_prompt=0
   (( $+_p9k__line_finished )) && return
 
@@ -5348,12 +5290,94 @@ function _p9k_zle_line_finish() {
   _p9k__line_finished='%{%}'
 }
 
-function _p9k_zle_line_pre_redraw() {
+function _p9k_on_widget_zle-line-pre-redraw() {
   [[ ${KEYMAP:-} == vicmd ]] || return 0
   local region=${${REGION_ACTIVE:-0}/2/1}
   [[ $region != $_p9k__region_active ]] || return 0
   _p9k__region_active=$region
   _p9k_reset_prompt
+}
+
+function _p9k_widget_hook() {
+  emulate -L zsh
+  setopt no_hist_expand extended_glob no_prompt_bang prompt_{percent,subst}
+  (( $+functions[_p9k_on_widget_$1] )) && _p9k_on_widget_$1
+  if (( $+_p9k__last_buffer )); then
+    local P9K_LASTBUFFER=$_p9k__last_buffer
+    local P9K_LASTCURSOR=$_p9k__last_cursor
+    local P9K_LASTCOMMAND=$_p9k__last_command
+  fi
+  if [[ $+_p9k__last_buffer == 1 && $_p9k__last_buffer == $BUFFER ]]; then
+    local P9K_COMMAND=$_p9k__last_command
+  else
+    local P9K_COMMAND="${(Q)${(Az)BUFFER}[1]}"
+    if (( $+aliases[$P9K_COMMAND] )); then
+      if functions[_p9k_buffer_cmd]=${(q)P9K_COMMAND} 2>/dev/null; then
+        P9K_COMMAND="${(Q)${(Az)functions[_p9k_buffer_cmd]}[1]}"
+        unset 'functions[_p9k_buffer_cmd]'
+      else
+        P9K_COMMAND=
+      fi
+    fi
+  fi
+  _p9k__last_buffer=$BUFFER
+  _p9k__last_cursor=$CURSOR
+  _p9k__last_command=$P9K_COMMAND
+  (( $+functions[p10k-on-post-widget] )) && p10k-on-post-widget "${@:2}"
+}
+
+function _p9k_widget() {
+  (( ! ${+widgets[_p9k_orig_$1]} )) || zle _p9k_orig_$1 "${@:2}"
+  local res=$?
+  (( ! __p9k_enabled )) || _p9k_widget_hook "$@"
+  return res
+}
+
+typeset -gi __p9k_widgets_wrapped=0
+
+function _p9k_wrap_widgets() {
+  (( __p9k_widgets_wrapped )) && return
+  typeset -gir __p9k_widgets_wrapped=1
+  local tmp=${TMPDIR:-/tmp}/p10k.bindings.$sysparams[pid]
+  {
+    {
+      local keymap
+      for keymap in $keymaps; do bindkey -M $keymap; done
+      print -lr -- "x zle-"{isearch-exit,isearch-update,line-pre-redraw,line-init,line-finish,history-line-set,keymap-select}
+    } >$tmp
+    local widget
+    for widget in ${(u)${${(f)"$(<$tmp)"}##* }:#(*\"|.*)}; do
+      functions[_p9k_widget_$widget]='_p9k_widget '${(q)widget}' "$@"'
+      zle -A $widget _p9k_orig_$widget
+      zle -N $widget _p9k_widget_$widget
+    done 2>/dev/null  # `zle -A` fails for inexisting widgets and complains to stderr
+  } always {
+    zf_rm -f $tmp
+  }
+}
+
+function _p9k_restore_prompt() {
+  emulate -L zsh
+  setopt no_hist_expand extended_glob no_prompt_bang prompt_{percent,subst}
+  {
+    (( _p9k__must_restore_prompt )) || return
+    _p9k__must_restore_prompt=0
+
+    unset _p9k__line_finished
+    _p9k_refresh_reason=restore
+    _p9k_set_prompt
+    _p9k_refresh_reason=
+
+    local tty=$P9K_TTY
+    P9K_TTY=$_p9k__last_tty
+    _p9k__expanded=0
+    _p9k_reset_prompt
+    P9K_TTY=$tty
+  } always {
+    zle -F $1
+    exec {1}>&-
+    _p9k__restore_prompt_fd=0
+  }
 }
 
 prompt__p9k_internal_nothing() { _p9k__prompt+='${_p9k_sss::=}'; }
@@ -6003,23 +6027,6 @@ _p9k_init() {
     fi
   fi
 
-  _p9k_wrap_zle_widget zle-line-finish _p9k_zle_line_finish
-  _p9k_wrap_zle_widget zle-line-init _p9k_zle_line_init
-
-  if _p9k_segment_in_use vi_mode || _p9k_segment_in_use prompt_char; then
-    _p9k_wrap_zle_widget zle-keymap-select _p9k_zle_keymap_select
-  fi
-
-  if _p9k_segment_in_use vi_mode && (( $+_POWERLEVEL9K_VI_VISUAL_MODE_STRING )) || _p9k_segment_in_use prompt_char; then
-    _p9k_wrap_zle_widget zle-line-pre-redraw _p9k_zle_line_pre_redraw
-  fi
-
-  if { _p9k_segment_in_use vi_mode && (( $+_POWERLEVEL9K_VI_OVERWRITE_MODE_STRING )) } ||
-     { _p9k_segment_in_use prompt_char && (( _POWERLEVEL9K_PROMPT_CHAR_OVERWRITE_STATE )) }; then
-    _p9k_wrap_zle_widget overwrite-mode _p9k_zle_state_changed
-    _p9k_wrap_zle_widget vi-replace _p9k_zle_state_changed
-  fi
-
   if _p9k_segment_in_use dir &&
      [[ $_POWERLEVEL9K_SHORTEN_STRATEGY == truncate_with_package_name && $+commands[jq] == 0 ]]; then
     print -rP -- '%F{yellow}WARNING!%f %BPOWERLEVEL9K_SHORTEN_STRATEGY=truncate_with_package_name%b requires %F{green}jq%f.'
@@ -6398,6 +6405,7 @@ zmodload zsh/parameter 2>/dev/null  # https://github.com/romkatv/gitstatus/issue
 zmodload zsh/system
 zmodload zsh/termcap
 zmodload zsh/terminfo
+zmodload zsh/zleparameter
 zmodload -F zsh/stat b:zstat
 zmodload -F zsh/net/socket b:zsocket
 zmodload -F zsh/files b:zf_mv b:zf_rm

@@ -1,33 +1,23 @@
-function _p9k_on_widget() {
-  zle _p9k_orig_$1 "${@:2}"
-}
-
-time ( repeat 1000 ( () {
-  local tmp=${TMPDIR:-/tmp}/p10k.bindings.$sysparams[pid]
-  {
-    bindkey >$tmp
-    local widget
-    for widget in ${(u)${${(f)"$(<$tmp)"}:#*\"}##* }; do
-      functions[_p9k_widget_$widget]='_p9k_on_widget '${(q)widget}' "$@"'
-      zle -A $widget _p9k_orig_$widget
-      zle -N $widget _p9k_widget_$widget
-    done
-  } always {
-    zf_rm -f $tmp
-  }
-} ) )  # 2.774s
-
-time ( repeat 1000 ( () {} ) )  # 0.960s
-
 Hooks:
 
   p10k-on-init
   p10k-on-pre-prompt
   p10k-on-post-prompt
-  p10k-on-buffer-change
+  p10k-on-post-widget
 
-Parameters accessible from hooks:
+Parameters accessible from all hooks:
 
   P9K_PROMPT=regular|instant
   P9K_TTY=old|new
-  P9K_COMMAND (only in p10k-on-post-prompt)
+
+Parameters accessible from p10k-on-post-widget:
+
+  All regular zle parameters (WIDGET, BUFFER, CURSOR, etc.).
+  P9K_COMMAND
+  P9K_LASTCOMMAND
+  P9K_LASTBUFFER
+  P9K_LASTCURSOR
+
+`P9K_LAST*` parameters are set if and only if this isn't the first p10k-on-post-widget call after p10k-on-init.
+
+# TODO: call all hooks with user options
