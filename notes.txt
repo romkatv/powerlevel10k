@@ -1,7 +1,7 @@
 Hooks:
 
-  p10k-on-init
-  p10k-on-pre-prompt
+  p10k-on-init (may be called while zle is active or not)
+  p10k-on-pre-prompt (may be called while zle is active or not)
   p10k-on-post-prompt
   p10k-on-post-widget
 

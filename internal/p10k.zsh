@@ -4948,6 +4948,7 @@ _p9k_init_params() {
   _p9k_declare -s POWERLEVEL9K_TRANSIENT_PROMPT off
   [[ $_POWERLEVEL9K_TRANSIENT_PROMPT == (off|always|same-dir) ]] || _POWERLEVEL9K_TRANSIENT_PROMPT=off
 
+  _p9k_declare -a POWERLEVEL9K_HOOK_WIDGETS --
   _p9k_declare -b POWERLEVEL9K_TODO_HIDE_ZERO_TOTAL 0
   _p9k_declare -b POWERLEVEL9K_TODO_HIDE_ZERO_FILTERED 0
   _p9k_declare -b POWERLEVEL9K_DISABLE_HOT_RELOAD 0
@@ -5236,9 +5237,20 @@ _p9k_init_params() {
   done
 }
 
-function _p9k_on_widget_zle-keymap-select() { _p9k_reset_prompt; }
-function _p9k_on_widget_overwrite-mode()    { _p9k_reset_prompt; }
-function _p9k_on_widget_vi-replace()        { _p9k_reset_prompt; }
+function _p9k_on_widget_zle-keymap-select() { __p9k_reset_state=2; }
+function _p9k_on_widget_overwrite-mode()    { __p9k_reset_state=2; }
+function _p9k_on_widget_vi-replace()        { __p9k_reset_state=2; }
+
+function _p9k_check_visual_mode() {
+  [[ ${KEYMAP:-} == vicmd ]] || return 0
+  local region=${${REGION_ACTIVE:-0}/2/1}
+  [[ $region != $_p9k__region_active ]] || return 0
+  _p9k__region_active=$region
+  __p9k_reset_state=2
+}
+function _p9k_on_widget_visual-mode()       { _p9k_check_visual_mode; }
+function _p9k_on_widget_visual-line-mode()  { _p9k_check_visual_mode; }
+function _p9k_on_widget_deactivate-region() { _p9k_check_visual_mode; }
 
 function _p9k_on_widget_zle-line-init() {
   (( _p9k__cursor_hidden )) || return 0
@@ -5251,28 +5263,20 @@ function _p9k_on_widget_zle-line-finish() {
   (( $+_p9k__line_finished )) && return
 
   _p9k__line_finished=
-  local -i reset=_p9k_reset_on_line_finish
-
-  if (( $+functions[p10k-on-post-prompt] )); then
-    __p9k_reset_state=1
-    p10k-on-post-prompt
-    if (( __p9k_reset_state == 2 )); then
-      reset=1
-    fi
-    __p9k_reset_state=0
-  fi
+  (( _p9k_reset_on_line_finish )) && __p9k_reset_state=2
+  (( $+functions[p10k-on-post-prompt] )) && p10k-on-post-prompt
 
   if [[ -n $_p9k_transient_prompt ]]; then
     if [[ $_POWERLEVEL9K_TRANSIENT_PROMPT == always || $_p9k_pwd == $_p9k__last_prompt_pwd ]]; then
       RPROMPT=
       PROMPT=$_p9k_transient_prompt
-      reset=1
+      __p9k_reset_state=2
     else
       _p9k__last_prompt_pwd=$_p9k_pwd
     fi
   fi
 
-  if (( reset )); then
+  if (( __p9k_reset_state == 2 )); then
     if [[ $1 == int ]]; then
       _p9k__must_restore_prompt=1
       if (( !_p9k__restore_prompt_fd )); then
@@ -5285,23 +5289,16 @@ function _p9k_on_widget_zle-line-finish() {
       echo -nE - $hide$'\n'$termcap[up]
     fi
     _p9k_reset_prompt
+    __p9k_reset_state=0
   fi
 
   _p9k__line_finished='%{%}'
 }
 
-function _p9k_on_widget_zle-line-pre-redraw() {
-  [[ ${KEYMAP:-} == vicmd ]] || return 0
-  local region=${${REGION_ACTIVE:-0}/2/1}
-  [[ $region != $_p9k__region_active ]] || return 0
-  _p9k__region_active=$region
-  _p9k_reset_prompt
-}
-
 function _p9k_widget_hook() {
   emulate -L zsh
   setopt no_hist_expand extended_glob no_prompt_bang prompt_{percent,subst}
-  (( $+functions[_p9k_on_widget_$1] )) && _p9k_on_widget_$1
+  __p9k_reset_state=1
   if (( $+_p9k__last_buffer )); then
     local P9K_LASTBUFFER=$_p9k__last_buffer
     local P9K_LASTCURSOR=$_p9k__last_cursor
@@ -5310,7 +5307,8 @@ function _p9k_widget_hook() {
   if [[ $+_p9k__last_buffer == 1 && $_p9k__last_buffer == $BUFFER ]]; then
     local P9K_COMMAND=$_p9k__last_command
   else
-    local P9K_COMMAND="${(Q)${(Az)BUFFER}[1]}"
+    local words=("${(@z)BUFFER}")  # cannot use an inline array with (A) because of bugs in old zsh
+    local P9K_COMMAND="${(Q)words[1]}"
     if (( $+aliases[$P9K_COMMAND] )); then
       if functions[_p9k_buffer_cmd]=${(q)P9K_COMMAND} 2>/dev/null; then
         P9K_COMMAND="${(Q)${(Az)functions[_p9k_buffer_cmd]}[1]}"
@@ -5324,6 +5322,9 @@ function _p9k_widget_hook() {
   _p9k__last_cursor=$CURSOR
   _p9k__last_command=$P9K_COMMAND
   (( $+functions[p10k-on-post-widget] )) && p10k-on-post-widget "${@:2}"
+  (( $+functions[_p9k_on_widget_$1] )) && _p9k_on_widget_$1
+  (( __p9k_reset_state == 2 )) && _p9k_reset_prompt
+  __p9k_reset_state=0
 }
 
 function _p9k_widget() {
@@ -5338,23 +5339,48 @@ typeset -gi __p9k_widgets_wrapped=0
 function _p9k_wrap_widgets() {
   (( __p9k_widgets_wrapped )) && return
   typeset -gir __p9k_widgets_wrapped=1
-  local tmp=${TMPDIR:-/tmp}/p10k.bindings.$sysparams[pid]
-  {
+  local -a widget_list
+  if is-at-least 5.3; then
+    local -aU widget_list=(
+      zle-line-pre-redraw
+      zle-line-init
+      zle-line-finish
+      zle-keymap-select
+      overwrite-mode
+      vi-replace
+      visual-mode
+      visual-line-mode
+      deactivate-region
+      $_POWERLEVEL9K_HOOK_WIDGETS
+    )
+  else
+    # There is no zle-line-pre-redraw in zsh < 5.3, so we have to wrap all widgets
+    # with key bindings. This costs extra 3ms: 1.5ms to fetch the list of widgets and
+    # another 1.5ms to wrap them.
+    local keymap tmp=${TMPDIR:-/tmp}/p10k.bindings.$sysparams[pid]
     {
-      local keymap
-      for keymap in $keymaps; do bindkey -M $keymap; done
-      print -lr -- "x zle-"{isearch-exit,isearch-update,line-pre-redraw,line-init,line-finish,history-line-set,keymap-select}
-    } >$tmp
-    local widget
-    for widget in ${(u)${${(f)"$(<$tmp)"}##* }:#(*\"|.*)}; do
-      functions[_p9k_widget_$widget]='_p9k_widget '${(q)widget}' "$@"'
-      # The leading dot is to work around bugs in zsh-syntax-highlighting.
-      zle -A $widget ._p9k_orig_$widget
-      zle -N $widget _p9k_widget_$widget
-    done 2>/dev/null  # `zle -A` fails for inexisting widgets and complains to stderr
-  } always {
-    zf_rm -f $tmp
-  }
+      for keymap in $keymaps; do bindkey -M $keymap; done >$tmp
+      local -aU widget_list=(
+        zle-isearch-exit
+        zle-isearch-update
+        zle-line-init
+        zle-line-finish
+        zle-history-line-set
+        zle-keymap-select
+        $_POWERLEVEL9K_HOOK_WIDGETS
+        ${${${(f)"$(<$tmp)"}##* }:#(*\"|.*)}
+      )
+    } always {
+      zf_rm -f $tmp
+    }
+  fi
+  local widget
+  for widget in $widget_list; do
+    functions[_p9k_widget_$widget]='_p9k_widget '${(q)widget}' "$@"'
+    # The leading dot is to work around bugs in zsh-syntax-highlighting.
+    zle -A $widget ._p9k_orig_$widget
+    zle -N $widget _p9k_widget_$widget
+  done 2>/dev/null  # `zle -A` fails for inexisting widgets and complains to stderr
 }
 
 function _p9k_restore_prompt() {
@@ -5727,7 +5753,7 @@ _p9k_must_init() {
     [[ $sig == $_p9k__param_sig ]] && return 1
     _p9k_deinit
   fi
-  _p9k__param_pat=$'v22\1'${ZSH_VERSION}$'\1'${ZSH_PATCHLEVEL}$'\1'
+  _p9k__param_pat=$'v23\1'${ZSH_VERSION}$'\1'${ZSH_PATCHLEVEL}$'\1'
   _p9k__param_pat+=$'${#parameters[(I)POWERLEVEL9K_*]}\1${(%):-%n%#}\1$GITSTATUS_LOG_LEVEL\1'
   _p9k__param_pat+=$'$GITSTATUS_ENABLE_LOGGING\1$GITSTATUS_DAEMON\1$GITSTATUS_NUM_THREADS\1'
   _p9k__param_pat+=$'$DEFAULT_USER\1${ZLE_RPROMPT_INDENT:-1}\1$P9K_SSH\1$__p9k_ksh_arrays'
