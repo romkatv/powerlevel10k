@@ -5298,7 +5298,7 @@ function _p9k_on_widget_zle-line-finish() {
 function _p9k_widget_hook() {
   emulate -L zsh
   setopt no_hist_expand extended_glob no_prompt_bang prompt_{percent,subst}
-  (( _p9k__restore_prompt_fd )) && _p9k_restore_prompt
+  (( _p9k__restore_prompt_fd )) && _p9k_restore_prompt $_p9k__restore_prompt_fd
   __p9k_reset_state=1
   if (( $+_p9k__last_buffer )); then
     local P9K_LASTBUFFER=$_p9k__last_buffer
