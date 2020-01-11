@@ -76,6 +76,7 @@ typeset -gA _p9k_term=(
   ';&' ''
   ';|' ''
   ')' ''
+  '()' ''
 )
 
 function _p9k_extract_commands() {
@@ -86,9 +87,11 @@ function _p9k_extract_commands() {
 
   typeset -ga _p9k_commands=()
   
+  local -r id='$(<->|[[:alpha:]_][[:IDENT:]]#)'
+  local -r var="\$$id|\${$id}|\"\$$id\"|\"\${$id}\""
+
   local -i e
-  local id='$(<->|[[:alpha:]_][[:IDENT:]]#)'
-  local skip n s r var="\$$id|\${$id}|\"\$$id\"|\"\${$id}\""
+  local skip n s r
   local -a aln alp alf v commands match mbegin mend
 
   [[ -o interactive_comments ]] && local tokens=(${(Z+C+)1}) || local tokens=(${(z)1})
@@ -99,12 +102,12 @@ function _p9k_extract_commands() {
       alp[-1]=()
       if (( $#tokens == alf[-1] )); then
         alf[-1]=()
-        e=0
+        (( e = 0 ))
       else
-        e=$#skip
+        (( e = $#skip ))
       fi
     else
-      e=$#skip
+      (( e = $#skip ))
     fi
 
     while (( $#tokens )) || break; do
@@ -134,15 +137,18 @@ function _p9k_extract_commands() {
     done
 
     if [[ -n $skip ]]; then
-      if [[ $token == $~skip ]]; then
-        skip=
+      if [[ $skip == '^' ]]; then
         if (( $+_p9k_term[$token] )); then
-          [[ $token == ';'[';&|'] ]] && skip='\)|esac'
-          _p9k_commands+=($commands)
-          commands=()
-        elif [[ $token == '()' ]]; then
+          if [[ $token == '()' ]]; then
+            skip=
+          else
+            _p9k_commands+=($commands)
+            [[ $token == ';'[';&|'] ]] && skip='\)|esac' || skip=
+          fi
           commands=()
         fi
+      elif [[ $token == $~skip ]]; then
+        skip=
       fi
       continue
     fi
@@ -177,9 +183,7 @@ function _p9k_extract_commands() {
     fi
 
     commands+=${:-${(Q)${~token}}}
-
-    # '|' '||' ';' '&' '&&' '|&' '&!' '&|' ';;' ';&' ';|' ')' '()'
-    skip='\||\|\||;|&|&&|\|&|&!|&\||;;|;&|;\||\)|}|\(\)'
+    skip='^'
   done
 
   _p9k_commands+=($commands)
