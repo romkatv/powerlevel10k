@@ -1,80 +1,80 @@
-typeset -gA _p9k_skip_token=(
-  '}' ''
-  '|' ''
-  '||' ''
-  '&' ''
-  '&&' ''
-  '|&' ''
-  '&!' ''
-  '&|' ''
-  ')' ''
-  '(' ''
-  '{' ''
-  '()' ''
-  '!' ''
-  ';' ''
-  'if' ''
-  'fi' ''
-  'elif' ''
-  'else' ''
-  'then' ''
-  'while' ''
-  'until' ''
-  'do' ''
-  'done' ''
-  'esac' ''
-  'end' ''
-  'coproc' ''
+typeset -gA __p9k_pb_cmd_skip=(
+  '}'         ''
+  '|'         ''
+  '||'        ''
+  '&'         ''
+  '&&'        ''
+  '|&'        ''
+  '&!'        ''
+  '&|'        ''
+  ')'         ''
+  '('         ''
+  '{'         ''
+  '()'        ''
+  '!'         ''
+  ';'         ''
+  'if'        ''
+  'fi'        ''
+  'elif'      ''
+  'else'      ''
+  'then'      ''
+  'while'     ''
+  'until'     ''
+  'do'        ''
+  'done'      ''
+  'esac'      ''
+  'end'       ''
+  'coproc'    ''
   'nocorrect' ''
-  'noglob' ''
-  'time' ''
-  '[[' '\]\]'
-  '((' '\)\)'
-  'case' '\)|esac'
-  ';;' '\)|esac'
-  ';&' '\)|esac'
-  ';|' '\)|esac'
-  'foreach' '\(*\)'
+  'noglob'    ''
+  'time'      ''
+  '[['        '\]\]'
+  '(('        '\)\)'
+  'case'      '\)|esac'
+  ';;'        '\)|esac'
+  ';&'        '\)|esac'
+  ';|'        '\)|esac'
+  'foreach'   '\(*\)'
 )
 
-typeset -gA _p9k_precomands=(
-  '-' ''
-  'builtin' ''
-  'command' ''
-  'exec' '-[^a]#[a]'
-  'nohup' ''
-  'setsid' ''
+typeset -gA __p9k_pb_precommand=(
+  '-'         ''
+  'builtin'   ''
+  'command'   ''
+  'exec'      '-[^a]#[a]'
+  'nohup'     ''
+  'setsid'    ''
   'eatmydata' ''
   'catchsegv' ''
-  'pkexec' '--user'
-  'doas' '-[^aCu]#[acU]'
-  'nice' '-[^n]#[n]|--adjustment'
-  'stdbuf' '-[^ioe]#[ioe]|--(input|output|error)'
-  'sudo' '-[^aghpuUCcrtT]#[aghpuUCcrtT]|--(close-from|group|host|prompt|role|type|other-user|command-timeout|user)'
+  'pkexec'    '--user'
+  'doas'      '-[^aCu]#[acU]'
+  'nice'      '-[^n]#[n]|--adjustment'
+  'stdbuf'    '-[^ioe]#[ioe]|--(input|output|error)'
+  'sudo'      '-[^aghpuUCcrtT]#[aghpuUCcrtT]|--(close-from|group|host|prompt|role|type|other-user|command-timeout|user)'
 )
 
-typeset -gA _p9k_redirect=(
-  '&>' ''
-  '>' ''
-  '>&' ''
-  '<' ''
-  '<&' ''
-  '<>' ''
-  '&>|' ''
-  '>|' ''
-  '&>>' ''
-  '>>' ''
-  '>>&' ''
+typeset -gA __p9k_pb_redirect=(
+  '&>'   ''
+  '>'    ''
+  '>&'   ''
+  '<'    ''
+  '<&'   ''
+  '<>'   ''
+  '&>|'  ''
+  '>|'   ''
+  '&>>'  ''
+  '>>'   ''
+  '>>&'  ''
   '&>>|' ''
-  '>>|' ''
-  '<<<' ''
+  '>>|'  ''
+  '<<<'  ''
 )
 
-typeset -gA _p9k_term=(
-  '|' ''
+typeset -gA __p9k_pb_term=(
+  '|'  ''
   '||' ''
-  ';' ''
-  '&' ''
+  ';'  ''
+  '&'  ''
   '&&' ''
   '|&' ''
   '&!' ''
@@ -82,19 +82,19 @@ typeset -gA _p9k_term=(
   ';;' ''
   ';&' ''
   ';|' ''
-  '(' ''
-  ')' ''
-  '{' ''
-  '}' ''
+  '('  ''
+  ')'  ''
+  '{'  ''
+  '}'  ''
   '()' ''
 )
 
-typeset -gA _p9k_skip_arg=(
+typeset -gA __p9k_pb_term_skip=(
+  '()' ''
+  '('  '\)'
   ';;' '\)|esac'
   ';&' '\)|esac'
   ';|' '\)|esac'
-  '(' '\)'
-  '()' ''
 )
 
 # False positives:
@@ -132,13 +132,15 @@ typeset -gA _p9k_skip_arg=(
 #   Punchline:
 #     x; y
 #   ---------------
-function _p9k_extract_commands() {
+#
+# More brokenness with non-standard options (ignore_braces, ignore_close_braces, etc.).
+function _p9k_parse_buffer() {
   local rcquotes
   [[ -o rcquotes ]] && rcquotes=(-o rcquotes)
 
   emulate -L zsh -o extended_glob -o no_nomatch $rcquotes
 
-  typeset -ga _p9k_commands=()
+  typeset -ga _p9k_buffer_commands=()
   
   local -r id='(<->|[[:alpha:]_][[:IDENT:]]#)'
   local -r var="\$$id|\${$id}|\"\$$id\"|\"\${$id}\""
@@ -192,10 +194,10 @@ function _p9k_extract_commands() {
 
       case $state in
         t|p*)
-          if (( $+_p9k_term[$token] )); then
-            skip=$_p9k_skip_arg[$token]
+          if (( $+__p9k_pb_term[$token] )); then
+            skip=$__p9k_pb_term_skip[$token]
             state=${skip:+s}
-            [[ $token == '()' ]] || _p9k_commands+=($commands)
+            [[ $token == '()' ]] || _p9k_buffer_commands+=($commands)
             commands=()
             continue
           elif [[ $state == t ]]; then
@@ -220,7 +222,7 @@ function _p9k_extract_commands() {
         continue
       fi
 
-      if (( $+_p9k_redirect[${token#<0-255>}] )); then
+      if (( $+__p9k_pb_redirect[${token#<0-255>}] )); then
         state+=r
         continue
       fi
@@ -236,8 +238,8 @@ function _p9k_extract_commands() {
 
       case $state in
         '')
-          if (( $+_p9k_skip_token[$token] )); then
-            skip=$_p9k_skip_token[$token]
+          if (( $+__p9k_pb_cmd_skip[$token] )); then
+            skip=$__p9k_pb_cmd_skip[$token]
             state=${skip:+s}
             continue
           fi
@@ -267,15 +269,15 @@ function _p9k_extract_commands() {
       esac
 
       commands+=$token
-      if (( $+_p9k_precomands[$commands[-1]] )); then
+      if (( $+__p9k_pb_precommand[$commands[-1]] )); then
         state=p
-        skip=$_p9k_precomands[$commands[-1]]
+        skip=$__p9k_pb_precommand[$commands[-1]]
       else
         state=t
       fi
     done
   }
 
-  _p9k_commands+=($commands)
-  _p9k_commands=(${(u)_p9k_commands:#('(('*'))'|'`'*'`'|'$'*)})
+  _p9k_buffer_commands+=($commands)
+  _p9k_buffer_commands=(${(u)_p9k_buffer_commands:#('(('*'))'|'`'*'`'|'$'*)})
 }
