@@ -114,6 +114,10 @@ typeset -gA _p9k_skip_arg=(
 #   ---------------
 #   ${x/}
 #   ---------------
+#   - -- x
+#   ---------------
+#   command -p -p x
+#   ---------------
 #   *
 #   ---------------
 #   x=$y; $x
@@ -187,14 +191,16 @@ function _p9k_extract_commands() {
       done
 
       case $state in
-        t)
+        t|p*)
           if (( $+_p9k_term[$token] )); then
             skip=$_p9k_skip_arg[$token]
             state=${skip:+s}
             [[ $token == '()' ]] || _p9k_commands+=($commands)
             commands=()
-          fi
-          continue;;
+            continue
+          elif [[ $state == t ]]; then
+            continue
+          fi;;
         s)
           if [[ $token == $~skip ]]; then
             state=
@@ -220,7 +226,6 @@ function _p9k_extract_commands() {
       fi
 
       if [[ $token == *'$'* ]]; then
-        setopt xtrace
         if [[ $token == $~var ]]; then
           n=${${token##[^[:IDENT:]]}%%[^[:IDENT:]]}
           [[ $token == *'"' ]] && v=("${(@P)n}") || v=(${(P)n})
