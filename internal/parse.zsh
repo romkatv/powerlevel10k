@@ -86,9 +86,16 @@ typeset -gA _p9k_term=(
   '()' ''
 )
 
+typeset -gA _p9k_skip_arg=(
+  ';;' '\)|esac'
+  ';&' '\)|esac'
+  ';|' '\)|esac'
+  '(' '\)'
+  '()' ''
+)
+
 # False positives:
 #
-#   for x (y) z
 #   {} always {}
 #
 # Completely broken:
@@ -158,12 +165,8 @@ function _p9k_extract_commands() {
     if [[ -n $skip ]]; then
       if [[ $skip == '^' ]]; then
         if (( $+_p9k_term[$token] )); then
-          if [[ $token == '()' ]]; then
-            skip=
-          else
-            _p9k_commands+=($commands)
-            [[ $token == ';'[';&|'] ]] && skip='\)|esac' || skip=
-          fi
+          skip=$_p9k_skip_arg[$token]
+          [[ $token == '()' ]] || _p9k_commands+=($commands)
           commands=()
         fi
       elif [[ $token == $~skip ]]; then
