@@ -5543,7 +5543,6 @@ function _p9k_on_widget_zle-line-init() {
 }
 
 function _p9k_on_widget_zle-line-finish() {
-  [[ -z $1 && $CONTEXT != start ]] && _p9k__must_restore_prompt=0
   (( $+_p9k__line_finished )) && return
 
   _p9k__line_finished=
@@ -5601,7 +5600,7 @@ function _p9k_widget_hook() {
 function _p9k_widget() {
   (( ! ${+widgets[._p9k_orig_$1]} )) || zle ._p9k_orig_$1 "${@:2}"
   local res=$?
-  (( ! __p9k_enabled )) || _p9k_widget_hook "$@"
+  (( ! __p9k_enabled )) || [[ $CONTEXT != start ]] || _p9k_widget_hook "$@"
   return res
 }
 
