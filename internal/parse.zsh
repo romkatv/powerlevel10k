@@ -230,7 +230,7 @@ function _p9k_parse_buffer() {
       if [[ $token == *'$'* ]]; then
         if [[ $token == $~var ]]; then
           n=${${token##[^[:IDENT:]]}%%[^[:IDENT:]]}
-          [[ $token == *'"' ]] && v=("${(@P)n}") || v=(${(P)n})
+          [[ $token == *'"' ]] && v=("${(P)n}") || v=(${(P)n})
           tokens[1,0]=(${(qq)v})
           continue
         fi
