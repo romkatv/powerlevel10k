@@ -216,9 +216,9 @@ function _p9k_extract_commands() {
     fi
 
     commands+=${:-${(Q)${~token}}}
-    [[ $commands[-1] == '(('*'))' ]] && commands[-1]=()
     skip='^'
   done
 
   _p9k_commands+=($commands)
+  _p9k_commands=(${(u)_p9k_commands:#('(('*'))'|'`'*'`'|'$'*)})
 }
