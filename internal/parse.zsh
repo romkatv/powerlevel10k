@@ -28,7 +28,7 @@ typeset -gA _p9k_skip_token=(
   'nocorrect' ''
   'time' ''
   '-' ''
-  'builtin' ''
+  'builtin' ''  # this is wrong as it will cause alias expansion
   '[[' '\]\]'
   '((' '\)\)'
   'case' '\)|esac'
@@ -96,26 +96,81 @@ typeset -gA _p9k_skip_arg=(
   '()' ''
 )
 
+function _p9k_next_token() {
+  if (( $#tokens == aln[-1] )); then
+    aln[-1]=()
+    alp[-1]=()
+    if (( $#tokens == alf[-1] )); then
+      alf[-1]=()
+      (( e = 0 ))
+    else
+      (( e = 1 ))
+    fi
+  else
+    (( e = 1 ))
+  fi
+
+  while (( $#tokens )); do
+    token=$tokens[1]
+    shift 1 tokens
+    if (( $+galiases[$token] )); then
+      (( $aln[(eI)p$token] )) && return
+      n=p$token
+      s=$galiases[$token]
+    elif (( e )); then
+      return
+    elif (( $+aliases[$token] )); then
+      (( $aln[(eI)p$token] )) && return
+      n=p$token
+      s=$aliases[$token]
+    elif [[ $token == (#b)?*.(?*) ]] && (( $+saliases[$match[1]] )); then
+      (( $aln[(eI)s$match[1]] )) && return
+      n=s$match[1]
+      s=${saliases[$match[1]]%% #}
+    else
+      return 0
+    fi
+    aln+=$n
+    alp+=$#tokens
+    [[ $s == *' ' ]] && alf+=$#tokens
+    [[ -o interactive_comments ]] && tokens[1,0]=(${(Z+C+)s}) || tokens[1,0]=(${(z)s})
+  done
+
+  token=
+  return 1
+}
+
 # False positives:
 #
 #   {} always {}
 #
 # False negatives:
 #
+#   ---------------
 #   : $(x)
+#   ---------------
 #   : `x`
+#   ---------------
 #
-# Completely broken:
+# Broken:
 #
+#   ---------------
 #   ${x/}
+#   ---------------
 #   *
+#   ---------------
 #   x=$y; $x
-#
+#   ---------------
+#   x <<END
+#   ; END
+#   END
+#   ---------------
 #   Setup:
 #     setopt interactive_comments
 #     alias x='#'
 #   Punchline:
 #     x; y
+#   ---------------
 function _p9k_extract_commands() {
   local rcquotes
   [[ -o rcquotes ]] && rcquotes=(-o rcquotes)
@@ -173,8 +228,19 @@ function _p9k_extract_commands() {
       [[ -o interactive_comments ]] && tokens[1,0]=(${(Z+C+)s}) || tokens[1,0]=(${(z)s})
     done
 
+    if [[ $token == '<<'(|-) ]]; then
+      _p9k_next_token || break
+      r=$token
+      while true; do
+        while _p9k_next_token && [[ $token != ';' ]]; do done
+        while _p9k_next_token && [[ $token == ';' ]]; do done
+        [[ $token == (|$r) ]] && break
+      done
+      continue
+    fi
+
     if [[ -n $skip ]]; then
-      if [[ $skip == '^' ]]; then
+      if [[ $skip == ']' ]]; then
         if (( $+_p9k_term[$token] )); then
           skip=$_p9k_skip_arg[$token]
           [[ $token == '()' ]] || _p9k_commands+=($commands)
@@ -216,7 +282,7 @@ function _p9k_extract_commands() {
     fi
 
     commands+=${:-${(Q)${~token}}}
-    skip='^'
+    skip=']'
   done
 
   _p9k_commands+=($commands)
