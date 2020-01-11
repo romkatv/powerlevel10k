@@ -48,6 +48,7 @@ typeset -gA _p9k_skip_token=(
   '>>&' '*'
   '&>>|' '*'
   '>>|' '*'
+  '<<<' '*'
   'foreach' '\(*\)'
 )
 
@@ -65,6 +66,7 @@ typeset -gA _p9k_redirect=(
   '>>&' ''
   '&>>|' ''
   '>>|' ''
+  '<<<' ''
 )
 
 typeset -gA _p9k_term=(
