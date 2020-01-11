@@ -21,6 +21,9 @@ typeset -gA _p9k_skip_token=(
   'while' ''
   'until' ''
   'do' ''
+  'done' ''
+  'esac' ''
+  'end' ''
   'coproc' ''
   'nocorrect' ''
   'time' ''
@@ -45,6 +48,7 @@ typeset -gA _p9k_skip_token=(
   '>>&' '*'
   '&>>|' '*'
   '>>|' '*'
+  'foreach' '\(*\)'
 )
 
 typeset -gA _p9k_redirect=(
@@ -75,10 +79,25 @@ typeset -gA _p9k_term=(
   ';;' ''
   ';&' ''
   ';|' ''
+  '(' ''
   ')' ''
+  '{' ''
+  '}' ''
   '()' ''
 )
 
+# False positives:
+#
+#   for x (y) z
+#   {} always {}
+#
+# Completely broken:
+#
+#   Setup:
+#     setopt interactive_comments
+#     alias x='#'
+#   Punchline:
+#     x; y
 function _p9k_extract_commands() {
   local rcquotes
   [[ -o rcquotes ]] && rcquotes=(-o rcquotes)
@@ -183,6 +202,7 @@ function _p9k_extract_commands() {
     fi
 
     commands+=${:-${(Q)${~token}}}
+    [[ $commands[-1] == '(('*'))' ]] && commands[-1]=()
     skip='^'
   done
 
