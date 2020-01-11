@@ -3905,7 +3905,7 @@ _p9k_set_instant_prompt() {
   RPROMPT=$saved_rprompt
 }
 
-typeset -gri __p9k_instant_prompt_version=14
+typeset -gri __p9k_instant_prompt_version=15
 
 _p9k_dump_instant_prompt() {
   local user=${(%):-%n}
@@ -4013,15 +4013,43 @@ _p9k_dump_instant_prompt() {
       fi
       if (( $+functions[p10k-on-init] )); then
         >&$fd print -r -- '
-  p10k-on-init() { '$functions[p10k-on-init]' }
-  p10k-on-init
+  p10k-on-init() { '$functions[p10k-on-init]' }'
+      fi
+      if (( $+functions[p10k-on-pre-prompt] )); then
+        >&$fd print -r -- '
+  p10k-on-pre-prompt() { '$functions[p10k-on-pre-prompt]' }'
+      fi
+      if (( $+functions[p10k-on-post-prompt] )); then
+        >&$fd print -r -- '
+  p10k-on-post-prompt() { '$functions[p10k-on-post-prompt]' }'
+      fi
+      if (( $+functions[p10k-on-post-widget] )); then
+        >&$fd print -r -- '
+  p10k-on-post-widget() { '$functions[p10k-on-post-widget]' }'
+      fi
+      if (( $+functions[p10k-on-init] )); then
+        >&$fd print -r -- '
+  p10k-on-init'
+      fi
+      if (( $+functions[p10k-on-pre-prompt] )); then
+        >&$fd print -r -- '
+  p10k-on-pre-prompt'
+      fi
+      if (( $+functions[p10k-on-init] )); then
+        >&$fd print -r -- '
   unfunction p10k-on-init'
       fi
       if (( $+functions[p10k-on-pre-prompt] )); then
         >&$fd print -r -- '
-  p10k-on-pre-prompt() { '$functions[p10k-on-pre-prompt]' }
-  p10k-on-pre-prompt
   unfunction p10k-on-pre-prompt'
+      fi
+      if (( $+functions[p10k-on-post-prompt] )); then
+        >&$fd print -r -- '
+  unfunction p10k-on-post-prompt'
+      fi
+      if (( $+functions[p10k-on-post-widget] )); then
+        >&$fd print -r -- '
+  unfunction p10k-on-post-widget'
       fi
       >&$fd print -r -- '
   trap "unset -m _p9k__\*; unfunction p10k" EXIT
