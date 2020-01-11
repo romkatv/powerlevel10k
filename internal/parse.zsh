@@ -100,7 +100,16 @@ typeset -gA _p9k_skip_arg=(
 #
 #   {} always {}
 #
+# False negatives:
+#
+#   : $(x)
+#   : `x`
+#
 # Completely broken:
+#
+#   ${x/}
+#   *
+#   x=$y; $x
 #
 #   Setup:
 #     setopt interactive_comments
