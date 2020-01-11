@@ -153,7 +153,7 @@ function _p9k_parse_buffer() {
 
   () {
     while (( $#tokens )); do
-      if (( $#tokens == aln[-1] )); then
+      if (( $#tokens == alp[-1] )); then
         aln[-1]=()
         alp[-1]=()
         if (( $#tokens == alf[-1] )); then
