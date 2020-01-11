@@ -16,6 +16,7 @@ typeset -gA _p9k_skip_token=(
   'if' ''
   'fi' ''
   'elif' ''
+  'else' ''
   'then' ''
   'while' ''
   'until' ''
@@ -62,6 +63,21 @@ typeset -gA _p9k_redirect=(
   '>>|' ''
 )
 
+typeset -gA _p9k_term=(
+  '|' ''
+  '||' ''
+  ';' ''
+  '&' ''
+  '&&' ''
+  '|&' ''
+  '&!' ''
+  '&|' ''
+  ';;' ''
+  ';&' ''
+  ';|' ''
+  ')' ''
+)
+
 function _p9k_extract_commands() {
   local rcquotes
   [[ -o rcquotes ]] && rcquotes=(-o rcquotes)
@@ -73,7 +89,7 @@ function _p9k_extract_commands() {
   local -i e
   local id='$(<->|[[:alpha:]_][[:IDENT:]]#)'
   local skip n s r var="\$$id|\${$id}|\"\$$id\"|\"\${$id}\""
-  local -a aln alp alf v match mbegin mend
+  local -a aln alp alf v commands match mbegin mend
 
   [[ -o interactive_comments ]] && local tokens=(${(Z+C+)1}) || local tokens=(${(z)1})
 
@@ -119,7 +135,14 @@ function _p9k_extract_commands() {
 
     if [[ -n $skip ]]; then
       if [[ $token == $~skip ]]; then
-        [[ $token == ';'[';&|'] ]] && skip='\)|esac' || skip=
+        skip=
+        if (( $+_p9k_term[$token] )); then
+          [[ $token == ';'[';&|'] ]] && skip='\)|esac'
+          _p9k_commands+=($commands)
+          commands=()
+        elif [[ $token == '()' ]]; then
+          commands=()
+        fi
       fi
       continue
     fi
@@ -153,9 +176,11 @@ function _p9k_extract_commands() {
       fi
     fi
 
-    _p9k_commands+=${token::=${(Q)${~token}}}
+    commands+=${:-${(Q)${~token}}}
 
-    # '|' '||' ';' '&' '&&' '|&' '&!' '&|' ';;' ';&' ';|' ')'
-    skip='\||\|\||;|&|&&|\|&|&!|&\||;;|;&|;\||\)|}'
+    # '|' '||' ';' '&' '&&' '|&' '&!' '&|' ';;' ';&' ';|' ')' '()'
+    skip='\||\|\||;|&|&&|\|&|&!|&\||;;|;&|;\||\)|}|\(\)'
   done
+
+  _p9k_commands+=($commands)
 }
