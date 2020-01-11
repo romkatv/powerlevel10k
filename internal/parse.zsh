@@ -26,9 +26,8 @@ typeset -gA _p9k_skip_token=(
   'end' ''
   'coproc' ''
   'nocorrect' ''
+  'noglob' ''
   'time' ''
-  '-' ''
-  'builtin' ''  # this is wrong as it will cause alias expansion
   '[[' '\]\]'
   '((' '\)\)'
   'case' '\)|esac'
@@ -50,6 +49,22 @@ typeset -gA _p9k_skip_token=(
   '>>|' '*'
   '<<<' '*'
   'foreach' '\(*\)'
+)
+
+typeset -gA _p9k_precomands=(
+  '-' ''
+  'builtin' ''
+  'command' ''
+  'exec' '-[^a]#[a]'
+  'nohup' ''
+  'setsid' ''
+  'eatmydata' ''
+  'catchsegv' ''
+  'pkexec' '--user'
+  'doas' '-[^aCu]#[acU]'
+  'nice' '-[^n]#[n]|--adjustment'
+  'stdbuf' '-[^ioe]#[ioe]|--(input|output|error)'
+  'sudo' '-[^aghpuUCcrtT]#[aghpuUCcrtT]|--(close-from|group|host|prompt|role|type|other-user|command-timeout|user)'
 )
 
 typeset -gA _p9k_redirect=(
