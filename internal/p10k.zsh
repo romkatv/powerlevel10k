@@ -5384,7 +5384,7 @@ function _p9k_parse_buffer() {
   local -r id='(<->|[[:alpha:]_][[:IDENT:]]#)'
   local -r var="\$$id|\${$id}|\"\$$id\"|\"\${$id}\""
 
-  local -i e c=1024
+  local -i e c=32
   local skip n s r state
   local -a aln alp alf v commands match mbegin mend
 
