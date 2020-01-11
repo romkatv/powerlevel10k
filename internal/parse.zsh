@@ -34,20 +34,6 @@ typeset -gA _p9k_skip_token=(
   ';;' '\)|esac'
   ';&' '\)|esac'
   ';|' '\)|esac'
-  '&>' '*'
-  '>' '*'
-  '>&' '*'
-  '<' '*'
-  '<&' '*'
-  '<>' '*'
-  '&>|' '*'
-  '>|' '*'
-  '&>>' '*'
-  '>>' '*'
-  '>>&' '*'
-  '&>>|' '*'
-  '>>|' '*'
-  '<<<' '*'
   'foreach' '\(*\)'
 )
 
@@ -111,52 +97,6 @@ typeset -gA _p9k_skip_arg=(
   '()' ''
 )
 
-function _p9k_next_token() {
-  if (( $#tokens )); then
-    if (( $#tokens == aln[-1] )); then
-      aln[-1]=()
-      alp[-1]=()
-      if (( $#tokens == alf[-1] )); then
-        alf[-1]=()
-        (( e = 0 ))
-      else
-        (( e = 1 ))
-      fi
-    else
-      (( e = 1 ))
-    fi
-
-    while (( c-- > 0 )); do
-      token=$tokens[1]
-      tokens[1]=()
-      if (( $+galiases[$token] )); then
-        (( $aln[(eI)p$token] )) && return
-        n=p$token
-        s=$galiases[$token]
-      elif (( e )); then
-        return
-      elif (( $+aliases[$token] )); then
-        (( $aln[(eI)p$token] )) && return
-        n=p$token
-        s=$aliases[$token]
-      elif [[ $token == (#b)?*.(?*) ]] && (( $+saliases[$match[1]] )); then
-        (( $aln[(eI)s$match[1]] )) && return
-        n=s$match[1]
-        s=${saliases[$match[1]]%% #}
-      else
-        return 0
-      fi
-      aln+=$n
-      alp+=$#tokens
-      [[ $s == *' ' ]] && alf+=$#tokens
-      [[ -o interactive_comments ]] && tokens[1,0]=(${(Z+C+)s}) || tokens[1,0]=(${(z)s})
-    done
-  fi
-
-  token=
-  return 1
-}
-
 # False positives:
 #
 #   {} always {}
@@ -196,11 +136,11 @@ function _p9k_extract_commands() {
 
   typeset -ga _p9k_commands=()
   
-  local -r id='$(<->|[[:alpha:]_][[:IDENT:]]#)'
+  local -r id='(<->|[[:alpha:]_][[:IDENT:]]#)'
   local -r var="\$$id|\${$id}|\"\$$id\"|\"\${$id}\""
 
-  local -i e c=32
-  local skip n s r
+  local -i e c=1024
+  local skip n s r state
   local -a aln alp alf v commands match mbegin mend
 
   [[ -o interactive_comments ]] && local tokens=(${(Z+C+)1}) || local tokens=(${(z)1})
@@ -214,10 +154,10 @@ function _p9k_extract_commands() {
           alf[-1]=()
           (( e = 0 ))
         else
-          (( e = $#skip ))
+          (( e = $#state ))
         fi
       else
-        (( e = $#skip ))
+        (( e = $#state ))
       fi
 
       while (( c-- > 0 )) || return; do
@@ -246,61 +186,88 @@ function _p9k_extract_commands() {
         [[ -o interactive_comments ]] && tokens[1,0]=(${(Z+C+)s}) || tokens[1,0]=(${(z)s})
       done
 
-      if [[ $token == '<<'(|-) ]]; then
-        _p9k_next_token || return
-        r=$token
-        while true; do
-          while _p9k_next_token && [[ $token != ';' ]]; do done
-          while _p9k_next_token && [[ $token == ';' ]]; do done
-          [[ $token == (|$r) ]] && break
-        done
-        continue
-      fi
-
-      if [[ -n $skip ]]; then
-        if [[ $skip == ']' ]]; then
+      case $state in
+        t)
           if (( $+_p9k_term[$token] )); then
             skip=$_p9k_skip_arg[$token]
+            state=${skip:+s}
             [[ $token == '()' ]] || _p9k_commands+=($commands)
             commands=()
           fi
-        elif [[ $token == $~skip ]]; then
-          skip=
-        fi
+          continue;;
+        s)
+          if [[ $token == $~skip ]]; then
+            state=
+          fi
+          continue;;
+        *r)
+          state[1]=
+          continue;;
+        h)
+          skip=${(b)token}
+          state=s
+          continue;;
+      esac
+
+      if [[ $token == '<<'(|-) ]]; then
+        state=h
         continue
       fi
 
-      r=${token#<0-255>}
-      if (( $+_p9k_skip_token[$r] )); then
-        if (( $+_p9k_skip_token[$token] )); then
-          skip=$_p9k_skip_token[$token]
-          continue
-        fi
-        if (( $+_p9k_redirect[$r] )); then
-          skip='*'
-          continue
-        fi
-      fi
-
-      if [[ $token == *=* ]]; then
-        v=${(S)token/#(<->|([[:alpha:]_][[:IDENT:]]#(|'['*[^\\](\\\\)#']')))(|'+')=}
-        if (( $#v < $#token )); then
-          [[ $v == '(' ]] && skip='\)'
-          continue
-        fi
+      if (( $+_p9k_redirect[${token#<0-255>}] )); then
+        state+=r
+        continue
       fi
 
       if [[ $token == *'$'* ]]; then
-        if [[ $token == $~id ]]; then
+        setopt xtrace
+        if [[ $token == $~var ]]; then
           n=${${token##[^[:IDENT:]]}%%[^[:IDENT:]]}
-          [[ $token == *'"' ]] && v=("${(@P)n}") || v=(${(P)name})
+          [[ $token == *'"' ]] && v=("${(@P)n}") || v=(${(P)n})
           tokens[1,0]=(${(qq)v})
           continue
         fi
       fi
 
-      commands+=${:-${(Q)${~token}}}
-      skip=']'
+      case $state in
+        '')
+          if (( $+_p9k_skip_token[$token] )); then
+            skip=$_p9k_skip_token[$token]
+            state=${skip:+s}
+            continue
+          fi
+          if [[ $token == *=* ]]; then
+            v=${(S)token/#(<->|([[:alpha:]_][[:IDENT:]]#(|'['*[^\\](\\\\)#']')))(|'+')=}
+            if (( $#v < $#token )); then
+              if [[ $v == '(' ]]; then
+                state=s
+                skip='\)'
+              fi
+              continue
+            fi
+          fi
+          : ${token::=${(Q)${~token}}};;
+        p)
+          : ${token::=${(Q)${~token}}}
+          case $token in
+            [^-]*)                    ;;
+            --)     state=p1; continue;;
+            $~skip) state=p2; continue;;
+            *)                continue;;
+          esac;;
+        p1) ;;
+        p2)
+          state=p
+          continue;;
+      esac
+
+      commands+=$token
+      if (( $+_p9k_precomands[$commands[-1]] )); then
+        state=p
+        skip=$_p9k_precomands[$commands[-1]]
+      else
+        state=t
+      fi
     done
   }
 
