@@ -141,7 +141,7 @@ function _p9k_parse_buffer() {
   emulate -L zsh -o extended_glob -o no_nomatch $rcquotes
 
   typeset -ga _p9k_buffer_commands=()
-  
+
   local -r id='(<->|[[:alpha:]_][[:IDENT:]]#)'
   local -r var="\$$id|\${$id}|\"\$$id\"|\"\${$id}\""
 
