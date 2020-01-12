@@ -5664,7 +5664,7 @@ function _p9k_widget_hook() {
     P9K_COMMANDS=($_p9k__last_commands)
   else
     _p9k__last_buffer=$PREBUFFER$BUFFER
-    _p9k_parse_buffer $_p9k__last_buffer 32
+    [[ -n $_p9k__last_buffer ]] && _p9k_parse_buffer $_p9k__last_buffer 32
     _p9k__last_commands=($P9K_COMMANDS)
   fi
   (( $+functions[p10k-on-post-widget] )) && p10k-on-post-widget "${@:2}"
