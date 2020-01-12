@@ -3905,7 +3905,7 @@ _p9k_set_instant_prompt() {
   RPROMPT=$saved_rprompt
 }
 
-typeset -gri __p9k_instant_prompt_version=15
+typeset -gri __p9k_instant_prompt_version=16
 
 _p9k_dump_instant_prompt() {
   local user=${(%):-%n}
@@ -4031,6 +4031,11 @@ _p9k_dump_instant_prompt() {
         >&$fd print -r -- '
   p10k-on-init'
       fi
+      local pattern segment
+      for pattern segment in $_p9k_show_on_command; do
+        >&$fd print -r -- "
+  _p9k__display_v[$((1+_p9k__display_k[$segment]))]=hide"
+      done
       if (( $+functions[p10k-on-pre-prompt] )); then
         >&$fd print -r -- '
   p10k-on-pre-prompt'
@@ -4501,6 +4506,10 @@ function _p9k_on_expand() {
       (( $+functions[p10k-on-init] )) && p10k-on-init
     fi
 
+    local pattern segment
+    for pattern segment in $_p9k_show_on_command; do
+      p10k display $segment=hide
+    done
     (( $+functions[p10k-on-pre-prompt] )) && p10k-on-pre-prompt
 
     __p9k_reset_state=0
@@ -4832,6 +4841,7 @@ typeset -g  _p9k__param_pat
 typeset -g  _p9k__param_sig
 
 _p9k_init_vars() {
+  typeset -ga _p9k_show_on_command
   typeset -g  _p9k__last_buffer
   typeset -ga _p9k__last_commands
   typeset -g  _p9k__last_tty
@@ -5268,7 +5278,8 @@ _p9k_init_params() {
 }
 
 typeset -grA __p9k_pb_cmd_skip=(
-  '}'         ''
+  '}'         'always'  # handled specially
+  '{'         ''
   '{'         ''
   '|'         ''
   '||'        ''
@@ -5353,8 +5364,8 @@ typeset -grA __p9k_pb_term=(
   ';|' ''
   '('  ''
   ')'  ''
-  '()' ''
-  '}'  ''
+  '()' ''  # handled specially
+  '}'  ''  # handled specially
 )
 
 typeset -grA __p9k_pb_term_skip=(
@@ -5415,7 +5426,7 @@ function _p9k_parse_buffer() {
   local -r var="\$$id|\${$id}|\"\$$id\"|\"\${$id}\""
 
   local -i e ic c=${2:-'1 << 62'}
-  local skip n s r state cmd
+  local skip n s r state cmd prev
   local -a aln alp alf v
 
   if [[ -o interactive_comments ]]; then
@@ -5429,14 +5440,14 @@ function _p9k_parse_buffer() {
     while (( $#tokens )); do
       (( e = $#state ))
 
-      if (( $#alp && $#tokens == alp[-1] )); then
+      while (( $#tokens == alp[-1] )); do
         aln[-1]=()
         alp[-1]=()
         if (( $#tokens == alf[-1] )); then
           alf[-1]=()
           (( e = 0 ))
         fi
-      fi
+      done
 
       while (( c-- > 0 )) || return; do
         token=$tokens[1]
@@ -5471,6 +5482,10 @@ function _p9k_parse_buffer() {
       fi
 
       case $state in
+        *r)
+          state[-1]=
+          continue
+          ;;
         a)
           if [[ $token == $skip ]]; then
             if [[ $token == '{' ]]; then
@@ -5503,6 +5518,14 @@ function _p9k_parse_buffer() {
             continue
           elif [[ $state == t ]]; then
             continue
+          elif [[ $state == *x ]]; then
+            if (( $+__p9k_pb_redirect[$token] )); then
+              prev=
+              state[-1]=r
+              continue
+            else
+              state[-1]=
+            fi
           fi
           ;;
         s)
@@ -5511,13 +5534,9 @@ function _p9k_parse_buffer() {
           fi
           continue
           ;;
-        *r)
-          state[1]=
-          continue
-          ;;
         h)
           while (( $#tokens )); do
-            (( e = ${tokens[(i)$token]} ))
+            (( e = ${tokens[(i)${(Q)token}]} ))
             if [[ $tokens[e-1] == ';' && $tokens[e+1] == ';' ]]; then
               tokens[1,e]=()
               break
@@ -5552,7 +5571,7 @@ function _p9k_parse_buffer() {
         '')
           if (( $+__p9k_pb_cmd_skip[$token] )); then
             skip=$__p9k_pb_cmd_skip[$token]
-            state=${skip:+s}
+            [[ $token == '}' ]] && state=a || state=${skip:+s}
             continue
           fi
           if [[ $token == *=* ]]; then
@@ -5567,33 +5586,64 @@ function _p9k_parse_buffer() {
           fi
           : ${token::=${(Q)${~token}}}
           ;;
-        p)
-          : ${token::=${(Q)${~token}}}
-          case $token in
-            [^-]*)                    ;;
-            --)     state=p1; continue;;
-            $~skip) state=p2; continue;;
-            *)                continue;;
-          esac
-          ;;
         p2)
-          state=p
-          continue
+          if [[ -n $prev ]]; then
+            prev=
+          else
+            : ${token::=${(Q)${~token}}}
+            if [[ $token == '{'$~id'}' ]]; then
+              state=p2x
+              prev=$token
+            else
+              state=p
+            fi
+            continue
+          fi
+          ;&  # fall through
+        p)
+          if [[ -n $prev ]]; then
+            token=$prev
+            prev=
+          else
+            : ${token::=${(Q)${~token}}}
+            case $token in
+              '{'$~id'}') prev=$token; state=px; continue;;
+              [^-]*)                                     ;;
+              --)                      state=p1; continue;;
+              $~skip)                  state=p2; continue;;
+              *)                                 continue;;
+            esac
+          fi
+          ;;
+        p1)
+          if [[ -n $prev ]]; then
+            token=$prev
+            prev=
+          else
+            : ${token::=${(Q)${~token}}}
+            if [[ $token == '{'$~id'}' ]]; then
+              state=p1x
+              prev=$token
+              continue
+            fi
+          fi
           ;;
       esac
 
       if (( $+__p9k_pb_precommand[$token] )); then
+        prev=
         state=p
         skip=$__p9k_pb_precommand[$token]
-        cmd+="$token "
+        cmd+=$token$'\0'
       else
         state=t
-        [[ $token == ('(('*'))'|'`'*'`'|'$'*) ]] || cmd+="$token "
+        [[ $token == ('(('*'))'|'`'*'`'|'$'*|['<>']'('*')'|*$'\0'*) ]] || cmd+=$token$'\0'
       fi
     done
   } always {
+    [[ $state == (px|p1x) ]] && cmd+=$prev
     P9K_COMMANDS+=$cmd
-    P9K_COMMANDS=(${(u)P9K_COMMANDS% })
+    P9K_COMMANDS=(${(u)P9K_COMMANDS%$'\0'})
   }
 }
 
@@ -5656,18 +5706,31 @@ function _p9k_on_widget_zle-line-finish() {
 }
 
 function _p9k_widget_hook() {
+  if (( $+functions[p10k-on-post-widget] || $#_p9k_show_on_command )); then
+    local -a P9K_COMMANDS
+    if [[ "$_p9k__last_buffer" == "$PREBUFFER$BUFFER" ]]; then
+      P9K_COMMANDS=(${_p9k__last_commands[@]})
+    else
+      _p9k__last_buffer="$PREBUFFER$BUFFER"
+      if [[ -n "$_p9k__last_buffer" ]]; then
+        _p9k_parse_buffer "$_p9k__last_buffer" 64 # this must run with user options
+      fi
+      _p9k__last_commands=(${P9K_COMMANDS[@]})
+    fi
+  fi
+
   emulate -L zsh
   setopt no_hist_expand extended_glob no_prompt_bang prompt_{percent,subst}
   (( _p9k__restore_prompt_fd )) && _p9k_restore_prompt $_p9k__restore_prompt_fd
   __p9k_reset_state=1
-  local -a P9K_COMMANDS
-  if [[ $_p9k__last_buffer == $PREBUFFER$BUFFER ]]; then
-    P9K_COMMANDS=($_p9k__last_commands)
-  else
-    _p9k__last_buffer=$PREBUFFER$BUFFER
-    [[ -n $_p9k__last_buffer ]] && _p9k_parse_buffer $_p9k__last_buffer 32
-    _p9k__last_commands=($P9K_COMMANDS)
-  fi
+  local pattern segment
+  for pattern segment in $_p9k_show_on_command; do
+    if (( $P9K_COMMANDS[(I)$pattern] )); then
+      p10k display $segment=show
+    else
+      p10k display $segment=hide
+    fi
+  done
   (( $+functions[p10k-on-post-widget] )) && p10k-on-post-widget "${@:2}"
   (( $+functions[_p9k_on_widget_$1] )) && _p9k_on_widget_$1
   (( __p9k_reset_state == 2 )) && _p9k_reset_prompt
@@ -6100,7 +6163,7 @@ _p9k_must_init() {
     [[ $sig == $_p9k__param_sig ]] && return 1
     _p9k_deinit
   fi
-  _p9k__param_pat=$'v23\1'${ZSH_VERSION}$'\1'${ZSH_PATCHLEVEL}$'\1'
+  _p9k__param_pat=$'v24\1'${ZSH_VERSION}$'\1'${ZSH_PATCHLEVEL}$'\1'
   _p9k__param_pat+=$'${#parameters[(I)POWERLEVEL9K_*]}\1${(%):-%n%#}\1$GITSTATUS_LOG_LEVEL\1'
   _p9k__param_pat+=$'$GITSTATUS_ENABLE_LOGGING\1$GITSTATUS_DAEMON\1$GITSTATUS_NUM_THREADS\1'
   _p9k__param_pat+=$'$DEFAULT_USER\1${ZLE_RPROMPT_INDENT:-1}\1$P9K_SSH\1$__p9k_ksh_arrays'
@@ -6123,6 +6186,23 @@ function _p9k_init_cacheable() {
   _p9k_init_icons
   _p9k_init_params
   _p9k_init_prompt
+
+  local elem
+  local -i i=0
+
+  for i in {1..$#_p9k_line_segments_left}; do
+    for elem in ${(@0)_p9k_line_segments_left[i]}; do
+      local var=POWERLEVEL9K_${(U)elem}_SHOW_ON_COMMAND
+      (( $+parameters[$var] )) || continue
+      _p9k_show_on_command+=($'(|*[/\0])('${(j.|.)${(P)var}}')' $i/left/$elem)
+    done
+    for elem in ${(@0)_p9k_line_segments_right[i]}; do
+      local var=POWERLEVEL9K_${(U)elem}_SHOW_ON_COMMAND
+      (( $+parameters[$var] )) || continue
+      local cmds=(${(P)var})
+      _p9k_show_on_command+=($'(|*[/\0])('${(j.|.)${(P)var}}')' $i/right/$elem)
+    done
+  done
 
   if [[ $_POWERLEVEL9K_TRANSIENT_PROMPT != off ]]; then
     _p9k_transient_prompt='%b%k%s%u%F{%(?.'
@@ -6203,14 +6283,13 @@ function _p9k_init_cacheable() {
     'DISCONNECTED'  "$_p9k_color2"
   )
 
-  local -i i=0
   # This simpler construct doesn't work on zsh-5.1 with multi-line prompt:
   #
   #   ${(@0)_p9k_line_segments_left[@]}
   local -a left_segments=(${(@0)${(pj:\0:)_p9k_line_segments_left}})
   _p9k_left_join=(1)
   for ((i = 2; i <= $#left_segments; ++i)); do
-    local elem=$left_segments[i]
+    elem=$left_segments[i]
     if [[ $elem == *_joined ]]; then
       _p9k_left_join+=$_p9k_left_join[((i-1))]
     else
@@ -6221,7 +6300,7 @@ function _p9k_init_cacheable() {
   local -a right_segments=(${(@0)${(pj:\0:)_p9k_line_segments_right}})
   _p9k_right_join=(1)
   for ((i = 2; i <= $#right_segments; ++i)); do
-    local elem=$right_segments[i]
+    elem=$right_segments[i]
     if [[ $elem == *_joined ]]; then
       _p9k_right_join+=$_p9k_right_join[((i-1))]
     else
