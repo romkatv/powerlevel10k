@@ -5415,8 +5415,8 @@ function _p9k_parse_buffer() {
   local -r var="\$$id|\${$id}|\"\$$id\"|\"\${$id}\""
 
   local -i e ic c=${2:-'1 << 62'}
-  local skip n s r state
-  local -a aln alp alf v commands
+  local skip n s r state cmd
+  local -a aln alp alf v
 
   if [[ -o interactive_comments ]]; then
     ic=1
@@ -5474,8 +5474,8 @@ function _p9k_parse_buffer() {
         a)
           if [[ $token == $skip ]]; then
             if [[ $token == '{' ]]; then
-              P9K_COMMANDS+=($commands)
-              commands=()
+              P9K_COMMANDS+=$cmd
+              cmd=
               state=
             else
               skip='{'
@@ -5490,7 +5490,7 @@ function _p9k_parse_buffer() {
             if [[ $token == '()' ]]; then
               state=
             else
-              P9K_COMMANDS+=($commands)
+              P9K_COMMANDS+=$cmd
               if [[ $token == '}' ]]; then
                 state=a
                 skip=always
@@ -5499,7 +5499,7 @@ function _p9k_parse_buffer() {
                 state=${skip:+s}
               fi
             fi
-            commands=()
+            cmd=
             continue
           elif [[ $state == t ]]; then
             continue
@@ -5582,17 +5582,18 @@ function _p9k_parse_buffer() {
           ;;
       esac
 
-      commands+=$token
-      if (( $+__p9k_pb_precommand[$commands[-1]] )); then
+      if (( $+__p9k_pb_precommand[$token] )); then
         state=p
-        skip=$__p9k_pb_precommand[$commands[-1]]
+        skip=$__p9k_pb_precommand[$token]
+        cmd+="$token "
       else
         state=t
+        [[ $token == ('(('*'))'|'`'*'`'|'$'*) ]] || cmd+="$token "
       fi
     done
   } always {
-    P9K_COMMANDS+=($commands)
-    P9K_COMMANDS=(${(u)P9K_COMMANDS:#('(('*'))'|'`'*'`'|'$'*)})
+    P9K_COMMANDS+=$cmd
+    P9K_COMMANDS=(${(u)P9K_COMMANDS% })
   }
 }
 
