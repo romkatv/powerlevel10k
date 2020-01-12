@@ -198,6 +198,11 @@ function _parse_buffer() {
         (( ic )) && tokens[1,0]=(${(Z+C+)s}) || tokens[1,0]=(${(z)s})
       done
 
+      if [[ $token == '<<'(|-) ]]; then
+        state=h
+        continue
+      fi
+
       case $state in
         t|p*)
           if (( $+__pb_term[$token] )); then
@@ -218,15 +223,22 @@ function _parse_buffer() {
           state[1]=
           continue;;
         h)
-          skip=${(b)token}
-          state=s
+          while (( $#tokens )); do
+            (( e = ${tokens[(i)$token]} ))
+            if [[ $tokens[e-1] == ';' && $tokens[e+1] == ';' ]]; then
+              tokens[1,e]=()
+              break
+            else
+              tokens[1,e]=()
+            fi
+          done
+          while (( $#alp && alp[-1] >= $#tokens )); do
+            aln[-1]=()
+            alp[-1]=()
+          done
+          state=t
           continue;;
       esac
-
-      if [[ $token == '<<'(|-) ]]; then
-        state=h
-        continue
-      fi
 
       if (( $+__pb_redirect[${token#<0-255>}] )); then
         state+=r
