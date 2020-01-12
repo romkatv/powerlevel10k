@@ -5477,10 +5477,16 @@ function _p9k_parse_buffer() {
         (( ic )) && tokens[1,0]=(${(Z+C+)s}) || tokens[1,0]=(${(z)s})
       done
 
-      if [[ $token == '<<'(|-) ]]; then
-        state=h
-        continue
-      fi
+      case $token in
+        '<<'(|-))
+          state=h
+          continue
+          ;;
+        '`'*'`'|'"`'*'`"'|'$('*')'|'"$('*')"'|['<>=']'('*')')
+          s=${${token##('"'|)(['$<>']|)?}%%?('"'|)}
+          (( ic )) && tokens+=(';' ${(Z+C+)s}) || tokens+=(';' ${(z)s})
+          ;;
+      esac
 
       case $state in
         *r)
@@ -5638,7 +5644,7 @@ function _p9k_parse_buffer() {
         cmd+=$token$'\0'
       else
         state=t
-        [[ $token == ('(('*'))'|'`'*'`'|'$'*|['<>']'('*')'|*$'\0'*) ]] || cmd+=$token$'\0'
+        [[ $token == ('(('*'))'|'`'*'`'|'$'*|['<>=']'('*')'|*$'\0'*) ]] || cmd+=$token$'\0'
       fi
     done
   } always {
