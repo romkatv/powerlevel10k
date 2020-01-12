@@ -1,4 +1,4 @@
-typeset -gA __p9k_pb_cmd_skip=(
+typeset -gA __pb_cmd_skip=(
   '}'         ''
   '|'         ''
   '||'        ''
@@ -37,7 +37,7 @@ typeset -gA __p9k_pb_cmd_skip=(
   'foreach'   '\(*\)'
 )
 
-typeset -gA __p9k_pb_precommand=(
+typeset -gA __pb_precommand=(
   '-'         ''
   'builtin'   ''
   'command'   ''
@@ -53,7 +53,7 @@ typeset -gA __p9k_pb_precommand=(
   'sudo'      '-[^aghpuUCcrtT]#[aghpuUCcrtT]|--(close-from|group|host|prompt|role|type|other-user|command-timeout|user)'
 )
 
-typeset -gA __p9k_pb_redirect=(
+typeset -gA __pb_redirect=(
   '&>'   ''
   '>'    ''
   '>&'   ''
@@ -70,7 +70,7 @@ typeset -gA __p9k_pb_redirect=(
   '<<<'  ''
 )
 
-typeset -gA __p9k_pb_term=(
+typeset -gA __pb_term=(
   '|'  ''
   '||' ''
   ';'  ''
@@ -89,7 +89,7 @@ typeset -gA __p9k_pb_term=(
   '()' ''
 )
 
-typeset -gA __p9k_pb_term_skip=(
+typeset -gA __pb_term_skip=(
   '()' ''
   '('  '\)'
   ';;' '\)|esac'
@@ -134,13 +134,13 @@ typeset -gA __p9k_pb_term_skip=(
 #   ---------------
 #
 # More brokenness with non-standard options (ignore_braces, ignore_close_braces, etc.).
-function _p9k_parse_buffer() {
+function _parse_buffer() {
   local rcquotes
   [[ -o rcquotes ]] && rcquotes=(-o rcquotes)
 
   emulate -L zsh -o extended_glob -o no_nomatch $rcquotes
 
-  typeset -ga _p9k_buffer_commands=()
+  typeset -ga _buffer_commands=()
 
   local -r id='(<->|[[:alpha:]_][[:IDENT:]]#)'
   local -r var="\$$id|\${$id}|\"\$$id\"|\"\${$id}\""
@@ -194,10 +194,10 @@ function _p9k_parse_buffer() {
 
       case $state in
         t|p*)
-          if (( $+__p9k_pb_term[$token] )); then
-            skip=$__p9k_pb_term_skip[$token]
+          if (( $+__pb_term[$token] )); then
+            skip=$__pb_term_skip[$token]
             state=${skip:+s}
-            [[ $token == '()' ]] || _p9k_buffer_commands+=($commands)
+            [[ $token == '()' ]] || _buffer_commands+=($commands)
             commands=()
             continue
           elif [[ $state == t ]]; then
@@ -222,7 +222,7 @@ function _p9k_parse_buffer() {
         continue
       fi
 
-      if (( $+__p9k_pb_redirect[${token#<0-255>}] )); then
+      if (( $+__pb_redirect[${token#<0-255>}] )); then
         state+=r
         continue
       fi
@@ -238,8 +238,8 @@ function _p9k_parse_buffer() {
 
       case $state in
         '')
-          if (( $+__p9k_pb_cmd_skip[$token] )); then
-            skip=$__p9k_pb_cmd_skip[$token]
+          if (( $+__pb_cmd_skip[$token] )); then
+            skip=$__pb_cmd_skip[$token]
             state=${skip:+s}
             continue
           fi
@@ -269,15 +269,15 @@ function _p9k_parse_buffer() {
       esac
 
       commands+=$token
-      if (( $+__p9k_pb_precommand[$commands[-1]] )); then
+      if (( $+__pb_precommand[$commands[-1]] )); then
         state=p
-        skip=$__p9k_pb_precommand[$commands[-1]]
+        skip=$__pb_precommand[$commands[-1]]
       else
         state=t
       fi
     done
   }
 
-  _p9k_buffer_commands+=($commands)
-  _p9k_buffer_commands=(${(u)_p9k_buffer_commands:#('(('*'))'|'`'*'`'|'$'*)})
+  _buffer_commands+=($commands)
+  _buffer_commands=(${(u)_buffer_commands:#('(('*'))'|'`'*'`'|'$'*)})
 }
