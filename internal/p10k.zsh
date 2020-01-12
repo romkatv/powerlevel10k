@@ -1367,7 +1367,7 @@ prompt_dir() {
       # for "~[a/b]" it'll give the nonsensical "~[a". To solve this problem we have to
       # repeat what "${(%):-%~}" does and hope that it produces the same result.
       local func=''
-      local -a parts=()
+      local -a parts=() reply=()
       for func in zsh_directory_name $zsh_directory_name_functions; do
         if (( $+functions[$func] )) && $func d $_p9k_pwd && [[ $p == '~['$reply[1]']'* ]]; then
           parts+='~['$reply[1]']'
@@ -6680,9 +6680,15 @@ typeset -gr __p9k_p10k_display_usage="Usage: %2Fp10k%f %Bdisplay%b part-pattern=
 Show, hide or toggle prompt parts. If called from zle, the current
 prompt is refreshed.
 
+Usage: %2Fp10k%f %Bdisplay%b -a [part-pattern]...
+
+Populate array \\\`reply\\\` with states of prompt parts matching the patterns.
+If no patterns are supplied, assume \\\`*\\\`.
+
 Parts:
   empty_line    empty line (duh)
-  ruler         ruler; if POWERLEVEL9K_RULER_CHAR=' ', it's essentially another new_line
+  ruler         ruler; if POWERLEVEL9K_RULER_CHAR=' ', it's essentially another
+                new_line
   N             prompt line number N, 1-based; counting from the top if positive,
                 from the bottom if negative
   N/left_frame  left frame on the Nth line
@@ -6697,14 +6703,31 @@ Part States:
   show          the part is displayed
   hide          the part is not displayed
   print         the part is printed in precmd; only applicable to empty_line and
-                ruler; looks better than show after clear; unlike show, the effects
-                of print cannot be undone with hide
+                ruler; looks better than show after calling \\\`clear\\\`; unlike
+                show, the effects of print cannot be undone with hide
+
+part-pattern is a glob pattern for parts. Examples:
+
+  */kubecontext         all kubecontext prompt segments, regardless of where
+                        they are
+  1/(right|right_frame) all prompt segments and frame from the right side of
+                        the first line
+
+state-list is a comma-separated list of states. Must have at least one element.
+If more than one, states will rotate.
 
 Example: Bind Ctrl+P to toggle right prompt.
 
   function toggle-right-prompt() { p10k display '*/right'=hide,show; }
   zle -N toggle-right-prompt
-  bindkey '^P' toggle-right-prompt"
+  bindkey '^P' toggle-right-prompt
+
+Example: Print the state of all prompt parts:
+
+  local -A reply
+  p10k display -a '*'
+  printf '%%32s = %%q\n' \\\${(@kv)reply}
+"
 
 # 0  -- reset-prompt not blocked
 # 1  -- reset-prompt blocked and not needed
@@ -6725,7 +6748,8 @@ function p10k() {
   case $1 in
     segment)
       shift
-      local opt state bg=0 fg icon cond text ref=0 expand=0
+      local -i OPTIND
+      local OPTARG opt state bg=0 fg icon cond text ref=0 expand=0
       while getopts ':s:b:f:i:c:t:reh' opt; do
         case $opt in
           s) state=$OPTARG;;
@@ -6766,14 +6790,28 @@ function p10k() {
         print -rP -- $__p9k_p10k_display_usage >&2
         return 1
       fi
-      if [[ $2 == -h ]]; then
-        print -rP -- $__p9k_p10k_display_usage >&2
+      shift
+      local -i OPTIND k dump
+      local OPTARG opt match MATCH prev new pair list name var
+      while getopts ':ha' opt; do
+        case $opt in
+          a) dump=1;;
+          h) print -rP -- $__p9k_p10k_display_usage; return 0;;
+          ?) print -rP -- $__p9k_p10k_display_usage >&2; return 1;;
+        esac
+      done
+      if (( dump )); then
+        reply=()
+        shift $((OPTIND-1))
+        (( ARGC )) || set -- '*'
+        for opt; do
+          for k in ${(u@)_p9k__display_k[(I)$opt]:/(#m)*/$_p9k__display_k[$MATCH]}; do
+            reply+=($_p9k__display_v[k,k+1])
+          done
+        done
         return 0
       fi
-      shift
-      local opt match MATCH prev new pair list name var
-      local -i k
-      for opt; do
+      for opt in "${@:$OPTIND}"; do
         pair=(${(s:=:)opt})
         list=(${(s:,:)${pair[2]}})
         for k in ${(u@)_p9k__display_k[(I)$pair[1]]:/(#m)*/$_p9k__display_k[$MATCH]}; do
