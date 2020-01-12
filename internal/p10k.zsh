@@ -5269,6 +5269,7 @@ _p9k_init_params() {
 
 typeset -grA __p9k_pb_cmd_skip=(
   '}'         ''
+  '{'         ''
   '|'         ''
   '||'        ''
   '&'         ''
@@ -5278,7 +5279,6 @@ typeset -grA __p9k_pb_cmd_skip=(
   '&|'        ''
   ')'         ''
   '('         ''
-  '{'         ''
   '()'        ''
   '!'         ''
   ';'         ''
@@ -5353,33 +5353,29 @@ typeset -grA __p9k_pb_term=(
   ';|' ''
   '('  ''
   ')'  ''
-  '{'  ''
-  '}'  ''
   '()' ''
+  '}'  ''
 )
 
 typeset -grA __p9k_pb_term_skip=(
-  '()' ''
   '('  '\)'
   ';;' '\)|esac'
   ';&' '\)|esac'
   ';|' '\)|esac'
 )
 
-# False positives:
+# Usage: _p9k_parse_buffer <buffer> [token-limit]
 #
-#   {} always {}
+# Parses the specified command line buffer and pupulates array P9K_COMMANDS
+# with commands from it. Terminates early and returns 1 if there are more
+# tokens than the specified limit.
 #
-# False negatives:
+# Broken:
 #
 #   ---------------
 #   : $(x)
 #   ---------------
 #   : `x`
-#   ---------------
-#
-# Broken:
-#
 #   ---------------
 #   ${x/}
 #   ---------------
@@ -5390,6 +5386,8 @@ typeset -grA __p9k_pb_term_skip=(
 #   *
 #   ---------------
 #   x=$y; $x
+#   ---------------
+#   alias x=y; y
 #   ---------------
 #   x <<END
 #   ; END
@@ -5404,33 +5402,40 @@ typeset -grA __p9k_pb_term_skip=(
 #
 # More brokenness with non-standard options (ignore_braces, ignore_close_braces, etc.).
 function _p9k_parse_buffer() {
+  [[ ${2:-0} == <-> ]] || return 2
+
   local rcquotes
   [[ -o rcquotes ]] && rcquotes=(-o rcquotes)
 
   emulate -L zsh -o extended_glob -o no_nomatch $rcquotes
 
+  typeset -ga P9K_COMMANDS=()
+
   local -r id='(<->|[[:alpha:]_][[:IDENT:]]#)'
   local -r var="\$$id|\${$id}|\"\$$id\"|\"\${$id}\""
 
-  local -i e c=32
+  local -i e ic c=${2:-'1 << 62'}
   local skip n s r state
-  local -a aln alp alf v commands match mbegin mend
+  local -a aln alp alf v commands
 
-  [[ -o interactive_comments ]] && local tokens=(${(Z+C+)1}) || local tokens=(${(z)1})
+  if [[ -o interactive_comments ]]; then
+    ic=1
+    local tokens=(${(Z+C+)1})
+  else
+    local tokens=(${(z)1})
+  fi
 
-  () {
+  {
     while (( $#tokens )); do
-      if (( $#tokens == alp[-1] )); then
+      (( e = $#state ))
+
+      if (( $#alp && $#tokens == alp[-1] )); then
         aln[-1]=()
         alp[-1]=()
         if (( $#tokens == alf[-1] )); then
           alf[-1]=()
           (( e = 0 ))
-        else
-          (( e = $#state ))
         fi
-      else
-        (( e = $#state ))
       fi
 
       while (( c-- > 0 )) || return; do
@@ -5438,56 +5443,96 @@ function _p9k_parse_buffer() {
         tokens[1]=()
         if (( $+galiases[$token] )); then
           (( $aln[(eI)p$token] )) && break
-          n=p$token
           s=$galiases[$token]
+          n=p$token
         elif (( e )); then
           break
         elif (( $+aliases[$token] )); then
           (( $aln[(eI)p$token] )) && break
-          n=p$token
           s=$aliases[$token]
-        elif [[ $token == (#b)?*.(?*) ]] && (( $+saliases[$match[1]] )); then
-          (( $aln[(eI)s$match[1]] )) && break
-          n=s$match[1]
-          s=${saliases[$match[1]]%% #}
+          n=p$token
+        elif [[ $token == ?*.?* ]] && (( $+saliases[${token##*.}] )); then
+          r=${token##*.}
+          (( $aln[(eI)s$r] )) && break
+          s=${saliases[$r]%% #}
+          n=s$r
         else
           break
         fi
         aln+=$n
         alp+=$#tokens
         [[ $s == *' ' ]] && alf+=$#tokens
-        [[ -o interactive_comments ]] && tokens[1,0]=(${(Z+C+)s}) || tokens[1,0]=(${(z)s})
+        (( ic )) && tokens[1,0]=(${(Z+C+)s}) || tokens[1,0]=(${(z)s})
       done
-
-      case $state in
-        t|p*)
-          if (( $+__p9k_pb_term[$token] )); then
-            skip=$__p9k_pb_term_skip[$token]
-            state=${skip:+s}
-            [[ $token == '()' ]] || P9K_COMMANDS+=($commands)
-            commands=()
-            continue
-          elif [[ $state == t ]]; then
-            continue
-          fi;;
-        s)
-          if [[ $token == $~skip ]]; then
-            state=
-          fi
-          continue;;
-        *r)
-          state[1]=
-          continue;;
-        h)
-          skip=${(b)token}
-          state=s
-          continue;;
-      esac
 
       if [[ $token == '<<'(|-) ]]; then
         state=h
         continue
       fi
+
+      case $state in
+        a)
+          if [[ $token == $skip ]]; then
+            if [[ $token == '{' ]]; then
+              P9K_COMMANDS+=($commands)
+              commands=()
+              state=
+            else
+              skip='{'
+            fi
+            continue
+          else
+            state=t
+          fi
+          ;&  # fall through
+        t|p*)
+          if (( $+__p9k_pb_term[$token] )); then
+            if [[ $token == '()' ]]; then
+              state=
+            else
+              P9K_COMMANDS+=($commands)
+              if [[ $token == '}' ]]; then
+                state=a
+                skip=always
+              else
+                skip=$__p9k_pb_term_skip[$token]
+                state=${skip:+s}
+              fi
+            fi
+            commands=()
+            continue
+          elif [[ $state == t ]]; then
+            continue
+          fi
+          ;;
+        s)
+          if [[ $token == $~skip ]]; then
+            state=
+          fi
+          continue
+          ;;
+        *r)
+          state[1]=
+          continue
+          ;;
+        h)
+          while (( $#tokens )); do
+            (( e = ${tokens[(i)$token]} ))
+            if [[ $tokens[e-1] == ';' && $tokens[e+1] == ';' ]]; then
+              tokens[1,e]=()
+              break
+            else
+              tokens[1,e]=()
+            fi
+          done
+          while (( $#alp && alp[-1] >= $#tokens )); do
+            aln[-1]=()
+            alp[-1]=()
+          done
+          state=t
+          continue
+          ;;
+      esac
 
       if (( $+__p9k_pb_redirect[${token#<0-255>}] )); then
         state+=r
@@ -5520,7 +5565,8 @@ function _p9k_parse_buffer() {
               continue
             fi
           fi
-          : ${token::=${(Q)${~token}}};;
+          : ${token::=${(Q)${~token}}}
+          ;;
         p)
           : ${token::=${(Q)${~token}}}
           case $token in
@@ -5528,11 +5574,12 @@ function _p9k_parse_buffer() {
             --)     state=p1; continue;;
             $~skip) state=p2; continue;;
             *)                continue;;
-          esac;;
-        p1) ;;
+          esac
+          ;;
         p2)
           state=p
-          continue;;
+          continue
+          ;;
       esac
 
       commands+=$token
@@ -5543,11 +5590,12 @@ function _p9k_parse_buffer() {
         state=t
       fi
     done
+  } always {
+    P9K_COMMANDS+=($commands)
+    P9K_COMMANDS=(${(u)P9K_COMMANDS:#('(('*'))'|'`'*'`'|'$'*)})
   }
-
-  P9K_COMMANDS+=($commands)
-  P9K_COMMANDS=(${(u)P9K_COMMANDS:#('(('*'))'|'`'*'`'|'$'*)})
 }
+
 
 function _p9k_on_widget_zle-keymap-select() { __p9k_reset_state=2; }
 function _p9k_on_widget_overwrite-mode()    { __p9k_reset_state=2; }
@@ -5616,7 +5664,7 @@ function _p9k_widget_hook() {
     P9K_COMMANDS=($_p9k__last_commands)
   else
     _p9k__last_buffer=$PREBUFFER$BUFFER
-    _p9k_parse_buffer $_p9k__last_buffer # 2>/dev/null
+    _p9k_parse_buffer $_p9k__last_buffer 32
     _p9k__last_commands=($P9K_COMMANDS)
   fi
   (( $+functions[p10k-on-post-widget] )) && p10k-on-post-widget "${@:2}"
