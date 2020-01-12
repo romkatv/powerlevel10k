@@ -95,6 +95,12 @@ typeset -gA __pb_term_skip=(
   ';|' '\)|esac'
 )
 
+# Usage: _parse_buffer <buffer> [token-limit]
+#
+# Parses the specified command line buffer and pupulates array P9K_COMMANDS
+# with commands from it. Terminates early and returns 1 if there are more
+# tokens than the specified limit.
+#
 # Broken:
 #
 #   ---------------
