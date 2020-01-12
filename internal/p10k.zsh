@@ -4988,6 +4988,7 @@ _p9k_init_params() {
   _p9k_declare -s POWERLEVEL9K_TRANSIENT_PROMPT off
   [[ $_POWERLEVEL9K_TRANSIENT_PROMPT == (off|always|same-dir) ]] || _POWERLEVEL9K_TRANSIENT_PROMPT=off
 
+  _p9k_declare -i POWERLEVEL9K_COMMANDS_MAX_TOKEN_COUNT 64
   _p9k_declare -a POWERLEVEL9K_HOOK_WIDGETS --
   _p9k_declare -b POWERLEVEL9K_TODO_HIDE_ZERO_TOTAL 0
   _p9k_declare -b POWERLEVEL9K_TODO_HIDE_ZERO_FILTERED 0
@@ -5647,7 +5648,6 @@ function _p9k_parse_buffer() {
   }
 }
 
-
 function _p9k_on_widget_zle-keymap-select() { __p9k_reset_state=2; }
 function _p9k_on_widget_overwrite-mode()    { __p9k_reset_state=2; }
 function _p9k_on_widget_vi-replace()        { __p9k_reset_state=2; }
@@ -5713,7 +5713,8 @@ function _p9k_widget_hook() {
     else
       _p9k__last_buffer="$PREBUFFER$BUFFER"
       if [[ -n "$_p9k__last_buffer" ]]; then
-        _p9k_parse_buffer "$_p9k__last_buffer" 64 # this must run with user options
+        # this must run with user options
+        _p9k_parse_buffer "$_p9k__last_buffer" $_POWERLEVEL9K_COMMANDS_MAX_TOKEN_COUNT
       fi
       _p9k__last_commands=(${P9K_COMMANDS[@]})
     fi
@@ -6163,7 +6164,7 @@ _p9k_must_init() {
     [[ $sig == $_p9k__param_sig ]] && return 1
     _p9k_deinit
   fi
-  _p9k__param_pat=$'v24\1'${ZSH_VERSION}$'\1'${ZSH_PATCHLEVEL}$'\1'
+  _p9k__param_pat=$'v25\1'${ZSH_VERSION}$'\1'${ZSH_PATCHLEVEL}$'\1'
   _p9k__param_pat+=$'${#parameters[(I)POWERLEVEL9K_*]}\1${(%):-%n%#}\1$GITSTATUS_LOG_LEVEL\1'
   _p9k__param_pat+=$'$GITSTATUS_ENABLE_LOGGING\1$GITSTATUS_DAEMON\1$GITSTATUS_NUM_THREADS\1'
   _p9k__param_pat+=$'$DEFAULT_USER\1${ZLE_RPROMPT_INDENT:-1}\1$P9K_SSH\1$__p9k_ksh_arrays'
