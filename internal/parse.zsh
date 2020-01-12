@@ -1,5 +1,6 @@
 typeset -gA __pb_cmd_skip=(
   '}'         ''
+  '{'         ''
   '|'         ''
   '||'        ''
   '&'         ''
@@ -9,7 +10,6 @@ typeset -gA __pb_cmd_skip=(
   '&|'        ''
   ')'         ''
   '('         ''
-  '{'         ''
   '()'        ''
   '!'         ''
   ';'         ''
@@ -84,33 +84,23 @@ typeset -gA __pb_term=(
   ';|' ''
   '('  ''
   ')'  ''
-  '{'  ''
-  '}'  ''
   '()' ''
+  '}'  ''
 )
 
 typeset -gA __pb_term_skip=(
-  '()' ''
   '('  '\)'
   ';;' '\)|esac'
   ';&' '\)|esac'
   ';|' '\)|esac'
 )
 
-# False positives:
-#
-#   {} always {}
-#
-# False negatives:
+# Broken:
 #
 #   ---------------
 #   : $(x)
 #   ---------------
 #   : `x`
-#   ---------------
-#
-# Broken:
-#
 #   ---------------
 #   ${x/}
 #   ---------------
@@ -121,6 +111,8 @@ typeset -gA __pb_term_skip=(
 #   *
 #   ---------------
 #   x=$y; $x
+#   ---------------
+#   alias x=y; y
 #   ---------------
 #   x <<END
 #   ; END
@@ -135,6 +127,8 @@ typeset -gA __pb_term_skip=(
 #
 # More brokenness with non-standard options (ignore_braces, ignore_close_braces, etc.).
 function _parse_buffer() {
+  [[ ${2:-0} == <-> ]] || return
+
   local rcquotes
   [[ -o rcquotes ]] && rcquotes=(-o rcquotes)
 
@@ -145,7 +139,7 @@ function _parse_buffer() {
   local -r id='(<->|[[:alpha:]_][[:IDENT:]]#)'
   local -r var="\$$id|\${$id}|\"\$$id\"|\"\${$id}\""
 
-  local -i e ic c=1024
+  local -i e ic c=${2:-'1 << 62'}
   local skip n s r state
   local -a aln alp alf v commands
 
@@ -156,19 +150,17 @@ function _parse_buffer() {
     local tokens=(${(z)1})
   fi
 
-  () {
+  {
     while (( $#tokens )); do
-      if (( $#tokens == alp[-1] )); then
+      (( e = $#state ))
+
+      if (( $#alp && $#tokens == alp[-1] )); then
         aln[-1]=()
         alp[-1]=()
         if (( $#tokens == alf[-1] )); then
           alf[-1]=()
           (( e = 0 ))
-        else
-          (( e = $#state ))
         fi
-      else
-        (( e = $#state ))
       fi
 
       while (( c-- > 0 )) || return; do
@@ -204,24 +196,50 @@ function _parse_buffer() {
       fi
 
       case $state in
+        a)
+          if [[ $token == $skip ]]; then
+            if [[ $token == '{' ]]; then
+              _buffer_commands+=($commands)
+              commands=()
+              state=
+            else
+              skip='{'
+            fi
+            continue
+          else
+            state=t
+          fi
+          ;&  # fall through
         t|p*)
           if (( $+__pb_term[$token] )); then
-            skip=$__pb_term_skip[$token]
-            state=${skip:+s}
-            [[ $token == '()' ]] || _buffer_commands+=($commands)
+            if [[ $token == '()' ]]; then
+              state=
+            else
+              _buffer_commands+=($commands)
+              if [[ $token == '}' ]]; then
+                state=a
+                skip=always
+              else
+                skip=$__pb_term_skip[$token]
+                state=${skip:+s}
+              fi
+            fi
             commands=()
             continue
           elif [[ $state == t ]]; then
             continue
-          fi;;
+          fi
+          ;;
         s)
           if [[ $token == $~skip ]]; then
             state=
           fi
-          continue;;
+          continue
+          ;;
         *r)
           state[1]=
-          continue;;
+          continue
+          ;;
         h)
           while (( $#tokens )); do
             (( e = ${tokens[(i)$token]} ))
@@ -237,7 +255,8 @@ function _parse_buffer() {
             alp[-1]=()
           done
           state=t
-          continue;;
+          continue
+          ;;
       esac
 
       if (( $+__pb_redirect[${token#<0-255>}] )); then
@@ -271,7 +290,8 @@ function _parse_buffer() {
               continue
             fi
           fi
-          : ${token::=${(Q)${~token}}};;
+          : ${token::=${(Q)${~token}}}
+          ;;
         p)
           : ${token::=${(Q)${~token}}}
           case $token in
@@ -279,11 +299,12 @@ function _parse_buffer() {
             --)     state=p1; continue;;
             $~skip) state=p2; continue;;
             *)                continue;;
-          esac;;
-        p1) ;;
+          esac
+          ;;
         p2)
           state=p
-          continue;;
+          continue
+          ;;
       esac
 
       commands+=$token
@@ -294,8 +315,8 @@ function _parse_buffer() {
         state=t
       fi
     done
+  } always {
+    _buffer_commands+=($commands)
+    _buffer_commands=(${(u)_buffer_commands:#('(('*'))'|'`'*'`'|'$'*)})
   }
-
-  _buffer_commands+=($commands)
-  _buffer_commands=(${(u)_buffer_commands:#('(('*'))'|'`'*'`'|'$'*)})
 }
