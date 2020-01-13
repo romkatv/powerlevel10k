@@ -2320,6 +2320,7 @@ instant_prompt_root_indicator() { prompt_root_indicator; }
 ################################################################
 # Segment to display Rust version number
 prompt_rust_version() {
+  unset P9K_RUST_VERSION
   (( $+commands[rustc] )) || return
   if (( _POWERLEVEL9K_RUST_VERSION_PROJECT_ONLY )); then
     local dir=$_p9k_pwd_a
@@ -2374,6 +2375,7 @@ prompt_rust_version() {
   fi
   local v=${${_p9k_cache_val[1]#rustc }%% *}
   [[ -n $v ]] || return
+  typeset -g P9K_RUST_VERSION=$_p9k_cache_val[1]
   _p9k_prompt_segment "$0" "darkorange" "$_p9k_color1" 'RUST_ICON' 0 '' "${v//\%/%%}"
 }
 
