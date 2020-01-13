@@ -2330,7 +2330,7 @@ prompt_rust_version() {
       dir=${dir:h}
     done
   fi
-  local rustc=${commands[rustc]:A} toolchain deps=()
+  local rustc=$commands[rustc] toolchain deps=()
   if (( $+commands[ldd] )); then
     if ! _p9k_cache_stat_get $0_so $rustc; then
       local line match so
@@ -2344,7 +2344,7 @@ prompt_rust_version() {
     deps+=$_p9k_cache_val[1]
   fi
   if (( $+commands[rustup] )); then
-    local rustup=${commands[rustup]:A}
+    local rustup=$commands[rustup]
     local rustup_home=${RUSTUP_HOME:-~/.rustup}
     local cfg=($rustup_home/settings.toml(.N))
     deps+=($cfg $rustup_home/update-hashes/*(.N))
