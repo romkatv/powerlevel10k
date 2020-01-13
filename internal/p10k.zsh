@@ -4479,7 +4479,7 @@ function _p9k_on_expand() {
       if [[ $P9K_TTY == new ]]; then
         _p9k__empty_line_i=3
         _p9k__display_v[2]=hide
-      elif [[ -z $_p9k_transient_prompt ]]; then
+      elif [[ -z $_p9k_transient_prompt && $+functions[p10k-on-post-prompt] == 0 ]]; then
         _p9k__empty_line_i=3
         _p9k__display_v[2]=print
       else
@@ -4492,7 +4492,7 @@ function _p9k_on_expand() {
       if [[ $P9K_TTY == new ]]; then
         _p9k__ruler_i=3
         _p9k__display_v[4]=hide
-      elif [[ -z $_p9k_transient_prompt ]]; then
+      elif [[ -z $_p9k_transient_prompt && $+functions[p10k-on-post-prompt] == 0 ]]; then
         _p9k__ruler_i=3
         _p9k__display_v[4]=print
       else
