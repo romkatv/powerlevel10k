@@ -2320,6 +2320,7 @@ instant_prompt_root_indicator() { prompt_root_indicator; }
 ################################################################
 # Segment to display Rust version number
 prompt_rust_version() {
+  unset P9K_RUST_VERSION
   (( $+commands[rustc] )) || return
   if (( _POWERLEVEL9K_RUST_VERSION_PROJECT_ONLY )); then
     local dir=$_p9k_pwd_a
@@ -2329,12 +2330,10 @@ prompt_rust_version() {
       dir=${dir:h}
     done
   fi
-  local rustc=$commands[rustc] so
+  local rustc=${commands[rustc]:A} toolchain deps=()
   if (( $+commands[ldd] )); then
-    if _p9k_cache_stat_get $0_so $rustc; then
-      so=$_p9k_cache_val[1]
-    else
-      local line match
+    if ! _p9k_cache_stat_get $0_so $rustc; then
+      local line match so
       for line in "${(@f)$(ldd $rustc 2>/dev/null)}"; do
         [[ $line == (#b)[[:space:]]#librustc_driver[^[:space:]]#.so' => '(*)' (0x'[[:xdigit:]]#')' ]] || continue
         so=$match[1]
@@ -2342,12 +2341,41 @@ prompt_rust_version() {
       done
       _p9k_cache_stat_set "$so"
     fi
+    deps+=$_p9k_cache_val[1]
   fi
-  if ! _p9k_cache_stat_get $0_v $rustc $so; then
+  if (( $+commands[rustup] )); then
+    local rustup=${commands[rustup]:A}
+    local rustup_home=${RUSTUP_HOME:-~/.rustup}
+    local cfg=($rustup_home/settings.toml(.N))
+    deps+=($cfg $rustup_home/update-hashes/*(.N))
+    if [[ -z ${toolchain::=$RUSTUP_TOOLCHAIN} ]]; then
+      if ! _p9k_cache_stat_get $0_overrides $rustup $cfg; then
+        local lines=(${(f)"$(rustup override list 2>/dev/null)"})
+        local keys=(/ ${lines%%[[:space:]]#[^[:space:]]#})
+        local vals=(_ ${lines##*[[:space:]]})
+        _p9k_cache_stat_set ${keys:^vals}
+      fi
+      local -A overrides=($_p9k_cache_val)
+      local dir=$_p9k_pwd_a
+      while true; do
+        if (( $+overrides[$dir] )); then
+          toolchain=$overrides[$dir]
+          break
+        fi
+        if [[ -r $dir/rust-toolchain ]]; then
+          { toolchain="$(<$dir/rust-toolchain)" } 2>/dev/null
+          break
+        fi
+        dir=${dir:h}
+      done
+    fi
+  fi
+  if ! _p9k_cache_stat_get $0_v$toolchain $rustc $deps; then
     _p9k_cache_stat_set "$($rustc --version 2>/dev/null)"
   fi
   local v=${${_p9k_cache_val[1]#rustc }%% *}
   [[ -n $v ]] || return
+  typeset -g P9K_RUST_VERSION=$_p9k_cache_val[1]
   _p9k_prompt_segment "$0" "darkorange" "$_p9k_color1" 'RUST_ICON' 0 '' "${v//\%/%%}"
 }
 
