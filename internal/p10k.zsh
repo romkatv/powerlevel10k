@@ -4473,13 +4473,16 @@ function _p9k_on_expand() {
     P9K_TTY=old
 
     if ! zle; then
-      [[ $_p9k__display_v[2] == print ]] && print -rn -- $_p9k_t[_p9k_empty_line_idx]
+      if [[ $_p9k__display_v[2] == print && -n $_p9k_t[_p9k_empty_line_idx] ]]; then
+        print -rnP -- '%b%k%f%E'$_p9k_t[_p9k_empty_line_idx]
+      fi
       if [[ $_p9k__display_v[4] == print ]]; then
-        local ruler=$_p9k_t[_p9k_ruler_idx]
         () {
+          local ruler=$_p9k_t[_p9k_ruler_idx]
+          local -i _p9k_clm=COLUMNS _p9k_ind=${ZLE_RPROMPT_INDENT:-1}
           (( __p9k_ksh_arrays )) && setopt ksh_arrays
           (( __p9k_sh_glob )) && setopt sh_glob
-          print -rnP -- $ruler
+          print -rnP -- '%b%k%f%E'$ruler
         }
       fi
     fi
@@ -5357,8 +5360,8 @@ _p9k_build_gap_post() {
   local char=${_p9k_ret:- }
   _p9k_prompt_length $char
   if (( _p9k_ret != 1 || $#char != 1 )); then
-    print -rP -- "%F{red}WARNING!%f %BMULTILINE_${(U)kind}_PROMPT_GAP_CHAR%b is not one character long. Will use ' '."
-    print -rP -- "Either change the value of %BPOWERLEVEL9K_MULTILINE_${(U)kind}_PROMPT_GAP_CHAR%b or remove it."
+    >&2 print -rP -- "%F{red}WARNING!%f %BMULTILINE_${(U)kind}_PROMPT_GAP_CHAR%b is not one character long. Will use ' '."
+    >&2 print -rP -- "Either change the value of %BPOWERLEVEL9K_MULTILINE_${(U)kind}_PROMPT_GAP_CHAR%b or remove it."
     char=' '
   fi
   local style
