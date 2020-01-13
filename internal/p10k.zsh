@@ -3905,7 +3905,7 @@ _p9k_set_instant_prompt() {
   RPROMPT=$saved_rprompt
 }
 
-typeset -gri __p9k_instant_prompt_version=16
+typeset -gri __p9k_instant_prompt_version=17
 
 _p9k_dump_instant_prompt() {
   local user=${(%):-%n}
@@ -3973,19 +3973,42 @@ _p9k_dump_instant_prompt() {
       fi
       >&$fd print -r -- '  fi
   local -i _p9k__empty_line_i=3 _p9k__ruler_i=3
-  local -A _p9k__display_k=('${(j: :)${(@q)${(kv)_p9k__display_k}}}')
+  local -A _p9k_display_k=('${(j: :)${(@q)${(kv)_p9k_display_k}}}')
   local -a _p9k__display_v=('${(j: :)${(@q)display_v}}')
   function p10k() {
     emulate -L zsh
     setopt no_hist_expand extended_glob prompt_percent prompt_subst no_aliases
     [[ $1 == display ]] || return
     shift
-    local opt match MATCH prev new pair list name var
-    local -i k
-    for opt; do
+    local -i OPTIND k dump
+    local OPTARG opt match MATCH prev new pair list name var
+    while getopts ":ha" opt; do
+      case $opt in
+        a) dump=1;;
+        h) return 0;;
+        ?) return 1;;
+      esac
+    done
+    if (( dump )); then
+      reply=()
+      shift $((OPTIND-1))
+      (( ARGC )) || set -- "*"
+      for opt; do
+        for k in ${(u@)_p9k_display_k[(I)$opt]:/(#m)*/$_p9k_display_k[$MATCH]}; do
+          reply+=($_p9k__display_v[k,k+1])
+        done
+      done
+      return 0
+    fi
+    for opt in "${@:$OPTIND}"; do
       pair=(${(s:=:)opt})
       list=(${(s:,:)${pair[2]}})
-      for k in ${(u@)_p9k__display_k[(I)$pair[1]]:/(#m)*/$_p9k__display_k[$MATCH]}; do
+      if [[ ${(b)pair[1]} == $pair[1] ]]; then
+        local ks=($_p9k_display_k[$pair[1]])
+      else
+        local ks=(${(u@)_p9k_display_k[(I)$pair[1]]:/(#m)*/$_p9k_display_k[$MATCH]})
+      fi
+      for k in $ks; do
         if (( $#list == 1 )); then
           [[ $_p9k__display_v[k+1] == $list[1] ]] && continue
           new=$list[1]
@@ -4031,10 +4054,11 @@ _p9k_dump_instant_prompt() {
         >&$fd print -r -- '
   p10k-on-init'
       fi
-      local pattern segment
-      for pattern segment in $_p9k_show_on_command; do
+      local pat idx var
+      for pat idx var in $_p9k_show_on_command; do
         >&$fd print -r -- "
-  _p9k__display_v[$((1+_p9k__display_k[$segment]))]=hide"
+  local $var=
+  _p9k__display_v[$idx]=hide"
       done
       if (( $+functions[p10k-on-pre-prompt] )); then
         >&$fd print -r -- '
@@ -4506,9 +4530,9 @@ function _p9k_on_expand() {
       (( $+functions[p10k-on-init] )) && p10k-on-init
     fi
 
-    local pattern segment
-    for pattern segment in $_p9k_show_on_command; do
-      p10k display $segment=hide
+    local pat idx var
+    for pat idx var in $_p9k_show_on_command; do
+      _p9k_display_segment $idx $var hide
     done
     (( $+functions[p10k-on-pre-prompt] )) && p10k-on-pre-prompt
 
@@ -4959,7 +4983,7 @@ _p9k_init_vars() {
   typeset -g  _p9k_uname_m
   typeset -g  _p9k_transient_prompt
   typeset -g  _p9k__last_prompt_pwd
-  typeset -gA _p9k__display_k
+  typeset -gA _p9k_display_k
   typeset -ga _p9k__display_v
 
   typeset -gA _p9k__dotnet_stat_cache
@@ -5714,6 +5738,14 @@ function _p9k_on_widget_zle-line-finish() {
   _p9k__line_finished='%{%}'
 }
 
+# Usage example: _p9k_display_segment 58 _p9k__1rkubecontext hide
+function _p9k_display_segment() {
+  [[ $_p9k__display_v[$1] == $3 ]] && return
+  _p9k__display_v[$1]=$3
+  [[ $3 == hide ]] && typeset -g $2= || unset $2
+  __p9k_reset_state=2
+}
+
 function _p9k_widget_hook() {
   if (( $+functions[p10k-on-post-widget] || $#_p9k_show_on_command )); then
     local -a P9K_COMMANDS
@@ -5733,12 +5765,12 @@ function _p9k_widget_hook() {
   setopt no_hist_expand extended_glob no_prompt_bang prompt_{percent,subst}
   (( _p9k__restore_prompt_fd )) && _p9k_restore_prompt $_p9k__restore_prompt_fd
   __p9k_reset_state=1
-  local pattern segment
-  for pattern segment in $_p9k_show_on_command; do
-    if (( $P9K_COMMANDS[(I)$pattern] )); then
-      p10k display $segment=show
+  local pat idx var
+  for pat idx var in $_p9k_show_on_command; do
+    if (( $P9K_COMMANDS[(I)$pat] )); then
+      _p9k_display_segment $idx $var show
     else
-      p10k display $segment=hide
+      _p9k_display_segment $idx $var hide
     fi
   done
   (( $+functions[p10k-on-post-widget] )) && p10k-on-post-widget "${@:2}"
@@ -6002,33 +6034,23 @@ _p9k_all_params_eq() {
 }
 
 _p9k_init_display() {
-  _p9k__display_k=(empty_line 1 ruler 3)
-  _p9k__display_v=(empty_line hide ruler hide)
+  _p9k_display_k=(empty_line 1 ruler 3)
   local -i n=3 i
   local name
   for i in {1..$#_p9k_line_segments_left}; do
     local -i j=$((-$#_p9k_line_segments_left+i-1))
-    _p9k__display_k+=(
+    _p9k_display_k+=(
       $i              $((n+=2)) $j             $n
       $i/left_frame   $((n+=2)) $j/left_frame  $n
       $i/right_frame  $((n+=2)) $j/right_frame $n
       $i/left         $((n+=2)) $j/left        $n
       $i/right        $((n+=2)) $j/right       $n
       $i/gap          $((n+=2)) $j/gap         $n)
-    _p9k__display_v+=(
-      $i             show
-      $i/left_frame  show
-      $i/right_frame show
-      $i/left        show
-      $i/right       show
-      $i/gap         show)
     for name in ${(@0)_p9k_line_segments_left[i]}; do
-      _p9k__display_k+=($i/left/$name $((n+=2)) $j/left/$name $n)
-      _p9k__display_v+=($i/left/$name show)
+      _p9k_display_k+=($i/left/$name $((n+=2)) $j/left/$name $n)
     done
     for name in ${(@0)_p9k_line_segments_right[i]}; do
-      _p9k__display_k+=($i/right/$name $((n+=2)) $j/right/$name $n)
-      _p9k__display_v+=($i/right/$name show)
+      _p9k_display_k+=($i/right/$name $((n+=2)) $j/right/$name $n)
     done
   done
 }
@@ -6173,7 +6195,7 @@ _p9k_must_init() {
     [[ $sig == $_p9k__param_sig ]] && return 1
     _p9k_deinit
   fi
-  _p9k__param_pat=$'v25\1'${ZSH_VERSION}$'\1'${ZSH_PATCHLEVEL}$'\1'
+  _p9k__param_pat=$'v26\1'${ZSH_VERSION}$'\1'${ZSH_PATCHLEVEL}$'\1'
   _p9k__param_pat+=$'${#parameters[(I)POWERLEVEL9K_*]}\1${(%):-%n%#}\1$GITSTATUS_LOG_LEVEL\1'
   _p9k__param_pat+=$'$GITSTATUS_ENABLE_LOGGING\1$GITSTATUS_DAEMON\1$GITSTATUS_NUM_THREADS\1'
   _p9k__param_pat+=$'$DEFAULT_USER\1${ZLE_RPROMPT_INDENT:-1}\1$P9K_SSH\1$__p9k_ksh_arrays'
@@ -6197,6 +6219,7 @@ function _p9k_init_cacheable() {
   _p9k_init_icons
   _p9k_init_params
   _p9k_init_prompt
+  _p9k_init_display
 
   local elem
   local -i i=0
@@ -6205,13 +6228,19 @@ function _p9k_init_cacheable() {
     for elem in ${(@0)_p9k_line_segments_left[i]}; do
       local var=POWERLEVEL9K_${(U)elem}_SHOW_ON_COMMAND
       (( $+parameters[$var] )) || continue
-      _p9k_show_on_command+=($'(|*[/\0])('${(j.|.)${(P)var}}')' $i/left/$elem)
+      _p9k_show_on_command+=(
+        $'(|*[/\0])('${(j.|.)${(P)var}}')'
+        $((1+_p9k_display_k[$i/left/$elem]))
+        _p9k__${i}l$elem)
     done
     for elem in ${(@0)_p9k_line_segments_right[i]}; do
       local var=POWERLEVEL9K_${(U)elem}_SHOW_ON_COMMAND
       (( $+parameters[$var] )) || continue
       local cmds=(${(P)var})
-      _p9k_show_on_command+=($'(|*[/\0])('${(j.|.)${(P)var}}')' $i/right/$elem)
+      _p9k_show_on_command+=(
+        $'(|*[/\0])('${(j.|.)${(P)var}}')'
+        $((1+$_p9k_display_k[$i/right/$elem]))
+        _p9k__${i}r$elem)
     done
   done
 
@@ -6460,7 +6489,14 @@ _p9k_init() {
   _p9k_init_vars
   _p9k_restore_state || _p9k_init_cacheable
 
-  _p9k_init_display
+  local k v
+  for k v in ${(kv)_p9k_display_k}; do
+    [[ $k == -* ]] && continue
+    _p9k__display_v[v]=$k
+    _p9k__display_v[v+1]=show
+  done
+  _p9k__display_v[2]=hide
+  _p9k__display_v[4]=hide
 
   if (( $+functions[iterm2_decorate_prompt] )); then
     _p9k__iterm2_decorate_prompt=$functions[iterm2_decorate_prompt]
@@ -6815,7 +6851,7 @@ function p10k() {
         shift $((OPTIND-1))
         (( ARGC )) || set -- '*'
         for opt; do
-          for k in ${(u@)_p9k__display_k[(I)$opt]:/(#m)*/$_p9k__display_k[$MATCH]}; do
+          for k in ${(u@)_p9k_display_k[(I)$opt]:/(#m)*/$_p9k_display_k[$MATCH]}; do
             reply+=($_p9k__display_v[k,k+1])
           done
         done
@@ -6824,7 +6860,12 @@ function p10k() {
       for opt in "${@:$OPTIND}"; do
         pair=(${(s:=:)opt})
         list=(${(s:,:)${pair[2]}})
-        for k in ${(u@)_p9k__display_k[(I)$pair[1]]:/(#m)*/$_p9k__display_k[$MATCH]}; do
+        if [[ ${(b)pair[1]} == $pair[1] ]]; then # this branch is purely for optimization
+          local ks=($_p9k_display_k[$pair[1]])
+        else
+          local ks=(${(u@)_p9k_display_k[(I)$pair[1]]:/(#m)*/$_p9k_display_k[$MATCH]})
+        fi
+        for k in $ks; do
           if (( $#list == 1 )); then  # this branch is purely for optimization
             [[ $_p9k__display_v[k+1] == $list[1] ]] && continue
             new=$list[1]
