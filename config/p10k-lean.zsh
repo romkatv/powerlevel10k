@@ -762,6 +762,10 @@
   # typeset -g POWERLEVEL9K_PLENV_VISUAL_IDENTIFIER_EXPANSION='⭐'
 
   #############[ kubecontext: current kubernetes context (https://kubernetes.io/) ]#############
+  # Show kubecontext only when the the command you are typing invokes one of these tools.
+  # Tip: Remove the next line to always show kubecontext.
+  typeset -g POWERLEVEL9K_KUBECONTEXT_SHOW_ON_COMMAND='kubectl|helm'
+
   # Kubernetes context classes for the purpose of using different colors, icons and expansions with
   # different contexts.
   #
@@ -849,6 +853,9 @@
   # typeset -g POWERLEVEL9K_TERRAFORM_VISUAL_IDENTIFIER_EXPANSION='⭐'
 
   #[ aws: aws profile (https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-profiles.html) ]#
+  # Show aws only when the the command you are typing invokes one of these tools.
+  # Tip: Remove the next line to always show aws.
+  typeset -g POWERLEVEL9K_AZURE_SHOW_ON_COMMAND='aws|terraform|pulumi'
   # AWS profile color.
   typeset -g POWERLEVEL9K_AWS_DEFAULT_FOREGROUND=208
   # POWERLEVEL9K_AWS_CLASSES is an array with even number of elements. The first element
@@ -887,12 +894,18 @@
   # typeset -g POWERLEVEL9K_AWS_EB_ENV_VISUAL_IDENTIFIER_EXPANSION='⭐'
 
   ##########[ azure: azure account name (https://docs.microsoft.com/en-us/cli/azure) ]##########
+  # Show azure only when the the command you are typing invokes one of these tools.
+  # Tip: Remove the next line to always show azure.
+  typeset -g POWERLEVEL9K_AZURE_SHOW_ON_COMMAND='azure|terraform|pulumi'
   # Azure account name color.
   typeset -g POWERLEVEL9K_AZURE_FOREGROUND=32
   # Custom icon.
   # typeset -g POWERLEVEL9K_AZURE_VISUAL_IDENTIFIER_EXPANSION='⭐'
 
   ##########[ gcloud: google cloud acccount and project (https://cloud.google.com/) ]###########
+  # Show gcloud only when the the command you are typing invokes one of these tools.
+  # Tip: Remove the next line to always show gcloud.
+  typeset -g POWERLEVEL9K_GCLOUD_SHOW_ON_COMMAND='gcloud|terraform|pulumi'
   # Google cloud color.
   typeset -g POWERLEVEL9K_GCLOUD_FOREGROUND=32
 
