@@ -176,8 +176,9 @@ Try Powerlevel10k in Docker. You can safely make any changes to the file system 
 the theme. Once you exit zsh, the image is deleted.
 
 ```zsh
-docker run -e TERM -it --rm archlinux/base bash -uexc '
-  pacman -Sy --noconfirm zsh git
+docker run -e TERM -it --rm debian:buster bash -uec '
+  apt update
+  apt install -y git zsh
   git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ~/powerlevel10k
   echo "source ~/powerlevel10k/powerlevel10k.zsh-theme" >>~/.zshrc
   cd ~/powerlevel10k
