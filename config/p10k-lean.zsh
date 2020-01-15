@@ -68,7 +68,7 @@
       kubecontext             # current kubernetes context (https://kubernetes.io/)
       terraform               # terraform workspace (https://www.terraform.io)
       aws                     # aws profile (https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-profiles.html)
-      # aws_eb_env            # aws elastic beanstalk environment (https://aws.amazon.com/elasticbeanstalk/)
+      aws_eb_env              # aws elastic beanstalk environment (https://aws.amazon.com/elasticbeanstalk/)
       azure                   # azure account name (https://docs.microsoft.com/en-us/cli/azure)
       gcloud                  # google cloud cli acccount and project (https://cloud.google.com/)
       google_app_cred         # google application credentials (https://cloud.google.com/docs/authentication/production)
@@ -77,7 +77,7 @@
       ranger                  # ranger shell (https://github.com/ranger/ranger)
       nnn                     # nnn shell (https://github.com/jarun/nnn)
       vim_shell               # vim shell indicator (:sh)
-      # midnight_commander    # midnight commander shell (https://midnight-commander.org/)
+      midnight_commander      # midnight commander shell (https://midnight-commander.org/)
       # vpn_ip                # virtual private network indicator
       # ram                   # free RAM
       # load                  # CPU load
