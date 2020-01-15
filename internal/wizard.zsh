@@ -63,6 +63,16 @@ local -ra lean_right=(
   '' ' %$frame_color[$color]F─╯%f'
 )
 
+local -ra lean_8colors_left=(
+  '╭─ ' '${extra_icons[1]:+$extra_icons[1] }%4F$extra_icons[2]%4F~/src%f $prefixes[1]%2F$extra_icons[3]master%f '
+  '╰─ ' '%2F❯%f ${buffer:-█}'
+)
+
+local -ra lean_8colors_right=(
+  ' $prefixes[2]%3F$extra_icons[4]5s%f${show_time:+ $prefixes[3]%6F$extra_icons[5]16:23:42%f}' ' ─╮'
+  '' ' ─╯'
+)
+
 local -ra classic_left=(
   '%$frame_color[$color]F╭─' '%F{$bg_color[$color]}$left_tail%K{$bg_color[$color]} ${extra_icons[1]:+$extra_icons[1]%K{$bg_color[$color]\} %$sep_color[$color]F$left_subsep%f }%31F$extra_icons[2]%B%39F~%b%K{$bg_color[$color]}%31F/%B%39Fsrc%b%K{$bg_color[$color]} %$sep_color[$color]F$left_subsep%f %$prefix_color[$color]F$prefixes[1]%76F$extra_icons[3]master %k%$bg_color[$color]F$left_head%f'
   '%$frame_color[$color]F╰─' '%f ${buffer:-█}'
@@ -122,7 +132,8 @@ function print_prompt() {
     left=($left[2] $left[4])
     right=($right[1] $right[3])
   else
-    (( left_frame )) || left=('' $left[2] '' "%76F❯%f ${buffer:-█}")
+    [[ $style == lean_8colors ]] && local green=2 || local green=76
+    (( left_frame )) || left=('' $left[2] '' "%${green}F❯%f ${buffer:-█}")
     (( right_frame )) || right=($right[1] '' '' '')
   fi
   local -i right_indent=prompt_indent
@@ -140,7 +151,8 @@ function print_prompt() {
     (( num_lines == 2 && i == 1 )) && local fill=$gap_char || local fill=' '
     print -n  -- ${(pl:$prompt_indent:: :)}
     print -nP -- $l
-    print -nP -- "%$frame_color[$color]F${(pl:$gap::$fill:)}%f"
+    [[ $style == lean_8colors ]] && local gap_color='%f' || local gap_color="%$frame_color[$color]F"
+    print -nP -- "$gap_color${(pl:$gap::$fill:)}%f"
     print -P  -- $r
   done
 }
@@ -594,6 +606,36 @@ function ask_style() {
   done
 }
 
+function ask_color_scheme() {
+  [[ $style != lean ]] && return
+  while true; do
+    clear
+    flowing -c "%BPrompt Colors%b"
+    print -P ""
+    print -P "%B(1)  256 colors.%b"
+    print -P ""
+    style=lean print_prompt
+    print -P ""
+    print -P "%B(2)  8 colors.%b"
+    print -P ""
+    style=lean_8colors print_prompt
+    print -P ""
+    print -P ""
+    print -P "(r)  Restart from the beginning."
+    print -P "(q)  Quit and do nothing."
+    print -P ""
+
+    local key=
+    read -k key${(%):-"?%BChoice [12rq]: %b"} || quit -c
+    case $key in
+      q) quit;;
+      r) return 1;;
+      1) style=lean; break;;
+      2) style=lean_8colors; break;;
+    esac
+  done
+}
+
 function ask_color() {
   [[ $style != classic ]] && return
   if [[ $LINES -lt 26 ]]; then
@@ -782,13 +824,12 @@ function ask_extra_icons() {
   fi
   branch_icon=${branch_icon// }
   if [[ $style == classic ]]; then
-    os_icon="%255F$os_icon%f"
+    os_icon="%B%255F$os_icon%f%b"
   elif [[ $style == rainbow ]]; then
-    os_icon="%F{232}$os_icon%f"
-  else
-    os_icon="%f$os_icon"
+    os_icon="%B%F{232}$os_icon%f%b"
+  elif [[ $style != lean_8colors ]]; then
+    os_icon="%B%f$os_icon%b"
   fi
-  os_icon="%B$os_icon%b"
   local few=('' '' '' '' '')
   local many=("$os_icon" "$dir_icon " "$vcs_icon $branch_icon " "$duration_icon " "$time_icon ")
   while true; do
@@ -1156,7 +1197,7 @@ function ask_gap_char() {
 }
 
 function ask_frame() {
-  if [[ $style != (classic|rainbow|lean) || $num_lines != 2 ]]; then
+  if [[ $style != (classic|rainbow|lean*) || $num_lines != 2 ]]; then
     return 0
   fi
 
@@ -1418,7 +1459,7 @@ function ask_zshrc_edit() {
 }
 
 function generate_config() {
-  local base && base="$(<$__p9k_root_dir/config/p10k-$style.zsh)" || return
+  local base && base="$(<$__p9k_root_dir/config/p10k-${style//_/-}.zsh)" || return
   local lines=("${(@f)base}")
 
   function sub() {
@@ -1443,7 +1484,11 @@ function generate_config() {
       sub VPN_IP_VISUAL_IDENTIFIER_EXPANSION "'\${P9K_VISUAL_IDENTIFIER// }'"
       sub VIM_SHELL_VISUAL_IDENTIFIER_EXPANSION "'\${P9K_VISUAL_IDENTIFIER// }'"
       sub MIDNIGHT_COMMANDER_VISUAL_IDENTIFIER_EXPANSION "'\${P9K_VISUAL_IDENTIFIER// }'"
-      sub OS_ICON_CONTENT_EXPANSION "'%B\${P9K_CONTENT// }'"
+      if [[ $style == lean_8colors ]]; then
+        sub OS_ICON_CONTENT_EXPANSION "'\${P9K_CONTENT// }'"
+      else
+        sub OS_ICON_CONTENT_EXPANSION "'%B\${P9K_CONTENT// }'"
+      fi
     else
       sub VISUAL_IDENTIFIER_EXPANSION "'\${P9K_VISUAL_IDENTIFIER}'"
       sub BACKGROUND_JOBS_VISUAL_IDENTIFIER_EXPANSION "'\${P9K_VISUAL_IDENTIFIER}'"
@@ -1546,11 +1591,6 @@ function generate_config() {
         sub CONTEXT_PREFIX "'${fg}with '"
         sub KUBECONTEXT_PREFIX "'${fg}at '"
         sub TIME_PREFIX "'${fg}at '"
-        sub CONTEXT_TEMPLATE "'%n$fg at %180F%m'"
-        sub CONTEXT_ROOT_TEMPLATE "'%n$fg at %227F%m'"
-      else
-        sub CONTEXT_TEMPLATE "'%n at %m'"
-        sub CONTEXT_ROOT_TEMPLATE "'%n at %m'"
       fi
     fi
 
@@ -1580,18 +1620,23 @@ function generate_config() {
       fi
     fi
 
-    if [[ $style == lean ]]; then
-      sub MULTILINE_FIRST_PROMPT_GAP_FOREGROUND $frame_color[$color]
+    if [[ $style == lean* ]]; then
+      if [[ $style == lean ]]; then
+        local c="%$frame_color[$color]F"
+        sub MULTILINE_FIRST_PROMPT_GAP_FOREGROUND $frame_color[$color]
+      else
+        local c=
+      fi
       if (( right_frame )); then
-        sub MULTILINE_FIRST_PROMPT_SUFFIX "'%$frame_color[$color]F─╮'"
-        sub MULTILINE_NEWLINE_PROMPT_SUFFIX "'%$frame_color[$color]F─┤'"
-        sub MULTILINE_LAST_PROMPT_SUFFIX "'%$frame_color[$color]F─╯'"
+        sub MULTILINE_FIRST_PROMPT_SUFFIX "'$c─╮'"
+        sub MULTILINE_NEWLINE_PROMPT_SUFFIX "'$c─┤'"
+        sub MULTILINE_LAST_PROMPT_SUFFIX "'$c─╯'"
         sub RIGHT_PROMPT_LAST_SEGMENT_END_SYMBOL "' '"
       fi
       if (( left_frame )); then
-        sub MULTILINE_FIRST_PROMPT_PREFIX "'%$frame_color[$color]F╭─'"
-        sub MULTILINE_NEWLINE_PROMPT_PREFIX "'%$frame_color[$color]F├─'"
-        sub MULTILINE_LAST_PROMPT_PREFIX "'%$frame_color[$color]F╰─'"
+        sub MULTILINE_FIRST_PROMPT_PREFIX "'$c╭─'"
+        sub MULTILINE_NEWLINE_PROMPT_PREFIX "'$c├─'"
+        sub MULTILINE_LAST_PROMPT_PREFIX "'$c╰─'"
         sub LEFT_PROMPT_FIRST_SEGMENT_START_SYMBOL "' '"
       fi
     fi
@@ -1611,7 +1656,7 @@ function generate_config() {
   (( transient_prompt )) && sub TRANSIENT_PROMPT always
 
   local header=${(%):-"# Generated by Powerlevel10k configuration wizard on %D{%Y-%m-%d at %H:%M %Z}."}$'\n'
-  header+="# Based on romkatv/powerlevel10k/config/p10k-$style.zsh"
+  header+="# Based on romkatv/powerlevel10k/config/p10k-${style//_/-}.zsh"
   if [[ $commands[sum] == ('/bin'|'/usr/bin'|'/usr/local/bin')'/sum' ]]; then
     local -a sum
     if sum=($(sum <<<${base//$'\r\n'/$'\n'} 2>/dev/null)) && (( $#sum == 2 )); then
@@ -1755,6 +1800,7 @@ while true; do
   ask_narrow_icons      || continue
   ask_style             || continue
   if [[ $style != pure ]]; then
+    ask_color_scheme    || continue
     ask_color           || continue
     ask_time            || continue
     ask_separators      || continue
