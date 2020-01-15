@@ -1598,7 +1598,7 @@ function generate_config() {
       local -a tmp
       local line
       for line in "$lines[@]"; do
-        [[ $line == ('      newline'|*'===[ Line #'*) ]] || tmp+=$line
+        [[ $line == ('    newline'|*'===[ Line #'*) ]] || tmp+=$line
       done
       lines=("$tmp[@]")
     fi
