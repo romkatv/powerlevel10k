@@ -493,7 +493,7 @@ Prompt segments can be configured to be shown only when the current command you 
 a releavant tool.
 
 ```zsh
-# Show prompt segment "kubecontext" only when the the command you are typing
+# Show prompt segment "kubecontext" only when the command you are typing
 # invokes kubectl, helm, kubens or kubectx.
 typeset -g POWERLEVEL9K_KUBECONTEXT_SHOW_ON_COMMAND='kubectl|helm|kubens|kubectx'
 ```
