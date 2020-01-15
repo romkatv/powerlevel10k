@@ -42,6 +42,7 @@ it will generate the same prompt.
    1. [How do I change the format of Git status?](#how-do-i-change-the-format-of-git-status)
    1. [How do I add username and/or hostname to prompt?](#how-do-i-add-username-andor-hostname-to-prompt)
    1. [How do I change colors?](#how-do-i-change-colors)
+   1. [Why some prompt segments appear and disappear as I'm typing?](#why-some-prompt-segments-appear-and-disappear-as-im-typing)
    1. [Why does Powerlevel10k spawn extra processes?](#why-does-powerlevel10k-spawn-extra-processes)
    1. [Are there configuration options that make Powerlevel10k slow?](#are-there-configuration-options-that-make-powerlevel10k-slow)
    1. [Is Powerlevel10k fast to load?](#is-powerlevel10k-fast-to-load)
@@ -485,6 +486,21 @@ adjusting the values of parameters nearby. There are plenty of comments to help 
 
 Finally, you can move `context` segment to where you want it to be in your prompt. Perhaps somewhere
 within `POWERLEVEL9K_LEFT_PROMPT_ELEMENTS`.
+
+### Why some prompt segments appear and disappear as I'm typing?
+
+Prompt segments can be configured to be shown only when the current command you are typing invokes
+a releavant tool.
+
+```zsh
+# Show prompt segment "kubecontext" only when the the command you are typing
+# invokes kubectl, helm, kubens or kubectx.
+typeset -g POWERLEVEL9K_KUBECONTEXT_SHOW_ON_COMMAND='kubectl|helm|kubens|kubectx'
+```
+
+Configs created by `p10k configure` may contain parameters of this kind. To customize when different
+prompt segments are shown, open `~/.p10k.zsh`, search for `SHOW_ON_COMMAND` and either remove these
+parameters or change their values.
 
 ### How do I change colors?
 
