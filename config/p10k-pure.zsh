@@ -32,13 +32,13 @@
 
   # Left prompt segments.
   typeset -g POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(
-      dir                       # current directory
-      vcs                       # git status
-      context                   # user@host
-      command_execution_time    # previous command duration
-      newline                   # \n
-      virtualenv                # python virtual environment
-      prompt_char               # prompt symbol
+    dir                       # current directory
+    vcs                       # git status
+    context                   # user@host
+    command_execution_time    # previous command duration
+    newline                   # \n
+    virtualenv                # python virtual environment
+    prompt_char               # prompt symbol
   )
 
   # Right prompt segments.
