@@ -5387,6 +5387,7 @@ typeset -grA __p9k_pb_precommand=(
   'nice'      '-[^n]#[n]|--adjustment'
   'stdbuf'    '-[^ioe]#[ioe]|--(input|output|error)'
   'sudo'      '-[^aghpuUCcrtT]#[aghpuUCcrtT]|--(close-from|group|host|prompt|role|type|other-user|command-timeout|user)'
+  'ssh-agent' '-[^aEPt]#[aEPt]'
 )
 
 typeset -grA __p9k_pb_redirect=(
