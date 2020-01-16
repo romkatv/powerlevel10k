@@ -1657,15 +1657,15 @@ prompt_dir() {
 
     local content="${(pj.$sep.)parts}"
     if (( _POWERLEVEL9K_DIR_HYPERLINK )); then
-      local pref=$'%{\e]8;;file://'${${_p9k_pwd//\%/%%25}//'#'/%%23}$'\a%}'
-      local suf=$'%{\e]8;;\a%}'
+      local header=$'%{\e]8;;file://'${${_p9k_pwd//\%/%%25}//'#'/%%23}$'\a%}'
+      local footer=$'%{\e]8;;\a%}'
       if (( expand )); then
-        _p9k_escape $pref
-        pref=$_p9k_ret
-        _p9k_escape $suf
-        suf=$_p9k_ret
+        _p9k_escape $header
+        header=$_p9k_ret
+        _p9k_escape $footer
+        footer=$_p9k_ret
       fi
-      content=$pref$content$suf
+      content=$header$content$footer
     fi
 
     (( expand )) && _p9k_prompt_length "${(e):-"\${\${_p9k_d::=0}+}$content"}" || _p9k_ret=
