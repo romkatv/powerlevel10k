@@ -371,7 +371,8 @@ function gitstatus_start() {
     }
 
     (( daemon_pid == -1 )) || {
-      local daemon=${GITSTATUS_DAEMON:-} os
+      local os
+      local daemon=${GITSTATUS_DAEMON:-}
       [[ -n $daemon ]] || {
         os="$(uname -s)" && [[ -n $os ]]
         [[ $os != Linux || "$(uname -o)" != Android ]] || os=Android
@@ -428,7 +429,7 @@ function gitstatus_start() {
       #   zsh -mc '' &!  # hangs when using zsh 5.0.2
       local zsh=${${:-/proc/self/exe}:A}
       [[ -x $zsh ]] || zsh=zsh
-      cmd="cd /; read; $setsid ${(q)zsh} -dfxc ${(q)cmd} &!; rm -f ${(q)req_fifo} ${(q)resp_fifo} ${(q)lock_file}"
+      cmd="cd /; read; unsetopt bg_nice; $setsid ${(q)zsh} -dfxc ${(q)cmd} &!; rm -f ${(q)req_fifo} ${(q)resp_fifo} ${(q)lock_file}"
       # We use `zsh -c` instead of plain {} or () to work around bugs in zplug (it hangs on
       # startup). Double fork is to daemonize, and so is `setsid`. Note that on macOS `setsid` has
       # to be installed manually by running  `brew install util-linux`.
