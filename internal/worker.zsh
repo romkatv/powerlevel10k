@@ -103,6 +103,7 @@ function _p9k_worker_stop() {
   _p9k__worker_req_fd=
   _p9k__worker_resp_fd=
   _p9k__worker_shell_pid=
+  _p9k__worker_params=()
   _p9k__worker_requests=()
   _p9k__worker_functions=()
   return 0
