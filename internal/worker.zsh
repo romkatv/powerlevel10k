@@ -214,15 +214,15 @@ function _p9k_worker_start() {
     trace=
 
     local fifo=$_p9k__worker_file_prefix.fifo
-    local cmd='
-      emulate zsh
-      { mkfifo '${(q)fifo}' && exec >&4 && echo -n "s$$\x1e" && exec 0<'${(q)fifo}' || exit } always { rm -f '${(q)fifo}' }
-      IFS= read -rd $'\''\x1e'\'' && eval $REPLY'
+    local cmd=(
+      'emulate zsh'
+      '{ mkfifo '${(q)fifo}' && exec >&4 && echo -n "s$$\x1e" && exec 0<'${(q)fifo}' || exit } always { rm -f '${(q)fifo}' }'
+      'IFS= read -rd $'\''\x1e'\'' && eval $REPLY')
     local setsid=${commands[setsid]:-/usr/local/opt/util-linux/bin/setsid}
     [[ -x $setsid ]] && setsid=${(q)setsid} || setsid=
     local zsh=${${:-/proc/self/exe}:A}
     [[ -x $zsh ]] || zsh=zsh
-    cmd="$setsid ${(q)zsh} --nobgnice --noaliases -${trace}dfc ${(q)cmd} &!"
+    cmd="$setsid ${(q)zsh} --nobgnice --noaliases -${trace}dfc ${(q)${(j:; :)cmd}} &!"
     sysopen -r -o cloexec -u _p9k__worker_resp_fd <(
       $zsh --nobgnice --noaliases -${trace}dfmc $cmd </dev/null 4>&1 &>>$log_file &!) || return
     zle -F $_p9k__worker_resp_fd _p9k_worker_receive
