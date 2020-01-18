@@ -80,6 +80,7 @@
     midnight_commander      # midnight commander shell (https://midnight-commander.org/)
     vi_mode                 # vi mode (you don't need this if you've enabled prompt_char)
     # vpn_ip                # virtual private network indicator
+    # disk_usage            # disk usage
     # ram                   # free RAM
     # load                  # CPU load
     todo                    # todo items (https://github.com/todotxt/todo.txt-cli)
@@ -546,6 +547,19 @@
   typeset -g POWERLEVEL9K_MIDNIGHT_COMMANDER_FOREGROUND=178
   # Icon to show when in a midnight commander shell.
   typeset -g POWERLEVEL9K_MIDNIGHT_COMMANDER_VISUAL_IDENTIFIER_EXPANSION='${P9K_VISUAL_IDENTIFIER}'
+
+  ##################################[ disk_usgae: disk usage ]##################################
+  # Colors for different levels of disk usage.
+  typeset -g POWERLEVEL9K_DISK_USAGE_NORMAL_FOREGROUND=35
+  typeset -g POWERLEVEL9K_DISK_USAGE_WARNING_FOREGROUND=220
+  typeset -g POWERLEVEL9K_DISK_USAGE_CRITICAL_FOREGROUND=160
+  # Thresholds for different levels of disk usage (percentage points).
+  typeset -g POWERLEVEL9K_DISK_USAGE_WARNING_LEVEL=90
+  typeset -g POWERLEVEL9K_DISK_USAGE_CRITICAL_LEVEL=95
+  # If set to true, hide disk usage when below $POWERLEVEL9K_DISK_USAGE_WARNING_LEVEL percent.
+  typeset -g POWERLEVEL9K_DISK_USAGE_ONLY_WARNING=false
+  # Custom icon.
+  # typeset -g POWERLEVEL9K_DISK_USAGE_VISUAL_IDENTIFIER_EXPANSION='⭐'
 
   ###########[ vi_mode: vi mode (you don't need this if you've enabled prompt_char) ]###########
   # Text and color for normal (a.k.a. command) vi mode.
