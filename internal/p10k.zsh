@@ -1839,15 +1839,13 @@ prompt_detect_virt() {
 ################################################################
 # Segment to display the current IP address
 prompt_ip() {
-  _p9k_parse_ip $_POWERLEVEL9K_IP_INTERFACE || return
-  _p9k_prompt_segment "$0" "cyan" "$_p9k_color1" 'NETWORK_ICON' 0 '' "${_p9k_ret//\%/%%}"
+  _p9k_prompt_segment "$0" "cyan" "$_p9k_color1" 'NETWORK_ICON' 1 '$_p9k__ip_ip' '$_p9k__ip_ip'
 }
 
 ################################################################
 # Segment to display if VPN is active
 prompt_vpn_ip() {
-  _p9k_parse_ip $_POWERLEVEL9K_VPN_IP_INTERFACE || return
-  _p9k_prompt_segment "$0" "cyan" "$_p9k_color1" 'VPN_ICON' 0 '' "${_p9k_ret//\%/%%}"
+  _p9k_prompt_segment "$0" "cyan" "$_p9k_color1" 'VPN_ICON' 1 '$_p9k__vpn_ip_ip' '$_p9k__vpn_ip_ip'
 }
 
 ################################################################
@@ -1864,38 +1862,76 @@ prompt_laravel_version() {
 ################################################################
 # Segment to display load
 prompt_load() {
-  local bucket=2
-  case $_POWERLEVEL9K_LOAD_WHICH in
-    1) bucket=1;;
-    5) bucket=2;;
-    15) bucket=3;;
-  esac
-
-  local load
-  case $_p9k_os in
-    OSX|BSD)
-      (( $+commands[sysctl] )) || return
-      load="$(sysctl -n vm.loadavg 2>/dev/null)" || return
-      load=${${(A)=load}[bucket+1]//,/.}
-    ;;
-    *)
-      [[ -r /proc/loadavg ]] || return
-      _p9k_read_file /proc/loadavg || return
-      load=${${(A)=_p9k_ret}[bucket]//,/.}
-    ;;
-  esac
-
-  (( _p9k_num_cpus )) || return
-
-  if (( load > 0.7 * _p9k_num_cpus )); then
-    local state=CRITICAL bg=red
-  elif (( load > 0.5 * _p9k_num_cpus )); then
-    local state=WARNING bg=yellow
-  else
-    local state=NORMAL bg=green
+  if [[ $_p9k_os == (OSX|BSD) ]]; then
+    _p9k_prompt_segment $0_CRITICAL red    "$_p9k_color1" LOAD_ICON 1 '$_p9k__load_critical' '$_p9k__load_value'
+    _p9k_prompt_segment $0_WARNING  yellow "$_p9k_color1" LOAD_ICON 1 '$_p9k__load_warning'  '$_p9k__load_value'
+    _p9k_prompt_segment $0_NORMAL   green  "$_p9k_color1" LOAD_ICON 1 '$_p9k__load_normal'   '$_p9k__load_value'
+    return
   fi
 
-  _p9k_prompt_segment $0_$state $bg "$_p9k_color1" LOAD_ICON 0 '' $load
+  [[ -r /proc/loadavg ]] || return
+  _p9k_read_file /proc/loadavg || return
+  local load=${${(A)=_p9k_ret}[_POWERLEVEL9K_LOAD_WHICH]//,/.}
+  local -F pct='100. * load / _p9k_num_cpus'
+  if (( pct > 70 )); then
+    _p9k_prompt_segment $0_CRITICAL red    "$_p9k_color1" LOAD_ICON 0 '' $load
+  elif (( pct > 50 )); then
+    _p9k_prompt_segment $0_WARNING  yellow "$_p9k_color1" LOAD_ICON 0 '' $load
+  else
+    _p9k_prompt_segment $0_NORMAL   green  "$_p9k_color1" LOAD_ICON 0 '' $load
+  fi
+}
+
+_p9k_prompt_load_init() {
+  [[ $_p9k_os == (OSX|BSD) ]] || return
+
+  typeset -g _p9k__load_value=
+  typeset -g _p9k__load_normal=
+  typeset -g _p9k__load_warning=
+  typeset -g _p9k__load_critical=
+
+  _p9k_worker_send_functions _p9k_prompt_load_async _p9k_prompt_load_sync
+
+  _p9k_worker_send_params     \
+    $_POWERLEVEL9K_LOAD_WHICH \
+    _p9k_os                   \
+    _p9k_num_cpus             \
+    _p9k__load_value          \
+    _p9k__load_normal         \
+    _p9k__load_warning        \
+    _p9k__load_critical
+}
+
+_p9k_prompt_load_compute() {
+  [[ $_p9k_os == (OSX|BSD) ]] || return
+  _p9k_worker_invoke load '(( $+commands[sysctl] ))' _p9k_prompt_load_async _p9k_prompt_load_sync
+}
+
+_p9k_prompt_load_async() {
+  local load
+  load="$(sysctl -n vm.loadavg 2>/dev/null)" || return
+  REPLY=${${(A)=load}[_POWERLEVEL9K_LOAD_WHICH+1]//,/.}
+}
+
+_p9k_prompt_load_sync() {
+  [[ $REPLY == <->(|.<->) && $REPLY != $_p9k__load_value ]] || return
+  _p9k__load_value=$REPLY
+  _p9k__load_normal=
+  _p9k__load_warning=
+  _p9k__load_critical=
+  local -F pct='100. * _p9k__load_value / _p9k_num_cpus'
+  if (( pct > 70 )); then
+    _p9k__load_critical=1
+  elif (( pct > 50 )); then
+    _p9k__load_warning=1
+  else
+    _p9k__load_normal=1
+  fi
+  _p9k_worker_send_params \
+    _p9k__load_value      \
+    _p9k__load_normal     \
+    _p9k__load_warning    \
+    _p9k__load_critical
 }
 
 function _p9k_cached_cmd_stdout() {
@@ -5175,6 +5211,11 @@ _p9k_init_params() {
   : ${_POWERLEVEL9K_VPN_IP_INTERFACE:='.*'}
   _p9k_segment_in_use vpn_ip || _POWERLEVEL9K_VPN_IP_INTERFACE=
   _p9k_declare -i POWERLEVEL9K_LOAD_WHICH 5
+  case $_POWERLEVEL9K_LOAD_WHICH in
+    1) _POWERLEVEL9K_LOAD_WHICH=1;;
+    15) _POWERLEVEL9K_LOAD_WHICH=3;;
+    *) _POWERLEVEL9K_LOAD_WHICH=2;;
+  esac
   _p9k_declare -b POWERLEVEL9K_NODENV_PROMPT_ALWAYS_SHOW 0
   _p9k_declare -b POWERLEVEL9K_NODE_VERSION_PROJECT_ONLY 0
   _p9k_declare -b POWERLEVEL9K_DOTNET_VERSION_PROJECT_ONLY 1
@@ -6386,6 +6427,7 @@ function _p9k_init_cacheable() {
     BSD) (( $+commands[sysctl] )) && _p9k_num_cpus="$(sysctl -n hw.ncpu 2>/dev/null)";;
     *)   (( $+commands[nproc]  )) && _p9k_num_cpus="$(nproc 2>/dev/null)";;
   esac
+  (( _p9k_num_cpus )) || _p9k_num_cpus=1
 
   if _p9k_segment_in_use dir; then
     if (( $+_POWERLEVEL9K_DIR_CLASSES )); then
