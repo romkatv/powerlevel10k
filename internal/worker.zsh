@@ -1,61 +1,56 @@
 # invoked in worker: _p9k_worker_main <timeout>
 function _p9k_worker_main() {
-  zmodload zsh/system   || return
-  zmodload zsh/zselect  || return
-  zselect -t0
-  (( $? == 1 ))         || return
+  zmodload zsh/system                || return
+  zmodload zsh/zselect               || return
+  zmodload zsh/datetime              || return
+  ! { zselect -t0 || (( $? != 1 )) } || return
 
   local req fd
-  local -A inflight  # fd => id$'\x1f'sync
   local -a ready
-  local _p9k_worker_tmout  # empty or non-negative int, in hundredths of a second
-  while true; do
-    if zselect -a ready ${_p9k_worker_tmout:+-t$_p9k_worker_tmout} 0 ${(k)inflight}; then
-      [[ $ready[1] == -r ]] || return
-      for fd in ${ready:1}; do
-        if [[ $fd == 0 ]]; then
-          local buf=
-          while true; do
-            sysread -t 0 'buf[$#buf+1]'  && continue
-            (( $? == 4 ))                || return
-            [[ $buf[-1] == (|$'\x1e') ]] && break
-            sysread 'buf[$#buf+1]'       || return
-          done
-          for req in ${(ps:\x1e:)buf}; do
-            local parts=("${(@ps:\x1f:)req}")  # id cond async sync
-            if () { eval $parts[2] }; then
-              if [[ -n $parts[3] ]]; then
-                sysopen -r -o cloexec -u fd <(
-                  local REPLY=; eval $parts[3]; print -rn -- $REPLY) || return
-                inflight[$fd]=$parts[1]$'\x1f'$parts[4]
-                continue
-              fi
-              local REPLY=
-              () { eval $parts[4] }
+  local -A inflight  # fd => id$'\x1f'sync
+  local -ri _p9k_worker_runs_me=1
+  while zselect -a ready 0 ${(k)inflight}; do
+    [[ $ready[1] == -r ]] || return
+    for fd in ${ready:1}; do
+      if [[ $fd == 0 ]]; then
+        local buf=
+        while true; do
+          sysread -t 0 'buf[$#buf+1]'  && continue
+          (( $? == 4 ))                || return
+          [[ $buf[-1] == (|$'\x1e') ]] && break
+          sysread 'buf[$#buf+1]'       || return
+        done
+        for req in ${(ps:\x1e:)buf}; do
+          local parts=("${(@ps:\x1f:)req}")  # id cond async sync
+          if () { eval $parts[2] }; then
+            if [[ -n $parts[3] ]]; then
+              sysopen -r -o cloexec -u fd <(
+                local REPLY=; eval $parts[3]; print -rn -- $REPLY) || return
+              inflight[$fd]=$parts[1]$'\x1f'$parts[4]
+              continue
             fi
-            if [[ -n $parts[1] ]]; then
-              print -rn -- d$parts[1]$'\x1e' || return
-            fi
-          done
-        else
-          local REPLY=
-          while true; do
-            sysread -i $fd 'REPLY[$#REPLY+1]' && continue
-            (( $? == 5 ))                     || return
-            break
-          done
-          local parts=("${(@ps:\x1f:)inflight[$fd]}")  # id sync
-          () { eval $parts[2] }
+            local REPLY=
+            () { eval $parts[4] }
+          fi
           if [[ -n $parts[1] ]]; then
             print -rn -- d$parts[1]$'\x1e' || return
           fi
-          unset "inflight[$fd]"
+        done
+      else
+        local REPLY=
+        while true; do
+          sysread -i $fd 'REPLY[$#REPLY+1]' && continue
+          (( $? == 5 ))                     || return
+          break
+        done
+        local parts=("${(@ps:\x1f:)inflight[$fd]}")  # id sync
+        () { eval $parts[2] }
+        if [[ -n $parts[1] ]]; then
+          print -rn -- d$parts[1]$'\x1e' || return
         fi
-      done
-    else
-      (( $? == 1 )) || return
-      (( $+functions[_p9k_worker_on_timeout] )) && _p9k_worker_on_timeout
-    fi
+        unset "inflight[$fd]"
+      fi
+    done
   done
 }
 
@@ -76,17 +71,6 @@ function _p9k_worker_reply() { eval $1 }
 # invoked in worker where it's called _p9k_worker_reply
 # usage: _p9k_worker_reply <list>
 function _p9k_worker_reply_remote() { print -rn -- e$1$'\x1e' }
-
-# invoked in worker: _p9k_worker_on_timeout
-function _p9k_worker_on_timeout() {
-  _p9k_worker_tmout=
-  _p9k_worker_reply _p9k_worker_keep_alive
-}
-
-# invoked in master: _p9k_worker_keep_alive
-function _p9k_worker_keep_alive() {
-  _p9k_worker_invoke "" "_p9k_worker_tmout=100" "" ""
-}
 
 # invoked in master: _p9k_worker_send_params [param]...
 function _p9k_worker_send_params() {
@@ -197,16 +181,9 @@ function _p9k_worker_receive() {
             print -r -- "
               emulate -L zsh
               setopt no_hist_expand extended_glob no_prompt_bang prompt_percent prompt_subst no_aliases
-              zmodload zsh/system
-              zmodload zsh/datetime
               function _p9k_worker_main()  { $functions[_p9k_worker_main] }
-              function _p9k_worker_reply() { $functions[_p9k_worker_reply_remote] }"  || return
-            if (( _POWERLEVEL9K_EXPERIMENTAL_TIME_REALTIME )); then
-              print -r -- "function _p9k_worker_on_timeout() {
-                $functions[_p9k_worker_on_timeout] }"                                 || return
-            fi
-            print -r -- "_p9k_worker_main"                                            || return
-            print -rn -- $'\x1e'                                                      || return
+              function _p9k_worker_reply() { $functions[_p9k_worker_reply_remote] }
+              _p9k_worker_main"$'\x1e'  || return
             if (( $#_p9k__worker_params )); then
               print -rn -- $'\x1f'                                                    || return
               typeset -p -- $_p9k__worker_params                                      || return
@@ -224,7 +201,6 @@ function _p9k_worker_receive() {
             done
             _p9k__worker_request_queue=()
           } >&$_p9k__worker_req_fd
-          (( _POWERLEVEL9K_EXPERIMENTAL_TIME_REALTIME )) && _p9k_worker_keep_alive
         ;;
         *)
           return 1
@@ -232,11 +208,7 @@ function _p9k_worker_receive() {
       esac
     done
 
-    if (( reset ||
-          _POWERLEVEL9K_EXPERIMENTAL_TIME_REALTIME &&
-            _p9k__last_prompt_update_time < EPOCHREALTIME - 0.8 )); then
-      _p9k_reset_prompt
-    fi
+    (( reset )) && _p9k_reset_prompt
     return 0
   } always {
     (( $? )) && _p9k_worker_stop
@@ -281,14 +253,12 @@ function _p9k_worker_start() {
 
 # todo: remove
 function _p9k_reset_prompt() {
-  zle && zle reset-prompt && zle -R && _p9k__last_prompt_update_time=EPOCHREALTIME
+  zle && zle reset-prompt && zle -R
 }
 
 emulate -L zsh -o prompt_subst # -o xtrace
 
 POWERLEVEL9K_WORKER_LOG_LEVEL=DEBUG
-_POWERLEVEL9K_EXPERIMENTAL_TIME_REALTIME=0
-typeset -F _p9k__last_prompt_update_time
 
 zmodload zsh/datetime
 zmodload zsh/system

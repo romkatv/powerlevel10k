@@ -4500,7 +4500,6 @@ function _p9k_maybe_dump() {
 }
 
 function _p9k_on_expand() {
-  _p9k__last_prompt_update_time=EPOCHREALTIME
   (( _p9k__expanded && ! $+__p9k_instant_prompt_active )) && return
 
   () {
@@ -4897,7 +4896,6 @@ typeset -g  _p9k__param_pat
 typeset -g  _p9k__param_sig
 
 _p9k_init_vars() {
-  typeset -gF _p9k__last_prompt_update_time
   typeset -ga _p9k_show_on_command
   typeset -g  _p9k__last_buffer
   typeset -ga _p9k__last_commands
