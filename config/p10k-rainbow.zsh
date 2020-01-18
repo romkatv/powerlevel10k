@@ -1044,6 +1044,7 @@
   # typeset -g POWERLEVEL9K_VPN_IP_FOREGROUND=0
   # typeset -g POWERLEVEL9K_VPN_IP_BACKGROUND=6
   # When on VPN, show just an icon without the IP address.
+  # Tip: To display the private IP address when on VPN, remove the next line.
   typeset -g POWERLEVEL9K_VPN_IP_CONTENT_EXPANSION=
   # Regular expression for the VPN network interface. Run ifconfig while on VPN to see the
   # name of the interface.
