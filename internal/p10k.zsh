@@ -6310,6 +6310,7 @@ function _p9k_init_cacheable() {
      segments+=net_iface
   fi
   for elem in $segments; do
+    [[ $elem == time && $_POWERLEVEL9K_EXPERIMENTAL_TIME_REALTIME == 0 ]] && continue
     local f_init=_p9k_prompt_${elem}_init
     local f_compute=_p9k_prompt_${elem}_compute
     if (( $+functions[$f_init] || $+functions[$f_compute] )); then
