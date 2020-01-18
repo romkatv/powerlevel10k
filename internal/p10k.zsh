@@ -2698,6 +2698,17 @@ instant_prompt_time() {
   _p9k_prompt_segment prompt_time "$_p9k_color2" "$_p9k_color1" "TIME_ICON" 1 '' $stash$_p9k_ret
 }
 
+_p9k_prompt_time_init() {
+  (( _POWERLEVEL9K_EXPERIMENTAL_TIME_REALTIME )) || return
+  _p9k_worker_send_functions _p9k_prompt_time_compute
+}
+
+_p9k_prompt_time_compute() {
+  (( _POWERLEVEL9K_EXPERIMENTAL_TIME_REALTIME )) || return
+  _p9k_worker_invoke \
+    'time' '(( _p9k_worker_runs_me ))' 'sleep 1' '_p9k_worker_reply _p9k_prompt_time_compute'
+}
+
 ################################################################
 # System date
 prompt_date() {
@@ -5275,7 +5286,6 @@ _p9k_init_params() {
   _p9k_declare -b POWERLEVEL9K_TIME_UPDATE_ON_COMMAND 0
   # If set to true, time will update every second.
   _p9k_declare -b POWERLEVEL9K_EXPERIMENTAL_TIME_REALTIME 0
-  _p9k_segment_in_use time || _POWERLEVEL9K_EXPERIMENTAL_TIME_REALTIME=0
 
   local -i i=1
   while (( i <= $#_POWERLEVEL9K_LEFT_PROMPT_ELEMENTS )); do
@@ -6253,7 +6263,6 @@ function _p9k_init_cacheable() {
   local -U segments=(
     ${_POWERLEVEL9K_LEFT_PROMPT_ELEMENTS%_joined}
     ${_POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS%_joined})
-  (( _POWERLEVEL9K_EXPERIMENTAL_TIME_REALTIME )) && segments+=ticking_clock
   if [[ -n $_POWERLEVEL9K_PUBLIC_IP_VPN_INTERFACE ||
         -n $_POWERLEVEL9K_IP_INTERFACE ||
         -n $_POWERLEVEL9K_VPN_IP_INTERFACE ]]; then
@@ -6263,7 +6272,8 @@ function _p9k_init_cacheable() {
     local f_init=_p9k_prompt_${elem}_init
     local f_compute=_p9k_prompt_${elem}_compute
     if (( $+functions[$f_init] || $+functions[$f_compute] )); then
-      _p9k_async_segments+=("$f_init" "$f_compute")
+      (( $+functions[$f_init]    )) && _p9k_async_segments+="$f_init"    || _p9k_async_segments+=''
+      (( $+functions[$f_compute] )) && _p9k_async_segments+="$f_compute" || _p9k_async_segments+=''
     fi
   done
 
