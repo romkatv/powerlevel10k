@@ -1,14 +1,20 @@
 # invoked in worker: _p9k_worker_main <timeout>
 function _p9k_worker_main() {
+  emulate -L zsh
+  setopt no_hist_expand extended_glob no_prompt_bang prompt_percent prompt_subst no_aliases
+
   zmodload zsh/system                || return
   zmodload zsh/zselect               || return
   zmodload zsh/datetime              || return
   ! { zselect -t0 || (( $? != 1 )) } || return
 
+  typeset -g IFS=$' \t\n\0'
+
   local req fd
   local -a ready
   local -A inflight  # fd => id$'\x1f'sync
   local -ri _p9k_worker_runs_me=1
+
   while zselect -a ready 0 ${(k)inflight}; do
     [[ $ready[1] == -r ]] || return
     for fd in ${ready:1}; do
@@ -49,6 +55,7 @@ function _p9k_worker_main() {
           print -rn -- d$parts[1]$'\x1e' || return
         fi
         unset "inflight[$fd]"
+        exec {fd}>&-
       fi
     done
   done
@@ -77,13 +84,28 @@ function _p9k_worker_send_params() {
   [[ -z $_p9k__worker_resp_fd || $# == 0 ]] && return
   if [[ -n $_p9k__worker_req_fd ]]; then
     {
-      print -rn -- $'\x1f' && typeset -p -- $* && print -rn -- $'\x1f\x1f\x1e' && return
+      print -rn -- $'\x1f' && typeset -pm -- ${(j.|.)${(b)@}} && print -rn -- $'\x1f\x1f\x1e' && return
     } >&$_p9k__worker_req_fd
     _p9k_worker_stop
     return 1
   else
     _p9k__worker_params+=($*)
   fi
+}
+
+function _p9k_worker_send_params_remote() {
+  [[ $# == 0 ]] && return
+  print -rn -- e && typeset -pm -- ${(j.|.)${(b)@}} && print -rn -- $'\x1e'
+}
+
+# invoked in master: _p9k_worker_send_functions [function-name]...
+function _p9k_worker_send_functions() {
+  [[ -z $_p9k__worker_resp_fd || $# == 0 ]] && return
+  local func req
+  for func; do
+    req+="function $func() { $functions[$func] }"$'\n'
+  done
+  _p9k_worker_invoke "" "$req" "" ""
 }
 
 # invoked in master: _p9k_worker_invoke <request-id> <cond> <async> <sync>
@@ -179,14 +201,13 @@ function _p9k_worker_receive() {
           sysopen -w -o cloexec -u _p9k__worker_req_fd $_p9k__worker_file_prefix.fifo || return
           {
             print -r -- "
-              emulate -L zsh
-              setopt no_hist_expand extended_glob no_prompt_bang prompt_percent prompt_subst no_aliases
-              function _p9k_worker_main()  { $functions[_p9k_worker_main] }
-              function _p9k_worker_reply() { $functions[_p9k_worker_reply_remote] }
+              function _p9k_worker_main()        { $functions[_p9k_worker_main] }
+              function _p9k_worker_reply()       { $functions[_p9k_worker_reply_remote] }
+              function _p9k_worker_send_params() { $functions[_p9k_worker_send_params_remote] }
               _p9k_worker_main"$'\x1e'  || return
             if (( $#_p9k__worker_params )); then
               print -rn -- $'\x1f'                                                    || return
-              typeset -p -- $_p9k__worker_params                                      || return
+              typeset -pm -- ${(j.|.)${(b)_p9k__worker_params}}                       || return
               print -rn -- $'\x1f\x1f\x1e'                                            || return
               _p9k__worker_params=()
             fi
@@ -220,7 +241,7 @@ function _p9k_worker_start() {
     [[ -n $_p9k__worker_resp_fd ]] && return
     _p9k__worker_file_prefix=${TMPDIR:-/tmp}/p10k.worker.$EUID.$$.$EPOCHSECONDS
 
-    if [[ -n $POWERLEVEL9K_WORKER_LOG_LEVEL ]]; then
+    if [[ -n $_POWERLEVEL9K_WORKER_LOG_LEVEL ]]; then
       local trace=x
       local log_file=$file_prefix.log
     else
@@ -252,6 +273,9 @@ function _p9k_worker_start() {
 }
 
 # todo: remove
+
+return
+
 function _p9k_reset_prompt() {
   zle && zle reset-prompt && zle -R
 }
