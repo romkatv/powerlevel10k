@@ -1,7 +1,7 @@
 # invoked in worker: _p9k_worker_main <timeout>
 function _p9k_worker_main() {
   emulate -L zsh
-  setopt no_hist_expand extended_glob no_prompt_bang prompt_percent prompt_subst no_aliases
+  setopt no_hist_expand extended_glob no_prompt_bang prompt_percent prompt_subst no_aliases no_bgnice
 
   zmodload zsh/system                || return
   zmodload zsh/zselect               || return
@@ -15,50 +15,54 @@ function _p9k_worker_main() {
   local -A inflight  # fd => id$'\x1f'sync
   local -ri _p9k_worker_runs_me=1
 
-  while zselect -a ready 0 ${(k)inflight}; do
-    [[ $ready[1] == -r ]] || return
-    for fd in ${ready:1}; do
-      if [[ $fd == 0 ]]; then
-        local buf=
-        while true; do
-          sysread -t 0 'buf[$#buf+1]'  && continue
-          (( $? == 4 ))                || return
-          [[ $buf[-1] == (|$'\x1e') ]] && break
-          sysread 'buf[$#buf+1]'       || return
-        done
-        for req in ${(ps:\x1e:)buf}; do
-          local parts=("${(@ps:\x1f:)req}")  # id cond async sync
-          if () { eval $parts[2] }; then
-            if [[ -n $parts[3] ]]; then
-              sysopen -r -o cloexec -u fd <(
-                local REPLY=; eval $parts[3]; print -rn -- $REPLY) || return
-              inflight[$fd]=$parts[1]$'\x1f'$parts[4]
-              continue
+  {
+    while zselect -a ready 0 ${(k)inflight}; do
+      [[ $ready[1] == -r ]] || return
+      for fd in ${ready:1}; do
+        if [[ $fd == 0 ]]; then
+          local buf=
+          while true; do
+            sysread -t 0 'buf[$#buf+1]'  && continue
+            (( $? == 4 ))                || return
+            [[ $buf[-1] == (|$'\x1e') ]] && break
+            sysread 'buf[$#buf+1]'       || return
+          done
+          for req in ${(ps:\x1e:)buf}; do
+            local parts=("${(@ps:\x1f:)req}")  # id cond async sync
+            if () { eval $parts[2] }; then
+              if [[ -n $parts[3] ]]; then
+                sysopen -r -o cloexec -u fd <(
+                  local REPLY=; eval $parts[3]; print -rn -- $REPLY) || return
+                inflight[$fd]=$parts[1]$'\x1f'$parts[4]
+                continue
+              fi
+              local REPLY=
+              () { eval $parts[4] }
             fi
-            local REPLY=
-            () { eval $parts[4] }
-          fi
+            if [[ -n $parts[1] ]]; then
+              print -rn -- d$parts[1]$'\x1e' || return
+            fi
+          done
+        else
+          local REPLY=
+          while true; do
+            sysread -i $fd 'REPLY[$#REPLY+1]' && continue
+            (( $? == 5 ))                     || return
+            break
+          done
+          local parts=("${(@ps:\x1f:)inflight[$fd]}")  # id sync
+          () { eval $parts[2] }
           if [[ -n $parts[1] ]]; then
             print -rn -- d$parts[1]$'\x1e' || return
           fi
-        done
-      else
-        local REPLY=
-        while true; do
-          sysread -i $fd 'REPLY[$#REPLY+1]' && continue
-          (( $? == 5 ))                     || return
-          break
-        done
-        local parts=("${(@ps:\x1f:)inflight[$fd]}")  # id sync
-        () { eval $parts[2] }
-        if [[ -n $parts[1] ]]; then
-          print -rn -- d$parts[1]$'\x1e' || return
+          unset "inflight[$fd]"
+          exec {fd}>&-
         fi
-        unset "inflight[$fd]"
-        exec {fd}>&-
-      fi
+      done
     done
-  done
+  } always {
+    kill -- -$$
+  }
 }
 
 typeset -g  _p9k__worker_pid
@@ -237,6 +241,7 @@ function _p9k_worker_receive() {
 }
 
 function _p9k_worker_start() {
+  setopt no_bgnice
   {
     [[ -n $_p9k__worker_resp_fd ]] && return
     _p9k__worker_file_prefix=${TMPDIR:-/tmp}/p10k.worker.$EUID.$$.$EPOCHSECONDS
@@ -253,17 +258,21 @@ function _p9k_worker_start() {
     trace=x
 
     local fifo=$_p9k__worker_file_prefix.fifo
-    local cmd=(
-      'emulate zsh'
-      '{ mkfifo '${(q)fifo}' && exec >&4 && echo -n "s$$\x1e" && exec 0<'${(q)fifo}' || exit } always { rm -f '${(q)fifo}' }'
-      'IFS= read -rd $'\''\x1e'\'' && eval $REPLY')
-    local setsid=${commands[setsid]:-/usr/local/opt/util-linux/bin/setsid}
-    [[ -x $setsid ]] && setsid=${(q)setsid} || setsid=
     local zsh=${${:-/proc/self/exe}:A}
     [[ -x $zsh ]] || zsh=zsh
-    cmd="$setsid ${(q)zsh} --nobgnice --noaliases -${trace}dfc ${(q)${(j:; :)cmd}} &!"
+    local bootstrap=(
+      '"emulate" "-L" "zsh" "-o" "no_aliases"'
+      '{ mkfifo '${(q)fifo}' && exec >&4 && echo -n "s$$\x1e" && exec 0<'${(q)fifo}' || exit } always { rm -f '${(q)fifo}' }'
+      'IFS= read -rd $'\''\x1e'\'' && eval $REPLY')
+    local child='"eval" "$_p9k_worker_bootstrap" &!'
+    local parent=(
+      '"emulate" "-L" "zsh" "-o" "no_aliases" "-o" "no_bgnice"'
+      ${(qqq)zsh}' -'${trace}'dfc '${(qqq)child}
+    )
     sysopen -r -o cloexec -u _p9k__worker_resp_fd <(
-      $zsh --nobgnice --noaliases -${trace}dfmc $cmd </dev/null 4>&1 &>>$log_file &!) || return
+      _p9k_worker_bootstrap=${(j:; :)bootstrap} \
+      </dev/null 4>&1 &>>$log_file $zsh -${trace}dfmc \
+      ${(j:; :)parent}) || return
     zle -F $_p9k__worker_resp_fd _p9k_worker_receive
     _p9k__worker_shell_pid=$sysparams[pid]
     add-zsh-hook zshexit _p9k_worker_cleanup
