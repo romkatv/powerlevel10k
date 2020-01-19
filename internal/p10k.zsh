@@ -207,7 +207,7 @@ function _p9k_prompt_length() {
   _p9k_ret=$x
 }
 
-typeset -gr __p9k_byte_suffix=('B' 'K' 'M' 'G' 'T' 'P' 'E' 'Z' 'Y')
+typeset -g __p9k_byte_suffix=('B' 'K' 'M' 'G' 'T' 'P' 'E' 'Z' 'Y')
 
 # 42 => 42B
 # 1536 => 1.5K
@@ -2213,6 +2213,23 @@ prompt_php_version() {
 ################################################################
 # Segment to display free RAM and used Swap
 prompt_ram() {
+  _p9k_prompt_segment $0 yellow "$_p9k_color1" RAM_ICON 1 '$_p9k__ram_free' '$_p9k__ram_free'
+}
+
+function _p9k_prompt_ram_init() {
+  typeset -g _p9k__ram_free=
+  _p9k_worker_send_params _p9k_os _p9k__ram_free __p9k_byte_suffix
+  _p9k_worker_send_functions  \
+    _p9k_human_readable_bytes \
+    _p9k_prompt_ram_async     \
+    _p9k_prompt_ram_sync
+}
+
+function _p9k_prompt_ram_compute() {
+  _p9k_worker_invoke ram '' _p9k_prompt_ram_async _p9k_prompt_ram_sync
+}
+
+_p9k_prompt_ram_async() {
   local -F free_bytes
 
   case $_p9k_os in
@@ -2238,7 +2255,13 @@ prompt_ram() {
   esac
 
   _p9k_human_readable_bytes $free_bytes
-  _p9k_prompt_segment $0 yellow "$_p9k_color1" RAM_ICON 0 '' $_p9k_ret
+  REPLY=$_p9k_ret
+}
+
+_p9k_prompt_ram_sync() {
+  [[ $_p9k__ram_free == $REPLY ]] && return
+  _p9k__ram_free=$REPLY
+  _p9k_worker_send_params _p9k__ram_free
 }
 
 function _p9k_read_rbenv_version_file() {
