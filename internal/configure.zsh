@@ -3,9 +3,10 @@ typeset -gr __p9k_wizard_lines=21
 typeset -gr __p9k_zd=${ZDOTDIR:-$HOME}
 typeset -gr __p9k_zd_u=${${${(q)__p9k_zd}/#(#b)${(q)HOME}(|\/*)/'~'$match[1]}//\%/%%}
 typeset -gr __p9k_cfg_basename=.p10k.zsh
-typeset -gr __p9k_cfg_path=$__p9k_zd/$__p9k_cfg_basename
+typeset -gr __p9k_cfg_path_o=$__p9k_zd/$__p9k_cfg_basename
+typeset -gr __p9k_cfg_path=${__p9k_cfg_path_o:A}
 typeset -gr __p9k_cfg_path_u=$__p9k_zd_u/$__p9k_cfg_basename
-typeset -gr __p9k_zshrc=$__p9k_zd/.zshrc
+typeset -gr __p9k_zshrc=${${:-$__p9k_zd/.zshrc}:A}
 typeset -gr __p9k_zshrc_u=$__p9k_zd_u/.zshrc
 typeset -gr __p9k_root_dir_u=${${${(q)__p9k_root_dir}/#(#b)${(q)HOME}(|\/*)/'~'$match[1]}//\%/%%}
 
@@ -61,7 +62,7 @@ function _p9k_can_configure() {
 
 function p9k_configure() {
   emulate -L zsh
-  setopt no_hist_expand extended_glob
+  setopt no_hist_expand extended_glob no_prompt_bang prompt_{percent,subst} no_aliases
   (
     set -- -f
     source $__p9k_root_dir/internal/wizard.zsh
