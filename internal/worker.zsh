@@ -283,10 +283,10 @@ function _p9k_worker_start() {
         } always { rm -f -- $fifo }
         IFS= read -rd $'"'\\x1e'"' && eval $REPLY
       } &!
-      command true'
+      exec true'
     sysopen -r -o cloexec -u _p9k__worker_resp_fd <(
       _p9k_worker_bootstrap=${bootstrap//  ##} </dev/null 4>&1 &>>$log_file \
-        $zsh -${trace}dfmc '"eval" "$_p9k_worker_bootstrap"' ) || return
+        exec $zsh -${trace}dfmc '"eval" "$_p9k_worker_bootstrap"') || return
     zle -F $_p9k__worker_resp_fd _p9k_worker_receive
     _p9k__worker_shell_pid=$sysparams[pid]
     add-zsh-hook zshexit _p9k_worker_cleanup
