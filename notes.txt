@@ -1,0 +1,17 @@
+- assume worker works; drop support for synchronous evaluation of workerized prompts.
+- call *_init methods from init_cacheable. their only purpose is to add stuff to two arrays:
+  _p9k_worker_functions and _p9k_worker_params. both arrays are cacheable. move all _p9__* param
+  initialization from *_init methods to _p9k_init_vars
+- inside worker, eval stdout from async
+- add two methods for the use inside *_sync: _p9k_worker_reply_begin and _p9k_worker_reply_end.
+  they simply print 'e' and $'\x1e'. *_sync can send params with `typeset -p` now.
+- declare local _p9k_worker_reset in _p9k_worker_receive. it can be set when replies from worker
+  are eval'd. initial value 0. 1 means reset-prompt is needed. 2 for _p9k_set_prompt + reset-prompt.
+- battery: when state or icon change, update with _p9k_set_prompt. make sure icons can be sent with
+  `typset -p` in zsh 5.1.
+- ram: reduce precision to 2 digits. check if it makes sense for all segments that use the same
+  function.
+- to avoid resetting prompt too often (e.g., when battery remaining time changes by 1 minute), can
+  do the following: send the current state from master to worker; worker sends new state if it's
+  different but it only triggers prompt reset if it's sufficiently different. this requires
+  disabling implicit reset on every eval in _p9k_worker_receive.
