@@ -1410,12 +1410,12 @@ function ask_zshrc_edit() {
   if [[ -e $__p9k_zshrc ]]; then
     zshrc_content="$(<$__p9k_zshrc)" || quit -c
     local lines=(${(f)zshrc_content})
-    local f0=$__p9k_cfg_path
+    local f0=$__p9k_cfg_path_o
     local f1=${(q)f0}
     local f2=${(q-)f0}
     local f3=${(qq)f0}
     local f4=${(qqq)f0}
-    local g1=${${(q)__p9k_cfg_path}/#(#b)${(q)HOME}\//'~/'}
+    local g1=${${(q)__p9k_cfg_path_o}/#(#b)${(q)HOME}\//'~/'}
     if [[ -n ${(@M)lines:#(#b)[^#]#([^[:IDENT:]]|)source[[:space:]]##($f1|$f2|$f3|$f4|$g1)(|[[:space:]]*|'#'*)} ]]; then
       zshrc_has_cfg=1
     fi
