@@ -2249,8 +2249,8 @@ _p9k_prompt_ram_async() {
     *)
       [[ -r /proc/meminfo ]] || return
       local stat && stat="$(</proc/meminfo)" || return
-      [[ $stat == (#b)*'MemAvailable:'[[:space:]]#(<->)* ]] || return
-      free_bytes=$(( $match[1] * 1024 ))
+      [[ $stat == (#b)*(MemAvailable:|MemFree:)[[:space:]]#(<->)* ]] || return
+      free_bytes=$(( $match[2] * 1024 ))
     ;;
   esac
 
