@@ -5,7 +5,6 @@ function _p9k_worker_main() {
 
   zmodload zsh/system                || return
   zmodload zsh/zselect               || return
-  zmodload zsh/datetime              || return
   ! { zselect -t0 || (( $? != 1 )) } || return
 
   typeset -g IFS=$' \t\n\0'
@@ -205,6 +204,17 @@ function _p9k_worker_receive() {
           sysopen -w -o cloexec -u _p9k__worker_req_fd $_p9k__worker_file_prefix.fifo || return
           {
             print -r -- "
+              zmodload zsh/datetime
+              zmodload zsh/mathfunc
+              zmodload zsh/parameter
+              zmodload zsh/system
+              zmodload zsh/termcap
+              zmodload zsh/terminfo
+              zmodload zsh/zleparameter
+              zmodload -F zsh/stat b:zstat
+              zmodload -F zsh/net/socket b:zsocket
+              zmodload -F zsh/files b:zf_mv b:zf_rm
+              autoload -Uz is-at-least
               function _p9k_worker_main()        { $functions[_p9k_worker_main] }
               function _p9k_worker_reply()       { $functions[_p9k_worker_reply_remote] }
               function _p9k_worker_send_params() { $functions[_p9k_worker_send_params_remote] }
