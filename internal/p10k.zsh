@@ -1049,7 +1049,7 @@ _p9k_prompt_disk_usage_compute() {
 }
 
 _p9k_prompt_disk_usage_async() {
-  (( $+commands[df] )) && REPLY=${${=${(f)"$(df -P . 2>/dev/null)"}[2]}[5]%%%}
+  (( $+commands[df] )) && REPLY=${${=${(f)"$(df -P $1 2>/dev/null)"}[2]}[5]%%%}
 }
 
 _p9k_prompt_disk_usage_sync() {
@@ -4035,8 +4035,14 @@ function _p9k_build_instant_segment() {
 function _p9k_set_prompt() {
   local ifs=$IFS
   IFS=$' \t\n\0'
-  _p9k__pwd=${(%):-%/}
-  _p9k__pwd_a=${_p9k__pwd:A}
+
+  if [[ $_p9k_refresh_reason == precmd ]]; then
+    local f_init f_compute
+    for f_init f_compute in "${_p9k_async_segments[@]}"; do
+      $f_compute
+    done
+  fi
+
   PROMPT=
   RPROMPT=
   [[ $1 == instant_ ]] || PROMPT+='${$((_p9k_on_expand()))+}'
@@ -4846,10 +4852,8 @@ _p9k_precmd_impl() {
     (( ++_p9k__prompt_idx ))
   fi
 
-  local f_init f_compute
-  for f_init f_compute in "${_p9k_async_segments[@]}"; do
-    $f_compute
-  done
+  _p9k__pwd=${(%):-%/}
+  _p9k__pwd_a=${_p9k__pwd:A}
 
   _p9k_refresh_reason=precmd
   _p9k_set_prompt
