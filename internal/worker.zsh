@@ -203,7 +203,7 @@ function _p9k_worker_receive() {
           _p9k__worker_pid=$arg
           sysopen -w -o cloexec -u _p9k__worker_req_fd $_p9k__worker_file_prefix.fifo || return
           {
-            print -r -- "
+            local init="
               zmodload zsh/datetime
               zmodload zsh/mathfunc
               zmodload zsh/parameter
@@ -218,7 +218,8 @@ function _p9k_worker_receive() {
               function _p9k_worker_main()        { $functions[_p9k_worker_main] }
               function _p9k_worker_reply()       { $functions[_p9k_worker_reply_remote] }
               function _p9k_worker_send_params() { $functions[_p9k_worker_send_params_remote] }
-              _p9k_worker_main"$'\x1e'  || return
+              _p9k_worker_main"
+            print -r -- ${init//$'\n'/$'\x1e'}                                        || return
             if (( $#_p9k__worker_params )); then
               print -rn -- $'\x1f'                                                    || return
               typeset -pm -- ${(j.|.)${(b)_p9k__worker_params}}                       || return
@@ -236,6 +237,7 @@ function _p9k_worker_receive() {
             done
             _p9k__worker_request_queue=()
           } >&$_p9k__worker_req_fd
+          echo shit sent >>/tmp/log
         ;;
         *)
           return 1
@@ -281,7 +283,7 @@ function _p9k_worker_start() {
             echo -n "s$sysparams[pid]\x1e" &&
             exec 0<$fifo                   || exit
         } always { rm -f -- $fifo }
-        IFS= read -rd $'"'\\x1e'"' && eval $REPLY
+        IFS= read -r && eval ${REPLY//$'"'\x1e'"'/$'"'\n'"'}
       } &!
       exec true'
     sysopen -r -o cloexec -u _p9k__worker_resp_fd <(
