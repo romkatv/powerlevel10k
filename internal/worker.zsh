@@ -261,18 +261,19 @@ function _p9k_worker_start() {
     local zsh=${${:-/proc/self/exe}:A}
     [[ -x $zsh ]] || zsh=zsh
     local bootstrap=(
-      '"emulate" "-L" "zsh" "-o" "no_aliases"'
-      '{ mkfifo '${(q)fifo}' && exec >&4 && echo -n "s$$\x1e" && exec 0<'${(q)fifo}' || exit } always { rm -f '${(q)fifo}' }'
+      '"emulate" "zsh" "-o" "no_aliases"'
+      '{ zmodload zsh/system && mkfifo '${(q)fifo}' && exec >&4 && echo -n "s$sysparams[pid]\x1e" && exec 0<'${(q)fifo}' || exit } always { rm -f '${(q)fifo}' }'
       'IFS= read -rd $'\''\x1e'\'' && eval $REPLY')
     local child='"eval" "$_p9k_worker_bootstrap" &!'
     local parent=(
       '"emulate" "-L" "zsh" "-o" "no_aliases" "-o" "no_bgnice"'
-      ${(qqq)zsh}' -'${trace}'dfc '${(qqq)child}
+      'echo PARENT $$ >>/tmp/log'
+      '{ eval $_p9k_worker_bootstrap } &!'
+      'command true'
     )
     sysopen -r -o cloexec -u _p9k__worker_resp_fd <(
       _p9k_worker_bootstrap=${(j:; :)bootstrap} \
-      </dev/null 4>&1 &>>$log_file $zsh -${trace}dfmc \
-      ${(j:; :)parent}) || return
+        $zsh -${trace}dfmc ${(j:; :)parent} </dev/null 4>&1 &>>$log_file) || return
     zle -F $_p9k__worker_resp_fd _p9k_worker_receive
     _p9k__worker_shell_pid=$sysparams[pid]
     add-zsh-hook zshexit _p9k_worker_cleanup
