@@ -7,9 +7,12 @@ function _p9k_worker_main() {
   zmodload zsh/zselect               || return
   ! { zselect -t0 || (( $? != 1 )) } || return
 
+  function _p9k_worker_reply_begin() { print e }
+  function _p9k_worker_reply_end()   { print -n -- '\x1e' }
+
   typeset -g IFS=$' \t\n\0'
 
-  local req fd
+  local req fd buf
   local -a ready
   local -A inflight  # fd => id$'\x1f'sync
   local -ri _p9k_worker_runs_me=1
@@ -19,7 +22,7 @@ function _p9k_worker_main() {
       [[ $ready[1] == -r ]] || return
       for fd in ${ready:1}; do
         if [[ $fd == 0 ]]; then
-          local buf=
+          buf=
           while true; do
             sysread -t 0 'buf[$#buf+1]'  && continue
             (( $? == 4 ))                || return
@@ -31,11 +34,10 @@ function _p9k_worker_main() {
             if () { eval $parts[2] }; then
               if [[ -n $parts[3] ]]; then
                 sysopen -r -o cloexec -u fd <(
-                  local REPLY=; eval $parts[3]; print -rn -- $REPLY) || return
+                  () { eval $parts[3]; } && print -n '\x1e') || return
                 inflight[$fd]=$parts[1]$'\x1f'$parts[4]
                 continue
               fi
-              local REPLY=
               () { eval $parts[4] }
             fi
             if [[ -n $parts[1] ]]; then
@@ -43,14 +45,16 @@ function _p9k_worker_main() {
             fi
           done
         else
-          local REPLY=
+          buf=
           while true; do
-            sysread -i $fd 'REPLY[$#REPLY+1]' && continue
-            (( $? == 5 ))                     || return
+            sysread -i $fd 'buf[$#buf+1]' && continue
+            (( $? == 5 ))                 || return
             break
           done
           local parts=("${(@ps:\x1f:)inflight[$fd]}")  # id sync
-          () { eval $parts[2] }
+          if [[ $buf == *$'\x1e' ]]; then
+            () { eval ${buf[1,-2]}$'\n'$parts[2] }
+          fi
           if [[ -n $parts[1] ]]; then
             print -rn -- d$parts[1]$'\x1e' || return
           fi
@@ -64,51 +68,48 @@ function _p9k_worker_main() {
   }
 }
 
-typeset -g  _p9k__worker_pid
-typeset -g  _p9k__worker_req_fd
-typeset -g  _p9k__worker_resp_fd
-typeset -g  _p9k__worker_shell_pid
-typeset -g  _p9k__worker_file_prefix
-typeset -ga _p9k__worker_params
-typeset -gA _p9k__worker_request_map
-typeset -ga _p9k__worker_request_queue
+typeset -g   _p9k__worker_pid
+typeset -g   _p9k__worker_req_fd
+typeset -g   _p9k__worker_resp_fd
+typeset -g   _p9k__worker_shell_pid
+typeset -g   _p9k__worker_file_prefix
+typeset -gaU _p9k__worker_params
+typeset -gaU _p9k__worker_functions
+typeset -gA  _p9k__worker_request_map
+typeset -ga  _p9k__worker_request_queue
 
-# invoked in master: _p9k_worker_reply <list>...
-#
-# worker also has _p9k_worker_reply but its implemented as _p9k_worker_reply_remote
-function _p9k_worker_reply() { eval $1 }
+function _p9k_worker_print_params() {
+  local names=(${@:/(#m)*/${${${+parameters[$MATCH]}:#0}:+$MATCH}})
+  (( ! $#names )) && return
+  print -n -- '\x1f' && typeset -p -- $names && print -n -- '\x1f\x1f\x1e'
+}
 
-# invoked in worker where it's called _p9k_worker_reply
-# usage: _p9k_worker_reply <list>
-function _p9k_worker_reply_remote() { print -rn -- e$1$'\x1e' }
+function _p9k_worker_print_functions() {
+  local names=(${@:/(#m)*/${${${+functions[$MATCH]}:#0}:+$MATCH}})
+  (( ! $#names )) && return
+  print -n -- '\x1f' && functions -- $names && print -n -- '\x1f\x1f\x1e'
+}
 
 # invoked in master: _p9k_worker_send_params [param]...
 function _p9k_worker_send_params() {
-  [[ -z $_p9k__worker_resp_fd || $# == 0 ]] && return
   if [[ -n $_p9k__worker_req_fd ]]; then
-    {
-      print -rn -- $'\x1f' && typeset -pm -- ${(j.|.)${(b)@}} && print -rn -- $'\x1f\x1f\x1e' && return
-    } >&$_p9k__worker_req_fd
+    _p9k_worker_print_params ${(u)@} >&$_p9k__worker_req_fd && return
     _p9k_worker_stop
     return 1
   else
-    _p9k__worker_params+=($*)
+    _p9k__worker_params+=($@)
   fi
-}
-
-function _p9k_worker_send_params_remote() {
-  [[ $# == 0 ]] && return
-  print -rn -- e && typeset -pm -- ${(j.|.)${(b)@}} && print -rn -- $'\x1e'
 }
 
 # invoked in master: _p9k_worker_send_functions [function-name]...
 function _p9k_worker_send_functions() {
-  [[ -z $_p9k__worker_resp_fd || $# == 0 ]] && return
-  local func req
-  for func; do
-    req+="function $func() { $functions[$func] }"$'\n'
-  done
-  _p9k_worker_invoke "" "$req" "" ""
+  if [[ -n $_p9k__worker_req_fd ]]; then
+    _p9k_worker_print_functions ${(u)@} >&$_p9k__worker_req_fd && return
+    _p9k_worker_stop
+    return 1
+  else
+    _p9k__worker_functions+=($@)
+  fi
 }
 
 # invoked in master: _p9k_worker_invoke <request-id> <cond> <async> <sync>
@@ -155,6 +156,7 @@ function _p9k_worker_stop() {
   _p9k__worker_resp_fd=
   _p9k__worker_shell_pid=
   _p9k__worker_params=()
+  _p9k__worker_functions=()
   _p9k__worker_request_map=()
   _p9k__worker_request_queue=()
   return 0
@@ -215,17 +217,12 @@ function _p9k_worker_receive() {
               zmodload -F zsh/net/socket b:zsocket
               zmodload -F zsh/files b:zf_mv b:zf_rm
               autoload -Uz is-at-least
-              function _p9k_worker_main()        { $functions[_p9k_worker_main] }
-              function _p9k_worker_reply()       { $functions[_p9k_worker_reply_remote] }
-              function _p9k_worker_send_params() { $functions[_p9k_worker_send_params_remote] }
-              _p9k_worker_main"
+              () { $functions[_p9k_worker_main] }"
             print -r -- ${init//$'\n'/$'\x1e'}                                        || return
-            if (( $#_p9k__worker_params )); then
-              print -rn -- $'\x1f'                                                    || return
-              typeset -pm -- ${(j.|.)${(b)_p9k__worker_params}}                       || return
-              print -rn -- $'\x1f\x1f\x1e'                                            || return
-              _p9k__worker_params=()
-            fi
+            _p9k_worker_print_params    $_p9k__worker_params                          || return
+            _p9k_worker_print_functions $_p9k__worker_functions                       || return
+            _p9k__worker_params=()
+            _p9k__worker_functions()
             local req=
             for req in $_p9k__worker_request_queue; do
               if [[ $req != *$'\x1e' ]]; then
@@ -237,7 +234,6 @@ function _p9k_worker_receive() {
             done
             _p9k__worker_request_queue=()
           } >&$_p9k__worker_req_fd
-          echo shit sent >>/tmp/log
         ;;
         *)
           return 1
