@@ -3771,7 +3771,9 @@ function instant_prompt_direnv() {
   fi
 }
 
-_p9k_preexec() {
+# Use two preexec hooks to survive https://github.com/MichaelAquilina/zsh-you-should-use with
+# YSU_HARDCORE=1. See https://github.com/romkatv/powerlevel10k/issues/427.
+_p9k_preexec1() {
   if (( $+_p9k_real_zle_rprompt_indent )); then
     if [[ -n $_p9k_real_zle_rprompt_indent ]]; then
       ZLE_RPROMPT_INDENT=$_p9k_real_zle_rprompt_indent
@@ -3780,6 +3782,10 @@ _p9k_preexec() {
     fi
     unset _p9k_real_zle_rprompt_indent
   fi
+  (( $+functions[TRAPINT] )) || trap - INT
+}
+
+_p9k_preexec2() {
   _p9k__preexec_cmd=$2
   _p9k__timer_start=EPOCHREALTIME
 }
@@ -4658,8 +4664,7 @@ _p9k_precmd_impl() {
     _p9k__timer_start=0
     _p9k__region_active=0
 
-    unset _p9k__line_finished
-    unset _p9k__preexec_cmd
+    unset _p9k__line_finished _p9k__preexec_cmd
     _p9k__keymap=main
     _p9k__zle_state=insert
 
@@ -4670,11 +4675,17 @@ _p9k_precmd_impl() {
   _p9k_set_prompt
   _p9k_refresh_reason=''
 
+  if [[ $precmd_functions[1] != _p9k_do_nothing && $precmd_functions[(I)_p9k_do_nothing] != 0 ]]; then
+    precmd_functions=(_p9k_do_nothing ${(@)precmd_functions:#_p9k_do_nothing})
+  fi
   if [[ $precmd_functions[-1] != _p9k_precmd && $precmd_functions[(I)_p9k_precmd] != 0 ]]; then
     precmd_functions=(${(@)precmd_functions:#_p9k_precmd} _p9k_precmd)
   fi
-  if [[ $precmd_functions[1] != _p9k_do_nothing && $precmd_functions[(I)_p9k_do_nothing] != 0 ]]; then
-    precmd_functions=(_p9k_do_nothing ${(@)precmd_functions:#_p9k_do_nothing})
+  if [[ $preexec_functions[1] != _p9k_preexec1 && $preexec_functions[(I)_p9k_preexec1] != 0 ]]; then
+    preexec_functions=(_p9k_preexec1 ${(@)preexec_functions:#_p9k_preexec1})
+  fi
+  if [[ $preexec_functions[-1] != _p9k_preexec2 && $preexec_functions[(I)_p9k_preexec2] != 0 ]]; then
+    preexec_functions=(${(@)preexec_functions:#_p9k_preexec2} _p9k_preexec2)
   fi
 }
 
@@ -6644,7 +6655,7 @@ prompt_powerlevel9k_setup() {
   setopt no_hist_expand extended_glob no_prompt_bang prompt_{percent,subst} no_aliases
   prompt_powerlevel9k_teardown
   __p9k_enabled=1
-  add-zsh-hook preexec _p9k_preexec
+  typeset -ga preexec_functions=(_p9k_preexec1 $preexec_functions _p9k_preexec2)
   typeset -ga precmd_functions=(_p9k_do_nothing $precmd_functions _p9k_precmd)
 }
 
