@@ -1031,8 +1031,6 @@ _p9k_prompt_disk_usage_init() {
   typeset -g _p9k__disk_usage_warning=
   typeset -g _p9k__disk_usage_critical=
 
-  _p9k_worker_send_functions _p9k_prompt_disk_usage_async _p9k_prompt_disk_usage_sync
-
   _p9k_worker_send_params                   \
     _POWERLEVEL9K_DISK_USAGE_CRITICAL_LEVEL \
     _POWERLEVEL9K_DISK_USAGE_WARNING_LEVEL  \
@@ -1041,26 +1039,24 @@ _p9k_prompt_disk_usage_init() {
     _p9k__disk_usage_normal                 \
     _p9k__disk_usage_warning                \
     _p9k__disk_usage_critical
-
-  _p9k__async_segments_compute+=_p9k_prompt_disk_usage_compute
 }
 
 _p9k_prompt_disk_usage_compute() {
-  _p9k_worker_invoke disk_usage \
-    '' "_p9k_prompt_disk_usage_async ${(q)_p9k__pwd_a}" _p9k_prompt_disk_usage_sync
+  _p9k_worker_invoke                                 \
+    disk_usage                                       \
+    _p9k_prompt_disk_usage_cond                      \
+    "_p9k_prompt_disk_usage_async ${(q)_p9k__pwd_a}" \
+    _p9k_prompt_disk_usage_sync
+}
+
+_p9k_prompt_disk_usage_cond() {
+  (( $+commands[df] ))
 }
 
 _p9k_prompt_disk_usage_async() {
-  (( $+commands[df] )) || return
-  local disk_usage_pct
-  disk_usage_pct=${${=${(f)"$(df -P $1 2>/dev/null)"}[2]}[5]%%%}
-  [[ $disk_usage_pct == <0-100> ]] || return
-  typeset -p disk_usage_pct
-}
-
-_p9k_prompt_disk_usage_sync() {
-  [[ $disk_usage_pct != $_p9k__disk_usage_pct ]] || return
-  _p9k__disk_usage_pct=$disk_usage_pct
+  local pct=${${=${(f)"$(df -P $1 2>/dev/null)"}[2]}[5]%%%}
+  [[ $pct == <0-100> && pct != $_p9k__disk_usage_pct ]] || return
+  _p9k__disk_usage_pct=$pct
   _p9k__disk_usage_normal=
   _p9k__disk_usage_warning=
   _p9k__disk_usage_critical=
@@ -1071,13 +1067,11 @@ _p9k_prompt_disk_usage_sync() {
   elif (( ! _POWERLEVEL9K_DISK_USAGE_ONLY_WARNING )); then
     _p9k__disk_usage_normal=1
   fi
-  _p9k_worker_reply_begin
   typeset -p                 \
     _p9k__disk_usage_pct     \
     _p9k__disk_usage_normal  \
     _p9k__disk_usage_warning \
     _p9k__disk_usage_critical
-  _p9k_worker_reply_end
 }
 
 function _p9k_read_file() {
@@ -1243,18 +1237,6 @@ _p9k_prompt_public_ip_init() {
     _POWERLEVEL9K_PUBLIC_IP_HOST    \
     _p9k__public_ip                 \
     _p9k__public_ip_next_time
-
-  _p9k_worker_send_functions    \
-    _p9k_prompt_public_ip_cond  \
-    _p9k_prompt_public_ip_async \
-    _p9k_prompt_public_ip_sync
-
-  _p9k__async_segments_compute+=_p9k_prompt_public_ip_compute
-}
-
-_p9k_prompt_public_ip_compute() {
-  _p9k_worker_invoke \
-    public_ip _p9k_prompt_public_ip_cond _p9k_prompt_public_ip_async _p9k_prompt_public_ip_sync
 }
 
 _p9k_prompt_public_ip_cond() {
@@ -1294,17 +1276,17 @@ _p9k_prompt_public_ip_async() {
       break
     fi
   done
-  typeset -p ip next
+  _p9k__public_ip=$ip
+  _p9k__public_ip_next_time=$next
+  typeset -p _p9k__public_ip _p9k__public_ip_next_time
 }
 
 _p9k_prompt_public_ip_sync() {
-  _p9k__public_ip_next_time=$next
-  if [[ $ip != _p9k__public_ip ]]; then
-    _p9k__public_ip=$ip
-    _p9k_worker_reply_begin
-    typeset -p _p9k__public_ip
-    _p9k_worker_reply_end
-  fi
+  [[ $prev == $cur ]] && return
+  local prev_ip=$_p9k__public_ip
+  eval $cur
+  [[ $_p9k__public_ip == $prev_ip ]] && return
+  _p9k_worker_reply $cur
 }
 
 ################################################################
@@ -1894,14 +1876,10 @@ prompt_load() {
 
 _p9k_prompt_load_init() {
   [[ $_p9k_os == (OSX|BSD) ]] || return
-
   typeset -g _p9k__load_value=
   typeset -g _p9k__load_normal=
   typeset -g _p9k__load_warning=
   typeset -g _p9k__load_critical=
-
-  _p9k_worker_send_functions _p9k_prompt_load_async _p9k_prompt_load_sync
-
   _p9k_worker_send_params     \
     $_POWERLEVEL9K_LOAD_WHICH \
     _p9k_num_cpus             \
@@ -1909,24 +1887,16 @@ _p9k_prompt_load_init() {
     _p9k__load_normal         \
     _p9k__load_warning        \
     _p9k__load_critical
-
-  _p9k__async_segments_compute+=_p9k_prompt_load_compute
 }
 
-_p9k_prompt_load_compute() {
-  _p9k_worker_invoke load '(( $+commands[sysctl] ))' _p9k_prompt_load_async _p9k_prompt_load_sync
+_p9k_prompt_load_cond() {
+  (( $+commands[sysctl] ))
 }
 
 _p9k_prompt_load_async() {
-  local load
-  load="$(sysctl -n vm.loadavg 2>/dev/null)" || return
+  local load="$(sysctl -n vm.loadavg 2>/dev/null)" || return
   load=${${(A)=load}[_POWERLEVEL9K_LOAD_WHICH+1]//,/.}
-  [[ $load == <->(|.<->) ]] || return
-  typeset -p load
-}
-
-_p9k_prompt_load_sync() {
-  [[ $load != $_p9k__load_value ]] || return
+  [[ $load == <->(|.<->) && $load != $_p9k__load_value ]] || return
   _p9k__load_value=$load
   _p9k__load_normal=
   _p9k__load_warning=
@@ -1939,14 +1909,11 @@ _p9k_prompt_load_sync() {
   else
     _p9k__load_normal=1
   fi
-
-  _p9k_worker_reply_begin
   typeset -p            \
     _p9k__load_value    \
     _p9k__load_normal   \
     _p9k__load_warning  \
     _p9k__load_critical
-  _p9k_worker_reply_end
 }
 
 function _p9k_cached_cmd_stdout() {
@@ -2234,15 +2201,7 @@ prompt_ram() {
 function _p9k_prompt_ram_init() {
   typeset -g _p9k__ram_free=
   _p9k_worker_send_params _p9k_os _p9k__ram_free __p9k_byte_suffix
-  _p9k_worker_send_functions  \
-    _p9k_human_readable_bytes \
-    _p9k_prompt_ram_async     \
-    _p9k_prompt_ram_sync
-  _p9k__async_segments_compute+=_p9k_prompt_ram_compute
-}
-
-function _p9k_prompt_ram_compute() {
-  _p9k_worker_invoke ram '' _p9k_prompt_ram_async _p9k_prompt_ram_sync
+  _p9k_worker_send_functions _p9k_human_readable_bytes
 }
 
 _p9k_prompt_ram_async() {
@@ -2253,9 +2212,9 @@ _p9k_prompt_ram_async() {
       (( $+commands[vm_stat] )) || return
       local stat && stat="$(vm_stat 2>/dev/null)" || return
       [[ $stat =~ 'Pages free:[[:space:]]+([0-9]+)' ]] || return
-      (( free_bytes+=match[1] ))
+      (( free_bytes += match[1] ))
       [[ $stat =~ 'Pages inactive:[[:space:]]+([0-9]+)' ]] || return
-      (( free_bytes+=match[1] ))
+      (( free_bytes += match[1] ))
       (( free_bytes *= 4096 ))
     ;;
     BSD)
@@ -2271,16 +2230,9 @@ _p9k_prompt_ram_async() {
   esac
 
   _p9k_human_readable_bytes $free_bytes
-  local ram_free=$_p9k_ret
-  typeset -p ram_free
-}
-
-_p9k_prompt_ram_sync() {
-  [[ $ram_free == $_p9k__ram_free ]] && return
-  _p9k__ram_free=$ram_free
-  _p9k_worker_reply_begin
+  [[ $_p9k_ret != $_p9k__ram_free ]] || return
+  _p9k__ram_free=$_p9k_ret
   typeset -p _p9k__ram_free
-  _p9k_worker_reply_end
 }
 
 function _p9k_read_rbenv_version_file() {
@@ -2782,14 +2734,12 @@ _p9k_prompt_time_init() {
   _p9k__async_segments_compute+=_p9k_prompt_time_compute
 }
 
-_p9k_prompt_time_compute() {
-  _p9k_worker_invoke 'time' '' 'sleep 1 || true' _p9k_prompt_time_sync
+_p9k_prompt_time_async() {
+  sleep 1 || true
 }
 
 _p9k_prompt_time_sync() {
-  _p9k_worker_reply_begin
-  echo _p9k_prompt_time_compute
-  _p9k_worker_reply_end
+  _p9k_worker_reply _p9k_prompt_time_compute
 }
 
 ################################################################
@@ -3989,15 +3939,7 @@ function _p9k_prompt_net_iface_init() {
     _POWERLEVEL9K_PUBLIC_IP_VPN_INTERFACE \
     _POWERLEVEL9K_IP_INTERFACE            \
     _POWERLEVEL9K_VPN_IP_INTERFACE
-  _p9k_worker_send_functions    \
-    _p9k_prompt_net_iface_match \
-    _p9k_prompt_net_iface_async \
-    _p9k_prompt_net_iface_sync
-  _p9k__async_segments_compute+=_p9k_prompt_net_iface_compute
-}
-
-function _p9k_prompt_net_iface_compute() {
-  _p9k_worker_invoke net_iface '' _p9k_prompt_net_iface_async _p9k_prompt_net_iface_sync
+  _p9k_worker_send_functions _p9k_prompt_net_iface_match
 }
 
 # reads `iface2ip` and sets `ip`
@@ -4034,33 +3976,24 @@ function _p9k_prompt_net_iface_async() {
     done
   fi
 
-  local params
   if _p9k_prompt_net_iface_match $_POWERLEVEL9K_PUBLIC_IP_VPN_INTERFACE; then
-    params+="typeset -g _p9k__public_ip_vpn=1"$'\n'
-    params+="typeset -g _p9k__public_ip_not_vpn="$'\n'
+    _p9k__public_ip_vpn=1
+    _p9k__public_ip_not_vpn=
   else
-    params+="typeset -g _p9k__public_ip_vpn="$'\n'
-    params+="typeset -g _p9k__public_ip_not_vpn=1"$'\n'
+    _p9k__public_ip_vpn=
+    _p9k__public_ip_not_vpn=1
   fi
   if _p9k_prompt_net_iface_match $_POWERLEVEL9K_IP_INTERFACE; then
-    params+="typeset -g _p9k__ip_ip=$ip"$'\n'
+    _p9k__ip_ip=$ip
   else
-    params+="typeset -g _p9k__ip_ip="$'\n'
+    _p9k__ip_ip=
   fi
   if _p9k_prompt_net_iface_match $_POWERLEVEL9K_VPN_IP_INTERFACE; then
-    params+="typeset -g _p9k__vpn_ip_ip=$ip"$'\n'
+    _p9k__vpn_ip_ip=$ip
   else
-    params+="typeset -g _p9k__vpn_ip_ip="$'\n'
+    _p9k__vpn_ip_ip=
   fi
-  typeset -p params
-}
-
-function _p9k_prompt_net_iface_sync() {
-  [[ $params == $_p9k__net_iface_params ]] && return
-  _p9k__net_iface_params=$params
-  _p9k_worker_reply_begin
-  print -rn -- $params
-  _p9k_worker_reply_end
+  typeset -p _p9k__public_ip_vpn _p9k__public_ip_not_vpn _p9k__ip_ip _p9k__vpn_ip_ip
 }
 
 function _p9k_build_segment() {
@@ -5182,7 +5115,7 @@ _p9k_init_params() {
   _p9k_declare -e POWERLEVEL9K_PUBLIC_IP_NONE ""
   _p9k_declare -s POWERLEVEL9K_PUBLIC_IP_HOST "http://ident.me"
   _p9k_declare -s POWERLEVEL9K_PUBLIC_IP_VPN_INTERFACE ""
-  _p9k_segment_in_use public_ip || POWERLEVEL9K_PUBLIC_IP_VPN_INTERFACE=
+  _p9k_segment_in_use public_ip || _POWERLEVEL9K_PUBLIC_IP_VPN_INTERFACE=
   _p9k_declare -b POWERLEVEL9K_ALWAYS_SHOW_CONTEXT 0
   _p9k_declare -b POWERLEVEL9K_ALWAYS_SHOW_USER 0
   _p9k_declare -e POWERLEVEL9K_CONTEXT_TEMPLATE "%n@%m"
@@ -6625,7 +6558,19 @@ _p9k_init() {
 
   local f_init
   for f_init in $_p9k_async_segments_init; do
-    $f_init
+    $f_init || continue
+    local f=${f_init%init}
+    if (( ! $+functions[${f}sync] )); then
+      functions[${f}sync]='[[ $cur == $prev ]] && return; eval $cur; _p9k_worker_reply $cur'
+    fi
+    if (( ! $+functions[${f}compute] )); then
+      local body="_p9k_worker_invoke $f "
+      (( $+functions[${f}cond]  )) && body+="${f}cond "  || body+="'' "
+      (( $+functions[${f}async] )) && body+="${f}async " || body+="'' "
+      functions[${f}compute]="$body ${f}sync"
+    fi
+    _p9k_worker_send_functions ${f}{cond,sync,async}
+    _p9k__async_segments_compute+=${f}compute
   done
 
   (( $#_p9k__async_segments_compute )) && _p9k_worker_start

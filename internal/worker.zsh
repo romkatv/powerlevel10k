@@ -7,14 +7,16 @@ function _p9k_worker_main() {
   zmodload zsh/zselect               || return
   ! { zselect -t0 || (( $? != 1 )) } || return
 
-  function _p9k_worker_reply_begin() { print e }
-  function _p9k_worker_reply_end()   { print -n -- '\x1e' }
+  function _p9k_worker_reply_begin() { print -nr -- e }
+  function _p9k_worker_reply_end()   { print -nr -- $'\x1e' }
+  function _p9k_worker_reply()       { print -nr -- e${(pj:\n:)@}$'\x1e' }
 
   typeset -g IFS=$' \t\n\0'
 
-  local req fd buf
+  local req fd
   local -a ready
   local -A inflight  # fd => id$'\x1f'sync
+  local -A last_async
   local -ri _p9k_worker_runs_me=1
 
   {
@@ -22,7 +24,7 @@ function _p9k_worker_main() {
       [[ $ready[1] == -r ]] || return
       for fd in ${ready:1}; do
         if [[ $fd == 0 ]]; then
-          buf=
+          local buf=
           while true; do
             sysread -t 0 'buf[$#buf+1]'  && continue
             (( $? == 4 ))                || return
@@ -45,15 +47,23 @@ function _p9k_worker_main() {
             fi
           done
         else
-          buf=
+          local cur=
           while true; do
-            sysread -i $fd 'buf[$#buf+1]' && continue
+            sysread -i $fd 'cur[$#cur+1]' && continue
             (( $? == 5 ))                 || return
             break
           done
           local parts=("${(@ps:\x1f:)inflight[$fd]}")  # id sync
-          if [[ $buf == *$'\x1e' ]]; then
-            () { eval ${buf[1,-2]}$'\n'$parts[2] }
+          if [[ $cur == *$'\x1e' ]]; then
+            cur[-1]=""
+            () {
+              local prev
+              if [[ -n $parts[1] ]]; then
+                prev=$last_async[$parts[1]]
+                last_async[$parts[1]]=$cur
+              fi
+              eval $parts[2]
+            }
           fi
           if [[ -n $parts[1] ]]; then
             print -rn -- d$parts[1]$'\x1e' || return
