@@ -34,7 +34,6 @@ local -ri wizard_columns=$((COLUMNS < 80 ? COLUMNS : 80))
 local -ri prompt_indent=2
 
 local -ra bg_color=(240 238 236 234)
-local -ra frame_color=(244 242 240 238)
 local -ra sep_color=(248 246 244 242)
 local -ra prefix_color=(250 248 246 244)
 
@@ -55,7 +54,7 @@ local -r slanted_bar='\uE0BD'
 
 local -ra lean_left=(
   '%$frame_color[$color]F╭─ ' '${extra_icons[1]:+$extra_icons[1] }%31F$extra_icons[2]%B%39F~%b%31F/%B%39Fsrc%b%f $prefixes[1]%76F$extra_icons[3]master%f '
-  '%$frame_color[$color]F╰─ ' '%76F❯%f ${buffer:-█}'
+  '%$frame_color[$color]F╰─' '%76F❯%f ${buffer:-█}'
 )
 
 local -ra lean_right=(
@@ -64,13 +63,13 @@ local -ra lean_right=(
 )
 
 local -ra lean_8colors_left=(
-  '╭─ ' '${extra_icons[1]:+$extra_icons[1] }%4F$extra_icons[2]%4F~/src%f $prefixes[1]%2F$extra_icons[3]master%f '
-  '╰─ ' '%2F❯%f ${buffer:-█}'
+  '%$frame_color[$color]F╭─ ' '${extra_icons[1]:+$extra_icons[1] }%4F$extra_icons[2]%4F~/src%f $prefixes[1]%2F$extra_icons[3]master%f '
+  '%$frame_color[$color]F╰─' '%2F❯%f ${buffer:-█}'
 )
 
 local -ra lean_8colors_right=(
-  ' $prefixes[2]%3F$extra_icons[4]5s%f${show_time:+ $prefixes[3]%6F$extra_icons[5]16:23:42%f}' ' ─╮'
-  '' ' ─╯'
+  ' $prefixes[2]%3F$extra_icons[4]5s%f${show_time:+ $prefixes[3]%6F$extra_icons[5]16:23:42%f}' ' %$frame_color[$color]F─╮%f'
+  '' ' %$frame_color[$color]F─╯%f'
 )
 
 local -ra classic_left=(
@@ -151,8 +150,7 @@ function print_prompt() {
     (( num_lines == 2 && i == 1 )) && local fill=$gap_char || local fill=' '
     print -n  -- ${(pl:$prompt_indent:: :)}
     print -nP -- $l
-    [[ $style == lean_8colors ]] && local gap_color='%f' || local gap_color="%$frame_color[$color]F"
-    print -nP -- "$gap_color${(pl:$gap::$fill:)}%f"
+    print -nP -- "%$frame_color[$color]F${(pl:$gap::$fill:)}%f"
     print -P  -- $r
   done
 }
@@ -631,7 +629,12 @@ function ask_color_scheme() {
       q) quit;;
       r) return 1;;
       1) style=lean; break;;
-      2) style=lean_8colors; break;;
+      2)
+        style=lean_8colors
+        frame_color=(0 7 2 4)
+        color_name=(Black White Green Blue)
+        break
+      ;;
     esac
   done
 }
@@ -647,19 +650,19 @@ function ask_color() {
     clear
     flowing -c "%BPrompt Color%b"
     print -n $nl
-    print -P "%B(1)  Lightest.%b"
+    print -P "%B(1)  $color_name[1].%b"
     print -n $nl
     color=1 print_prompt
     print -P ""
-    print -P "%B(2)  Light.%b"
+    print -P "%B(1)  $color_name[2].%b"
     print -n $nl
     color=2 print_prompt
     print -P ""
-    print -P "%B(3)  Dark.%b"
+    print -P "%B(1)  $color_name[3].%b"
     print -n $nl
     color=3 print_prompt
     print -P ""
-    print -P "%B(4)  Darkest.%b"
+    print -P "%B(1)  $color_name[4].%b"
     print -n $nl
     color=4 print_prompt
     print -P ""
@@ -672,16 +675,14 @@ function ask_color() {
     case $key in
       q) quit;;
       r) return 1;;
-      1) color=1; options+=lightest; break;;
-      2) color=2; options+=light; break;;
-      3) color=3; options+=dark; break;;
-      4) color=4; options+=darkest; break;;
+      [1-4]) color=$key; break;;
     esac
   done
+  options+=${(L)color_name[color]}
 }
 
 function ask_ornaments_color() {
-  [[ $style != (rainbow|lean) || $num_lines == 1 ]] && return
+  [[ $style != (rainbow|lean*) || $num_lines == 1 ]] && return
   [[ $gap_char == ' ' && $left_frame == 0 && $right_frame == 0 ]] && return
   if [[ $LINES -lt 26 ]]; then
     local nl=''
@@ -695,19 +696,19 @@ function ask_ornaments_color() {
     clear
     flowing -c "%B${(j: & :)ornaments} Color%b"
     print -n $nl
-    print -P "%B(1)  Lightest.%b"
+    print -P "%B(1)  $color_name[1].%b"
     print -n $nl
     color=1 print_prompt
     print -P ""
-    print -P "%B(2)  Light.%b"
+    print -P "%B(2)  $color_name[2].%b"
     print -n $nl
     color=2 print_prompt
     print -P ""
-    print -P "%B(3)  Dark.%b"
+    print -P "%B(3)  $color_name[3].%b"
     print -n $nl
     color=3 print_prompt
     print -P ""
-    print -P "%B(4)  Darkest.%b"
+    print -P "%B(4)  $color_name[4].%b"
     print -n $nl
     color=4 print_prompt
     print -P ""
@@ -720,12 +721,10 @@ function ask_ornaments_color() {
     case $key in
       q) quit;;
       r) return 1;;
-      1) color=1; options+=lightest; break;;
-      2) color=2; options+=light; break;;
-      3) color=3; options+=dark; break;;
-      4) color=4; options+=darkest; break;;
+      [1-4]) color=$key; break;;
     esac
   done
+  options+=${(L)color_name[color]}-ornaments
 }
 
 function ask_time() {
@@ -1545,6 +1544,7 @@ function generate_config() {
         sub LEFT_SUBSEGMENT_SEPARATOR "'$left_subsep'"
         sub RIGHT_SUBSEGMENT_SEPARATOR "'$right_subsep'"
       fi
+      sub RULER_FOREGROUND $frame_color[$color]
       sub MULTILINE_FIRST_PROMPT_GAP_FOREGROUND $frame_color[$color]
       sub MULTILINE_FIRST_PROMPT_PREFIX "'%$frame_color[$color]F╭─'"
       sub MULTILINE_NEWLINE_PROMPT_PREFIX "'%$frame_color[$color]F├─'"
@@ -1621,22 +1621,18 @@ function generate_config() {
     fi
 
     if [[ $style == lean* ]]; then
-      if [[ $style == lean ]]; then
-        local c="%$frame_color[$color]F"
-        sub MULTILINE_FIRST_PROMPT_GAP_FOREGROUND $frame_color[$color]
-      else
-        local c=
-      fi
+      sub RULER_FOREGROUND $frame_color[$color]
+      sub MULTILINE_FIRST_PROMPT_GAP_FOREGROUND $frame_color[$color]
       if (( right_frame )); then
-        sub MULTILINE_FIRST_PROMPT_SUFFIX "'$c─╮'"
-        sub MULTILINE_NEWLINE_PROMPT_SUFFIX "'$c─┤'"
-        sub MULTILINE_LAST_PROMPT_SUFFIX "'$c─╯'"
+        sub MULTILINE_FIRST_PROMPT_SUFFIX "'%$frame_color[$color]F─╮'"
+        sub MULTILINE_NEWLINE_PROMPT_SUFFIX "'%$frame_color[$color]F─┤'"
+        sub MULTILINE_LAST_PROMPT_SUFFIX "'%$frame_color[$color]F─╯'"
         sub RIGHT_PROMPT_LAST_SEGMENT_END_SYMBOL "' '"
       fi
       if (( left_frame )); then
-        sub MULTILINE_FIRST_PROMPT_PREFIX "'$c╭─'"
-        sub MULTILINE_NEWLINE_PROMPT_PREFIX "'$c├─'"
-        sub MULTILINE_LAST_PROMPT_PREFIX "'$c╰─'"
+        sub MULTILINE_FIRST_PROMPT_PREFIX "'%$frame_color[$color]F╭─'"
+        sub MULTILINE_NEWLINE_PROMPT_PREFIX "'%$frame_color[$color]F├─'"
+        sub MULTILINE_LAST_PROMPT_PREFIX "'%$frame_color[$color]F╰─'"
         sub LEFT_PROMPT_FIRST_SEGMENT_START_SYMBOL "' '"
       fi
     fi
@@ -1740,6 +1736,8 @@ while true; do
   local -i num_lines=0 empty_line=0 color=2 left_frame=1 right_frame=1 transient_prompt=0
   local -i cap_diamond=0 cap_python=0 cap_debian=0 cap_narrow_icons=0 cap_lock=0
   local -a extra_icons=('' '' '')
+  local -a frame_color=(244 242 240 238)
+  local -a color_name=(Lightest Light Dark Darkest)
   local -a prefixes=('' '')
   local -a options=()
 
