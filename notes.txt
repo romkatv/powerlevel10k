@@ -1,3 +1,4 @@
+- decouple *_init functions from segments; find all of them with a glob in _p9k_init_cacheable.
 - declare local _p9k_worker_reset in _p9k_worker_receive. it can be set when replies from worker
   are eval'd. initial value 0. 1 means reset-prompt is needed. 2 for _p9k_set_prompt + reset-prompt.
 - battery: when state or icon change, update with _p9k_set_prompt. make sure icons can be sent with
