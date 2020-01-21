@@ -571,13 +571,14 @@ function ask_style() {
   else
     local nl=$'\n'
   fi
+  (( terminfo[colors] >= 256 )) && local lean=lean || local lean=lean_8colors
   while true; do
     clear
     flowing -c "%BPrompt Style%b"
     print -n $nl
     print -P "%B(1)  Lean.%b"
     print -n $nl
-    style=lean left_frame=0 right_frame=0 print_prompt
+    style=$lean left_frame=0 right_frame=0 print_prompt
     print -P ""
     print -P "%B(2)  Classic.%b"
     print -n $nl
@@ -600,12 +601,16 @@ function ask_style() {
     case $key in
       q) quit;;
       r) return 1;;
-      1) style=lean; left_frame=0; right_frame=0; options+=lean; break;;
+      1) style=$lean; left_frame=0; right_frame=0; options+=$lean; break;;
       2) style=classic; options+=classic; break;;
       3) style=rainbow; options+=rainbow; break;;
       4) style=pure; empty_line=1; options+=pure; break;;
     esac
   done
+  if [[ $style == lean_8colors ]]; then
+    frame_color=(0 7 2 4)
+    color_name=(Black White Green Blue)
+  fi
 }
 
 function ask_color_scheme() {
@@ -641,6 +646,7 @@ function ask_color_scheme() {
         ;;
       esac
     done
+    options=(${options:#lean} $style)
   elif [[ $style == pure && $has_truecolor == 1 ]]; then
     while true; do
       clear
@@ -1774,6 +1780,7 @@ else
   _p9k_can_configure -q || return
 fi
 
+zmodload zsh/terminfo                     || return
 autoload -Uz is-at-least                  || return
 source $__p9k_root_dir/internal/icons.zsh || return
 
