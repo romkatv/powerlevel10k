@@ -641,7 +641,7 @@ function ask_color_scheme() {
         ;;
       esac
     done
-  elif [[ $style == pure ]]; then
+  elif [[ $style == pure && $has_truecolor == 1 ]]; then
     while true; do
       clear
       flowing -c "%BPrompt Colors%b"
