@@ -8,3 +8,5 @@
   do the following: send the current state from master to worker; worker sends new state if it's
   different but it only triggers prompt reset if it's sufficiently different. this requires
   disabling implicit reset on every eval in _p9k_worker_receive.
+- implement fake gitstatus api on top of vcs_info (or plain git?) + worker and use it if there is no
+  gitstatus.
