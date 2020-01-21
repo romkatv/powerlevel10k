@@ -33,6 +33,8 @@ local -ri wizard_columns=$((COLUMNS < 80 ? COLUMNS : 80))
 
 local -ri prompt_indent=2
 
+local -rA pure_original=(grey 242 red 1 yellow 3 blue 4 magenta 5 cyan 6 white 7)
+local -rA pure_snazzy=(grey 242 red '#FF5C57' yellow '#F3F99D' blue '#57C7FF' magenta '#FF6AC1' cyan '#9AEDFE' white '#F1F1F0')
 local -ra bg_color=(240 238 236 234)
 local -ra sep_color=(248 246 244 242)
 local -ra prefix_color=(250 248 246 244)
@@ -83,8 +85,8 @@ local -ra classic_right=(
 )
 
 local -ra pure_left=(
-  '' '%4F~/src%f %242Fmaster%f %3F5s%f'
-  '' '%5F❯%f ${buffer:-█}'
+  '' '%F{$pure_color[blue]}~/src%f %F{$pure_color[grey]}master%f %F{$pure_color[yellow]}5s%f'
+  '' '%F{$pure_color[magenta]}❯%f ${buffer:-█}'
 )
 
 local -ra pure_right=(
@@ -131,8 +133,10 @@ function print_prompt() {
     left=($left[2] $left[4])
     right=($right[1] $right[3])
   else
-    [[ $style == lean_8colors ]] && local green=2 || local green=76
-    (( left_frame )) || left=('' $left[2] '' "%${green}F❯%f ${buffer:-█}")
+    local prompt_char='%76F❯%f'
+    [[ $style == pure ]] && prompt_char="%F{$pure_color[magenta]}❯%f"
+    [[ $style == lean_8colors ]] && prompt_char='%2F❯%f'
+    (( left_frame )) || left=('' $left[2] '' "$prompt_char ${buffer:-█}")
     (( right_frame )) || right=($right[1] '' '' '')
   fi
   local -i right_indent=prompt_indent
@@ -605,38 +609,74 @@ function ask_style() {
 }
 
 function ask_color_scheme() {
-  [[ $style != lean ]] && return
-  while true; do
-    clear
-    flowing -c "%BPrompt Colors%b"
-    print -P ""
-    print -P "%B(1)  256 colors.%b"
-    print -P ""
-    style=lean print_prompt
-    print -P ""
-    print -P "%B(2)  8 colors.%b"
-    print -P ""
-    style=lean_8colors print_prompt
-    print -P ""
-    print -P ""
-    print -P "(r)  Restart from the beginning."
-    print -P "(q)  Quit and do nothing."
-    print -P ""
+  if [[ $style == lean ]]; then
+    while true; do
+      clear
+      flowing -c "%BPrompt Colors%b"
+      print -P ""
+      print -P "%B(1)  256 colors.%b"
+      print -P ""
+      style=lean print_prompt
+      print -P ""
+      print -P "%B(2)  8 colors.%b"
+      print -P ""
+      style=lean_8colors print_prompt
+      print -P ""
+      print -P ""
+      print -P "(r)  Restart from the beginning."
+      print -P "(q)  Quit and do nothing."
+      print -P ""
 
-    local key=
-    read -k key${(%):-"?%BChoice [12rq]: %b"} || quit -c
-    case $key in
-      q) quit;;
-      r) return 1;;
-      1) style=lean; break;;
-      2)
-        style=lean_8colors
-        frame_color=(0 7 2 4)
-        color_name=(Black White Green Blue)
-        break
-      ;;
-    esac
-  done
+      local key=
+      read -k key${(%):-"?%BChoice [12rq]: %b"} || quit -c
+      case $key in
+        q) quit;;
+        r) return 1;;
+        1) style=lean; break;;
+        2)
+          style=lean_8colors
+          frame_color=(0 7 2 4)
+          color_name=(Black White Green Blue)
+          break
+        ;;
+      esac
+    done
+  elif [[ $style == pure ]]; then
+    while true; do
+      clear
+      flowing -c "%BPrompt Colors%b"
+      print -P ""
+      print -P "%B(1)  Original.%b"
+      print -P ""
+      pure_color=(${(kv)pure_original}) print_prompt
+      print -P ""
+      print -P "%B(2)  Snazzy.%b"
+      print -P ""
+      pure_color=(${(kv)pure_snazzy}) print_prompt
+      print -P ""
+      print -P ""
+      print -P "(r)  Restart from the beginning."
+      print -P "(q)  Quit and do nothing."
+      print -P ""
+
+      local key=
+      read -k key${(%):-"?%BChoice [12rq]: %b"} || quit -c
+      case $key in
+        q) quit;;
+        r) return 1;;
+        1)
+          pure_color=(${(kv)pure_original})
+          options+=original
+          break
+        ;;
+        2)
+          pure_color=(${(kv)pure_snazzy})
+          options+=snazzy
+          break
+        ;;
+      esac
+    done
+  fi
 }
 
 function ask_color() {
@@ -1270,7 +1310,6 @@ function ask_empty_line() {
 }
 
 function ask_instant_prompt() {
-  autoload -Uz is-at-least
   if ! is-at-least 5.4; then
     instant_prompt=off
     return 0
@@ -1316,7 +1355,8 @@ function ask_instant_prompt() {
 function ask_transient_prompt() {
   local disable_rprompt=$((num_lines == 1))
   local prompt_char='%76F❯%f'
-  [[ $style == pure ]] && prompt_char='%5F❯%f'
+  [[ $style == pure ]] && prompt_char="%F{$pure_color[magenta]}❯%f"
+  [[ $style == lean_8colors ]] && prompt_char='%2F❯%f'
   while true; do
     clear
     flowing -c "%BEnable Transient Prompt?%b"
@@ -1473,7 +1513,15 @@ function generate_config() {
     lines=("${(@)lines//$1/$2}")
   }
 
-  if [[ $style != pure ]]; then
+  if [[ $style == pure ]]; then
+    rep "local grey=242" "local grey='$pure_color[grey]'"
+    rep "local red=1" "local red='$pure_color[red]'"
+    rep "local yellow=3" "local yellow='$pure_color[yellow]'"
+    rep "local blue=4" "local blue='$pure_color[blue]'"
+    rep "local magenta=5" "local magenta='$pure_color[magenta]'"
+    rep "local cyan=6" "local cyan='$pure_color[cyan]'"
+    rep "local white=7" "local white='$pure_color[white]'"
+  else
     sub MODE $POWERLEVEL9K_MODE
 
     if (( cap_narrow_icons )); then
@@ -1726,7 +1774,14 @@ else
   _p9k_can_configure -q || return
 fi
 
+autoload -Uz is-at-least                  || return
 source $__p9k_root_dir/internal/icons.zsh || return
+
+if is-at-least 5.7.1 && [[ $COLORTERM == (24bit|truecolor) ]]; then
+  local -ir has_truecolor=1
+else
+  local -ir has_truecolor=0
+fi
 
 while true; do
   local instant_prompt=verbose zshrc_content= zshrc_backup= zshrc_backup_u=
@@ -1740,6 +1795,11 @@ while true; do
   local -a color_name=(Lightest Light Dark Darkest)
   local -a prefixes=('' '')
   local -a options=()
+  if (( has_truecolor )); then
+    local -A pure_color=(${(kv)pure_snazzy})
+  else
+    local -A pure_color=(${(kv)pure_original})
+  fi
 
   ask_font || continue
   ask_diamond || continue
@@ -1797,8 +1857,8 @@ while true; do
   _p9k_init_icons
   ask_narrow_icons      || continue
   ask_style             || continue
+  ask_color_scheme      || continue
   if [[ $style != pure ]]; then
-    ask_color_scheme    || continue
     ask_color           || continue
     ask_time            || continue
     ask_separators      || continue
