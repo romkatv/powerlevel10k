@@ -700,15 +700,15 @@ function ask_color() {
     print -n $nl
     color=1 print_prompt
     print -P ""
-    print -P "%B(1)  $color_name[2].%b"
+    print -P "%B(2)  $color_name[2].%b"
     print -n $nl
     color=2 print_prompt
     print -P ""
-    print -P "%B(1)  $color_name[3].%b"
+    print -P "%B(3)  $color_name[3].%b"
     print -n $nl
     color=3 print_prompt
     print -P ""
-    print -P "%B(1)  $color_name[4].%b"
+    print -P "%B(4)  $color_name[4].%b"
     print -n $nl
     color=4 print_prompt
     print -P ""
