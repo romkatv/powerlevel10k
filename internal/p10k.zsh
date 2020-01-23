@@ -1473,7 +1473,12 @@ prompt_dir() {
       shortenlen=${_POWERLEVEL9K_SHORTEN_DIR_LENGTH:-1}
       (( shortenlen >= 0 )) || shortenlen=1
       local -i i=2 e=$(($#parts - shortenlen))
-      [[ $p[1] == / ]] && (( ++i ))
+      if (( _POWERLEVEL9K_DIR_TRUNCATE_BEFORE_MARKER )); then
+        (( e += shortenlen ))
+        local orig=("$parts[2]" "${(@)parts[$((shortenlen > $#parts ? -$#parts : -shortenlen)),-1]}")
+      elif [[ $p[1] == / ]]; then
+        (( ++i ))
+      fi
       local parent="${_p9k_pwd%/${(pj./.)parts[i,-1]}}"
       if (( i <= e )); then
         local MATCH= mtimes=()
@@ -1524,11 +1529,34 @@ prompt_dir() {
           fi
           parent+=/$sub
         done
-        for ((; i <= $#parts; ++i)); do
-          [[ $parts[i] == *["~!#\`\$^&*()\\\"'<>?{}[]"]* ]] && parts[i]='${(Q)${:-'${(qqq)${(q)parts[i]}}'}}'
-          parts[i]+=$'\2'
-        done
-        [[ -n $key ]] && _p9k_cache_ephemeral_set "$key" "${parts[@]}"
+        if (( _POWERLEVEL9K_DIR_TRUNCATE_BEFORE_MARKER )); then
+          local _2=$'\2'
+          (( e = ${parts[(I)*$_2]} ))
+          if (( e > 1 )); then
+            parts[1,e-1]=()
+            fake_first=1
+          elif [[ $p == /?* ]]; then
+            parts[2]="\${(Q)\${:-${(qqq)${(q)orig[1]}}}}"$'\2'
+          fi
+          for ((i = $#parts < shortenlen ? $#parts : shortenlen; i > 0; --i)); do
+            [[ $#parts[-i] == *$'\2' ]] && continue
+            if [[ $orig[-i] == *["~!#\`\$^&*()\\\"'<>?{}[]"]* ]]; then
+              parts[-i]='${(Q)${:-'${(qqq)${(q)orig[-i]}}'}}'$'\2'
+            else
+              parts[-i]=${orig[-i]}$'\2'
+            fi
+          done
+        else
+          for ((; i <= $#parts; ++i)); do
+            [[ $parts[i] == *["~!#\`\$^&*()\\\"'<>?{}[]"]* ]] && parts[i]='${(Q)${:-'${(qqq)${(q)parts[i]}}'}}'
+            parts[i]+=$'\2'
+          done
+        fi
+        if [[ -n $key ]]; then
+          _p9k_cache_ephemeral_set "$key" "${parts[@]}"
+        else
+          _p9k_cache_val=("$key" "${parts[@]}")
+        fi
       fi
       parts=("${(@)_p9k_cache_val[2,-1]}")
     ;;
@@ -5200,6 +5228,8 @@ _p9k_init_params() {
   _p9k_declare -a POWERLEVEL9K_DIR_CLASSES
   _p9k_declare -i POWERLEVEL9K_SHORTEN_DELIMITER_LENGTH
   _p9k_declare -e POWERLEVEL9K_SHORTEN_DELIMITER
+  _p9k_declare -b POWERLEVEL9K_DIR_TRUNCATE_BEFORE_MARKER
+  [[ -z $_POWERLEVEL9K_SHORTEN_FOLDER_MARKER ]] && _POWERLEVEL9K_DIR_TRUNCATE_BEFORE_MARKER=0
   _p9k_declare -i POWERLEVEL9K_SHORTEN_DIR_LENGTH
   _p9k_declare -s POWERLEVEL9K_IP_INTERFACE ""
   _p9k_declare -s POWERLEVEL9K_VPN_IP_INTERFACE "(wg|(.*tun))[0-9]*"
@@ -6241,7 +6271,7 @@ _p9k_must_init() {
     [[ $sig == $_p9k__param_sig ]] && return 1
     _p9k_deinit
   fi
-  _p9k__param_pat=$'v26\1'${ZSH_VERSION}$'\1'${ZSH_PATCHLEVEL}$'\1'
+  _p9k__param_pat=$'v27\1'${ZSH_VERSION}$'\1'${ZSH_PATCHLEVEL}$'\1'
   _p9k__param_pat+=$'${#parameters[(I)POWERLEVEL9K_*]}\1${(%):-%n%#}\1$GITSTATUS_LOG_LEVEL\1'
   _p9k__param_pat+=$'$GITSTATUS_ENABLE_LOGGING\1$GITSTATUS_DAEMON\1$GITSTATUS_NUM_THREADS\1'
   _p9k__param_pat+=$'$DEFAULT_USER\1${ZLE_RPROMPT_INDENT:-1}\1$P9K_SSH\1$__p9k_ksh_arrays'
