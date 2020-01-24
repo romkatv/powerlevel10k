@@ -1,11 +1,11 @@
 # invoked in worker: _p9k_worker_main <timeout>
 function _p9k_worker_main() {
-  emulate -L zsh
-  setopt no_hist_expand extended_glob no_prompt_bang prompt_percent prompt_subst no_aliases no_bgnice
-
-  zmodload zsh/system                || return
-  zmodload zsh/zselect               || return
-  ! { zselect -t0 || (( $? != 1 )) } || return
+  zmodload zsh/zselect                  || return
+  ! { zselect -t0 || (( $? != 1 )) }    || return
+  mkfifo $_p9k__worker_file_prefix.fifo || return
+  echo -nE - s${1}$'\x1e'               || return
+  exec 0<$_p9k__worker_file_prefix.fifo || return
+  rm $_p9k__worker_file_prefix.fifo     || return
 
   function _p9k_worker_reply_begin() { print -nr -- e }
   function _p9k_worker_reply_end()   { print -nr -- $'\x1e' }
@@ -83,44 +83,14 @@ typeset -g   _p9k__worker_req_fd
 typeset -g   _p9k__worker_resp_fd
 typeset -g   _p9k__worker_shell_pid
 typeset -g   _p9k__worker_file_prefix
-typeset -gaU _p9k__worker_params
-typeset -gaU _p9k__worker_functions
 typeset -gA  _p9k__worker_request_map
 typeset -ga  _p9k__worker_request_queue
 
-function _p9k_worker_print_params() {
-  local names=(${@:/(#m)*/${${${+parameters[$MATCH]}:#0}:+$MATCH}})
-  (( ! $#names )) && return
-  print -n -- '\x1f' && typeset -p -- $names && print -n -- '\x1f\x1f\x1e'
-}
-
-function _p9k_worker_print_functions() {
-  local names=(${@:/(#m)*/${${${+functions[$MATCH]}:#0}:+$MATCH}})
-  (( ! $#names )) && return
-  print -n -- '\x1f' && functions -- $names && print -n -- '\x1f\x1f\x1e'
-}
-
 # invoked in master: _p9k_worker_send_params [param]...
-function _p9k_worker_send_params() {
-  if [[ -n $_p9k__worker_req_fd ]]; then
-    _p9k_worker_print_params ${(u)@} >&$_p9k__worker_req_fd && return
-    _p9k_worker_stop
-    return 1
-  else
-    _p9k__worker_params+=($@)
-  fi
-}
+function _p9k_worker_send_params() { }
 
 # invoked in master: _p9k_worker_send_functions [function-name]...
-function _p9k_worker_send_functions() {
-  if [[ -n $_p9k__worker_req_fd ]]; then
-    _p9k_worker_print_functions ${(u)@} >&$_p9k__worker_req_fd && return
-    _p9k_worker_stop
-    return 1
-  else
-    _p9k__worker_functions+=($@)
-  fi
-}
+function _p9k_worker_send_functions() { }
 
 # invoked in master: _p9k_worker_invoke <request-id> <cond> <async> <sync>
 function _p9k_worker_invoke() {
@@ -165,8 +135,6 @@ function _p9k_worker_stop() {
   _p9k__worker_req_fd=
   _p9k__worker_resp_fd=
   _p9k__worker_shell_pid=
-  _p9k__worker_params=()
-  _p9k__worker_functions=()
   _p9k__worker_request_map=()
   _p9k__worker_request_queue=()
   return 0
@@ -214,36 +182,16 @@ function _p9k_worker_receive() {
           [[ $arg == <1->        ]]                                                   || return
           _p9k__worker_pid=$arg
           sysopen -w -o cloexec -u _p9k__worker_req_fd $_p9k__worker_file_prefix.fifo || return
-          {
-            local init="
-              zmodload zsh/datetime
-              zmodload zsh/mathfunc
-              zmodload zsh/parameter
-              zmodload zsh/system
-              zmodload zsh/termcap
-              zmodload zsh/terminfo
-              zmodload zsh/zleparameter
-              zmodload -F zsh/stat b:zstat
-              zmodload -F zsh/net/socket b:zsocket
-              zmodload -F zsh/files b:zf_mv b:zf_rm
-              autoload -Uz is-at-least
-              () { $functions[_p9k_worker_main] }"
-            print -r -- ${init//$'\n'/$'\x1e'}                                        || return
-            _p9k_worker_print_params    $_p9k__worker_params                          || return
-            _p9k_worker_print_functions $_p9k__worker_functions                       || return
-            _p9k__worker_params=()
-            _p9k__worker_functions()
-            local req=
-            for req in $_p9k__worker_request_queue; do
-              if [[ $req != *$'\x1e' ]]; then
-                local id=$req
-                req=$_p9k__worker_request_map[$id]
-                _p9k__worker_request_map[$id]=
-              fi
-              print -rnu $_p9k__worker_req_fd -- $req                                 || return
-            done
-            _p9k__worker_request_queue=()
-          } >&$_p9k__worker_req_fd
+          local req=
+          for req in $_p9k__worker_request_queue; do
+            if [[ $req != *$'\x1e' ]]; then
+              local id=$req
+              req=$_p9k__worker_request_map[$id]
+              _p9k__worker_request_map[$id]=
+            fi
+            print -rnu $_p9k__worker_req_fd -- $req                                   || return
+          done
+          _p9k__worker_request_queue=()
         ;;
         *)
           return 1
@@ -259,42 +207,24 @@ function _p9k_worker_receive() {
 }
 
 function _p9k_worker_start() {
-  setopt no_bgnice
+  setopt no_bgnice monitor
   {
     [[ -n $_p9k__worker_resp_fd ]] && return
     _p9k__worker_file_prefix=${TMPDIR:-/tmp}/p10k.worker.$EUID.$$.$EPOCHSECONDS
 
-    if [[ -n $_POWERLEVEL9K_WORKER_LOG_LEVEL ]]; then
-      local trace=x
-      local log_file=$file_prefix.log
-    else
-      local trace=
-      local log_file=/dev/null
-    fi
-
-    log_file=/tmp/log  # todo: remove
-    trace=x
-
-    local fifo=$_p9k__worker_file_prefix.fifo
-    local zsh=${${:-/proc/self/exe}:A}
-    [[ -x $zsh ]] || zsh=zsh
-    local bootstrap='
-      "emulate" "-L" "zsh" "-o" "no_aliases" "-o" "no_bgnice"
-      {
-        local fifo='${(q)fifo}'
-        {
-          zmodload zsh/system              &&
-            mkfifo $fifo                   &&
-            exec >&4                       &&
-            echo -n "s$sysparams[pid]\x1e" &&
-            exec 0<$fifo                   || exit
-        } always { rm -f -- $fifo }
-        IFS= read -r && eval ${REPLY//$'"'\x1e'"'/$'"'\n'"'}
-      } &!
-      exec true'
     sysopen -r -o cloexec -u _p9k__worker_resp_fd <(
-      _p9k_worker_bootstrap=${bootstrap//  ##} </dev/null 4>&1 &>>$log_file \
-        exec $zsh -${trace}dfmc '"eval" "$_p9k_worker_bootstrap"') || return
+      if [[ -n $_POWERLEVEL9K_WORKER_LOG_LEVEL ]]; then
+        exec 2>$_p9k__worker_file_prefix.log
+        setopt xtrace
+      else
+        exec 2>/dev/null
+      fi
+      # todo: remove
+      exec 2>>/tmp/log
+      setopt xtrace
+      local pid=$sysparams[pid]
+      _p9k_worker_main $pid &
+      exec =true) || return
     zle -F $_p9k__worker_resp_fd _p9k_worker_receive
     _p9k__worker_shell_pid=$sysparams[pid]
     add-zsh-hook zshexit _p9k_worker_cleanup
