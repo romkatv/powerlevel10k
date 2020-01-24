@@ -1033,16 +1033,16 @@ prompt_disk_usage() {
   local disk_usage=${${=${(f)"$(df -P . 2>/dev/null)"}[2]}[5]%%%}
   local state bg fg
   if (( disk_usage >= _POWERLEVEL9K_DISK_USAGE_CRITICAL_LEVEL )); then
-    state=critical
+    state=CRITICAL
     bg=red
     fg=white
   elif (( disk_usage >= _POWERLEVEL9K_DISK_USAGE_WARNING_LEVEL )); then
-    state=warning
+    state=WARNING
     bg=yellow
     fg=$_p9k_color1
   else
     (( _POWERLEVEL9K_DISK_USAGE_ONLY_WARNING )) && return
-    state=normal
+    state=NORMAL
     bg=$_p9k_color1
     fg=yellow
   fi
