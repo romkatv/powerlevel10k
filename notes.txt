@@ -10,8 +10,6 @@
   disabling implicit reset on every eval in _p9k_worker_receive.
 - implement fake gitstatus api on top of vcs_info (or plain git?) + worker and use it if there is no
   gitstatus.
-- when worker_main kills itself, the gpid is wrong.
-- spawn watchdog from within <(...) right after worker_main. it should sleep on zselect (zselect should be loaded in <(...)) and try to write zero bytes to stdout. on failure, kill the group.
 
 _p9k_worker_async cb1 cb2
 

@@ -86,10 +86,8 @@ typeset -g   _p9k__worker_file_prefix
 typeset -gA  _p9k__worker_request_map
 typeset -ga  _p9k__worker_request_queue
 
-# invoked in master: _p9k_worker_send_params [param]...
+# todo: remove these
 function _p9k_worker_send_params() { }
-
-# invoked in master: _p9k_worker_send_functions [function-name]...
 function _p9k_worker_send_functions() { }
 
 # invoked in master: _p9k_worker_invoke <request-id> <cond> <async> <sync>
@@ -155,10 +153,9 @@ function _p9k_worker_receive() {
       sysread -i $_p9k__worker_resp_fd 'buf[$#buf+1]'                                 || return
     done
 
-    for resp in ${(ps:\x1e:)buf}; do
+    for resp in ${(ps:\x1e:)${buf//$'\x05'}}; do
       local arg=$resp[2,-1]
       case $resp[1] in
-        p) ;;
         d)
           local req=$_p9k__worker_request_map[$arg]
           if [[ -n $req ]]; then
@@ -229,7 +226,7 @@ function _p9k_worker_start() {
       _p9k_worker_main $pgid &
       {
         trap '' PIPE
-        while syswrite p$'\x1e'; do zselect -t 1000; done
+        while syswrite $'\x05'; do zselect -t 1000; done
         kill -- -$pgid
       } &
       exec =true) || return
