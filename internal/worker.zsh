@@ -1,9 +1,7 @@
 # invoked in worker: _p9k_worker_main <pgid>
 function _p9k_worker_main() {
-  local pgid=$1
-
   mkfifo $_p9k__worker_file_prefix.fifo || return
-  echo -nE - s${1}$'\x1e'               || return
+  echo -nE - s$_p9k_worker_pgid$'\x1e'  || return
   exec 0<$_p9k__worker_file_prefix.fifo || return
   rm $_p9k__worker_file_prefix.fifo     || return
 
@@ -16,9 +14,9 @@ function _p9k_worker_main() {
   local -A _p9k_worker_fds       # fd => id$'\x1f'callback
   local -A _p9k_worker_inflight  # id => inflight count
 
-  function _p9k_worker_reply_begin() { print -nr -- e }
-  function _p9k_worker_reply_end()   { print -nr -- $'\x1e' }
-  function _p9k_worker_reply()       { print -nr -- e${(pj:\n:)@}$'\x1e' }
+  function _p9k_worker_reply() {
+    print -nr -- e${(pj:\n:)@}$'\x1e' || kill -- -$_p9k_worker_pgid
+  }
 
   # usage: _p9k_worker_async <work> <callback>
   function _p9k_worker_async() {
@@ -28,6 +26,8 @@ function _p9k_worker_main() {
     (( ++_p9k_worker_inflight[$_p9k_worker_request_id] ))
     _p9k_worker_fds[$fd]=$_p9k_worker_request_id$'\x1f'$2
   }
+
+  trap '' PIPE
 
   {
     while zselect -a ready 0 ${(k)_p9k_worker_fds}; do
@@ -70,7 +70,7 @@ function _p9k_worker_main() {
       done
     done
   } always {
-    kill -- -$pgid
+    kill -- -$_p9k_worker_pgid
   }
 }
 
@@ -200,12 +200,12 @@ function _p9k_worker_start() {
       setopt xtrace
       zmodload zsh/zselect               || return
       ! { zselect -t0 || (( $? != 1 )) } || return
-      local pgid=$sysparams[pid]
-      _p9k_worker_main $pgid &
+      local _p9k_worker_pgid=$sysparams[pid]
+      _p9k_worker_main &
       {
         trap '' PIPE
         while syswrite $'\x05'; do zselect -t 1000; done
-        kill -- -$pgid
+        kill -- -$_p9k_worker_pgid
       } &
       exec =true) || return
     zle -F $_p9k__worker_resp_fd _p9k_worker_receive
