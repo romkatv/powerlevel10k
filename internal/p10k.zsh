@@ -4931,6 +4931,8 @@ _p9k_precmd_impl() {
   if [[ $preexec_functions[-1] != _p9k_preexec2 && $preexec_functions[(I)_p9k_preexec2] != 0 ]]; then
     preexec_functions=(${(@)preexec_functions:#_p9k_preexec2} _p9k_preexec2)
   fi
+
+  _p9k_worker_receive
 }
 
 _p9k_trapint() {

@@ -121,6 +121,8 @@ function _p9k_worker_receive() {
   emulate -L zsh
   setopt no_hist_expand extended_glob no_prompt_bang prompt_{percent,subst} no_aliases
 
+  [[ -z $_p9k__worker_resp_fd ]] && return
+
   {
     (( $# <= 1 )) || return
 
