@@ -3,7 +3,7 @@ function _p9k_worker_main() {
   mkfifo $_p9k__worker_file_prefix.fifo || return
   echo -nE - s$_p9k_worker_pgid$'\x1e'  || return
   exec 0<$_p9k__worker_file_prefix.fifo || return
-  rm $_p9k__worker_file_prefix.fifo     || return
+  zf_rm $_p9k__worker_file_prefix.fifo  || return
 
   typeset -g IFS=$' \t\n\0'
 
@@ -108,6 +108,7 @@ function _p9k_worker_stop() {
   [[ -n $_p9k__worker_resp_fd     ]] && exec {_p9k__worker_resp_fd}>&-
   [[ -n $_p9k__worker_req_fd      ]] && exec {_p9k__worker_req_fd}>&-
   [[ -n $_p9k__worker_pid         ]] && kill -- -$_p9k__worker_pid 2>/dev/null
+  [[ -n $_p9k__worker_file_prefix ]] && zf_rm -f $_p9k__worker_file_prefix.fifo
   _p9k__worker_pid=
   _p9k__worker_req_fd=
   _p9k__worker_resp_fd=
@@ -205,6 +206,7 @@ function _p9k_worker_start() {
       {
         trap '' PIPE
         while syswrite $'\x05'; do zselect -t 1000; done
+        zf_rm -f $_p9k__worker_file_prefix.fifo
         kill -- -$_p9k_worker_pgid
       } &
       exec =true) || return
@@ -230,11 +232,13 @@ emulate -L zsh -o prompt_subst -o interactive_comments # -o xtrace
 
 zmodload zsh/datetime
 zmodload zsh/system
+zmodload -F zsh/files b:zf_mv b:zf_rm
+
 autoload -Uz add-zsh-hook
 
 function foo_compute() {
   _p9k_worker_reply 'echo sync latency: $((1000*(EPOCHREALTIME-'$1'))) >>/tmp/log'
-  _p9k_worker_async foo_async "foo_sync $1"
+  # _p9k_worker_async foo_async "foo_sync $1"
 }
 
 function foo_async() {

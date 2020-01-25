@@ -1,5 +1,3 @@
-- declare local _p9k_worker_reset in _p9k_worker_receive. it can be set when replies from worker
-  are eval'd. initial value 0. 1 means reset-prompt is needed. 2 for _p9k_set_prompt + reset-prompt.
 - battery: when state or icon change, update with _p9k_set_prompt. make sure icons can be sent with
   `typset -p` in zsh 5.1.
 - ram: reduce precision to 2 digits. check if it makes sense for all segments that use the same
@@ -10,6 +8,3 @@
   disabling implicit reset on every eval in _p9k_worker_receive.
 - implement fake gitstatus api on top of vcs_info (or plain git?) + worker and use it if there is no
   gitstatus.
-
-_p9k_worker_async cb1 cb2
-
