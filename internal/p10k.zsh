@@ -963,6 +963,10 @@ prompt_anaconda() {
   _p9k_prompt_segment "$0" "blue" "$_p9k_color1" 'PYTHON_ICON' 0 '' "$msg"
 }
 
+_p9k_prompt_anaconda_init() {
+  typeset -g "_p9k__segment_cond_${_p9k_prompt_side}[_p9k_segment_index]"='${CONDA_PREFIX:-$CONDA_ENV_PATH}'
+}
+
 ################################################################
 # AWS Profile
 prompt_aws() {
@@ -975,9 +979,12 @@ prompt_aws() {
         break
       fi
     done
-
     _p9k_prompt_segment "$0$state" red white 'AWS_ICON' 0 '' "${aws_profile//\%/%%}"
   fi
+}
+
+_p9k_prompt_aws_init() {
+  typeset -g "_p9k__segment_cond_${_p9k_prompt_side}[_p9k_segment_index]"='${AWS_VAULT:-${AWSUME_PROFILE:-${AWS_PROFILE:-$AWS_DEFAULT_PROFILE}}}'
 }
 
 ################################################################
@@ -1002,9 +1009,14 @@ prompt_aws_eb_env() {
   _p9k_prompt_segment "$0" black green 'AWS_EB_ICON' 0 '' "${_p9k_cache_val[1]//\%/%%}"
 }
 
+_p9k_prompt_aws_eb_env_init() {
+  typeset -g "_p9k__segment_cond_${_p9k_prompt_side}[_p9k_segment_index]"='$commands[eb]'
+}
+
 ################################################################
 # Segment to indicate background jobs with an icon.
 prompt_background_jobs() {
+  local -i len=$#_p9k__prompt
   local msg
   if (( _POWERLEVEL9K_BACKGROUND_JOBS_VERBOSE )); then
     if (( _POWERLEVEL9K_BACKGROUND_JOBS_VERBOSE_ALWAYS )); then
@@ -1014,15 +1026,19 @@ prompt_background_jobs() {
     fi
   fi
   _p9k_prompt_segment $0 "$_p9k_color1" cyan BACKGROUND_JOBS_ICON 1 '${${(%):-%j}:#0}' "$msg"
+  typeset -g "_p9k__segment_val_${_p9k_prompt_side}[_p9k_segment_index]"=$_p9k__prompt[len+1,-1]
 }
 
 ################################################################
 # Segment that indicates usage level of current partition.
 prompt_disk_usage() {
+  local -i len=$#_p9k__prompt
   _p9k_prompt_segment $0_CRITICAL red    white        DISK_ICON 1 '$_p9k__disk_usage_critical' '$_p9k__disk_usage_pct%%'
   _p9k_prompt_segment $0_WARNING  yellow $_p9k_color1 DISK_ICON 1 '$_p9k__disk_usage_warning'  '$_p9k__disk_usage_pct%%'
-  (( _POWERLEVEL9K_DISK_USAGE_ONLY_WARNING )) && return
-  _p9k_prompt_segment $0_NORMAL $_p9k_color1 yellow   DISK_ICON 1 '$_p9k__disk_usage_normal'   '$_p9k__disk_usage_pct%%'
+  if (( ! _POWERLEVEL9K_DISK_USAGE_ONLY_WARNING )); then
+    _p9k_prompt_segment $0_NORMAL $_p9k_color1 yellow   DISK_ICON 1 '$_p9k__disk_usage_normal'   '$_p9k__disk_usage_pct%%'
+  fi
+  typeset -g "_p9k__segment_val_${_p9k_prompt_side}[_p9k_segment_index]"=$_p9k__prompt[len+1,-1]
 }
 
 _p9k_prompt_disk_usage_init() {
@@ -1086,6 +1102,10 @@ prompt_fvm() {
   done
 }
 
+_p9k_prompt_fvm_init() {
+  typeset -g "_p9k__segment_cond_${_p9k_prompt_side}[_p9k_segment_index]"='$commands[fvm]'
+}
+
 ################################################################
 # Segment that displays the battery status in levels and colors
 prompt_battery() {
@@ -1095,7 +1115,13 @@ prompt_battery() {
 
 _p9k_prompt_battery_init() {
   typeset -ga _p9k__battery_args=()
-  [[ $_p9k_os == OSX ]] && _p9k__async_segments_compute+=_p9k_prompt_battery_compute
+  if [[ $_p9k_os == OSX && $+commands[pmset] == 1 ]]; then
+    _p9k__async_segments_compute+=_p9k_prompt_battery_compute
+    return
+  fi
+  if [[ $_p9k_os != (Linux|Android) || -z /sys/class/power_supply/(BAT*|battery)/(#qFN) ]]; then
+    typeset -g "_p9k__segment_cond_${_p9k_prompt_side}[_p9k_segment_index]"='${:-}'
+  fi
 }
 
 _p9k_prompt_battery_compute() {
@@ -1238,6 +1264,7 @@ _p9k_prompt_battery_set_args() {
 ################################################################
 # Public IP segment
 prompt_public_ip() {
+  local -i len=$#_p9k__prompt
   local ip='${_p9k__public_ip:-$_POWERLEVEL9K_PUBLIC_IP_NONE}'
   if [[ -n $_POWERLEVEL9K_PUBLIC_IP_VPN_INTERFACE ]]; then
     _p9k_prompt_segment "$0" "$_p9k_color1" "$_p9k_color2" PUBLIC_IP_ICON 1 '${_p9k__public_ip_not_vpn:+'$ip'}' $ip
@@ -1245,6 +1272,7 @@ prompt_public_ip() {
   else
     _p9k_prompt_segment "$0" "$_p9k_color1" "$_p9k_color2" PUBLIC_IP_ICON 1 $ip $ip
   fi
+  typeset -g "_p9k__segment_val_${_p9k_prompt_side}[_p9k_segment_index]"=$_p9k__prompt[len+1,-1]
 }
 
 _p9k_prompt_public_ip_init() {
@@ -1307,84 +1335,105 @@ _p9k_prompt_public_ip_sync() {
 ################################################################
 # Context: user@hostname (who am I and where am I)
 prompt_context() {
-  if ! _p9k_cache_get $0 "${(%):-%#}"; then
-    local -i enabled=1
-    local content
-    if [[ $_POWERLEVEL9K_ALWAYS_SHOW_CONTEXT == 0 && -n $DEFAULT_USER && $P9K_SSH == 0 ]]; then
-      local user="${(%):-%n}"
-      if [[ $user == $DEFAULT_USER ]]; then
-        if (( _POWERLEVEL9K_ALWAYS_SHOW_USER )); then
-          content="${user//\%/%%}"
-        else
-          enabled=0
-        fi
-      fi
+  local -i len=$#_p9k__prompt
+
+  local content
+  if [[ $_POWERLEVEL9K_ALWAYS_SHOW_CONTEXT == 0 && -n $DEFAULT_USER && $P9K_SSH == 0 ]]; then
+    local user="${(%):-%n}"
+    if [[ $user == $DEFAULT_USER ]]; then
+      content="${user//\%/%%}"
     fi
-
-    local state
-    if (( enabled )); then
-      state="DEFAULT"
-      if [[ "${(%):-%#}" == '#' ]]; then
-        state="ROOT"
-      elif (( P9K_SSH )); then
-        if [[ -n "$SUDO_COMMAND" ]]; then
-          state="REMOTE_SUDO"
-        else
-          state="REMOTE"
-        fi
-      elif [[ -n "$SUDO_COMMAND" ]]; then
-        state="SUDO"
-      fi
-
-      if [[ -z $content ]]; then
-        local var=_POWERLEVEL9K_CONTEXT_${state}_TEMPLATE
-        if (( $+parameters[$var] )); then
-          [[ -z $_p9k_locale ]] || local LC_ALL=$_p9k_locale
-          content=${(P)var}
-          content=${(g::)content}
-        else
-          content=$_POWERLEVEL9K_CONTEXT_TEMPLATE
-        fi
-      fi
-    fi
-
-    _p9k_cache_set "$enabled" "$state" "$content"
   fi
 
-  (( _p9k_cache_val[1] )) || return
-  _p9k_prompt_segment "$0_$_p9k_cache_val[2]" "$_p9k_color1" yellow '' 0 '' "$_p9k_cache_val[3]"
+  local state
+  if (( P9K_SSH )); then
+    if [[ -n "$SUDO_COMMAND" ]]; then
+      state="REMOTE_SUDO"
+    else
+      state="REMOTE"
+    fi
+  elif [[ -n "$SUDO_COMMAND" ]]; then
+    state="SUDO"
+  else
+    state="DEFAULT"
+  fi
+
+  local cond
+  for state cond in $state '${${(%):-%#}:#\#}' ROOT '${${(%):-%#}:#\%}'; do
+    local text=$content
+    if [[ -z $text ]]; then
+      local var=_POWERLEVEL9K_CONTEXT_${state}_TEMPLATE
+      if (( $+parameters[$var] )); then
+        [[ -z $_p9k_locale ]] || local LC_ALL=$_p9k_locale
+        text=${(P)var}
+        text=${(g::)text}
+      else
+        text=$_POWERLEVEL9K_CONTEXT_TEMPLATE
+      fi
+    fi
+    _p9k_prompt_segment "$0_$state" "$_p9k_color1" yellow '' 0 "$cond" "$text"
+  done
+
+  typeset -g "_p9k__segment_val_${_p9k_prompt_side}[_p9k_segment_index]"=$_p9k__prompt[len+1,-1]
 }
 
-instant_prompt_context() { prompt_context; }
+instant_prompt_context() {
+  if [[ $_POWERLEVEL9K_ALWAYS_SHOW_CONTEXT == 0 && -n $DEFAULT_USER && $P9K_SSH == 0 ]]; then
+    if [[ ${(%):-%n} == $DEFAULT_USER ]]; then
+      if (( ! _POWERLEVEL9K_ALWAYS_SHOW_USER )); then
+        return
+      fi
+    fi
+  fi
+  prompt_context
+}
+
+_p9k_prompt_context_init() {
+  if [[ $_POWERLEVEL9K_ALWAYS_SHOW_CONTEXT == 0 && -n $DEFAULT_USER && $P9K_SSH == 0 ]]; then
+    if [[ ${(%):-%n} == $DEFAULT_USER ]]; then
+      if (( ! _POWERLEVEL9K_ALWAYS_SHOW_USER )); then
+        typeset -g "_p9k__segment_cond_${_p9k_prompt_side}[_p9k_segment_index]"='${:-}'
+      fi
+    fi
+  fi
+}
 
 ################################################################
 # User: user (who am I)
 prompt_user() {
-  if ! _p9k_cache_get $0 "${(%):-%#}"; then
-    local user="${(%):-%n}"
-    if [[ $_POWERLEVEL9K_ALWAYS_SHOW_USER == 0 && $user == $DEFAULT_USER ]]; then
-      _p9k_cache_set true
-    elif [[ "${(%):-%#}" == '#' ]]; then
-      _p9k_cache_set _p9k_prompt_segment "${0}_ROOT" "${_p9k_color1}" yellow ROOT_ICON 0 '' "$_POWERLEVEL9K_USER_TEMPLATE"
-    elif [[ -n "$SUDO_COMMAND" ]]; then
-      _p9k_cache_set _p9k_prompt_segment "${0}_SUDO" "${_p9k_color1}" yellow SUDO_ICON 0 '' "$_POWERLEVEL9K_USER_TEMPLATE"
-    else
-      _p9k_cache_set _p9k_prompt_segment "${0}_DEFAULT" "${_p9k_color1}" yellow USER_ICON 0 '' "${user//\%/%%}"
-    fi
+  local -i len=$#_p9k__prompt
+  _p9k_prompt_segment "${0}_ROOT" "${_p9k_color1}" yellow ROOT_ICON 0 '${${(%):-%#}:#\%}' "$_POWERLEVEL9K_USER_TEMPLATE"
+  if [[ -n "$SUDO_COMMAND" ]]; then
+    _p9k_prompt_segment "${0}_SUDO" "${_p9k_color1}" yellow SUDO_ICON 0 '${${(%):-%#}:#\#}' "$_POWERLEVEL9K_USER_TEMPLATE"
+  else
+    _p9k_prompt_segment "${0}_DEFAULT" "${_p9k_color1}" yellow USER_ICON 0 '${${(%):-%#}:#\#}' "%n"
   fi
-  "$_p9k_cache_val[@]"
+  typeset -g "_p9k__segment_val_${_p9k_prompt_side}[_p9k_segment_index]"=$_p9k__prompt[len+1,-1]
 }
 
-instant_prompt_user() { prompt_user; }
+instant_prompt_user() {
+  if [[ $_POWERLEVEL9K_ALWAYS_SHOW_USER == 0 && "${(%):-%n}" == $DEFAULT_USER ]]; then
+    return
+  fi
+  prompt_user
+}
+
+_p9k_prompt_user_init() {
+  if [[ $_POWERLEVEL9K_ALWAYS_SHOW_USER == 0 && "${(%):-%n}" == $DEFAULT_USER ]]; then
+    typeset -g "_p9k__segment_cond_${_p9k_prompt_side}[_p9k_segment_index]"='${:-}'
+  fi
+}
 
 ################################################################
 # Host: machine (where am I)
 prompt_host() {
+  local -i len=$#_p9k__prompt
   if (( P9K_SSH )); then
     _p9k_prompt_segment "$0_REMOTE" "${_p9k_color1}" yellow SSH_ICON 0 '' "$_POWERLEVEL9K_HOST_TEMPLATE"
   else
     _p9k_prompt_segment "$0_LOCAL" "${_p9k_color1}" yellow HOST_ICON 0 '' "$_POWERLEVEL9K_HOST_TEMPLATE"
   fi
+  typeset -g "_p9k__segment_val_${_p9k_prompt_side}[_p9k_segment_index]"=$_p9k__prompt[len+1,-1]
 }
 
 instant_prompt_host() { prompt_host; }
@@ -1824,6 +1873,10 @@ prompt_docker_machine() {
   fi
 }
 
+_p9k_prompt_docker_machine_init() {
+  typeset -g "_p9k__segment_cond_${_p9k_prompt_side}[_p9k_segment_index]"='$DOCKER_MACHINE_NAME'
+}
+
 ################################################################
 # GO prompt
 prompt_go_version() {
@@ -1852,10 +1905,16 @@ prompt_go_version() {
   _p9k_prompt_segment "$0" "green" "grey93" "GO_ICON" 0 '' "${v//\%/%%}"
 }
 
+_p9k_prompt_go_version_init() {
+  typeset -g "_p9k__segment_cond_${_p9k_prompt_side}[_p9k_segment_index]"='$commands[go]'
+}
+
 ################################################################
 # Command number (in local history)
 prompt_history() {
+  local -i len=$#_p9k__prompt
   _p9k_prompt_segment "$0" "grey50" "$_p9k_color1" '' 0 '' '%h'
+  typeset -g "_p9k__segment_val_${_p9k_prompt_side}[_p9k_segment_index]"=$_p9k__prompt[len+1,-1]
 }
 
 ################################################################
@@ -1871,16 +1930,24 @@ prompt_detect_virt() {
   fi
 }
 
+_p9k_prompt_detect_virt_init() {
+  typeset -g "_p9k__segment_cond_${_p9k_prompt_side}[_p9k_segment_index]"='$commands[systemd-detect-virt]'
+}
+
 ################################################################
 # Segment to display the current IP address
 prompt_ip() {
+  local -i len=$#_p9k__prompt
   _p9k_prompt_segment "$0" "cyan" "$_p9k_color1" 'NETWORK_ICON' 1 '$_p9k__ip_ip' '$_p9k__ip_ip'
+  typeset -g "_p9k__segment_val_${_p9k_prompt_side}[_p9k_segment_index]"=$_p9k__prompt[len+1,-1]
 }
 
 ################################################################
 # Segment to display if VPN is active
 prompt_vpn_ip() {
+  local -i len=$#_p9k__prompt
   _p9k_prompt_segment "$0" "cyan" "$_p9k_color1" 'VPN_ICON' 1 '$_p9k__vpn_ip_ip' '$_p9k__vpn_ip_ip'
+  typeset -g "_p9k__segment_val_${_p9k_prompt_side}[_p9k_segment_index]"=$_p9k__prompt[len+1,-1]
 }
 
 ################################################################
@@ -1894,13 +1961,19 @@ prompt_laravel_version() {
   fi
 }
 
+_p9k_prompt_laravel_version_init() {
+  typeset -g "_p9k__segment_cond_${_p9k_prompt_side}[_p9k_segment_index]"='$commands[php]'
+}
+
 ################################################################
 # Segment to display load
 prompt_load() {
   if [[ $_p9k_os == (OSX|BSD) ]]; then
+    local -i len=$#_p9k__prompt
     _p9k_prompt_segment $0_CRITICAL red    "$_p9k_color1" LOAD_ICON 1 '$_p9k__load_critical' '$_p9k__load_value'
     _p9k_prompt_segment $0_WARNING  yellow "$_p9k_color1" LOAD_ICON 1 '$_p9k__load_warning'  '$_p9k__load_value'
     _p9k_prompt_segment $0_NORMAL   green  "$_p9k_color1" LOAD_ICON 1 '$_p9k__load_normal'   '$_p9k__load_value'
+    typeset -g "_p9k__segment_val_${_p9k_prompt_side}[_p9k_segment_index]"=$_p9k__prompt[len+1,-1]
     return
   fi
 
@@ -1918,12 +1991,15 @@ prompt_load() {
 }
 
 _p9k_prompt_load_init() {
-  [[ $_p9k_os == (OSX|BSD) ]] || return
-  typeset -g _p9k__load_value=
-  typeset -g _p9k__load_normal=
-  typeset -g _p9k__load_warning=
-  typeset -g _p9k__load_critical=
-  _p9k__async_segments_compute+=_p9k_prompt_load_compute
+  if [[ $_p9k_os == (OSX|BSD) ]]; then
+    typeset -g _p9k__load_value=
+    typeset -g _p9k__load_normal=
+    typeset -g _p9k__load_warning=
+    typeset -g _p9k__load_critical=
+    _p9k__async_segments_compute+=_p9k_prompt_load_compute
+  elif [[ ! -r /proc/loadavg ]]; then
+    typeset -g "_p9k__segment_cond_${_p9k_prompt_side}[_p9k_segment_index]"='${:-}'
+  fi
 }
 
 _p9k_prompt_load_compute() {
@@ -2002,6 +2078,10 @@ prompt_node_version() {
 
   _p9k_cached_cmd_stdout node --version && [[ $_p9k_ret == v?* ]] || return
   _p9k_prompt_segment "$0" "green" "white" 'NODE_ICON' 0 '' "${_p9k_ret#v}"
+}
+
+_p9k_prompt_node_version_init() {
+  typeset -g "_p9k__segment_cond_${_p9k_prompt_side}[_p9k_segment_index]"='$commands[node]'
 }
 
 # Almost the same as `nvm_version default` but faster. The differences shouldn't affect
@@ -2111,6 +2191,10 @@ prompt_nvm() {
   _p9k_prompt_segment "$0" "magenta" "black" 'NODE_ICON' 0 '' "${${current#v}//\%/%%}"
 }
 
+_p9k_prompt_nvm_init() {
+  typeset -g "_p9k__segment_cond_${_p9k_prompt_side}[_p9k_segment_index]"='${commands[nvm]:-${${+functions[nvm]}:#0}}'
+}
+
 ################################################################
 # Segment to display NodeEnv
 prompt_nodeenv() {
@@ -2121,6 +2205,10 @@ prompt_nodeenv() {
   fi
   msg+="$_POWERLEVEL9K_NODEENV_LEFT_DELIMITER${${NODE_VIRTUAL_ENV:t}//\%/%%}$_POWERLEVEL9K_NODEENV_RIGHT_DELIMITER"
   _p9k_prompt_segment "$0" "black" "green" 'NODE_ICON' 0 '' "$msg"
+}
+
+_p9k_prompt_nodeenv_init() {
+  typeset -g "_p9k__segment_cond_${_p9k_prompt_side}[_p9k_segment_index]"='$NODE_VIRTUAL_ENV'
 }
 
 function _p9k_read_nodenv_version_file() {
@@ -2174,6 +2262,10 @@ prompt_nodenv() {
   _p9k_prompt_segment "$0" "black" "green" 'NODE_ICON' 0 '' "${v//\%/%%}"
 }
 
+_p9k_prompt_nodenv_init() {
+  typeset -g "_p9k__segment_cond_${_p9k_prompt_side}[_p9k_segment_index]"='${commands[nodenv]:-${${+functions[nodenv]}:#0}}'
+}
+
 prompt_dotnet_version() {
   (( $+commands[dotnet] )) || return
 
@@ -2217,11 +2309,16 @@ prompt_dotnet_version() {
   _p9k_prompt_segment "$0" "magenta" "white" 'DOTNET_ICON' 0 '' "$_p9k_ret"
 }
 
+_p9k_prompt_dotnet_init() {
+  typeset -g "_p9k__segment_cond_${_p9k_prompt_side}[_p9k_segment_index]"='$commands[dotnet]'
+}
 
 ################################################################
 # Segment to print a little OS icon
 prompt_os_icon() {
+  local -i len=$#_p9k__prompt
   _p9k_prompt_segment "$0" "black" "white" '' 0 '' "$_p9k_os_icon"
+  typeset -g "_p9k__segment_val_${_p9k_prompt_side}[_p9k_segment_index]"=$_p9k__prompt[len+1,-1]
 }
 
 instant_prompt_os_icon() { prompt_os_icon; }
@@ -2236,13 +2333,25 @@ prompt_php_version() {
   _p9k_prompt_segment "$0" "fuchsia" "grey93" '' 0 '' "${v//\%/%%}"
 }
 
+_p9k_prompt_php_version_init() {
+  typeset -g "_p9k__segment_cond_${_p9k_prompt_side}[_p9k_segment_index]"='$commands[php]'
+}
+
 ################################################################
 # Segment to display free RAM and used Swap
 prompt_ram() {
+  local -i len=$#_p9k__prompt
   _p9k_prompt_segment $0 yellow "$_p9k_color1" RAM_ICON 1 '$_p9k__ram_free' '$_p9k__ram_free'
+  typeset -g "_p9k__segment_val_${_p9k_prompt_side}[_p9k_segment_index]"=$_p9k__prompt[len+1,-1]
 }
 
 function _p9k_prompt_ram_init() {
+  if [[ $_p9k_os == OSX && $+commands[vm_stat] == 0 ||
+        $_p9k_os == BSD && ! -r /var/run/dmesg.boot ||
+        $_p9k_os != (OSX|BSD) && ! -r /proc/meminfo ]]; then
+    typeset -g "_p9k__segment_cond_${_p9k_prompt_side}[_p9k_segment_index]"='${:-}'
+    return
+  fi
   typeset -g _p9k__ram_free=
   _p9k__async_segments_compute+=_p9k_prompt_ram_compute
 }
@@ -2335,6 +2444,10 @@ prompt_rbenv() {
   _p9k_prompt_segment "$0" "red" "$_p9k_color1" 'RUBY_ICON' 0 '' "${v//\%/%%}"
 }
 
+_p9k_prompt_rbenv_init() {
+  typeset -g "_p9k__segment_cond_${_p9k_prompt_side}[_p9k_segment_index]"='${commands[rbenv]:-${${+functions[rbenv]}:#0}}'
+}
+
 function _p9k_read_luaenv_version_file() {
   [[ -r $1 ]] || return
   local rest
@@ -2380,6 +2493,10 @@ prompt_luaenv() {
   fi
 
   _p9k_prompt_segment "$0" blue "$_p9k_color1" 'LUA_ICON' 0 '' "${v//\%/%%}"
+}
+
+_p9k_prompt_luaenv_init() {
+  typeset -g "_p9k__segment_cond_${_p9k_prompt_side}[_p9k_segment_index]"='${commands[luaenv]:-${${+functions[luaenv]}:#0}}'
 }
 
 function _p9k_read_jenv_version_file() {
@@ -2440,6 +2557,10 @@ prompt_plenv() {
   _p9k_prompt_segment "$0" "blue" "$_p9k_color1" 'PERL_ICON' 0 '' "${v//\%/%%}"
 }
 
+_p9k_prompt_plenv_init() {
+  typeset -g "_p9k__segment_cond_${_p9k_prompt_side}[_p9k_segment_index]"='${commands[plenv]:-${${+functions[plenv]}:#0}}'
+}
+
 ################################################################
 # Segment to display jenv information
 # https://github.com/jenv/jenv
@@ -2476,6 +2597,10 @@ prompt_jenv() {
   _p9k_prompt_segment "$0" white red 'JAVA_ICON' 0 '' "${v//\%/%%}"
 }
 
+_p9k_prompt_jenv_init() {
+  typeset -g "_p9k__segment_cond_${_p9k_prompt_side}[_p9k_segment_index]"='${commands[jenv]:-${${+functions[jenv]}:#0}}'
+}
+
 ################################################################
 # Segment to display chruby information
 # see https://github.com/postmodern/chruby/issues/245 for chruby_auto issue with ZSH
@@ -2487,10 +2612,16 @@ prompt_chruby() {
   _p9k_prompt_segment "$0" "red" "$_p9k_color1" 'RUBY_ICON' 0 '' "${v//\%/%%}"
 }
 
+_p9k_prompt_chruby_init() {
+  typeset -g "_p9k__segment_cond_${_p9k_prompt_side}[_p9k_segment_index]"='$RUBY_ENGINE'
+}
+
 ################################################################
 # Segment to print an icon if user is root.
 prompt_root_indicator() {
-  _p9k_prompt_segment "$0" "$_p9k_color1" "yellow" 'ROOT_ICON' 0 '${${(%):-%#}:#%}' ''
+  local -i len=$#_p9k__prompt
+  _p9k_prompt_segment "$0" "$_p9k_color1" "yellow" 'ROOT_ICON' 0 '${${(%):-%#}:#\%}' ''
+  typeset -g "_p9k__segment_val_${_p9k_prompt_side}[_p9k_segment_index]"=$_p9k__prompt[len+1,-1]
 }
 
 instant_prompt_root_indicator() { prompt_root_indicator; }
@@ -2557,6 +2688,10 @@ prompt_rust_version() {
   _p9k_prompt_segment "$0" "darkorange" "$_p9k_color1" 'RUST_ICON' 0 '' "${v//\%/%%}"
 }
 
+_p9k_prompt_rust_version_init() {
+  typeset -g "_p9k__segment_cond_${_p9k_prompt_side}[_p9k_segment_index]"='$commands[rustc]'
+}
+
 # RSpec test ratio
 prompt_rspec_stats() {
   if [[ -d app && -d spec ]]; then
@@ -2579,15 +2714,30 @@ prompt_rvm() {
   _p9k_prompt_segment "$0" "240" "$_p9k_color1" 'RUBY_ICON' 0 '' "${v//\%/%%}"
 }
 
+_p9k_prompt_rvm_init() {
+  typeset -g "_p9k__segment_cond_${_p9k_prompt_side}[_p9k_segment_index]"='${commands[rvm-prompt]:-${${+functions[rvm-prompt]}:#0}}'
+}
+
 ################################################################
 # Segment to display SSH icon when connected
 prompt_ssh() {
-  if (( P9K_SSH )); then
-    _p9k_prompt_segment "$0" "$_p9k_color1" "yellow" 'SSH_ICON' 0 '' ''
+  local -i len=$#_p9k__prompt
+  _p9k_prompt_segment "$0" "$_p9k_color1" "yellow" 'SSH_ICON' 0 '' ''
+  typeset -g "_p9k__segment_val_${_p9k_prompt_side}[_p9k_segment_index]"=$_p9k__prompt[len+1,-1]
+}
+
+_p9k_prompt_ssh_init() {
+  if (( ! P9K_SSH )); then
+    typeset -g "_p9k__segment_cond_${_p9k_prompt_side}[_p9k_segment_index]"='${:-}'
   fi
 }
 
-instant_prompt_ssh() { prompt_ssh; }
+instant_prompt_ssh() {
+  if (( ! P9K_SSH )); then
+    return
+  fi
+  prompt_ssh
+}
 
 ################################################################
 # Status: When an error occur, return the error code, or a cross icon if option is set
@@ -2638,6 +2788,7 @@ instant_prompt_status() {
 }
 
 prompt_prompt_char() {
+  local -i len=$#_p9k__prompt
   if (( __p9k_sh_glob )); then
     if (( _p9k__status )); then
       if (( _POWERLEVEL9K_PROMPT_CHAR_OVERWRITE_STATE )); then
@@ -2679,6 +2830,7 @@ prompt_prompt_char() {
       _p9k_prompt_segment $0_OK_VIVIS "$_p9k_color1" 76 '' 0 '${(M)${:-$_p9k__keymap$_p9k__region_active}:#(vicmd1|vivis?|vivli?)}' 'Ⅴ'
     fi
   fi
+  typeset -g "_p9k__segment_val_${_p9k_prompt_side}[_p9k_segment_index]"=$_p9k__prompt[len+1,-1]
 }
 
 instant_prompt_prompt_char() {
@@ -2688,6 +2840,25 @@ instant_prompt_prompt_char() {
 ################################################################
 # Segment to display Swap information
 prompt_swap() {
+  local -i len=$#_p9k__prompt
+  _p9k_prompt_segment $0 yellow "$_p9k_color1" SWAP_ICON 1 '$_p9k__swap_used' '$_p9k__swap_used'
+  typeset -g "_p9k__segment_val_${_p9k_prompt_side}[_p9k_segment_index]"=$_p9k__prompt[len+1,-1]
+}
+
+function _p9k_prompt_swap_init() {
+  if [[ $_p9k_os == OSX && $+commands[sysctl] == 0 || $_p9k_os != OSX && ! -r /proc/meminfo ]]; then
+    typeset -g "_p9k__segment_cond_${_p9k_prompt_side}[_p9k_segment_index]"='${:-}'
+    return
+  fi
+  typeset -g _p9k__swap_used=
+  _p9k__async_segments_compute+=_p9k_prompt_swap_compute
+}
+
+_p9k_prompt_swap_compute() {
+  _p9k_worker_async _p9k_prompt_swap_async _p9k_prompt_swap_sync
+}
+
+_p9k_prompt_swap_async() {
   local -F used_bytes
 
   if [[ "$_p9k_os" == "OSX" ]]; then
@@ -2711,7 +2882,15 @@ prompt_swap() {
   fi
 
   _p9k_human_readable_bytes $used_bytes
-  _p9k_prompt_segment $0 yellow "$_p9k_color1" SWAP_ICON 0 '' $_p9k_ret
+  [[ $_p9k_ret != $_p9k__swap_used ]] || return
+  _p9k__swap_used=$_p9k_ret
+  typeset -p _p9k__swap_used
+  echo -E - 'reset=1'
+}
+
+_p9k_prompt_swap_sync() {
+  eval $REPLY
+  _p9k_worker_reply $REPLY
 }
 
 ################################################################
@@ -2844,6 +3023,10 @@ prompt_todo() {
     fi
     _p9k_prompt_segment "$0" "grey50" "$_p9k_color1" 'TODO_ICON' 0 '' "$text"
   fi
+}
+
+_p9k_prompt_todo_init() {
+  typeset -g "_p9k__segment_cond_${_p9k_prompt_side}[_p9k_segment_index]"='$commands[todo.sh]'
 }
 
 ################################################################
@@ -3446,6 +3629,7 @@ prompt_vcs() {
 ################################################################
 # Vi Mode: show editing mode (NORMAL|INSERT|VISUAL)
 prompt_vi_mode() {
+  local -i len=$#_p9k__prompt
   if (( __p9k_sh_glob )); then
     if (( $+_POWERLEVEL9K_VI_OVERWRITE_MODE_STRING )); then
       if [[ -n $_POWERLEVEL9K_VI_INSERT_MODE_STRING ]]; then
@@ -3483,6 +3667,7 @@ prompt_vi_mode() {
       _p9k_prompt_segment $0_NORMAL "$_p9k_color1" white '' 0 '${(M)_p9k__keymap:#(vicmd|vivis|vivli)}' "$_POWERLEVEL9K_VI_COMMAND_MODE_STRING"
     fi
   fi
+  typeset -g "_p9k__segment_val_${_p9k_prompt_side}[_p9k_segment_index]"=$_p9k__prompt[len+1,-1]
 }
 
 instant_prompt_vi_mode() {
@@ -3505,6 +3690,10 @@ prompt_virtualenv() {
   (( _POWERLEVEL9K_VIRTUALENV_GENERIC_NAMES[(I)$v] )) && v=${VIRTUAL_ENV:h:t}
   msg+="$_POWERLEVEL9K_VIRTUALENV_LEFT_DELIMITER${v//\%/%%}$_POWERLEVEL9K_VIRTUALENV_RIGHT_DELIMITER"
   _p9k_prompt_segment "$0" "blue" "$_p9k_color1" 'PYTHON_ICON' 0 '' "$msg"
+}
+
+_p9k_prompt_virtualenv_init() {
+  typeset -g "_p9k__segment_cond_${_p9k_prompt_side}[_p9k_segment_index]"='$VIRTUAL_ENV'
 }
 
 function _p9k_read_pyenv_version_file() {
@@ -3554,6 +3743,10 @@ prompt_pyenv() {
   _p9k_prompt_segment "$0" "blue" "$_p9k_color1" 'PYTHON_ICON' 0 '' "${v//\%/%%}"
 }
 
+_p9k_prompt_pyenv_init() {
+  typeset -g "_p9k__segment_cond_${_p9k_prompt_side}[_p9k_segment_index]"='${commands[pyenv]:-${${+functions[pyenv]}:#0}}'
+}
+
 function _p9k_read_goenv_version_file() {
   [[ -r $1 ]] || return
   local content
@@ -3595,6 +3788,10 @@ prompt_goenv() {
   _p9k_prompt_segment "$0" "blue" "$_p9k_color1" 'GO_ICON' 0 '' "${v//\%/%%}"
 }
 
+_p9k_prompt_goenv_init() {
+  typeset -g "_p9k__segment_cond_${_p9k_prompt_side}[_p9k_segment_index]"='${commands[goenv]:-${${+functions[goenv]}:#0}}'
+}
+
 ################################################################
 # Display openfoam information
 prompt_openfoam() {
@@ -3607,12 +3804,20 @@ prompt_openfoam() {
   fi
 }
 
+_p9k_prompt_openfoam_init() {
+  typeset -g "_p9k__segment_cond_${_p9k_prompt_side}[_p9k_segment_index]"='$WM_PROJECT_VERSION'
+}
+
 ################################################################
 # Segment to display Swift version
 prompt_swift_version() {
   _p9k_cached_cmd_stdout swift --version || return
   [[ $_p9k_ret == (#b)[^[:digit:]]#([[:digit:].]##)* ]] || return
   _p9k_prompt_segment "$0" "magenta" "white" 'SWIFT_ICON' 0 '' "${match[1]//\%/%%}"
+}
+
+_p9k_prompt_swift_version_init() {
+  typeset -g "_p9k__segment_cond_${_p9k_prompt_side}[_p9k_segment_index]"='$commands[swift]'
 }
 
 ################################################################
@@ -3704,6 +3909,10 @@ prompt_kubecontext() {
   _p9k_prompt_segment $0$_p9k_cache_val[9] magenta white KUBERNETES_ICON 0 '' "${_p9k_cache_val[8]//\%/%%}"
 }
 
+_p9k_prompt_kubecontext_init() {
+  typeset -g "_p9k__segment_cond_${_p9k_prompt_side}[_p9k_segment_index]"='$commands[kubectl]'
+}
+
 ################################################################
 # Dropbox status
 prompt_dropbox() {
@@ -3722,6 +3931,10 @@ prompt_dropbox() {
   fi
 }
 
+_p9k_prompt_dropbox_init() {
+  typeset -g "_p9k__segment_cond_${_p9k_prompt_side}[_p9k_segment_index]"='$commands[dropbox-cli]'
+}
+
 # print Java version number
 prompt_java_version() {
   _p9k_cached_cmd_stdout_stderr java -fullversion || return
@@ -3730,6 +3943,10 @@ prompt_java_version() {
   (( _POWERLEVEL9K_JAVA_VERSION_FULL )) || v=${v%%-*}
   [[ -n $v ]] || return
   _p9k_prompt_segment "$0" "red" "white" "JAVA_ICON" 0 '' "${v//\%/%%}"
+}
+
+_p9k_prompt_java_version_init() {
+  typeset -g "_p9k__segment_cond_${_p9k_prompt_side}[_p9k_segment_index]"='$commands[java]'
 }
 
 prompt_azure() {
@@ -3748,6 +3965,10 @@ prompt_azure() {
   _p9k_prompt_segment "$0" "blue" "white" "AZURE_ICON" 0 '' "${_p9k_cache_val[1]//\%/%%}"
 }
 
+_p9k_prompt_azure_init() {
+  typeset -g "_p9k__segment_cond_${_p9k_prompt_side}[_p9k_segment_index]"='$commands[az]'
+}
+
 prompt_gcloud() {
   unset P9K_GCLOUD_PROJECT P9K_GCLOUD_ACCOUNT
   (( $+commands[gcloud] )) || return
@@ -3758,6 +3979,10 @@ prompt_gcloud() {
   P9K_GCLOUD_ACCOUNT=$_p9k_cache_val[1]
   P9K_GCLOUD_PROJECT=$_p9k_cache_val[2]
   _p9k_prompt_segment "$0" "blue" "white" "GCLOUD_ICON" 0 '' "${P9K_GCLOUD_ACCOUNT//\%/%%}:${P9K_GCLOUD_PROJECT//\%/%%}"
+}
+
+_p9k_prompt_gcloud_init() {
+  typeset -g "_p9k__segment_cond_${_p9k_prompt_side}[_p9k_segment_index]"='$commands[gcloud]'
 }
 
 prompt_google_app_cred() {
@@ -3788,6 +4013,10 @@ prompt_google_app_cred() {
   P9K_GOOGLE_APP_CRED_PROJECT_ID=$_p9k_cache_val[3]
   P9K_GOOGLE_APP_CRED_CLIENT_EMAIL=$_p9k_cache_val[4]
   _p9k_prompt_segment "$0$_p9k_cache_val[6]" "blue" "white" "GCLOUD_ICON" 0 '' "$_p9k_cache_val[5]"
+}
+
+_p9k_prompt_google_app_cred_init() {
+  typeset -g "_p9k__segment_cond_${_p9k_prompt_side}[_p9k_segment_index]"='${GOOGLE_APPLICATION_CREDENTIALS:+$commands[jq]}'
 }
 
 typeset -gra __p9k_nordvpn_tag=(
@@ -3891,9 +4120,18 @@ function prompt_nordvpn() {
   esac
 }
 
+_p9k_prompt_nordvpn_init() {
+  typeset -g "_p9k__segment_cond_${_p9k_prompt_side}[_p9k_segment_index]"='$commands[nordvpn]'
+}
+
 function prompt_ranger() {
-  [[ -n $RANGER_LEVEL ]] || return
+  local -i len=$#_p9k__prompt
   _p9k_prompt_segment $0 $_p9k_color1 yellow RANGER_ICON 0 '' $RANGER_LEVEL
+  typeset -g "_p9k__segment_val_${_p9k_prompt_side}[_p9k_segment_index]"=$_p9k__prompt[len+1,-1]
+}
+
+_p9k_prompt_ranger_init() {
+  typeset -g "_p9k__segment_cond_${_p9k_prompt_side}[_p9k_segment_index]"='$RANGER_LEVEL'
 }
 
 function instant_prompt_ranger() {
@@ -3901,8 +4139,13 @@ function instant_prompt_ranger() {
 }
 
 function prompt_midnight_commander() {
-  [[ -n $MC_TMPDIR ]] || return
+  local -i len=$#_p9k__prompt
   _p9k_prompt_segment $0 $_p9k_color1 yellow MIDNIGHT_COMMANDER_ICON 0 '' ''
+  typeset -g "_p9k__segment_val_${_p9k_prompt_side}[_p9k_segment_index]"=$_p9k__prompt[len+1,-1]
+}
+
+_p9k_prompt_midnight_commander_init() {
+  typeset -g "_p9k__segment_cond_${_p9k_prompt_side}[_p9k_segment_index]"='$MC_TMPDIR'
 }
 
 function instant_prompt_midnight_commander() {
@@ -3910,8 +4153,13 @@ function instant_prompt_midnight_commander() {
 }
 
 function prompt_nnn() {
-  [[ $NNNLVL == (0|) ]] && return
+  local -i len=$#_p9k__prompt
   _p9k_prompt_segment $0 6 $_p9k_color1 NNN_ICON 0 '' $NNNLVL
+  typeset -g "_p9k__segment_val_${_p9k_prompt_side}[_p9k_segment_index]"=$_p9k__prompt[len+1,-1]
+}
+
+_p9k_prompt_nnn_init() {
+  typeset -g "_p9k__segment_cond_${_p9k_prompt_side}[_p9k_segment_index]"='${NNNLVL:#0}'
 }
 
 function instant_prompt_nnn() {
@@ -3919,8 +4167,13 @@ function instant_prompt_nnn() {
 }
 
 function prompt_vim_shell() {
-  [[ -n $VIMRUNTIME ]] || return
+  local -i len=$#_p9k__prompt
   _p9k_prompt_segment $0 green $_p9k_color1 VIM_ICON 0 '' ''
+  typeset -g "_p9k__segment_val_${_p9k_prompt_side}[_p9k_segment_index]"=$_p9k__prompt[len+1,-1]
+}
+
+_p9k_prompt_vim_shell_init() {
+  typeset -g "_p9k__segment_cond_${_p9k_prompt_side}[_p9k_segment_index]"='$VIMRUNTIME'
 }
 
 function instant_prompt_vim_shell() {
@@ -3940,6 +4193,10 @@ function prompt_terraform() {
   [[ $ws == default ]] || _p9k_prompt_segment $0 $_p9k_color1 blue TERRAFORM_ICON 0 '' $ws
 }
 
+_p9k_prompt_terraform_init() {
+  typeset -g "_p9k__segment_cond_${_p9k_prompt_side}[_p9k_segment_index]"='$commands[terraform]'
+}
+
 function prompt_proxy() {
   local -U p=(
     $all_proxy $http_proxy $https_proxy $ftp_proxy
@@ -3950,14 +4207,20 @@ function prompt_proxy() {
   _p9k_prompt_segment $0 $_p9k_color1 blue PROXY_ICON 0 '' "$p[1]"
 }
 
+_p9k_prompt_proxy_init() {
+  typeset -g "_p9k__segment_cond_${_p9k_prompt_side}[_p9k_segment_index]"='$all_proxy$http_proxy$https_proxy$ftp_proxy$ALL_PROXY$HTTP_PROXY$HTTPS_PROXY$FTP_PROXY'
+}
+
 function prompt_direnv() {
-  if [[ -n $DIRENV_DIR ]]; then
-    _p9k_prompt_segment $0 $_p9k_color1 yellow DIRENV_ICON 0 '' ''
-  elif [[ $precmd_functions[-1] != _p9k_precmd ]]; then
-    # DIRENV_DIR is set in a precmd hook. If our hook isn't the last, DIRENV_DIR might
-    # still get set before prompt is expanded.
-    _p9k_prompt_segment $0 $_p9k_color1 yellow DIRENV_ICON 0 '$DIRENV_DIR' ''
-  fi
+  local -i len=$#_p9k__prompt
+  _p9k_prompt_segment $0 $_p9k_color1 yellow DIRENV_ICON 0 '$DIRENV_DIR' ''
+  typeset -g "_p9k__segment_val_${_p9k_prompt_side}[_p9k_segment_index]"=$_p9k__prompt[len+1,-1]
+}
+
+_p9k_prompt_direnv_init() {
+  # DIRENV_DIR is set in a precmd hook. If our hook isn't the last, DIRENV_DIR might
+  # still get set before prompt is expanded.
+  typeset -g "_p9k__segment_cond_${_p9k_prompt_side}[_p9k_segment_index]"='${DIRENV_DIR:-${precmd_functions[-1]:#_p9k_precmd}}'
 }
 
 function instant_prompt_direnv() {
@@ -4066,33 +4329,6 @@ _p9k_prompt_net_iface_sync() {
   _p9k_worker_reply $REPLY
 }
 
-function _p9k_build_segment() {
-  _p9k_segment_name=${_p9k_segment_name%_joined}
-  local disabled=_POWERLEVEL9K_${(U)_p9k_segment_name}_DISABLED_DIR_PATTERN
-  [[ $_p9k__pwd == ${(P)~disabled} ]] && return
-  if [[ $_p9k_segment_name == custom_* ]]; then
-    _p9k_custom_prompt $_p9k_segment_name[8,-1]
-  elif (( $+functions[prompt_$_p9k_segment_name] )); then
-    prompt_$_p9k_segment_name
-  fi
-  ((++_p9k_segment_index))
-}
-
-function _p9k_build_instant_segment() {
-  _p9k_segment_name=${_p9k_segment_name%_joined}
-  local disabled=_POWERLEVEL9K_${(U)_p9k_segment_name}_DISABLED_DIR_PATTERN
-  [[ $_p9k__pwd == ${(P)~disabled} ]] && return
-  if (( $+functions[instant_prompt_$_p9k_segment_name] )); then
-    local -i len=$#_p9k__prompt
-    _p9k_non_hermetic_expansion=0
-    instant_prompt_$_p9k_segment_name
-    if (( _p9k_non_hermetic_expansion )); then
-      _p9k__prompt[len+1,-1]=
-    fi
-  fi
-  ((++_p9k_segment_index))
-}
-
 function _p9k_set_prompt() {
   local ifs=$IFS
   IFS=$' \t\n\0'
@@ -4117,9 +4353,42 @@ function _p9k_set_prompt() {
       _p9k__prompt=
       _p9k_segment_index=right_idx
       _p9k_prompt_side=right
-      for _p9k_segment_name in ${(@0)_p9k_line_segments_right[_p9k_line_index]}; do
-        _p9k_build_${1}segment
-      done
+      if [[ $1 == instant_ ]]; then
+        for _p9k_segment_name in ${${(0)_p9k_line_segments_right[_p9k_line_index]}%_joined}; do
+          if (( $+functions[instant_prompt_$_p9k_segment_name] )); then
+            local disabled=_POWERLEVEL9K_${(U)_p9k_segment_name}_DISABLED_DIR_PATTERN
+            if [[ $_p9k__pwd != ${(P)~disabled} ]]; then
+              local -i len=$#_p9k__prompt
+              _p9k_non_hermetic_expansion=0
+              instant_prompt_$_p9k_segment_name
+              if (( _p9k_non_hermetic_expansion )); then
+                _p9k__prompt[len+1,-1]=
+              fi
+            fi
+          fi
+          ((++_p9k_segment_index))
+        done
+      else
+        for _p9k_segment_name in ${${(0)_p9k_line_segments_right[_p9k_line_index]}%_joined}; do
+          local cond=$_p9k__segment_cond_right[_p9k_segment_index]
+          if [[ -z $cond || -n ${(e)cond} ]]; then
+            local disabled=_POWERLEVEL9K_${(U)_p9k_segment_name}_DISABLED_DIR_PATTERN
+            if [[ $_p9k__pwd != ${(P)~disabled} ]]; then
+              local val=$_p9k__segment_val_right[_p9k_segment_index]
+              if [[ -n $val ]]; then
+                _p9k__prompt+=$val
+              else
+                if [[ $_p9k_segment_name == custom_* ]]; then
+                  _p9k_custom_prompt $_p9k_segment_name[8,-1]
+                elif (( $+functions[prompt_$_p9k_segment_name] )); then
+                  prompt_$_p9k_segment_name
+                fi
+              fi
+            fi
+          fi
+          ((++_p9k_segment_index))
+        done
+      fi
       _p9k__prompt=${${_p9k__prompt//$' %{\b'/'%{%G'}//$' \b'}
       right_idx=_p9k_segment_index
       if [[ -n $_p9k__prompt || $_p9k_line_never_empty_right[_p9k_line_index] == 1 ]]; then
@@ -4130,9 +4399,42 @@ function _p9k_set_prompt() {
     _p9k__prompt=$_p9k_line_prefix_left[_p9k_line_index]
     _p9k_segment_index=left_idx
     _p9k_prompt_side=left
-    for _p9k_segment_name in ${(@0)_p9k_line_segments_left[_p9k_line_index]}; do
-      _p9k_build_${1}segment
-    done
+    if [[ $1 == instant_ ]]; then
+      for _p9k_segment_name in ${${(0)_p9k_line_segments_left[_p9k_line_index]}%_joined}; do
+        if (( $+functions[instant_prompt_$_p9k_segment_name] )); then
+          local disabled=_POWERLEVEL9K_${(U)_p9k_segment_name}_DISABLED_DIR_PATTERN
+          if [[ $_p9k__pwd != ${(P)~disabled} ]]; then
+            local -i len=$#_p9k__prompt
+            _p9k_non_hermetic_expansion=0
+            instant_prompt_$_p9k_segment_name
+            if (( _p9k_non_hermetic_expansion )); then
+              _p9k__prompt[len+1,-1]=
+            fi
+          fi
+        fi
+        ((++_p9k_segment_index))
+      done
+    else
+      for _p9k_segment_name in ${${(0)_p9k_line_segments_left[_p9k_line_index]}%_joined}; do
+        local cond=$_p9k__segment_cond_left[_p9k_segment_index]
+        if [[ -z $cond || -n ${(e)cond} ]]; then
+          local disabled=_POWERLEVEL9K_${(U)_p9k_segment_name}_DISABLED_DIR_PATTERN
+          if [[ $_p9k__pwd != ${(P)~disabled} ]]; then
+            local val=$_p9k__segment_val_left[_p9k_segment_index]
+            if [[ -n $val ]]; then
+              _p9k__prompt+=$val
+            else
+              if [[ $_p9k_segment_name == custom_* ]]; then
+                _p9k_custom_prompt $_p9k_segment_name[8,-1]
+              elif (( $+functions[prompt_$_p9k_segment_name] )); then
+                prompt_$_p9k_segment_name
+              fi
+            fi
+          fi
+        fi
+        ((++_p9k_segment_index))
+      done
+    fi
     _p9k__prompt=${${_p9k__prompt//$' %{\b'/'%{%G'}//$' \b'}
     left_idx=_p9k_segment_index
     _p9k__prompt+=$_p9k_line_suffix_left[_p9k_line_index]
@@ -4991,6 +5293,10 @@ typeset -g  _p9k__param_pat
 typeset -g  _p9k__param_sig
 
 _p9k_init_vars() {
+  typeset -ga _p9k__segment_cond_left
+  typeset -ga _p9k__segment_cond_right
+  typeset -ga _p9k__segment_val_left
+  typeset -ga _p9k__segment_val_right
   typeset -ga _p9k_show_on_command
   typeset -g  _p9k__last_buffer
   typeset -ga _p9k__last_commands
@@ -5098,7 +5404,6 @@ _p9k_init_vars() {
   typeset -g  _p9k__last_prompt_pwd
   typeset -gA _p9k_display_k
   typeset -ga _p9k__display_v
-  typeset -ga _p9k_async_segments_init
   typeset -ga _p9k__async_segments_compute
 
   typeset -gA _p9k__dotnet_stat_cache
@@ -6376,19 +6681,6 @@ function _p9k_init_cacheable() {
     done
   done
 
-  local -U segments=(
-    ${_POWERLEVEL9K_LEFT_PROMPT_ELEMENTS%_joined}
-    ${_POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS%_joined})
-  if [[ -n $_POWERLEVEL9K_PUBLIC_IP_VPN_INTERFACE ||
-        -n $_POWERLEVEL9K_IP_INTERFACE ||
-        -n $_POWERLEVEL9K_VPN_IP_INTERFACE ]]; then
-     segments+=net_iface
-  fi
-  for elem in $segments; do
-    local f_init=_p9k_prompt_${elem}_init
-    (( $+functions[$f_init] )) && _p9k_async_segments_init+=$f_init
-  done
-
   if [[ $_POWERLEVEL9K_TRANSIENT_PROMPT != off ]]; then
     _p9k_transient_prompt='%b%k%s%u%F{%(?.'
     _p9k_color prompt_prompt_char_OK_VIINS FOREGROUND 76
@@ -6630,10 +6922,34 @@ _p9k_init() {
   _p9k_init_vars
   _p9k_restore_state || _p9k_init_cacheable
 
-  local f_init
-  for f_init in $_p9k_async_segments_init; do
-    $f_init continue
+  local -i i
+  local elem
+
+  _p9k_prompt_side=left
+  _p9k_segment_index=1
+  for i in {1..$#_p9k_line_segments_left}; do
+    for elem in ${${(@0)_p9k_line_segments_left[i]}%_joined}; do
+      local f_init=_p9k_prompt_${elem}_init
+      (( $+functions[$f_init] )) && $f_init
+      (( ++_p9k_segment_index ))
+    done
   done
+
+  _p9k_prompt_side=right
+  _p9k_segment_index=1
+  for i in {1..$#_p9k_line_segments_right}; do
+    for elem in ${${(@0)_p9k_line_segments_right[i]}%_joined}; do
+      local f_init=_p9k_prompt_${elem}_init
+      (( $+functions[$f_init] )) && $f_init
+      (( ++_p9k_segment_index ))
+    done
+  done
+
+  if [[ -n $_POWERLEVEL9K_PUBLIC_IP_VPN_INTERFACE ||
+        -n $_POWERLEVEL9K_IP_INTERFACE ||
+        -n $_POWERLEVEL9K_VPN_IP_INTERFACE ]]; then
+     _p9k_prompt_net_iface_init
+  fi
 
   (( $#_p9k__async_segments_compute )) && _p9k_worker_start
 
