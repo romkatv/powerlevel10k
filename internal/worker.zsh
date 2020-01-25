@@ -1,7 +1,7 @@
-# invoked in worker: _p9k_worker_main <timeout>
+# invoked in worker: _p9k_worker_main <pgid>
 function _p9k_worker_main() {
-  zmodload zsh/zselect                  || return
-  ! { zselect -t0 || (( $? != 1 )) }    || return
+  local pgid=$1
+
   mkfifo $_p9k__worker_file_prefix.fifo || return
   echo -nE - s${1}$'\x1e'               || return
   exec 0<$_p9k__worker_file_prefix.fifo || return
@@ -74,7 +74,7 @@ function _p9k_worker_main() {
       done
     done
   } always {
-    kill -- -$sysparams[pid]
+    kill -- -$pgid
   }
 }
 
@@ -158,6 +158,7 @@ function _p9k_worker_receive() {
     for resp in ${(ps:\x1e:)buf}; do
       local arg=$resp[2,-1]
       case $resp[1] in
+        p) ;;
         d)
           local req=$_p9k__worker_request_map[$arg]
           if [[ -n $req ]]; then
@@ -222,8 +223,15 @@ function _p9k_worker_start() {
       # todo: remove
       exec 2>>/tmp/log
       setopt xtrace
-      local pid=$sysparams[pid]
-      _p9k_worker_main $pid &
+      zmodload zsh/zselect               || return
+      ! { zselect -t0 || (( $? != 1 )) } || return
+      local pgid=$sysparams[pid]
+      _p9k_worker_main $pgid &
+      {
+        trap '' PIPE
+        while syswrite p$'\x1e'; do zselect -t 1000; done
+        kill -- -$pgid
+      } &
       exec =true) || return
     zle -F $_p9k__worker_resp_fd _p9k_worker_receive
     _p9k__worker_shell_pid=$sysparams[pid]
