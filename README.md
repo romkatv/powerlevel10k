@@ -495,8 +495,8 @@ a releavant tool.
 
 ```zsh
 # Show prompt segment "kubecontext" only when the command you are typing
-# invokes kubectl, helm, kubens or kubectx.
-typeset -g POWERLEVEL9K_KUBECONTEXT_SHOW_ON_COMMAND='kubectl|helm|kubens|kubectx'
+# invokes kubectl, helm, kubens, kubectx or oc.
+typeset -g POWERLEVEL9K_KUBECONTEXT_SHOW_ON_COMMAND='kubectl|helm|kubens|kubectx|oc'
 ```
 
 Configs created by `p10k configure` may contain parameters of this kind. To customize when different
