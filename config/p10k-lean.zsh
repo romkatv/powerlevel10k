@@ -79,9 +79,10 @@
     vim_shell               # vim shell indicator (:sh)
     midnight_commander      # midnight commander shell (https://midnight-commander.org/)
     # vpn_ip                # virtual private network indicator
+    # load                  # CPU load
     # disk_usage            # disk usage
     # ram                   # free RAM
-    # load                  # CPU load
+    # swap                  # used swap
     todo                    # todo items (https://github.com/todotxt/todo.txt-cli)
     # time                  # current time
     # =========================[ Line #2 ]=========================
@@ -562,6 +563,12 @@
   typeset -g POWERLEVEL9K_RAM_FOREGROUND=66
   # Custom icon.
   # typeset -g POWERLEVEL9K_RAM_VISUAL_IDENTIFIER_EXPANSION='⭐'
+
+  #####################################[ swap: used swap ]######################################
+  # Swap color.
+  typeset -g POWERLEVEL9K_SWAP_FOREGROUND=96
+  # Custom icon.
+  # typeset -g POWERLEVEL9K_SWAP_VISUAL_IDENTIFIER_EXPANSION='⭐'
 
   ######################################[ load: CPU load ]######################################
   # Show average CPU load over this many last minutes. Valid values are 1, 5 and 15.

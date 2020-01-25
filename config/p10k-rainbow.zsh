@@ -80,9 +80,10 @@
     midnight_commander      # midnight commander shell (https://midnight-commander.org/)
     vi_mode                 # vi mode (you don't need this if you've enabled prompt_char)
     # vpn_ip                # virtual private network indicator
+    # load                  # CPU load
     # disk_usage            # disk usage
     # ram                   # free RAM
-    # load                  # CPU load
+    # swap                  # used swap
     todo                    # todo items (https://github.com/todotxt/todo.txt-cli)
     # time                  # current time
     # =========================[ Line #2 ]=========================
@@ -588,6 +589,13 @@
   # typeset -g POWERLEVEL9K_RAM_BACKGROUND=3
   # Custom icon.
   # typeset -g POWERLEVEL9K_RAM_VISUAL_IDENTIFIER_EXPANSION='⭐'
+
+  #####################################[ swap: used swap ]######################################
+  # Swap color.
+  # typeset -g POWERLEVEL9K_SWAP_FOREGROUND=0
+  # typeset -g POWERLEVEL9K_SWAP_BACKGROUND=3
+  # Custom icon.
+  # typeset -g POWERLEVEL9K_SWAP_VISUAL_IDENTIFIER_EXPANSION='⭐'
 
   ######################################[ load: CPU load ]######################################
   # Show average CPU load over this many last minutes. Valid values are 1, 5 and 15.
