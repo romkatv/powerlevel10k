@@ -221,6 +221,30 @@ function _p9k_human_readable_bytes() {
   _p9k_ret=$n$suf
 }
 
+if is-at-least 5.4; then
+  function _p9k_print_params() { typeset -p -- "$@" }
+else
+  # Cannot use `typeset -p` unconditionally because of bugs in zsh.
+  function _p9k_print_params() {
+    local name
+    for name; do
+      case $parameters[$name] in
+        array*)
+          print -r -- "$name=(" "${(@q)${(@P)name}}" ")"
+        ;;
+        association*)
+          # Cannot use "${(@q)${(@kvP)name}}" because of bugs in zsh.
+          local kv=("${(@kvP)name}")
+          print -r -- "$name=(" "${(@q)kv}" ")"
+        ;;
+        *)
+          print -r -- "$name=${(q)${(P)name}}"
+        ;;
+      esac
+    done
+  }
+fi
+
 # Determine if the passed segment is used in the prompt
 #
 # Pass the name of the segment to this function to test for its presence in
@@ -1068,7 +1092,7 @@ _p9k_prompt_disk_usage_async() {
   elif (( ! _POWERLEVEL9K_DISK_USAGE_ONLY_WARNING )); then
     _p9k__disk_usage_normal=1
   fi
-  typeset -p                 \
+  _p9k_print_params          \
     _p9k__disk_usage_pct     \
     _p9k__disk_usage_normal  \
     _p9k__disk_usage_warning \
@@ -1132,7 +1156,7 @@ _p9k_prompt_battery_async() {
   local prev="${(pj:\0:)_p9k__battery_args}"
   _p9k_prompt_battery_set_args
   [[ "${(pj:\0:)_p9k__battery_args}" == $prev ]] && return 1
-  typeset -p _p9k__battery_args
+  _p9k_print_params _p9k__battery_args
   echo -E - 'reset=2'
 }
 
@@ -1304,12 +1328,12 @@ _p9k_prompt_public_ip_async() {
       ;;
       curl)
         if (( $+commands[curl] )); then
-          ip="$(curl --max-time 5 -w '\n' "$ip_url" 2>/dev/null)"
+          ip="$(curl --max-time 5 -w '\n' "$_POWERLEVEL9K_PUBLIC_IP_HOST" 2>/dev/null)"
         fi
       ;;
       wget)
         if (( $+commands[wget] )); then
-          ip="$(wget -T 5 -qO- "$ip_url" 2>/dev/null)"
+          ip="$(wget -T 5 -qO- "$_POWERLEVEL9K_PUBLIC_IP_HOST" 2>/dev/null)"
         fi
       ;;
     esac
@@ -1320,10 +1344,10 @@ _p9k_prompt_public_ip_async() {
     fi
   done
   _p9k__public_ip_next_time=$next
-  typeset -p _p9k__public_ip_next_time
+  _p9k_print_params _p9k__public_ip_next_time
   [[ $_p9k__public_ip == $ip ]] && return
   _p9k__public_ip=$ip
-  typeset -p _p9k__public_ip
+  _p9k_print_params _p9k__public_ip
   echo -E - 'reset=1'
 }
 
@@ -2023,7 +2047,7 @@ _p9k_prompt_load_async() {
   else
     _p9k__load_normal=1
   fi
-  typeset -p            \
+  _p9k_print_params     \
     _p9k__load_value    \
     _p9k__load_normal   \
     _p9k__load_warning  \
@@ -2388,7 +2412,7 @@ _p9k_prompt_ram_async() {
   _p9k_human_readable_bytes $free_bytes
   [[ $_p9k_ret != $_p9k__ram_free ]] || return
   _p9k__ram_free=$_p9k_ret
-  typeset -p _p9k__ram_free
+  _p9k_print_params _p9k__ram_free
   echo -E - 'reset=1'
 }
 
@@ -2884,7 +2908,7 @@ _p9k_prompt_swap_async() {
   _p9k_human_readable_bytes $used_bytes
   [[ $_p9k_ret != $_p9k__swap_used ]] || return
   _p9k__swap_used=$_p9k_ret
-  typeset -p _p9k__swap_used
+  _p9k_print_params _p9k__swap_used
   echo -E - 'reset=1'
 }
 
@@ -4287,8 +4311,6 @@ function _p9k_prompt_net_iface_async() {
       fi
     done
   elif [[ -x /sbin/ip ]]; then
-    local line
-    local iface
     for line in ${(f)"$(/sbin/ip -4 a show 2>/dev/null)"}; do
       if [[ $line == (#b)<->:[[:space:]]##([^:]##):[[:space:]]##\<([^\>]#)\>* ]]; then
         [[ ,$match[2], == *,UP,* ]] && iface=$match[1] || iface=
@@ -4324,7 +4346,7 @@ function _p9k_prompt_net_iface_async() {
   _p9k__public_ip_not_vpn=$public_ip_not_vpn
   _p9k__ip_ip=$ip_ip
   _p9k__vpn_ip_ip=$vpn_ip_ip
-  typeset -p _p9k__public_ip_vpn _p9k__public_ip_not_vpn _p9k__ip_ip _p9k__vpn_ip_ip
+  _p9k_print_params _p9k__public_ip_vpn _p9k__public_ip_not_vpn _p9k__ip_ip _p9k__vpn_ip_ip
   echo -E - 'reset=1'
 }
 
@@ -5500,7 +5522,7 @@ _p9k_init_params() {
   _p9k_declare -F POWERLEVEL9K_PUBLIC_IP_TIMEOUT 300
   _p9k_declare -a POWERLEVEL9K_PUBLIC_IP_METHODS -- dig curl wget
   _p9k_declare -e POWERLEVEL9K_PUBLIC_IP_NONE ""
-  _p9k_declare -s POWERLEVEL9K_PUBLIC_IP_HOST "http://ident.me"
+  _p9k_declare -s POWERLEVEL9K_PUBLIC_IP_HOST "https://v4.ident.me/"
   _p9k_declare -s POWERLEVEL9K_PUBLIC_IP_VPN_INTERFACE ""
   _p9k_segment_in_use public_ip || _POWERLEVEL9K_PUBLIC_IP_VPN_INTERFACE=
   _p9k_declare -b POWERLEVEL9K_ALWAYS_SHOW_CONTEXT 0
