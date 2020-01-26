@@ -74,13 +74,6 @@ function _p9k_worker_main() {
   }
 }
 
-typeset -g   _p9k__worker_pid
-typeset -g   _p9k__worker_req_fd
-typeset -g   _p9k__worker_resp_fd
-typeset -g   _p9k__worker_shell_pid
-typeset -g   _p9k__worker_file_prefix
-typeset -gA  _p9k__worker_request_map
-
 # invoked in master: _p9k_worker_invoke <request-id> <list>
 function _p9k_worker_invoke() {
   [[ -n $_p9k__worker_resp_fd ]] || return

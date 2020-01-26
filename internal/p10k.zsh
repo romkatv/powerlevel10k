@@ -5297,6 +5297,12 @@ typeset -g  _p9k__param_pat
 typeset -g  _p9k__param_sig
 
 _p9k_init_vars() {
+  typeset -g   _p9k__worker_pid
+  typeset -g   _p9k__worker_req_fd
+  typeset -g   _p9k__worker_resp_fd
+  typeset -g   _p9k__worker_shell_pid
+  typeset -g   _p9k__worker_file_prefix
+  typeset -gA  _p9k__worker_request_map
   typeset -ga _p9k__segment_cond_left
   typeset -ga _p9k__segment_cond_right
   typeset -ga _p9k__segment_val_left
