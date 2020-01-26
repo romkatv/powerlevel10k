@@ -608,6 +608,11 @@
   ###########[ timewarrior: timewarrior tracking status (https://timewarrior.net/) ]############
   # Timewarrior color.
   typeset -g POWERLEVEL9K_TIMEWARRIOR_FOREGROUND=4
+  # If the tracked task is longer than 24 characters, truncate and append "…".
+  # Tip: To always display tasks without truncation, delete the following parameter.
+  # Tip: To hide task names and display just the icon when time tracking is enabled, set the
+  # value of the following parameter to "".
+  typeset -g POWERLEVEL9K_TIMEWARRIOR_CONTENT_EXPANSION='${P9K_CONTENT:0:24}${${P9K_CONTENT:24}:+…}'
 
   # Custom icon.
   # typeset -g POWERLEVEL9K_TIMEWARRIOR_VISUAL_IDENTIFIER_EXPANSION='⭐'
