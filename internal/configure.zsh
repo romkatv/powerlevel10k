@@ -11,8 +11,6 @@ typeset -gr __p9k_zshrc_u=$__p9k_zd_u/.zshrc
 typeset -gr __p9k_root_dir_u=${${${(q)__p9k_root_dir}/#(#b)${(q)HOME}(|\/*)/'~'$match[1]}//\%/%%}
 
 function _p9k_can_configure() {
-  emulate -L zsh
-  setopt extended_glob no_prompt_{bang,subst} prompt_percent
   [[ $1 == '-q' ]] && local -i q=1 || local -i q=0
   function $0_error() {
     (( q )) || print -rP "%1F[ERROR]%f %Bp10k configure%b: $1" >&2
@@ -61,8 +59,7 @@ function _p9k_can_configure() {
 }
 
 function p9k_configure() {
-  emulate -L zsh
-  setopt no_hist_expand extended_glob no_prompt_bang prompt_{percent,subst} no_aliases
+  eval $__p9k_intro
   (
     set -- -f
     source $__p9k_root_dir/internal/wizard.zsh

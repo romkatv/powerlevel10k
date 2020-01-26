@@ -5,8 +5,6 @@ function _p9k_worker_main() {
   exec 0<$_p9k__worker_file_prefix.fifo || return
   zf_rm $_p9k__worker_file_prefix.fifo  || return
 
-  typeset -g IFS=$' \t\n\0'
-
   local -i reset
   local req fd
   local -a ready
@@ -87,15 +85,12 @@ function _p9k_worker_invoke() {
 }
 
 function _p9k_worker_cleanup() {
-  emulate -L zsh
-  setopt no_hist_expand extended_glob no_prompt_bang prompt_{percent,subst} no_aliases
+  eval $__p9k_intro
   [[ $_p9k__worker_shell_pid == $sysparams[pid] ]] && _p9k_worker_stop
   return 0
 }
 
 function _p9k_worker_stop() {
-  emulate -L zsh
-  setopt no_hist_expand extended_glob no_prompt_bang prompt_{percent,subst} no_aliases
   add-zsh-hook -D zshexit _p9k_worker_cleanup
   [[ -n $_p9k__worker_resp_fd     ]] && zle -F $_p9k__worker_resp_fd
   [[ -n $_p9k__worker_resp_fd     ]] && exec {_p9k__worker_resp_fd}>&-
@@ -111,8 +106,7 @@ function _p9k_worker_stop() {
 }
 
 function _p9k_worker_receive() {
-  emulate -L zsh
-  setopt no_hist_expand extended_glob no_prompt_bang prompt_{percent,subst} no_aliases
+  eval $__p9k_intro
 
   [[ -z $_p9k__worker_resp_fd ]] && return
 
@@ -179,7 +173,7 @@ function _p9k_worker_receive() {
 }
 
 function _p9k_worker_start() {
-  setopt no_bgnice monitor
+  setopt monitor || return
   {
     [[ -n $_p9k__worker_resp_fd ]] && return
     _p9k__worker_file_prefix=${TMPDIR:-/tmp}/p10k.worker.$EUID.$$.$EPOCHSECONDS

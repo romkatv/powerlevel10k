@@ -89,8 +89,7 @@ typeset -grA __p9k_colors=(
 #
 # Type `getColorCode background` or `getColorCode foreground` to see the list of predefined colors.
 function getColorCode() {
-  emulate -L zsh
-  setopt no_hist_expand extended_glob no_prompt_bang prompt_{percent,subst} no_aliases
+  eval $__p9k_intro
   if (( ARGC == 1 )); then
     case $1 in
       foreground)
@@ -117,8 +116,7 @@ function getColorCode() {
 
 # Sadly, this is a part of public API. Its use is emphatically discouraged.
 function print_icon() {
-  emulate -L zsh
-  setopt no_hist_expand extended_glob no_prompt_bang prompt_{percent,subst} no_aliases
+  eval $__p9k_intro
   (( $+functions[_p9k_print_icon] )) || source "${__p9k_root_dir}/internal/icons.zsh"
   _p9k_print_icon "$@"
 }
@@ -129,8 +127,7 @@ function print_icon() {
 #                 otherwise "print_icon" is used, which takes the users
 #                 overrides into account.
 function get_icon_names() {
-  emulate -L zsh
-  setopt no_hist_expand extended_glob no_prompt_bang prompt_{percent,subst} no_aliases
+  eval $__p9k_intro
   (( $+functions[_p9k_get_icon_names] )) || source "${__p9k_root_dir}/internal/icons.zsh"
   _p9k_get_icon_names "$@"
 }
@@ -1542,8 +1539,9 @@ prompt_dir() {
       # for "~[a/b]" it'll give the nonsensical "~[a". To solve this problem we have to
       # repeat what "${(%):-%~}" does and hope that it produces the same result.
       local func=''
-      local -a parts=() reply=()
+      local -a parts=()
       for func in zsh_directory_name $zsh_directory_name_functions; do
+        local reply=()
         if (( $+functions[$func] )) && $func d $_p9k__pwd && [[ $p == '~['$reply[1]']'* ]]; then
           parts+='~['$reply[1]']'
           break
@@ -1905,7 +1903,6 @@ _p9k_prompt_docker_machine_init() {
 # GO prompt
 prompt_go_version() {
   _p9k_cached_cmd_stdout go version || return
-  local -a match
   [[ $_p9k_ret == (#b)*go([[:digit:].]##)* ]] || return
   local v=$match[1]
   if (( _POWERLEVEL9K_GO_VERSION_PROJECT_ONLY )); then
@@ -2174,7 +2171,6 @@ function _p9k_nvm_ls_default() {
   (( $#matches )) || return
 
   local max path
-  local -a match
   for path in ${(Oa)matches}; do
     [[ ${path:t} == (#b)v(*).(*).(*) ]] || continue
     v=${(j::)${(@l:6::0:)match}}
@@ -2351,7 +2347,6 @@ instant_prompt_os_icon() { prompt_os_icon; }
 # Segment to display PHP version number
 prompt_php_version() {
   _p9k_cached_cmd_stdout php --version || return
-  local -a match
   [[ $_p9k_ret == (#b)(*$'\n')#(PHP [[:digit:].]##)* ]] || return
   local v=$match[2]
   _p9k_prompt_segment "$0" "fuchsia" "grey93" '' 0 '' "${v//\%/%%}"
@@ -2666,7 +2661,7 @@ prompt_rust_version() {
   local rustc=$commands[rustc] toolchain deps=()
   if (( $+commands[ldd] )); then
     if ! _p9k_cache_stat_get $0_so $rustc; then
-      local line match so
+      local line so
       for line in "${(@f)$(ldd $rustc 2>/dev/null)}"; do
         [[ $line == (#b)[[:space:]]#librustc_driver[^[:space:]]#.so' => '(*)' (0x'[[:xdigit:]]#')' ]] || continue
         so=$match[1]
@@ -2812,6 +2807,11 @@ instant_prompt_status() {
 }
 
 prompt_prompt_char() {
+  local saved=$_p9k__prompt_char_saved[1+!_p9k__status]
+  if [[ -n $saved ]]; then
+    _p9k__prompt+=$saved
+    return
+  fi
   local -i len=$#_p9k__prompt
   if (( __p9k_sh_glob )); then
     if (( _p9k__status )); then
@@ -2854,7 +2854,7 @@ prompt_prompt_char() {
       _p9k_prompt_segment $0_OK_VIVIS "$_p9k_color1" 76 '' 0 '${(M)${:-$_p9k__keymap$_p9k__region_active}:#(vicmd1|vivis?|vivli?)}' 'Ⅴ'
     fi
   fi
-  typeset -g "_p9k__segment_val_${_p9k_prompt_side}[_p9k_segment_index]"=$_p9k__prompt[len+1,-1]
+  _p9k__prompt_char_saved[1+!_p9k__status]=$_p9k__prompt[len+1,-1]
 }
 
 instant_prompt_prompt_char() {
@@ -3526,8 +3526,7 @@ function _p9k_maybe_ignore_git_repo() {
 }
 
 function _p9k_vcs_resume() {
-  emulate -L zsh
-  setopt no_hist_expand extended_glob no_prompt_bang prompt_{percent,subst} no_aliases
+  eval $__p9k_intro
 
   _p9k_maybe_ignore_git_repo
 
@@ -3861,7 +3860,6 @@ prompt_kubecontext() {
 
   if ! _p9k_cache_stat_get $0 ${(s.:.)${KUBECONFIG:-$HOME/.kube/config}}; then
     local name namespace cluster user cloud_name cloud_account cloud_zone cloud_cluster text state
-    local -a match
     () {
       local cfg && cfg=(${(f)"$(kubectl config view -o=yaml 2>/dev/null)"}) || return
       local ctx=(${(@M)cfg:#current-context: [^\"\'\|\>]*})
@@ -4356,16 +4354,6 @@ _p9k_prompt_net_iface_sync() {
 }
 
 function _p9k_set_prompt() {
-  local ifs=$IFS
-  IFS=$' \t\n\0'
-
-  if [[ $_p9k_refresh_reason == precmd ]]; then
-    local f_compute
-    for f_compute in "${_p9k__async_segments_compute[@]}"; do
-      _p9k_worker_invoke ${f_compute%% *} ${(e)f_compute}
-    done
-  fi
-
   PROMPT=
   RPROMPT=
   [[ $1 == instant_ ]] || PROMPT+='${$((_p9k_on_expand()))+}'
@@ -4508,7 +4496,6 @@ function _p9k_set_prompt() {
   _p9k_prompt_side=
   (( $#_p9k_cache < _POWERLEVEL9K_MAX_CACHE_SIZE )) || _p9k_cache=()
   (( $#_p9k__cache_ephemeral < _POWERLEVEL9K_MAX_CACHE_SIZE )) || _p9k__cache_ephemeral=()
-  IFS=$ifs
 }
 
 _p9k_set_instant_prompt() {
@@ -4520,7 +4507,7 @@ _p9k_set_instant_prompt() {
   RPROMPT=$saved_rprompt
 }
 
-typeset -gri __p9k_instant_prompt_version=17
+typeset -gri __p9k_instant_prompt_version=18
 
 _p9k_dump_instant_prompt() {
   local user=${(%):-%n}
@@ -4543,7 +4530,7 @@ _p9k_dump_instant_prompt() {
       display_v[2]=hide
       display_v[4]=hide
       >&$fd print -r -- "() {
-  emulate -L zsh
+  $__p9k_intro
   (( ! \$+__p9k_instant_prompt_disabled )) || return
   typeset -gi __p9k_instant_prompt_disabled=1 __p9k_instant_prompt_sourced=$__p9k_instant_prompt_version
   [[ -t 0 && -t 1 && -t 2 && \$ZSH_VERSION == ${(q)ZSH_VERSION} && \$ZSH_PATCHLEVEL == ${(q)ZSH_PATCHLEVEL} &&
@@ -4591,12 +4578,11 @@ _p9k_dump_instant_prompt() {
   local -A _p9k_display_k=('${(j: :)${(@q)${(kv)_p9k_display_k}}}')
   local -a _p9k__display_v=('${(j: :)${(@q)display_v}}')
   function p10k() {
-    emulate -L zsh
-    setopt no_hist_expand extended_glob prompt_percent prompt_subst no_aliases
+    '$__p9k_intro'
     [[ $1 == display ]] || return
     shift
-    local -i OPTIND k dump
-    local OPTARG opt match MATCH prev new pair list name var
+    local -i k dump
+    local opt prev new pair list name var
     while getopts ":ha" opt; do
       case $opt in
         a) dump=1;;
@@ -4783,11 +4769,11 @@ _p9k_dump_instant_prompt() {
     _p9k_preinit
   fi
   function _p9k_instant_prompt_precmd_first() {
-    emulate -L zsh
+    '$__p9k_intro'
     function _p9k_instant_prompt_sched_last() {
       (( $+__p9k_instant_prompt_active )) || return 0
       () {
-        emulate -L zsh
+        '$__p9k_intro'
         exec 0<&$__p9k_fd_0 1>&$__p9k_fd_1 2>&$__p9k_fd_2 {__p9k_fd_0}>&- {__p9k_fd_1}>&- {__p9k_fd_2}>&-
         unset __p9k_fd_0 __p9k_fd_1 __p9k_fd_2 __p9k_instant_prompt_active
         typeset -gi __p9k_instant_prompt_erased=1
@@ -5059,7 +5045,6 @@ function _p9k_maybe_dump() {
         fi
       fi
     elif (( _p9k__state_dump_scheduled || ! (_p9k__instant_prompt_disabled || $+_p9k_dumped_instant_prompt_sigs[$_p9k__instant_prompt_sig]) )); then
-      setopt no_bg_nice
       (
         if ! (( _p9k__instant_prompt_disabled || $+_p9k_dumped_instant_prompt_sigs[$_p9k__instant_prompt_sig] )); then
           _p9k_set_instant_prompt
@@ -5079,8 +5064,7 @@ function _p9k_on_expand() {
   (( _p9k__expanded && ! $+__p9k_instant_prompt_active )) && return
 
   () {
-    emulate -L zsh
-    setopt no_hist_expand extended_glob no_prompt_bang prompt_{percent,subst} no_aliases
+    eval $__p9k_intro
 
     _p9k_maybe_dump
     (( $+__p9k_instant_prompt_active )) && _p9k_clear_instant_prompt
@@ -5169,8 +5153,7 @@ function _p9k_on_expand() {
 functions -M _p9k_on_expand
 
 _p9k_precmd_impl() {
-  emulate -L zsh
-  setopt no_hist_expand extended_glob no_prompt_bang prompt_{percent,subst} no_aliases
+  eval $__p9k_intro
 
   (( __p9k_enabled )) || return
 
@@ -5243,6 +5226,11 @@ _p9k_precmd_impl() {
   _p9k__pwd=${(%):-%/}
   _p9k__pwd_a=${_p9k__pwd:A}
 
+  local f_compute
+  for f_compute in "${_p9k__async_segments_compute[@]}"; do
+    _p9k_worker_invoke ${f_compute%% *} ${(e)f_compute}
+  done
+
   _p9k_refresh_reason=precmd
   _p9k_set_prompt
   _p9k_refresh_reason=''
@@ -5265,8 +5253,7 @@ _p9k_precmd_impl() {
 
 _p9k_trapint() {
   if (( __p9k_enabled )); then
-    emulate -L zsh
-    setopt no_hist_expand extended_glob no_prompt_bang prompt_{percent,subst}
+    eval $__p9k_intro
     zle && _p9k_on_widget_zle-line-finish int
   fi
   return 0
@@ -5290,6 +5277,7 @@ _p9k_precmd() {
 
 function _p9k_reset_prompt() {
   if zle && [[ -z $_p9k__line_finished ]]; then
+    setopt prompt_subst
     (( __p9k_ksh_arrays )) && setopt ksh_arrays
     (( __p9k_sh_glob )) && setopt sh_glob
     (( _p9k__can_hide_cursor )) && echoti civis
@@ -5319,6 +5307,7 @@ typeset -g  _p9k__param_pat
 typeset -g  _p9k__param_sig
 
 _p9k_init_vars() {
+  typeset -ga  _p9k__prompt_char_saved
   typeset -g   _p9k__worker_pid
   typeset -g   _p9k__worker_req_fd
   typeset -g   _p9k__worker_resp_fd
@@ -5911,9 +5900,10 @@ function _p9k_parse_buffer() {
   [[ ${2:-0} == <-> ]] || return 2
 
   local rcquotes
-  [[ -o rcquotes ]] && rcquotes=(-o rcquotes)
+  [[ -o rcquotes ]] && rcquotes=rcquotes
 
-  emulate -L zsh -o extended_glob -o no_nomatch $rcquotes
+  eval $__p9k_intro
+  setopt no_nomatch $rcquotes
 
   typeset -ga P9K_COMMANDS=()
 
@@ -6230,8 +6220,7 @@ function _p9k_widget_hook() {
     fi
   fi
 
-  emulate -L zsh
-  setopt no_hist_expand extended_glob no_prompt_bang prompt_{percent,subst}
+  eval $__p9k_intro
   (( _p9k__restore_prompt_fd )) && _p9k_restore_prompt $_p9k__restore_prompt_fd
   __p9k_reset_state=1
   local pat idx var
@@ -6305,8 +6294,7 @@ function _p9k_wrap_widgets() {
 }
 
 function _p9k_restore_prompt() {
-  emulate -L zsh
-  setopt no_hist_expand extended_glob no_prompt_bang prompt_{percent,subst}
+  eval $__p9k_intro
   {
     (( _p9k__must_restore_prompt )) || return
     _p9k__must_restore_prompt=0
@@ -6664,7 +6652,7 @@ _p9k_must_init() {
     [[ $sig == $_p9k__param_sig ]] && return 1
     _p9k_deinit
   fi
-  _p9k__param_pat=$'v28\1'${ZSH_VERSION}$'\1'${ZSH_PATCHLEVEL}$'\1'
+  _p9k__param_pat=$'v29\1'${ZSH_VERSION}$'\1'${ZSH_PATCHLEVEL}$'\1'
   _p9k__param_pat+=$'${#parameters[(I)POWERLEVEL9K_*]}\1${(%):-%n%#}\1$GITSTATUS_LOG_LEVEL\1'
   _p9k__param_pat+=$'$GITSTATUS_ENABLE_LOGGING\1$GITSTATUS_DAEMON\1$GITSTATUS_NUM_THREADS\1'
   _p9k__param_pat+=$'$DEFAULT_USER\1${ZLE_RPROMPT_INDENT:-1}\1$P9K_SSH\1$__p9k_ksh_arrays'
@@ -7095,13 +7083,12 @@ prompt_powerlevel9k_setup() {
   (( __p9k_enabled )) && return
 
   prompt_opts=(percent subst)
-  (( $+__p9k_instant_prompt_active )) || {
-    [[ ! -o prompt_sp ]] || prompt_opts+=sp
-    [[ ! -o prompt_cr ]] || prompt_opts+=cr
-  }
+  if (( ! $+__p9k_instant_prompt_active )); then
+    prompt_opts+=sp
+    prompt_opts+=cr
+  fi
 
-  emulate -L zsh
-  setopt no_hist_expand extended_glob no_prompt_bang prompt_{percent,subst} no_aliases
+  eval $__p9k_intro
   prompt_powerlevel9k_teardown
   __p9k_enabled=1
   typeset -ga preexec_functions=(_p9k_preexec1 $preexec_functions _p9k_preexec2)
@@ -7109,8 +7096,7 @@ prompt_powerlevel9k_setup() {
 }
 
 prompt_powerlevel9k_teardown() {
-  emulate -L zsh
-  setopt no_hist_expand extended_glob no_prompt_bang prompt_{percent,subst} no_aliases
+  eval $__p9k_intro
   add-zsh-hook -D precmd '(_p9k_|powerlevel9k_)*'
   add-zsh-hook -D preexec '(_p9k_|powerlevel9k_)*'
   PROMPT='%m%# '
@@ -7184,7 +7170,7 @@ Example: 'core' segment tells you if there is a file name 'core' in the current 
     else
       local state=PROTECTED
     fi
-    p10k segment -s \\\$state -i '⭐' -f blue -t \\\${size[1]}b
+    p10k segment -s \$state -i '⭐' -f blue -t \${size[1]}b
   }
 
 To enable this segment, add 'core' to POWERLEVEL9K_LEFT_PROMPT_ELEMENTS or
@@ -7223,8 +7209,8 @@ prompt is refreshed.
 
 Usage: %2Fp10k%f %Bdisplay%b -a [part-pattern]...
 
-Populate array \\\`reply\\\` with states of prompt parts matching the patterns.
-If no patterns are supplied, assume \\\`*\\\`.
+Populate array \`reply\` with states of prompt parts matching the patterns.
+If no patterns are supplied, assume \`*\`.
 
 Parts:
   empty_line    empty line (duh)
@@ -7244,7 +7230,7 @@ Part States:
   show          the part is displayed
   hide          the part is not displayed
   print         the part is printed in precmd; only applicable to empty_line and
-                ruler; looks better than show after calling \\\`clear\\\`; unlike
+                ruler; looks better than show after calling \`clear\`; unlike
                 show, the effects of print cannot be undone with hide
 
 part-pattern is a glob pattern for parts. Examples:
@@ -7267,7 +7253,7 @@ Example: Print the state of all prompt parts:
 
   local -A reply
   p10k display -a '*'
-  printf '%%32s = %%q\n' \\\${(@kv)reply}
+  printf '%%32s = %%q\\n' \${(@kv)reply}
 "
 
 # 0  -- reset-prompt not blocked
@@ -7278,8 +7264,7 @@ typeset -gi __p9k_reset_state
 function p10k() {
   [[ $# != 1 || $1 != finalize ]] || { p10k-instant-prompt-finalize; return 0 }
 
-  emulate -L zsh
-  setopt no_hist_expand extended_glob prompt_percent prompt_subst no_aliases
+  eval $__p9k_intro
 
   if (( !ARGC )); then
     print -rP -- $__p9k_p10k_usage >&2
@@ -7332,8 +7317,8 @@ function p10k() {
         return 1
       fi
       shift
-      local -i OPTIND k dump
-      local OPTARG opt match MATCH prev new pair list name var
+      local -i k dump
+      local opt prev new pair list name var
       while getopts ':ha' opt; do
         case $opt in
           a) dump=1;;

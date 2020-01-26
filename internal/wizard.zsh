@@ -1,8 +1,3 @@
-emulate -L zsh
-setopt noaliases
-
-() {
-setopt extended_glob no_prompt_{bang,subst} prompt_percent typeset_silent
 zmodload zsh/langinfo
 if [[ ${langinfo[CODESET]:-} != (utf|UTF)(-|)8 ]]; then
   local LC_ALL=${${(@M)$(locale -a):#*.(utf|UTF)(-|)8}[1]:-en_US.UTF-8}
@@ -1902,5 +1897,3 @@ change_zshrc || return
 print -rP ""
 flowing +c File feature requests and bug reports at "$(href https://github.com/romkatv/powerlevel10k/issues)."
 print -rP ""
-
-} "$@"

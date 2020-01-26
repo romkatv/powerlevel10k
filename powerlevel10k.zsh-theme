@@ -18,10 +18,14 @@
 'builtin' 'setopt' 'no_aliases' 'no_sh_glob' 'brace_expand'
 
 (( $+__p9k_root_dir )) || typeset -gr __p9k_root_dir=${POWERLEVEL9K_INSTALLATION_DIR:-${${(%):-%x}:A:h}}
+(( $+__p9k_intro )) || typeset -gr __p9k_intro='emulate -L zsh -o no_hist_expand -o extended_glob -o no_prompt_bang -o prompt_percent -o no_prompt_subst -o no_aliases -o no_bg_nice -o typeset_silent
+local -a match mbegin mend reply
+local -i MBEGIN MEND OPTIND
+local MATCH REPLY OPTARG IFS=$'\'' \t\n\0'\''
+[[ -z $_p9k_locale ]] || local LC_ALL=$_p9k_locale'
 
 () {
-  emulate -L zsh
-  setopt no_hist_expand extended_glob no_prompt_bang no_prompt_subst prompt_percent no_aliases
+  eval $__p9k_intro
   if (( $+__p9k_sourced )); then
     prompt_powerlevel9k_setup
     return 0
@@ -40,7 +44,8 @@
   source $__p9k_root_dir/internal/p10k.zsh || true
 }
 
-(( ! $+__p9k_instant_prompt_active )) || unsetopt local_options prompt_cr prompt_sp
+unsetopt local_options
+(( $+__p9k_instant_prompt_active )) && unsetopt prompt_cr prompt_sp || setopt prompt_cr prompt_sp
 
 (( ${#__p9k_src_opts} )) && setopt ${__p9k_src_opts[@]}
 'builtin' 'unset' '__p9k_src_opts'
