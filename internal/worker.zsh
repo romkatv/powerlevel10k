@@ -191,9 +191,6 @@ function _p9k_worker_start() {
       else
         exec 2>/dev/null
       fi
-      # todo: remove
-      exec 2>>/tmp/log
-      setopt xtrace
       zmodload zsh/zselect               || return
       ! { zselect -t0 || (( $? != 1 )) } || return
       local _p9k_worker_pgid=$sysparams[pid]
@@ -212,40 +209,3 @@ function _p9k_worker_start() {
     (( $? )) && _p9k_worker_stop
   }
 }
-
-# todo: remove
-
-return
-
-function _p9k_reset_prompt() {
-  zle && zle reset-prompt && zle -R
-}
-
-emulate -L zsh -o prompt_subst -o interactive_comments # -o xtrace
-
-# POWERLEVEL9K_WORKER_LOG_LEVEL=DEBUG
-
-zmodload zsh/datetime
-zmodload zsh/system
-zmodload -F zsh/files b:zf_mv b:zf_rm
-
-autoload -Uz add-zsh-hook
-
-function foo_compute() {
-  _p9k_worker_reply 'echo sync latency: $((1000*(EPOCHREALTIME-'$1'))) >>/tmp/log'
-  # _p9k_worker_async foo_async "foo_sync $1"
-}
-
-function foo_async() {
-}
-
-function foo_sync() {
-  _p9k_worker_reply 'echo async latency: $((1000*(EPOCHREALTIME-'$1'))) >>/tmp/log'
-}
-
-typeset -F start_time=EPOCHREALTIME
-_p9k_worker_start
-_p9k_worker_invoke first '_p9k_worker_reply ""'
-echo -E - $((1000*(EPOCHREALTIME-start_time)))
-
-bm() { _p9k_worker_invoke foo$1 "foo_compute $EPOCHREALTIME" }
