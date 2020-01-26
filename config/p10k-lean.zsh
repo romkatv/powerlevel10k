@@ -84,6 +84,7 @@
     # ram                   # free RAM
     # swap                  # used swap
     todo                    # todo items (https://github.com/todotxt/todo.txt-cli)
+    timewarrior             # timewarrior tracking status (https://timewarrior.net/)
     # time                  # current time
     # =========================[ Line #2 ]=========================
     newline
@@ -605,6 +606,13 @@
 
   # Custom icon.
   # typeset -g POWERLEVEL9K_TODO_VISUAL_IDENTIFIER_EXPANSION='⭐'
+
+  ###########[ timewarrior: timewarrior tracking status (https://timewarrior.net/) ]############
+  # Timewarrior color.
+  typeset -g POWERLEVEL9K_TIMEWARRIOR_FOREGROUND=110
+
+  # Custom icon.
+  # typeset -g POWERLEVEL9K_TIMEWARRIOR_VISUAL_IDENTIFIER_EXPANSION='⭐'
 
   ##################################[ context: user@hostname ]##################################
   # Context color when running with privileges.

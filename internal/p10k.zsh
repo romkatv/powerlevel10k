@@ -4255,6 +4255,63 @@ function instant_prompt_direnv() {
   fi
 }
 
+function prompt_timewarrior() {
+  local -a stat
+  if [[ -n $_p9k_timewarrior_file_name ]]; then
+    zstat -A stat +mtime -- ~/.timewarrior/data $_p9k_timewarrior_file_name 2>/dev/null || stat=()
+    if [[ $stat[1] == $_p9k_timewarrior_dir_mtime && $stat[2] == $_p9k_timewarrior_file_mtime ]]; then
+      if (( $+_p9k_timewarrior_tags )); then
+        _p9k_prompt_segment $0 grey 255 TIMEWARRIOR_ICON 0 '' "${_p9k_timewarrior_tags//\%/%%}"
+      fi
+      return
+    fi
+  fi
+  if [[ ! -d ~/.timewarrior/data ]]; then
+    _p9k_timewarrior_dir_mtime=0
+    _p9k_timewarrior_file_mtime=0
+    _p9k_timewarrior_file_name=
+    unset _p9k_timewarrior_tags
+    return
+  fi
+  if [[ $stat[1] != $_p9k_timewarrior_dir_mtime ]]; then
+    local -a files=(~/.timewarrior/data/<->-<->.data(.N))
+    if (( ! $#files )); then
+      if (( $#stat )) || zstat -A stat +mtime -- ~/.timewarrior/data 2>/dev/null; then
+        _p9k_timewarrior_dir_mtime=$stat[1]
+        _p9k_timewarrior_file_mtime=$stat[1]
+        _p9k_timewarrior_file_name=~/.timewarrior/data
+      else
+        _p9k_timewarrior_dir_mtime=0
+        _p9k_timewarrior_file_mtime=0
+        _p9k_timewarrior_file_name=
+      fi
+      unset _p9k_timewarrior_tags
+      return
+    fi
+    _p9k_timewarrior_file_name=${${(AO)files}[1]}
+  fi
+  if ! zstat -A stat +mtime -- ~/.timewarrior/data $_p9k_timewarrior_file_name 2>/dev/null; then
+    _p9k_timewarrior_dir_mtime=0
+    _p9k_timewarrior_file_mtime=0
+    _p9k_timewarrior_file_name=
+    unset _p9k_timewarrior_tags
+    return
+  fi
+  _p9k_timewarrior_dir_mtime=$stat[1]
+  _p9k_timewarrior_file_mtime=$stat[2]
+  { local tail=${${(Af)"$(<$_p9k_timewarrior_file_name)"}[-1]} } 2>/dev/null
+  if [[ $tail == (#b)'inc '[^\ ]##(|\ #\#(*)) ]]; then
+    _p9k_timewarrior_tags=${${match[2]## #}%% #}
+    _p9k_prompt_segment $0 grey 255 TIMEWARRIOR_ICON 0 '' "${_p9k_timewarrior_tags//\%/%%}"
+  else
+    unset _p9k_timewarrior_tags
+  fi
+}
+
+function _p9k_prompt_timewarrior_init() {
+  typeset -g "_p9k__segment_cond_${_p9k_prompt_side}[_p9k_segment_index]"='$commands[timew]'
+}
+
 # Use two preexec hooks to survive https://github.com/MichaelAquilina/zsh-you-should-use with
 # YSU_HARDCORE=1. See https://github.com/romkatv/powerlevel10k/issues/427.
 _p9k_preexec1() {
@@ -5307,6 +5364,9 @@ typeset -g  _p9k__param_pat
 typeset -g  _p9k__param_sig
 
 _p9k_init_vars() {
+  typeset -gi  _p9k_timewarrior_dir_mtime
+  typeset -gi  _p9k_timewarrior_file_mtime
+  typeset -g   _p9k_timewarrior_file_name
   typeset -ga  _p9k__prompt_char_saved
   typeset -g   _p9k__worker_pid
   typeset -g   _p9k__worker_req_fd

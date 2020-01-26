@@ -123,6 +123,7 @@ function _p9k_init_icons() {
         LUA_ICON                       'lua'
         PERL_ICON                      'perl'
         NNN_ICON                       'nnn'
+        TIMEWARRIOR_ICON               'tw'
       )
     ;;
     'awesome-fontconfig')
@@ -233,6 +234,7 @@ function _p9k_init_icons() {
         LUA_ICON                       'lua'
         PERL_ICON                      'perl'
         NNN_ICON                       'nnn'
+        TIMEWARRIOR_ICON               'tw'
       )
     ;;
     'awesome-mapped-fontconfig')
@@ -347,6 +349,7 @@ function _p9k_init_icons() {
         LUA_ICON                       'lua'
         PERL_ICON                      'perl'
         NNN_ICON                       'nnn'
+        TIMEWARRIOR_ICON               'tw'
       )
     ;;
     'nerdfont-complete'|'nerdfont-fontconfig')
@@ -458,6 +461,7 @@ function _p9k_init_icons() {
         LUA_ICON                       '\uE620'               # 
         PERL_ICON                      '\uE769'               # 
         NNN_ICON                       'nnn'
+        TIMEWARRIOR_ICON               '\uF132'               # 
       )
     ;;
     *)
@@ -568,6 +572,7 @@ function _p9k_init_icons() {
         LUA_ICON                       'lua'
         PERL_ICON                      'perl'
         NNN_ICON                       'nnn'
+        TIMEWARRIOR_ICON               'tw'
       )
     ;;
   esac
