@@ -1174,7 +1174,7 @@ _p9k_prompt_battery_set_args() {
   case $_p9k_os in
     OSX)
       (( $+commands[pmset] )) || return
-      local raw_data=${${(f)"$(pmset -g batt 2>/dev/null)"}[2]}
+      local raw_data=${${(Af)"$(pmset -g batt 2>/dev/null)"}[2]}
       [[ $raw_data == *InternalBattery* ]] || return
       remain=${${(s: :)${${(s:; :)raw_data}[3]}}[1]}
       [[ $remain == *no* ]] && remain="..."
