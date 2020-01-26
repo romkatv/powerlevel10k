@@ -3836,7 +3836,8 @@ prompt_kubecontext() {
   (( $+commands[kubectl] )) || return
 
   if ! _p9k_cache_stat_get $0 ${(s.:.)${KUBECONFIG:-$HOME/.kube/config}}; then
-    local name namespace cluster cloud_name cloud_account cloud_zone cloud_cluster text state
+    local name namespace cluster user cloud_name cloud_account cloud_zone cloud_cluster text state
+    local -a match
     () {
       local cfg && cfg=(${(f)"$(kubectl config view -o=yaml 2>/dev/null)"}) || return
       local ctx=(${(@M)cfg:#current-context: [^\"\'\|\>]*})
@@ -3856,6 +3857,8 @@ prompt_kubecontext() {
           cluster=$match[1]
         elif [[ $line == (#b)'    namespace: '([^\"\'\|\>]*) ]]; then
           namespace=$match[1]
+        elif [[ $line == (#b)'    user: '([^\"\'\|\>]*) ]]; then
+          user=$match[1]
         fi
       done
     }
@@ -3895,18 +3898,19 @@ prompt_kubecontext() {
         fi
       done
     fi
-    _p9k_cache_stat_set "$name" "$namespace" "$cluster" "$cloud_name" "$cloud_account" "$cloud_zone" "$cloud_cluster" "$text" "$state"
+    _p9k_cache_stat_set "$name" "$namespace" "$cluster" "$user" "$cloud_name" "$cloud_account" "$cloud_zone" "$cloud_cluster" "$text" "$state"
   fi
 
   typeset -g P9K_KUBECONTEXT_NAME=$_p9k_cache_val[1]
   typeset -g P9K_KUBECONTEXT_NAMESPACE=$_p9k_cache_val[2]
   typeset -g P9K_KUBECONTEXT_CLUSTER=$_p9k_cache_val[3]
-  typeset -g P9K_KUBECONTEXT_CLOUD_NAME=$_p9k_cache_val[4]
-  typeset -g P9K_KUBECONTEXT_CLOUD_ACCOUNT=$_p9k_cache_val[5]
-  typeset -g P9K_KUBECONTEXT_CLOUD_ZONE=$_p9k_cache_val[6]
-  typeset -g P9K_KUBECONTEXT_CLOUD_CLUSTER=$_p9k_cache_val[7]
-  [[ -n $_p9k_cache_val[8] ]] || return
-  _p9k_prompt_segment $0$_p9k_cache_val[9] magenta white KUBERNETES_ICON 0 '' "${_p9k_cache_val[8]//\%/%%}"
+  typeset -g P9K_KUBECONTEXT_USER=$_p9k_cache_val[4]
+  typeset -g P9K_KUBECONTEXT_CLOUD_NAME=$_p9k_cache_val[5]
+  typeset -g P9K_KUBECONTEXT_CLOUD_ACCOUNT=$_p9k_cache_val[6]
+  typeset -g P9K_KUBECONTEXT_CLOUD_ZONE=$_p9k_cache_val[7]
+  typeset -g P9K_KUBECONTEXT_CLOUD_CLUSTER=$_p9k_cache_val[8]
+  [[ -n $_p9k_cache_val[9] ]] || return
+  _p9k_prompt_segment $0$_p9k_cache_val[10] magenta white KUBERNETES_ICON 0 '' "${_p9k_cache_val[9]//\%/%%}"
 }
 
 _p9k_prompt_kubecontext_init() {

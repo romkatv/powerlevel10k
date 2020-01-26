@@ -865,6 +865,8 @@
   # - P9K_KUBECONTEXT_NAMESPACE  The current context's namespace. Corresponds to column NAMESPACE
   #                              in the output of `kubectl config get-contexts`. If there is no
   #                              namespace, the parameter is set to "default".
+  # - P9K_KUBECONTEXT_USER       The current context's user. Corresponds to column AUTHINFO in the
+  #                              output of `kubectl config get-contexts`.
   #
   # If the context points to Google Kubernetes Engine (GKE) or Elastic Kubernetes Service (EKS),
   # the following extra parameters are available:
