@@ -18,11 +18,12 @@
 'builtin' 'setopt' 'no_aliases' 'no_sh_glob' 'brace_expand'
 
 (( $+__p9k_root_dir )) || typeset -gr __p9k_root_dir=${POWERLEVEL9K_INSTALLATION_DIR:-${${(%):-%x}:A:h}}
+# Note: leading spaces before `local` are important. Otherwise Antigen will remove `local` (!!!).
 (( $+__p9k_intro )) || typeset -gr __p9k_intro='emulate -L zsh -o no_hist_expand -o extended_glob -o no_prompt_bang -o prompt_percent -o no_prompt_subst -o no_aliases -o no_bg_nice -o typeset_silent
-local -a match mbegin mend reply
-local -i MBEGIN MEND OPTIND
-local MATCH REPLY OPTARG IFS=$'\'' \t\n\0'\''
-[[ -z $_p9k_locale ]] || local LC_ALL=$_p9k_locale'
+  local -a match mbegin mend reply
+  local -i MBEGIN MEND OPTIND
+  local MATCH REPLY OPTARG IFS=$'\'' \t\n\0'\''
+  [[ -z $_p9k_locale ]] || local LC_ALL=$_p9k_locale'
 
 () {
   eval $__p9k_intro
