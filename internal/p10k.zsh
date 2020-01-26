@@ -218,7 +218,7 @@ function _p9k_human_readable_bytes() {
     (( n < 100 )) && break
     (( n /= 1024 ))
   done
-  _p9k_ret=$n$suf
+  _p9k_ret=${${n%%0#}%.}$suf
 }
 
 if is-at-least 5.4; then
