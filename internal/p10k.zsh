@@ -201,26 +201,19 @@ function _p9k_declare() {
   esac
 }
 
-# todox: move these to init_vars
-
-# _p9k__parent_dirs and _p9k__parent_mtimes are parallel arrays. They are updated
-# together with _p9k__pwd. _p9k__parent_mtimes[i] is mtime for _p9k__parent_dirs[i].
-#
-# When _p9k__pwd is / or ~, both arrays are empty. When _p9k__pwd is ~/foo/bar,
-# _p9k__parent_dirs is (/home/user/foo/bar /home/user/foo). When _p9k__pwd is
-# /foo/bar, it's (/foo/bar /foo).
-#
-# _p9k__parent_mtimes_s is always "$_p9k__parent_mtimes".
-typeset -ga _p9k__parent_dirs
-typeset -ga _p9k__parent_mtimes
-typeset -g  _p9k__parent_mtimes_s
-
-# dir/pattern => dir mtime ':' num_matches
-typeset -gA _p9k__glob_cache
-
-# dir/pattern => space-separated parent dir mtimes ' :' the first matching parent dir
-# Note: ' :' is indeed the delimiter.
-typeset -gA _p9k__upsearch_cache
+function _p9k_read_word() {
+  local -a stat
+  zstat -A stat +mtime -- $1 2>/dev/null || stat=(-1)
+  local cached=$_p9k__read_word_cache[$1]
+  if [[ $cached == $stat[1]:* ]]; then
+    _p9k_ret=${cached#*:}
+  else
+    local rest
+    { read _p9k_ret rest <$1 } 2>/dev/null
+    _p9k__read_word_cache[$1]=$stat[1]:$_p9k_ret
+  fi
+  [[ -n $_p9k_ret ]]
+}
 
 function _p9k_fetch_cwd() {
   _p9k__cwd=${(%):-%/}
@@ -241,18 +234,19 @@ function _p9k_fetch_cwd() {
     ;;
   esac
   local MATCH
-  _p9k__parent_dirs=(${(@)${:-{$#parts..1}}/(#m)*/$parent${(pj./.)parts[1,$MATCH]}})
+  _p9k__parent_dirs=(${(@)${:-{$#parts..1}}/(#m)*/$parent${(pj./.)parts[1,MATCH]}})
   if ! zstat -A _p9k__parent_mtimes +mtime -- $_p9k__parent_dirs 2>/dev/null; then
     _p9k__parent_mtimes=(${(@)parts/*/-1})
   fi
-  _p9k__parent_mtimes_s="$_p9k__parent_mtimes"
+  _p9k__parent_mtimes_i=(${(@)${:-{1..$#parts}}/(#m)*/$MATCH:$_p9k__parent_mtimes[MATCH]})
+  _p9k__parent_mtimes_s="$_p9k__parent_mtimes_i"
 }
 
 # Usage: _p9k_glob parent_dir_index pattern
 #
 # parent_dir_index indexes _p9k__parent_dirs.
 #
-# Returns the number of matches capped at 2.
+# Returns the number of matches.
 #
 # Pattern cannot have slashes.
 #
@@ -264,57 +258,49 @@ function _p9k_glob() {
     return ${cached##*:}
   fi
   local -a stat
-  zstat -A stat +mtime -- $dir || stat=(-1)
+  zstat -A stat +mtime -- $dir 2>/dev/null || stat=(-1)
   local files=($dir/$~2(N:t))
-  local -i res=$(($#files < 2 ? $#files : 2))
-  _p9k__glob_cache[$dir/$2]="$stat[1]:$res"
-  return res
+  _p9k__glob_cache[$dir/$2]="$stat[1]:$#files"
+  return $#files
 }
 
 # Usage: _p9k_upsearch pattern
 #
-# On match, sets _p9k_ret to the directory in which match happened and returns 0.
-# Otherwise sets _p9k_ret to "" and returns 1.
+# Returns index within _p9k__parent_dirs or 0 if there is no match.
 #
 # Pattern cannot have slashes. Never matches in / or ~. Search stops before reaching / or ~.
 #
 # Example: _p9k_upsearch '*.csproj'
 function _p9k_upsearch() {
-  local key=""
-  local cached=$_p9k__upsearch_cache[$_p9k__pwd/$1]
-  if [[ $cached == $_p9k__parent_mtimes_s\ * ]]; then
-    _p9k_ret=${cached:$(($#_p9k__parent_mtimes_s+2))}
-    [[ -n $_p9k_ret ]]
-    return
-  fi
-
-  _p9k_ret=
-
+  local cached=$_p9k__upsearch_cache[$_p9k__cwd/$1]
   if [[ -n $cached ]]; then
-    local last_mtime cur_mtime dir last_dir=${cached##*:}
-    local -i i=0
-    for last_mtime cur_mtime in ${${(s: :)cached}:^_p9k__parent_mtimes}; do
-      dir=$_p9k__parent_dirs[++i]
-      if [[ $last_mtime == $cur_mtime ]] && (( $#last_dir <= $#dir )); then
-        (( $#last_dir < $#dir )) && continue
-        _p9k_ret=$last_dir
-        break
-      fi
-      _p9k_glob $i $1 && continue
-      _p9k_ret=$last_dir
-      break
-    done
-  else
+    if [[ $_p9k__parent_mtimes_s == ${cached% *}(| *) ]]; then
+      return ${cached##* }
+    fi
+    cached=(${(s: :)cached})
+    local last_idx=$cached[-1]
+    cached[-1]=()
     local -i i
-    for i in {1..$#_p9k__parent_dirs}; do
+    for i in ${(@)${cached:|_p9k__parent_mtimes_i}%:*}; do
       _p9k_glob $i $1 && continue
-      _p9k_ret=$_p9k__parent_dirs[i]
-      break
+      _p9k__upsearch_cache[$_p9k__cwd/$1]="${_p9k__parent_mtimes_i[1,i]} $i"
+      return i
     done
+    if (( i != last_idx )); then
+      _p9k__upsearch_cache[$_p9k__cwd/$1]="${_p9k__parent_mtimes_i[1,$#cached]} $last_idx"
+      return last_idx
+    fi
+    i=$(($#cached + 1))
+  else
+    local -i i=1
   fi
-
-  _p9k__upsearch_cache[$_p9k__pwd/$1]="$_p9k__parent_mtimes_s :$_p9k_ret"
-  [[ -n $_p9k_ret ]]
+  for ((; i <= $#_p9k__parent_mtimes; ++i)); do
+    _p9k_glob $i $1 && continue
+    _p9k__upsearch_cache[$_p9k__cwd/$1]="${_p9k__parent_mtimes_i[1,i]} $i"
+    return i
+  done
+  _p9k__upsearch_cache[$_p9k__cwd/$1]="$_p9k__parent_mtimes_s 0"
+  return 0
 }
 
 # If we execute `print -P $1`, how many characters will be printed on the last line?
@@ -1114,7 +1100,6 @@ function _p9k_python_version() {
 # Anaconda Environment
 prompt_anaconda() {
   local p=${CONDA_PREFIX:-$CONDA_ENV_PATH}
-  [[ -n $p ]] || return
   local msg=''
   if (( _POWERLEVEL9K_ANACONDA_SHOW_PYTHON_VERSION )) && _p9k_python_version; then
     msg="${_p9k_ret//\%//%%} "
@@ -1131,16 +1116,14 @@ _p9k_prompt_anaconda_init() {
 # AWS Profile
 prompt_aws() {
   local aws_profile="${AWS_VAULT:-${AWSUME_PROFILE:-${AWS_PROFILE:-$AWS_DEFAULT_PROFILE}}}"
-  if [[ -n "$aws_profile" ]]; then
-    local pat class
-    for pat class in "${_POWERLEVEL9K_AWS_CLASSES[@]}"; do
-      if [[ $aws_profile == ${~pat} ]]; then
-        [[ -n $class ]] && state=_${(U)class}
-        break
-      fi
-    done
-    _p9k_prompt_segment "$0$state" red white 'AWS_ICON' 0 '' "${aws_profile//\%/%%}"
-  fi
+  local pat class
+  for pat class in "${_POWERLEVEL9K_AWS_CLASSES[@]}"; do
+    if [[ $aws_profile == ${~pat} ]]; then
+      [[ -n $class ]] && state=_${(U)class}
+      break
+    fi
+  done
+  _p9k_prompt_segment "$0$state" red white 'AWS_ICON' 0 '' "${aws_profile//\%/%%}"
 }
 
 _p9k_prompt_aws_init() {
@@ -1150,14 +1133,8 @@ _p9k_prompt_aws_init() {
 ################################################################
 # Current Elastic Beanstalk environment
 prompt_aws_eb_env() {
-  (( $+commands[eb] )) || return
-
-  local dir=$_p9k__cwd
-  while true; do
-    [[ $dir == / ]] && return
-    [[ -d $dir/.elasticbeanstalk ]] && break
-    dir=${dir:h}
-  done
+  _p9k_upsearch .elasticbeanstalk && return
+  local dir=$_p9k__parent_dirs[$?]
 
   if ! _p9k_cache_stat_get $0 $dir/.elasticbeanstalk/config.yml; then
     local env
@@ -1248,18 +1225,14 @@ function _p9k_read_file() {
 }
 
 prompt_fvm() {
-  (( $+commands[fvm] )) || return
-  local dir=$_p9k__cwd_a
-  while [[ $dir != / ]]; do
-    local link=$dir/fvm
-    if [[ -L $link ]]; then
-      if [[ ${link:A} == (#b)*/versions/([^/]##)/bin/flutter ]]; then
-        _p9k_prompt_segment $0 blue $_p9k_color1 FLUTTER_ICON 0 '' ${match[1]//\%/%%}
-      fi
-      return
+  _p9k_upsearch fvm && return
+  local link=$_p9k__parent_dirs[$?]/fvm
+  if [[ -L $link ]]; then
+    if [[ ${link:A} == (#b)*/versions/([^/]##)/bin/flutter ]]; then
+      _p9k_prompt_segment $0 blue $_p9k_color1 FLUTTER_ICON 0 '' ${match[1]//\%/%%}
     fi
-    dir=${dir:h}
-  done
+    return
+  fi
 }
 
 _p9k_prompt_fvm_init() {
@@ -2029,9 +2002,7 @@ instant_prompt_dir() { prompt_dir; }
 ################################################################
 # Docker machine
 prompt_docker_machine() {
-  if [[ -n "$DOCKER_MACHINE_NAME" ]]; then
-    _p9k_prompt_segment "$0" "magenta" "$_p9k_color1" 'SERVER_ICON' 0 '' "${DOCKER_MACHINE_NAME//\%/%%}"
-  fi
+  _p9k_prompt_segment "$0" "magenta" "$_p9k_color1" 'SERVER_ICON' 0 '' "${DOCKER_MACHINE_NAME//\%/%%}"
 }
 
 _p9k_prompt_docker_machine_init() {
@@ -2054,12 +2025,7 @@ prompt_go_version() {
       fi
     fi
     if [[ $_p9k__cwd/ != $p/* && $_p9k__cwd_a/ != $p/* ]]; then
-      local dir=$_p9k__cwd_a
-      while true; do
-        [[ $dir == / ]] && return
-        [[ -e $dir/go.mod ]] && break
-        dir=${dir:h}
-      done
+      _p9k_upsearch go.mod && return
     fi
   fi
   _p9k_prompt_segment "$0" "green" "grey93" "GO_ICON" 0 '' "${v//\%/%%}"
@@ -2080,7 +2046,6 @@ prompt_history() {
 ################################################################
 # Detection for virtualization (systemd based systems only)
 prompt_detect_virt() {
-  (( $+commands[systemd-detect-virt] )) || return
   local virt="$(systemd-detect-virt 2>/dev/null)"
   if [[ "$virt" == "none" ]]; then
     [[ "$(ls -di /)" != "2 /" ]] && virt="chroot"
@@ -2225,17 +2190,9 @@ function _p9k_cached_cmd_stdout_stderr() {
 ################################################################
 # Segment to diplay Node version
 prompt_node_version() {
-  (( $+commands[node] )) || return
-
   if (( _POWERLEVEL9K_NODE_VERSION_PROJECT_ONLY )); then
-    local dir=$_p9k__cwd
-    while true; do
-      [[ $dir == / ]] && return
-      [[ -e $dir/package.json ]] && break
-      dir=${dir:h}
-    done
+    _p9k_upsearch package.json && return
   fi
-
   _p9k_cached_cmd_stdout node --version && [[ $_p9k_ret == v?* ]] || return
   _p9k_prompt_segment "$0" "green" "white" 'NODE_ICON' 0 '' "${_p9k_ret#v}"
 }
@@ -2343,7 +2300,6 @@ _p9k_nvm_ls_current() {
 # Segment to display Node version from NVM
 # Only prints the segment if different than the default value
 prompt_nvm() {
-  (( $+commands[nvm] || $+functions[nvm] )) || return
   [[ -n $NVM_DIR ]] && _p9k_nvm_ls_current || return
   local current=$_p9k_ret
   ! _p9k_nvm_ls_default || [[ $_p9k_ret != $current ]] || return
@@ -2357,7 +2313,6 @@ _p9k_prompt_nvm_init() {
 ################################################################
 # Segment to display NodeEnv
 prompt_nodeenv() {
-  [[ -n "$NODE_VIRTUAL_ENV" ]] || return
   local msg
   if (( _POWERLEVEL9K_NODEENV_SHOW_NODE_VERSION )) && _p9k_cached_cmd_stdout node --version; then
     msg="${_p9k_ret//\%/%%} "
@@ -2395,15 +2350,20 @@ function _p9k_nodenv_global_version() {
 # Segment to display nodenv information
 # https://github.com/nodenv/nodenv
 prompt_nodenv() {
-  (( $+commands[nodenv] || $+functions[nodenv] )) || return
   _p9k_ret=$NODENV_VERSION
   if [[ -z $_p9k_ret ]]; then
-    [[ $NODENV_DIR == /* ]] && local dir=$NODENV_DIR || local dir="$_p9k__cwd_a/$NODENV_DIR"
-    while [[ $dir != //[^/]# ]]; do
-      _p9k_read_nodenv_version_file $dir/.node-version && break
-      [[ $dir == / ]] && break
-      dir=${dir:h}
-    done
+    if [[ $NODENV_DIR == (|.) ]]; then
+      _p9k_upsearch .node-version
+      local -i idx=$?
+      (( idx )) && _p9k_read_nodenv_version_file $_p9k__parent_dirs[idx]/.node-version || _p9k_ret=
+    else
+      [[ $NODENV_DIR == /* ]] && local dir=$NODENV_DIR || local dir="$_p9k__cwd_a/$NODENV_DIR"
+      while [[ $dir != //[^/]# ]]; do
+        _p9k_read_nodenv_version_file $dir/.node-version && break
+        [[ $dir == / ]] && break
+        dir=${dir:h}
+      done
+    fi
     if [[ -z $_p9k_ret ]]; then
       (( _POWERLEVEL9K_NODENV_PROMPT_ALWAYS_SHOW )) || return
       _p9k_nodenv_global_version
@@ -2426,44 +2386,9 @@ _p9k_prompt_nodenv_init() {
 }
 
 prompt_dotnet_version() {
-  (( $+commands[dotnet] )) || return
-
   if (( _POWERLEVEL9K_DOTNET_VERSION_PROJECT_ONLY )); then
-    case $_p9k__cwd in
-      ~|/) return 0;;
-      ~/*)
-        local parent=~/
-        local parts=(${(s./.)_p9k__cwd#$parent})
-      ;;
-      *)
-        local parent=/
-        local parts=(${(s./.)_p9k__cwd})
-      ;;
-    esac
-    local MATCH
-    local dirs=(${(@)${:-{1..$#parts}}/(#m)*/$parent${(pj./.)parts[i,$MATCH]}})
-    local mtimes=()
-    zstat -A mtimes +mtime -- $dirs 2>/dev/null || mtimes=()
-    local key="${(pj.:.)mtimes}"
-    if ! _p9k_cache_ephemeral_get $0 $_p9k__cwd || [[ $key != $_p9k_cache_val[1] ]] ; then
-      local -i i found
-      for i in {1..$#dirs}; do
-        local dir=$dirs[i] mtime=$mtimes[i]
-        local pair=$_p9k__dotnet_stat_cache[$dir]
-        if [[ $pair == ${mtime:-x}:* ]]; then
-          (( $pair[-1] )) && found=1
-        else
-          [[ -z $dir/(project.json|global.json|packet.dependencies|*.csproj|*.fsproj|*.xproj|*.sln)(#qN^/) ]]
-          local -i has=$?
-          (( has )) && found=1
-          [[ -n $mtime ]] && _p9k__dotnet_stat_cache[$dir]="$mtime:$has"
-        fi
-      done
-      [[ -n $key ]] && _p9k_cache_ephemeral_set "$key" $found
-    fi
-    (( _p9k_cache_val[2] )) || return
+    _p9k_upsearch 'project.json|global.json|packet.dependencies|*.csproj|*.fsproj|*.xproj|*.sln' && return
   fi
-
   _p9k_cached_cmd_stdout dotnet --version || return
   _p9k_prompt_segment "$0" "magenta" "white" 'DOTNET_ICON' 0 '' "$_p9k_ret"
 }
@@ -2555,43 +2480,44 @@ _p9k_prompt_ram_sync() {
   _p9k_worker_reply $REPLY
 }
 
-function _p9k_read_rbenv_version_file() {
-  [[ -r $1 ]] || return
-  local rest
-  read _p9k_ret rest <$1 2>/dev/null
-  [[ -n $_p9k_ret ]]
-}
-
 function _p9k_rbenv_global_version() {
-  _p9k_read_rbenv_version_file ${RBENV_ROOT:-$HOME/.rbenv}/version || _p9k_ret=system
+  _p9k_read_word ${RBENV_ROOT:-$HOME/.rbenv}/version || _p9k_ret=system
 }
 
 ################################################################
 # Segment to display rbenv information
 # https://github.com/rbenv/rbenv#choosing-the-ruby-version
 prompt_rbenv() {
-  (( $+commands[rbenv] || $+functions[rbenv] )) || return
   if [[ -n $RBENV_VERSION ]]; then
     (( ${_POWERLEVEL9K_RBENV_SOURCES[(I)shell]} )) || return
     local v=$RBENV_VERSION
   else
     (( ${_POWERLEVEL9K_RBENV_SOURCES[(I)local|global]} )) || return
-    [[ $RBENV_DIR == /* ]] && local dir=$RBENV_DIR || local dir="$_p9k__cwd_a/$RBENV_DIR"
-    while true; do
-      if _p9k_read_rbenv_version_file $dir/.ruby-version; then
+    if [[ $RBENV_DIR == (|.) ]]; then
+      _p9k_upsearch .ruby-version
+      local -i idx=$?
+      if (( idx )) && _p9k_read_word $_p9k__parent_dirs[idx]/.ruby-version; then
         (( ${_POWERLEVEL9K_RBENV_SOURCES[(I)local]} )) || return
-        local v=$_p9k_ret
-        break
+      else
+        _p9k_ret=
       fi
-      if [[ $dir == / ]]; then
-        (( _POWERLEVEL9K_RBENV_PROMPT_ALWAYS_SHOW )) || return
-        (( ${_POWERLEVEL9K_RBENV_SOURCES[(I)global]} )) || return
-        _p9k_rbenv_global_version
-        local v=$_p9k_ret
-        break
-      fi
-      dir=${dir:h}
-    done
+    else
+      [[ $RBENV_DIR == /* ]] && local dir=$RBENV_DIR || local dir="$_p9k__cwd_a/$RBENV_DIR"
+      while true; do
+        if _p9k_read_word $dir/.ruby-version; then
+          (( ${_POWERLEVEL9K_RBENV_SOURCES[(I)local]} )) || return
+          break
+        fi
+        [[ $dir == / ]] && break
+        dir=${dir:h}
+      done
+    fi
+    if [[ -z $_p9k_ret ]]; then
+      (( _POWERLEVEL9K_RBENV_PROMPT_ALWAYS_SHOW )) || return
+      (( ${_POWERLEVEL9K_RBENV_SOURCES[(I)global]} )) || return
+      _p9k_rbenv_global_version
+    fi
+    local v=$_p9k_ret
   fi
 
   if (( !_POWERLEVEL9K_RBENV_PROMPT_ALWAYS_SHOW )); then
@@ -2621,7 +2547,6 @@ function _p9k_luaenv_global_version() {
 # Segment to display luaenv information
 # https://github.com/cehoffman/luaenv
 prompt_luaenv() {
-  (( $+commands[luaenv] || $+functions[luaenv] )) || return
   if [[ -n $LUAENV_VERSION ]]; then
     (( ${_POWERLEVEL9K_LUAENV_SOURCES[(I)shell]} )) || return
     local v=$LUAENV_VERSION
@@ -2683,7 +2608,6 @@ function _p9k_plenv_global_version() {
 # Segment to display plenv information
 # https://github.com/plenv/plenv#choosing-the-perl-version
 prompt_plenv() {
-  (( $+commands[plenv] || $+functions[plenv] )) || return
   if [[ -n $PLENV_VERSION ]]; then
     (( ${_POWERLEVEL9K_PLENV_SOURCES[(I)shell]} )) || return
     local v=$PLENV_VERSION
@@ -2723,7 +2647,6 @@ _p9k_prompt_plenv_init() {
 # Segment to display jenv information
 # https://github.com/jenv/jenv
 prompt_jenv() {
-  (( $+commands[jenv] || $+functions[jenv] )) || return
   if [[ -n $JENV_VERSION ]]; then
     (( ${_POWERLEVEL9K_JENV_SOURCES[(I)shell]} )) || return
     local v=$JENV_VERSION
@@ -2763,7 +2686,6 @@ _p9k_prompt_jenv_init() {
 # Segment to display chruby information
 # see https://github.com/postmodern/chruby/issues/245 for chruby_auto issue with ZSH
 prompt_chruby() {
-  [[ -n $RUBY_ENGINE ]] || return
   local v=''
   (( _POWERLEVEL9K_CHRUBY_SHOW_ENGINE )) && v=$RUBY_ENGINE
   if [[ $_POWERLEVEL9K_CHRUBY_SHOW_VERSION == 1 && -n $RUBY_VERSION ]] && v+=${v:+ }$RUBY_VERSION
@@ -2788,7 +2710,6 @@ instant_prompt_root_indicator() { prompt_root_indicator; }
 # Segment to display Rust version number
 prompt_rust_version() {
   unset P9K_RUST_VERSION
-  (( $+commands[rustc] )) || return
   if (( _POWERLEVEL9K_RUST_VERSION_PROJECT_ONLY )); then
     local dir=$_p9k__cwd_a
     while true; do
@@ -2863,7 +2784,6 @@ prompt_rspec_stats() {
 ################################################################
 # Segment to display Ruby Version Manager information
 prompt_rvm() {
-  (( $+commands[rvm-prompt] || $+functions[rvm-prompt] )) || return
   [[ $GEM_HOME == *rvm* && $ruby_string != $rvm_path/bin/ruby ]] || return
   local v=${GEM_HOME:t}
   (( _POWERLEVEL9K_RVM_SHOW_GEMSET )) || v=${v%%${rvm_gemset_separator:-@}*}
@@ -3164,8 +3084,8 @@ instant_prompt_date() {
 # todo.sh: shows the number of tasks in your todo.sh file
 prompt_todo() {
   unset P9K_TODO_TOTAL_TASK_COUNT P9K_TODO_FILTERED_TASK_COUNT
+  [[ -r $_p9k_todo_file ]] || return
   local todo=$commands[todo.sh]
-  [[ -n $todo && -r $_p9k_todo_file ]] || return
   if ! _p9k_cache_stat_get $0 $_p9k_todo_file; then
     local count="$($todo -p ls | tail -1)"
     if [[ $count == (#b)'TODO: '([[:digit:]]##)' of '([[:digit:]]##)' '* ]]; then
@@ -3843,7 +3763,6 @@ instant_prompt_vi_mode() {
 # More information on virtualenv (Python):
 # https://virtualenv.pypa.io/en/latest/
 prompt_virtualenv() {
-  [[ -n $VIRTUAL_ENV ]] || return
   local msg=''
   if (( _POWERLEVEL9K_VIRTUALENV_SHOW_PYTHON_VERSION )) && _p9k_python_version; then
     msg="${_p9k_ret//\%/%%} "
@@ -3873,7 +3792,6 @@ function _p9k_pyenv_global_version() {
 # Segment to display pyenv information
 # https://github.com/pyenv/pyenv#choosing-the-python-version
 prompt_pyenv() {
-  (( $+commands[pyenv] || $+functions[pyenv] )) || return
   local v=${(j.:.)${(@)${(s.:.)PYENV_VERSION}#python-}}
   if [[ -n $v ]]; then
     (( ${_POWERLEVEL9K_PYENV_SOURCES[(I)shell]} )) || return
@@ -3923,7 +3841,6 @@ function _p9k_goenv_global_version() {
 ################################################################
 # Segment to display goenv information: https://github.com/syndbg/goenv
 prompt_goenv() {
-  (( $+commands[goenv] || $+functions[goenv] )) || return
   local v=${(j.:.)${(s.:.)GOENV_VERSION}}
   if [[ -z $v ]]; then
     [[ $GOENV_DIR == /* ]] && local dir=$GOENV_DIR || local dir="$_p9k__cwd_a/$GOENV_DIR"
@@ -3957,12 +3874,10 @@ _p9k_prompt_goenv_init() {
 ################################################################
 # Display openfoam information
 prompt_openfoam() {
-  local wm_project_version="$WM_PROJECT_VERSION"
-  local wm_fork="$WM_FORK"
-  if [[ -n "$wm_project_version" && -z "$wm_fork" ]] ; then
-    _p9k_prompt_segment "$0" "yellow" "$_p9k_color1" '' 0 '' "OF: ${${wm_project_version:t}//\%/%%}"
-  elif [[ -n "$wm_project_version" && -n "$wm_fork" ]] ; then
-    _p9k_prompt_segment "$0" "yellow" "$_p9k_color1" '' 0 '' "F-X: ${${wm_project_version:t}//\%/%%}"
+  if [[ -z "$WM_FORK" ]] ; then
+    _p9k_prompt_segment "$0" "yellow" "$_p9k_color1" '' 0 '' "OF: ${${WM_PROJECT_VERSION:t}//\%/%%}"
+  else
+    _p9k_prompt_segment "$0" "yellow" "$_p9k_color1" '' 0 '' "F-X: ${${WM_PROJECT_VERSION:t}//\%/%%}"
   fi
 }
 
@@ -3985,7 +3900,7 @@ _p9k_prompt_swift_version_init() {
 ################################################################
 # dir_writable: Display information about the user's permission to write in the current directory
 prompt_dir_writable() {
-  if [[ ! -w "$_p9k__cwd" ]]; then
+  if [[ ! -w "$_p9k__cwd_a" ]]; then
     _p9k_prompt_segment "$0_FORBIDDEN" "red" "yellow1" 'LOCK_ICON' 0 '' ''
   fi
 }
@@ -3995,8 +3910,6 @@ instant_prompt_dir_writable() { prompt_dir_writable; }
 ################################################################
 # Kubernetes Current Context/Namespace
 prompt_kubecontext() {
-  (( $+commands[kubectl] )) || return
-
   if ! _p9k_cache_stat_get $0 ${(s.:.)${KUBECONFIG:-$HOME/.kube/config}}; then
     local name namespace cluster user cloud_name cloud_account cloud_zone cloud_cluster text state
     () {
@@ -4081,7 +3994,6 @@ _p9k_prompt_kubecontext_init() {
 ################################################################
 # Dropbox status
 prompt_dropbox() {
-  (( $+commands[dropbox-cli] )) || return
   # The first column is just the directory, so cut it
   local dropbox_status="$(dropbox-cli filestatus . | cut -d\  -f2-)"
 
@@ -4115,7 +4027,6 @@ _p9k_prompt_java_version_init() {
 }
 
 prompt_azure() {
-  (( $+commands[az] )) || return
   local cfg=${AZURE_CONFIG_DIR:-$HOME/.azure}/azureProfile.json
   if ! _p9k_cache_stat_get $0 $cfg; then
     local name
@@ -4136,7 +4047,6 @@ _p9k_prompt_azure_init() {
 
 prompt_gcloud() {
   unset P9K_GCLOUD_PROJECT P9K_GCLOUD_ACCOUNT
-  (( $+commands[gcloud] )) || return
   if ! _p9k_cache_stat_get $0 ~/.config/gcloud/active_config ~/.config/gcloud/configurations/config_default; then
     _p9k_cache_stat_set "$(gcloud config get-value account 2>/dev/null)" "$(gcloud config get-value project 2>/dev/null)"
   fi
@@ -4152,8 +4062,6 @@ _p9k_prompt_gcloud_init() {
 
 prompt_google_app_cred() {
   unset P9K_GOOGLE_APP_CRED_{TYPE,PROJECT_ID,CLIENT_EMAIL}
-  [[ -n $GOOGLE_APPLICATION_CREDENTIALS ]] || return
-  (( $+commands[jq] )) || return
 
   if ! _p9k_cache_stat_get $0 $GOOGLE_APPLICATION_CREDENTIALS; then
     local -a lines
@@ -4267,7 +4175,7 @@ function _p9k_fetch_nordvpn_status() {
 #   POWERLEVEL9K_NORDVPN_CONNECTING_BACKGROUND=cyan
 function prompt_nordvpn() {
   unset $__p9k_nordvpn_tag P9K_NORDVPN_COUNTRY_CODE
-  if [[ $+commands[nordvpn] == 1 && -e /run/nordvpnd.sock ]]; then
+  if [[ -e /run/nordvpnd.sock ]]; then
     _p9k_fetch_nordvpn_status 2>/dev/null
     if [[ $P9K_NORDVPN_SERVER == (#b)([[:alpha:]]##)[[:digit:]]##.nordvpn.com ]]; then
       typeset -g P9K_NORDVPN_COUNTRY_CODE=${(U)match[1]}
@@ -4346,7 +4254,6 @@ function instant_prompt_vim_shell() {
 }
 
 function prompt_terraform() {
-  (( $+commands[terraform] )) || return
   local ws=default
   if [[ -n $TF_WORKSPACE ]]; then
     ws=$TF_WORKSPACE
@@ -4367,7 +4274,6 @@ function prompt_proxy() {
     $all_proxy $http_proxy $https_proxy $ftp_proxy
     $ALL_PROXY $HTTP_PROXY $HTTPS_PROXY $FTP_PROXY)
   p=(${(@)${(@)${(@)p#*://}##*@}%%/*})
-  (( $#p )) || return
   (( $#p == 1 )) || p=("")
   _p9k_prompt_segment $0 $_p9k_color1 blue PROXY_ICON 0 '' "$p[1]"
 }
@@ -5503,16 +5409,40 @@ typeset -g  _p9k__param_pat
 typeset -g  _p9k__param_sig
 
 _p9k_init_vars() {
-  typeset -gi  _p9k_timewarrior_dir_mtime
-  typeset -gi  _p9k_timewarrior_file_mtime
-  typeset -g   _p9k_timewarrior_file_name
-  typeset -ga  _p9k__prompt_char_saved
-  typeset -g   _p9k__worker_pid
-  typeset -g   _p9k__worker_req_fd
-  typeset -g   _p9k__worker_resp_fd
-  typeset -g   _p9k__worker_shell_pid
-  typeset -g   _p9k__worker_file_prefix
-  typeset -gA  _p9k__worker_request_map
+  # filepath => mtime ':' word
+  typeset -gA _p9k__read_word_cache
+
+  # _p9k__parent_dirs and _p9k__parent_mtimes are parallel arrays. They are updated
+  # together with _p9k__cwd. _p9k__parent_mtimes[i] is mtime for _p9k__parent_dirs[i].
+  #
+  # When _p9k__cwd is / or ~, both arrays are empty. When _p9k__cwd is ~/foo/bar,
+  # _p9k__parent_dirs is (/home/user/foo/bar /home/user/foo). When _p9k__cwd is
+  # /foo/bar, it's (/foo/bar /foo).
+  #
+  # $_p9k__parent_mtimes_i[i] == "$i:$_p9k__parent_mtimes[i]"
+  # $_p9k__parent_mtimes_s == "$_p9k__parent_mtimes_i".
+  typeset -ga _p9k__parent_dirs
+  typeset -ga _p9k__parent_mtimes
+  typeset -ga _p9k__parent_mtimes_i
+  typeset -g  _p9k__parent_mtimes_s
+
+  # dir/pattern => dir mtime ':' num_matches
+  typeset -gA _p9k__glob_cache
+
+  # dir/pattern => space-separated parent dir mtimes ' :' the first matching parent dir
+  # Note: ' :' is indeed the delimiter.
+  typeset -gA _p9k__upsearch_cache
+
+  typeset -gi _p9k_timewarrior_dir_mtime
+  typeset -gi _p9k_timewarrior_file_mtime
+  typeset -g  _p9k_timewarrior_file_name
+  typeset -ga _p9k__prompt_char_saved
+  typeset -g  _p9k__worker_pid
+  typeset -g  _p9k__worker_req_fd
+  typeset -g  _p9k__worker_resp_fd
+  typeset -g  _p9k__worker_shell_pid
+  typeset -g  _p9k__worker_file_prefix
+  typeset -gA _p9k__worker_request_map
   typeset -ga _p9k__segment_cond_left
   typeset -ga _p9k__segment_cond_right
   typeset -ga _p9k__segment_val_left
