@@ -28,14 +28,14 @@
 () {
   eval $__p9k_intro
   if (( $+__p9k_sourced )); then
-    prompt_powerlevel9k_setup
+    (( $+functions[_p9k_setup] )) && _p9k_setup
     return 0
   fi
   typeset -gr __p9k_dump_file=${XDG_CACHE_HOME:-~/.cache}/p10k-dump-${(%):-%n}.zsh
   if [[ $__p9k_dump_file != $__p9k_instant_prompt_dump_file ]] && (( ! $+functions[_p9k_preinit] )) && source $__p9k_dump_file 2>/dev/null && (( $+functions[_p9k_preinit] )); then
     _p9k_preinit
   fi
-  typeset -gr __p9k_sourced=1
+  typeset -gr __p9k_sourced=2
   if [[ -w $__p9k_root_dir && -w $__p9k_root_dir/internal && -w $__p9k_root_dir/gitstatus && ${(%):-%#} == % ]]; then
     local f
     for f in $__p9k_root_dir/{powerlevel9k.zsh-theme,powerlevel10k.zsh-theme,internal/p10k.zsh,internal/icons.zsh,internal/configure.zsh,internal/worker.zsh,gitstatus/gitstatus.plugin.zsh}; do

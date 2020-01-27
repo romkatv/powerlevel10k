@@ -1,3 +1,25 @@
+if [[ $__p9k_sourced != 2 ]]; then
+  >&2 print -P ""
+  >&2 print -P "[%F{1}ERROR%f]: Corrupted powerlevel10k installation."
+  >&2 print -P ""
+  if (( ${+functions[antigen]} )); then
+    >&2 print -P "If using %Bantigen%b, run the folowing command to fix:"
+    >&2 print -P ""
+    >&2 print -P "    %F{2}antigen%f reset"
+    if [[ -d ~/.antigen ]]; then
+      >&2 print -P ""
+      >&2 print -P "If it doesn't help, try this:"
+      >&2 print -P ""
+      >&2 print -P "    %F{2}rm%f -rf %U~/.antigen%u"
+    fi
+  else
+    >&2 print -P "Try resetting cache in your plugin manager or"
+    >&2 print -P "reinstalling powerlevel10k from scratch."
+  fi
+  >&2 print -P ""
+  return 1
+fi
+
 if ! autoload -Uz is-at-least || ! is-at-least 5.1; then
   () {
     >&2 echo -E "You are using ZSH version $ZSH_VERSION. The minimum required version for Powerlevel10k is 5.1."
@@ -7139,7 +7161,7 @@ fi
 
 _p9k_do_nothing() { true; }
 
-prompt_powerlevel9k_setup() {
+_p9k_setup() {
   (( __p9k_enabled )) && return
 
   prompt_opts=(percent subst)
@@ -7154,6 +7176,8 @@ prompt_powerlevel9k_setup() {
   typeset -ga preexec_functions=(_p9k_preexec1 $preexec_functions _p9k_preexec2)
   typeset -ga precmd_functions=(_p9k_do_nothing $precmd_functions _p9k_precmd)
 }
+
+prompt_powerlevel9k_setup() { _p9k_setup }
 
 prompt_powerlevel9k_teardown() {
   eval $__p9k_intro
