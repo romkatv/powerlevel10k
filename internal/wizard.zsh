@@ -355,9 +355,9 @@ function install_font() {
       print -P " %2FOK%f"
       run_command "Updating %BiTerm2%b settings cache" /usr/bin/defaults read com.googlecode.iterm2
       clear
-      print -P "%2FMeslo Nerd Font%f successfully installed."
+      flowing +c "%2FMeslo Nerd Font%f" successfully installed.
       print -P ""
-      print -P "Please %Brestart iTerm2%b for the changes to take effect."
+      flowing +c Please "%Brestart iTerm2%b" for the changes to take effect.
       print -P ""
       while true; do
         flowing +c -i 5 "  1. Click" "%BiTerm2 → Quit iTerm2%b" or press "%B⌘ Q%b."
@@ -372,7 +372,7 @@ function install_font() {
         fi
         print -P ""
         print -P ""
-        print -P "It's important to %Brestart iTerm2%b for the changes to take effect."
+        flowing +c "It's" important to "%Brestart iTerm2%b" for the changes to take effect.
         print -P ""
       done
     ;;
