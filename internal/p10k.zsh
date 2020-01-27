@@ -5334,6 +5334,7 @@ function _p9k_on_expand() {
           local -i _p9k_clm=COLUMNS _p9k_ind=${ZLE_RPROMPT_INDENT:-1}
           (( __p9k_ksh_arrays )) && setopt ksh_arrays
           (( __p9k_sh_glob )) && setopt sh_glob
+          setopt prompt_subst
           print -rnP -- '%b%k%f%E'$ruler
         }
       fi
