@@ -155,7 +155,7 @@ applications on your system. Configure your terminal to use this font:
   `terminal.integrated.fontFamily` in the search box and set the value to `MesloLGS NF`.
 - **GNOME Terminal** (the default Ubuntu terminal): Open *Terminal → Preferences* and click on the
   selected profile under *Profiles*. Check *Custom font* under *Text Appearance* and select
-  `MesloLGS NF Regular`.
+  `MesloLGS NF Regular`. If you want to use a different font and it doesn't show up in the list, see [here](https://github.com/ryanoasis/nerd-fonts/issues/318) for a solution.
 - **Konsole**: Open *Settings → Edit Current Profile → Appearance*, click *Select Font* and select
   `MesloLGS NF Regular`.
 - **Tilix**: Open *Tilix → Preferences* and click on the selected profile under *Profiles*. Check
