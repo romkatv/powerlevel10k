@@ -2736,7 +2736,7 @@ prompt_rust_version() {
           _p9k_cache_stat_set
         else
           local MATCH
-          local keys=(${^${lines%%[[:space:]]#[^[:space:]]#}}'/*')
+          local keys=(${(@)${lines%%[[:space:]]#[^[:space:]]#}/(#m)*/${(b)MATCH}/})
           local vals=(${(@)lines/(#m)*/$MATCH[(I)/] ${MATCH##*[[:space:]]}})
           _p9k_cache_stat_set ${keys:^vals}
         fi
