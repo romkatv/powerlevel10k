@@ -329,7 +329,7 @@ function _p9k_prompt_length() {
   _p9k_ret=$x
 }
 
-typeset -g __p9k_byte_suffix=('B' 'K' 'M' 'G' 'T' 'P' 'E' 'Z' 'Y')
+typeset -gr __p9k_byte_suffix=('B' 'K' 'M' 'G' 'T' 'P' 'E' 'Z' 'Y')
 
 # 42 => 42B
 # 1536 => 1.5K
