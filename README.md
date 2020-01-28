@@ -7,10 +7,11 @@ Powerlevel10k can be used as a [fast](#is-it-really-fast) drop-in replacement fo
 [Powerlevel9k](https://github.com/bhilburn/powerlevel9k). When given the same configuration options
 it will generate the same prompt.
 
-![Powerlevel10k](https://raw.githubusercontent.com/romkatv/powerlevel10k/master/powerlevel10k.png)
+![Powerlevel10k](https://raw.githubusercontent.com/romkatv/powerlevel10k-media/master/prompt-styles.png)
 
 ## Table of Contents
 
+1. [Features](#features)
 1. [Installation](#installation)
    1. [Manual](#manual)
    1. [Oh My Zsh](#oh-my-zsh)
@@ -51,6 +52,56 @@ it will generate the same prompt.
    1. [Is there an AUR package for Powerlevel10k?](#is-there-an-aur-package-for-powerlevel10k)
    1. [I cannot make Powerlevel10k work with my plugin manager. Help!](#i-cannot-make-powerlevel10k-work-with-my-plugin-manager-help)
    1. [What is the minimum supported zsh version?](#what-is-the-minimum-supported-zsh-version)
+
+## Features
+
+### Configuration wizard
+
+Type `p10k configure` to access the builtin configuration wizard right from your terminal.
+
+![Powerlevel10k Configuration Wizard](
+  https://raw.githubusercontent.com/romkatv/powerlevel10k-media/master/configuration-wizard.gif)
+
+Configuration wizard creates `~/.p10k.zsh` based on your preferences. Additional prompt
+customization can be done by editing this file. It has many comments to help you navigate through
+configuration options.
+
+### Unparalleled performance
+
+When you hit *ENTER*, the next prompt appears instantly. There is never prompt lag when using
+Powerlevel10k: not when you work on Linux Git repository, or have 100,000 files in the current
+directory, or use Cygwin on Raspberry Pi, or enable 50 prompt segments that fill four full prompt
+lines on both sides of the screen. Powerlevel10k prompt is always blazingly fast, no matter what.
+
+![Powerlevel10k Performance](
+  https://raw.githubusercontent.com/romkatv/powerlevel10k-media/master/performance.png)
+
+### Powerlevel9k compatibility
+
+Powerlevel10k understands all Powerlevel9k configuration parameters.
+
+![Powerlevel10k Compatibility with 9k](
+  https://raw.githubusercontent.com/romkatv/powerlevel10k-media/master/p9k-compatibility.gif)
+
+If you are currently using Powerlevel9k, you can switch to Powerlevel10k in just a few seconds.
+All your `POWERLEVEL9K` configuration parameters will still work. Prompt will look the same as
+before but it will be *much* faster.
+
+How to switch to Powerlevel10k if you are using Powerlevel9k with Oh My Zsh:
+
+1. Clone powerlevel10k repository.
+2. Replace `ZSH_THEME="powerlevel9k/powerlevel9k"` with `ZSH_THEME="powerlevel10k/powerlevel10k"`
+3. Restart Zsh.
+
+```zsh
+git clone --depth=1 https://github.com/romkatv/powerlevel10k.git $ZSH_CUSTOM/themes/powerlevel10k
+sed 's/powerlevel9k/powerlevel10k/g' -i ~/.zshrc
+exec zsh
+```
+
+Optional: Type `p10k configure` and explore exlusive Powerlevel10k prompt styles.
+
+### Pure emulation
 
 ## Installation
 
