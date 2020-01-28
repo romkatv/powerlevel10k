@@ -2325,13 +2325,6 @@ _p9k_prompt_nodeenv_init() {
   typeset -g "_p9k__segment_cond_${_p9k_prompt_side}[_p9k_segment_index]"='$NODE_VIRTUAL_ENV'
 }
 
-function _p9k_read_nodenv_version_file() {
-  [[ -r $1 ]] || return
-  local rest
-  read _p9k_ret rest <$1 2>/dev/null
-  [[ -n $_p9k_ret ]]
-}
-
 function _p9k_nodeenv_version_transform() {
   local dir=${NODENV_ROOT:-$HOME/.nodenv}/versions
   [[ -z $1 || $1 == system ]] && _p9k_ret=$1          && return
@@ -2343,7 +2336,7 @@ function _p9k_nodeenv_version_transform() {
 }
 
 function _p9k_nodenv_global_version() {
-  _p9k_read_nodenv_version_file ${NODENV_ROOT:-$HOME/.nodenv}/version || _p9k_ret=system
+  _p9k_read_word ${NODENV_ROOT:-$HOME/.nodenv}/version || _p9k_ret=system
 }
 
 ################################################################
@@ -2355,11 +2348,11 @@ prompt_nodenv() {
     if [[ $NODENV_DIR == (|.) ]]; then
       _p9k_upglob .node-version
       local -i idx=$?
-      (( idx )) && _p9k_read_nodenv_version_file $_p9k__parent_dirs[idx]/.node-version || _p9k_ret=
+      (( idx )) && _p9k_read_word $_p9k__parent_dirs[idx]/.node-version || _p9k_ret=
     else
       [[ $NODENV_DIR == /* ]] && local dir=$NODENV_DIR || local dir="$_p9k__cwd_a/$NODENV_DIR"
       while [[ $dir != //[^/]# ]]; do
-        _p9k_read_nodenv_version_file $dir/.node-version && break
+        _p9k_read_word $dir/.node-version && break
         [[ $dir == / ]] && break
         dir=${dir:h}
       done
@@ -2502,6 +2495,7 @@ prompt_rbenv() {
         _p9k_ret=
       fi
     else
+      _p9k_ret=
       [[ $RBENV_DIR == /* ]] && local dir=$RBENV_DIR || local dir="$_p9k__cwd_a/$RBENV_DIR"
       while true; do
         if _p9k_read_word $dir/.ruby-version; then
@@ -2532,15 +2526,8 @@ _p9k_prompt_rbenv_init() {
   typeset -g "_p9k__segment_cond_${_p9k_prompt_side}[_p9k_segment_index]"='${commands[rbenv]:-${${+functions[rbenv]}:#0}}'
 }
 
-function _p9k_read_luaenv_version_file() {
-  [[ -r $1 ]] || return
-  local rest
-  read _p9k_ret rest <$1 2>/dev/null
-  [[ -n $_p9k_ret ]]
-}
-
 function _p9k_luaenv_global_version() {
-  _p9k_read_luaenv_version_file ${LUAENV_ROOT:-$HOME/.luaenv}/version || _p9k_ret=system
+  _p9k_read_word ${LUAENV_ROOT:-$HOME/.luaenv}/version || _p9k_ret=system
 }
 
 ################################################################
@@ -2552,22 +2539,32 @@ prompt_luaenv() {
     local v=$LUAENV_VERSION
   else
     (( ${_POWERLEVEL9K_LUAENV_SOURCES[(I)local|global]} )) || return
-    [[ $LUAENV_DIR == /* ]] && local dir=$LUAENV_DIR || local dir="$_p9k__cwd_a/$LUAENV_DIR"
-    while true; do
-      if _p9k_read_luaenv_version_file $dir/.lua-version; then
+    if [[ $LUAENV_DIR == (|.) ]]; then
+      _p9k_upglob .lua-version
+      local -i idx=$?
+      if (( idx )) && _p9k_read_word $_p9k__parent_dirs[idx]/.lua-version; then
         (( ${_POWERLEVEL9K_LUAENV_SOURCES[(I)local]} )) || return
-        local v=$_p9k_ret
-        break
+      else
+        _p9k_ret=
       fi
-      if [[ $dir == / ]]; then
-        (( _POWERLEVEL9K_LUAENV_PROMPT_ALWAYS_SHOW )) || return
-        (( ${_POWERLEVEL9K_LUAENV_SOURCES[(I)global]} )) || return
-        _p9k_luaenv_global_version
-        local v=$_p9k_ret
-        break
-      fi
-      dir=${dir:h}
-    done
+    else
+      _p9k_ret=
+      [[ $LUAENV_DIR == /* ]] && local dir=$LUAENV_DIR || local dir="$_p9k__cwd_a/$LUAENV_DIR"
+      while true; do
+        if _p9k_read_word $dir/.lua-version; then
+          (( ${_POWERLEVEL9K_LUAENV_SOURCES[(I)local]} )) || return
+          break
+        fi
+        [[ $dir == / ]] && break
+        dir=${dir:h}
+      done
+    fi
+    if [[ -z $_p9k_ret ]]; then
+      (( _POWERLEVEL9K_LUAENV_PROMPT_ALWAYS_SHOW )) || return
+      (( ${_POWERLEVEL9K_LUAENV_SOURCES[(I)global]} )) || return
+      _p9k_luaenv_global_version
+    fi
+    local v=$_p9k_ret
   fi
 
   if (( !_POWERLEVEL9K_LUAENV_PROMPT_ALWAYS_SHOW )); then
@@ -2582,65 +2579,8 @@ _p9k_prompt_luaenv_init() {
   typeset -g "_p9k__segment_cond_${_p9k_prompt_side}[_p9k_segment_index]"='${commands[luaenv]:-${${+functions[luaenv]}:#0}}'
 }
 
-function _p9k_read_jenv_version_file() {
-  [[ -r $1 ]] || return
-  local rest
-  read _p9k_ret rest <$1 2>/dev/null
-  [[ -n $_p9k_ret ]]
-}
-
 function _p9k_jenv_global_version() {
-  _p9k_read_jenv_version_file ${JENV_ROOT:-$HOME/.jenv}/version || _p9k_ret=system
-}
-
-function _p9k_read_plenv_version_file() {
-  [[ -r $1 ]] || return
-  local rest
-  read _p9k_ret rest <$1 2>/dev/null
-  [[ -n $_p9k_ret ]]
-}
-
-function _p9k_plenv_global_version() {
-  _p9k_read_plenv_version_file ${PLENV_ROOT:-$HOME/.plenv}/version || _p9k_ret=system
-}
-
-################################################################
-# Segment to display plenv information
-# https://github.com/plenv/plenv#choosing-the-perl-version
-prompt_plenv() {
-  if [[ -n $PLENV_VERSION ]]; then
-    (( ${_POWERLEVEL9K_PLENV_SOURCES[(I)shell]} )) || return
-    local v=$PLENV_VERSION
-  else
-    (( ${_POWERLEVEL9K_PLENV_SOURCES[(I)local|global]} )) || return
-    [[ $PLENV_DIR == /* ]] && local dir=$PLENV_DIR || local dir="$_p9k__cwd_a/$PLENV_DIR"
-    while true; do
-      if _p9k_read_plenv_version_file $dir/.perl-version; then
-        (( ${_POWERLEVEL9K_PLENV_SOURCES[(I)local]} )) || return
-        local v=$_p9k_ret
-        break
-      fi
-      if [[ $dir == / ]]; then
-        (( _POWERLEVEL9K_PLENV_PROMPT_ALWAYS_SHOW )) || return
-        (( ${_POWERLEVEL9K_PLENV_SOURCES[(I)global]} )) || return
-        _p9k_plenv_global_version
-        local v=$_p9k_ret
-        break
-      fi
-      dir=${dir:h}
-    done
-  fi
-
-  if (( !_POWERLEVEL9K_PLENV_PROMPT_ALWAYS_SHOW )); then
-    _p9k_plenv_global_version
-    [[ $v == $_p9k_ret ]] && return
-  fi
-
-  _p9k_prompt_segment "$0" "blue" "$_p9k_color1" 'PERL_ICON' 0 '' "${v//\%/%%}"
-}
-
-_p9k_prompt_plenv_init() {
-  typeset -g "_p9k__segment_cond_${_p9k_prompt_side}[_p9k_segment_index]"='${commands[plenv]:-${${+functions[plenv]}:#0}}'
+  _p9k_read_word ${JENV_ROOT:-$HOME/.jenv}/version || _p9k_ret=system
 }
 
 ################################################################
@@ -2652,22 +2592,32 @@ prompt_jenv() {
     local v=$JENV_VERSION
   else
     (( ${_POWERLEVEL9K_JENV_SOURCES[(I)local|global]} )) || return
-    [[ $JENV_DIR == /* ]] && local dir=$JENV_DIR || local dir="$_p9k__cwd_a/$JENV_DIR"
-    while true; do
-      if _p9k_read_jenv_version_file $dir/.java-version; then
+    if [[ $JENV_DIR == (|.) ]]; then
+      _p9k_upglob .java-version
+      local -i idx=$?
+      if (( idx )) && _p9k_read_word $_p9k__parent_dirs[idx]/.java-version; then
         (( ${_POWERLEVEL9K_JENV_SOURCES[(I)local]} )) || return
-        local v=$_p9k_ret
-        break
+      else
+        _p9k_ret=
       fi
-      if [[ $dir == / ]]; then
-        (( _POWERLEVEL9K_JENV_PROMPT_ALWAYS_SHOW )) || return
-        (( ${_POWERLEVEL9K_JENV_SOURCES[(I)global]} )) || return
-        _p9k_jenv_global_version
-        local v=$_p9k_ret
-        break
-      fi
-      dir=${dir:h}
-    done
+    else
+      _p9k_ret=
+      [[ $JENV_DIR == /* ]] && local dir=$JENV_DIR || local dir="$_p9k__cwd_a/$JENV_DIR"
+      while true; do
+        if _p9k_read_word $dir/.java-version; then
+          (( ${_POWERLEVEL9K_JENV_SOURCES[(I)local]} )) || return
+          break
+        fi
+        [[ $dir == / ]] && break
+        dir=${dir:h}
+      done
+    fi
+    if [[ -z $_p9k_ret ]]; then
+      (( _POWERLEVEL9K_JENV_PROMPT_ALWAYS_SHOW )) || return
+      (( ${_POWERLEVEL9K_JENV_SOURCES[(I)global]} )) || return
+      _p9k_jenv_global_version
+    fi
+    local v=$_p9k_ret
   fi
 
   if (( !_POWERLEVEL9K_JENV_PROMPT_ALWAYS_SHOW )); then
@@ -2680,6 +2630,59 @@ prompt_jenv() {
 
 _p9k_prompt_jenv_init() {
   typeset -g "_p9k__segment_cond_${_p9k_prompt_side}[_p9k_segment_index]"='${commands[jenv]:-${${+functions[jenv]}:#0}}'
+}
+
+function _p9k_plenv_global_version() {
+  _p9k_read_word ${PLENV_ROOT:-$HOME/.plenv}/version || _p9k_ret=system
+}
+
+################################################################
+# Segment to display plenv information
+# https://github.com/plenv/plenv#choosing-the-perl-version
+prompt_plenv() {
+  if [[ -n $PLENV_VERSION ]]; then
+    (( ${_POWERLEVEL9K_PLENV_SOURCES[(I)shell]} )) || return
+    local v=$PLENV_VERSION
+  else
+    (( ${_POWERLEVEL9K_PLENV_SOURCES[(I)local|global]} )) || return
+    if [[ $PLENV_DIR == (|.) ]]; then
+      _p9k_upglob .perl-version
+      local -i idx=$?
+      if (( idx )) && _p9k_read_word $_p9k__parent_dirs[idx]/.perl-version; then
+        (( ${_POWERLEVEL9K_PLENV_SOURCES[(I)local]} )) || return
+      else
+        _p9k_ret=
+      fi
+    else
+      _p9k_ret=
+      [[ $PLENV_DIR == /* ]] && local dir=$PLENV_DIR || local dir="$_p9k__cwd_a/$PLENV_DIR"
+      while true; do
+        if _p9k_read_word $dir/.perl-version; then
+          (( ${_POWERLEVEL9K_PLENV_SOURCES[(I)local]} )) || return
+          break
+        fi
+        [[ $dir == / ]] && break
+        dir=${dir:h}
+      done
+    fi
+    if [[ -z $_p9k_ret ]]; then
+      (( _POWERLEVEL9K_PLENV_PROMPT_ALWAYS_SHOW )) || return
+      (( ${_POWERLEVEL9K_PLENV_SOURCES[(I)global]} )) || return
+      _p9k_plenv_global_version
+    fi
+    local v=$_p9k_ret
+  fi
+
+  if (( !_POWERLEVEL9K_PLENV_PROMPT_ALWAYS_SHOW )); then
+    _p9k_plenv_global_version
+    [[ $v == $_p9k_ret ]] && return
+  fi
+
+  _p9k_prompt_segment "$0" "blue" "$_p9k_color1" 'PERL_ICON' 0 '' "${v//\%/%%}"
+}
+
+_p9k_prompt_plenv_init() {
+  typeset -g "_p9k__segment_cond_${_p9k_prompt_side}[_p9k_segment_index]"='${commands[plenv]:-${${+functions[plenv]}:#0}}'
 }
 
 ################################################################
@@ -2711,12 +2714,7 @@ instant_prompt_root_indicator() { prompt_root_indicator; }
 prompt_rust_version() {
   unset P9K_RUST_VERSION
   if (( _POWERLEVEL9K_RUST_VERSION_PROJECT_ONLY )); then
-    local dir=$_p9k__cwd_a
-    while true; do
-      [[ $dir == / ]] && return
-      [[ -e $dir/Cargo.toml ]] && break
-      dir=${dir:h}
-    done
+    _p9k_upglob Cargo.toml && return
   fi
   local rustc=$commands[rustc] toolchain deps=()
   if (( $+commands[ldd] )); then
@@ -2739,23 +2737,30 @@ prompt_rust_version() {
     if [[ -z ${toolchain::=$RUSTUP_TOOLCHAIN} ]]; then
       if ! _p9k_cache_stat_get $0_overrides $rustup $cfg; then
         local lines=(${(f)"$(rustup override list 2>/dev/null)"})
-        local keys=(/ ${lines%%[[:space:]]#[^[:space:]]#})
-        local vals=(_ ${lines##*[[:space:]]})
-        _p9k_cache_stat_set ${keys:^vals}
+        if [[ $lines[1] == "no overrides" ]]; then
+          _p9k_cache_stat_set
+        else
+          local MATCH
+          local keys=(${^${lines%%[[:space:]]#[^[:space:]]#}}'/*')
+          local vals=(${(@)lines/(#m)*/$MATCH[(I)/] ${MATCH##*[[:space:]]}})
+          _p9k_cache_stat_set ${keys:^vals}
+        fi
       fi
       local -A overrides=($_p9k_cache_val)
-      local dir=$_p9k__cwd_a
-      while true; do
-        if (( $+overrides[$dir] )); then
-          toolchain=$overrides[$dir]
-          break
-        fi
-        if [[ -r $dir/rust-toolchain ]]; then
-          { toolchain="$(<$dir/rust-toolchain)" } 2>/dev/null
-          break
-        fi
-        dir=${dir:h}
+      _p9k_upglob rust-toolchain
+      local dir=$_p9k__parent_dirs[$?]
+      local -i n m=${dir[(I)/]}
+      local pair
+      for pair in ${overrides[(K)$_p9k__cwd/]}; do
+        n=${pair%% *}
+        (( n <= m )) && continue
+        m=n
+        toolchain=${pair#* }
       done
+      if [[ -z $toolchain && -n $dir ]]; then
+        _p9k_read_word $dir/rust-toolchain
+        toolchain=$_p9k_ret
+      fi
     fi
   fi
   if ! _p9k_cache_stat_get $0_v$toolchain $rustc $deps; then
@@ -3777,15 +3782,30 @@ _p9k_prompt_virtualenv_init() {
   typeset -g "_p9k__segment_cond_${_p9k_prompt_side}[_p9k_segment_index]"='$VIRTUAL_ENV'
 }
 
-function _p9k_read_pyenv_version_file() {
-  [[ -r $1 ]] || return
-  local content
-  IFS='' read -rd $'\0' content <$1 2>/dev/null
-  _p9k_ret=${${(j.:.)${(@)${=content}#python-}:-system}}
+# _p9k_read_pyenv_like_version_file <filepath> [prefix]
+function _p9k_read_pyenv_like_version_file() {
+  local -a stat
+  zstat -A stat +mtime -- $1 2>/dev/null || stat=(-1)
+  local cached=$_p9k__read_pyenv_like_version_file_cache[$1:$2]
+  if [[ $cached == $stat[1]:* ]]; then
+    _p9k_ret=${cached#*:}
+  else
+    local fd content
+    {
+      { sysopen -r -u fd $1 && sysread -i $fd -s 1024 content } 2>/dev/null
+    } always {
+      [[ -n $fd ]] && exec {fd}>&-
+    }
+    local MATCH
+    local versions=(${(@)${(f)content}/(#m)*/${MATCH[(w)1]#$2}})
+    _p9k_ret=${(j.:.)versions}
+    _p9k__read_pyenv_like_version_file_cache[$1:$2]=$stat[1]:$_p9k_ret
+  fi
+  [[ -n $_p9k_ret ]]
 }
 
 function _p9k_pyenv_global_version() {
-  _p9k_read_pyenv_version_file ${PYENV_ROOT:-$HOME/.pyenv}/version || _p9k_ret=system
+  _p9k_read_pyenv_like_version_file ${PYENV_ROOT:-$HOME/.pyenv}/version python- || _p9k_ret=system
 }
 
 ################################################################
@@ -3797,22 +3817,32 @@ prompt_pyenv() {
     (( ${_POWERLEVEL9K_PYENV_SOURCES[(I)shell]} )) || return
   else
     (( ${_POWERLEVEL9K_PYENV_SOURCES[(I)local|global]} )) || return
-    [[ $PYENV_DIR == /* ]] && local dir=$PYENV_DIR || local dir="$_p9k__cwd_a/$PYENV_DIR"
-    while true; do
-      if _p9k_read_pyenv_version_file $dir/.python-version; then
+    if [[ $PYENV_DIR == (|.) ]]; then
+      _p9k_upglob .python-version
+      local -i idx=$?
+      if (( idx )) && _p9k_read_pyenv_like_version_file $_p9k__parent_dirs[idx]/.python-version python-; then
         (( ${_POWERLEVEL9K_PYENV_SOURCES[(I)local]} )) || return
-        v=$_p9k_ret
-        break
+      else
+        _p9k_ret=
       fi
-      if [[ $dir == / ]]; then
-        (( _POWERLEVEL9K_PYENV_PROMPT_ALWAYS_SHOW )) || return
-        (( ${_POWERLEVEL9K_PYENV_SOURCES[(I)global]} )) || return
-        _p9k_pyenv_global_version
-        v=$_p9k_ret
-        break
-      fi
-      dir=${dir:h}
-    done
+    else
+      _p9k_ret=
+      [[ $PYENV_DIR == /* ]] && local dir=$PYENV_DIR || local dir="$_p9k__cwd_a/$PYENV_DIR"
+      while true; do
+        if _p9k_read_pyenv_like_version_file $dir/.python-version python-; then
+          (( ${_POWERLEVEL9K_PYENV_SOURCES[(I)local]} )) || return
+          break
+        fi
+        [[ $dir == / ]] && break
+        dir=${dir:h}
+      done
+    fi
+    if [[ -z $_p9k_ret ]]; then
+      (( _POWERLEVEL9K_PYENV_PROMPT_ALWAYS_SHOW )) || return
+      (( ${_POWERLEVEL9K_PYENV_SOURCES[(I)global]} )) || return
+      _p9k_pyenv_global_version
+    fi
+    v=$_p9k_ret
   fi
 
   if (( !_POWERLEVEL9K_PYENV_PROMPT_ALWAYS_SHOW )); then
@@ -3827,36 +3857,44 @@ _p9k_prompt_pyenv_init() {
   typeset -g "_p9k__segment_cond_${_p9k_prompt_side}[_p9k_segment_index]"='${commands[pyenv]:-${${+functions[pyenv]}:#0}}'
 }
 
-function _p9k_read_goenv_version_file() {
-  [[ -r $1 ]] || return
-  local content
-  IFS='' read -rd $'\0' content <$1 2>/dev/null
-  _p9k_ret=${${(j.:.)${=content}:-system}}
-}
-
 function _p9k_goenv_global_version() {
-  _p9k_read_goenv_version_file ${GOENV_ROOT:-$HOME/.goenv}/version || _p9k_ret=system
+  _p9k_read_pyenv_like_version_file ${GOENV_ROOT:-$HOME/.goenv}/version go- || _p9k_ret=system
 }
 
 ################################################################
 # Segment to display goenv information: https://github.com/syndbg/goenv
 prompt_goenv() {
-  local v=${(j.:.)${(s.:.)GOENV_VERSION}}
-  if [[ -z $v ]]; then
-    [[ $GOENV_DIR == /* ]] && local dir=$GOENV_DIR || local dir="$_p9k__cwd_a/$GOENV_DIR"
-    while true; do
-      if _p9k_read_goenv_version_file $dir/.go-version; then
-        v=$_p9k_ret
-        break
+    local v=${(j.:.)${(@)${(s.:.)GOENV_VERSION}#go-}}
+  if [[ -n $v ]]; then
+    (( ${_POWERLEVEL9K_GOENV_SOURCES[(I)shell]} )) || return
+  else
+    (( ${_POWERLEVEL9K_GOENV_SOURCES[(I)local|global]} )) || return
+    if [[ $GOENV_DIR == (|.) ]]; then
+      _p9k_upglob .go-version
+      local -i idx=$?
+      if (( idx )) && _p9k_read_goenv_like_version_file $_p9k__parent_dirs[idx]/.go-version go-; then
+        (( ${_POWERLEVEL9K_GOENV_SOURCES[(I)local]} )) || return
+      else
+        _p9k_ret=
       fi
-      if [[ $dir == / ]]; then
-        (( _POWERLEVEL9K_GOENV_PROMPT_ALWAYS_SHOW )) || return
-        _p9k_goenv_global_version
-        v=$_p9k_ret
-        break
-      fi
-      dir=${dir:h}
-    done
+    else
+      _p9k_ret=
+      [[ $GOENV_DIR == /* ]] && local dir=$GOENV_DIR || local dir="$_p9k__cwd_a/$GOENV_DIR"
+      while true; do
+        if _p9k_read_goenv_like_version_file $dir/.go-version go-; then
+          (( ${_POWERLEVEL9K_GOENV_SOURCES[(I)local]} )) || return
+          break
+        fi
+        [[ $dir == / ]] && break
+        dir=${dir:h}
+      done
+    fi
+    if [[ -z $_p9k_ret ]]; then
+      (( _POWERLEVEL9K_GOENV_PROMPT_ALWAYS_SHOW )) || return
+      (( ${_POWERLEVEL9K_GOENV_SOURCES[(I)global]} )) || return
+      _p9k_goenv_global_version
+    fi
+    v=$_p9k_ret
   fi
 
   if (( !_POWERLEVEL9K_GOENV_PROMPT_ALWAYS_SHOW )); then
@@ -5411,6 +5449,8 @@ typeset -g  _p9k__param_sig
 _p9k_init_vars() {
   # filepath => mtime ':' word
   typeset -gA _p9k__read_word_cache
+  # filepath:prefix => mtime ':' versions
+  typeset -gA _p9k__read_pyenv_like_version_file_cache
 
   # _p9k__parent_dirs and _p9k__parent_mtimes are parallel arrays. They are updated
   # together with _p9k__cwd. _p9k__parent_mtimes[i] is mtime for _p9k__parent_dirs[i].
@@ -5809,6 +5849,7 @@ _p9k_init_params() {
   _p9k_declare -b POWERLEVEL9K_PYENV_PROMPT_ALWAYS_SHOW 0
   _p9k_declare -a POWERLEVEL9K_PYENV_SOURCES -- shell local global
   _p9k_declare -b POWERLEVEL9K_GOENV_PROMPT_ALWAYS_SHOW 0
+  _p9k_declare -a POWERLEVEL9K_GOENV_SOURCES -- shell local global
   _p9k_declare -b POWERLEVEL9K_NODEENV_SHOW_NODE_VERSION 1
   _p9k_declare -e POWERLEVEL9K_NODEENV_LEFT_DELIMITER "["
   _p9k_declare -e POWERLEVEL9K_NODEENV_RIGHT_DELIMITER "]"
