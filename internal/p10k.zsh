@@ -1764,13 +1764,12 @@ prompt_dir() {
       elif [[ $p[1] == / ]]; then
         (( ++i ))
       fi
-      local parent="${_p9k__cwd%/${(pj./.)parts[i,-1]}}"
       if (( i <= e )); then
-        local MATCH= mtimes=()
-        zstat -A mtimes +mtime -- ${(@)${:-{$i..$e}}/(#m)*/$parent/${(pj./.)parts[i,$MATCH]}} 2>/dev/null || mtimes=()
+        local parent="${_p9k__cwd%/${(pj./.)parts[i,-1]}}"
+        local mtimes=(${(Oa)_p9k__parent_mtimes:$(($#parts-e)):$((e-i+1))})
         local key="${(pj.:.)mtimes}"
       else
-        local key='good'
+        local key=
       fi
       if ! _p9k_cache_ephemeral_get $0 $e $i $_p9k__cwd || [[ $key != $_p9k_cache_val[1] ]] ; then
         _p9k_prompt_length $delim
@@ -1837,11 +1836,7 @@ prompt_dir() {
             parts[i]+=$'\2'
           done
         fi
-        if [[ -n $key ]]; then
-          _p9k_cache_ephemeral_set "$key" "${parts[@]}"
-        else
-          _p9k_cache_val=("$key" "${parts[@]}")
-        fi
+        _p9k_cache_ephemeral_set "$key" "${parts[@]}"
       fi
       parts=("${(@)_p9k_cache_val[2,-1]}")
     ;;
