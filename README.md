@@ -68,17 +68,32 @@ configuration options.
 
 ### Unparalleled performance
 
-When you hit *ENTER*, the next prompt appears instantly. There is never prompt lag when using
-Powerlevel10k: not when you work on Linux Git repository, or have 100,000 files in the current
-directory, or use Cygwin on Raspberry Pi, or enable 50 prompt segments that fill four full prompt
-lines on both sides of the screen. Powerlevel10k prompt is always blazingly fast, no matter what.
+When you hit *ENTER*, the next prompt appears instantly. With Powerlevel10k there is no prompt lag.
+If you install Cygwin on Raspberry Pi, `cd` in a Linux Git repository and activate enough prompt
+segments to fill four prompt lines on both sides of the screen... wait, that's just crazy and no
+one ever does that. Probably impossible, too. The point is, Powerlevel10k prompt is always fast, no
+matter what!
 
 ![Powerlevel10k Performance](
   https://raw.githubusercontent.com/romkatv/powerlevel10k-media/master/performance.gif)
 
+Note how the effect of every command is instantly reflected by the very next prompt.
+
+| Command                       | Prompt Indicator | Meaning                              |
+|-------------------------------|:----------------:|-------------------------------------:|
+| `timew start hack linux`      | `🛡️ hack linux`  | time tracking enabled in timewarrior |
+| `touch x y`                   | `?2`             | 2 untracked files                    |
+| `rm COPYING`                  | `!1`             | 1 unstaged change                    |
+| `echo 2.7.3 >.python-version` | `🐍 2.7.3`       | the current python version in pyenv  |
+
+Other Zsh themes capable of displaying the same information either produce prompt lag or print stale
+prompt that doesn't reflect the current state of the system and then refresh it later. With
+Powerlevel10k you get fast prompt *and* up-to-date information.
+
 ### Powerlevel9k compatibility
 
-Powerlevel10k understands all Powerlevel9k configuration parameters.
+Powerlevel10k understands all [Powerlevel9k](https://github.com/Powerlevel9k/powerlevel9k)
+configuration parameters.
 
 ![Powerlevel10k Compatibility with 9k](
   https://raw.githubusercontent.com/romkatv/powerlevel10k-media/master/9k-compatibility.gif)
@@ -102,6 +117,15 @@ exec zsh
 Optional: Type `p10k configure` and explore exlusive Powerlevel10k prompt styles.
 
 ### Pure emulation
+
+Powerlevel10k can produce the same prompt as [Pure](https://github.com/sindresorhus/pure). Type
+`p10k configure` and select *Pure* style.
+
+![Powerlevel10k Pure Style](
+  https://raw.githubusercontent.com/romkatv/powerlevel10k-media/master/pure-style.gif)
+
+You can still use Powerlevel10k features such as *Transient Prompt* or *Instant Prompt* when
+sporting Pure style.
 
 ## Installation
 
