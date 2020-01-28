@@ -421,18 +421,15 @@ function gitstatus_start() {
           ${(q)daemon}-static $daemon_args
         fi
         echo -nE $'bye\x1f0\x1e'"
-      local setsid=${commands[setsid]:-/usr/local/opt/util-linux/bin/setsid}
-      [[ -x $setsid ]] && setsid=${(q)setsid} || setsid=
       # Try to use the same executable as the current zsh. Some people like having an ancient
       # `zsh` in their PATH while using a newer version. zsh 5.0.2 hangs when enabling `monitor`.
       #
       #   zsh -mc '' &!  # hangs when using zsh 5.0.2
       local zsh=${${:-/proc/self/exe}:A}
       [[ -x $zsh ]] || zsh=zsh
-      cmd="cd /; read; unsetopt bg_nice; $setsid ${(q)zsh} -dfxc ${(q)cmd} &!; rm -f ${(q)req_fifo} ${(q)resp_fifo} ${(q)lock_file}"
+      cmd="cd /; read; unsetopt bg_nice; ${(q)zsh} -dfxc ${(q)cmd} &!; rm -f ${(q)req_fifo} ${(q)resp_fifo} ${(q)lock_file}"
       # We use `zsh -c` instead of plain {} or () to work around bugs in zplug (it hangs on
-      # startup). Double fork is to daemonize, and so is `setsid`. Note that on macOS `setsid` has
-      # to be installed manually by running  `brew install util-linux`.
+      # startup). Double fork is to daemonize.
       $zsh -dfmxc $cmd <$req_fifo >$log_file 2>&1 3<$lock_file 4>$resp_fifo &!
 
       sysopen -w -o cloexec,sync -u req_fd $req_fifo
