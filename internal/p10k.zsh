@@ -5466,6 +5466,9 @@ _p9k_init_vars() {
   typeset -ga _p9k__parent_mtimes_i
   typeset -g  _p9k__parent_mtimes_s
 
+  typeset -g  _p9k__cwd
+  typeset -g  _p9k__cwd_a
+
   # dir/pattern => dir mtime ':' num_matches
   typeset -gA _p9k__glob_cache
 
@@ -5583,8 +5586,6 @@ _p9k_init_vars() {
   typeset -g  _p9k_w
   typeset -gi _p9k_dir_len
   typeset -gi _p9k_num_cpus
-  typeset -g  _p9k__cwd
-  typeset -g  _p9k__cwd_a
   typeset -g  _p9k__keymap
   typeset -g  _p9k__zle_state
   typeset -g  _p9k_uname
