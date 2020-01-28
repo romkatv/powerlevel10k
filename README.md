@@ -74,14 +74,14 @@ directory, or use Cygwin on Raspberry Pi, or enable 50 prompt segments that fill
 lines on both sides of the screen. Powerlevel10k prompt is always blazingly fast, no matter what.
 
 ![Powerlevel10k Performance](
-  https://raw.githubusercontent.com/romkatv/powerlevel10k-media/master/performance.png)
+  https://raw.githubusercontent.com/romkatv/powerlevel10k-media/master/performance.gif)
 
 ### Powerlevel9k compatibility
 
 Powerlevel10k understands all Powerlevel9k configuration parameters.
 
 ![Powerlevel10k Compatibility with 9k](
-  https://raw.githubusercontent.com/romkatv/powerlevel10k-media/master/p9k-compatibility.gif)
+  https://raw.githubusercontent.com/romkatv/powerlevel10k-media/master/9k-compatibility.gif)
 
 If you are currently using Powerlevel9k, you can switch to Powerlevel10k in just a few seconds.
 All your `POWERLEVEL9K` configuration parameters will still work. Prompt will look the same as
