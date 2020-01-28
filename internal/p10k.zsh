@@ -264,14 +264,14 @@ function _p9k_glob() {
   return $#files
 }
 
-# Usage: _p9k_upsearch pattern
+# Usage: _p9k_upglob pattern
 #
 # Returns index within _p9k__parent_dirs or 0 if there is no match.
 #
 # Pattern cannot have slashes. Never matches in / or ~. Search stops before reaching / or ~.
 #
-# Example: _p9k_upsearch '*.csproj'
-function _p9k_upsearch() {
+# Example: _p9k_upglob '*.csproj'
+function _p9k_upglob() {
   local cached=$_p9k__upsearch_cache[$_p9k__cwd/$1]
   if [[ -n $cached ]]; then
     if [[ $_p9k__parent_mtimes_s == ${cached% *}(| *) ]]; then
@@ -1133,7 +1133,7 @@ _p9k_prompt_aws_init() {
 ################################################################
 # Current Elastic Beanstalk environment
 prompt_aws_eb_env() {
-  _p9k_upsearch .elasticbeanstalk && return
+  _p9k_upglob .elasticbeanstalk && return
   local dir=$_p9k__parent_dirs[$?]
 
   if ! _p9k_cache_stat_get $0 $dir/.elasticbeanstalk/config.yml; then
@@ -1225,7 +1225,7 @@ function _p9k_read_file() {
 }
 
 prompt_fvm() {
-  _p9k_upsearch fvm && return
+  _p9k_upglob fvm && return
   local link=$_p9k__parent_dirs[$?]/fvm
   if [[ -L $link ]]; then
     if [[ ${link:A} == (#b)*/versions/([^/]##)/bin/flutter ]]; then
@@ -2025,7 +2025,7 @@ prompt_go_version() {
       fi
     fi
     if [[ $_p9k__cwd/ != $p/* && $_p9k__cwd_a/ != $p/* ]]; then
-      _p9k_upsearch go.mod && return
+      _p9k_upglob go.mod && return
     fi
   fi
   _p9k_prompt_segment "$0" "green" "grey93" "GO_ICON" 0 '' "${v//\%/%%}"
@@ -2191,7 +2191,7 @@ function _p9k_cached_cmd_stdout_stderr() {
 # Segment to diplay Node version
 prompt_node_version() {
   if (( _POWERLEVEL9K_NODE_VERSION_PROJECT_ONLY )); then
-    _p9k_upsearch package.json && return
+    _p9k_upglob package.json && return
   fi
   _p9k_cached_cmd_stdout node --version && [[ $_p9k_ret == v?* ]] || return
   _p9k_prompt_segment "$0" "green" "white" 'NODE_ICON' 0 '' "${_p9k_ret#v}"
@@ -2353,7 +2353,7 @@ prompt_nodenv() {
   _p9k_ret=$NODENV_VERSION
   if [[ -z $_p9k_ret ]]; then
     if [[ $NODENV_DIR == (|.) ]]; then
-      _p9k_upsearch .node-version
+      _p9k_upglob .node-version
       local -i idx=$?
       (( idx )) && _p9k_read_nodenv_version_file $_p9k__parent_dirs[idx]/.node-version || _p9k_ret=
     else
@@ -2387,7 +2387,7 @@ _p9k_prompt_nodenv_init() {
 
 prompt_dotnet_version() {
   if (( _POWERLEVEL9K_DOTNET_VERSION_PROJECT_ONLY )); then
-    _p9k_upsearch 'project.json|global.json|packet.dependencies|*.csproj|*.fsproj|*.xproj|*.sln' && return
+    _p9k_upglob 'project.json|global.json|packet.dependencies|*.csproj|*.fsproj|*.xproj|*.sln' && return
   fi
   _p9k_cached_cmd_stdout dotnet --version || return
   _p9k_prompt_segment "$0" "magenta" "white" 'DOTNET_ICON' 0 '' "$_p9k_ret"
@@ -2494,7 +2494,7 @@ prompt_rbenv() {
   else
     (( ${_POWERLEVEL9K_RBENV_SOURCES[(I)local|global]} )) || return
     if [[ $RBENV_DIR == (|.) ]]; then
-      _p9k_upsearch .ruby-version
+      _p9k_upglob .ruby-version
       local -i idx=$?
       if (( idx )) && _p9k_read_word $_p9k__parent_dirs[idx]/.ruby-version; then
         (( ${_POWERLEVEL9K_RBENV_SOURCES[(I)local]} )) || return
