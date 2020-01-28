@@ -8,4 +8,3 @@
   disabling implicit reset on every eval in _p9k_worker_receive.
 - implement fake gitstatus api on top of vcs_info (or plain git?) + worker and use it if there is no
   gitstatus.
-- add `tabbed` to precommands; z-sy-h has added it like this: `'tabbed' gnprtTuU:cdfhs`.
