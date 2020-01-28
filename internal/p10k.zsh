@@ -223,6 +223,9 @@ function _p9k_fetch_cwd() {
     ~|/)
       _p9k__parent_dirs=()
       _p9k__parent_mtimes=()
+      _p9k__parent_mtimes_i=()
+      _p9k__parent_mtimes_s=
+      return
     ;;
     ~/*)
       local parent=~/
@@ -1231,7 +1234,6 @@ prompt_fvm() {
     if [[ ${link:A} == (#b)*/versions/([^/]##)/bin/flutter ]]; then
       _p9k_prompt_segment $0 blue $_p9k_color1 FLUTTER_ICON 0 '' ${match[1]//\%/%%}
     fi
-    return
   fi
 }
 
@@ -1765,13 +1767,14 @@ prompt_dir() {
         (( ++i ))
       fi
       if (( i <= e )); then
-        local parent="${_p9k__cwd%/${(pj./.)parts[i,-1]}}"
         local mtimes=(${(Oa)_p9k__parent_mtimes:$(($#parts-e)):$((e-i+1))})
         local key="${(pj.:.)mtimes}"
       else
         local key=
       fi
       if ! _p9k_cache_ephemeral_get $0 $e $i $_p9k__cwd || [[ $key != $_p9k_cache_val[1] ]] ; then
+        local tail=${(j./.)parts[i,-1]}
+        local parent=$_p9k__cwd[1,-2-$#tail]
         _p9k_prompt_length $delim
         local -i real_delim_len=_p9k_ret
         [[ -n $parts[i-1] ]] && parts[i-1]="\${(Q)\${:-${(qqq)${(q)parts[i-1]}}}}"$'\2'
@@ -2684,7 +2687,7 @@ _p9k_prompt_plenv_init() {
 # Segment to display chruby information
 # see https://github.com/postmodern/chruby/issues/245 for chruby_auto issue with ZSH
 prompt_chruby() {
-  local v=''
+  local v
   (( _POWERLEVEL9K_CHRUBY_SHOW_ENGINE )) && v=$RUBY_ENGINE
   if [[ $_POWERLEVEL9K_CHRUBY_SHOW_VERSION == 1 && -n $RUBY_VERSION ]] && v+=${v:+ }$RUBY_VERSION
   _p9k_prompt_segment "$0" "red" "$_p9k_color1" 'RUBY_ICON' 0 '' "${v//\%/%%}"
@@ -3859,7 +3862,7 @@ function _p9k_goenv_global_version() {
 ################################################################
 # Segment to display goenv information: https://github.com/syndbg/goenv
 prompt_goenv() {
-    local v=${(j.:.)${(@)${(s.:.)GOENV_VERSION}#go-}}
+  local v=${(j.:.)${(@)${(s.:.)GOENV_VERSION}#go-}}
   if [[ -n $v ]]; then
     (( ${_POWERLEVEL9K_GOENV_SOURCES[(I)shell]} )) || return
   else
