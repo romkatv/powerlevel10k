@@ -3126,6 +3126,7 @@ typeset -gA __p9k_vcs_states=(
   'UNTRACKED'     '2'
   'LOADING'       '8'
   'CONFLICTED'    '3'
+  'STASHED'       '208'           # add
 )
 
 function +vi-git-untracked() {
@@ -3418,16 +3419,21 @@ function _p9k_vcs_render() {
 
   if (( _POWERLEVEL9K_VCS_DISABLE_GITSTATUS_FORMATTING )); then
     if [[ -z $state ]]; then
-      if [[ $VCS_STATUS_HAS_CONFLICTED == 1 && $_POWERLEVEL9K_VCS_CONFLICTED_STATE == 1 ]]; then
+      #echo "myMOD"
+      #if [[ $VCS_STATUS_HAS_CONFLICTED == 1 && $_POWERLEVEL9K_VCS_CONFLICTED_STATE == 1 ]];            # old
+      if [[ $VCS_STATUS_HAS_CONFLICTED == 1 ]]; then                                                    # new
         state=CONFLICTED
       elif [[ $VCS_STATUS_HAS_STAGED != 0 || $VCS_STATUS_HAS_UNSTAGED != 0 ]]; then
         state=MODIFIED
       elif [[ $VCS_STATUS_HAS_UNTRACKED != 0 ]]; then
         state=UNTRACKED
+      elif [[ $VCS_STATUS_STASHES != 0 ]]; then                                                         # add
+        state=STASHED                                                                                   # add
       else
         state=CLEAN
       fi
     fi
+
     _p9k_vcs_icon
     _p9k_prompt_segment prompt_vcs_$state "${__p9k_vcs_states[$state]}" "$_p9k_color1" "$_p9k_ret" 0 '' ""
     return 0

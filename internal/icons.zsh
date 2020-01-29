@@ -372,7 +372,9 @@ function _p9k_init_icons() {
         BACKGROUND_JOBS_ICON           '\uF013 '              # 
         TEST_ICON                      '\uF188 '              # 
         TODO_ICON                      '\u2611'               # ☑
-        BATTERY_ICON                   '\UF240 '              # 
+        BATTERY_ICON                   '\UF240 '              #     upTo F244 (5 icons in total) from full to empty
+        BATTERY_ICON_UNKNOW            '\uF590 '              #    '\uF582' 
+        BATTERY_ICON_AC                '\uF492 '              # 
         DISK_ICON                      '\uF0A0 '              # 
         OK_ICON                        '\uF00C '              # 
         FAIL_ICON                      '\uF00D'               # 
@@ -419,8 +421,8 @@ function _p9k_init_icons() {
         VCS_UNSTAGED_ICON              '\uF06A '              # 
         VCS_STAGED_ICON                '\uF055 '              # 
         VCS_STASH_ICON                 '\uF01C '              # 
-        VCS_INCOMING_CHANGES_ICON      '\uF01A '              # 
-        VCS_OUTGOING_CHANGES_ICON      '\uF01B '              # 
+        VCS_INCOMING_CHANGES_ICON      '\uF0AB '              # 
+        VCS_OUTGOING_CHANGES_ICON      '\uF0AA '              # 
         VCS_TAG_ICON                   '\uF02B '              # 
         VCS_BOOKMARK_ICON              '\uF461 '              # 
         VCS_COMMIT_ICON                '\uE729 '              # 

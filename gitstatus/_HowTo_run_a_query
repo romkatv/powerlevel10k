@@ -1,0 +1,6 @@
+source gitstatus.plugin.zsh
+
+gitstatus_start MY
+gitstatus_query -d $PWD MY
+typeset -m 'VCS_STATUS_*'
+
