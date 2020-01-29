@@ -1,16 +1,20 @@
 # Powerlevel10k
 [![Gitter](https://badges.gitter.im/powerlevel10k/community.svg)](https://gitter.im/powerlevel10k/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 
-Powerlevel10k is a theme for ZSH. It's fast, flexible and easy to get started with.
+Powerlevel10k is a theme for ZSH. It emphasizes [speed](#unparalleled-performance),
+[flexibility](#extremely-customizable) and [out-of-the-box experience](#configuration-wizard).
 
-![Powerlevel10k](https://raw.githubusercontent.com/romkatv/powerlevel10k-media/master/prompt-styles.png)
+![Powerlevel10k](
+  https://raw.githubusercontent.com/romkatv/powerlevel10k-media/master/prompt-styles.png)
 
 To see what Powerlevel10k is about, scroll through [features](#features).
 
-Ready to give it a try?
+Powerlevel9k users, go [here](#powerlevel9k-compatibility).
 
-1. Install [the recommended font](#recommended-meslo-nerd-font-patched-for-powerlevel10k). Optional
-   but highly recommended.
+Ready to give Powerlevel10k a try?
+
+1. Install [the recommended font](#meslo-nerd-font-patched-for-powerlevel10k). *Optional but highly
+   recommended.*
 1. Install Powerlevel10k for your plugin manager.
    - [Manual](#manual) 👈 **choose this if confused or uncertain**
    - [Oh My Zsh](#oh-my-zsh)
@@ -21,8 +25,9 @@ Ready to give it a try?
    - [Zgen](#zgen)
    - [Antibody](#antibody)
    - [Zplugin](#zplugin)
+1. Restart Zsh. If the configuration wizard doesn't start automatically, type `p10k configure`.
 
-The full [table of contents](#table-of-contents) is at the bottom.
+The full [table of contents](#table-of-contents) is at the bottom of the page.
 
 ## Features
 
@@ -33,16 +38,16 @@ Type `p10k configure` to access the builtin configuration wizard right from your
 ![Powerlevel10k Configuration Wizard](
   https://raw.githubusercontent.com/romkatv/powerlevel10k-media/master/configuration-wizard.gif)
 
+All styles except [Pure](#pure-compatibility) are functionally equivalent. They display the same
+information and differ only in presentation.
+
 Configuration wizard creates `~/.p10k.zsh` based on your preferences. Additional prompt
 customization can be done by editing this file. It has many comments to help you navigate through
 configuration options.
 
-All styles except [Pure](#pure-compatibility) are functionally equivalent. They display the same
-information and differ only in presentation.
-
 Tip: Install [the recommended font](#recommended-meslo-nerd-font-patched-for-powerlevel10k) before
-running `p10k configure`. If you are using iTerm2, `p10k configure` can install the font for you.
-Simply say *Yes* when asked.
+running `p10k configure`. If you are using iTerm2 or Termux, `p10k configure` can install the font
+for you. Simply say *Yes* when asked.
 
 ### Unparalleled performance
 
@@ -92,7 +97,10 @@ sed 's/powerlevel9k/powerlevel10k/g' -i ~/.zshrc
 exec zsh
 ```
 
-Optional: Type `p10k configure` and explore exlusive Powerlevel10k prompt styles.
+Optional steps (highly recommended):
+
+4. Install [the recommended font](#meslo-nerd-font-patched-for-powerlevel10k).
+5. Type `p10k configure` and explore exlusive Powerlevel10k prompt styles.
 
 ### Pure compatibility
 
@@ -128,6 +136,8 @@ upon Zsh startup so you can start typing while plugins are still loading.
 
 Other themes *increase* Zsh startup lag -- some by a lot, others by a just a little. Powerlevel10k
 *removes* it outright.
+
+For details, see [FAQ](#what-is-instant-prompt).
 
 ### Show on command
 
@@ -454,7 +464,7 @@ covered by the same license.
 
 ## FAQ
 
-### <a name='instant-prompt'></a>What is instant prompt?
+### </a>What is instant prompt?
 
 *Instant Prompt* is an optional feature of Powerlevel10k. When enabled, it gives you a limited
 prompt within a few milliseconds of starting zsh, allowing you to start hacking right away while zsh
@@ -816,20 +826,20 @@ theme (so that you end up with no theme) and then installing Powerlevel10k manua
 
 1. Disable the current theme in your framework / plugin manager.
 
+- **oh-my-zsh:** Open `~/.zshrc` and remove the line that sets `ZSH_THEME`. It might look like this:
+  `ZSH_THEME="powerlevel9k/powerlevel9k"`.
 - **zplug:** Open `~/.zshrc` and remove the `zplug` command that refers to your current theme. For
   example, if you are currently using Powerlevel9k, look for
   `zplug bhilburn/powerlevel9k, use:powerlevel9k.zsh-theme`.
 - **prezto:** Open `~/.zpreztorc` and put `zstyle :prezto:module:prompt theme off` in it. Remove
   any other command that sets `theme` such as `zstyle :prezto:module:prompt theme powerlevel9k`.
-- **oh-my-zsh:** Open `~/.zshrc` and remove the line that sets `ZSH_THEME`, such as
-  `ZSH_THEME=powerlevel9k/powerlevel9k`.
-- **antigen:** Open `~/.zshrc` and remove the line that sets `antigen theme`, such as
-  `antigen theme powerlevel9k/powerlevel9k`.
+- **antigen:** Open `~/.zshrc` and remove the line that sets `antigen theme`. It might look like
+  this: `antigen theme powerlevel9k/powerlevel9k`.
 
 2. Install Powerlevel10k manually.
 
 ```zsh
-git clone https://github.com/romkatv/powerlevel10k.git ~/powerlevel10k
+git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ~/powerlevel10k
 echo 'source ~/powerlevel10k/powerlevel10k.zsh-theme' >>! ~/.zshrc
 ```
 
@@ -839,9 +849,27 @@ This method of installation won't make anything slower or otherwise sub-par.
 
 Zsh 5.1 or newer should work. Fast startup requires zsh >= 5.4.
 
+### How were these screenshots and animated gifs created?
+
+All screenshots and animated gifs were recorded in GNOME Terminal with white text on black
+background, Tango palette, and [the recommended font](#meslo-nerd-font-patched-for-powerlevel10k).
+
+![GNOME Terminal Color Settings](
+  https://raw.githubusercontent.com/romkatv/powerlevel10k-media/master/gnome-terminal-colors.png)
+
 ## Table of contents
 
 1. [Features](#features)
+   1. [Configuration wizard](#configuration-wizard)
+   1. [Unparalleled performance](#unparalleled-performance)
+   1. [Powerlevel9k compatibility](#powerlevel9k-compatibility)
+   1. [Pure compatibility](#pure-compatibility)
+   1. [Instant prompt](#instant-prompt)
+   1. [Show On Command](#show-on-command)
+   1. [Transient prompt](#transient-prompt)
+   1. [Current directory that just works](#current-directory-that-just-works)
+   1. [Extremely customizable](#extremely-customizable)
+   1. [Batteries included](#batteries-included)
 1. [Installation](#installation)
    1. [Manual](#manual)
    1. [Oh My Zsh](#oh-my-zsh)
@@ -856,7 +884,9 @@ Zsh 5.1 or newer should work. Fast startup requires zsh >= 5.4.
    1. [For new users](#for-new-users)
    1. [For Powerlevel9k users](#for-powerlevel9k-users)
 1. [Fonts](#fonts)
-   1. [Recommended: Meslo Nerd Font patched for Powerlevel10k](#recommended-meslo-nerd-font-patched-for-powerlevel10k)
+   1. [Meslo Nerd Font patched for Powerlevel10k](#meslo-nerd-font-patched-for-powerlevel10k)
+      1. [Automatic font installation](#automatic-font-installation)
+      1. [Manual font installation](#manual-font-installation)
 1. [Try it in Docker](#try-it-in-docker)
 1. [Is it really fast?](#is-it-really-fast)
 1. [License](#license)
@@ -882,3 +912,4 @@ Zsh 5.1 or newer should work. Fast startup requires zsh >= 5.4.
    1. [Is there an AUR package for Powerlevel10k?](#is-there-an-aur-package-for-powerlevel10k)
    1. [I cannot make Powerlevel10k work with my plugin manager. Help!](#i-cannot-make-powerlevel10k-work-with-my-plugin-manager-help)
    1. [What is the minimum supported zsh version?](#what-is-the-minimum-supported-zsh-version)
+   1. [How were these screenshots and animated gifs created?](#how-were-these-screenshots-and-animated-gifs-created)
