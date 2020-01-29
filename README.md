@@ -66,6 +66,13 @@ Configuration wizard creates `~/.p10k.zsh` based on your preferences. Additional
 customization can be done by editing this file. It has many comments to help you navigate through
 configuration options.
 
+All styles except [Pure](#pure-compatibility) are functionally equivalent. They display the same
+information and differ only in presentation.
+
+Tip: Install [the recommended font](#recommended-meslo-nerd-font-patched-for-powerlevel10k) before
+running `p10k configure`. If you are using iTerm2, `p10k configure` can install the font for you.
+Simply say *Yes* when asked.
+
 ### Unparalleled performance
 
 When you hit *ENTER*, the next prompt appears instantly. With Powerlevel10k there is no prompt lag.
@@ -86,7 +93,7 @@ Note how the effect of every command is instantly reflected by the very next pro
 | `rm COPYING`                  | `!1`             | 1 unstaged change                    |
 | `echo 2.7.3 >.python-version` | `🐍 2.7.3`       | the current python version in pyenv  |
 
-Other Zsh themes capable of displaying the same information either produce prompt lag or print stale
+Other Zsh themes capable of displaying the same information either produce prompt lag or print
 prompt that doesn't reflect the current state of the system and then refresh it later. With
 Powerlevel10k you get fast prompt *and* up-to-date information.
 
@@ -116,7 +123,7 @@ exec zsh
 
 Optional: Type `p10k configure` and explore exlusive Powerlevel10k prompt styles.
 
-### Pure emulation
+### Pure compatibility
 
 Powerlevel10k can produce the same prompt as [Pure](https://github.com/sindresorhus/pure). Type
 `p10k configure` and select *Pure* style.
@@ -124,8 +131,103 @@ Powerlevel10k can produce the same prompt as [Pure](https://github.com/sindresor
 ![Powerlevel10k Pure Style](
   https://raw.githubusercontent.com/romkatv/powerlevel10k-media/master/pure-style.gif)
 
-You can still use Powerlevel10k features such as *Transient Prompt* or *Instant Prompt* when
-sporting Pure style.
+You can still use Powerlevel10k features such as [Transient Prompt](#transient-prompt) or
+[Instant Prompt](#instant-prompt) when sporting Pure style.
+
+To customize prompt, edit `~/.p10k.zsh`. Powerlevel10k doesn't recognize Pure configuration
+parameters, so you need to use `POWERLEVEL9K_COMMAND_EXECUTION_TIME_THRESHOLD=3` instead of
+`PURE_CMD_MAX_EXEC_TIME=3`, etc. All relevant parameters are in the config.
+
+### Instant prompt
+
+If your `~/.zshrc` loads many plugins, or perhaps just a few slow ones (pyenv and nvm are the usual
+suspects), you may have noticed that it takes some time for Zsh to start.
+
+![Powerlevel10k Pure Style](
+  https://raw.githubusercontent.com/romkatv/powerlevel10k-media/master/no-instant-prompt.gif)
+
+Powerlevel10k can remove Zsh startup lag *even if it's not caused by a theme*.
+
+![Powerlevel10k Pure Style](
+  https://raw.githubusercontent.com/romkatv/powerlevel10k-media/master/instant-prompt.gif)
+
+This feature is called *Instant Prompt*. You need to explicitly enable it through `p10k configure`
+or [manually](#what-is-instant-prompt). It does what it says on the tin -- prints prompt instantly
+upon Zsh startup so you can start typing while plugins are still loading.
+
+Other themes *increase* Zsh startup lag -- some by a lot, others by a just a little -- while
+Powerlevel10k *removes* it outright.
+
+### Show on command
+
+The behavior of some commands depends on global environment. For example, `kubectl run ...` runs an
+image on the cluster defined by the current kubernetes context. If you frequently change context
+between "prod" and "testing", you might want to display the current context in Zsh prompt. If you do
+likewise for AWS, Azure and Google Cloud credentials, prompt will get pretty crowded.
+
+Enter *Show On Command*. This feature makes certain prompt segments appear only when they are
+relevant to the command you are currently typing.
+
+![Powerlevel10k Show On Command](
+  https://raw.githubusercontent.com/romkatv/powerlevel10k-media/master/show-on-command.gif)
+
+Configs created by `p10k configure` enable Show On Command for several prompt segments by default.
+
+```zsh
+# Show prompt segment "kubecontext" only when the command you are typing
+# invokes kubectl, helm, kubens, kubectx or oc.
+typeset -g POWERLEVEL9K_KUBECONTEXT_SHOW_ON_COMMAND='kubectl|helm|kubens|kubectx|oc'
+```
+
+To customize when different prompt segments are shown, open `~/.p10k.zsh`, search for
+`SHOW_ON_COMMAND` and either remove these parameters to display affected segments unconditionally,
+or change their values.
+
+### Transient prompt
+
+When *Transient Prompt* is enabled through `p10k configure`, Powerlevel10k will trim down every
+prompt when accepting a command line.
+
+![Powerlevel10k Show On Command](
+  https://raw.githubusercontent.com/romkatv/powerlevel10k-media/master/transient-prompt.gif)
+
+Transient Prompt makes it much easier to copy-paste series of commands from the terminal scrollback.
+
+Tip: If you enable Transient Prompt, take advantage of two-line prompt. You'll get the benefit of
+extra space for typing commands from fixed offset without the usual downside of reduced scrollback
+density.
+
+### Current directory that just works
+
+The current working directory is perhaps the most important prompt segment. Powerlevel10k goes to
+great length to highlight its important parts and to truncate it with the least loss of information.
+
+![Powerlevel10k Directory Truncation](
+  https://raw.githubusercontent.com/romkatv/powerlevel10k-media/master/directory-truncation.gif)
+
+When the full directory doesn't fit, the leftmost segment gets truncated to its shortest unique
+prefix. In the screencast, `~/work` becomes `~/wo`. It couldn't be truncated to `~/w` because it
+would be ambiguous (there was `~/wireguard` when the session was recorded). The next segment --
+`projects` -- turns into `p` as there was nothing else that started with `p` in `~/work`.
+
+Directory segments are shown in one of three colors:
+
+- Important segments are bright and never truncated. These include the first and the last segment,
+  roots of Git repositories, etc.
+- Truncated segments are bleak.
+- Regular segments (not truncated but can be) use in-between color.
+
+Tip: If you copy-paste a truncated directory and hit *TAB*, it'll complete to the original.
+
+### Extremely customizable
+
+Powerlevel10k can be configured to look like any other Zsh theme.
+
+TODO
+
+### Batteries included
+
+TODO
 
 ## Installation
 
