@@ -155,8 +155,8 @@ This feature is called *Instant Prompt*. You need to explicitly enable it throug
 or [manually](#what-is-instant-prompt). It does what it says on the tin -- prints prompt instantly
 upon Zsh startup so you can start typing while plugins are still loading.
 
-Other themes *increase* Zsh startup lag -- some by a lot, others by a just a little -- while
-Powerlevel10k *removes* it outright.
+Other themes *increase* Zsh startup lag -- some by a lot, others by a just a little. Powerlevel10k
+*removes* it outright.
 
 ### Show on command
 
@@ -226,10 +226,10 @@ Powerlevel10k can be configured to look like any other Zsh theme.
 ![Powerlevel10k Other Theme Emulation](
   https://raw.githubusercontent.com/romkatv/powerlevel10k-media/master/other-theme-emulation.gif)
 
-Note: [Pure](#pure-compatibility) and Powerlevel9k(#powerlevel9k-compatibility) emulation is
-built-in. To emulate the appearence of other themes, you'll need to write a suitable configuration
-file. The best way to go about it is to run `p10k configure`, select the style that is the closest
-to your goal and then edit `~/.p10k.zsh`.
+[Pure](#pure-compatibility) and [Powerlevel9k](#powerlevel9k-compatibility) emulation is built-in.
+To emulate the appearence of other themes, you'll need to write a suitable configuration file. The
+best way to go about it is to run `p10k configure`, select the style that is the closest to your
+goal and then edit `~/.p10k.zsh`.
 
 The full range of Powerlevel10k appearance spans from spartan:
 
