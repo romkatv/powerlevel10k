@@ -12,7 +12,8 @@
 # doesn't fit on one line, it wraps around with no attempt to shorten it.
 #
 # If you like the general style of Pure but not particularly attached to all its quirks, type
-# `p10k configure` while having Powerlevel10k theme active and pick "Lean" style.
+# `p10k configure` and pick "Lean" style. This will give you slick minimalist prompt while taking
+# advantage of Powerlevel10k features that aren't present in Pure.
 
 # Temporarily change options.
 'builtin' 'local' '-a' 'p10k_config_opts'
@@ -117,12 +118,12 @@
   typeset -g POWERLEVEL9K_VCS_{INCOMING,OUTGOING}_CHANGESFORMAT_FOREGROUND=$cyan
   # Don't show remote branch, current tag or stashes.
   typeset -g POWERLEVEL9K_VCS_GIT_HOOKS=(vcs-detect-changes git-untracked git-aheadbehind)
-  # Don't show the branh icon.
+  # Don't show the branch icon.
   typeset -g POWERLEVEL9K_VCS_BRANCH_ICON=
   # When in detached HEAD state, show @commit where branch normally goes.
   typeset -g POWERLEVEL9K_VCS_COMMIT_ICON='@'
   # Don't show staged, unstaged, untracked indicators.
-  typeset -g POWERLEVEL9K_VCS_{STAGED,UNSTAGED,UNTRACKED}_ICON=$'\b'
+  typeset -g POWERLEVEL9K_VCS_{STAGED,UNSTAGED,UNTRACKED}_ICON=
   # Show '*' when there are staged, unstaged or untracked files.
   typeset -g POWERLEVEL9K_VCS_DIRTY_ICON='*'
   # Show '⇣' if local branch is behind remote.
@@ -131,8 +132,8 @@
   typeset -g POWERLEVEL9K_VCS_OUTGOING_CHANGES_ICON='⇡'
   # Don't show the number of commits next to the ahead/behind arrows.
   typeset -g POWERLEVEL9K_VCS_{COMMITS_AHEAD,COMMITS_BEHIND}_MAX_NUM=1
-  # Remove space between '⇣' and '⇡'.
-  typeset -g POWERLEVEL9K_VCS_CONTENT_EXPANSION='${P9K_CONTENT/⇣* ⇡/⇣⇡}'
+  # Remove space between '⇣' and '⇡' and all trailing spaces.
+  typeset -g POWERLEVEL9K_VCS_CONTENT_EXPANSION='${${P9K_CONTENT/⇣* ⇡/⇣⇡}// }'
 
   # Transient prompt works similarly to the builtin transient_rprompt option. It trims down prompt
   # when accepting a command line. Supported values:
