@@ -46,16 +46,15 @@ customization can be done by editing this file. It has many comments to help you
 configuration options.
 
 Tip: Install [the recommended font](#recommended-meslo-nerd-font-patched-for-powerlevel10k) before
-running `p10k configure`. If you are using iTerm2 or Termux, `p10k configure` can install the font
-for you. Simply say *Yes* when asked.
+running `p10k configure`.
 
 ### Unparalleled performance
 
 When you hit *ENTER*, the next prompt appears instantly. With Powerlevel10k there is no prompt lag.
-If you install Cygwin on Raspberry Pi, `cd` in a Linux Git repository and activate enough prompt
+If you install Cygwin on Raspberry Pi, `cd` into a Linux Git repository and activate enough prompt
 segments to fill four prompt lines on both sides of the screen... wait, that's just crazy and no
 one ever does that. Probably impossible, too. The point is, Powerlevel10k prompt is always fast, no
-matter what!
+matter what you do!
 
 ![Powerlevel10k Performance](
   https://raw.githubusercontent.com/romkatv/powerlevel10k-media/master/performance.gif)
@@ -91,13 +90,15 @@ How to switch to Powerlevel10k if you are using Powerlevel9k with Oh My Zsh:
 2. Replace `ZSH_THEME="powerlevel9k/powerlevel9k"` with `ZSH_THEME="powerlevel10k/powerlevel10k"`
 3. Restart Zsh.
 
+Copy-paste this command to perform the 3 steps automatically:
+
 ```zsh
 git clone --depth=1 https://github.com/romkatv/powerlevel10k.git $ZSH_CUSTOM/themes/powerlevel10k
 sed 's/powerlevel9k/powerlevel10k/g' -i ~/.zshrc
 exec zsh
 ```
 
-Optional steps (highly recommended):
+Optional steps (*highly recommended*):
 
 4. Install [the recommended font](#meslo-nerd-font-patched-for-powerlevel10k).
 5. Type `p10k configure` and explore exlusive Powerlevel10k prompt styles.
@@ -132,7 +133,7 @@ Powerlevel10k can remove Zsh startup lag *even if it's not caused by a theme*.
 
 This feature is called *Instant Prompt*. You need to explicitly enable it through `p10k configure`
 or [manually](#what-is-instant-prompt). It does what it says on the tin -- prints prompt instantly
-upon Zsh startup so you can start typing while plugins are still loading.
+upon Zsh startup allowing you to start typing while plugins are still loading.
 
 Other themes *increase* Zsh startup lag -- some by a lot, others by a just a little. Powerlevel10k
 *removes* it outright.
@@ -146,13 +147,14 @@ image on the cluster defined by the current kubernetes context. If you frequentl
 between "prod" and "testing", you might want to display the current context in Zsh prompt. If you do
 likewise for AWS, Azure and Google Cloud credentials, prompt will get pretty crowded.
 
-Enter *Show On Command*. This feature makes certain prompt segments appear only when they are
-relevant to the command you are currently typing.
+Enter *Show On Command*. This feature makes prompt segments appear only when they are relevant to
+the command you are currently typing.
 
 ![Powerlevel10k Show On Command](
   https://raw.githubusercontent.com/romkatv/powerlevel10k-media/master/show-on-command.gif)
 
 Configs created by `p10k configure` enable Show On Command for several prompt segments by default.
+Here's the relevant parameter for kubernetes context:
 
 ```zsh
 # Show prompt segment "kubecontext" only when the command you are typing
@@ -175,7 +177,7 @@ prompt when accepting a command line.
 Transient Prompt makes it much easier to copy-paste series of commands from the terminal scrollback.
 
 Tip: If you enable Transient Prompt, take advantage of two-line prompt. You'll get the benefit of
-extra space for typing commands without the usual downside of reduced scrollback density.
+extra space for typing commands without the usual drawback of reduced scrollback density.
 
 ### Current directory that just works
 
@@ -192,9 +194,9 @@ would be ambiguous (there was `~/wireguard` when the session was recorded). The 
 
 Directory segments are shown in one of three colors:
 
+- Truncated segments are bleak.
 - Important segments are bright and never truncated. These include the first and the last segment,
   roots of Git repositories, etc.
-- Truncated segments are bleak.
 - Regular segments (not truncated but can be) use in-between color.
 
 Tip: If you copy-paste a truncated directory and hit *TAB*, it'll complete to the original.
