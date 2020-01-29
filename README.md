@@ -1,57 +1,28 @@
 # Powerlevel10k
 [![Gitter](https://badges.gitter.im/powerlevel10k/community.svg)](https://gitter.im/powerlevel10k/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 
-Powerlevel10k is a theme for ZSH. It's fast, flexible and easy to install and configure.
-
-Powerlevel10k can be used as a [fast](#is-it-really-fast) drop-in replacement for
-[Powerlevel9k](https://github.com/bhilburn/powerlevel9k). When given the same configuration options
-it will generate the same prompt.
+Powerlevel10k is a theme for ZSH. It's fast, flexible and easy to get started with.
 
 ![Powerlevel10k](https://raw.githubusercontent.com/romkatv/powerlevel10k-media/master/prompt-styles.png)
 
-## Table of Contents
+To see what Powerlevel10k is about, scroll through [features](#features).
 
-1. [Features](#features)
-1. [Installation](#installation)
-   1. [Manual](#manual)
-   1. [Oh My Zsh](#oh-my-zsh)
-   1. [Prezto](#prezto)
-   1. [Zim](#zim)
-   1. [Antigen](#antigen)
-   1. [Zplug](#zplug)
-   1. [Zgen](#zgen)
-   1. [Antibody](#antibody)
-   1. [Zplugin](#zplugin)
-1. [Configuration](#configuration)
-   1. [For new users](#for-new-users)
-   1. [For Powerlevel9k users](#for-powerlevel9k-users)
-1. [Fonts](#fonts)
-   1. [Recommended: Meslo Nerd Font patched for Powerlevel10k](#recommended-meslo-nerd-font-patched-for-powerlevel10k)
-1. [Try it in Docker](#try-it-in-docker)
-1. [Is it really fast?](#is-it-really-fast)
-1. [License](#license)
-1. [FAQ](#faq)
-   1. [What is instant prompt?](#what-is-instant-prompt)
-   1. [Why do my icons and/or powerline symbols look bad?](#why-do-my-icons-andor-powerline-symbols-look-bad)
-   1. [I'm getting "character not in range" error. What gives?](#im-getting-character-not-in-range-error-what-gives)
-   1. [Why is my cursor in the wrong place?](#why-is-my-cursor-in-the-wrong-place)
-   1. [Why is my prompt wrapping around in a weird way?](#why-is-my-prompt-wrapping-around-in-a-weird-way)
-   1. [Why is my right prompt in the wrong place?](#why-is-my-right-prompt-in-the-wrong-place)
-   1. [Why does the configuration wizard run automatically every time I start zsh?](#why-does-the-configuration-wizard-run-automatically-every-time-i-start-zsh)
-   1. [I cannot install the recommended font. Help!](#i-cannot-install-the-recommended-font-help)
-   1. [Why do I have a question mark symbol in my prompt? Is my font broken?](#why-do-i-have-a-question-mark-symbol-in-my-prompt-is-my-font-broken)
-   1. [What do different symbols in Git status mean?](#what-do-different-symbols-in-git-status-mean)
-   1. [How do I change the format of Git status?](#how-do-i-change-the-format-of-git-status)
-   1. [How do I add username and/or hostname to prompt?](#how-do-i-add-username-andor-hostname-to-prompt)
-   1. [How do I change colors?](#how-do-i-change-colors)
-   1. [Why some prompt segments appear and disappear as I'm typing?](#why-some-prompt-segments-appear-and-disappear-as-im-typing)
-   1. [Why does Powerlevel10k spawn extra processes?](#why-does-powerlevel10k-spawn-extra-processes)
-   1. [Are there configuration options that make Powerlevel10k slow?](#are-there-configuration-options-that-make-powerlevel10k-slow)
-   1. [Is Powerlevel10k fast to load?](#is-powerlevel10k-fast-to-load)
-   1. [Does Powerlevel10k always render exactly the same prompt as Powerlevel9k given the same config?](#does-powerlevel10k-always-render-exactly-the-same-prompt-as-powerlevel9k-given-the-same-config)
-   1. [Is there an AUR package for Powerlevel10k?](#is-there-an-aur-package-for-powerlevel10k)
-   1. [I cannot make Powerlevel10k work with my plugin manager. Help!](#i-cannot-make-powerlevel10k-work-with-my-plugin-manager-help)
-   1. [What is the minimum supported zsh version?](#what-is-the-minimum-supported-zsh-version)
+Ready to give it a try?
+
+1. Install [the recommended font](#recommended-meslo-nerd-font-patched-for-powerlevel10k). Optional
+   but highly recommended.
+1. Install Powerlevel10k for your plugin manager.
+   - [Manual](#manual) 👈 **choose this if confused or uncertain**
+   - [Oh My Zsh](#oh-my-zsh)
+   - [Prezto](#prezto)
+   - [Zim](#zim)
+   - [Antigen](#antigen)
+   - [Zplug](#zplug)
+   - [Zgen](#zgen)
+   - [Antibody](#antibody)
+   - [Zplugin](#zplugin)
+
+The full [table of contents](#table-of-contents) is at the bottom.
 
 ## Features
 
@@ -194,8 +165,7 @@ prompt when accepting a command line.
 Transient Prompt makes it much easier to copy-paste series of commands from the terminal scrollback.
 
 Tip: If you enable Transient Prompt, take advantage of two-line prompt. You'll get the benefit of
-extra space for typing commands from fixed offset without the usual downside of reduced scrollback
-density.
+extra space for typing commands without the usual downside of reduced scrollback density.
 
 ### Current directory that just works
 
@@ -243,7 +213,62 @@ To ~~ridiculous~~ extravagant:
 
 ### Batteries included
 
-TODO
+Powerlevel10k comes with dozens of built-in high quality segments. When you run `p10k configure`
+and choose any style except Pure, most of these segments get enabled by default. Some must be
+manually enabled by opening `~/.p10k.zsh` and uncommenting them. You can enable as many segments as
+you like. It won't slow down your prompt or Zsh startup.
+
+| Segment | Meaning |
+|--------:|---------|
+| `os_icon` | your OS logo (apple for macOS, swirl for debian, etc.) |
+| `dir` | current working directory |
+| `vcs` | Git repository status |
+| `prompt_char` | multi-functional prompt symbol; changes depending on vi mode: `❯`, `❮`, `Ⅴ`, `▶` for insert, command, visual and replace mode respectively; turns red on error |
+| `context` | user@hostname |
+| `status` | exit code of the last command |
+| `command_execution_time` | duration (wall time) of the last command |
+| `background_jobs` | presence of background jobs |
+| `time` | current time |
+| `direnv` | [direnv](https://direnv.net/) status |
+| `virtualenv` | python environment from [venv](https://docs.python.org/3/library/venv.html) |
+| `anaconda` | virtual environment from [conda](https://conda.io/) |
+| `pyenv` | python environment from [pyenv](https://github.com/pyenv/pyenv) |
+| `goenv` | go environment from [goenv](https://github.com/syndbg/goenv) |
+| `nodenv` | node.js environment from [nodenv](https://github.com/nodenv/nodenv) |
+| `nvm` | node.js environment from [nvm](https://github.com/nvm-sh/nvm) |
+| `nodeenv` | node.js environment from [nodeenv](https://github.com/ekalinin/nodeenv) |
+| `rbenv` | ruby environment from [rbenv](https://github.com/rbenv/rbenv) |
+| `rvm` | ruby environment from [rvm](https://rvm.io) |
+| `fvm` | flutter environment from [fvm](https://github.com/leoafarias/fvm) |
+| `luaenv` | lua environment from [luaenv](https://github.com/cehoffman/luaenv) |
+| `jenv` | java environment from [jenv](https://github.com/jenv/jenv) |
+| `plenv` | perl environment from [plenv](https://github.com/tokuhirom/plenv) |
+| `node_version` | [node.js](https://nodejs.org/) version |
+| `go_version` | [go](https://golang.org) version |
+| `rust_version` | [rustc](https://www.rust-lang.org) version |
+| `dotnet_version` | [dotnet](https://dotnet.microsoft.com) version |
+| `kubecontext` | current [kubernetes](https://kubernetes.io/) context |
+| `terraform` | [terraform](https://www.terraform.io) workspace |
+| `aws` | [aws profile](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-profiles.html) |
+| `aws_eb_env` | [aws elastic beanstalk](https://aws.amazon.com/elasticbeanstalk/) environment |
+| `azure` | [azure](https://docs.microsoft.com/en-us/cli/azure) account name |
+| `gcloud` | [google cloud](https://cloud.google.com/) cli acccount and project |
+| `google_app_cred` | [google application credentials](https://cloud.google.com/docs/authentication/production) |
+| `nordvpn` | [nordvpn](https://nordvpn.com/) connection status |
+| `ranger` | [ranger](https://github.com/ranger/ranger) shell |
+| `nnn` | [nnn](https://github.com/jarun/nnn) shell |
+| `vim_shell` | [vim](https://www.vim.org/) shell (`:sh`) |
+| `midnight_commander` | [midnight commander](https://midnight-commander.org/) shell |
+| `todo` | [todo](https://github.com/todotxt/todo.txt-cli) items |
+| `timewarrior` | [timewarrior](https://timewarrior.net/) tracking status |
+| `vpn_ip` | virtual private network indicator |
+| `load` | CPU load |
+| `disk_usage` | disk usage |
+| `ram` | free RAM |
+| `swap` | used swap |
+| `public_ip` | public ip address |
+| `proxy` | system-wide http/https/ftp proxy |
+| `battery` | internal battery state and charge level (yep, batteries *literally* included) |
 
 ## Installation
 
@@ -326,7 +351,23 @@ It works well with [Nerd Fonts](https://github.com/ryanoasis/nerd-fonts),
 the default system fonts. The full choice of style options is available only when using
 [Nerd Fonts](https://github.com/ryanoasis/nerd-fonts).
 
-### Recommended: Meslo Nerd Font patched for Powerlevel10k
+👇 **Recommended font**: Meslo Nerd Font patched for Powerlevel10k. 👇
+
+### <a name='recommended-meslo-nerd-font-patched-for-powerlevel10k'></a>Meslo Nerd Font patched for Powerlevel10k
+
+Gorgeous monospace font designed by Jim Lyles for Apple, customized by André Berg, patched by Ryan
+L McIntyre of Nerd Fonts, and hand-edited in FontForge by yours trully. Contains all glyphs and
+symbols that Powerlevel10k may need. Battle-tested in dozens of different terminals on all major
+operating systems.
+
+#### Automatic font installation
+
+If you are using iTerm2 or Termux, `p10k configure` can install the recommended font for you.
+Simply answer `Yes` when asked whether to install *Meslo Nerd Font*.
+
+If you are using a different terminal, proceed with manual font installation.
+
+#### Manual font installation
 
 Download these four ttf files:
 - [MesloLGS NF Regular.ttf](https://github.com/romkatv/dotfiles-public/raw/master/.local/share/fonts/NerdFonts/MesloLGS%20NF%20Regular.ttf)
@@ -337,9 +378,7 @@ Download these four ttf files:
 Double-click on each file and press "Install". This will make `MesloLGS NF` font available to all
 applications on your system. Configure your terminal to use this font:
 
-- **iTerm2**: Type `p10k configure`, answer `Yes` when asked whether to install
-  *Meslo Nerd Font* and restart iTerm2 for the changes to take effect. Alternatively, open
-  *iTerm2 → Preferences → Profiles → Text* and set *Font* to `MesloLGS NF`.
+- **iTerm2**: Open *iTerm2 → Preferences → Profiles → Text* and set *Font* to `MesloLGS NF`.
 - **Apple Terminal** Open *Terminal → Preferences → Profiles → Text*, click *Change* under *Font*
   and select `MesloLGS NF` family.
 - **Hyper**: Open *Hyper → Edit → Preferences* and change the value of `fontFamily` under
@@ -799,3 +838,47 @@ This method of installation won't make anything slower or otherwise sub-par.
 ### What is the minimum supported zsh version?
 
 Zsh 5.1 or newer should work. Fast startup requires zsh >= 5.4.
+
+## Table of contents
+
+1. [Features](#features)
+1. [Installation](#installation)
+   1. [Manual](#manual)
+   1. [Oh My Zsh](#oh-my-zsh)
+   1. [Prezto](#prezto)
+   1. [Zim](#zim)
+   1. [Antigen](#antigen)
+   1. [Zplug](#zplug)
+   1. [Zgen](#zgen)
+   1. [Antibody](#antibody)
+   1. [Zplugin](#zplugin)
+1. [Configuration](#configuration)
+   1. [For new users](#for-new-users)
+   1. [For Powerlevel9k users](#for-powerlevel9k-users)
+1. [Fonts](#fonts)
+   1. [Recommended: Meslo Nerd Font patched for Powerlevel10k](#recommended-meslo-nerd-font-patched-for-powerlevel10k)
+1. [Try it in Docker](#try-it-in-docker)
+1. [Is it really fast?](#is-it-really-fast)
+1. [License](#license)
+1. [FAQ](#faq)
+   1. [What is instant prompt?](#what-is-instant-prompt)
+   1. [Why do my icons and/or powerline symbols look bad?](#why-do-my-icons-andor-powerline-symbols-look-bad)
+   1. [I'm getting "character not in range" error. What gives?](#im-getting-character-not-in-range-error-what-gives)
+   1. [Why is my cursor in the wrong place?](#why-is-my-cursor-in-the-wrong-place)
+   1. [Why is my prompt wrapping around in a weird way?](#why-is-my-prompt-wrapping-around-in-a-weird-way)
+   1. [Why is my right prompt in the wrong place?](#why-is-my-right-prompt-in-the-wrong-place)
+   1. [Why does the configuration wizard run automatically every time I start zsh?](#why-does-the-configuration-wizard-run-automatically-every-time-i-start-zsh)
+   1. [I cannot install the recommended font. Help!](#i-cannot-install-the-recommended-font-help)
+   1. [Why do I have a question mark symbol in my prompt? Is my font broken?](#why-do-i-have-a-question-mark-symbol-in-my-prompt-is-my-font-broken)
+   1. [What do different symbols in Git status mean?](#what-do-different-symbols-in-git-status-mean)
+   1. [How do I change the format of Git status?](#how-do-i-change-the-format-of-git-status)
+   1. [How do I add username and/or hostname to prompt?](#how-do-i-add-username-andor-hostname-to-prompt)
+   1. [How do I change colors?](#how-do-i-change-colors)
+   1. [Why some prompt segments appear and disappear as I'm typing?](#why-some-prompt-segments-appear-and-disappear-as-im-typing)
+   1. [Why does Powerlevel10k spawn extra processes?](#why-does-powerlevel10k-spawn-extra-processes)
+   1. [Are there configuration options that make Powerlevel10k slow?](#are-there-configuration-options-that-make-powerlevel10k-slow)
+   1. [Is Powerlevel10k fast to load?](#is-powerlevel10k-fast-to-load)
+   1. [Does Powerlevel10k always render exactly the same prompt as Powerlevel9k given the same config?](#does-powerlevel10k-always-render-exactly-the-same-prompt-as-powerlevel9k-given-the-same-config)
+   1. [Is there an AUR package for Powerlevel10k?](#is-there-an-aur-package-for-powerlevel10k)
+   1. [I cannot make Powerlevel10k work with my plugin manager. Help!](#i-cannot-make-powerlevel10k-work-with-my-plugin-manager-help)
+   1. [What is the minimum supported zsh version?](#what-is-the-minimum-supported-zsh-version)
