@@ -104,17 +104,17 @@ To customize prompt, edit `~/.p10k.zsh`. Powerlevel10k doesn't recognize Pure co
 parameters, so you need to use `POWERLEVEL9K_COMMAND_EXECUTION_TIME_THRESHOLD=3` instead of
 `PURE_CMD_MAX_EXEC_TIME=3`, etc. All relevant parameters are in the config.
 
-### Instant prompt
+### <a name='what-is-instant-prompt'></a>Instant prompt
 
 If your `~/.zshrc` loads many plugins, or perhaps just a few slow ones (pyenv and nvm are the usual
 suspects), you may have noticed that it takes some time for Zsh to start.
 
-![Powerlevel10k Pure Style](
+![Powerlevel10k No Instant Prompt](
   https://raw.githubusercontent.com/romkatv/powerlevel10k-media/master/no-instant-prompt.gif)
 
 Powerlevel10k can remove Zsh startup lag *even if it's not caused by a theme*.
 
-![Powerlevel10k Pure Style](
+![Powerlevel10k Instant Prompt](
   https://raw.githubusercontent.com/romkatv/powerlevel10k-media/master/instant-prompt.gif)
 
 This feature is called *Instant Prompt*. You need to explicitly enable it through `p10k configure`
@@ -124,7 +124,7 @@ upon Zsh startup allowing you to start typing while plugins are still loading.
 Other themes *increase* Zsh startup lag -- some by a lot, others by a just a little. Powerlevel10k
 *removes* it outright.
 
-For details, see [FAQ](#what-is-instant-prompt).
+For caveats and details, see [FAQ](#how-do-i-enable-instant-prompt).
 
 ### Show on command
 
@@ -473,14 +473,12 @@ Powerlevel10k, on the other hand, doesn't require trading latency for utility --
 instant with any configuration. It stays well below the 50 ms mark, leaving most of the latency
 budget for other plugins you might install.
 
-### </a>What is instant prompt?
+### How do I enable instant prompt?
 
-*Instant Prompt* is an optional feature of Powerlevel10k. When enabled, it gives you a limited
-prompt within a few milliseconds of starting zsh, allowing you to start hacking right away while zsh
-is initializing. Once initialization is complete, the full-featured Powerlevel10k prompt will
-seamlessly replace instant prompt.
+See [instant prompt](#instant-prompt) to learn what instant prompt is. This section explains how
+you can enable it, and caveats that you should be aware of.
 
-You can enable instant prompt either by running `p10k configure` or by manually adding the following
+Instant prompt can be enabled either through `p10k configure` or by manually adding the following
 code snippet at the top of `~/.zshrc`:
 
 ```zsh
@@ -517,6 +515,7 @@ fi
 
 keychain id_rsa --agents ssh  # asks for password
 chatty-script                 # spams to stdout even when everything is fine
+# ...
 ```
 
 Fixed version:
@@ -532,6 +531,7 @@ fi
 # console output may appear uncolored.
 
 chatty-script >/dev/null      # spam output suppressed
+# ...
 ```
 
 If `POWERLEVEL9K_INSTANT_PROMPT` is unset or set to `verbose`, Powerlevel10k will print a warning
@@ -544,125 +544,6 @@ initialization and you don't know how to fix it.
 
 *NOTE: Instant prompt requires zsh >= 5.4. It's OK to enable it even when using an older version of
 zsh but it won't do anything.*
-
-### Why do my icons and/or powerline symbols look bad?
-
-It's likely your font's fault.
-[Install the recommended font](#recommended-meslo-nerd-font-patched-for-powerlevel10k) and run
-`p10k configure`.
-
-### I'm getting "character not in range" error. What gives?
-
-Type `echo '\u276F'`. If you get an error saying "zsh: character not in range", your locale
-doesn't support UTF-8. You need to fix it. If you are running zsh over SSH, see
-[this](https://github.com/romkatv/powerlevel10k/issues/153#issuecomment-518347833). If you are
-running zsh locally, Google "set UTF-8 locale in *your OS*".
-
-### Why is my cursor in the wrong place?
-
-Type `echo '\u276F'`. If you get an error saying "zsh: character not in range", see the
-[previous question](#im-getting-character-not-in-range-error-what-gives).
-
-If the `echo` command prints `❯` but the cursor is still in the wrong place, install
-[the recommended font](#recommended-meslo-nerd-font-patched-for-powerlevel10k) and run
-`p10k configure`.
-
-If this doesn't help, add `unset ZLE_RPROMPT_INDENT` at the bottom of `~/.zshrc`.
-
-Still having issues? Run the following command to diagnose the problem:
-
-```zsh
-() {
-  emulate -L zsh
-  setopt err_return no_unset
-  local text
-  print -rl -- 'Select a part of your prompt from the terminal window and paste it below.' ''
-  read -r '?Prompt: ' text
-  local -i len=${(m)#text}
-  local frame="+-${(pl.$len..-.):-}-+"
-  print -lr -- $frame "| $text |" $frame
-}
-```
-
-#### If the prompt line aligns with the frame
-
-```text
-+------------------------------+
-| romka@adam ✓ ~/powerlevel10k |
-+------------------------------+
-```
-
-If the output of the command is aligned for every part of your prompt (left and right), this
-indicates a bug in the theme or your config. Use this command to diagnose it:
-
-```zsh
-print -rl -- ${(eq+)PROMPT} ${(eq+)RPROMPT}
-```
-
-Look for `%{...%}` and backslash escapes in the output. If there are any, they are the likely
-culprits. Open an issue if you get stuck.
-
-#### If the prompt line is longer than the frame
-
-```text
-+-----------------------------+
-| romka@adam ✓ ~/powerlevel10k |
-+-----------------------------+
-```
-
-This is usually caused by a terminal bug or misconfiguration that makes it print ambiguous-width
-characters as double-width instead of single width. For example,
-[this issue](https://github.com/romkatv/powerlevel10k/issues/165).
-
-#### If the prompt line is shorter than the frame and is mangled
-
-```text
-+------------------------------+
-| romka@adam ✓~/powerlevel10k |
-+------------------------------+
-```
-
-Note that this prompt is different from the original as it's missing a space after the checkmark.
-
-This can be caused by a low-level bug in macOS. See
-[this issue](https://github.com/romkatv/powerlevel10k/issues/241).
-
-#### If the prompt line is shorter than the frame and is not mangled
-
-```text
-+--------------------------------+
-| romka@adam ✓ ~/powerlevel10k |
-+--------------------------------+
-```
-
-This can be caused by misconfigured locale. See
-[this issue](https://github.com/romkatv/powerlevel10k/issues/251).
-
-### Why is my prompt wrapping around in a weird way?
-
-See [Why is my cursor in the wrong place?](#why-is-my-cursor-in-the-wrong-place)
-
-### Why is my right prompt in the wrong place?
-
-See [Why is my cursor in the wrong place?](#why-is-my-cursor-in-the-wrong-place)
-
-### Why does the configuration wizard run automatically every time I start zsh?
-
-When Powerlevel10k starts, it automatically runs `p10k configure` if no `POWERLEVEL9K_*`
-parameters are defined. Based on your prompt style choices, the configuration wizard creates
-`~/.p10k.zsh` with a bunch of `POWERLEVEL9K_*` parameters in it and adds a line to `~/.zshrc` to
-source this file. The next time you start zsh, the configuration wizard shouldn't run automatically.
-If it does, this means the evaluation of `~/.zshrc` terminates prematurely before it reaches the
-line that sources `~/.p10k.zsh`. This most often happens due to syntax errors in `~/.zshrc`. These
-errors get hidden by the configuration wizard screen, so you don't notice them. Scroll up in the
-first configuration wizard screen to see these errors. Alternatively, run
-`POWERLEVEL9K_DISABLE_CONFIGURATION_WIZARD=true zsh` to start zsh without automatically running the
-configuration wizard. Once you can see the errors, fix `~/.zshrc` to get rid of them.
-
-### I cannot install the recommended font. Help!
-
-Once you download [the recommended font](#recommended-meslo-nerd-font-patched-for-powerlevel10k),
-you can install it just like any other font. Google "how to install fonts on *your OS*".
 
 ### Why do I have a question mark symbol in my prompt? Is my font broken?
 
@@ -796,8 +677,8 @@ for i in {0..255}; do print -Pn "%K{$i} %k%F{$i}${(l:3::0:)i}%f " ${${(M)$((i%8)
 Powerlevel10k uses [gitstatus](https://github.com/romkatv/gitstatus) as the backend behind `vcs`
 prompt; gitstatus spawns `gitstatusd` and `zsh`. See
 [gitstatus](https://github.com/romkatv/gitstatus) for details. Powerlevel10k may also spawn `zsh`
-to trigger async prompt refresh. To avoid security hazard, these background processes aren't shared
-by different interactive shells.
+to perform computation without blocking prompt. To avoid security hazard, these background processes
+aren't shared by different interactive shells.
 
 ### Are there configuration options that make Powerlevel10k slow?
 
@@ -824,22 +705,25 @@ times faster than powerlevel9k/master and 17 times faster than powerlevel9k/next
 
 ### Does Powerlevel10k always render exactly the same prompt as Powerlevel9k given the same config?
 
-This is the goal. You should be able to switch from Powerlevel9k to Powerlevel10k with no
-visible changes except for performance. There are, however, several differences.
+Almost. There are a few differences.
 
-- By default only `git` vcs backend is enabled in Powerlevel10k. If you need `svn` and `hg`, you'll
-  need to add them to `POWERLEVEL9K_VCS_BACKENDS`.
+- By default only `git` vcs backend is enabled in Powerlevel10k. If you need `svn` and `hg`, add
+  them to `POWERLEVEL9K_VCS_BACKENDS`.
 - Powerlevel10k strives to be bug-compatible with Powerlevel9k but not when it comes to egregious
   bugs. If you accidentally rely on these bugs, your prompt will differ between Powerlevel9k and
   Powerlevel10k. Some examples:
-  - Powerlevel9k doesn't respect `ZLE_RPROMPT_INDENT`. As a result, right prompt in Powerlevel10k
-    can have an extra space at the end compared to Powerlevel9k. Set `ZLE_RPROMPT_INDENT=0` if you
-    don't want that space.
   - Powerlevel9k ignores some options that are set after the theme is sourced while Powerlevel10k
     respects all options. If you see different icons in Powerlevel9k and Powerlevel10k, you've
     probably defined `POWERLEVEL9K_MODE` before sourcing the theme. This parameter gets ignored
     by Powerlevel9k but honored by Powerlevel10k. If you want your prompt to look in Powerlevel10k
     the same as in Powerlevel9k, remove `POWERLEVEL9K_MODE`.
+  - Powerlevel9k doesn't respect `ZLE_RPROMPT_INDENT`. As a result, right prompt in Powerlevel10k
+    can have an extra space at the end compared to Powerlevel9k. Set `ZLE_RPROMPT_INDENT=0` if you
+    don't want that space. More details in
+    [troubleshooting](#extra-space-without-background-on-the-right-side-of-right-prompt).
+  - Powerlevel9k has inconsistent spacing around icons. This was fixed in Powerlevel10k. Set
+    `POWERLEVEL9K_LEGACY_ICON_SPACING=true` to get the same spacing as in Powerlevel9k.  More
+    details in [troubleshooting](#extra-spaces-after-some-icons).
   - There are
     [dozens more bugs](https://github.com/Powerlevel9k/powerlevel9k/issues/created_by/romkatv) in
     Powerlevel9k that don't exist in Powerlevel10k.
@@ -852,7 +736,192 @@ Powerlevel10k, please [open an issue](https://github.com/romkatv/powerlevel10k/i
 Yes, [zsh-theme-powerlevel10k-git](https://aur.archlinux.org/packages/zsh-theme-powerlevel10k-git/).
 This package is owned by an unaffiliated volunteer.
 
-### I cannot make Powerlevel10k work with my plugin manager. Help!
+### What is the minimum supported zsh version?
+
+Zsh 5.1 or newer should work. Fast startup requires zsh >= 5.4.
+
+### How were these screenshots and animated gifs created?
+
+All screenshots and animated gifs were recorded in GNOME Terminal with
+[the recommended font](#meslo-nerd-font-patched-for-powerlevel10k) and Tango Dark color scheme with
+custom background color (`#171A1B` instead of `#2E3436` -- twice as dark).
+
+![GNOME Terminal Color Settings](
+  https://raw.githubusercontent.com/romkatv/powerlevel10k-media/master/gnome-terminal-colors.png)
+
+## Troubleshooting
+
+### Icons, glyphs or powerline symbols don't render.
+
+Restart your terminal, [install the recommended font](
+  #recommended-meslo-nerd-font-patched-for-powerlevel10k) and run `p10k configure`.
+
+###  zsh: character not in range
+
+Type `echo '\u276F'`. If you get an error saying "zsh: character not in range", your locale
+doesn't support UTF-8. You need to fix it. If you are running zsh over SSH, see
+[this](https://github.com/romkatv/powerlevel10k/issues/153#issuecomment-518347833). If you are
+running zsh locally, Google "set UTF-8 locale in *your OS*".
+
+### Cursor is in the wrong place
+
+Type `echo '\u276F'`. If you get an error saying "zsh: character not in range", see the
+[previous section](#zsh-character-not-in-range).
+
+If the `echo` command prints `❯` but the cursor is still in the wrong place, install
+[the recommended font](#recommended-meslo-nerd-font-patched-for-powerlevel10k) and run
+`p10k configure`.
+
+If this doesn't help, add `unset ZLE_RPROMPT_INDENT` at the bottom of `~/.zshrc`.
+
+Still having issues? Run the following command to diagnose the problem:
+
+```zsh
+() {
+  emulate -L zsh
+  setopt err_return no_unset
+  local text
+  print -rl -- 'Select a part of your prompt from the terminal window and paste it below.' ''
+  read -r '?Prompt: ' text
+  local -i len=${(m)#text}
+  local frame="+-${(pl.$len..-.):-}-+"
+  print -lr -- $frame "| $text |" $frame
+}
+```
+
+#### If the prompt line aligns with the frame
+
+```text
++------------------------------+
+| romka@adam ✓ ~/powerlevel10k |
++------------------------------+
+```
+
+If the output of the command is aligned for every part of your prompt (left and right), this
+indicates a bug in the theme or your config. Use this command to diagnose it:
+
+```zsh
+print -rl -- ${(eq+)PROMPT} ${(eq+)RPROMPT}
+```
+
+Look for `%{...%}` and backslash escapes in the output. If there are any, they are the likely
+culprits. Open an issue if you get stuck.
+
+#### If the prompt line is longer than the frame
+
+```text
++-----------------------------+
+| romka@adam ✓ ~/powerlevel10k |
++-----------------------------+
+```
+
+This is usually caused by a terminal bug or misconfiguration that makes it print ambiguous-width
+characters as double-width instead of single width. For example,
+[this issue](https://github.com/romkatv/powerlevel10k/issues/165).
+
+#### If the prompt line is shorter than the frame and is mangled
+
+```text
++------------------------------+
+| romka@adam ✓~/powerlevel10k |
++------------------------------+
+```
+
+Note that this prompt is different from the original as it's missing a space after the checkmark.
+
+This can be caused by a low-level bug in macOS. See
+[this issue](https://github.com/romkatv/powerlevel10k/issues/241).
+
+#### If the prompt line is shorter than the frame and is not mangled
+
+```text
++--------------------------------+
+| romka@adam ✓ ~/powerlevel10k |
++--------------------------------+
+```
+
+This can be caused by misconfigured locale. See
+[this issue](https://github.com/romkatv/powerlevel10k/issues/251).
+
+### Prompt wrapping around in a weird way
+
+See [cursor is in the wrong place](#cursor-is-in-the-wrong-place).
+
+### Right prompt is in the wrong place
+
+See [cursor is in the wrong place](#cursor-is-in-the-wrong-place).
+
+### Configuration wizard run automatically every time zsh is started
+
+When Powerlevel10k starts, it automatically runs `p10k configure` if no `POWERLEVEL9K_*`
+parameters are defined. Based on your prompt style choices, the configuration wizard creates
+`~/.p10k.zsh` with a bunch of `POWERLEVEL9K_*` parameters in it and adds a line to `~/.zshrc` to
+source this file. The next time you start zsh, the configuration wizard shouldn't run automatically.
+If it does, this means the evaluation of `~/.zshrc` terminates prematurely before it reaches the
+line that sources `~/.p10k.zsh`. This most often happens due to syntax errors in `~/.zshrc`. These
+errors get hidden by the configuration wizard screen, so you don't notice them. Scroll up in the
+first configuration wizard screen to see these errors. Alternatively, run
+`POWERLEVEL9K_DISABLE_CONFIGURATION_WIZARD=true zsh` to start zsh without automatically running the
+configuration wizard. Once you can see the errors, fix `~/.zshrc` to get rid of them.
+
+### Cannot install the recommended font
+
+Once you download [the recommended font](#recommended-meslo-nerd-font-patched-for-powerlevel10k),
+you can install it just like any other font. Google "how to install fonts on *your OS*".
+
+### Extra spaces in prompt compared to Powerlevel9k
+
+When using Powerlevel10k with a Powerlevel9k config, you might get additional spaces in prompt here
+and there. These come in two flavors.
+
+#### Extra space without background on the right side of right prompt
+
+tl;dr: Add `ZLE_RPROMPT_INDENT=0` to `~/.zshrc` to get rid of that space.
+
+From [Zsh documentation](
+  http://zsh.sourceforge.net/Doc/Release/Parameters.html#index-ZLE_005fRPROMPT_005fINDENT):
+
+> `ZLE_RPROMPT_INDENT <S>`
+> 
+> If set, used to give the indentation between the right hand side of the right prompt in the line
+> editor as given by `RPS1` or `RPROMPT` and the right hand side of the screen. If not set, the
+> value `1` is used.
+> 
+> Typically this will be used to set the value to `0` so that the prompt appears flush with the
+> right hand side of the screen.
+
+Powerlevel10k respects this parameter. If you set `ZLE_RPROMPT_INDENT=1` (or leave it unset, which
+is the same thing as setting it to `1`), you'll get an empty space to the right of right prompt. If
+you set `ZLE_RPROMPT_INDENT=0`, your prompt will go to the edge of the terminal. This is how it
+works in every theme except Powerlevel9k.
+
+![ZLE_RPROMPT_INDENT: Powerlevel10k vs Powerlevel9k](
+  https://raw.githubusercontent.com/romkatv/powerlevel10k-media/master/p9k-vs-p10k-zle-rprompt-indent.png)
+
+Bug against Powerlevel9k: [powerlevel9k#1292](
+  https://github.com/Powerlevel9k/powerlevel9k/issues/1292). It's been fixed in the development
+branch of Powerlevel9k but the fix hasn't yet made it to `master`.
+
+Add `ZLE_RPROMPT_INDENT=0` to `~/.zshrc` to get the same spacing on the right edge of prompt as in
+Powerlevel9k.
+
+#### Extra spaces after some icons
+
+tl;dr: Add `POWERLEVEL9K_LEGACY_ICON_SPACING=true` to `~/.zshrc` to get rid of these spaces.
+
+Spacing around icons in Powerlevel9k is inconsistent.
+
+![ZLE_RPROMPT_INDENT: Powerlevel10k vs Powerlevel9k](
+  https://raw.githubusercontent.com/romkatv/powerlevel10k-media/master/p9k-vs-p10k-icon-spacing.png)
+
+This inconsistency is a constant source of annoyance, so it was fixed in Powerlevel10k.
+Unfortunately, this means that users upgrading from Powerlevel9k will notice differences in spacing
+around some icons.
+
+Add `POWERLEVEL9K_LEGACY_ICON_SPACING=true` to `~/.zshrc` to get the same spacing around icons as in
+Powerlevel9k.
+
+### Cannot make Powerlevel10k work with my plugin manager
 
 If the [installation instructions](#installation) didn't work for you, try disabling your current
 theme (so that you end up with no theme) and then installing Powerlevel10k manually.
@@ -877,19 +946,6 @@ echo 'source ~/powerlevel10k/powerlevel10k.zsh-theme' >>! ~/.zshrc
 ```
 
 This method of installation won't make anything slower or otherwise sub-par.
-
-### What is the minimum supported zsh version?
-
-Zsh 5.1 or newer should work. Fast startup requires zsh >= 5.4.
-
-### How were these screenshots and animated gifs created?
-
-All screenshots and animated gifs were recorded in GNOME Terminal with
-[the recommended font](#meslo-nerd-font-patched-for-powerlevel10k) and Tango Dark color scheme with
-custom background color (`#171A1B` instead of `#2E3436` -- twice as dark).
-
-![GNOME Terminal Color Settings](
-  https://raw.githubusercontent.com/romkatv/powerlevel10k-media/master/gnome-terminal-colors.png)
 
 ## Table of contents
 
@@ -944,6 +1000,7 @@ custom background color (`#171A1B` instead of `#2E3436` -- twice as dark).
    1. [Are there configuration options that make Powerlevel10k slow?](#are-there-configuration-options-that-make-powerlevel10k-slow)
    1. [Is Powerlevel10k fast to load?](#is-powerlevel10k-fast-to-load)
    1. [Does Powerlevel10k always render exactly the same prompt as Powerlevel9k given the same config?](#does-powerlevel10k-always-render-exactly-the-same-prompt-as-powerlevel9k-given-the-same-config)
+   1. [Why do I get extra spaces in prompt when I use my Powerlevel9k config with Powerlevel10k?](#why-do-i-get-extra-spaces-in-prompt-when-i-use-my-powerlevel9k-config-with-powerlevel10k)
    1. [Is there an AUR package for Powerlevel10k?](#is-there-an-aur-package-for-powerlevel10k)
    1. [I cannot make Powerlevel10k work with my plugin manager. Help!](#i-cannot-make-powerlevel10k-work-with-my-plugin-manager-help)
    1. [What is the minimum supported zsh version?](#what-is-the-minimum-supported-zsh-version)
