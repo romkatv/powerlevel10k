@@ -900,9 +900,9 @@ works in every theme except Powerlevel9k.
 ![ZLE_RPROMPT_INDENT: Powerlevel10k vs Powerlevel9k](
   https://raw.githubusercontent.com/romkatv/powerlevel10k-media/master/p9k-vs-p10k-zle-rprompt-indent.png)
 
-Bug against Powerlevel9k: [powerlevel9k#1292](
-  https://github.com/Powerlevel9k/powerlevel9k/issues/1292). It's been fixed in the development
-branch of Powerlevel9k but the fix hasn't yet made it to `master`.
+Powerlevel9k issue: [powerlevel9k#1292](https://github.com/Powerlevel9k/powerlevel9k/issues/1292).
+It's been fixed in the development branch of Powerlevel9k but the fix hasn't yet made it to
+`master`.
 
 Add `ZLE_RPROMPT_INDENT=0` to `~/.zshrc` to get the same spacing on the right edge of prompt as in
 Powerlevel9k.
