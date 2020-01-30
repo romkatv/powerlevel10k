@@ -4956,7 +4956,7 @@ _p9k_dump_instant_prompt() {
     echo -n >$tmp || return
   fi
 
-  { print -rn -- entry=$'\x1e'$_p9k__instant_prompt_sig$'\x1f'${(pj:\x1f:)_p9k_t}$'\x1f'$_p9k_instant_prompt >>$tmp } 2>/dev/null || return
+  { print -rn -- $'\x1e'$_p9k__instant_prompt_sig$'\x1f'${(pj:\x1f:)_p9k_t}$'\x1f'$_p9k_instant_prompt >>$tmp } 2>/dev/null || return
   zf_mv -f $tmp $prompt_file 2>/dev/null || return
 }
 
