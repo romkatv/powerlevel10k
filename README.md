@@ -3,7 +3,9 @@
 
 Powerlevel10k is a theme for ZSH. It emphasizes [speed](#uncompromising-performance),
 [flexibility](#extremely-customizable) and [out-of-the-box experience](#configuration-wizard).
-Powerlevel10k is committed to being best-in-class in each of these categories.
+Powerlevel10k is committed to being best-in-class in each of these categories. If you ever consider
+switching to another theme because Powerlevel10k is not fast enough, not flexible enough or fails
+to Just Work, please file an issue.
 
 ![Powerlevel10k](
   https://raw.githubusercontent.com/romkatv/powerlevel10k-media/master/prompt-styles.png)
@@ -476,7 +478,7 @@ budget for other plugins you might install.
 ### How do I enable instant prompt?
 
 See [instant prompt](#instant-prompt) to learn what instant prompt is. This section explains how
-you can enable it, and caveats that you should be aware of.
+you can enable it and lists caveats that you should be aware of.
 
 Instant prompt can be enabled either through `p10k configure` or by manually adding the following
 code snippet at the top of `~/.zshrc`:
