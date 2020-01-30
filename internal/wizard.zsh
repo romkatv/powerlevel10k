@@ -1553,6 +1553,7 @@ while true; do
   ask_narrow_icons     || continue
 
   # Set screen size to 80x25, run `p10k configure`, answer "yyyy22".
+  # gsettings set org.gnome.desktop.interface monospace-font-name 'MesloLGS NF 48'
   local few_icons=("$extra_icons[@]")
   ask_extra_icons      || continue
   local many_icons=("$extra_icons[@]")
