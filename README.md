@@ -281,7 +281,7 @@ echo 'source ~/powerlevel10k/powerlevel10k.zsh-theme' >>! ~/.zshrc
 
 This is the simplest kind of installation and it works even if you are using a plugin manager. Just
 make sure to disable your current theme in your plugin manager. See
-[FAQ](#i-cannot-make-powerlevel10k-work-with-my-plugin-manager-help) for help.
+[troubleshooting](#cannot-make-powerlevel10k-work-with-my-plugin-manager) for help.
 
 ### Oh My Zsh
 
