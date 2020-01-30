@@ -853,8 +853,9 @@ Zsh 5.1 or newer should work. Fast startup requires zsh >= 5.4.
 
 ### How were these screenshots and animated gifs created?
 
-All screenshots and animated gifs were recorded in GNOME Terminal with white text on black
-background, Tango palette, and [the recommended font](#meslo-nerd-font-patched-for-powerlevel10k).
+All screenshots and animated gifs were recorded in GNOME Terminal with
+[the recommended font](#meslo-nerd-font-patched-for-powerlevel10k) and Tango Dark color scheme with
+custom background color (`#171A1B` instead of `#2E3436` -- twice as dark).
 
 ![GNOME Terminal Color Settings](
   https://raw.githubusercontent.com/romkatv/powerlevel10k-media/master/gnome-terminal-colors.png)
