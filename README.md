@@ -1,7 +1,7 @@
 # Powerlevel10k
 [![Gitter](https://badges.gitter.im/powerlevel10k/community.svg)](https://gitter.im/powerlevel10k/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 
-Powerlevel10k is a theme for ZSH. It emphasizes [speed](#unparalleled-performance),
+Powerlevel10k is a theme for ZSH. It emphasizes [speed](#uncompromising-performance),
 [flexibility](#extremely-customizable) and [out-of-the-box experience](#configuration-wizard).
 Powerlevel10k is committed to being best-in-class in each of these categories.
 
@@ -48,7 +48,7 @@ configuration options.
 Tip: Install [the recommended font](#recommended-meslo-nerd-font-patched-for-powerlevel10k) before
 running `p10k configure`.
 
-### Unparalleled performance
+### Uncompromising performance
 
 When you hit *ENTER*, the next prompt appears instantly. With Powerlevel10k there is no prompt lag.
 If you install Cygwin on Raspberry Pi, `cd` into a Linux Git repository and activate enough prompt
@@ -84,7 +84,7 @@ If you are currently using Powerlevel9k, you can switch to Powerlevel10k in just
 All your `POWERLEVEL9K` configuration parameters will still work. Prompt will look the same as
 before ([almost](
   #does-powerlevel10k-always-render-exactly-the-same-prompt-as-powerlevel9k-given-the-same-config))
-but it will be [much faster](#unparalleled-performance) ([certainly](#is-it-really-fast)).
+but it will be [much faster](#uncompromising-performance) ([certainly](#is-it-really-fast)).
 
 FAQ: [I'm using Powerlevel9k with Oh My Zsh. How do I migrate?](
   #im-using-powerlevel9k-with-oh-my-zsh-how-do-i-migrate)
@@ -408,14 +408,19 @@ Try Powerlevel10k in Docker. You can safely make any changes to the file system 
 the theme. Once you exit zsh, the image is deleted.
 
 ```zsh
-docker run -e TERM -it --rm debian:buster bash -uec '
+docker run -e TERM -e COLORTERM -it --rm debian:buster bash -uec '
   apt update
-  apt install -y git zsh
+  apt install -y git zsh nano vim
   git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ~/powerlevel10k
   echo "source ~/powerlevel10k/powerlevel10k.zsh-theme" >>~/.zshrc
   cd ~/powerlevel10k
   exec zsh'
 ```
+
+Tip: Install [the recommended font](#recommended-meslo-nerd-font-patched-for-powerlevel10k) before
+running the Docker command to get access to all prompt styles.
+
+Tip: Run `p10k configure` while in Docker to try a different prompt style.
 
 ## License
 
@@ -890,7 +895,7 @@ custom background color (`#171A1B` instead of `#2E3436` -- twice as dark).
 
 1. [Features](#features)
    1. [Configuration wizard](#configuration-wizard)
-   1. [Unparalleled performance](#unparalleled-performance)
+   1. [Uncompromising performance](#uncompromising-performance)
    1. [Powerlevel9k compatibility](#powerlevel9k-compatibility)
    1. [Pure compatibility](#pure-compatibility)
    1. [Instant prompt](#instant-prompt)
