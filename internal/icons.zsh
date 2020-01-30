@@ -464,7 +464,7 @@ function _p9k_init_icons() {
         LUA_ICON                       '\uE620'               # 
         PERL_ICON                      '\uE769'               # 
         NNN_ICON                       'nnn'
-        TIMEWARRIOR_ICON               '\uF132'               # 
+        TIMEWARRIOR_ICON               '\uF49B'               # 
         NIX_SHELL_ICON                 '\uF313'               # 
       )
     ;;
