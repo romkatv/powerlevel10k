@@ -3,6 +3,7 @@
 
 Powerlevel10k is a theme for ZSH. It emphasizes [speed](#unparalleled-performance),
 [flexibility](#extremely-customizable) and [out-of-the-box experience](#configuration-wizard).
+Powerlevel10k is committed to being best-in-class in each of these categories.
 
 ![Powerlevel10k](
   https://raw.githubusercontent.com/romkatv/powerlevel10k-media/master/prompt-styles.png)
@@ -25,9 +26,8 @@ Ready to give Powerlevel10k a try?
    - [Zgen](#zgen)
    - [Antibody](#antibody)
    - [Zplugin](#zplugin)
-1. Restart Zsh. If the configuration wizard doesn't start automatically, type `p10k configure`.
-
-The full [table of contents](#table-of-contents) is at the bottom of the page.
+1. Restart Zsh.
+1. Type `p10k configure` if the configuration wizard doesn't start automatically.
 
 ## Features
 
@@ -61,12 +61,12 @@ matter what you do!
 
 Note how the effect of every command is instantly reflected by the very next prompt.
 
-| Command                       | Prompt Indicator | Meaning                              |
-|-------------------------------|:----------------:|-------------------------------------:|
-| `timew start hack linux`      | `🛡️ hack linux`  | time tracking enabled in timewarrior |
-| `touch x y`                   | `?2`             | 2 untracked files                    |
-| `rm COPYING`                  | `!1`             | 1 unstaged change                    |
-| `echo 2.7.3 >.python-version` | `🐍 2.7.3`       | the current python version in pyenv  |
+| Command                       | Prompt Indicator | Meaning                                                               |
+|-------------------------------|:----------------:|----------------------------------------------------------------------:|
+| `timew start hack linux`      | `🛡️ hack linux`  | time tracking enabled in [timewarrior](https://timewarrior.net/)      |
+| `touch x y`                   | `?2`             | 2 untracked files in the Git repo                                     |
+| `rm COPYING`                  | `!1`             | 1 unstaged change in the Git repo                                     |
+| `echo 2.7.3 >.python-version` | `🐍 2.7.3`       | the current python version in [pyenv](https://github.com/pyenv/pyenv) |
 
 Other Zsh themes capable of displaying the same information either produce prompt lag or print
 prompt that doesn't reflect the current state of the system and then refresh it later. With
@@ -82,26 +82,12 @@ configuration parameters.
 
 If you are currently using Powerlevel9k, you can switch to Powerlevel10k in just a few seconds.
 All your `POWERLEVEL9K` configuration parameters will still work. Prompt will look the same as
-before but it will be *much* faster.
+before ([almost](
+  #does-powerlevel10k-always-render-exactly-the-same-prompt-as-powerlevel9k-given-the-same-config))
+but it will be [much faster](#unparalleled-performance) ([certainly](#is-it-really-fast)).
 
-How to switch to Powerlevel10k if you are using Powerlevel9k with Oh My Zsh:
-
-1. Clone powerlevel10k repository.
-2. Replace `ZSH_THEME="powerlevel9k/powerlevel9k"` with `ZSH_THEME="powerlevel10k/powerlevel10k"`
-3. Restart Zsh.
-
-Copy-paste this command to perform the 3 steps automatically:
-
-```zsh
-git clone --depth=1 https://github.com/romkatv/powerlevel10k.git $ZSH_CUSTOM/themes/powerlevel10k
-sed 's/powerlevel9k/powerlevel10k/g' -i ~/.zshrc
-exec zsh
-```
-
-Optional steps (*highly recommended*):
-
-4. Install [the recommended font](#meslo-nerd-font-patched-for-powerlevel10k).
-5. Type `p10k configure` and explore exlusive Powerlevel10k prompt styles.
+FAQ: [I'm using Powerlevel9k with Oh My Zsh. How do I migrate?](
+  #im-using-powerlevel9k-with-oh-my-zsh-how-do-i-migrate)
 
 ### Pure compatibility
 
@@ -431,7 +417,31 @@ docker run -e TERM -it --rm debian:buster bash -uec '
   exec zsh'
 ```
 
-## Is it really fast?
+## License
+
+Powerlevel10k is released under the
+[MIT license](https://github.com/romkatv/powerlevel10k/blob/master/LICENSE).
+
+## FAQ
+
+### I'm using Powerlevel9k with Oh My Zsh. How do I migrate?
+
+1. Run this command:
+```zsh
+# Add powerlevel10k to the list of Oh My Zsh themes.
+git clone --depth=1 https://github.com/romkatv/powerlevel10k.git $ZSH_CUSTOM/themes/powerlevel10k
+# Replace ZSH_THEME="powerlevel9k/powerlevel9k" with ZSH_THEME="powerlevel10k/powerlevel10k".
+sed 's/powerlevel9k/powerlevel10k/g' -i ~/.zshrc
+# Restart Zsh.
+exec zsh
+```
+2. *Optional but highly recommended:*
+   1. Install [the recommended font](#meslo-nerd-font-patched-for-powerlevel10k).
+   1. Type `p10k configure` and chose your favorite prompt style.
+
+Related: [Powerlevel9k compatibility](#powerlevel9k-compatibility).
+
+### Is it really fast?
 
 Yes.
 
@@ -457,14 +467,6 @@ careful with Powerlevel9k configuration as it's all too easy to make prompt frus
 Powerlevel10k, on the other hand, doesn't require trading latency for utility -- it's virtually
 instant with any configuration. It stays well below the 50 ms mark, leaving most of the latency
 budget for other plugins you might install.
-
-## License
-
-Powerlevel10k is released under the
-[MIT license](https://github.com/romkatv/powerlevel10k/blob/master/LICENSE). Contributions are
-covered by the same license.
-
-## FAQ
 
 ### </a>What is instant prompt?
 
@@ -749,15 +751,39 @@ parameters or change their values.
 
 ### How do I change colors?
 
+You can either change the color palette used by your terminal or set colors through Powerlevel10k
+configuration parameters.
+
+#### Change the color palette used by your terminal
+
+How exactly you change the terminal color pallete (a.k.a. color scheme, or theme) depends on the
+kind of terminal you are using. Look around in terminal's settings/preferences or consult
+documentation.
+
+When you change the color palette used by your terminal, it usually affects only the first 16
+colors, numbered from 0 to 15. In order to see any effect on Powerlevel10k prompt, you need to
+use prompt style that utilizes these low-numbered colors. Type `p10k configure` and select
+*Rainbow*, *Lean with 8 colors* or *Pure with original colors*. Other styles use higher-numbered
+colors, so they look the same in any terminal color palette.
+
+#### Set colors through Powerlevel10k configuration parameters
+
 Open `~/.p10k.zsh`, search for "color", "foreground" and "background" and change values of
-appropriate parameters. Colors are specified using numbers from 0 to 255. Colors from 0 to 15 look
-differently in different terminals. Many terminals also support customization of these colors
-through color schemes or themes. Colors from 16 to 255 always look the same.
+appropriate parameters. For example, here's how you can set the foreground of `time` prompt segment
+to bright red:
+
+```zsh
+typeset -g POWERLEVEL9K_TIME_FOREGROUND=160
+```
+
+Colors are specified using numbers from 0 to 255. Colors from 0 to 15 look differently in different
+terminals. Many terminals also support customization of these colors through color palettes
+(a.k.a. color schemes, or themes). Colors from 16 to 255 always look the same.
 
 To see how different colors look in your terminal, run the following command:
 
 ```zsh
-for i in {0..255}; do print -Pn "%${i}F${(l:3::0:)i}%f " ${${(M)$((i%8)):#7}:+$'\n'}; done
+for i in {0..255}; do print -Pn "%K{$i} %k%F{$i}${(l:3::0:)i}%f " ${${(M)$((i%8)):#7}:+$'\n'}; done
 ```
 
 ### Why does Powerlevel10k spawn extra processes?
@@ -891,9 +917,10 @@ custom background color (`#171A1B` instead of `#2E3436` -- twice as dark).
       1. [Automatic font installation](#automatic-font-installation)
       1. [Manual font installation](#manual-font-installation)
 1. [Try it in Docker](#try-it-in-docker)
-1. [Is it really fast?](#is-it-really-fast)
 1. [License](#license)
 1. [FAQ](#faq)
+   1. [I'm using Powerlevel9k with Oh My Zsh. How do I migrate?](#im-using-powerlevel9k-with-oh-my-zsh-how-do-i-migrate)
+   1. [Is it really fast?](#is-it-really-fast)
    1. [What is instant prompt?](#what-is-instant-prompt)
    1. [Why do my icons and/or powerline symbols look bad?](#why-do-my-icons-andor-powerline-symbols-look-bad)
    1. [I'm getting "character not in range" error. What gives?](#im-getting-character-not-in-range-error-what-gives)
