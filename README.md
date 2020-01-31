@@ -44,12 +44,11 @@ Configuration wizard creates `~/.p10k.zsh` based on your preferences. Additional
 customization can be done by editing this file. It has plenty of comments to help you navigate
 through configuration options.
 
-*Tip*: Install [the recommended font](#recommended-meslo-nerd-font-patched-for-powerlevel10k) before
+*Tip*: Install [the recommended font](#meslo-nerd-font-patched-for-powerlevel10k) before
 running `p10k configure`.
 
 *FAQ:*
 
-- [Why do I have a question mark symbol in my prompt? Is my font broken?](#why-do-i-have-a-question-mark-symbol-in-my-prompt-is-my-font-broken)
 - [What do different symbols in Git status mean?](#what-do-different-symbols-in-git-status-mean)
 - [How do I change the format of Git status?](#how-do-i-change-the-format-of-git-status)
 - [How do I add username and/or hostname to prompt?](#how-do-i-add-username-andor-hostname-to-prompt)
@@ -434,7 +433,7 @@ docker run -e TERM -e COLORTERM -it --rm debian:buster bash -uec '
   exec zsh'
 ```
 
-*Tip*: Install [the recommended font](#recommended-meslo-nerd-font-patched-for-powerlevel10k) before
+*Tip*: Install [the recommended font](#meslo-nerd-font-patched-for-powerlevel10k) before
 running the Docker command to get access to all prompt styles.
 
 *Tip*: Run `p10k configure` while in Docker to try a different prompt style.
@@ -562,19 +561,8 @@ to move it above the instant prompt preamble or to suppress its output. You can 
 instant prompt with `POWERLEVEL9K_INSTANT_PROMPT=off`. Do this if instant prompt breaks zsh
 initialization and you don't know how to fix it.
 
-*NOTE: Instant prompt requires zsh >= 5.4. It's OK to enable it even when using an older version of
-zsh but it won't do anything.*
-
-### Why do I have a question mark symbol in my prompt? Is my font broken?
-
-If it looks like a regular `?`, that's normal. It means you have untracked files in the current Git
-repository. Type `git status` to see these files. You can change this symbol or disable the display
-of untracked files altogether. Search for `untracked files` in `~/.p10k.zsh`.
-
-You can also get a weird-looking question mark in your prompt if your terminal's font is missing
-some glyphs. To fix this problem,
-[install the recommended font](#recommended-meslo-nerd-font-patched-for-powerlevel10k) and run
-`p10k configure`.
+*Note*: Instant prompt requires zsh >= 5.4. It's OK to enable it even when using an older version of
+zsh but it won't do anything.
 
 ### What do different symbols in Git status mean?
 
@@ -750,7 +738,7 @@ Almost. There are a few differences.
     [troubleshooting](#extra-space-without-background-on-the-right-side-of-right-prompt).
   - Powerlevel9k has inconsistent spacing around icons. This was fixed in Powerlevel10k. Set
     `POWERLEVEL9K_LEGACY_ICON_SPACING=true` to get the same spacing as in Powerlevel9k.  More
-    details in [troubleshooting](#extra-or-missing-spaces-after-some-icons).
+    details in [troubleshooting](#extra-or-missing-spaces-around-icons).
   - There are
     [dozens more bugs](https://github.com/Powerlevel9k/powerlevel9k/issues/created_by/romkatv) in
     Powerlevel9k that don't exist in Powerlevel10k.
@@ -778,16 +766,62 @@ custom background color (`#171A1B` instead of `#2E3436` -- twice as dark).
 
 ## Troubleshooting
 
+### Question mark in prompt
+
+If it looks like a regular `?`, that's normal. It means you have untracked files in the current Git
+repository. Type `git status` to see these files. You can change this symbol or disable the display
+of untracked files altogether. Search for `untracked files` in `~/.p10k.zsh`.
+
+*FAQ*: [What do different symbols in Git status mean?](
+  #what-do-different-symbols-in-git-status-mean)
+
+You can also get a weird-looking question mark in your prompt if your terminal's font is missing
+some glyphs. See [icons-glyphs-or-powerline-symbols-dont-render](
+  icons, glyphs or powerline symbols don't render).
+
 ### Icons, glyphs or powerline symbols don't render
 
-Restart your terminal, [install the recommended font](
-  #recommended-meslo-nerd-font-patched-for-powerlevel10k) and run `p10k configure`.
+Restart your terminal, [install the recommended font](#meslo-nerd-font-patched-for-powerlevel10k)
+and run `p10k configure`.
 
-### Small imperfections around powerline symbols
+### Sub-pixel imperfections around powerline symbols
 
-TODO
+![Powerline Prompt Imperfections](
+  https://raw.githubusercontent.com/romkatv/powerlevel10k-media/master/powerline-imperfections.png)
 
-###  zsh: character not in range
+There are three imperfections on the screenshot. From left to right:
+
+1. A thin blue line (a sub-pixel gap) between the content of a prompt segment and the following
+powerline connection.
+1. Incorrect alignment of a powerline connection and the following prompt segment. The connection
+appears shifted to the right.
+1. A thin red line below a powerline connection. The connection appears shifted up.
+
+Zsh themes don't have down-to-pixel control over the terminal content. Everything you seen on the
+screen is made of monospace characters. A white powerline prompt segment is made of text on white
+background followed by U+E0B0 (a right-pointing triangle).
+
+![Powerline Prompt Imperfections](
+  https://raw.githubusercontent.com/romkatv/powerlevel10k-media/master/powerline-anatomy.png)
+
+If Powerlevel10k prompt has imperfections around powerline symbols, you'll see exactly the same
+imperfections with all powerline themes (Agnoster, Powerlevel9k, Powerline, etc.)
+
+There are several things you can try to deal with these imperfections:
+
+- Try [the recommended font](#meslo-nerd-font-patched-for-powerlevel10k). If you are already using
+  it, switching to another font may help but is unlikely.
+- Change terminal font size one point up or down. For example, in iTerm2 powerline prompt looks
+  perfect at font sizes 11 and 13 but breaks down at 12.
+- Change font hinting and/or antialiasing mode in the terminal settings.
+- Shift all text one pixel up/down/left/right if your terminal has an option to do so.
+- Try a different terminal.
+
+A more radical solution is to switch to prompt style without background. Type `p10k configure` and
+select *Lean*. This style has a modern lightweight look. As a bonus, it doesn't suffer from
+rendering imperfections that afflict powerline-style prompt.
+
+### zsh: character not in range
 
 Type `echo '\u276F'`. If you get an error saying "zsh: character not in range", your locale
 doesn't support UTF-8. You need to fix it. If you are running zsh over SSH, see
@@ -800,7 +834,7 @@ Type `echo '\u276F'`. If you get an error saying "zsh: character not in range", 
 [previous section](#zsh-character-not-in-range).
 
 If the `echo` command prints `❯` but the cursor is still in the wrong place, install
-[the recommended font](#recommended-meslo-nerd-font-patched-for-powerlevel10k) and run
+[the recommended font](#meslo-nerd-font-patched-for-powerlevel10k) and run
 `p10k configure`.
 
 If this doesn't help, add `unset ZLE_RPROMPT_INDENT` at the bottom of `~/.zshrc`.
@@ -897,7 +931,7 @@ configuration wizard. Once you can see the errors, fix `~/.zshrc` to get rid of 
 
 ### Cannot install the recommended font
 
-Once you download [the recommended font](#recommended-meslo-nerd-font-patched-for-powerlevel10k),
+Once you download [the recommended font](#meslo-nerd-font-patched-for-powerlevel10k),
 you can install it just like any other font. Google "how to install fonts on *your OS*".
 
 ### Extra or missing spaces in prompt compared to Powerlevel9k
@@ -943,9 +977,10 @@ Powerlevel9k.
 Powerlevel10k can work around these bugs when using powerline prompt style. If you notice visual
 artifacts in prompt, or wrong cursor position, try removing `ZLE_RPROMPT_INDENT` from `~/.zshrc`.
 
-#### Extra or missing spaces after some icons
+#### Extra or missing spaces around icons
 
-tl;dr: Add `POWERLEVEL9K_LEGACY_ICON_SPACING=true` to `~/.zshrc` to get rid of these spaces.
+tl;dr: Add `POWERLEVEL9K_LEGACY_ICON_SPACING=true` to `~/.zshrc` to get the same spacing around
+icons as in Powerlevel9k.
 
 Spacing around icons in Powerlevel9k is inconsistent.
 
