@@ -120,6 +120,9 @@ parameters, so you'll need to use `POWERLEVEL9K_COMMAND_EXECUTION_TIME_THRESHOLD
 `PURE_CMD_MAX_EXEC_TIME=3`, etc. All relevant parameters are in `~/.p10k.zsh`. This file has
 plenty of comments to help you navigate through it.
 
+*FAQ:* [What is the best prompt style in the configuration wizard?](
+  #what-is-the-best-prompt-style-in-the-configuration-wizard)
+
 ### <a name='what-is-instant-prompt'></a>Instant prompt
 
 If your `~/.zshrc` loads many plugins, or perhaps just a few slow ones
@@ -881,7 +884,7 @@ powerline connection.
 appears shifted to the right.
 1. A thin red line below a powerline connection. The connection appears shifted up.
 
-Zsh themes don't have down-to-pixel control over the terminal content. Everything you seen on the
+Zsh themes don't have down-to-pixel control over the terminal content. Everything you see on the
 screen is made of monospace characters. A white powerline prompt segment is made of text on white
 background followed by U+E0B0 (a right-pointing triangle).
 
