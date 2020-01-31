@@ -259,6 +259,7 @@ you like. It won't slow down your prompt or Zsh startup.
 | `nnn` | [nnn](https://github.com/jarun/nnn) shell |
 | `vim_shell` | [vim](https://www.vim.org/) shell (`:sh`) |
 | `midnight_commander` | [midnight commander](https://midnight-commander.org/) shell |
+| `nix_shell` | [nix shell](https://nixos.org/nixos/nix-pills/developing-with-nix-shell.html) indicator |
 | `todo` | [todo](https://github.com/todotxt/todo.txt-cli) items |
 | `timewarrior` | [timewarrior](https://timewarrior.net/) tracking status |
 | `vpn_ip` | virtual private network indicator |
