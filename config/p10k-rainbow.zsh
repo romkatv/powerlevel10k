@@ -864,11 +864,36 @@
   # typeset -g POWERLEVEL9K_PLENV_VISUAL_IDENTIFIER_EXPANSION='⭐'
 
   ################[ terraform: terraform workspace (https://www.terraform.io) ]#################
-  # Terraform color.
-  # typeset -g POWERLEVEL9K_TERRAFORM_FOREGROUND=4
-  # typeset -g POWERLEVEL9K_TERRAFORM_BACKGROUND=0
-  # Custom icon.
-  # typeset -g POWERLEVEL9K_TERRAFORM_VISUAL_IDENTIFIER_EXPANSION='⭐'
+  # POWERLEVEL9K_TERRAFORM_CLASSES is an array with even number of elements. The first element
+  # in each pair defines a pattern against which the current terraform workspace gets matched.
+  # More specifically, it's P9K_CONTENT prior to the application of context expansion (see below)
+  # that gets matched. If you unset all POWERLEVEL9K_TERRAFORM_*CONTENT_EXPANSION parameters,
+  # you'll see this value in your prompt. The second element of each pair in
+  # POWERLEVEL9K_TERRAFORM_CLASSES defines the workspace class. Patterns are tried in order. The
+  # first match wins.
+  #
+  # For example, given these settings:
+  #
+  #   typeset -g POWERLEVEL9K_TERRAFORM_CLASSES=(
+  #     '*prod*'  PROD
+  #     '*test*'  TEST
+  #     '*'       DEFAULT)
+  #
+  # If your current terraform workspace is "project_test", its class is TEST because "project_test"
+  # doesn't match the pattern '*prod*' but does match '*test*'.
+  #
+  # You can define different colors, icons and content expansions for different classes:
+  #
+  #   typeset -g POWERLEVEL9K_TERRAFORM_TEST_FOREGROUND=2
+  #   typeset -g POWERLEVEL9K_TERRAFORM_TEST_VISUAL_IDENTIFIER_EXPANSION='⭐'
+  #   typeset -g POWERLEVEL9K_TERRAFORM_TEST_CONTENT_EXPANSION='> ${P9K_CONTENT} <'
+  typeset -g POWERLEVEL9K_TERRAFORM_CLASSES=(
+      # '*prod*'  PROD    # These values are examples that are unlikely
+      # '*test*'  TEST    # to match your needs. Customize them as needed.
+      '*'       DEFAULT)
+  typeset -g POWERLEVEL9K_TERRAFORM_DEFAULT_FOREGROUND=4
+  typeset -g POWERLEVEL9K_TERRAFORM_DEFAULT_BACKGROUND=0
+  # typeset -g POWERLEVEL9K_TERRAFORM_DEFAULT_VISUAL_IDENTIFIER_EXPANSION='⭐'
 
   #############[ kubecontext: current kubernetes context (https://kubernetes.io/) ]#############
   # Show kubecontext only when the the command you are typing invokes one of these tools.
@@ -969,7 +994,7 @@
   # More specifically, it's P9K_CONTENT prior to the application of context expansion (see below)
   # that gets matched. If you unset all POWERLEVEL9K_AWS_*CONTENT_EXPANSION parameters,
   # you'll see this value in your prompt. The second element of each pair in
-  # POWERLEVEL9K_AWS_CLASSES defines the context class. Patterns are tried in order. The
+  # POWERLEVEL9K_AWS_CLASSES defines the profile class. Patterns are tried in order. The
   # first match wins.
   #
   # For example, given these settings:
