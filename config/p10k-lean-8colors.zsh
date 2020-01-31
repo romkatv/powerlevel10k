@@ -70,7 +70,7 @@
     aws                     # aws profile (https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-profiles.html)
     aws_eb_env              # aws elastic beanstalk environment (https://aws.amazon.com/elasticbeanstalk/)
     azure                   # azure account name (https://docs.microsoft.com/en-us/cli/azure)
-    gcloud                  # google cloud cli acccount and project (https://cloud.google.com/)
+    gcloud                  # google cloud cli account and project (https://cloud.google.com/)
     google_app_cred         # google application credentials (https://cloud.google.com/docs/authentication/production)
     context                 # user@hostname
     nordvpn                 # nordvpn connection status, linux only (https://nordvpn.com/)
@@ -978,7 +978,7 @@
   # Custom icon.
   # typeset -g POWERLEVEL9K_AZURE_VISUAL_IDENTIFIER_EXPANSION='⭐'
 
-  ##########[ gcloud: google cloud acccount and project (https://cloud.google.com/) ]###########
+  ##########[ gcloud: google cloud account and project (https://cloud.google.com/) ]###########
   # Show gcloud only when the the command you are typing invokes one of these tools.
   # Tip: Remove the next line to always show gcloud.
   typeset -g POWERLEVEL9K_GCLOUD_SHOW_ON_COMMAND='gcloud|gcs'

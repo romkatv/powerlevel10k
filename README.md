@@ -1,5 +1,6 @@
 # Powerlevel10k
-[![Gitter](https://badges.gitter.im/powerlevel10k/community.svg)](https://gitter.im/powerlevel10k/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
+[![Gitter](https://badges.gitter.im/powerlevel10k/community.svg)](
+  https://gitter.im/powerlevel10k/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 
 Powerlevel10k is a theme for Zsh. It emphasizes [speed](#uncompromising-performance),
 [flexibility](#extremely-customizable) and [out-of-the-box experience](#configuration-wizard).
@@ -45,15 +46,15 @@ customization can be done by editing this file. It has plenty of comments to hel
 through configuration options.
 
 *Tip*: Install [the recommended font](#meslo-nerd-font-patched-for-powerlevel10k) before
-running `p10k configure`.
+running `p10k configure` to unlock all prompt styles.
 
 *FAQ:*
 
-- [What do different symbols in Git status mean?](#what-do-different-symbols-in-git-status-mean)
-- [How do I change the format of Git status?](#how-do-i-change-the-format-of-git-status)
-- [How do I add username and/or hostname to prompt?](#how-do-i-add-username-andor-hostname-to-prompt)
-- [How do I change colors?](#how-do-i-change-colors)
-- [Why some prompt segments appear and disappear as I'm typing?](#why-some-prompt-segments-appear-and-disappear-as-im-typing)
+- [What is the best prompt style in the configuration wizard?](
+    #what-is-the-best-prompt-style-in-the-configuration-wizard)
+- [What do different symbols in Git status mean?](
+    #what-do-different-symbols-in-git-status-mean)
+- [How do I change prompt colors?](#how-do-i-change-prompt-colors)
 
 ### Uncompromising performance
 
@@ -115,14 +116,14 @@ You can still use Powerlevel10k features such as [transient prompt](#transient-p
 [instant Prompt](#instant-prompt) when sporting Pure style.
 
 To customize prompt, edit `~/.p10k.zsh`. Powerlevel10k doesn't recognize Pure configuration
-parameters, so you need to use `POWERLEVEL9K_COMMAND_EXECUTION_TIME_THRESHOLD=3` instead of
+parameters, so you'll need to use `POWERLEVEL9K_COMMAND_EXECUTION_TIME_THRESHOLD=3` instead of
 `PURE_CMD_MAX_EXEC_TIME=3`, etc. All relevant parameters are in `~/.p10k.zsh`. This file has
 plenty of comments to help you navigate through it.
 
 ### <a name='what-is-instant-prompt'></a>Instant prompt
 
 If your `~/.zshrc` loads many plugins, or perhaps just a few slow ones
-(for example, [pyenv](https://github.com/pyenv/pyenv) or [nvm](https://github.com/nvm-sh/nvm), you
+(for example, [pyenv](https://github.com/pyenv/pyenv) or [nvm](https://github.com/nvm-sh/nvm)), you
 may have noticed that it takes some time for Zsh to start.
 
 ![Powerlevel10k No Instant Prompt](
@@ -179,7 +180,8 @@ prompt when accepting a command line.
 Transient prompt makes it much easier to copy-paste series of commands from the terminal scrollback.
 
 *Tip*: If you enable transient prompt, take advantage of two-line prompt. You'll get the benefit of
-extra space for typing commands without the usual drawback of reduced scrollback density.
+extra space for typing commands without the usual drawback of reduced scrollback density. Sparse
+prompt (with an empty line before prompt) also works great in combination with transient prompt.
 
 ### Current directory that just works
 
@@ -204,6 +206,9 @@ Directory segments are shown in one of three colors:
 
 *Tip*: If you copy-paste a truncated directory and hit *TAB*, it'll complete to the original.
 
+*Troubleshooting*: [Directory is hard to see in prompt when using Rainbow style.](
+  #directory-is-hard-to-see-in-prompt-when-using-rainbow-style)
+
 ### Extremely customizable
 
 Powerlevel10k can be configured to look like any other Zsh theme out there.
@@ -212,7 +217,7 @@ Powerlevel10k can be configured to look like any other Zsh theme out there.
   https://raw.githubusercontent.com/romkatv/powerlevel10k-media/master/other-theme-emulation.gif)
 
 [Pure](#pure-compatibility) and [Powerlevel9k](#powerlevel9k-compatibility) emulations are built-in.
-To emulate the appearence of other themes, you'll need to write a suitable configuration file. The
+To emulate the appearance of other themes, you'll need to write a suitable configuration file. The
 best way to go about it is to run `p10k configure`, select the style that is the closest to your
 goal and then edit `~/.p10k.zsh`.
 
@@ -229,8 +234,8 @@ To ~~ridiculous~~ extravagant:
 ### Batteries included
 
 Powerlevel10k comes with dozens of built-in high quality segments. When you run `p10k configure`
-and choose any style except [Pure](#pure-compatibility), most of these segments get enabled by
-default. Some must be manually enabled by opening `~/.p10k.zsh` and uncommenting them. You can
+and choose any style except [Pure](#pure-compatibility), many of these segments get enabled by
+default while others be manually enabled by opening `~/.p10k.zsh` and uncommenting them. You can
 enable as many segments as you like. It won't slow down your prompt or Zsh startup.
 
 | Segment | Meaning |
@@ -267,7 +272,7 @@ enable as many segments as you like. It won't slow down your prompt or Zsh start
 | `aws` | [aws profile](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-profiles.html) |
 | `aws_eb_env` | [aws elastic beanstalk](https://aws.amazon.com/elasticbeanstalk/) environment |
 | `azure` | [azure](https://docs.microsoft.com/en-us/cli/azure) account name |
-| `gcloud` | [google cloud](https://cloud.google.com/) cli acccount and project |
+| `gcloud` | [google cloud](https://cloud.google.com/) cli account and project |
 | `google_app_cred` | [google application credentials](https://cloud.google.com/docs/authentication/production) |
 | `nordvpn` | [nordvpn](https://nordvpn.com/) connection status |
 | `ranger` | [ranger](https://github.com/ranger/ranger) shell |
@@ -369,7 +374,7 @@ the default system fonts. The full choice of style options is available only whe
 ### <a name='recommended-meslo-nerd-font-patched-for-powerlevel10k'></a>Meslo Nerd Font patched for Powerlevel10k
 
 Gorgeous monospace font designed by Jim Lyles for Apple, customized by André Berg, patched by Ryan
-L McIntyre of Nerd Fonts, and hand-edited in FontForge by yours trully. Contains all glyphs and
+L McIntyre of Nerd Fonts, and hand-edited in FontForge by yours truly. Contains all glyphs and
 symbols that Powerlevel10k may need. Battle-tested in dozens of different terminals on all major
 operating systems.
 
@@ -449,8 +454,8 @@ Powerlevel10k is released under the
 
 ### Which aspects of shell and terminal does Powerlevel10k affect?
 
-Powerlevel10k defines prompt and nothing else. It sets prompt-related options (their names start
-`prompt`), and parameters `PS1` and `RPS1`.
+Powerlevel10k defines prompt and nothing else. It sets [prompt-related options](
+  http://zsh.sourceforge.net/Doc/Release/Options.html#Prompting), and parameters `PS1` and `RPS1`.
 
 Powerlevel10k does not affect:
 
@@ -476,14 +481,18 @@ exec zsh
 
 *Related:*
   - [Powerlevel9k compatibility.](#powerlevel9k-compatibility)
-  - [Does Powerlevel10k always render exactly the same prompt as Powerlevel9k given the same config?](#does-powerlevel10k-always-render-exactly-the-same-prompt-as-powerlevel9k-given-the-same-config)
-  - [Extra or missing spaces in prompt compared to Powerlevel9k.](#extra-or-missing-spaces-in-prompt-compared-to-powerlevel9k)
+  - [Does Powerlevel10k always render exactly the same prompt as Powerlevel9k given the same config?](
+      #does-powerlevel10k-always-render-exactly-the-same-prompt-as-powerlevel9k-given-the-same-config)
+  - [Extra or missing spaces in prompt compared to Powerlevel9k.](
+      #extra-or-missing-spaces-in-prompt-compared-to-powerlevel9k)
+  - [Configuration wizard.](#configuration-wizard)
 
 ### Is it really fast?
 
 Yes.
 
-[![asciicast](https://asciinema.org/a/NHRjK3BMePw66jtRVY2livHwZ.svg)](https://asciinema.org/a/NHRjK3BMePw66jtRVY2livHwZ)
+[![asciicast](https://asciinema.org/a/NHRjK3BMePw66jtRVY2livHwZ.svg)](
+  https://asciinema.org/a/NHRjK3BMePw66jtRVY2livHwZ)
 
 Benchmark results obtained with
 [zsh-prompt-benchmark](https://github.com/romkatv/zsh-prompt-benchmark) on an Intel i9-7900X
@@ -508,8 +517,8 @@ budget for other plugins you might install.
 
 ### How do I enable instant prompt?
 
-See [instant prompt](#instant-prompt) to learn what instant prompt is. This section explains how
-you can enable it and lists caveats that you should be aware of.
+See [instant prompt](#instant-prompt) to learn about instant prompt. This section explains how you
+can enable it and lists caveats that you should be aware of.
 
 Instant prompt can be enabled either through `p10k configure` or by manually adding the following
 code snippet at the top of `~/.zshrc`:
@@ -580,7 +589,7 @@ zsh but it won't do anything.
 
 ### What do different symbols in Git status mean?
 
-When using *Lean*, *Classic* or *Rainbow* style, Git status may look like this:
+When using Lean, Classic or Rainbow style, Git status may look like this:
 
 ```text
 feature:master ⇣42⇡42 *42 merge ~42 +42 !42 ?42
@@ -611,11 +620,10 @@ source code.
 
 ### How do I add username and/or hostname to prompt?
 
-When using *Lean*, *Classic* or *Rainbow* style, prompt shows `username@hostname` when you are
-logged in as root or via SSH. There is little value in showing `username` or `hostname` when you are
-logged in to your local machine as a normal user. So the absence of `username@hostname` in your
-prompt is an indication that you are working locally and that you aren't root. You can change it,
-however.
+When using Lean, Classic or Rainbow style, prompt shows `username@hostname` when you are logged in
+as root or via SSH. There is little value in showing `username` or `hostname` when you are logged in
+to your local machine as a normal user. So the absence of `username@hostname` in your prompt is an
+indication that you are working locally and that you aren't root. You can change it, however.
 
 Open `~/.p10k.zsh`. Close to the top you can see the most important parameters that define which
 segments are shown in your prompt. All generally useful prompt segments are listed in there. Some of
@@ -648,7 +656,7 @@ to `POWERLEVEL9K_LEFT_PROMPT_ELEMENTS`.
 ### Why some prompt segments appear and disappear as I'm typing?
 
 Prompt segments can be configured to be shown only when the current command you are typing invokes
-a releavant tool.
+a relevant tool.
 
 ```zsh
 # Show prompt segment "kubecontext" only when the command you are typing
@@ -660,7 +668,7 @@ Configs created by `p10k configure` may contain parameters of this kind. To cust
 prompt segments are shown, open `~/.p10k.zsh`, search for `SHOW_ON_COMMAND` and either remove these
 parameters or change their values.
 
-### How do I change colors?
+### How do I change prompt colors?
 
 You can either [change the color palette used by your terminal](
   #change-the-color-palette-used-by-your-terminal) or
@@ -669,7 +677,7 @@ You can either [change the color palette used by your terminal](
 
 #### Change the color palette used by your terminal
 
-How exactly you change the terminal color pallete (a.k.a. color scheme, or theme) depends on the
+How exactly you change the terminal color palette (a.k.a. color scheme, or theme) depends on the
 kind of terminal you are using. Look around in terminal's settings/preferences or consult
 documentation.
 
@@ -692,6 +700,8 @@ typeset -g POWERLEVEL9K_TIME_FOREGROUND=160
 Colors are specified using numbers from 0 to 255. Colors from 0 to 15 look differently in different
 terminals. Many terminals also support customization of these colors through color palettes
 (a.k.a. color schemes, or themes). Colors from 16 to 255 always look the same.
+
+Type `source ~/.p10k.zsh` to apply your changes to the current Zsh session.
 
 To see how different colors look in your terminal, run the following command:
 
@@ -725,7 +735,7 @@ time (repeat 1000 zsh -dfis <<< 'source ~/powerlevel10k/powerlevel10k.zsh-theme'
 ```
 
 *Note:* This measures time to first complete prompt. Powerlevel10k can also display a
-[limited prompt](#what-is-instant-prompt) before the full-featured prompt is ready.
+[limited prompt](#instant-prompt) before the full-featured prompt is ready.
 
 Running this command with `~/powerlevel10k` as the current directory on the same machine as in the
 [prompt benchmark](#is-it-really-fast) takes 29 seconds (29 ms per invocation). This is about 6
@@ -746,8 +756,8 @@ Powerlevel9k repository get ported to Powerlevel10k.
 Over time, virtually all code in Powerlevel10k has been rewritten. There is currently no meaningful
 overlap between the implementations of Powerlevel9k and Powerlevel10k.
 
-Powerlevel10k is committed to maintaining backward compatiblity with all configs indefinitely. This
-committment covers all configuration parameters recognized by Powerlevel9k (see
+Powerlevel10k is committed to maintaining backward compatibility with all configs indefinitely. This
+commitment covers all configuration parameters recognized by Powerlevel9k (see
 [Powerlevel9k compatibility](#powerlevel9k-compatibility)) and additional parameters that only
 Powerlevel10k understands. Names of all parameters in Powerlevel10k start with `POWERLEVEL9K_` for
 consistency.
@@ -847,8 +857,8 @@ of untracked files altogether. Search for `untracked files` in `~/.p10k.zsh`.
   #what-do-different-symbols-in-git-status-mean)
 
 You can also get a weird-looking question mark in your prompt if your terminal's font is missing
-some glyphs. See [icons-glyphs-or-powerline-symbols-dont-render](
-  icons, glyphs or powerline symbols don't render).
+some glyphs. See [icons, glyphs or powerline symbols don't render](
+  #icons-glyphs-or-powerline-symbols-dont-render).
 
 ### Icons, glyphs or powerline symbols don't render
 
@@ -884,7 +894,7 @@ There are several things you can try to deal with these imperfections:
   it, switching to another font may help but is unlikely.
 - Change terminal font size one point up or down. For example, in iTerm2 powerline prompt looks
   perfect at font sizes 11 and 13 but breaks down at 12.
-- Change font hinting and/or antialiasing mode in the terminal settings.
+- Change font hinting and/or anti-aliasing mode in the terminal settings.
 - Shift all text one pixel up/down/left/right if your terminal has an option to do so.
 - Try a different terminal.
 
@@ -963,7 +973,7 @@ characters as double-width instead of single width. For example,
 +------------------------------+
 ```
 
-Note that this prompt is different from the original as it's missing a space after the checkmark.
+Note that this prompt is different from the original as it's missing a space after the check mark.
 
 This can be caused by a low-level bug in macOS. See
 [this issue](https://github.com/romkatv/powerlevel10k/issues/241).
@@ -1091,6 +1101,21 @@ echo 'source ~/powerlevel10k/powerlevel10k.zsh-theme' >>! ~/.zshrc
 
 This method of installation won't make anything slower or otherwise sub-par.
 
+### Directory is hard to see in prompt when using Rainbow style
+
+In Classic style the current working directory is shown with bright white white text on blue
+background. The white is fixed and always looks the same but the appearance of "blue" is defined
+by your terminal color palette. If it's very light, it's difficult to see white text on it.
+
+There are several ways to fix this.
+
+- Type `p10k configure` and choose a more readable prompt style.
+- [Change terminal color palette](#change-the-color-palette-used-by-your-terminal). Try Tango Dark
+  or Solarized Dark, or change just the "blue" color.
+- [Change directory background color](#set-colors-through-Powerlevel10k-configuration-parameters).
+  The parameter you are looking for is called `POWERLEVEL9K_DIR_BACKGROUND`. You can find it in
+  in `~/.p10k.zsh`. Uncomment it if it's commented out and try different values.
+
 ## Table of contents
 
 1. [Features](#features)
@@ -1138,7 +1163,7 @@ This method of installation won't make anything slower or otherwise sub-par.
    1. [What do different symbols in Git status mean?](#what-do-different-symbols-in-git-status-mean)
    1. [How do I change the format of Git status?](#how-do-i-change-the-format-of-git-status)
    1. [How do I add username and/or hostname to prompt?](#how-do-i-add-username-andor-hostname-to-prompt)
-   1. [How do I change colors?](#how-do-i-change-colors)
+   1. [How do I change prompt colors?](#how-do-i-change-prompt-colors)
    1. [Why some prompt segments appear and disappear as I'm typing?](#why-some-prompt-segments-appear-and-disappear-as-im-typing)
    1. [Why does Powerlevel10k spawn extra processes?](#why-does-powerlevel10k-spawn-extra-processes)
    1. [Are there configuration options that make Powerlevel10k slow?](#are-there-configuration-options-that-make-powerlevel10k-slow)
