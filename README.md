@@ -100,6 +100,8 @@ but it will be [much faster](#uncompromising-performance) ([certainly](#is-it-re
     #im-using-powerlevel9k-with-oh-my-zsh-how-do-i-migrate)
 - [Does Powerlevel10k always render exactly the same prompt as Powerlevel9k given the same config?](
     #does-powerlevel10k-always-render-exactly-the-same-prompt-as-powerlevel9k-given-the-same-config)
+- [What is the relationship between Powerlevel9k and Powerlevel10k?](
+    #What-is-the-relationship-between-powerlevel9k-and-powerlevel10k)
 
 ### Pure compatibility
 
@@ -716,6 +718,27 @@ time (repeat 1000 zsh -dfis <<< 'source ~/powerlevel10k/powerlevel10k.zsh-theme'
 Running this command with `~/powerlevel10k` as the current directory on the same machine as in the
 [prompt benchmark](#is-it-really-fast) takes 29 seconds (29 ms per invocation). This is about 6
 times faster than powerlevel9k/master and 17 times faster than powerlevel9k/next.
+
+### What is the relationship between Powerlevel9k and Powerlevel10k?
+
+Powerlevel10k was forked from Powerlevel9k in March 2019 after a week-long discussion in
+[powerlevel9k#1170](https://github.com/Powerlevel9k/powerlevel9k/issues/1170). Powerlevel9k was
+already a mature project with large user base and release cycle measured in months. Powerlevel10k
+was spun off to iterate on performance improvements and new features at much higher pace.
+
+Powerlevel9k and Powerlevel10k are independent projects. When using one, you shouldn't install the
+other. Issues should be filed against the project that you actually use. There are no individuals
+that have commit rights in both repositories. All bug fixes and new features committed to
+Powerlevel9k repository get ported to Powerlevel10k.
+
+Over time, virtually all code in Powerlevel10k has been rewritten. There is currently no meaningful
+overlap between the implementations of Powerlevel9k and Powerlevel10k.
+
+Powerlevel10k is committed to maintaining backward compatiblity with all configs indefinitely. This
+committment covers all configuration parameters recognized by Powerlevel9k (see
+[Powerlevel9k compatibility](#powerlevel9k-compatibility)) and additional parameters that only
+Powerlevel10k understands. Names of all parameters in Powerlevel10k start with `POWERLEVEL9K_` for
+consistency.
 
 ### Does Powerlevel10k always render exactly the same prompt as Powerlevel9k given the same config?
 
