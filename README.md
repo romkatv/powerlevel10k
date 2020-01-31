@@ -113,7 +113,7 @@ Powerlevel10k can produce the same prompt as [Pure](https://github.com/sindresor
   https://raw.githubusercontent.com/romkatv/powerlevel10k-media/master/pure-style.gif)
 
 You can still use Powerlevel10k features such as [transient prompt](#transient-prompt) or
-[instant Prompt](#instant-prompt) when sporting Pure style.
+[instant prompt](#instant-prompt) when sporting Pure style.
 
 To customize prompt, edit `~/.p10k.zsh`. Powerlevel10k doesn't recognize Pure configuration
 parameters, so you'll need to use `POWERLEVEL9K_COMMAND_EXECUTION_TIME_THRESHOLD=3` instead of
@@ -135,8 +135,8 @@ Powerlevel10k can remove Zsh startup lag **even if it's not caused by a theme**.
   https://raw.githubusercontent.com/romkatv/powerlevel10k-media/master/instant-prompt.gif)
 
 This feature is called *Instant Prompt*. You need to explicitly enable it through `p10k configure`
-or [manually](#what-is-instant-prompt). It does what it says on the tin -- prints prompt instantly
-upon Zsh startup allowing you to start typing while plugins are still loading.
+or [manually](#how-do-i-enable-instant-prompt). It does what it says on the tin -- prints prompt
+instantly upon Zsh startup allowing you to start typing while plugins are still loading.
 
 Other themes *increase* Zsh startup lag -- some by a lot, others by a just a little. Powerlevel10k
 *removes* it outright.
@@ -388,10 +388,15 @@ If you are using a different terminal, proceed with manual font installation. ðŸ
 #### Manual font installation
 
 Download these four ttf files:
-- [MesloLGS NF Regular.ttf](https://github.com/romkatv/dotfiles-public/raw/master/.local/share/fonts/NerdFonts/MesloLGS%20NF%20Regular.ttf)
-- [MesloLGS NF Bold.ttf](https://github.com/romkatv/dotfiles-public/raw/master/.local/share/fonts/NerdFonts/MesloLGS%20NF%20Bold.ttf)
-- [MesloLGS NF Italic.ttf](https://github.com/romkatv/dotfiles-public/raw/master/.local/share/fonts/NerdFonts/MesloLGS%20NF%20Italic.ttf)
-- [MesloLGS NF Bold Italic.ttf](https://github.com/romkatv/dotfiles-public/raw/master/.local/share/fonts/NerdFonts/MesloLGS%20NF%20Bold%20Italic.ttf)
+
+- [MesloLGS NF Regular.ttf](
+    https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Regular.ttf)
+- [MesloLGS NF Bold.ttf](
+    https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Bold.ttf)
+- [MesloLGS NF Italic.ttf](
+    https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Italic.ttf)
+- [MesloLGS NF Bold Italic.ttf](
+    https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Bold%20Italic.ttf)
 
 Double-click on each file and click "Install". This will make `MesloLGS NF` font available to all
 applications on your system. Configure your terminal to use this font:
@@ -784,9 +789,7 @@ Almost. There are a few differences.
   - Powerlevel9k has inconsistent spacing around icons. This was fixed in Powerlevel10k. Set
     `POWERLEVEL9K_LEGACY_ICON_SPACING=true` to get the same spacing as in Powerlevel9k.  More
     details in [troubleshooting](#extra-or-missing-spaces-around-icons).
-  - There are
-    [dozens more bugs](https://github.com/Powerlevel9k/powerlevel9k/issues/created_by/romkatv) in
-    Powerlevel9k that don't exist in Powerlevel10k.
+  - There are dozens more bugs in Powerlevel9k that don't exist in Powerlevel10k.
 
 If you notice any other changes in prompt appearance when switching from Powerlevel9k to
 Powerlevel10k, please [open an issue](https://github.com/romkatv/powerlevel10k/issues).
@@ -836,7 +839,7 @@ Zsh 5.1 or newer should work. Fast startup requires zsh >= 5.4.
 ### How were these screenshots and animated gifs created?
 
 All screenshots and animated gifs were recorded in GNOME Terminal with
-[the recommended font](#meslo-nerd-font-patched-for-powerlevel10k) and Tango Dark color scheme with
+[the recommended font](#meslo-nerd-font-patched-for-powerlevel10k) and Tango Dark color palette with
 custom background color (`#171A1B` instead of `#2E3436` -- twice as dark).
 
 ![GNOME Terminal Color Settings](
