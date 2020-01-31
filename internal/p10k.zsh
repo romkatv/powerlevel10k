@@ -209,6 +209,7 @@ function _p9k_read_word() {
     _p9k_ret=${cached#*:}
   else
     local rest
+    _p9k_ret=
     { read _p9k_ret rest <$1 } 2>/dev/null
     _p9k__read_word_cache[$1]=$stat[1]:$_p9k_ret
   fi
@@ -4298,15 +4299,19 @@ function instant_prompt_nix_shell() {
 }
 
 function prompt_terraform() {
-  local ws=default
-  if [[ -n $TF_WORKSPACE ]]; then
-    ws=$TF_WORKSPACE
-  else
-    local f=${TF_DATA_DIR:-.terraform}/environment
-    [[ -r $f ]] && _p9k_read_file $f && ws=$_p9k_ret
+  local ws=$TF_WORKSPACE
+  if [[ -z $TF_WORKSPACE ]]; then
+    _p9k_read_word ${${TF_DATA_DIR:-.terraform}:A}/environment && ws=$_p9k_ret
   fi
-  ws=${${ws##[[:space:]]#}%%[[:space:]]#}
-  [[ $ws == default ]] || _p9k_prompt_segment $0 $_p9k_color1 blue TERRAFORM_ICON 0 '' $ws
+  [[ $ws == (|default) ]] && return
+  local pat class
+  for pat class in "${_POWERLEVEL9K_TERRAFORM_CLASSES[@]}"; do
+    if [[ $ws == ${~pat} ]]; then
+      [[ -n $class ]] && state=_${(U)class}
+      break
+    fi
+  done
+  _p9k_prompt_segment "$0$state" $_p9k_color1 blue TERRAFORM_ICON 0 '' $ws
 }
 
 _p9k_prompt_terraform_init() {
@@ -5887,6 +5892,7 @@ _p9k_init_params() {
   #   POWERLEVEL9K_KUBECONTEXT_OTHER_BACKGROUND=yellow
   _p9k_declare -a POWERLEVEL9K_KUBECONTEXT_CLASSES --
   _p9k_declare -a POWERLEVEL9K_AWS_CLASSES --
+  _p9k_declare -a POWERLEVEL9K_TERRAFORM_CLASSES --
   _p9k_declare -a POWERLEVEL9K_GOOGLE_APP_CRED_CLASSES -- 'service_account:*' SERVICE_ACCOUNT
   # Specifies the format of java version.
   #
@@ -6449,7 +6455,7 @@ _p9k_must_init() {
     [[ $sig == $_p9k__param_sig ]] && return 1
     _p9k_deinit
   fi
-  _p9k__param_pat=$'v31\1'${ZSH_VERSION}$'\1'${ZSH_PATCHLEVEL}$'\1'
+  _p9k__param_pat=$'v33\1'${ZSH_VERSION}$'\1'${ZSH_PATCHLEVEL}$'\1'
   _p9k__param_pat+=$'${#parameters[(I)POWERLEVEL9K_*]}\1${(%):-%n%#}\1$GITSTATUS_LOG_LEVEL\1'
   _p9k__param_pat+=$'$GITSTATUS_ENABLE_LOGGING\1$GITSTATUS_DAEMON\1$GITSTATUS_NUM_THREADS\1'
   _p9k__param_pat+=$'$DEFAULT_USER\1${ZLE_RPROMPT_INDENT:-1}\1$P9K_SSH\1$__p9k_ksh_arrays'
