@@ -111,7 +111,7 @@ Powerlevel10k can produce the same prompt as [Pure](https://github.com/sindresor
 ![Powerlevel10k Pure Style](
   https://raw.githubusercontent.com/romkatv/powerlevel10k-media/master/pure-style.gif)
 
-You can still use Powerlevel10k features such as [transient Prompt](#transient-prompt) or
+You can still use Powerlevel10k features such as [transient prompt](#transient-prompt) or
 [instant Prompt](#instant-prompt) when sporting Pure style.
 
 To customize prompt, edit `~/.p10k.zsh`. Powerlevel10k doesn't recognize Pure configuration
@@ -178,7 +178,7 @@ prompt when accepting a command line.
 
 Transient prompt makes it much easier to copy-paste series of commands from the terminal scrollback.
 
-*Tip*: If you enable Transient Prompt, take advantage of two-line prompt. You'll get the benefit of
+*Tip*: If you enable transient prompt, take advantage of two-line prompt. You'll get the benefit of
 extra space for typing commands without the usual drawback of reduced scrollback density.
 
 ### Current directory that just works
@@ -446,6 +446,18 @@ Powerlevel10k is released under the
 [MIT license](https://github.com/romkatv/powerlevel10k/blob/master/LICENSE).
 
 ## FAQ
+
+### Which aspects of shell and terminal does Powerlevel10k affect?
+
+Powerlevel10k defines prompt and nothing else. It sets prompt-related options (their names start
+`prompt`), and parameters `PS1` and `RPS1`.
+
+Powerlevel10k does not affect:
+
+- Terminal window title.
+- Colors used by `ls`.
+- Command line colors (syntax highlighting).
+- Prompt parameters other than `PS1` and `RPS1`.
 
 ### I'm using Powerlevel9k with Oh My Zsh. How do I migrate?
 
@@ -769,6 +781,39 @@ Almost. There are a few differences.
 If you notice any other changes in prompt appearance when switching from Powerlevel9k to
 Powerlevel10k, please [open an issue](https://github.com/romkatv/powerlevel10k/issues).
 
+### What is the best prompt style in the configuration wizard?
+
+There are as many opinions on what constitutes the best prompt as there are people. It mostly comes
+down to personal preference. There are, however, a few hidden implications of different choices.
+
+Pure style is an exact replication of [Pure Zsh theme](https://github.com/sindresorhus/pure). It
+exists to ease the migration for users of this theme. Unless you are one of them, choose Lean
+style over Pure.
+
+If you want to confine prompt colors to the selected terminal color palette (say, *Solarized Dark*),
+use *Rainbow*, *Lean* → *8 colors* or *Pure* → *Original*. Other styles use fixed colors and thus
+look the same in any terminal color palette.
+
+If you enable transient prompt, take advantage of two-line prompt. You'll get the benefit of
+extra space for typing commands without the usual drawback of reduced scrollback density. Having
+all commands start from the same offset is also nice.
+
+Similarly, if you enable transient prompt, sparse prompt (with an empty line before prompt) is a
+great choice.
+
+If you are using vi keymap, choose prompt with `prompt_char` in it (shown as green `❯` in the
+wizard). This symbol changes depending on vi mode: `❯`, `❮`, `Ⅴ`, `▶` for insert, command, visual
+and replace mode respectively. When a command fails, the symbol turns red. *Lean* style always has
+`prompt_char` in it. *Rainbow* and *Classic* styles have it only in the two-line configuration
+without left frame.
+
+If you value horizontal space or prefer minimalist aesthetics, disable *current time* and use *few
+icons*. The extra icons enabled by the *many icons* option primarily serve decorative function.
+Informative icons, such as background job indicator, will be shown either way.
+
+*Note*: You can run configuration wizard as many times as you like. Type `p10k configure` to try new
+prompt style.
+
 ### Is there an AUR package for Powerlevel10k?
 
 Yes, [zsh-theme-powerlevel10k-git](https://aur.archlinux.org/packages/zsh-theme-powerlevel10k-git/).
@@ -786,6 +831,9 @@ custom background color (`#171A1B` instead of `#2E3436` -- twice as dark).
 
 ![GNOME Terminal Color Settings](
   https://raw.githubusercontent.com/romkatv/powerlevel10k-media/master/gnome-terminal-colors.png)
+
+Syntax highlighting, where present, was provided by [zsh-syntax-highlighting](
+  https://github.com/zsh-users/zsh-syntax-highlighting).
 
 ## Troubleshooting
 
