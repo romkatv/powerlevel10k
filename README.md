@@ -1321,9 +1321,15 @@ There are a few mitigation options for this issue.
 - Disable text reflowing on window resize in terminal settings. If your terminal doesn't have this
   setting, try a different terminal.
 - Avoid long lines between the start of prompt and cursor.
-  1. Disable right prompt with `POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=()`.
-  2. Disable ruler with `POWERLEVEL9K_SHOW_RULER=false`.
-  3. Disable prompt gap with `POWERLEVEL9K_MULTILINE_FIRST_PROMPT_GAP_CHAR=' '`.
+  1. Disable ruler with `POWERLEVEL9K_SHOW_RULER=false`.
+  1. Disable prompt connection with `POWERLEVEL9K_MULTILINE_FIRST_PROMPT_GAP_CHAR=' '`.
+  1. Disable right frame with `POWERLEVEL9K_MULTILINE_FIRST_PROMPT_SUFFIX=` and
+     `POWERLEVEL9K_MULTILINE_NEWLINE_PROMPT_SUFFIX=` and
+     `POWERLEVEL9K_MULTILINE_LAST_PROMPT_SUFFIX=`.
+  1. Remove all elements from `POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS`. Right prompt on the last prompt
+     line will cause resizing issues only when the cursor is below it. This isn't very common, so
+     you might want to keep some elements in `POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS` provided that
+     none of them are succeeded by `newline`.
 
 ## Table of contents
 
