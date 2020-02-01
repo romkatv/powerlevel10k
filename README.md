@@ -587,12 +587,12 @@ fi
 It's important that you copy the lines verbatim. Don't replace `source` with something else, don't
 call `zcompile`, don't redirect output, etc.
 
-When instant prompt is enabled, for the duration of zsh initialization standard input is redirected
-to `/dev/null` and standard output with standard error are redirected to a temporary file. Once zsh
+When instant prompt is enabled, for the duration of Zsh initialization standard input is redirected
+to `/dev/null` and standard output with standard error are redirected to a temporary file. Once Zsh
 is fully initialized, standard file descriptors are restored and the content of the temporary file
 is printed out.
 
-When using instant prompt, you should carefully check any output that appears on zsh startup as it
+When using instant prompt, you should carefully check any output that appears on Zsh startup as it
 may indicate that initialization has been altered, or perhaps even broken, by instant prompt.
 Initialization code that may require console input, such as asking for a keyring password or for a
 *[y/n]* confirmation, must be moved above the instant prompt preamble in `~/.zshrc`. Initialization
@@ -633,11 +633,11 @@ when it detects console output during initialization to bring attention to poten
 silence this warning (without suppressing console output) with `POWERLEVEL9K_INSTANT_PROMPT=quiet`.
 This is recommended if some initialization code in `~/.zshrc` prints to console and it's infeasible
 to move it above the instant prompt preamble or to suppress its output. You can completely disable
-instant prompt with `POWERLEVEL9K_INSTANT_PROMPT=off`. Do this if instant prompt breaks zsh
+instant prompt with `POWERLEVEL9K_INSTANT_PROMPT=off`. Do this if instant prompt breaks Zsh
 initialization and you don't know how to fix it.
 
-*Note*: Instant prompt requires zsh >= 5.4. It's OK to enable it even when using an older version of
-zsh but it won't do anything.
+*Note*: Instant prompt requires Zsh >= 5.4. It's OK to enable it even when using an older version of
+Zsh but it won't do anything.
 
 ### What do different symbols in Git status mean?
 
@@ -778,7 +778,7 @@ prompt latency when using Powerlevel10k, please
 
 ### Is Powerlevel10k fast to load?
 
-Yes, provided that you are using zsh >= 5.4.
+Yes, provided that you are using Zsh >= 5.4.
 
 Loading time, or time to first prompt, can be measured with the following benchmark:
 
@@ -879,9 +879,9 @@ prompt style.
 Yes, [zsh-theme-powerlevel10k-git](https://aur.archlinux.org/packages/zsh-theme-powerlevel10k-git/).
 This package is owned by an unaffiliated volunteer.
 
-### What is the minimum supported zsh version?
+### What is the minimum supported Zsh version?
 
-Zsh 5.1 or newer should work. Fast startup requires zsh >= 5.4.
+Zsh 5.1 or newer should work. Fast startup requires Zsh >= 5.4.
 
 ### How were these screenshots and animated gifs created?
 
@@ -955,9 +955,9 @@ rendering imperfections that afflict powerline-style prompt.
 ### zsh: character not in range
 
 Type `echo '\u276F'`. If you get an error saying "zsh: character not in range", your locale
-doesn't support UTF-8. You need to fix it. If you are running zsh over SSH, see
+doesn't support UTF-8. You need to fix it. If you are running Zsh over SSH, see
 [this](https://github.com/romkatv/powerlevel10k/issues/153#issuecomment-518347833). If you are
-running zsh locally, Google "set UTF-8 locale in *your OS*".
+running Zsh locally, Google "set UTF-8 locale in *your OS*".
 
 ### Cursor is in the wrong place
 
@@ -1047,17 +1047,17 @@ See [cursor is in the wrong place](#cursor-is-in-the-wrong-place).
 
 See [cursor is in the wrong place](#cursor-is-in-the-wrong-place).
 
-### Configuration wizard run automatically every time zsh is started
+### Configuration wizard run automatically every time Zsh is started
 
 When Powerlevel10k starts, it automatically runs `p10k configure` if no `POWERLEVEL9K_*`
 parameters are defined. Based on your prompt style choices, the configuration wizard creates
 `~/.p10k.zsh` with a bunch of `POWERLEVEL9K_*` parameters in it and adds a line to `~/.zshrc` to
-source this file. The next time you start zsh, the configuration wizard shouldn't run automatically.
+source this file. The next time you start Zsh, the configuration wizard shouldn't run automatically.
 If it does, this means the evaluation of `~/.zshrc` terminates prematurely before it reaches the
 line that sources `~/.p10k.zsh`. This most often happens due to syntax errors in `~/.zshrc`. These
 errors get hidden by the configuration wizard screen, so you don't notice them. Scroll up in the
 first configuration wizard screen to see these errors. Alternatively, run
-`POWERLEVEL9K_DISABLE_CONFIGURATION_WIZARD=true zsh` to start zsh without automatically running the
+`POWERLEVEL9K_DISABLE_CONFIGURATION_WIZARD=true zsh` to start Zsh without automatically running the
 configuration wizard. Once you can see the errors, fix `~/.zshrc` to get rid of them.
 
 ### Cannot install the recommended font
@@ -1215,7 +1215,7 @@ There are several ways to fix this.
   - [Does Powerlevel10k always render exactly the same prompt as Powerlevel9k given the same config?](#does-powerlevel10k-always-render-exactly-the-same-prompt-as-powerlevel9k-given-the-same-config)
   - [What is the best prompt style in the configuration wizard?](#what-is-the-best-prompt-style-in-the-configuration-wizard)
   - [Is there an AUR package for Powerlevel10k?](#is-there-an-aur-package-for-powerlevel10k)
-  - [What is the minimum supported zsh version?](#what-is-the-minimum-supported-zsh-version)
+  - [What is the minimum supported Zsh version?](#what-is-the-minimum-supported-zsh-version)
   - [How were these screenshots and animated gifs created?](#how-were-these-screenshots-and-animated-gifs-created)
 - [Troubleshooting](#troubleshooting)
   - [Question mark in prompt](#question-mark-in-prompt)
@@ -1225,7 +1225,7 @@ There are several ways to fix this.
   - [Cursor is in the wrong place](#cursor-is-in-the-wrong-place)
   - [Prompt wrapping around in a weird way](#prompt-wrapping-around-in-a-weird-way)
   - [Right prompt is in the wrong place](#right-prompt-is-in-the-wrong-place)
-  - [Configuration wizard run automatically every time zsh is started](#configuration-wizard-run-automatically-every-time-zsh-is-started)
+  - [Configuration wizard run automatically every time Zsh is started](#configuration-wizard-run-automatically-every-time-zsh-is-started)
   - [Cannot install the recommended font](#cannot-install-the-recommended-font)
   - [Extra or missing spaces in prompt compared to Powerlevel9k](#extra-or-missing-spaces-in-prompt-compared-to-powerlevel9k)
     - [Extra space without background on the right side of right prompt](#extra-space-without-background-on-the-right-side-of-right-prompt)
