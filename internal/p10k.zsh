@@ -1,4 +1,4 @@
-if [[ $__p9k_sourced != 3 ]]; then
+if [[ $__p9k_sourced != 4 ]]; then
   >&2 print -P ""
   >&2 print -P "[%F{1}ERROR%f]: Corrupted powerlevel10k installation."
   >&2 print -P ""
@@ -112,7 +112,7 @@ typeset -grA __p9k_colors=(
 #
 # Type `getColorCode background` or `getColorCode foreground` to see the list of predefined colors.
 function getColorCode() {
-  eval $__p9k_intro
+  eval "$__p9k_intro"
   if (( ARGC == 1 )); then
     case $1 in
       foreground)
@@ -139,7 +139,7 @@ function getColorCode() {
 
 # Sadly, this is a part of public API. Its use is emphatically discouraged.
 function print_icon() {
-  eval $__p9k_intro
+  eval "$__p9k_intro"
   (( $+functions[_p9k_print_icon] )) || source "${__p9k_root_dir}/internal/icons.zsh"
   _p9k_print_icon "$@"
 }
@@ -150,7 +150,7 @@ function print_icon() {
 #                 otherwise "print_icon" is used, which takes the users
 #                 overrides into account.
 function get_icon_names() {
-  eval $__p9k_intro
+  eval "$__p9k_intro"
   (( $+functions[_p9k_get_icon_names] )) || source "${__p9k_root_dir}/internal/icons.zsh"
   _p9k_get_icon_names "$@"
 }
@@ -3589,7 +3589,7 @@ function _p9k_maybe_ignore_git_repo() {
 }
 
 function _p9k_vcs_resume() {
-  eval $__p9k_intro
+  eval "$__p9k_intro"
 
   _p9k_maybe_ignore_git_repo
 
@@ -5215,7 +5215,7 @@ function _p9k_on_expand() {
   (( _p9k__expanded && ! $+__p9k_instant_prompt_active )) && return
 
   () {
-    eval $__p9k_intro
+    eval "$__p9k_intro"
 
     _p9k_maybe_dump
     (( $+__p9k_instant_prompt_active )) && _p9k_clear_instant_prompt
@@ -5305,7 +5305,7 @@ function _p9k_on_expand() {
 functions -M _p9k_on_expand
 
 _p9k_precmd_impl() {
-  eval $__p9k_intro
+  eval "$__p9k_intro"
 
   (( __p9k_enabled )) || return
 
@@ -5404,7 +5404,7 @@ _p9k_precmd_impl() {
 
 _p9k_trapint() {
   if (( __p9k_enabled )); then
-    eval $__p9k_intro
+    eval "$__p9k_intro"
     zle && _p9k_on_widget_zle-line-finish int
   fi
   return 0
@@ -6023,7 +6023,7 @@ function _p9k_widget_hook() {
     fi
   fi
 
-  eval $__p9k_intro
+  eval "$__p9k_intro"
   (( _p9k__restore_prompt_fd )) && _p9k_restore_prompt $_p9k__restore_prompt_fd
   __p9k_reset_state=1
   local pat idx var
@@ -6097,7 +6097,7 @@ function _p9k_wrap_widgets() {
 }
 
 function _p9k_restore_prompt() {
-  eval $__p9k_intro
+  eval "$__p9k_intro"
   {
     (( _p9k__must_restore_prompt )) || return
     _p9k__must_restore_prompt=0
@@ -6891,7 +6891,7 @@ _p9k_setup() {
     prompt_opts+=cr
   fi
 
-  eval $__p9k_intro
+  eval "$__p9k_intro"
   prompt_powerlevel9k_teardown
   __p9k_enabled=1
   typeset -ga preexec_functions=(_p9k_preexec1 $preexec_functions _p9k_preexec2)
@@ -6901,7 +6901,7 @@ _p9k_setup() {
 prompt_powerlevel9k_setup() { _p9k_setup }
 
 prompt_powerlevel9k_teardown() {
-  eval $__p9k_intro
+  eval "$__p9k_intro"
   add-zsh-hook -D precmd '(_p9k_|powerlevel9k_)*'
   add-zsh-hook -D preexec '(_p9k_|powerlevel9k_)*'
   PROMPT='%m%# '
@@ -7069,7 +7069,7 @@ typeset -gi __p9k_reset_state
 function p10k() {
   [[ $# != 1 || $1 != finalize ]] || { p10k-instant-prompt-finalize; return 0 }
 
-  eval $__p9k_intro
+  eval "$__p9k_intro"
 
   if (( !ARGC )); then
     print -rP -- $__p9k_p10k_usage >&2

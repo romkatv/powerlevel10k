@@ -85,7 +85,7 @@ function _p9k_worker_invoke() {
 }
 
 function _p9k_worker_cleanup() {
-  eval $__p9k_intro
+  eval "$__p9k_intro"
   [[ $_p9k__worker_shell_pid == $sysparams[pid] ]] && _p9k_worker_stop
   return 0
 }
@@ -106,7 +106,7 @@ function _p9k_worker_stop() {
 }
 
 function _p9k_worker_receive() {
-  eval $__p9k_intro
+  eval "$__p9k_intro"
 
   [[ -z $_p9k__worker_resp_fd ]] && return
 

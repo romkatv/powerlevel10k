@@ -59,7 +59,7 @@ function _p9k_can_configure() {
 }
 
 function p9k_configure() {
-  eval $__p9k_intro
+  eval "$__p9k_intro"
   (
     set -- -f
     source $__p9k_root_dir/internal/wizard.zsh
