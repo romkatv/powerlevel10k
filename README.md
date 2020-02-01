@@ -408,7 +408,7 @@ will pick them up and provide you with the same prompt UI you are used to. See
     #does-powerlevel10k-always-render-exactly-the-same-prompt-as-powerlevel9k-given-the-same-config)
 
 *Troubleshooting*: [Extra or missing spaces in prompt compared to Powerlevel9k](
-  #extra-or-missing-spaces-in-prompt-compared-to-powerlevel9k.)
+  #extra-or-missing-spaces-in-prompt-compared-to-powerlevel9k).
 
 ## Fonts
 
