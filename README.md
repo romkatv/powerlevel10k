@@ -1317,7 +1317,8 @@ There is no ETA for the patch making its way into upstream Zsh. See [discussion]
 
 There are a few mitigation options for this issue.
 
-- Apply [the patch](#zsh-patch) and rebuild Zsh from source.
+- Apply [the patch](#zsh-patch) and [rebuild Zsh from source](
+    https://github.com/zsh-users/zsh/blob/master/INSTALL).
 - Disable text reflowing on window resize in terminal settings. If your terminal doesn't have this
   setting, try a different terminal.
 - Avoid long lines between the start of prompt and cursor.
