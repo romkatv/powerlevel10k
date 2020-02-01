@@ -1210,9 +1210,9 @@ tl;dr: This is a bug in Zsh that isn't specific to Powerlevel10k. See [mitigatio
 
 #### Zsh bug
 
-This issue is caused by a bug in Zsh that gets triggered the vertical distance between the start of
-the current prompt and the cursor (henceforth `VD`) changes when the terminal window is resized.
-This bug is not specific to Powerlevel10k.
+This issue is caused by a bug in Zsh that gets triggered when the vertical distance between the
+start of the current prompt and the cursor (henceforth `VD`) changes when the terminal window is
+resized. This bug is not specific to Powerlevel10k.
 
 When a terminal window gets shrunk horizontally, there are two ways for a terminal to handle long
 lines that no longer fit: *reflow* or *truncate*.
