@@ -90,8 +90,9 @@ configuration parameters.
 ![Powerlevel10k Compatibility with 9k](
   https://raw.githubusercontent.com/romkatv/powerlevel10k-media/master/9k-compatibility.gif)
 
-Migration from Powerlevel9k to Powerlevel10k is a straightforward process. All your `POWERLEVEL9K`
-configuration parameters will still work. Prompt will look the same as before ([almost](
+[Migration](#installation) from Powerlevel9k to Powerlevel10k is a straightforward process. All
+your `POWERLEVEL9K` configuration parameters will still work. Prompt will look the same as before
+([almost](
   #does-powerlevel10k-always-render-exactly-the-same-prompt-as-powerlevel9k-given-the-same-config))
 but it will be [much faster](#uncompromising-performance) ([certainly](#is-it-really-fast)).
 
