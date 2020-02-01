@@ -56,6 +56,15 @@ running `p10k configure` to unlock all prompt styles.
     #what-do-different-symbols-in-git-status-mean)
 - [How do I change prompt colors?](#how-do-i-change-prompt-colors)
 
+*Troubleshooting*:
+
+- [Question mark in prompt](#question-mark-in-prompt).
+- [Icons, glyphs or powerline symbols don't render](#icons-glyphs-or-powerline-symbols-dont-render).
+- [Sub-pixel imperfections around powerline symbols](
+    #sub-pixel-imperfections-around-powerline-symbols).
+- [Directory is difficult to see in prompt when using Rainbow style](
+    #directory-is-difficult-to-see-in-prompt-when-using-rainbow-style).
+
 ### Uncompromising performance
 
 When you hit *ENTER*, the next prompt appears instantly. With Powerlevel10k there is no prompt lag.
@@ -358,11 +367,45 @@ Configuration wizard creates `~/.p10k.zsh` based on your preferences. Additional
 customization can be done by editing this file. It has plenty of comments to help you navigate
 through configuration options.
 
+*FAQ*:
+
+- [What is the best prompt style in the configuration wizard?](
+    #what-is-the-best-prompt-style-in-the-configuration-wizard)
+- [What do different symbols in Git status mean?](
+    #what-do-different-symbols-in-git-status-mean)
+- [How do I change the format of Git status?](#how-do-i-change-the-format-of-git-status)
+- [How do I add username and/or hostname to prompt?](
+    #how-do-i-add-username-andor-hostname-to-prompt)
+- [How do I change prompt colors?](#how-do-i-change-prompt-colors)
+- [Why some prompt segments appear and disappear as I'm typing?](
+    #why-some-prompt-segments-appear-and-disappear-as-im-typing)
+
+*Troubleshooting*:
+
+- [Question mark in prompt](#question-mark-in-prompt).
+- [Icons, glyphs or powerline symbols don't render](#icons-glyphs-or-powerline-symbols-dont-render).
+- [Sub-pixel imperfections around powerline symbols](
+    #sub-pixel-imperfections-around-powerline-symbols).
+- [Directory is difficult to see in prompt when using Rainbow style](
+    #directory-is-difficult-to-see-in-prompt-when-using-rainbow-style).
+
 ### For Powerlevel9k users
 
 If you've been using Powerlevel9k before, **do not remove the configuration options**. Powerlevel10k
 will pick them up and provide you with the same prompt UI you are used to. See
 [Powerlevel9k compatibility](#powerlevel9k-compatibility).
+
+*FAQ*:
+
+- [I'm using Powerlevel9k with Oh My Zsh. How do I migrate?](
+    #im-using-powerlevel9k-with-oh-my-zsh-how-do-i-migrate)
+- [What is the relationship between Powerlevel9k and Powerlevel10k?](
+    #what-is-the-relationship-between-powerlevel9k-and-powerlevel10k)
+- [Does Powerlevel10k always render exactly the same prompt as Powerlevel9k given the same config?](
+    #does-powerlevel10k-always-render-exactly-the-same-prompt-as-powerlevel9k-given-the-same-config)
+
+*Troubleshooting*: [Extra or missing spaces in prompt compared to Powerlevel9k](
+  #extra-or-missing-spaces-in-prompt-compared-to-powerlevel9k.)
 
 ## Fonts
 
@@ -486,7 +529,7 @@ exec zsh
 ```
 2. *Optional but highly recommended:*
    1. Install [the recommended font](#meslo-nerd-font-patched-for-powerlevel10k).
-   1. Type `p10k configure` and chose your favorite prompt style.
+   1. Type `p10k configure` and choose your favorite prompt style.
 
 *Related:*
   - [Powerlevel9k compatibility.](#powerlevel9k-compatibility)
