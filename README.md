@@ -511,17 +511,17 @@ Powerlevel10k is released under the
 
 The command to update Powerlevel10k depends on how it was installed.
 
-| Installation                       | Update command |
-|-------------------------------|----------------|
-| [Manual](#manual)      | `git -C ~/powerlevel10k pull`  |
-| [Oh My Zsh](#oh-my-zsh)      | `git -C $ZSH_CUSTOM/themes/powerlevel10k pull`  |
-| [Prezto](#prezto)        | `zprezto-update` |
-| [Zim](#zim)        | `zimfw update` |
-| [Antigen](#antigen)        | `antigen update` |
-| [Zplug](#zplug)        | `zplug update` |
-| [Zgen](#zgen)        | `zgen update` |
-| [Zplugin](#zplugin)        | `zplugin update` |
-| [Zinit](#zinit)        | `zinit update` |
+| Installation            | Update command                                 |
+|-------------------------|------------------------------------------------|
+| [Manual](#manual)       | `git -C ~/powerlevel10k pull`                  |
+| [Oh My Zsh](#oh-my-zsh) | `git -C $ZSH_CUSTOM/themes/powerlevel10k pull` |
+| [Prezto](#prezto)       | `zprezto-update`                               |
+| [Zim](#zim)             | `zimfw update`                                 |
+| [Antigen](#antigen)     | `antigen update`                               |
+| [Zplug](#zplug)         | `zplug update`                                 |
+| [Zgen](#zgen)           | `zgen update`                                  |
+| [Zplugin](#zplugin)     | `zplugin update`                               |
+| [Zinit](#zinit)         | `zinit update`                                 |
 
 **IMPORTANT**: Restart Zsh after updating Powerlevel10k. [Do not use `source ~/.zshrc`](
   #weird-things-happen-after-typing-source-zshrc).
