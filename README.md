@@ -1198,6 +1198,133 @@ There are several ways to fix this.
   The parameter you are looking for is called `POWERLEVEL9K_DIR_BACKGROUND`. You can find it in
   in `~/.p10k.zsh`. Uncomment it if it's commented out and try different values.
 
+### Horrific mess when resizing terminal window
+
+When you resize terminal window horizontally back and forth a few times, you might see this ugly
+picture.
+
+![Powerlevel10k Resizing Mess](
+  https://raw.githubusercontent.com/romkatv/powerlevel10k-media/master/resizing-mess.png)
+
+tl;dr: This is a bug in Zsh that isn't specific to Powerlevel10k. See [mitigation](#mitigation).
+
+#### Zsh bug
+
+This issue is caused by a bug in Zsh that gets triggered the vertical distance between the start of
+the current prompt and the cursor (henceforth `VD`) changes when the terminal window is resized.
+This bug is not specific to Powerlevel10k.
+
+When a terminal window gets shrunk horizontally, there are two ways for a terminal to handle long
+lines that no longer fit: *reflow* or *truncate*.
+
+Terminal content before shrinking:
+
+![Terminal Content Before Shrinking](
+  https://raw.githubusercontent.com/romkatv/powerlevel10k-media/master/resize-original.png)
+
+Terminal reflows text when shrinking:
+
+![Terminal Reflows Text When Shrinking](
+  https://raw.githubusercontent.com/romkatv/powerlevel10k-media/master/resize-reflow.png)
+
+Terminal truncates text when shrinking:
+
+![Terminal Truncates Text When Shrinking](
+  https://raw.githubusercontent.com/romkatv/powerlevel10k-media/master/resize-truncate.png)
+
+Reflowing strategy can change the hight of terminal content. If such content happens to be between
+the start of the current prompt and the cursor, Zsh will print prompt on the wrong line. Truncation
+strategy never changes the hight of terminal content, so it doesn't trigger this bug in Zsh.
+
+Let's see how the bug plays out in slow motion. We'll start by launching `zsh -df` and pasting
+the following code:
+
+```zsh
+function pause() { read -s }
+functions -M pause 0
+
+reset
+print -l {1..3}
+setopt prompt_subst
+PROMPT=$'${$((pause()))+}left>${(pl.$((COLUMNS-12))..-.)}<right\n> '
+```
+
+When `PROMPT` gets expanded, it calls `pause` to let us observe the state of the terminal. Here's
+the initial state:
+
+![Zsh Resizing Bug 1](
+  https://raw.githubusercontent.com/romkatv/powerlevel10k-media/master/resize-bug-1.png)
+
+Zsh keeps track of the cursor position relative to the start of the current prompt. In this case it
+knows that the cursor is one line below. When we shrink the terminal window, it looks like this:
+
+![Zsh Resizing Bug 2](
+  https://raw.githubusercontent.com/romkatv/powerlevel10k-media/master/resize-bug-2.png)
+
+At this point the terminal sends `SIGWINCH` to Zsh to notify it about changes in the terminal
+dimensions. Note that this signal is sent *after* the content of the terminal has been reflown.
+
+When Zsh receives `SIGWINCH`, it attempts to erase the current prompt and print it anew. It goes to
+the position where it *thinks* the current prompt is -- one line above the cursor (!) -- erases all
+terminal content that follows and prints reexpanded prompt there. However, after resizing prompt is
+no longer one line above the cursor. It's two lines above! Zsh ends up printing new prompt one line
+too low.
+
+![Zsh Resizing Bug 3](
+  https://raw.githubusercontent.com/romkatv/powerlevel10k-media/master/resize-bug-3.png)
+
+In this case we ended up with unwanted junk content because `VD` has *increased*. When you make
+terminal window wider, `VD` can also *decrease*, which would result in the new prompt being printed
+higher than intended, potentially erasing useful content in the process.
+
+Here are a few more examples where shrinking terminal window increased `VD`.
+
+Simple one-line left prompt with right prompt. No `prompt_subst`. Note that the cursor is below the
+prompt line (hit *ESC-ENTER* to get it there).
+
+![Zsh Prompt That Breaks on Terminal Shrinking 1](
+  https://raw.githubusercontent.com/romkatv/powerlevel10k-media/master/resize-breakable-1.png)
+
+Simple one-line left prompt. No `prompt_subst`, no right prompt. Here `VD` is bound to increase
+upon terminal shrinking due to the command line wrapping around.
+
+![Zsh Prompt That Breaks on Terminal Shrinking 2](
+  https://raw.githubusercontent.com/romkatv/powerlevel10k-media/master/resize-breakable-2.png)
+
+#### Zsh patch
+
+The bug described above has been fixed in [this branch](
+  https://github.com/romkatv/zsh/tree/fix-winchanged). The idea behind the fix is to use `sc` (save
+cursor) terminal capability before printing prompt and `rc` (restore cursor) to move cursor back
+to the same position when prompt needs to be refreshed.
+
+There are two alternative approaches to fixing the bug that may seem to work at fight glance but in
+fact don't:
+
+- Instead of `sc`, use `u7` terminal capability to query the current cursor position and then `cup`
+  to go back to it. This doesn't work because the absolute position of the start of the current
+  prompt changes when text gets reflown.
+- Recompute `VD` based on new terminal dimensions before attempting to refresh prompt. This doesn't
+  work because Zsh doesn't know whether terminal reflows text or truncates it. If Zsh could somehow
+  know that the terminal reflows text, this approach still wouldn't work on terminals that
+  continuously reflow text and rapid-fire `SIGWINCH` when the window is being resized. In such
+  environment real terminal dimensions go out of sync with what Zsh thinks the dimensions are.
+
+There is no ETA for the patch making its way into upstream Zsh. See [discussion](
+  https://www.zsh.org/mla/workers//2019/msg00561.html).
+
+#### Mitigation
+
+There are a few mitigation options for this issue.
+
+- Apply [the patch](#zsh-patch) and rebuild Zsh from source.
+- Disable text reflowing on window resize in terminal settings. If your terminal doesn't have this
+  setting, try a different terminal.
+- Avoid long lines between the start of prompt and cursor.
+  1. Disable right prompt with `POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=()`.
+  2. Disable ruler with `POWERLEVEL9K_SHOW_RULER=false`.
+  3. Disable prompt gap with `POWERLEVEL9K_MULTILINE_FIRST_PROMPT_GAP_CHAR=' '`.
+
 ## Table of contents
 
 - [Features](#features)
@@ -1266,3 +1393,4 @@ There are several ways to fix this.
   - [Weird things happen after typing `source ~/.zshrc`](#weird-things-happen-after-typing-source-zshrc)
   - [Cannot make Powerlevel10k work with my plugin manager](#cannot-make-powerlevel10k-work-with-my-plugin-manager)
   - [Directory is difficult to see in prompt when using Rainbow style](#directory-is-difficult-to-see-in-prompt-when-using-rainbow-style)
+  - [Horrific mess when resizing terminal window](#horrific-mess-when-resizing-terminal-window)
