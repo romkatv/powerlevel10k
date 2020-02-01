@@ -24,8 +24,8 @@ Ready to give Powerlevel10k a try?
    - [Antigen](#antigen)
    - [Zplug](#zplug)
    - [Zgen](#zgen)
-   - [Antibody](#antibody)
    - [Zplugin](#zplugin)
+   - [Zinit](#zinit)
 1. Restart Zsh.
 1. Type `p10k configure` if the configuration wizard doesn't start automatically.
 
@@ -346,13 +346,16 @@ Add `zplug romkatv/powerlevel10k, as:theme, depth:1` to `~/.zshrc`.
 
 Add `zgen load romkatv/powerlevel10k powerlevel10k` to `~/.zshrc`.
 
-### Antibody
-
-Add `antibody bundle romkatv/powerlevel10k` to `~/.zshrc`.
-
 ### Zplugin
 
 Add `zplugin ice depth=1; zplugin light romkatv/powerlevel10k` to `~/.zshrc`.
+
+The use of `depth=1` ice is optional. Other types of ice are neither recommended nor officially
+supported by Powerlevel10k.
+
+### Zinit
+
+Add `zinit ice depth=1; zinit light romkatv/powerlevel10k` to `~/.zshrc`.
 
 The use of `depth=1` ice is optional. Other types of ice are neither recommended nor officially
 supported by Powerlevel10k.
@@ -503,6 +506,25 @@ Powerlevel10k is released under the
 [MIT license](https://github.com/romkatv/powerlevel10k/blob/master/LICENSE).
 
 ## FAQ
+
+### How do I update Powerlevel10k?
+
+The command to update Powerlevel10k depends on how it was installed.
+
+| Installation                       | Update command |
+|-------------------------------|----------------|
+| [Manual](#manual)      | `git -C ~/powerlevel10k pull`  |
+| [Oh My Zsh](#oh-my-zsh)      | `git -C $ZSH_CUSTOM/themes/powerlevel10k pull`  |
+| [Prezto](#prezto)        | `zprezto-update` |
+| [Zim](#zim)        | `zimfw update` |
+| [Antigen](#antigen)        | `antigen update` |
+| [Zplug](#zplug)        | `zplug update` |
+| [Zgen](#zgen)        | `zgen update` |
+| [Zplugin](#zplugin)        | `zplugin update` |
+| [Zinit](#zinit)        | `zinit update` |
+
+**IMPORTANT**: Restart Zsh after updating Powerlevel10k. [Do not use `source ~/.zshrc`](
+  #weird-things-happen-after-typing-source-zshrc).
 
 ### Which aspects of shell and terminal does Powerlevel10k affect?
 
@@ -1125,6 +1147,16 @@ Powerlevel9k.
 *Note:* It's not a good idea to define `POWERLEVEL9K_LEGACY_ICON_SPACING` when using
 `p10k configure`.
 
+### Weird things happen after typing `source ~/.zshrc`
+
+It's almost always a bad idea to run `source ~/.zshrc`, whether you are using Powerlevel10k or not.
+This command may result in random errors, misbehaving code and progressive slowdown of Zsh.
+
+If you've made changes to `~/.zshrc` or to files sourced by it, restart Zsh to apply them. The most
+reliable way to do this is to type `exit` and then start start a new Zsh session. You can also use
+`exec zsh`. While not exactly equivalent to complete Zsh restart, this command is much more reliable
+than `source ~/.zshrc`.
+
 ### Cannot make Powerlevel10k work with my plugin manager
 
 If the [installation instructions](#installation) didn't work for you, try disabling your current
@@ -1187,8 +1219,8 @@ There are several ways to fix this.
   - [Antigen](#antigen)
   - [Zplug](#zplug)
   - [Zgen](#zgen)
-  - [Antibody](#antibody)
   - [Zplugin](#zplugin)
+  - [Zinit](#zinit)
 - [Configuration](#configuration)
   - [For new users](#for-new-users)
   - [For Powerlevel9k users](#for-powerlevel9k-users)
@@ -1199,6 +1231,7 @@ There are several ways to fix this.
 - [Try it in Docker](#try-it-in-docker)
 - [License](#license)
 - [FAQ](#faq)
+  - [How do I update Powerlevel10k?](#how-do-i-update-powerlevel10k)
   - [Which aspects of shell and terminal does Powerlevel10k affect?](#which-aspects-of-shell-and-terminal-does-powerlevel10k-affect)
   - [I'm using Powerlevel9k with Oh My Zsh. How do I migrate?](#im-using-powerlevel9k-with-oh-my-zsh-how-do-i-migrate)
   - [Is it really fast?](#is-it-really-fast)
@@ -1230,5 +1263,6 @@ There are several ways to fix this.
   - [Extra or missing spaces in prompt compared to Powerlevel9k](#extra-or-missing-spaces-in-prompt-compared-to-powerlevel9k)
     - [Extra space without background on the right side of right prompt](#extra-space-without-background-on-the-right-side-of-right-prompt)
     - [Extra or missing spaces around icons](#extra-or-missing-spaces-around-icons)
+  - [Weird things happen after typing `source ~/.zshrc`](#weird-things-happen-after-typing-source-zshrc)
   - [Cannot make Powerlevel10k work with my plugin manager](#cannot-make-powerlevel10k-work-with-my-plugin-manager)
   - [Directory is difficult to see in prompt when using Rainbow style](#directory-is-difficult-to-see-in-prompt-when-using-rainbow-style)
