@@ -80,12 +80,12 @@ local -ra classic_right=(
 )
 
 local -ra pure_left=(
-  '' '%F{$pure_color[blue]}~/src%f %F{$pure_color[grey]}master%f %F{$pure_color[yellow]}5s%f'
+  '' '%F{$pure_color[blue]}~/src%f %F{$pure_color[grey]}master%f ${pure_use_rprompt-%F{$pure_color[yellow]\}5s%f }'
   '' '%F{$pure_color[magenta]}❯%f ${buffer:-█}'
 )
 
 local -ra pure_right=(
-  '' ''
+  '${pure_use_rprompt+%F{$pure_color[yellow]\}5s%f${show_time:+ }}${show_time:+%F{$pure_color[grey]\}16:23:42%f}' ''
   '' ''
 )
 
@@ -769,7 +769,7 @@ function ask_ornaments_color() {
 }
 
 function ask_time() {
-  if (( wizard_columns < 80 )); then
+  if (( wizard_columns < 80 )) && [[ $style != pure ]]; then
     show_time=
     return 0
   fi
@@ -797,6 +797,35 @@ function ask_time() {
       r) return 1;;
       y) show_time=1; options+=time; break;;
       n) show_time=; break;;
+    esac
+  done
+}
+
+function ask_use_rprompt() {
+  [[ $style != pure ]] && return
+  while true; do
+    clear
+    flowing -c "%BNon-permanent content location%b"
+    print -P ""
+    print -P "%B(1)  Left.%b"
+    print -P ""
+    print_prompt
+    print -P ""
+    print -P "%B(2)  Right.%b"
+    print -P ""
+    pure_use_rprompt= print_prompt
+    print -P ""
+    print -P "(r)  Restart from the beginning."
+    print -P "(q)  Quit and do nothing."
+    print -P ""
+
+    local key=
+    read -k key${(%):-"?%BChoice [12rq]: %b"} || quit -c
+    case $key in
+      q) quit;;
+      r) return 1;;
+      1) break;;
+      2) pure_use_rprompt=; options+=rpromt; break;;
     esac
   done
 }
@@ -846,7 +875,7 @@ function os_icon_name() {
 }
 
 function ask_extra_icons() {
-  if [[ $POWERLEVEL9K_MODE == (powerline|compatible) ]]; then
+  if [[ $style == pure || $POWERLEVEL9K_MODE == (powerline|compatible) ]]; then
     return 0
   fi
   local os_icon=${(g::)icons[$(os_icon_name)]}
@@ -900,6 +929,7 @@ function ask_extra_icons() {
 }
 
 function ask_prefixes() {
+  [[ $style == pure ]] && return
   local concise=('' '' '')
   local fluent=('on ' 'took ' 'at ')
   if (( wizard_columns < 80 )); then
@@ -1201,9 +1231,7 @@ function ask_num_lines() {
 }
 
 function ask_gap_char() {
-  if [[ $num_lines != 2 ]]; then
-    return 0
-  fi
+  [[ $num_lines != 2 || $style == pure ]] && return
   while true; do
     clear
     flowing -c "%BPrompt Connection%b"
@@ -1599,10 +1627,6 @@ function generate_config() {
       sub RIGHT_PROMPT_LAST_SEGMENT_END_SYMBOL "'$right_tail'"
     fi
 
-    if [[ -n $show_time ]]; then
-      uncomment time
-    fi
-
     if [[ -n ${(j::)extra_icons} ]]; then
       local branch_icon=${icons[VCS_BRANCH_ICON]// }
       sub VCS_BRANCH_ICON "'$branch_icon '"
@@ -1631,15 +1655,6 @@ function generate_config() {
         sub KUBECONTEXT_PREFIX "'${fg}at '"
         sub TIME_PREFIX "'${fg}at '"
       fi
-    fi
-
-    if (( num_lines == 1 )); then
-      local -a tmp
-      local line
-      for line in "$lines[@]"; do
-        [[ $line == ('    newline'|*'===[ Line #'*) ]] || tmp+=$line
-      done
-      lines=("$tmp[@]")
     fi
 
     sub MULTILINE_FIRST_PROMPT_GAP_CHAR "'$gap_char'"
@@ -1683,9 +1698,31 @@ function generate_config() {
         uncomment vi_mode
       fi
     fi
-
-    (( empty_line )) && sub PROMPT_ADD_NEWLINE true || sub PROMPT_ADD_NEWLINE false
   fi
+
+  if (( $+pure_use_rprompt )); then
+    local segment
+    for segment in command_execution_time virtualenv context; do
+      rep "    $segment" "    tmp_$segment"
+      uncomment $segment
+      rep "    tmp_$segment  " "    # $segment"
+    done
+  fi
+
+  if [[ -n $show_time ]]; then
+    uncomment time
+  fi
+
+  if (( num_lines == 1 )); then
+    local -a tmp
+    local line
+    for line in "$lines[@]"; do
+      [[ $line == ('    newline'*|*'===[ Line #'*) ]] || tmp+=$line
+    done
+    lines=("$tmp[@]")
+  fi
+
+  (( empty_line )) && sub PROMPT_ADD_NEWLINE true || sub PROMPT_ADD_NEWLINE false
 
   sub INSTANT_PROMPT $instant_prompt
   (( transient_prompt )) && sub TRANSIENT_PROMPT always
@@ -1793,6 +1830,8 @@ while true; do
     local -A pure_color=(${(kv)pure_original})
   fi
 
+  unset pure_use_rprompt
+
   ask_font || continue
   ask_diamond || continue
   if [[ $AWESOME_GLYPHS_LOADED == 1 ]]; then
@@ -1847,27 +1886,26 @@ while true; do
     right_head=$fade_in
   fi
   _p9k_init_icons
-  ask_narrow_icons      || continue
-  ask_style             || continue
-  ask_color_scheme      || continue
-  if [[ $style != pure ]]; then
-    ask_color           || continue
-    ask_time            || continue
-    ask_separators      || continue
-    ask_heads           || continue
-    ask_tails           || continue
-    ask_num_lines       || continue
-    ask_gap_char        || continue
-    ask_frame           || continue
-    ask_ornaments_color || continue
-    ask_empty_line      || continue
-    ask_extra_icons     || continue
-    ask_prefixes        || continue
-  fi
-  ask_transient_prompt  || continue
-  ask_instant_prompt    || continue
-  ask_config_overwrite  || continue
-  ask_zshrc_edit        || continue
+  ask_narrow_icons     || continue
+  ask_style            || continue
+  ask_color_scheme     || continue
+  ask_color            || continue
+  ask_use_rprompt      || continue
+  ask_time             || continue
+  ask_separators       || continue
+  ask_heads            || continue
+  ask_tails            || continue
+  ask_num_lines        || continue
+  ask_gap_char         || continue
+  ask_frame            || continue
+  ask_ornaments_color  || continue
+  ask_empty_line       || continue
+  ask_extra_icons      || continue
+  ask_prefixes         || continue
+  ask_transient_prompt || continue
+  ask_instant_prompt   || continue
+  ask_config_overwrite || continue
+  ask_zshrc_edit       || continue
   break
 done
 
@@ -1882,7 +1920,7 @@ if [[ -n $zshrc_backup ]]; then
 fi
 
 generate_config || return
-change_zshrc || return
+change_zshrc    || return
 
 print -rP ""
 flowing +c File feature requests and bug reports at "$(href https://github.com/romkatv/powerlevel10k/issues)."

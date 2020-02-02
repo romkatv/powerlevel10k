@@ -42,17 +42,27 @@
 
   # Left prompt segments.
   typeset -g POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(
+    # =========================[ Line #1 ]=========================
     dir                       # current directory
     vcs                       # git status
     context                   # user@host
     command_execution_time    # previous command duration
+    # =========================[ Line #2 ]=========================
     newline                   # \n
     virtualenv                # python virtual environment
     prompt_char               # prompt symbol
   )
 
   # Right prompt segments.
-  typeset -g POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=()
+  typeset -g POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(
+    # =========================[ Line #1 ]=========================
+    # command_execution_time  # previous command duration
+    # virtualenv              # python virtual environment
+    # context                 # user@host
+    # time                    # current time
+    # =========================[ Line #2 ]=========================
+    newline                   # \n
+  )
 
   # Basic style options that define the overall prompt look.
   typeset -g POWERLEVEL9K_BACKGROUND=                            # transparent background
@@ -62,7 +72,7 @@
   typeset -g POWERLEVEL9K_VISUAL_IDENTIFIER_EXPANSION=           # no segment icons
 
   # Add an empty line before each prompt except the first. This doesn't emulate the bug
-  # in Pure that makes prompt drift down whenever you use the ALT-C binding from fzf or similar.
+  # in Pure that makes prompt drift down whenever you use the Alt-C binding from fzf or similar.
   typeset -g POWERLEVEL9K_PROMPT_ADD_NEWLINE=true
 
   # Magenta prompt symbol if the last command succeeded.
@@ -134,6 +144,15 @@
   typeset -g POWERLEVEL9K_VCS_{COMMITS_AHEAD,COMMITS_BEHIND}_MAX_NUM=1
   # Remove space between '⇣' and '⇡' and all trailing spaces.
   typeset -g POWERLEVEL9K_VCS_CONTENT_EXPANSION='${${P9K_CONTENT/⇣* ⇡/⇣⇡}// }'
+
+  # Grey current time.
+  typeset -g POWERLEVEL9K_TIME_FOREGROUND=$grey
+  # Format for the current time: 09:51:02. See `man 3 strftime`.
+  typeset -g POWERLEVEL9K_TIME_FORMAT='%D{%H:%M:%S}'
+  # If set to true, time will update when you hit enter. This way prompts for the past
+  # commands will contain the start times of their commands rather than the end times of
+  # their preceding commands.
+  typeset -g POWERLEVEL9K_TIME_UPDATE_ON_COMMAND=false
 
   # Transient prompt works similarly to the builtin transient_rprompt option. It trims down prompt
   # when accepting a command line. Supported values:

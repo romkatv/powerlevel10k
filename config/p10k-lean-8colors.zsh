@@ -34,7 +34,7 @@
     dir                     # current directory
     vcs                     # git status
     # =========================[ Line #2 ]=========================
-    newline
+    newline                 # \n
     prompt_char             # prompt symbol
   )
 
@@ -88,7 +88,7 @@
     timewarrior             # timewarrior tracking status (https://timewarrior.net/)
     # time                  # current time
     # =========================[ Line #2 ]=========================
-    newline
+    newline                 # \n
     # public_ip             # public IP address
     # proxy                 # system-wide http/https/ftp proxy
     # battery               # internal battery
