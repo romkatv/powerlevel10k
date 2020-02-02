@@ -1232,9 +1232,9 @@ Terminal truncates text when shrinking:
 ![Terminal Truncates Text When Shrinking](
   https://raw.githubusercontent.com/romkatv/powerlevel10k-media/master/resize-truncate.png)
 
-Reflowing strategy can change the hight of terminal content. If such content happens to be between
+Reflowing strategy can change the height of terminal content. If such content happens to be between
 the start of the current prompt and the cursor, Zsh will print prompt on the wrong line. Truncation
-strategy never changes the hight of terminal content, so it doesn't trigger this bug in Zsh.
+strategy never changes the height of terminal content, so it doesn't trigger this bug in Zsh.
 
 Let's see how the bug plays out in slow motion. We'll start by launching `zsh -df` and pasting
 the following code:
