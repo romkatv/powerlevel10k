@@ -58,6 +58,8 @@ running `p10k configure` to unlock all prompt styles.
 
 *Troubleshooting*:
 
+- [Some prompt styles are missing from the configuration wizard](
+    #some-prompt-styles-are-missing-from-the-configuration-wizard).
 - [Question mark in prompt](#question-mark-in-prompt).
 - [Icons, glyphs or powerline symbols don't render](#icons-glyphs-or-powerline-symbols-dont-render).
 - [Sub-pixel imperfections around powerline symbols](
@@ -1082,6 +1084,22 @@ first configuration wizard screen to see these errors. Alternatively, run
 `POWERLEVEL9K_DISABLE_CONFIGURATION_WIZARD=true zsh` to start Zsh without automatically running the
 configuration wizard. Once you can see the errors, fix `~/.zshrc` to get rid of them.
 
+### Some prompt styles are missing from the configuration wizard
+
+tl;dr: To see all prompt styles in the configuration wizard, install [the recommended font](
+  #meslo-nerd-font-patched-for-powerlevel10k) and resize your terminal to at least 80 columns by 25
+lines prior to running `p10k configure`.
+
+The first few questions in the configuration wizard are meant to assess the capabilities of the
+terminal font. If your answers indicate that some glyphs don't render correctly, configuration
+wizard won't offer prompt styles that use them. If you'd like to see all prompt styles, install
+[the recommended font](#meslo-nerd-font-patched-for-powerlevel10k).
+
+The minimum screen size at which configuration wizard can function is 55 columns by 21 lines.
+However, not all prompt styles are offered at such small screen size as there is simply not enough
+space to present them. Resize your terminal to at least 80 columns by 25 lines prior to running
+`p10k configure` to see all prompt styles.
+
 ### Cannot install the recommended font
 
 Once you download [the recommended font](#meslo-nerd-font-patched-for-powerlevel10k),
@@ -1393,6 +1411,7 @@ There are a few mitigation options for this issue.
   - [Prompt wrapping around in a weird way](#prompt-wrapping-around-in-a-weird-way)
   - [Right prompt is in the wrong place](#right-prompt-is-in-the-wrong-place)
   - [Configuration wizard run automatically every time Zsh is started](#configuration-wizard-run-automatically-every-time-zsh-is-started)
+  - [Some prompt styles are missing from the configuration wizard](#some-prompt-styles-are-missing-from-the-configuration-wizard)
   - [Cannot install the recommended font](#cannot-install-the-recommended-font)
   - [Extra or missing spaces in prompt compared to Powerlevel9k](#extra-or-missing-spaces-in-prompt-compared-to-powerlevel9k)
     - [Extra space without background on the right side of right prompt](#extra-space-without-background-on-the-right-side-of-right-prompt)
