@@ -1597,7 +1597,7 @@ function generate_config() {
     fi
 
     if [[ $POWERLEVEL9K_MODE == nerdfont-complete ]]; then
-      sub BATTERY_STAGES "\$'\uf58d\uf579\uf57a\uf57b\uf57c\uf57d\uf57e\uf57f\uf580\uf581\uf578'"
+      sub BATTERY_STAGES "'\uf58d\uf579\uf57a\uf57b\uf57c\uf57d\uf57e\uf57f\uf580\uf581\uf578'"
     fi
 
     if [[ $style == (classic|rainbow) ]]; then
