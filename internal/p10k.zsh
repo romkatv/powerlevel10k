@@ -517,7 +517,7 @@ _p9k_param() {
 
 # _p9k_get_icon prompt_foo_BAR BAZ_ICON quix
 _p9k_get_icon() {
-  local key="_p9k_param ${(pj:\0:)*}"
+  local key="_p9k_get_icon ${(pj:\0:)*}"
   _p9k_ret=$_p9k_cache[$key]
   if [[ -n $_p9k_ret ]]; then
     _p9k_ret[-1,-1]=''
@@ -6474,7 +6474,7 @@ _p9k_must_init() {
     [[ $sig == $_p9k__param_sig ]] && return 1
     _p9k_deinit
   fi
-  _p9k__param_pat=$'v34\1'${ZSH_VERSION}$'\1'${ZSH_PATCHLEVEL}$'\1'
+  _p9k__param_pat=$'v35\1'${ZSH_VERSION}$'\1'${ZSH_PATCHLEVEL}$'\1'
   _p9k__param_pat+=$'${#parameters[(I)POWERLEVEL9K_*]}\1${(%):-%n%#}\1$GITSTATUS_LOG_LEVEL\1'
   _p9k__param_pat+=$'$GITSTATUS_ENABLE_LOGGING\1$GITSTATUS_DAEMON\1$GITSTATUS_NUM_THREADS\1'
   _p9k__param_pat+=$'$DEFAULT_USER\1${ZLE_RPROMPT_INDENT:-1}\1$P9K_SSH\1$__p9k_ksh_arrays'
