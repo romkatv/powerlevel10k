@@ -135,12 +135,6 @@ function _p9k_worker_receive() {
           fi
         ;;
         e)
-          if (( start_time )); then
-            local -F end_time=EPOCHREALTIME
-            local -F3 latency=$((1000*(end_time-start_time)))
-            echo "latency: $latency ms" >>/tmp/log
-            start_time=0
-          fi
           () { eval $arg }
           (( reset > max_reset )) && max_reset=reset
         ;;
