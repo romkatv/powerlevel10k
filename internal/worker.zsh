@@ -121,7 +121,7 @@ function _p9k_worker_receive() {
       sysread -i $_p9k__worker_resp_fd 'buf[$#buf+1]'                                 || return
     done
 
-    local -i reset
+    local -i reset max_reset
     for resp in ${(ps:\x1e:)${buf//$'\x05'}}; do
       local arg=$resp[2,-1]
       case $resp[1] in
@@ -142,6 +142,7 @@ function _p9k_worker_receive() {
             start_time=0
           fi
           () { eval $arg }
+          (( reset > max_reset )) && max_reset=reset
         ;;
         s)
           [[ -z $_p9k__worker_pid ]]                                                  || return
@@ -160,12 +161,12 @@ function _p9k_worker_receive() {
       esac
     done
 
-    if (( reset == 2 )); then
+    if (( max_reset == 2 )); then
       _p9k_refresh_reason=worker
       _p9k_set_prompt
       _p9k_refresh_reason=''
     fi
-    (( reset )) && _p9k_reset_prompt
+    (( max_reset )) && _p9k_reset_prompt
     return 0
   } always {
     (( $? )) && _p9k_worker_stop
