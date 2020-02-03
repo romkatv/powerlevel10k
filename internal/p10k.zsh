@@ -1374,24 +1374,27 @@ _p9k_prompt_battery_set_args() {
   [[ $_POWERLEVEL9K_BATTERY_VERBOSE == 1 && -n $remain ]] && msg+=" ($remain)"
 
   local icon=BATTERY_ICON
-  if (( $#_POWERLEVEL9K_BATTERY_STAGES )); then
-    local -i idx=$#_POWERLEVEL9K_BATTERY_STAGES
-    (( bat_percent < 100 )) && idx=$((bat_percent * $#_POWERLEVEL9K_BATTERY_STAGES / 100 + 1))
-    icon=$'\1'$_POWERLEVEL9K_BATTERY_STAGES[idx]
+  local var=_POWERLEVEL9K_BATTERY_${state}_STAGES
+  local -i idx="${#${(@P)var}}"
+  if (( idx )); then
+    (( bat_percent < 100 )) && idx=$((bat_percent * idx / 100 + 1))
+    icon=$'\1'"${${(@P)var}[idx]}"
   fi
 
   local bg=$_p9k_color1
-  if (( $#_POWERLEVEL9K_BATTERY_LEVEL_BACKGROUND )); then
-    local -i idx=$#_POWERLEVEL9K_BATTERY_LEVEL_BACKGROUND
-    (( bat_percent < 100 )) && idx=$((bat_percent * $#_POWERLEVEL9K_BATTERY_LEVEL_BACKGROUND / 100 + 1))
-    bg=$_POWERLEVEL9K_BATTERY_LEVEL_BACKGROUND[idx]
+  local var=_POWERLEVEL9K_BATTERY_${state}_LEVEL_BACKGROUND
+  local -i idx="${#${(@P)var}}"
+  if (( idx )); then
+    (( bat_percent < 100 )) && idx=$((bat_percent * idx / 100 + 1))
+    bg="${${(@P)var}[idx]}"
   fi
 
   local fg=$_p9k_battery_states[$state]
-  if (( $#_POWERLEVEL9K_BATTERY_LEVEL_FOREGROUND )); then
-    local -i idx=$#_POWERLEVEL9K_BATTERY_LEVEL_FOREGROUND
-    (( bat_percent < 100 )) && idx=$((bat_percent * $#_POWERLEVEL9K_BATTERY_LEVEL_FOREGROUND / 100 + 1))
-    fg=$_POWERLEVEL9K_BATTERY_LEVEL_FOREGROUND[idx]
+  local var=_POWERLEVEL9K_BATTERY_${state}_LEVEL_FOREGROUND
+  local -i idx="${#${(@P)var}}"
+  if (( idx )); then
+    (( bat_percent < 100 )) && idx=$((bat_percent * idx / 100 + 1))
+    fg="${${(@P)var}[idx]}"
   fi
 
   _p9k__battery_args=(prompt_battery_$state "$bg" "$fg" $icon 0 '' $msg)
@@ -5679,16 +5682,32 @@ _p9k_init_params() {
   _p9k_declare -i POWERLEVEL9K_DISK_USAGE_CRITICAL_LEVEL 95
   _p9k_declare -i POWERLEVEL9K_BATTERY_LOW_THRESHOLD 10
   _p9k_declare -i POWERLEVEL9K_BATTERY_HIDE_ABOVE_THRESHOLD 999
+  _p9k_declare -b POWERLEVEL9K_BATTERY_VERBOSE 1
   _p9k_declare -a POWERLEVEL9K_BATTERY_LEVEL_BACKGROUND --
   _p9k_declare -a POWERLEVEL9K_BATTERY_LEVEL_FOREGROUND --
-  _p9k_declare -b POWERLEVEL9K_BATTERY_VERBOSE 1
-  if [[ $parameters[POWERLEVEL9K_BATTERY_STAGES] == scalar ]]; then
-    _p9k_declare -e POWERLEVEL9K_BATTERY_STAGES
-  else
-    [[ -z $_p9k_locale ]] || local LC_ALL=$_p9k_locale
-    _p9k_declare -a POWERLEVEL9K_BATTERY_STAGES --
-    _POWERLEVEL9K_BATTERY_STAGES=("${(@g::)_POWERLEVEL9K_BATTERY_STAGES}")
-  fi
+  case $parameters[POWERLEVEL9K_BATTERY_STAGES] in
+    scalar*) typeset -ga _POWERLEVEL9K_BATTERY_STAGES=("${(@s::)${(g::)POWERLEVEL9K_BATTERY_STAGES}}");;
+    array*)  typeset -ga _POWERLEVEL9K_BATTERY_STAGES=("${(@g::)POWERLEVEL9K_BATTERY_STAGES}");;
+  esac
+  local state
+  for state in CHARGED CHARGING LOW DISCONNECTED; do
+    local var=POWERLEVEL9K_BATTERY_${state}_STAGES
+    case $parameters[$var] in
+      scalar*) eval "typeset -ga _$var=(${(@qq)${(@s::)${(g::)${(P)var}}}})";;
+      array*)  eval "typeset -ga _$var=(${(@qq)${(@g::)${(@P)var}}})";;
+      *)       eval "typeset -ga _$var=(${(@qq)_POWERLEVEL9K_BATTERY_STAGES})";;
+    esac
+    local var=POWERLEVEL9K_BATTERY_${state}_LEVEL_BACKGROUND
+    case $parameters[$var] in
+      array*)  eval "typeset -ga _$var=(${(@qq)${(@P)var}})";;
+      *)       eval "typeset -ga _$var=(${(@qq)_POWERLEVEL9K_BATTERY_LEVEL_BACKGROUND})";;
+    esac
+    local var=POWERLEVEL9K_BATTERY_${state}_LEVEL_FOREGROUND
+    case $parameters[$var] in
+      array*)  eval "typeset -ga _$var=(${(@qq)${(@P)var}})";;
+      *)       eval "typeset -ga _$var=(${(@qq)_POWERLEVEL9K_BATTERY_LEVEL_FOREGROUND})";;
+    esac
+  done
   _p9k_declare -F POWERLEVEL9K_PUBLIC_IP_TIMEOUT 300
   _p9k_declare -a POWERLEVEL9K_PUBLIC_IP_METHODS -- dig curl wget
   _p9k_declare -e POWERLEVEL9K_PUBLIC_IP_NONE ""
@@ -6455,7 +6474,7 @@ _p9k_must_init() {
     [[ $sig == $_p9k__param_sig ]] && return 1
     _p9k_deinit
   fi
-  _p9k__param_pat=$'v33\1'${ZSH_VERSION}$'\1'${ZSH_PATCHLEVEL}$'\1'
+  _p9k__param_pat=$'v34\1'${ZSH_VERSION}$'\1'${ZSH_PATCHLEVEL}$'\1'
   _p9k__param_pat+=$'${#parameters[(I)POWERLEVEL9K_*]}\1${(%):-%n%#}\1$GITSTATUS_LOG_LEVEL\1'
   _p9k__param_pat+=$'$GITSTATUS_ENABLE_LOGGING\1$GITSTATUS_DAEMON\1$GITSTATUS_NUM_THREADS\1'
   _p9k__param_pat+=$'$DEFAULT_USER\1${ZLE_RPROMPT_INDENT:-1}\1$P9K_SSH\1$__p9k_ksh_arrays'
