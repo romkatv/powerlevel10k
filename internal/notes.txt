@@ -8,3 +8,34 @@
   disabling implicit reset on every eval in _p9k_worker_receive.
 - implement fake gitstatus api on top of vcs_info (or plain git?) + worker and use it if there is no
   gitstatus.
+
+## asdf
+
+- https://asdf-vm.com/#/core-configuration?id=environment-variables
+- https://asdf-vm.com/#/core-configuration?id=tool-versions
+- https://asdf-vm.com/#/core-configuration?id=homeasdfrc
+- https://asdf-vm.com/#/plugins-create?id=binlist-legacy-filenames
+- https://asdf-vm.com/#/plugins-create?id=binparse-legacy-file
+- `print -lr -- ${ASDF_DATA_DIR:-~/.asdf}/plugins/*(/N:t)`
+- `print -lr -- $(${ASDF_DATA_DIR:-~/.asdf}/plugins/ruby/bin/list-legacy-filenames)`
+- `${ASDF_DATA_DIR:-~/.asdf}/plugins/ruby/bin/parse-legacy-file ~/powerlevel10k/test/foo/.ruby-version`
+  - if empty, keep looking
+- deeper version overrides win
+- .tool-versions wins over .ruby-version when in the same directory
+- versions for different tools are looked up independently: if /foo/bar/.tool-versions doesn't
+  override "ruby" it's as if it doesn't exist as far as ruby version is concerned.
+- ${ASDF_CONFIG_FILE:-~/.asdfrc} parsing:
+    opt="$(
+      grep -E "^\\s*legacy_version_file\\s*=\\s*" "$config_path" |
+      head                                                     |
+      awk -F '=' '{print $2}'                                  |
+      sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')"
+    [[ $opt == yes ]]
+
+Stat caches:
+- ${ASDF_CONFIG_FILE:-~/.asdfrc} => legacy_version_file (yes or no)
+- ${ASDF_DATA_DIR:-~/.asdf}/plugins => list of plugins
+- ${ASDF_DATA_DIR:-~/.asdf}/plugins/ruby/bin => list of relevant scripts
+  (list-legacy-filenames and parse-legacy-file)
+- ${ASDF_DATA_DIR:-~/.asdf}/plugins/ruby/bin/list-legacy-filenames => list (or pattern made from it?)
+- /foo/bar => { tool => version }
