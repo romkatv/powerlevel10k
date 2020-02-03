@@ -4409,6 +4409,107 @@ function _p9k_prompt_timewarrior_init() {
   typeset -g "_p9k__segment_cond_${_p9k_prompt_side}[_p9k_segment_index]"='$commands[timew]'
 }
 
+prompt_wifi() {
+  local -i len=$#_p9k__prompt
+  _p9k_prompt_segment $0 green $_p9k_color1 WIFI_ICON 1 '$_p9k__wifi_on' '$P9K_WIFI_LAST_TX_RATE Mbps'
+  typeset -g "_p9k__segment_val_${_p9k_prompt_side}[_p9k_segment_index]"=$_p9k__prompt[len+1,-1]
+}
+
+_p9k_prompt_wifi_init() {
+  if [[ -x /System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Resources/airport ]]; then
+    typeset -g _p9k__wifi_on=
+    typeset -g P9K_WIFI_LAST_TX_RATE=
+    typeset -g P9K_WIFI_SSID=
+    typeset -g P9K_WIFI_LINK_AUTH=
+    typeset -g P9K_WIFI_RSSI=
+    typeset -g P9K_WIFI_NOISE=
+    typeset -g P9K_WIFI_BARS=
+    _p9k__async_segments_compute+=_p9k_prompt_wifi_compute
+  else
+    typeset -g "_p9k__segment_cond_${_p9k_prompt_side}[_p9k_segment_index]"='${:-}'
+  fi
+}
+
+_p9k_prompt_wifi_compute() {
+  _p9k_worker_async _p9k_prompt_wifi_async _p9k_prompt_wifi_sync
+}
+
+_p9k_prompt_wifi_async() {
+  local airport=/System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Resources/airport
+  local last_tx_rate ssid link_auth rssi noise bars on out line v state
+  {
+    [[ -x $airport ]] || return 0
+    out="$($airport -I)" || return 0
+    for line in ${${${(f)out}##[[:space:]]#}%%[[:space:]]#}; do
+      v=${line#*: }
+      case $line[1,-$#v-3] in
+        agrCtlRSSI)  rssi=$v;;
+        agrCtlNoise) noise=$v;;
+        state)       state=$v;;
+        lastTxRate)  last_tx_rate=$v;;
+        link\ auth)  link_auth=$v;;
+        SSID)        ssid=$v;;
+      esac
+    done
+    if [[ $state != running || $rssi != (0|-<->) || $noise != (0|-<->) ]]; then
+      rssi=
+      noise=
+      last_tx_rate=
+      link_auth=
+      ssid=
+      bars=
+      return 0
+    fi
+    # https://www.speedguide.net/faq/how-to-read-rssisignal-and-snrnoise-ratings-440
+    # http://www.wireless-nets.com/resources/tutorials/define_SNR_values.html
+    local -i snr_margin='rssi - noise'
+    if (( snr_margin >= 40 )); then
+      bars=4
+    elif (( snr_margin >= 25 )); then
+      bars=3
+    elif (( snr_margin >= 15 )); then
+      bars=2
+    elif (( snr_margin >= 10 )); then
+      bars=1
+    else
+      bars=0
+    fi
+    on=1
+  } always {
+    if [[ $_p9k__wifi_on         != $on           ||
+          $P9K_WIFI_LAST_TX_RATE != $last_tx_rate ||
+          $P9K_WIFI_SSID         != $ssid         ||
+          $P9K_WIFI_LINK_AUTH    != $link_auth    ||
+          $P9K_WIFI_RSSI         != $rssi         ||
+          $P9K_WIFI_NOISE        != $noise        ||
+          $P9K_WIFI_BARS         != $bars         ]]; then
+      _p9k__wifi_on=$on
+      P9K_WIFI_LAST_TX_RATE=$last_tx_rate
+      P9K_WIFI_SSID=$ssid
+      P9K_WIFI_LINK_AUTH=$link_auth
+      P9K_WIFI_RSSI=$rssi
+      P9K_WIFI_NOISE=$noise
+      P9K_WIFI_BARS=$bars
+      _p9k_print_params       \
+        _p9k__wifi_on         \
+        P9K_WIFI_LAST_TX_RATE \
+        P9K_WIFI_SSID         \
+        P9K_WIFI_LINK_AUTH    \
+        P9K_WIFI_RSSI         \
+        P9K_WIFI_NOISE        \
+        P9K_WIFI_BARS
+      echo -E - 'reset=1'
+    fi
+  }
+}
+
+_p9k_prompt_wifi_sync() {
+  if [[ -n $REPLY ]]; then
+    eval $REPLY
+    _p9k_worker_reply $REPLY
+  fi
+}
+
 # Use two preexec hooks to survive https://github.com/MichaelAquilina/zsh-you-should-use with
 # YSU_HARDCORE=1. See https://github.com/romkatv/powerlevel10k/issues/427.
 _p9k_preexec1() {
@@ -5609,7 +5710,7 @@ _p9k_init_vars() {
   typeset -g  _p9k__last_prompt_pwd
   typeset -gA _p9k_display_k
   typeset -ga _p9k__display_v
-  typeset -ga _p9k__async_segments_compute
+  typeset -gaU _p9k__async_segments_compute
 
   typeset -gA _p9k__dotnet_stat_cache
   typeset -gA _p9k__dir_stat_cache
@@ -6474,7 +6575,7 @@ _p9k_must_init() {
     [[ $sig == $_p9k__param_sig ]] && return 1
     _p9k_deinit
   fi
-  _p9k__param_pat=$'v35\1'${ZSH_VERSION}$'\1'${ZSH_PATCHLEVEL}$'\1'
+  _p9k__param_pat=$'v36\1'${ZSH_VERSION}$'\1'${ZSH_PATCHLEVEL}$'\1'
   _p9k__param_pat+=$'${#parameters[(I)POWERLEVEL9K_*]}\1${(%):-%n%#}\1$GITSTATUS_LOG_LEVEL\1'
   _p9k__param_pat+=$'$GITSTATUS_ENABLE_LOGGING\1$GITSTATUS_DAEMON\1$GITSTATUS_NUM_THREADS\1'
   _p9k__param_pat+=$'$DEFAULT_USER\1${ZLE_RPROMPT_INDENT:-1}\1$P9K_SSH\1$__p9k_ksh_arrays'

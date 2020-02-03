@@ -93,6 +93,7 @@
     # public_ip             # public IP address
     # proxy                 # system-wide http/https/ftp proxy
     # battery               # internal battery
+    # wifi                  # wifi speed
     # example               # example user-defined segment (see prompt_example function below)
   )
 
@@ -1152,6 +1153,37 @@
   # Don't show the remaining time to charge/discharge.
   typeset -g POWERLEVEL9K_BATTERY_VERBOSE=false
   # typeset -g POWERLEVEL9K_BATTERY_BACKGROUND=0
+
+  #####################################[ wifi: wifi speed ]#####################################
+  # WiFi color.
+  # typeset -g POWERLEVEL9K_WIFI_FOREGROUND=0
+  # typeset -g POWERLEVEL9K_WIFI_BACKGROUND=4
+  # Custom icon.
+  # typeset -g POWERLEVEL9K_WIFI_VISUAL_IDENTIFIER_EXPANSION='⭐'
+
+  # Use different colors and icons depending on signal strength ($P9K_WIFI_BARS).
+  #
+  #   # Wifi colors and icons for different signal strength levels (low to high).
+  #   typeset -g my_wifi_fg=(0 0 0 0 0)                                # <-- change these values
+  #   typeset -g my_wifi_icon=('WiFi' 'WiFi' 'WiFi' 'WiFi' 'WiFi')     # <-- change these values
+  #
+  #   typeset -g POWERLEVEL9K_WIFI_CONTENT_EXPANSION='%F{${my_wifi_fg[P9K_WIFI_BARS+1]}}$P9K_WIFI_LAST_TX_RATE Mbps'
+  #   typeset -g POWERLEVEL9K_WIFI_VISUAL_IDENTIFIER_EXPANSION='%F{${my_wifi_fg[P9K_WIFI_BARS+1]}}${my_wifi_icon[P9K_WIFI_BARS+1]}'
+  #
+  # The following parameters are accessible within the expansions:
+  #
+  #   Parameter             | Meaning
+  #   ----------------------+---------------
+  #   P9K_WIFI_SSID         | service set identifier, a.k.a. network name
+  #   P9K_WIFI_LINK_AUTH    | authentication protocol
+  #   P9K_WIFI_LAST_TX_RATE | wireless transmit rate in megabits per second
+  #   P9K_WIFI_RSSI         | signal strength in dBm, from -120 to 0
+  #   P9K_WIFI_NOISE        | noise in dBm, from -120 to 0
+  #   P9K_WIFI_BARS         | signal strength in bars, from 0 to 4 (derived from P9K_WIFI_RSSI and P9K_WIFI_NOISE)
+  #
+  # All parameters except P9K_WIFI_BARS are extracted from the output of the following command:
+  #
+  #   /System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Resources/airport -I
 
   ####################################[ time: current time ]####################################
   # Current time color.

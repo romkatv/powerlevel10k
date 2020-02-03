@@ -133,6 +133,7 @@ function _p9k_init_icons() {
         NNN_ICON                       'nnn'
         TIMEWARRIOR_ICON               'tw'
         NIX_SHELL_ICON                 'nix'
+        WIFI_ICON                      'WiFi'
       )
     ;;
     'awesome-fontconfig')
@@ -245,6 +246,7 @@ function _p9k_init_icons() {
         NNN_ICON                       'nnn'
         TIMEWARRIOR_ICON               'tw'
         NIX_SHELL_ICON                 'nix'
+        WIFI_ICON                      'WiFi'
       )
     ;;
     'awesome-mapped-fontconfig')
@@ -361,6 +363,7 @@ function _p9k_init_icons() {
         NNN_ICON                       'nnn'
         TIMEWARRIOR_ICON               'tw'
         NIX_SHELL_ICON                 'nix'
+        WIFI_ICON                      'WiFi'
       )
     ;;
     'nerdfont-complete'|'nerdfont-fontconfig')
@@ -474,6 +477,7 @@ function _p9k_init_icons() {
         NNN_ICON                       'nnn'
         TIMEWARRIOR_ICON               '\uF49B'               # 
         NIX_SHELL_ICON                 '\uF313'               # 
+        WIFI_ICON                      '\uF1EB'               # 
       )
     ;;
     *)
@@ -586,6 +590,7 @@ function _p9k_init_icons() {
         NNN_ICON                       'nnn'
         TIMEWARRIOR_ICON               'tw'
         NIX_SHELL_ICON                 'nix'
+        WIFI_ICON                      'WiFi'
       )
     ;;
   esac
