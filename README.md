@@ -1086,14 +1086,14 @@ configuration wizard. Once you can see the errors, fix `~/.zshrc` to get rid of 
 
 ### Some prompt styles are missing from the configuration wizard
 
-tl;dr: To see all prompt styles in the configuration wizard, install [the recommended font](
-  #meslo-nerd-font-patched-for-powerlevel10k) and resize your terminal to at least 80 columns by 25
-lines prior to running `p10k configure`.
+tl;dr: To see all prompt styles in the configuration wizard, restart your terminal, install
+[the recommended font](#meslo-nerd-font-patched-for-powerlevel10k) and resize your terminal to at
+least 80 columns by 25 lines prior to running `p10k configure`.
 
 The first few questions in the configuration wizard are meant to assess the capabilities of the
 terminal font. If your answers indicate that some glyphs don't render correctly, configuration
-wizard won't offer prompt styles that use them. If you'd like to see all prompt styles, install
-[the recommended font](#meslo-nerd-font-patched-for-powerlevel10k).
+wizard won't offer prompt styles that use them. If you'd like to see all prompt styles, restart your
+terminal and install [the recommended font](#meslo-nerd-font-patched-for-powerlevel10k).
 
 The minimum screen size at which configuration wizard can function is 55 columns by 21 lines.
 However, not all prompt styles are offered at such small screen size as there is simply not enough
