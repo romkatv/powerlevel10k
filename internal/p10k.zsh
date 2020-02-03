@@ -4086,6 +4086,7 @@ _p9k_prompt_azure_init() {
 }
 
 prompt_gcloud() {
+  # TODO: Use `gcloud config configurations list` instead.
   unset P9K_GCLOUD_PROJECT P9K_GCLOUD_ACCOUNT
   if ! _p9k_cache_stat_get $0 ~/.config/gcloud/active_config ~/.config/gcloud/configurations/config_default; then
     _p9k_cache_stat_set "$(gcloud config get-value account 2>/dev/null)" "$(gcloud config get-value project 2>/dev/null)"
