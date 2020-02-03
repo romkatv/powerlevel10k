@@ -421,7 +421,7 @@ function _p9k_init_icons() {
         HOME_SUB_ICON                  '\uF07C'$s             # 
         FOLDER_ICON                    '\uF115'$s             # 
         ETC_ICON                       '\uF013'$s             # 
-        NETWORK_ICON                   '\uF1EB'$s             # 
+        NETWORK_ICON                   '\uFBF1'$s             # ﯱ
         LOAD_ICON                      '\uF080 '              # 
         SWAP_ICON                      '\uF464'$s             # 
         RAM_ICON                       '\uF0E4'$s             # 
@@ -457,9 +457,9 @@ function _p9k_init_icons() {
         DROPBOX_ICON                   '\UF16B'$s             # 
         DATE_ICON                      '\uF073 '              # 
         TIME_ICON                      '\uF017 '              # 
-        JAVA_ICON                      '\U2615'               # ☕︎
+        JAVA_ICON                      '\uE738'               # 
         LARAVEL_ICON                   '\ue73f'$q             # 
-        RANGER_ICON                    '\u2B50'               # ⭐
+        RANGER_ICON                    '\uF00b'               # 
         MIDNIGHT_COMMANDER_ICON        'mc'
         VIM_ICON                       '\uE62B'               # 
         TERRAFORM_ICON                 '\U1F6E0\u00A0'        # 🛠️
