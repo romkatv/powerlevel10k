@@ -20,10 +20,13 @@
 - `print -lr -- $(${ASDF_DATA_DIR:-~/.asdf}/plugins/ruby/bin/list-legacy-filenames)`
 - `${ASDF_DATA_DIR:-~/.asdf}/plugins/ruby/bin/parse-legacy-file ~/powerlevel10k/test/foo/.ruby-version`
   - if empty, keep looking
+- ASDF_${upcase_name}_VERSION wins over everything
 - deeper version overrides win
 - .tool-versions wins over .ruby-version when in the same directory
 - versions for different tools are looked up independently: if /foo/bar/.tool-versions doesn't
   override "ruby" it's as if it doesn't exist as far as ruby version is concerned.
+- after upglob look $HOME (same file patterns)
+- finally look at $ASDF_DEFAULT_TOOL_VERSIONS_FILENAME (single file; parse it like .tool-versions)
 - ${ASDF_CONFIG_FILE:-~/.asdfrc} parsing:
     opt="$(
       grep -E "^\\s*legacy_version_file\\s*=\\s*" "$config_path" |
@@ -38,4 +41,16 @@ Stat caches:
 - ${ASDF_DATA_DIR:-~/.asdf}/plugins/ruby/bin => list of relevant scripts
   (list-legacy-filenames and parse-legacy-file)
 - ${ASDF_DATA_DIR:-~/.asdf}/plugins/ruby/bin/list-legacy-filenames => list (or pattern made from it?)
-- /foo/bar => { tool => version }
+- /foo/bar => { tool => version } (permanent cache via stat cache)
+
+---
+
+typeset -ga _p9k_asdf_meta_files=(
+  ${ASDF_CONFIG_FILE:-~/.asdfrc}
+  ${ASDF_DATA_DIR:-~/.asdf}/plugins
+  ${ASDF_DATA_DIR:-~/.asdf}/plugins/*/bin{,/list-legacy-filenames,/parse-legacy-file}(N)
+)
+typeset -g _p9k_asdf_meta_sig  # $ASDF_CONFIG_FILE ':' $ASDF_DATA_DIR ':' $ASDF_DEFAULT_TOOL_VERSIONS_FILENAME ':' $ASDF_DEFAULT_TOOL_VERSIONS_FILENAME ':' ${(j.:.)mtimes}
+
+typeset -g _p9k_asdf_file_pat    # example: '(.tool-versions|.ruby-version)'
+typeset -gA _p9k_asdf_file_info  # .ruby-version => ruby1 ('1' means parse-legacy-file is present)
