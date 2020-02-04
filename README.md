@@ -528,6 +528,20 @@ The command to update Powerlevel10k depends on how it was installed.
 **IMPORTANT**: Restart Zsh after updating Powerlevel10k. [Do not use `source ~/.zshrc`](
   #weird-things-happen-after-typing-source-zshrc).
 
+### Where can I ask for help and report bugs?
+
+The best way to ask for help and to report bugs is to [open an issue](
+  https://github.com/romkatv/powerlevel10k/issues).
+
+[Gitter](
+  https://gitter.im/powerlevel10k/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
+is another option.
+
+If all else fails, email roman.perepelitsa@gmail.com.
+
+If necessary, encrypt your communication with [this PGP key](
+  https://api.github.com/users/romkatv/gpg_keys).
+
 ### Which aspects of shell and terminal does Powerlevel10k affect?
 
 Powerlevel10k defines prompt and nothing else. It sets [prompt-related options](
@@ -1384,6 +1398,7 @@ There are a few mitigation options for this issue.
 - [License](#license)
 - [FAQ](#faq)
   - [How do I update Powerlevel10k?](#how-do-i-update-powerlevel10k)
+  - [Where can I ask for help and report bugs?](#where-can-i-ask-for-help-and-report-bugs)
   - [Which aspects of shell and terminal does Powerlevel10k affect?](#which-aspects-of-shell-and-terminal-does-powerlevel10k-affect)
   - [I'm using Powerlevel9k with Oh My Zsh. How do I migrate?](#im-using-powerlevel9k-with-oh-my-zsh-how-do-i-migrate)
   - [Is it really fast?](#is-it-really-fast)
