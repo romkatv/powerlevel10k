@@ -4752,6 +4752,8 @@ function _p9k_set_prompt() {
   _p9k_prompt_side=
   (( $#_p9k_cache < _POWERLEVEL9K_MAX_CACHE_SIZE )) || _p9k_cache=()
   (( $#_p9k__cache_ephemeral < _POWERLEVEL9K_MAX_CACHE_SIZE )) || _p9k__cache_ephemeral=()
+
+  [[ -n $RPROMPT ]] || unset RPROMPT
 }
 
 _p9k_set_instant_prompt() {
@@ -4761,6 +4763,7 @@ _p9k_set_instant_prompt() {
   typeset -g _p9k_instant_prompt=$PROMPT$'\x1f'$_p9k__prompt$'\x1f'$RPROMPT
   PROMPT=$saved_prompt
   RPROMPT=$saved_rprompt
+  [[ -n $RPROMPT ]] || unset RPROMPT
 }
 
 typeset -gri __p9k_instant_prompt_version=18
@@ -6327,6 +6330,13 @@ _p9k_init_lines() {
     [[ -n $_p9k_ret ]] && _p9k_line_never_empty_right+=1 || _p9k_line_never_empty_right+=0
     _p9k_line_prefix_right+='${_p9k__'$i'r-${${:-${_p9k_bg::=NONE}${_p9k_i::=0}${_p9k_sss::='$_p9k_ret'}}+}'
     _p9k_line_suffix_right+='$_p9k_sss%b%k%f}'  # gets overridden for _p9k_emulate_zero_rprompt_indent
+    if (( i == num_lines )); then
+      typeset -p i num_lines _p9k_ret
+      # it's safe to use _p9k_prompt_length on the last line because it cannot have prompt connection
+      _p9k_prompt_length ${(e)_p9k_ret}
+      typeset -p i num_lines _p9k_ret
+      (( _p9k_ret )) || _p9k_line_never_empty_right[-1]=0
+    fi
   done
 
   _p9k_get_icon '' LEFT_SEGMENT_END_SEPARATOR
@@ -6380,7 +6390,9 @@ _p9k_init_lines() {
     if [[ -n $_p9k_ret ]]; then
       [[ _p9k_ret == *%* ]] && _p9k_ret+=%b%k%f
       _p9k_line_suffix_right[-1]+='${_p9k__'$num_lines'r_frame-'${(qqq)_p9k_ret}'}'
-      _p9k_line_never_empty_right[-1]=1
+      # it's safe to use _p9k_prompt_length on the last line because it cannot have prompt connection
+      _p9k_prompt_length $_p9k_ret
+      (( _p9k_ret )) && _p9k_line_never_empty_right[-1]=1
     fi
 
     if (( num_lines > 2 )); then
