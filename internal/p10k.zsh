@@ -2067,7 +2067,7 @@ _p9k_prompt_detect_virt_init() {
 # Segment to display the current IP address
 prompt_ip() {
   local -i len=$#_p9k__prompt
-  _p9k_prompt_segment "$0" "cyan" "$_p9k_color1" 'NETWORK_ICON' 1 '$_p9k__ip_ip' '$_p9k__ip_ip'
+  _p9k_prompt_segment "$0" "cyan" "$_p9k_color1" 'NETWORK_ICON' 1 '$P9K_IP_IP' '$P9K_IP_IP'
   typeset -g "_p9k__segment_val_${_p9k_prompt_side}[_p9k_segment_index]"=$_p9k__prompt[len+1,-1]
 }
 
@@ -4540,15 +4540,21 @@ _p9k_preexec2() {
 function _p9k_prompt_net_iface_init() {
   typeset -g _p9k__public_ip_vpn=
   typeset -g _p9k__public_ip_not_vpn=
-  typeset -g _p9k__ip_ip=
+  typeset -g P9K_IP_IP=
+  typeset -g P9K_IP_INTERFACE=
+  typeset -g P9K_IP_TX_BYTES=
+  typeset -g P9K_IP_RX_BYTES=
+  typeset -g P9K_IP_TX_RATE=
+  typeset -g P9K_IP_RX_RATE=
+  typeset -g _p9__ip_timestamp=
   typeset -g _p9k__vpn_ip_ip=
   [[ -z $_POWERLEVEL9K_PUBLIC_IP_VPN_INTERFACE ]] && _p9k__public_ip_not_vpn=1
   _p9k__async_segments_compute+=_p9k_prompt_net_iface_compute
 }
 
-# reads `iface2ip` and sets `ip`
+# reads `iface2ip` and sets `iface` and `ip`
 function _p9k_prompt_net_iface_match() {
-  local iface_regex="^($1)\$" iface
+  local iface_regex="^($1)\$"
   for iface ip in "${(@kv)iface2ip}"; do
     [[ $iface =~ $iface_regex ]] && return
   done
@@ -4561,13 +4567,13 @@ function _p9k_prompt_net_iface_compute() {
 
 function _p9k_prompt_net_iface_async() {
   local iface ip line var
-  typeset -A iface2ip
+  typeset -a iface2ip
   if [[ -x /sbin/ifconfig ]]; then
     for line in ${(f)"$(/sbin/ifconfig 2>/dev/null)"}; do
       if [[ $line == (#b)([^[:space:]]##):[[:space:]]##flags=(<->)'<'* ]]; then
         [[ $match[2] == *[13579] ]] && iface=$match[1] || iface=
       elif [[ -n $iface && $line == (#b)[[:space:]]##inet[[:space:]]##([0-9.]##)* ]]; then
-        iface2ip[$iface]=$match[1]
+        iface2ip+=($iface $match[1])
         iface=
       fi
     done
@@ -4576,7 +4582,7 @@ function _p9k_prompt_net_iface_async() {
       if [[ $line == (#b)<->:[[:space:]]##([^:]##):[[:space:]]##\<([^\>]#)\>* ]]; then
         [[ ,$match[2], == *,UP,* ]] && iface=$match[1] || iface=
       elif [[ -n $iface && $line == (#b)[[:space:]]##inet[[:space:]]##([0-9.]##)* ]]; then
-        iface2ip[$iface]=$match[1]
+        iface2ip+=($iface $match[1])
         iface=
       fi
     done
@@ -4590,9 +4596,40 @@ function _p9k_prompt_net_iface_async() {
     local public_ip_not_vpn=1
   fi
   if _p9k_prompt_net_iface_match $_POWERLEVEL9K_IP_INTERFACE; then
-    local ip_ip=$ip
+    local ip_ip=$ip ip_interface=$iface ip_timestamp=$EPOCHREALTIME
+    local ip_tx_bytes=0 ip_rx_bytes=0 ip_tx_rate='0 Bps' ip_rx_rate='0 Bps'
+    if [[ $_p9k_os == (Linux|Android) ]]; then
+      if [[ -r /sys/class/net/$iface/statistics/rx_bytes ]] &&
+         _p9k_read_file /sys/class/net/$iface/statistics/rx_bytes; then
+        ip_rx_bytes=$_p9k_ret
+      fi
+      if [[ -r /sys/class/net/$iface/statistics/tx_bytes ]] &&
+         _p9k_read_file /sys/class/net/$iface/statistics/tx_bytes; then
+        ip_tx_bytes=$_p9k_ret
+      fi
+    elif [[ $_p9k_os == (BSD|OSX) && $commands[netstat] == 1 ]]; then
+      local -a ns
+      if ns="$(netstat -inbI $iface)"; then
+        for line in ${${(f)ns}:1}; do
+          (( ip_rx_bytes += ${line[(w)8]}  ))
+          (( ip_tx_bytes += ${line[(w)11]} ))
+        done
+      fi
+    fi
+    if [[ $ip_ip == $P9K_IP_IP && $iface == $P9K_IP_INTERFACE ]]; then
+      local -F t='ip_timestamp - _p9__ip_timestamp'
+      if (( t <= 0 )); then
+        ip_tx_rate=$P9K_IP_TX_RATE
+        ip_rx_rate=$P9K_IP_RX_RATE
+      else
+        _p9k_human_readable_bytes $((8 * (ip_tx_bytes - P9K_IP_TX_BYTES) / t))
+        ip_tx_rate="$_p9k_ret[1,-2] $_p9k_ret[-1]bps"
+        _p9k_human_readable_bytes $((8 * (ip_rx_bytes - P9K_IP_RX_BYTES) / t))
+        ip_rx_rate="$_p9k_ret[1,-2] $_p9k_ret[-1]bps"
+      fi
+    fi
   else
-    local ip_ip=
+    local ip_ip= ip_interface= ip_tx_bytes= ip_rx_bytes= ip_tx_rate= ip_rx_rate= ip_timestamp=
   fi
   if _p9k_prompt_net_iface_match $_POWERLEVEL9K_VPN_IP_INTERFACE; then
     local vpn_ip_ip=$ip
@@ -4601,13 +4638,34 @@ function _p9k_prompt_net_iface_async() {
   fi
   [[ $_p9k__public_ip_vpn == $public_ip_vpn &&
      $_p9k__public_ip_not_vpn == $public_ip_not_vpn &&
-     $_p9k__ip_ip == $ip_ip &&
+     $P9K_IP_IP == $ip_ip &&
+     $P9K_IP_INTERFACE == $ip_interface &&
+     $P9K_IP_TX_BYTES == $ip_tx_bytes &&
+     $P9K_IP_RX_BYTES == $ip_rx_bytes &&
+     $P9K_IP_TX_RATE == $ip_tx_rate &&
+     $P9K_IP_RX_RATE == $ip_rx_rate &&
      $_p9k__vpn_ip_ip == $vpn_ip_ip ]] && return 1
   _p9k__public_ip_vpn=$public_ip_vpn
   _p9k__public_ip_not_vpn=$public_ip_not_vpn
-  _p9k__ip_ip=$ip_ip
+  P9K_IP_IP=$ip_ip
+  P9K_IP_INTERFACE=$ip_interface
+  P9K_IP_TX_BYTES=$ip_tx_bytes
+  P9K_IP_RX_BYTES=$ip_rx_bytes
+  P9K_IP_TX_RATE=$ip_tx_rate
+  P9K_IP_RX_RATE=$ip_rx_rate
+  _p9__ip_timestamp=$ip_timestamp
   _p9k__vpn_ip_ip=$vpn_ip_ip
-  _p9k_print_params _p9k__public_ip_vpn _p9k__public_ip_not_vpn _p9k__ip_ip _p9k__vpn_ip_ip
+  _p9k_print_params         \
+    _p9k__public_ip_vpn     \
+    _p9k__public_ip_not_vpn \
+    P9K_IP_IP               \
+    P9K_IP_INTERFACE        \
+    P9K_IP_TX_BYTES         \
+    P9K_IP_RX_BYTES         \
+    P9K_IP_TX_RATE          \
+    P9K_IP_RX_RATE          \
+    _p9__ip_timestamp       \
+    _p9k__vpn_ip_ip
   echo -E - 'reset=1'
 }
 
