@@ -304,6 +304,7 @@ enable as many segments as you like. It won't slow down your prompt or Zsh start
 | `swap` | used swap |
 | `public_ip` | public ip address |
 | `proxy` | system-wide http/https/ftp proxy |
+| `wifi` | WiFi speed |
 | `battery` | internal battery state and charge level (yep, batteries *literally* included) |
 
 ## Installation
