@@ -298,6 +298,7 @@ enable as many segments as you like. It won't slow down your prompt or Zsh start
 | `todo` | [todo](https://github.com/todotxt/todo.txt-cli) items |
 | `timewarrior` | [timewarrior](https://timewarrior.net/) tracking status |
 | `vpn_ip` | virtual private network indicator |
+| `ip` | ip address and bandwidth usage for a specified network interface |
 | `load` | CPU load |
 | `disk_usage` | disk usage |
 | `ram` | free RAM |
