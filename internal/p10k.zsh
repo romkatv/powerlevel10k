@@ -1312,6 +1312,7 @@ _p9k_prompt_battery_set_args() {
     ;;
 
     Linux|Android)
+      # See https://sourceforge.net/projects/acpiclient.
       local -a bats=( /sys/class/power_supply/(BAT*|battery)/(FN) )
       (( $#bats )) || return
 
