@@ -3,12 +3,6 @@ typeset -gA icons
 function _p9k_init_icons() {
   [[ $+_p9k_icon_mode == 1 && $_p9k_icon_mode == $POWERLEVEL9K_MODE/$POWERLEVEL9K_LEGACY_ICON_SPACING ]] && return
   typeset -g _p9k_icon_mode=$POWERLEVEL9K_MODE/$POWERLEVEL9K_LEGACY_ICON_SPACING
-  zmodload zsh/langinfo
-  if [[ ${langinfo[CODESET]:-} != (utf|UTF)(-|)8 ]]; then
-    typeset -g _p9k_locale=${${(@M)$(locale -a):#*.(utf|UTF)(-|)8}[1]:-en_US.UTF-8}
-  else
-    typeset -g _p9k_locale=
-  fi
 
   if [[ $POWERLEVEL9K_LEGACY_ICON_SPACING == true ]]; then
     local s=
@@ -614,7 +608,6 @@ function _p9k_init_icons() {
 # Sadly, this is a part of public API. Its use is emphatically discouraged.
 function _p9k_print_icon() {
   _p9k_init_icons
-  [[ -z $_p9k_locale ]] || local LC_ALL=$_p9k_locale
   local icon_name=$1
   local var_name=POWERLEVEL9K_${icon_name}
   if [[ -n "${(tP)var_name}" ]]; then
@@ -631,7 +624,6 @@ function _p9k_print_icon() {
 #                 overrides into account.
 function _p9k_get_icon_names() {
   _p9k_init_icons
-  [[ -z $_p9k_locale ]] || local LC_ALL=$_p9k_locale
   # Iterate over a ordered list of keys of the icons array
   for key in ${(@kon)icons}; do
     echo -n "POWERLEVEL9K_$key: "

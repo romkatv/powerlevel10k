@@ -1,4 +1,4 @@
-if [[ $__p9k_sourced != 4 ]]; then
+if [[ $__p9k_sourced != 5 ]]; then
   >&2 print -P ""
   >&2 print -P "[%F{1}ERROR%f]: Corrupted powerlevel10k installation."
   >&2 print -P ""
@@ -140,6 +140,10 @@ function getColorCode() {
 # Sadly, this is a part of public API. Its use is emphatically discouraged.
 function print_icon() {
   eval "$__p9k_intro"
+  if (( ! $+_p9k__locale )); then
+    _p9k_init_locale
+    [[ -z $_p9k__locale ]] || local LC_ALL=$_p9k__locale
+  fi
   (( $+functions[_p9k_print_icon] )) || source "${__p9k_root_dir}/internal/icons.zsh"
   _p9k_print_icon "$@"
 }
@@ -151,6 +155,10 @@ function print_icon() {
 #                 overrides into account.
 function get_icon_names() {
   eval "$__p9k_intro"
+  if (( ! $+_p9k__locale )); then
+    _p9k_init_locale
+    [[ -z $_p9k__locale ]] || local LC_ALL=$_p9k__locale
+  fi
   (( $+functions[_p9k_get_icon_names] )) || source "${__p9k_root_dir}/internal/icons.zsh"
   _p9k_get_icon_names "$@"
 }
@@ -188,7 +196,6 @@ function _p9k_declare() {
       (( set )) && typeset -g _$2=${(P)2} || typeset -g _$2=$3
       ;;
     -e)
-      [[ -z $_p9k_locale ]] || local LC_ALL=$_p9k_locale
       if (( set )); then
         local v=${(P)2}
         typeset -g _$2=${(g::)v}
@@ -529,7 +536,6 @@ _p9k_get_icon() {
       if [[ $_p9k_ret == $'\1'* ]]; then
         _p9k_ret=${_p9k_ret[2,-1]}
       else
-        [[ -z $_p9k_locale ]] || local LC_ALL=$_p9k_locale
         _p9k_ret=${(g::)_p9k_ret}
         [[ $_p9k_ret != $'\b'? ]] || _p9k_ret="%{$_p9k_ret%}"  # penance for past sins
       fi
@@ -767,7 +773,6 @@ _p9k_left_prompt_segment() {
 
     p+='${${_p9k_e:#00}:+${${_p9k_t[$_p9k_n]/'$ss'/$_p9k_ss}/'$s'/$_p9k_s}'
 
-    [[ -z $_p9k_locale ]] || local LC_ALL=$_p9k_locale
     _p9k_param $1 ICON_BEFORE_CONTENT ''
     if [[ $_p9k_ret != false ]]; then
       _p9k_param $1 PREFIX ''
@@ -988,7 +993,6 @@ _p9k_right_prompt_segment() {
 
     p+='${${_p9k_e:#00}:+${_p9k_t[$_p9k_n]/'$w'/$_p9k_w}'
 
-    [[ -z $_p9k_locale ]] || local LC_ALL=$_p9k_locale
     _p9k_param $1 ICON_BEFORE_CONTENT ''
     if [[ $_p9k_ret != true ]]; then
       _p9k_param $1 PREFIX ''
@@ -1503,7 +1507,6 @@ prompt_context() {
     if [[ -z $text ]]; then
       local var=_POWERLEVEL9K_CONTEXT_${state}_TEMPLATE
       if (( $+parameters[$var] )); then
-        [[ -z $_p9k_locale ]] || local LC_ALL=$_p9k_locale
         text=${(P)var}
         text=${(g::)text}
       else
@@ -1677,7 +1680,6 @@ prompt_dir() {
   fi
 
   local -i fake_first=0 expand=0
-  [[ -z $_p9k_locale ]] || local LC_ALL=$_p9k_locale
   local delim=${_POWERLEVEL9K_SHORTEN_DELIMITER-$'\u2026'}
   local -i shortenlen=${_POWERLEVEL9K_SHORTEN_DIR_LENGTH:--1}
 
@@ -4804,7 +4806,7 @@ _p9k_dump_instant_prompt() {
   local prompt_dir=${(q)prompt_dir}
   zmodload zsh/langinfo
   if [[ \${langinfo[CODESET]:-} != (utf|UTF)(-|)8 ]]; then
-    local lc=${(q)${${${_p9k_locale:-${(M)LC_CTYPE:#*.(utf|UTF)(-|)8}}:-${(M)LC_ALL:#*.(utf|UTF)(-|)8}}}:-${(M)LANG:#*.(utf|UTF)(-|)8}}
+    local lc=${(q)${${${_p9k__locale:-${(M)LC_CTYPE:#*.(utf|UTF)(-|)8}}:-${(M)LC_ALL:#*.(utf|UTF)(-|)8}}}:-${(M)LANG:#*.(utf|UTF)(-|)8}}
     local LC_ALL=\${lc:-\${\${(@M)\$(locale -a 2>/dev/null):#*.(utf|UTF)(-|)8}[1]:-en_US.UTF-8}}
   fi"
       >&$fd print -r -- '
@@ -5417,6 +5419,11 @@ _p9k_precmd_impl() {
 
   (( __p9k_enabled )) || return
 
+  if (( ! $+_p9k__locale )); then
+    _p9k_init_locale
+    [[ -z $_p9k__locale ]] || local LC_ALL=$_p9k__locale
+  fi
+
   if ! zle || [[ -z $_p9k__param_sig ]]; then
     if zle; then
       __p9k_new_status=0
@@ -5560,6 +5567,15 @@ function _p9k_prompt_overflow_bug() {
   [[ $ZSH_PATCHLEVEL =~ '^zsh-5\.4\.2-([0-9]+)-' ]] && return $(( match[1] < 159 ))
   [[ $ZSH_PATCHLEVEL =~ '^zsh-5\.7\.1-([0-9]+)-' ]] && return $(( match[1] >= 50 ))
   is-at-least 5.5 && ! is-at-least 5.7.2
+}
+
+function _p9k_init_locale() {
+  zmodload zsh/langinfo
+  if [[ ${langinfo[CODESET]:-} != (utf|UTF)(-|)8 ]]; then
+    typeset -g _p9k__locale=${${(@M)$(locale -a):#*.(utf|UTF)(-|)8}[1]:-en_US.UTF-8}
+  else
+    typeset -g _p9k__locale=
+  fi
 }
 
 typeset -g  _p9k__param_pat
@@ -6289,7 +6305,6 @@ _p9k_build_gap_post() {
 }
 
 _p9k_init_lines() {
-  [[ -z $_p9k_locale ]] || local LC_ALL=$_p9k_locale
   local -a left_segments=($_POWERLEVEL9K_LEFT_PROMPT_ELEMENTS)
   local -a right_segments=($_POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS)
 
@@ -6586,7 +6601,7 @@ _p9k_must_init() {
     [[ $sig == $_p9k__param_sig ]] && return 1
     _p9k_deinit
   fi
-  _p9k__param_pat=$'v36\1'${ZSH_VERSION}$'\1'${ZSH_PATCHLEVEL}$'\1'
+  _p9k__param_pat=$'v37\1'${ZSH_VERSION}$'\1'${ZSH_PATCHLEVEL}$'\1'
   _p9k__param_pat+=$'${#parameters[(I)POWERLEVEL9K_*]}\1${(%):-%n%#}\1$GITSTATUS_LOG_LEVEL\1'
   _p9k__param_pat+=$'$GITSTATUS_ENABLE_LOGGING\1$GITSTATUS_DAEMON\1$GITSTATUS_NUM_THREADS\1'
   _p9k__param_pat+=$'$DEFAULT_USER\1${ZLE_RPROMPT_INDENT:-1}\1$P9K_SSH\1$__p9k_ksh_arrays'
@@ -6748,7 +6763,6 @@ function _p9k_init_cacheable() {
 
   if _p9k_segment_in_use dir; then
     if (( $+_POWERLEVEL9K_DIR_CLASSES )); then
-      [[ -z $_p9k_locale ]] || local LC_ALL=$_p9k_locale
       local -i i=3
       for ((; i <= $#_POWERLEVEL9K_DIR_CLASSES; i+=3)); do
         _POWERLEVEL9K_DIR_CLASSES[i]=${(g::)_POWERLEVEL9K_DIR_CLASSES[i]}
