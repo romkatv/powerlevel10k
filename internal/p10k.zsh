@@ -4607,7 +4607,7 @@ function _p9k_prompt_net_iface_async() {
          _p9k_read_file /sys/class/net/$iface/statistics/tx_bytes; then
         ip_tx_bytes=$_p9k_ret
       fi
-    elif [[ $_p9k_os == (BSD|OSX) && $commands[netstat] == 1 ]]; then
+    elif [[ $_p9k_os == (BSD|OSX) && $+commands[netstat] == 1 ]]; then
       local -a lines
       if lines=(${(f)"$(netstat -inbI $iface)"}); then
         local header=($=lines[1])
