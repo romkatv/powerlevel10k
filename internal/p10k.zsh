@@ -4554,6 +4554,7 @@ function _p9k_prompt_net_iface_compute() {
 }
 
 function _p9k_prompt_net_iface_async() {
+  # netstat -inbI en0
   local iface ip line var
   typeset -A iface2ip
   if [[ -x /sbin/ifconfig ]]; then
