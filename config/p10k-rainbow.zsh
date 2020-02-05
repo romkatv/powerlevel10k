@@ -90,6 +90,7 @@
     # time                  # current time
     # =========================[ Line #2 ]=========================
     newline
+    # ip                    # ip address and bandwidth usage for a specified network interface
     # public_ip             # public IP address
     # proxy                 # system-wide http/https/ftp proxy
     # battery               # internal battery
@@ -1127,11 +1128,32 @@
   # When on VPN, show just an icon without the IP address.
   # Tip: To display the private IP address when on VPN, remove the next line.
   typeset -g POWERLEVEL9K_VPN_IP_CONTENT_EXPANSION=
-  # Regular expression for the VPN network interface. Run ifconfig while on VPN to see the
-  # name of the interface.
+  # Regular expression for the VPN network interface. Run `ifconfig` or `ip -4 a show` while on VPN
+  # to see the name of the interface.
   typeset -g POWERLEVEL9K_VPN_IP_INTERFACE='(wg|(.*tun))[0-9]*'
   # Custom icon.
   # typeset -g POWERLEVEL9K_VPN_IP_VISUAL_IDENTIFIER_EXPANSION='⭐'
+
+  ###########[ ip: ip address and bandwidth usage for a specified network interface ]###########
+  # IP color.
+  typeset -g POWERLEVEL9K_IP_BACKGROUND=4
+  typeset -g POWERLEVEL9K_IP_FOREGROUND=0
+  # The following parameters are accessible within the expansion:
+  #
+  #   Parameter             | Meaning
+  #   ----------------------+---------------
+  #   P9K_IP_IP         | IP address
+  #   P9K_IP_INTERFACE  | network interface
+  #   P9K_IP_RX_BYTES   | total number of bytes received
+  #   P9K_IP_TX_BYTES   | total number of bytes sent
+  #   P9K_IP_RX_RATE    | receive rate (since last prompt)
+  #   P9K_IP_TX_RATE    | send rate (since last prompt)
+  typeset -g POWERLEVEL9K_IP_CONTENT_EXPANSION='⇣$P9K_IP_RX_RATE ⇡$P9K_IP_TX_RATE $P9K_IP_IP'
+  # Show information for the first network interface whose name matches this regular expression.
+  # Run `ifconfig` or `ip -4 a show` to see the names of all network interfaces.
+  typeset -g POWERLEVEL9K_IP_INTERFACE='e.*'
+  # Custom icon.
+  # typeset -g POWERLEVEL9K_IP_VISUAL_IDENTIFIER_EXPANSION='⭐'
 
   #########################[ proxy: system-wide http/https/ftp proxy ]##########################
   # Proxy color.
