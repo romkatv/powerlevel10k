@@ -4362,8 +4362,9 @@ function instant_prompt_direnv() {
 
 function prompt_timewarrior() {
   local -a stat
+  local timewarriordb=${TIMEWARRIORDB:-~/.timewarrior}
   if [[ -n $_p9k_timewarrior_file_name ]]; then
-    zstat -A stat +mtime -- ~/.timewarrior/data $_p9k_timewarrior_file_name 2>/dev/null || stat=()
+    zstat -A stat +mtime -- ${timewarriordb}/data $_p9k_timewarrior_file_name 2>/dev/null || stat=()
     if [[ $stat[1] == $_p9k_timewarrior_dir_mtime && $stat[2] == $_p9k_timewarrior_file_mtime ]]; then
       if (( $+_p9k_timewarrior_tags )); then
         _p9k_prompt_segment $0 grey 255 TIMEWARRIOR_ICON 0 '' "${_p9k_timewarrior_tags//\%/%%}"
@@ -4371,7 +4372,7 @@ function prompt_timewarrior() {
       return
     fi
   fi
-  if [[ ! -d ~/.timewarrior/data ]]; then
+  if [[ ! -d ${timewarriordb}/data ]]; then
     _p9k_timewarrior_dir_mtime=0
     _p9k_timewarrior_file_mtime=0
     _p9k_timewarrior_file_name=
@@ -4379,12 +4380,12 @@ function prompt_timewarrior() {
     return
   fi
   if [[ $stat[1] != $_p9k_timewarrior_dir_mtime ]]; then
-    local -a files=(~/.timewarrior/data/<->-<->.data(.N))
+    local -a files=(${timewarriordb}/data/<->-<->.data(.N))
     if (( ! $#files )); then
-      if (( $#stat )) || zstat -A stat +mtime -- ~/.timewarrior/data 2>/dev/null; then
+      if (( $#stat )) || zstat -A stat +mtime -- ${timewarriordb}/data 2>/dev/null; then
         _p9k_timewarrior_dir_mtime=$stat[1]
         _p9k_timewarrior_file_mtime=$stat[1]
-        _p9k_timewarrior_file_name=~/.timewarrior/data
+        _p9k_timewarrior_file_name=${timewarriordb}/data
       else
         _p9k_timewarrior_dir_mtime=0
         _p9k_timewarrior_file_mtime=0
@@ -4395,7 +4396,7 @@ function prompt_timewarrior() {
     fi
     _p9k_timewarrior_file_name=${${(AO)files}[1]}
   fi
-  if ! zstat -A stat +mtime -- ~/.timewarrior/data $_p9k_timewarrior_file_name 2>/dev/null; then
+  if ! zstat -A stat +mtime -- ${timewarriordb}/data $_p9k_timewarrior_file_name 2>/dev/null; then
     _p9k_timewarrior_dir_mtime=0
     _p9k_timewarrior_file_mtime=0
     _p9k_timewarrior_file_name=
