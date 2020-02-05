@@ -4608,11 +4608,14 @@ function _p9k_prompt_net_iface_async() {
         ip_tx_bytes=$_p9k_ret
       fi
     elif [[ $_p9k_os == (BSD|OSX) && $commands[netstat] == 1 ]]; then
-      local -a ns
-      if ns="$(netstat -inbI $iface)"; then
-        for line in ${${(f)ns}:1}; do
-          (( ip_rx_bytes += ${line[(w)8]}  ))
-          (( ip_tx_bytes += ${line[(w)11]} ))
+      local -a lines
+      if lines=(${(f)"$(netstat -inbI $iface)"}); then
+        local header=($=lines[1])
+        local -i rx_idx=$header[(Ie)Ibytes]
+        local -i tx_idx=$header[(Ie)Obytes]
+        for line in ${lines:1}; do
+          (( ip_rx_bytes += ${line[(w)rx_idx]} ))
+          (( ip_tx_bytes += ${line[(w)tx_idx]} ))
         done
       fi
     fi
