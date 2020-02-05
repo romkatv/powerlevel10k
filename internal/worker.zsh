@@ -34,6 +34,7 @@ function _p9k_worker_main() {
         if [[ $fd == 0 ]]; then
           local buf=
           while true; do
+            [[ -t 0 ]]
             sysread -t 0 'buf[$#buf+1]'  && continue
             (( $? == 4 ))                || return
             [[ $buf[-1] == (|$'\x1e') ]] && break
@@ -115,6 +116,7 @@ function _p9k_worker_receive() {
 
     local buf resp
     while true; do
+      [[ -t $_p9k__worker_resp_fd ]]
       sysread -t 0 -i $_p9k__worker_resp_fd 'buf[$#buf+1]' && continue
       (( $? == 4 ))                                                                   || return
       [[ $buf == (|*$'\x1e')$'\x05'# ]] && break
