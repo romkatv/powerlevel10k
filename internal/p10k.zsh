@@ -6331,10 +6331,8 @@ _p9k_init_lines() {
     _p9k_line_prefix_right+='${_p9k__'$i'r-${${:-${_p9k_bg::=NONE}${_p9k_i::=0}${_p9k_sss::='$_p9k_ret'}}+}'
     _p9k_line_suffix_right+='$_p9k_sss%b%k%f}'  # gets overridden for _p9k_emulate_zero_rprompt_indent
     if (( i == num_lines )); then
-      typeset -p i num_lines _p9k_ret
       # it's safe to use _p9k_prompt_length on the last line because it cannot have prompt connection
       _p9k_prompt_length ${(e)_p9k_ret}
-      typeset -p i num_lines _p9k_ret
       (( _p9k_ret )) || _p9k_line_never_empty_right[-1]=0
     fi
   done
