@@ -48,6 +48,7 @@
     command_execution_time  # duration of the last command
     background_jobs         # presence of background jobs
     direnv                  # direnv status (https://direnv.net/)
+    asdf                    # asdf version manager (https://github.com/asdf-vm/asdf)
     virtualenv              # python virtual environment (https://docs.python.org/3/library/venv.html)
     anaconda                # conda environment (https://conda.io/)
     pyenv                   # python environment (https://github.com/pyenv/pyenv)
@@ -255,7 +256,12 @@
     .hg
     .node-version
     .python-version
+    .go-version
     .ruby-version
+    .lua-version
+    .java-version
+    .perl-version
+    .tool-version
     .shorten_folder_marker
     .svn
     .terraform
@@ -513,6 +519,50 @@
   typeset -g POWERLEVEL9K_DIRENV_FOREGROUND=178
   # Custom icon.
   # typeset -g POWERLEVEL9K_DIRENV_VISUAL_IDENTIFIER_EXPANSION='⭐'
+
+  ###############[ asdf: asdf version manager (https://github.com/asdf-vm/asdf) ]###############
+  # Default asdf color. Only used to display tools for which there is no color override (see below).
+  typeset -g POWERLEVEL9K_ASDF_FOREGROUND=66
+
+  # Ruby version from asdf.
+  typeset -g POWERLEVEL9K_ASDF_RUBY_FOREGROUND=168
+  # typeset -g POWERLEVEL9K_ASDF_RUBY_VISUAL_IDENTIFIER_EXPANSION='⭐'
+
+  # Python version from asdf.
+  typeset -g POWERLEVEL9K_ASDF_PYTHON_FOREGROUND=37
+  # typeset -g POWERLEVEL9K_ASDF_PYTHON_VISUAL_IDENTIFIER_EXPANSION='⭐'
+
+  # Go version from asdf.
+  typeset -g POWERLEVEL9K_ASDF_GO_FOREGROUND=37
+  # typeset -g POWERLEVEL9K_ASDF_GO_VISUAL_IDENTIFIER_EXPANSION='⭐'
+
+  # Node.js version from asdf.
+  typeset -g POWERLEVEL9K_ASDF_NODEJS_FOREGROUND=70
+  # typeset -g POWERLEVEL9K_ASDF_NODEJS_VISUAL_IDENTIFIER_EXPANSION='⭐'
+
+  # Rust version from asdf.
+  typeset -g POWERLEVEL9K_ASDF_RUST_FOREGROUND=37
+  # typeset -g POWERLEVEL9K_ASDF_RUST_VISUAL_IDENTIFIER_EXPANSION='⭐'
+
+  # .NET Core version from asdf.
+  typeset -g POWERLEVEL9K_ASDF_DOTNET_CORE_FOREGROUND=134
+  # typeset -g POWERLEVEL9K_ASDF_DOTNET_CORE_VISUAL_IDENTIFIER_EXPANSION='⭐'
+
+  # Flutter version from asdf.
+  typeset -g POWERLEVEL9K_ASDF_FLUTTER_FOREGROUND=38
+  # typeset -g POWERLEVEL9K_ASDF_FLUTTER_VISUAL_IDENTIFIER_EXPANSION='⭐'
+
+  # Lua version from asdf.
+  typeset -g POWERLEVEL9K_ASDF_LUA_FOREGROUND=32
+  # typeset -g POWERLEVEL9K_ASDF_LUA_VISUAL_IDENTIFIER_EXPANSION='⭐'
+
+  # Java version from asdf.
+  typeset -g POWERLEVEL9K_ASDF_JAVA_FOREGROUND=32
+  # typeset -g POWERLEVEL9K_ASDF_JAVA_VISUAL_IDENTIFIER_EXPANSION='⭐'
+
+  # Perl version from asdf.
+  typeset -g POWERLEVEL9K_ASDF_PERL_FOREGROUND=67
+  # typeset -g POWERLEVEL9K_ASDF_PERL_VISUAL_IDENTIFIER_EXPANSION='⭐'
 
   ##########[ nordvpn: nordvpn connection status, linux only (https://nordvpn.com/) ]###########
   # NordVPN connection indicator color.
