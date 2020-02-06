@@ -265,6 +265,7 @@ enable as many segments as you like. It won't slow down your prompt or Zsh start
 | `background_jobs` | presence of background jobs |
 | `time` | current time |
 | `direnv` | [direnv](https://direnv.net/) status |
+| `asdf` | tool versions from [asdf](https://github.com/asdf-vm/asdf) |
 | `virtualenv` | python environment from [venv](https://docs.python.org/3/library/venv.html) |
 | `anaconda` | virtual environment from [conda](https://conda.io/) |
 | `pyenv` | python environment from [pyenv](https://github.com/pyenv/pyenv) |
