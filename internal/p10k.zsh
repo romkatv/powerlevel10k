@@ -4750,8 +4750,8 @@ function _p9k_prompt_net_iface_async() {
   # netstat -inbI en0
   local iface ip line var
   typeset -a iface2ip
-  if [[ -x /sbin/ifconfig ]]; then
-    for line in ${(f)"$(/sbin/ifconfig 2>/dev/null)"}; do
+  if (( $+commands[ifconfig] )); then
+    for line in ${(f)"$(command ifconfig 2>/dev/null)"}; do
       if [[ $line == (#b)([^[:space:]]##):[[:space:]]##flags=(<->)'<'* ]]; then
         [[ $match[2] == *[13579] ]] && iface=$match[1] || iface=
       elif [[ -n $iface && $line == (#b)[[:space:]]##inet[[:space:]]##([0-9.]##)* ]]; then
@@ -4759,8 +4759,8 @@ function _p9k_prompt_net_iface_async() {
         iface=
       fi
     done
-  elif [[ -x /sbin/ip ]]; then
-    for line in ${(f)"$(/sbin/ip -4 a show 2>/dev/null)"}; do
+  elif (( $+commands[ip] )); then
+    for line in ${(f)"$(command ip -4 a show 2>/dev/null)"}; do
       if [[ $line == (#b)<->:[[:space:]]##([^:]##):[[:space:]]##\<([^\>]#)\>* ]]; then
         [[ ,$match[2], == *,UP,* ]] && iface=$match[1] || iface=
       elif [[ -n $iface && $line == (#b)[[:space:]]##inet[[:space:]]##([0-9.]##)* ]]; then
