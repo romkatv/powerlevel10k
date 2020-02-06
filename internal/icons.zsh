@@ -38,6 +38,7 @@ function _p9k_init_icons() {
         FAIL_ICON                      '\u2718'               # ✘
         SYMFONY_ICON                   'SF'
         NODE_ICON                      '\u2B22'$s             # ⬢
+        NODEJS_ICON                    '\u2B22'$s             # ⬢
         MULTILINE_FIRST_PROMPT_PREFIX  '\u256D\U2500'         # ╭─
         MULTILINE_NEWLINE_PROMPT_PREFIX '\u251C\U2500'        # ├─
         MULTILINE_LAST_PROMPT_PREFIX   '\u2570\U2500 '        # ╰─
@@ -118,6 +119,7 @@ function _p9k_init_icons() {
         TERRAFORM_ICON                 'tf'
         PROXY_ICON                     '\u2B82'               # ⮂
         DOTNET_ICON                    '.NET'
+        DOTNET_CORE_ICON               '.NET'
         AZURE_ICON                     '\u2601'               # ☁
         DIRENV_ICON                    '\u25BC'               # ▼
         FLUTTER_ICON                   'F'
@@ -155,6 +157,7 @@ function _p9k_init_icons() {
         FAIL_ICON                      '\u2718'               # ✘
         SYMFONY_ICON                   'SF'
         NODE_ICON                      '\u2B22'               # ⬢
+        NODEJS_ICON                    '\u2B22'               # ⬢
         MULTILINE_FIRST_PROMPT_PREFIX  '\u256D\U2500'         # ╭─
         MULTILINE_NEWLINE_PROMPT_PREFIX '\u251C\U2500'        # ├─
         MULTILINE_LAST_PROMPT_PREFIX   '\u2570\U2500 '        # ╰─
@@ -231,6 +234,7 @@ function _p9k_init_icons() {
         TERRAFORM_ICON                 'tf'
         PROXY_ICON                     '\u2B82'               # ⮂
         DOTNET_ICON                    '.NET'
+        DOTNET_CORE_ICON               '.NET'
         AZURE_ICON                     '\u2601'               # ☁
         DIRENV_ICON                    '\u25BC'               # ▼
         FLUTTER_ICON                   'F'
@@ -275,6 +279,7 @@ function _p9k_init_icons() {
         FAIL_ICON                      "${CODEPOINT_OF_AWESOME_TIMES:+\\u$CODEPOINT_OF_AWESOME_TIMES}"
         SYMFONY_ICON                   'SF'
         NODE_ICON                      '\u2B22'                                       # ⬢
+        NODEJS_ICON                    '\u2B22'                                       # ⬢
         MULTILINE_FIRST_PROMPT_PREFIX  '\u256D\U2500'                                 # ╭─
         MULTILINE_NEWLINE_PROMPT_PREFIX '\u251C\U2500'                                # ├─
         MULTILINE_LAST_PROMPT_PREFIX   '\u2570\U2500 '                                # ╰─
@@ -348,6 +353,7 @@ function _p9k_init_icons() {
         TERRAFORM_ICON                 'tf'
         PROXY_ICON                     '\u2B82'                                       # ⮂
         DOTNET_ICON                    '.NET'
+        DOTNET_CORE_ICON               '.NET'
         AZURE_ICON                     '\u2601'                                       # ☁
         DIRENV_ICON                    '\u25BC'                                       # ▼
         FLUTTER_ICON                   'F'
@@ -386,6 +392,7 @@ function _p9k_init_icons() {
         FAIL_ICON                      '\uF00D'               # 
         SYMFONY_ICON                   '\uE757'               # 
         NODE_ICON                      '\uE617 '              # 
+        NODEJS_ICON                    '\uE617 '              # 
         MULTILINE_FIRST_PROMPT_PREFIX  '\u256D\U2500'         # ╭─
         MULTILINE_NEWLINE_PROMPT_PREFIX '\u251C\U2500'        # ├─
         MULTILINE_LAST_PROMPT_PREFIX   '\u2570\U2500 '        # ╰─
@@ -462,6 +469,7 @@ function _p9k_init_icons() {
         TERRAFORM_ICON                 '\uF1BB'               # 
         PROXY_ICON                     '\u2B82'               # ⮂
         DOTNET_ICON                    '\uE77F'               # 
+        DOTNET_CORE_ICON               '\uE77F'               # 
         AZURE_ICON                     '\uFD03'               # ﴃ
         DIRENV_ICON                    '\u25BC'               # ▼
         FLUTTER_ICON                   'F'
@@ -499,6 +507,7 @@ function _p9k_init_icons() {
         FAIL_ICON                      '\u2718'               # ✘
         SYMFONY_ICON                   'SF'
         NODE_ICON                      'Node'
+        NODEJS_ICON                    'Node'
         MULTILINE_FIRST_PROMPT_PREFIX  '\u256D\U2500'         # ╭─
         MULTILINE_NEWLINE_PROMPT_PREFIX '\u251C\U2500'        # ├─
         MULTILINE_LAST_PROMPT_PREFIX   '\u2570\U2500 '        # ╰─
@@ -575,6 +584,7 @@ function _p9k_init_icons() {
         TERRAFORM_ICON                 'tf'
         PROXY_ICON                     '\u2194'               # ↔
         DOTNET_ICON                    '.NET'
+        DOTNET_CORE_ICON               '.NET'
         AZURE_ICON                     '\u2601'               # ☁
         DIRENV_ICON                    '\u25BC'               # ▼
         FLUTTER_ICON                   'F'
