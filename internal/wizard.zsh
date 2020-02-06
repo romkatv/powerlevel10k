@@ -1,10 +1,3 @@
-zmodload zsh/langinfo
-if [[ ${langinfo[CODESET]:-} != (utf|UTF)(-|)8 ]]; then
-  local LC_ALL=${${(@M)$(locale -a):#*.(utf|UTF)(-|)8}[1]:-en_US.UTF-8}
-fi
-
-zmodload -F zsh/files b:zf_mv b:zf_rm
-
 local -i force=0
 
 local opt
@@ -1571,8 +1564,6 @@ function generate_config() {
     if [[ $POWERLEVEL9K_MODE == (compatible|powerline) ]]; then
       uncomment 'typeset -g POWERLEVEL9K_DIR_NOT_WRITABLE_VISUAL_IDENTIFIER_EXPANSION'
       sub DIR_NOT_WRITABLE_VISUAL_IDENTIFIER_EXPANSION "'∅'"
-      uncomment 'typeset -g POWERLEVEL9K_TERRAFORM_VISUAL_IDENTIFIER_EXPANSION'
-      sub TERRAFORM_VISUAL_IDENTIFIER_EXPANSION "'tf'"
       uncomment 'typeset -g POWERLEVEL9K_RANGER_VISUAL_IDENTIFIER_EXPANSION'
       sub RANGER_VISUAL_IDENTIFIER_EXPANSION "'▲'"
       uncomment 'typeset -g POWERLEVEL9K_KUBECONTEXT_DEFAULT_VISUAL_IDENTIFIER_EXPANSION'

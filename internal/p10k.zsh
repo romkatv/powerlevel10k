@@ -1,4 +1,4 @@
-if [[ $__p9k_sourced != 4 ]]; then
+if [[ $__p9k_sourced != 5 ]]; then
   >&2 print -P ""
   >&2 print -P "[%F{1}ERROR%f]: Corrupted powerlevel10k installation."
   >&2 print -P ""
@@ -140,6 +140,10 @@ function getColorCode() {
 # Sadly, this is a part of public API. Its use is emphatically discouraged.
 function print_icon() {
   eval "$__p9k_intro"
+  if (( ! $+_p9k__locale )); then
+    _p9k_init_locale
+    [[ -z $_p9k__locale ]] || local LC_ALL=$_p9k__locale
+  fi
   (( $+functions[_p9k_print_icon] )) || source "${__p9k_root_dir}/internal/icons.zsh"
   _p9k_print_icon "$@"
 }
@@ -151,6 +155,10 @@ function print_icon() {
 #                 overrides into account.
 function get_icon_names() {
   eval "$__p9k_intro"
+  if (( ! $+_p9k__locale )); then
+    _p9k_init_locale
+    [[ -z $_p9k__locale ]] || local LC_ALL=$_p9k__locale
+  fi
   (( $+functions[_p9k_get_icon_names] )) || source "${__p9k_root_dir}/internal/icons.zsh"
   _p9k_get_icon_names "$@"
 }
@@ -188,7 +196,6 @@ function _p9k_declare() {
       (( set )) && typeset -g _$2=${(P)2} || typeset -g _$2=$3
       ;;
     -e)
-      [[ -z $_p9k_locale ]] || local LC_ALL=$_p9k_locale
       if (( set )); then
         local v=${(P)2}
         typeset -g _$2=${(g::)v}
@@ -529,7 +536,6 @@ _p9k_get_icon() {
       if [[ $_p9k_ret == $'\1'* ]]; then
         _p9k_ret=${_p9k_ret[2,-1]}
       else
-        [[ -z $_p9k_locale ]] || local LC_ALL=$_p9k_locale
         _p9k_ret=${(g::)_p9k_ret}
         [[ $_p9k_ret != $'\b'? ]] || _p9k_ret="%{$_p9k_ret%}"  # penance for past sins
       fi
@@ -767,7 +773,6 @@ _p9k_left_prompt_segment() {
 
     p+='${${_p9k_e:#00}:+${${_p9k_t[$_p9k_n]/'$ss'/$_p9k_ss}/'$s'/$_p9k_s}'
 
-    [[ -z $_p9k_locale ]] || local LC_ALL=$_p9k_locale
     _p9k_param $1 ICON_BEFORE_CONTENT ''
     if [[ $_p9k_ret != false ]]; then
       _p9k_param $1 PREFIX ''
@@ -988,7 +993,6 @@ _p9k_right_prompt_segment() {
 
     p+='${${_p9k_e:#00}:+${_p9k_t[$_p9k_n]/'$w'/$_p9k_w}'
 
-    [[ -z $_p9k_locale ]] || local LC_ALL=$_p9k_locale
     _p9k_param $1 ICON_BEFORE_CONTENT ''
     if [[ $_p9k_ret != true ]]; then
       _p9k_param $1 PREFIX ''
@@ -1504,7 +1508,6 @@ prompt_context() {
     if [[ -z $text ]]; then
       local var=_POWERLEVEL9K_CONTEXT_${state}_TEMPLATE
       if (( $+parameters[$var] )); then
-        [[ -z $_p9k_locale ]] || local LC_ALL=$_p9k_locale
         text=${(P)var}
         text=${(g::)text}
       else
@@ -1678,7 +1681,6 @@ prompt_dir() {
   fi
 
   local -i fake_first=0 expand=0
-  [[ -z $_p9k_locale ]] || local LC_ALL=$_p9k_locale
   local delim=${_POWERLEVEL9K_SHORTEN_DELIMITER-$'\u2026'}
   local -i shortenlen=${_POWERLEVEL9K_SHORTEN_DIR_LENGTH:--1}
 
@@ -2066,7 +2068,7 @@ _p9k_prompt_detect_virt_init() {
 # Segment to display the current IP address
 prompt_ip() {
   local -i len=$#_p9k__prompt
-  _p9k_prompt_segment "$0" "cyan" "$_p9k_color1" 'NETWORK_ICON' 1 '$_p9k__ip_ip' '$_p9k__ip_ip'
+  _p9k_prompt_segment "$0" "cyan" "$_p9k_color1" 'NETWORK_ICON' 1 '$P9K_IP_IP' '$P9K_IP_IP'
   typeset -g "_p9k__segment_val_${_p9k_prompt_side}[_p9k_segment_index]"=$_p9k__prompt[len+1,-1]
 }
 
@@ -4153,22 +4155,27 @@ function _p9k_fetch_nordvpn_status() {
     >&$fd echo -nE - $'PRI * HTTP/2.0\r\n\r\nSM\r\n\r\n\0\0\0\4\1\0\0\0\0\0\0N\1\4\0\0\0\1\203\206E\221bA\226\223\325\\k\337\31i=LnH\323j?A\223\266\243y\270\303\fYmLT{$\357]R.\203\223\257_\213\35u\320b\r&=LMedz\212\232\312\310\264\307`+\210K\203@\2te\206M\2035\5\261\37\0\0\5\0\1\0\0\0\1\0\0\0\0\0'
     local tag len val
     local -i n
-    IFS='' read -t 0.25 -r tag <&3
-    tag=$'\015'
-    while true; do
-      tag=$((#tag))
-      (( (tag >>= 3) && tag <= $#__p9k_nordvpn_tag )) || break
-      tag=$__p9k_nordvpn_tag[tag]
-      sysread -c n -s 1 -t 0.25 len <&3
-      len=$((#len))
-      val=
-      (( ! len )) || {
-        sysread -c n -s $len -t 0.25 val <&3
-        (( n == len ))
-      }
-      typeset -g $tag=$val
-      sysread -c n -s 1 -t 0.25 tag <&3
-    done
+    {
+      IFS='' read -t 0.25 -r tag
+      tag=$'\015'
+      while true; do
+        tag=$((#tag))
+        (( (tag >>= 3) && tag <= $#__p9k_nordvpn_tag )) || break
+        tag=$__p9k_nordvpn_tag[tag]
+        [[ -t $fd ]] || true
+        sysread -c n -s 1 -t 0.25 len
+        len=$((#len))
+        val=
+        (( ! len )) || {
+          [[ -t $fd ]] || true
+          sysread -c n -s $len -t 0.25 val
+          (( n == len ))
+        }
+        typeset -g $tag=$val
+        [[ -t $fd ]] || true
+        sysread -c n -s 1 -t 0.25 tag
+      done
+    } <&$fd
   } always {
     exec {fd}>&-
   }
@@ -4356,8 +4363,9 @@ function instant_prompt_direnv() {
 
 function prompt_timewarrior() {
   local -a stat
+  local timewarriordb=${TIMEWARRIORDB:-~/.timewarrior}
   if [[ -n $_p9k_timewarrior_file_name ]]; then
-    zstat -A stat +mtime -- ~/.timewarrior/data $_p9k_timewarrior_file_name 2>/dev/null || stat=()
+    zstat -A stat +mtime -- ${timewarriordb}/data $_p9k_timewarrior_file_name 2>/dev/null || stat=()
     if [[ $stat[1] == $_p9k_timewarrior_dir_mtime && $stat[2] == $_p9k_timewarrior_file_mtime ]]; then
       if (( $+_p9k_timewarrior_tags )); then
         _p9k_prompt_segment $0 grey 255 TIMEWARRIOR_ICON 0 '' "${_p9k_timewarrior_tags//\%/%%}"
@@ -4365,7 +4373,7 @@ function prompt_timewarrior() {
       return
     fi
   fi
-  if [[ ! -d ~/.timewarrior/data ]]; then
+  if [[ ! -d ${timewarriordb}/data ]]; then
     _p9k_timewarrior_dir_mtime=0
     _p9k_timewarrior_file_mtime=0
     _p9k_timewarrior_file_name=
@@ -4373,12 +4381,12 @@ function prompt_timewarrior() {
     return
   fi
   if [[ $stat[1] != $_p9k_timewarrior_dir_mtime ]]; then
-    local -a files=(~/.timewarrior/data/<->-<->.data(.N))
+    local -a files=(${timewarriordb}/data/<->-<->.data(.N))
     if (( ! $#files )); then
-      if (( $#stat )) || zstat -A stat +mtime -- ~/.timewarrior/data 2>/dev/null; then
+      if (( $#stat )) || zstat -A stat +mtime -- ${timewarriordb}/data 2>/dev/null; then
         _p9k_timewarrior_dir_mtime=$stat[1]
         _p9k_timewarrior_file_mtime=$stat[1]
-        _p9k_timewarrior_file_name=~/.timewarrior/data
+        _p9k_timewarrior_file_name=${timewarriordb}/data
       else
         _p9k_timewarrior_dir_mtime=0
         _p9k_timewarrior_file_mtime=0
@@ -4389,7 +4397,7 @@ function prompt_timewarrior() {
     fi
     _p9k_timewarrior_file_name=${${(AO)files}[1]}
   fi
-  if ! zstat -A stat +mtime -- ~/.timewarrior/data $_p9k_timewarrior_file_name 2>/dev/null; then
+  if ! zstat -A stat +mtime -- ${timewarriordb}/data $_p9k_timewarrior_file_name 2>/dev/null; then
     _p9k_timewarrior_dir_mtime=0
     _p9k_timewarrior_file_mtime=0
     _p9k_timewarrior_file_name=
@@ -4534,15 +4542,21 @@ _p9k_preexec2() {
 function _p9k_prompt_net_iface_init() {
   typeset -g _p9k__public_ip_vpn=
   typeset -g _p9k__public_ip_not_vpn=
-  typeset -g _p9k__ip_ip=
+  typeset -g P9K_IP_IP=
+  typeset -g P9K_IP_INTERFACE=
+  typeset -g P9K_IP_TX_BYTES=
+  typeset -g P9K_IP_RX_BYTES=
+  typeset -g P9K_IP_TX_RATE=
+  typeset -g P9K_IP_RX_RATE=
+  typeset -g _p9__ip_timestamp=
   typeset -g _p9k__vpn_ip_ip=
   [[ -z $_POWERLEVEL9K_PUBLIC_IP_VPN_INTERFACE ]] && _p9k__public_ip_not_vpn=1
   _p9k__async_segments_compute+=_p9k_prompt_net_iface_compute
 }
 
-# reads `iface2ip` and sets `ip`
+# reads `iface2ip` and sets `iface` and `ip`
 function _p9k_prompt_net_iface_match() {
-  local iface_regex="^($1)\$" iface
+  local iface_regex="^($1)\$"
   for iface ip in "${(@kv)iface2ip}"; do
     [[ $iface =~ $iface_regex ]] && return
   done
@@ -4556,13 +4570,13 @@ function _p9k_prompt_net_iface_compute() {
 function _p9k_prompt_net_iface_async() {
   # netstat -inbI en0
   local iface ip line var
-  typeset -A iface2ip
+  typeset -a iface2ip
   if [[ -x /sbin/ifconfig ]]; then
     for line in ${(f)"$(/sbin/ifconfig 2>/dev/null)"}; do
       if [[ $line == (#b)([^[:space:]]##):[[:space:]]##flags=(<->)'<'* ]]; then
         [[ $match[2] == *[13579] ]] && iface=$match[1] || iface=
       elif [[ -n $iface && $line == (#b)[[:space:]]##inet[[:space:]]##([0-9.]##)* ]]; then
-        iface2ip[$iface]=$match[1]
+        iface2ip+=($iface $match[1])
         iface=
       fi
     done
@@ -4571,7 +4585,7 @@ function _p9k_prompt_net_iface_async() {
       if [[ $line == (#b)<->:[[:space:]]##([^:]##):[[:space:]]##\<([^\>]#)\>* ]]; then
         [[ ,$match[2], == *,UP,* ]] && iface=$match[1] || iface=
       elif [[ -n $iface && $line == (#b)[[:space:]]##inet[[:space:]]##([0-9.]##)* ]]; then
-        iface2ip[$iface]=$match[1]
+        iface2ip+=($iface $match[1])
         iface=
       fi
     done
@@ -4585,9 +4599,43 @@ function _p9k_prompt_net_iface_async() {
     local public_ip_not_vpn=1
   fi
   if _p9k_prompt_net_iface_match $_POWERLEVEL9K_IP_INTERFACE; then
-    local ip_ip=$ip
+    local ip_ip=$ip ip_interface=$iface ip_timestamp=$EPOCHREALTIME
+    local ip_tx_bytes=0 ip_rx_bytes=0 ip_tx_rate='0 B/s' ip_rx_rate='0 B/s'
+    if [[ $_p9k_os == (Linux|Android) ]]; then
+      if [[ -r /sys/class/net/$iface/statistics/rx_bytes ]] &&
+         _p9k_read_file /sys/class/net/$iface/statistics/rx_bytes; then
+        ip_rx_bytes=$_p9k_ret
+      fi
+      if [[ -r /sys/class/net/$iface/statistics/tx_bytes ]] &&
+         _p9k_read_file /sys/class/net/$iface/statistics/tx_bytes; then
+        ip_tx_bytes=$_p9k_ret
+      fi
+    elif [[ $_p9k_os == (BSD|OSX) && $+commands[netstat] == 1 ]]; then
+      local -a lines
+      if lines=(${(f)"$(netstat -inbI $iface)"}); then
+        local header=($=lines[1])
+        local -i rx_idx=$header[(Ie)Ibytes]
+        local -i tx_idx=$header[(Ie)Obytes]
+        for line in ${lines:1}; do
+          (( ip_rx_bytes += ${line[(w)rx_idx]} ))
+          (( ip_tx_bytes += ${line[(w)tx_idx]} ))
+        done
+      fi
+    fi
+    if [[ $ip_ip == $P9K_IP_IP && $iface == $P9K_IP_INTERFACE ]]; then
+      local -F t='ip_timestamp - _p9__ip_timestamp'
+      if (( t <= 0 )); then
+        ip_tx_rate=$P9K_IP_TX_RATE
+        ip_rx_rate=$P9K_IP_RX_RATE
+      else
+        _p9k_human_readable_bytes $(((ip_tx_bytes - P9K_IP_TX_BYTES) / t))
+        [[ $_p9k_ret == *B ]] && ip_tx_rate="$_p9k_ret[1,-2] B/s" || ip_tx_rate="$_p9k_ret[1,-2] $_p9k_ret[-1]iB/s"
+        _p9k_human_readable_bytes $(((ip_rx_bytes - P9K_IP_RX_BYTES) / t))
+        [[ $_p9k_ret == *B ]] && ip_rx_rate="$_p9k_ret[1,-2] B/s" || ip_rx_rate="$_p9k_ret[1,-2] $_p9k_ret[-1]iB/s"
+      fi
+    fi
   else
-    local ip_ip=
+    local ip_ip= ip_interface= ip_tx_bytes= ip_rx_bytes= ip_tx_rate= ip_rx_rate= ip_timestamp=
   fi
   if _p9k_prompt_net_iface_match $_POWERLEVEL9K_VPN_IP_INTERFACE; then
     local vpn_ip_ip=$ip
@@ -4596,13 +4644,34 @@ function _p9k_prompt_net_iface_async() {
   fi
   [[ $_p9k__public_ip_vpn == $public_ip_vpn &&
      $_p9k__public_ip_not_vpn == $public_ip_not_vpn &&
-     $_p9k__ip_ip == $ip_ip &&
+     $P9K_IP_IP == $ip_ip &&
+     $P9K_IP_INTERFACE == $ip_interface &&
+     $P9K_IP_TX_BYTES == $ip_tx_bytes &&
+     $P9K_IP_RX_BYTES == $ip_rx_bytes &&
+     $P9K_IP_TX_RATE == $ip_tx_rate &&
+     $P9K_IP_RX_RATE == $ip_rx_rate &&
      $_p9k__vpn_ip_ip == $vpn_ip_ip ]] && return 1
   _p9k__public_ip_vpn=$public_ip_vpn
   _p9k__public_ip_not_vpn=$public_ip_not_vpn
-  _p9k__ip_ip=$ip_ip
+  P9K_IP_IP=$ip_ip
+  P9K_IP_INTERFACE=$ip_interface
+  P9K_IP_TX_BYTES=$ip_tx_bytes
+  P9K_IP_RX_BYTES=$ip_rx_bytes
+  P9K_IP_TX_RATE=$ip_tx_rate
+  P9K_IP_RX_RATE=$ip_rx_rate
+  _p9__ip_timestamp=$ip_timestamp
   _p9k__vpn_ip_ip=$vpn_ip_ip
-  _p9k_print_params _p9k__public_ip_vpn _p9k__public_ip_not_vpn _p9k__ip_ip _p9k__vpn_ip_ip
+  _p9k_print_params         \
+    _p9k__public_ip_vpn     \
+    _p9k__public_ip_not_vpn \
+    P9K_IP_IP               \
+    P9K_IP_INTERFACE        \
+    P9K_IP_TX_BYTES         \
+    P9K_IP_RX_BYTES         \
+    P9K_IP_TX_RATE          \
+    P9K_IP_RX_RATE          \
+    _p9__ip_timestamp       \
+    _p9k__vpn_ip_ip
   echo -E - 'reset=1'
 }
 
@@ -4806,7 +4875,7 @@ _p9k_dump_instant_prompt() {
   local prompt_dir=${(q)prompt_dir}
   zmodload zsh/langinfo
   if [[ \${langinfo[CODESET]:-} != (utf|UTF)(-|)8 ]]; then
-    local lc=${(q)${${${_p9k_locale:-${(M)LC_CTYPE:#*.(utf|UTF)(-|)8}}:-${(M)LC_ALL:#*.(utf|UTF)(-|)8}}}:-${(M)LANG:#*.(utf|UTF)(-|)8}}
+    local lc=${(q)${${${_p9k__locale:-${(M)LC_CTYPE:#*.(utf|UTF)(-|)8}}:-${(M)LC_ALL:#*.(utf|UTF)(-|)8}}}:-${(M)LANG:#*.(utf|UTF)(-|)8}}
     local LC_ALL=\${lc:-\${\${(@M)\$(locale -a 2>/dev/null):#*.(utf|UTF)(-|)8}[1]:-en_US.UTF-8}}
   fi"
       >&$fd print -r -- '
@@ -5419,6 +5488,11 @@ _p9k_precmd_impl() {
 
   (( __p9k_enabled )) || return
 
+  if (( ! $+_p9k__locale )); then
+    _p9k_init_locale
+    [[ -z $_p9k__locale ]] || local LC_ALL=$_p9k__locale
+  fi
+
   if ! zle || [[ -z $_p9k__param_sig ]]; then
     if zle; then
       __p9k_new_status=0
@@ -5562,6 +5636,15 @@ function _p9k_prompt_overflow_bug() {
   [[ $ZSH_PATCHLEVEL =~ '^zsh-5\.4\.2-([0-9]+)-' ]] && return $(( match[1] < 159 ))
   [[ $ZSH_PATCHLEVEL =~ '^zsh-5\.7\.1-([0-9]+)-' ]] && return $(( match[1] >= 50 ))
   is-at-least 5.5 && ! is-at-least 5.7.2
+}
+
+function _p9k_init_locale() {
+  zmodload zsh/langinfo
+  if [[ ${langinfo[CODESET]:-} != (utf|UTF)(-|)8 ]]; then
+    typeset -g _p9k__locale=${${(@M)$(locale -a):#*.(utf|UTF)(-|)8}[1]:-en_US.UTF-8}
+  else
+    typeset -g _p9k__locale=
+  fi
 }
 
 typeset -g  _p9k__param_pat
@@ -6291,7 +6374,6 @@ _p9k_build_gap_post() {
 }
 
 _p9k_init_lines() {
-  [[ -z $_p9k_locale ]] || local LC_ALL=$_p9k_locale
   local -a left_segments=($_POWERLEVEL9K_LEFT_PROMPT_ELEMENTS)
   local -a right_segments=($_POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS)
 
@@ -6588,7 +6670,7 @@ _p9k_must_init() {
     [[ $sig == $_p9k__param_sig ]] && return 1
     _p9k_deinit
   fi
-  _p9k__param_pat=$'v36\1'${ZSH_VERSION}$'\1'${ZSH_PATCHLEVEL}$'\1'
+  _p9k__param_pat=$'v37\1'${ZSH_VERSION}$'\1'${ZSH_PATCHLEVEL}$'\1'
   _p9k__param_pat+=$'${#parameters[(I)POWERLEVEL9K_*]}\1${(%):-%n%#}\1$GITSTATUS_LOG_LEVEL\1'
   _p9k__param_pat+=$'$GITSTATUS_ENABLE_LOGGING\1$GITSTATUS_DAEMON\1$GITSTATUS_NUM_THREADS\1'
   _p9k__param_pat+=$'$DEFAULT_USER\1${ZLE_RPROMPT_INDENT:-1}\1$P9K_SSH\1$__p9k_ksh_arrays'
@@ -6750,7 +6832,6 @@ function _p9k_init_cacheable() {
 
   if _p9k_segment_in_use dir; then
     if (( $+_POWERLEVEL9K_DIR_CLASSES )); then
-      [[ -z $_p9k_locale ]] || local LC_ALL=$_p9k_locale
       local -i i=3
       for ((; i <= $#_POWERLEVEL9K_DIR_CLASSES; i+=3)); do
         _POWERLEVEL9K_DIR_CLASSES[i]=${(g::)_POWERLEVEL9K_DIR_CLASSES[i]}

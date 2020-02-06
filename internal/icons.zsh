@@ -3,12 +3,6 @@ typeset -gA icons
 function _p9k_init_icons() {
   [[ $+_p9k_icon_mode == 1 && $_p9k_icon_mode == $POWERLEVEL9K_MODE/$POWERLEVEL9K_LEGACY_ICON_SPACING ]] && return
   typeset -g _p9k_icon_mode=$POWERLEVEL9K_MODE/$POWERLEVEL9K_LEGACY_ICON_SPACING
-  zmodload zsh/langinfo
-  if [[ ${langinfo[CODESET]:-} != (utf|UTF)(-|)8 ]]; then
-    typeset -g _p9k_locale=${${(@M)$(locale -a):#*.(utf|UTF)(-|)8}[1]:-en_US.UTF-8}
-  else
-    typeset -g _p9k_locale=
-  fi
 
   if [[ $POWERLEVEL9K_LEGACY_ICON_SPACING == true ]]; then
     local s=
@@ -121,7 +115,7 @@ function _p9k_init_icons() {
         RANGER_ICON                    '\u2B50'               # ⭐
         MIDNIGHT_COMMANDER_ICON        'mc'
         VIM_ICON                       'vim'
-        TERRAFORM_ICON                 '\U1F6E0\u00A0'        # 🛠️
+        TERRAFORM_ICON                 'tf'
         PROXY_ICON                     '\u2B82'               # ⮂
         DOTNET_ICON                    '.NET'
         AZURE_ICON                     '\u2601'               # ☁
@@ -234,7 +228,7 @@ function _p9k_init_icons() {
         RANGER_ICON                    '\u2B50'               # ⭐
         MIDNIGHT_COMMANDER_ICON        'mc'
         VIM_ICON                       'vim'
-        TERRAFORM_ICON                 '\U1F6E0\u00A0'        # 🛠️
+        TERRAFORM_ICON                 'tf'
         PROXY_ICON                     '\u2B82'               # ⮂
         DOTNET_ICON                    '.NET'
         AZURE_ICON                     '\u2601'               # ☁
@@ -351,7 +345,7 @@ function _p9k_init_icons() {
         RANGER_ICON                    '\u2B50'                                       # ⭐
         MIDNIGHT_COMMANDER_ICON        'mc'
         VIM_ICON                       'vim'
-        TERRAFORM_ICON                 '\U1F6E0\u00A0'                                # 🛠️
+        TERRAFORM_ICON                 'tf'
         PROXY_ICON                     '\u2B82'                                       # ⮂
         DOTNET_ICON                    '.NET'
         AZURE_ICON                     '\u2601'                                       # ☁
@@ -465,7 +459,7 @@ function _p9k_init_icons() {
         RANGER_ICON                    '\uF00b'               # 
         MIDNIGHT_COMMANDER_ICON        'mc'
         VIM_ICON                       '\uE62B'               # 
-        TERRAFORM_ICON                 '\U1F6E0\u00A0'        # 🛠️
+        TERRAFORM_ICON                 '\uF1BB'               # 
         PROXY_ICON                     '\u2B82'               # ⮂
         DOTNET_ICON                    '\uE77F'               # 
         AZURE_ICON                     '\uFD03'               # ﴃ
@@ -578,7 +572,7 @@ function _p9k_init_icons() {
         RANGER_ICON                    '\u2B50'               # ⭐
         MIDNIGHT_COMMANDER_ICON        'mc'
         VIM_ICON                       'vim'
-        TERRAFORM_ICON                 '\U1F6E0\u00A0'        # 🛠️
+        TERRAFORM_ICON                 'tf'
         PROXY_ICON                     '\u2194'               # ↔
         DOTNET_ICON                    '.NET'
         AZURE_ICON                     '\u2601'               # ☁
@@ -614,7 +608,6 @@ function _p9k_init_icons() {
 # Sadly, this is a part of public API. Its use is emphatically discouraged.
 function _p9k_print_icon() {
   _p9k_init_icons
-  [[ -z $_p9k_locale ]] || local LC_ALL=$_p9k_locale
   local icon_name=$1
   local var_name=POWERLEVEL9K_${icon_name}
   if [[ -n "${(tP)var_name}" ]]; then
@@ -631,7 +624,6 @@ function _p9k_print_icon() {
 #                 overrides into account.
 function _p9k_get_icon_names() {
   _p9k_init_icons
-  [[ -z $_p9k_locale ]] || local LC_ALL=$_p9k_locale
   # Iterate over a ordered list of keys of the icons array
   for key in ${(@kon)icons}; do
     echo -n "POWERLEVEL9K_$key: "
