@@ -4608,7 +4608,7 @@ function prompt_asdf() {
   local -A versions
   local plugin
   for plugin in $_p9k_asdf_plugins; do
-    local var=ASDF_${(U)plugin}_VERSION
+    local var=ASDF_${(U)plugin//-/_}_VERSION
     local val="${(P)var}"
     [[ -n $val ]] && versions[$plugin]=$val
   done
@@ -4689,7 +4689,7 @@ function prompt_asdf() {
 
   local plugin version
   for plugin version in ${(kv)versions}; do
-    local upper=${(U)plugin}
+    local upper=${(U)plugin//-/_}
     _p9k_get_icon $0_$upper ${upper}_ICON $plugin
     _p9k_prompt_segment $0_$upper green $_p9k_color1 $'\1'$_p9k_ret 0 '' ${version//\%/%%}
   done
