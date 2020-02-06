@@ -115,7 +115,7 @@ function _p9k_init_icons() {
         RANGER_ICON                    '\u2B50'               # ⭐
         MIDNIGHT_COMMANDER_ICON        'mc'
         VIM_ICON                       'vim'
-        TERRAFORM_ICON                 '\U1F6E0\u00A0'        # 🛠️
+        TERRAFORM_ICON                 'tf'
         PROXY_ICON                     '\u2B82'               # ⮂
         DOTNET_ICON                    '.NET'
         AZURE_ICON                     '\u2601'               # ☁
@@ -228,7 +228,7 @@ function _p9k_init_icons() {
         RANGER_ICON                    '\u2B50'               # ⭐
         MIDNIGHT_COMMANDER_ICON        'mc'
         VIM_ICON                       'vim'
-        TERRAFORM_ICON                 '\U1F6E0\u00A0'        # 🛠️
+        TERRAFORM_ICON                 'tf'
         PROXY_ICON                     '\u2B82'               # ⮂
         DOTNET_ICON                    '.NET'
         AZURE_ICON                     '\u2601'               # ☁
@@ -345,7 +345,7 @@ function _p9k_init_icons() {
         RANGER_ICON                    '\u2B50'                                       # ⭐
         MIDNIGHT_COMMANDER_ICON        'mc'
         VIM_ICON                       'vim'
-        TERRAFORM_ICON                 '\U1F6E0\u00A0'                                # 🛠️
+        TERRAFORM_ICON                 'tf'
         PROXY_ICON                     '\u2B82'                                       # ⮂
         DOTNET_ICON                    '.NET'
         AZURE_ICON                     '\u2601'                                       # ☁
@@ -459,7 +459,7 @@ function _p9k_init_icons() {
         RANGER_ICON                    '\uF00b'               # 
         MIDNIGHT_COMMANDER_ICON        'mc'
         VIM_ICON                       '\uE62B'               # 
-        TERRAFORM_ICON                 '\U1F6E0\u00A0'        # 🛠️
+        TERRAFORM_ICON                 '\uF1BB'               # 
         PROXY_ICON                     '\u2B82'               # ⮂
         DOTNET_ICON                    '\uE77F'               # 
         AZURE_ICON                     '\uFD03'               # ﴃ
@@ -572,7 +572,7 @@ function _p9k_init_icons() {
         RANGER_ICON                    '\u2B50'               # ⭐
         MIDNIGHT_COMMANDER_ICON        'mc'
         VIM_ICON                       'vim'
-        TERRAFORM_ICON                 '\U1F6E0\u00A0'        # 🛠️
+        TERRAFORM_ICON                 'tf'
         PROXY_ICON                     '\u2194'               # ↔
         DOTNET_ICON                    '.NET'
         AZURE_ICON                     '\u2601'               # ☁
