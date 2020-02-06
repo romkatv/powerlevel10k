@@ -1086,7 +1086,7 @@ See [cursor is in the wrong place](#cursor-is-in-the-wrong-place).
 
 See [cursor is in the wrong place](#cursor-is-in-the-wrong-place).
 
-### Configuration wizard run automatically every time Zsh is started
+### Configuration wizard runs automatically every time Zsh is started
 
 When Powerlevel10k starts, it automatically runs `p10k configure` if no `POWERLEVEL9K_*`
 parameters are defined. Based on your prompt style choices, the configuration wizard creates
@@ -1426,7 +1426,7 @@ There are a few mitigation options for this issue.
   - [Cursor is in the wrong place](#cursor-is-in-the-wrong-place)
   - [Prompt wrapping around in a weird way](#prompt-wrapping-around-in-a-weird-way)
   - [Right prompt is in the wrong place](#right-prompt-is-in-the-wrong-place)
-  - [Configuration wizard run automatically every time Zsh is started](#configuration-wizard-run-automatically-every-time-zsh-is-started)
+  - [Configuration wizard runs automatically every time Zsh is started](#configuration-wizard-runs-automatically-every-time-zsh-is-started)
   - [Some prompt styles are missing from the configuration wizard](#some-prompt-styles-are-missing-from-the-configuration-wizard)
   - [Cannot install the recommended font](#cannot-install-the-recommended-font)
   - [Extra or missing spaces in prompt compared to Powerlevel9k](#extra-or-missing-spaces-in-prompt-compared-to-powerlevel9k)
