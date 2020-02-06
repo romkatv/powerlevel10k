@@ -272,6 +272,11 @@
     package.json
   )
   typeset -g POWERLEVEL9K_SHORTEN_FOLDER_MARKER="(${(j:|:)anchor_files})"
+  # If set to true, remove everything before the last (deepest) subdirectory that contains files
+  # matching $POWERLEVEL9K_SHORTEN_FOLDER_MARKER. For example, when the current directory is
+  # /foo/bar/git_repo/baz, prompt will display git_repo/baz. This assumes that /foo/bar/git_repo
+  # contains a marker (.git) and other directories don't.
+  typeset -g POWERLEVEL9K_DIR_TRUNCATE_BEFORE_MARKER=false
   # Don't shorten this many last directory segments. They are anchors.
   typeset -g POWERLEVEL9K_SHORTEN_DIR_LENGTH=1
   # Shorten directory if it's longer than this even if there is space for it. The value can
