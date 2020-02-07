@@ -3426,16 +3426,14 @@ function _p9k_vcs_render() {
 
   if (( _POWERLEVEL9K_VCS_DISABLE_GITSTATUS_FORMATTING )); then
     if [[ -z $state ]]; then
-      #echo "myMOD"
-      #if [[ $VCS_STATUS_HAS_CONFLICTED == 1 && $_POWERLEVEL9K_VCS_CONFLICTED_STATE == 1 ]];            # old
-      if [[ $VCS_STATUS_HAS_CONFLICTED == 1 ]]; then                                                    # new
+      if [[ $VCS_STATUS_HAS_CONFLICTED == 1 ]]; then
         state=CONFLICTED
       elif [[ $VCS_STATUS_HAS_STAGED != 0 || $VCS_STATUS_HAS_UNSTAGED != 0 ]]; then
         state=MODIFIED
       elif [[ $VCS_STATUS_HAS_UNTRACKED != 0 ]]; then
         state=UNTRACKED
-      elif [[ $VCS_STATUS_STASHES != 0 ]]; then                                                         # add
-        state=STASHED                                                                                   # add
+      elif [[ $VCS_STATUS_STASHES != 0 ]]; then
+        state=STASHED
       else
         state=CLEAN
       fi
@@ -3485,12 +3483,15 @@ function _p9k_vcs_render() {
     local content
 
     if (( ${_POWERLEVEL9K_VCS_GIT_HOOKS[(I)vcs-detect-changes]} )); then
-      if [[ $VCS_STATUS_HAS_CONFLICTED == 1 && $_POWERLEVEL9K_VCS_CONFLICTED_STATE == 1 ]]; then
+      #if [[ $VCS_STATUS_HAS_CONFLICTED == 1 && $_POWERLEVEL9K_VCS_CONFLICTED_STATE == 1 ]]; then
+      if [[ $VCS_STATUS_HAS_CONFLICTED == 1 ]]; then
         : ${state:=CONFLICTED}
       elif [[ $VCS_STATUS_HAS_STAGED != 0 || $VCS_STATUS_HAS_UNSTAGED != 0 ]]; then
         : ${state:=MODIFIED}
       elif [[ $VCS_STATUS_HAS_UNTRACKED != 0 ]]; then
         : ${state:=UNTRACKED}
+      elif [[ $VCS_STATUS_STASHES != 0 ]]; then
+        : ${state:=STASHED}
       fi
 
       # It's weird that removing vcs-detect-changes from POWERLEVEL9K_VCS_GIT_HOOKS gets rid
