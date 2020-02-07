@@ -130,6 +130,9 @@ function _p9k_init_icons() {
         TIMEWARRIOR_ICON               'tw'
         NIX_SHELL_ICON                 'nix'
         WIFI_ICON                      'WiFi'
+        ERLANG_ICON                    'erl'
+        ELIXIR_ICON                    'elixir'
+        POSTGRES_ICON                  'postgres'
       )
     ;;
     'awesome-fontconfig')
@@ -245,6 +248,9 @@ function _p9k_init_icons() {
         TIMEWARRIOR_ICON               'tw'
         NIX_SHELL_ICON                 'nix'
         WIFI_ICON                      'WiFi'
+        ERLANG_ICON                    'erl'
+        ELIXIR_ICON                    'elixir'
+        POSTGRES_ICON                  'postgres'
       )
     ;;
     'awesome-mapped-fontconfig')
@@ -364,6 +370,9 @@ function _p9k_init_icons() {
         TIMEWARRIOR_ICON               'tw'
         NIX_SHELL_ICON                 'nix'
         WIFI_ICON                      'WiFi'
+        ERLANG_ICON                    'erl'
+        ELIXIR_ICON                    'elixir'
+        POSTGRES_ICON                  'postgres'
       )
     ;;
     'nerdfont-complete'|'nerdfont-fontconfig')
@@ -480,6 +489,9 @@ function _p9k_init_icons() {
         TIMEWARRIOR_ICON               '\uF49B'               # 
         NIX_SHELL_ICON                 '\uF313 '              # 
         WIFI_ICON                      '\uF1EB '              # 
+        ERLANG_ICON                    '\uE7B1 '              # 
+        ELIXIR_ICON                    '\uE62D'               # 
+        POSTGRES_ICON                  '\uE76E'               # 
       )
     ;;
     *)
@@ -595,6 +607,9 @@ function _p9k_init_icons() {
         TIMEWARRIOR_ICON               'tw'
         NIX_SHELL_ICON                 'nix'
         WIFI_ICON                      'WiFi'
+        ERLANG_ICON                    'erl'
+        ELIXIR_ICON                    'elixir'
+        POSTGRES_ICON                  'postgres'
       )
     ;;
   esac
