@@ -4583,6 +4583,7 @@ function _p9k_asdf_init_meta() {
             fi
             local name
             for name in $($list_names 2>/dev/null); do
+              [[ $name == (*/*|*:*|.tool-versions) ]] && continue
               _p9k_asdf_file_info[$name]+="${plugin:t} $has_parse "
             done
           fi
@@ -4608,71 +4609,32 @@ function _p9k_asdf_init_meta() {
   }
 }
 
-function prompt_asdf() {
-  _p9k_asdf_check_meta || _p9k_asdf_init_meta || return
-
-  local -A versions
-  local plugin
-  for plugin in $_p9k_asdf_plugins; do
-    local var=ASDF_${(U)plugin//-/_}_VERSION
-    local val="${(P)var}"
-    [[ -n $val ]] && versions[$plugin]=$val
-  done
-
+# Usage: _p9k_asdf_parse_version_file <file> <is_legacy>
+#
+# Mutates `versions` on success.
+function _p9k_asdf_parse_version_file() {
+  local file=$1
+  local is_legacy=$2
   local -a stat
-  zstat -A stat +mtime ~ 2>/dev/null || return
-  local dirs=($_p9k__parent_dirs ~)
-  local mtimes=($_p9k__parent_mtimes $stat[1])
-
-  local elem
-  for elem in ${(@)${:-{1..$#dirs}}/(#m)*/${${:-$MATCH:$_p9k__asdf_dir2files[$dirs[MATCH]]}#$MATCH:$mtimes[MATCH]:}}; do
-    if [[ $elem == *:* ]]; then
-      local dir=$dirs[${elem%%:*}]
-      zstat -A stat +mtime $dir 2>/dev/null || return
-      local files=($dir/.tool-versions(N) $dir/${(k)^_p9k_asdf_file_info}(N))
-      _p9k__asdf_dir2files[$dir]=$stat[1]:${(pj:\0:)files}
-    else
-      local files=(${(0)elem})
-    fi
-    local file
-    for file in $files; do
-      zstat -A stat +mtime $file 2>/dev/null || return
-      local cached=$_p9k_asdf_file2versions[$file]
+  zstat -A stat +mtime $file 2>/dev/null || return
+  if (( is_legacy )); then
+    local plugin has_parse
+    for plugin has_parse in $=_p9k_asdf_file_info[$file:t]; do
+      (( $+versions[$plugin] )) && continue
+      local cached=$_p9k_asdf_file2versions[$file:$plugin]
       if [[ $cached == $stat[1]:* ]]; then
-        local file_versions=(${(0)${cached#*:}})
+        versions[$plugin]=${cached#*:}
       else
-        local file_versions=()
-        if [[ $file == */.tool-versions ]]; then
-          { local lines=(${(@)${(f)"$(<$file)"}/\#*}) } 2>/dev/null
-          local line
-          for line in $lines; do
-            local words=($=line)
-            (( $#words > 1 && $_p9k_asdf_plugins[(Ie)$words[1]] )) || continue
-            file_versions+=($words[1] "${words[2,-1]}")
-          done
+        if (( has_parse )); then
+          local v=($(${ASDF_DATA_DIR:-~/.asdf}/plugins/$plugin/bin/parse-legacy-file $file 2>/dev/null))
         else
-          local plugin has_parse
-          for plugin has_parse in $=_p9k_asdf_file_info[$file:t]; do
-            if (( has_parse )); then
-              local v=($(${ASDF_DATA_DIR:-~/.asdf}/plugins/$plugin/bin/parse-legacy-file $file 2>/dev/null))
-            else
-              { local v=($(<$file)) } 2>/dev/null
-            fi
-            (( $#v )) && file_versions+=($plugin "$v")
-          done
+          { local v=($(<$file)) } 2>/dev/null
         fi
-        _p9k_asdf_file2versions[$file]=$stat[1]:${(pj:\0:)file_versions}
+        (( $#v )) && versions[$plugin]="$v"
+        _p9k_asdf_file2versions[$file:$plugin]=$stat[1]:"$v"
       fi
-      local plugin version
-      for plugin version in $file_versions; do
-        [[ -z $versions[$plugin] ]] && versions[$plugin]=$version
-      done
     done
-  done
-
-  if [[ -r $ASDF_DEFAULT_TOOL_VERSIONS_FILENAME ]]; then
-    local file=$ASDF_DEFAULT_TOOL_VERSIONS_FILENAME
-    zstat -A stat +mtime $file 2>/dev/null || return
+  else
     local cached=$_p9k_asdf_file2versions[$file]
     if [[ $cached == $stat[1]:* ]]; then
       local file_versions=(${(0)${cached#*:}})
@@ -4689,13 +4651,110 @@ function prompt_asdf() {
     fi
     local plugin version
     for plugin version in $file_versions; do
-      [[ -z $versions[$plugin] ]] && versions[$plugin]=$version
+      (( $+versions[$plugin] )) || versions[$plugin]=$version
     done
   fi
+  return 0
+}
 
-  local plugin version
-  for plugin version in ${(kv)versions}; do
+function prompt_asdf() {
+  _p9k_asdf_check_meta || _p9k_asdf_init_meta || return
+
+  local -A versions
+  local -a stat
+  zstat -A stat +mtime ~ 2>/dev/null || return
+  local dirs=($_p9k__parent_dirs ~)
+  local mtimes=($_p9k__parent_mtimes $stat[1])
+  local -i has_global
+
+  local elem
+  for elem in ${(@)${:-{1..$#dirs}}/(#m)*/${${:-$MATCH:$_p9k__asdf_dir2files[$dirs[MATCH]]}#$MATCH:$mtimes[MATCH]:}}; do
+    if [[ $elem == *:* ]]; then
+      local dir=$dirs[${elem%%:*}]
+      zstat -A stat +mtime $dir 2>/dev/null || return
+      local files=($dir/.tool-versions(N) $dir/${(k)^_p9k_asdf_file_info}(N))
+      _p9k__asdf_dir2files[$dir]=$stat[1]:${(pj:\0:)files}
+    else
+      local files=(${(0)elem})
+    fi
+    if [[ ${files[1]:h} == ~ ]]; then
+      has_global=1
+      local -A local_versions=(${(kv)versions})
+      versions=()
+    fi
+    local file
+    for file in $files; do
+      [[ $file == */.tool-versions ]]
+      _p9k_asdf_parse_version_file $file $? || return
+    done
+  done
+
+  if (( ! has_global )); then
+    has_global=1
+    local -A local_versions=(${(kv)versions})
+    versions=()
+  fi
+
+  if [[ -r $ASDF_DEFAULT_TOOL_VERSIONS_FILENAME ]]; then
+    _p9k_asdf_parse_version_file $ASDF_DEFAULT_TOOL_VERSIONS_FILENAME 0 || return
+  fi
+
+  local plugin
+  for plugin in $_p9k_asdf_plugins; do
     local upper=${(U)plugin//-/_}
+    local var=POWERLEVEL9K_ASDF_${upper}_SOURCES
+    if (( $+parameters[$var] )); then
+      local sources=(${(P)var})
+    else
+      var=POWERLEVEL9K_ASDF_SOURCES
+      if (( $+parameters[$var] )); then
+        local sources=(${(P)var})
+      else
+        local sources=(shell local global)
+      fi
+    fi
+
+    var=ASDF_${upper}_VERSION
+    local version="${(P)var}"
+    if [[ -n $version ]]; then
+      (( $sources[(I)shell] )) || continue
+    else
+      version=$local_versions[$plugin]
+      if [[ -n $version ]]; then
+        (( $sources[(I)local] )) || continue
+      else
+        version=$versions[$plugin]
+        [[ -n $version ]] || continue
+        (( $sources[(I)global] )) || continue
+      fi
+    fi
+
+    if [[ $version == $versions[$plugin] ]]; then
+      var=POWERLEVEL9K_ASDF_${upper}_PROMPT_ALWAYS_SHOW
+      if (( $+parameters[$var] )); then
+        [[ ${(P)var} == true ]] || continue
+      else
+        var=POWERLEVEL9K_ASDF_PROMPT_ALWAYS_SHOW
+        if (( $+parameters[$var] )); then
+          [[ ${(P)var} == true ]] || continue
+        else
+          continue
+        fi
+      fi
+    fi
+
+    if [[ $version == system ]]; then
+      var=POWERLEVEL9K_ASDF_${upper}_SHOW_SYSTEM
+      if (( $+parameters[$var] )); then
+        [[ ${(P)var} == true ]] || continue
+      else
+        var=POWERLEVEL9K_ASDF_SHOW_SYSTEM
+        if (( $+parameters[$var] )); then
+          [[ ${(P)var} == true ]] || continue
+        fi
+      fi
+    fi
+
     _p9k_get_icon $0_$upper ${upper}_ICON $plugin
     _p9k_prompt_segment $0_$upper green $_p9k_color1 $'\1'$_p9k_ret 0 '' ${version//\%/%%}
   done
@@ -6874,7 +6933,7 @@ _p9k_must_init() {
     [[ $sig == $_p9k__param_sig ]] && return 1
     _p9k_deinit
   fi
-  _p9k__param_pat=$'v38\1'${ZSH_VERSION}$'\1'${ZSH_PATCHLEVEL}$'\1'
+  _p9k__param_pat=$'v39\1'${ZSH_VERSION}$'\1'${ZSH_PATCHLEVEL}$'\1'
   _p9k__param_pat+=$'${#parameters[(I)POWERLEVEL9K_*]}\1${(%):-%n%#}\1$GITSTATUS_LOG_LEVEL\1'
   _p9k__param_pat+=$'$GITSTATUS_ENABLE_LOGGING\1$GITSTATUS_DAEMON\1$GITSTATUS_NUM_THREADS\1'
   _p9k__param_pat+=$'$DEFAULT_USER\1${ZLE_RPROMPT_INDENT:-1}\1$P9K_SSH\1$__p9k_ksh_arrays'

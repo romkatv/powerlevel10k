@@ -528,6 +528,45 @@
   # Default asdf color. Only used to display tools for which there is no color override (see below).
   typeset -g POWERLEVEL9K_ASDF_FOREGROUND=66
 
+  # There are three parameters that can be used to hide tools. If at least one of them decides
+  # to hide a tool, that tool gets hidden. POWERLEVEL9K_ASDF_SHOW_SYSTEM=false hides "system". To
+  # see the difference between POWERLEVEL9K_ASDF_SOURCES and POWERLEVEL9K_ASDF_PROMPT_ALWAYS_SHOW
+  # consider the effect of the following commands:
+  #
+  #   asdf local  python 3.8.1
+  #   asdf global python 3.8.1
+  #
+  # After running both commands the current python version is 3.8.1 and its source is "local" as
+  # it takes precedence over "global". If POWERLEVEL9K_ASDF_PROMPT_ALWAYS_SHOW is set to false,
+  # it'll hide python version in this case because 3.8.1 is the same as the global version.
+  # POWERLEVEL9K_ASDF_SOURCES will hide python version only if the value of this parameter doesn't
+  # contain "local".
+
+  # Hide tool versions that don't come from one of these sources.
+  #
+  # Available sources:
+  #
+  # - shell   `asdf current` says "set by ASDF_${TOOL}_VERSION environment variable"
+  # - local   `asdf current` says "set by /some/not/home/directory/file"
+  # - global  `asdf current` says "set by /home/username/file"
+  #
+  # Note: If this parameter is set to (shell local global), it won't hide tools.
+  # Tip:  Override this parameter for ${TOOL} with POWERLEVEL9K_ASDF_${TOOL}_SOURCES.
+  typeset -g POWERLEVEL9K_ASDF_SOURCES=(shell local global)
+
+  # If set to false, hide tool versions that are the same as global.
+  #
+  # Note: The name of this parameter doesn't reflect its meaning at all.
+  # Note: If this parameter is set to true, it won't hide tools.
+  # Tip:  Override this parameter for ${TOOL} with POWERLEVEL9K_ASDF_${TOOL}_PROMPT_ALWAYS_SHOW.
+  typeset -g POWERLEVEL9K_ASDF_PROMPT_ALWAYS_SHOW=false
+
+  # If set to false, hide tool versions that are equal to "system".
+  #
+  # Note: If this parameter is set to true, it won't hide tools.
+  # Tip: Override this parameter for ${TOOL} with POWERLEVEL9K_ASDF_${TOOL}_SHOW_SYSTEM.
+  typeset -g POWERLEVEL9K_ASDF_SHOW_SYSTEM=true
+
   # Ruby version from asdf.
   typeset -g POWERLEVEL9K_ASDF_RUBY_FOREGROUND=168
   # typeset -g POWERLEVEL9K_ASDF_RUBY_VISUAL_IDENTIFIER_EXPANSION='⭐'
