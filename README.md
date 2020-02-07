@@ -1192,6 +1192,11 @@ reliable way to do this is to type `exit` and then start start a new Zsh session
 `exec zsh`. While not exactly equivalent to complete Zsh restart, this command is much more reliable
 than `source ~/.zshrc`.
 
+### Transient prompt stops working after some time
+
+See [weird things happen after typing `source ~/.zshrc`](
+  #weird-things-happen-after-typing-source-zshrc).
+
 ### Cannot make Powerlevel10k work with my plugin manager
 
 If the [installation instructions](#installation) didn't work for you, try disabling your current
@@ -1435,6 +1440,7 @@ There are a few mitigation options for this issue.
     - [Extra space without background on the right side of right prompt](#extra-space-without-background-on-the-right-side-of-right-prompt)
     - [Extra or missing spaces around icons](#extra-or-missing-spaces-around-icons)
   - [Weird things happen after typing `source ~/.zshrc`](#weird-things-happen-after-typing-source-zshrc)
+  - [Transient prompt stops working after some time](#transient-prompt-stops-working-after-some-time)
   - [Cannot make Powerlevel10k work with my plugin manager](#cannot-make-powerlevel10k-work-with-my-plugin-manager)
   - [Directory is difficult to see in prompt when using Rainbow style](#directory-is-difficult-to-see-in-prompt-when-using-rainbow-style)
   - [Horrific mess when resizing terminal window](#horrific-mess-when-resizing-terminal-window)
