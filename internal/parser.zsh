@@ -141,7 +141,7 @@ function _p9k_parse_buffer() {
   local rcquotes
   [[ -o rcquotes ]] && rcquotes=rcquotes
 
-  eval $__p9k_intro
+  eval "$__p9k_intro"
   setopt no_nomatch $rcquotes
 
   typeset -ga P9K_COMMANDS=()

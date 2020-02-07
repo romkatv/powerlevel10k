@@ -3,7 +3,7 @@
 #
 # Tip: Looking for a nice color? Here's a one-liner to print colormap.
 #
-#   for i in {0..255}; do print -Pn "%${i}F${(l:3::0:)i}%f " ${${(M)$((i%8)):#7}:+$'\n'}; done
+#   for i in {0..255}; do print -Pn "%K{$i} %k%F{$i}${(l:3::0:)i}%f " ${${(M)$((i%8)):#7}:+$'\n'}; done
 
 # Temporarily change options.
 'builtin' 'local' '-a' 'p10k_config_opts'
@@ -34,7 +34,7 @@
     dir                     # current directory
     vcs                     # git status
     # =========================[ Line #2 ]=========================
-    newline
+    newline                 # \n
     # prompt_char           # prompt symbol
   )
 
@@ -48,6 +48,7 @@
     command_execution_time  # duration of the last command
     background_jobs         # presence of background jobs
     direnv                  # direnv status (https://direnv.net/)
+    asdf                    # asdf version manager (https://github.com/asdf-vm/asdf)
     virtualenv              # python virtual environment (https://docs.python.org/3/library/venv.html)
     anaconda                # conda environment (https://conda.io/)
     pyenv                   # python environment (https://github.com/pyenv/pyenv)
@@ -70,7 +71,7 @@
     aws                     # aws profile (https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-profiles.html)
     aws_eb_env              # aws elastic beanstalk environment (https://aws.amazon.com/elasticbeanstalk/)
     azure                   # azure account name (https://docs.microsoft.com/en-us/cli/azure)
-    gcloud                  # google cloud cli acccount and project (https://cloud.google.com/)
+    gcloud                  # google cloud cli account and project (https://cloud.google.com/)
     google_app_cred         # google application credentials (https://cloud.google.com/docs/authentication/production)
     context                 # user@hostname
     nordvpn                 # nordvpn connection status, linux only (https://nordvpn.com/)
@@ -78,6 +79,7 @@
     nnn                     # nnn shell (https://github.com/jarun/nnn)
     vim_shell               # vim shell indicator (:sh)
     midnight_commander      # midnight commander shell (https://midnight-commander.org/)
+    nix_shell               # nix shell (https://nixos.org/nixos/nix-pills/developing-with-nix-shell.html)
     vi_mode                 # vi mode (you don't need this if you've enabled prompt_char)
     # vpn_ip                # virtual private network indicator
     # load                  # CPU load
@@ -88,10 +90,12 @@
     timewarrior             # timewarrior tracking status (https://timewarrior.net/)
     # time                  # current time
     # =========================[ Line #2 ]=========================
-    newline
+    newline                 # \n
+    # ip                    # ip address and bandwidth usage for a specified network interface
     # public_ip             # public IP address
     # proxy                 # system-wide http/https/ftp proxy
     # battery               # internal battery
+    # wifi                  # wifi speed
     # example               # example user-defined segment (see prompt_example function below)
   )
 
@@ -267,6 +271,11 @@
     package.json
   )
   typeset -g POWERLEVEL9K_SHORTEN_FOLDER_MARKER="(${(j:|:)anchor_files})"
+  # If set to true, remove everything before the last (deepest) subdirectory that contains files
+  # matching $POWERLEVEL9K_SHORTEN_FOLDER_MARKER. For example, when the current directory is
+  # /foo/bar/git_repo/baz, prompt will display git_repo/baz. This assumes that /foo/bar/git_repo
+  # contains a marker (.git) and other directories don't.
+  typeset -g POWERLEVEL9K_DIR_TRUNCATE_BEFORE_MARKER=false
   # Don't shorten this many last directory segments. They are anchors.
   typeset -g POWERLEVEL9K_SHORTEN_DIR_LENGTH=1
   # Shorten directory if it's longer than this even if there is space for it. The value can
@@ -515,6 +524,62 @@
   # Custom icon.
   # typeset -g POWERLEVEL9K_DIRENV_VISUAL_IDENTIFIER_EXPANSION='⭐'
 
+  ###############[ asdf: asdf version manager (https://github.com/asdf-vm/asdf) ]###############
+  # Default asdf color. Only used to display tools for which there is no color override (see below).
+  typeset -g POWERLEVEL9K_ASDF_FOREGROUND=66
+
+  # Ruby version from asdf.
+  typeset -g POWERLEVEL9K_ASDF_RUBY_FOREGROUND=168
+  # typeset -g POWERLEVEL9K_ASDF_RUBY_VISUAL_IDENTIFIER_EXPANSION='⭐'
+
+  # Python version from asdf.
+  typeset -g POWERLEVEL9K_ASDF_PYTHON_FOREGROUND=37
+  # typeset -g POWERLEVEL9K_ASDF_PYTHON_VISUAL_IDENTIFIER_EXPANSION='⭐'
+
+  # Go version from asdf.
+  typeset -g POWERLEVEL9K_ASDF_GO_FOREGROUND=37
+  # typeset -g POWERLEVEL9K_ASDF_GO_VISUAL_IDENTIFIER_EXPANSION='⭐'
+
+  # Node.js version from asdf.
+  typeset -g POWERLEVEL9K_ASDF_NODEJS_FOREGROUND=70
+  # typeset -g POWERLEVEL9K_ASDF_NODEJS_VISUAL_IDENTIFIER_EXPANSION='⭐'
+
+  # Rust version from asdf.
+  typeset -g POWERLEVEL9K_ASDF_RUST_FOREGROUND=37
+  # typeset -g POWERLEVEL9K_ASDF_RUST_VISUAL_IDENTIFIER_EXPANSION='⭐'
+
+  # .NET Core version from asdf.
+  typeset -g POWERLEVEL9K_ASDF_DOTNET_CORE_FOREGROUND=134
+  # typeset -g POWERLEVEL9K_ASDF_DOTNET_CORE_VISUAL_IDENTIFIER_EXPANSION='⭐'
+
+  # Flutter version from asdf.
+  typeset -g POWERLEVEL9K_ASDF_FLUTTER_FOREGROUND=38
+  # typeset -g POWERLEVEL9K_ASDF_FLUTTER_VISUAL_IDENTIFIER_EXPANSION='⭐'
+
+  # Lua version from asdf.
+  typeset -g POWERLEVEL9K_ASDF_LUA_FOREGROUND=32
+  # typeset -g POWERLEVEL9K_ASDF_LUA_VISUAL_IDENTIFIER_EXPANSION='⭐'
+
+  # Java version from asdf.
+  typeset -g POWERLEVEL9K_ASDF_JAVA_FOREGROUND=32
+  # typeset -g POWERLEVEL9K_ASDF_JAVA_VISUAL_IDENTIFIER_EXPANSION='⭐'
+
+  # Perl version from asdf.
+  typeset -g POWERLEVEL9K_ASDF_PERL_FOREGROUND=67
+  # typeset -g POWERLEVEL9K_ASDF_PERL_VISUAL_IDENTIFIER_EXPANSION='⭐'
+
+  # Erlang version from asdf.
+  typeset -g POWERLEVEL9K_ASDF_ERLANG_FOREGROUND=125
+  # typeset -g POWERLEVEL9K_ASDF_ERLANG_VISUAL_IDENTIFIER_EXPANSION='⭐'
+
+  # Elixir version from asdf.
+  typeset -g POWERLEVEL9K_ASDF_ELIXIR_FOREGROUND=129
+  # typeset -g POWERLEVEL9K_ASDF_ELIXIR_VISUAL_IDENTIFIER_EXPANSION='⭐'
+
+  # Postgres version from asdf.
+  typeset -g POWERLEVEL9K_ASDF_POSTGRES_FOREGROUND=31
+  # typeset -g POWERLEVEL9K_ASDF_POSTGRES_VISUAL_IDENTIFIER_EXPANSION='⭐'
+
   ##########[ nordvpn: nordvpn connection status, linux only (https://nordvpn.com/) ]###########
   # NordVPN connection indicator color.
   typeset -g POWERLEVEL9K_NORDVPN_FOREGROUND=39
@@ -547,6 +612,16 @@
   typeset -g POWERLEVEL9K_MIDNIGHT_COMMANDER_FOREGROUND=178
   # Custom icon.
   # typeset -g POWERLEVEL9K_MIDNIGHT_COMMANDER_VISUAL_IDENTIFIER_EXPANSION='⭐'
+
+  #[ nix_shell: nix shell (https://nixos.org/nixos/nix-pills/developing-with-nix-shell.html) ]##
+  # Nix shell color.
+  typeset -g POWERLEVEL9K_NIX_SHELL_FOREGROUND=74
+
+  # Tip: If you want to see just the icon without "pure" and "impure", uncomment the next line.
+  # typeset -g POWERLEVEL9K_NIX_SHELL_CONTENT_EXPANSION=
+
+  # Custom icon.
+  # typeset -g POWERLEVEL9K_NIX_SHELL_VISUAL_IDENTIFIER_EXPANSION='⭐'
 
   ##################################[ disk_usgae: disk usage ]##################################
   # Colors for different levels of disk usage.
@@ -821,10 +896,35 @@
   # typeset -g POWERLEVEL9K_PLENV_VISUAL_IDENTIFIER_EXPANSION='⭐'
 
   ################[ terraform: terraform workspace (https://www.terraform.io) ]#################
-  # Terraform color.
-  typeset -g POWERLEVEL9K_TERRAFORM_FOREGROUND=38
-  # Custom icon.
-  # typeset -g POWERLEVEL9K_TERRAFORM_VISUAL_IDENTIFIER_EXPANSION='⭐'
+  # POWERLEVEL9K_TERRAFORM_CLASSES is an array with even number of elements. The first element
+  # in each pair defines a pattern against which the current terraform workspace gets matched.
+  # More specifically, it's P9K_CONTENT prior to the application of context expansion (see below)
+  # that gets matched. If you unset all POWERLEVEL9K_TERRAFORM_*CONTENT_EXPANSION parameters,
+  # you'll see this value in your prompt. The second element of each pair in
+  # POWERLEVEL9K_TERRAFORM_CLASSES defines the workspace class. Patterns are tried in order. The
+  # first match wins.
+  #
+  # For example, given these settings:
+  #
+  #   typeset -g POWERLEVEL9K_TERRAFORM_CLASSES=(
+  #     '*prod*'  PROD
+  #     '*test*'  TEST
+  #     '*'       DEFAULT)
+  #
+  # If your current terraform workspace is "project_test", its class is TEST because "project_test"
+  # doesn't match the pattern '*prod*' but does match '*test*'.
+  #
+  # You can define different colors, icons and content expansions for different classes:
+  #
+  #   typeset -g POWERLEVEL9K_TERRAFORM_TEST_FOREGROUND=28
+  #   typeset -g POWERLEVEL9K_TERRAFORM_TEST_VISUAL_IDENTIFIER_EXPANSION='⭐'
+  #   typeset -g POWERLEVEL9K_TERRAFORM_TEST_CONTENT_EXPANSION='> ${P9K_CONTENT} <'
+  typeset -g POWERLEVEL9K_TERRAFORM_CLASSES=(
+      # '*prod*'  PROD    # These values are examples that are unlikely
+      # '*test*'  TEST    # to match your needs. Customize them as needed.
+      '*'       DEFAULT)
+  typeset -g POWERLEVEL9K_TERRAFORM_DEFAULT_FOREGROUND=38
+  # typeset -g POWERLEVEL9K_TERRAFORM_DEFAULT_VISUAL_IDENTIFIER_EXPANSION='⭐'
 
   #############[ kubecontext: current kubernetes context (https://kubernetes.io/) ]#############
   # Show kubecontext only when the the command you are typing invokes one of these tools.
@@ -923,7 +1023,7 @@
   # More specifically, it's P9K_CONTENT prior to the application of context expansion (see below)
   # that gets matched. If you unset all POWERLEVEL9K_AWS_*CONTENT_EXPANSION parameters,
   # you'll see this value in your prompt. The second element of each pair in
-  # POWERLEVEL9K_AWS_CLASSES defines the context class. Patterns are tried in order. The
+  # POWERLEVEL9K_AWS_CLASSES defines the profile class. Patterns are tried in order. The
   # first match wins.
   #
   # For example, given these settings:
@@ -963,7 +1063,7 @@
   # Custom icon.
   # typeset -g POWERLEVEL9K_AZURE_VISUAL_IDENTIFIER_EXPANSION='⭐'
 
-  ##########[ gcloud: google cloud acccount and project (https://cloud.google.com/) ]###########
+  ##########[ gcloud: google cloud account and project (https://cloud.google.com/) ]###########
   # Show gcloud only when the the command you are typing invokes one of these tools.
   # Tip: Remove the next line to always show gcloud.
   typeset -g POWERLEVEL9K_GCLOUD_SHOW_ON_COMMAND='gcloud|gcs'
@@ -1048,11 +1148,31 @@
   # When on VPN, show just an icon without the IP address.
   # Tip: To display the private IP address when on VPN, remove the next line.
   typeset -g POWERLEVEL9K_VPN_IP_CONTENT_EXPANSION=
-  # Regular expression for the VPN network interface. Run ifconfig while on VPN to see the
-  # name of the interface.
+  # Regular expression for the VPN network interface. Run `ifconfig` or `ip -4 a show` while on VPN
+  # to see the name of the interface.
   typeset -g POWERLEVEL9K_VPN_IP_INTERFACE='(wg|(.*tun))[0-9]*'
   # Custom icon.
   # typeset -g POWERLEVEL9K_VPN_IP_VISUAL_IDENTIFIER_EXPANSION='⭐'
+
+  ###########[ ip: ip address and bandwidth usage for a specified network interface ]###########
+  # IP color.
+  typeset -g POWERLEVEL9K_IP_FOREGROUND=38
+  # The following parameters are accessible within the expansion:
+  #
+  #   Parameter             | Meaning
+  #   ----------------------+---------------
+  #   P9K_IP_IP         | IP address
+  #   P9K_IP_INTERFACE  | network interface
+  #   P9K_IP_RX_BYTES   | total number of bytes received
+  #   P9K_IP_TX_BYTES   | total number of bytes sent
+  #   P9K_IP_RX_RATE    | receive rate (since last prompt)
+  #   P9K_IP_TX_RATE    | send rate (since last prompt)
+  typeset -g POWERLEVEL9K_IP_CONTENT_EXPANSION='%70F⇣$P9K_IP_RX_RATE %215F⇡$P9K_IP_TX_RATE %38F$P9K_IP_IP'
+  # Show information for the first network interface whose name matches this regular expression.
+  # Run `ifconfig` or `ip -4 a show` to see the names of all network interfaces.
+  typeset -g POWERLEVEL9K_IP_INTERFACE='e.*'
+  # Custom icon.
+  # typeset -g POWERLEVEL9K_IP_VISUAL_IDENTIFIER_EXPANSION='⭐'
 
   #########################[ proxy: system-wide http/https/ftp proxy ]##########################
   # Proxy color.
@@ -1072,6 +1192,36 @@
   typeset -g POWERLEVEL9K_BATTERY_STAGES=('%K{232}▁' '%K{232}▂' '%K{232}▃' '%K{232}▄' '%K{232}▅' '%K{232}▆' '%K{232}▇' '%K{232}█')
   # Don't show the remaining time to charge/discharge.
   typeset -g POWERLEVEL9K_BATTERY_VERBOSE=false
+
+  #####################################[ wifi: wifi speed ]#####################################
+  # WiFi color.
+  typeset -g POWERLEVEL9K_WIFI_FOREGROUND=68
+  # Custom icon.
+  # typeset -g POWERLEVEL9K_WIFI_VISUAL_IDENTIFIER_EXPANSION='⭐'
+
+  # Use different colors and icons depending on signal strength ($P9K_WIFI_BARS).
+  #
+  #   # Wifi colors and icons for different signal strength levels (low to high).
+  #   typeset -g my_wifi_fg=(68 68 68 68 68)                           # <-- change these values
+  #   typeset -g my_wifi_icon=('WiFi' 'WiFi' 'WiFi' 'WiFi' 'WiFi')     # <-- change these values
+  #
+  #   typeset -g POWERLEVEL9K_WIFI_CONTENT_EXPANSION='%F{${my_wifi_fg[P9K_WIFI_BARS+1]}}$P9K_WIFI_LAST_TX_RATE Mbps'
+  #   typeset -g POWERLEVEL9K_WIFI_VISUAL_IDENTIFIER_EXPANSION='%F{${my_wifi_fg[P9K_WIFI_BARS+1]}}${my_wifi_icon[P9K_WIFI_BARS+1]}'
+  #
+  # The following parameters are accessible within the expansions:
+  #
+  #   Parameter             | Meaning
+  #   ----------------------+---------------
+  #   P9K_WIFI_SSID         | service set identifier, a.k.a. network name
+  #   P9K_WIFI_LINK_AUTH    | authentication protocol such as "wpa2-psk" or "none"
+  #   P9K_WIFI_LAST_TX_RATE | wireless transmit rate in megabits per second
+  #   P9K_WIFI_RSSI         | signal strength in dBm, from -120 to 0
+  #   P9K_WIFI_NOISE        | noise in dBm, from -120 to 0
+  #   P9K_WIFI_BARS         | signal strength in bars, from 0 to 4 (derived from P9K_WIFI_RSSI and P9K_WIFI_NOISE)
+  #
+  # All parameters except P9K_WIFI_BARS are extracted from the output of the following command:
+  #
+  #   /System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Resources/airport -I
 
   ####################################[ time: current time ]####################################
   # Current time color.
