@@ -4737,6 +4737,18 @@ function prompt_asdf() {
       fi
     fi
 
+    if [[ $version == system ]]; then
+      var=POWERLEVEL9K_ASDF_${upper}_SHOW_SYSTEM
+      if (( $+parameters[$var] )); then
+        [[ ${(P)var} == true ]] || continue
+      else
+        var=POWERLEVEL9K_ASDF_SHOW_SYSTEM
+        if (( $+parameters[$var] )); then
+          [[ ${(P)var} == true ]] || continue
+        fi
+      fi
+    fi
+
     _p9k_get_icon $0_$upper ${upper}_ICON $plugin
     _p9k_prompt_segment $0_$upper green $_p9k_color1 $'\1'$_p9k_ret 0 '' ${version//\%/%%}
   done
