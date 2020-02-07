@@ -463,10 +463,10 @@ function _p9k_init_icons() {
         TIME_ICON                      '\uF017 '              # 
         JAVA_ICON                      '\uE738'               # 
         LARAVEL_ICON                   '\ue73f'$q             # 
-        RANGER_ICON                    '\uF00b'               # 
+        RANGER_ICON                    '\uF00b '              # 
         MIDNIGHT_COMMANDER_ICON        'mc'
         VIM_ICON                       '\uE62B'               # 
-        TERRAFORM_ICON                 '\uF1BB'               # 
+        TERRAFORM_ICON                 '\uF1BB '              # 
         PROXY_ICON                     '\u2B82'               # ⮂
         DOTNET_ICON                    '\uE77F'               # 
         DOTNET_CORE_ICON               '\uE77F'               # 
@@ -478,8 +478,8 @@ function _p9k_init_icons() {
         PERL_ICON                      '\uE769'               # 
         NNN_ICON                       'nnn'
         TIMEWARRIOR_ICON               '\uF49B'               # 
-        NIX_SHELL_ICON                 '\uF313'               # 
-        WIFI_ICON                      '\uF1EB'               # 
+        NIX_SHELL_ICON                 '\uF313 '              # 
+        WIFI_ICON                      '\uF1EB '              # 
       )
     ;;
     *)
