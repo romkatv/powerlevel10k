@@ -581,6 +581,21 @@
   typeset -g POWERLEVEL9K_ASDF_PERL_BACKGROUND=4
   # typeset -g POWERLEVEL9K_ASDF_PERL_VISUAL_IDENTIFIER_EXPANSION='⭐'
 
+  # Erlang version from asdf.
+  typeset -g POWERLEVEL9K_ASDF_ERLANG_FOREGROUND=0
+  typeset -g POWERLEVEL9K_ASDF_ERLANG_BACKGROUND=1
+  # typeset -g POWERLEVEL9K_ASDF_ERLANG_VISUAL_IDENTIFIER_EXPANSION='⭐'
+
+  # Elixir version from asdf.
+  typeset -g POWERLEVEL9K_ASDF_ELIXIR_FOREGROUND=0
+  typeset -g POWERLEVEL9K_ASDF_ELIXIR_BACKGROUND=5
+  # typeset -g POWERLEVEL9K_ASDF_ELIXIR_VISUAL_IDENTIFIER_EXPANSION='⭐'
+
+  # Postgres version from asdf.
+  typeset -g POWERLEVEL9K_ASDF_POSTGRES_FOREGROUND=0
+  typeset -g POWERLEVEL9K_ASDF_POSTGRES_BACKGROUND=6
+  # typeset -g POWERLEVEL9K_ASDF_POSTGRES_VISUAL_IDENTIFIER_EXPANSION='⭐'
+
   ##########[ nordvpn: nordvpn connection status, linux only (https://nordvpn.com/) ]###########
   # NordVPN connection indicator color.
   # typeset -g POWERLEVEL9K_NORDVPN_FOREGROUND=7
