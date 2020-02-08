@@ -3128,12 +3128,12 @@ _p9k_prompt_todo_init() {
 
 # The vcs segment can have 4 different states - defaults to 'CLEAN'.
 typeset -gA __p9k_vcs_states=(
-  'CLEAN'         '2'
-  'MODIFIED'      '3'
-  'UNTRACKED'     '2'
+  'CLEAN'         '10'
+  'MODIFIED'      '11'
+  'UNTRACKED'     '12'
   'LOADING'       '8'
-  'CONFLICTED'    '3'
-  'STASHED'       '208'           # add
+  'CONFLICTED'    '9'
+  'STASHED'       '13'           # add
 )
 
 function +vi-git-untracked() {
