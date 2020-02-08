@@ -4525,7 +4525,7 @@ function _p9k_asdf_check_meta() {
   [[ -z $^_p9k_asdf_meta_non_files(#qN) ]] || return
   local -a stat
   zstat -A stat +mtime -- $_p9k_asdf_meta_files 2>/dev/null || return
-  [[ $_p9k_asdf_meta_sig == "$ASDF_CONFIG_FILE:$ASDF_DATA_DIR:${(j.:.)stat}" ]] || return
+  [[ $_p9k_asdf_meta_sig == $ASDF_CONFIG_FILE$'\0'$ASDF_DATA_DIR$'\0'${(pj:\0:)stat} ]] || return
 }
 
 function _p9k_asdf_init_meta() {
@@ -4590,7 +4590,7 @@ function _p9k_asdf_init_meta() {
 
     local -a stat
     zstat -A stat +mtime -- $_p9k_asdf_meta_files 2>/dev/null || return
-    _p9k_asdf_meta_sig="$ASDF_CONFIG_FILE:$ASDF_DATA_DIR:${(j.:.)stat}"
+    _p9k_asdf_meta_sig=$ASDF_CONFIG_FILE$'\0'$ASDF_DATA_DIR$'\0'${(pj:\0:)stat}
   } always {
     (( $? )) || return
     _p9k_asdf_meta_files=()
@@ -4615,7 +4615,7 @@ function _p9k_asdf_parse_version_file() {
     local plugin has_parse
     for plugin has_parse in $=_p9k_asdf_file_info[$file:t]; do
       (( $+versions[$plugin] )) && continue
-      local cached=$_p9k_asdf_file2versions[$file:$plugin]
+      local cached=$_p9k_asdf_file2versions[$plugin:$file]
       if [[ $cached == $stat[1]:* ]]; then
         versions[$plugin]=${cached#*:}
       else
@@ -4625,11 +4625,11 @@ function _p9k_asdf_parse_version_file() {
           { local v=($(<$file)) } 2>/dev/null
         fi
         (( $#v )) && versions[$plugin]="$v"
-        _p9k_asdf_file2versions[$file:$plugin]=$stat[1]:"$v"
+        _p9k_asdf_file2versions[$plugin:$file]=$stat[1]:"$v"
       fi
     done
   else
-    local cached=$_p9k_asdf_file2versions[$file]
+    local cached=$_p9k_asdf_file2versions[:$file]
     if [[ $cached == $stat[1]:* ]]; then
       local file_versions=(${(0)${cached#*:}})
     else
@@ -4641,7 +4641,7 @@ function _p9k_asdf_parse_version_file() {
         (( $#words > 1 && $_p9k_asdf_plugins[(Ie)$words[1]] )) || continue
         file_versions+=($words[1] "${words[2,-1]}")
       done
-      _p9k_asdf_file2versions[$file]=$stat[1]:${(pj:\0:)file_versions}
+      _p9k_asdf_file2versions[:$file]=$stat[1]:${(pj:\0:)file_versions}
     fi
     local plugin version
     for plugin version in $file_versions; do
@@ -5905,7 +5905,8 @@ _p9k_init_vars() {
   # dir => mtime ':' ${(pj:\0:)files}
   typeset -gA _p9k__asdf_dir2files
 
-  # file => mtime ':' ${(pj:\0:)versions}
+  # :file       => mtime ':' ${(pj:\0:)tool_versions}
+  # plugin:file => mtime ':' version
   typeset -gA _p9k_asdf_file2versions
 
   # filepath => mtime ':' word
@@ -6927,7 +6928,7 @@ _p9k_must_init() {
     [[ $sig == $_p9k__param_sig ]] && return 1
     _p9k_deinit
   fi
-  _p9k__param_pat=$'v39\1'${ZSH_VERSION}$'\1'${ZSH_PATCHLEVEL}$'\1'
+  _p9k__param_pat=$'v40\1'${ZSH_VERSION}$'\1'${ZSH_PATCHLEVEL}$'\1'
   _p9k__param_pat+=$'${#parameters[(I)POWERLEVEL9K_*]}\1${(%):-%n%#}\1$GITSTATUS_LOG_LEVEL\1'
   _p9k__param_pat+=$'$GITSTATUS_ENABLE_LOGGING\1$GITSTATUS_DAEMON\1$GITSTATUS_NUM_THREADS\1'
   _p9k__param_pat+=$'$DEFAULT_USER\1${ZLE_RPROMPT_INDENT:-1}\1$P9K_SSH\1$__p9k_ksh_arrays'
