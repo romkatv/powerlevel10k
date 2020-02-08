@@ -4614,19 +4614,18 @@ function _p9k_asdf_parse_version_file() {
   if (( is_legacy )); then
     local plugin has_parse
     for plugin has_parse in $=_p9k_asdf_file_info[$file:t]; do
-      (( $+versions[$plugin] )) && continue
       local cached=$_p9k_asdf_file2versions[$plugin:$file]
       if [[ $cached == $stat[1]:* ]]; then
-        versions[$plugin]=${cached#*:}
+        local v=${cached#*:}
       else
         if (( has_parse )); then
           local v=($(${ASDF_DATA_DIR:-~/.asdf}/plugins/$plugin/bin/parse-legacy-file $file 2>/dev/null))
         else
           { local v=($(<$file)) } 2>/dev/null
         fi
-        (( $#v )) && versions[$plugin]="$v"
         _p9k_asdf_file2versions[$plugin:$file]=$stat[1]:"$v"
       fi
+      (( $#v )) && : ${versions[$plugin]="$v"}
     done
   else
     local cached=$_p9k_asdf_file2versions[:$file]
@@ -4645,7 +4644,7 @@ function _p9k_asdf_parse_version_file() {
     fi
     local plugin version
     for plugin version in $file_versions; do
-      (( $+versions[$plugin] )) || versions[$plugin]=$version
+      : ${versions[$plugin]=$version}
     done
   fi
   return 0
