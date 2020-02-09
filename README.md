@@ -309,6 +309,24 @@ enable as many segments as you like. It won't slow down your prompt or Zsh start
 | `wifi` | WiFi speed |
 | `battery` | internal battery state and charge level (yep, batteries *literally* included) |
 
+### Extensible
+
+If there is no prompt segment that does what you need, implement your own. Powerlevel10k provides
+public API for defining segments that are as fast and as flexible as built-in ones.
+
+![Powerlevel10k Custom Segment](
+  https://raw.githubusercontent.com/romkatv/powerlevel10k-media/master/custom-segment.gif)
+
+On Linux you can fetch current CPU temperature by reading `/sys/class/thermal/thermal_zone0/temp`.
+The screencast shows how to define prompt segment `my_cpu_temp` to display this value. Once the
+segment is defined, you can use it like any other segment. All standard customization parameters
+will work for it out of the box.
+
+Type `p10k help segment` for reference.
+
+*Tip*: Prefix names of your own segments with `my_` to avoid clashes with future versions of
+Powerlevel10k.
+
 ## Installation
 
 ### Manual
@@ -1385,6 +1403,7 @@ There are a few mitigation options for this issue.
   - [Current directory that just works](#current-directory-that-just-works)
   - [Extremely customizable](#extremely-customizable)
   - [Batteries included](#batteries-included)
+  - [Extensible](#extensible)
 - [Installation](#installation)
   - [Manual](#manual)
   - [Oh My Zsh](#oh-my-zsh)
