@@ -299,12 +299,12 @@ enable as many segments as you like. It won't slow down your prompt or Zsh start
 | `todo` | [todo](https://github.com/todotxt/todo.txt-cli) items |
 | `timewarrior` | [timewarrior](https://timewarrior.net/) tracking status |
 | `vpn_ip` | virtual private network indicator |
-| `ip` | ip address and bandwidth usage for a specified network interface |
+| `ip` | IP address and bandwidth usage for a specified network interface |
 | `load` | CPU load |
 | `disk_usage` | disk usage |
 | `ram` | free RAM |
 | `swap` | used swap |
-| `public_ip` | public ip address |
+| `public_ip` | public IP address |
 | `proxy` | system-wide http/https/ftp proxy |
 | `wifi` | WiFi speed |
 | `battery` | internal battery state and charge level (yep, batteries *literally* included) |
