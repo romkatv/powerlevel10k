@@ -36,13 +36,19 @@
 #   VCS_STATUS_HAS_UNTRACKED=1
 #   VCS_STATUS_INDEX_SIZE=33
 #   VCS_STATUS_LOCAL_BRANCH=master
+#   VCS_STATUS_NUM_ASSUME_UNCHANGED=0
 #   VCS_STATUS_NUM_CONFLICTED=0
 #   VCS_STATUS_NUM_STAGED=0
 #   VCS_STATUS_NUM_UNSTAGED=1
+#   VCS_STATUS_NUM_SKIP_WORKTREE=0
 #   VCS_STATUS_NUM_STAGED_NEW=0
 #   VCS_STATUS_NUM_STAGED_DELETED=0
 #   VCS_STATUS_NUM_UNSTAGED_DELETED=0
 #   VCS_STATUS_NUM_UNTRACKED=1
+#   VCS_STATUS_PUSH_COMMITS_AHEAD=0
+#   VCS_STATUS_PUSH_COMMITS_BEHIND=0
+#   VCS_STATUS_PUSH_REMOTE_NAME=''
+#   VCS_STATUS_PUSH_REMOTE_URL=''
 #   VCS_STATUS_REMOTE_BRANCH=master
 #   VCS_STATUS_REMOTE_NAME=origin
 #   VCS_STATUS_REMOTE_URL=git@github.com:romkatv/powerlevel10k.git
@@ -125,6 +131,16 @@ typeset -g _gitstatus_plugin_dir=${${(%):-%x}:A:h}
 #   VCS_STATUS_STASHES              Number of stashes. Non-negative integer.
 #   VCS_STATUS_TAG                  The last tag (in lexicographical order) that points to the same
 #                                   commit as HEAD.
+#   VCS_STATUS_PUSH_REMOTE_NAME     The push remote name, e.g. "upstream" or "origin".
+#   VCS_STATUS_PUSH_REMOTE_URL      Push remote URL. Can be empty.
+#   VCS_STATUS_PUSH_COMMITS_AHEAD   Number of commits the current branch is ahead of push remote.
+#                                   Non-negative integer.
+#   VCS_STATUS_PUSH_COMMITS_BEHIND  Number of commits the current branch is behind push remote.
+#                                   Non-negative integer.
+#   VCS_STATUS_NUM_SKIP_WORKTREE    The number of files in the index with skip-worktree bit set.
+#                                   Non-negative integer.
+#   VCS_STATUS_NUM_ASSUME_UNCHANGED The number of files in the index with assume-unchanged bit set.
+#                                   Non-negative integer.
 #
 # The point of reporting -1 via VCS_STATUS_HAS_* is to allow the command to skip scanning files in
 # large repos. See -m flag of gitstatus_start.
@@ -228,6 +244,12 @@ function _gitstatus_process_response() {
     typeset -gi VCS_STATUS_NUM_UNSTAGED_DELETED="${resp[19]}"
     typeset -gi VCS_STATUS_NUM_STAGED_NEW="${resp[20]:-0}"
     typeset -gi VCS_STATUS_NUM_STAGED_DELETED="${resp[21]:-0}"
+    typeset -g  VCS_STATUS_PUSH_REMOTE_NAME="${resp[22]:-}"
+    typeset -g  VCS_STATUS_PUSH_REMOTE_URL="${resp[23]:-}"
+    typeset -gi VCS_STATUS_PUSH_COMMITS_AHEAD="${resp[24]:-0}"
+    typeset -gi VCS_STATUS_PUSH_COMMITS_BEHIND="${resp[25]:-0}"
+    typeset -gi VCS_STATUS_NUM_SKIP_WORKTREE="${resp[26]:-0}"
+    typeset -gi VCS_STATUS_NUM_ASSUME_UNCHANGED="${resp[27]:-0}"
     typeset -gi VCS_STATUS_HAS_STAGED=$((VCS_STATUS_NUM_STAGED > 0))
     (( dirty_max_index_size >= 0 && VCS_STATUS_INDEX_SIZE > dirty_max_index_size )) && {
       typeset -gi VCS_STATUS_HAS_UNSTAGED=-1
@@ -263,6 +285,12 @@ function _gitstatus_process_response() {
     unset VCS_STATUS_NUM_UNSTAGED_DELETED
     unset VCS_STATUS_NUM_STAGED_NEW
     unset VCS_STATUS_NUM_STAGED_DELETED
+    unset VCS_STATUS_PUSH_REMOTE_NAME
+    unset VCS_STATUS_PUSH_REMOTE_URL
+    unset VCS_STATUS_PUSH_COMMITS_AHEAD
+    unset VCS_STATUS_PUSH_COMMITS_BEHIND
+    unset VCS_STATUS_NUM_SKIP_WORKTREE
+    unset VCS_STATUS_NUM_ASSUME_UNCHANGED
   }
 
   (( ! ours )) && (( #header )) && emulate -L zsh && "${header[@]}" || true
