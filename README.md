@@ -318,9 +318,9 @@ public API for defining segments that are as fast and as flexible as built-in on
   https://raw.githubusercontent.com/romkatv/powerlevel10k-media/master/custom-segment.gif)
 
 On Linux you can fetch current CPU temperature by reading `/sys/class/thermal/thermal_zone0/temp`.
-The screencast shows how to define prompt segment `my_cpu_temp` to display this value. Once the
-segment is defined, you can use it like any other segment. All standard customization parameters
-will work for it out of the box.
+The screencast shows how to define a prompt segment to display this value. Once the segment is
+defined, you can use it like any other segment. All standard customization parameters will work for
+it out of the box.
 
 Type `p10k help segment` for reference.
 
