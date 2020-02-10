@@ -434,10 +434,25 @@
     # See POWERLEVEL9K_VCS_UNTRACKED_ICON above if you want to use a different icon.
     # Remove the next line if you don't want to see untracked files at all.
     (( VCS_STATUS_NUM_UNTRACKED  )) && res+=" ${untracked}${POWERLEVEL9K_VCS_UNTRACKED_ICON}${VCS_STATUS_NUM_UNTRACKED}"
+    # "─" if the number of unstaged files is unknown. This can happen due to
+    # POWERLEVEL9K_VCS_MAX_INDEX_SIZE_DIRTY (see below) being set to a non-negative number lower
+    # than the number of files in the Git index, or due to bash.showDirtyState being set to false
+    # in the repository config. The number of staged and untracked files may also be unknown
+    # in this case.
+    (( VCS_STATUS_HAS_UNSTAGED == -1 )) && res+=" ${modified}─"
 
     typeset -g my_git_format=$res
   }
   functions -M my_git_formatter 2>/dev/null
+
+  # Don't count the number of unstaged, untracked and conflicted files in Git repositories with
+  # more than this many files in the index. Negative value means infinity.
+  #
+  # If you are working in Git repositories with tens of millions of files and seeing performance
+  # sagging, try setting POWERLEVEL9K_VCS_MAX_INDEX_SIZE_DIRTY to a number lower than the output
+  # of `git ls-files | wc -l`. Alternatively, add `bash.showDirtyState = false` to the repository's
+  # config: `git config bash.showDirtyState false`.
+  typeset -g POWERLEVEL9K_VCS_MAX_INDEX_SIZE_DIRTY=-1
 
   # Disable the default Git status formatting.
   typeset -g POWERLEVEL9K_VCS_DISABLE_GITSTATUS_FORMATTING=true
