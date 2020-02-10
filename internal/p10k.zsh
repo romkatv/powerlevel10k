@@ -5599,13 +5599,26 @@ function _p9k_clear_instant_prompt() {
   fi
 }
 
+function _p9k_do_dump() {
+  eval "$__p9k_intro"
+  zle -F $1
+  exec {1}>&-
+  if ! (( _p9k__instant_prompt_disabled || $+_p9k_dumped_instant_prompt_sigs[$_p9k__instant_prompt_sig] )); then
+    _p9k_set_instant_prompt
+    _p9k_dump_instant_prompt
+    _p9k_dumped_instant_prompt_sigs[$_p9k__instant_prompt_sig]=1
+  fi
+  _p9k_dump_state
+  _p9k__state_dump_scheduled=0
+  _p9k__state_dump_fd=0
+}
+
 function _p9k_maybe_dump() {
   (( __p9k_dumps_enabled )) || return 0
 
   _p9k__instant_prompt_sig=$_p9k__cwd:$P9K_SSH:${(%):-%#}
 
-  if (( ! _p9k__dump_pid )) || ! kill -0 $_p9k__dump_pid 2>/dev/null; then
-    _p9k__dump_pid=0
+  if (( ! _p9k__state_dump_fd )); then
     if (( _p9k__prompt_idx == 1 )) then
       (( _p9k__instant_prompt_disabled )) || _p9k_set_instant_prompt
       if (( !_p9k__state_restored )); then
@@ -5615,8 +5628,7 @@ function _p9k_maybe_dump() {
         fi
         _p9k_dump_state
         _p9k__state_dump_scheduled=0
-      elif [[ $_p9k__instant_prompt_disabled == 0 &&
-              "${(pj:\x1f:)__p9k_used_instant_prompt}" != "${(e)_p9k__instant_prompt}" ]]; then
+      elif (( ! _p9k__instant_prompt_disabled )); then
         _p9k_dump_instant_prompt
         if (( ! $+_p9k_dumped_instant_prompt_sigs[$_p9k__instant_prompt_sig] )); then
           _p9k_dumped_instant_prompt_sigs[$_p9k__instant_prompt_sig]=1
@@ -5624,18 +5636,10 @@ function _p9k_maybe_dump() {
           _p9k__state_dump_scheduled=0
         fi
       fi
-    elif (( _p9k__state_dump_scheduled || ! (_p9k__instant_prompt_disabled || $+_p9k_dumped_instant_prompt_sigs[$_p9k__instant_prompt_sig]) )); then
-      (
-        if ! (( _p9k__instant_prompt_disabled || $+_p9k_dumped_instant_prompt_sigs[$_p9k__instant_prompt_sig] )); then
-          _p9k_set_instant_prompt
-          _p9k_dump_instant_prompt
-          _p9k_dumped_instant_prompt_sigs[$_p9k__instant_prompt_sig]=1
-        fi
-        _p9k_dump_state
-      ) &!
-      _p9k__dump_pid=$!
-      _p9k__state_dump_scheduled=0
-      (( _p9k__instant_prompt_disabled )) || _p9k_dumped_instant_prompt_sigs[$_p9k__instant_prompt_sig]=1
+    elif (( _p9k__state_dump_scheduled ||
+            ! (_p9k__instant_prompt_disabled || $+_p9k_dumped_instant_prompt_sigs[$_p9k__instant_prompt_sig]) )); then
+      exec {_p9k__state_dump_fd}</dev/null
+      zle -F $_p9k__state_dump_fd _p9k_do_dump
     fi
   fi
 }
@@ -5981,7 +5985,7 @@ _p9k_init_vars() {
   typeset -g  _p9k__instant_prompt_sig
   typeset -g  _p9k__instant_prompt
   typeset -gi _p9k__state_dump_scheduled
-  typeset -gi _p9k__dump_pid
+  typeset -gi _p9k__state_dump_fd
   typeset -gi _p9k__prompt_idx
   typeset -gi _p9k__state_restored
   typeset -gi _p9k_reset_on_line_finish
@@ -6941,7 +6945,7 @@ _p9k_must_init() {
     [[ $sig == $_p9k__param_sig ]] && return 1
     _p9k_deinit
   fi
-  _p9k__param_pat=$'v42\1'${ZSH_VERSION}$'\1'${ZSH_PATCHLEVEL}$'\1'
+  _p9k__param_pat=$'v43\1'${ZSH_VERSION}$'\1'${ZSH_PATCHLEVEL}$'\1'
   _p9k__param_pat+=$'${#parameters[(I)POWERLEVEL9K_*]}\1${(%):-%n%#}\1$GITSTATUS_LOG_LEVEL\1'
   _p9k__param_pat+=$'$GITSTATUS_ENABLE_LOGGING\1$GITSTATUS_DAEMON\1$GITSTATUS_NUM_THREADS\1'
   _p9k__param_pat+=$'$DEFAULT_USER\1${ZLE_RPROMPT_INDENT:-1}\1$P9K_SSH\1$__p9k_ksh_arrays'
@@ -7348,7 +7352,7 @@ _p9k_deinit() {
   (( $+functions[_p9k_preinit] )) && unfunction _p9k_preinit
   (( $+functions[gitstatus_stop] )) && gitstatus_stop POWERLEVEL9K
   _p9k_worker_stop
-  (( _p9k__dump_pid )) && wait $_p9k__dump_pid 2>/dev/null
+  (( _p9k__state_dump_fd )) && exec {_p9k__state_dump_fd}>&-
   (( $+_p9k__iterm2_precmd )) && functions[iterm2_precmd]=$_p9k__iterm2_precmd
   (( $+_p9k__iterm2_decorate_prompt )) && functions[iterm2_decorate_prompt]=$_p9k__iterm2_decorate_prompt
   unset -m '(_POWERLEVEL9K_|P9K_|_p9k_)*~(P9K_SSH|P9K_TTY)'
