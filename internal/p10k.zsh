@@ -4162,7 +4162,7 @@ function _p9k_fetch_nordvpn_status() {
     local -i n
     {
       IFS='' read -t 0.25 -r tag
-      tag=$'\015'
+      tag=$'\n'
       while true; do
         tag=$((#tag))
         (( (tag >>= 3) && tag <= $#__p9k_nordvpn_tag )) || break
