@@ -4168,17 +4168,18 @@ function _p9k_fetch_nordvpn_status() {
         (( (tag >>= 3) && tag <= $#__p9k_nordvpn_tag )) || break
         tag=$__p9k_nordvpn_tag[tag]
         [[ -t $fd ]] || true  # https://www.zsh.org/mla/workers/2020/msg00207.html
-        sysread -c n -s 1 -t 0.25 len
+        sysread -s 1 -t 0.25 len
         len=$((#len))
         val=
-        (( ! len )) || {
+        while true; do
+          (( len )) || break
           [[ -t $fd ]] || true  # https://www.zsh.org/mla/workers/2020/msg00207.html
-          sysread -c n -s $len -t 0.25 val
-          (( n == len ))
-        }
+          sysread -c n -s $len -t 0.25 'val[$#val+1]'
+          len+=-n
+        done
         typeset -g $tag=$val
         [[ -t $fd ]] || true  # https://www.zsh.org/mla/workers/2020/msg00207.html
-        sysread -c n -s 1 -t 0.25 tag
+        sysread -s 1 -t 0.25 tag
       done
     } <&$fd
   } always {
