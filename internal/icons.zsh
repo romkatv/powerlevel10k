@@ -1,8 +1,8 @@
 typeset -gA icons
 
 function _p9k_init_icons() {
-  [[ $+_p9k_icon_mode == 1 && $_p9k_icon_mode == $POWERLEVEL9K_MODE/$POWERLEVEL9K_LEGACY_ICON_SPACING ]] && return
-  typeset -g _p9k_icon_mode=$POWERLEVEL9K_MODE/$POWERLEVEL9K_LEGACY_ICON_SPACING
+  [[ $+_p9k__icon_mode == 1 && $_p9k__icon_mode == $POWERLEVEL9K_MODE/$POWERLEVEL9K_LEGACY_ICON_SPACING ]] && return
+  typeset -g _p9k__icon_mode=$POWERLEVEL9K_MODE/$POWERLEVEL9K_LEGACY_ICON_SPACING
 
   if [[ $POWERLEVEL9K_LEGACY_ICON_SPACING == true ]]; then
     local s=

@@ -158,9 +158,9 @@ function _p9k_worker_receive() {
     done
 
     if (( max_reset == 2 )); then
-      _p9k_refresh_reason=worker
+      _p9k__refresh_reason=worker
       _p9k_set_prompt
-      _p9k_refresh_reason=''
+      _p9k__refresh_reason=''
     fi
     (( max_reset )) && _p9k_reset_prompt
     return 0
