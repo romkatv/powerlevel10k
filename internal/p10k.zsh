@@ -5606,9 +5606,9 @@ function _p9k_maybe_dump() {
               "${(pj:\x1f:)__p9k_used_instant_prompt}" != "${(e)_p9k_instant_prompt}" ]]; then
         _p9k_dump_instant_prompt
         if (( ! $+_p9k_dumped_instant_prompt_sigs[$_p9k__instant_prompt_sig] )); then
+          _p9k_dumped_instant_prompt_sigs[$_p9k__instant_prompt_sig]=1
           _p9k_dump_state
           _p9k__state_dump_scheduled=0
-          _p9k_dumped_instant_prompt_sigs[$_p9k__instant_prompt_sig]=1
         fi
       fi
     elif (( _p9k__state_dump_scheduled || ! (_p9k__instant_prompt_disabled || $+_p9k_dumped_instant_prompt_sigs[$_p9k__instant_prompt_sig]) )); then
