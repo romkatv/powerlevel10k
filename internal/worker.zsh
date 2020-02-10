@@ -5,7 +5,7 @@ function _p9k_worker_main() {
   exec 0<$_p9k__worker_file_prefix.fifo || return
   zf_rm $_p9k__worker_file_prefix.fifo  || return
 
-  local -i reset
+  local -i reset n
   local req fd
   local -a ready
   local _p9k_worker_request_id
@@ -33,13 +33,14 @@ function _p9k_worker_main() {
       for fd in ${ready:1}; do
         if [[ $fd == 0 ]]; then
           local buf=
-          while true; do
-            [[ -t 0 ]]
-            sysread -t 0 'buf[$#buf+1]'  && continue
-            (( $? == 4 ))                || return
-            [[ $buf[-1] == (|$'\x1e') ]] && break
-            sysread 'buf[$#buf+1]'       || return
-          done
+          [[ -t 0 ]]  # https://www.zsh.org/mla/workers/2020/msg00207.html
+          if sysread -c n -t 0 'buf[$#buf+1]'; then
+            while [[ $buf != *$'\x1e' ]] || (( n == 8192 )); do
+              sysread -c n 'buf[$#buf+1]' || return
+            done
+          else
+            (( $? == 4 )) || return
+          fi
           for req in ${(ps:\x1e:)buf}; do
             _p9k_worker_request_id=${req%%$'\x1f'*}
             () { eval $req[$#_p9k_worker_request_id+2,-1] }
@@ -115,13 +116,16 @@ function _p9k_worker_receive() {
     (( $# <= 1 )) || return
 
     local buf resp
-    while true; do
-      [[ -t $_p9k__worker_resp_fd ]]
-      sysread -t 0 -i $_p9k__worker_resp_fd 'buf[$#buf+1]' && continue
-      (( $? == 4 ))                                                                   || return
-      [[ $buf == (|*$'\x1e')$'\x05'# ]] && break
-      sysread -i $_p9k__worker_resp_fd 'buf[$#buf+1]'                                 || return
-    done
+    local -i n
+
+    [[ -t $_p9k__worker_resp_fd ]]  # https://www.zsh.org/mla/workers/2020/msg00207.html
+    if sysread -i $_p9k__worker_resp_fd -c n -t 0 'buf[$#buf+1]'; then
+      while [[ ${buf%%$'\x05'#} != (|*$'\x1e') ]] || (( n == 8192 )); do
+        sysread -i $_p9k__worker_resp_fd -c n 'buf[$#buf+1]' || return
+      done
+    else
+      (( $? == 4 )) || return
+    fi
 
     local -i reset max_reset
     for resp in ${(ps:\x1e:)${buf//$'\x05'}}; do
