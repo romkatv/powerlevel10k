@@ -443,12 +443,17 @@ _p9k_cache_stat_get() {
     fi
   done
 
-  if _p9k_cache_get $0 $label meta "$@" && [[ $_p9k__cache_val[1] == $_p9k__cache_stat_meta ]]; then
-    _p9k__cache_stat_fprint=$_p9k__cache_val[2]
-    local -a key=($0 $label fprint "$@" "$_p9k__cache_stat_fprint")
-    _p9k__cache_fprint_key="${(pj:\0:)key}"
-    shift 2 _p9k__cache_val
-    return 0
+  if _p9k_cache_get $0 $label meta "$@"; then
+     if [[ $_p9k__cache_val[1] == $_p9k__cache_stat_meta ]]; then
+      _p9k__cache_stat_fprint=$_p9k__cache_val[2]
+      local -a key=($0 $label fprint "$@" "$_p9k__cache_stat_fprint")
+      _p9k__cache_fprint_key="${(pj:\0:)key}"
+      shift 2 _p9k__cache_val
+      return 0
+    else
+      local -a key=($0 $label fprint "$@" "$_p9k__cache_val[2]")
+      _p9k__cache_ephemeral[${(pj:\0:)key}]="${(pj:\0:)_p9k__cache_val[3,-1]}0"
+    fi
   fi
 
   if (( $+commands[md5] )); then
@@ -467,7 +472,7 @@ _p9k_cache_stat_get() {
   done
 
   local meta_key=$_p9k__cache_key
-  if _p9k_cache_get $0 $label fprint "$@" "$_p9k__cache_stat_fprint"; then
+  if _p9k_cache_ephemeral_get $0 $label fprint "$@" "$_p9k__cache_stat_fprint"; then
     _p9k__cache_fprint_key=$_p9k__cache_key
     _p9k__cache_key=$meta_key
     _p9k_cache_set "$_p9k__cache_stat_meta" "$_p9k__cache_stat_fprint" "$_p9k__cache_val[@]"
@@ -483,7 +488,7 @@ _p9k_cache_stat_get() {
 _p9k_cache_stat_set() {
   _p9k_cache_set "$_p9k__cache_stat_meta" "$_p9k__cache_stat_fprint" "$@"
   _p9k__cache_key=$_p9k__cache_fprint_key
-  _p9k_cache_set "$@"
+  _p9k_cache_ephemeral_set "$@"
 }
 
 # _p9k_param prompt_foo_BAR BACKGROUND red
