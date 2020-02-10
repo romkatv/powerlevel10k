@@ -935,6 +935,16 @@ Informative icons, such as background job indicator, will be shown either way.
 *Note*: You can run configuration wizard as many times as you like. Type `p10k configure` to try new
 prompt style.
 
+### Can prompts for completed commands display error status for *those* commands instead of the commands preceding them?
+
+No. When you hit *ENTER* and the command you've typed starts running, its error status isn't yet
+known, so it cannot be shown in prompt. When the command completes, the error status gets known but
+it's no longer possible to update prompt for *that* command. This is why the error status for every
+command is reflected in the *next* prompt.
+
+For details, see [this post on /r/zsh](
+https://www.reddit.com/r/zsh/comments/eg49ff/powerlevel10k_prompt_history_exit_code_colors/fc5huku).
+
 ### Is there an AUR package for Powerlevel10k?
 
 Yes, [zsh-theme-powerlevel10k-git](https://aur.archlinux.org/packages/zsh-theme-powerlevel10k-git/).
@@ -1443,6 +1453,7 @@ There are a few mitigation options for this issue.
   - [What is the relationship between Powerlevel9k and Powerlevel10k?](#what-is-the-relationship-between-powerlevel9k-and-powerlevel10k)
   - [Does Powerlevel10k always render exactly the same prompt as Powerlevel9k given the same config?](#does-powerlevel10k-always-render-exactly-the-same-prompt-as-powerlevel9k-given-the-same-config)
   - [What is the best prompt style in the configuration wizard?](#what-is-the-best-prompt-style-in-the-configuration-wizard)
+  - [Can prompts for completed commands display error status for *those* commands instead of the commands preceding them?](#can-prompts-for-completed-commands-display-error-status-for-those-commands-instead-of-the-commands-preceding-them)
   - [Is there an AUR package for Powerlevel10k?](#is-there-an-aur-package-for-powerlevel10k)
   - [What is the minimum supported Zsh version?](#what-is-the-minimum-supported-zsh-version)
   - [How were these screenshots and animated gifs created?](#how-were-these-screenshots-and-animated-gifs-created)
