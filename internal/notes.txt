@@ -14,3 +14,7 @@
   no POWERLEVEL9K_SEGMENT_*_UPGLOB are, upglob can be checked from _p9k_set_prompt. otherwise it
   has to be checked from `p10k segment` (or its internal equivalent). how to make it work with
   static segments that have multiple states? for example, prompt_char.
+- when directory cannot be shortened any further, start chopping off segments from the left and
+  replacing the chopped off part with `…`. e.g., `…/x/anchor/y/anchor`. the shortest dir
+  representation is thus `…/last` or `…/last` depending on whether the last segment is an anchor.
+  the replacement parameter's value is `…/` (with a slash) to allow for `x/anchor/y/anchor`.
