@@ -720,6 +720,7 @@ feature:master ⇣42⇡42 *42 merge ~42 +42 !42 ?42
 | `+42`     | this many staged changes                                             | `git status --ignore-submodules=dirty`                 |
 | `!42`     | this many unstaged changes                                           | `git status --ignore-submodules=dirty`                 |
 | `?42`     | this many untracked files                                            | `git status --ignore-submodules=dirty`                 |
+| `─`       | the number of staged, unstaged or untracked files is unknown         | `echo $POWERLEVEL9K_VCS_MAX_INDEX_SIZE_DIRTY` or `git config --get bash.showDirtyState` |
 
 *Related*: [How do I change the format of Git status?](#how-do-i-change-the-format-of-git-status)
 
