@@ -10,3 +10,4 @@
   gitstatus.
 - add _SHOW_SYSTEM to all *env segments.
 - add POWERLEVEL9K_VCS_DISABLED_WORKDIR_PATTERN='~' to config templates
+- support states in SHOW_ON_COMMAND: POWERLEVEL9K_SEGMENT_STATE_SHOW_ON_COMMAND='...'
