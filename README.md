@@ -732,6 +732,20 @@ source code.
 *Related*: [What do different symbols in Git status mean?](
   #what-do-different-symbols-in-git-status-mean)
 
+### Why is Git status from `$HOME/.git` not displayed in prompt?
+
+When using Lean, Classic or Rainbow style, `~/.p10k.zsh` contains the following parameter:
+
+```zsh
+# Don't show Git status in prompt for repositories whose workdir matches this pattern.
+# For example, if set to '~', the Git repository at $HOME/.git will be ignored.
+# Multiple patterns can be combined with '|': '~|~/some/dir'.
+typeset -g POWERLEVEL9K_VCS_DISABLED_WORKDIR_PATTERN='~'
+```
+
+To see Git status for `$HOME/.git` in prompt, open `~/.p10k.zsh` and remove
+`POWERLEVEL9K_VCS_DISABLED_WORKDIR_PATTERN`.
+
 ### How do I add username and/or hostname to prompt?
 
 When using Lean, Classic or Rainbow style, prompt shows `username@hostname` when you are logged in
@@ -1445,6 +1459,7 @@ There are a few mitigation options for this issue.
   - [How do I enable instant prompt?](#how-do-i-enable-instant-prompt)
   - [What do different symbols in Git status mean?](#what-do-different-symbols-in-git-status-mean)
   - [How do I change the format of Git status?](#how-do-i-change-the-format-of-git-status)
+  - [Why is Git status from `$HOME/.git` not displayed in prompt?](#why-is-git-status-from-home-git-not-displayed-in-prompt)
   - [How do I add username and/or hostname to prompt?](#how-do-i-add-username-andor-hostname-to-prompt)
   - [Why some prompt segments appear and disappear as I'm typing?](#why-some-prompt-segments-appear-and-disappear-as-im-typing)
   - [How do I change prompt colors?](#how-do-i-change-prompt-colors)
