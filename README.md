@@ -1459,7 +1459,7 @@ There are a few mitigation options for this issue.
   - [How do I enable instant prompt?](#how-do-i-enable-instant-prompt)
   - [What do different symbols in Git status mean?](#what-do-different-symbols-in-git-status-mean)
   - [How do I change the format of Git status?](#how-do-i-change-the-format-of-git-status)
-  - [Why is Git status from `$HOME/.git` not displayed in prompt?](#why-is-git-status-from-home-git-not-displayed-in-prompt)
+  - [Why is Git status from `$HOME/.git` not displayed in prompt?](#why-is-git-status-from-homegit-not-displayed-in-prompt)
   - [How do I add username and/or hostname to prompt?](#how-do-i-add-username-andor-hostname-to-prompt)
   - [Why some prompt segments appear and disappear as I'm typing?](#why-some-prompt-segments-appear-and-disappear-as-im-typing)
   - [How do I change prompt colors?](#how-do-i-change-prompt-colors)
