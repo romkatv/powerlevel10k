@@ -4714,20 +4714,13 @@ function prompt_asdf() {
   local plugin
   for plugin in $_p9k_asdf_plugins; do
     local upper=${(U)plugin//-/_}
-    local var=POWERLEVEL9K_ASDF_${upper}_SOURCES
-    if (( $+parameters[$var] )); then
-      local sources=(${(P)var})
+    if (( $+parameters[_POWERLEVEL9K_ASDF_${upper}_SOURCES] )); then
+      local sources=(${(P)${:-_POWERLEVEL9K_ASDF_${upper}_SOURCES}})
     else
-      var=POWERLEVEL9K_ASDF_SOURCES
-      if (( $+parameters[$var] )); then
-        local sources=(${(P)var})
-      else
-        local sources=(shell local global)
-      fi
+      local sources=($_POWERLEVEL9K_ASDF_SOURCES)
     fi
 
-    var=ASDF_${upper}_VERSION
-    local version="${(P)var}"
+    local version="${(P)${:-ASDF_${upper}_VERSION}}"
     if [[ -n $version ]]; then
       (( $sources[(I)shell] )) || continue
     else
@@ -4742,28 +4735,18 @@ function prompt_asdf() {
     fi
 
     if [[ $version == $versions[$plugin] ]]; then
-      var=POWERLEVEL9K_ASDF_${upper}_PROMPT_ALWAYS_SHOW
-      if (( $+parameters[$var] )); then
-        [[ ${(P)var} == true ]] || continue
+      if (( $+parameters[_POWERLEVEL9K_ASDF_${upper}_PROMPT_ALWAYS_SHOW] )); then
+        (( _POWERLEVEL9K_ASDF_${upper}_PROMPT_ALWAYS_SHOW )) || continue
       else
-        var=POWERLEVEL9K_ASDF_PROMPT_ALWAYS_SHOW
-        if (( $+parameters[$var] )); then
-          [[ ${(P)var} == true ]] || continue
-        else
-          continue
-        fi
+        (( _POWERLEVEL9K_ASDF_PROMPT_ALWAYS_SHOW )) || continue
       fi
     fi
 
     if [[ $version == system ]]; then
-      var=POWERLEVEL9K_ASDF_${upper}_SHOW_SYSTEM
-      if (( $+parameters[$var] )); then
-        [[ ${(P)var} == true ]] || continue
+      if (( $+parameters[_POWERLEVEL9K_ASDF_${upper}_SHOW_SYSTEM] )); then
+        (( _POWERLEVEL9K_ASDF_${upper}_SHOW_SYSTEM )) || continue
       else
-        var=POWERLEVEL9K_ASDF_SHOW_SYSTEM
-        if (( $+parameters[$var] )); then
-          [[ ${(P)var} == true ]] || continue
-        fi
+        (( _POWERLEVEL9K_ASDF_SHOW_SYSTEM )) || continue
       fi
     fi
 
@@ -6301,6 +6284,19 @@ _p9k_init_params() {
   _p9k_declare -a POWERLEVEL9K_JENV_SOURCES -- shell local global
   _p9k_declare -b POWERLEVEL9K_PLENV_PROMPT_ALWAYS_SHOW 0
   _p9k_declare -a POWERLEVEL9K_PLENV_SOURCES -- shell local global
+  _p9k_declare -b POWERLEVEL9K_ASDF_PROMPT_ALWAYS_SHOW 0
+  _p9k_declare -b POWERLEVEL9K_ASDF_SHOW_SYSTEM 1
+  _p9k_declare -a POWERLEVEL9K_ASDF_SOURCES -- shell local global
+  local var
+  for var in ${parameters[(I)POWERLEVEL9K_ASDF_*_PROMPT_ALWAYS_SHOW]}; do
+    _p9k_declare -b $var $_POWERLEVEL9K_ASDF_PROMPT_ALWAYS_SHOW
+  done
+  for var in ${parameters[(I)POWERLEVEL9K_ASDF_*_SHOW_SYSTEM]}; do
+    _p9k_declare -b $var $_POWERLEVEL9K_ASDF_SHOW_SYSTEM
+  done
+  for var in ${parameters[(I)POWERLEVEL9K_ASDF_*_SOURCES]}; do
+    _p9k_declare -a $var -- $_POWERLEVEL9K_ASDF_SOURCES
+  done
   _p9k_declare -b POWERLEVEL9K_RVM_SHOW_GEMSET 0
   _p9k_declare -b POWERLEVEL9K_RVM_SHOW_PREFIX 0
   _p9k_declare -b POWERLEVEL9K_CHRUBY_SHOW_VERSION 1
@@ -6426,10 +6422,12 @@ _p9k_init_params() {
     fi
   done
 
-  local var=
-  for var in ${parameters[(I)POWERLEVEL9K_*]}; do
-    local _var=_$var
-    (( $+parameters[$_var] )) || typeset -g $_var=${(P)var}
+  local var
+  for var in ${(@)${parameters[(I)POWERLEVEL9K_*]}/(#m)*/${(M)${parameters[_$MATCH]-$MATCH}:#$MATCH}}; do
+    case $parameters[$var] in
+      (scalar|integer|float)*) typeset -g _$var=${(P)var};;
+      array*)                  eval 'typeset -ga '_$var'=("${'$var'[@]}")';;
+    esac
   done
 }
 
@@ -6951,7 +6949,7 @@ _p9k_must_init() {
     [[ $sig == $_p9k__param_sig ]] && return 1
     _p9k_deinit
   fi
-  _p9k__param_pat=$'v43\1'${ZSH_VERSION}$'\1'${ZSH_PATCHLEVEL}$'\1'
+  _p9k__param_pat=$'v44\1'${ZSH_VERSION}$'\1'${ZSH_PATCHLEVEL}$'\1'
   _p9k__param_pat+=$'${#parameters[(I)POWERLEVEL9K_*]}\1${(%):-%n%#}\1$GITSTATUS_LOG_LEVEL\1'
   _p9k__param_pat+=$'$GITSTATUS_ENABLE_LOGGING\1$GITSTATUS_DAEMON\1$GITSTATUS_NUM_THREADS\1'
   _p9k__param_pat+=$'$DEFAULT_USER\1${ZLE_RPROMPT_INDENT:-1}\1$P9K_SSH\1$__p9k_ksh_arrays'
