@@ -9,3 +9,4 @@
 - implement fake gitstatus api on top of vcs_info (or plain git?) + worker and use it if there is no
   gitstatus.
 - add _SHOW_SYSTEM to all *env segments.
+- add POWERLEVEL9K_VCS_DISABLED_WORKDIR_PATTERN='~' to config templates
