@@ -1597,7 +1597,7 @@ _p9k_custom_prompt() {
   (( $+functions[$cmd] || $+commands[$cmd] )) || return
   local content="$(eval $command)"
   [[ -n $content ]] || return
-  _p9k_prompt_segment "prompt_custom_$segment_name" $_p9k_color2 $_p9k_color1 "CUSTOM_${segment_name}_ICON" 0 '' "$content"
+  _p9k_prompt_segment "prompt_custom_$1" $_p9k_color2 $_p9k_color1 "CUSTOM_${segment_name}_ICON" 0 '' "$content"
 }
 
 ################################################################
