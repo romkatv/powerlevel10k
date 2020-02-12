@@ -10,7 +10,8 @@
   gitstatus.
 - add _SHOW_SYSTEM to all *env segments.
 - support states in SHOW_ON_COMMAND: POWERLEVEL9K_SEGMENT_STATE_SHOW_ON_COMMAND='...'
-- add POWERLEVEL9K_${SEGMENT}_${STATE}_SHOW_IN_DIR='pwd_pattern'
+- add POWERLEVEL9K_${SEGMENT}_${STATE}_SHOW_IN_DIR='pwd_pattern'; implement the same way as
+  SHOW_ON_UPGLOB.
 - add `p10k upglob`; returns 0 on match and sets REPLY to the directory where match was found.
 - when directory cannot be shortened any further, start chopping off segments from the left and
   replacing the chopped off part with `…`. e.g., `…/x/anchor/y/anchor`. the shortest dir
