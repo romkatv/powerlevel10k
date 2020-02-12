@@ -10,10 +10,7 @@
   gitstatus.
 - add _SHOW_SYSTEM to all *env segments.
 - support states in SHOW_ON_COMMAND: POWERLEVEL9K_SEGMENT_STATE_SHOW_ON_COMMAND='...'
-- add generic POWERLEVEL9K_SEGMENT_STATE_UPGLOB. if POWERLEVEL9K_SEGMENT_UPGLOB is defined but
-  no POWERLEVEL9K_SEGMENT_*_UPGLOB are, upglob can be checked from _p9k_set_prompt. otherwise it
-  has to be checked from `p10k segment` (or its internal equivalent). how to make it work with
-  static segments that have multiple states? for example, prompt_char.
+- add `p10k upglob`; returns 0 on match and sets REPLY to the directory where match was found.
 - when directory cannot be shortened any further, start chopping off segments from the left and
   replacing the chopped off part with `…`. e.g., `…/x/anchor/y/anchor`. the shortest dir
   representation is thus `…/last` or `…/last` depending on whether the last segment is an anchor.
