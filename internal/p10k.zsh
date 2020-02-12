@@ -1,4 +1,4 @@
-if [[ $__p9k_sourced != 5 ]]; then
+if [[ $__p9k_sourced != 6 ]]; then
   >&2 print -P ""
   >&2 print -P "[%F{1}ERROR%f]: Corrupted powerlevel10k installation."
   >&2 print -P ""
@@ -7562,7 +7562,7 @@ typeset -gi __p9k_reset_state
 function p10k() {
   [[ $# != 1 || $1 != finalize ]] || { p10k-instant-prompt-finalize; return 0 }
 
-  eval "$__p9k_intro"
+  eval "$__p9k_intro_no_reply"
 
   if (( !ARGC )); then
     print -rP -- $__p9k_p10k_usage >&2
@@ -7571,6 +7571,8 @@ function p10k() {
 
   case $1 in
     segment)
+      local REPLY
+      local -a reply
       shift
       local -i OPTIND
       local OPTARG opt state bg=0 fg icon cond text ref=0 expand=0
@@ -7635,6 +7637,8 @@ function p10k() {
         done
         return 0
       fi
+      local REPLY
+      local -a reply
       for opt in "${@:$OPTIND}"; do
         pair=(${(s:=:)opt})
         list=(${(s:,:)${pair[2]}})
@@ -7677,6 +7681,8 @@ function p10k() {
         print -rP -- $__p9k_p10k_configure_usage >&2
         return 1
       fi
+      local REPLY
+      local -a reply
       p9k_configure "$@" || return
       ;;
     reload)
