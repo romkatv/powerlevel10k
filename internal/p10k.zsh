@@ -4588,21 +4588,20 @@ function _p9k_asdf_init_meta() {
       local plugin
       for plugin in $root/[^[:space:]]##(N); do
         _p9k_asdf_plugins+=${plugin:t}
+        (( legacy_enabled )) || continue
         if [[ ! -e $plugin/bin ]]; then
           files+=$plugin/bin
         else
           local list_names=$plugin/bin/list-legacy-filenames
           files+=$list_names
           if [[ -x $list_names ]]; then
+            local parse=$plugin/bin/parse-legacy-file
             local -i has_parse=0
-            if (( legacy_enabled )); then
-              local parse=$plugin/bin/parse-legacy-file
-              files+=$parse
-              [[ -x $parse ]] && has_parse=1
-            fi
+            files+=$parse
+            [[ -x $parse ]] && has_parse=1
             local name
             for name in $($list_names 2>/dev/null); do
-              [[ $name == (*/*|*:*|.tool-versions) ]] && continue
+              [[ $name == (*/*|.tool-versions) ]] && continue
               _p9k_asdf_file_info[$name]+="${plugin:t} $has_parse "
             done
           fi
