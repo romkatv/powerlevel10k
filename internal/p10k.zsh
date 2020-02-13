@@ -5381,7 +5381,7 @@ _p9k_dump_instant_prompt() {
       exec {fd}>&-
     }
     zf_mv -f $tmp $root_file || return
-    zcompile $root_file || return
+    zcompile -R $root_file || return
   fi
 
   local tmp=$prompt_file.tmp.$$
@@ -5463,7 +5463,7 @@ function _p9k_dump_state() {
     exec {fd}>&-
   }
   zf_mv -f $tmp $__p9k_dump_file || return
-  zcompile $__p9k_dump_file
+  zcompile -R $__p9k_dump_file
 }
 
 function _p9k_restore_state() {
