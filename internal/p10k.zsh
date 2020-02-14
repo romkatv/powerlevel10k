@@ -4106,9 +4106,10 @@ _p9k_prompt_azure_init() {
 }
 
 prompt_gcloud() {
-  # TODO: Use `gcloud config configurations list` instead.
   unset P9K_GCLOUD_PROJECT P9K_GCLOUD_ACCOUNT
-  if ! _p9k_cache_stat_get $0 ~/.config/gcloud/active_config ~/.config/gcloud/configurations/config_default; then
+  _p9k_read_word ~/.config/gcloud/active_config || return
+  if ! _p9k_cache_stat_get $0 ~/.config/gcloud/configurations/config_$_p9k__ret; then
+    # TODO: Use `gcloud config configurations list` instead.
     _p9k_cache_stat_set "$(gcloud config get-value account 2>/dev/null)" "$(gcloud config get-value project 2>/dev/null)"
   fi
   [[ -n $_p9k__cache_val[1] || -n $_p9k__cache_val[2] ]] || return
@@ -6960,7 +6961,7 @@ _p9k_must_init() {
     [[ $sig == $_p9k__param_sig ]] && return 1
     _p9k_deinit
   fi
-  _p9k__param_pat=$'v45\1'${ZSH_VERSION}$'\1'${ZSH_PATCHLEVEL}$'\1'
+  _p9k__param_pat=$'v46\1'${ZSH_VERSION}$'\1'${ZSH_PATCHLEVEL}$'\1'
   _p9k__param_pat+=$'${#parameters[(I)POWERLEVEL9K_*]}\1${(%):-%n%#}\1$GITSTATUS_LOG_LEVEL\1'
   _p9k__param_pat+=$'$GITSTATUS_ENABLE_LOGGING\1$GITSTATUS_DAEMON\1$GITSTATUS_NUM_THREADS\1'
   _p9k__param_pat+=$'$DEFAULT_USER\1${ZLE_RPROMPT_INDENT:-1}\1$P9K_SSH\1$__p9k_ksh_arrays'
