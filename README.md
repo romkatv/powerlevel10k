@@ -1233,7 +1233,7 @@ It's almost always a bad idea to run `source ~/.zshrc`, whether you are using Po
 This command may result in random errors, misbehaving code and progressive slowdown of Zsh.
 
 If you've made changes to `~/.zshrc` or to files sourced by it, restart Zsh to apply them. The most
-reliable way to do this is to type `exit` and then start start a new Zsh session. You can also use
+reliable way to do this is to type `exit` and then start a new Zsh session. You can also use
 `exec zsh`. While not exactly equivalent to complete Zsh restart, this command is much more reliable
 than `source ~/.zshrc`.
 
