@@ -17,3 +17,6 @@
   replacing the chopped off part with `…`. e.g., `…/x/anchor/y/anchor`. the shortest dir
   representation is thus `…/last` or `…/last` depending on whether the last segment is an anchor.
   the replacement parameter's value is `…/` (with a slash) to allow for `x/anchor/y/anchor`.
+- add to faq: how do i display an environment variable in prompt? link it from "extensible"
+- add to faq: how do i display an icon in prompt? link it from "extensible"
+
