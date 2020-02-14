@@ -5,7 +5,7 @@ function _p9k_worker_main() {
   exec 0<$_p9k__worker_file_prefix.fifo || return
   zf_rm $_p9k__worker_file_prefix.fifo  || return
 
-  local -i reset n
+  local -i reset
   local req fd
   local -a ready
   local _p9k_worker_request_id
@@ -34,9 +34,9 @@ function _p9k_worker_main() {
         if [[ $fd == 0 ]]; then
           local buf=
           [[ -t 0 ]]  # https://www.zsh.org/mla/workers/2020/msg00207.html
-          if sysread -c n -t 0 'buf[$#buf+1]'; then
-            while [[ $buf != *$'\x1e' ]] || (( n == 8192 )); do
-              sysread -c n 'buf[$#buf+1]' || return
+          if sysread -t 0 'buf[$#buf+1]'; then
+            while [[ $buf != *$'\x1e' ]]; do
+              sysread 'buf[$#buf+1]' || return
             done
           else
             (( $? == 4 )) || return
@@ -116,12 +116,11 @@ function _p9k_worker_receive() {
     (( $# <= 1 )) || return
 
     local buf resp
-    local -i n
 
     [[ -t $_p9k__worker_resp_fd ]]  # https://www.zsh.org/mla/workers/2020/msg00207.html
-    if sysread -i $_p9k__worker_resp_fd -c n -t 0 'buf[$#buf+1]'; then
-      while [[ ${buf%%$'\x05'#} != (|*$'\x1e') ]] || (( n == 8192 )); do
-        sysread -i $_p9k__worker_resp_fd -c n 'buf[$#buf+1]' || return
+    if sysread -i $_p9k__worker_resp_fd -t 0 'buf[$#buf+1]'; then
+      while [[ $buf == *[^$'\x05\x1e']$'\x05'# ]]; do
+        sysread -i $_p9k__worker_resp_fd 'buf[$#buf+1]' || return
       done
     else
       (( $? == 4 )) || return
@@ -177,7 +176,7 @@ function _p9k_worker_start() {
   setopt monitor || return
   {
     [[ -n $_p9k__worker_resp_fd ]] && return
-    _p9k__worker_file_prefix=${TMPDIR:-/tmp}/p10k.worker.$EUID.$$.$EPOCHSECONDS
+    _p9k__worker_file_prefix=${TMPDIR:-/tmp}/p10k.worker.$EUID.$sysparams[pid].$EPOCHSECONDS
 
     sysopen -r -o cloexec -u _p9k__worker_resp_fd <(
       if [[ -n $_POWERLEVEL9K_WORKER_LOG_LEVEL ]]; then
