@@ -5565,7 +5565,7 @@ function _p9k_clear_instant_prompt() {
     print -rn -- $terminfo[rc]${(%):-%b%k%f%s%u}$terminfo[ed]
   fi
   prompt_opts=(percent subst sp cr)
-  if [[ $_POWERLEVEL9K_DISABLE_INSTANT_PROMPT == 0 && -o prompt_cr ]]; then
+  if [[ $_POWERLEVEL9K_DISABLE_INSTANT_PROMPT == 0 && $__p9k_instant_prompt_active == 2 ]]; then
     >&2 echo -E - ""
     >&2 echo -E - "${(%):-[%1FERROR%f]: When using Powerlevel10k with instant prompt, %Bprompt_cr%b must be unset.}"
     >&2 echo -E - ""
@@ -5646,16 +5646,12 @@ function _p9k_maybe_dump() {
 }
 
 function _p9k_on_expand() {
-  (( _p9k__expanded && ! $+__p9k_instant_prompt_active )) && return
+  (( _p9k__expanded && ! ${+__p9k_instant_prompt_active} )) && return
 
-  () {
-    eval "$__p9k_intro"
+  eval "$__p9k_intro"
 
+  if (( ! _p9k__expanded )); then
     _p9k_maybe_dump
-    (( $+__p9k_instant_prompt_active )) && _p9k_clear_instant_prompt
-
-    (( _p9k__expanded )) && return
-    _p9k__expanded=1
 
     if (( ! $+P9K_TTY )); then
       typeset -gx P9K_TTY=old
@@ -5698,15 +5694,24 @@ function _p9k_on_expand() {
       fi
     fi
 
-    if [[ -z $_p9k__last_tty ]]; then
-      _p9k_wrap_widgets
-      (( $+functions[p10k-on-init] )) && p10k-on-init
-    fi
+    [[ -z $_p9k__last_tty ]] && _p9k_wrap_widgets
+  fi
+
+  if (( $+__p9k_instant_prompt_active )); then
+    _p9k_clear_instant_prompt
+    unset __p9k_instant_prompt_active
+  fi
+
+  if (( ! _p9k__expanded )); then
+    _p9k__expanded=1
+
+    [[ -z $_p9k__last_tty && $+functions[p10k-on-init] == 1 ]] && p10k-on-init
 
     local pat idx var
     for pat idx var in $_p9k_show_on_command; do
       _p9k_display_segment $idx $var hide
     done
+
     (( $+functions[p10k-on-pre-prompt] )) && p10k-on-pre-prompt
 
     __p9k_reset_state=0
@@ -5728,12 +5733,6 @@ function _p9k_on_expand() {
         }
       fi
     fi
-  }
-
-  if (( $+__p9k_instant_prompt_active )); then
-    unset __p9k_instant_prompt_active
-    unsetopt localoptions
-    setopt prompt_sp prompt_cr
   fi
 }
 functions -M _p9k_on_expand
@@ -5857,12 +5856,9 @@ _p9k_precmd() {
 
   _p9k_precmd_impl
 
-  unsetopt localoptions
-  setopt nopromptbang prompt_percent prompt_subst
-
-  if (( ! $+functions[TRAPINT] )); then
-    trap '_p9k_trapint; return 130' INT
-  fi
+  (( ${+functions[TRAPINT]} )) || trap '_p9k_trapint; return 130' INT
+  [[ ${+__p9k_instant_prompt_active} == 0 || -o no_prompt_cr ]] || __p9k_instant_prompt_active=2
+  setopt no_local_options no_prompt_bang prompt_percent prompt_subst prompt_cr prompt_sp
 }
 
 function _p9k_reset_prompt() {
@@ -7396,14 +7392,16 @@ _p9k_setup() {
     prompt_opts+=cr
   fi
 
-  eval "$__p9k_intro"
   prompt_powerlevel9k_teardown
   __p9k_enabled=1
   typeset -ga preexec_functions=(_p9k_preexec1 $preexec_functions _p9k_preexec2)
   typeset -ga precmd_functions=(_p9k_do_nothing $precmd_functions _p9k_precmd)
 }
 
-prompt_powerlevel9k_setup() { _p9k_setup }
+prompt_powerlevel9k_setup() {
+  eval "$__p9k_intro"
+  _p9k_setup
+}
 
 prompt_powerlevel9k_teardown() {
   eval "$__p9k_intro"
@@ -7734,7 +7732,8 @@ function p10k() {
 powerlevel10k_plugin_unload() { prompt_powerlevel9k_teardown; }
 
 function p10k-instant-prompt-finalize() {
-  (( ! __p9k_instant_prompt_active )) || unsetopt localoptions prompt_cr
+  unsetopt local_options
+  (( ${+__p9k_instant_prompt_active} )) && unsetopt prompt_cr prompt_sp || setopt prompt_cr prompt_sp
 }
 
 autoload -Uz add-zsh-hook
