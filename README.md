@@ -958,6 +958,14 @@ If you value horizontal space or prefer minimalist aesthetics:
 *Note*: You can run configuration wizard as many times as you like. Type `p10k configure` to try new
 prompt style.
 
+### How to make Powerlevel10k look like robbyrussell Oh My Zsh theme?
+
+Use [this config](
+  https://github.com/romkatv/powerlevel10k/blob/master/config/p10k-robbyrussell.zsh).
+
+You can either download it, save as `~/.p10k.zsh` and `source ~/.p10k.zsh` from `~/.zshrc`, or
+source `p10k-robbyrussell.zsh` directly from your cloned `powerlevel10k` repository.
+
 ### Can prompts for completed commands display error status for *those* commands instead of the commands preceding them?
 
 No. When you hit *ENTER* and the command you've typed starts running, its error status isn't yet
@@ -1477,6 +1485,7 @@ There are a few mitigation options for this issue.
   - [What is the relationship between Powerlevel9k and Powerlevel10k?](#what-is-the-relationship-between-powerlevel9k-and-powerlevel10k)
   - [Does Powerlevel10k always render exactly the same prompt as Powerlevel9k given the same config?](#does-powerlevel10k-always-render-exactly-the-same-prompt-as-powerlevel9k-given-the-same-config)
   - [What is the best prompt style in the configuration wizard?](#what-is-the-best-prompt-style-in-the-configuration-wizard)
+  - [How to make Powerlevel10k look like robbyrussell Oh My Zsh theme?](#how-to-make-powerlevel10k-look-like-robbyrussell-oh-my-zsh-theme)
   - [Can prompts for completed commands display error status for *those* commands instead of the commands preceding them?](#can-prompts-for-completed-commands-display-error-status-for-those-commands-instead-of-the-commands-preceding-them)
   - [Is there an AUR package for Powerlevel10k?](#is-there-an-aur-package-for-powerlevel10k)
   - [What is the minimum supported Zsh version?](#what-is-the-minimum-supported-zsh-version)
