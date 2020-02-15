@@ -1052,7 +1052,7 @@
   # Custom icon.
   # typeset -g POWERLEVEL9K_PLENV_VISUAL_IDENTIFIER_EXPANSION='⭐'
 
-  ###########[ phpenv: php version from phpenv (https://github.com/phpenv/phpenv) ]############
+  ############[ phpenv: php version from phpenv (https://github.com/phpenv/phpenv) ]############
   # PHP color.
   # typeset -g POWERLEVEL9K_PHPENV_FOREGROUND=0
   # typeset -g POWERLEVEL9K_PHPENV_BACKGROUND=5
