@@ -24,5 +24,5 @@
 - add ssh to config templates
 - add swift version to config templates; see if there is a good pattern for PROJECT_ONLY
 - add swiftenv
-- add faq: how to shorten directory? mention POWERLEVEL9K_DIR_TRUNCATE_BEFORE_MARKER,
+- add faq: how to make directory shorter? mention POWERLEVEL9K_DIR_TRUNCATE_BEFORE_MARKER,
   POWERLEVEL9K_DIR_MAX_LENGTH and truncate_to_last.
