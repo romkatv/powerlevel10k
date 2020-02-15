@@ -2425,10 +2425,13 @@ instant_prompt_os_icon() { prompt_os_icon; }
 ################################################################
 # Segment to display PHP version number
 prompt_php_version() {
+  if (( _POWERLEVEL9K_PHP_VERSION_PROJECT_ONLY )); then
+    _p9k_upglob 'composer.json|*.php' && return
+  fi
   _p9k_cached_cmd_stdout php --version || return
   [[ $_p9k__ret == (#b)(*$'\n')#(PHP [[:digit:].]##)* ]] || return
   local v=$match[2]
-  _p9k_prompt_segment "$0" "fuchsia" "grey93" '' 0 '' "${v//\%/%%}"
+  _p9k_prompt_segment "$0" "fuchsia" "grey93" 'PHP_ICON' 0 '' "${v//\%/%%}"
 }
 
 _p9k_prompt_php_version_init() {
@@ -6331,6 +6334,7 @@ _p9k_init_params() {
   esac
   _p9k_declare -b POWERLEVEL9K_NODENV_PROMPT_ALWAYS_SHOW 0
   _p9k_declare -b POWERLEVEL9K_NODE_VERSION_PROJECT_ONLY 0
+  _p9k_declare -b POWERLEVEL9K_PHP_VERSION_PROJECT_ONLY 0
   _p9k_declare -b POWERLEVEL9K_DOTNET_VERSION_PROJECT_ONLY 1
   _p9k_declare -b POWERLEVEL9K_GO_VERSION_PROJECT_ONLY 1
   _p9k_declare -b POWERLEVEL9K_RUST_VERSION_PROJECT_ONLY 1
