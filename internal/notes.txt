@@ -19,4 +19,8 @@
   the replacement parameter's value is `…/` (with a slash) to allow for `x/anchor/y/anchor`.
 - add to faq: how do i display an environment variable in prompt? link it from "extensible"
 - add to faq: how do i display an icon in prompt? link it from "extensible"
-
+- add root_indicator to config templates
+- test chruby and add it to config templates
+- add ssh to config templates
+- add swift version to config templates; see if there is a good pattern for PROJECT_ONLY
+- add swiftenv
