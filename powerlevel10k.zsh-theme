@@ -53,7 +53,6 @@
   source $__p9k_root_dir/internal/p10k.zsh || true
 }
 
-unsetopt local_options
 (( $+__p9k_instant_prompt_active )) && unsetopt prompt_cr prompt_sp || setopt prompt_cr prompt_sp
 
 (( ${#__p9k_src_opts} )) && setopt ${__p9k_src_opts[@]}
