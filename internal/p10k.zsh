@@ -2433,7 +2433,7 @@ prompt_php_version() {
     _p9k_upglob 'composer.json|*.php' && return
   fi
   _p9k_cached_cmd_stdout php --version || return
-  [[ $_p9k__ret == (#b)(*$'\n')#(PHP [[:digit:].]##)* ]] || return
+  [[ $_p9k__ret == (#b)(*$'\n')#'PHP '([[:digit:].]##)* ]] || return
   local v=$match[2]
   _p9k_prompt_segment "$0" "fuchsia" "grey93" 'PHP_ICON' 0 '' "${v//\%/%%}"
 }
