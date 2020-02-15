@@ -2548,6 +2548,56 @@ _p9k_prompt_rbenv_init() {
   typeset -g "_p9k__segment_cond_${_p9k__prompt_side}[_p9k__segment_index]"='${commands[rbenv]:-${${+functions[rbenv]}:#0}}'
 }
 
+function _p9k_phpenv_global_version() {
+  _p9k_read_word ${PHPENV_ROOT:-$HOME/.phpenv}/version || _p9k__ret=system
+}
+
+prompt_phpenv() {
+  if [[ -n $PHPENV_VERSION ]]; then
+    (( ${_POWERLEVEL9K_PHPENV_SOURCES[(I)shell]} )) || return
+    local v=$PHPENV_VERSION
+  else
+    (( ${_POWERLEVEL9K_PHPENV_SOURCES[(I)local|global]} )) || return
+    if [[ $PHPENV_DIR == (|.) ]]; then
+      _p9k_upglob .php-version
+      local -i idx=$?
+      if (( idx )) && _p9k_read_word $_p9k__parent_dirs[idx]/.php-version; then
+        (( ${_POWERLEVEL9K_PHPENV_SOURCES[(I)local]} )) || return
+      else
+        _p9k__ret=
+      fi
+    else
+      _p9k__ret=
+      [[ $PHPENV_DIR == /* ]] && local dir=$PHPENV_DIR || local dir="$_p9k__cwd_a/$PHPENV_DIR"
+      while true; do
+        if _p9k_read_word $dir/.php-version; then
+          (( ${_POWERLEVEL9K_PHPENV_SOURCES[(I)local]} )) || return
+          break
+        fi
+        [[ $dir == / ]] && break
+        dir=${dir:h}
+      done
+    fi
+    if [[ -z $_p9k__ret ]]; then
+      (( _POWERLEVEL9K_PHPENV_PROMPT_ALWAYS_SHOW )) || return
+      (( ${_POWERLEVEL9K_PHPENV_SOURCES[(I)global]} )) || return
+      _p9k_phpenv_global_version
+    fi
+    local v=$_p9k__ret
+  fi
+
+  if (( !_POWERLEVEL9K_PHPENV_PROMPT_ALWAYS_SHOW )); then
+    _p9k_phpenv_global_version
+    [[ $v == $_p9k__ret ]] && return
+  fi
+
+  _p9k_prompt_segment "$0" "magenta" "$_p9k_color1" 'PHP_ICON' 0 '' "${v//\%/%%}"
+}
+
+_p9k_prompt_phpenv_init() {
+  typeset -g "_p9k__segment_cond_${_p9k__prompt_side}[_p9k__segment_index]"='${commands[phpenv]:-${${+functions[phpenv]}:#0}}'
+}
+
 function _p9k_luaenv_global_version() {
   _p9k_read_word ${LUAENV_ROOT:-$HOME/.luaenv}/version || _p9k__ret=system
 }
@@ -6286,6 +6336,8 @@ _p9k_init_params() {
   _p9k_declare -b POWERLEVEL9K_RUST_VERSION_PROJECT_ONLY 1
   _p9k_declare -b POWERLEVEL9K_RBENV_PROMPT_ALWAYS_SHOW 0
   _p9k_declare -a POWERLEVEL9K_RBENV_SOURCES -- shell local global
+  _p9k_declare -b POWERLEVEL9K_PHPENV_PROMPT_ALWAYS_SHOW 0
+  _p9k_declare -a POWERLEVEL9K_PHPENV_SOURCES -- shell local global
   _p9k_declare -b POWERLEVEL9K_LUAENV_PROMPT_ALWAYS_SHOW 0
   _p9k_declare -a POWERLEVEL9K_LUAENV_SOURCES -- shell local global
   _p9k_declare -b POWERLEVEL9K_JENV_PROMPT_ALWAYS_SHOW 0
@@ -6957,7 +7009,7 @@ _p9k_must_init() {
     [[ $sig == $_p9k__param_sig ]] && return 1
     _p9k_deinit
   fi
-  _p9k__param_pat=$'v46\1'${ZSH_VERSION}$'\1'${ZSH_PATCHLEVEL}$'\1'
+  _p9k__param_pat=$'v47\1'${ZSH_VERSION}$'\1'${ZSH_PATCHLEVEL}$'\1'
   _p9k__param_pat+=$'${#parameters[(I)POWERLEVEL9K_*]}\1${(%):-%n%#}\1$GITSTATUS_LOG_LEVEL\1'
   _p9k__param_pat+=$'$GITSTATUS_ENABLE_LOGGING\1$GITSTATUS_DAEMON\1$GITSTATUS_NUM_THREADS\1'
   _p9k__param_pat+=$'$DEFAULT_USER\1${ZLE_RPROMPT_INDENT:-1}\1$P9K_SSH\1$__p9k_ksh_arrays'

@@ -66,6 +66,7 @@
     luaenv                  # lua version from luaenv (https://github.com/cehoffman/luaenv)
     jenv                    # java version from jenv (https://github.com/jenv/jenv)
     plenv                   # perl version from plenv (https://github.com/tokuhirom/plenv)
+    phpenv                  # php version from phpenv (https://github.com/phpenv/phpenv)
     kubecontext             # current kubernetes context (https://kubernetes.io/)
     terraform               # terraform workspace (https://www.terraform.io)
     aws                     # aws profile (https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-profiles.html)
@@ -261,6 +262,7 @@
     .lua-version
     .java-version
     .perl-version
+    .php-version
     .tool-version
     .shorten_folder_marker
     .svn
@@ -971,6 +973,17 @@
   typeset -g POWERLEVEL9K_PLENV_PROMPT_ALWAYS_SHOW=false
   # Custom icon.
   # typeset -g POWERLEVEL9K_PLENV_VISUAL_IDENTIFIER_EXPANSION='⭐'
+
+  ###########[ phpenv: php version from phpenv (https://github.com/phpenv/phpenv) ]############
+  # PHP color.
+  typeset -g POWERLEVEL9K_PHPENV_FOREGROUND=99
+  # Hide php version if it doesn't come from one of these sources.
+  typeset -g POWERLEVEL9K_PHPENV_SOURCES=(shell local global)
+  # If set to false, hide php version if it's the same as global:
+  # $(phpenv version-name) == $(phpenv global).
+  typeset -g POWERLEVEL9K_PHPENV_PROMPT_ALWAYS_SHOW=false
+  # Custom icon.
+  # typeset -g POWERLEVEL9K_PHPENV_VISUAL_IDENTIFIER_EXPANSION='⭐'
 
   #############[ kubecontext: current kubernetes context (https://kubernetes.io/) ]#############
   # Show kubecontext only when the the command you are typing invokes one of these tools.

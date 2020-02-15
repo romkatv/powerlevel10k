@@ -133,6 +133,7 @@ function _p9k_init_icons() {
         ERLANG_ICON                    'erl'
         ELIXIR_ICON                    'elixir'
         POSTGRES_ICON                  'postgres'
+        PHP_ICON                       'php'
       )
     ;;
     'awesome-fontconfig')
@@ -251,6 +252,7 @@ function _p9k_init_icons() {
         ERLANG_ICON                    'erl'
         ELIXIR_ICON                    'elixir'
         POSTGRES_ICON                  'postgres'
+        PHP_ICON                       'php'
       )
     ;;
     'awesome-mapped-fontconfig')
@@ -373,6 +375,7 @@ function _p9k_init_icons() {
         ERLANG_ICON                    'erl'
         ELIXIR_ICON                    'elixir'
         POSTGRES_ICON                  'postgres'
+        PHP_ICON                       'php'
       )
     ;;
     'nerdfont-complete'|'nerdfont-fontconfig')
@@ -492,6 +495,7 @@ function _p9k_init_icons() {
         ERLANG_ICON                    '\uE7B1 '              # 
         ELIXIR_ICON                    '\uE62D'               # 
         POSTGRES_ICON                  '\uE76E'               # 
+        PHP_ICON                       '\uE608'               # 
       )
     ;;
     *)
@@ -610,6 +614,7 @@ function _p9k_init_icons() {
         ERLANG_ICON                    'erl'
         ELIXIR_ICON                    'elixir'
         POSTGRES_ICON                  'postgres'
+        PHP_ICON                       'php'
       )
     ;;
   esac
