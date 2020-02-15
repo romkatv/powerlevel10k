@@ -279,10 +279,13 @@ enable as many segments as you like. It won't slow down your prompt or Zsh start
 | `luaenv` | lua environment from [luaenv](https://github.com/cehoffman/luaenv) |
 | `jenv` | java environment from [jenv](https://github.com/jenv/jenv) |
 | `plenv` | perl environment from [plenv](https://github.com/tokuhirom/plenv) |
+| `phpenv` | php environment from [phpenv](https://github.com/phpenv/phpenv) |
 | `node_version` | [node.js](https://nodejs.org/) version |
 | `go_version` | [go](https://golang.org) version |
 | `rust_version` | [rustc](https://www.rust-lang.org) version |
 | `dotnet_version` | [dotnet](https://dotnet.microsoft.com) version |
+| `php_version` | [php](https://www.php.net/) version |
+| `laravel_version` | [laravel php framework](https://laravel.com/) version |
 | `kubecontext` | current [kubernetes](https://kubernetes.io/) context |
 | `terraform` | [terraform](https://www.terraform.io) workspace |
 | `aws` | [aws profile](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-profiles.html) |
