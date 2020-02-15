@@ -946,9 +946,14 @@ and replace mode respectively. When a command fails, the symbol turns red. *Lean
 `prompt_char` in it. *Rainbow* and *Classic* styles have it only in the two-line configuration
 without left frame.
 
-If you value horizontal space or prefer minimalist aesthetics, disable *current time* and use *few
-icons*. The extra icons enabled by the *many icons* option primarily serve decorative function.
-Informative icons, such as background job indicator, will be shown either way.
+If you value horizontal space or prefer minimalist aesthetics:
+
+- Use a monospace font, such as [the recommended font](#meslo-nerd-font-patched-for-powerlevel10k).
+  Non-monospace fonts require extra space after icons that are larger than a single column.
+- Use Lean style. Compared to Classic and Rainbow, it saves two characters per prompt segment.
+- Disable *current time* and *frame*.
+- Use *few icons*. The extra icons enabled by the *many icons* option primarily serve decorative
+  function. Informative icons, such as background job indicator, will be shown either way.
 
 *Note*: You can run configuration wizard as many times as you like. Type `p10k configure` to try new
 prompt style.
