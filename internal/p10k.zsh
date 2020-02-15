@@ -2100,12 +2100,16 @@ prompt_vpn_ip() {
 ################################################################
 # Segment to display laravel version
 prompt_laravel_version() {
-  local laravel_version="$(php artisan --version 2> /dev/null)"
-  if [[ -n "${laravel_version}" && "${laravel_version}" =~ "Laravel Framework" ]]; then
-    # Strip out everything but the version
-    laravel_version="${laravel_version//Laravel Framework /}"
-    _p9k_prompt_segment "$0" "maroon" "white" 'LARAVEL_ICON' 0 '' "${laravel_version//\%/%%}"
+  _p9k_upglob artisan && return
+  local dir=$_p9k__parent_dirs[$?]
+  local app=$dir/vendor/laravel/framework/src/Illuminate/Foundation/Application.php
+  [[ -r $app ]] || return
+  if ! _p9k_cache_stat_get $0 $dir/artisan $app; then
+    local v="$(php $dir/artisan --version 2> /dev/null)"
+    _p9k_cache_stat_set "${${(M)v:#Laravel Framework *}#Laravel Framework }"
   fi
+  [[ -n $_p9k__cache_val[1] ]] || return
+  _p9k_prompt_segment "$0" "maroon" "white" 'LARAVEL_ICON' 0 '' "${_p9k__cache_val[1]//\%/%%}"
 }
 
 _p9k_prompt_laravel_version_init() {
