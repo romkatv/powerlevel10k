@@ -10,6 +10,8 @@ typeset -gr __p9k_zshrc=${${:-$__p9k_zd/.zshrc}:A}
 typeset -gr __p9k_zshrc_u=$__p9k_zd_u/.zshrc
 typeset -gr __p9k_root_dir_u=${${${(q)__p9k_root_dir}/#(#b)${(q)HOME}(|\/*)/'~'$match[1]}//\%/%%}
 
+typeset -gr __p9k_readonly_zsh=$(test ! -e $__p9k_zshrc || test -w $__p9k_zshrc)
+
 function _p9k_can_configure() {
   [[ $1 == '-q' ]] && local -i q=1 || local -i q=0
   function $0_error() {
@@ -43,10 +45,7 @@ function _p9k_can_configure() {
       $0_error "$__p9k_zshrc_u is not readable"
       return 1
     }
-    [[ ! -e $__p9k_zshrc || -w $__p9k_zshrc ]]                             || {
-      $0_error "$__p9k_zshrc_u is not writable"
-      return 1
-    }
+
     (( LINES >= __p9k_wizard_lines && COLUMNS >= __p9k_wizard_columns ))   || {
       $0_error "terminal size too small; must be at least $__p9k_wizard_columns x $__p9k_wizard_lines"
       return 1
