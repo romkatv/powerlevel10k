@@ -5810,9 +5810,6 @@ _p9k_precmd_impl() {
     if zle; then
       __p9k_new_status=0
       __p9k_new_pipestatus=(0)
-      _p9k__expanded=1
-    else
-      _p9k__expanded=0
       _p9k__must_restore_prompt=0
     fi
 
@@ -5878,6 +5875,8 @@ _p9k_precmd_impl() {
   for f_compute in "${_p9k__async_segments_compute[@]}"; do
     _p9k_worker_invoke ${f_compute%% *} ${(e)f_compute}
   done
+
+  _p9k__expanded=0
 
   _p9k__refresh_reason=precmd
   _p9k_set_prompt
