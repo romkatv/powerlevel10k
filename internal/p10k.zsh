@@ -5783,7 +5783,11 @@ function _p9k_on_expand() {
           _p9k_display_segment $idx $var hide
         fi
       done
-      (( $+functions[p10k-on-post-widget] )) && p10k-on-post-widget
+      if (( $+functions[p10k-on-post-widget] )); then
+        local -h WIDGET
+        unset WIDGET
+        p10k-on-post-widget
+      fi
     else
       if [[ $_p9k__display_v[2] == print && -n $_p9k_t[_p9k_empty_line_idx] ]]; then
         print -rnP -- '%b%k%f%E'$_p9k_t[_p9k_empty_line_idx]
