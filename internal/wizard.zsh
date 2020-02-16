@@ -1912,7 +1912,6 @@ if [[ -n $zshrc_backup ]]; then
 fi
 
 generate_config || return
-
 change_zshrc    || return
 
 print -rP ""
