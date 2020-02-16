@@ -1506,6 +1506,7 @@ function ask_zshrc_edit() {
       r) return 1;;
       n) return 0;;
       y)
+        test $__p9k_readonly_zsh echo "Zshrc is readonly ignoring..."; return
         write_zshrc=1
         if [[ -n $zshrc_content ]]; then
           zshrc_backup="$(mktemp ${TMPDIR:-/tmp}/.zshrc.XXXXXXXXXX)" || quit -c
@@ -1911,6 +1912,7 @@ if [[ -n $zshrc_backup ]]; then
 fi
 
 generate_config || return
+
 change_zshrc    || return
 
 print -rP ""
