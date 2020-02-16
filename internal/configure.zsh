@@ -27,14 +27,6 @@ function _p9k_can_configure() {
       $0_error "$__p9k_cfg_path_u is a special file"
       return 1
     }
-    [[ -r $__p9k_root_dir/config/p10k-lean.zsh ]]                          || {
-      $0_error "cannot read $__p9k_root_dir_u/config/p10k-lean.zsh"
-      return 1
-    }
-    [[ -r $__p9k_root_dir/config/p10k-classic.zsh ]]                       || {
-      $0_error "cannot read $__p9k_root_dir_u/config/p10k-classic.zsh"
-      return 1
-    }
     [[ ! -e $__p9k_zshrc || -f $__p9k_zshrc || -h $__p9k_zshrc ]]          || {
       $0_error "$__p9k_zshrc_u a special file"
       return 1
@@ -43,6 +35,13 @@ function _p9k_can_configure() {
       $0_error "$__p9k_zshrc_u is not readable"
       return 1
     }
+    local style
+    for style in lean lean-8colors classic rainbow pure; do
+      [[ -r $__p9k_root_dir/config/p10k-$style.zsh ]]                      || {
+        $0_error "$__p9k_root_dir_u/config/p10k-$style.zsh is not readable"
+        return 1
+      }
+    done
 
     (( LINES >= __p9k_wizard_lines && COLUMNS >= __p9k_wizard_columns ))   || {
       $0_error "terminal size too small; must be at least $__p9k_wizard_columns x $__p9k_wizard_lines"

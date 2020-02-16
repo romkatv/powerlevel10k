@@ -1491,7 +1491,25 @@ function ask_zshrc_edit() {
     clear
     flowing -c "%BApply changes to %b%2F${__p9k_zshrc_u//\\/\\\\}%f%B?%b"
     print -P ""
-    print -P "%B(y)  Yes (recommended).%b"
+    local modifiable=y
+    if [[ -e $__p9k_zshrc && ! -w $__p9k_zshrc ]]; then
+      local -a stat
+      zstat -A stat +uid -- $__p9k_zshrc || quit -c
+      if (( stat[1] == EUID )); then
+        flowing -c %3FNOTE:%f %2F${__p9k_zshrc_u//\\/\\\\}%f %3Fis readonly.%f
+      else
+        modifiable=
+        flowing -c                                                        \
+          %3FWARNING:%f %2F${__p9k_zshrc_u//\\/\\\\}%f %3Fis readonly and \
+          not owned by the user. Cannot modify it.%f
+      fi
+      print -P ""
+    fi
+    if [[ $modifiable == y ]]; then
+      print -P "%B(y)  Yes (recommended).%b"
+    else
+      print -P "%1F(y)  Yes (disabled).%f"
+    fi
     print -P ""
     print -P "%B(n)  No. I know which changes to apply and will do it myself.%b"
     print -P ""
@@ -1500,18 +1518,24 @@ function ask_zshrc_edit() {
     print -P ""
 
     local key=
-    read -k key${(%):-"?%BChoice [ynrq]: %b"} || quit -c
+    read -k key${(%):-"?%BChoice [${modifiable}nrq]: %b"} || quit -c
     case $key in
       q) quit;;
       r) return 1;;
       n) return 0;;
       y)
-        [[ ! -e $__p9k_zshrc || -w $__p9k_zshrc ]] || (echo "Zshrc is readonly ignoring..."; return 1)
+        [[ $modifiable == y ]] || continue
         write_zshrc=1
         if [[ -n $zshrc_content ]]; then
           zshrc_backup="$(mktemp ${TMPDIR:-/tmp}/.zshrc.XXXXXXXXXX)" || quit -c
           cp -p $__p9k_zshrc $zshrc_backup                           || quit -c
+          local -i writable=1
+          if [[ ! -w $zshrc_backup ]]; then
+            chmod u+w -- $zshrc_backup                               || quit -c
+            writable=0
+          fi
           print -r -- $zshrc_content >$zshrc_backup                  || quit -c
+          (( writable )) || chmod u-w -- $zshrc_backup               || quit -c
           zshrc_backup_u=${${TMPDIR:+\$TMPDIR}:-/tmp}/${(q-)zshrc_backup:t}
         fi
         break
@@ -1755,6 +1779,12 @@ function change_zshrc() {
   [[ ! -e $__p9k_zshrc ]] || cp -p $__p9k_zshrc $tmp || return
 
   {
+    local -i writable=1
+    if [[ ! -w $tmp ]]; then
+      chmod u+w -- $tmp || return
+      writable=0
+    fi
+
     print -n >$tmp || return
 
     if (( !zshrc_has_instant_prompt )); then
@@ -1774,6 +1804,7 @@ fi" || return
 # To customize prompt, run \`p10k configure\` or edit ${(%)__p9k_cfg_path_u}.
 [[ ! -f ${(%)__p9k_cfg_path_u} ]] || source ${(%)__p9k_cfg_path_u}" || return
     fi
+    (( writable )) || chmod u-w -- $tmp || return
     zf_mv -f -- $tmp $__p9k_zshrc || return
   } always {
     zf_rm -f -- $tmp
