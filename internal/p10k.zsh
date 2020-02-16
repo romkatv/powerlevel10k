@@ -5773,11 +5773,18 @@ function _p9k_on_expand() {
 
     (( $+functions[p10k-on-pre-prompt] )) && p10k-on-pre-prompt
 
-    __p9k_reset_state=0
-    _p9k__last_tty=$P9K_TTY
-    P9K_TTY=old
-
-    if ! zle; then
+    if zle; then
+      local -a P9K_COMMANDS=($_p9k__last_commands)
+      local pat idx var
+      for pat idx var in $_p9k_show_on_command; do
+        if (( $P9K_COMMANDS[(I)$pat] )); then
+          _p9k_display_segment $idx $var show
+        else
+          _p9k_display_segment $idx $var hide
+        fi
+      done
+      (( $+functions[p10k-on-post-widget] )) && p10k-on-post-widget
+    else
       if [[ $_p9k__display_v[2] == print && -n $_p9k_t[_p9k_empty_line_idx] ]]; then
         print -rnP -- '%b%k%f%E'$_p9k_t[_p9k_empty_line_idx]
       fi
@@ -5792,6 +5799,10 @@ function _p9k_on_expand() {
         }
       fi
     fi
+
+    __p9k_reset_state=0
+    _p9k__last_tty=$P9K_TTY
+    P9K_TTY=old
   fi
 }
 functions -M _p9k_on_expand
@@ -5810,9 +5821,7 @@ _p9k_precmd_impl() {
     if zle; then
       __p9k_new_status=0
       __p9k_new_pipestatus=(0)
-      _p9k__expanded=1
     else
-      _p9k__expanded=0
       _p9k__must_restore_prompt=0
     fi
 
@@ -5878,6 +5887,8 @@ _p9k_precmd_impl() {
   for f_compute in "${_p9k__async_segments_compute[@]}"; do
     _p9k_worker_invoke ${f_compute%% *} ${(e)f_compute}
   done
+
+  _p9k__expanded=0
 
   _p9k__refresh_reason=precmd
   _p9k_set_prompt
