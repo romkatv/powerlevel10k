@@ -43,10 +43,7 @@ function _p9k_can_configure() {
       $0_error "$__p9k_zshrc_u is not readable"
       return 1
     }
-    [[ ! -e $__p9k_zshrc || -w $__p9k_zshrc ]]                             || {
-      $0_error "$__p9k_zshrc_u is not writable"
-      return 1
-    }
+
     (( LINES >= __p9k_wizard_lines && COLUMNS >= __p9k_wizard_columns ))   || {
       $0_error "terminal size too small; must be at least $__p9k_wizard_columns x $__p9k_wizard_lines"
       return 1
