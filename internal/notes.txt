@@ -28,3 +28,4 @@
   POWERLEVEL9K_DIR_MAX_LENGTH and truncate_to_last.
 - fix a bug in zsh: https://github.com/romkatv/powerlevel10k/issues/502. to reproduce:
     emulate zsh -o prompt_percent -c 'print -P "%F{#ff0000}red%F{green}%B bold green"'
+- bug: open a new tab and hit ctrl-p. an empty line will appear before prompt.
