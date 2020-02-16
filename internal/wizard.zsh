@@ -1780,7 +1780,7 @@ function change_zshrc() {
 
   {
     local -i writable=1
-    if [[ ! -w $tmp ]]; then
+    if [[ -e $tmp && ! -w $tmp ]]; then
       chmod u+w -- $tmp || return
       writable=0
     fi
