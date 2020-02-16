@@ -2952,7 +2952,7 @@ instant_prompt_status() {
 }
 
 prompt_prompt_char() {
-  local saved=$_p9k__prompt_char_saved[1+!_p9k__status]
+  local saved=$_p9k__prompt_char_saved[$_p9k__prompt_side$_p9k__segment_index$((!_p9k__status))]
   if [[ -n $saved ]]; then
     _p9k__prompt+=$saved
     return
@@ -2999,7 +2999,7 @@ prompt_prompt_char() {
       _p9k_prompt_segment $0_OK_VIVIS "$_p9k_color1" 76 '' 0 '${(M)${:-$_p9k__keymap$_p9k__region_active}:#(vicmd1|vivis?|vivli?)}' 'Ⅴ'
     fi
   fi
-  (( _p9k__has_upglob )) || _p9k__prompt_char_saved[1+!_p9k__status]=$_p9k__prompt[len+1,-1]
+  (( _p9k__has_upglob )) || _p9k__prompt_char_saved[$_p9k__prompt_side$_p9k__segment_index$((!_p9k__status))]=$_p9k__prompt[len+1,-1]
 }
 
 instant_prompt_prompt_char() {
@@ -6029,7 +6029,7 @@ _p9k_init_vars() {
   typeset -gi _p9k_timewarrior_dir_mtime
   typeset -gi _p9k_timewarrior_file_mtime
   typeset -g  _p9k_timewarrior_file_name
-  typeset -ga _p9k__prompt_char_saved
+  typeset -gA _p9k__prompt_char_saved
   typeset -g  _p9k__worker_pid
   typeset -g  _p9k__worker_req_fd
   typeset -g  _p9k__worker_resp_fd
