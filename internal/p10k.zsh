@@ -3873,7 +3873,7 @@ function _p9k_read_pyenv_like_version_file() {
   else
     local fd content
     {
-      { sysopen -r -u fd $1 && sysread -i $fd -s 1024 content } 2>/dev/null
+      { sysopen -r -u fd -- $1 && sysread -i $fd -s 1024 content } 2>/dev/null
     } always {
       [[ -n $fd ]] && exec {fd}>&-
     }
@@ -5161,7 +5161,7 @@ _p9k_dump_instant_prompt() {
   if [[ ! -e $root_file  ]]; then
     local tmp=$root_file.tmp.$$
     local -i fd
-    sysopen -a -o creat,trunc -u fd $tmp || return
+    sysopen -a -m 600 -o creat,trunc -u fd -- $tmp || return
     {
       [[ $TERM_PROGRAM == Hyper ]] && local hyper='==' || local hyper='!='
       local -a display_v=("${_p9k__display_v[@]}")
@@ -5440,18 +5440,34 @@ _p9k_dump_instant_prompt() {
     } always {
       exec {fd}>&-
     }
-    zf_mv -f $tmp $root_file || return
-    zcompile -R $root_file || return
+    {
+      (( ! $? ))                          || return
+      zf_mv -f $tmp $root_file            || return
+      zcompile -R -- $tmp.zwc $root_file  || return
+      zf_mv -f -- $tmp.zwc $root_file.zwc || return
+    } always {
+      (( $? )) && zf_rm -f -- $tmp $tmp.zwc 2>/dev/null
+    }
   fi
 
   local tmp=$prompt_file.tmp.$$
-  zf_mv -f $prompt_file $tmp 2>/dev/null
+  zf_mv -f -- $prompt_file $tmp 2>/dev/null
   if [[ "$(<$prompt_file)" == *$'\x1e'$_p9k__instant_prompt_sig$'\x1f'* ]] 2>/dev/null; then
     echo -n >$tmp || return
   fi
 
-  { print -rn -- $'\x1e'$_p9k__instant_prompt_sig$'\x1f'${(pj:\x1f:)_p9k_t}$'\x1f'$_p9k__instant_prompt >>$tmp } 2>/dev/null || return
-  zf_mv -f $tmp $prompt_file 2>/dev/null || return
+  local -i fd
+  sysopen -a -m 600 -o creat -u fd -- $tmp || return
+  {
+    {
+      print -rnu $fd -- $'\x1e'$_p9k__instant_prompt_sig$'\x1f'${(pj:\x1f:)_p9k_t}$'\x1f'$_p9k__instant_prompt || return
+    } always {
+      exec {fd}>&-
+    }
+    zf_mv -f -- $tmp $prompt_file || return
+  } always {
+    (( $? )) && zf_rm -f -- $tmp 2>/dev/null
+  }
 }
 
 typeset -gi __p9k_sh_glob
@@ -5505,25 +5521,30 @@ _p9k_save_status() {
 
 function _p9k_dump_state() {
   local dir=${__p9k_dump_file:h}
-  [[ -d $dir ]] || mkdir -p $dir || return
+  [[ -d $dir ]] || mkdir -p -- $dir || return
   [[ -w $dir ]] || return
-  local tmp=$__p9k_dump_file.$$-$EPOCHREALTIME-$RANDOM
+  local tmp=$__p9k_dump_file.tmp.$$
   local -i fd
-  sysopen -a -m 600 -o creat,trunc -u fd $tmp || return
+  sysopen -a -m 600 -o creat,trunc -u fd -- $tmp || return
   {
-    typeset -g __p9k_cached_param_pat=$_p9k__param_pat
-    typeset -g __p9k_cached_param_sig=$_p9k__param_sig
-    typeset -pm __p9k_cached_param_pat __p9k_cached_param_sig >&$fd || return
-    unset __p9k_cached_param_pat __p9k_cached_param_sig
-    (( $+_p9k_preinit )) && { print -r -- $_p9k_preinit >&$fd || return }
-    print -r -- '_p9k_restore_state_impl() {' >&$fd || return
-    typeset -pm '_POWERLEVEL9K_*|_p9k_[^_]*|icons|OS|DEFAULT_COLOR|DEFAULT_COLOR_INVERTED' >&$fd || return
-    print -r -- '}' >&$fd || return
+    {
+      typeset -g __p9k_cached_param_pat=$_p9k__param_pat
+      typeset -g __p9k_cached_param_sig=$_p9k__param_sig
+      typeset -pm __p9k_cached_param_pat __p9k_cached_param_sig >&$fd || return
+      unset __p9k_cached_param_pat __p9k_cached_param_sig
+      (( $+_p9k_preinit )) && { print -r -- $_p9k_preinit >&$fd || return }
+      print -r -- '_p9k_restore_state_impl() {' >&$fd || return
+      typeset -pm '_POWERLEVEL9K_*|_p9k_[^_]*|icons|OS|DEFAULT_COLOR|DEFAULT_COLOR_INVERTED' >&$fd || return
+      print -r -- '}' >&$fd || return
+    } always {
+      exec {fd}>&-
+    }
+    zf_mv -f -- $tmp $__p9k_dump_file         || return
+    zcompile -R -- $tmp.zwc $__p9k_dump_file  || return
+    zf_mv -f -- $tmp.zwc $__p9k_dump_file.zwc || return
   } always {
-    exec {fd}>&-
+    (( $? )) && zf_rm -f -- $tmp $tmp.zwc 2>/dev/null
   }
-  zf_mv -f $tmp $__p9k_dump_file || return
-  zcompile -R $__p9k_dump_file
 }
 
 function _p9k_restore_state() {
@@ -6657,7 +6678,7 @@ function _p9k_wrap_widgets() {
         ${${${(f)"$(<$tmp)"}##* }:#(*\"|.*)}
       )
     } always {
-      zf_rm -f $tmp
+      zf_rm -f -- $tmp
     }
   fi
   local widget
@@ -7827,7 +7848,7 @@ zmodload -F zsh/net/socket b:zsocket
 zmodload -F zsh/files b:zf_mv b:zf_rm
 
 if [[ $__p9k_dump_file != $__p9k_instant_prompt_dump_file && -n $__p9k_instant_prompt_dump_file ]]; then
-  zf_rm -f $__p9k_instant_prompt_dump_file 2>/dev/null
+  zf_rm -f -- $__p9k_instant_prompt_dump_file 2>/dev/null
 fi
 
 if [[ $+__p9k_instant_prompt_sourced == 1 && $__p9k_instant_prompt_sourced != $__p9k_instant_prompt_version ]]; then
