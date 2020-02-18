@@ -52,6 +52,7 @@ fi
 source "${__p9k_root_dir}/internal/configure.zsh"
 source "${__p9k_root_dir}/internal/worker.zsh"
 source "${__p9k_root_dir}/internal/parser.zsh"
+source "${__p9k_root_dir}/internal/icons.zsh"
 
 # For compatibility with Powerlevel9k. It's not recommended to use mnemonic color
 # names in the configuration except for colors 0-7 as these are standard.
@@ -135,32 +136,6 @@ function getColorCode() {
   fi
   echo "Usage: getColorCode background|foreground" >&2
   return 1
-}
-
-# Sadly, this is a part of public API. Its use is emphatically discouraged.
-function print_icon() {
-  eval "$__p9k_intro"
-  if (( ! $+_p9k__locale )); then
-    _p9k_init_locale
-    [[ -z $_p9k__locale ]] || local LC_ALL=$_p9k__locale
-  fi
-  (( $+functions[_p9k_print_icon] )) || source "${__p9k_root_dir}/internal/icons.zsh"
-  _p9k_print_icon "$@"
-}
-
-# Prints a list of configured icons.
-#
-#   * $1 string - If "original", then the original icons are printed,
-#                 otherwise "print_icon" is used, which takes the users
-#                 overrides into account.
-function get_icon_names() {
-  eval "$__p9k_intro"
-  if (( ! $+_p9k__locale )); then
-    _p9k_init_locale
-    [[ -z $_p9k__locale ]] || local LC_ALL=$_p9k__locale
-  fi
-  (( $+functions[_p9k_get_icon_names] )) || source "${__p9k_root_dir}/internal/icons.zsh"
-  _p9k_get_icon_names "$@"
 }
 
 # _p9k_declare <type> <uppercase-name> [default]...
@@ -7055,7 +7030,7 @@ _p9k_must_init() {
     [[ $sig == $_p9k__param_sig ]] && return 1
     _p9k_deinit
   fi
-  _p9k__param_pat=$'v50\1'${ZSH_VERSION}$'\1'${ZSH_PATCHLEVEL}$'\1'
+  _p9k__param_pat=$'v51\1'${ZSH_VERSION}$'\1'${ZSH_PATCHLEVEL}$'\1'
   _p9k__param_pat+=$'${#parameters[(I)POWERLEVEL9K_*]}\1${(%):-%n%#}\1$GITSTATUS_LOG_LEVEL\1'
   _p9k__param_pat+=$'$GITSTATUS_ENABLE_LOGGING\1$GITSTATUS_DAEMON\1$GITSTATUS_NUM_THREADS\1'
   _p9k__param_pat+=$'$DEFAULT_USER\1${ZLE_RPROMPT_INDENT:-1}\1$P9K_SSH\1$__p9k_ksh_arrays'
@@ -7075,7 +7050,6 @@ function _p9k_set_os() {
 }
 
 function _p9k_init_cacheable() {
-  (( $+functions[_p9k_init_icons] )) || source "${__p9k_root_dir}/internal/icons.zsh"
   _p9k_init_icons
   _p9k_init_params
   _p9k_init_prompt

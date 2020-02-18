@@ -1827,7 +1827,6 @@ fi
 
 zmodload zsh/terminfo                     || return
 autoload -Uz is-at-least                  || return
-source $__p9k_root_dir/internal/icons.zsh || return
 
 if is-at-least 5.7.1 && [[ $COLORTERM == (24bit|truecolor) ]]; then
   local -ir has_truecolor=1

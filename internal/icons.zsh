@@ -636,14 +636,18 @@ function _p9k_init_icons() {
 }
 
 # Sadly, this is a part of public API. Its use is emphatically discouraged.
-function _p9k_print_icon() {
+function print_icon() {
+  eval "$__p9k_intro"
+  if (( ! $+_p9k__locale )); then
+    _p9k_init_locale
+    [[ -z $_p9k__locale ]] || local LC_ALL=$_p9k__locale
+  fi
   _p9k_init_icons
-  local icon_name=$1
-  local var_name=POWERLEVEL9K_${icon_name}
-  if [[ -n "${(tP)var_name}" ]]; then
-    echo -n "${(P)var_name}"
+  local var=POWERLEVEL9K_$1
+  if (( $+parameters[$var] )); then
+    echo -n - ${(P)var}
   else
-    echo -n "${icons[$icon_name]}"
+    echo -n - $icons[$1]
   fi
 }
 
@@ -652,17 +656,22 @@ function _p9k_print_icon() {
 #   * $1 string - If "original", then the original icons are printed,
 #                 otherwise "print_icon" is used, which takes the users
 #                 overrides into account.
-function _p9k_get_icon_names() {
+function get_icon_names() {
+  eval "$__p9k_intro"
+  if (( ! $+_p9k__locale )); then
+    _p9k_init_locale
+    [[ -z $_p9k__locale ]] || local LC_ALL=$_p9k__locale
+  fi
   _p9k_init_icons
-  # Iterate over a ordered list of keys of the icons array
+  local key
   for key in ${(@kon)icons}; do
-    echo -n "POWERLEVEL9K_$key: "
-    if [[ "${1}" == "original" ]]; then
-      # print the original icons as they are defined in the array above
-      echo "${icons[$key]}"
+    echo -n - "POWERLEVEL9K_$key: "
+    print -nP "%K{red} %k"
+    if [[ $1 == original ]]; then
+      echo -n - $icons[$key]
     else
-      # print the icons as they are configured by the user
-      echo "$(print_icon "$key")"
+      print_icon $key
     fi
+    print -P "%K{red} %k"
   done
 }
