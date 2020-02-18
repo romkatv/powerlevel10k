@@ -1477,7 +1477,17 @@ function ask_zshrc_edit() {
     local f3=${(qq)f0}
     local f4=${(qqq)f0}
     local g1=${${(q)__p9k_cfg_path_o}/#(#b)${(q)HOME}\//'~/'}
-    if [[ -n ${(@M)lines:#(#b)[^#]#([^[:IDENT:]]|)source[[:space:]]##($f1|$f2|$f3|$f4|$g1)(|[[:space:]]*|'#'*)} ]]; then
+    local h0='${ZDOTDIR:-~}/.p10k.zsh'
+    local h1='${ZDOTDIR:-$HOME}/.p10k.zsh'
+    local h2='"${ZDOTDIR:-$HOME}/.p10k.zsh"'
+    local h3='"${ZDOTDIR:-$HOME}"/.p10k.zsh'
+    local h4='${ZDOTDIR}/.p10k.zsh'
+    local h5='"${ZDOTDIR}/.p10k.zsh"'
+    local h6='"${ZDOTDIR}"/.p10k.zsh'
+    local h7='$ZDOTDIR/.p10k.zsh'
+    local h8='"$ZDOTDIR/.p10k.zsh"'
+    local h9='"$ZDOTDIR"/.p10k.zsh'
+    if [[ -n ${(@M)lines:#(#b)[^#]#([^[:IDENT:]]|)source[[:space:]]##($f1|$f2|$f3|$f4|$g1|$h0|$h1|$h2|$h3|$h4|$h5|$h6|$h7|$h8|$h9)(|[[:space:]]*|'#'*)} ]]; then
       zshrc_has_cfg=1
     fi
     local pre='${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh'
