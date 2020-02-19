@@ -7030,7 +7030,7 @@ _p9k_must_init() {
     [[ $sig == $_p9k__param_sig ]] && return 1
     _p9k_deinit
   fi
-  _p9k__param_pat=$'v51\1'${ZSH_VERSION}$'\1'${ZSH_PATCHLEVEL}$'\1'
+  _p9k__param_pat=$'v52\1'${ZSH_VERSION}$'\1'${ZSH_PATCHLEVEL}$'\1'
   _p9k__param_pat+=$'${#parameters[(I)POWERLEVEL9K_*]}\1${(%):-%n%#}\1$GITSTATUS_LOG_LEVEL\1'
   _p9k__param_pat+=$'$GITSTATUS_ENABLE_LOGGING\1$GITSTATUS_DAEMON\1$GITSTATUS_NUM_THREADS\1'
   _p9k__param_pat+=$'$DEFAULT_USER\1${ZLE_RPROMPT_INDENT:-1}\1$P9K_SSH\1$__p9k_ksh_arrays'
@@ -7131,6 +7131,7 @@ function _p9k_init_cacheable() {
           *nixos*)                 _p9k_set_os Linux LINUX_NIXOS_ICON;;
           *devuan*)                _p9k_set_os Linux LINUX_DEVUAN_ICON;;
           *manjaro*)               _p9k_set_os Linux LINUX_MANJARO_ICON;;
+          *void*)                  _p9k_set_os Linux LINUX_VOID_ICON;;
           *)                       _p9k_set_os Linux LINUX_ICON;;
         esac
         ;;

@@ -860,6 +860,7 @@ function os_icon_name() {
           *nixos*)                 echo LINUX_NIXOS_ICON;;
           *devuan*)                echo LINUX_DEVUAN_ICON;;
           *manjaro*)               echo LINUX_MANJARO_ICON;;
+          *void*)                  echo LINUX_VOID_ICON;;
           *)                       echo LINUX_ICON;;
         esac
         ;;
