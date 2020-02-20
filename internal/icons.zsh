@@ -643,10 +643,6 @@ function _p9k_init_icons() {
 # Sadly, this is a part of public API. Its use is emphatically discouraged.
 function print_icon() {
   eval "$__p9k_intro"
-  if (( ! $+__p9k_locale )); then
-    _p9k_init_locale
-    [[ -z $__p9k_locale ]] || local LC_ALL=$__p9k_locale
-  fi
   _p9k_init_icons
   local var=POWERLEVEL9K_$1
   if (( $+parameters[$var] )); then
@@ -663,10 +659,6 @@ function print_icon() {
 #                 overrides into account.
 function get_icon_names() {
   eval "$__p9k_intro"
-  if (( ! $+__p9k_locale )); then
-    _p9k_init_locale
-    [[ -z $__p9k_locale ]] || local LC_ALL=$__p9k_locale
-  fi
   _p9k_init_icons
   local key
   for key in ${(@kon)icons}; do

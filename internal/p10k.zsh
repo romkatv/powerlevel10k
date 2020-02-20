@@ -1,4 +1,4 @@
-if [[ $__p9k_sourced != 6 ]]; then
+if [[ $__p9k_sourced != 7 ]]; then
   >&2 print -P ""
   >&2 print -P "[%F{1}ERROR%f]: Corrupted powerlevel10k installation."
   >&2 print -P ""
@@ -4808,15 +4808,8 @@ _p9k_prompt_asdf_init() {
 # Use two preexec hooks to survive https://github.com/MichaelAquilina/zsh-you-should-use with
 # YSU_HARDCORE=1. See https://github.com/romkatv/powerlevel10k/issues/427.
 _p9k_preexec1() {
-  if (( $+_p9k__real_zle_rprompt_indent )); then
-    if [[ -n $_p9k__real_zle_rprompt_indent ]]; then
-      ZLE_RPROMPT_INDENT=$_p9k__real_zle_rprompt_indent
-    else
-      unset ZLE_RPROMPT_INDENT
-    fi
-    unset _p9k__real_zle_rprompt_indent
-  fi
-  (( $+functions[TRAPINT] )) || trap - INT
+  _p9k_restore_special_params
+  (( ${+functions[TRAPINT]} )) || trap - INT
 }
 
 _p9k_preexec2() {
@@ -5122,7 +5115,7 @@ _p9k_set_instant_prompt() {
   [[ -n $RPROMPT ]] || unset RPROMPT
 }
 
-typeset -gri __p9k_instant_prompt_version=18
+typeset -gri __p9k_instant_prompt_version=19
 
 _p9k_dump_instant_prompt() {
   local user=${(%):-%n}
@@ -5145,7 +5138,7 @@ _p9k_dump_instant_prompt() {
       display_v[2]=hide
       display_v[4]=hide
       >&$fd print -r -- "() {
-  $__p9k_intro
+  $__p9k_intro_no_locale
   (( ! \$+__p9k_instant_prompt_disabled )) || return
   typeset -gi __p9k_instant_prompt_disabled=1 __p9k_instant_prompt_sourced=$__p9k_instant_prompt_version
   [[ -t 0 && -t 1 && -t 2 && \$ZSH_VERSION == ${(q)ZSH_VERSION} && \$ZSH_PATCHLEVEL == ${(q)ZSH_PATCHLEVEL} &&
@@ -5157,13 +5150,20 @@ _p9k_dump_instant_prompt() {
   [[ -n \$SSH_CLIENT || -n \$SSH_TTY || -n \$SSH_CONNECTION ]] && local ssh=1 || local ssh=0
   local cr=\$'\r' lf=\$'\n' esc=\$'\e[' rs=$'\x1e' us=$'\x1f'
   local -i height=$_POWERLEVEL9K_INSTANT_PROMPT_COMMAND_LINES
-  local prompt_dir=${(q)prompt_dir}
-  zmodload zsh/langinfo
-  if [[ \${langinfo[CODESET]:-} != (utf|UTF)(-|)8 ]]; then
-    local lc=${(q)${${${__p9k_locale:-${(M)LC_CTYPE:#*.(utf|UTF)(-|)8}}:-${(M)LC_ALL:#*.(utf|UTF)(-|)8}}}:-${(M)LANG:#*.(utf|UTF)(-|)8}}
-    local LC_ALL=\${lc:-\${\${(@M)\$(locale -a 2>/dev/null):#*.(utf|UTF)(-|)8}[1]:-en_US.UTF-8}}
-  fi"
+  local prompt_dir=${(q)prompt_dir}"
       >&$fd print -r -- '
+  zmodload zsh/langinfo
+  if [[ $langinfo[CODESET] != (utf|UTF)(-|)8 ]]; then
+    local loc_cmd=$commands[locale]
+    [[ -z $loc_cmd ]] && loc_cmd='${(q)commands[locale]}'
+    if [[ -x $loc_cmd ]]; then
+      local -a locs
+      if locs=(${(@M)$(locale -a 2>/dev/null):#*.(utf|UTF)(-|)8}) && (( $#locs )); then
+        local loc=${locs[(r)(#i)C.UTF(-|)8]:-${locs[(r)(#i)en_US.UTF(-|)8]:-$locs[1]}}
+        [[ -n $LC_ALL ]] && local LC_ALL=$loc || local LC_CTYPE=$loc
+      fi
+    fi
+  fi
   zmodload zsh/terminfo
   (( $+terminfo[cuu] && $+terminfo[cuf] && $+terminfo[ed] && $+terminfo[sc] && $+terminfo[rc] )) || return
   local pwd=${(%):-%/}
@@ -5700,10 +5700,43 @@ function _p9k_maybe_dump() {
   fi
 }
 
-function _p9k_on_expand() {
-  (( _p9k__expanded && ! ${+__p9k_instant_prompt_active} )) && return
+# Must not run under `eval "$__p9k_intro_locale"`. Safe to run with any options.
+function _p9k_restore_special_params() {
+  (( ! ${+_p9k__real_zle_rprompt_indent} )) || {
+    [[ -n "$_p9k__real_zle_rprompt_indent" ]]             &&
+      ZLE_RPROMPT_INDENT="$_p9k__real_zle_rprompt_indent" ||
+      unset ZLE_RPROMPT_INDENT
+    unset _p9k__real_zle_rprompt_indent
+  }
+  (( ! ${+_p9k__real_lc_ctype} )) || {
+    LC_CTYPE="$_p9k__real_lc_ctype"
+    unset _p9k__real_lc_ctype
+  }
+  (( ! ${+_p9k__real_lc_all} )) || {
+    LC_ALL="$_p9k__real_lc_all"
+    unset _p9k__real_lc_all
+  }
+}
 
-  eval "$__p9k_intro"
+function _p9k_on_expand() {
+  eval "$__p9k_intro_no_locale"
+
+  if [[ $langinfo[CODESET] != (utf|UTF)(-|)8 ]]; then
+    _p9k_restore_special_params
+    if [[ $langinfo[CODESET] != (utf|UTF)(-|)8 ]] && _p9k_init_locale; then
+      if [[ -n $LC_ALL ]]; then
+        _p9k__real_lc_all=$LC_ALL
+        LC_ALL=$__p9k_locale
+      else
+        _p9k__real_lc_ctype=$LC_CTYPE
+        LC_CTYPE=$__p9k_locale
+      fi
+    fi
+  fi
+
+  (( _p9k__expanded && ! $+__p9k_instant_prompt_active )) && return
+
+  eval "$__p9k_intro_locale"
 
   if (( ! _p9k__expanded )); then
     _p9k_maybe_dump
@@ -5812,26 +5845,12 @@ _p9k_precmd_impl() {
 
   (( __p9k_enabled )) || return
 
-  if (( ! $+__p9k_locale )); then
-    _p9k_init_locale
-    [[ -z $__p9k_locale ]] || local LC_ALL=$__p9k_locale
-  fi
-
   if ! zle || [[ -z $_p9k__param_sig ]]; then
     if zle; then
       __p9k_new_status=0
       __p9k_new_pipestatus=(0)
     else
       _p9k__must_restore_prompt=0
-    fi
-
-    if (( $+_p9k__real_zle_rprompt_indent )); then
-      if [[ -n $_p9k__real_zle_rprompt_indent ]]; then
-        ZLE_RPROMPT_INDENT=$_p9k__real_zle_rprompt_indent
-      else
-        unset ZLE_RPROMPT_INDENT
-      fi
-      unset _p9k__real_zle_rprompt_indent
     fi
 
     if _p9k_must_init; then
@@ -5923,6 +5942,7 @@ _p9k_precmd() {
   __p9k_new_pipestatus=($pipestatus)
   [[ -o ksh_arrays ]] && __p9k_ksh_arrays=1 || __p9k_ksh_arrays=0
   [[ -o sh_glob ]] && __p9k_sh_glob=1 || __p9k_sh_glob=0
+  _p9k_restore_special_params
 
   _p9k_precmd_impl
 
@@ -5957,15 +5977,6 @@ function _p9k_prompt_overflow_bug() {
   [[ $ZSH_PATCHLEVEL =~ '^zsh-5\.4\.2-([0-9]+)-' ]] && return $(( match[1] < 159 ))
   [[ $ZSH_PATCHLEVEL =~ '^zsh-5\.7\.1-([0-9]+)-' ]] && return $(( match[1] >= 50 ))
   is-at-least 5.5 && ! is-at-least 5.7.2
-}
-
-function _p9k_init_locale() {
-  zmodload zsh/langinfo
-  if [[ ${langinfo[CODESET]:-} != (utf|UTF)(-|)8 ]]; then
-    typeset -g __p9k_locale=${${(@M)$(locale -a):#*.(utf|UTF)(-|)8}[1]:-en_US.UTF-8}
-  else
-    typeset -g __p9k_locale=
-  fi
 }
 
 typeset -g  _p9k__param_pat
@@ -7030,12 +7041,12 @@ _p9k_must_init() {
     [[ $sig == $_p9k__param_sig ]] && return 1
     _p9k_deinit
   fi
-  _p9k__param_pat=$'v53\1'${ZSH_VERSION}$'\1'${ZSH_PATCHLEVEL}$'\1'
+  _p9k__param_pat=$'v54\1'${ZSH_VERSION}$'\1'${ZSH_PATCHLEVEL}$'\1'
   _p9k__param_pat+=$'${#parameters[(I)POWERLEVEL9K_*]}\1${(%):-%n%#}\1$GITSTATUS_LOG_LEVEL\1'
   _p9k__param_pat+=$'$GITSTATUS_ENABLE_LOGGING\1$GITSTATUS_DAEMON\1$GITSTATUS_NUM_THREADS\1'
   _p9k__param_pat+=$'$DEFAULT_USER\1${ZLE_RPROMPT_INDENT:-1}\1$P9K_SSH\1$__p9k_ksh_arrays'
   _p9k__param_pat+=$'$__p9k_sh_glob\1$ITERM_SHELL_INTEGRATION_INSTALLED\1$commands[uname]'
-  _p9k__param_pat+=$'${PROMPT_EOL_MARK-%B%S%#%s%b}\1$LANG\1$LC_ALL\1$LC_CTYPE\1'
+  _p9k__param_pat+=$'${PROMPT_EOL_MARK-%B%S%#%s%b}\1$commands[locale]\1'
   _p9k__param_pat+=$'$functions[p10k-on-init]$functions[p10k-on-pre-prompt]\1'
   _p9k__param_pat+=$'$functions[p10k-on-post-widget]$functions[p10k-on-post-prompt]\1'
   local MATCH
@@ -7473,11 +7484,13 @@ _p9k_setup() {
 }
 
 prompt_powerlevel9k_setup() {
+  _p9k_restore_special_params
   eval "$__p9k_intro"
   _p9k_setup
 }
 
 prompt_powerlevel9k_teardown() {
+  _p9k_restore_special_params
   eval "$__p9k_intro"
   add-zsh-hook -D precmd '(_p9k_|powerlevel9k_)*'
   add-zsh-hook -D preexec '(_p9k_|powerlevel9k_)*'

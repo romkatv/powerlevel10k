@@ -20,17 +20,28 @@
 (( $+__p9k_root_dir )) || typeset -gr __p9k_root_dir=${POWERLEVEL9K_INSTALLATION_DIR:-${${(%):-%x}:A:h}}
 (( $+__p9k_intro )) || {
   # Note: leading spaces before `local` are important. Otherwise Antigen will remove `local` (!!!).
-  typeset -gr __p9k_intro='emulate -L zsh -o no_hist_expand -o extended_glob -o no_prompt_bang -o prompt_percent -o no_prompt_subst -o no_aliases -o no_bg_nice -o typeset_silent
-  local -a match mbegin mend reply
-  local -i MBEGIN MEND OPTIND
-  local MATCH REPLY OPTARG IFS=$'\'' \t\n\0'\''
-  [[ -z $__p9k_locale ]] || local LC_ALL=$__p9k_locale'
-  # The same as above but without `local -a reply` and `local REPLY`.
-  typeset -gr __p9k_intro_no_reply='emulate -L zsh -o no_hist_expand -o extended_glob -o no_prompt_bang -o prompt_percent -o no_prompt_subst -o no_aliases -o no_bg_nice -o typeset_silent
+  typeset -gr __p9k_intro_base='emulate -L zsh -o no_hist_expand -o extended_glob -o no_prompt_bang -o prompt_percent -o no_prompt_subst -o no_aliases -o no_bg_nice -o typeset_silent
   local -a match mbegin mend
   local -i MBEGIN MEND OPTIND
-  local REPLY OPTARG IFS=$'\'' \t\n\0'\''
-  [[ -z $__p9k_locale ]] || local LC_ALL=$__p9k_locale'
+  local MATCH OPTARG IFS=$'\'' \t\n\0'\'
+  typeset -gr __p9k_intro_locale='[[ $langinfo[CODESET] != (utf|UTF)(-|)8 ]] && _p9k_init_locale && { [[ -n $LC_ALL ]] && local LC_ALL=$__p9k_locale || local LC_CTYPE=$__p9k_locale }'
+  typeset -gr __p9k_intro_no_locale="${${__p9k_intro_base/ match / match reply }/ MATCH / MATCH REPLY }"
+  typeset -gr __p9k_intro_no_reply="$__p9k_intro_base; $__p9k_intro_locale"
+  typeset -gr __p9k_intro="$__p9k_intro_no_locale; $__p9k_intro_locale"
+}
+
+zmodload zsh/langinfo
+
+function _p9k_init_locale() {
+  if (( ! $+__p9k_locale )); then
+    typeset -g __p9k_locale=
+    (( $+commands[locale] )) || return
+    local -a loc
+    loc=(${(@M)$(locale -a 2>/dev/null):#*.(utf|UTF)(-|)8}) || return
+    (( $#loc )) || return
+    typeset -g __p9k_locale=${loc[(r)(#i)C.UTF(-|)8]:-${loc[(r)(#i)en_US.UTF(-|)8]:-$loc[1]}}
+  fi
+  [[ -n $__p9k_locale ]]
 }
 
 () {
@@ -43,7 +54,7 @@
   if [[ $__p9k_dump_file != $__p9k_instant_prompt_dump_file ]] && (( ! $+functions[_p9k_preinit] )) && source $__p9k_dump_file 2>/dev/null && (( $+functions[_p9k_preinit] )); then
     _p9k_preinit
   fi
-  typeset -gr __p9k_sourced=6
+  typeset -gr __p9k_sourced=7
   if [[ -w $__p9k_root_dir && -w $__p9k_root_dir/internal && -w $__p9k_root_dir/gitstatus ]]; then
     local f
     for f in $__p9k_root_dir/{powerlevel9k.zsh-theme,powerlevel10k.zsh-theme,internal/p10k.zsh,internal/icons.zsh,internal/configure.zsh,internal/worker.zsh,internal/parser.zsh,gitstatus/gitstatus.plugin.zsh}; do
