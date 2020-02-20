@@ -302,7 +302,7 @@ enable as many segments as you like. It won't slow down your prompt or Zsh start
 | `nix_shell` | [nix shell](https://nixos.org/nixos/nix-pills/developing-with-nix-shell.html) indicator |
 | `todo` | [todo](https://github.com/todotxt/todo.txt-cli) items |
 | `timewarrior` | [timewarrior](https://timewarrior.net/) tracking status |
-| `taskwarrior` | [taskwarrior](ttps://taskwarrior.org/) task count |
+| `taskwarrior` | [taskwarrior](https://taskwarrior.org/) task count |
 | `vpn_ip` | virtual private network indicator |
 | `ip` | IP address and bandwidth usage for a specified network interface |
 | `load` | CPU load |
