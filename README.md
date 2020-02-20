@@ -1055,7 +1055,7 @@ A more radical solution is to switch to prompt style without background. Type `p
 select *Lean*. This style has a modern lightweight look. As a bonus, it doesn't suffer from
 rendering imperfections that afflict powerline-style prompt.
 
-### zsh: character not in range
+### Error: character not in range
 
 Type `echo '\u276F'`. If you get an error saying "zsh: character not in range", your locale
 doesn't support UTF-8. You need to fix it. If you are running Zsh over SSH, see
@@ -1495,7 +1495,7 @@ There are a few mitigation options for this issue.
   - [Question mark in prompt](#question-mark-in-prompt)
   - [Icons, glyphs or powerline symbols don't render](#icons-glyphs-or-powerline-symbols-dont-render)
   - [Sub-pixel imperfections around powerline symbols](#sub-pixel-imperfections-around-powerline-symbols)
-  - [zsh: character not in range](#zsh-character-not-in-range)
+  - [Error: character not in range](#error-character-not-in-range)
   - [Cursor is in the wrong place](#cursor-is-in-the-wrong-place)
   - [Prompt wrapping around in a weird way](#prompt-wrapping-around-in-a-weird-way)
   - [Right prompt is in the wrong place](#right-prompt-is-in-the-wrong-place)
