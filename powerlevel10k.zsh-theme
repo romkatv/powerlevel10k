@@ -24,13 +24,13 @@
   local -a match mbegin mend reply
   local -i MBEGIN MEND OPTIND
   local MATCH REPLY OPTARG IFS=$'\'' \t\n\0'\''
-  [[ -z $_p9k__locale ]] || local LC_ALL=$_p9k__locale'
+  [[ -z $__p9k_locale ]] || local LC_ALL=$__p9k_locale'
   # The same as above but without `local -a reply` and `local REPLY`.
   typeset -gr __p9k_intro_no_reply='emulate -L zsh -o no_hist_expand -o extended_glob -o no_prompt_bang -o prompt_percent -o no_prompt_subst -o no_aliases -o no_bg_nice -o typeset_silent
   local -a match mbegin mend
   local -i MBEGIN MEND OPTIND
   local REPLY OPTARG IFS=$'\'' \t\n\0'\''
-  [[ -z $_p9k__locale ]] || local LC_ALL=$_p9k__locale'
+  [[ -z $__p9k_locale ]] || local LC_ALL=$__p9k_locale'
 }
 
 () {

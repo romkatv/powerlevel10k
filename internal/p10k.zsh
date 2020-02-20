@@ -5160,7 +5160,7 @@ _p9k_dump_instant_prompt() {
   local prompt_dir=${(q)prompt_dir}
   zmodload zsh/langinfo
   if [[ \${langinfo[CODESET]:-} != (utf|UTF)(-|)8 ]]; then
-    local lc=${(q)${${${_p9k__locale:-${(M)LC_CTYPE:#*.(utf|UTF)(-|)8}}:-${(M)LC_ALL:#*.(utf|UTF)(-|)8}}}:-${(M)LANG:#*.(utf|UTF)(-|)8}}
+    local lc=${(q)${${${__p9k_locale:-${(M)LC_CTYPE:#*.(utf|UTF)(-|)8}}:-${(M)LC_ALL:#*.(utf|UTF)(-|)8}}}:-${(M)LANG:#*.(utf|UTF)(-|)8}}
     local LC_ALL=\${lc:-\${\${(@M)\$(locale -a 2>/dev/null):#*.(utf|UTF)(-|)8}[1]:-en_US.UTF-8}}
   fi"
       >&$fd print -r -- '
@@ -5812,9 +5812,9 @@ _p9k_precmd_impl() {
 
   (( __p9k_enabled )) || return
 
-  if (( ! $+_p9k__locale )); then
+  if (( ! $+__p9k_locale )); then
     _p9k_init_locale
-    [[ -z $_p9k__locale ]] || local LC_ALL=$_p9k__locale
+    [[ -z $__p9k_locale ]] || local LC_ALL=$__p9k_locale
   fi
 
   if ! zle || [[ -z $_p9k__param_sig ]]; then
@@ -5962,9 +5962,9 @@ function _p9k_prompt_overflow_bug() {
 function _p9k_init_locale() {
   zmodload zsh/langinfo
   if [[ ${langinfo[CODESET]:-} != (utf|UTF)(-|)8 ]]; then
-    typeset -g _p9k__locale=${${(@M)$(locale -a):#*.(utf|UTF)(-|)8}[1]:-en_US.UTF-8}
+    typeset -g __p9k_locale=${${(@M)$(locale -a):#*.(utf|UTF)(-|)8}[1]:-en_US.UTF-8}
   else
-    typeset -g _p9k__locale=
+    typeset -g __p9k_locale=
   fi
 }
 
@@ -7030,7 +7030,7 @@ _p9k_must_init() {
     [[ $sig == $_p9k__param_sig ]] && return 1
     _p9k_deinit
   fi
-  _p9k__param_pat=$'v52\1'${ZSH_VERSION}$'\1'${ZSH_PATCHLEVEL}$'\1'
+  _p9k__param_pat=$'v53\1'${ZSH_VERSION}$'\1'${ZSH_PATCHLEVEL}$'\1'
   _p9k__param_pat+=$'${#parameters[(I)POWERLEVEL9K_*]}\1${(%):-%n%#}\1$GITSTATUS_LOG_LEVEL\1'
   _p9k__param_pat+=$'$GITSTATUS_ENABLE_LOGGING\1$GITSTATUS_DAEMON\1$GITSTATUS_NUM_THREADS\1'
   _p9k__param_pat+=$'$DEFAULT_USER\1${ZLE_RPROMPT_INDENT:-1}\1$P9K_SSH\1$__p9k_ksh_arrays'
@@ -7441,6 +7441,7 @@ _p9k_deinit() {
   (( $+_p9k__iterm2_precmd )) && functions[iterm2_precmd]=$_p9k__iterm2_precmd
   (( $+_p9k__iterm2_decorate_prompt )) && functions[iterm2_decorate_prompt]=$_p9k__iterm2_decorate_prompt
   unset -m '(_POWERLEVEL9K_|P9K_|_p9k_)*~(P9K_SSH|P9K_TTY)'
+  [[ -n $__p9k_locale ]] || unset __p9k_locale
 }
 
 typeset -gi __p9k_enabled=0
