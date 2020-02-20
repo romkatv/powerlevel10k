@@ -4583,7 +4583,9 @@ function _p9k_asdf_check_meta() {
   [[ -n $_p9k_asdf_meta_sig ]] || return
   [[ -z $^_p9k_asdf_meta_non_files(#qN) ]] || return
   local -a stat
-  zstat -A stat +mtime -- $_p9k_asdf_meta_files 2>/dev/null || return
+  if (( $#_p9k_asdf_meta_files )); then
+    zstat -A stat +mtime -- $_p9k_asdf_meta_files 2>/dev/null || return
+  fi
   [[ $_p9k_asdf_meta_sig == $ASDF_CONFIG_FILE$'\0'$ASDF_DATA_DIR$'\0'${(pj:\0:)stat} ]] || return
 }
 
@@ -4648,7 +4650,9 @@ function _p9k_asdf_init_meta() {
     _p9k_asdf_meta_non_files=(${files:|_p9k_asdf_meta_files})
 
     local -a stat
-    zstat -A stat +mtime -- $_p9k_asdf_meta_files 2>/dev/null || return
+    if (( $#_p9k_asdf_meta_files )); then
+      zstat -A stat +mtime -- $_p9k_asdf_meta_files 2>/dev/null || return
+    fi
     _p9k_asdf_meta_sig=$ASDF_CONFIG_FILE$'\0'$ASDF_DATA_DIR$'\0'${(pj:\0:)stat}
   } always {
     if (( $? == 0 )); then
