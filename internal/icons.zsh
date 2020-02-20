@@ -129,6 +129,7 @@ function _p9k_init_icons() {
         PERL_ICON                      'perl'
         NNN_ICON                       'nnn'
         TIMEWARRIOR_ICON               'tw'
+        TASKWARRIOR_ICON               'task'
         NIX_SHELL_ICON                 'nix'
         WIFI_ICON                      'WiFi'
         ERLANG_ICON                    'erl'
@@ -249,6 +250,7 @@ function _p9k_init_icons() {
         PERL_ICON                      'perl'
         NNN_ICON                       'nnn'
         TIMEWARRIOR_ICON               'tw'
+        TASKWARRIOR_ICON               'task'
         NIX_SHELL_ICON                 'nix'
         WIFI_ICON                      'WiFi'
         ERLANG_ICON                    'erl'
@@ -373,6 +375,7 @@ function _p9k_init_icons() {
         PERL_ICON                      'perl'
         NNN_ICON                       'nnn'
         TIMEWARRIOR_ICON               'tw'
+        TASKWARRIOR_ICON               'task'
         NIX_SHELL_ICON                 'nix'
         WIFI_ICON                      'WiFi'
         ERLANG_ICON                    'erl'
@@ -494,6 +497,7 @@ function _p9k_init_icons() {
         PERL_ICON                      '\uE769'               # 
         NNN_ICON                       'nnn'
         TIMEWARRIOR_ICON               '\uF49B'               # 
+        TASKWARRIOR_ICON               '\uF4A0 '              # 
         NIX_SHELL_ICON                 '\uF313 '              # 
         WIFI_ICON                      '\uF1EB '              # 
         ERLANG_ICON                    '\uE7B1 '              # 
@@ -614,6 +618,7 @@ function _p9k_init_icons() {
         PERL_ICON                      'perl'
         NNN_ICON                       'nnn'
         TIMEWARRIOR_ICON               'tw'
+        TASKWARRIOR_ICON               'task'
         NIX_SHELL_ICON                 'nix'
         WIFI_ICON                      'WiFi'
         ERLANG_ICON                    'erl'

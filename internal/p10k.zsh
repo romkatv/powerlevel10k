@@ -4478,6 +4478,113 @@ function _p9k_prompt_timewarrior_init() {
   typeset -g "_p9k__segment_cond_${_p9k__prompt_side}[_p9k__segment_index]"='$commands[timew]'
 }
 
+function _p9k_taskwarrior_check_meta() {
+  [[ -n $_p9k_taskwarrior_meta_sig ]] || return
+  [[ -z $^_p9k_taskwarrior_meta_non_files(#qN) ]] || return
+  local -a stat
+  if (( $#_p9k_taskwarrior_meta_files )); then
+    zstat -A stat +mtime -- $_p9k_taskwarrior_meta_files 2>/dev/null || return
+  fi
+  [[ $_p9k_taskwarrior_meta_sig == ${(pj:\0:)stat}$'\0'$TASKRC$'\0'$TASKDATA ]] || return
+}
+
+function _p9k_taskwarrior_init_meta() {
+  local last_sig=$_p9k_taskwarrior_meta_sig
+  {
+    local cfg
+    cfg="$(task show data.location </dev/null 2>/dev/null)" || return
+    local lines=(${(@M)${(f)cfg}:#data.location[[:space:]]##[^[:space:]]*})
+    (( $#lines == 1 )) || return
+    local dir=${lines[1]##data.location[[:space:]]#}
+    : ${dir::=$~dir}  # `task` can give us path with `~`` in it; expand it
+
+    local -a stat files=(${TASKRC:-~/.taskrc})
+    _p9k_taskwarrior_meta_files=($^files(N))
+    _p9k_taskwarrior_meta_non_files=(${files:|_p9k_taskwarrior_meta_files})
+    if (( $#_p9k_taskwarrior_meta_files )); then
+      zstat -A stat +mtime -- $_p9k_taskwarrior_meta_files 2>/dev/null || stat=(-1)
+    fi
+    _p9k_taskwarrior_meta_sig=${(pj:\0:)stat}$'\0'$TASKRC$'\0'$TASKDATA
+    _p9k_taskwarrior_data_dir=$dir
+  } always {
+    if (( $? == 0 )); then
+      _p9k__state_dump_scheduled=1
+      return
+    fi
+    [[ -n $last_sig ]] && _p9k__state_dump_scheduled=1
+    _p9k_taskwarrior_meta_files=()
+    _p9k_taskwarrior_meta_non_files=()
+    _p9k_taskwarrior_meta_sig=
+    _p9k_taskwarrior_data_dir=
+    _p9k__taskwarrior_functional=
+  }
+}
+
+function _p9k_taskwarrior_check_data() {
+  [[ -n $_p9k_taskwarrior_data_sig ]] || return
+  [[ -z $^_p9k_taskwarrior_data_non_files(#qN) ]] || return
+  local -a stat
+  if (( $#_p9k_taskwarrior_data_files )); then
+    zstat -A stat +mtime -- $_p9k_taskwarrior_data_files 2>/dev/null || return
+  fi
+  [[ $_p9k_taskwarrior_data_sig == ${(pj:\0:)stat}$'\0'$TASKRC$'\0'$TASKDATA ]] || return
+}
+
+function _p9k_taskwarrior_init_data() {
+  local -a stat files=($_p9k_taskwarrior_data_dir/{pending,completed}.data)
+  _p9k_taskwarrior_data_files=($^files(N))
+  _p9k_taskwarrior_data_non_files=(${files:|_p9k_taskwarrior_data_files})
+  if (( $#_p9k_taskwarrior_data_files )); then
+    zstat -A stat +mtime -- $_p9k_taskwarrior_data_files 2>/dev/null || stat=(-1)
+    _p9k_taskwarrior_data_sig=${(pj:\0:)stat}$'\0'
+  else
+    _p9k_taskwarrior_data_sig=
+  fi
+
+  _p9k_taskwarrior_data_files+=($_p9k_taskwarrior_meta_files)
+  _p9k_taskwarrior_data_non_files+=($_p9k_taskwarrior_meta_non_files)
+  _p9k_taskwarrior_data_sig+=$_p9k_taskwarrior_meta_sig
+
+  local name val
+  for name in PENDING OVERDUE; do
+    val="$(task +$name count </dev/null 2>/dev/null)" || continue
+    [[ $val == <1-> ]] || continue
+    _p9k_taskwarrior_counters[$name]=$val
+  done
+
+  _p9k__state_dump_scheduled=1
+}
+
+function prompt_taskwarrior() {
+  unset P9K_TASKWARRIOR_PENDING_COUNT P9K_TASKWARRIOR_OVERDUE_COUNT
+  if ! _p9k_taskwarrior_check_data; then
+    _p9k_taskwarrior_data_files=()
+    _p9k_taskwarrior_data_non_files=()
+    _p9k_taskwarrior_data_sig=
+    _p9k_taskwarrior_counters=()
+    _p9k_taskwarrior_check_meta || _p9k_taskwarrior_init_meta || return
+    _p9k_taskwarrior_init_data
+  fi
+  (( $#_p9k_taskwarrior_counters )) || return
+  local text c=$_p9k_taskwarrior_counters[OVERDUE]
+  if [[ -n $c ]]; then
+    typeset -g P9K_TASKWARRIOR_OVERDUE_COUNT=$c
+    text+="!$c"
+  fi
+  c=$_p9k_taskwarrior_counters[PENDING]
+  if [[ -n $c ]]; then
+    typeset -g P9K_TASKWARRIOR_PENDING_COUNT=$c
+    [[ -n $text ]] && text+='/'
+    text+=$c
+  fi
+  [[ -n $text ]] || return
+  _p9k_prompt_segment $0 6 $_p9k_color1 TASKWARRIOR_ICON 0 '' $text
+}
+
+function _p9k_prompt_taskwarrior_init() {
+  typeset -g "_p9k__segment_cond_${_p9k__prompt_side}[_p9k__segment_index]"='${commands[task]:+$_p9k__taskwarrior_functional}'
+}
+
 prompt_wifi() {
   local -i len=$#_p9k__prompt _p9k__has_upglob
   _p9k_prompt_segment $0 green $_p9k_color1 WIFI_ICON 1 '$_p9k__wifi_on' '$P9K_WIFI_LAST_TX_RATE Mbps'
@@ -5987,6 +6094,16 @@ typeset -g  _p9k__param_pat
 typeset -g  _p9k__param_sig
 
 _p9k_init_vars() {
+  typeset -ga _p9k_taskwarrior_meta_files
+  typeset -ga _p9k_taskwarrior_meta_non_files
+  typeset -g  _p9k_taskwarrior_meta_sig
+  typeset -g  _p9k_taskwarrior_data_dir
+  typeset -g  _p9k__taskwarrior_functional=1
+  typeset -ga _p9k_taskwarrior_data_files
+  typeset -ga _p9k_taskwarrior_data_non_files
+  typeset -g  _p9k_taskwarrior_data_sig
+  typeset -gA _p9k_taskwarrior_counters
+
   typeset -ga _p9k_asdf_meta_files
   typeset -ga _p9k_asdf_meta_non_files
   typeset -g  _p9k_asdf_meta_sig
@@ -7045,7 +7162,7 @@ _p9k_must_init() {
     [[ $sig == $_p9k__param_sig ]] && return 1
     _p9k_deinit
   fi
-  _p9k__param_pat=$'v54\1'${ZSH_VERSION}$'\1'${ZSH_PATCHLEVEL}$'\1'
+  _p9k__param_pat=$'v55\1'${ZSH_VERSION}$'\1'${ZSH_PATCHLEVEL}$'\1'
   _p9k__param_pat+=$'${#parameters[(I)POWERLEVEL9K_*]}\1${(%):-%n%#}\1$GITSTATUS_LOG_LEVEL\1'
   _p9k__param_pat+=$'$GITSTATUS_ENABLE_LOGGING\1$GITSTATUS_DAEMON\1$GITSTATUS_NUM_THREADS\1'
   _p9k__param_pat+=$'$DEFAULT_USER\1${ZLE_RPROMPT_INDENT:-1}\1$P9K_SSH\1$__p9k_ksh_arrays'
