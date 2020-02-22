@@ -1,9 +1,9 @@
 # invoked in worker: _p9k_worker_main <pgid>
 function _p9k_worker_main() {
-  mkfifo $_p9k__worker_file_prefix.fifo || return
-  echo -nE - s$_p9k_worker_pgid$'\x1e'  || return
-  exec 0<$_p9k__worker_file_prefix.fifo || return
-  zf_rm $_p9k__worker_file_prefix.fifo  || return
+  mkfifo -- $_p9k__worker_file_prefix.fifo || return
+  echo -nE - s$'\x1e'                      || return
+  exec <$_p9k__worker_file_prefix.fifo     || return
+  zf_rm -- $_p9k__worker_file_prefix.fifo  || return
 
   local -i reset
   local req fd
@@ -19,8 +19,7 @@ function _p9k_worker_main() {
   # usage: _p9k_worker_async <work> <callback>
   function _p9k_worker_async() {
     local fd async=$1
-    sysopen -r -o cloexec -u fd <(
-      () { eval $async; } && print -n '\x1e') || return
+    sysopen -r -o cloexec -u fd <(() { eval $async; } && print -n '\x1e') || return
     (( ++_p9k_worker_inflight[$_p9k_worker_request_id] ))
     _p9k_worker_fds[$fd]=$_p9k_worker_request_id$'\x1f'$2
   }
@@ -101,7 +100,7 @@ function _p9k_worker_stop() {
   [[ -n $_p9k__worker_resp_fd     ]] && exec {_p9k__worker_resp_fd}>&-
   [[ -n $_p9k__worker_req_fd      ]] && exec {_p9k__worker_req_fd}>&-
   [[ -n $_p9k__worker_pid         ]] && kill -- -$_p9k__worker_pid 2>/dev/null
-  [[ -n $_p9k__worker_file_prefix ]] && zf_rm -f $_p9k__worker_file_prefix.fifo
+  [[ -n $_p9k__worker_file_prefix ]] && zf_rm -f -- $_p9k__worker_file_prefix.fifo
   _p9k__worker_pid=
   _p9k__worker_req_fd=
   _p9k__worker_resp_fd=
@@ -147,9 +146,8 @@ function _p9k_worker_receive() {
           (( reset > max_reset )) && max_reset=reset
         ;;
         s)
-          [[ -z $_p9k__worker_pid ]]                                                  || return
-          [[ $arg == <1->        ]]                                                   || return
-          _p9k__worker_pid=$arg
+          [[ -z $_p9k__worker_req_fd ]]                                               || return
+          [[ -z $arg                 ]]                                               || return
           sysopen -w -o cloexec -u _p9k__worker_req_fd $_p9k__worker_file_prefix.fifo || return
           local req=
           for req in $_p9k__worker_request_map; do
@@ -199,6 +197,8 @@ function _p9k_worker_start() {
         kill -- -$_p9k_worker_pgid
       } &
       exec =true) || return
+    _p9k__worker_pid=$sysparams[procsubstpid]
+    [[ -n $_p9k__worker_pid ]] || return
     zle -F $_p9k__worker_resp_fd _p9k_worker_receive
     _p9k__worker_shell_pid=$sysparams[pid]
     add-zsh-hook zshexit _p9k_worker_cleanup
