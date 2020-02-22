@@ -459,8 +459,9 @@ function gitstatus_start() {
 
       {
         () {
-          [[ $sysparams[procsubstpid] == <1-> ]] || return
-          typeset -gi GITSTATUS_DAEMON_PID_$name="sysparams[procsubstpid]"
+          if [[ $sysparams[procsubstpid] == <1-> ]]; then
+            typeset -gi GITSTATUS_DAEMON_PID_$name="sysparams[procsubstpid]"
+          fi
           sysopen -r -o cloexec -u resp_fd -- $1 || return
           typeset -gi _GITSTATUS_RESP_FD_$name=resp_fd
         } <(
@@ -502,7 +503,7 @@ function gitstatus_start() {
               fi
 
               mkfifo -- $file_prefix.fifo || return
-              print -n 1                  || return
+              print -rn -- ${(l:20:)pgid} || return
               exec <$file_prefix.fifo     || return
               zf_rm -- $file_prefix.fifo  || return
 
@@ -530,10 +531,13 @@ function gitstatus_start() {
     if (( ! async )); then
       (( _GITSTATUS_CLIENT_PID_$name == sysparams[pid] )) || return
 
-      local ready
-      [[ -t $resp_fd ]]
-      sysread -s1 -t $timeout -i $resp_fd ready || return
-      [[ $ready == 1 ]] || return
+      local pgid
+      while (( $#pgid < 20 )); do
+        [[ -t $resp_fd ]]
+        sysread -s $((20 - $#pgid)) -t $timeout -i $resp_fd 'pgid[$#pgid+1]' || return
+      done
+      [[ $pgid == ' '#<1-> ]] || return
+      typeset -gi GITSTATUS_DAEMON_PID_$name=pgid
 
       sysopen -w -o cloexec -u req_fd -- $file_prefix.fifo || return
       typeset -gi _GITSTATUS_REQ_FD_$name=req_fd
@@ -567,7 +571,7 @@ function gitstatus_start() {
       local expected=$'hello\x1f0' actual
       while (( $#actual < $#expected )); do
         [[ -t $resp_fd ]]
-        sysread -s $(($#expected - $#actual)) -t $timeout -i $resp_fd actual || return
+        sysread -s $(($#expected - $#actual)) -t $timeout -i $resp_fd 'actual[$#actual+1]' || return
       done
       [[ $actual == $expected ]] || return
 
