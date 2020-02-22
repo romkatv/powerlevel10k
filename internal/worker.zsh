@@ -50,9 +50,12 @@ function _p9k_worker_main() {
         else
           local REPLY=
           while true; do
-            sysread -i $fd 'REPLY[$#REPLY+1]' && continue
-            (( $? == 5 ))                     || return
-            break
+            if sysread -i $fd 'REPLY[$#REPLY+1]'; then
+              [[ $REPLY == *$'\x1e' ]] || continue
+            else
+              (( $? == 5 ))            || return
+              break
+            fi
           done
           local cb=$_p9k_worker_fds[$fd]
           _p9k_worker_request_id=${cb%%$'\x1f'*}
