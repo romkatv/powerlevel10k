@@ -577,6 +577,7 @@ function gitstatus_start() {
 
       zf_rm -- $file_prefix.lock || return
       zsystem flock -u $lock_fd  || return
+      unset _GITSTATUS_LOCK_FD_$name
 
       typeset -gi _GITSTATUS_STATE_$name=2
     fi
@@ -661,7 +662,7 @@ function gitstatus_stop() {
   local req_fd_var=_GITSTATUS_REQ_FD_$name
   local resp_fd_var=_GITSTATUS_RESP_FD_$name
   local lock_fd_var=_GITSTATUS_LOCK_FD_$name
-  local client_pid_var=GITSTATUS_CLIENT_PID_$name
+  local client_pid_var=_GITSTATUS_CLIENT_PID_$name
   local daemon_pid_var=GITSTATUS_DAEMON_PID_$name
   local inflight_var=_GITSTATUS_NUM_INFLIGHT_$name
   local file_prefix_var=_GITSTATUS_FILE_PREFIX_$name
