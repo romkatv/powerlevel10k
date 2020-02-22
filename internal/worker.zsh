@@ -1,7 +1,7 @@
 # invoked in worker: _p9k_worker_main <pgid>
 function _p9k_worker_main() {
   mkfifo -- $_p9k__worker_file_prefix.fifo || return
-  echo -nE - s$'\x1e'                      || return
+  echo -nE - s$_p9k_worker_pgid$'\x1e'     || return
   exec <$_p9k__worker_file_prefix.fifo     || return
   zf_rm -- $_p9k__worker_file_prefix.fifo  || return
 
@@ -147,7 +147,8 @@ function _p9k_worker_receive() {
         ;;
         s)
           [[ -z $_p9k__worker_req_fd ]]                                               || return
-          [[ -z $arg                 ]]                                               || return
+          [[ $arg == <1->        ]]                                                   || return
+          _p9k__worker_pid=$arg
           sysopen -w -o cloexec -u _p9k__worker_req_fd $_p9k__worker_file_prefix.fifo || return
           local req=
           for req in $_p9k__worker_request_map; do
@@ -198,7 +199,6 @@ function _p9k_worker_start() {
       } &
       exec =true) || return
     _p9k__worker_pid=$sysparams[procsubstpid]
-    [[ -n $_p9k__worker_pid ]] || return
     zle -F $_p9k__worker_resp_fd _p9k_worker_receive
     _p9k__worker_shell_pid=$sysparams[pid]
     add-zsh-hook zshexit _p9k_worker_cleanup
