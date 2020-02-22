@@ -30,3 +30,5 @@
     emulate zsh -o prompt_percent -c 'print -P "%F{#ff0000}red%F{green}%B bold green"'
 - bug: open a new tab and hit ctrl-p. an empty line will appear before prompt.
 - zsh-syntax-highlighting added two precommands: chronic and ifne.
+- use this in wizard: https://wiki.bash-hackers.org/snipplets/screen_saverestore
+- use the same sysread pattern in worker.zsh as in gitstatus
