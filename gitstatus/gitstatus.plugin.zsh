@@ -685,7 +685,7 @@ function gitstatus_stop() {
   fi
 
   [[ -n $file_prefix ]] && zf_rm -f -- "$file_prefix.lock" "$file_prefix.fifo"
-  [[ -n $lock_fd     ]] && system flock -u $lock_fd
+  [[ -n $lock_fd     ]] && zsystem flock -u $lock_fd
   [[ -n $req_fd      ]] && exec {req_fd}>&-
   [[ -n $resp_fd     ]] && exec {resp_fd}>&-
 
