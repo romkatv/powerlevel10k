@@ -453,8 +453,12 @@ function gitstatus_start() {
     fi
 
     if (( ! _GITSTATUS_STATE_$name )); then
-      print -rn >$file_prefix.lock || return
-      zsystem flock -f lock_fd $file_prefix.lock || return
+      if [[ -r /proc/version && "$(</proc/version)" == *Microsoft* ]]; then
+        lock_fd=-1
+      else
+        print -rn >$file_prefix.lock || return
+        zsystem flock -f lock_fd $file_prefix.lock || return
+      fi
       typeset -gi _GITSTATUS_LOCK_FD_$name=lock_fd
 
       {
@@ -516,6 +520,8 @@ function gitstatus_start() {
             }
           } &!
 
+          (( lock_fd == -1 )) && return
+
           {
             if zsystem flock -- $file_prefix.lock && [[ -e $file_prefix.lock ]]; then
               zf_rm -f -- $file_prefix.lock $file_prefix.fifo
@@ -575,8 +581,10 @@ function gitstatus_start() {
       done
       [[ $actual == $expected ]] || return
 
-      zf_rm -- $file_prefix.lock || return
-      zsystem flock -u $lock_fd  || return
+      if (( lock_fd != -1 )); then
+        zf_rm -- $file_prefix.lock || return
+        zsystem flock -u $lock_fd  || return
+      fi
       unset _GITSTATUS_LOCK_FD_$name
 
       typeset -gi _GITSTATUS_STATE_$name=2
@@ -690,7 +698,7 @@ function gitstatus_stop() {
   fi
 
   [[ -n $file_prefix ]] && zf_rm -f -- "$file_prefix.lock" "$file_prefix.fifo"
-  [[ -n $lock_fd     ]] && zsystem flock -u $lock_fd
+  [[ -n $lock_fd     ]] && (( lock_fd != -1 )) && zsystem flock -u $lock_fd
   [[ -n $req_fd      ]] && exec {req_fd}>&-
   [[ -n $resp_fd     ]] && exec {resp_fd}>&-
 
