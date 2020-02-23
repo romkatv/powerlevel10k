@@ -7362,7 +7362,7 @@ _p9k_init_vcs() {
   _p9k_segment_in_use vcs || return
   _p9k_vcs_info_init
   if (( $+functions[_p9k_preinit] )); then
-    (( $+_GITSTATUS_STATE_POWERLEVEL9K )) && gitstatus_start POWERLEVEL9K || _p9k__gitstatus_disabled=1
+    (( $+GITSTATUS_DAEMON_PID_POWERLEVEL9K )) && gitstatus_start POWERLEVEL9K || _p9k__gitstatus_disabled=1
     return 0
   fi
   if (( _POWERLEVEL9K_DISABLE_GITSTATUS )); then
@@ -7372,11 +7372,14 @@ _p9k_init_vcs() {
   (( $_POWERLEVEL9K_VCS_BACKENDS[(I)git] )) || return
 
   local gitstatus_dir=${_POWERLEVEL9K_GITSTATUS_DIR:-${__p9k_root_dir}/gitstatus}
-  if [[ -z $GITSTATUS_DAEMON && $_p9k_uname_m == (i686|arm7l) && -z $gitstatus_dir/bin/*-$_p9k_uname_m(-static|)(#qN) ]]; then
+
+  local id=${(L)${${(M)_p9k_uname_o:#Android}:-$_p9k_uname}}-${(L)_p9k_uname_m}
+  if [[ -z $GITSTATUS_DAEMON && $id == (android-arm7l|*-i686) &&
+        -z $gitstatus_dir/bin/(usrbin|bin)/*-$id(|-static)(#qN) ]]; then
     _p9k__gitstatus_disabled=1
     >&2 echo -E - "${(%):-[%1FERROR%f]: %BPowerlevel10k%b is unable to use %Bgitstatus%b. Git prompt will be slow.}"
     >&2 echo -E - ""
-    >&2 echo -E - "${(%):-Reason: There is no %Bgitstatusd%b binary for $_p9k_uname_m (32-bit architecture).}"
+    >&2 echo -E - "${(%):-Reason: There is no %Bgitstatusd%b binary for %B${id//\%/%%}%b (32-bit).}"
     >&2 echo -E - ""
     >&2 echo -E - "${(%):-You can:}"
     >&2 echo -E - ""
@@ -7407,49 +7410,30 @@ _p9k_init_vcs() {
     return 0
   fi
 
-  local daemon=${GITSTATUS_DAEMON}
-  if [[ -z $daemon ]]; then
-    daemon=$gitstatus_dir/bin/gitstatusd-
-    if [[ $_p9k_uname_o == Android ]]; then
-      daemon+=android
-    elif [[ $_p9k_uname == (#i)(mingw|msys)* ]]; then
-      daemon+=msys_nt-10.0
-    elif [[ $_p9k_uname == (#i)cygwin_nt* ]]; then
-      daemon+=cygwin_nt-10.0
-    else
-      daemon+=${_p9k_uname:l}
-    fi
-    daemon+=-${_p9k_uname_m:l}
-  fi
-  local -i threads=${GITSTATUS_NUM_THREADS:-0}
-  if (( threads <= 0 )); then
-    threads=$(( _p9k_num_cpus * 2 ))
-    (( threads > 0 )) || threads=8
-    (( threads <= 32 )) || threads=32
-  fi
   typeset -g _p9k_preinit="function _p9k_preinit() {
     [[ \$ZSH_VERSION == ${(q)ZSH_VERSION} ]]          || return
     [[ -r ${(q)gitstatus_dir}/gitstatus.plugin.zsh ]] || return
     source ${(q)gitstatus_dir}/gitstatus.plugin.zsh   || return
-    GITSTATUS_DAEMON=${(q)daemon} GITSTATUS_NUM_THREADS=$threads              \
-      GITSTATUS_LOG_LEVEL=${(q)GITSTATUS_LOG_LEVEL}                           \
-      GITSTATUS_ENABLE_LOGGING=${(q)GITSTATUS_ENABLE_LOGGING} gitstatus_start \
-        -s $_POWERLEVEL9K_VCS_STAGED_MAX_NUM                                  \
-        -u $_POWERLEVEL9K_VCS_UNSTAGED_MAX_NUM                                \
-        -d $_POWERLEVEL9K_VCS_UNTRACKED_MAX_NUM                               \
-        -c $_POWERLEVEL9K_VCS_CONFLICTED_MAX_NUM                              \
-        -m $_POWERLEVEL9K_VCS_MAX_INDEX_SIZE_DIRTY                            \
-        ${${_POWERLEVEL9K_VCS_RECURSE_UNTRACKED_DIRS:#0}:+-e}                 \
-        -a POWERLEVEL9K
+    GITSTATUS_DAEMON=${(q)GITSTATUS_DAEMON}                     \
+      GITSTATUS_NUM_THREADS=${(q)GITSTATUS_NUM_THREADS}         \
+      GITSTATUS_LOG_LEVEL=${(q)GITSTATUS_LOG_LEVEL}             \
+      GITSTATUS_ENABLE_LOGGING=${(q)GITSTATUS_ENABLE_LOGGING}   \
+        gitstatus_start                                         \
+          -s $_POWERLEVEL9K_VCS_STAGED_MAX_NUM                  \
+          -u $_POWERLEVEL9K_VCS_UNSTAGED_MAX_NUM                \
+          -d $_POWERLEVEL9K_VCS_UNTRACKED_MAX_NUM               \
+          -c $_POWERLEVEL9K_VCS_CONFLICTED_MAX_NUM              \
+          -m $_POWERLEVEL9K_VCS_MAX_INDEX_SIZE_DIRTY            \
+          ${${_POWERLEVEL9K_VCS_RECURSE_UNTRACKED_DIRS:#0}:+-e} \
+          -a POWERLEVEL9K
   }"
-  source ${gitstatus_dir}/gitstatus.plugin.zsh
-  GITSTATUS_DAEMON=$daemon GITSTATUS_NUM_THREADS=$threads gitstatus_start \
-    -s $_POWERLEVEL9K_VCS_STAGED_MAX_NUM                                  \
-    -u $_POWERLEVEL9K_VCS_UNSTAGED_MAX_NUM                                \
-    -d $_POWERLEVEL9K_VCS_UNTRACKED_MAX_NUM                               \
-    -c $_POWERLEVEL9K_VCS_CONFLICTED_MAX_NUM                              \
-    -m $_POWERLEVEL9K_VCS_MAX_INDEX_SIZE_DIRTY                            \
-    ${${_POWERLEVEL9K_VCS_RECURSE_UNTRACKED_DIRS:#0}:+-e}                 \
+  source $gitstatus_dir/gitstatus.plugin.zsh && gitstatus_start \
+    -s $_POWERLEVEL9K_VCS_STAGED_MAX_NUM                        \
+    -u $_POWERLEVEL9K_VCS_UNSTAGED_MAX_NUM                      \
+    -d $_POWERLEVEL9K_VCS_UNTRACKED_MAX_NUM                     \
+    -c $_POWERLEVEL9K_VCS_CONFLICTED_MAX_NUM                    \
+    -m $_POWERLEVEL9K_VCS_MAX_INDEX_SIZE_DIRTY                  \
+    ${${_POWERLEVEL9K_VCS_RECURSE_UNTRACKED_DIRS:#0}:+-e}       \
     POWERLEVEL9K || _p9k__gitstatus_disabled=1
 }
 
