@@ -5015,15 +5015,14 @@ function _p9k_prompt_net_iface_async() {
   fi
   if _p9k_prompt_net_iface_match $_POWERLEVEL9K_IP_INTERFACE; then
     local ip_ip=$ip ip_interface=$iface ip_timestamp=$EPOCHREALTIME
-    local ip_tx_bytes=0 ip_rx_bytes=0 ip_tx_rate='0 B/s' ip_rx_rate='0 B/s'
+    local ip_tx_bytes ip_rx_bytes ip_tx_rate ip_rx_rate
     if [[ $_p9k_os == (Linux|Android) ]]; then
-      if [[ -r /sys/class/net/$iface/statistics/rx_bytes ]] &&
-         _p9k_read_file /sys/class/net/$iface/statistics/rx_bytes; then
-        ip_rx_bytes=$_p9k__ret
-      fi
-      if [[ -r /sys/class/net/$iface/statistics/tx_bytes ]] &&
-         _p9k_read_file /sys/class/net/$iface/statistics/tx_bytes; then
-        ip_tx_bytes=$_p9k__ret
+      if [[ -r /sys/class/net/$iface/statistics/tx_bytes &&
+            -r /sys/class/net/$iface/statistics/rx_bytes ]]; then
+        _p9k_read_file /sys/class/net/$iface/statistics/tx_bytes &&
+          [[ $_p9k__ret == <-> ]] && ip_tx_bytes=$_p9k__ret &&
+        _p9k_read_file /sys/class/net/$iface/statistics/rx_bytes &&
+          [[ $_p9k__ret == <-> ]] && ip_rx_bytes=$_p9k__ret || { ip_tx_bytes=; ip_rx_bytes=; }
       fi
     elif [[ $_p9k_os == (BSD|OSX) && $+commands[netstat] == 1 ]]; then
       local -a lines
@@ -5031,22 +5030,31 @@ function _p9k_prompt_net_iface_async() {
         local header=($=lines[1])
         local -i rx_idx=$header[(Ie)Ibytes]
         local -i tx_idx=$header[(Ie)Obytes]
-        for line in ${lines:1}; do
-          (( ip_rx_bytes += ${line[(w)rx_idx]} ))
-          (( ip_tx_bytes += ${line[(w)tx_idx]} ))
-        done
+        if (( rx_idx && tx_idx )); then
+          ip_tx_bytes=0
+          ip_rx_bytes=0
+          for line in ${lines:1}; do
+            (( ip_rx_bytes += ${line[(w)rx_idx]} ))
+            (( ip_tx_bytes += ${line[(w)tx_idx]} ))
+          done
+        fi
       fi
     fi
-    if [[ $ip_ip == $P9K_IP_IP && $iface == $P9K_IP_INTERFACE ]]; then
-      local -F t='ip_timestamp - _p9__ip_timestamp'
-      if (( t <= 0 )); then
-        ip_tx_rate=$P9K_IP_TX_RATE
-        ip_rx_rate=$P9K_IP_RX_RATE
+    if [[ -n $ip_rx_bytes ]]; then
+      if [[ $ip_ip == $P9K_IP_IP && $iface == $P9K_IP_INTERFACE ]]; then
+        local -F t='ip_timestamp - _p9__ip_timestamp'
+        if (( t <= 0 )); then
+          ip_tx_rate=${P9K_IP_TX_RATE:-0 B/s}
+          ip_rx_rate=${P9K_IP_RX_RATE:-0 B/s}
+        else
+          _p9k_human_readable_bytes $(((ip_tx_bytes - P9K_IP_TX_BYTES) / t))
+          [[ $_p9k__ret == *B ]] && ip_tx_rate="$_p9k__ret[1,-2] B/s" || ip_tx_rate="$_p9k__ret[1,-2] $_p9k__ret[-1]iB/s"
+          _p9k_human_readable_bytes $(((ip_rx_bytes - P9K_IP_RX_BYTES) / t))
+          [[ $_p9k__ret == *B ]] && ip_rx_rate="$_p9k__ret[1,-2] B/s" || ip_rx_rate="$_p9k__ret[1,-2] $_p9k__ret[-1]iB/s"
+        fi
       else
-        _p9k_human_readable_bytes $(((ip_tx_bytes - P9K_IP_TX_BYTES) / t))
-        [[ $_p9k__ret == *B ]] && ip_tx_rate="$_p9k__ret[1,-2] B/s" || ip_tx_rate="$_p9k__ret[1,-2] $_p9k__ret[-1]iB/s"
-        _p9k_human_readable_bytes $(((ip_rx_bytes - P9K_IP_RX_BYTES) / t))
-        [[ $_p9k__ret == *B ]] && ip_rx_rate="$_p9k__ret[1,-2] B/s" || ip_rx_rate="$_p9k__ret[1,-2] $_p9k__ret[-1]iB/s"
+        ip_tx_rate='0 B/s'
+        ip_rx_rate='0 B/s'
       fi
     fi
   else
