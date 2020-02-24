@@ -6042,6 +6042,7 @@ _p9k_precmd_impl() {
   _p9k_fetch_cwd
 
   _p9k__refresh_reason=precmd
+  __p9k_reset_state=1
 
   if (( _p9k_vcs_index && $+GITSTATUS_DAEMON_PID_POWERLEVEL9K )); then
     unset _p9k__vcs
@@ -6084,6 +6085,7 @@ _p9k_precmd_impl() {
   fi
 
   _p9k_worker_receive
+  __p9k_reset_state=0
 }
 
 _p9k_trapint() {
@@ -6109,14 +6111,19 @@ _p9k_precmd() {
 }
 
 function _p9k_reset_prompt() {
-  if zle && [[ -z $_p9k__line_finished ]]; then
+  if (( __p9k_reset_state != 1 )) && zle && [[ -z $_p9k__line_finished ]]; then
+    __p9k_reset_state=0
     setopt prompt_subst
     (( __p9k_ksh_arrays )) && setopt ksh_arrays
     (( __p9k_sh_glob )) && setopt sh_glob
     (( _p9k__can_hide_cursor )) && echoti civis
-    zle .reset-prompt
-    zle -R
-    (( _p9k__can_hide_cursor )) && echoti cnorm
+    {
+      zle .reset-prompt
+      zle -R
+    } always {
+      (( _p9k__can_hide_cursor )) && echoti cnorm
+      _p9k__cursor_hidden=0
+    }
   fi
 }
 
@@ -6743,7 +6750,6 @@ function _p9k_on_widget_zle-line-finish() {
       echo -nE - $hide$'\n'$termcap[up]
     fi
     _p9k_reset_prompt
-    __p9k_reset_state=0
   fi
 
   _p9k__line_finished='%{%}'
@@ -7968,7 +7974,6 @@ function p10k() {
       done
       if (( __p9k_reset_state == -1 )); then
         _p9k_reset_prompt
-        __p9k_reset_state=0
       fi
       ;;
     configure)

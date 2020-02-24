@@ -708,7 +708,7 @@ Zsh but it won't do anything.
 When using Lean, Classic or Rainbow style, Git status may look like this:
 
 ```text
-feature:master ⇣42⇡42 *42 merge ~42 +42 !42 ?42
+feature:master ⇣42⇡42 ⇠42⇢42 *42 merge ~42 +42 !42 ?42
 ```
 
 | Symbol    | Meaning                                                              | Source                                                 |
