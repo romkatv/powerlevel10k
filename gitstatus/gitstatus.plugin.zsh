@@ -65,9 +65,9 @@ typeset -g _gitstatus_plugin_dir=${${(%):-%x}:A:h}
 #             is set.
 #   -c STR    Callback function to call once the results are available. Called only after
 #             gitstatus_query returns 0 with VCS_STATUS_RESULT=tout.
-#   -t FLOAT  Timeout in seconds. Will block for at most this long. If no results are
-#             available by then: if -c isn't specified, will return 1; otherwise will set
-#             VCS_STATUS_RESULT=tout and return 0.
+#   -t FLOAT  Timeout in seconds. Negative value means infinity. Will block for at most this long.
+#             If no results are available by then: if -c isn't specified, will return 1; otherwise
+#             will set VCS_STATUS_RESULT=tout and return 0.
 #   -p        Don't compute anything that requires reading Git index. If this option is used,
 #             the following parameters will be 0: VCS_STATUS_INDEX_SIZE,
 #             VCS_STATUS_{NUM,HAS}_{STAGED,UNSTAGED,UNTRACKED,CONFLICTED}.
@@ -78,7 +78,7 @@ typeset -g _gitstatus_plugin_dir=${${(%):-%x}:A:h}
 #   norepo-sync  The directory isn't a git repo.
 #   ok-sync      The directory is a git repo.
 #
-# When the callback is called VCS_STATUS_RESULT is set to one of the following values:
+# When the callback is called, VCS_STATUS_RESULT is set to one of the following values:
 #
 #   norepo-async  The directory isn't a git repo.
 #   ok-async      The directory is a git repo.
@@ -153,7 +153,7 @@ function gitstatus_query() {
       d)  dir=$OPTARG;;
       c)  callback=$OPTARG;;
       t)
-        if [[ $OPTARG != (|+)<->(|.<->)(|[eE](|-|+)<->) ]]; then
+        if [[ $OPTARG != (|+|-)<->(|.<->)(|[eE](|-|+)<->) ]]; then
           print -ru2 -- "gitstatus_query: invalid -t argument: $OPTARG"
           return 1
         fi
@@ -203,6 +203,18 @@ function gitstatus_query() {
   [[ $VCS_STATUS_RESULT != tout || -n $callback ]]
 }
 
+# If the last call to gitstatus_query timed out (VCS_STATUS_RESULT=tout), wait for the callback
+# to be called. Otherwise do nothing.
+#
+# Usage: gitstatus_process_results [OPTION]... NAME
+#
+#   -t FLOAT  Timeout in seconds. Negative value means infinity. Will block for at most this long.
+#
+# Returns an error only when invoked with incorrect arguments and when gitstatusd isn't running or
+# broken.
+#
+# If a callback gets called, VCS_STATUS_* parameters are set as in gitstatus_query.
+# VCS_STATUS_RESULT is either norepo-async or ok-async.
 function gitstatus_process_results() {
   emulate -L zsh -o no_aliases -o extended_glob -o typeset_silent
   local opt OPTARG
@@ -211,7 +223,7 @@ function gitstatus_process_results() {
   while getopts ":t:" opt; do
     case $opt in
       t)
-        if [[ $OPTARG != (|+)<->(|.<->)(|[eE](|-|+)<->) ]]; then
+        if [[ $OPTARG != (|+|-)<->(|.<->)(|[eE](|-|+)<->) ]]; then
           print -ru2 -- "gitstatus_process_results: invalid -t argument: $OPTARG"
           return 1
         fi
