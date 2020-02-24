@@ -3687,9 +3687,16 @@ function _p9k_vcs_resume() {
     fi
   fi
 
-  _p9k__refresh_reason=gitstatus
-  _p9k_set_prompt
-  _p9k__refresh_reason=''
+  if (( _p9k_vcs_index && $+GITSTATUS_DAEMON_PID_POWERLEVEL9K )); then
+    local _p9k__prompt _p9k__prompt_side=$_p9k_vcs_side
+    local -i _p9k__has_upglob _p9k__segment_index=_p9k_vcs_index
+    _p9k_vcs_render
+    typeset -g _p9k__vcs=$_p9k__prompt
+  else
+    _p9k__refresh_reason=gitstatus
+    _p9k_set_prompt
+    _p9k__refresh_reason=''
+  fi
   _p9k_reset_prompt
 }
 
@@ -3724,6 +3731,16 @@ function _p9k_vcs_gitstatus() {
       fi
       (( _p9k__prompt_idx == 1 )) && timeout=0
       _p9k__git_dir=$GIT_DIR
+      if (( _p9k_vcs_index && $+GITSTATUS_DAEMON_PID_POWERLEVEL9K )); then
+        if ! gitstatus_query -d $_p9k__cwd_a -t 0 -c '_p9k_vcs_resume 1' POWERLEVEL9K; then
+          unset VCS_STATUS_RESULT
+          return 1
+        fi
+        _p9k__gitstatus_next_dir=''
+        _p9k__gitstatus_start_time=$EPOCHREALTIME
+        typeset -g _p9k__vcs=
+        return 0
+      fi
       if ! gitstatus_query -d $_p9k__cwd_a -t $timeout -c '_p9k_vcs_resume 1' POWERLEVEL9K; then
         unset VCS_STATUS_RESULT
         return 1
@@ -3743,8 +3760,13 @@ function _p9k_vcs_gitstatus() {
 # Segment to show VCS information
 
 prompt_vcs() {
+  if (( _p9k_vcs_index && $+GITSTATUS_DAEMON_PID_POWERLEVEL9K )); then
+    _p9k__prompt+='${(e)_p9k__vcs}'
+    return
+  fi
+
   local -a backends=($_POWERLEVEL9K_VCS_BACKENDS)
-  if (( ${backends[(I)git]} && !_p9k__gitstatus_disabled )) && _p9k_vcs_gitstatus; then
+  if (( ${backends[(I)git]} && $+GITSTATUS_DAEMON_PID_POWERLEVEL9K )) && _p9k_vcs_gitstatus; then
     _p9k_vcs_render && return
     backends=(${backends:#git})
   fi
@@ -5079,6 +5101,8 @@ function _p9k_set_prompt() {
   [[ $1 == instant_ ]] || PROMPT+='${$((_p9k_on_expand()))+}'
   PROMPT+=$_p9k_prompt_prefix_left
 
+  local -i _p9k__has_upglob
+
   local -i left_idx=1 right_idx=1 num_lines=$#_p9k_line_segments_left
   for _p9k__line_index in {1..$num_lines}; do
     local right=
@@ -6017,6 +6041,13 @@ _p9k_precmd_impl() {
 
   _p9k_fetch_cwd
 
+  _p9k__refresh_reason=precmd
+
+  if (( _p9k_vcs_index && $+GITSTATUS_DAEMON_PID_POWERLEVEL9K )); then
+    unset _p9k__vcs
+    _p9k_vcs_gitstatus
+  fi
+
   local f_compute
   for f_compute in "${_p9k__async_segments_compute[@]}"; do
     _p9k_worker_invoke ${f_compute%% *} ${(e)f_compute}
@@ -6024,8 +6055,8 @@ _p9k_precmd_impl() {
 
   _p9k__expanded=0
 
-  _p9k__refresh_reason=precmd
   _p9k_set_prompt
+
   _p9k__refresh_reason=''
 
   if [[ $precmd_functions[1] != _p9k_do_nothing && $precmd_functions[(I)_p9k_do_nothing] != 0 ]]; then
@@ -6039,6 +6070,17 @@ _p9k_precmd_impl() {
   fi
   if [[ $preexec_functions[-1] != _p9k_preexec2 && $preexec_functions[(I)_p9k_preexec2] != 0 ]]; then
     preexec_functions=(${(@)preexec_functions:#_p9k_preexec2} _p9k_preexec2)
+  fi
+
+  if (( _p9k_vcs_index && $+GITSTATUS_DAEMON_PID_POWERLEVEL9K )); then
+    # TODO: use better timeout
+    gitstatus_process_results -t $_POWERLEVEL9K_VCS_MAX_SYNC_LATENCY_SECONDS POWERLEVEL9K
+    if (( ! $+_p9k__vcs )); then
+      local _p9k__prompt _p9k__prompt_side=$_p9k_vcs_side
+      local -i _p9k__has_upglob _p9k__segment_index=_p9k_vcs_index
+      _p9k_vcs_render
+      typeset -g _p9k__vcs=$_p9k__prompt
+    fi
   fi
 
   _p9k_worker_receive
@@ -6098,6 +6140,9 @@ typeset -g  _p9k__param_pat
 typeset -g  _p9k__param_sig
 
 _p9k_init_vars() {
+  typeset -gi _p9k_vcs_index
+  typeset -g  _p9k_vcs_side
+
   typeset -ga _p9k_taskwarrior_meta_files
   typeset -ga _p9k_taskwarrior_meta_non_files
   typeset -g  _p9k_taskwarrior_meta_sig
@@ -6216,7 +6261,6 @@ _p9k_init_vars() {
   typeset -gA _p9k_git_slow
   # git workdir => the last state we've seen for it
   typeset -gA _p9k__gitstatus_last
-  typeset -gi _p9k__gitstatus_disabled
   typeset -gF _p9k__gitstatus_start_time
   typeset -g  _p9k__prompt
   typeset -g  _p9k__rprompt
@@ -7166,7 +7210,7 @@ _p9k_must_init() {
     [[ $sig == $_p9k__param_sig ]] && return 1
     _p9k_deinit
   fi
-  _p9k__param_pat=$'v56\1'${ZSH_VERSION}$'\1'${ZSH_PATCHLEVEL}$'\1'
+  _p9k__param_pat=$'v57\1'${ZSH_VERSION}$'\1'${ZSH_PATCHLEVEL}$'\1'
   _p9k__param_pat+=$'${#parameters[(I)POWERLEVEL9K_*]}\1${(%):-%n%#}\1$GITSTATUS_LOG_LEVEL\1'
   _p9k__param_pat+=$'$GITSTATUS_ENABLE_LOGGING\1$GITSTATUS_DAEMON\1$GITSTATUS_NUM_THREADS\1'
   _p9k__param_pat+=$'$DEFAULT_USER\1${ZLE_RPROMPT_INDENT:-1}\1$P9K_SSH\1$__p9k_ksh_arrays'
@@ -7356,19 +7400,62 @@ function _p9k_init_cacheable() {
       done
     fi
   fi
+
+  if [[ $#_POWERLEVEL9K_VCS_BACKENDS == 1 && $_POWERLEVEL9K_VCS_BACKENDS[1] == git ]]; then
+    local elem line
+    local -i i=0
+    for line in $_p9k_line_segments_left; do
+      for elem in ${${(0)line}%_joined}; do
+        (( ++i ))
+        if [[ $elem == vcs ]]; then
+          if (( _p9k_vcs_index )); then
+            _p9k_vcs_index=-1
+          else
+            _p9k_vcs_index=i
+            _p9k_vcs_side=left
+          fi
+        fi
+      done
+    done
+    i=0
+    for line in $_p9k_line_segments_right; do
+      for elem in ${${(0)line}%_joined}; do
+        (( ++i ))
+        if [[ $elem == vcs ]]; then
+          if (( _p9k_vcs_index )); then
+            _p9k_vcs_index=-1
+          else
+            _p9k_vcs_index=i
+            _p9k_vcs_side=right
+          fi
+        fi
+      done
+    done
+    if (( _p9k_vcs_index > 0 )); then
+      local state
+      for state in ${(k)__p9k_vcs_states}; do
+        _p9k_param prompt_vcs_$state CONTENT_EXPANSION x
+        if [[ -z $_p9k__ret ]]; then
+          _p9k_vcs_index=-1
+          break
+        fi
+      done
+    fi
+    if (( _p9k_vcs_index == -1 )); then
+      _p9k_vcs_index=0
+      _p9k_vcs_side=
+    fi
+  fi
 }
 
 _p9k_init_vcs() {
   _p9k_segment_in_use vcs || return
   _p9k_vcs_info_init
   if (( $+functions[_p9k_preinit] )); then
-    (( $+GITSTATUS_DAEMON_PID_POWERLEVEL9K )) && gitstatus_start POWERLEVEL9K || _p9k__gitstatus_disabled=1
+    (( $+GITSTATUS_DAEMON_PID_POWERLEVEL9K )) && gitstatus_start POWERLEVEL9K
     return 0
   fi
-  if (( _POWERLEVEL9K_DISABLE_GITSTATUS )); then
-    _p9k__gitstatus_disabled=1
-    return 0
-  fi
+  (( _POWERLEVEL9K_DISABLE_GITSTATUS )) && return
   (( $_POWERLEVEL9K_VCS_BACKENDS[(I)git] )) || return
 
   local gitstatus_dir=${_POWERLEVEL9K_GITSTATUS_DIR:-${__p9k_root_dir}/gitstatus}
@@ -7376,7 +7463,6 @@ _p9k_init_vcs() {
   local id=${(L)${${(M)_p9k_uname_o:#Android}:-$_p9k_uname}}-${(L)_p9k_uname_m}
   if [[ -z $GITSTATUS_DAEMON && $id == (android-arm7l|*-i686) &&
         -z $gitstatus_dir/bin/(usrbin|bin)/*-$id(|-static)(#qN) ]]; then
-    _p9k__gitstatus_disabled=1
     >&2 echo -E - "${(%):-[%1FERROR%f]: %BPowerlevel10k%b is unable to use %Bgitstatus%b. Git prompt will be slow.}"
     >&2 echo -E - ""
     >&2 echo -E - "${(%):-Reason: There is no %Bgitstatusd%b binary for %B${id//\%/%%}%b (32-bit).}"
@@ -7434,7 +7520,7 @@ _p9k_init_vcs() {
     -c $_POWERLEVEL9K_VCS_CONFLICTED_MAX_NUM                    \
     -m $_POWERLEVEL9K_VCS_MAX_INDEX_SIZE_DIRTY                  \
     ${${_POWERLEVEL9K_VCS_RECURSE_UNTRACKED_DIRS:#0}:+-e}       \
-    POWERLEVEL9K || _p9k__gitstatus_disabled=1
+    POWERLEVEL9K
 }
 
 _p9k_init() {
