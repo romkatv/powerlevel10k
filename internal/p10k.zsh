@@ -3736,9 +3736,9 @@ function _p9k_vcs_gitstatus() {
           unset VCS_STATUS_RESULT
           return 1
         fi
+        typeset -gF _p9k__vcs_timeout=timeout
         _p9k__gitstatus_next_dir=''
         _p9k__gitstatus_start_time=$EPOCHREALTIME
-        typeset -g _p9k__vcs=
         return 0
       fi
       if ! gitstatus_query -d $_p9k__cwd_a -t $timeout -c '_p9k_vcs_resume 1' POWERLEVEL9K; then
@@ -6045,7 +6045,9 @@ _p9k_precmd_impl() {
   __p9k_reset_state=1
 
   if (( _p9k_vcs_index && $+GITSTATUS_DAEMON_PID_POWERLEVEL9K )); then
+    local -F start_time=EPOCHREALTIME
     unset _p9k__vcs
+    unset _p9k__vcs_timeout
     _p9k_vcs_gitstatus
   fi
 
@@ -6074,8 +6076,11 @@ _p9k_precmd_impl() {
   fi
 
   if (( _p9k_vcs_index && $+GITSTATUS_DAEMON_PID_POWERLEVEL9K )); then
-    # TODO: use better timeout
-    gitstatus_process_results -t $_POWERLEVEL9K_VCS_MAX_SYNC_LATENCY_SECONDS POWERLEVEL9K
+    if (( $+_p9k__vcs_timeout )); then
+      (( _p9k__vcs_timeout = _POWERLEVEL9K_VCS_MAX_SYNC_LATENCY_SECONDS + start_time - EPOCHREALTIME ))
+      (( _p9k__vcs_timeout >= 0 )) || (( _p9k__vcs_timeout = 0 ))
+      gitstatus_process_results -t $_p9k__vcs_timeout POWERLEVEL9K
+    fi
     if (( ! $+_p9k__vcs )); then
       local _p9k__prompt _p9k__prompt_side=$_p9k_vcs_side
       local -i _p9k__has_upglob _p9k__segment_index=_p9k_vcs_index
@@ -6591,6 +6596,7 @@ _p9k_init_params() {
   # If it takes longer than this to fetch git repo status, display the prompt with a greyed out
   # vcs segment and fix it asynchronously when the results come it.
   _p9k_declare -F POWERLEVEL9K_VCS_MAX_SYNC_LATENCY_SECONDS 0.02
+  (( POWERLEVEL9K_VCS_MAX_SYNC_LATENCY_SECONDS >= 0 )) || (( POWERLEVEL9K_VCS_MAX_SYNC_LATENCY_SECONDS = 0 ))
   _p9k_declare -a POWERLEVEL9K_VCS_BACKENDS -- git
   _p9k_declare -b POWERLEVEL9K_VCS_DISABLE_GITSTATUS_FORMATTING 0
   _p9k_declare -i POWERLEVEL9K_VCS_MAX_INDEX_SIZE_DIRTY -1
