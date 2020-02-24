@@ -2069,9 +2069,23 @@ prompt_ip() {
 ################################################################
 # Segment to display if VPN is active
 prompt_vpn_ip() {
-  local -i len=$#_p9k__prompt _p9k__has_upglob
-  _p9k_prompt_segment "$0" "cyan" "$_p9k_color1" 'VPN_ICON' 1 '$_p9k__vpn_ip_ip' '$_p9k__vpn_ip_ip'
-  (( _p9k__has_upglob )) || typeset -g "_p9k__segment_val_${_p9k__prompt_side}[_p9k__segment_index]"=$_p9k__prompt[len+1,-1]
+  typeset -ga _p9k__vpn_ip_segments
+  _p9k__vpn_ip_segments+=($_p9k__prompt_side $_p9k__segment_index)
+  local p='${(e)_p9k__vpn_ip_'$_p9k__prompt_side$_p9k__segment_index'}'
+  _p9k__prompt+=$p
+  typeset -g "_p9k__segment_val_${_p9k__prompt_side}[_p9k__segment_index]"=$p
+}
+
+_p9k_vpn_ip_render() {
+  local _p9k__segment_name=vpn_ip _p9k__prompt_side ip
+  local -i _p9k__has_upglob _p9k__segment_index
+  for _p9k__prompt_side _p9k__segment_index in $_p9k__vpn_ip_segments; do
+    local _p9k__prompt=
+    for ip in $_p9k__vpn_ip_ips; do
+      _p9k_prompt_segment prompt_vpn_ip "cyan" "$_p9k_color1" 'VPN_ICON' 0 '' $ip
+    done
+    typeset -g _p9k__vpn_ip_$_p9k__prompt_side$_p9k__segment_index=$_p9k__prompt
+  done
 }
 
 ################################################################
@@ -4964,18 +4978,22 @@ function _p9k_prompt_net_iface_init() {
   typeset -g P9K_IP_TX_RATE=
   typeset -g P9K_IP_RX_RATE=
   typeset -g _p9__ip_timestamp=
-  typeset -g _p9k__vpn_ip_ip=
+  typeset -g _p9k__vpn_ip_ips=()
   [[ -z $_POWERLEVEL9K_PUBLIC_IP_VPN_INTERFACE ]] && _p9k__public_ip_not_vpn=1
   _p9k__async_segments_compute+=_p9k_prompt_net_iface_compute
 }
 
-# reads `iface2ip` and sets `iface` and `ip`
+# reads `iface2ip` and sets `ifaces` and `ips`
 function _p9k_prompt_net_iface_match() {
-  local iface_regex="^($1)\$"
-  for iface ip in "${(@kv)iface2ip}"; do
-    [[ $iface =~ $iface_regex ]] && return
+  local iface_regex="^($1)\$" iface ip
+  ips=()
+  ifaces=()
+  for iface ip in "${(@)iface2ip}"; do
+    [[ $iface =~ $iface_regex ]] || continue
+    ifaces+=$iface
+    ips+=$ip
   done
-  return 1
+  return $(($#ips == 0))
 }
 
 function _p9k_prompt_net_iface_compute() {
@@ -4985,7 +5003,7 @@ function _p9k_prompt_net_iface_compute() {
 function _p9k_prompt_net_iface_async() {
   # netstat -inbI en0
   local iface ip line var
-  typeset -a iface2ip
+  typeset -a iface2ip ips ifaces
   if (( $+commands[ifconfig] )); then
     for line in ${(f)"$(command ifconfig 2>/dev/null)"}; do
       if [[ $line == (#b)([^[:space:]]##):[[:space:]]##flags=(<->)'<'* ]]; then
@@ -5014,19 +5032,19 @@ function _p9k_prompt_net_iface_async() {
     local public_ip_not_vpn=1
   fi
   if _p9k_prompt_net_iface_match $_POWERLEVEL9K_IP_INTERFACE; then
-    local ip_ip=$ip ip_interface=$iface ip_timestamp=$EPOCHREALTIME
+    local ip_ip=$ips[1] ip_interface=$ifaces[1] ip_timestamp=$EPOCHREALTIME
     local ip_tx_bytes ip_rx_bytes ip_tx_rate ip_rx_rate
     if [[ $_p9k_os == (Linux|Android) ]]; then
-      if [[ -r /sys/class/net/$iface/statistics/tx_bytes &&
-            -r /sys/class/net/$iface/statistics/rx_bytes ]]; then
-        _p9k_read_file /sys/class/net/$iface/statistics/tx_bytes &&
+      if [[ -r /sys/class/net/$ifaces[1]/statistics/tx_bytes &&
+            -r /sys/class/net/$ifaces[1]/statistics/rx_bytes ]]; then
+        _p9k_read_file /sys/class/net/$ifaces[1]/statistics/tx_bytes &&
           [[ $_p9k__ret == <-> ]] && ip_tx_bytes=$_p9k__ret &&
-        _p9k_read_file /sys/class/net/$iface/statistics/rx_bytes &&
+        _p9k_read_file /sys/class/net/$ifaces[1]/statistics/rx_bytes &&
           [[ $_p9k__ret == <-> ]] && ip_rx_bytes=$_p9k__ret || { ip_tx_bytes=; ip_rx_bytes=; }
       fi
     elif [[ $_p9k_os == (BSD|OSX) && $+commands[netstat] == 1 ]]; then
       local -a lines
-      if lines=(${(f)"$(netstat -inbI $iface)"}); then
+      if lines=(${(f)"$(netstat -inbI $ifaces[1])"}); then
         local header=($=lines[1])
         local -i rx_idx=$header[(Ie)Ibytes]
         local -i tx_idx=$header[(Ie)Obytes]
@@ -5041,7 +5059,7 @@ function _p9k_prompt_net_iface_async() {
       fi
     fi
     if [[ -n $ip_rx_bytes ]]; then
-      if [[ $ip_ip == $P9K_IP_IP && $iface == $P9K_IP_INTERFACE ]]; then
+      if [[ $ip_ip == $P9K_IP_IP && $ifaces[1] == $P9K_IP_INTERFACE ]]; then
         local -F t='ip_timestamp - _p9__ip_timestamp'
         if (( t <= 0 )); then
           ip_tx_rate=${P9K_IP_TX_RATE:-0 B/s}
@@ -5061,9 +5079,13 @@ function _p9k_prompt_net_iface_async() {
     local ip_ip= ip_interface= ip_tx_bytes= ip_rx_bytes= ip_tx_rate= ip_rx_rate= ip_timestamp=
   fi
   if _p9k_prompt_net_iface_match $_POWERLEVEL9K_VPN_IP_INTERFACE; then
-    local vpn_ip_ip=$ip
+    if (( _POWERLEVEL9K_VPN_IP_SHOW_ALL )); then
+      local vpn_ip_ips=($ips)
+    else
+      local vpn_ip_ips=($ips[1])
+    fi
   else
-    local vpn_ip_ip=
+    local vpn_ip_ips=()
   fi
   [[ $_p9k__public_ip_vpn == $public_ip_vpn &&
      $_p9k__public_ip_not_vpn == $public_ip_not_vpn &&
@@ -5073,7 +5095,12 @@ function _p9k_prompt_net_iface_async() {
      $P9K_IP_RX_BYTES == $ip_rx_bytes &&
      $P9K_IP_TX_RATE == $ip_tx_rate &&
      $P9K_IP_RX_RATE == $ip_rx_rate &&
-     $_p9k__vpn_ip_ip == $vpn_ip_ip ]] && return 1
+     "$_p9k__vpn_ip_ips" == "$vpn_ip_ips" ]] && return 1
+  if [[ "$_p9k__vpn_ip_ips" == "$vpn_ip_ips" ]]; then
+    echo -n 0
+  else
+    echo -n 1
+  fi
   _p9k__public_ip_vpn=$public_ip_vpn
   _p9k__public_ip_not_vpn=$public_ip_not_vpn
   P9K_IP_IP=$ip_ip
@@ -5083,7 +5110,7 @@ function _p9k_prompt_net_iface_async() {
   P9K_IP_TX_RATE=$ip_tx_rate
   P9K_IP_RX_RATE=$ip_rx_rate
   _p9__ip_timestamp=$ip_timestamp
-  _p9k__vpn_ip_ip=$vpn_ip_ip
+  _p9k__vpn_ip_ips=($vpn_ip_ips)
   _p9k_print_params         \
     _p9k__public_ip_vpn     \
     _p9k__public_ip_not_vpn \
@@ -5094,12 +5121,15 @@ function _p9k_prompt_net_iface_async() {
     P9K_IP_TX_RATE          \
     P9K_IP_RX_RATE          \
     _p9__ip_timestamp       \
-    _p9k__vpn_ip_ip
+    _p9k__vpn_ip_ips
   echo -E - 'reset=1'
 }
 
 _p9k_prompt_net_iface_sync() {
+  local -i vpn_ip_changed=$REPLY[1]
+  REPLY[1]=""
   eval $REPLY
+  (( vpn_ip_changed )) && REPLY+='; _p9k_vpn_ip_render'
   _p9k_worker_reply $REPLY
 }
 
@@ -6547,6 +6577,7 @@ _p9k_init_params() {
   _p9k_declare -s POWERLEVEL9K_VPN_IP_INTERFACE "(wg|(.*tun))[0-9]*"
   : ${_POWERLEVEL9K_VPN_IP_INTERFACE:='.*'}
   _p9k_segment_in_use vpn_ip || _POWERLEVEL9K_VPN_IP_INTERFACE=
+  _p9k_declare -b POWERLEVEL9K_VPN_IP_SHOW_ALL 0
   _p9k_declare -i POWERLEVEL9K_LOAD_WHICH 5
   case $_POWERLEVEL9K_LOAD_WHICH in
     1) _POWERLEVEL9K_LOAD_WHICH=1;;
@@ -7234,7 +7265,7 @@ _p9k_must_init() {
     [[ $sig == $_p9k__param_sig ]] && return 1
     _p9k_deinit
   fi
-  _p9k__param_pat=$'v57\1'${ZSH_VERSION}$'\1'${ZSH_PATCHLEVEL}$'\1'
+  _p9k__param_pat=$'v58\1'${ZSH_VERSION}$'\1'${ZSH_PATCHLEVEL}$'\1'
   _p9k__param_pat+=$'${#parameters[(I)POWERLEVEL9K_*]}\1${(%):-%n%#}\1$GITSTATUS_LOG_LEVEL\1'
   _p9k__param_pat+=$'$GITSTATUS_ENABLE_LOGGING\1$GITSTATUS_DAEMON\1$GITSTATUS_NUM_THREADS\1'
   _p9k__param_pat+=$'$DEFAULT_USER\1${ZLE_RPROMPT_INDENT:-1}\1$P9K_SSH\1$__p9k_ksh_arrays'

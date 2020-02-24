@@ -1283,6 +1283,10 @@
   # Regular expression for the VPN network interface. Run `ifconfig` or `ip -4 a show` while on VPN
   # to see the name of the interface.
   typeset -g POWERLEVEL9K_VPN_IP_INTERFACE='(wg|(.*tun))[0-9]*'
+  # If set to true, show one segment per matching network interface. If set to false, show only
+  # one segment corresponding to the first matching network interface.
+  # Tip: If you set it to true, you'll probably want to unset POWERLEVEL9K_VPN_IP_CONTENT_EXPANSION.
+  typeset -g POWERLEVEL9K_VPN_IP_SHOW_ALL=false
   # Custom icon.
   # typeset -g POWERLEVEL9K_VPN_IP_VISUAL_IDENTIFIER_EXPANSION='⭐'
 
