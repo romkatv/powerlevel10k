@@ -322,7 +322,8 @@ function install_font() {
       for style in Regular Bold Italic 'Bold Italic'; do
         local file="MesloLGS NF ${style}.ttf"
         run_command "Downloading %B$file%b" \
-          curl -fsSL -o ~/Library/Fonts/$file "$font_base_url/${file// /%20}"
+          curl -fsSL -o ~/Library/Fonts/$file.tmp "$font_base_url/${file// /%20}"
+        zf_mv -f -- ~/Library/Fonts/$file{.tmp,} || quit -c
       done
       print -nP -- "Changing %BiTerm2%b settings ..."
       local k t v settings=(
