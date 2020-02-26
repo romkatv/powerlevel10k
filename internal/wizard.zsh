@@ -422,11 +422,19 @@ function ask_remove_font() {
     done
     print -P ""
     if (( protected )); then
-      flowing Please %Bdelete%b these files and run '%2Fp10k%f %Bconfigure%b.'
+      if (( $#fonts == 1 )); then
+        flowing Please %Bdelete%b this file and run '%2Fp10k%f %Bconfigure%b.'
+      else
+        flowing Please %Bdelete%b these files and run '%2Fp10k%f %Bconfigure%b.'
+      fi
       print
       exit 0
     fi
-    flowing -c "%BDelete these files?%b"
+    if (( $#fonts == 1 )); then
+      flowing -c "%BDelete this file?%b"
+    else
+      flowing -c "%BDelete these files?%b"
+    fi
     print -P ""
     print -P "%B(y)  Yes (recommended).%b"
     print -P ""
