@@ -346,8 +346,9 @@ function install_font() {
         run_command "" /usr/libexec/PlistBuddy -c \
           "Add :\"New Bookmarks\":0:$k $t $v" ~/Library/Preferences/com.googlecode.iterm2.plist
       done
-      print -P " %2FOK%f"
       run_command "Updating %BiTerm2%b settings cache" /usr/bin/defaults read com.googlecode.iterm2
+      sleep 3
+      print -P " %2FOK%f"
       clear
       flowing +c "%2FMeslo Nerd Font%f" successfully installed.
       print -P ""
