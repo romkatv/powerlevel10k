@@ -901,6 +901,8 @@
   # Python virtual environment color.
   # typeset -g POWERLEVEL9K_VIRTUALENV_FOREGROUND=0
   # typeset -g POWERLEVEL9K_VIRTUALENV_BACKGROUND=4
+  # Show Python virtual environment name.
+  typeset -g POWERLEVEL9K_VIRTUALENV_SHOW_ENV_NAME=true
   # Don't show Python version next to the virtual environment name.
   typeset -g POWERLEVEL9K_VIRTUALENV_SHOW_PYTHON_VERSION=false
   # Separate environment name from Python version only with a space.

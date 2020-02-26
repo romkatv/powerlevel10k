@@ -90,6 +90,8 @@
 
   # Grey Python Virtual Environment.
   typeset -g POWERLEVEL9K_VIRTUALENV_FOREGROUND=$grey
+  # Show Python virtual environment name.
+  typeset -g POWERLEVEL9K_VIRTUALENV_SHOW_ENV_NAME=true
   # Don't show Python version.
   typeset -g POWERLEVEL9K_VIRTUALENV_SHOW_PYTHON_VERSION=false
   typeset -g POWERLEVEL9K_VIRTUALENV_{LEFT,RIGHT}_DELIMITER=
