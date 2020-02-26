@@ -374,28 +374,74 @@ function install_font() {
 
 function ask_font() {
   can_install_font || return 0
+  {
+    while true; do
+      clear
+      (( greeting_printed )) || print_greeting
+      flowing -c "%BInstall %b%2FMeslo Nerd Font%f%B?%b"
+      print -P ""
+      print -P ""
+      print -P "%B(y)  Yes (recommended).%b"
+      print -P ""
+      print -P "%B(n)  No. Use the current font.%b"
+      print -P ""
+      print -P "(q)  Quit and do nothing."
+      print -P ""
+
+      local key=
+      read -k key${(%):-"?%BChoice [ynq]: %b"} || quit -c
+      case $key in
+        q) quit;;
+        y) ask_remove_font || return; install_font; break;;
+        n) break;;
+      esac
+    done
+  } always {
+    greeting_printed=1
+  }
+}
+
+function ask_remove_font() {
+  local font
+  local -a fonts
+  local -i protected
+  for font in {,/System,~}/Library/Fonts/**/*[Mm]eslo*.(ttf|otf)(N:A); do
+    [[ -f $font && -r $font ]] || continue
+    [[ $font == ~/Library/Fonts/'MesloLGS NF '(Regular|Bold|Italic|Bold\ Italic).ttf ]] && continue
+    [[ "$(<$font)" == *"MesloLGS NF"$'\0'* ]] || continue
+    fonts+=$font
+    [[ -w ${font:h} ]] || protected=1
+  done
+  (( $#fonts )) || return 0
   while true; do
     clear
-    print_greeting
-    flowing -c "%BInstall %b%2FMeslo Nerd Font%f%B?%b"
+    flowing -c "A variant of %2FMeslo Nerd Font%f" is already installed.
     print -P ""
+    for font in $fonts; do
+      print -P "  %B${font//\%/%%}%b"
+    done
+    print -P ""
+    if (( protected )); then
+      flowing Please %Bdelete%b these files and run '%2Fp10k%f %Bconfigure%b.'
+      print
+      exit 0
+    fi
+    flowing -c "%BDelete these files?%b"
     print -P ""
     print -P "%B(y)  Yes (recommended).%b"
     print -P ""
-    print -P "%B(n)  No. Use the current font.%b"
-    print -P ""
+    print -P "(r)  Restart from the beginning."
     print -P "(q)  Quit and do nothing."
     print -P ""
 
     local key=
-    read -k key${(%):-"?%BChoice [ynq]: %b"} || quit -c
+    read -k key${(%):-"?%BChoice [yrq]: %b"} || quit -c
     case $key in
       q) quit;;
-      y) install_font; break;;
-      n) break;;
+      r) return 1;;
+      y) zf_rm -f -- $fonts || quit -c; break;;
     esac
   done
-  greeting_printed=1
 }
 
 function ask_diamond() {
