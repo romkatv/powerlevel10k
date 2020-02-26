@@ -6902,25 +6902,23 @@ function _p9k_wrap_widgets() {
 
 function _p9k_restore_prompt() {
   eval "$__p9k_intro"
-  {
-    (( _p9k__must_restore_prompt )) || return
-    _p9k__must_restore_prompt=0
+  zle -F $1
+  exec {1}>&-
+  _p9k__restore_prompt_fd=0
 
-    unset _p9k__line_finished
-    _p9k__refresh_reason=restore
-    _p9k_set_prompt
-    _p9k__refresh_reason=
+  (( _p9k__must_restore_prompt )) || return 0
+  _p9k__must_restore_prompt=0
 
-    local tty=$P9K_TTY
-    P9K_TTY=$_p9k__last_tty
-    _p9k__expanded=0
-    _p9k_reset_prompt
-    P9K_TTY=$tty
-  } always {
-    zle -F $1
-    exec {1}>&-
-    _p9k__restore_prompt_fd=0
-  }
+  unset _p9k__line_finished
+  _p9k__refresh_reason=restore
+  _p9k_set_prompt
+  _p9k__refresh_reason=
+
+  local tty=$P9K_TTY
+  P9K_TTY=$_p9k__last_tty
+  _p9k__expanded=0
+  _p9k_reset_prompt
+  P9K_TTY=$tty
 }
 
 prompt__p9k_internal_nothing() { _p9k__prompt+='${_p9k__sss::=}'; }
