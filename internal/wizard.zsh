@@ -428,7 +428,7 @@ function ask_remove_font() {
         flowing Please %Bdelete%b these files and run '%2Fp10k%f %Bconfigure%b.'
       fi
       print
-      exit 0
+      exit 1
     fi
     if (( $#fonts == 1 )); then
       flowing -c "%BDelete this file?%b"
