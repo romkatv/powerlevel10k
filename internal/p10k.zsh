@@ -1252,7 +1252,7 @@ _p9k_prompt_battery_init() {
     return
   fi
   if [[ $_p9k_os != (Linux|Android) ||
-        -z /sys/class/power_supply/(BAT*|battery)/(energy_full|charge_full|charge_counter)(#qL+0N) ]]; then
+        -z /sys/class/power_supply/(BAT*|battery)/(energy_full|charge_full|charge_counter)(#qN) ]]; then
     typeset -g "_p9k__segment_cond_${_p9k__prompt_side}[_p9k__segment_index]"='${:-}'
   fi
 }
