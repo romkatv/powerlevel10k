@@ -24,7 +24,6 @@
 
 () {
   emulate -L zsh
-  setopt no_unset
 
   autoload -Uz is-at-least && is-at-least 5.1 || return
 
