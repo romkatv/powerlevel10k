@@ -103,6 +103,7 @@ function _p9k_init_icons() {
         PYTHON_ICON                    '\uE63C'$s             #  (doesn't always work)
         SWIFT_ICON                     'Swift'
         GO_ICON                        'Go'
+        GOLANG_ICON                    'Go'
         PUBLIC_IP_ICON                 'IP'
         LOCK_ICON                      '\UE138'               # 
         EXECUTION_TIME_ICON            '\UE89C'$s             # 
@@ -224,6 +225,7 @@ function _p9k_init_icons() {
         PYTHON_ICON                    '\uE63C'$s             # 
         SWIFT_ICON                     'Swift'
         GO_ICON                        'Go'
+        GOLANG_ICON                    'Go'
         PUBLIC_IP_ICON                 'IP'
         LOCK_ICON                      '\UF023'               # 
         EXECUTION_TIME_ICON            '\uF253'$s             # 
@@ -471,6 +473,7 @@ function _p9k_init_icons() {
         PYTHON_ICON                    '\UE73C '              # 
         SWIFT_ICON                     '\uE755'               # 
         GO_ICON                        '\uE626'               # 
+        GOLANG_ICON                    '\uE626'               # 
         PUBLIC_IP_ICON                 '\UF0AC'$s             # 
         LOCK_ICON                      '\UF023'               # 
         EXECUTION_TIME_ICON            '\uF252'$s             # 
@@ -592,6 +595,7 @@ function _p9k_init_icons() {
         PYTHON_ICON                    'Py'
         SWIFT_ICON                     'Swift'
         GO_ICON                        'Go'
+        GOLANG_ICON                    'Go'
         PUBLIC_IP_ICON                 'IP'
         LOCK_ICON                      '\UE0A2' 
         EXECUTION_TIME_ICON            ''
