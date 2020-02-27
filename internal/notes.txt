@@ -29,12 +29,6 @@
 - fix a bug in zsh: https://github.com/romkatv/powerlevel10k/issues/502. to reproduce:
     emulate zsh -o prompt_percent -c 'print -P "%F{#ff0000}red%F{green}%B bold green"'
 - bug: open a new tab and hit ctrl-p. an empty line will appear before prompt.
-- zsh-syntax-highlighting added two precommands: chronic and ifne.
-- add POWERLEVEL9K_MODE=ascii
-- add ascii version of lean style (both color versions); hopefully without creating new files.
-- wizard: if the font seems very weak, add another question about ❯. if it's not visible, go ascii.
-- wizard: add flat heads and tails; display them if there is no powerline support. maybe even make
-  them the default.
 - take a look at https://github.com/skywind3000/z.lua. it claims to have fzf support. would be nice
   if alt-down showed two groups -- one for subdirs and another for directory history (sorted by
   frequency of use? by last use? three sections? more key bindings?).
