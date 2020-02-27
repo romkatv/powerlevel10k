@@ -54,6 +54,8 @@ typeset -grA __p9k_pb_precommand=(
   'sudo'      '-[^aghpuUCcrtT]#[aghpuUCcrtT]|--(close-from|group|host|prompt|role|type|other-user|command-timeout|user)'
   'ssh-agent' '-[^aEPt]#[aEPt]'
   'tabbed'    '-[^gnprtTuU]#[gnprtTuU]'
+  'chronic'   ''
+  'ifne'      ''
 )
 
 typeset -grA __p9k_pb_redirect=(
