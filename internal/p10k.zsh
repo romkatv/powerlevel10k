@@ -4291,8 +4291,8 @@ function _p9k_fetch_nordvpn_status() {
 #   # Display this icon when NordVPN is not installed or nordvpnd is not running
 #   POWERLEVEL9K_NORDVPN_MISSING_VISUAL_IDENTIFIER_EXPANSION='⭐'
 #
-# CONNECTED: NordVPN is connected. By default shows LOCK_ICON as icon and country code as content.
-# In addition, the following variables are set for the use by
+# CONNECTED: NordVPN is connected. By default shows NORDVPN_ICON as icon and country code as
+# content. In addition, the following variables are set for the use by
 # POWERLEVEL9K_NORDVPN_CONNECTED_VISUAL_IDENTIFIER_EXPANSION and
 # POWERLEVEL9K_NORDVPN_CONNECTED_CONTENT_EXPANSION:
 #
@@ -4312,7 +4312,7 @@ function _p9k_fetch_nordvpn_status() {
 #   POWERLEVEL9K_NORDVPN_CONNECTED_CONTENT_EXPANSION='${P9K_NORDVPN_CITY}'
 #
 # DISCONNECTED, CONNECTING, DISCONNECTING: NordVPN is disconnected/connecting/disconnecting. By
-# default shows LOCK_ICON as icon and FAIL_ICON as content. In state CONNECTING the same
+# default shows NORDVPN_ICON as icon and FAIL_ICON as content. In state CONNECTING the same
 # P9K_NORDVPN_* variables are set as in CONNECTED. In states DISCONNECTED and DISCONNECTING only
 # P9K_NORDVPN_STATUS is set. Example customizations:
 #
@@ -4333,11 +4333,11 @@ function prompt_nordvpn() {
   fi
   case $P9K_NORDVPN_STATUS in
     Connected)
-      _p9k_prompt_segment $0_CONNECTED blue   white LOCK_ICON 0 '' "$P9K_NORDVPN_COUNTRY_CODE";;
+      _p9k_prompt_segment $0_CONNECTED blue   white NORDVPN_ICON 0 '' "$P9K_NORDVPN_COUNTRY_CODE";;
     Disconnected|Connecting|Disconnecting)
       local state=${(U)P9K_NORDVPN_STATUS}
       _p9k_get_icon $0_$state FAIL_ICON
-      _p9k_prompt_segment $0_$state    yellow white LOCK_ICON 0 '' "$_p9k__ret";;
+      _p9k_prompt_segment $0_$state    yellow white NORDVPN_ICON 0 '' "$_p9k__ret";;
     *)
       _p9k_prompt_segment $0_MISSING   blue   white ''        0 '' '';;
   esac
@@ -7275,7 +7275,7 @@ _p9k_must_init() {
     [[ $sig == $_p9k__param_sig ]] && return 1
     _p9k_deinit
   fi
-  _p9k__param_pat=$'v60\1'${ZSH_VERSION}$'\1'${ZSH_PATCHLEVEL}$'\1'
+  _p9k__param_pat=$'v61\1'${ZSH_VERSION}$'\1'${ZSH_PATCHLEVEL}$'\1'
   _p9k__param_pat+=$'${#parameters[(I)POWERLEVEL9K_*]}\1${(%):-%n%#}\1$GITSTATUS_LOG_LEVEL\1'
   _p9k__param_pat+=$'$GITSTATUS_ENABLE_LOGGING\1$GITSTATUS_DAEMON\1$GITSTATUS_NUM_THREADS\1'
   _p9k__param_pat+=$'$DEFAULT_USER\1${ZLE_RPROMPT_INDENT:-1}\1$P9K_SSH\1$__p9k_ksh_arrays'

@@ -106,6 +106,7 @@ function _p9k_init_icons() {
         GOLANG_ICON                    'Go'
         PUBLIC_IP_ICON                 'IP'
         LOCK_ICON                      '\UE138'               # 
+        NORDVPN_ICON                   '\UE138'               # 
         EXECUTION_TIME_ICON            '\UE89C'$s             # 
         SSH_ICON                       'ssh'
         VPN_ICON                       '\UE138'
@@ -228,6 +229,7 @@ function _p9k_init_icons() {
         GOLANG_ICON                    'Go'
         PUBLIC_IP_ICON                 'IP'
         LOCK_ICON                      '\UF023'               # 
+        NORDVPN_ICON                   '\UF023'               # 
         EXECUTION_TIME_ICON            '\uF253'$s             # 
         SSH_ICON                       'ssh'
         VPN_ICON                       '\uF023' 
@@ -353,6 +355,7 @@ function _p9k_init_icons() {
         SWIFT_ICON                     '\uE655'$s                                     # 
         PUBLIC_IP_ICON                 "${CODEPOINT_OF_AWESOME_GLOBE:+\\u$CODEPOINT_OF_AWESOME_GLOBE$s}"
         LOCK_ICON                      "${CODEPOINT_OF_AWESOME_LOCK:+\\u$CODEPOINT_OF_AWESOME_LOCK}"
+        NORDVPN_ICON                   "${CODEPOINT_OF_AWESOME_LOCK:+\\u$CODEPOINT_OF_AWESOME_LOCK}"
         EXECUTION_TIME_ICON            "${CODEPOINT_OF_AWESOME_HOURGLASS_END:+\\u$CODEPOINT_OF_AWESOME_HOURGLASS_END$s}"
         SSH_ICON                       'ssh'
         VPN_ICON                       "${CODEPOINT_OF_AWESOME_LOCK:+\\u$CODEPOINT_OF_AWESOME_LOCK}"
@@ -476,6 +479,7 @@ function _p9k_init_icons() {
         GOLANG_ICON                    '\uE626'               # 
         PUBLIC_IP_ICON                 '\UF0AC'$s             # 
         LOCK_ICON                      '\UF023'               # 
+        NORDVPN_ICON                   '\UF023'               # 
         EXECUTION_TIME_ICON            '\uF252'$s             # 
         SSH_ICON                       '\uF489'$s             # 
         VPN_ICON                       '\UF023'
@@ -596,6 +600,7 @@ function _p9k_init_icons() {
         GOLANG_ICON                    'go'
         PUBLIC_IP_ICON                 'ip'
         LOCK_ICON                      '!w'
+        NORDVPN_ICON                   'nordvpn'
         EXECUTION_TIME_ICON            ''
         SSH_ICON                       'ssh'
         VPN_ICON                       'vpn'
@@ -717,7 +722,8 @@ function _p9k_init_icons() {
         GO_ICON                        'Go'
         GOLANG_ICON                    'Go'
         PUBLIC_IP_ICON                 'IP'
-        LOCK_ICON                      '\UE0A2' 
+        LOCK_ICON                      '\UE0A2'
+        NORDVPN_ICON                   '\UE0A2'
         EXECUTION_TIME_ICON            ''
         SSH_ICON                       'ssh'
         VPN_ICON                       'vpn'
