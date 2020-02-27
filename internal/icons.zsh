@@ -533,7 +533,7 @@ function _p9k_init_icons() {
         BATTERY_ICON                   'battery'
         DISK_ICON                      'disk'
         OK_ICON                        'ok'
-        FAIL_ICON                      'error'
+        FAIL_ICON                      'err'
         SYMFONY_ICON                   'symphony'
         NODE_ICON                      'node'
         NODEJS_ICON                    'node'
