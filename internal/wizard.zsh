@@ -14,6 +14,8 @@ if (( OPTIND <= ARGC )); then
   return 1
 fi
 
+(( $+terminfo[smcup] && $+terminfo[rmcup] )) && echoti smcup
+
 local -ri force
 
 local -r font_base_url='https://github.com/romkatv/dotfiles-public/raw/master/.local/share/fonts/NerdFonts'
@@ -201,7 +203,12 @@ function quit() {
   if [[ $1 == '-c' ]]; then
     print -P ""
   else
-    clear
+    if (( $+terminfo[smcup] && $+terminfo[rmcup] )); then
+      echoti rmcup
+      print
+    else
+      clear
+    fi
   fi
   if (( force )); then
     print -P "Powerlevel10k configuration wizard has been aborted. To run it again, type:"
@@ -1632,8 +1639,8 @@ function ask_config_overwrite() {
       q) quit;;
       r) return 1;;
       y)
-        config_backup="$(mktemp ${TMPDIR:-/tmp}/$__p9k_cfg_basename.XXXXXXXXXX)" || exit 1
-        cp $__p9k_cfg_path $config_backup                                        || exit 1
+        config_backup="$(mktemp ${TMPDIR:-/tmp}/$__p9k_cfg_basename.XXXXXXXXXX)" || quit -c
+        cp $__p9k_cfg_path $config_backup                                        || quit -c
         config_backup_u=${${TMPDIR:+\$TMPDIR}:-/tmp}/${(q-)config_backup:t}
         break
         ;;
@@ -2162,7 +2169,12 @@ while true; do
   break
 done
 
-clear
+if (( $+terminfo[smcup] && $+terminfo[rmcup] )); then
+  echoti rmcup
+  print
+else
+  clear
+fi
 
 flowing +c New config: "%B${__p9k_cfg_path_u//\\/\\\\}%b."
 if [[ -n $config_backup ]]; then

@@ -1165,8 +1165,8 @@ parameters are defined. Based on your prompt style choices, the configuration wi
 source this file. The next time you start Zsh, the configuration wizard shouldn't run automatically.
 If it does, this means the evaluation of `~/.zshrc` terminates prematurely before it reaches the
 line that sources `~/.p10k.zsh`. This most often happens due to syntax errors in `~/.zshrc`. These
-errors get hidden by the configuration wizard screen, so you don't notice them. Scroll up in the
-first configuration wizard screen to see these errors. Alternatively, run
+errors get hidden by the configuration wizard screen, so you don't notice them. When you exit
+configuration wizard, look for error messages. You can also use
 `POWERLEVEL9K_DISABLE_CONFIGURATION_WIZARD=true zsh` to start Zsh without automatically running the
 configuration wizard. Once you can see the errors, fix `~/.zshrc` to get rid of them.
 
