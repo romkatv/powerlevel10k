@@ -980,8 +980,10 @@ https://www.reddit.com/r/zsh/comments/eg49ff/powerlevel10k_prompt_history_exit_c
 
 ### Is there an AUR package for Powerlevel10k?
 
-Yes, [zsh-theme-powerlevel10k-git](https://aur.archlinux.org/packages/zsh-theme-powerlevel10k-git/).
-This package is owned by an unaffiliated volunteer.
+There are two:
+[zsh-theme-powerlevel10k-git](https://aur.archlinux.org/packages/zsh-theme-powerlevel10k-git/) and
+[zsh-theme-powerlevel10k](https://aur.archlinux.org/packages/zsh-theme-powerlevel10k/). Both
+packages are owned by unaffiliated volunteers.
 
 ### What is the minimum supported Zsh version?
 
