@@ -900,7 +900,8 @@ consistency.
 Almost. There are a few differences.
 
 - By default only `git` vcs backend is enabled in Powerlevel10k. If you need `svn` and `hg`, add
-  them to `POWERLEVEL9K_VCS_BACKENDS`.
+  them to `POWERLEVEL9K_VCS_BACKENDS`. These backends aren't yet optimized in Powerlevel10k, so
+  enabling them will make prompt *very slow*.
 - Powerlevel10k doesn't support `POWERLEVEL9K_VCS_SHOW_SUBMODULE_DIRTY=true`.
 - Powerlevel10k strives to be bug-compatible with Powerlevel9k but not when it comes to egregious
   bugs. If you accidentally rely on these bugs, your prompt will differ between Powerlevel9k and
