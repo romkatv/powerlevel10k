@@ -42,9 +42,11 @@ local -r fade_out='▓▒░'
 local -r vertical_bar='|'
 local -r slanted_bar='\uE0BD'
 
+local -r cursor='%1{\e[07m \e[27m%}'
+
 local -ra lean_left=(
   '%$frame_color[$color]F╭─ ' '${extra_icons[1]:+$extra_icons[1] }%31F$extra_icons[2]%B%39F~%b%31F/%B%39Fsrc%b%f $prefixes[1]%76F$extra_icons[3]master%f '
-  '%$frame_color[$color]F╰─' '%76F❯%f ${buffer:-█}'
+  '%$frame_color[$color]F╰─' '%76F$prompt_char%f ${buffer:-$cursor}'
 )
 
 local -ra lean_right=(
@@ -54,7 +56,7 @@ local -ra lean_right=(
 
 local -ra lean_8colors_left=(
   '%$frame_color[$color]F╭─ ' '${extra_icons[1]:+$extra_icons[1] }%4F$extra_icons[2]%4F~/src%f $prefixes[1]%2F$extra_icons[3]master%f '
-  '%$frame_color[$color]F╰─' '%2F❯%f ${buffer:-█}'
+  '%$frame_color[$color]F╰─' '%2F$prompt_char%f ${buffer:-$cursor}'
 )
 
 local -ra lean_8colors_right=(
@@ -64,7 +66,7 @@ local -ra lean_8colors_right=(
 
 local -ra classic_left=(
   '%$frame_color[$color]F╭─' '%F{$bg_color[$color]}$left_tail%K{$bg_color[$color]} ${extra_icons[1]:+$extra_icons[1]%K{$bg_color[$color]\} %$sep_color[$color]F$left_subsep%f }%31F$extra_icons[2]%B%39F~%b%K{$bg_color[$color]}%31F/%B%39Fsrc%b%K{$bg_color[$color]} %$sep_color[$color]F$left_subsep%f %$prefix_color[$color]F$prefixes[1]%76F$extra_icons[3]master %k%$bg_color[$color]F$left_head%f'
-  '%$frame_color[$color]F╰─' '%f ${buffer:-█}'
+  '%$frame_color[$color]F╰─' '%f ${buffer:-$cursor}'
 )
 
 local -ra classic_right=(
@@ -74,7 +76,7 @@ local -ra classic_right=(
 
 local -ra pure_left=(
   '' '%F{$pure_color[blue]}~/src%f %F{$pure_color[grey]}master%f ${pure_use_rprompt-%F{$pure_color[yellow]\}5s%f }'
-  '' '%F{$pure_color[magenta]}❯%f ${buffer:-█}'
+  '' '%F{$pure_color[magenta]}$prompt_char%f ${buffer:-$cursor}'
 )
 
 local -ra pure_right=(
@@ -84,7 +86,7 @@ local -ra pure_right=(
 
 local -ra rainbow_left=(
   '%$frame_color[$color]F╭─' '%F{${${extra_icons[1]:+7}:-4}}$left_tail${extra_icons[1]:+%K{7\} $extra_icons[1] %K{4\}%7F$left_sep}%K{4}%254F $extra_icons[2]%B%255F~%b%K{4}%254F/%B%255Fsrc%b%K{4} %K{2}%4F$left_sep %0F$prefixes[1]$extra_icons[3]master %k%2F$left_head%f'
-  '%$frame_color[$color]F╰─' '%f ${buffer:-█}'
+  '%$frame_color[$color]F╰─' '%f ${buffer:-$cursor}'
 )
 
 local -ra rainbow_right=(
@@ -121,10 +123,10 @@ function print_prompt() {
     left=($left[2] $left[4])
     right=($right[1] $right[3])
   else
-    local prompt_char='%76F❯%f'
-    [[ $style == pure ]] && prompt_char="%F{$pure_color[magenta]}❯%f"
-    [[ $style == lean_8colors ]] && prompt_char='%2F❯%f'
-    (( left_frame )) || left=('' $left[2] '' "$prompt_char ${buffer:-█}")
+    local c=76
+    [[ $style == pure ]] && c=$pure_color[magenta]
+    [[ $style == lean_8colors ]] && c=2
+    (( left_frame )) || left=('' $left[2] '' "%F{$c}$prompt_char%f ${buffer:-$cursor}")
     (( right_frame )) || right=($right[1] '' '' '')
   fi
   local -i right_indent=prompt_indent
@@ -542,6 +544,32 @@ function ask_python() {
   done
 }
 
+function ask_arrow() {
+  while true; do
+    clear
+    flowing -c "%BDoes this look like %b%2F><%f%B but taller and fatter?%b"
+    print -P ""
+    flowing -c -- "--->  \u276F\u276E  <---"
+    print -P ""
+    print -P "%B(y)  Yes.%b"
+    print -P ""
+    print -P "%B(n)  No.%b"
+    print -P ""
+    print -P "(r)  Restart from the beginning."
+    print -P "(q)  Quit and do nothing."
+    print -P ""
+
+    local key=
+    read -k key${(%):-"?%BChoice [ynrq]: %b"} || quit -c
+    case $key in
+      q) quit;;
+      r) return 1;;
+      y) cap_arrow=1; break;;
+      n) cap_arrow=0; break;;
+    esac
+  done
+}
+
 function ask_debian() {
   while true; do
     clear
@@ -570,7 +598,7 @@ function ask_debian() {
 }
 
 function ask_narrow_icons() {
-  if [[ $POWERLEVEL9K_MODE == (powerline|compatible) ]]; then
+  if [[ $POWERLEVEL9K_MODE == (powerline|compatible|ascii) ]]; then
     cap_narrow_icons=0
     return 0
   fi
@@ -610,19 +638,30 @@ function ask_narrow_icons() {
 }
 
 function ask_style() {
+  if (( terminfo[colors] < 256 )); then
+    style=lean_8colors
+    left_frame=0
+    right_frame=0
+    frame_color=(0 7 2 4)
+    color_name=(Black White Green Blue)
+    options+=lean_8colors
+    return
+  fi
+
   if (( cap_diamond && LINES < 26 )); then
     local nl=''
   else
     local nl=$'\n'
   fi
-  (( terminfo[colors] >= 256 )) && local lean=lean || local lean=lean_8colors
+
   while true; do
+    local extra=
     clear
     flowing -c "%BPrompt Style%b"
     print -n $nl
     print -P "%B(1)  Lean.%b"
     print -n $nl
-    style=$lean left_frame=0 right_frame=0 print_prompt
+    style=lean left_frame=0 right_frame=0 print_prompt
     print -P ""
     print -P "%B(2)  Classic.%b"
     print -n $nl
@@ -632,32 +671,89 @@ function ask_style() {
     print -n $nl
     style=rainbow print_prompt
     print -P ""
-    print -P "%B(4)  Pure.%b"
-    print -n $nl
-    style=pure print_prompt
+    if [[ $POWERLEVEL9K_MODE != ascii ]]; then
+      extra+=4
+      print -P "%B(4)  Pure.%b"
+      print -n $nl
+      style=pure print_prompt
+      print -P ""
+    fi
+    print -P "(r)  Restart from the beginning."
+    print -P "(q)  Quit and do nothing."
+    print -P ""
+
+    local key=
+    read -k key${(%):-"?%BChoice [123${extra}rq]: %b"} || quit -c
+    case $key in
+      q) quit;;
+      r) return 1;;
+      1) style=lean; left_frame=0; right_frame=0; options+=lean; break;;
+      2) style=classic; options+=classic; break;;
+      3) style=rainbow; options+=rainbow; break;;
+      4)
+        if [[ $extra == *4* ]]; then
+          style=pure
+          empty_line=1
+          options+=pure
+          break
+        fi
+      ;;
+    esac
+  done
+}
+
+function ask_charset() {
+  [[ $style == (lean*|classic|rainbow) && $POWERLEVEL9K_MODE != ascii ]] || return 0
+
+  while true; do
+    clear
+    flowing -c "%BCharacter Set%b"
+    print -P ""
+    print -P "%B(1)  Unicode.%b"
+    print -P ""
+    print_prompt
+    print -P ""
+    print -P "%B(2)  ASCII.%b"
+    print -P ""
+    left_sep= right_sep= left_subsep=$vertical_bar right_subsep=$vertical_bar left_head= \
+      right_head= prompt_char='>' left_frame=0 right_frame=0 print_prompt
     print -P ""
     print -P "(r)  Restart from the beginning."
     print -P "(q)  Quit and do nothing."
     print -P ""
 
     local key=
-    read -k key${(%):-"?%BChoice [1234rq]: %b"} || quit -c
+    read -k key${(%):-"?%BChoice [12rq]: %b"} || quit -c
     case $key in
       q) quit;;
       r) return 1;;
-      1) style=$lean; left_frame=0; right_frame=0; options+=$lean; break;;
-      2) style=classic; options+=classic; break;;
-      3) style=rainbow; options+=rainbow; break;;
-      4) style=pure; empty_line=1; options+=pure; break;;
+      1) options+=unicode; break;;
+      2)
+        left_sep=
+        right_sep=
+        left_subsep=$vertical_bar
+        right_subsep=$vertical_bar
+        left_head=
+        right_head=
+        prompt_char='>'
+        left_frame=0
+        right_frame=0
+        POWERLEVEL9K_MODE=ascii
+        cap_diamond=0
+        cap_python=0
+        cap_debian=0
+        cap_narrow_icons=1
+        cap_lock=0
+        cap_arrow=0
+        break
+      ;;
     esac
   done
-  if [[ $style == lean_8colors ]]; then
-    frame_color=(0 7 2 4)
-    color_name=(Black White Green Blue)
-  fi
 }
 
 function ask_color_scheme() {
+  (( terminfo[colors] < 256 )) && return
+
   if [[ $style == lean ]]; then
     while true; do
       clear
@@ -670,7 +766,6 @@ function ask_color_scheme() {
       print -P "%B(2)  8 colors.%b"
       print -P ""
       style=lean_8colors print_prompt
-      print -P ""
       print -P ""
       print -P "(r)  Restart from the beginning."
       print -P "(q)  Quit and do nothing."
@@ -703,7 +798,6 @@ function ask_color_scheme() {
       print -P "%B(2)  Snazzy.%b"
       print -P ""
       pure_color=(${(kv)pure_snazzy}) print_prompt
-      print -P ""
       print -P ""
       print -P "(r)  Restart from the beginning."
       print -P "(q)  Quit and do nothing."
@@ -925,7 +1019,7 @@ function os_icon_name() {
 }
 
 function ask_extra_icons() {
-  if [[ $style == pure || $POWERLEVEL9K_MODE == (powerline|compatible) ]]; then
+  if [[ $style == pure || $POWERLEVEL9K_MODE == (powerline|compatible|ascii) ]]; then
     return 0
   fi
   local os_icon=${(g::)icons[$(os_icon_name)]}
@@ -1102,7 +1196,7 @@ function ask_separators() {
 }
 
 function ask_heads() {
-  if [[ $style != (classic|rainbow) ]]; then
+  if [[ $style != (classic|rainbow) || $POWERLEVEL9K_MODE == ascii ]]; then
     return 0
   fi
   if [[ $POWERLEVEL9K_MODE == nerdfont-complete && $LINES -lt 26 ]]; then
@@ -1195,7 +1289,7 @@ function ask_heads() {
 }
 
 function ask_tails() {
-  if [[ $style != (classic|rainbow) ]]; then
+  if [[ $style != (classic|rainbow) || $POWERLEVEL9K_MODE == ascii ]]; then
     return 0
   fi
   if [[ $POWERLEVEL9K_MODE == nerdfont-complete && $LINES -lt 31 ]]; then
@@ -1306,6 +1400,13 @@ function ask_num_lines() {
 
 function ask_gap_char() {
   [[ $num_lines != 2 || $style == pure ]] && return
+  if [[ $POWERLEVEL9K_MODE == ascii ]]; then
+    local dot='.'
+    local dash='-'
+  else
+    local dot='·'
+    local dash='─'
+  fi
   while true; do
     clear
     flowing -c "%BPrompt Connection%b"
@@ -1316,11 +1417,11 @@ function ask_gap_char() {
     print -P ""
     print -P "%B(2)  Dotted.%b"
     print -P ""
-    gap_char="·" print_prompt
+    gap_char=$dot print_prompt
     print -P ""
     print -P "%B(3)  Solid.%b"
     print -P ""
-    gap_char="─" print_prompt
+    gap_char=$dash print_prompt
     print -P ""
     print -P "(r)  Restart from the beginning."
     print -P "(q)  Quit and do nothing."
@@ -1332,14 +1433,14 @@ function ask_gap_char() {
       q) quit;;
       r) return 1;;
       1) gap_char=" "; options+=disconnected; break;;
-      2) gap_char="·"; options+=dotted; break;;
-      3) gap_char="─"; options+=solid; break;;
+      2) gap_char=$dot; options+=dotted; break;;
+      3) gap_char=$dash; options+=solid; break;;
     esac
   done
 }
 
 function ask_frame() {
-  if [[ $style != (classic|rainbow|lean*) || $num_lines != 2 ]]; then
+  if [[ $style != (classic|rainbow|lean*) || $num_lines != 2 || $POWERLEVEL9K_MODE == ascii ]]; then
     return 0
   fi
 
@@ -1457,9 +1558,10 @@ function ask_instant_prompt() {
 
 function ask_transient_prompt() {
   local disable_rprompt=$((num_lines == 1))
-  local prompt_char='%76F❯%f'
-  [[ $style == pure ]] && prompt_char="%F{$pure_color[magenta]}❯%f"
-  [[ $style == lean_8colors ]] && prompt_char='%2F❯%f'
+  local p=76
+  [[ $style == pure ]] && p=$pure_color[magenta]
+  [[ $style == lean_8colors ]] && p=2
+  p="%F{$p}$prompt_char%f"
   while true; do
     clear
     flowing -c "%BEnable Transient Prompt?%b"
@@ -1467,13 +1569,13 @@ function ask_transient_prompt() {
     print -P "%B(y)  Yes.%b"
     if (( LINES >= 25 || num_lines == 1 )); then
       print -P ""
-      print -P "${(pl:$prompt_indent:: :)}$prompt_char %2Fgit%f pull"
+      print -P "${(pl:$prompt_indent:: :)}$p %2Fgit%f pull"
     elif (( LINES < 23 )); then
       print -P ""
     else
-      print -P "${(pl:$prompt_indent:: :)}$prompt_char %2Fgit%f pull"
+      print -P "${(pl:$prompt_indent:: :)}$p %2Fgit%f pull"
     fi
-    print -P "${(pl:$prompt_indent:: :)}$prompt_char %2Fgit%f branch x"
+    print -P "${(pl:$prompt_indent:: :)}$p %2Fgit%f branch x"
     (( empty_line )) && echo
     buffer="%2Fgit%f checkout x█" print_prompt
     print -P ""
@@ -1805,6 +1907,26 @@ function generate_config() {
         uncomment vi_mode
       fi
     fi
+
+    if [[ $POWERLEVEL9K_MODE == ascii ]]; then
+      sub 'STATUS_OK_VISUAL_IDENTIFIER_EXPANSION' "'ok'"
+      sub 'STATUS_OK_PIPE_VISUAL_IDENTIFIER_EXPANSION' "'ok'"
+      sub 'STATUS_ERROR_VISUAL_IDENTIFIER_EXPANSION' "'err'"
+      sub 'STATUS_ERROR_SIGNAL_VISUAL_IDENTIFIER_EXPANSION' ""
+      sub 'STATUS_ERROR_PIPE_VISUAL_IDENTIFIER_EXPANSION' "'err'"
+      sub 'BATTERY_STAGES' "('battery')"
+      sub 'PROMPT_CHAR_{OK,ERROR}_VIINS_CONTENT_EXPANSION' "'>'"
+      sub 'PROMPT_CHAR_{OK,ERROR}_VICMD_CONTENT_EXPANSION' "'<'"
+      sub 'PROMPT_CHAR_{OK,ERROR}_VIVIS_CONTENT_EXPANSION' "'V'"
+      sub 'PROMPT_CHAR_{OK,ERROR}_VIOWR_CONTENT_EXPANSION' "'^'"
+      rep "-i '⭐'" "-i '*'"
+      rep '…' '..'
+      rep '⇣' '<'
+      rep '⇡' '>'
+      rep '⇠' '<-'
+      rep '⇢' '->'
+      rep '─' '-'
+    fi
   fi
 
   if (( $+pure_use_rprompt )); then
@@ -1928,10 +2050,10 @@ fi
 while true; do
   local instant_prompt=verbose zshrc_content= zshrc_backup= zshrc_backup_u=
   local -i zshrc_has_cfg=0 zshrc_has_instant_prompt=0 write_zshrc=0
-  local POWERLEVEL9K_MODE= style= config_backup= config_backup_u= gap_char=' '
+  local POWERLEVEL9K_MODE= style= config_backup= config_backup_u= gap_char=' ' prompt_char='❯'
   local left_subsep= right_subsep= left_tail= right_tail= left_head= right_head= show_time=
   local -i num_lines=0 empty_line=0 color=2 left_frame=1 right_frame=1 transient_prompt=0
-  local -i cap_diamond=0 cap_python=0 cap_debian=0 cap_narrow_icons=0 cap_lock=0
+  local -i cap_diamond=0 cap_python=0 cap_debian=0 cap_narrow_icons=0 cap_lock=0 cap_arrow=0
   local -a extra_icons=('' '' '')
   local -a frame_color=(244 242 240 238)
   local -a color_name=(Lightest Light Dark Darkest)
@@ -1945,36 +2067,46 @@ while true; do
 
   unset pure_use_rprompt
 
-  ask_font || continue
-  ask_diamond || continue
-  if [[ $AWESOME_GLYPHS_LOADED == 1 ]]; then
-    POWERLEVEL9K_MODE=awesome-mapped-fontconfig
-  else
-    ask_lock '\uF023' || continue
-    if (( ! cap_lock )); then
-      ask_lock '\uE138' "Let's try another one." || continue
-      if (( cap_lock )); then
-        if (( cap_diamond )); then
-          POWERLEVEL9K_MODE=awesome-patched
-          ask_python || continue
-        else
-          POWERLEVEL9K_MODE=flat
-        fi
-      else
-        (( cap_diamond )) && POWERLEVEL9K_MODE=powerline || POWERLEVEL9K_MODE=compatible
-      fi
-    elif (( ! cap_diamond )); then
-      POWERLEVEL9K_MODE=awesome-fontconfig
+  if [[ $langinfo[CODESET] == (utf|UTF)(-|)8 ]]; then
+    ask_font || continue
+    ask_diamond || continue
+    if [[ $AWESOME_GLYPHS_LOADED == 1 ]]; then
+      POWERLEVEL9K_MODE=awesome-mapped-fontconfig
     else
-      ask_debian || continue
-      if (( cap_debian )); then
-        POWERLEVEL9K_MODE=nerdfont-complete
-      else
+      ask_lock '\uF023' || continue
+      if (( ! cap_lock )); then
+        ask_lock '\uE138' "Let's try another one." || continue
+        if (( cap_lock )); then
+          if (( cap_diamond )); then
+            POWERLEVEL9K_MODE=awesome-patched
+            ask_python || continue
+          else
+            POWERLEVEL9K_MODE=flat
+          fi
+        else
+          if (( cap_diamond )); then
+            POWERLEVEL9K_MODE=powerline
+          else
+            ask_arrow || continue
+            (( cap_arrow )) && POWERLEVEL9K_MODE=compatible || POWERLEVEL9K_MODE=ascii
+          fi
+        fi
+      elif (( ! cap_diamond )); then
         POWERLEVEL9K_MODE=awesome-fontconfig
-        ask_python || continue
+      else
+        ask_debian || continue
+        if (( cap_debian )); then
+          POWERLEVEL9K_MODE=nerdfont-complete
+        else
+          POWERLEVEL9K_MODE=awesome-fontconfig
+          ask_python || continue
+        fi
       fi
     fi
+  else
+    POWERLEVEL9K_MODE=ascii
   fi
+
   if [[ $POWERLEVEL9K_MODE == powerline ]]; then
     options+=powerline
   elif (( cap_diamond )); then
@@ -1997,10 +2129,18 @@ while true; do
     right_subsep=$vertical_bar
     left_head=
     right_head=
+    if [[ $POWERLEVEL9K_MODE == ascii ]]; then
+      prompt_char='>'
+      left_frame=0
+      right_frame=0
+    fi
   fi
+
   _p9k_init_icons
+
   ask_narrow_icons     || continue
   ask_style            || continue
+  ask_charset          || continue
   ask_color_scheme     || continue
   ask_color            || continue
   ask_use_rprompt      || continue
