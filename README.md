@@ -936,6 +936,9 @@ If you want to confine prompt colors to the selected terminal color palette (say
 use *Rainbow*, *Lean* → *8 colors* or *Pure* → *Original*. Other styles use fixed colors and thus
 look the same in any terminal color palette.
 
+All styles except Pure have an option to use *ASCII* charset. Prompt will look less pretty but will
+render correctly with all fonts and in all locales.
+
 If you enable transient prompt, take advantage of two-line prompt. You'll get the benefit of
 extra space for typing commands without the usual drawback of reduced scrollback density. Having
 all commands start from the same offset is also nice.
