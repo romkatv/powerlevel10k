@@ -1672,9 +1672,17 @@ prompt_dir() {
     fi
   fi
 
-  local -i fake_first=0 expand=0
-  local delim=${_POWERLEVEL9K_SHORTEN_DELIMITER-$'\u2026'}
-  local -i shortenlen=${_POWERLEVEL9K_SHORTEN_DIR_LENGTH:--1}
+  local -i fake_first=0 expand=0 shortenlen=${_POWERLEVEL9K_SHORTEN_DIR_LENGTH:--1}
+
+  if (( $+_POWERLEVEL9K_SHORTEN_DELIMITER )); then
+    local delim=$_POWERLEVEL9K_SHORTEN_DELIMITER
+  else
+    if [[ $langinfo[CODESET] == (utf|UTF)(-|)8 ]]; then
+      local delim=$'\u2026'
+    else
+      local delim='..'
+    fi
+  fi
 
   case $_POWERLEVEL9K_SHORTEN_STRATEGY in
     truncate_absolute|truncate_absolute_chars)
@@ -6429,7 +6437,11 @@ _p9k_init_params() {
   _p9k_declare -i POWERLEVEL9K_VCS_SHORTEN_LENGTH
   _p9k_declare -i POWERLEVEL9K_VCS_SHORTEN_MIN_LENGTH
   _p9k_declare -s POWERLEVEL9K_VCS_SHORTEN_STRATEGY
-  _p9k_declare -e POWERLEVEL9K_VCS_SHORTEN_DELIMITER '\u2026'
+  if [[ $langinfo[CODESET] == (utf|UTF)(-|)8 ]]; then
+    _p9k_declare -e POWERLEVEL9K_VCS_SHORTEN_DELIMITER '\u2026'
+  else
+    _p9k_declare -e POWERLEVEL9K_VCS_SHORTEN_DELIMITER '..'
+  fi
   _p9k_declare -b POWERLEVEL9K_VCS_CONFLICTED_STATE 0
   _p9k_declare -b POWERLEVEL9K_HIDE_BRANCH_ICON 0
   _p9k_declare -b POWERLEVEL9K_VCS_HIDE_TAGS 0
@@ -7263,12 +7275,12 @@ _p9k_must_init() {
     [[ $sig == $_p9k__param_sig ]] && return 1
     _p9k_deinit
   fi
-  _p9k__param_pat=$'v59\1'${ZSH_VERSION}$'\1'${ZSH_PATCHLEVEL}$'\1'
+  _p9k__param_pat=$'v60\1'${ZSH_VERSION}$'\1'${ZSH_PATCHLEVEL}$'\1'
   _p9k__param_pat+=$'${#parameters[(I)POWERLEVEL9K_*]}\1${(%):-%n%#}\1$GITSTATUS_LOG_LEVEL\1'
   _p9k__param_pat+=$'$GITSTATUS_ENABLE_LOGGING\1$GITSTATUS_DAEMON\1$GITSTATUS_NUM_THREADS\1'
   _p9k__param_pat+=$'$DEFAULT_USER\1${ZLE_RPROMPT_INDENT:-1}\1$P9K_SSH\1$__p9k_ksh_arrays'
   _p9k__param_pat+=$'$__p9k_sh_glob\1$ITERM_SHELL_INTEGRATION_INSTALLED\1$commands[uname]'
-  _p9k__param_pat+=$'${PROMPT_EOL_MARK-%B%S%#%s%b}\1$commands[locale]\1'
+  _p9k__param_pat+=$'${PROMPT_EOL_MARK-%B%S%#%s%b}\1$commands[locale]\1$langinfo[CODESET]'
   _p9k__param_pat+=$'$functions[p10k-on-init]$functions[p10k-on-pre-prompt]\1'
   _p9k__param_pat+=$'$functions[p10k-on-post-widget]$functions[p10k-on-post-prompt]\1'
   local MATCH
