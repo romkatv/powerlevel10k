@@ -1102,7 +1102,7 @@ function ask_separators() {
 }
 
 function ask_heads() {
-  if [[ $style != (classic|rainbow) || $cap_diamond != 1 ]]; then
+  if [[ $style != (classic|rainbow) ]]; then
     return 0
   fi
   if [[ $POWERLEVEL9K_MODE == nerdfont-complete && $LINES -lt 26 ]]; then
@@ -1113,15 +1113,23 @@ function ask_heads() {
   while true; do
     local extra=
     clear
+    if 
     flowing -c "%BPrompt Heads%b"
-    if [[ -n $nl ]]; then
-      print -P "                   head"
-      print -P "%B(1)  Sharp.%b         |"
-      print -P "                    v"
+    if (( cap_diamond )); then
+      if [[ -n $nl ]]; then
+        print -P "                   head"
+        print -P "%B(1)  Sharp.%b         |"
+        print -P "                    v"
+      else
+        print -P "%B(1)  Sharp.%b"
+      fi
+      left_head=$right_triangle right_head=$left_triangle print_prompt
     else
-      print -P "%B(1)  Sharp.%b"
+      print -P ""
+      print -P "%B(1)  Flat.%b"
+      print -P ""
+      left_head= right_head= print_prompt
     fi
-    left_head=$right_triangle right_head=$left_triangle print_prompt
     print -P ""
     print -P "%B(2)  Blurred.%b"
     print -n $nl
@@ -1148,8 +1156,24 @@ function ask_heads() {
     case $key in
       q) quit;;
       r) return 1;;
-      1) left_head=$right_triangle; right_head=$left_triangle; options+='sharp heads';   break;;
-      2) left_head=$fade_out;       right_head=$fade_in;       options+='blurred heads'; break;;
+      1)
+        if (( cap_diamond )); then
+          left_head=$right_triangle
+          right_head=$left_triangle
+          options+='sharp heads'
+        else
+          left_head=
+          right_head=
+          options+='flat heads'
+        fi
+        break
+      ;;
+      2)
+        left_head=$fade_out
+        right_head=$fade_in
+        options+='blurred heads'
+        break
+      ;;
       3)
         if [[ $extra == *3* ]]; then
           left_head=$down_triangle
@@ -1971,8 +1995,8 @@ while true; do
     right_sep=
     left_subsep=$vertical_bar
     right_subsep=$vertical_bar
-    left_head=$fade_out
-    right_head=$fade_in
+    left_head=
+    right_head=
   fi
   _p9k_init_icons
   ask_narrow_icons     || continue
