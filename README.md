@@ -1172,19 +1172,28 @@ configuration wizard. Once you can see the errors, fix `~/.zshrc` to get rid of 
 
 ### Some prompt styles are missing from the configuration wizard
 
-tl;dr: To see all prompt styles in the configuration wizard, restart your terminal, install
-[the recommended font](#meslo-nerd-font-patched-for-powerlevel10k) and resize your terminal to at
-least 80 columns by 25 lines prior to running `p10k configure`.
+If Zsh version is below 5.7.1 or `COLORTERM` environment variable is neither `24bit` nor
+`truecolor`, configuration wizard won't offer Pure style with Snazzy color scheme. *Fix*: Install
+Zsh >= 5.7.1 and use a terminal with truecolor support. Verify with `print -P '%F{#ff0000}red%f'`.
 
-The first few questions in the configuration wizard are meant to assess the capabilities of the
-terminal font. If your answers indicate that some glyphs don't render correctly, configuration
-wizard won't offer prompt styles that use them. If you'd like to see all prompt styles, restart your
-terminal and install [the recommended font](#meslo-nerd-font-patched-for-powerlevel10k).
+If the terminal can display fewer than 256 colors, configuration wizard preselects Lean style with
+8 colors. All other styles require at least 256 colors. *Fix*: Use a terminal with 256 color support
+and make sure that `TERM` environment variable is set correctly. Verify with
+`print $terminfo[colors]`.
+
+If there is no UTF-8 locale on the system, configuration wizard won't offer prompt styles that use
+Unicode characters. *Fix*: Install a UTF-8 locale. Verify with `locale -a`.
+
+When a UTF-8 locale is available, the first few questions asked by the configuration wizard assess
+capabilities of the terminal font. If your answers indicate that some glyphs don't render correctly,
+configuration wizard won't offer prompt styles that use them. *Fix*: Restart your terminal and
+install [the recommended font](#meslo-nerd-font-patched-for-powerlevel10k). Verify by running
+`p10k configure` and checking that all glyphs render correctly.
 
 The minimum screen size at which configuration wizard can function is 55 columns by 21 lines.
 However, not all prompt styles are offered at such small screen size as there is simply not enough
-space to present them. Resize your terminal to at least 80 columns by 25 lines prior to running
-`p10k configure` to see all prompt styles.
+space to present them. *Fix*: Resize your terminal to at least 80 columns by 25 lines prior to
+running `p10k configure`. Verify with `print ${COLUMNS}x${LINES}`.
 
 ### Cannot install the recommended font
 
