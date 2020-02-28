@@ -1,17 +1,11 @@
-- battery: when state or icon change, update with _p9k_set_prompt. make sure icons can be sent with
-  `typset -p` in zsh 5.1.
-- ram: reduce precision to 2 digits. check if it makes sense for all segments that use the same
-  function.
-- to avoid resetting prompt too often (e.g., when battery remaining time changes by 1 minute), can
-  do the following: send the current state from master to worker; worker sends new state if it's
-  different but it only triggers prompt reset if it's sufficiently different. this requires
-  disabling implicit reset on every eval in _p9k_worker_receive.
+- battery: use the same technique as in vpn_ip to avoid reset=2.
 - implement fake gitstatus api on top of vcs_info (or plain git?) + worker and use it if there is no
   gitstatus.
+- call vcs_info on worker. the tricky question is what to display while "loading".
 - add _SHOW_SYSTEM to all *env segments.
 - support states in SHOW_ON_COMMAND: POWERLEVEL9K_SEGMENT_STATE_SHOW_ON_COMMAND='...'
 - add POWERLEVEL9K_${SEGMENT}_${STATE}_SHOW_IN_DIR='pwd_pattern'; implement the same way as
-  SHOW_ON_UPGLOB.
+  SHOW_ON_UPGLOB. how should it interact with POWERLEVEL9K_${SEGMENT}_DISABLED_DIR_PATTERN?
 - add `p10k upglob`; returns 0 on match and sets REPLY to the directory where match was found.
 - when directory cannot be shortened any further, start chopping off segments from the left and
   replacing the chopped off part with `…`. e.g., `…/x/anchor/y/anchor`. the shortest dir
