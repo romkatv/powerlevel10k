@@ -6765,17 +6765,22 @@ _p9k_init_params() {
   done
 }
 
-function _p9k_on_widget_zle-keymap-select() { __p9k_reset_state=2; }
-function _p9k_on_widget_overwrite-mode()    { __p9k_reset_state=2; }
-function _p9k_on_widget_vi-replace()        { __p9k_reset_state=2; }
+function _p9k_on_widget_zle-keymap-select() { _p9k_check_visual_mode; __p9k_reset_state=2; }
+function _p9k_on_widget_overwrite-mode()    { _p9k_check_visual_mode; __p9k_reset_state=2; }
+function _p9k_on_widget_vi-replace()        { _p9k_check_visual_mode; __p9k_reset_state=2; }
 
-function _p9k_check_visual_mode() {
-  [[ ${KEYMAP:-} == vicmd ]] || return 0
-  local region=${${REGION_ACTIVE:-0}/2/1}
-  [[ $region != $_p9k__region_active ]] || return 0
-  _p9k__region_active=$region
-  __p9k_reset_state=2
-}
+if is-at-least 5.3; then
+  function _p9k_check_visual_mode() {
+    [[ ${KEYMAP:-} == vicmd ]] || return 0
+    local region=${${REGION_ACTIVE:-0}/2/1}
+    [[ $region != $_p9k__region_active ]] || return 0
+    _p9k__region_active=$region
+    __p9k_reset_state=2
+  }
+else
+  function _p9k_check_visual_mode() {}
+fi
+
 function _p9k_on_widget_visual-mode()       { _p9k_check_visual_mode; }
 function _p9k_on_widget_visual-line-mode()  { _p9k_check_visual_mode; }
 function _p9k_on_widget_deactivate-region() { _p9k_check_visual_mode; }
@@ -6847,6 +6852,7 @@ function _p9k_widget_hook() {
   eval "$__p9k_intro"
   (( _p9k__restore_prompt_fd )) && _p9k_restore_prompt $_p9k__restore_prompt_fd
   __p9k_reset_state=1
+  _p9k_check_visual_mode
   local pat idx var
   for pat idx var in $_p9k_show_on_command; do
     if (( $P9K_COMMANDS[(I)$pat] )); then
