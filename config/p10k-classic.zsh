@@ -72,6 +72,7 @@
     jenv                    # java version from jenv (https://github.com/jenv/jenv)
     plenv                   # perl version from plenv (https://github.com/tokuhirom/plenv)
     phpenv                  # php version from phpenv (https://github.com/phpenv/phpenv)
+    haskell_stack           # haskell version from stack (https://haskellstack.org/)
     kubecontext             # current kubernetes context (https://kubernetes.io/)
     terraform               # terraform workspace (https://www.terraform.io)
     aws                     # aws profile (https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-profiles.html)
@@ -1060,6 +1061,20 @@
   typeset -g POWERLEVEL9K_PHPENV_PROMPT_ALWAYS_SHOW=false
   # Custom icon.
   # typeset -g POWERLEVEL9K_PHPENV_VISUAL_IDENTIFIER_EXPANSION='⭐'
+
+  ##########[ haskell_stack: haskell version from stack (https://haskellstack.org/) ]###########
+  # Haskell color.
+  typeset -g POWERLEVEL9K_HASKELL_STACK_FOREGROUND=172
+  # Hide haskell version if it doesn't come from one of these sources.
+  #
+  #   shell:  version is set by STACK_YAML
+  #   local:  version is set by stack.yaml up the directory tree
+  #   global: version is set by the implicit global project (~/.stack/global-project/stack.yaml)
+  typeset -g POWERLEVEL9K_HASKELL_STACK_SOURCES=(shell local)
+  # If set to false, hide haskell version if it's the same as in the implicit global project.
+  typeset -g POWERLEVEL9K_HASKELL_STACK_ALWAYS_SHOW=true
+  # Custom icon.
+  # typeset -g POWERLEVEL9K_HASKELL_STACK_VISUAL_IDENTIFIER_EXPANSION='⭐'
 
   ################[ terraform: terraform workspace (https://www.terraform.io) ]#################
   # POWERLEVEL9K_TERRAFORM_CLASSES is an array with even number of elements. The first element

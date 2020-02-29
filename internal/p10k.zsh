@@ -4968,6 +4968,55 @@ _p9k_prompt_asdf_init() {
   typeset -g "_p9k__segment_cond_${_p9k__prompt_side}[_p9k__segment_index]"='${commands[asdf]:-${${+functions[asdf]}:#0}}'
 }
 
+_p9k_haskell_stack_version() {
+  if ! _p9k_cache_stat_get $0 $1 ${STACK_ROOT:-~/.stack}/{pantry/pantry.sqlite3,stack.sqlite3}; then
+    local v
+    v="$(STACK_YAML=$1 stack \
+      --silent                 \
+      --no-install-ghc         \
+      --skip-ghc-check         \
+      --no-terminal            \
+      --color=never            \
+      --lock-file=read-only    \
+      query compiler actual)" || v=
+    _p9k_cache_stat_set "$v"
+  fi
+  _p9k__ret=$_p9k__cache_val[1]
+}
+
+prompt_haskell_stack() {
+  if [[ -n $STACK_YAML ]]; then
+    (( ${_POWERLEVEL9K_HASKELL_STACK_SOURCES[(I)shell]} )) || return
+    _p9k_haskell_stack_version $STACK_YAML
+  else
+    (( ${_POWERLEVEL9K_HASKELL_STACK_SOURCES[(I)local|global]} )) || return
+    if _p9k_upglob stack.yaml; then
+      (( _POWERLEVEL9K_HASKELL_STACK_PROMPT_ALWAYS_SHOW )) || return
+      (( ${_POWERLEVEL9K_HASKELL_STACK_SOURCES[(I)global]} )) || return
+      _p9k_haskell_stack_version ${STACK_ROOT:-~/.stack}/global-project/stack.yaml
+    else
+      local -i idx=$?
+      (( ${_POWERLEVEL9K_HASKELL_STACK_SOURCES[(I)local]} )) || return
+      _p9k_haskell_stack_version $_p9k__parent_dirs[idx]/stack.yaml
+    fi
+  fi
+
+  [[ -n $_p9k__ret ]] || return
+
+  local v=$_p9k__ret
+
+  if (( !_POWERLEVEL9K_HASKELL_STACK_PROMPT_ALWAYS_SHOW )); then
+    _p9k_haskell_stack_version ${STACK_ROOT:-~/.stack}/global-project/stack.yaml
+    [[ $v == $_p9k__ret ]] && return
+  fi
+
+  _p9k_prompt_segment "$0" "yellow" "$_p9k_color1" 'HASKELL_ICON' 0 '' "${v//\%/%%}"
+}
+
+_p9k_prompt_haskell_stack_init() {
+  typeset -g "_p9k__segment_cond_${_p9k__prompt_side}[_p9k__segment_index]"='$commands[stack]'
+}
+
 # Use two preexec hooks to survive https://github.com/MichaelAquilina/zsh-you-should-use with
 # YSU_HARDCORE=1. See https://github.com/romkatv/powerlevel10k/issues/427.
 _p9k_preexec1() {
@@ -6609,6 +6658,8 @@ _p9k_init_params() {
   _p9k_declare -b POWERLEVEL9K_JAVA_VERSION_PROJECT_ONLY 0
   _p9k_declare -b POWERLEVEL9K_RBENV_PROMPT_ALWAYS_SHOW 0
   _p9k_declare -a POWERLEVEL9K_RBENV_SOURCES -- shell local global
+  _p9k_declare -b POWERLEVEL9K_HASKELL_STACK_PROMPT_ALWAYS_SHOW 1
+  _p9k_declare -a POWERLEVEL9K_HASKELL_STACK_SOURCES -- shell local
   _p9k_declare -b POWERLEVEL9K_PHPENV_PROMPT_ALWAYS_SHOW 0
   _p9k_declare -a POWERLEVEL9K_PHPENV_SOURCES -- shell local global
   _p9k_declare -b POWERLEVEL9K_LUAENV_PROMPT_ALWAYS_SHOW 0
@@ -7286,7 +7337,7 @@ _p9k_must_init() {
     [[ $sig == $_p9k__param_sig ]] && return 1
     _p9k_deinit
   fi
-  _p9k__param_pat=$'v64\1'${ZSH_VERSION}$'\1'${ZSH_PATCHLEVEL}$'\1'
+  _p9k__param_pat=$'v65\1'${ZSH_VERSION}$'\1'${ZSH_PATCHLEVEL}$'\1'
   _p9k__param_pat+=$'${#parameters[(I)POWERLEVEL9K_*]}\1${(%):-%n%#}\1$GITSTATUS_LOG_LEVEL\1'
   _p9k__param_pat+=$'$GITSTATUS_ENABLE_LOGGING\1$GITSTATUS_DAEMON\1$GITSTATUS_NUM_THREADS\1'
   _p9k__param_pat+=$'$DEFAULT_USER\1${ZLE_RPROMPT_INDENT:-1}\1$P9K_SSH\1$__p9k_ksh_arrays'

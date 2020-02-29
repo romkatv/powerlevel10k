@@ -281,6 +281,7 @@ enable as many segments as you like. It won't slow down your prompt or Zsh start
 | `jenv` | java environment from [jenv](https://github.com/jenv/jenv) |
 | `plenv` | perl environment from [plenv](https://github.com/tokuhirom/plenv) |
 | `phpenv` | php environment from [phpenv](https://github.com/phpenv/phpenv) |
+| `haskell_stack` | haskell version from [stack](https://haskellstack.org/) |
 | `node_version` | [node.js](https://nodejs.org/) version |
 | `go_version` | [go](https://golang.org) version |
 | `rust_version` | [rustc](https://www.rust-lang.org) version |
