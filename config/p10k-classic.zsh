@@ -283,6 +283,7 @@
     composer.json
     go.mod
     package.json
+    stack.yaml
   )
   typeset -g POWERLEVEL9K_SHORTEN_FOLDER_MARKER="(${(j:|:)anchor_files})"
   # If set to true, remove everything before the last (deepest) subdirectory that contains files
