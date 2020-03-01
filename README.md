@@ -392,8 +392,10 @@ supported by Powerlevel10k.
 
 ### Homebrew
 
-Run `brew install romkatv/powerlevel10k/powerlevel10k` and add
-`source /usr/local/opt/powerlevel10k/powerlevel10k.zsh-theme` to `~/.zshrc`.
+```zsh
+brew install romkatv/powerlevel10k/powerlevel10k
+echo 'source /usr/local/opt/powerlevel10k/powerlevel10k.zsh-theme' >>! ~/.zshrc
+```
 
 ## Configuration
 
@@ -1482,6 +1484,7 @@ There are a few mitigation options for this issue.
   - [Zgen](#zgen)
   - [Zplugin](#zplugin)
   - [Zinit](#zinit)
+  - [Homebrew](#homebrew)
 - [Configuration](#configuration)
   - [For new users](#for-new-users)
   - [For Powerlevel9k users](#for-powerlevel9k-users)
