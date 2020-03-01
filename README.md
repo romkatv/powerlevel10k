@@ -26,6 +26,7 @@ Ready to give Powerlevel10k a try?
    - [Zgen](#zgen)
    - [Zplugin](#zplugin)
    - [Zinit](#zinit)
+   - [Homebrew](#homebrew)
 1. Restart Zsh.
 1. Type `p10k configure` if the configuration wizard doesn't start automatically.
 
@@ -389,6 +390,11 @@ Add `zinit ice depth=1; zinit light romkatv/powerlevel10k` to `~/.zshrc`.
 The use of `depth=1` ice is optional. Other types of ice are neither recommended nor officially
 supported by Powerlevel10k.
 
+### Homebrew
+
+Run `brew install romkatv/powerlevel10k/powerlevel10k` and add
+`source /usr/local/opt/powerlevel10k/powerlevel10k.zsh-theme` to `~/.zshrc`.
+
 ## Configuration
 
 ### For new users
@@ -551,6 +557,7 @@ The command to update Powerlevel10k depends on how it was installed.
 | [Zgen](#zgen)           | `zgen update`                                  |
 | [Zplugin](#zplugin)     | `zplugin update`                               |
 | [Zinit](#zinit)         | `zinit update`                                 |
+| [Homebrew](#homebrew)   | `brew update && brew upgrade`                  |
 
 **IMPORTANT**: Restart Zsh after updating Powerlevel10k. [Do not use `source ~/.zshrc`](
   #weird-things-happen-after-typing-source-zshrc).
