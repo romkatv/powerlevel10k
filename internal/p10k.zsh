@@ -6204,7 +6204,8 @@ _p9k_precmd_impl() {
     fi
     _p9k_save_status
 
-    if [[ $_p9k__preexec_cmd == (clear|reset) ]]; then
+    if [[ $_p9k__preexec_cmd == [[:space:]]#(clear([[:space:]]##-[a-zA-Z-_]#)#|reset)[[:space:]]# &&
+          $_p9k__status == 0 ]]; then
       P9K_TTY=new
     elif [[ $P9K_TTY == new && $_p9k__fully_initialized == 1 ]] && ! zle; then
       P9K_TTY=old
