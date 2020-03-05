@@ -6068,6 +6068,8 @@ function _p9k_on_expand() {
           P9K_TTY=new
         fi
       fi
+    elif [[ $P9K_TTY == new && $_p9k__fully_initialized == 1 ]] && ! zle; then
+      P9K_TTY=old
     fi
 
     __p9k_reset_state=1
@@ -6098,7 +6100,7 @@ function _p9k_on_expand() {
       fi
     fi
 
-    [[ -z $_p9k__last_tty ]] && _p9k_wrap_widgets
+    (( _p9k__fully_initialized )) || _p9k_wrap_widgets
   fi
 
   if (( $+__p9k_instant_prompt_active )); then
@@ -6109,7 +6111,7 @@ function _p9k_on_expand() {
   if (( ! _p9k__expanded )); then
     _p9k__expanded=1
 
-    [[ -z $_p9k__last_tty && $+functions[p10k-on-init] == 1 ]] && p10k-on-init
+    (( _p9k__fully_initialized || ! $+functions[p10k-on-init] )) || p10k-on-init
 
     local pat idx var
     for pat idx var in $_p9k_show_on_command; do
@@ -6150,8 +6152,7 @@ function _p9k_on_expand() {
     fi
 
     __p9k_reset_state=0
-    _p9k__last_tty=$P9K_TTY
-    P9K_TTY=old
+    _p9k__fully_initialized=1
   fi
 }
 functions -M _p9k_on_expand
@@ -6413,7 +6414,7 @@ _p9k_init_vars() {
   typeset -ga _p9k_show_on_command
   typeset -g  _p9k__last_buffer
   typeset -ga _p9k__last_commands
-  typeset -g  _p9k__last_tty
+  typeset -gi  _p9k__fully_initialized
   typeset -gi _p9k__must_restore_prompt
   typeset -gi _p9k__restore_prompt_fd
   typeset -gi _p9k__can_hide_cursor=$(( $+terminfo[civis] && $+terminfo[cnorm] ))
@@ -7081,11 +7082,8 @@ function _p9k_restore_prompt() {
   _p9k_set_prompt
   _p9k__refresh_reason=
 
-  local tty=$P9K_TTY
-  P9K_TTY=$_p9k__last_tty
   _p9k__expanded=0
   _p9k_reset_prompt
-  P9K_TTY=$tty
 }
 
 prompt__p9k_internal_nothing() { _p9k__prompt+='${_p9k__sss::=}'; }
@@ -7430,7 +7428,7 @@ _p9k_must_init() {
     [[ $sig == $_p9k__param_sig ]] && return 1
     _p9k_deinit
   fi
-  _p9k__param_pat=$'v67\1'${ZSH_VERSION}$'\1'${ZSH_PATCHLEVEL}$'\1'
+  _p9k__param_pat=$'v68\1'${ZSH_VERSION}$'\1'${ZSH_PATCHLEVEL}$'\1'
   _p9k__param_pat+=$'${#parameters[(I)POWERLEVEL9K_*]}\1${(%):-%n%#}\1$GITSTATUS_LOG_LEVEL\1'
   _p9k__param_pat+=$'$GITSTATUS_ENABLE_LOGGING\1$GITSTATUS_DAEMON\1$GITSTATUS_NUM_THREADS\1'
   _p9k__param_pat+=$'$DEFAULT_USER\1${ZLE_RPROMPT_INDENT:-1}\1$P9K_SSH\1$__p9k_ksh_arrays'
