@@ -958,7 +958,10 @@
   # Nodenv color.
   # typeset -g POWERLEVEL9K_NODENV_FOREGROUND=2
   # typeset -g POWERLEVEL9K_NODENV_BACKGROUND=0
-  # Don't show node version if it's the same as global: $(nodenv version-name) == $(nodenv global).
+  # Hide node version if it doesn't come from one of these sources.
+  typeset -g POWERLEVEL9K_NODENV_SOURCES=(shell local global)
+  # If set to false, hide node version if it's the same as global:
+  # $(nodenv version-name) == $(nodenv global).
   typeset -g POWERLEVEL9K_NODENV_PROMPT_ALWAYS_SHOW=false
   # Custom icon.
   # typeset -g POWERLEVEL9K_NODENV_VISUAL_IDENTIFIER_EXPANSION='⭐'
