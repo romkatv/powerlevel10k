@@ -5104,7 +5104,6 @@ _p9k_preexec1() {
 _p9k_preexec2() {
   _p9k__preexec_cmd=$2
   _p9k__timer_start=EPOCHREALTIME
-  [[ "$2" != (clear|reset) ]] || P9K_TTY=new
 }
 
 function _p9k_prompt_net_iface_init() {
@@ -6068,8 +6067,6 @@ function _p9k_on_expand() {
           P9K_TTY=new
         fi
       fi
-    elif [[ $P9K_TTY == new && $_p9k__fully_initialized == 1 ]] && ! zle; then
-      P9K_TTY=old
     fi
 
     __p9k_reset_state=1
@@ -6206,6 +6203,12 @@ _p9k_precmd_impl() {
       unset P9K_COMMAND_DURATION_SECONDS
     fi
     _p9k_save_status
+
+    if [[ $_p9k__preexec_cmd == (clear|reset) ]]; then
+      P9K_TTY=new
+    elif [[ $P9K_TTY == new && $_p9k__fully_initialized == 1 ]] && ! zle; then
+      P9K_TTY=old
+    fi
 
     _p9k__timer_start=0
     _p9k__region_active=0
