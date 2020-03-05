@@ -5104,6 +5104,7 @@ _p9k_preexec1() {
 _p9k_preexec2() {
   _p9k__preexec_cmd=$2
   _p9k__timer_start=EPOCHREALTIME
+  [[ "$2" != (clear|reset) ]] || P9K_TTY=new
 }
 
 function _p9k_prompt_net_iface_init() {
@@ -6988,6 +6989,11 @@ function _p9k_widget_hook() {
 
   eval "$__p9k_intro"
   (( _p9k__restore_prompt_fd )) && _p9k_restore_prompt $_p9k__restore_prompt_fd
+  if [[ $1 == clear-screen ]]; then
+    P9K_TTY=new
+    _p9k__expanded=0
+    _p9k_reset_prompt
+  fi
   __p9k_reset_state=1
   _p9k_check_visual_mode
   local pat idx var
@@ -7028,6 +7034,7 @@ function _p9k_wrap_widgets() {
       visual-mode
       visual-line-mode
       deactivate-region
+      clear-screen
       $_POWERLEVEL9K_HOOK_WIDGETS
     )
   else
