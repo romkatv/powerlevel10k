@@ -618,6 +618,9 @@ _p9k_left_prompt_segment() {
     _p9k_foreground $fg_color
     local fg=$_p9k__ret
 
+    local style=%b$bg$fg
+    local style_=${style//\}/\\\}}
+
     _p9k_get_icon $1 LEFT_SEGMENT_SEPARATOR
     local sep=$_p9k__ret
     _p9k_escape $_p9k__ret
@@ -641,9 +644,6 @@ _p9k_left_prompt_segment() {
     _p9k_get_icon $1 LEFT_PROMPT_LAST_SEGMENT_END_SYMBOL $sep
     _p9k_escape $_p9k__ret
     local end_sep_=$_p9k__ret
-
-    local style=%b$bg$fg
-    local style_=${style//\}/\\\}}
 
     _p9k_get_icon $1 WHITESPACE_BETWEEN_LEFT_SEGMENTS ' '
     local space=$_p9k__ret
@@ -682,9 +682,9 @@ _p9k_left_prompt_segment() {
       else
         _p9k_foreground $_p9k_color1
       fi
-      _p9k_t+=%b$bg$_p9k__ret$ss$style$left_space  # 3
+      _p9k_t+=%b$bg$_p9k__ret$ss$style$left_space    # 3
     else
-      _p9k_t+=%b$bg$ss$style$left_space           # 3
+      _p9k_t+=%b$bg$ss$style$left_space              # 3
     fi
     _p9k_t+=%b$bg$s$style$left_space                 # 4
 
@@ -700,17 +700,17 @@ _p9k_left_prompt_segment() {
 
     local p=
     p+="\${_p9k__n::=}"
-    p+="\${\${\${_p9k__bg:-0}:#NONE}:-\${_p9k__n::=$((t+1))}}"                               # 1
+    p+="\${\${\${_p9k__bg:-0}:#NONE}:-\${_p9k__n::=$((t+1))}}"                                # 1
     if [[ -n $join ]]; then
-      p+="\${_p9k__n:=\${\${\$(($join)):#0}:+$((t+2))}}"                                    # 2
+      p+="\${_p9k__n:=\${\${\$(($join)):#0}:+$((t+2))}}"                                      # 2
     fi
     if (( __p9k_sh_glob )); then
-      p+="\${_p9k__n:=\${\${(M)\${:-x$bg_color}:#x\$_p9k__bg}:+$((t+3))}}"                   # 3
-      p+="\${_p9k__n:=\${\${(M)\${:-x$bg_color}:#x\$${_p9k__bg:-0}}:+$((t+3))}}"             # 3
+      p+="\${_p9k__n:=\${\${(M)\${:-x$bg_color}:#x\$_p9k__bg}:+$((t+3))}}"                    # 3
+      p+="\${_p9k__n:=\${\${(M)\${:-x$bg_color}:#x\$${_p9k__bg:-0}}:+$((t+3))}}"              # 3
     else
       p+="\${_p9k__n:=\${\${(M)\${:-x$bg_color}:#x(\$_p9k__bg|\${_p9k__bg:-0})}:+$((t+3))}}"  # 3
     fi
-    p+="\${_p9k__n:=$((t+4))}"                                                              # 4
+    p+="\${_p9k__n:=$((t+4))}"                                                                # 4
 
     _p9k_param $1 VISUAL_IDENTIFIER_EXPANSION '${P9K_VISUAL_IDENTIFIER}'
     [[ $_p9k__ret == (|*[^\\])'$('* ]] && non_hermetic=1
@@ -854,6 +854,9 @@ _p9k_right_prompt_segment() {
     _p9k_foreground $fg_color
     local fg=$_p9k__ret
 
+    local style=%b$bg$fg
+    local style_=${style//\}/\\\}}
+
     _p9k_get_icon $1 RIGHT_SEGMENT_SEPARATOR
     local sep=$_p9k__ret
     _p9k_escape $_p9k__ret
@@ -861,6 +864,7 @@ _p9k_right_prompt_segment() {
 
     _p9k_get_icon $1 RIGHT_SUBSEGMENT_SEPARATOR
     local subsep=$_p9k__ret
+    [[ $subsep == *%* ]] && subsep+=$style
 
     local icon_
     if [[ -n $4 ]]; then
@@ -877,9 +881,6 @@ _p9k_right_prompt_segment() {
     _p9k_escape $_p9k__ret
     local end_sep_=$_p9k__ret
 
-    local style=%b$bg$fg
-    local style_=${style//\}/\\\}}
-
     _p9k_get_icon $1 WHITESPACE_BETWEEN_RIGHT_SEGMENTS ' '
     local space=$_p9k__ret
 
@@ -891,8 +892,6 @@ _p9k_right_prompt_segment() {
     _p9k_escape $_p9k__ret
     local right_space_=$_p9k__ret
     [[ $right_space_ == *%* ]] && right_space_+=$style_
-
-    [[ $subsep == *%* ]] && subsep+=$style
 
     local w='<_p9k__w>' s='<_p9k__s>'
 
@@ -930,7 +929,7 @@ _p9k_right_prompt_segment() {
     p+="\${_p9k__n::=}"
     p+="\${\${\${_p9k__bg:-0}:#NONE}:-\${_p9k__n::=$((t+1))}}"                                      # 1
     if [[ -n $join ]]; then
-      p+="\${_p9k__n:=\${\${\$(($join)):#0}:+$((t+2))}}"                                           # 2
+      p+="\${_p9k__n:=\${\${\$(($join)):#0}:+$((t+2))}}"                                            # 2
     fi
     if (( __p9k_sh_glob )); then
       p+="\${_p9k__n:=\${\${(M)\${:-x\$_p9k__bg}:#x${(b)bg_color}}:+$((t+3))}}"                     # 3
@@ -938,7 +937,7 @@ _p9k_right_prompt_segment() {
     else
       p+="\${_p9k__n:=\${\${(M)\${:-x\$_p9k__bg}:#x(${(b)bg_color}|${(b)bg_color:-0})}:+$((t+3))}}" # 3
     fi
-    p+="\${_p9k__n:=$((t+4))}"                                                                     # 4
+    p+="\${_p9k__n:=$((t+4))}"                                                                      # 4
 
     _p9k_param $1 VISUAL_IDENTIFIER_EXPANSION '${P9K_VISUAL_IDENTIFIER}'
     [[ $_p9k__ret == (|*[^\\])'$('* ]] && non_hermetic=1
