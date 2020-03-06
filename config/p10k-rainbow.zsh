@@ -939,6 +939,8 @@
   # If set to false, hide python version if it's the same as global:
   # $(pyenv version-name) == $(pyenv global).
   typeset -g POWERLEVEL9K_PYENV_PROMPT_ALWAYS_SHOW=false
+  # If set to false, hide python version if it's equal to "system".
+  typeset -g POWERLEVEL9K_PYENV_SHOW_SYSTEM=true
   # Custom icon.
   # typeset -g POWERLEVEL9K_PYENV_VISUAL_IDENTIFIER_EXPANSION='⭐'
 
@@ -951,6 +953,8 @@
   # If set to false, hide go version if it's the same as global:
   # $(goenv version-name) == $(goenv global).
   typeset -g POWERLEVEL9K_GOENV_PROMPT_ALWAYS_SHOW=false
+  # If set to false, hide go version if it's equal to "system".
+  typeset -g POWERLEVEL9K_GOENV_SHOW_SYSTEM=true
   # Custom icon.
   # typeset -g POWERLEVEL9K_GOENV_VISUAL_IDENTIFIER_EXPANSION='⭐'
 
@@ -963,6 +967,8 @@
   # If set to false, hide node version if it's the same as global:
   # $(nodenv version-name) == $(nodenv global).
   typeset -g POWERLEVEL9K_NODENV_PROMPT_ALWAYS_SHOW=false
+  # If set to false, hide node version if it's equal to "system".
+  typeset -g POWERLEVEL9K_NODENV_SHOW_SYSTEM=true
   # Custom icon.
   # typeset -g POWERLEVEL9K_NODENV_VISUAL_IDENTIFIER_EXPANSION='⭐'
 
@@ -1045,6 +1051,8 @@
   # If set to false, hide ruby version if it's the same as global:
   # $(rbenv version-name) == $(rbenv global).
   typeset -g POWERLEVEL9K_RBENV_PROMPT_ALWAYS_SHOW=false
+  # If set to false, hide ruby version if it's equal to "system".
+  typeset -g POWERLEVEL9K_RBENV_SHOW_SYSTEM=true
   # Custom icon.
   # typeset -g POWERLEVEL9K_RBENV_VISUAL_IDENTIFIER_EXPANSION='⭐'
 
@@ -1086,6 +1094,8 @@
   # If set to false, hide lua version if it's the same as global:
   # $(luaenv version-name) == $(luaenv global).
   typeset -g POWERLEVEL9K_LUAENV_PROMPT_ALWAYS_SHOW=false
+  # If set to false, hide lua version if it's equal to "system".
+  typeset -g POWERLEVEL9K_LUAENV_SHOW_SYSTEM=true
   # Custom icon.
   # typeset -g POWERLEVEL9K_LUAENV_VISUAL_IDENTIFIER_EXPANSION='⭐'
 
@@ -1098,6 +1108,8 @@
   # If set to false, hide java version if it's the same as global:
   # $(jenv version-name) == $(jenv global).
   typeset -g POWERLEVEL9K_JENV_PROMPT_ALWAYS_SHOW=false
+  # If set to false, hide java version if it's equal to "system".
+  typeset -g POWERLEVEL9K_JENV_SHOW_SYSTEM=true
   # Custom icon.
   # typeset -g POWERLEVEL9K_JENV_VISUAL_IDENTIFIER_EXPANSION='⭐'
 
@@ -1110,6 +1122,8 @@
   # If set to false, hide perl version if it's the same as global:
   # $(plenv version-name) == $(plenv global).
   typeset -g POWERLEVEL9K_PLENV_PROMPT_ALWAYS_SHOW=false
+  # If set to false, hide perl version if it's equal to "system".
+  typeset -g POWERLEVEL9K_PLENV_SHOW_SYSTEM=true
   # Custom icon.
   # typeset -g POWERLEVEL9K_PLENV_VISUAL_IDENTIFIER_EXPANSION='⭐'
 
@@ -1122,6 +1136,8 @@
   # If set to false, hide php version if it's the same as global:
   # $(phpenv version-name) == $(phpenv global).
   typeset -g POWERLEVEL9K_PHPENV_PROMPT_ALWAYS_SHOW=false
+  # If set to false, hide PHP version if it's equal to "system".
+  typeset -g POWERLEVEL9K_PHPENV_SHOW_SYSTEM=true
   # Custom icon.
   # typeset -g POWERLEVEL9K_PHPENV_VISUAL_IDENTIFIER_EXPANSION='⭐'
 
