@@ -1979,7 +1979,7 @@ prompt_dir() {
     [[ $sep == *%* ]] && sep+=$style
 
     local content="${(pj.$sep.)parts}"
-    if (( _POWERLEVEL9K_DIR_HYPERLINK )); then
+    if (( _POWERLEVEL9K_DIR_HYPERLINK && _p9k_term_has_href )); then
       local header=$'%{\e]8;;file://'${${_p9k__cwd//\%/%%25}//'#'/%%23}$'\e\\%}'
       local footer=$'%{\e]8;;\e\\%}'
       if (( expand )); then
@@ -5921,7 +5921,11 @@ function _p9k_clear_instant_prompt() {
           echo -E - "${(%):-    * Zsh will start %Bquickly%b but prompt will %Bjump down%b after initialization.}"
           echo -E - ""
           echo -E - "${(%):-For details, see:}"
-          echo    - "${(%):-\e]8;;https://github.com/romkatv/powerlevel10k/blob/master/README.md#instant-prompt\e\\https://github.com/romkatv/powerlevel10k/blob/master/README.md#instant-prompt\e]8;;\e\\}"
+          if (( _p9k_term_has_href )); then
+            echo    - "${(%):-\e]8;;https://github.com/romkatv/powerlevel10k/blob/master/README.md#instant-prompt\e\\https://github.com/romkatv/powerlevel10k/blob/master/README.md#instant-prompt\e]8;;\e\\}"
+          else
+            echo    - "${(%):-https://github.com/romkatv/powerlevel10k/blob/master/README.md#instant-prompt}"
+          fi
           echo -E - ""
           echo    - "${(%):-%3F-- console output produced during zsh initialization follows --%f}"
           echo -E - ""
@@ -6339,6 +6343,8 @@ typeset -g  _p9k__param_pat
 typeset -g  _p9k__param_sig
 
 _p9k_init_vars() {
+  typeset -gi _p9k_term_has_href
+
   typeset -gi _p9k_vcs_index
   typeset -g  _p9k_vcs_side
 
@@ -7436,9 +7442,10 @@ _p9k_must_init() {
   _p9k__param_pat=$'v69\1'${ZSH_VERSION}$'\1'${ZSH_PATCHLEVEL}$'\1'
   _p9k__param_pat+=$'${#parameters[(I)POWERLEVEL9K_*]}\1${(%):-%n%#}\1$GITSTATUS_LOG_LEVEL\1'
   _p9k__param_pat+=$'$GITSTATUS_ENABLE_LOGGING\1$GITSTATUS_DAEMON\1$GITSTATUS_NUM_THREADS\1'
-  _p9k__param_pat+=$'$DEFAULT_USER\1${ZLE_RPROMPT_INDENT:-1}\1$P9K_SSH\1$__p9k_ksh_arrays'
-  _p9k__param_pat+=$'$__p9k_sh_glob\1$ITERM_SHELL_INTEGRATION_INSTALLED\1$commands[uname]'
-  _p9k__param_pat+=$'${PROMPT_EOL_MARK-%B%S%#%s%b}\1$commands[locale]\1$langinfo[CODESET]'
+  _p9k__param_pat+=$'$DEFAULT_USER\1${ZLE_RPROMPT_INDENT:-1}\1$P9K_SSH\1$__p9k_ksh_arrays\1'
+  _p9k__param_pat+=$'$__p9k_sh_glob\1$ITERM_SHELL_INTEGRATION_INSTALLED\1$commands[uname]\1'
+  _p9k__param_pat+=$'${PROMPT_EOL_MARK-%B%S%#%s%b}\1$commands[locale]\1$langinfo[CODESET]\1'
+  _p9k__param_pat+=$'$VTE_VERSION\1$TERM_PROGRAM\1'
   _p9k__param_pat+=$'$functions[p10k-on-init]$functions[p10k-on-pre-prompt]\1'
   _p9k__param_pat+=$'$functions[p10k-on-post-widget]$functions[p10k-on-post-prompt]\1'
   local MATCH
@@ -7457,6 +7464,11 @@ function _p9k_init_cacheable() {
   _p9k_init_params
   _p9k_init_prompt
   _p9k_init_display
+
+  # https://gist.github.com/egmontkob/eb114294efbcd5adb1944c9f3cb5feda#backward-compatibility
+  if [[ $VTE_VERSION != (<1-4602>|4801) ]]; then
+    _p9k_term_has_href=1
+  fi
 
   local elem func
   local -i i=0
@@ -7840,7 +7852,11 @@ _p9k_init() {
     >&2 echo -E - "${(%):-You can:}"
     >&2 echo -E - ""
     >&2 echo -E - "${(%):-  - %BRecommended%b: Change the way Powerlevel10k is loaded from %B$__p9k_zshrc_u%b.}"
-    >&2 echo    - "${(%):-    See \e]8;;https://github.com/romkatv/powerlevel10k/blob/master/README.md#installation\e\\https://github.com/romkatv/powerlevel10k/blob/master/README.md#installation\e]8;;\e\\.}"
+    if (( _p9k_term_has_href )); then
+      >&2 echo    - "${(%):-    See \e]8;;https://github.com/romkatv/powerlevel10k/blob/master/README.md#installation\e\\https://github.com/romkatv/powerlevel10k/blob/master/README.md#installation\e]8;;\e\\.}"
+    else
+      >&2 echo    - "${(%):-    See https://github.com/romkatv/powerlevel10k/blob/master/README.md#installation.}"
+    fi
     if (( $+functins[zplugin] )); then
       >&2 echo -E - "${(%):-    NOTE: If using %2Fzplugin%f to load %3F'romkatv/powerlevel10k'%f, %Bdo not apply%b %1Fice wait%f.}"
     fi

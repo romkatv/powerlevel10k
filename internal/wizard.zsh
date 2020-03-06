@@ -153,7 +153,11 @@ function print_prompt() {
 
 function href() {
   local url=${${1//\%/%%}//\\/\\\\}
-  print -r -- '%{\e]8;;'$url'\e\\%}'$url'%{\e]8;;\e\\%}'
+  if (( _p9k_term_has_href )); then
+    print -r -- '%{\e]8;;'$url'\e\\%}'$url'%{\e]8;;\e\\%}'
+  else
+    print -r -- $url
+  fi
 }
 
 function flowing() {
