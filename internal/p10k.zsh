@@ -684,7 +684,7 @@ _p9k_left_prompt_segment() {
       fi
       _p9k_t+=%b$bg$_p9k__ret$ss$style$left_space  # 3
     else
-      _p9k_t+=%b$bg$ss$fg$style$left_space           # 3
+      _p9k_t+=%b$bg$ss$style$left_space           # 3
     fi
     _p9k_t+=%b$bg$s$style$left_space                 # 4
 
@@ -891,6 +891,8 @@ _p9k_right_prompt_segment() {
     _p9k_escape $_p9k__ret
     local right_space_=$_p9k__ret
     [[ $right_space_ == *%* ]] && right_space_+=$style_
+
+    [[ $subsep == *%* ]] && subsep+=$style
 
     local w='<_p9k__w>' s='<_p9k__s>'
 
@@ -7432,7 +7434,7 @@ _p9k_must_init() {
     [[ $sig == $_p9k__param_sig ]] && return 1
     _p9k_deinit
   fi
-  _p9k__param_pat=$'v68\1'${ZSH_VERSION}$'\1'${ZSH_PATCHLEVEL}$'\1'
+  _p9k__param_pat=$'v69\1'${ZSH_VERSION}$'\1'${ZSH_PATCHLEVEL}$'\1'
   _p9k__param_pat+=$'${#parameters[(I)POWERLEVEL9K_*]}\1${(%):-%n%#}\1$GITSTATUS_LOG_LEVEL\1'
   _p9k__param_pat+=$'$GITSTATUS_ENABLE_LOGGING\1$GITSTATUS_DAEMON\1$GITSTATUS_NUM_THREADS\1'
   _p9k__param_pat+=$'$DEFAULT_USER\1${ZLE_RPROMPT_INDENT:-1}\1$P9K_SSH\1$__p9k_ksh_arrays'
