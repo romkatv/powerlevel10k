@@ -617,7 +617,7 @@ function _p9k_init_icons() {
         RANGER_ICON                    'ranger'
         MIDNIGHT_COMMANDER_ICON        'mc'
         VIM_ICON                       'vim'
-        TERRAFORM_ICON                 'terraform'
+        TERRAFORM_ICON                 'tf'
         PROXY_ICON                     'proxy'
         DOTNET_ICON                    '.net'
         DOTNET_CORE_ICON               '.net'
