@@ -684,7 +684,7 @@ _p9k_left_prompt_segment() {
       fi
       _p9k_t+=%b$bg$_p9k__ret$ss$style$left_space  # 3
     else
-      _p9k_t+=%b$bg$fg$ss$style$left_space           # 3
+      _p9k_t+=%b$bg$ss$fg$style$left_space           # 3
     fi
     _p9k_t+=%b$bg$s$style$left_space                 # 4
 
@@ -911,7 +911,7 @@ _p9k_right_prompt_segment() {
     local t=$(($#_p9k_t - __p9k_ksh_arrays))
     _p9k_t+=$start_sep$style$left_space           # 1
     _p9k_t+=$w$style                              # 2
-    _p9k_t+=$w$subsep$style$left_space            # 3
+    _p9k_t+=$w$style$subsep$left_space            # 3
     _p9k_t+=$w%F{$bg_color}$sep$style$left_space  # 4
 
     local join="_p9k__i>=$_p9k_right_join[$_p9k__segment_index]"
