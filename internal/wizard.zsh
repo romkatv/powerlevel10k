@@ -152,7 +152,8 @@ function print_prompt() {
 }
 
 function href() {
-  print -r -- $'%{\e]8;;'${1//\%/%%}$'\a%}'${1//\%/%%}$'%{\e]8;;\a%}'
+  local url=${${1//\%/%%}//\\/\\\\}
+  print -r -- '%{\e]8;;'$url'\e\\%}'$url'%{\e]8;;\e\\%}'
 }
 
 function flowing() {

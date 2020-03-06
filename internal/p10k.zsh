@@ -1980,8 +1980,8 @@ prompt_dir() {
 
     local content="${(pj.$sep.)parts}"
     if (( _POWERLEVEL9K_DIR_HYPERLINK )); then
-      local header=$'%{\e]8;;file://'${${_p9k__cwd//\%/%%25}//'#'/%%23}$'\a%}'
-      local footer=$'%{\e]8;;\a%}'
+      local header=$'%{\e]8;;file://'${${_p9k__cwd//\%/%%25}//'#'/%%23}$'\e\\%}'
+      local footer=$'%{\e]8;;\e\\%}'
       if (( expand )); then
         _p9k_escape $header
         header=$_p9k__ret
@@ -5921,7 +5921,7 @@ function _p9k_clear_instant_prompt() {
           echo -E - "${(%):-    * Zsh will start %Bquickly%b but prompt will %Bjump down%b after initialization.}"
           echo -E - ""
           echo -E - "${(%):-For details, see:}"
-          echo    - "${(%):-\e]8;;https://github.com/romkatv/powerlevel10k/blob/master/README.md#instant-prompt\ahttps://github.com/romkatv/powerlevel10k/blob/master/README.md#instant-prompt\e]8;;\a}"
+          echo    - "${(%):-\e]8;;https://github.com/romkatv/powerlevel10k/blob/master/README.md#instant-prompt\e\\https://github.com/romkatv/powerlevel10k/blob/master/README.md#instant-prompt\e]8;;\e\\}"
           echo -E - ""
           echo    - "${(%):-%3F-- console output produced during zsh initialization follows --%f}"
           echo -E - ""
@@ -7840,7 +7840,7 @@ _p9k_init() {
     >&2 echo -E - "${(%):-You can:}"
     >&2 echo -E - ""
     >&2 echo -E - "${(%):-  - %BRecommended%b: Change the way Powerlevel10k is loaded from %B$__p9k_zshrc_u%b.}"
-    >&2 echo    - "${(%):-    See \e]8;;https://github.com/romkatv/powerlevel10k/blob/master/README.md#installation\ahttps://github.com/romkatv/powerlevel10k/blob/master/README.md#installation\e]8;;\a.}"
+    >&2 echo    - "${(%):-    See \e]8;;https://github.com/romkatv/powerlevel10k/blob/master/README.md#installation\e\\https://github.com/romkatv/powerlevel10k/blob/master/README.md#installation\e]8;;\e\\.}"
     if (( $+functins[zplugin] )); then
       >&2 echo -E - "${(%):-    NOTE: If using %2Fzplugin%f to load %3F'romkatv/powerlevel10k'%f, %Bdo not apply%b %1Fice wait%f.}"
     fi
