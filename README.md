@@ -849,7 +849,7 @@ Type `source ~/.p10k.zsh` to apply your changes to the current Zsh session.
 To see how different colors look in your terminal, run the following command:
 
 ```zsh
-for i in {0..255}; do print -Pn "%K{$i} %k%F{$i}${(l:3::0:)i}%f " ${${(M)$((i%8)):#7}:+$'\n'}; done
+for i in {0..255}; do print -Pn "%K{$i} %F{0}${(l:3::0:)i}%f %k"${${(M)$((i%6)):#3}:+$'\n'}; done
 ```
 
 ### Why does Powerlevel10k spawn extra processes?
