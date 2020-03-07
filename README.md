@@ -583,11 +583,17 @@ If necessary, encrypt your communication with [this PGP key](
 Powerlevel10k defines prompt and nothing else. It sets [prompt-related options](
   http://zsh.sourceforge.net/Doc/Release/Options.html#Prompting), and parameters `PS1` and `RPS1`.
 
+![Prompt Highlight](
+  https://raw.githubusercontent.com/romkatv/powerlevel10k-media/master/prompt-highlight.png)
+
+Everything within the highlighted areas on the screenshot is produced by Powerlevel10k.
+Powerlevel10k has no control over the terminal content or color outside these areas.
+
 Powerlevel10k does not affect:
 
 - Terminal window title.
 - Colors used by `ls`.
-- Command line colors (syntax highlighting).
+- Command line colors (syntax highlighting, autosuggestions, etc.).
 - Prompt parameters other than `PS1` and `RPS1`.
 
 ### I'm using Powerlevel9k with Oh My Zsh. How do I migrate?
