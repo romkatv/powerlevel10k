@@ -30,6 +30,8 @@ Ready to give Powerlevel10k a try?
 1. Restart Zsh.
 1. Type `p10k configure` if the configuration wizard doesn't start automatically.
 
+The full [table of contents](#table-of-contents) is at the bottom.
+
 ## Features
 
 ### Configuration wizard
