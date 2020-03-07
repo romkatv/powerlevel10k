@@ -595,8 +595,11 @@ Powerlevel10k does not affect:
 
 - Terminal window title.
 - Colors used by `ls`.
+- Content and style of command completions.
 - Command line colors (syntax highlighting, autosuggestions, etc.).
 - Prompt parameters other than `PS1` and `RPS1`.
+- Zsh options other than those [related to prompt](
+    http://zsh.sourceforge.net/Doc/Release/Options.html#Prompting).
 
 ### I'm using Powerlevel9k with Oh My Zsh. How do I migrate?
 
