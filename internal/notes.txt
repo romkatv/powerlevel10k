@@ -26,3 +26,17 @@
 - take a look at https://github.com/skywind3000/z.lua. it claims to have fzf support. would be nice
   if alt-down showed two groups -- one for subdirs and another for directory history (sorted by
   frequency of use? by last use? three sections? more key bindings?).
+- add `p10k explain` that prints something like this:
+
+    segment     icons meaning
+    --------------------------
+    status      ✔  ✘  exit code of the last command
+
+  implement it the hard way: for every enabled segment go over all its {state,icon} pairs, resolve
+  the icon (if not absolute), apply VISUAL_IDENTIFIER_EXPANSION, remove leading and trailing
+  whitespace and print without formatting (sort of like `print -P | cat`); print segment names in
+  green and icons in bold; battery can have an unlimited number of icons, so `...` would be needed
+  (based on total length of concatenated icons rather than the number of icons); user-defined
+  segments would have "unknown" icons by default (yellow and not bold); can allow them to
+  participate by defining `explainprompt_foo` that populates array `reply` with strings like this:
+  '-s STATE -i LOCK_ICON +r'; the first element must be segment description.
