@@ -7730,6 +7730,9 @@ _p9k_init_vcs() {
     >&2 echo -E - ""
     >&2 echo -E - "${(%):-      %B${(D)gitstatus_dir//\%/%%}/usrbin/%b}"
     >&2 echo -E - ""
+    local q="'"
+    >&2 echo -E - "${(%):-    %BNOTE%b: You${q}ll have to rebuild the binary every time you update powerlevel10k.}"
+    >&2 echo -E - ""
     >&2 echo -E - "${(%):-    * You %Bwill not%b see this error message again.}"
     >&2 echo -E - "${(%):-    * Git prompt will be %Bfast%b.}"
     return 0
