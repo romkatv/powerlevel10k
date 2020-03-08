@@ -2058,7 +2058,10 @@ prompt_history() {
 prompt_detect_virt() {
   local virt="$(systemd-detect-virt 2>/dev/null)"
   if [[ "$virt" == "none" ]]; then
-    [[ "$(ls -di /)" != "2 /" ]] && virt="chroot"
+    local -a inode
+    if zstat -A inode +inode / 2>/dev/null && [[ $inode[1] != 2 ]]; then
+      virt="chroot"
+    fi
   fi
   if [[ -n "${virt}" ]]; then
     _p9k_prompt_segment "$0" "$_p9k_color1" "yellow" '' 0 '' "${virt//\%/%%}"
