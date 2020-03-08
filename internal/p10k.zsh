@@ -7696,7 +7696,7 @@ _p9k_init_vcs() {
   local gitstatus_dir=${_POWERLEVEL9K_GITSTATUS_DIR:-${__p9k_root_dir}/gitstatus}
 
   local id=${(L)${${(M)_p9k_uname_o:#Android}:-$_p9k_uname}}-${(L)_p9k_uname_m}
-  if [[ -z $GITSTATUS_DAEMON && $id == (android-arm7l|*-i686) &&
+  if [[ -z $GITSTATUS_DAEMON && $id == (android-armv7l|*-i686) &&
         -z $gitstatus_dir/bin/(usrbin|bin)/*-$id(|-static)(#qN) ]]; then
     >&2 echo -E - "${(%):-[%1FERROR%f]: %BPowerlevel10k%b is unable to use %Bgitstatus%b. Git prompt will be slow.}"
     >&2 echo -E - ""
