@@ -773,6 +773,19 @@ typeset -g POWERLEVEL9K_VCS_DISABLED_WORKDIR_PATTERN='~'
 To see Git status for `$HOME/.git` in prompt, open `~/.p10k.zsh` and remove
 `POWERLEVEL9K_VCS_DISABLED_WORKDIR_PATTERN`.
 
+### Why does Git status sometimes appear grey and then gets colored after a short period of time?
+
+tl;dr: When Git status in prompt is greyed out, it means Powerlevel10k is currently computing
+up-to-date Git status in the background. Prompt will get automatically refreshed when this
+computation completes.
+
+When your current directory is withing a Git repository, Powerlevel10k computes up-to-date Git
+status after every command. If the repository is large, or the machine is slow, this computation
+can take quite a bit of time. If it takes longer than 20 milliseconds (configurable via
+`POWERLEVEL9K_VCS_MAX_SYNC_LATENCY_SECONDS`), Powerlevel10k displays the last known Git status in
+grey and continues to compute up-to-date Git status in the background. When the computation
+completes, Powerlevel10k refreshes prompt with new information, this time with colored Git status.
+
 ### How do I add username and/or hostname to prompt?
 
 When using Lean, Classic or Rainbow style, prompt shows `username@hostname` when you are logged in
@@ -1516,6 +1529,7 @@ There are a few mitigation options for this issue.
   - [What do different symbols in Git status mean?](#what-do-different-symbols-in-git-status-mean)
   - [How do I change the format of Git status?](#how-do-i-change-the-format-of-git-status)
   - [Why is Git status from `$HOME/.git` not displayed in prompt?](#why-is-git-status-from-homegit-not-displayed-in-prompt)
+  - [Why does Git status sometimes appear grey and then gets colored after a short period of time?](#why-does-git-status-sometimes-appear-grey-and-then-gets-colored-after-a-short-period-of-time)
   - [How do I add username and/or hostname to prompt?](#how-do-i-add-username-andor-hostname-to-prompt)
   - [Why some prompt segments appear and disappear as I'm typing?](#why-some-prompt-segments-appear-and-disappear-as-im-typing)
   - [How do I change prompt colors?](#how-do-i-change-prompt-colors)
