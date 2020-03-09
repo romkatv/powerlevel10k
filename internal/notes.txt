@@ -40,5 +40,3 @@
   segments would have "unknown" icons by default (yellow and not bold); can allow them to
   participate by defining `explainprompt_foo` that populates array `reply` with strings like this:
   '-s STATE -i LOCK_ICON +r'; the first element must be segment description.
-- add `package` segment that displays name@version where name is `.name` and version is `.version`
-  from package.json. Expose them as P9K_PACKAGE_NAME and P9K_PACKAGE_VERSION.

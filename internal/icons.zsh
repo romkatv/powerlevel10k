@@ -139,6 +139,7 @@ function _p9k_init_icons() {
         POSTGRES_ICON                  'postgres'
         PHP_ICON                       'php'
         HASKELL_ICON                   'hs'
+        PACKAGE_ICON                   'pkg'
       )
     ;;
     'awesome-fontconfig')
@@ -263,6 +264,7 @@ function _p9k_init_icons() {
         POSTGRES_ICON                  'postgres'
         PHP_ICON                       'php'
         HASKELL_ICON                   'hs'
+        PACKAGE_ICON                   'pkg'
       )
     ;;
     'awesome-mapped-fontconfig')
@@ -390,6 +392,7 @@ function _p9k_init_icons() {
         POSTGRES_ICON                  'postgres'
         PHP_ICON                       'php'
         HASKELL_ICON                   'hs'
+        PACKAGE_ICON                   'pkg'
       )
     ;;
     'nerdfont-complete'|'nerdfont-fontconfig')
@@ -515,6 +518,7 @@ function _p9k_init_icons() {
         POSTGRES_ICON                  '\uE76E'               # 
         PHP_ICON                       '\uE608'               # 
         HASKELL_ICON                   '\uE61F'               # 
+        PACKAGE_ICON                   '\uF8D6'               # 
       )
     ;;
     ascii)
@@ -637,6 +641,7 @@ function _p9k_init_icons() {
         POSTGRES_ICON                  'postgres'
         PHP_ICON                       'php'
         HASKELL_ICON                   'hs'
+        PACKAGE_ICON                   'pkg'
       )
     ;;
     *)
@@ -761,6 +766,7 @@ function _p9k_init_icons() {
         POSTGRES_ICON                  'postgres'
         PHP_ICON                       'php'
         HASKELL_ICON                   'hs'
+        PACKAGE_ICON                   'pkg'
       )
     ;;
   esac

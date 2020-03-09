@@ -65,6 +65,7 @@
     # php_version           # php version (https://www.php.net/)
     # laravel_version       # laravel php framework version (https://laravel.com/)
     # java_version          # java version (https://www.java.com/)
+    # package               # name@version from package.json (https://docs.npmjs.com/files/package.json)
     rbenv                   # ruby version from rbenv (https://github.com/rbenv/rbenv)
     rvm                     # ruby version from rvm (https://rvm.io)
     fvm                     # flutter version management (https://github.com/leoafarias/fvm)
@@ -1005,6 +1006,18 @@
   typeset -g POWERLEVEL9K_JAVA_VERSION_FULL=false
   # Custom icon.
   # typeset -g POWERLEVEL9K_JAVA_VERSION_VISUAL_IDENTIFIER_EXPANSION='⭐'
+
+  ###[ package: name@version from package.json (https://docs.npmjs.com/files/package.json) ]####
+  # Package color.
+  typeset -g POWERLEVEL9K_PACKAGE_FOREGROUND=117
+  # Package format. The following parameters are available within the expansion.
+  #
+  # - P9K_PACKAGE_NAME     The value of `name` field in package.json.
+  # - P9K_PACKAGE_VERSION  The value of `version` field in package.json.
+  #
+  # typeset -g POWERLEVEL9K_PACKAGE_CONTENT_EXPANSION='${P9K_PACKAGE_NAME//\%/%%}@${P9K_PACKAGE_VERSION//\%/%%}'
+  # Custom icon.
+  # typeset -g POWERLEVEL9K_PACKAGE_VISUAL_IDENTIFIER_EXPANSION='⭐'
 
   #############[ rbenv: ruby version from rbenv (https://github.com/rbenv/rbenv) ]##############
   # Rbenv color.
