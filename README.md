@@ -855,7 +855,7 @@ function kube-toggle() {
 }
 ```
 
-Call this function by typing `kube-toggle`. You can also bind it to a key by adding two more lines
+Invoke this function by typing `kube-toggle`. You can also bind it to a key by adding two more lines
 to `~/.zshrc`:
 
 ```zsh
