@@ -836,6 +836,33 @@ Configs created by `p10k configure` may contain parameters of this kind. To cust
 prompt segments are shown, open `~/.p10k.zsh`, search for `SHOW_ON_COMMAND` and either remove these
 parameters or change their values.
 
+You can also define a function in `~/.zshrc` to toggle the display of a prompt segment between
+*always* and *on command*. This is similar to `kubeon`/`kubeoff` from
+[kube-ps1](https://github.com/jonmosco/kube-ps1).
+
+```zsh
+function kube-toggle() {
+  if (( ${+POWERLEVEL9K_KUBECONTEXT_SHOW_ON_COMMAND} )); then
+    unset POWERLEVEL9K_KUBECONTEXT_SHOW_ON_COMMAND
+  else
+    POWERLEVEL9K_KUBECONTEXT_SHOW_ON_COMMAND='kubectl|helm|kubens|kubectx|oc|istioctl|kogito'
+  fi
+  p10k reload
+  if zle; then
+    zle push-input
+    zle accept-line
+  fi
+}
+```
+
+Call this function by typing `kube-toggle`. You can also bind it to a key by adding two more lines
+to `~/.zshrc`:
+
+```zsh
+zle -N kube-toggle
+bindkey '^]' kube-toggle  # ctrl-] to toggle kubecontext in powerlevel10k prompt
+```
+
 ### How do I change prompt colors?
 
 You can either [change the color palette used by your terminal](
