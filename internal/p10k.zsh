@@ -2062,6 +2062,8 @@ prompt_package() {
     () {
       local data field
       local -A found
+      # Redneck json parsing. Yields correct results for any well-formed json document.
+      # Produces random garbage for invalid json.
       { data="$(<$file)" || return } 2>/dev/null
       data=${data##[[:space:]]#}
       [[ $data == '{'* ]] || return
