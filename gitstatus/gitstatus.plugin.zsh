@@ -504,9 +504,8 @@ function gitstatus_start() {
                 local -aU os
                 case $kernel in
                   linux)
-                    os=("${(L)$(uname -o)}") || return
-                    [[ -n $os[1] ]]          || return
-                    [[ $os[1] == android ]]  || os[1]=linux
+                    os=("${(L)$(uname -o 2>/dev/null)}") || os=()
+                    [[ $os[1] == android ]]              || os=(linux)
                   ;;
                   cygwin_nt-*)  os=($kernel cygwin_nt-10.0);;
                   mingw|msys)   os=($kernel msys_nt-10.0);;
