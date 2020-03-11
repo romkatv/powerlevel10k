@@ -40,3 +40,7 @@
   segments would have "unknown" icons by default (yellow and not bold); can allow them to
   participate by defining `explainprompt_foo` that populates array `reply` with strings like this:
   '-s STATE -i LOCK_ICON +r'; the first element must be segment description.
+- add `docker_context` prompt segment; similar to `kubecontext`; the data should come from
+  `currentContext` field in `~/.docker/config.json` (according to
+  https://github.com/starship/starship/issues/995); there is also `DOCKER_CONTEXT`; more info:
+  https://docs.docker.com/engine/reference/commandline/context_use.
