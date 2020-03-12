@@ -7827,6 +7827,8 @@ _p9k_init() {
   _p9k_init_vars
   _p9k_restore_state || _p9k_init_cacheable
 
+  typeset -g P9K_OS_ICON=$_p9k_os_icon
+
   local -i i
   local elem
 
