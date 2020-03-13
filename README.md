@@ -1561,7 +1561,7 @@ Some fonts have this incorrect dotted icon in bold typeface. There are two ways 
 1. Use a font with a correct Arch Linux logo in bold typeface. For example,
   [the recommended Powerlevel10k font](#meslo-nerd-font-patched-for-powerlevel10k).
 2. Display the icon in regular (non-bold) typeface. To do this, open `~/.p10k.zsh`, search for
-   `POWERLEVEL9K_OS_ICON_CONTENT_EXPANSION` and and remove `%B` from its value.
+   `POWERLEVEL9K_OS_ICON_CONTENT_EXPANSION` and remove `%B` from its value.
 ```zsh
 typeset -g POWERLEVEL9K_OS_ICON_CONTENT_EXPANSION='${P9K_CONTENT}'  # not bold
 ```
