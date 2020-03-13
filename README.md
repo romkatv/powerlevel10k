@@ -1200,6 +1200,11 @@ Note that this prompt is different from the original as it's missing a space aft
 This can be caused by a low-level bug in macOS. See
 [this issue](https://github.com/romkatv/powerlevel10k/issues/241).
 
+This can also happen if prompt contains glyphs designated as "wide" in the Unicode standard and your
+terminal incorrectly displays them as non-wide. Terminals suffering from this limitation include
+Konsole, Hyper and the integrated VSCode Terminal. The solution is to use a different terminal or
+remove all wide glyphs from prompt.
+
 #### If the prompt line is shorter than the frame and is not mangled
 
 ```text
@@ -1512,6 +1517,55 @@ There are a few mitigation options for this issue.
      you might want to keep some elements in `POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS` provided that
      none of them are succeeded by `newline`.
 
+### Icons cut off in Konsole
+
+When using Konsole with a non-monospace font, icons may be cut off on the right side. Here
+"non-monospace" refers to any font with glyphs wider than a single column, or wider than two columns
+for glyphs designated as "wide" in the Unicode standard.
+
+![Icons cut off in Konsole](
+  https://raw.githubusercontent.com/romkatv/powerlevel10k-media/master/konsole-non-monospace-font.png)
+
+The last line on the screenshot shows a cut off Arch Linux logo.
+
+There are several mitigation options for this issue.
+
+1. Use a different terminal. Konsole is the only terminal that exhibits this behavior.
+2. Use a monospace font. For example, [the recommended Powerlevel10k font](
+    #meslo-nerd-font-patched-for-powerlevel10k).
+3. Manually add an extra space after the icon that gets cut off. For example, if the content of
+   `os_icon` prompt segment gets cut off, open `~/.p10k.zsh`, search for
+   `POWERLEVEL9K_OS_ICON_CONTENT_EXPANSION` and change it as follows:
+```zsh
+typeset -g POWERLEVEL9K_OS_ICON_CONTENT_EXPANSION='%B${P9K_CONTENT} '  # extra space at the end
+```
+4. Use a different icon that isn't monospace. For example, if Arch Linux logo gets cut off, add
+   the following parameter to `~/.p10k.zsh`:
+```zsh
+typeset -g POWERLEVEL9K_LINUX_ARCH_ICON='Arch'  # plain "Arch" in place of a logo
+```
+5. Disable the display of the icon that gets cut off. For example, if the content of
+   `os_icon` prompt segment gets cut off, open `~/.p10k.zsh` and remove `os_icon` from
+   `POWERLEVEL9K_LEFT_PROMPT_ELEMENTS` and `POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS`.
+
+*Note*: [Non-monospace fonts are not officially supported by Konsole](
+  https://bugs.kde.org/show_bug.cgi?id=418553#c5).
+
+### Arch Linux logo has a dot in the bottom right corner
+
+![Arch Linux Logo with a dot](
+  https://raw.githubusercontent.com/romkatv/powerlevel10k-media/master/arch-linux-logo-dot.png)
+
+Some fonts have this incorrect dotted icon in bold typeface. There are two ways to fix this issue.
+
+1. Use a font with a correct Arch Linux logo in bold typeface. For example,
+  [the recommended Powerlevel10k font](#meslo-nerd-font-patched-for-powerlevel10k).
+2. Display the icon in regular (non-bold) typeface. To do this, open `~/.p10k.zsh`, search for
+   `POWERLEVEL9K_OS_ICON_CONTENT_EXPANSION` and and remove `%B` from its value.
+```zsh
+typeset -g POWERLEVEL9K_OS_ICON_CONTENT_EXPANSION='${P9K_CONTENT}'  # not bold
+```
+
 ## Table of contents
 
 - [Features](#features)
@@ -1590,3 +1644,5 @@ There are a few mitigation options for this issue.
   - [Cannot make Powerlevel10k work with my plugin manager](#cannot-make-powerlevel10k-work-with-my-plugin-manager)
   - [Directory is difficult to see in prompt when using Rainbow style](#directory-is-difficult-to-see-in-prompt-when-using-rainbow-style)
   - [Horrific mess when resizing terminal window](#horrific-mess-when-resizing-terminal-window)
+  - [Icons cut off in Konsole](#icons-cut-off-in-konsole)
+  - [Arch Linux logo has a dot in the bottom right corner](#arch-linux-logo-has-a-dot-in-the-bottom-right-corner)
