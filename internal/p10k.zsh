@@ -1980,8 +1980,8 @@ prompt_dir() {
 
     local content="${(pj.$sep.)parts}"
     if (( _POWERLEVEL9K_DIR_HYPERLINK && _p9k_term_has_href )); then
-      local header=$'%{\e]8;;file://'${${_p9k__cwd//\%/%%25}//'#'/%%23}$'\e\\%}'
-      local footer=$'%{\e]8;;\e\\%}'
+      local header=$'%{\e]8;;file://'${${_p9k__cwd//\%/%%25}//'#'/%%23}$'\a%}'
+      local footer=$'%{\e]8;;\a%}'
       if (( expand )); then
         _p9k_escape $header
         header=$_p9k__ret
@@ -5980,7 +5980,7 @@ function _p9k_clear_instant_prompt() {
           echo -E - ""
           echo -E - "${(%):-For details, see:}"
           if (( _p9k_term_has_href )); then
-            echo    - "${(%):-\e]8;;https://github.com/romkatv/powerlevel10k/blob/master/README.md#instant-prompt\e\\https://github.com/romkatv/powerlevel10k/blob/master/README.md#instant-prompt\e]8;;\e\\}"
+            echo    - "${(%):-\e]8;;https://github.com/romkatv/powerlevel10k/blob/master/README.md#instant-prompt\ahttps://github.com/romkatv/powerlevel10k/blob/master/README.md#instant-prompt\e]8;;\a}"
           else
             echo    - "${(%):-https://github.com/romkatv/powerlevel10k/blob/master/README.md#instant-prompt}"
           fi
@@ -7920,7 +7920,7 @@ _p9k_init() {
     >&2 echo -E - ""
     >&2 echo -E - "${(%):-  - %BRecommended%b: Change the way Powerlevel10k is loaded from %B$__p9k_zshrc_u%b.}"
     if (( _p9k_term_has_href )); then
-      >&2 echo    - "${(%):-    See \e]8;;https://github.com/romkatv/powerlevel10k/blob/master/README.md#installation\e\\https://github.com/romkatv/powerlevel10k/blob/master/README.md#installation\e]8;;\e\\.}"
+      >&2 echo    - "${(%):-    See \e]8;;https://github.com/romkatv/powerlevel10k/blob/master/README.md#installation\ahttps://github.com/romkatv/powerlevel10k/blob/master/README.md#installation\e]8;;\a.}"
     else
       >&2 echo    - "${(%):-    See https://github.com/romkatv/powerlevel10k/blob/master/README.md#installation.}"
     fi
