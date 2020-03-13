@@ -1776,13 +1776,8 @@ function generate_config() {
   else
     sub MODE $POWERLEVEL9K_MODE
 
-    if (( cap_narrow_icons )); then
-      sub VISUAL_IDENTIFIER_EXPANSION "'\${P9K_VISUAL_IDENTIFIER// }'"
-      if [[ $style == lean_8colors ]]; then
-        sub OS_ICON_CONTENT_EXPANSION "'\${P9K_CONTENT// }'"
-      else
-        sub OS_ICON_CONTENT_EXPANSION "'%B\${P9K_CONTENT// }'"
-      fi
+    if (( ! cap_narrow_icons )); then
+      sub ICON_PADDING moderate
     fi
 
     if [[ $POWERLEVEL9K_MODE == compatible ]]; then

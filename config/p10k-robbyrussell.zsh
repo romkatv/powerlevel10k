@@ -20,10 +20,11 @@
 () {
   emulate -L zsh
 
-  autoload -Uz is-at-least && is-at-least 5.1 || return
-
   # Unset all configuration options.
   unset -m 'POWERLEVEL9K_*'
+
+  # Zsh >= 5.1 is required.
+  autoload -Uz is-at-least && is-at-least 5.1 || return
 
   # Left prompt segments.
   typeset -g POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(prompt_char dir vcs)

@@ -25,10 +25,11 @@
 () {
   emulate -L zsh
 
-  autoload -Uz is-at-least && is-at-least 5.1 || return
-
   # Unset all configuration options.
   unset -m 'POWERLEVEL9K_*'
+
+  # Zsh >= 5.1 is required.
+  autoload -Uz is-at-least && is-at-least 5.1 || return
 
   # Prompt colors.
   local grey=242

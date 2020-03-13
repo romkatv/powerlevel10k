@@ -19,15 +19,8 @@
   # restarting zsh. Edit ~/.p10k.zsh and type `source ~/.p10k.zsh`.
   unset -m 'POWERLEVEL9K_*'
 
+  # Zsh >= 5.1 is required.
   autoload -Uz is-at-least && is-at-least 5.1 || return
-
-  zmodload zsh/langinfo
-  if [[ ${langinfo[CODESET]:-} != (utf|UTF)(-|)8 && $+commands[locale] == 1 ]]; then
-    local -a loc
-    if loc=(${(@M)$(locale -a 2>/dev/null):#*.(utf|UTF)(-|)8}) && (( $#loc )); then
-      local LC_ALL=${loc[(r)(#i)C.UTF(-|)8]:-${loc[(r)(#i)en_US.UTF(-|)8]:-$loc[1]}}
-    fi
-  fi
 
   # The list of segments shown on the left. Fill it with the most important segments.
   typeset -g POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(
@@ -107,58 +100,18 @@
     # example               # example user-defined segment (see prompt_example function below)
   )
 
+  # Defines character set used by powerlevel10k. It's best to let `p10k configure` set it for you.
+  typeset -g POWERLEVEL9K_MODE=nerdfont-complete
+  # When set to `moderate`, some icons will have an extra space after them. This is meant to avoid
+  # icon overlap when using non-monospace fonts. When set to `none`, spaces are not added.
+  typeset -g POWERLEVEL9K_ICON_PADDING=none
+
   # Basic style options that define the overall look of your prompt. You probably don't want to
   # change them.
   typeset -g POWERLEVEL9K_BACKGROUND=                            # transparent background
   typeset -g POWERLEVEL9K_{LEFT,RIGHT}_{LEFT,RIGHT}_WHITESPACE=  # no surrounding whitespace
   typeset -g POWERLEVEL9K_{LEFT,RIGHT}_SUBSEGMENT_SEPARATOR=' '  # separate segments with a space
   typeset -g POWERLEVEL9K_{LEFT,RIGHT}_SEGMENT_SEPARATOR=        # no end-of-line symbol
-
-  # To enable default icons for all segments, don't define POWERLEVEL9K_VISUAL_IDENTIFIER_EXPANSION
-  # or set it to '${P9K_VISUAL_IDENTIFIER}'.
-  #
-  # To remove spaces from all default icons, set POWERLEVEL9K_VISUAL_IDENTIFIER_EXPANSION
-  # to '${P9K_VISUAL_IDENTIFIER// }'. You'll know that you you need this option if you see extra
-  # spaces after icons.
-  #
-  # To enable default icons for one segment (e.g., dir), set
-  # POWERLEVEL9K_DIR_VISUAL_IDENTIFIER_EXPANSION='${P9K_VISUAL_IDENTIFIER}'.
-  #
-  # To assign a specific icon to one segment (e.g., dir), set
-  # POWERLEVEL9K_DIR_VISUAL_IDENTIFIER_EXPANSION='⭐'.
-  #
-  # To assign a specific icon to a segment in a given state (e.g., dir in state NOT_WRITABLE),
-  # set POWERLEVEL9K_DIR_NOT_WRITABLE_VISUAL_IDENTIFIER_EXPANSION='⭐'.
-  #
-  # Note: You can use $'\u2B50' instead of '⭐'. It's especially convenient when specifying
-  # icons that your text editor cannot render. Don't forget to put $ and use single quotes when
-  # defining icons via Unicode codepoints.
-  #
-  # Note: Many default icons cannot be displayed with system fonts. You'll need to install a
-  # capable font to use them. See POWERLEVEL9K_MODE below.
-  typeset -g POWERLEVEL9K_VISUAL_IDENTIFIER_EXPANSION='${P9K_VISUAL_IDENTIFIER}'
-
-  # This option makes a difference only when default icons are enabled for all or some prompt
-  # segments (see POWERLEVEL9K_VISUAL_IDENTIFIER_EXPANSION above). LOCK_ICON can be printed as
-  # $'\uE0A2', $'\uE138' or $'\uF023' depending on POWERLEVEL9K_MODE. The correct value of this
-  # parameter depends on the provider of the font your terminal is using.
-  #
-  #   Font Provider                    | POWERLEVEL9K_MODE
-  #   ---------------------------------+-------------------
-  #   Powerline                        | powerline
-  #   Font Awesome                     | awesome-fontconfig
-  #   Adobe Source Code Pro            | awesome-fontconfig
-  #   Source Code Pro                  | awesome-fontconfig
-  #   Awesome-Terminal Fonts (regular) | awesome-fontconfig
-  #   Awesome-Terminal Fonts (patched) | awesome-patched
-  #   Nerd Fonts                       | nerdfont-complete
-  #   Other                            | compatible
-  #
-  # If this looks overwhelming, either stick with a preinstalled system font and set
-  # POWERLEVEL9K_MODE=compatible, or install the recommended Powerlevel10k font from
-  # https://github.com/romkatv/powerlevel10k/#recommended-meslo-nerd-font-patched-for-powerlevel10k
-  # and set POWERLEVEL9K_MODE=nerdfont-complete.
-  typeset -g POWERLEVEL9K_MODE=nerdfont-complete
 
   # When set to true, icons appear before content on both sides of the prompt. When set
   # to false, icons go after content. If empty or not set, icons go before content in the left
@@ -356,12 +309,10 @@
   #####################################[ vcs: git status ]######################################
   # Branch icon. Set this parameter to '\uF126 ' for the popular Powerline branch icon.
   typeset -g POWERLEVEL9K_VCS_BRANCH_ICON=
-  POWERLEVEL9K_VCS_BRANCH_ICON=${(g::)POWERLEVEL9K_VCS_BRANCH_ICON}
 
   # Untracked files icon. It's really a question mark, your font isn't broken.
   # Change the value of this parameter to show a different icon.
   typeset -g POWERLEVEL9K_VCS_UNTRACKED_ICON='?'
-  POWERLEVEL9K_VCS_UNTRACKED_ICON=${(g::)POWERLEVEL9K_VCS_UNTRACKED_ICON}
 
   # Formatter for Git status.
   #
@@ -400,7 +351,7 @@
     local res
     local where  # branch or tag
     if [[ -n $VCS_STATUS_LOCAL_BRANCH ]]; then
-      res+="${clean}${POWERLEVEL9K_VCS_BRANCH_ICON}"
+      res+="${clean}${(g::)POWERLEVEL9K_VCS_BRANCH_ICON}"
       where=${(V)VCS_STATUS_LOCAL_BRANCH}
     elif [[ -n $VCS_STATUS_TAG ]]; then
       res+="${meta}#"
@@ -444,7 +395,7 @@
     # ?42 if have untracked files. It's really a question mark, your font isn't broken.
     # See POWERLEVEL9K_VCS_UNTRACKED_ICON above if you want to use a different icon.
     # Remove the next line if you don't want to see untracked files at all.
-    (( VCS_STATUS_NUM_UNTRACKED  )) && res+=" ${untracked}${POWERLEVEL9K_VCS_UNTRACKED_ICON}${VCS_STATUS_NUM_UNTRACKED}"
+    (( VCS_STATUS_NUM_UNTRACKED  )) && res+=" ${untracked}${(g::)POWERLEVEL9K_VCS_UNTRACKED_ICON}${VCS_STATUS_NUM_UNTRACKED}"
     # "─" if the number of unstaged files is unknown. This can happen due to
     # POWERLEVEL9K_VCS_MAX_INDEX_SIZE_DIRTY (see below) being set to a non-negative number lower
     # than the number of files in the Git index, or due to bash.showDirtyState being set to false
