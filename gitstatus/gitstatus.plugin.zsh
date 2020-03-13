@@ -508,7 +508,7 @@ function gitstatus_start() {
                     [[ $os[1] == android ]]              || os=(linux)
                   ;;
                   cygwin_nt-*)  os=($kernel cygwin_nt-10.0);;
-                  mingw|msys)   os=($kernel msys_nt-10.0);;
+                  mingw*|msys*) os=($kernel msys_nt-10.0);;
                   *)            os=($kernel);;
                 esac
                 local arch
