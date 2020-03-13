@@ -591,7 +591,7 @@ function _p9k_init_icons() {
         VCS_OUTGOING_CHANGES_ICON      '>'
         VCS_TAG_ICON                   ''
         VCS_BOOKMARK_ICON              '^'
-        VCS_COMMIT_ICON                ''
+        VCS_COMMIT_ICON                '@'
         VCS_BRANCH_ICON                ''
         VCS_REMOTE_BRANCH_ICON         ':'
         VCS_LOADING_ICON               ''
@@ -786,7 +786,7 @@ function _p9k_init_icons() {
     ;;
   esac
 
-  if [[ $POWERLEVEL9K_ICON_PADDING == none ]]; then
+  if [[ $POWERLEVEL9K_ICON_PADDING == none && $POWERLEVEL9K_MODE != ascii ]]; then
     icons=("${(@kv)icons%% #}")
     icons[LEFT_SEGMENT_END_SEPARATOR]+=' '
     icons[MULTILINE_LAST_PROMPT_PREFIX]+=' '
