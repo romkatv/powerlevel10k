@@ -2,7 +2,7 @@ typeset -gA icons
 
 function _p9k_init_icons() {
   [[ $+_p9k__icon_mode == 1 && $_p9k__icon_mode == $POWERLEVEL9K_MODE/$POWERLEVEL9K_LEGACY_ICON_SPACING ]] && return
-  typeset -g _p9k__icon_mode=$POWERLEVEL9K_MODE/$POWERLEVEL9K_LEGACY_ICON_SPACING
+  typeset -g _p9k__icon_mode=$POWERLEVEL9K_MODE/$POWERLEVEL9K_LEGACY_ICON_SPACING/$POWERLEVEL9K_ICON_PADDING
 
   if [[ $POWERLEVEL9K_LEGACY_ICON_SPACING == true ]]; then
     local s=
@@ -785,6 +785,16 @@ function _p9k_init_icons() {
       icons[VCS_BRANCH_ICON]='@'
     ;;
   esac
+
+  if [[ $POWERLEVEL9K_ICON_PADDING == none ]]; then
+    icons=("${(@kv)icons%% #}")
+    icons[LEFT_SEGMENT_END_SEPARATOR]+=' '
+    icons[MULTILINE_LAST_PROMPT_PREFIX]+=' '
+    icons[VCS_TAG_ICON]+=' '
+    icons[VCS_COMMIT_ICON]+=' '
+    icons[VCS_BRANCH_ICON]+=' '
+    icons[VCS_REMOTE_BRANCH_ICON]+=' '
+  fi
 }
 
 # Sadly, this is a part of public API. Its use is emphatically discouraged.
