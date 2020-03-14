@@ -441,8 +441,10 @@ function gitstatus_start() {
     daemon_log=${(P)${:-GITSTATUS_DAEMON_LOG_$name}}
     file_prefix=${(P)${:-_GITSTATUS_FILE_PREFIX_$name}}
   else
+    typeset -gi _GITSTATUS_START_COUNTER
     local log_level=$GITSTATUS_LOG_LEVEL
-    local file_prefix=${${TMPDIR:-/tmp}:A}/gitstatus.$name.$EUID.$sysparams[pid].$EPOCHSECONDS
+    local file_prefix=${${TMPDIR:-/tmp}:A}/gitstatus.$name.$EUID
+    file_prefix+=.$sysparams[pid].$EPOCHSECONDS.$((++_GITSTATUS_START_COUNTER))
     (( GITSTATUS_ENABLE_LOGGING )) && : ${log_level:=INFO}
     if [[ -n $log_level ]]; then
       xtrace=$file_prefix.xtrace.log
