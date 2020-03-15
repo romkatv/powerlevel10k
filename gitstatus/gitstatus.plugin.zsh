@@ -381,9 +381,7 @@ function _gitstatus_process_response() {
 #   -D        Unless this option is specified, report zero staged, unstaged and conflicted
 #             changes for repositories with bash.showDirtyState = false.
 function gitstatus_start() {
-  emulate -L zsh || return
-  setopt no_aliases no_bg_nice extended_glob typeset_silent monitor || return
-
+  emulate -L zsh -o no_aliases -o no_bg_nice -o extended_glob -o typeset_silent || return
   print -rnu2 || return
 
   local opt OPTARG
@@ -464,6 +462,8 @@ function gitstatus_start() {
       exec 2>>$xtrace     || return
       setopt xtrace
     fi
+
+    setopt monitor || return
 
     if (( ! _GITSTATUS_STATE_$name )); then
       if [[ -r /proc/version && "$(</proc/version)" == *Microsoft* ]]; then
