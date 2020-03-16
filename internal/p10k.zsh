@@ -4332,7 +4332,7 @@ prompt_gcloud() {
   _p9k_read_word ~/.config/gcloud/active_config || return
   if ! _p9k_cache_stat_get $0 ~/.config/gcloud/configurations/config_$_p9k__ret; then
     # TODO: Use `gcloud config configurations list` instead.
-    _p9k_cache_stat_set "$(gcloud config get-value account 2>/dev/null)" "$(gcloud config get-value project 2>/dev/null)"
+    _p9k_cache_stat_set "$(gcloud config get-value account 2>/dev/null)" "$(gcloud projects describe `gcloud config get-value project 2>/dev/null` | grep name | cut -d ":" -f 2 2>/dev/null)"
   fi
   [[ -n $_p9k__cache_val[1] || -n $_p9k__cache_val[2] ]] || return
   P9K_GCLOUD_ACCOUNT=$_p9k__cache_val[1]
