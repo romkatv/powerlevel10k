@@ -19,7 +19,7 @@ fi
 local -ri force
 
 local -r font_base_url='https://github.com/romkatv/dotfiles-public/raw/master/.local/share/fonts/NerdFonts'
-local -ri wizard_columns=$((COLUMNS < 80 ? COLUMNS : 80))
+local -ri wizard_columns=$((COLUMNS < 83 ? COLUMNS : 83))
 
 local -ri prompt_indent=2
 
@@ -46,13 +46,16 @@ local -r slanted_bar='\uE0BD'
 
 local -r cursor='%1{\e[07m \e[27m%}'
 
+local -r time_24h='16:23:42'
+local -r time_12h='04:23:42 PM'
+
 local -ra lean_left=(
   '%$frame_color[$color]F╭─ ' '${extra_icons[1]:+$extra_icons[1] }%31F$extra_icons[2]%B%39F~%b%31F/%B%39Fsrc%b%f $prefixes[1]%76F$extra_icons[3]master%f '
   '%$frame_color[$color]F╰─' '%76F$prompt_char%f ${buffer:-$cursor}'
 )
 
 local -ra lean_right=(
-  ' $prefixes[2]%101F$extra_icons[4]5s%f${show_time:+ $prefixes[3]%66F$extra_icons[5]16:23:42%f}' ' %$frame_color[$color]F─╮%f'
+  ' $prefixes[2]%101F$extra_icons[4]5s%f${time:+ $prefixes[3]%66F$extra_icons[5]$time%f}' ' %$frame_color[$color]F─╮%f'
   '' ' %$frame_color[$color]F─╯%f'
 )
 
@@ -62,7 +65,7 @@ local -ra lean_8colors_left=(
 )
 
 local -ra lean_8colors_right=(
-  ' $prefixes[2]%3F$extra_icons[4]5s%f${show_time:+ $prefixes[3]%6F$extra_icons[5]16:23:42%f}' ' %$frame_color[$color]F─╮%f'
+  ' $prefixes[2]%3F$extra_icons[4]5s%f${time:+ $prefixes[3]%6F$extra_icons[5]$time%f}' ' %$frame_color[$color]F─╮%f'
   '' ' %$frame_color[$color]F─╯%f'
 )
 
@@ -72,7 +75,7 @@ local -ra classic_left=(
 )
 
 local -ra classic_right=(
-  '%$bg_color[$color]F$right_head%K{$bg_color[$color]}%f %$prefix_color[$color]F$prefixes[2]%101F5s $extra_icons[4]${show_time:+%$sep_color[$color]F$right_subsep %$prefix_color[$color]F$prefixes[3]%66F16:23:42 $extra_icons[5]}%k%F{$bg_color[$color]}$right_tail%f' '%$frame_color[$color]F─╮%f'
+  '%$bg_color[$color]F$right_head%K{$bg_color[$color]}%f %$prefix_color[$color]F$prefixes[2]%101F5s $extra_icons[4]${time:+%$sep_color[$color]F$right_subsep %$prefix_color[$color]F$prefixes[3]%66F$time $extra_icons[5]}%k%F{$bg_color[$color]}$right_tail%f' '%$frame_color[$color]F─╮%f'
   '' '%$frame_color[$color]F─╯%f'
 )
 
@@ -82,7 +85,7 @@ local -ra pure_left=(
 )
 
 local -ra pure_right=(
-  '${pure_use_rprompt+%F{$pure_color[yellow]\}5s%f${show_time:+ }}${show_time:+%F{$pure_color[grey]\}16:23:42%f}' ''
+  '${pure_use_rprompt+%F{$pure_color[yellow]\}5s%f${time:+ }}${time:+%F{$pure_color[grey]\}$time%f}' ''
   '' ''
 )
 
@@ -92,7 +95,7 @@ local -ra rainbow_left=(
 )
 
 local -ra rainbow_right=(
-  '%3F$right_head%K{3} %0F$prefixes[2]5s $extra_icons[4]%3F${show_time:+%7F$right_sep%K{7\} %0F$prefixes[3]16:23:42 $extra_icons[5]%7F}%k$right_tail%f' '%$frame_color[$color]F─╮%f'
+  '%3F$right_head%K{3} %0F$prefixes[2]5s $extra_icons[4]%3F${time:+%7F$right_sep%K{7\} %0F$prefixes[3]$time $extra_icons[5]%7F}%k$right_tail%f' '%$frame_color[$color]F─╮%f'
   '' '%$frame_color[$color]F─╯%f'
 )
 
@@ -925,33 +928,48 @@ function ask_ornaments_color() {
 
 function ask_time() {
   if (( wizard_columns < 80 )) && [[ $style != pure ]]; then
-    show_time=
+    time=
     return 0
   fi
 
   while true; do
+    local extra=
     clear
     flowing -c "%BShow current time?%b"
     print -P ""
-    print -P "%B(y)  Yes.%b"
+    print -P "%B(1)  No.%b"
     print -P ""
-    show_time=1 print_prompt
+    time= print_prompt
     print -P ""
-    print -P "%B(n)  No.%b"
+    print -P "%B(2)  24-hour format.%b"
     print -P ""
-    show_time= print_prompt
+    time=$time_24h print_prompt
     print -P ""
+    if [[ $wizard_columns -ge 83 || $style == lean* || $cap_narrow_icons == 1 ]]; then
+      extra+=3
+      print -P "%B(3)  12-hour format.%b"
+      print -P ""
+      time=$time_12h print_prompt
+      print -P ""
+    fi
     print -P "(r)  Restart from the beginning."
     print -P "(q)  Quit and do nothing."
     print -P ""
 
     local key=
-    read -k key${(%):-"?%BChoice [ynrq]: %b"} || quit -c
+    read -k key${(%):-"?%BChoice [12${extra}rq]: %b"} || quit -c
     case $key in
       q) quit;;
       r) return 1;;
-      y) show_time=1; options+=time; break;;
-      n) show_time=; break;;
+      1) time=; break;;
+      2) time=$time_24h; options+='24h time'; break;;
+      3)
+        if [[ $extra == *3* ]]; then
+          time=$time_12h
+          options+='12h time'
+          break
+        fi
+      ;;
     esac
   done
 }
@@ -1945,8 +1963,11 @@ function generate_config() {
     done
   fi
 
-  if [[ -n $show_time ]]; then
+  if [[ -n $time ]]; then
     uncomment time
+    if [[ $time == $time_12h ]]; then
+      sub TIME_FORMAT "'%D{%I:%M:%S %p}'"
+    fi
   fi
 
   if (( num_lines == 1 )); then
@@ -2058,7 +2079,7 @@ while true; do
   local instant_prompt=verbose zshrc_content= zshrc_backup= zshrc_backup_u=
   local -i zshrc_has_cfg=0 zshrc_has_instant_prompt=0 write_zshrc=0
   local POWERLEVEL9K_MODE= style= config_backup= config_backup_u= gap_char=' ' prompt_char='❯'
-  local left_subsep= right_subsep= left_tail= right_tail= left_head= right_head= show_time=
+  local left_subsep= right_subsep= left_tail= right_tail= left_head= right_head= time=
   local -i num_lines=0 empty_line=0 color=2 left_frame=1 right_frame=1 transient_prompt=0
   local -i cap_diamond=0 cap_python=0 cap_debian=0 cap_narrow_icons=0 cap_lock=0 cap_arrow=0
   local -a extra_icons=('' '' '')
