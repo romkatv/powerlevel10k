@@ -612,9 +612,9 @@ function ask_debian() {
   done
 }
 
-function ask_narrow_icons() {
+function ask_icon_padding() {
   if [[ $POWERLEVEL9K_MODE == (powerline|compatible|ascii) ]]; then
-    cap_narrow_icons=0
+    POWERLEVEL9K_ICON_PADDING=none
     return 0
   fi
   local text="X"
@@ -646,8 +646,8 @@ function ask_narrow_icons() {
     case $key in
       q) quit;;
       r) return 1;;
-      y) cap_narrow_icons=1; options+='small icons'; break;;
-      n) cap_narrow_icons=0; options+='large icons'; break;;
+      y) POWERLEVEL9K_ICON_PADDING=none; options+='small icons'; break;;
+      n) POWERLEVEL9K_ICON_PADDING=moderate; options+='large icons'; break;;
     esac
   done
 }
@@ -754,10 +754,10 @@ function ask_charset() {
         left_frame=0
         right_frame=0
         POWERLEVEL9K_MODE=ascii
+        POWERLEVEL9K_ICON_PADDING=none
         cap_diamond=0
         cap_python=0
         cap_debian=0
-        cap_narrow_icons=1
         cap_lock=0
         cap_arrow=0
         break
@@ -945,7 +945,7 @@ function ask_time() {
     print -P ""
     time=$time_24h print_prompt
     print -P ""
-    if [[ $wizard_columns -ge 83 || $style == lean* || $cap_narrow_icons == 1 ]]; then
+    if [[ $wizard_columns -ge 83 || $style == lean* || $POWERLEVEL9K_ICON_PADDING == none ]]; then
       extra+=3
       print -P "%B(3)  12-hour format.%b"
       print -P ""
@@ -1058,13 +1058,6 @@ function ask_extra_icons() {
   local branch_icon=${(g::)icons[VCS_BRANCH_ICON]}
   local duration_icon=${(g::)icons[EXECUTION_TIME_ICON]}
   local time_icon=${(g::)icons[TIME_ICON]}
-  if (( cap_narrow_icons )); then
-    os_icon=${os_icon// }
-    dir_icon=${dir_icon// }
-    vcs_icon=${vcs_icon// }
-    duration_icon=${duration_icon// }
-    time_icon=${time_icon// }
-  fi
   branch_icon=${branch_icon// }
   if [[ $style == classic ]]; then
     os_icon="%B%255F$os_icon%f%b"
@@ -1794,9 +1787,7 @@ function generate_config() {
   else
     sub MODE $POWERLEVEL9K_MODE
 
-    if (( ! cap_narrow_icons )); then
-      sub ICON_PADDING moderate
-    fi
+    sub ICON_PADDING $POWERLEVEL9K_ICON_PADDING
 
     if [[ $POWERLEVEL9K_MODE == compatible ]]; then
       sub STATUS_ERROR_VISUAL_IDENTIFIER_EXPANSION "'х'"
@@ -2078,10 +2069,11 @@ fi
 while true; do
   local instant_prompt=verbose zshrc_content= zshrc_backup= zshrc_backup_u=
   local -i zshrc_has_cfg=0 zshrc_has_instant_prompt=0 write_zshrc=0
-  local POWERLEVEL9K_MODE= style= config_backup= config_backup_u= gap_char=' ' prompt_char='❯'
+  local POWERLEVEL9K_MODE= POWERLEVEL9K_ICON_PADDING=moderate style= config_backup= config_backup_u=
+  local gap_char=' ' prompt_char='❯'
   local left_subsep= right_subsep= left_tail= right_tail= left_head= right_head= time=
   local -i num_lines=0 empty_line=0 color=2 left_frame=1 right_frame=1 transient_prompt=0
-  local -i cap_diamond=0 cap_python=0 cap_debian=0 cap_narrow_icons=0 cap_lock=0 cap_arrow=0
+  local -i cap_diamond=0 cap_python=0 cap_debian=0 cap_lock=0 cap_arrow=0
   local -a extra_icons=('' '' '')
   local -a frame_color=(244 242 240 238)
   local -a color_name=(Lightest Light Dark Darkest)
@@ -2165,8 +2157,9 @@ while true; do
   fi
 
   _p9k_init_icons
+  ask_icon_padding     || continue
+  _p9k_init_icons
 
-  ask_narrow_icons     || continue
   ask_style            || continue
   ask_charset          || continue
   ask_color_scheme     || continue

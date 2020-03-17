@@ -1,7 +1,7 @@
 typeset -gA icons
 
 function _p9k_init_icons() {
-  [[ $+_p9k__icon_mode == 1 && $_p9k__icon_mode == $POWERLEVEL9K_MODE/$POWERLEVEL9K_LEGACY_ICON_SPACING ]] && return
+  [[ $_p9k__icon_mode == $POWERLEVEL9K_MODE/$POWERLEVEL9K_LEGACY_ICON_SPACING/$POWERLEVEL9K_ICON_PADDING ]] && return
   typeset -g _p9k__icon_mode=$POWERLEVEL9K_MODE/$POWERLEVEL9K_LEGACY_ICON_SPACING/$POWERLEVEL9K_ICON_PADDING
 
   if [[ $POWERLEVEL9K_LEGACY_ICON_SPACING == true ]]; then
