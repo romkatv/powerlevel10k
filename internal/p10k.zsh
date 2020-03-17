@@ -432,19 +432,12 @@ _p9k_cache_stat_get() {
   fi
 
   if (( $+commands[md5] )); then
-    local -a md5=(md5)
+    _p9k__cache_stat_fprint="$(md5 -- $* 2>&1)"
   elif (( $+commands[md5sum] )); then
-    local -a md5=(md5sum -b)
+    _p9k__cache_stat_fprint="$(md5sum -b -- $* 2>&1)"
   else
     return 1
   fi
-
-  local fprint
-  for f; do
-    if fprint="$($md5 $f 2>/dev/null)"; then
-      _p9k__cache_stat_fprint+="${(q)fprint} "
-    fi
-  done
 
   local meta_key=$_p9k__cache_key
   if _p9k_cache_ephemeral_get $0 $label fprint "$@" "$_p9k__cache_stat_fprint"; then
@@ -1089,7 +1082,7 @@ function _p9k_prompt_segment() { "_p9k_${_p9k__prompt_side}_prompt_segment" "$@"
 function p9k_prompt_segment() { p10k segment "$@" }
 
 function _p9k_python_version() {
-  _p9k_cached_cmd_stdout_stderr python --version || return
+  _p9k_cached_cmd 1 python --version || return
   [[ $_p9k__ret == (#b)Python\ ([[:digit:].]##)* ]] && _p9k__ret=$match[1]
 }
 
@@ -2022,7 +2015,7 @@ _p9k_prompt_docker_machine_init() {
 ################################################################
 # GO prompt
 prompt_go_version() {
-  _p9k_cached_cmd_stdout go version || return
+  _p9k_cached_cmd 0 go version || return
   [[ $_p9k__ret == (#b)*go([[:digit:].]##)* ]] || return
   local v=$match[1]
   if (( _POWERLEVEL9K_GO_VERSION_PROJECT_ONLY )); then
@@ -2247,26 +2240,19 @@ _p9k_prompt_load_sync() {
   _p9k_worker_reply $REPLY
 }
 
-function _p9k_cached_cmd_stdout() {
-  local cmd=${commands[$1]:A}
+# Usage: _p9k_cached_cmd <0|1> <cmd> [args...]
+#
+# The first argument says whether to capture stderr (1) or ignore it (0).
+function _p9k_cached_cmd() {
+  local cmd=$commands[$2]
   [[ -n $cmd ]] || return
-  shift
   if ! _p9k_cache_stat_get $0" ${(q)*}" $cmd; then
     local out
-    out="$($cmd "$@" 2>/dev/null)"
-    _p9k_cache_stat_set $(( ! $? )) "$out"
-  fi
-  (( $_p9k__cache_val[1] )) || return
-  _p9k__ret=$_p9k__cache_val[2]
-}
-
-function _p9k_cached_cmd_stdout_stderr() {
-  local cmd=${commands[$1]:A}
-  [[ -n $cmd ]] || return
-  shift
-  if ! _p9k_cache_stat_get $0" ${(q)*}" $cmd; then
-    local out
-    out="$($cmd "$@" 2>&1)"  # this line is the only diff with _p9k_cached_cmd_stdout
+    if (( $1 )); then
+      out="$($cmd "${@:3}" 2>&1)"
+    else
+      out="$($cmd "${@:3}" 2>/dev/null)"
+    fi
     _p9k_cache_stat_set $(( ! $? )) "$out"
   fi
   (( $_p9k__cache_val[1] )) || return
@@ -2279,7 +2265,7 @@ prompt_node_version() {
   if (( _POWERLEVEL9K_NODE_VERSION_PROJECT_ONLY )); then
     _p9k_upglob package.json && return
   fi
-  _p9k_cached_cmd_stdout node --version && [[ $_p9k__ret == v?* ]] || return
+  _p9k_cached_cmd 0 node --version && [[ $_p9k__ret == v?* ]] || return
   _p9k_prompt_segment "$0" "green" "white" 'NODE_ICON' 0 '' "${_p9k__ret#v}"
 }
 
@@ -2372,10 +2358,10 @@ _p9k_nvm_ls_current() {
 
   local nvm_dir=${NVM_DIR:A}
   if [[ -n $nvm_dir && $node_path == $nvm_dir/versions/io.js/* ]]; then
-    _p9k_cached_cmd_stdout iojs --version || return
+    _p9k_cached_cmd 0 iojs --version || return
     _p9k__ret=iojs-v${_p9k__ret#v}
   elif [[ -n $nvm_dir && $node_path == $nvm_dir/* ]]; then
-    _p9k_cached_cmd_stdout node --version || return
+    _p9k_cached_cmd 0 node --version || return
     _p9k__ret=v${_p9k__ret#v}
   else
     _p9k__ret=system
@@ -2400,7 +2386,7 @@ _p9k_prompt_nvm_init() {
 # Segment to display NodeEnv
 prompt_nodeenv() {
   local msg
-  if (( _POWERLEVEL9K_NODEENV_SHOW_NODE_VERSION )) && _p9k_cached_cmd_stdout node --version; then
+  if (( _POWERLEVEL9K_NODEENV_SHOW_NODE_VERSION )) && _p9k_cached_cmd 0 node --version; then
     msg="${_p9k__ret//\%/%%} "
   fi
   msg+="$_POWERLEVEL9K_NODEENV_LEFT_DELIMITER${${NODE_VIRTUAL_ENV:t}//\%/%%}$_POWERLEVEL9K_NODEENV_RIGHT_DELIMITER"
@@ -2488,7 +2474,7 @@ prompt_dotnet_version() {
   if (( _POWERLEVEL9K_DOTNET_VERSION_PROJECT_ONLY )); then
     _p9k_upglob 'project.json|global.json|packet.dependencies|*.csproj|*.fsproj|*.xproj|*.sln' && return
   fi
-  _p9k_cached_cmd_stdout dotnet --version || return
+  _p9k_cached_cmd 0 dotnet --version || return
   _p9k_prompt_segment "$0" "magenta" "white" 'DOTNET_ICON' 0 '' "$_p9k__ret"
 }
 
@@ -2512,7 +2498,7 @@ prompt_php_version() {
   if (( _POWERLEVEL9K_PHP_VERSION_PROJECT_ONLY )); then
     _p9k_upglob 'composer.json|*.php' && return
   fi
-  _p9k_cached_cmd_stdout php --version || return
+  _p9k_cached_cmd 0 php --version || return
   [[ $_p9k__ret == (#b)(*$'\n')#'PHP '([[:digit:].]##)* ]] || return
   local v=$match[2]
   _p9k_prompt_segment "$0" "fuchsia" "grey93" 'PHP_ICON' 0 '' "${v//\%/%%}"
@@ -4167,7 +4153,7 @@ _p9k_prompt_openfoam_init() {
 ################################################################
 # Segment to display Swift version
 prompt_swift_version() {
-  _p9k_cached_cmd_stdout swift --version || return
+  _p9k_cached_cmd 0 swift --version || return
   [[ $_p9k__ret == (#b)[^[:digit:]]#([[:digit:].]##)* ]] || return
   _p9k_prompt_segment "$0" "magenta" "white" 'SWIFT_ICON' 0 '' "${match[1]//\%/%%}"
 }
@@ -4296,7 +4282,7 @@ prompt_java_version() {
   if (( _POWERLEVEL9K_JAVA_VERSION_PROJECT_ONLY )); then
     _p9k_upglob 'pom.xml|build.gradle.kts|build.sbt|deps.edn|project.clj|build.boot|*.(java|class|jar|gradle|clj|cljc)' && return
   fi
-  _p9k_cached_cmd_stdout_stderr java -fullversion || return
+  _p9k_cached_cmd 1 java -fullversion || return
   local v=$_p9k__ret
   v=${${v#*\"}%\"*}
   (( _POWERLEVEL9K_JAVA_VERSION_FULL )) || v=${v%%-*}
@@ -7497,7 +7483,7 @@ _p9k_must_init() {
     [[ $sig == $_p9k__param_sig ]] && return 1
     _p9k_deinit
   fi
-  _p9k__param_pat=$'v74\1'${ZSH_VERSION}$'\1'${ZSH_PATCHLEVEL}$'\1'
+  _p9k__param_pat=$'v75\1'${ZSH_VERSION}$'\1'${ZSH_PATCHLEVEL}$'\1'
   _p9k__param_pat+=$'${#parameters[(I)POWERLEVEL9K_*]}\1${(%):-%n%#}\1$GITSTATUS_LOG_LEVEL\1'
   _p9k__param_pat+=$'$GITSTATUS_ENABLE_LOGGING\1$GITSTATUS_DAEMON\1$GITSTATUS_NUM_THREADS\1'
   _p9k__param_pat+=$'$DEFAULT_USER\1${ZLE_RPROMPT_INDENT:-1}\1$P9K_SSH\1$__p9k_ksh_arrays\1'
