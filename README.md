@@ -21,6 +21,7 @@ Ready to give Powerlevel10k a try?
    - [Oh My Zsh](#oh-my-zsh)
    - [Prezto](#prezto)
    - [Zim](#zim)
+   - [Antibody](#antibody)
    - [Antigen](#antigen)
    - [Zplug](#zplug)
    - [Zgen](#zgen)
@@ -365,6 +366,10 @@ Add `zstyle :prezto:module:prompt theme powerlevel10k` to `~/.zpreztorc`.
 ### Zim
 
 Add `zmodule romkatv/powerlevel10k` to `~/.zimrc` and run `zimfw install`.
+
+### Antibody
+
+Add `antibody bundle romkatv/powerlevel10k` to `~/.zshrc`.
 
 ### Antigen
 
