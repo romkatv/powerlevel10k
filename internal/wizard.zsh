@@ -50,7 +50,7 @@ local -r time_24h='16:23:42'
 local -r time_12h='04:23:42 PM'
 
 local -ra lean_left=(
-  '%$frame_color[$color]F╭─ ' '${extra_icons[1]:+$extra_icons[1] }%31F$extra_icons[2]%B%39F~%b%31F/%B%39Fsrc%b%f $prefixes[1]%76F$extra_icons[3]master%f '
+  '%$frame_color[$color]F╭─ ' '${extra_icons[1]:+%B%f$extra_icons[1] %b}%31F$extra_icons[2]%B%39F~%b%31F/%B%39Fsrc%b%f $prefixes[1]%76F$extra_icons[3]master%f '
   '%$frame_color[$color]F╰─' '%76F$prompt_char%f ${buffer:-$cursor}'
 )
 
@@ -60,7 +60,7 @@ local -ra lean_right=(
 )
 
 local -ra lean_8colors_left=(
-  '%$frame_color[$color]F╭─ ' '${extra_icons[1]:+$extra_icons[1] }%4F$extra_icons[2]%4F~/src%f $prefixes[1]%2F$extra_icons[3]master%f '
+  '%$frame_color[$color]F╭─ ' '${extra_icons[1]:+%f$extra_icons[1] }%4F$extra_icons[2]%4F~/src%f $prefixes[1]%2F$extra_icons[3]master%f '
   '%$frame_color[$color]F╰─' '%2F$prompt_char%f ${buffer:-$cursor}'
 )
 
@@ -70,7 +70,7 @@ local -ra lean_8colors_right=(
 )
 
 local -ra classic_left=(
-  '%$frame_color[$color]F╭─' '%F{$bg_color[$color]}$left_tail%K{$bg_color[$color]} ${extra_icons[1]:+$extra_icons[1]%K{$bg_color[$color]\} %$sep_color[$color]F$left_subsep%f }%31F$extra_icons[2]%B%39F~%b%K{$bg_color[$color]}%31F/%B%39Fsrc%b%K{$bg_color[$color]} %$sep_color[$color]F$left_subsep%f %$prefix_color[$color]F$prefixes[1]%76F$extra_icons[3]master %k%$bg_color[$color]F$left_head%f'
+  '%$frame_color[$color]F╭─' '%F{$bg_color[$color]}$left_tail%K{$bg_color[$color]} ${extra_icons[1]:+%255F$extra_icons[1] %$sep_color[$color]F$left_subsep%f }%31F$extra_icons[2]%B%39F~%b%K{$bg_color[$color]}%31F/%B%39Fsrc%b%K{$bg_color[$color]} %$sep_color[$color]F$left_subsep%f %$prefix_color[$color]F$prefixes[1]%76F$extra_icons[3]master %k%$bg_color[$color]F$left_head%f'
   '%$frame_color[$color]F╰─' '%f ${buffer:-$cursor}'
 )
 
@@ -90,7 +90,7 @@ local -ra pure_right=(
 )
 
 local -ra rainbow_left=(
-  '%$frame_color[$color]F╭─' '%F{${${extra_icons[1]:+7}:-4}}$left_tail${extra_icons[1]:+%K{7\} $extra_icons[1] %K{4\}%7F$left_sep}%K{4}%254F $extra_icons[2]%B%255F~%b%K{4}%254F/%B%255Fsrc%b%K{4} %K{2}%4F$left_sep %0F$prefixes[1]$extra_icons[3]master %k%2F$left_head%f'
+  '%$frame_color[$color]F╭─' '%F{${${extra_icons[1]:+7}:-4}}$left_tail${extra_icons[1]:+%K{7\}%232F $extra_icons[1] %K{4\}%7F$left_sep}%K{4}%254F $extra_icons[2]%B%255F~%b%K{4}%254F/%B%255Fsrc%b%K{4} %K{2}%4F$left_sep %0F$prefixes[1]$extra_icons[3]master %k%2F$left_head%f'
   '%$frame_color[$color]F╰─' '%f ${buffer:-$cursor}'
 )
 
@@ -1059,13 +1059,6 @@ function ask_extra_icons() {
   local duration_icon=${(g::)icons[EXECUTION_TIME_ICON]}
   local time_icon=${(g::)icons[TIME_ICON]}
   branch_icon=${branch_icon// }
-  if [[ $style == classic ]]; then
-    os_icon="%B%255F$os_icon%f%b"
-  elif [[ $style == rainbow ]]; then
-    os_icon="%B%F{232}$os_icon%f%b"
-  elif [[ $style != lean_8colors ]]; then
-    os_icon="%B%f$os_icon%b"
-  fi
   local few=('' '' '' '' '')
   local many=("$os_icon" "$dir_icon " "$vcs_icon $branch_icon " "$duration_icon " "$time_icon ")
   while true; do

@@ -1531,15 +1531,14 @@ The last line on the screenshot shows a cut off Arch Linux logo.
 There are several mitigation options for this issue.
 
 1. Use a different terminal. Konsole is the only terminal that exhibits this behavior.
-2. Use a monospace font. For example, [the recommended Powerlevel10k font](
-    #meslo-nerd-font-patched-for-powerlevel10k).
+2. Use a monospace font.
 3. Manually add an extra space after the icon that gets cut off. For example, if the content of
    `os_icon` prompt segment gets cut off, open `~/.p10k.zsh`, search for
    `POWERLEVEL9K_OS_ICON_CONTENT_EXPANSION` and change it as follows:
 ```zsh
-typeset -g POWERLEVEL9K_OS_ICON_CONTENT_EXPANSION='%B${P9K_CONTENT} '  # extra space at the end
+typeset -g POWERLEVEL9K_OS_ICON_CONTENT_EXPANSION='${P9K_CONTENT} '  # extra space at the end
 ```
-4. Use a different icon that isn't monospace. For example, if Arch Linux logo gets cut off, add
+4. Use a different icon that is monospace. For example, if Arch Linux logo gets cut off, add
    the following parameter to `~/.p10k.zsh`:
 ```zsh
 typeset -g POWERLEVEL9K_LINUX_ARCH_ICON='Arch'  # plain "Arch" in place of a logo
