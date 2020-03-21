@@ -28,6 +28,7 @@ Ready to give Powerlevel10k a try?
    - [Zplugin](#zplugin)
    - [Zinit](#zinit)
    - [Homebrew](#homebrew)
+   - [Arch Linux](#arch-linux)
 1. Restart Zsh.
 1. Type `p10k configure` if the configuration wizard doesn't start automatically.
 
@@ -403,6 +404,13 @@ supported by Powerlevel10k.
 ```zsh
 brew install romkatv/powerlevel10k/powerlevel10k
 echo 'source /usr/local/opt/powerlevel10k/powerlevel10k.zsh-theme' >>! ~/.zshrc
+```
+
+### Arch Linux
+
+```zsh
+pacman -Sy --noconfirm zsh-theme-powerlevel10k
+echo 'source /usr/share/zsh-theme-powerlevel10k/powerlevel10k.zsh-theme' >>! ~/.zshrc
 ```
 
 ## Configuration
@@ -1051,10 +1059,11 @@ https://www.reddit.com/r/zsh/comments/eg49ff/powerlevel10k_prompt_history_exit_c
 
 ### Is there an AUR package for Powerlevel10k?
 
-There are two:
-[zsh-theme-powerlevel10k-git](https://aur.archlinux.org/packages/zsh-theme-powerlevel10k-git/) and
-[zsh-theme-powerlevel10k](https://aur.archlinux.org/packages/zsh-theme-powerlevel10k/). Both
-packages are owned by unaffiliated volunteers.
+There is [zsh-theme-powerlevel10k-git](
+  https://aur.archlinux.org/packages/zsh-theme-powerlevel10k-git/). It's owned by an unaffiliated
+volunteer.
+
+There is also an [official Powerlevel10k package](#arch-linux) for Pacman.
 
 ### What is the minimum supported Zsh version?
 
@@ -1589,12 +1598,14 @@ typeset -g POWERLEVEL9K_OS_ICON_CONTENT_EXPANSION='${P9K_CONTENT}'  # not bold
   - [Oh My Zsh](#oh-my-zsh)
   - [Prezto](#prezto)
   - [Zim](#zim)
+  - [Antibody](#antibody)
   - [Antigen](#antigen)
   - [Zplug](#zplug)
   - [Zgen](#zgen)
   - [Zplugin](#zplugin)
   - [Zinit](#zinit)
   - [Homebrew](#homebrew)
+  - [Arch Linux](#arch-linux)
 - [Configuration](#configuration)
   - [For new users](#for-new-users)
   - [For Powerlevel9k users](#for-powerlevel9k-users)
