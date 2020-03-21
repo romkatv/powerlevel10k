@@ -4320,20 +4320,90 @@ _p9k_prompt_azure_init() {
 }
 
 prompt_gcloud() {
-  unset P9K_GCLOUD_PROJECT P9K_GCLOUD_ACCOUNT
+  local -i len=$#_p9k__prompt _p9k__has_upglob
+  _p9k_prompt_segment                                                                    \
+    $0_PARTIAL blue white GCLOUD_ICON 1                                                  \
+    '${${(M)${#P9K_GCLOUD_PROJECT_NAME}:#0}:+$P9K_GCLOUD_ACCOUNT$P9K_GCLOUD_PROJECT_ID}' \
+    '${P9K_GCLOUD_ACCOUNT//\%/%%}:${P9K_GCLOUD_PROJECT_ID//\%/%%}'
+  _p9k_prompt_segment                                                                    \
+    $0_COMPLETE blue white GCLOUD_ICON 1                                                 \
+    '$P9K_GCLOUD_PROJECT_NAME'                                                           \
+    '${P9K_GCLOUD_ACCOUNT//\%/%%}:${P9K_GCLOUD_PROJECT_ID//\%/%%}'
+  (( _p9k__has_upglob )) || typeset -g "_p9k__segment_val_${_p9k__prompt_side}[_p9k__segment_index]"=$_p9k__prompt[len+1,-1]
+}
+
+_p9k_gcloud_prefetch() {
+  # P9K_GCLOUD_PROJECT is deprecated; it's always equal to P9K_GCLOUD_PROJECT_ID
+  unset P9K_GCLOUD_CONFIGURATION P9K_GCLOUD_ACCOUNT P9K_GCLOUD_PROJECT P9K_GCLOUD_PROJECT_ID P9K_GCLOUD_PROJECT_NAME
+  (( $+commands[gcloud] )) || return
   _p9k_read_word ~/.config/gcloud/active_config || return
-  if ! _p9k_cache_stat_get $0 ~/.config/gcloud/configurations/config_$_p9k__ret; then
-    # TODO: Use `gcloud config configurations list` instead.
-    _p9k_cache_stat_set "$(gcloud config get-value account 2>/dev/null)" "$(gcloud projects describe `gcloud config get-value project 2>/dev/null` | grep name | cut -d ":" -f 2 2>/dev/null)"
+  P9K_GCLOUD_CONFIGURATION=$_p9k__ret
+  if ! _p9k_cache_stat_get $0 ~/.config/gcloud/configurations/config_$P9K_GCLOUD_CONFIGURATION; then
+    local pair account project_id
+    pair="$(gcloud config configurations list --configuration=$P9K_GCLOUD_CONFIGURATION \
+      --format=$'value[separator="\1"](properties.core.account,properties.core.project)')"
+    (( ! $? )) && IFS=$'\1' read account project_id <<<$pair
+    _p9k_cache_stat_set "$account" "$project_id"
   fi
-  [[ -n $_p9k__cache_val[1] || -n $_p9k__cache_val[2] ]] || return
-  P9K_GCLOUD_ACCOUNT=$_p9k__cache_val[1]
-  P9K_GCLOUD_PROJECT=$_p9k__cache_val[2]
-  _p9k_prompt_segment "$0" "blue" "white" "GCLOUD_ICON" 0 '' "${P9K_GCLOUD_ACCOUNT//\%/%%}:${P9K_GCLOUD_PROJECT//\%/%%}"
+  if [[ -n $_p9k__cache_val[1] ]]; then
+    P9K_GCLOUD_ACCOUNT=$_p9k__cache_val[1]
+  fi
+  if [[ -n $_p9k__cache_val[2] ]]; then
+    P9K_GCLOUD_PROJECT_ID=$_p9k__cache_val[2]
+    P9K_GCLOUD_PROJECT=$P9K_GCLOUD_PROJECT_ID  # deprecated parameter; set for backward compatibility
+  fi
+  if [[ $P9K_GCLOUD_CONFIGURATION == $_p9k_gcloud_configuration &&
+        $P9K_GCLOUD_ACCOUNT == $_p9k_gcloud_account &&
+        $P9K_GCLOUD_PROJECT_ID == $_p9k_gcloud_project_id ]]; then
+    [[ -n $_p9k_gcloud_project_name ]] && P9K_GCLOUD_PROJECT_NAME=$_p9k_gcloud_project_name
+    if (( _POWERLEVEL9K_GCLOUD_REFRESH_PROJECT_NAME_SECONDS < 0 ||
+          _p9k__gcloud_last_fetch_ts + _POWERLEVEL9K_GCLOUD_REFRESH_PROJECT_NAME_SECONDS > EPOCHREALTIME )); then
+      return
+    fi
+  else
+    _p9k_gcloud_configuration=$P9K_GCLOUD_CONFIGURATION
+    _p9k_gcloud_account=$P9K_GCLOUD_ACCOUNT
+    _p9k_gcloud_project_id=$P9K_GCLOUD_PROJECT_ID
+    _p9k_gcloud_project_name=
+    _p9k__state_dump_scheduled=1
+  fi
+  [[ -n $P9K_GCLOUD_CONFIGURATION && -n $P9K_GCLOUD_ACCOUNT && -n $P9K_GCLOUD_PROJECT_ID ]] || return
+  _p9k__gcloud_last_fetch_ts=EPOCHREALTIME
+  _p9k_worker_invoke gcloud "_p9k_prompt_gcloud_compute ${(q)commands[gcloud]} ${(q)P9K_GCLOUD_CONFIGURATION} ${(q)P9K_GCLOUD_ACCOUNT} ${(q)P9K_GCLOUD_PROJECT_ID}"
 }
 
 _p9k_prompt_gcloud_init() {
+  _p9k__async_segments_compute+=_p9k_gcloud_prefetch
   typeset -g "_p9k__segment_cond_${_p9k__prompt_side}[_p9k__segment_index]"='$commands[gcloud]'
+}
+
+_p9k_prompt_gcloud_compute() {
+  local gcloud=$1
+  P9K_GCLOUD_CONFIGURATION=$2
+  P9K_GCLOUD_ACCOUNT=$3
+  P9K_GCLOUD_PROJECT_ID=$4
+  _p9k_worker_async "_p9k_prompt_gcloud_async ${(q)gcloud}" _p9k_prompt_gcloud_sync
+}
+
+_p9k_prompt_gcloud_async() {
+  local gcloud=$1
+  $gcloud projects describe $P9K_GCLOUD_PROJECT_ID --configuration=$P9K_GCLOUD_CONFIGURATION \
+    --account=$P9K_GCLOUD_ACCOUNT --format='value(name)'
+}
+
+_p9k_prompt_gcloud_sync() {
+  _p9k_worker_reply "_p9k_prompt_gcloud_update ${(q)P9K_GCLOUD_CONFIGURATION} ${(q)P9K_GCLOUD_ACCOUNT} ${(q)P9K_GCLOUD_PROJECT_ID} ${(q)REPLY%$'\n'}"
+}
+
+_p9k_prompt_gcloud_update() {
+  [[ $1 == $P9K_GCLOUD_CONFIGURATION &&
+     $2 == $P9K_GCLOUD_ACCOUNT &&
+     $3 == $P9K_GCLOUD_PROJECT_ID &&
+     $4 != $P9K_GCLOUD_PROJECT_NAME ]] || return
+  [[ -n $4 ]] && P9K_GCLOUD_PROJECT_NAME=$4 || unset P9K_GCLOUD_PROJECT_NAME
+  _p9k_gcloud_project_name=$P9K_GCLOUD_PROJECT_NAME
+  _p9k__state_dump_scheduled=1
+  reset=1
 }
 
 prompt_google_app_cred() {
@@ -6390,6 +6460,12 @@ typeset -g  _p9k__param_pat
 typeset -g  _p9k__param_sig
 
 _p9k_init_vars() {
+  typeset -gF _p9k__gcloud_last_fetch_ts
+  typeset -g  _p9k_gcloud_configuration
+  typeset -g  _p9k_gcloud_account
+  typeset -g  _p9k_gcloud_project_id
+  typeset -g  _p9k_gcloud_project_name
+
   typeset -gi _p9k_term_has_href
 
   typeset -gi _p9k_vcs_index
@@ -6586,6 +6662,8 @@ _p9k_init_vars() {
 }
 
 _p9k_init_params() {
+  _p9k_declare -F POWERLEVEL9K_GCLOUD_REFRESH_PROJECT_NAME_SECONDS 60
+
   # invarint:  _POWERLEVEL9K_INSTANT_PROMPT == (verbose|quiet|off)
   # invariant: [[ ($_POWERLEVEL9K_INSTANT_PROMPT == off) == $_POWERLEVEL9K_DISABLE_INSTANT_PROMPT ]]
   _p9k_declare -s POWERLEVEL9K_INSTANT_PROMPT  # verbose, quiet, off
