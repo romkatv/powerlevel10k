@@ -1177,7 +1177,7 @@ _p9k_prompt_disk_usage_init() {
   typeset -g _p9k__disk_usage_normal=
   typeset -g _p9k__disk_usage_warning=
   typeset -g _p9k__disk_usage_critical=
-  _p9k__async_segments_compute+='_p9k_prompt_disk_usage_compute ${(q)_p9k__cwd_a}'
+  _p9k__async_segments_compute+='_p9k_worker_invoke disk_usage "_p9k_prompt_disk_usage_compute ${(q)_p9k__cwd_a}"'
 }
 
 _p9k_prompt_disk_usage_compute() {
@@ -1242,7 +1242,7 @@ prompt_battery() {
 _p9k_prompt_battery_init() {
   typeset -ga _p9k__battery_args=()
   if [[ $_p9k_os == OSX && $+commands[pmset] == 1 ]]; then
-    _p9k__async_segments_compute+=_p9k_prompt_battery_compute
+    _p9k__async_segments_compute+='_p9k_worker_invoke battery _p9k_prompt_battery_compute'
     return
   fi
   if [[ $_p9k_os != (Linux|Android) ||
@@ -1409,7 +1409,7 @@ prompt_public_ip() {
 _p9k_prompt_public_ip_init() {
   typeset -g _p9k__public_ip=
   typeset -gF _p9k__public_ip_next_time=0
-  _p9k__async_segments_compute+=_p9k_prompt_public_ip_compute
+  _p9k__async_segments_compute+='_p9k_worker_invoke public_ip _p9k_prompt_public_ip_compute'
 }
 
 _p9k_prompt_public_ip_compute() {
@@ -2200,7 +2200,7 @@ _p9k_prompt_load_init() {
     typeset -g _p9k__load_normal=
     typeset -g _p9k__load_warning=
     typeset -g _p9k__load_critical=
-    _p9k__async_segments_compute+=_p9k_prompt_load_compute
+    _p9k__async_segments_compute+='_p9k_worker_invoke load _p9k_prompt_load_compute'
   elif [[ ! -r /proc/loadavg ]]; then
     typeset -g "_p9k__segment_cond_${_p9k__prompt_side}[_p9k__segment_index]"='${:-}'
   fi
@@ -2524,7 +2524,7 @@ function _p9k_prompt_ram_init() {
     return
   fi
   typeset -g _p9k__ram_free=
-  _p9k__async_segments_compute+=_p9k_prompt_ram_compute
+  _p9k__async_segments_compute+='_p9k_worker_invoke ram _p9k_prompt_ram_compute'
 }
 
 _p9k_prompt_ram_compute() {
@@ -3124,7 +3124,7 @@ function _p9k_prompt_swap_init() {
     return
   fi
   typeset -g _p9k__swap_used=
-  _p9k__async_segments_compute+=_p9k_prompt_swap_compute
+  _p9k__async_segments_compute+='_p9k_worker_invoke swap _p9k_prompt_swap_compute'
 }
 
 _p9k_prompt_swap_compute() {
@@ -3235,7 +3235,7 @@ instant_prompt_time() {
 
 _p9k_prompt_time_init() {
   (( _POWERLEVEL9K_EXPERIMENTAL_TIME_REALTIME )) || return
-  _p9k__async_segments_compute+=_p9k_prompt_time_compute
+  _p9k__async_segments_compute+='_p9k_worker_invoke time _p9k_prompt_time_compute'
 }
 
 _p9k_prompt_time_compute() {
@@ -4780,7 +4780,7 @@ _p9k_prompt_wifi_init() {
     typeset -g P9K_WIFI_RSSI=
     typeset -g P9K_WIFI_NOISE=
     typeset -g P9K_WIFI_BARS=
-    _p9k__async_segments_compute+=_p9k_prompt_wifi_compute
+    _p9k__async_segments_compute+='_p9k_worker_invoke wifi _p9k_prompt_wifi_compute'
   else
     typeset -g "_p9k__segment_cond_${_p9k__prompt_side}[_p9k__segment_index]"='${:-}'
   fi
@@ -5169,7 +5169,7 @@ function _p9k_prompt_net_iface_init() {
   typeset -g _p9__ip_timestamp=
   typeset -g _p9k__vpn_ip_ips=()
   [[ -z $_POWERLEVEL9K_PUBLIC_IP_VPN_INTERFACE ]] && _p9k__public_ip_not_vpn=1
-  _p9k__async_segments_compute+=_p9k_prompt_net_iface_compute
+  _p9k__async_segments_compute+='_p9k_worker_invoke net_iface _p9k_prompt_net_iface_compute'
 }
 
 # reads `iface2ip` and sets `ifaces` and `ips`
@@ -6292,10 +6292,7 @@ _p9k_precmd_impl() {
     fi
   fi
 
-  local f_compute
-  for f_compute in "${_p9k__async_segments_compute[@]}"; do
-    _p9k_worker_invoke ${f_compute%% *} ${(e)f_compute}
-  done
+  (( $+functions[_p9k_async_segments_compute] )) && _p9k_async_segments_compute
 
   _p9k__expanded=0
 
@@ -6576,7 +6573,6 @@ _p9k_init_vars() {
   typeset -g  _p9k__last_prompt_pwd
   typeset -gA _p9k_display_k
   typeset -ga _p9k__display_v
-  typeset -gaU _p9k__async_segments_compute
 
   typeset -gA _p9k__dotnet_stat_cache
   typeset -gA _p9k__dir_stat_cache
@@ -7821,6 +7817,8 @@ _p9k_init() {
 
   typeset -g P9K_OS_ICON=$_p9k_os_icon
 
+  local -a _p9k__async_segments_compute
+
   local -i i
   local elem
 
@@ -7850,7 +7848,10 @@ _p9k_init() {
      _p9k_prompt_net_iface_init
   fi
 
-  (( $#_p9k__async_segments_compute )) && _p9k_worker_start
+  if [[ -n $_p9k__async_segments_compute ]]; then
+    functions[_p9k_async_segments_compute]=${(pj:\n:)_p9k__async_segments_compute}
+    _p9k_worker_start
+  fi
 
   local k v
   for k v in ${(kv)_p9k_display_k}; do
