@@ -1219,14 +1219,36 @@
   # Google cloud color.
   typeset -g POWERLEVEL9K_GCLOUD_FOREGROUND=4
 
-  # Google cloud format. Change the value of POWERLEVEL9K_GCLOUD_CONTENT_EXPANSION if the default
-  # is too verbose or not informative enough.
+  # Google cloud format. Change the value of POWERLEVEL9K_GCLOUD_PARTIAL_CONTENT_EXPANSION and/or
+  # POWERLEVEL9K_GCLOUD_COMPLETE_CONTENT_EXPANSION if the default is too verbose or not informative
+  # enough. You can use the following parameters in the expansions. Each of them corresponds to the
+  # output of `gcloud` tool.
   #
-  #   P9K_GCLOUD_ACCOUNT: the output of `gcloud config get-value account`
-  #   P9K_GCLOUD_PROJECT: the output of `gcloud config get-value project`
-  #   ${VARIABLE//\%/%%}: ${VARIABLE} with all occurences of '%' replaced with '%%'.
+  #   Parameter                | Source
+  #   -------------------------|--------------------------------------------------------------------
+  #   P9K_GCLOUD_CONFIGURATION | gcloud config configurations list --format='value(name)'
+  #   P9K_GCLOUD_ACCOUNT       | gcloud config get-value account
+  #   P9K_GCLOUD_PROJECT_ID    | gcloud config get-value project
+  #   P9K_GCLOUD_PROJECT_NAME  | gcloud projects describe $P9K_GCLOUD_PROJECT_ID --format='value(name)'
   #
-  typeset -g POWERLEVEL9K_GCLOUD_CONTENT_EXPANSION='${P9K_GCLOUD_PROJECT//\%/%%}'
+  # Note: ${VARIABLE//\%/%%} expands to ${VARIABLE} with all occurences of '%' replaced with '%%'.
+  #
+  # Obtaining project name requires sending a request to Google servers. This can take a long time
+  # and even fail. When project name is unknown, P9K_GCLOUD_PROJECT_NAME is not set and gcloud
+  # prompt segment is in state PARTIAL. When project name gets known, P9K_GCLOUD_PROJECT_NAME gets
+  # set and gcloud prompt segment transitions to state COMPLETE.
+  #
+  # You can customize the format, icon and colors of gcloud segment separately for states PARTIAL
+  # and COMPLETE. You can also hide gcloud in state PARTIAL by setting
+  # POWERLEVEL9K_GCLOUD_PARTIAL_VISUAL_IDENTIFIER_EXPANSION and
+  # POWERLEVEL9K_GCLOUD_PARTIAL_CONTENT_EXPANSION to empty.
+  typeset -g POWERLEVEL9K_GCLOUD_PARTIAL_CONTENT_EXPANSION='${P9K_GCLOUD_PROJECT_ID//\%/%%}'
+  typeset -g POWERLEVEL9K_GCLOUD_COMPLETE_CONTENT_EXPANSION='${P9K_GCLOUD_PROJECT_NAME//\%/%%}'
+
+  # Send a request to Google (by means of `gcloud projects describe ...`) to obtain project name
+  # this often. Negative value disables periodic polling. In this mode project name is retrieved
+  # only when the current configuration, account or project id changes.
+  typeset -g POWERLEVEL9K_GCLOUD_REFRESH_PROJECT_NAME_SECONDS=60
 
   # Custom icon.
   # typeset -g POWERLEVEL9K_GCLOUD_VISUAL_IDENTIFIER_EXPANSION='⭐'
