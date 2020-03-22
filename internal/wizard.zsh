@@ -41,8 +41,8 @@ local -r down_triangle='\uE0BC'
 local -r up_triangle='\uE0BA'
 local -r fade_in='░▒▓'
 local -r fade_out='▓▒░'
-local -r vertical_bar='|'
-local -r slanted_bar='\uE0BD'
+local -r vertical_bar='\u2502'
+local -r slanted_bar='\u2571'
 
 local -r cursor='%1{\e[07m \e[27m%}'
 
@@ -739,7 +739,7 @@ function ask_charset() {
     print -P ""
     print -P "%B(2)  ASCII.%b"
     print -P ""
-    left_sep= right_sep= left_subsep=$vertical_bar right_subsep=$vertical_bar left_head= \
+    left_sep= right_sep= left_subsep='|' right_subsep='|' left_head= \
       right_head= prompt_char='>' left_frame=0 right_frame=0 print_prompt
     print -P ""
     print -P "(r)  Restart from the beginning."
@@ -755,8 +755,8 @@ function ask_charset() {
       2)
         left_sep=
         right_sep=
-        left_subsep=$vertical_bar
-        right_subsep=$vertical_bar
+        left_subsep='|'
+        right_subsep='|'
         left_head=
         right_head=
         prompt_char='>'
@@ -2147,14 +2147,17 @@ while true; do
   else
     left_sep=
     right_sep=
-    left_subsep=$vertical_bar
-    right_subsep=$vertical_bar
     left_head=
     right_head=
     if [[ $POWERLEVEL9K_MODE == ascii ]]; then
+      left_subsep='|'
+      right_subsep='|'
       prompt_char='>'
       left_frame=0
       right_frame=0
+    else
+      left_subsep=$vertical_bar
+      right_subsep=$vertical_bar
     fi
   fi
 
