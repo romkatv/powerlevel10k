@@ -482,6 +482,8 @@ originally developed by Ryan L McIntyre of Nerd Fonts. Contains all glyphs and s
 Powerlevel10k may need. Battle-tested in dozens of different terminals on all major operating
 systems.
 
+*FAQ*: [How was the recommended font created?](#how-was-the-recommended-font-created)
+
 #### Automatic font installation
 
 If you are using iTerm2 or Termux, `p10k configure` can install the recommended font for you.
