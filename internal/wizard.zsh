@@ -259,9 +259,9 @@ function iterm_get() {
   /usr/libexec/PlistBuddy -c "Print :$1" ~/Library/Preferences/com.googlecode.iterm2.plist
 }
 
-local terminal iterm2_font_size
+local terminal iterm2_font_size iterm2_old_font=0 can_install_font=0
 
-function can_install_font() {
+() {
   [[ $P9K_SSH == 0 ]] || return
   if [[ "$(uname)" == Linux && "$(uname -o)" == Android ]]; then
     (( $+commands[termux-reload-settings] )) || return
@@ -297,14 +297,15 @@ function can_install_font() {
     local guid2 && guid2="$(iterm_get '"New Bookmarks":0:"Guid"' 2>/dev/null)" || return
     local font && font="$(iterm_get '"New Bookmarks":0:"Normal Font"' 2>/dev/null)" || return
     [[ $guid1 == $guid2 ]] || return
-    [[ $font != ('MesloLGSNer-Regular '|'MesloLGS-NF-Regular ')<-> ]] || return
+    [[ $font != 'MesloLGS-NF-Regular '<-> ]] || return
     [[ $font == (#b)*' '(<->) ]] || return
+    [[ $font == 'MesloLGSNer-Regular '<-> ]] && iterm2_old_font=1
     iterm2_font_size=$match[1]
     terminal=iTerm2
     return 0
   fi
   return 1
-}
+} && can_install_font=1
 
 function run_command() {
   local msg=$1
@@ -395,12 +396,16 @@ function install_font() {
 }
 
 function ask_font() {
-  can_install_font || return 0
+  (( can_install_font )) || return 0
   {
     while true; do
       clear
       (( greeting_printed )) || print_greeting
-      flowing -c "%BInstall %b%2FMeslo Nerd Font%f%B?%b"
+      if (( iterm2_old_font )); then
+        flowing -c A new version of '%2FMeslo Nerd Font%f' is available. "%BInstall?"
+      else
+        flowing -c "%BInstall %b%2FMeslo Nerd Font%f%B?%b"
+      fi
       print -P ""
       print -P ""
       print -P "%B(y)  Yes (recommended).%b"
@@ -488,7 +493,7 @@ function ask_diamond() {
     print -P ""
     print -P "%B(n)  No.%b"
     print -P ""
-    if can_install_font; then
+    if (( can_install_font )); then
       extra+=r
       print -P "(r)  Restart from the beginning."
     fi
