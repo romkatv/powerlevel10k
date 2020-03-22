@@ -476,10 +476,11 @@ the default system fonts. The full choice of style options is available only whe
 
 ### <a name='recommended-meslo-nerd-font-patched-for-powerlevel10k'></a>Meslo Nerd Font patched for Powerlevel10k
 
-Gorgeous monospace font designed by Jim Lyles for Apple, customized by André Berg, patched by Ryan
-L McIntyre of Nerd Fonts, and hand-edited in FontForge by yours truly. Contains all glyphs and
-symbols that Powerlevel10k may need. Battle-tested in dozens of different terminals on all major
-operating systems.
+Gorgeous monospace font designed by Jim Lyles for Bitstream, customized by the same for Apple,
+further customized by André Berg, and finally patched by yours truly with customized scripts
+originally developed by Ryan L McIntyre of Nerd Fonts. Contains all glyphs and symbols that
+Powerlevel10k may need. Battle-tested in dozens of different terminals on all major operating
+systems.
 
 #### Automatic font installation
 
@@ -1081,6 +1082,23 @@ custom background color (`#171A1B` instead of `#2E3436` -- twice as dark).
 Syntax highlighting, where present, was provided by [zsh-syntax-highlighting](
   https://github.com/zsh-users/zsh-syntax-highlighting).
 
+### How was the recommended font created?
+
+[The recommended font](#meslo-nerd-font-patched-for-powerlevel10k) is the product of many
+individuals. Its origin is *Bitstream Vera Sans Mono*, which has given birth to *Menlo*, which in
+turn has spawned *Meslo*. Finally, extra glyphs have been added to *Meslo* with scripts forked
+from Nerd Fonts.
+
+MesloLGS NF font can be recreated with the following command (requires `git` and `docker`):
+
+```zsh
+git clone --depth=1 https://github.com/romkatv/nerd-fonts.git
+cd nerd-fonts
+./build 'Meslo/S/*'
+```
+
+If everything goes well, four `ttf` files will appear in `./out`.
+
 ## Troubleshooting
 
 ### Question mark in prompt
@@ -1640,6 +1658,7 @@ typeset -g POWERLEVEL9K_OS_ICON_CONTENT_EXPANSION='${P9K_CONTENT}'  # not bold
   - [Is there an AUR package for Powerlevel10k?](#is-there-an-aur-package-for-powerlevel10k)
   - [What is the minimum supported Zsh version?](#what-is-the-minimum-supported-zsh-version)
   - [How were these screenshots and animated gifs created?](#how-were-these-screenshots-and-animated-gifs-created)
+  - [How was the recommended font created?](#how-was-the-recommended-font-created)
 - [Troubleshooting](#troubleshooting)
   - [Question mark in prompt](#question-mark-in-prompt)
   - [Icons, glyphs or powerline symbols don't render](#icons-glyphs-or-powerline-symbols-dont-render)
