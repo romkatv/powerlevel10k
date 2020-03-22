@@ -1150,6 +1150,7 @@ There are several things you can try to deal with these imperfections:
   it, switching to another font may help but is unlikely.
 - Change terminal font size one point up or down. For example, in iTerm2 powerline prompt looks
   perfect at font sizes 11 and 13 but breaks down at 12.
+- Enable builtin powerline glyphs in terminal settings if your terminal supports it (iTerm2 does).
 - Change font hinting and/or anti-aliasing mode in the terminal settings.
 - Shift all text one pixel up/down/left/right if your terminal has an option to do so.
 - Try a different terminal.
