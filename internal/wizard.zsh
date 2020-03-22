@@ -50,7 +50,7 @@ local -r time_24h='16:23:42'
 local -r time_12h='04:23:42 PM'
 
 local -ra lean_left=(
-  '%$frame_color[$color]F╭─ ' '${extra_icons[1]:+%B%f$extra_icons[1] %b}%31F$extra_icons[2]%B%39F~%b%31F/%B%39Fsrc%b%f $prefixes[1]%76F$extra_icons[3]master%f '
+  '%$frame_color[$color]F╭─ ' '${extra_icons[1]:+%f$extra_icons[1] }%31F$extra_icons[2]%B%39F~%b%31F/%B%39Fsrc%b%f $prefixes[1]%76F$extra_icons[3]master%f '
   '%$frame_color[$color]F╰─' '%76F$prompt_char%f ${buffer:-$cursor}'
 )
 
