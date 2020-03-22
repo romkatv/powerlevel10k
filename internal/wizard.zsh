@@ -18,7 +18,7 @@ fi
 
 local -ri force
 
-local -r font_base_url='https://github.com/romkatv/dotfiles-public/raw/master/.local/share/fonts/NerdFonts'
+local -r font_base_url='https://github.com/romkatv/powerlevel10k-media/raw/master'
 local -ri wizard_columns=$((COLUMNS < 83 ? COLUMNS : 83))
 
 local -ri prompt_indent=2
@@ -297,7 +297,7 @@ function can_install_font() {
     local guid2 && guid2="$(iterm_get '"New Bookmarks":0:"Guid"' 2>/dev/null)" || return
     local font && font="$(iterm_get '"New Bookmarks":0:"Normal Font"' 2>/dev/null)" || return
     [[ $guid1 == $guid2 ]] || return
-    [[ $font != 'MesloLGSNer-Regular '<-> ]] || return
+    [[ $font != ('MesloLGSNer-Regular '|'MesloLGS-NF-Regular ')<-> ]] || return
     [[ $font == (#b)*' '(<->) ]] || return
     iterm2_font_size=$match[1]
     terminal=iTerm2
@@ -343,8 +343,10 @@ function install_font() {
         zf_mv -f -- ~/Library/Fonts/$file{.tmp,} || quit -c
       done
       print -nP -- "Changing %BiTerm2%b settings ..."
+      local size=$iterm2_font_size
+      [[ $size == 12 ]] && size=13
       local k t v settings=(
-        '"Normal Font"'            string '"MesloLGSNer-Regular '$iterm2_font_size'"'
+        '"Normal Font"'            string '"MesloLGS-NF-Regular '$size'"'
         '"Terminal Type"'          string '"xterm-256color"'
         '"Horizontal Spacing"'     real   1
         '"Vertical Spacing"'       real   1
@@ -356,6 +358,7 @@ function install_font() {
         '"Non-ASCII Anti Aliased"' bool   1
         '"Use Non-ASCII Font"'     bool   0
         '"Ambiguous Double Width"' bool   0
+        '"Draw Powerline Glyphs"'  bool   1
       )
       for k t v in $settings; do
         /usr/libexec/PlistBuddy -c "Set :\"New Bookmarks\":0:$k $v" \
