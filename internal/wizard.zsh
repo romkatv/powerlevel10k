@@ -367,7 +367,9 @@ function install_font() {
         run_command "" /usr/libexec/PlistBuddy -c \
           "Add :\"New Bookmarks\":0:$k $t $v" ~/Library/Preferences/com.googlecode.iterm2.plist
       done
-      run_command "Updating %BiTerm2%b settings cache" /usr/bin/defaults read com.googlecode.iterm2
+      print -P " %2FOK%f"
+      print -nP "Updating %BiTerm2%b settings cache ..."
+      run_command "" /usr/bin/defaults read com.googlecode.iterm2
       sleep 3
       print -P " %2FOK%f"
       clear
