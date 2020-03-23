@@ -45,3 +45,4 @@
   https://github.com/starship/starship/issues/995); there is also `DOCKER_CONTEXT`; more info:
   https://docs.docker.com/engine/reference/commandline/context_use; also
   https://github.com/starship/starship/pull/996.
+- support `env` precommand in parser.zsh.
