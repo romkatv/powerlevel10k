@@ -4139,9 +4139,9 @@ _p9k_prompt_goenv_init() {
 ################################################################
 # Display openfoam information
 prompt_openfoam() {
-  if [[ -z "$WM_FORK" ]] ; then
+  if [[ -n "$WM_PROJECT_VERSION" && -z "$WM_FORK" ]] ; then
     _p9k_prompt_segment "$0" "yellow" "$_p9k_color1" '' 0 '' "OF: ${${WM_PROJECT_VERSION:t}//\%/%%}"
-  else
+  elif [[ -n "$WM_PROJECT_VERSION" && -n "$WM_FORK" ]] ; then
     _p9k_prompt_segment "$0" "yellow" "$_p9k_color1" '' 0 '' "F-X: ${${WM_PROJECT_VERSION:t}//\%/%%}"
   fi
 }
