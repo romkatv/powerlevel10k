@@ -2207,5 +2207,5 @@ generate_config || return
 change_zshrc    || return
 
 print -rP ""
-flowing +c File feature requests and bug reports at "$(href https://github.com/romkatv/powerlevel10k/issues)."
+flowing +c File feature requests and bug reports at "$(href https://github.com/romkatv/powerlevel10k/issues)"
 print -rP ""
