@@ -7821,7 +7821,7 @@ _p9k_init_vcs() {
 
   local id=${(L)${${(M)_p9k_uname_o:#Android}:-$_p9k_uname}}-${(L)_p9k_uname_m}
   if [[ -z $GITSTATUS_DAEMON && $id == (android-armv7l|*-i686) &&
-        -z $gitstatus_dir/bin/(usrbin|bin)/*-$id(|-static)(#qN) ]]; then
+        -z $gitstatus_dir/(usrbin|bin)/*-$id(|-static)(#qN) ]]; then
     >&2 echo -E - "${(%):-[%1FERROR%f]: %BPowerlevel10k%b is unable to use %Bgitstatus%b. Git prompt will be slow.}"
     >&2 echo -E - ""
     >&2 echo -E - "${(%):-Reason: There is no %Bgitstatusd%b binary for %B${id//\%/%%}%b (32-bit).}"
