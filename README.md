@@ -8,12 +8,15 @@ Powerlevel10k is a theme for Zsh. It emphasizes [speed](#uncompromising-performa
 ![Powerlevel10k](
 https://raw.githubusercontent.com/romkatv/powerlevel10k-media/master/prompt-styles-high-contrast.png)
 
-To see what Powerlevel10k is about, scroll through [features](#features) or check out
-[table of contents](#table-of-contents).
+Ready to [Get Started](#get-started)? See below.
+
+To see what Powerlevel10k is about go to [Features](#features).
 
 Powerlevel9k users, go [here](#powerlevel9k-compatibility).
 
-Ready to give Powerlevel10k a try?
+See the [Table of Contents](#table-of-contents) at the bottom.
+
+## Get Started
 
 1. Install [the recommended font](#meslo-nerd-font-patched-for-powerlevel10k). *Optional but highly
    recommended.*
