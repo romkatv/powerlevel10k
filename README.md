@@ -8,7 +8,8 @@ Powerlevel10k is a theme for Zsh. It emphasizes [speed](#uncompromising-performa
 ![Powerlevel10k](
 https://raw.githubusercontent.com/romkatv/powerlevel10k-media/master/prompt-styles-high-contrast.png)
 
-To see what Powerlevel10k is about, scroll through [features](#features).
+To see what Powerlevel10k is about, scroll through [features](#features) or check out
+[table of contents](#table-of-contents).
 
 Powerlevel9k users, go [here](#powerlevel9k-compatibility).
 
@@ -31,8 +32,6 @@ Ready to give Powerlevel10k a try?
    - [Arch Linux](#arch-linux)
 1. Restart Zsh.
 1. Type `p10k configure` if the configuration wizard doesn't start automatically.
-
-The full [table of contents](#table-of-contents) is at the bottom.
 
 ## Features
 
