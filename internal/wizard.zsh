@@ -19,7 +19,6 @@ fi
 local -ri force
 
 local -r font_base_url='https://github.com/romkatv/powerlevel10k-media/raw/master'
-local -ri wizard_columns=$((COLUMNS < 83 ? COLUMNS : 83))
 
 local -ri prompt_indent=2
 
@@ -37,12 +36,9 @@ local -r left_triangle='\uE0B2'
 local -r right_triangle='\uE0B0'
 local -r left_angle='\uE0B3'
 local -r right_angle='\uE0B1'
-local -r down_triangle='\uE0BC'
-local -r up_triangle='\uE0BA'
 local -r fade_in='░▒▓'
 local -r fade_out='▓▒░'
 local -r vertical_bar='\u2502'
-local -r slanted_bar='\u2571'
 
 local -r cursor='%1{\e[07m \e[27m%}'
 
@@ -134,20 +130,27 @@ function print_prompt() {
     (( left_frame )) || left=('' $left[2] '' "%F{$c}$prompt_char%f ${buffer:-$cursor}")
     (( right_frame )) || right=($right[1] '' '' '')
   fi
+  local -i left_indent=prompt_indent
   local -i right_indent=prompt_indent
   prompt_length ${(g::):-$left[1]$left[2]$right[1]$right[2]}
   local -i width=REPLY
-  while (( wizard_columns - width <= prompt_indent + right_indent )); do
-    (( --right_indent ))
+  while (( wizard_columns - width <= left_indent + right_indent )); do
+    if (( right_indent )); then
+      (( --right_indent ))
+    elif (( left_indent )); then
+      (( --left_indent ))
+    else
+      break  # not supposed to happen; will result in overflow if it does
+    fi
   done
   local -i i
   for ((i = 1; i < $#left; i+=2)); do
     local l=${(g::):-$left[i]$left[i+1]}
     local r=${(g::):-$right[i]$right[i+1]}
     prompt_length $l$r
-    local -i gap=$((wizard_columns - prompt_indent - right_indent - REPLY))
+    local -i gap=$((wizard_columns - left_indent - right_indent - REPLY))
     (( num_lines == 2 && i == 1 )) && local fill=$gap_char || local fill=' '
-    print -n  -- ${(pl:$prompt_indent:: :)}
+    print -n  -- ${(pl:$left_indent:: :)}
     print -nP -- $l
     print -nP -- "%$frame_color[$color]F${(pl:$gap::$fill:)}%f"
     print -P  -- $r
@@ -623,8 +626,10 @@ function ask_debian() {
 }
 
 function ask_icon_padding() {
+  local -i saves=5
   if [[ $POWERLEVEL9K_MODE == (powerline|compatible|ascii) ]]; then
     POWERLEVEL9K_ICON_PADDING=none
+    (( saved_columns += saves ))
     return 0
   fi
   local text="X"
@@ -655,8 +660,20 @@ function ask_icon_padding() {
     case $key in
       q) quit;;
       r) return 1;;
-      y) POWERLEVEL9K_ICON_PADDING=none; options+='small icons'; break;;
-      n) POWERLEVEL9K_ICON_PADDING=moderate; options+='large icons'; break;;
+      y)
+        POWERLEVEL9K_ICON_PADDING=none
+        options+='small icons'
+        (( saved_columns += saves ))
+        break
+      ;;
+      n)
+        POWERLEVEL9K_ICON_PADDING=moderate
+        options+='large icons'
+        up_triangle+=' '
+        down_triangle+=' '
+        slanted_bar='\uE0BD '
+        break
+      ;;
     esac
   done
 }
@@ -669,6 +686,7 @@ function ask_style() {
     frame_color=(0 7 2 4)
     color_name=(Black White Green Blue)
     options+=lean_8colors
+    (( saved_columns += 5 ))
     return
   fi
 
@@ -711,7 +729,7 @@ function ask_style() {
     case $key in
       q) quit;;
       r) return 1;;
-      1) style=lean; left_frame=0; right_frame=0; options+=lean; break;;
+      1) style=lean; left_frame=0; right_frame=0; options+=lean; (( saved_columns += 5 )); break;;
       2) style=classic; options+=classic; break;;
       3) style=rainbow; options+=rainbow; break;;
       4)
@@ -719,6 +737,7 @@ function ask_style() {
           style=pure
           empty_line=1
           options+=pure
+          (( saved_columns += 5 ))
           break
         fi
       ;;
@@ -936,11 +955,6 @@ function ask_ornaments_color() {
 }
 
 function ask_time() {
-  if (( wizard_columns < 80 )) && [[ $style != pure ]]; then
-    time=
-    return 0
-  fi
-
   while true; do
     local extra=
     clear
@@ -954,31 +968,22 @@ function ask_time() {
     print -P ""
     time=$time_24h print_prompt
     print -P ""
-    if [[ $wizard_columns -ge 83 || $style == lean* || $POWERLEVEL9K_ICON_PADDING == none ]]; then
-      extra+=3
-      print -P "%B(3)  12-hour format.%b"
-      print -P ""
-      time=$time_12h print_prompt
-      print -P ""
-    fi
+    print -P "%B(3)  12-hour format.%b"
+    print -P ""
+    time=$time_12h print_prompt
+    print -P ""
     print -P "(r)  Restart from the beginning."
     print -P "(q)  Quit and do nothing."
     print -P ""
 
     local key=
-    read -k key${(%):-"?%BChoice [12${extra}rq]: %b"} || quit -c
+    read -k key${(%):-"?%BChoice [123rq]: %b"} || quit -c
     case $key in
       q) quit;;
       r) return 1;;
-      1) time=; break;;
-      2) time=$time_24h; options+='24h time'; break;;
-      3)
-        if [[ $extra == *3* ]]; then
-          time=$time_12h
-          options+='12h time'
-          break
-        fi
-      ;;
+      1) time=; (( saved_columns += 12 )); break;;
+      2) time=$time_24h; options+='24h time'; (( saved_columns += 3 )); break;;
+      3) time=$time_12h; options+='12h time'; break;;
     esac
   done
 }
@@ -1058,7 +1063,15 @@ function os_icon_name() {
 }
 
 function ask_extra_icons() {
+  local -i saves=12
   if [[ $style == pure || $POWERLEVEL9K_MODE == (powerline|compatible|ascii) ]]; then
+    (( saved_columns += saves ))
+    return 0
+  fi
+  if (( wizard_columns + saved_columns < 69 )); then
+    prefixes=("$concise[@]")
+    options+=concise
+    (( saved_columns += saves ))
     return 0
   fi
   local os_icon=${(g::)icons[$(os_icon_name)]}
@@ -1091,21 +1104,26 @@ function ask_extra_icons() {
     case $key in
       q) quit;;
       r) return 1;;
-      1) extra_icons=("$few[@]"); options+='few icons'; break;;
+      1) extra_icons=("$few[@]"); options+='few icons'; (( saved_columns += saves )); break;;
       2) extra_icons=("$many[@]"); options+='many icons'; break;;
     esac
   done
 }
 
 function ask_prefixes() {
-  [[ $style == pure ]] && return
-  local concise=('' '' '')
-  local fluent=('on ' 'took ' 'at ')
-  if (( wizard_columns < 80 )); then
-    prefixes=("$concise[@]")
-    options+=concise
+  local -i saves=11
+  if [[ $style == pure ]]; then
+    (( saved_columns += saves ))
     return 0
   fi
+  if (( wizard_columns + saved_columns < 84 )); then
+    prefixes=("$concise[@]")
+    options+=concise
+    (( saved_columns += saves ))
+    return 0
+  fi
+  local concise=('' '' '')
+  local fluent=('on ' 'took ' 'at ')
   while true; do
     clear
     flowing -c "%BPrompt Flow%b"
@@ -1127,7 +1145,7 @@ function ask_prefixes() {
     case $key in
       q) quit;;
       r) return 1;;
-      1) prefixes=("$concise[@]"); options+=concise; break;;
+      1) prefixes=("$concise[@]"); options+=concise; (( saved_columns += saves )); break;;
       2) prefixes=("$fluent[@]"); options+=fluent; break;;
     esac
   done
@@ -1135,6 +1153,7 @@ function ask_prefixes() {
 
 function ask_separators() {
   if [[ $style != (classic|rainbow) || $cap_diamond != 1 ]]; then
+    (( saved_columns += 5 ))
     return 0
   fi
   if [[ $POWERLEVEL9K_MODE == nerdfont-complete && $LINES -lt 26 ]]; then
@@ -1218,10 +1237,17 @@ function ask_separators() {
         ;;
     esac
   done
+
+  prompt_length $left_sep
+  (( saved_columns += (2 - REPLY) * 2 ))
+  prompt_length $right_sep
+  (( saved_columns += (2 - REPLY) * 1 ))
+  return 0
 }
 
 function ask_heads() {
   if [[ $style != (classic|rainbow) || $POWERLEVEL9K_MODE == ascii ]]; then
+    (( saved_columns += 6 ))
     return 0
   fi
   if [[ $POWERLEVEL9K_MODE == nerdfont-complete && $LINES -lt 26 ]]; then
@@ -1311,10 +1337,17 @@ function ask_heads() {
         ;;
     esac
   done
+
+  prompt_length $left_head
+  (( saved_columns += 3 - REPLY ))
+  prompt_length $right_head
+  (( saved_columns += 3 - REPLY ))
+  return 0
 }
 
 function ask_tails() {
   if [[ $style != (classic|rainbow) || $POWERLEVEL9K_MODE == ascii ]]; then
+    (( saved_columns += 6 ))
     return 0
   fi
   if [[ $POWERLEVEL9K_MODE == nerdfont-complete && $LINES -lt 31 ]]; then
@@ -1393,6 +1426,12 @@ function ask_tails() {
         ;;
     esac
   done
+
+  prompt_length $left_tail
+  (( saved_columns += 3 - REPLY ))
+  prompt_length $right_tail
+  (( saved_columns += 3 - REPLY ))
+  return 0
 }
 
 function ask_num_lines() {
@@ -1466,6 +1505,7 @@ function ask_gap_char() {
 
 function ask_frame() {
   if [[ $style != (classic|rainbow|lean*) || $num_lines != 2 || $POWERLEVEL9K_MODE == ascii ]]; then
+    (( saved_columns += 4 ))
     return 0
   fi
 
@@ -1505,6 +1545,9 @@ function ask_frame() {
       4) left_frame=1; right_frame=1; options+='full frame';  break;;
     esac
   done
+
+  (( left_frame  )) || (( saved_columns += 2 ))
+  (( right_frame )) || (( saved_columns += 2 ))
 }
 
 function ask_empty_line() {
@@ -2072,9 +2115,10 @@ while true; do
   local instant_prompt=verbose zshrc_content= zshrc_backup= zshrc_backup_u=
   local -i zshrc_has_cfg=0 zshrc_has_instant_prompt=0 write_zshrc=0
   local POWERLEVEL9K_MODE= POWERLEVEL9K_ICON_PADDING=moderate style= config_backup= config_backup_u=
-  local gap_char=' ' prompt_char='❯'
+  local gap_char=' ' prompt_char='❯' down_triangle='\uE0BC' up_triangle='\uE0BA' slanted_bar='\u2571'
   local left_subsep= right_subsep= left_tail= right_tail= left_head= right_head= time=
   local -i num_lines=0 empty_line=0 color=2 left_frame=1 right_frame=1 transient_prompt=0
+  local -i wizard_columns=$((COLUMNS < 88 ? COLUMNS : 88)) saved_columns=0
   local -i cap_diamond=0 cap_python=0 cap_debian=0 cap_lock=0 cap_arrow=0
   local -a extra_icons=('' '' '')
   local -a frame_color=(244 242 240 238)
