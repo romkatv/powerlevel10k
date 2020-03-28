@@ -8,13 +8,13 @@ Powerlevel10k is a theme for Zsh. It emphasizes [speed](#uncompromising-performa
 ![Powerlevel10k](
 https://raw.githubusercontent.com/romkatv/powerlevel10k-media/master/prompt-styles-high-contrast.png)
 
-Ready to [Get Started](#get-started)? See below.
+Ready to [get started](#get-started)? See below.
 
-To see what Powerlevel10k is about go to [Features](#features).
+To see what Powerlevel10k is about go to [features](#features).
 
 Powerlevel9k users, go [here](#powerlevel9k-compatibility).
 
-See the [Table of Contents](#table-of-contents) at the bottom.
+See the [table of contents](#table-of-contents) at the bottom.
 
 ## Get Started
 
