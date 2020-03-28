@@ -398,6 +398,8 @@ function install_font() {
       done
     ;;
   esac
+
+  return 0
 }
 
 function ask_font() {
@@ -428,6 +430,8 @@ function ask_font() {
         n) break;;
       esac
     done
+
+    return 0
   } always {
     greeting_printed=1
   }
@@ -482,6 +486,8 @@ function ask_remove_font() {
       y) zf_rm -f -- $fonts || quit -c; break;;
     esac
   done
+
+  return 0
 }
 
 function ask_diamond() {
@@ -515,6 +521,7 @@ function ask_diamond() {
     esac
   done
   greeting_printed=1
+  return 0
 }
 
 function ask_lock() {
@@ -543,6 +550,8 @@ function ask_lock() {
       n) cap_lock=0; break;;
     esac
   done
+
+  return 0
 }
 
 function ask_python() {
@@ -570,6 +579,8 @@ function ask_python() {
       n) cap_python=0; break;;
     esac
   done
+
+  return 0
 }
 
 function ask_arrow() {
@@ -596,6 +607,8 @@ function ask_arrow() {
       n) cap_arrow=0; break;;
     esac
   done
+
+  return 0
 }
 
 function ask_debian() {
@@ -623,6 +636,8 @@ function ask_debian() {
       n) cap_debian=0; break;;
     esac
   done
+
+  return 0
 }
 
 function ask_icon_padding() {
@@ -676,6 +691,8 @@ function ask_icon_padding() {
       ;;
     esac
   done
+
+  return 0
 }
 
 function ask_style() {
@@ -687,7 +704,7 @@ function ask_style() {
     color_name=(Black White Green Blue)
     options+=lean_8colors
     (( saved_columns += 5 ))
-    return
+    return 0
   fi
 
   if (( cap_diamond && LINES < 26 )); then
@@ -743,6 +760,8 @@ function ask_style() {
       ;;
     esac
   done
+
+  return 0
 }
 
 function ask_charset() {
@@ -792,6 +811,8 @@ function ask_charset() {
       ;;
     esac
   done
+
+  return 0
 }
 
 function ask_color_scheme() {
@@ -864,6 +885,8 @@ function ask_color_scheme() {
       esac
     done
   fi
+
+  return 0
 }
 
 function ask_color() {
@@ -906,6 +929,7 @@ function ask_color() {
     esac
   done
   options+=${(L)color_name[color]}
+  return 0
 }
 
 function ask_ornaments_color() {
@@ -952,6 +976,7 @@ function ask_ornaments_color() {
     esac
   done
   options+=${(L)color_name[color]}-ornaments
+  return 0
 }
 
 function ask_time() {
@@ -986,6 +1011,8 @@ function ask_time() {
       3) time=$time_12h; options+='12h time'; break;;
     esac
   done
+
+  return 0
 }
 
 function ask_use_rprompt() {
@@ -1015,6 +1042,8 @@ function ask_use_rprompt() {
       2) pure_use_rprompt=; options+=rpromt; break;;
     esac
   done
+
+  return 0
 }
 
 function os_icon_name() {
@@ -1108,6 +1137,8 @@ function ask_extra_icons() {
       2) extra_icons=("$many[@]"); options+='many icons'; break;;
     esac
   done
+
+  return 0
 }
 
 function ask_prefixes() {
@@ -1149,6 +1180,8 @@ function ask_prefixes() {
       2) prefixes=("$fluent[@]"); options+=fluent; break;;
     esac
   done
+
+  return 0
 }
 
 function ask_separators() {
@@ -1460,6 +1493,8 @@ function ask_num_lines() {
       2) num_lines=2; options+='2 lines'; break;;
     esac
   done
+
+  return 0
 }
 
 function ask_gap_char() {
@@ -1501,6 +1536,8 @@ function ask_gap_char() {
       3) gap_char=$dash; options+=solid; break;;
     esac
   done
+
+  return 0
 }
 
 function ask_frame() {
@@ -1548,6 +1585,7 @@ function ask_frame() {
 
   (( left_frame  )) || (( saved_columns += 2 ))
   (( right_frame )) || (( saved_columns += 2 ))
+  return 0
 }
 
 function ask_empty_line() {
@@ -1579,6 +1617,8 @@ function ask_empty_line() {
       2) empty_line=1; options+='sparse';  break;;
     esac
   done
+
+  return 0
 }
 
 function ask_instant_prompt() {
@@ -1622,6 +1662,8 @@ function ask_instant_prompt() {
       3) instant_prompt=verbose; options+=instant_prompt=verbose; break;;
     esac
   done
+
+  return 0
 }
 
 function ask_transient_prompt() {
@@ -1675,6 +1717,8 @@ function ask_transient_prompt() {
       n) transient_prompt=0; break;;
     esac
   done
+
+  return 0
 }
 
 function ask_config_overwrite() {
@@ -1707,6 +1751,8 @@ function ask_config_overwrite() {
         ;;
     esac
   done
+
+  return 0
 }
 
 function ask_zshrc_edit() {
@@ -1803,6 +1849,8 @@ function ask_zshrc_edit() {
       ;;
     esac
   done
+
+  return 0
 }
 
 function generate_config() {
