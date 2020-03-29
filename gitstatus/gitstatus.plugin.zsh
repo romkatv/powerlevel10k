@@ -503,15 +503,16 @@ function gitstatus_start() {
               elif [[ -n $GITSTATUS_DAEMON ]]; then
                 local daemons=($_gitstatus_plugin_dir/{usrbin,bin}/$GITSTATUS_DAEMON)
               else
-                local -aU os
+                local -aU os=($kernel)
                 case $kernel in
                   linux)
-                    os=("${(L)$(uname -o 2>/dev/null)}") || os=()
-                    [[ $os[1] == android ]]              || os=(linux)
+                    local os_flavor
+                    os_flavor="${(L)$(uname -o 2>/dev/null)}" && os+=(${(M)os_flavor:#android})
                   ;;
-                  cygwin_nt-*)  os=($kernel cygwin_nt-10.0);;
-                  mingw*|msys*) os=($kernel msys_nt-10.0);;
-                  *)            os=($kernel);;
+                  cygwin_nt-*)  os+=(cygwin_nt-10.0);;
+                  msys_nt-*)    os+=(msys_nt-10.0);;
+                  mingw32_nt-*) os+=(msys_nt-10.0);;
+                  mingw64_nt-*) os+=(msys_nt-10.0);;
                 esac
                 local arch
                 arch="${(L)$(uname -m)}" || return
