@@ -7819,49 +7819,6 @@ _p9k_init_vcs() {
 
   local gitstatus_dir=${_POWERLEVEL9K_GITSTATUS_DIR:-${__p9k_root_dir}/gitstatus}
 
-  local id=${(L)${${(M)_p9k_uname_o:#Android}:-$_p9k_uname}}-${(L)_p9k_uname_m}
-  if [[ -z $GITSTATUS_DAEMON && $id == (android-armv7l|*-i686) &&
-        -z $gitstatus_dir/(usrbin|bin)/*-$id(|-static)(#qN) ]]; then
-    >&2 echo -E - "${(%):-[%1FERROR%f]: %BPowerlevel10k%b is unable to use %Bgitstatus%b. Git prompt will be slow.}"
-    >&2 echo -E - ""
-    >&2 echo -E - "${(%):-Reason: There is no %Bgitstatusd%b binary for %B${id//\%/%%}%b (32-bit).}"
-    >&2 echo -E - ""
-    >&2 echo -E - "${(%):-You can:}"
-    >&2 echo -E - ""
-    >&2 echo -E - "${(%):-  - Do nothing.}"
-    >&2 echo -E - ""
-    >&2 echo -E - "${(%):-    * You %Bwill%b see this error message every time you start zsh.}"
-    >&2 echo -E - "${(%):-    * Git prompt will be %Bslow%b.}"
-    >&2 echo -E - ""
-    >&2 echo -E - "${(%):-  - Set %BPOWERLEVEL9K_DISABLE_GITSTATUS=true%b at the bottom of %B$__p9k_zshrc_u%b.}"
-    >&2 echo -E - "${(%):-    You can do this by running the following command:}"
-    >&2 echo -E - ""
-    >&2 echo -E - "${(%):-      %2Fecho%f %3F'POWERLEVEL9K_DISABLE_GITSTATUS=true'%f >>! $__p9k_zshrc_u}"
-    >&2 echo -E - ""
-    >&2 echo -E - "${(%):-    * You %Bwill not%b see this error message again.}"
-    >&2 echo -E - "${(%):-    * Git prompt will be %Bslow%b.}"
-    >&2 echo -E - ""
-    >&2 echo -E - "${(%):-  - Upgrade to a 64-bit OS.}"
-    >&2 echo -E - ""
-    >&2 echo -E - "${(%):-    * You %Bwill not%b see this error message again.}"
-    >&2 echo -E - "${(%):-    * Git prompt will be %Bfast%b.}"
-    >&2 echo -E - ""
-    >&2 echo -E - "${(%):-  - Compile %Bgitstatusd%b by following these instructions:}"
-    >&2 echo -E - ""
-    >&2 echo -E - "${(%):-      https://github.com/romkatv/gitstatus/blob/master/README.md#compiling}"
-    >&2 echo -E - ""
-    >&2 echo -E - "${(%):-    Place the compiled binary in this directory:}"
-    >&2 echo -E - ""
-    >&2 echo -E - "${(%):-      %B${(D)gitstatus_dir//\%/%%}/usrbin/%b}"
-    >&2 echo -E - ""
-    local q="'"
-    >&2 echo -E - "${(%):-    %BNOTE%b: You${q}ll have to rebuild the binary every time you update powerlevel10k.}"
-    >&2 echo -E - ""
-    >&2 echo -E - "${(%):-    * You %Bwill not%b see this error message again.}"
-    >&2 echo -E - "${(%):-    * Git prompt will be %Bfast%b.}"
-    return 0
-  fi
-
   typeset -g _p9k_preinit="function _p9k_preinit() {
     [[ \$ZSH_VERSION == ${(q)ZSH_VERSION} ]]          || return
     [[ -r ${(q)gitstatus_dir}/gitstatus.plugin.zsh ]] || return
