@@ -120,7 +120,7 @@ function _p9k_init_icons() {
         MIDNIGHT_COMMANDER_ICON        'mc'
         VIM_ICON                       'vim'
         TERRAFORM_ICON                 'tf'
-        PROXY_ICON                     '\u2B82'               # ⮂
+        PROXY_ICON                     '\u2194'               # ↔
         DOTNET_ICON                    '.NET'
         DOTNET_CORE_ICON               '.NET'
         AZURE_ICON                     '\u2601'               # ☁
@@ -245,7 +245,7 @@ function _p9k_init_icons() {
         MIDNIGHT_COMMANDER_ICON        'mc'
         VIM_ICON                       'vim'
         TERRAFORM_ICON                 'tf'
-        PROXY_ICON                     '\u2B82'               # ⮂
+        PROXY_ICON                     '\u2194'               # ↔
         DOTNET_ICON                    '.NET'
         DOTNET_CORE_ICON               '.NET'
         AZURE_ICON                     '\u2601'               # ☁
@@ -373,7 +373,7 @@ function _p9k_init_icons() {
         MIDNIGHT_COMMANDER_ICON        'mc'
         VIM_ICON                       'vim'
         TERRAFORM_ICON                 'tf'
-        PROXY_ICON                     '\u2B82'                                       # ⮂
+        PROXY_ICON                     '\u2194'                                       # ↔
         DOTNET_ICON                    '.NET'
         DOTNET_CORE_ICON               '.NET'
         AZURE_ICON                     '\u2601'                                       # ☁
@@ -499,7 +499,7 @@ function _p9k_init_icons() {
         MIDNIGHT_COMMANDER_ICON        'mc'
         VIM_ICON                       '\uE62B'               # 
         TERRAFORM_ICON                 '\uF1BB '              # 
-        PROXY_ICON                     '\u2B82'               # ⮂
+        PROXY_ICON                     '\u2194'               # ↔
         DOTNET_ICON                    '\uE77F'               # 
         DOTNET_CORE_ICON               '\uE77F'               # 
         AZURE_ICON                     '\uFD03'               # ﴃ
