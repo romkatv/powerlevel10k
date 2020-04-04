@@ -1763,6 +1763,11 @@ function ask_zshrc_edit() {
   zshrc_has_instant_prompt=0
   write_zshrc=0
 
+  if (( $+functions[z4h] )); then
+    zshrc_has_cfg=1
+    zshrc_has_instant_prompt=1
+  fi
+
   [[ $instant_prompt == off ]] && zshrc_has_instant_prompt=1
 
   if [[ -e $__p9k_zshrc ]]; then
