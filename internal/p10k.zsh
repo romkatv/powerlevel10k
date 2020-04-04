@@ -5863,7 +5863,7 @@ _p9k_dump_instant_prompt() {
 
   local tmp=$prompt_file.tmp.$$
   zf_mv -f -- $prompt_file $tmp 2>/dev/null
-  if [[ "$(<$prompt_file)" == *$'\x1e'$_p9k__instant_prompt_sig$'\x1f'* ]] 2>/dev/null; then
+  if [[ "$(<$tmp)" == *$'\x1e'$_p9k__instant_prompt_sig$'\x1f'* ]] 2>/dev/null; then
     echo -n >$tmp || return
   fi
 
