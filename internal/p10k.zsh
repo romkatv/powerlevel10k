@@ -1,4 +1,4 @@
-if [[ $__p9k_sourced != 8 ]]; then
+if [[ $__p9k_sourced != 9 ]]; then
   >&2 print -P ""
   >&2 print -P "[%F{1}ERROR%f]: Corrupted powerlevel10k installation."
   >&2 print -P ""
@@ -5852,10 +5852,12 @@ _p9k_dump_instant_prompt() {
       exec {fd}>&-
     }
     {
-      (( ! $? ))                          || return
-      zf_mv -f $tmp $root_file            || return
-      zcompile -R -- $tmp.zwc $root_file  || return
-      zf_mv -f -- $tmp.zwc $root_file.zwc || return
+      (( ! $? ))                                      || return
+      zf_mv -f $tmp $root_file                        || return
+      zcompile -R -- $tmp.zwc $root_file              || return
+      # Error suppression is due to https://github.com/romkatv/powerlevel10k/issues/610.
+      # I've no idea what actually happens there.
+      zf_mv -f -- $tmp.zwc $root_file.zwc 2>/dev/null || return
     } always {
       (( $? )) && zf_rm -f -- $tmp $tmp.zwc 2>/dev/null
     }
@@ -5950,9 +5952,11 @@ function _p9k_dump_state() {
     } always {
       exec {fd}>&-
     }
-    zf_mv -f -- $tmp $__p9k_dump_file         || return
-    zcompile -R -- $tmp.zwc $__p9k_dump_file  || return
-    zf_mv -f -- $tmp.zwc $__p9k_dump_file.zwc || return
+    zf_mv -f -- $tmp $__p9k_dump_file                     || return
+    zcompile -R -- $tmp.zwc $__p9k_dump_file              || return
+    # Error suppression is due to https://github.com/romkatv/powerlevel10k/issues/610.
+    # I've no idea what actually happens there.
+    zf_mv -f -- $tmp.zwc $__p9k_dump_file.zwc 2>/dev/null || return
   } always {
     (( $? )) && zf_rm -f -- $tmp $tmp.zwc 2>/dev/null
   }

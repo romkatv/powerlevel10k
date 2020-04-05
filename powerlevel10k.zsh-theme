@@ -54,7 +54,7 @@ function _p9k_init_locale() {
   if [[ $__p9k_dump_file != $__p9k_instant_prompt_dump_file ]] && (( ! $+functions[_p9k_preinit] )) && source $__p9k_dump_file 2>/dev/null && (( $+functions[_p9k_preinit] )); then
     _p9k_preinit
   fi
-  typeset -gr __p9k_sourced=8
+  typeset -gr __p9k_sourced=9
   if [[ $ZSH_VERSION == (5.<1->*|<6->.*) ]]; then
     if [[ -w $__p9k_root_dir && -w $__p9k_root_dir/internal && -w $__p9k_root_dir/gitstatus ]]; then
       local f
@@ -63,9 +63,16 @@ function _p9k_init_locale() {
         zmodload -F zsh/files b:zf_mv b:zf_rm
         local tmp=$f.tmp.$$.zwc
         {
-          zcompile -R -- $tmp $f && zf_mv -f -- $tmp $f.zwc
+          # The first error suppression is a workaround for the bug in
+          # https://aur.archlinux.org/packages/zsh-theme-powerlevel10k-git/.
+          # This package misses some source files.
+          #
+          # The second error suppression is due to
+          # https://github.com/romkatv/powerlevel10k/issues/610.
+          # I've no idea what actually happens there.
+          zcompile -R -- $tmp $f 2>/dev/null && zf_mv -f -- $tmp $f.zwc 2>/dev/null
         } always {
-          (( $? )) && zf_rm -f -- $tmp
+          (( $? )) && zf_rm -f -- $tmp 2>/dev/null
         }
       done
     fi
