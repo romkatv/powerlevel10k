@@ -1,4 +1,4 @@
-if [[ $__p9k_sourced != 7 ]]; then
+if [[ $__p9k_sourced != 8 ]]; then
   >&2 print -P ""
   >&2 print -P "[%F{1}ERROR%f]: Corrupted powerlevel10k installation."
   >&2 print -P ""
