@@ -145,3 +145,13 @@ There are two prompt questions that don't fit this pattern: `ask_empty_line` and
 Revert `3ef4e68b5fdae654f323af644cbca40f27a8ab97`. Instead of it use `zf_rm -f -- $dst` before
 `zf_mv -f -- $src $dst`. `zwc` files are readonly and `zf_mv` fails on NTFS if the target file
 exists and is readonly.
+---
+Optimize auto-wizard check.
+
+```text
+time ( repeat 1000 [[ -z "${parameters[(I)POWERLEVEL9K_*~(POWERLEVEL9K_MODE|POWERLEVEL9K_CONFIG_FILE)]}" ]] )
+user=0.21s system=0.05s cpu=99% total=0.264
+
+time ( repeat 1000 [[ -z "${parameters[(I)POWERLEVEL9K_*]}" ]] )
+user=0.17s system=0.00s cpu=99% total=0.175
+```
