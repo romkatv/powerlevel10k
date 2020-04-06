@@ -121,3 +121,6 @@ There are two prompt questions that don't fit this pattern: `ask_empty_line` and
 `ask_transient_prompt`. The first is easy to adapt (`print_prompt` can print prompt twice if
 `empty_line=1`) but the second will probably have to be hand-coded.
 ---
+Revert `3ef4e68b5fdae654f323af644cbca40f27a8ab97`. Instead of it use `zf_rm -f -- $dst` before
+`zf_mv -f -- $src $dst`. `zwc` files are readonly and `zf_mv` fails on NTFS if the target file
+exists and is readonly.
