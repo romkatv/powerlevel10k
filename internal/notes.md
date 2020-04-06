@@ -73,7 +73,28 @@ https://github.com/starship/starship/pull/996.
 ---
 support `env` precommand in parser.zsh.
 ---
-add ruler to configuration wizard
+Add ruler to configuration wizard. Options: `─`, `·`, `╌`, `┄`, `▁`, `═`.
+---
+Add frame styles to the wizard.
+
+```text
+╭─
+╰─
+
+┌─
+└─
+
+┏━
+┗━
+
+╔═
+╚═
+
+▛▀
+▙▄
+```
+
+Prompt connection should have matching options.
 ---
 Add `POWERLEVEL9K_{LEFT,RIGHT}_SEGMENT_MIRROR_SEPARATOR`. If set, left segments get separated with
 `POWERLEVEL9K_LEFT_SEGMENT_SEPARATOR` followed by `POWERLEVEL9K_LEFT_SEGMENT_MIRROR_SEPARATOR`.
