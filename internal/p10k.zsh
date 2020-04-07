@@ -1,4 +1,4 @@
-if [[ $__p9k_sourced != 9 ]]; then
+if [[ $__p9k_sourced != 10 ]]; then
   >&2 print -P ""
   >&2 print -P "[%F{1}ERROR%f]: Corrupted powerlevel10k installation."
   >&2 print -P ""
@@ -5551,7 +5551,7 @@ _p9k_set_instant_prompt() {
   [[ -n $RPROMPT ]] || unset RPROMPT
 }
 
-typeset -gri __p9k_instant_prompt_version=19
+typeset -gri __p9k_instant_prompt_version=20
 
 _p9k_dump_instant_prompt() {
   local user=${(%):-%n}
@@ -5852,12 +5852,12 @@ _p9k_dump_instant_prompt() {
       exec {fd}>&-
     }
     {
-      (( ! $? ))                                      || return
-      zf_mv -f $tmp $root_file                        || return
-      zcompile -R -- $tmp.zwc $root_file              || return
-      # Error suppression is due to https://github.com/romkatv/powerlevel10k/issues/610.
-      # I've no idea what actually happens there.
-      zf_mv -f -- $tmp.zwc $root_file.zwc 2>/dev/null || return
+      (( ! $? ))                          || return
+      # `zf_mv -f src dst` fails on NTFS if `dst` is not writable, hence `zf_rm`.
+      zf_rm -f -- $root_file.zwc          || return
+      zf_mv -f -- $tmp $root_file         || return
+      zcompile -R -- $tmp.zwc $root_file  || return
+      zf_mv -f -- $tmp.zwc $root_file.zwc || return
     } always {
       (( $? )) && zf_rm -f -- $tmp $tmp.zwc 2>/dev/null
     }
@@ -5952,11 +5952,11 @@ function _p9k_dump_state() {
     } always {
       exec {fd}>&-
     }
-    zf_mv -f -- $tmp $__p9k_dump_file                     || return
-    zcompile -R -- $tmp.zwc $__p9k_dump_file              || return
-    # Error suppression is due to https://github.com/romkatv/powerlevel10k/issues/610.
-    # I've no idea what actually happens there.
-    zf_mv -f -- $tmp.zwc $__p9k_dump_file.zwc 2>/dev/null || return
+    # `zf_mv -f src dst` fails on NTFS if `dst` is not writable, hence `zf_rm`.
+    zf_rm -f -- $__p9k_dump_file.zwc          || return
+    zf_mv -f -- $tmp $__p9k_dump_file         || return
+    zcompile -R -- $tmp.zwc $__p9k_dump_file  || return
+    zf_mv -f -- $tmp.zwc $__p9k_dump_file.zwc || return
   } always {
     (( $? )) && zf_rm -f -- $tmp $tmp.zwc 2>/dev/null
   }
@@ -7567,7 +7567,7 @@ _p9k_must_init() {
     [[ $sig == $_p9k__param_sig ]] && return 1
     _p9k_deinit
   fi
-  _p9k__param_pat=$'v77\1'${ZSH_VERSION}$'\1'${ZSH_PATCHLEVEL}$'\1'
+  _p9k__param_pat=$'v78\1'${ZSH_VERSION}$'\1'${ZSH_PATCHLEVEL}$'\1'
   _p9k__param_pat+=$'${#parameters[(I)POWERLEVEL9K_*]}\1${(%):-%n%#}\1$GITSTATUS_LOG_LEVEL\1'
   _p9k__param_pat+=$'$GITSTATUS_ENABLE_LOGGING\1$GITSTATUS_DAEMON\1$GITSTATUS_NUM_THREADS\1'
   _p9k__param_pat+=$'$DEFAULT_USER\1${ZLE_RPROMPT_INDENT:-1}\1$P9K_SSH\1$__p9k_ksh_arrays\1'

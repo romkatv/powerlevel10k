@@ -212,12 +212,6 @@ There are two prompt questions that don't fit this pattern: `ask_empty_line` and
 
 ---
 
-Revert `3ef4e68b5fdae654f323af644cbca40f27a8ab97`. Instead of it use `zf_rm -f -- $dst` before
-`zf_mv -f -- $src $dst`. `zwc` files are readonly and `zf_mv` fails on NTFS if the target file
-exists and is readonly.
-
----
-
 Optimize auto-wizard check.
 
 ```text
