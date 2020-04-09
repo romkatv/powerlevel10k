@@ -129,7 +129,7 @@ https://github.com/starship/starship/pull/996.
 
 ---
 
-support `env` precommand in parser.zsh.
+support `env` and `ionice` precommands in `parser.zsh`.
 
 ---
 
