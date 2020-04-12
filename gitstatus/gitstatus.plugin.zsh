@@ -348,6 +348,103 @@ function _gitstatus_process_response() {
   return 0
 }
 
+function _gitstatus_daemon() {
+  # Close stdin to work around bugs in Cygwin 32-bit.
+  exec 0<&- 2>>$daemon_log || return
+  local pgid=$sysparams[pid]
+  [[ $pgid == <1-> ]] || return
+
+  {
+    {
+      trap '' PIPE
+
+      if [[ -z $GITSTATUS_DAEMON || $GITSTATUS_NUM_THREADS != <1-> ]]; then
+        local kernel
+        kernel="${(L)$(uname -s)}" || return
+        [[ -n $kernel ]]           || return
+      fi
+
+      if [[ $GITSTATUS_DAEMON == /* ]]; then
+        local daemons=($GITSTATUS_DAEMON)
+      elif (( $+commands[$GITSTATUS_DAEMON] )); then
+        local daemons=($commands[$GITSTATUS_DAEMON])
+      elif [[ -n $GITSTATUS_DAEMON ]]; then
+        local daemons=($_gitstatus_plugin_dir/{usrbin,bin}/$GITSTATUS_DAEMON)
+      else
+        local -aU os=($kernel)
+        case $kernel in
+          linux)
+            local os_flavor
+            os_flavor="${(L)$(uname -o 2>/dev/null)}" && os+=(${(M)os_flavor:#android})
+          ;;
+          cygwin_nt-*)  os+=(cygwin_nt-10.0);;
+          msys_nt-*)    os+=(msys_nt-10.0);;
+          mingw32_nt-*) os+=(msys_nt-10.0);;
+          mingw64_nt-*) os+=(msys_nt-10.0);;
+        esac
+        local arch
+        arch="${(L)$(uname -m)}" || return
+        [[ -n $arch ]]           || return
+        local daemons=(
+          $_gitstatus_plugin_dir/{usrbin,bin}/gitstatusd-${^os}-$arch{,-static})
+      fi
+
+      local files=(${^daemons}(N:A))
+      daemons=(${^files}(N*))
+
+      if (( stderr_fd && $#daemons != $#files )); then
+        unsetopt xtrace
+        print -ru2   -- ''
+        print -ru2   -- 'ERROR: missing execute permissions on gitstatusd file(s):'
+        print -ru2   -- ''
+        print -ru2   -- '  '${(pj:\n  :)${files:|daemons}}
+        print -ru2   -- ''
+        setopt xtrace
+      fi
+
+      (( $#daemons )) || return
+
+      if [[ $GITSTATUS_NUM_THREADS == <1-> ]]; then
+        args+=(-t $GITSTATUS_NUM_THREADS)
+      else
+        local cpus
+        if (( ! $+commands[sysctl] )) || [[ $kernel == linux ]] ||
+            ! cpus="$(sysctl -n hw.ncpu)"; then
+          if (( ! $+commands[getconf] )) || ! cpus="$(getconf _NPROCESSORS_ONLN)"; then
+            cpus=8
+          fi
+        fi
+        args+=(-t $((cpus > 16 ? 32 : cpus > 0 ? 2 * cpus : 16)))
+      fi
+
+      mkfifo -- $file_prefix.fifo || return
+      print -rn -- ${(l:20:)pgid} || return
+      exec <$file_prefix.fifo     || return
+      zf_rm -- $file_prefix.fifo  || return
+
+      local daemon
+      for daemon in $daemons; do
+        $daemon "${(@)args}"
+        local -i ret=$?
+        (( ret == 0 || ret == 10 || ret > 128 )) && return ret
+      done
+    } always {
+      local -i ret=$?
+      zf_rm -f -- $file_prefix.lock $file_prefix.fifo
+      kill -- -$pgid
+    }
+  } &!
+
+  (( lock_fd == -1 )) && return
+
+  {
+    if zsystem flock -- $file_prefix.lock && [[ -e $file_prefix.lock ]]; then
+      zf_rm -f -- $file_prefix.lock $file_prefix.fifo
+      kill -- -$pgid
+    fi
+  } &!
+}
+
 # Starts gitstatusd in the background. Does nothing and succeeds if gitstatusd is already running.
 #
 # Usage: gitstatus_start [OPTION]... NAME
@@ -473,111 +570,36 @@ function gitstatus_start() {
         zsystem flock -f lock_fd $file_prefix.lock || return
         [[ $lock_fd == <1-> ]]                     || return
       fi
+
       typeset -gi _GITSTATUS_LOCK_FD_$name=lock_fd
+      typeset -gi GITSTATUS_DAEMON_PID_$name="${sysparams[procsubstpid]:--1}"
 
-      {
-        () {
-          typeset -gi GITSTATUS_DAEMON_PID_$name="${sysparams[procsubstpid]:--1}"
-          sysopen -r -o cloexec -u resp_fd -- $1 || return
-          [[ $resp_fd == <1-> ]]                 || return
-          typeset -gi _GITSTATUS_RESP_FD_$name=resp_fd
-        } <(
-          exec 2>&3 3>&-      || return
-          local pgid=$sysparams[pid]
-          [[ $pgid == <1-> ]] || return
+      if [[ -n $USERPROFILE && -d /cygdrive && -d /proc/self/fd ]]; then
+        # Work around bugs in Cygwin 32-bit.
+        #
+        # This hangs:
+        #
+        #   emulate -L zsh
+        #   () { exec {fd}< $1 } <(:)
+        #   =true  # hangs here
+        #
+        # This hangs:
+        #
+        #   sysopen -r -u fd <(:)
+        local -i fd
+        exec {fd}< <(_gitstatus_daemon)                       || return
+        {
+          [[ -r /proc/self/fd/$fd ]]                          || return
+          sysopen -r -o cloexec -u resp_fd /proc/self/fd/$fd  || return
+        } always {
+          exec {fd} >&-                                       || return
+        }
+      else
+        sysopen -r -o cloexec -u resp_fd <(_gitstatus_daemon) || return
+      fi
 
-          {
-            {
-              trap '' PIPE
-
-              if [[ -z $GITSTATUS_DAEMON || $GITSTATUS_NUM_THREADS != <1-> ]]; then
-                local kernel
-                kernel="${(L)$(uname -s)}" || return
-                [[ -n $kernel ]]           || return
-              fi
-
-              if [[ $GITSTATUS_DAEMON == /* ]]; then
-                local daemons=($GITSTATUS_DAEMON)
-              elif (( $+commands[$GITSTATUS_DAEMON] )); then
-                local daemons=($commands[$GITSTATUS_DAEMON])
-              elif [[ -n $GITSTATUS_DAEMON ]]; then
-                local daemons=($_gitstatus_plugin_dir/{usrbin,bin}/$GITSTATUS_DAEMON)
-              else
-                local -aU os=($kernel)
-                case $kernel in
-                  linux)
-                    local os_flavor
-                    os_flavor="${(L)$(uname -o 2>/dev/null)}" && os+=(${(M)os_flavor:#android})
-                  ;;
-                  cygwin_nt-*)  os+=(cygwin_nt-10.0);;
-                  msys_nt-*)    os+=(msys_nt-10.0);;
-                  mingw32_nt-*) os+=(msys_nt-10.0);;
-                  mingw64_nt-*) os+=(msys_nt-10.0);;
-                esac
-                local arch
-                arch="${(L)$(uname -m)}" || return
-                [[ -n $arch ]]           || return
-                local daemons=(
-                  $_gitstatus_plugin_dir/{usrbin,bin}/gitstatusd-${^os}-$arch{,-static})
-              fi
-
-              local files=(${^daemons}(N:A))
-              daemons=(${^files}(N*))
-
-              if (( stderr_fd && $#daemons != $#files )); then
-                unsetopt xtrace
-                print -ru2   -- ''
-                print -ru2   -- 'ERROR: missing execute permissions on gitstatusd file(s):'
-                print -ru2   -- ''
-                print -ru2   -- '  '${(pj:\n  :)${files:|daemons}}
-                print -ru2   -- ''
-                setopt xtrace
-              fi
-
-              (( $#daemons )) || return
-
-              if [[ $GITSTATUS_NUM_THREADS == <1-> ]]; then
-                args+=(-t $GITSTATUS_NUM_THREADS)
-              else
-                local cpus
-                if (( ! $+commands[sysctl] )) || [[ $kernel == linux ]] ||
-                   ! cpus="$(sysctl -n hw.ncpu)"; then
-                  if (( ! $+commands[getconf] )) || ! cpus="$(getconf _NPROCESSORS_ONLN)"; then
-                    cpus=8
-                  fi
-                fi
-                args+=(-t $((cpus > 16 ? 32 : cpus > 0 ? 2 * cpus : 16)))
-              fi
-
-              mkfifo -- $file_prefix.fifo || return
-              print -rn -- ${(l:20:)pgid} || return
-              exec <$file_prefix.fifo     || return
-              zf_rm -- $file_prefix.fifo  || return
-
-              local daemon
-              for daemon in $daemons; do
-                $daemon "${(@)args}"
-                local -i ret=$?
-                (( ret == 0 || ret == 10 || ret > 128 )) && return ret
-              done
-            } always {
-              local -i ret=$?
-              zf_rm -f -- $file_prefix.lock $file_prefix.fifo
-              kill -- -$pgid
-            }
-          } &!
-
-          (( lock_fd == -1 )) && return
-
-          {
-            if zsystem flock -- $file_prefix.lock && [[ -e $file_prefix.lock ]]; then
-              zf_rm -f -- $file_prefix.lock $file_prefix.fifo
-              kill -- -$pgid
-            fi
-          } &!
-        ) || return
-      } <&- >&- 3>>$daemon_log || return
-
+      [[ $resp_fd == <1-> ]] || return
+      typeset -gi _GITSTATUS_RESP_FD_$name=resp_fd
       typeset -gi _GITSTATUS_STATE_$name=1
     fi
 
