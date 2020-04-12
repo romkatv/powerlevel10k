@@ -295,6 +295,7 @@ enable as many segments as you like. It won't slow down your prompt or Zsh start
 | `dotnet_version` | [dotnet](https://dotnet.microsoft.com) version |
 | `php_version` | [php](https://www.php.net/) version |
 | `laravel_version` | [laravel php framework](https://laravel.com/) version |
+| `java_version` | [java](https://www.java.com/) version |
 | `package` | `name@version` from [package.json](https://docs.npmjs.com/files/package.json) |
 | `kubecontext` | current [kubernetes](https://kubernetes.io/) context |
 | `terraform` | [terraform](https://www.terraform.io) workspace |
