@@ -562,6 +562,7 @@ function gitstatus_start() {
               done
             } always {
               local -i ret=$?
+              zf_rm -f -- $file_prefix.lock $file_prefix.fifo
               kill -- -$pgid
             }
           } &!
@@ -575,7 +576,7 @@ function gitstatus_start() {
             fi
           } &!
         ) || return
-      } 3>>$daemon_log </dev/null >/dev/null || return
+      } <&- >&- 3>>$daemon_log || return
 
       typeset -gi _GITSTATUS_STATE_$name=1
     fi
