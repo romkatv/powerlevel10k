@@ -1521,6 +1521,8 @@ The bug described above has been fixed in [this branch](
 cursor) terminal capability before printing prompt and `rc` (restore cursor) to move cursor back
 to the same position when prompt needs to be refreshed.
 
+*Note*: The patch doesn't work on Alacritty. On the plus side, it doesn't make things worse.
+
 There are two alternative approaches to fixing the bug that may seem to work at fight glance but in
 fact don't:
 
@@ -1541,7 +1543,7 @@ There is no ETA for the patch making its way into upstream Zsh. See [discussion]
 There are a few mitigation options for this issue.
 
 - Apply [the patch](#zsh-patch) and [rebuild Zsh from source](
-    https://github.com/zsh-users/zsh/blob/master/INSTALL).
+    https://github.com/zsh-users/zsh/blob/master/INSTALL). It won't help if you are using Alacritty.
 - Disable text reflowing on window resize in terminal settings. If your terminal doesn't have this
   setting, try a different terminal.
 - Avoid long lines between the start of prompt and cursor.
