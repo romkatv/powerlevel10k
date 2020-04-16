@@ -1092,7 +1092,10 @@ Syntax highlighting, where present, was provided by [zsh-syntax-highlighting](
 [The recommended font](#meslo-nerd-font-patched-for-powerlevel10k) is the product of many
 individuals. Its origin is *Bitstream Vera Sans Mono*, which has given birth to *Menlo*, which in
 turn has spawned *Meslo*. Finally, extra glyphs have been added to *Meslo* with scripts forked
-from Nerd Fonts.
+from Nerd Fonts. The final font is released under the terms of
+[Apache License](
+  https://raw.githubusercontent.com/romkatv/powerlevel10k-media/master/MesloLGS%20NF%20License.txt).
+
 
 MesloLGS NF font can be recreated with the following command (requires `git` and `docker`):
 
