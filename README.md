@@ -412,7 +412,7 @@ echo 'source /usr/local/opt/powerlevel10k/powerlevel10k.zsh-theme' >>! ~/.zshrc
 ### Arch Linux
 
 ```zsh
-pacman -Sy --noconfirm zsh-theme-powerlevel10k
+pacman -S --noconfirm zsh-theme-powerlevel10k
 echo 'source /usr/share/zsh-theme-powerlevel10k/powerlevel10k.zsh-theme' >>! ~/.zshrc
 ```
 
