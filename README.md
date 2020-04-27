@@ -534,6 +534,7 @@ applications on your system. Configure your terminal to use this font:
   *Meslo Nerd Font*.
 - **Blink** Type `config`, go to *Appearance*, tap *Add a new font*, tap *Open Gallery*, select
   *MesloLGS NF.css*, tap *import* and type `exit` in the home view to reload the font.
+- **Terminus**: Open *Settings → Appearance* and set the *Font* to `MesloLGS NF`.
 
 **IMPORTANT:** Run `p10k configure` after changing terminal font. The old `~/.p10k.zsh` may work
 incorrectly with the new font.
