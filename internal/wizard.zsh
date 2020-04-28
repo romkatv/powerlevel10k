@@ -298,14 +298,17 @@ function render_screen_pass() {
   done
 }
 
+function get_columns() { return 'COLUMNS > 88 ? 88 : COLUMNS' }
+functions -M get_columns 0 0
+
 function render_screen() {
   {
     hide_cursor
     stty -echo 2>/dev/null
     while true; do
       while true; do
-        local -i wizard_columns=$((COLUMNS > 88 ? 88 : COLUMNS))
-        local -i wizard_lines=LINES
+        typeset -gi wizard_columns='get_columns()'
+        typeset -gi wizard_lines=LINES
         if (( wizard_columns < __p9k_wizard_columns )); then
           clear
           flowing -c %1FNot enough horizontal space.%f
@@ -362,7 +365,7 @@ function add_prompt_n() {
   add_widget 0 "$@" print_prompt
   local var
   for var; do
-    eval "local $var"
+    eval "local ${(q)var}"
   done
   if (( num_lines == 2 )); then
     add_widget $(( 100 - ++prompt_idx )) print -P '  [%3Fnot enough vertical space to display this%f]'
@@ -379,13 +382,13 @@ function add_prompt() {
 
 function ask() {
   local choices=$1
-  local -i lines columns
+  local -i lines columns wizard_lines wizard_columns
   add_widget 0 print -P "(q)  Quit and do nothing."
   add_widget 0 print
   add_widget 0 print -P "%BChoice [${choices}q]: %b"
   while true; do
     =true
-    if (( LINES != lines || COLUMNS != columns )); then
+    if (( LINES != lines || get_columns() != columns )); then
       render_screen
       lines=wizard_lines
       columns=wizard_columns
@@ -1364,7 +1367,7 @@ function ask_frame() {
   add_prompt left_frame=1 right_frame=1
   add_widget 0 print -P "(r)  Restart from the beginning."
   ask 1234r
-  case $key in
+  case $choice in
     r) return 1;;
     1) left_frame=0; right_frame=0; options+='no frame';;
     2) left_frame=1; right_frame=0; options+='left frame';;
