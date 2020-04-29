@@ -801,7 +801,7 @@ tl;dr: When Git status in prompt is greyed out, it means Powerlevel10k is curren
 up-to-date Git status in the background. Prompt will get automatically refreshed when this
 computation completes.
 
-When your current directory is withing a Git repository, Powerlevel10k computes up-to-date Git
+When your current directory is within a Git repository, Powerlevel10k computes up-to-date Git
 status after every command. If the repository is large, or the machine is slow, this computation
 can take quite a bit of time. If it takes longer than 20 milliseconds (configurable via
 `POWERLEVEL9K_VCS_MAX_SYNC_LATENCY_SECONDS`), Powerlevel10k displays the last known Git status in
