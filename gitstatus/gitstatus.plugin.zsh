@@ -662,7 +662,7 @@ function gitstatus_start() {
   }
 
   local -i err=$?
-  (( stderr_fd )) && exec 2>&$stderr_fd
+  (( stderr_fd )) && exec 2>&$stderr_fd {stderr_fd}>&-
   (( err == 0  )) && return
 
   gitstatus_stop $name
