@@ -262,50 +262,60 @@
   # the full directory that was used in previous commands.
   typeset -g POWERLEVEL9K_DIR_HYPERLINK=false
 
-  # Enable special styling for non-writable directories.
-  typeset -g POWERLEVEL9K_DIR_SHOW_WRITABLE=true
-  # Show this icon when the current directory is not writable. POWERLEVEL9K_DIR_SHOW_WRITABLE
-  # above must be set to true for this parameter to have effect.
-  # typeset -g POWERLEVEL9K_DIR_NOT_WRITABLE_VISUAL_IDENTIFIER_EXPANSION='⭐'
+  # Enable special styling for non-writable directories. See POWERLEVEL9K_LOCK_ICON and
+  # POWERLEVEL9K_DIR_CLASSES below.
+  typeset -g POWERLEVEL9K_DIR_SHOW_WRITABLE=v2
 
-  # Custom prefix.
-  # typeset -g POWERLEVEL9K_DIR_PREFIX='%fin '
+  # The default icon shown next to non-writable directories when POWERLEVEL9K_DIR_SHOW_WRITABLE is
+  # set to v2.
+  # typeset -g POWERLEVEL9K_LOCK_ICON='⭐'
 
-  # POWERLEVEL9K_DIR_CLASSES allows you to specify custom icons for different directories.
-  # It must be an array with 3 * N elements. Each triplet consists of:
+  # POWERLEVEL9K_DIR_CLASSES allows you to specify custom icons and colors for different
+  # directories. It must be an array with 3 * N elements. Each triplet consists of:
   #
-  #   1. A pattern against which the current directory is matched. Matching is done with
+  #   1. A pattern against which the current directory ($PWD) is matched. Matching is done with
   #      extended_glob option enabled.
   #   2. Directory class for the purpose of styling.
-  #   3. Icon.
+  #   3. An empty string.
   #
-  # Triplets are tried in order. The first triplet whose pattern matches $PWD wins. If there
-  # are no matches, the directory will have no icon.
+  # Triplets are tried in order. The first triplet whose pattern matches $PWD wins.
   #
-  # Example:
+  # If POWERLEVEL9K_DIR_SHOW_WRITABLE is set to v2 and the current directory is not writable,
+  # its class gets suffix _NOT_WRITABLE.
+  #
+  # For example, given these settings:
   #
   #   typeset -g POWERLEVEL9K_DIR_CLASSES=(
-  #       '~/work(|/*)'  WORK     '(╯°□°）╯︵ ┻━┻'
-  #       '~(|/*)'       HOME     '⌂'
-  #       '*'            DEFAULT  '')
+  #     '~/work(|/*)'  WORK     ''
+  #     '~(|/*)'       HOME     ''
+  #     '*'            DEFAULT  '')
   #
-  # With these settings, the current directory in the prompt may look like this:
+  # Whenever the current directory is ~/work or a subdirectory of ~/work, it gets styled with class
+  # WORK or WORK_NOT_WRITABLE.
   #
-  #   (╯°□°）╯︵ ┻━┻ ~/work/projects/important/urgent
+  # Simply assigning classes to directories don't have any visible effects. It merely gives you an
+  # option to define custom colors and icons for different directory classes.
   #
-  # Or like this:
-  #
-  #   ⌂ ~/best/powerlevel10k
-  #
-  # You can also set different colors for directories of different classes. Remember to override
-  # FOREGROUND, SHORTENED_FOREGROUND and ANCHOR_FOREGROUND for every directory class that you wish
-  # to have its own color.
-  #
+  #   # Styling for WORK.
+  #   typeset -g POWERLEVEL9K_DIR_WORK_VISUAL_IDENTIFIER_EXPANSION='⭐'
   #   typeset -g POWERLEVEL9K_DIR_WORK_FOREGROUND=31
   #   typeset -g POWERLEVEL9K_DIR_WORK_SHORTENED_FOREGROUND=103
   #   typeset -g POWERLEVEL9K_DIR_WORK_ANCHOR_FOREGROUND=39
   #
+  #   # Styling for WORK_NOT_WRITABLE.
+  #   typeset -g POWERLEVEL9K_DIR_WORK_NOT_WRITABLE_VISUAL_IDENTIFIER_EXPANSION='⭐'
+  #   typeset -g POWERLEVEL9K_DIR_WORK_NOT_WRITABLE_FOREGROUND=31
+  #   typeset -g POWERLEVEL9K_DIR_WORK_NOT_WRITABLE_SHORTENED_FOREGROUND=103
+  #   typeset -g POWERLEVEL9K_DIR_WORK_NOT_WRITABLE_ANCHOR_FOREGROUND=39
+  #
+  # If a styling parameter isn't explicitly defined for some class, it falls back to the classless
+  # parameter. For example, if POWERLEVEL9K_DIR_WORK_NOT_WRITABLE_FOREGROUND is not set, it falls
+  # back to POWERLEVEL9K_DIR_FOREGROUND.
+  #
   # typeset -g POWERLEVEL9K_DIR_CLASSES=()
+
+  # Custom prefix.
+  # typeset -g POWERLEVEL9K_DIR_PREFIX='%fin '
 
   #####################################[ vcs: git status ]######################################
   # Branch icon. Set this parameter to '\uF126 ' for the popular Powerline branch icon.

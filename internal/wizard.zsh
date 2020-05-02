@@ -1641,8 +1641,10 @@ function generate_config() {
     fi
 
     if [[ $POWERLEVEL9K_MODE == (compatible|powerline) ]]; then
-      uncomment 'typeset -g POWERLEVEL9K_DIR_NOT_WRITABLE_VISUAL_IDENTIFIER_EXPANSION'
-      sub DIR_NOT_WRITABLE_VISUAL_IDENTIFIER_EXPANSION "'∅'"
+      uncomment 'typeset -g POWERLEVEL9K_LOCK_ICON'
+      sub LOCK_ICON "'∅'"
+      uncomment 'typeset -g POWERLEVEL9K_NORDVPN_VISUAL_IDENTIFIER_EXPANSION'
+      sub NORDVPN_VISUAL_IDENTIFIER_EXPANSION "'nord'"
       uncomment 'typeset -g POWERLEVEL9K_RANGER_VISUAL_IDENTIFIER_EXPANSION'
       sub RANGER_VISUAL_IDENTIFIER_EXPANSION "'▲'"
       uncomment 'typeset -g POWERLEVEL9K_KUBECONTEXT_DEFAULT_VISUAL_IDENTIFIER_EXPANSION'

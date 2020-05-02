@@ -1878,23 +1878,26 @@ prompt_dir() {
     ;;
   esac
 
-  [[ $_POWERLEVEL9K_DIR_SHOW_WRITABLE == 1 && ! -w $_p9k__cwd ]]
+  [[ $_POWERLEVEL9K_DIR_SHOW_WRITABLE != 0 && ! -w $_p9k__cwd ]]
   local w=$?
   if ! _p9k_cache_ephemeral_get $0 $_p9k__cwd $p $w $fake_first "${parts[@]}"; then
     local state=$0
     local icon=''
+    local a='' b='' c=''
+    for a b c in "${_POWERLEVEL9K_DIR_CLASSES[@]}"; do
+      if [[ $_p9k__cwd == ${~a} ]]; then
+        [[ -n $b ]] && state+=_${(U)b}
+        icon=$'\1'$c
+        break
+      fi
+    done
     if (( ! w )); then
-      state+=_NOT_WRITABLE
+      if (( _POWERLEVEL9K_DIR_SHOW_WRITABLE == 1 )); then
+        state=${0}_NOT_WRITABLE
+      else
+        state+=_NOT_WRITABLE
+      fi
       icon=LOCK_ICON
-    else
-      local a='' b='' c=''
-      for a b c in "${_POWERLEVEL9K_DIR_CLASSES[@]}"; do
-        if [[ $_p9k__cwd == ${~a} ]]; then
-          [[ -n $b ]] && state+=_${(U)b}
-          icon=$'\1'$c
-          break
-        fi
-      done
     fi
 
     local style=%b
@@ -1919,9 +1922,11 @@ prompt_dir() {
     fi
 
     local last_style=
-    (( _POWERLEVEL9K_DIR_PATH_HIGHLIGHT_BOLD )) && last_style+=%B
-    if (( $+_POWERLEVEL9K_DIR_PATH_HIGHLIGHT_FOREGROUND )); then
-      _p9k_translate_color $_POWERLEVEL9K_DIR_PATH_HIGHLIGHT_FOREGROUND
+    _p9k_param $state PATH_HIGHLIGHT_BOLD ''
+    [[ $_p9k__ret == true ]] && last_style+=%B
+    if (( $+parameters[_POWERLEVEL9K_DIR_PATH_HIGHLIGHT_FOREGROUND] ||
+          $+parameters[_POWERLEVEL9K_${(U)state}_PATH_HIGHLIGHT_FOREGROUND] )); then
+      _p9k_color $state PATH_HIGHLIGHT_FOREGROUND ''
       _p9k_foreground $_p9k__ret
       last_style+=$_p9k__ret
     fi
@@ -1931,9 +1936,11 @@ prompt_dir() {
     fi
 
     local anchor_style=
-    (( _POWERLEVEL9K_DIR_ANCHOR_BOLD )) && anchor_style+=%B
-    if (( $+_POWERLEVEL9K_DIR_ANCHOR_FOREGROUND )); then
-      _p9k_translate_color $_POWERLEVEL9K_DIR_ANCHOR_FOREGROUND
+    _p9k_param $state ANCHOR_BOLD ''
+    [[ $_p9k__ret == true ]] && anchor_style+=%B
+    if (( $+parameters[_POWERLEVEL9K_DIR_ANCHOR_FOREGROUND] ||
+          $+parameters[_POWERLEVEL9K_${(U)state}_ANCHOR_FOREGROUND] )); then
+      _p9k_color $state ANCHOR_FOREGROUND ''
       _p9k_foreground $_p9k__ret
       anchor_style+=$_p9k__ret
     fi
@@ -1949,8 +1956,9 @@ prompt_dir() {
       parts=("${(@)parts/$'\2'}")
     fi
 
-    if (( $+_POWERLEVEL9K_DIR_SHORTENED_FOREGROUND )); then
-      _p9k_translate_color $_POWERLEVEL9K_DIR_SHORTENED_FOREGROUND
+    if (( $+parameters[_POWERLEVEL9K_DIR_SHORTENED_FOREGROUND] ||
+          $+parameters[_POWERLEVEL9K_${(U)state}_SHORTENED_FOREGROUND] )); then
+      _p9k_color $state SHORTENED_FOREGROUND ''
       _p9k_foreground $_p9k__ret
       (( expand )) && _p9k_escape_style $_p9k__ret
       local shortened_fg=$_p9k__ret
@@ -1966,13 +1974,15 @@ prompt_dir() {
     fi
 
     local sep=''
-    if (( $+_POWERLEVEL9K_DIR_PATH_SEPARATOR_FOREGROUND )); then
-      _p9k_translate_color $_POWERLEVEL9K_DIR_PATH_SEPARATOR_FOREGROUND
+    if (( $+parameters[_POWERLEVEL9K_DIR_PATH_SEPARATOR_FOREGROUND] ||
+          $+parameters[_POWERLEVEL9K_${(U)state}_PATH_SEPARATOR_FOREGROUND] )); then
+      _p9k_color $state PATH_SEPARATOR_FOREGROUND ''
       _p9k_foreground $_p9k__ret
       (( expand )) && _p9k_escape_style $_p9k__ret
       sep=$_p9k__ret
     fi
-    (( expand )) && _p9k_escape $_POWERLEVEL9K_DIR_PATH_SEPARATOR || _p9k__ret=$_POWERLEVEL9K_DIR_PATH_SEPARATOR
+    _p9k_param $state PATH_SEPARATOR /
+    (( expand )) && _p9k_escape $_p9k__ret
     sep+=$_p9k__ret
     [[ $sep == *%* ]] && sep+=$style
 
@@ -6777,19 +6787,18 @@ _p9k_init_params() {
   _p9k_declare -i POWERLEVEL9K_COMMAND_EXECUTION_TIME_PRECISION 2
   # Other options: "d h m s".
   _p9k_declare -s POWERLEVEL9K_COMMAND_EXECUTION_TIME_FORMAT "H:M:S"
-  _p9k_declare -e POWERLEVEL9K_DIR_PATH_SEPARATOR "/"
   _p9k_declare -e POWERLEVEL9K_HOME_FOLDER_ABBREVIATION "~"
-  _p9k_declare -b POWERLEVEL9K_DIR_PATH_HIGHLIGHT_BOLD 0
-  _p9k_declare -b POWERLEVEL9K_DIR_ANCHOR_BOLD 0
   _p9k_declare -b POWERLEVEL9K_DIR_PATH_ABSOLUTE 0
-  _p9k_declare -b POWERLEVEL9K_DIR_SHOW_WRITABLE 0
+  _p9k_declare -s POWERLEVEL9K_DIR_SHOW_WRITABLE ''
+  case $_POWERLEVEL9K_DIR_SHOW_WRITABLE in
+    true) _POWERLEVEL9K_DIR_SHOW_WRITABLE=1;;
+    v2)   _POWERLEVEL9K_DIR_SHOW_WRITABLE=2;;
+    *)    _POWERLEVEL9K_DIR_SHOW_WRITABLE=0;;
+  esac
+  typeset -gi _POWERLEVEL9K_DIR_SHOW_WRITABLE
   _p9k_declare -b POWERLEVEL9K_DIR_OMIT_FIRST_CHARACTER 0
   _p9k_declare -b POWERLEVEL9K_DIR_HYPERLINK 0
   _p9k_declare -s POWERLEVEL9K_SHORTEN_STRATEGY ""
-  _p9k_declare -s POWERLEVEL9K_DIR_PATH_SEPARATOR_FOREGROUND
-  _p9k_declare -s POWERLEVEL9K_DIR_PATH_HIGHLIGHT_FOREGROUND
-  _p9k_declare -s POWERLEVEL9K_DIR_ANCHOR_FOREGROUND
-  _p9k_declare -s POWERLEVEL9K_DIR_SHORTENED_FOREGROUND
   local markers=(
     .bzr
     .citc
@@ -7578,7 +7587,7 @@ _p9k_must_init() {
     [[ $sig == $_p9k__param_sig ]] && return 1
     _p9k_deinit
   fi
-  _p9k__param_pat=$'v79\1'${ZSH_VERSION}$'\1'${ZSH_PATCHLEVEL}$'\1'
+  _p9k__param_pat=$'v80\1'${ZSH_VERSION}$'\1'${ZSH_PATCHLEVEL}$'\1'
   _p9k__param_pat+=$'${#parameters[(I)POWERLEVEL9K_*]}\1${(%):-%n%#}\1$GITSTATUS_LOG_LEVEL\1'
   _p9k__param_pat+=$'$GITSTATUS_ENABLE_LOGGING\1$GITSTATUS_DAEMON\1$GITSTATUS_NUM_THREADS\1'
   _p9k__param_pat+=$'$DEFAULT_USER\1${ZLE_RPROMPT_INDENT:-1}\1$P9K_SSH\1$__p9k_ksh_arrays\1'
