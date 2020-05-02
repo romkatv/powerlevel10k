@@ -4038,6 +4038,8 @@ function _p9k_pyenv_global_version() {
 # Segment to display pyenv information
 # https://github.com/pyenv/pyenv#choosing-the-python-version
 prompt_pyenv() {
+  unset P9K_PYENV_PYTHON_VERSION
+
   local v=${(j.:.)${(@)${(s.:.)PYENV_VERSION}#python-}}
   if [[ -n $v ]]; then
     (( ${_POWERLEVEL9K_PYENV_SOURCES[(I)shell]} )) || return
@@ -4082,6 +4084,14 @@ prompt_pyenv() {
 
   if (( !_POWERLEVEL9K_PYENV_SHOW_SYSTEM )); then
     [[ $v == system ]] && return
+  fi
+
+  local versions=${PYENV_ROOT:-$HOME/.pyenv}/versions
+  versions=${versions:A}
+  local version=$versions/$v
+  version=${version:A}
+  if [[ $version == (#b)$versions/([^/]##)* ]]; then
+    typeset -g P9K_PYENV_PYTHON_VERSION=$match[1]
   fi
 
   _p9k_prompt_segment "$0" "blue" "$_p9k_color1" 'PYTHON_ICON' 0 '' "${v//\%/%%}"
