@@ -5576,7 +5576,7 @@ _p9k_set_instant_prompt() {
   [[ -n $RPROMPT ]] || unset RPROMPT
 }
 
-typeset -gri __p9k_instant_prompt_version=20
+typeset -gri __p9k_instant_prompt_version=21
 
 _p9k_dump_instant_prompt() {
   local user=${(%):-%n}
@@ -5818,9 +5818,10 @@ _p9k_dump_instant_prompt() {
   local out'
        [[ $+VTE_VERSION == 1 || $TERM_PROGRAM == Hyper ]] && >&$fd print -r -- '  if (( ! $+_p9k__g )); then'
        >&$fd print -r -- '
-  [[ $PROMPT_EOL_MARK == "%B%S%#%s%b" ]] && _p9k__ret=1 || _p9k_prompt_length $PROMPT_EOL_MARK
+  local mark=${(e)PROMPT_EOL_MARK}
+  [[ $mark == "%B%S%#%s%b" ]] && _p9k__ret=1 || _p9k_prompt_length $mark
   local -i fill=$((COLUMNS > _p9k__ret ? COLUMNS - _p9k__ret : 0))
-  out+="${(%):-%b%k%f%s%u$PROMPT_EOL_MARK${(pl.$fill.. .)}$cr%b%k%f%s%u%E}"'
+  out+="${(%):-%b%k%f%s%u$mark${(pl.$fill.. .)}$cr%b%k%f%s%u%E}"'
         [[ $+VTE_VERSION == 1 || $TERM_PROGRAM == Hyper ]] && >&$fd print -r -- '  fi'
         >&$fd print -r -- '
   out+="${(pl.$height..$lf.)}$esc${height}A$terminfo[sc]"
@@ -5856,7 +5857,7 @@ _p9k_dump_instant_prompt() {
         print -rn -- $terminfo[rc]${(%):-%b%k%f%s%u}$terminfo[ed]
         if [[ -s $__p9k_instant_prompt_output ]]; then
           cat $__p9k_instant_prompt_output 2>/dev/null
-          local _p9k__ret mark="${PROMPT_EOL_MARK-%B%S%#%s%b}"
+          local _p9k__ret mark="${(e)${PROMPT_EOL_MARK-%B%S%#%s%b}}"
           _p9k_prompt_length $mark
           local -i fill=$((COLUMNS > _p9k__ret ? COLUMNS - _p9k__ret : 0))
           echo -nE - "${(%):-%b%k%f%s%u$mark${(pl.$fill.. .)}$cr%b%k%f%s%u%E}"
@@ -6022,7 +6023,7 @@ function _p9k_clear_instant_prompt() {
     {
       local content
       [[ $_POWERLEVEL9K_INSTANT_PROMPT == verbose ]] && content="$(<$__p9k_instant_prompt_output)"
-      local mark="${PROMPT_EOL_MARK-%B%S%#%s%b}"
+      local mark="${(e)${PROMPT_EOL_MARK-%B%S%#%s%b}}"
       _p9k_prompt_length $mark
       local -i fill=$((COLUMNS > _p9k__ret ? COLUMNS - _p9k__ret : 0))
       local cr=$'\r'
