@@ -353,7 +353,7 @@ function _gitstatus_daemon() {
   exec 0<&- 2>>$daemon_log || return
   local pgid=$sysparams[pid]
   [[ $pgid == <1-> ]] || return
-  builtin cd / || return
+  builtin cd -q / || return
 
   {
     {
