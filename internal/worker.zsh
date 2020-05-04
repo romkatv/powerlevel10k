@@ -188,7 +188,7 @@ function _p9k_worker_start() {
       else
         exec 2>/dev/null
       fi
-      cd /                               || return
+      builtin cd -q /                    || return
       zmodload zsh/zselect               || return
       ! { zselect -t0 || (( $? != 1 )) } || return
       local _p9k_worker_pgid=$sysparams[pid]
