@@ -377,8 +377,8 @@ Add `antibody bundle romkatv/powerlevel10k` to `~/.zshrc`.
 
 ### Antigen
 
-Add `antigen theme romkatv/powerlevel10k` to `~/.zshrc`. Make sure you have `antigen apply`
-somewhere after it.
+Add `antigen theme romkatv/powerlevel10k` to `~/.antigenrc`. Make sure you have `antigen apply`
+somewhere after it within the same file. In your `~/.zshrc` add `antigen init ~/.antigenrc`.
 
 ### Zplug
 
