@@ -6135,6 +6135,7 @@ function _p9k_do_dump() {
   zle -F $1
   exec {1}>&-
   if (( ! _p9k__instant_prompt_disabled )); then
+    _p9k__instant_prompt_sig=$_p9k__cwd:$P9K_SSH:${(%):-%#}
     _p9k_set_instant_prompt
     _p9k_dump_instant_prompt
     _p9k_dumped_instant_prompt_sigs[$_p9k__instant_prompt_sig]=1
@@ -6144,35 +6145,11 @@ function _p9k_do_dump() {
   _p9k__state_dump_fd=0
 }
 
-function _p9k_maybe_dump() {
-  (( __p9k_dumps_enabled )) || return 0
-
+function _p9k_should_dump() {
+  (( __p9k_dumps_enabled && ! _p9k__state_dump_fd )) || return
+  (( _p9k__state_dump_scheduled || _p9k__prompt_idx == 1 )) && return
   _p9k__instant_prompt_sig=$_p9k__cwd:$P9K_SSH:${(%):-%#}
-
-  if (( ! _p9k__state_dump_fd )); then
-    if (( _p9k__prompt_idx == 1 )) then
-      (( _p9k__instant_prompt_disabled )) || _p9k_set_instant_prompt
-      if (( !_p9k__state_restored )); then
-        if (( !_p9k__instant_prompt_disabled )); then
-          _p9k_dump_instant_prompt
-          _p9k_dumped_instant_prompt_sigs[$_p9k__instant_prompt_sig]=1
-        fi
-        _p9k_dump_state
-        _p9k__state_dump_scheduled=0
-      elif (( ! _p9k__instant_prompt_disabled )); then
-        _p9k_dump_instant_prompt
-        if (( ! $+_p9k_dumped_instant_prompt_sigs[$_p9k__instant_prompt_sig] )); then
-          _p9k_dumped_instant_prompt_sigs[$_p9k__instant_prompt_sig]=1
-          _p9k_dump_state
-          _p9k__state_dump_scheduled=0
-        fi
-      fi
-    elif (( _p9k__state_dump_scheduled ||
-            ! (_p9k__instant_prompt_disabled || $+_p9k_dumped_instant_prompt_sigs[$_p9k__instant_prompt_sig]) )); then
-      exec {_p9k__state_dump_fd}</dev/null
-      zle -F $_p9k__state_dump_fd _p9k_do_dump
-    fi
-  fi
+  (( ! $+_p9k_dumped_instant_prompt_sigs[$_p9k__instant_prompt_sig] ))
 }
 
 # Must not run under `eval "$__p9k_intro_locale"`. Safe to run with any options.
@@ -6214,7 +6191,10 @@ function _p9k_on_expand() {
   eval "$__p9k_intro_locale"
 
   if (( ! _p9k__expanded )); then
-    _p9k_maybe_dump
+    if _p9k_should_dump; then
+      exec {_p9k__state_dump_fd}</dev/null
+      zle -F $_p9k__state_dump_fd _p9k_do_dump
+    fi
 
     if (( ! $+P9K_TTY )); then
       typeset -gx P9K_TTY=old
@@ -7610,7 +7590,7 @@ _p9k_must_init() {
     [[ $sig == $_p9k__param_sig ]] && return 1
     _p9k_deinit
   fi
-  _p9k__param_pat=$'v81\1'${ZSH_VERSION}$'\1'${ZSH_PATCHLEVEL}$'\1'
+  _p9k__param_pat=$'v82\1'${ZSH_VERSION}$'\1'${ZSH_PATCHLEVEL}$'\1'
   _p9k__param_pat+=$'${#parameters[(I)POWERLEVEL9K_*]}\1${(%):-%n%#}\1$GITSTATUS_LOG_LEVEL\1'
   _p9k__param_pat+=$'$GITSTATUS_ENABLE_LOGGING\1$GITSTATUS_DAEMON\1$GITSTATUS_NUM_THREADS\1'
   _p9k__param_pat+=$'$DEFAULT_USER\1${ZLE_RPROMPT_INDENT:-1}\1$P9K_SSH\1$__p9k_ksh_arrays\1'
