@@ -1,4 +1,4 @@
-if [[ $__p9k_sourced != 10 ]]; then
+if [[ $__p9k_sourced != 11 ]]; then
   >&2 print -P ""
   >&2 print -P "[%F{1}ERROR%f]: Corrupted powerlevel10k installation."
   >&2 print -P ""
@@ -5244,7 +5244,8 @@ _p9k_prompt_haskell_stack_init() {
 # YSU_HARDCORE=1. See https://github.com/romkatv/powerlevel10k/issues/427.
 _p9k_preexec1() {
   _p9k_restore_special_params
-  (( ${+functions[TRAPINT]} )) || trap - INT
+  unset __p9k_trapint
+  trap - INT
 }
 
 _p9k_preexec2() {
@@ -6446,15 +6447,21 @@ _p9k_trapint() {
 _p9k_precmd() {
   __p9k_new_status=$?
   __p9k_new_pipestatus=($pipestatus)
+
+  trap "" INT
+
   [[ -o ksh_arrays ]] && __p9k_ksh_arrays=1 || __p9k_ksh_arrays=0
   [[ -o sh_glob ]] && __p9k_sh_glob=1 || __p9k_sh_glob=0
   _p9k_restore_special_params
 
   _p9k_precmd_impl
 
-  (( ${+functions[TRAPINT]} )) || trap '_p9k_trapint; return 130' INT
   [[ ${+__p9k_instant_prompt_active} == 0 || -o no_prompt_cr ]] || __p9k_instant_prompt_active=2
   setopt no_local_options no_prompt_bang prompt_percent prompt_subst prompt_cr prompt_sp
+
+  # See https://www.zsh.org/mla/workers/2020/msg00612.html for the reason behind __p9k_trapint.
+  typeset -g __p9k_trapint='_p9k_trapint; return 130'
+  trap $__p9k_trapint INT
 }
 
 function _p9k_reset_prompt() {

@@ -21,6 +21,8 @@
 (( $+__p9k_intro )) || {
   # Note: leading spaces before `local` are important. Otherwise Antigen will remove `local` (!!!).
   typeset -gr __p9k_intro_base='emulate -L zsh -o no_hist_expand -o extended_glob -o no_prompt_bang -o prompt_percent -o no_prompt_subst -o no_aliases -o no_bg_nice -o typeset_silent
+  trap "" INT
+  trap "trap ${(q)__p9k_trapint:-} INT" EXIT
   local -a match mbegin mend
   local -i MBEGIN MEND OPTIND
   local MATCH OPTARG IFS=$'\'' \t\n\0'\'
@@ -54,7 +56,7 @@ function _p9k_init_locale() {
   if [[ $__p9k_dump_file != $__p9k_instant_prompt_dump_file ]] && (( ! $+functions[_p9k_preinit] )) && source $__p9k_dump_file 2>/dev/null && (( $+functions[_p9k_preinit] )); then
     _p9k_preinit
   fi
-  typeset -gr __p9k_sourced=10
+  typeset -gr __p9k_sourced=11
   if [[ $ZSH_VERSION == (5.<1->*|<6->.*) ]]; then
     if [[ -w $__p9k_root_dir && -w $__p9k_root_dir/internal && -w $__p9k_root_dir/gitstatus ]]; then
       local f
