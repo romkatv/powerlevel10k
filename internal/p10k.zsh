@@ -6133,7 +6133,7 @@ function _p9k_do_dump() {
   eval "$__p9k_intro"
   zle -F $1
   exec {1}>&-
-  if ! (( _p9k__instant_prompt_disabled || $+_p9k_dumped_instant_prompt_sigs[$_p9k__instant_prompt_sig] )); then
+  if (( ! _p9k__instant_prompt_disabled )); then
     _p9k_set_instant_prompt
     _p9k_dump_instant_prompt
     _p9k_dumped_instant_prompt_sigs[$_p9k__instant_prompt_sig]=1
