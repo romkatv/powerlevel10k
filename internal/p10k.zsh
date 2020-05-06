@@ -6428,7 +6428,7 @@ _p9k_precmd() {
   __p9k_new_status=$?
   __p9k_new_pipestatus=($pipestatus)
 
-  trap "" INT
+  trap ":" INT
 
   [[ -o ksh_arrays ]] && __p9k_ksh_arrays=1 || __p9k_ksh_arrays=0
   [[ -o sh_glob ]] && __p9k_sh_glob=1 || __p9k_sh_glob=0
