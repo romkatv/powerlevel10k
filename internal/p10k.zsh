@@ -5988,6 +5988,12 @@ function _p9k_dump_state() {
   }
 }
 
+function _p9k_delete_instant_prompt() {
+  local user=${(%):-%n}
+  local root_dir=${__p9k_dump_file:h}
+  zf_rm -f -- $root_dir/p10k-instant-prompt-$user.zsh{,.zwc} ${root_dir}/p10k-$user/prompt-*(N) 2>/dev/null
+}
+
 function _p9k_restore_state() {
   {
     [[ $__p9k_cached_param_pat == $_p9k__param_pat && $__p9k_cached_param_sig == $_p9k__param_sig ]] || return
@@ -6001,9 +6007,7 @@ function _p9k_restore_state() {
         unfunction _p9k_preinit
         (( $+functions[gitstatus_stop] )) && gitstatus_stop POWERLEVEL9K
       fi
-      local user=${(%):-%n}
-      local root_dir=${__p9k_dump_file:h}
-      zf_rm -f -- $root_dir/p10k-instant-prompt-$user.zsh{,.zwc} ${root_dir}/p10k-$user/prompt-*(N) 2>/dev/null
+      _p9k_delete_instant_prompt
     fi
   }
 }
@@ -6342,7 +6346,7 @@ _p9k_precmd_impl() {
               fi
             ;;
             2)
-              zf_rm -f -- ${__p9k_dump_file:h}/p10k-instant-prompt-${(%):-%n}.zsh{,.zwc} 2>/dev/null
+              _p9k_delete_instant_prompt
               instant_prompt_disabled=1
             ;;
           esac
@@ -7972,7 +7976,7 @@ _p9k_init() {
 
   if (( _POWERLEVEL9K_DISABLE_INSTANT_PROMPT )); then
     unset __p9k_instant_prompt_erased
-    zf_rm -f -- ${__p9k_dump_file:h}/p10k-instant-prompt-${(%):-%n}.zsh{,.zwc} 2>/dev/null
+    _p9k_delete_instant_prompt
   fi
 
   if (( $+__p9k_instant_prompt_erased )); then
@@ -8407,7 +8411,7 @@ if [[ $__p9k_dump_file != $__p9k_instant_prompt_dump_file && -n $__p9k_instant_p
 fi
 
 if [[ $+__p9k_instant_prompt_sourced == 1 && $__p9k_instant_prompt_sourced != $__p9k_instant_prompt_version ]]; then
-  zf_rm -f -- ${__p9k_dump_file:h}/p10k-instant-prompt-${(%):-%n}.zsh{,.zwc} 2>/dev/null
+  _p9k_delete_instant_prompt
 fi
 
 _p9k_init_ssh
