@@ -22,7 +22,7 @@
   # Note: leading spaces before `local` are important. Otherwise Antigen will remove `local` (!!!).
   typeset -gr __p9k_intro_base='emulate -L zsh -o no_hist_expand -o extended_glob -o no_prompt_bang -o prompt_percent -o no_prompt_subst -o no_aliases -o no_bg_nice -o typeset_silent
   trap "" INT
-  trap "trap ${(q)__p9k_trapint:-} INT" EXIT
+  trap "trap ${(q)__p9k_trapint:--} INT" EXIT
   local -a match mbegin mend
   local -i MBEGIN MEND OPTIND
   local MATCH OPTARG IFS=$'\'' \t\n\0'\'
