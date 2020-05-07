@@ -6441,7 +6441,7 @@ _p9k_precmd() {
 
   # See https://www.zsh.org/mla/workers/2020/msg00612.html for the reason behind __p9k_trapint.
   typeset -g __p9k_trapint='_p9k_trapint; return 130'
-  trap $__p9k_trapint INT
+  trap "$__p9k_trapint" INT
 }
 
 function _p9k_reset_prompt() {
