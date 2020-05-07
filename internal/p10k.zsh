@@ -6034,7 +6034,7 @@ function _p9k_clear_instant_prompt() {
       local cr=$'\r'
       local sp="${(%):-%b%k%f%s%u$mark${(pl.$fill.. .)}$cr%b%k%f%s%u%E}"
       print -rn -- $terminfo[rc]${(%):-%b%k%f%s%u}$terminfo[ed]
-      local unexpected=${(S)content//$'\e'*($'\a'|$'\e\\')}
+      local unexpected=${${${(S)content//$'\e'*($'\a'|$'\e\\')}//$'\e[?'<->'c'}//$'\e['<->' q'}
       if [[ -n $unexpected ]]; then
         local omz1='[Oh My Zsh] Would you like to update? [Y/n]: '
         local omz2='Updating Oh My Zsh'
@@ -6086,7 +6086,7 @@ function _p9k_clear_instant_prompt() {
           echo -E - ""
         fi
       fi
-      cat $__p9k_instant_prompt_output
+      cat -- $__p9k_instant_prompt_output
       echo -nE - $sp
       zf_rm -f -- $__p9k_instant_prompt_output
     } 2>/dev/null
