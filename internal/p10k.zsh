@@ -6171,6 +6171,8 @@ function _p9k_restore_special_params() {
 }
 
 function _p9k_on_expand() {
+  (( _p9k__expanded && ! ${+__p9k_instant_prompt_active} )) && [[ "${langinfo[CODESET]}" == (utf|UTF)(-|)8 ]] && return
+
   eval "$__p9k_intro_no_locale"
 
   if [[ $langinfo[CODESET] != (utf|UTF)(-|)8 ]]; then
