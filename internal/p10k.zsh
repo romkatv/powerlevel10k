@@ -8185,8 +8185,9 @@ Part States:
   show          the part is displayed
   hide          the part is not displayed
   print         the part is printed in precmd; only applicable to empty_line and
-                ruler; looks better than show after calling \`clear\`; unlike
-                show, the effects of print cannot be undone with hide
+                ruler; unlike show, the effects of print cannot be undone with hide;
+                print used to look better after \`clear\` but this is no longer the
+                case; it's best to avoid it unless you know what you are doing
 
 part-pattern is a glob pattern for parts. Examples:
 
@@ -8204,11 +8205,11 @@ Example: Bind Ctrl+P to toggle right prompt.
   zle -N toggle-right-prompt
   bindkey '^P' toggle-right-prompt
 
-Example: Print the state of all prompt parts:
+Example: Print the current state of all prompt parts:
 
-  local -A reply
+  typeset -A reply
   p10k display -a '*'
-  printf '%%32s = %%q\\n' \${(@kv)reply}
+  printf '%%-32s = %%q\n' \${(@kv)reply} | sort
 "
 
 # 0  -- reset-prompt not blocked
