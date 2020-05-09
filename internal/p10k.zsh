@@ -1800,7 +1800,7 @@ prompt_dir() {
               (( q )) && parts[i]="\${(Q)\${:-${(qqq)${(q)sub}}}}"
               parts[i]+=$'\2'
             else
-              local -i j=1
+              local -i j=$sub[(i)[^.]]
               for (( ; j + d < $#sub; ++j )); do
                 local -a matching=($parent/$sub[1,j]*/(N))
                 (( $#matching == 1 )) && break
