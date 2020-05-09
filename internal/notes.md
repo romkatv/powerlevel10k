@@ -221,3 +221,7 @@ user=0.21s system=0.05s cpu=99% total=0.264
 time ( repeat 1000 [[ -z "${parameters[(I)POWERLEVEL9K_*]}" ]] )
 user=0.17s system=0.00s cpu=99% total=0.175
 ```
+
+---
+
+Add the equivalent of `P9K_PYTHON_VERSION` to all `*env` segments where it makes sense.
