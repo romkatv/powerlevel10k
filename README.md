@@ -1110,6 +1110,49 @@ cd nerd-fonts
 
 If everything goes well, four `ttf` files will appear in `./out`.
 
+### How to package Powerlevel10k for distribution?
+
+If you want to package Powerlevel10k, it's best to do it based off releases. In a nutshell, you
+need to download Powerlevel10k tarball, build gitstatusd and compile zsh files.
+
+The following code should work. If it doesn't, please open an issue.
+
+**IMPORTANT:** *Change version to what you want to package. This example doesn't get updated when
+new versions are released.*
+
+```zsh
+curl -fsSLO https://github.com/romkatv/powerlevel10k/archive/v1.0.0.tar.gz
+tar -xzf v1.0.0.tar.gz
+cd powerlevel10k-1.0.0
+(
+  cd gitstatus
+  . ./build.info
+  curl -fsSLo                              \
+    deps/libgit2-"$libgit2_version".tar.gz \
+    https://github.com/romkatv/libgit2/archive/"$libgit2_version".tar.gz
+  ./build
+  rm deps/libgit2-*.tar.gz
+)
+for file in *.zsh-theme internal/*.zsh gitstatus/*.zsh gitstatus/install; do
+  zsh -fc "zcompile -R -- $file.zwc $file"
+done
+```
+
+This needs binutils, cmake, gcc, g++, git, GNU make and zsh.
+
+Depending on your workflow, it might be easier to store the URL to the libgit2 tarball in the
+same place where you are going to put the main powerlevel10k tarball URL. You'll need to update both
+URLs at the same time when bumping package version.
+
+Once build completes, *do not delete or move any files*. Package the whole directory as is. Don't
+add it (or any of its subdirectories) to `PATH`.
+
+Note that Powerlevel10k has an embedded version of gitstatus. It must stay that way. The embedded
+gitstatus won't conflict with the standalone version. They can have different versions and can
+coexist within the same Zsh process. Do not attempt to surgically remove gitstatus from
+Powerlevel10k, package the result and then somehow force Powerlevel10k to use a separately packaged
+gitstatus.
+
 ## Troubleshooting
 
 ### Question mark in prompt
@@ -1673,6 +1716,7 @@ typeset -g POWERLEVEL9K_OS_ICON_CONTENT_EXPANSION='${P9K_CONTENT}'  # not bold
   - [What is the minimum supported Zsh version?](#what-is-the-minimum-supported-zsh-version)
   - [How were these screenshots and animated gifs created?](#how-were-these-screenshots-and-animated-gifs-created)
   - [How was the recommended font created?](#how-was-the-recommended-font-created)
+  - [How to package Powerlevel10k for distribution?](#how-to-package-powerlevel10k-for-distribution)
 - [Troubleshooting](#troubleshooting)
   - [Question mark in prompt](#question-mark-in-prompt)
   - [Icons, glyphs or powerline symbols don't render](#icons-glyphs-or-powerline-symbols-dont-render)
