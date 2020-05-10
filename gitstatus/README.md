@@ -473,6 +473,9 @@ want to build in docker (`-d docker`) or to allow automatic downloading of libgi
 
 The following code should work. If it doesn't, please open an issue.
 
+**IMPORTANT:** *Change version to what you want to package. This example doesn't get updated when
+new versions are released.*
+
 ```zsh
 curl -fsSLO https://github.com/romkatv/gitstatus/archive/v1.0.0.tar.gz
 tar -xzf v1.0.0.tar.gz
@@ -485,7 +488,7 @@ cd gitstatus-1.0.0
 )
 ./build
 rm deps/libgit2-*.tar.gz
-for file in gitstatus.plugin.zsh gitstatus.prompt.zsh install; do
+for file in *.zsh install; do
   zsh -fc "zcompile -R -- $file.zwc $file"
 done
 ```
