@@ -151,7 +151,7 @@ function _p9k_declare() {
       fi
       ;;
     -a)
-      local -a v=(${(P)2})
+      local -a v=("${(@P)2}")
       if (( set )); then
         eval "typeset -ga _${(q)2}=(${(@qq)v})";
       else
