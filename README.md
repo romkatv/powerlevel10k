@@ -1121,9 +1121,9 @@ The following code should work. If it doesn't, please open an issue.
 new versions are released.*
 
 ```zsh
-curl -fsSLO https://github.com/romkatv/powerlevel10k/archive/v1.0.0.tar.gz
-tar -xzf v1.0.0.tar.gz
-cd powerlevel10k-1.0.0
+curl -fsSLO https://github.com/romkatv/powerlevel10k/archive/v1.8.0.tar.gz
+tar -xzf v1.8.0.tar.gz
+cd powerlevel10k-1.8.0
 (
   cd gitstatus
   . ./build.info
