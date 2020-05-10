@@ -209,13 +209,13 @@ END
     if command -v curl >/dev/null 2>&1; then
       if ! err="$(command curl -fsSLo "$archive" -- "$url" 2>&1)"; then
         >&2 echo "[gitstatus] error: failed to download gitstatusd: $url"
-        >&2 printf "%s" "$err"
+        >&2 printf "%s\n" "$err"
         return 1
       fi
     elif command -v wget >/dev/null 2>&1; then
       if ! err="$(command wget -O "$archive" -- "$url" 2>&1)"; then
         >&2 echo "[gitstatus] error: failed to download gitstatusd: $url"
-        >&2 printf "%s" "$err"
+        >&2 printf "%s\n" "$err"
         return 1
       fi
     else
