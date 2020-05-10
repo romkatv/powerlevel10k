@@ -107,7 +107,7 @@ END
     uname_s="$(printf '%s' "$uname_s" | command tr '[A-Z]' '[a-z]')" || return
   fi
   if [ -z "$uname_m" ]; then
-    uname_m="$(command uname -s)" || return
+    uname_m="$(command uname -m)" || return
     uname_m="$(printf '%s' "$uname_m" | command tr '[A-Z]' '[a-z]')" || return
   fi
 
