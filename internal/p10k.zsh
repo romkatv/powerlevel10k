@@ -3818,7 +3818,7 @@ function _p9k_vcs_resume() {
 
   if [[ -n $_p9k__gitstatus_next_dir ]]; then
     _p9k__git_dir=$GIT_DIR
-    if ! gitstatus_query -d $_p9k__gitstatus_next_dir -t 0 -c '_p9k_vcs_resume 1' POWERLEVEL9K; then
+    if ! gitstatus_query_p9k_ -d $_p9k__gitstatus_next_dir -t 0 -c '_p9k_vcs_resume 1' POWERLEVEL9K; then
       unset _p9k__gitstatus_next_dir
       unset VCS_STATUS_RESULT
     else
@@ -3852,7 +3852,7 @@ function _p9k_vcs_gitstatus() {
       local -F timeout=_POWERLEVEL9K_VCS_MAX_SYNC_LATENCY_SECONDS
       if ! _p9k_vcs_status_for_dir; then
         _p9k__git_dir=$GIT_DIR
-        gitstatus_query -d $_p9k__cwd_a -t $timeout -p -c '_p9k_vcs_resume 0' POWERLEVEL9K || return 1
+        gitstatus_query_p9k_ -d $_p9k__cwd_a -t $timeout -p -c '_p9k_vcs_resume 0' POWERLEVEL9K || return 1
         _p9k_maybe_ignore_git_repo
         case $VCS_STATUS_RESULT in
           tout) _p9k__gitstatus_next_dir=''; _p9k__gitstatus_start_time=$EPOCHREALTIME; return 0;;
@@ -3876,7 +3876,7 @@ function _p9k_vcs_gitstatus() {
       (( _p9k__prompt_idx == 1 )) && timeout=0
       _p9k__git_dir=$GIT_DIR
       if (( _p9k_vcs_index && $+GITSTATUS_DAEMON_PID_POWERLEVEL9K )); then
-        if ! gitstatus_query -d $_p9k__cwd_a -t 0 -c '_p9k_vcs_resume 1' POWERLEVEL9K; then
+        if ! gitstatus_query_p9k_ -d $_p9k__cwd_a -t 0 -c '_p9k_vcs_resume 1' POWERLEVEL9K; then
           unset VCS_STATUS_RESULT
           return 1
         fi
@@ -3885,7 +3885,7 @@ function _p9k_vcs_gitstatus() {
         _p9k__gitstatus_start_time=$EPOCHREALTIME
         return 0
       fi
-      if ! gitstatus_query -d $_p9k__cwd_a -t $timeout -c '_p9k_vcs_resume 1' POWERLEVEL9K; then
+      if ! gitstatus_query_p9k_ -d $_p9k__cwd_a -t $timeout -c '_p9k_vcs_resume 1' POWERLEVEL9K; then
         unset VCS_STATUS_RESULT
         return 1
       fi
@@ -6006,7 +6006,7 @@ function _p9k_restore_state() {
     if (( !_p9k__state_restored )); then
       if (( $+functions[_p9k_preinit] )); then
         unfunction _p9k_preinit
-        (( $+functions[gitstatus_stop] )) && gitstatus_stop POWERLEVEL9K
+        (( $+functions[gitstatus_stop_p9k_] )) && gitstatus_stop_p9k_ POWERLEVEL9K
       fi
       _p9k_delete_instant_prompt
     fi
@@ -6404,7 +6404,7 @@ _p9k_precmd_impl() {
     if (( $+_p9k__vcs_timeout )); then
       (( _p9k__vcs_timeout = _POWERLEVEL9K_VCS_MAX_SYNC_LATENCY_SECONDS + start_time - EPOCHREALTIME ))
       (( _p9k__vcs_timeout >= 0 )) || (( _p9k__vcs_timeout = 0 ))
-      gitstatus_process_results -t $_p9k__vcs_timeout POWERLEVEL9K
+      gitstatus_process_results_p9k_ -t $_p9k__vcs_timeout POWERLEVEL9K
     fi
     if (( ! $+_p9k__vcs )); then
       local _p9k__prompt _p9k__prompt_side=$_p9k_vcs_side _p9k__segment_name=vcs
@@ -7592,13 +7592,13 @@ _p9k_must_init() {
     [[ $sig == $_p9k__param_sig ]] && return 1
     _p9k_deinit
   fi
-  _p9k__param_pat=$'v83\1'${ZSH_VERSION}$'\1'${ZSH_PATCHLEVEL}$'\1'
+  _p9k__param_pat=$'v84\1'${ZSH_VERSION}$'\1'${ZSH_PATCHLEVEL}$'\1'
   _p9k__param_pat+=$'${#parameters[(I)POWERLEVEL9K_*]}\1${(%):-%n%#}\1$GITSTATUS_LOG_LEVEL\1'
   _p9k__param_pat+=$'$GITSTATUS_ENABLE_LOGGING\1$GITSTATUS_DAEMON\1$GITSTATUS_NUM_THREADS\1'
-  _p9k__param_pat+=$'$DEFAULT_USER\1${ZLE_RPROMPT_INDENT:-1}\1$P9K_SSH\1$__p9k_ksh_arrays\1'
+  _p9k__param_pat+=$'$GITSTATUS_CACHE_DIR\1\1${ZLE_RPROMPT_INDENT:-1}\1$__p9k_ksh_arrays\1'
   _p9k__param_pat+=$'$__p9k_sh_glob\1$ITERM_SHELL_INTEGRATION_INSTALLED\1$commands[uname]\1'
   _p9k__param_pat+=$'${PROMPT_EOL_MARK-%B%S%#%s%b}\1$commands[locale]\1$langinfo[CODESET]\1'
-  _p9k__param_pat+=$'$VTE_VERSION\1$TERM_PROGRAM\1'
+  _p9k__param_pat+=$'$VTE_VERSION\1$TERM_PROGRAM\1$DEFAULT_USER\1$P9K_SSH\1'
   _p9k__param_pat+=$'$functions[p10k-on-init]$functions[p10k-on-pre-prompt]\1'
   _p9k__param_pat+=$'$functions[p10k-on-post-widget]$functions[p10k-on-post-prompt]\1'
   local MATCH
@@ -7840,7 +7840,7 @@ _p9k_init_vcs() {
   _p9k_segment_in_use vcs || return
   _p9k_vcs_info_init
   if (( $+functions[_p9k_preinit] )); then
-    (( $+GITSTATUS_DAEMON_PID_POWERLEVEL9K )) && gitstatus_start POWERLEVEL9K
+    (( $+GITSTATUS_DAEMON_PID_POWERLEVEL9K )) && gitstatus_start_p9k_ POWERLEVEL9K
     return 0
   fi
   (( _POWERLEVEL9K_DISABLE_GITSTATUS )) && return
@@ -7849,14 +7849,16 @@ _p9k_init_vcs() {
   local gitstatus_dir=${_POWERLEVEL9K_GITSTATUS_DIR:-${__p9k_root_dir}/gitstatus}
 
   typeset -g _p9k_preinit="function _p9k_preinit() {
-    [[ \$ZSH_VERSION == ${(q)ZSH_VERSION} ]]          || return
-    [[ -r ${(q)gitstatus_dir}/gitstatus.plugin.zsh ]] || return
-    source ${(q)gitstatus_dir}/gitstatus.plugin.zsh   || return
-    GITSTATUS_DAEMON=${(q)GITSTATUS_DAEMON}                     \
+    [[ \$ZSH_VERSION == ${(q)ZSH_VERSION} ]]              || return
+    [[ -r ${(q)gitstatus_dir}/gitstatus.plugin.zsh ]]     || return
+    source ${(q)gitstatus_dir}/gitstatus.plugin.zsh _p9k_ || return
+    GITSTATUS_AUTO_INSTALL=${(q)GITSTATUS_AUTO_INSTALL}         \
+      GITSTATUS_DAEMON=${(q)GITSTATUS_DAEMON}                   \
+      GITSTATUS_CACHE_DIR=${(q)GITSTATUS_CACHE_DIR}             \
       GITSTATUS_NUM_THREADS=${(q)GITSTATUS_NUM_THREADS}         \
       GITSTATUS_LOG_LEVEL=${(q)GITSTATUS_LOG_LEVEL}             \
       GITSTATUS_ENABLE_LOGGING=${(q)GITSTATUS_ENABLE_LOGGING}   \
-        gitstatus_start                                         \
+        gitstatus_start_p9k_                                    \
           -s $_POWERLEVEL9K_VCS_STAGED_MAX_NUM                  \
           -u $_POWERLEVEL9K_VCS_UNSTAGED_MAX_NUM                \
           -d $_POWERLEVEL9K_VCS_UNTRACKED_MAX_NUM               \
@@ -7865,13 +7867,14 @@ _p9k_init_vcs() {
           ${${_POWERLEVEL9K_VCS_RECURSE_UNTRACKED_DIRS:#0}:+-e} \
           -a POWERLEVEL9K
   }"
-  source $gitstatus_dir/gitstatus.plugin.zsh && gitstatus_start \
-    -s $_POWERLEVEL9K_VCS_STAGED_MAX_NUM                        \
-    -u $_POWERLEVEL9K_VCS_UNSTAGED_MAX_NUM                      \
-    -d $_POWERLEVEL9K_VCS_UNTRACKED_MAX_NUM                     \
-    -c $_POWERLEVEL9K_VCS_CONFLICTED_MAX_NUM                    \
-    -m $_POWERLEVEL9K_VCS_MAX_INDEX_SIZE_DIRTY                  \
-    ${${_POWERLEVEL9K_VCS_RECURSE_UNTRACKED_DIRS:#0}:+-e}       \
+  source $gitstatus_dir/gitstatus.plugin.zsh _p9k_ || return
+  gitstatus_start_p9k_                                    \
+    -s $_POWERLEVEL9K_VCS_STAGED_MAX_NUM                  \
+    -u $_POWERLEVEL9K_VCS_UNSTAGED_MAX_NUM                \
+    -d $_POWERLEVEL9K_VCS_UNTRACKED_MAX_NUM               \
+    -c $_POWERLEVEL9K_VCS_CONFLICTED_MAX_NUM              \
+    -m $_POWERLEVEL9K_VCS_MAX_INDEX_SIZE_DIRTY            \
+    ${${_POWERLEVEL9K_VCS_RECURSE_UNTRACKED_DIRS:#0}:+-e} \
     POWERLEVEL9K
 }
 
@@ -8006,7 +8009,7 @@ _p9k_init() {
 
 _p9k_deinit() {
   (( $+functions[_p9k_preinit] )) && unfunction _p9k_preinit
-  (( $+functions[gitstatus_stop] )) && gitstatus_stop POWERLEVEL9K
+  (( $+functions[gitstatus_stop_p9k_] )) && gitstatus_stop_p9k_ POWERLEVEL9K
   _p9k_worker_stop
   (( _p9k__state_dump_fd )) && exec {_p9k__state_dump_fd}>&-
   (( $+_p9k__iterm2_precmd )) && functions[iterm2_precmd]=$_p9k__iterm2_precmd
