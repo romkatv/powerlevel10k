@@ -1,0 +1,18 @@
+# This value gets embedded in gitstatusd at build time. It is
+# read by ./Makefile. `gitstatusd --version` reports it back.
+#
+# This value is also read by shell bindings (indirectly, through
+# ./install) when gitstatusd is from ./usrbin.
+gitstatus_version="v1.0.0"
+
+# libgit2 is a build time dependency of gitstatusd. The value of
+# libgit2_version is read by ./build.
+#
+# If ./deps/libgit2-${libgit2_version}.tar.gz doesn't exist, build
+# downloads it from the following location:
+#
+#   https://github.com/romkatv/libgit2/archive/${libgit2_version}.tar.gz
+#
+# Once downloaded, the tarball is stored at the path indicated
+# above so that repeated builds don't consume network bandwidth.
+libgit2_version="tag-005f77dca6dbe8788e55139fa1199fc94cc04f9a"

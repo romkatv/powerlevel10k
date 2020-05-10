@@ -1,0 +1,24 @@
+# This file is used by ./install and indirectly by shell bindings.
+
+# Official gitstatusd binaries.
+uname_s_glob="cygwin_nt-10.0"; uname_m_glob="i686";    file="gitstatusd-${uname_s}-${uname_m}";     version="v1.0.0";
+uname_s_glob="cygwin_nt-10.0"; uname_m_glob="x86_64";  file="gitstatusd-${uname_s}-${uname_m}";     version="v1.0.0";
+uname_s_glob="darwin";         uname_m_glob="x86_64";  file="gitstatusd-${uname_s}-${uname_m}";     version="v1.0.0";
+uname_s_glob="freebsd";        uname_m_glob="amd64";   file="gitstatusd-${uname_s}-${uname_m}";     version="v1.0.0";
+uname_s_glob="linux";          uname_m_glob="aarch64"; file="gitstatusd-${uname_s}-${uname_m}";     version="v1.0.0";
+uname_s_glob="linux";          uname_m_glob="armv6l";  file="gitstatusd-${uname_s}-${uname_m}";     version="v1.0.0";
+uname_s_glob="linux";          uname_m_glob="armv7l";  file="gitstatusd-${uname_s}-${uname_m}";     version="v1.0.0";
+uname_s_glob="linux";          uname_m_glob="i686";    file="gitstatusd-${uname_s}-${uname_m}";     version="v1.0.0";
+uname_s_glob="linux";          uname_m_glob="x86_64";  file="gitstatusd-${uname_s}-${uname_m}";     version="v1.0.0";
+uname_s_glob="msys_nt-10.0";   uname_m_glob="i686";    file="gitstatusd-${uname_s}-${uname_m}";     version="v1.0.0";
+uname_s_glob="msys_nt-10.0";   uname_m_glob="x86_64";  file="gitstatusd-${uname_s}-${uname_m}";     version="v1.0.0";
+
+# Fallbacks to official gitstatusd binaries.
+uname_s_glob="cygwin_nt-*";    uname_m_glob="i686";    file="gitstatusd-cygwin_nt-10.0-${uname_m}"; version="v1.0.0";
+uname_s_glob="cygwin_nt-*";    uname_m_glob="x86_64";  file="gitstatusd-cygwin_nt-10.0-${uname_m}"; version="v1.0.0";
+uname_s_glob="mingw32_nt-*";   uname_m_glob="i686";    file="gitstatusd-msys_nt-10.0-${uname_m}";   version="v1.0.0";
+uname_s_glob="mingw32_nt-*";   uname_m_glob="x86_64";  file="gitstatusd-msys_nt-10.0-${uname_m}";   version="v1.0.0";
+uname_s_glob="mingw64_nt-*";   uname_m_glob="i686";    file="gitstatusd-msys_nt-10.0-${uname_m}";   version="v1.0.0";
+uname_s_glob="mingw64_nt-*";   uname_m_glob="x86_64";  file="gitstatusd-msys_nt-10.0-${uname_m}";   version="v1.0.0";
+uname_s_glob="msys_nt-*";      uname_m_glob="i686";    file="gitstatusd-msys_nt-10.0-${uname_m}";   version="v1.0.0";
+uname_s_glob="msys_nt-*";      uname_m_glob="x86_64";  file="gitstatusd-msys_nt-10.0-${uname_m}";   version="v1.0.0";
