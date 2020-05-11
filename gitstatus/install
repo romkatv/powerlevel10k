@@ -205,31 +205,30 @@ END
     [ -d "$cache_dir" ] || mkdir -p -- "$cache_dir" || return
 
     local url="https://github.com/romkatv/gitstatus/releases/download/$version/$file.tar.gz"
-    local archive="$cache_dir"/"$file".tmp.$$.tar.gz
-    if command -v curl >/dev/null 2>&1; then
-      # `cd` is a workaround for Cygwin. It cannot handle -o with slashes.
-      if ! err="$(cd ${ZSH_VERSION:+-q} -- "$cache_dir" 2>&1 &&
-                  command curl -fsSLo "${archive##*/}" -- "$url" 2>&1)"; then
-        >&2 printf "%s\n" "$err"
-        >&2 echo "[gitstatus] error: failed to download gitstatusd: $url"
-        return 1
-      fi
-    elif command -v wget >/dev/null 2>&1; then
-      if ! err="$(command wget -O "$archive" -- "$url" 2>&1)"; then
-        >&2 printf "%s\n" "$err"
-        >&2 echo "[gitstatus] error: failed to download gitstatusd: $url"
-        return 1
-      fi
-    else
-      >&2 echo "[gitstatus] error: please install curl or wget"
-      return 1
-    fi
 
     (
       if [ -n "${ZSH_VERSION:-}" ]; then
-        builtin cd -q -- "$cache_dir" || return
+        builtin cd -q -- "$cache_dir" || exit
       else
-        cd -- "$cache_dir" || return
+        cd -- "$cache_dir" || exit
+      fi
+
+      local archive="$file".tmp.$$.tar.gz
+      local err
+
+      if command -v curl >/dev/null 2>&1; then
+        err="$(command curl -fsSLo "$archive" -- "$url" 2>&1)"
+      elif command -v wget >/dev/null 2>&1; then
+        err="$(command wget -O "$archive" -- "$url" 2>&1)"
+      else
+        >&2 echo "[gitstatus] error: please install curl or wget"
+        exit 1
+      fi
+
+      if [ $? != 0 ]; then
+        >&2 printf "%s\n" "$err"
+        >&2 echo "[gitstatus] error: failed to download gitstatusd: $url"
+        exit 1
       fi
 
       local old=
@@ -240,7 +239,7 @@ END
           [ -e "$old" ] || break
           i="$((i+1))"
         done
-        command mv -f -- "$daemon" "$old" || return
+        command mv -f -- "$daemon" "$old" || exit
       fi
 
       command tar -xzf "$archive"
