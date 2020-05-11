@@ -445,7 +445,7 @@ function _gitstatus_daemon"${1:-}"() {
 # Usage: gitstatus_start [OPTION]... NAME
 #
 #   -t FLOAT  Fail the self-check on initialization if not getting a response from gitstatusd for
-#             this this many seconds. Defaults to 5.
+#             this this many seconds. Defaults to 30.
 #
 #   -s INT    Report at most this many staged changes; negative value means infinity.
 #             Defaults to 1.
@@ -480,7 +480,7 @@ function gitstatus_start"${1:-}"() {
 
   local opt OPTARG
   local -i OPTIND
-  local -F timeout=5
+  local -F timeout=30
   local -i async=0
   local -a args=()
   local -i dirty_max_index_size=-1
