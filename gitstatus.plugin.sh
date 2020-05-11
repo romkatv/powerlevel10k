@@ -8,7 +8,7 @@
 # Usage: gitstatus_start [OPTION]...
 #
 #   -t FLOAT  Fail the self-check on initialization if not getting a response from
-#             gitstatusd for this this many seconds. Defaults to 5.
+#             gitstatusd for this this many seconds. Defaults to 30.
 #
 #   -s INT    Report at most this many staged changes; negative value means infinity.
 #             Defaults to 1.
@@ -37,7 +37,7 @@
 #             changes for repositories with bash.showDirtyState = false.
 function gitstatus_start() {
   unset OPTIND
-  local opt timeout=5 max_dirty=-1 extra_flags
+  local opt timeout=30 max_dirty=-1 extra_flags
   local max_num_staged=1 max_num_unstaged=1 max_num_conflicted=1 max_num_untracked=1
   local ignore_status_show_untracked_files
   while getopts "t:s:u:c:d:m:eUWD" opt; do
