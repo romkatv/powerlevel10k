@@ -207,15 +207,17 @@ END
     local url="https://github.com/romkatv/gitstatus/releases/download/$version/$file.tar.gz"
     local archive="$cache_dir"/"$file".tmp.$$.tar.gz
     if command -v curl >/dev/null 2>&1; then
-      if ! err="$(command curl -fsSLo "$archive" -- "$url" 2>&1)"; then
-        >&2 echo "[gitstatus] error: failed to download gitstatusd: $url"
+      # `cd` is a workaround for Cygwin. It cannot handle -o with slashes.
+      if ! err="$(cd ${ZSH_VERSION:+-q} -- "$cache_dir" 2>&1 &&
+                  command curl -fsSLo "${archive##*/}" -- "$url" 2>&1)"; then
         >&2 printf "%s\n" "$err"
+        >&2 echo "[gitstatus] error: failed to download gitstatusd: $url"
         return 1
       fi
     elif command -v wget >/dev/null 2>&1; then
       if ! err="$(command wget -O "$archive" -- "$url" 2>&1)"; then
-        >&2 echo "[gitstatus] error: failed to download gitstatusd: $url"
         >&2 printf "%s\n" "$err"
+        >&2 echo "[gitstatus] error: failed to download gitstatusd: $url"
         return 1
       fi
     else
