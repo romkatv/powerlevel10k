@@ -1134,7 +1134,7 @@ cd powerlevel10k-1.8.0
   rm deps/libgit2-*.tar.gz
 )
 for file in *.zsh-theme internal/*.zsh gitstatus/*.zsh gitstatus/install; do
-  zsh -fc "zcompile -R -- $file.zwc $file"
+  zsh -fc "emulate zsh -o no_aliases && zcompile -R -- $file.zwc $file"
 done
 ```
 
