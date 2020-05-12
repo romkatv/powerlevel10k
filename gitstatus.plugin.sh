@@ -8,7 +8,7 @@
 # Usage: gitstatus_start [OPTION]...
 #
 #   -t FLOAT  Fail the self-check on initialization if not getting a response from
-#             gitstatusd for this this many seconds. Defaults to 30.
+#             gitstatusd for this this many seconds. Defaults to 5.
 #
 #   -s INT    Report at most this many staged changes; negative value means infinity.
 #             Defaults to 1.
@@ -37,7 +37,7 @@
 #             changes for repositories with bash.showDirtyState = false.
 function gitstatus_start() {
   unset OPTIND
-  local opt timeout=30 max_dirty=-1 extra_flags
+  local opt timeout=5 max_dirty=-1 extra_flags
   local max_num_staged=1 max_num_unstaged=1 max_num_conflicted=1 max_num_untracked=1
   local ignore_status_show_untracked_files
   while getopts "t:s:u:c:d:m:eUWD" opt; do
@@ -117,7 +117,10 @@ function gitstatus_start() {
 
     {
       (
+        trap '' INT
+        [[ "$GITSTATUS_DAEMON_LOG" == /dev/null ]] || set -x
         builtin cd /
+
         (
           local fd_in fd_out
           exec {fd_in}<"$req_fifo" {fd_out}>"$resp_fifo" || exit
@@ -131,14 +134,15 @@ function gitstatus_start() {
             _gitstatus_bash_downloaded="$3"
           }
 
-          set -- -d "$gitstatus_plugin_dir" -s "$uname_s" -m "$uname_m" -- _gitstatus_set_daemon
+          set -- -d "$gitstatus_plugin_dir" -s "$uname_s" -m "$uname_m" \
+            -p "printf '.\036' >&$fd_out" -- _gitstatus_set_daemon
           [[ "${GITSTATUS_AUTO_INSTALL:-1}" -ne 0 ]]  || set -- -n "$@"
           source "$gitstatus_plugin_dir"/install      || return
           [[ -n "$_gitstatus_bash_daemon" ]]          || return
           [[ -n "$_gitstatus_bash_version" ]]         || return
           [[ "$_gitstatus_bash_downloaded" == [01] ]] || return
 
-          local sig=(INT QUIT TERM EXIT ILL PIPE)
+          local sig=(QUIT TERM EXIT ILL PIPE)
 
           if [[ -x "$_gitstatus_bash_daemon" ]]; then
             "$_gitstatus_bash_daemon" \
@@ -174,9 +178,9 @@ function gitstatus_start() {
           wait "$pid"
           trap - ${sig[@]}
           echo -nE $'bye\x1f0\x1e' >&"$fd_out"
-        ) &
-      )  & disown
-    } 0</dev/null &>/dev/null
+        ) & disown
+      ) & disown
+    } 0</dev/null &>$GITSTATUS_DAEMON_LOG
 
     exec {_GITSTATUS_REQ_FD}>"$req_fifo" {_GITSTATUS_RESP_FD}<"$resp_fifo" || return
     command rm "$req_fifo" "$resp_fifo"                                    || return
@@ -186,8 +190,32 @@ function gitstatus_start() {
 
     local reply
     echo -nE $'hello\x1f\x1e' >&$_GITSTATUS_REQ_FD                     || return
-    IFS='' read -rd $'\x1e' -u $_GITSTATUS_RESP_FD -t "$timeout" reply || return
-    [[ "$reply" == $'hello\x1f0' ]]                                    || return
+    local dl=
+    while true; do
+      IFS='' read -rd $'\x1e' -u $_GITSTATUS_RESP_FD -t "$timeout" reply || return
+      [[ "$reply" == $'hello\x1f0' ]] && break
+      [[ "$reply" == . ]] || return
+      if [[ -z "$dl" ]]; then
+        dl=1
+        if [[ -t 2 ]]; then
+          local spinner=('\b\033[33m-\033[0m' '\b\033[33m\\\033[0m' '\b\033[33m|\033[0m' '\b\033[33m/\033[0m')
+          >&2 printf '[\033[33mgitstatus\033[0m] fetching \033[32mgitstatusd\033[0m ..  '
+        else
+          local spinner=('.')
+          >&2 printf '[gitstatus] fetching gitstatusd ..'
+        fi
+      fi
+      >&2 printf "${spinner[0]}"
+      spinner=("${spinner[@]:1}" "${spinner[0]}")
+    done
+
+    if [[ -n "$dl" ]]; then
+      if [[ -t 2 ]]; then
+        >&2 printf '\b[\033[32mok\033[0m]\n'
+      else
+        >&2 echo ' [ok]'
+      fi
+    fi
 
     _GITSTATUS_DIRTY_MAX_INDEX_SIZE=$max_dirty
     _GITSTATUS_CLIENT_PID="$BASHPID"

@@ -383,6 +383,11 @@ function _gitstatus_daemon"${1:-}"() {
         args+=(-t $((cpus > 16 ? 32 : cpus > 0 ? 2 * cpus : 16)))
       fi
 
+      mkfifo -- $file_prefix.fifo           || return
+      print -rnu $pipe_fd -- ${(l:20:)pgid} || return
+      exec <$file_prefix.fifo               || return
+      zf_rm -- $file_prefix.fifo            || return
+
       local _gitstatus_zsh_daemon _gitstatus_zsh_version _gitstatus_zsh_downloaded
 
       function _gitstatus_set_daemon$fsuf() {
@@ -393,17 +398,13 @@ function _gitstatus_daemon"${1:-}"() {
 
       local gitstatus_plugin_dir_var=_gitstatus_plugin_dir$fsuf
       local gitstatus_plugin_dir=${(P)gitstatus_plugin_dir_var}
-      set -- -d $gitstatus_plugin_dir -s $uname_s -m $uname_m -- _gitstatus_set_daemon$fsuf
+      set -- -d $gitstatus_plugin_dir -s $uname_s -m $uname_m -p "printf . >&$pipe_fd" -- \
+        _gitstatus_set_daemon$fsuf
       [[ ${GITSTATUS_AUTO_INSTALL:-1} == (|-|+)<1-> ]] || set -- -n "$@"
       source $gitstatus_plugin_dir/install     || return
       [[ -n $_gitstatus_zsh_daemon ]]          || return
       [[ -n $_gitstatus_zsh_version ]]         || return
       [[ $_gitstatus_zsh_downloaded == [01] ]] || return
-
-      mkfifo -- $file_prefix.fifo           || return
-      print -rnu $pipe_fd -- ${(l:20:)pgid} || return
-      exec <$file_prefix.fifo               || return
-      zf_rm -- $file_prefix.fifo            || return
 
       if [[ -x $_gitstatus_zsh_daemon ]]; then
         $_gitstatus_zsh_daemon -G $_gitstatus_zsh_version "${(@)args}" >&$pipe_fd
@@ -445,7 +446,7 @@ function _gitstatus_daemon"${1:-}"() {
 # Usage: gitstatus_start [OPTION]... NAME
 #
 #   -t FLOAT  Fail the self-check on initialization if not getting a response from gitstatusd for
-#             this this many seconds. Defaults to 30.
+#             this this many seconds. Defaults to 5.
 #
 #   -s INT    Report at most this many staged changes; negative value means infinity.
 #             Defaults to 1.
@@ -480,7 +481,7 @@ function gitstatus_start"${1:-}"() {
 
   local opt OPTARG
   local -i OPTIND
-  local -F timeout=30
+  local -F timeout=5
   local -i async=0
   local -a args=()
   local -i dirty_max_index_size=-1
@@ -647,6 +648,57 @@ function gitstatus_start"${1:-}"() {
 
       print -nru $req_fd -- $'hello\x1f\x1e' || return
       local expected=$'hello\x1f0\x1e' actual
+      if (( $+functions[p10k] )) && [[ ! -t 1 && ! -t 0 ]]; then
+        local -F deadline='EPOCHREALTIME + 4'
+      else
+        local -F deadline='1'
+      fi
+      while true; do
+        [[ -t $resp_fd ]]
+        sysread -s 1 -t $timeout -i $resp_fd actual || return
+        [[ $actual == h ]] && break
+        [[ $actual == . ]] || return
+        (( EPOCHREALTIME < deadline )) && continue
+        if (( deadline > 0 )); then
+          deadline=0
+          if (( stderr_fd )); then
+            unsetopt xtrace
+            exec 2>&$stderr_fd {stderr_fd}>&-
+            stderr_fd=0
+          fi
+          if (( $+functions[p10k] )); then
+            p10k clear-instant-prompt || return
+          fi
+          if [[ $name == POWERLEVEL9K ]]; then
+            local label=powerlevel10k
+          else
+            local label=gitstatus
+          fi
+          if [[ -t 2 ]]; then
+            local spinner=($'\b%3F-%f' $'\b%3F\\%f' $'\b%3F|%f' $'\b%3F/%f')
+            print -Prnu2 -- "[%3F$label%f] fetching %2Fgitstatusd%f ..  "
+          else
+            local spinner=('.')
+            print -rnu2 -- "[$label] fetching gitstatusd .."
+          fi
+        fi
+        print -Prnu2 -- $spinner[1]
+        spinner=($spinner[2,-1] $spinner[1])
+      done
+
+      if (( deadline == 0 )); then
+        if [[ -t 2 ]]; then
+          print -Pru2 -- $'\b[%2Fok%f]'
+        else
+          print -ru2 -- ' [ok]'
+        fi
+        if [[ $xtrace != /dev/null && -o no_xtrace ]]; then
+          exec {stderr_fd}>&2 || return
+          exec 2>>$xtrace     || return
+          setopt xtrace
+        fi
+      fi
+
       while (( $#actual < $#expected )); do
         [[ -t $resp_fd ]]
         sysread -s $(($#expected - $#actual)) -t $timeout -i $resp_fd 'actual[$#actual+1]' || return

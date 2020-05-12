@@ -1,4 +1,9 @@
+# ae988158e1044abb1626a15d6a27751cd80c13be
+#
 # This file is used by ./install and indirectly by shell bindings.
+#
+# The first line is read by powerlevel10k instant prompt. It must
+# be updated whenever the content of this file changes.
 
 # Official gitstatusd binaries.
 uname_s_glob="cygwin_nt-10.0"; uname_m_glob="i686";    file="gitstatusd-${uname_s}-${uname_m}";     version="v1.0.0";
