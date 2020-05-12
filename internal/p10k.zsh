@@ -5577,7 +5577,7 @@ _p9k_set_instant_prompt() {
   [[ -n $RPROMPT ]] || unset RPROMPT
 }
 
-typeset -gri __p9k_instant_prompt_version=21
+typeset -gri __p9k_instant_prompt_version=22
 
 _p9k_dump_instant_prompt() {
   local user=${(%):-%n}
@@ -5599,6 +5599,11 @@ _p9k_dump_instant_prompt() {
       for ((i = 6; i <= $#display_v; i+=2)); do display_v[i]=show; done
       display_v[2]=hide
       display_v[4]=hide
+      local gitstatus_dir=${${_POWERLEVEL9K_GITSTATUS_DIR:A}:-${__p9k_root_dir}/gitstatus}
+      local gitstatus_header
+      if [[ -r $gitstatus_dir/install.info ]]; then
+        IFS= read -r gitstatus_header <$gitstatus_dir/install.info || return
+      fi
       >&$fd print -r -- "() {
   $__p9k_intro_no_locale
   (( ! \$+__p9k_instant_prompt_disabled )) || return
@@ -5607,6 +5612,8 @@ _p9k_dump_instant_prompt() {
      \$TERM_PROGRAM $hyper 'Hyper' && \$+VTE_VERSION == $+VTE_VERSION &&
      \$POWERLEVEL9K_DISABLE_INSTANT_PROMPT != 'true' &&
      \$POWERLEVEL9K_INSTANT_PROMPT != 'off' ]] || { __p9k_instant_prompt_sourced=0; return 1; }
+  local gitstatus_dir=${(q)gitstatus_dir}
+  local gitstatus_header=${(q)gitstatus_header}
   local -i ZLE_RPROMPT_INDENT=${ZLE_RPROMPT_INDENT:-1}
   local PROMPT_EOL_MARK=${(q)PROMPT_EOL_MARK-%B%S%#%s%b}
   [[ -n \$SSH_CLIENT || -n \$SSH_TTY || -n \$SSH_CONNECTION ]] && local ssh=1 || local ssh=0
@@ -5614,6 +5621,14 @@ _p9k_dump_instant_prompt() {
   local -i height=$_POWERLEVEL9K_INSTANT_PROMPT_COMMAND_LINES
   local prompt_dir=${(q)prompt_dir}"
       >&$fd print -r -- '
+  local real_gitstatus_header
+  if [[ -r $gitstatus_dir/install.info ]]; then
+    IFS= read -r real_gitstatus_header <$gitstatus_dir/install.info || real_gitstatus_header=borked
+  fi
+  if [[ $real_gitstatus_header != $gitstatus_header ]]; then
+    __p9k_instant_prompt_sourced=0
+    return 1
+  fi
   zmodload zsh/langinfo
   if [[ $langinfo[CODESET] != (utf|UTF)(-|)8 ]]; then
     local loc_cmd=$commands[locale]
@@ -8370,6 +8385,13 @@ function p10k() {
     finalize)
       print -rP -- $__p9k_p10k_finalize_usage >&2
       return 1
+      ;;
+    clear-instant-prompt)
+      if (( $+__p9k_instant_prompt_active )); then
+        _p9k_clear_instant_prompt
+        unset __p9k_instant_prompt_active
+      fi
+      return 0
       ;;
     *)
       print -rP -- $__p9k_p10k_usage >&2
