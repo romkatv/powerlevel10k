@@ -489,7 +489,7 @@ cd gitstatus-1.0.0
 ./build
 rm deps/libgit2-*.tar.gz
 for file in *.zsh install; do
-  zsh -fc "zcompile -R -- $file.zwc $file"
+  zsh -fc "emulate zsh -o no_aliases && zcompile -R -- $file.zwc $file"
 done
 ```
 
