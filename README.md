@@ -468,45 +468,81 @@ this case you'll need to rebuild.
 
 ### Compiling for distribution
 
-If you want to package gitstatus, it's best to do it based off releases. You also probably don't
-want to build in docker (`-d docker`) or to allow automatic downloading of libgit2 tarballs (`-w`).
+If you want to package gitstatus, it's best to do it based off [releases](
+  https://github.com/romkatv/gitstatus/releases).
 
-The following code should work. If it doesn't, please open an issue.
+The following code should work without patching anything in gitstatus sources. If it doesn't, please
+open an issue.
 
 **IMPORTANT:** *Change version to what you want to package. This example doesn't get updated when
 new versions are released.*
 
 ```zsh
-curl -fsSLO https://github.com/romkatv/gitstatus/archive/v1.0.0.tar.gz
-tar -xzf v1.0.0.tar.gz
-cd gitstatus-1.0.0
-(
-  . ./build.info
-  curl -fsSLo                              \
-    deps/libgit2-"$libgit2_version".tar.gz \
-    https://github.com/romkatv/libgit2/archive/"$libgit2_version".tar.gz
-)
-./build
-rm deps/libgit2-*.tar.gz
+# Download and extract gitstatus tarball.
+gitstatus_version=1.0.0  # IMPORTANT: CHANGE VERSION TO WHAT YOU WANT
+wget https://github.com/romkatv/gitstatus/archive/v"$gitstatus_version".tar.gz
+tar -xzf v"$gitstatus_version".tar.gz
+cd gitstatus-"$gitstatus_version"
+
+# Download libgit2 tarball and compile gitstatusd.
+./build -w
+
+# Post-process.
+rm ./deps/libgit2-*.tar.gz
 for file in *.zsh install; do
   zsh -fc "emulate zsh -o no_aliases && zcompile -R -- $file.zwc $file"
 done
 ```
 
-This needs binutils, cmake, gcc, g++, git, GNU make and zsh.
-
-Depending on your workflow, it might be easier to store the URL to the libgit2 tarball in the
-same place where you are going to put the main gitstatus tarball URL. You'll need to update both
-URLs at the same time when bumping package version.
+This needs binutils, cmake, gcc, g++, git, GNU make, wget, zsh and either shasum or sha256sum.
 
 Once build completes, *do not delete or move any files*. Package the whole directory as is. Don't
-add it (or any of its subdirectories) to `PATH`.
+add the directory or any of its subdirectories to `PATH`.
 
-Note that Powerlevel10k has an embedded version of gitstatus. It must stay that way. The embedded
-gitstatus won't conflict with the standalone version. They can have different versions and can
-coexist within the same Zsh process. Do not attempt to surgically remove gitstatus from
-Powerlevel10k, package the result and then somehow force Powerlevel10k to use a separately packaged
-gitstatus.
+You probably don't want to build in docker, so don't pass `-d` to `./build`.
+
+gitstatus depends on a [custom fork of libgit2](https://github.com/romkatv/libgit2/). When you run
+`./build -w`, it'll automatically download the appropriate libgit2 tarball and verify its sha256.
+If you want to separate the downloading of source tarballs from compilation, you can download the
+libgit2 tarball manually and invoke `./build` without `-w`.
+
+```zsh
+# Download and extract gitstatus tarball.
+gitstatus_version=1.0.0  # IMPORTANT: CHANGE VERSION TO WHAT YOU WANT
+wget https://github.com/romkatv/gitstatus/archive/v"$gitstatus_version".tar.gz
+tar -xzf v"$gitstatus_version".tar.gz
+cd gitstatus-"$gitstatus_version"
+
+# Download libgit2 tarball and place it where ./build expects it.
+. ./build.info
+libgit2_path=./deps/libgit2-"$libgit2_version".tar.gz
+libgit2_url=https://github.com/romkatv/libgit2/archive/"$libgit2_version".tar.gz
+wget -O "$libgit2_path" "$libgit2_url"
+
+# Compile gitstatusd.
+./build
+
+# Post-process.
+rm ./deps/libgit2-*.tar.gz
+for file in *.zsh install; do
+  zsh -fc "emulate zsh -o no_aliases && zcompile -R -- $file.zwc $file"
+done
+```
+
+Note that the URL and the content of the libgit2 tarball are fully defined by the main gitstatus
+tarball. Thus, you can set URLs and sha256 checksums of the two tarball in the same place (package
+definition) and update them at the same time when bumping package version. In other words, you don't
+have to extract `libgit2_version` programmatically. You can manually copy it from [build.info](
+  https://github.com/romkatv/gitstatus/blob/master/build.info) to your package definition, if you
+prefer.
+
+[Powerlevel10k](https://github.com/romkatv/powerlevel10k) has an embedded version of gitstatus. It
+must stay that way. If you decide to package both of them, follow the respective instructions from
+each project. The embedded gitstatus in Powerlevel10k won't conflict with the standalone gitstatus.
+They can have different versions and can coexist within the same Zsh process. Do not attempt to
+surgically remove gitstatus from Powerlevel10k, package the result and then force Powerlevel10k to
+use a separately packaged gitstatus. Instead, treat Powerlevel10k and gitstatus as independent
+projects that don't depend on each other.
 
 ## License
 
