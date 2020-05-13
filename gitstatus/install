@@ -159,10 +159,14 @@ END
     line="${line###*}"
     [ -n "$line" ] || continue
 
-    local uname_s_glob= uname_m_glob= file= version=
+    local uname_s_glob= uname_m_glob= file= version= sha256=
     eval "$line" || return
 
-    if [ -z "$uname_s_glob" -o -z "$uname_m_glob" -o -z "$file" -o -z "$version" ]; then
+    if [ -z "$uname_s_glob" -o \
+         -z "$uname_m_glob" -o \
+         -z "$file"         -o \
+         -z "$version"      -o \
+         -z "$sha256" ]; then
       >&2 echo "[gitstatus] internal error: invalid install.info line: $line"
       return 1
     fi
@@ -216,7 +220,20 @@ END
     fi
     [ -d "$cache_dir" ] || mkdir -p -- "$cache_dir" || return
 
+    local tmpdir
+    if ! command -v mktemp >/dev/null 2>&1 ||
+        ! tmpdir="$(command mktemp -d "${TMPDIR:-/tmp}"/gitstatus-install.XXXXXXXXXX)"; then
+      tmpdir="${TMPDIR:-/tmp}/gitstatus-install.tmp.$$"
+      mkdir -p -- "$tmpdir" || return
+    fi
+
     (
+      if [ -n "${ZSH_VERSION:-}" ]; then
+        builtin cd -q -- "$tmpdir" || exit
+      else
+        cd -- "$tmpdir" || exit
+      fi
+
       local fetch
       if command -v curl >/dev/null 2>&1; then
         fetch="command curl -fsSLo"
@@ -229,19 +246,26 @@ END
 
       local url1="https://github.com/romkatv/gitstatus/releases/download/$version/$file.tar.gz"
       local url2="https://gitee.com/romkatv/gitstatus/raw/release-$version/release/$file.tar.gz"
-      local tmp="$file".tmp.$$
 
-      if [ -n "${ZSH_VERSION:-}" ]; then
-        builtin cd -q -- "$cache_dir" || exit
-      else
-        cd -- "$cache_dir" || exit
-      fi
-
-      cleanup() {
-        local n
-        for n in "$@"; do
-          command rm -rf -- "$tmp"."$n".tar.gz "$tmp"."$n".status || return
-        done
+      check_sha256() {
+        local file="$1".tar.gz
+        local hash=
+        if command -v shasum >/dev/null 2>/dev/null; then
+          hash="$(command shasum -b -a 256 -- "$file")" || hash=
+          hash="${hash%% *}"
+        elif command -v sha256sum >/dev/null 2>/dev/null; then
+          hash="$(command sha256sum -b -- "$file")" || hash=
+          hash="${hash%% *}"
+        elif command -v sha256 >/dev/null 2>/dev/null; then
+          hash="$(command sha256 -- "$file" </dev/null)" || hash=
+          # Ignore sha256 output if it's from hashalot. It's incompatible.
+          if [ ${#hash} -lt 64 ]; then
+            hash=
+          else
+            hash="${hash##* }"
+          fi
+        fi
+        [ "$1" = 1 -a -z "$hash" -o "$hash" = "$sha256" ]
       }
 
       local sig='INT QUIT TERM ILL PIPE'
@@ -249,19 +273,17 @@ END
       fetch() {
         local trapped=
         trap 'trapped=1' $sig
-        # TODO: enable this after adding sha256 verification.
-        [ "$1" = 1 ] || return
         if [ "$1" != 1 ] && command -v sleep >/dev/null 2>/dev/null; then
           sleep "$1"
         fi
-        $fetch "$tmp"."$1".tar.gz -- "$2" 2>/dev/null &
+        $fetch "$1".tar.gz -- "$2" 2>/dev/null &
         local pid=$!
-        local die="trap - $sig; kill -- $pid 2>/dev/null; cleanup $1; exit 1"
+        local die="trap - $sig; kill -- $pid 2>/dev/null; exit 1"
         trap "$die" $sig
         [ -z "$trapped" ] || eval "$die"
-        wait -- "$pid" 2>/dev/null
+        wait -- "$pid" 2>/dev/null && check_sha256 "$1"
         local ret="$?"
-        echo -n >"$tmp"."$1".status
+        echo -n >"$1".status
         trap - $sig
         return "$ret"
       }
@@ -273,7 +295,7 @@ END
       fetch 2 "$url2" & 
       local pid2=$!
 
-      local die="trap - $sig; kill -- $pid1 $pid2 2>/dev/null; cleanup 1 2; exit 1"
+      local die="trap - $sig; kill -- $pid1 $pid2 2>/dev/null; exit 1"
       trap "$die" $sig
       [ -z "$trapped" ] || eval "$die"
 
@@ -285,7 +307,7 @@ END
         elif command -v true >/dev/null 2>/dev/null; then
           command true
         fi
-        if [ -n "$pid1" -a -e "$tmp".1.status ]; then
+        if [ -n "$pid1" -a -e 1.status ]; then
           wait -- "$pid1" 2>/dev/null
           local ret="$?"
           pid1=
@@ -296,7 +318,7 @@ END
           elif [ -z "$pid2" ]; then
             break
           fi
-        elif [ -n "$pid2" -a -e "$tmp".2.status ]; then
+        elif [ -n "$pid2" -a -e 2.status ]; then
           wait -- "$pid2" 2>/dev/null
           local ret="$?"
           pid2=
@@ -317,36 +339,28 @@ END
         >&2 echo ""
         >&2 echo "  1. $url1"
         >&2 echo "  2. $url2"
-        cleanup 1 2
         exit 1
       fi
 
-      local old=
-      if [ -e "$daemon" ]; then
-        local i=1
-        while :; do
-          old="$daemon"."$i"
-          [ -e "$old" ] || break
-          i="$((i+1))"
-        done
-        if ! command mv -f -- "$daemon" "$old"; then
-          cleanup 1 2
-          exit 1
-        fi
+      command tar -xzf "$n".tar.gz || exit
+
+      local tmpfile
+      if ! command -v mktemp >/dev/null 2>&1 ||
+         ! tmpfile="$(command mktemp "$cache_dir"/gitstatusd.XXXXXXXXXX)"; then
+        tmpfile="$cache_dir"/gitstatusd.tmp.$$
       fi
 
-      command tar -xzf "$tmp"."$n".tar.gz
-      local ret=$?
-      cleanup 1 2
-      if [ -n "$old" ]; then
-        if [ "$ret" = 0 ]; then
-          command rm -f -- "$old" 2>/dev/null
-        else
-          command mv -f -- "$old" "$daemon"
-        fi
-      fi
-      exit "$ret"
-    ) || return
+      command mv -f -- gitstatusd-* "$tmpfile" || exit
+      command mv -f -- "$tmpfile" "$cache_dir"/"$file" && exit
+      command rm -f -- "$cache_dir"/"$file"
+      command mv -f -- "$tmpfile" "$cache_dir"/"$file" && exit
+      command rm -f -- "$tmpfile"
+      exit 1
+    )
+
+    local ret=$?
+    command rm -rf -- "$tmpdir"
+    [ "$ret" = 0 ] || return
 
     [ $# = 0 ] || "$@" "$daemon" "$version" 1
     return

@@ -69,7 +69,7 @@ function gitstatus_start() {
     local gitstatus_plugin_dir="$PWD"
   fi
 
-  local req_fifo resp_fifo
+  local tmpdir req_fifo resp_fifo
 
   function gitstatus_start_impl() {
     local log_level="${GITSTATUS_LOG_LEVEL:-}"
@@ -104,20 +104,22 @@ function gitstatus_start() {
       --dirty-max-index-size="$max_dirty"
       $extra_flags)
 
+    tmpdir="$(mktemp -d "${TMPDIR:-/tmp}"/gitstatus.bash.$$.XXXXXXXXXX)" || return
+
     if [[ -n "$log_level" ]]; then
-      GITSTATUS_DAEMON_LOG=$(mktemp "${TMPDIR:-/tmp}"/gitstatus.$$.log.XXXXXXXXXX) || return
+      GITSTATUS_DAEMON_LOG="$tmpdir"/daemon.log
       [[ "$log_level" == INFO ]] || daemon_args+=(--log-level="$log_level")
     else
       GITSTATUS_DAEMON_LOG=/dev/null
     fi
 
-    req_fifo=$(mktemp -u "${TMPDIR:-/tmp}"/gitstatus.$$.pipe.req.XXXXXXXXXX)   || return
-    resp_fifo=$(mktemp -u "${TMPDIR:-/tmp}"/gitstatus.$$.pipe.resp.XXXXXXXXXX) || return
-    mkfifo "$req_fifo" "$resp_fifo"                                            || return
+    req_fifo="$tmpdir"/req.fifo
+    resp_fifo="$tmpdir"/resp.fifo
+    mkfifo -- "$req_fifo" "$resp_fifo" || return
 
     {
       (
-        trap '' INT
+        trap '' INT QUIT TSTP
         [[ "$GITSTATUS_DAEMON_LOG" == /dev/null ]] || set -x
         builtin cd /
 
@@ -142,7 +144,7 @@ function gitstatus_start() {
           [[ -n "$_gitstatus_bash_version" ]]         || return
           [[ "$_gitstatus_bash_downloaded" == [01] ]] || return
 
-          local sig=(QUIT TERM EXIT ILL PIPE)
+          local sig=(TERM ILL PIPE)
 
           if [[ -x "$_gitstatus_bash_daemon" ]]; then
             "$_gitstatus_bash_daemon" \
@@ -166,7 +168,7 @@ function gitstatus_start() {
           _gitstatus_bash_daemon=
           _gitstatus_bash_version=
           _gitstatus_bash_downloaded=
-          source "$gitstatus_plugin_dir"/install  || return
+          source "$gitstatus_plugin_dir"/install   || return
           [[ -n "$_gitstatus_bash_daemon" ]]       || return
           [[ -n "$_gitstatus_bash_version" ]]      || return
           [[ "$_gitstatus_bash_downloaded" == 1 ]] || return
@@ -180,13 +182,14 @@ function gitstatus_start() {
           echo -nE $'bye\x1f0\x1e' >&"$fd_out"
         ) & disown
       ) & disown
-    } 0</dev/null &>$GITSTATUS_DAEMON_LOG
+    } 0</dev/null &>"$GITSTATUS_DAEMON_LOG"
 
-    exec {_GITSTATUS_REQ_FD}>"$req_fifo" {_GITSTATUS_RESP_FD}<"$resp_fifo" || return
-    command rm "$req_fifo" "$resp_fifo"                                    || return
+    exec {_GITSTATUS_REQ_FD}>"$req_fifo" {_GITSTATUS_RESP_FD}<"$resp_fifo"   || return
+    command rm -f -- "$req_fifo" "$resp_fifo"                                || return
+    [[ "$GITSTATUS_DAEMON_LOG" != /dev/null ]] || command rmdir -- "$tmpdir" 2>/dev/null
 
     IFS='' read -r -u $_GITSTATUS_RESP_FD GITSTATUS_DAEMON_PID || return
-    [[ $GITSTATUS_DAEMON_PID == [1-9]* ]] || return
+    [[ "$GITSTATUS_DAEMON_PID" == [1-9]* ]] || return
 
     local reply
     echo -nE $'hello\x1f\x1e' >&$_GITSTATUS_REQ_FD                     || return
