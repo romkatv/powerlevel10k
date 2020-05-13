@@ -9,7 +9,7 @@ if [ -n "${ZSH_VERSION:-}" ]; then
   emulate sh -o err_exit -o no_unset
 fi
 
-usage="$(cat <<\END
+usage="$(command cat <<\END
 Usage: build [-m ARCH] [-c CPU] [-d CMD] [-i IMAGE] [-s] [-w]
 
 Options:
@@ -32,18 +32,18 @@ Options:
 END
 )"
 
-build="$(cat <<\END
-outdir="$(pwd)"
+build="$(command cat <<\END
+outdir="$(command pwd)"
 
 if command -v mktemp >/dev/null 2>&1; then
-  workdir="$(mktemp -d "${TMPDIR:-/tmp}"/gitstatus-build.XXXXXXXXXX)"
+  workdir="$(command mktemp -d "${TMPDIR:-/tmp}"/gitstatus-build.XXXXXXXXXX)"
 else
   workdir="${TMPDIR:-/tmp}/gitstatus-build.tmp.$$"
-  mkdir -- "$workdir"
+  command mkdir -- "$workdir"
 fi
 
 cd -- "$workdir"
-workdir="$(pwd)"
+workdir="$(command pwd)"
 
 narg() { echo $#; }
 
@@ -57,22 +57,22 @@ libgit2_tmp="$outdir"/deps/"$appname".libgit2.tmp
 
 cleanup() {
   cd /
-  rm -rf -- "$workdir" "$outdir"/usrbin/"$appname".tmp "$libgit2_tmp"
-  trap - INT QUIT TERM EXIT ILL PIPE
+  command rm -rf -- "$workdir" "$outdir"/usrbin/"$appname".tmp "$libgit2_tmp"
+  trap - INT QUIT TERM ILL PIPE
 }
-trap cleanup INT QUIT TERM EXIT ILL PIPE
+trap cleanup INT QUIT TERM ILL PIPE
 
 if [ -n "$gitstatus_install_tools" ]; then
   case "$gitstatus_kernel" in
     linux)
-      apk update
-      apk add binutils cmake gcc g++ git make musl-dev
+      command apk update
+      command apk add binutils cmake gcc g++ git make musl-dev perl-utils
     ;;
     freebsd)
-      pkg install -y cmake gmake binutils gcc git
+      command pkg install -y cmake gmake binutils gcc git perl5
     ;;
     netbsd)
-      pkgin -y install cmake gmake binutils git
+      command pkgin -y install cmake gmake binutils git
     ;;
     darwin)
       if ! command -v make >/dev/null 2>&1 || ! command -v gcc >/dev/null 2>&1; then
@@ -84,16 +84,16 @@ if [ -n "$gitstatus_install_tools" ]; then
         exit 1
       fi
       for formula in libiconv cmake git wget; do
-        if brew list "$formula" &>/dev/null; then
-          brew upgrade "$formula"
+        if command brew list "$formula" &>/dev/null; then
+          command brew upgrade "$formula"
         else
-          brew install "$formula"
+          command brew install "$formula"
         fi
       done
     ;;
     msys*|mingw*)
-      pacman -Syu --noconfirm
-      pacman -S --needed --noconfirm binutils cmake gcc git make
+      command pacman -Syu --noconfirm
+      command pacman -S --needed --noconfirm binutils cmake gcc git make perl
     ;;
     *)
       >&2 echo "[internal error] unhandled kernel: $gitstatus_kernel"
@@ -102,7 +102,9 @@ if [ -n "$gitstatus_install_tools" ]; then
   esac
 fi
 
-cpus="$(getconf _NPROCESSORS_ONLN)" || cpus="$(sysctl -n hw.ncpu)" || cpus=8
+cpus="$(command getconf _NPROCESSORS_ONLN 2>/dev/null)" ||
+  cpus="$(command sysctl -n hw.ncpu 2>/dev/null)" ||
+  cpus=8
 
 libgit2_cmake_flags=
 libgit2_cflags="-march=$gitstatus_cpu"
@@ -126,8 +128,8 @@ case "$gitstatus_kernel" in
     gitstatus_ldflags="$gitstatus_ldflags -static"
   ;;
   darwin)
-    mkdir -- "$workdir"/lib
-    ln -s -- /usr/local/opt/libiconv/lib/libiconv.a "$workdir"/lib
+    command mkdir -- "$workdir"/lib
+    command ln -s -- /usr/local/opt/libiconv/lib/libiconv.a "$workdir"/lib
     libgit2_cmake_flags="$libgit2_cmake_flags -DUSE_ICONV=ON"
     libgit2_cflags="$libgit2_cflags -I/usr/local/opt/libiconv/include"
     gitstatus_cxxflags="$gitstatus_cxxflags -I/usr/local/opt/libiconv/include"
@@ -146,7 +148,7 @@ case "$gitstatus_kernel" in
   ;;
 esac
 
-for cmd in cmake gcc g++ git ld "$gitstatus_make" wget; do
+for cmd in cat cmake gcc g++ git ld ln mkdir rm strip tar "$gitstatus_make"; do
   if ! command -v "$cmd" >/dev/null 2>&1; then
     if [ -n "$gitstatus_install_tools" ]; then
       >&2 echo "[internal error] $cmd not found"
@@ -159,45 +161,89 @@ for cmd in cmake gcc g++ git ld "$gitstatus_make" wget; do
 done
 
 . "$outdir"/build.info
-if [ -z "$libgit2_version" ]; then
+if [ -z "${libgit2_version:-}" ]; then
   >&2 echo "[internal error] libgit2_version not set"
+  exit 1
+fi
+if [ -z "${libgit2_sha256:-}" ]; then
+  >&2 echo "[internal error] libgit2_sha256 not set"
   exit 1
 fi
 libgit2_tarball="$outdir"/deps/libgit2-"$libgit2_version".tar.gz
 if [ ! -e "$libgit2_tarball" ]; then
   if [ -n "$gitstatus_download_deps" ]; then
+    if ! command -v wget >/dev/null 2>&1; then
+      if [ -n "$gitstatus_install_tools" ]; then
+        >&2 echo "[internal error] wget not found"
+        exit 1
+      else
+        >&2 echo "[error] command not found: wget"
+        exit 1
+      fi
+    fi
     libgit2_url=https://github.com/romkatv/libgit2/archive/"$libgit2_version".tar.gz
-    wget -O "$libgit2_tmp" -- "$libgit2_url"
-    mv -f -- "$libgit2_tmp" "$libgit2_tarball"
+    command wget -O "$libgit2_tmp" -- "$libgit2_url"
+    command mv -f -- "$libgit2_tmp" "$libgit2_tarball"
   else
     >&2 echo "[error] file not found: deps/libgit2-"$libgit2_version".tar.gz"
     exit 1
   fi
 fi
 
+libgit2_actual_sha256=
+if command -v shasum >/dev/null 2>/dev/null; then
+  libgit2_actual_sha256="$(command shasum -b -a 256 -- "$libgit2_tarball")"
+  libgit2_actual_sha256="${libgit2_actual_sha256%% *}"
+elif command -v sha256sum >/dev/null 2>/dev/null; then
+  libgit2_actual_sha256="$(command sha256sum -b -- "$libgit2_tarball")"
+  libgit2_actual_sha256="${libgit2_actual_sha256%% *}"
+elif command -v sha256 >/dev/null 2>/dev/null; then
+  libgit2_actual_sha256="$(command sha256 -- "$libgit2_tarball" </dev/null)"
+  # Ignore sha256 output if it's from hashalot. It's incompatible.
+  if [ ${#libgit2_actual_sha256} -lt 64 ]; then
+    libgit2_actual_sha256=
+  else
+    libgit2_actual_sha256="${libgit2_actual_sha256##* }"
+  fi
+fi
+
+if [ -z "$libgit2_actual_sha256" ]; then
+  >&2 echo "[error] command not found: shasum or sha256sum"
+  exit 1
+fi
+
+if [ "$libgit2_actual_sha256" != "$libgit2_sha256" ]; then
+  >&2 echo "[error] sha256 mismatch"
+  >&2 echo ""
+  >&2 echo "  file    : deps/libgit2-$libgit2_version.tar.gz"
+  >&2 echo "  expected: $libgit2_sha256"
+  >&2 echo "  actual  : $libgit2_actual_sha256"
+  exit 1
+fi
+
 cd -- "$workdir"
-tar -xzf "$libgit2_tarball"
-mv -- libgit2-"$libgit2_version" libgit2
-mkdir libgit2/build
+command tar -xzf "$libgit2_tarball"
+command mv -- libgit2-"$libgit2_version" libgit2
+command mkdir libgit2/build
 cd libgit2/build
 
-CFLAGS="$libgit2_cflags" cmake     \
-  -DCMAKE_BUILD_TYPE=Release       \
-  -DZERO_NSEC=ON                   \
-  -DTHREADSAFE=ON                  \
-  -DUSE_BUNDLED_ZLIB=ON            \
-  -DREGEX_BACKEND=builtin          \
-  -DUSE_HTTP_PARSER=builtin        \
-  -DUSE_SSH=OFF                    \
-  -DUSE_HTTPS=OFF                  \
-  -DBUILD_CLAR=OFF                 \
-  -DUSE_GSSAPI=OFF                 \
-  -DUSE_NTLMCLIENT=OFF             \
-  -DBUILD_SHARED_LIBS=OFF          \
-  -DENABLE_REPRODUCIBLE_BUILDS=OFF \
-  $libgit2_cmake_flags             \
+CFLAGS="$libgit2_cflags" command cmake \
+  -DCMAKE_BUILD_TYPE=Release           \
+  -DZERO_NSEC=ON                       \
+  -DTHREADSAFE=ON                      \
+  -DUSE_BUNDLED_ZLIB=ON                \
+  -DREGEX_BACKEND=builtin              \
+  -DUSE_HTTP_PARSER=builtin            \
+  -DUSE_SSH=OFF                        \
+  -DUSE_HTTPS=OFF                      \
+  -DBUILD_CLAR=OFF                     \
+  -DUSE_GSSAPI=OFF                     \
+  -DUSE_NTLMCLIENT=OFF                 \
+  -DBUILD_SHARED_LIBS=OFF              \
+  -DENABLE_REPRODUCIBLE_BUILDS=OFF     \
+  $libgit2_cmake_flags                 \
   ..
-make -j "$cpus" VERBOSE=1
+command make -j "$cpus" VERBOSE=1
 
 APPNAME="$appname".tmp           \
   OBJDIR="$workdir"/gitstatus    \
@@ -205,16 +251,16 @@ APPNAME="$appname".tmp           \
   CXXFLAGS="$gitstatus_cxxflags" \
   LDFLAGS="$gitstatus_ldflags"   \
   LDLIBS="$gitstatus_ldlibs"     \
-  "$gitstatus_make" -C "$outdir" -j "$cpus"
+  command "$gitstatus_make" -C "$outdir" -j "$cpus"
 
 app="$outdir"/usrbin/"$appname"
 
-strip "$app".tmp
+command strip "$app".tmp
 
-mkdir -- "$workdir"/repo
-git -C "$workdir"/repo init --
-git -C "$workdir"/repo config user.email "you@example.com"
-git -C "$workdir"/repo commit --allow-empty --allow-empty-message -m ''
+command mkdir -- "$workdir"/repo
+command git -C "$workdir"/repo init --
+command git -C "$workdir"/repo config user.email "you@example.com"
+command git -C "$workdir"/repo commit --allow-empty --allow-empty-message -m ''
 
 resp="$(printf "hello\037$workdir/repo\036" | "$app".tmp)"
 [ -n "$resp" -a -z "${resp##hello*1*$workdir/repo*master*}" ]
@@ -222,11 +268,11 @@ resp="$(printf "hello\037$workdir/repo\036" | "$app".tmp)"
 resp="$(printf 'hello\037\036' | "$app".tmp)"
 [ -n "$resp" -a -z "${resp##hello*0*}" ]
 
-mv -f -- "$app".tmp "$app"
+command mv -f -- "$app".tmp "$app"
 
 cleanup
 
-cat >&2 <<-END
+command cat >&2 <<-END
 	-------------------------------------------------
 	SUCCESS: created usrbin/$appname
 	END

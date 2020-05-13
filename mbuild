@@ -46,7 +46,7 @@
 #     ps> C:\msys64\autorebase.bat
 # - Install 64-bit and 32-bit cygwin: https://cygwin.com/install.html.
 #   - Choose to install 32-bit to c:/cygwin32 instead of the default c:/cygwin.
-#   - Select these packages: binutils, cmake, gcc-core, gcc-g++, git, make, wget.
+#   - Select these packages: binutils, cmake, gcc-core, gcc-g++, git, make, perl, wget.
 #
 # IMPORTANT: Install msys2 and cygwin one at a time.
 #
