@@ -1123,7 +1123,7 @@ new versions are released.*
 
 ```zsh
 # Download and extract Powerlevel10k tarball.
-powerlevel10k_version=1.8.2  # IMPORTANT: CHANGE VERSION TO WHAT YOU WANT
+powerlevel10k_version=1.9.0  # IMPORTANT: CHANGE VERSION TO WHAT YOU WANT
 wget https://github.com/romkatv/powerlevel10k/archive/v"$powerlevel10k_version".tar.gz
 tar -xzf v"$powerlevel10k_version".tar.gz
 cd powerlevel10k-"$powerlevel10k_version"
@@ -1152,7 +1152,7 @@ download the libgit2 tarball manually and invoke `./gitstatus/build` without `-w
 
 ```zsh
 # Download and extract Powerlevel10k tarball.
-powerlevel10k_version=1.8.2  # IMPORTANT: CHANGE VERSION TO WHAT YOU WANT
+powerlevel10k_version=1.9.0  # IMPORTANT: CHANGE VERSION TO WHAT YOU WANT
 wget https://github.com/romkatv/powerlevel10k/archive/v"$powerlevel10k_version".tar.gz
 tar -xzf v"$powerlevel10k_version".tar.gz
 cd powerlevel10k-"$powerlevel10k_version"
