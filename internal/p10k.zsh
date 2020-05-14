@@ -5577,7 +5577,7 @@ _p9k_set_instant_prompt() {
   [[ -n $RPROMPT ]] || unset RPROMPT
 }
 
-typeset -gri __p9k_instant_prompt_version=22
+typeset -gri __p9k_instant_prompt_version=23
 
 _p9k_dump_instant_prompt() {
   local user=${(%):-%n}
@@ -5879,7 +5879,9 @@ _p9k_dump_instant_prompt() {
           echo -nE - "${(%):-%b%k%f%s%u$mark${(pl.$fill.. .)}$cr%b%k%f%s%u%E}"
         fi
         zmodload -F zsh/files b:zf_rm
-        zf_rm -f -- $__p9k_instant_prompt_output ${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh{,.zwc} 2>/dev/null
+        local user=${(%):-%n}
+        local root_dir=${__p9k_instant_prompt_dump_file:h}
+        zf_rm -f -- $__p9k_instant_prompt_output $__p9k_instant_prompt_dump_file{,.zwc} $root_dir/p10k-instant-prompt-$user.zsh{,.zwc} $root_dir/p10k-$user/prompt-*(N) 2>/dev/null
       }
       setopt no_local_options prompt_cr prompt_sp
     }
@@ -6024,6 +6026,7 @@ function _p9k_restore_state() {
         (( $+functions[gitstatus_stop_p9k_] )) && gitstatus_stop_p9k_ POWERLEVEL9K
       fi
       _p9k_delete_instant_prompt
+      zf_rm -f -- $__p9k_dump_file{,.zwc} 2>/dev/null
     fi
   }
 }
@@ -6345,6 +6348,7 @@ _p9k_precmd_impl() {
             ;;
             2)
               _p9k_delete_instant_prompt
+              zf_rm -f -- $__p9k_dump_file{,.zwc} 2>/dev/null
               instant_prompt_disabled=1
             ;;
           esac
@@ -7984,6 +7988,7 @@ _p9k_init() {
   if (( _POWERLEVEL9K_DISABLE_INSTANT_PROMPT )); then
     unset __p9k_instant_prompt_erased
     _p9k_delete_instant_prompt
+    _p9k_dumped_instant_prompt_sigs=()
   fi
 
   if (( $+__p9k_instant_prompt_erased )); then
@@ -8422,11 +8427,14 @@ zmodload -F zsh/net/socket b:zsocket
 zmodload -F zsh/files b:zf_mv b:zf_rm
 
 if [[ $__p9k_dump_file != $__p9k_instant_prompt_dump_file && -n $__p9k_instant_prompt_dump_file ]]; then
-  zf_rm -f -- $__p9k_instant_prompt_dump_file 2>/dev/null
+  _p9k_delete_instant_prompt
+  zf_rm -f -- $__p9k_dump_file{,.zwc} 2>/dev/null
+  zf_rm -f -- $__p9k_instant_prompt_dump_file{,.zwc} 2>/dev/null
 fi
 
 if [[ $+__p9k_instant_prompt_sourced == 1 && $__p9k_instant_prompt_sourced != $__p9k_instant_prompt_version ]]; then
   _p9k_delete_instant_prompt
+  zf_rm -f -- $__p9k_dump_file{,.zwc} 2>/dev/null
 fi
 
 _p9k_init_ssh
