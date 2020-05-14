@@ -710,16 +710,16 @@ function ask_lock() {
 }
 
 function ask_python() {
-  add_widget 0 add_widget 0 flowing -c %BDoes this look like a "%b%2FPython logo%f%B?%b"
-  add_widget 0 add_widget 0 flowing -c reference: "$(href https://fontawesome.com/icons/python)"
-  add_widget 0 add_widget 0 print -P ""
-  add_widget 0 add_widget 0 flowing -c -- "--->  \uE63C  <---"
-  add_widget 0 add_widget 0 print -P ""
-  add_widget 0 add_widget 0 print -P "%B(y)  Yes.%b"
-  add_widget 0 add_widget 0 print -P ""
-  add_widget 0 add_widget 0 print -P "%B(n)  No.%b"
-  add_widget 0 add_widget 0 print -P ""
-  add_widget 0 add_widget 0 print -P "(r)  Restart from the beginning."
+  add_widget 0 flowing -c %BDoes this look like a "%b%2FPython logo%f%B?%b"
+  add_widget 0 flowing -c reference: "$(href https://fontawesome.com/icons/python)"
+  add_widget 0 print -P ""
+  add_widget 0 flowing -c -- "--->  \uE63C  <---"
+  add_widget 0 print -P ""
+  add_widget 0 print -P "%B(y)  Yes.%b"
+  add_widget 0 print -P ""
+  add_widget 0 print -P "%B(n)  No.%b"
+  add_widget 0 print -P ""
+  add_widget 0 print -P "(r)  Restart from the beginning."
   ask ynr
   case $choice in
     r) return 1;;
