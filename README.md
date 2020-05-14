@@ -788,7 +788,7 @@ When using Lean, Classic or Rainbow style, `~/.p10k.zsh` contains the following 
 ```zsh
 # Don't show Git status in prompt for repositories whose workdir matches this pattern.
 # For example, if set to '~', the Git repository at $HOME/.git will be ignored.
-# Multiple patterns can be combined with '|': '~|~/some/dir'.
+# Multiple patterns can be combined with '|': '~(|/foo)|/bar/baz/*'.
 typeset -g POWERLEVEL9K_VCS_DISABLED_WORKDIR_PATTERN='~'
 ```
 
