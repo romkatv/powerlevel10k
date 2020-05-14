@@ -23,6 +23,8 @@ else
   function restore_screen() {}
 fi
 
+local -i success=0
+
 {  # always
 
 local -ri force
@@ -234,7 +236,10 @@ function show_cursor() {
 
 function consume_input() {
   local key
-  while read -t0 key; do true; done
+  while true; do
+    [[ -t 2 ]]
+    read -t0 -k key || break
+  done 2>/dev/null
 }
 
 function quit() {
@@ -271,6 +276,7 @@ function quit() {
     print -P "  %2Fp10k%f %Bconfigure%b"
     print -P ""
   fi
+  function quit() {}
   exit 1
 }
 
@@ -2051,7 +2057,10 @@ print -rP ""
 flowing +c File feature requests and bug reports at "$(href https://github.com/romkatv/powerlevel10k/issues)"
 print -rP ""
 
+success=1
+
 } always {
+  (( success )) || quit
   consume_input
   stty echo 2>/dev/null
   show_cursor
