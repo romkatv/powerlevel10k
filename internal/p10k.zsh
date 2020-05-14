@@ -6333,25 +6333,34 @@ _p9k_precmd_impl() {
         __p9k_configured=1
         if [[ -z "${parameters[(I)POWERLEVEL9K_*~(POWERLEVEL9K_MODE|POWERLEVEL9K_CONFIG_FILE)]}" ]]; then
           _p9k_can_configure -q
-          case $? in
-            0)
-              (
-                source "$__p9k_root_dir"/internal/wizard.zsh
-              )
-              if (( $? )); then
-                instant_prompt_disabled=1
-              else
-                source "$__p9k_cfg_path"
-                _p9k__force_must_init=1
-                _p9k_must_init
-              fi
-            ;;
-            2)
-              _p9k_delete_instant_prompt
-              zf_rm -f -- $__p9k_dump_file{,.zwc} 2>/dev/null
+          local -i ret=$?
+          if (( ret == 2 && $+__p9k_instant_prompt_active )); then
+            _p9k_clear_instant_prompt
+            unset __p9k_instant_prompt_active
+            _p9k_delete_instant_prompt
+            zf_rm -f -- $__p9k_dump_file{,.zwc} 2>/dev/null
+            () {
+              local key
+              while true; do
+                [[ -t 2 ]]
+                read -t0 -k key || break
+              done 2>/dev/null
+            }
+            _p9k_can_configure -q
+            ret=$?
+          fi
+          if (( ret == 0 )); then
+            (
+              source "$__p9k_root_dir"/internal/wizard.zsh
+            )
+            if (( $? )); then
               instant_prompt_disabled=1
-            ;;
-          esac
+            else
+              source "$__p9k_cfg_path"
+              _p9k__force_must_init=1
+              _p9k_must_init
+            fi
+          fi
         fi
       fi
       _p9k_init
@@ -7985,7 +7994,7 @@ _p9k_init() {
 
   _p9k_init_vcs
 
-  if (( _POWERLEVEL9K_DISABLE_INSTANT_PROMPT )); then
+  if (( _p9k__instant_prompt_disabled )); then
     unset __p9k_instant_prompt_erased
     _p9k_delete_instant_prompt
     _p9k_dumped_instant_prompt_sigs=()
