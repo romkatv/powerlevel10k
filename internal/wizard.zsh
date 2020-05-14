@@ -310,7 +310,6 @@ functions -M get_columns 0 0
 function render_screen() {
   {
     hide_cursor
-    stty -echo 2>/dev/null
     while true; do
       while true; do
         typeset -gi wizard_columns='get_columns()'
@@ -362,7 +361,6 @@ function render_screen() {
       done
     done
   } always {
-    stty echo 2>/dev/null
     show_cursor
   }
 }
@@ -1918,6 +1916,8 @@ if is-at-least 5.7.1 && [[ $COLORTERM == (24bit|truecolor) ]]; then
 else
   local -ir has_truecolor=0
 fi
+
+stty -echo 2>/dev/null
 
 while true; do
   local instant_prompt=verbose zshrc_content= zshrc_backup= zshrc_backup_u=
