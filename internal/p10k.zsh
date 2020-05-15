@@ -5577,7 +5577,7 @@ _p9k_set_instant_prompt() {
   [[ -n $RPROMPT ]] || unset RPROMPT
 }
 
-typeset -gri __p9k_instant_prompt_version=23
+typeset -gri __p9k_instant_prompt_version=24
 
 _p9k_dump_instant_prompt() {
   local user=${(%):-%n}
@@ -5629,7 +5629,7 @@ _p9k_dump_instant_prompt() {
     __p9k_instant_prompt_sourced=0
     return 1
   fi
-  zmodload zsh/langinfo
+  zmodload zsh/langinfo zsh/terminfo zsh/system || return
   if [[ $langinfo[CODESET] != (utf|UTF)(-|)8 ]]; then
     local loc_cmd=$commands[locale]
     [[ -z $loc_cmd ]] && loc_cmd='${(q)commands[locale]}'
@@ -5641,7 +5641,6 @@ _p9k_dump_instant_prompt() {
       fi
     fi
   fi
-  zmodload zsh/terminfo
   (( $+terminfo[cuu] && $+terminfo[cuf] && $+terminfo[ed] && $+terminfo[sc] && $+terminfo[rc] )) || return
   local pwd=${(%):-%/}
   local prompt_file=$prompt_dir/prompt-${#pwd}
@@ -5657,8 +5656,8 @@ _p9k_dump_instant_prompt() {
       else
         >&$fd print -r -- '
     typeset -gx P9K_TTY=old
-    zmodload -F zsh/stat b:zstat
-    zmodload zsh/datetime
+    zmodload -F zsh/stat b:zstat || return
+    zmodload zsh/datetime || return
     local -a stat
     if zstat -A stat +ctime -- $TTY 2>/dev/null &&
       (( EPOCHREALTIME - stat[1] < '$_POWERLEVEL9K_NEW_TTY_MAX_AGE_SECONDS' )); then
@@ -5784,11 +5783,10 @@ _p9k_dump_instant_prompt() {
         fi
         >&$fd print -r -- '
   if (( LINES == '$bad_lines' && COLUMNS == '$bad_columns' )); then
-    zmodload -F zsh/stat b:zstat
-    zmodload zsh/datetime
+    zmodload -F zsh/stat b:zstat || return
+    zmodload zsh/datetime || return
     local -a tty_ctime
     if ! zstat -A tty_ctime +ctime -- $TTY 2>/dev/null || (( tty_ctime[1] + 2 > EPOCHREALTIME )); then
-      zmodload zsh/datetime
       local -F deadline=$((EPOCHREALTIME+0.025))
       local tty_size
       while true; do
@@ -5854,8 +5852,10 @@ _p9k_dump_instant_prompt() {
   typeset -g __p9k_instant_prompt_output=${TMPDIR:-/tmp}/p10k-instant-prompt-output-${(%):-%n}-$$
   { echo -n > $__p9k_instant_prompt_output } || return
   print -rn -- "$out" || return
-  exec {__p9k_fd_0}<&0 {__p9k_fd_1}>&1 {__p9k_fd_2}>&2 0</dev/null 1>$__p9k_instant_prompt_output
-  exec 2>&1
+  local fd_null
+  sysopen -ru fd_null /dev/null || return
+  exec {__p9k_fd_0}<&0 {__p9k_fd_1}>&1 {__p9k_fd_2}>&2 0<&$fd_null 1>$__p9k_instant_prompt_output
+  exec 2>&1 {fd_null}>&-
   typeset -gi __p9k_instant_prompt_active=1
   typeset -g __p9k_instant_prompt_dump_file=${XDG_CACHE_HOME:-~/.cache}/p10k-dump-${(%):-%n}.zsh
   if source $__p9k_instant_prompt_dump_file 2>/dev/null && (( $+functions[_p9k_preinit] )); then
@@ -5878,7 +5878,7 @@ _p9k_dump_instant_prompt() {
           local -i fill=$((COLUMNS > _p9k__ret ? COLUMNS - _p9k__ret : 0))
           echo -nE - "${(%):-%b%k%f%s%u$mark${(pl.$fill.. .)}$cr%b%k%f%s%u%E}"
         fi
-        zmodload -F zsh/files b:zf_rm
+        zmodload -F zsh/files b:zf_rm || return
         local user=${(%):-%n}
         local root_dir=${__p9k_instant_prompt_dump_file:h}
         zf_rm -f -- $__p9k_instant_prompt_output $__p9k_instant_prompt_dump_file{,.zwc} $root_dir/p10k-instant-prompt-$user.zsh{,.zwc} $root_dir/p10k-$user/prompt-*(N) 2>/dev/null
@@ -6212,7 +6212,7 @@ function _p9k_on_expand() {
 
   if (( ! _p9k__expanded )); then
     if _p9k_should_dump; then
-      exec {_p9k__state_dump_fd}</dev/null
+      sysopen -o cloexec -ru _p9k__state_dump_fd /dev/null
       zle -F $_p9k__state_dump_fd _p9k_do_dump
     fi
 
@@ -7143,7 +7143,7 @@ function _p9k_on_widget_zle-line-finish() {
     if [[ $1 == int ]]; then
       _p9k__must_restore_prompt=1
       if (( !_p9k__restore_prompt_fd )); then
-        exec {_p9k__restore_prompt_fd}</dev/null
+        sysopen -o cloexec -ru _p9k__restore_prompt_fd /dev/null
         zle -F $_p9k__restore_prompt_fd _p9k_restore_prompt
       fi
     fi
