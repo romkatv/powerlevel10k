@@ -17,8 +17,8 @@ Options:
   -m ARCH   `uname -m` from the target machine; defaults to `uname -m`
             from the local machine
   -c CPU    generate machine instructions for CPU of this type; this
-            value gets passed as `-march` to gcc; inferred from ARCH
-            if not set explicitly
+            value gets passed as `-march` (or `-mcpu` for ppc64le) to gcc;
+            inferred from ARCH if not set explicitly
   -d CMD    build in a Docker container and use CMD as the `docker`
             command; e.g., `-d docker` or `-d podman`
   -i IMAGE  build in this Docker image; inferred from ARCH if not set
@@ -106,11 +106,20 @@ cpus="$(command getconf _NPROCESSORS_ONLN 2>/dev/null)" ||
   cpus="$(command sysctl -n hw.ncpu 2>/dev/null)" ||
   cpus=8
 
+case "$gitstatus_cpu" in
+  ppc64le)
+    archflag="-mcpu"
+  ;;
+  *)
+    archflag="-march"
+  ;;
+esac
+
 libgit2_cmake_flags=
-libgit2_cflags="-march=$gitstatus_cpu"
+libgit2_cflags="$archflag=$gitstatus_cpu"
 
 gitstatus_cxx=g++
-gitstatus_cxxflags="-I${workdir}/libgit2/include -DGITSTATUS_ZERO_NSEC -D_GNU_SOURCE -march=$gitstatus_cpu"
+gitstatus_cxxflags="-I${workdir}/libgit2/include -DGITSTATUS_ZERO_NSEC -D_GNU_SOURCE $archflag=$gitstatus_cpu"
 gitstatus_ldflags="-L${workdir}/libgit2/build"
 gitstatus_ldlibs=
 gitstatus_make=make
@@ -377,6 +386,8 @@ if [ -z "$gitstatus_cpu" ]; then
     armv6l)         gitstatus_cpu=armv6;;
     armv7l)         gitstatus_cpu=armv7;;
     aarch64)        gitstatus_cpu=armv8-a;;
+    ppc64le)        gitstatus_cpu=powerpc64le;;
+    riscv64)        gitstatus_cpu=rv64imafdc;;
     x86_64|amd64)   gitstatus_cpu=x86-64;;
     i386|i586|i686) gitstatus_cpu="$gitstatus_arch";;
     *)
@@ -411,6 +422,7 @@ case "$gitstatus_kernel" in
           armv6l)         docker_image=arm32v6/alpine:3.11.6;;
           armv7l)         docker_image=arm32v7/alpine:3.11.6;;
           aarch64)        docker_image=arm64v8/alpine:3.11.6;;
+          ppc64le)        docker_image=ppc64le/alpine:3.11.6;;
           *)
             >&2 echo '[error] unable to infer docker image'
             >&2 echo 'Please specify explicitly with `-i IMAGE`.'
