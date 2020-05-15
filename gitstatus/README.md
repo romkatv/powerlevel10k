@@ -35,6 +35,16 @@ git clone --depth=1 https://github.com/romkatv/gitstatus.git ~/gitstatus
 echo 'source ~/gitstatus/gitstatus.prompt.zsh' >>! ~/.zshrc
 ```
 
+Alternatively, on macOS you can install with Homebrew:
+
+```zsh
+brew install romkatv/gitstatus/gitstatus
+echo 'source /usr/local/opt/gitstatus/gitstatus.prompt.zsh' >>! ~/.zshrc
+```
+
+(If you choose this option, replace `~/gitstatus` with `/usr/local/opt/gitstatus` in all code
+snippets below.)
+
 _Make sure to disable your current theme if you have one._
 
 This will give you a basic yet functional prompt with git status in it. It's
@@ -117,6 +127,16 @@ The easiest way to take advantage of gitstatus from Bash is via
 git clone --depth=1 https://github.com/romkatv/gitstatus.git ~/gitstatus
 echo 'source ~/gitstatus/gitstatus.prompt.sh' >> ~/.bashrc
 ```
+
+Alternatively, on macOS you can install with Homebrew:
+
+```zsh
+brew install romkatv/gitstatus/gitstatus
+echo 'source /usr/local/opt/gitstatus/gitstatus.prompt.sh' >> ~/.bashrc
+```
+
+(If you choose this option, replace `~/gitstatus` with `/usr/local/opt/gitstatus` in all code
+snippets below.)
 
 This will give you a basic yet functional prompt with git status in it. It's
 [over 10x faster](#benchmarks) than any alternative that can give you comparable prompt.
@@ -479,7 +499,7 @@ new versions are released.*
 
 ```zsh
 # Download and extract gitstatus tarball.
-gitstatus_version=1.0.0  # IMPORTANT: CHANGE VERSION TO WHAT YOU WANT
+gitstatus_version=1.1.0  # IMPORTANT: CHANGE VERSION TO WHAT YOU WANT
 wget https://github.com/romkatv/gitstatus/archive/v"$gitstatus_version".tar.gz
 tar -xzf v"$gitstatus_version".tar.gz
 cd gitstatus-"$gitstatus_version"
@@ -508,7 +528,7 @@ libgit2 tarball manually and invoke `./build` without `-w`.
 
 ```zsh
 # Download and extract gitstatus tarball.
-gitstatus_version=1.0.0  # IMPORTANT: CHANGE VERSION TO WHAT YOU WANT
+gitstatus_version=1.1.0  # IMPORTANT: CHANGE VERSION TO WHAT YOU WANT
 wget https://github.com/romkatv/gitstatus/archive/v"$gitstatus_version".tar.gz
 tar -xzf v"$gitstatus_version".tar.gz
 cd gitstatus-"$gitstatus_version"
