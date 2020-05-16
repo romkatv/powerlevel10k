@@ -351,6 +351,13 @@ git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ~/powerlevel10k
 echo 'source ~/powerlevel10k/powerlevel10k.zsh-theme' >>! ~/.zshrc
 ```
 
+Users in mainland China can use the official mirror on gitee.com for faster download.
+
+```zsh
+git clone --depth=1 https://gitee.com/romkatv/powerlevel10k.git ~/powerlevel10k
+echo 'source ~/powerlevel10k/powerlevel10k.zsh-theme' >>! ~/.zshrc
+```
+
 This is the simplest kind of installation and it works even if you are using a plugin manager. Just
 make sure to disable the current theme in your plugin manager. See
 [troubleshooting](#cannot-make-powerlevel10k-work-with-my-plugin-manager) for help.
@@ -359,6 +366,12 @@ make sure to disable the current theme in your plugin manager. See
 
 ```zsh
 git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/themes/powerlevel10k
+```
+
+Users in mainland China can use the official mirror on gitee.com for faster download.
+
+```zsh
+git clone --depth=1 https://gitee.com/romkatv/powerlevel10k.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/themes/powerlevel10k
 ```
 
 Set `ZSH_THEME="powerlevel10k/powerlevel10k"` in `~/.zshrc`.
