@@ -1507,18 +1507,20 @@ This method of installation won't make anything slower or otherwise sub-par.
 
 ### Directory is difficult to see in prompt when using Rainbow style
 
-In Classic style the current working directory is shown with bright white white text on blue
-background. The white is fixed and always looks the same but the appearance of "blue" is defined
-by your terminal color palette. If it's very light, it's difficult to see white text on it.
+In Rainbow style the current working directory is shown with bright white text on blue background.
+The white is fixed and always looks the same but the appearance of "blue" is defined by your
+terminal color palette. If it's very light, it may be difficult to see white text on it.
 
 There are several ways to fix this.
 
 - Type `p10k configure` and choose a more readable prompt style.
 - [Change terminal color palette](#change-the-color-palette-used-by-your-terminal). Try Tango Dark
   or Solarized Dark, or change just the "blue" color.
-- [Change directory background color](#set-colors-through-Powerlevel10k-configuration-parameters).
-  The parameter you are looking for is called `POWERLEVEL9K_DIR_BACKGROUND`. You can find it in
-  in `~/.p10k.zsh`. Uncomment it if it's commented out and try different values.
+- [Change directory background and/or foreground color](#set-colors-through-Powerlevel10k-configuration-parameters).
+  The parameters you are looking for are called `POWERLEVEL9K_DIR_BACKGROUND`,
+  `POWERLEVEL9K_DIR_FOREGROUND`, `POWERLEVEL9K_DIR_SHORTENED_FOREGROUND`,
+  `POWERLEVEL9K_DIR_ANCHOR_FOREGROUND` and `POWERLEVEL9K_DIR_ANCHOR_BOLD`. You can find them in
+  in `~/.p10k.zsh`.
 
 ### Horrific mess when resizing terminal window
 
