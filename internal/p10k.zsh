@@ -4369,7 +4369,7 @@ _p9k_gcloud_prefetch() {
   P9K_GCLOUD_CONFIGURATION=$_p9k__ret
   if ! _p9k_cache_stat_get $0 ~/.config/gcloud/configurations/config_$P9K_GCLOUD_CONFIGURATION; then
     local pair account project_id
-    pair="$(gcloud config configurations list --configuration=$P9K_GCLOUD_CONFIGURATION \
+    pair="$(gcloud config configurations describe $P9K_GCLOUD_CONFIGURATION \
       --format=$'value[separator="\1"](properties.core.account,properties.core.project)')"
     (( ! $? )) && IFS=$'\1' read account project_id <<<$pair
     _p9k_cache_stat_set "$account" "$project_id"
@@ -7625,7 +7625,7 @@ _p9k_must_init() {
     [[ $sig == $_p9k__param_sig ]] && return 1
     _p9k_deinit
   fi
-  _p9k__param_pat=$'v85\1'${ZSH_VERSION}$'\1'${ZSH_PATCHLEVEL}$'\1'
+  _p9k__param_pat=$'v86\1'${ZSH_VERSION}$'\1'${ZSH_PATCHLEVEL}$'\1'
   _p9k__param_pat+=$'${#parameters[(I)POWERLEVEL9K_*]}\1${(%):-%n%#}\1$GITSTATUS_LOG_LEVEL\1'
   _p9k__param_pat+=$'$GITSTATUS_ENABLE_LOGGING\1$GITSTATUS_DAEMON\1$GITSTATUS_NUM_THREADS\1'
   _p9k__param_pat+=$'$GITSTATUS_CACHE_DIR\1\1${ZLE_RPROMPT_INDENT:-1}\1$__p9k_ksh_arrays\1'
