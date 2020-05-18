@@ -225,3 +225,12 @@ user=0.17s system=0.00s cpu=99% total=0.175
 ---
 
 Add the equivalent of `P9K_PYTHON_VERSION` to all `*env` segments where it makes sense.
+
+---
+
+Define `P9K_ICON` on initialization. Fill it with `$icon`. Duplicate every key that ends in `_ICON`.
+Respect `POWERLEVEL9K_VCS_STASH_ICON` overrides but not anything with segment name or state.
+
+Define `POWERLEVEL9K_VCS_*` parameters in config templates for all symbols used in
+`my_git_formatter`. Add missing entries to `icons`. Use `$P9K_ICON[...]` within `my_git_formatter`.
+Add a screen to the wizard to choose between clear and circled icons.
