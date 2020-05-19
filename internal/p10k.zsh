@@ -5581,7 +5581,7 @@ _p9k_set_instant_prompt() {
   [[ -n $RPROMPT ]] || unset RPROMPT
 }
 
-typeset -gri __p9k_instant_prompt_version=24
+typeset -gri __p9k_instant_prompt_version=25
 
 _p9k_dump_instant_prompt() {
   local user=${(%):-%n}
@@ -5654,7 +5654,7 @@ _p9k_dump_instant_prompt() {
   local tail=${content##*$rs$key$us}
   [[ ${#tail} != ${#content} ]] || return
   local P9K_PROMPT=instant
-  if (( ! $+P9K_TTY )); then'
+  if [[ $P9K_TTY != old ]]; then'
       if (( _POWERLEVEL9K_NEW_TTY_MAX_AGE_SECONDS < 0 )); then
         >&$fd print -r -- '    typeset -gx P9K_TTY=new'
       else
