@@ -1,4 +1,4 @@
-if [[ $__p9k_sourced != 11 ]]; then
+if [[ $__p9k_sourced != 12 ]]; then
   >&2 print -P ""
   >&2 print -P "[%F{1}ERROR%f]: Corrupted powerlevel10k installation."
   >&2 print -P ""
@@ -7882,7 +7882,16 @@ _p9k_init_vcs() {
   _p9k_segment_in_use vcs || return
   _p9k_vcs_info_init
   if (( $+functions[_p9k_preinit] )); then
-    (( $+GITSTATUS_DAEMON_PID_POWERLEVEL9K )) && gitstatus_start_p9k_ POWERLEVEL9K
+    if (( $+GITSTATUS_DAEMON_PID_POWERLEVEL9K )); then
+      () {
+        trap 'return 130' INT
+        {
+          gitstatus_start_p9k_ POWERLEVEL9K
+        } always {
+          trap ':' INT
+        }
+      }
+    fi
     return 0
   fi
   (( _POWERLEVEL9K_DISABLE_GITSTATUS )) && return
@@ -7910,14 +7919,21 @@ _p9k_init_vcs() {
           -a POWERLEVEL9K
   }"
   source $gitstatus_dir/gitstatus.plugin.zsh _p9k_ || return
-  gitstatus_start_p9k_                                    \
-    -s $_POWERLEVEL9K_VCS_STAGED_MAX_NUM                  \
-    -u $_POWERLEVEL9K_VCS_UNSTAGED_MAX_NUM                \
-    -d $_POWERLEVEL9K_VCS_UNTRACKED_MAX_NUM               \
-    -c $_POWERLEVEL9K_VCS_CONFLICTED_MAX_NUM              \
-    -m $_POWERLEVEL9K_VCS_MAX_INDEX_SIZE_DIRTY            \
-    ${${_POWERLEVEL9K_VCS_RECURSE_UNTRACKED_DIRS:#0}:+-e} \
-    POWERLEVEL9K
+  () {
+    trap 'return 130' INT
+    {
+      gitstatus_start_p9k_                                    \
+        -s $_POWERLEVEL9K_VCS_STAGED_MAX_NUM                  \
+        -u $_POWERLEVEL9K_VCS_UNSTAGED_MAX_NUM                \
+        -d $_POWERLEVEL9K_VCS_UNTRACKED_MAX_NUM               \
+        -c $_POWERLEVEL9K_VCS_CONFLICTED_MAX_NUM              \
+        -m $_POWERLEVEL9K_VCS_MAX_INDEX_SIZE_DIRTY            \
+        ${${_POWERLEVEL9K_VCS_RECURSE_UNTRACKED_DIRS:#0}:+-e} \
+        POWERLEVEL9K
+    } always {
+      trap ':' INT
+    }
+  }
 }
 
 _p9k_init() {
