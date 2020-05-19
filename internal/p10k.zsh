@@ -6156,6 +6156,7 @@ function _p9k_do_dump() {
   eval "$__p9k_intro"
   zle -F $1
   exec {1}>&-
+  (( _p9k__state_dump_fd )) || return
   if (( ! _p9k__instant_prompt_disabled )); then
     _p9k__instant_prompt_sig=$_p9k__cwd:$P9K_SSH:${(%):-%#}
     _p9k_set_instant_prompt
@@ -6367,8 +6368,8 @@ _p9k_precmd_impl() {
           fi
         fi
       fi
+      typeset -gi _p9k__instant_prompt_disabled=instant_prompt_disabled
       _p9k_init
-      _p9k__instant_prompt_disabled=$((_POWERLEVEL9K_DISABLE_INSTANT_PROMPT || instant_prompt_disabled))
     fi
 
     if (( _p9k__timer_start )); then
@@ -6608,7 +6609,6 @@ _p9k_init_vars() {
   typeset -gi _p9k__restore_prompt_fd
   typeset -gi _p9k__can_hide_cursor=$(( $+terminfo[civis] && $+terminfo[cnorm] ))
   typeset -gi _p9k__cursor_hidden
-  typeset -gi _p9k__instant_prompt_disabled
   typeset -gi _p9k__non_hermetic_expansion
   typeset -g  _p9k__time
   typeset -g  _p9k__date
@@ -6732,6 +6732,8 @@ _p9k_init_params() {
       _POWERLEVEL9K_INSTANT_PROMPT=verbose
     fi
   fi
+
+  (( _POWERLEVEL9K_DISABLE_INSTANT_PROMPT )) && _p9k__instant_prompt_disabled=1
 
   _p9k_declare -s POWERLEVEL9K_TRANSIENT_PROMPT off
   [[ $_POWERLEVEL9K_TRANSIENT_PROMPT == (off|always|same-dir) ]] || _POWERLEVEL9K_TRANSIENT_PROMPT=off
@@ -7625,7 +7627,7 @@ _p9k_must_init() {
     [[ $sig == $_p9k__param_sig ]] && return 1
     _p9k_deinit
   fi
-  _p9k__param_pat=$'v86\1'${ZSH_VERSION}$'\1'${ZSH_PATCHLEVEL}$'\1'
+  _p9k__param_pat=$'v87\1'${ZSH_VERSION}$'\1'${ZSH_PATCHLEVEL}$'\1'
   _p9k__param_pat+=$'${#parameters[(I)POWERLEVEL9K_*]}\1${(%):-%n%#}\1$GITSTATUS_LOG_LEVEL\1'
   _p9k__param_pat+=$'$GITSTATUS_ENABLE_LOGGING\1$GITSTATUS_DAEMON\1$GITSTATUS_NUM_THREADS\1'
   _p9k__param_pat+=$'$GITSTATUS_CACHE_DIR\1\1${ZLE_RPROMPT_INDENT:-1}\1$__p9k_ksh_arrays\1'
