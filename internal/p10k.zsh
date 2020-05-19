@@ -6021,10 +6021,9 @@ function _p9k_restore_state() {
     [[ $__p9k_cached_param_pat == $_p9k__param_pat && $__p9k_cached_param_sig == $_p9k__param_sig ]] || return
     (( $+functions[_p9k_restore_state_impl] )) || return
     _p9k_restore_state_impl
-    _p9k__state_restored=1
+    return 0
   } always {
-    unset __p9k_cached_param_sig
-    if (( !_p9k__state_restored )); then
+    if (( $? )); then
       if (( $+functions[_p9k_preinit] )); then
         unfunction _p9k_preinit
         (( $+functions[gitstatus_stop_p9k_] )) && gitstatus_stop_p9k_ POWERLEVEL9K
@@ -6032,6 +6031,7 @@ function _p9k_restore_state() {
       _p9k_delete_instant_prompt
       zf_rm -f -- $__p9k_dump_file{,.zwc} 2>/dev/null
     fi
+    unset __p9k_cached_param_sig
   }
 }
 
@@ -6618,7 +6618,6 @@ _p9k_init_vars() {
   typeset -gi _p9k__state_dump_scheduled
   typeset -gi _p9k__state_dump_fd
   typeset -gi _p9k__prompt_idx
-  typeset -gi _p9k__state_restored
   typeset -gi _p9k_reset_on_line_finish
   typeset -gF _p9k__timer_start
   typeset -gi _p9k__status
