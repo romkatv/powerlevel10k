@@ -5253,7 +5253,7 @@ _p9k_preexec1() {
 }
 
 _p9k_preexec2() {
-  _p9k__preexec_cmd=$2
+  typeset -g _p9k__preexec_cmd=$2
   _p9k__timer_start=EPOCHREALTIME
 }
 
