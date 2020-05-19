@@ -2147,7 +2147,7 @@ prompt_ip() {
 # Segment to display if VPN is active
 prompt_vpn_ip() {
   typeset -ga _p9k__vpn_ip_segments
-  _p9k__vpn_ip_segments+=($_p9k__prompt_side $_p9k__segment_index)
+  _p9k__vpn_ip_segments+=($_p9k__prompt_side $_p9k__line_index $_p9k__segment_index)
   local p='${(e)_p9k__vpn_ip_'$_p9k__prompt_side$_p9k__segment_index'}'
   _p9k__prompt+=$p
   typeset -g "_p9k__segment_val_${_p9k__prompt_side}[_p9k__segment_index]"=$p
@@ -2156,7 +2156,7 @@ prompt_vpn_ip() {
 _p9k_vpn_ip_render() {
   local _p9k__segment_name=vpn_ip _p9k__prompt_side ip
   local -i _p9k__has_upglob _p9k__segment_index
-  for _p9k__prompt_side _p9k__segment_index in $_p9k__vpn_ip_segments; do
+  for _p9k__prompt_side _p9k__line_index _p9k__segment_index in $_p9k__vpn_ip_segments; do
     local _p9k__prompt=
     for ip in $_p9k__vpn_ip_ips; do
       _p9k_prompt_segment prompt_vpn_ip "cyan" "$_p9k_color1" 'VPN_ICON' 0 '' $ip
@@ -3833,7 +3833,7 @@ function _p9k_vcs_resume() {
 
   if (( _p9k_vcs_index && $+GITSTATUS_DAEMON_PID_POWERLEVEL9K )); then
     local _p9k__prompt _p9k__prompt_side=$_p9k_vcs_side _p9k__segment_name=vcs
-    local -i _p9k__has_upglob _p9k__segment_index=_p9k_vcs_index
+    local -i _p9k__has_upglob _p9k__segment_index=_p9k_vcs_index _p9k__line_index=_p9k_vcs_line_index
     _p9k_vcs_render
     typeset -g _p9k__vcs=$_p9k__prompt
   else
@@ -6441,7 +6441,7 @@ _p9k_precmd_impl() {
     fi
     if (( ! $+_p9k__vcs )); then
       local _p9k__prompt _p9k__prompt_side=$_p9k_vcs_side _p9k__segment_name=vcs
-      local -i _p9k__has_upglob _p9k__segment_index=_p9k_vcs_index
+      local -i _p9k__has_upglob _p9k__segment_index=_p9k_vcs_index _p9k__line_index=_p9k_vcs_line_index
       _p9k_vcs_render
       typeset -g _p9k__vcs=$_p9k__prompt
     fi
@@ -6525,6 +6525,7 @@ _p9k_init_vars() {
   typeset -gi _p9k_term_has_href
 
   typeset -gi _p9k_vcs_index
+  typeset -gi _p9k_vcs_line_index
   typeset -g  _p9k_vcs_side
 
   typeset -ga _p9k_taskwarrior_meta_files
@@ -7825,8 +7826,9 @@ function _p9k_init_cacheable() {
 
   if [[ $#_POWERLEVEL9K_VCS_BACKENDS == 1 && $_POWERLEVEL9K_VCS_BACKENDS[1] == git ]]; then
     local elem line
-    local -i i=0
+    local -i i=0 line_idx=0
     for line in $_p9k_line_segments_left; do
+      (( ++line_idx ))
       for elem in ${${(0)line}%_joined}; do
         (( ++i ))
         if [[ $elem == vcs ]]; then
@@ -7834,13 +7836,16 @@ function _p9k_init_cacheable() {
             _p9k_vcs_index=-1
           else
             _p9k_vcs_index=i
+            _p9k_vcs_line_index=line_idx
             _p9k_vcs_side=left
           fi
         fi
       done
     done
     i=0
+    line_idx=0
     for line in $_p9k_line_segments_right; do
+      (( ++line_idx ))
       for elem in ${${(0)line}%_joined}; do
         (( ++i ))
         if [[ $elem == vcs ]]; then
@@ -7848,6 +7853,7 @@ function _p9k_init_cacheable() {
             _p9k_vcs_index=-1
           else
             _p9k_vcs_index=i
+            _p9k_vcs_line_index=line_idx
             _p9k_vcs_side=right
           fi
         fi
@@ -7865,6 +7871,7 @@ function _p9k_init_cacheable() {
     fi
     if (( _p9k_vcs_index == -1 )); then
       _p9k_vcs_index=0
+      _p9k_vcs_line_index=0
       _p9k_vcs_side=
     fi
   fi
