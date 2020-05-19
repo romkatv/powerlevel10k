@@ -182,6 +182,9 @@ function _p9k_worker_start() {
 
     sysopen -r -o cloexec -u _p9k__worker_resp_fd <(
       exec 0</dev/null
+      (( __p9k_fd_0 )) && exec {__p9k_fd_0}>&-
+      (( __p9k_fd_1 )) && exec {__p9k_fd_1}>&-
+      (( __p9k_fd_2 )) && exec {__p9k_fd_2}>&-
       if [[ -n $_POWERLEVEL9K_WORKER_LOG_LEVEL ]]; then
         exec 2>$_p9k__worker_file_prefix.log
         setopt xtrace
