@@ -5581,7 +5581,7 @@ _p9k_set_instant_prompt() {
   [[ -n $RPROMPT ]] || unset RPROMPT
 }
 
-typeset -gri __p9k_instant_prompt_version=25
+typeset -gri __p9k_instant_prompt_version=26
 
 _p9k_dump_instant_prompt() {
   local user=${(%):-%n}
@@ -5616,6 +5616,7 @@ _p9k_dump_instant_prompt() {
      \$TERM_PROGRAM $hyper 'Hyper' && \$+VTE_VERSION == $+VTE_VERSION &&
      \$POWERLEVEL9K_DISABLE_INSTANT_PROMPT != 'true' &&
      \$POWERLEVEL9K_INSTANT_PROMPT != 'off' ]] || { __p9k_instant_prompt_sourced=0; return 1; }
+  typeset -g __p9k_instant_prompt_param_sig=${(q+)_p9k__param_sig}
   local gitstatus_dir=${(q)gitstatus_dir}
   local gitstatus_header=${(q)gitstatus_header}
   local -i ZLE_RPROMPT_INDENT=${ZLE_RPROMPT_INDENT:-1}
@@ -6030,6 +6031,9 @@ function _p9k_restore_state() {
       fi
       _p9k_delete_instant_prompt
       zf_rm -f -- $__p9k_dump_file{,.zwc} 2>/dev/null
+    elif [[ $__p9k_instant_prompt_param_sig != $_p9k__param_sig ]]; then
+      _p9k_delete_instant_prompt
+      _p9k_dumped_instant_prompt_sigs=()
     fi
     unset __p9k_cached_param_sig
   }
