@@ -356,9 +356,6 @@ function _gitstatus_process_response"${1:-}"() {
 function _gitstatus_daemon"${1:-}"() {
   local -i pipe_fd
   exec 0<&- {pipe_fd}>&1 1>>$daemon_log 2>&1 || return
-  (( __p9k_fd_0 )) && exec {__p9k_fd_0}>&-
-  (( __p9k_fd_1 )) && exec {__p9k_fd_1}>&-
-  (( __p9k_fd_2 )) && exec {__p9k_fd_2}>&-
   local pgid=$sysparams[pid]
   [[ $pgid == <1-> ]] || return
   builtin cd -q /     || return
