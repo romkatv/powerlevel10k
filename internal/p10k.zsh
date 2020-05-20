@@ -5255,6 +5255,7 @@ _p9k_preexec1() {
 _p9k_preexec2() {
   typeset -g _p9k__preexec_cmd=$2
   _p9k__timer_start=EPOCHREALTIME
+  P9K_TTY=old
 }
 
 function _p9k_prompt_net_iface_init() {
