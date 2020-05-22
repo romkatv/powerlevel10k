@@ -426,10 +426,10 @@ echo 'source /usr/local/opt/powerlevel10k/powerlevel10k.zsh-theme' >>! ~/.zshrc
 
 ### Arch Linux
 
-```zsh
-pacman -S --noconfirm zsh-theme-powerlevel10k
-echo 'source /usr/share/zsh-theme-powerlevel10k/powerlevel10k.zsh-theme' >>! ~/.zshrc
-```
+There is [zsh-theme-powerlevel10k](
+  https://www.archlinux.org/packages/community/any/zsh-theme-powerlevel10k/) community package and
+[zsh-theme-powerlevel10k-git](https://aur.archlinux.org/packages/zsh-theme-powerlevel10k-git/) AUR
+package. Both are old and broken. **Do not use them.**
 
 ## Configuration
 
@@ -1080,14 +1080,6 @@ command is reflected in the *next* prompt.
 
 For details, see [this post on /r/zsh](
 https://www.reddit.com/r/zsh/comments/eg49ff/powerlevel10k_prompt_history_exit_code_colors/fc5huku).
-
-### Is there an AUR package for Powerlevel10k?
-
-There is [zsh-theme-powerlevel10k-git](
-  https://aur.archlinux.org/packages/zsh-theme-powerlevel10k-git/). It's owned by an unaffiliated
-volunteer.
-
-There is also an [official Powerlevel10k package](#arch-linux) for Pacman.
 
 ### What is the minimum supported Zsh version?
 
@@ -1764,7 +1756,6 @@ typeset -g POWERLEVEL9K_OS_ICON_CONTENT_EXPANSION='${P9K_CONTENT}'  # not bold
   - [What is the best prompt style in the configuration wizard?](#what-is-the-best-prompt-style-in-the-configuration-wizard)
   - [How to make Powerlevel10k look like robbyrussell Oh My Zsh theme?](#how-to-make-powerlevel10k-look-like-robbyrussell-oh-my-zsh-theme)
   - [Can prompts for completed commands display error status for *those* commands instead of the commands preceding them?](#can-prompts-for-completed-commands-display-error-status-for-those-commands-instead-of-the-commands-preceding-them)
-  - [Is there an AUR package for Powerlevel10k?](#is-there-an-aur-package-for-powerlevel10k)
   - [What is the minimum supported Zsh version?](#what-is-the-minimum-supported-zsh-version)
   - [How were these screenshots and animated gifs created?](#how-were-these-screenshots-and-animated-gifs-created)
   - [How was the recommended font created?](#how-was-the-recommended-font-created)
