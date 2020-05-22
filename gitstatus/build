@@ -267,9 +267,10 @@ app="$outdir"/usrbin/"$appname"
 command strip "$app".tmp
 
 command mkdir -- "$workdir"/repo
-command git -C "$workdir"/repo init --
+command git -C "$workdir"/repo init
+command git -C "$workdir"/repo config user.name "Your Name"
 command git -C "$workdir"/repo config user.email "you@example.com"
-command git -C "$workdir"/repo commit --allow-empty --allow-empty-message -m ''
+command git -C "$workdir"/repo commit --allow-empty --allow-empty-message --no-gpg-sign -m ''
 
 resp="$(printf "hello\037$workdir/repo\036" | "$app".tmp)"
 [ -n "$resp" -a -z "${resp##hello*1*$workdir/repo*master*}" ]
