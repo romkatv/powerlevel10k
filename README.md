@@ -266,7 +266,7 @@ enable as many segments as you like. It won't slow down your prompt or Zsh start
 | `os_icon` | your OS logo (apple for macOS, swirl for debian, etc.) |
 | `dir` | current working directory |
 | `vcs` | Git repository status |
-| `prompt_char` | multi-functional prompt symbol; changes depending on vi mode: `❯`, `❮`, `Ⅴ`, `▶` for insert, command, visual and replace mode respectively; turns red on error |
+| `prompt_char` | multi-functional prompt symbol; changes depending on vi mode: `❯`, `❮`, `V`, `▶` for insert, command, visual and replace mode respectively; turns red on error |
 | `context` | user@hostname |
 | `status` | exit code of the last command |
 | `command_execution_time` | duration (wall time) of the last command |
@@ -1046,7 +1046,7 @@ Similarly, if you enable transient prompt, sparse prompt (with an empty line bef
 great choice.
 
 If you are using vi keymap, choose prompt with `prompt_char` in it (shown as green `❯` in the
-wizard). This symbol changes depending on vi mode: `❯`, `❮`, `Ⅴ`, `▶` for insert, command, visual
+wizard). This symbol changes depending on vi mode: `❯`, `❮`, `V`, `▶` for insert, command, visual
 and replace mode respectively. When a command fails, the symbol turns red. *Lean* style always has
 `prompt_char` in it. *Rainbow* and *Classic* styles have it only in the two-line configuration
 without left frame.
