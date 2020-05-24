@@ -426,10 +426,15 @@ echo 'source /usr/local/opt/powerlevel10k/powerlevel10k.zsh-theme' >>! ~/.zshrc
 
 ### Arch Linux
 
-There is [zsh-theme-powerlevel10k](
+```zsh
+yay -Sy --noconfirm zsh-theme-powerlevel10k-bin
+echo 'source /usr/share/zsh-theme-powerlevel10k/powerlevel10k.zsh-theme' >>! ~/.zshrc
+```
+
+There is also [zsh-theme-powerlevel10k](
   https://www.archlinux.org/packages/community/any/zsh-theme-powerlevel10k/) community package and
 [zsh-theme-powerlevel10k-git](https://aur.archlinux.org/packages/zsh-theme-powerlevel10k-git/) AUR
-package. Both are old and broken. **Do not use them.**
+package. Both of these are old and broken. **Do not use them.**
 
 ## Configuration
 
@@ -588,18 +593,19 @@ Powerlevel10k is released under the
 
 The command to update Powerlevel10k depends on how it was installed.
 
-| Installation            | Update command                                 |
-|-------------------------|------------------------------------------------|
-| [Manual](#manual)       | `git -C ~/powerlevel10k pull`                  |
-| [Oh My Zsh](#oh-my-zsh) | `git -C $ZSH_CUSTOM/themes/powerlevel10k pull` |
-| [Prezto](#prezto)       | `zprezto-update`                               |
-| [Zim](#zim)             | `zimfw update`                                 |
-| [Antigen](#antigen)     | `antigen update`                               |
-| [Zplug](#zplug)         | `zplug update`                                 |
-| [Zgen](#zgen)           | `zgen update`                                  |
-| [Zplugin](#zplugin)     | `zplugin update`                               |
-| [Zinit](#zinit)         | `zinit update`                                 |
-| [Homebrew](#homebrew)   | `brew update && brew upgrade`                  |
+| Installation              | Update command                                 |
+|---------------------------|------------------------------------------------|
+| [Manual](#manual)         | `git -C ~/powerlevel10k pull`                  |
+| [Oh My Zsh](#oh-my-zsh)   | `git -C $ZSH_CUSTOM/themes/powerlevel10k pull` |
+| [Prezto](#prezto)         | `zprezto-update`                               |
+| [Zim](#zim)               | `zimfw update`                                 |
+| [Antigen](#antigen)       | `antigen update`                               |
+| [Zplug](#zplug)           | `zplug update`                                 |
+| [Zgen](#zgen)             | `zgen update`                                  |
+| [Zplugin](#zplugin)       | `zplugin update`                               |
+| [Zinit](#zinit)           | `zinit update`                                 |
+| [Homebrew](#homebrew)     | `brew update && brew upgrade`                  |
+| [Arch Linux](#arch-linux) | `yay -Syu`                                     |
 
 **IMPORTANT**: Restart Zsh after updating Powerlevel10k. [Do not use `source ~/.zshrc`](
   #weird-things-happen-after-typing-source-zshrc).
