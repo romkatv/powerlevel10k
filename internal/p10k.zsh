@@ -5010,12 +5010,14 @@ function _p9k_asdf_init_meta() {
       fi
     fi
 
-    local root=${ASDF_DATA_DIR:-~/.asdf}/plugins
-    files+=$root
-    if [[ -d $root ]]; then
+    local root=${ASDF_DATA_DIR:-~/.asdf}
+    files+=$root/plugins
+    if [[ -d $root/plugins ]]; then
       local plugin
-      for plugin in $root/[^[:space:]]##(N); do
-        _p9k_asdf_plugins+=${plugin:t}
+      for plugin in $root/plugins/[^[:space:]]##(/N); do
+        files+=$root/installs/${plugin:t}
+        local -aU installed=($root/installs/${plugin:t}/[^[:space:]]##(/N:t) system)
+        _p9k_asdf_plugins[${plugin:t}]=${(j:|:)${(@b)installed}}
         (( legacy_enabled )) || continue
         if [[ ! -e $plugin/bin ]]; then
           files+=$plugin/bin
@@ -5045,6 +5047,8 @@ function _p9k_asdf_init_meta() {
       zstat -A stat +mtime -- $_p9k_asdf_meta_files 2>/dev/null || return
     fi
     _p9k_asdf_meta_sig=$ASDF_CONFIG_FILE$'\0'$ASDF_DATA_DIR$'\0'${(pj:\0:)stat}
+    _p9k__asdf_dir2files=()
+    _p9k_asdf_file2versions=()
   } always {
     if (( $? == 0 )); then
       _p9k__state_dump_scheduled=1
@@ -5081,10 +5085,11 @@ function _p9k_asdf_parse_version_file() {
         else
           { local v=($(<$file)) } 2>/dev/null
         fi
+        v=${v[(r)$_p9k_asdf_plugins[$plugin]]:-$v[1]}
         _p9k_asdf_file2versions[$plugin:$file]=$stat[1]:"$v"
         _p9k__state_dump_scheduled=1
       fi
-      (( $#v )) && : ${versions[$plugin]="$v"}
+      [[ -n $v ]] && : ${versions[$plugin]="$v"}
     done
   else
     local cached=$_p9k_asdf_file2versions[:$file]
@@ -5096,8 +5101,10 @@ function _p9k_asdf_parse_version_file() {
       local line
       for line in $lines; do
         local words=($=line)
-        (( $#words > 1 && $_p9k_asdf_plugins[(Ie)$words[1]] )) || continue
-        file_versions+=($words[1] "${words[2,-1]}")
+        (( $#words > 1 )) || continue
+        local installed=$_p9k_asdf_plugins[$words[1]]
+        [[ -n $installed ]] || continue
+        file_versions+=($words[1] ${${words:1}[(r)$installed]:-$words[2]})
       done
       _p9k_asdf_file2versions[:$file]=$stat[1]:${(pj:\0:)file_versions}
       _p9k__state_dump_scheduled=1
@@ -5153,7 +5160,7 @@ function prompt_asdf() {
   fi
 
   local plugin
-  for plugin in $_p9k_asdf_plugins; do
+  for plugin in ${(k)_p9k_asdf_plugins}; do
     local upper=${(U)plugin//-/_}
     if (( $+parameters[_POWERLEVEL9K_ASDF_${upper}_SOURCES] )); then
       local sources=(${(P)${:-_POWERLEVEL9K_ASDF_${upper}_SOURCES}})
@@ -6553,8 +6560,9 @@ _p9k_init_vars() {
   typeset -ga _p9k_asdf_meta_non_files
   typeset -g  _p9k_asdf_meta_sig
 
-  # example: (ruby lua chubaka)
-  typeset -ga _p9k_asdf_plugins
+  # plugin => installed_version_pattern
+  # example: (ruby '2.7.0|2.6.3|system' lua 'system' chubaka '1.0.0|system')
+  typeset -gA _p9k_asdf_plugins
 
   # example: (.ruby-version "ruby 1 chubaka 0")
   #
@@ -7638,7 +7646,7 @@ _p9k_must_init() {
     [[ $sig == $_p9k__param_sig ]] && return 1
     _p9k_deinit
   fi
-  _p9k__param_pat=$'v88\1'${ZSH_VERSION}$'\1'${ZSH_PATCHLEVEL}$'\1'
+  _p9k__param_pat=$'v89\1'${ZSH_VERSION}$'\1'${ZSH_PATCHLEVEL}$'\1'
   _p9k__param_pat+=$'${#parameters[(I)POWERLEVEL9K_*]}\1${(%):-%n%#}\1$GITSTATUS_LOG_LEVEL\1'
   _p9k__param_pat+=$'$GITSTATUS_ENABLE_LOGGING\1$GITSTATUS_DAEMON\1$GITSTATUS_NUM_THREADS\1'
   _p9k__param_pat+=$'$GITSTATUS_CACHE_DIR\1\1${ZLE_RPROMPT_INDENT:-1}\1$__p9k_ksh_arrays\1'
