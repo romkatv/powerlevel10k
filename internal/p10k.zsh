@@ -1093,11 +1093,16 @@ function _p9k_python_version() {
 ################################################################
 # Anaconda Environment
 prompt_anaconda() {
-  local p=${CONDA_PREFIX:-$CONDA_ENV_PATH}
-  local msg=''
-  if (( _POWERLEVEL9K_ANACONDA_SHOW_PYTHON_VERSION )) && _p9k_python_version; then
-    msg="${_p9k__ret//\%//%%} "
+  local msg
+  if _p9k_python_version; then
+    P9K_ANACONDA_PYTHON_VERSION=$_p9k__ret
+    if (( _POWERLEVEL9K_ANACONDA_SHOW_PYTHON_VERSION )); then
+      msg="${P9K_ANACONDA_PYTHON_VERSION//\%/%%} "
+    fi
+  else
+    unset P9K_ANACONDA_PYTHON_VERSION
   fi
+  local p=${CONDA_PREFIX:-$CONDA_ENV_PATH}
   msg+="$_POWERLEVEL9K_ANACONDA_LEFT_DELIMITER${${p:t}//\%/%%}$_POWERLEVEL9K_ANACONDA_RIGHT_DELIMITER"
   _p9k_prompt_segment "$0" "blue" "$_p9k_color1" 'PYTHON_ICON' 0 '' "$msg"
 }
@@ -7633,7 +7638,7 @@ _p9k_must_init() {
     [[ $sig == $_p9k__param_sig ]] && return 1
     _p9k_deinit
   fi
-  _p9k__param_pat=$'v87\1'${ZSH_VERSION}$'\1'${ZSH_PATCHLEVEL}$'\1'
+  _p9k__param_pat=$'v88\1'${ZSH_VERSION}$'\1'${ZSH_PATCHLEVEL}$'\1'
   _p9k__param_pat+=$'${#parameters[(I)POWERLEVEL9K_*]}\1${(%):-%n%#}\1$GITSTATUS_LOG_LEVEL\1'
   _p9k__param_pat+=$'$GITSTATUS_ENABLE_LOGGING\1$GITSTATUS_DAEMON\1$GITSTATUS_NUM_THREADS\1'
   _p9k__param_pat+=$'$GITSTATUS_CACHE_DIR\1\1${ZLE_RPROMPT_INDENT:-1}\1$__p9k_ksh_arrays\1'
