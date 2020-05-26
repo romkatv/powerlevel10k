@@ -573,7 +573,7 @@ function gitstatus_start"${1:-}"() {
 
         typeset -gi _GITSTATUS_LOCK_FD_$name=lock_fd
 
-        if [[ -n $USERPROFILE && -d /cygdrive && -d /proc/self/fd ]]; then
+        if [[ $OSTYPE == cygwin* && -d /proc/self/fd ]]; then
           # Work around bugs in Cygwin 32-bit.
           #
           # This hangs:
