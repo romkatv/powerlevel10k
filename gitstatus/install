@@ -236,9 +236,9 @@ END
 
       local fetch
       if command -v curl >/dev/null 2>&1; then
-        fetch="command curl -fsSLo"
+        fetch="command curl -fsSL --"
       elif command -v wget >/dev/null 2>&1; then
-        fetch="command wget -O"
+        fetch="command wget -O- --"
       else
         >&2 echo "[gitstatus] error: please install curl or wget"
         exit 1
@@ -276,15 +276,29 @@ END
         if [ "$1" != 1 ] && command -v sleep >/dev/null 2>/dev/null; then
           sleep "$1"
         fi
-        $fetch "$1".tar.gz -- "$2" 2>/dev/null &
-        local pid=$!
-        local die="trap - $sig; kill -- $pid 2>/dev/null; exit 1"
-        trap "$die" $sig
-        [ -z "$trapped" ] || eval "$die"
-        wait -- "$pid" 2>/dev/null && check_sha256 "$1"
-        local ret="$?"
+        local part=0 url ret pid die
+        while true; do
+          if [ "$part" = 3 ]; then
+            ret=1
+            break
+          elif [ "$part" = 0 ]; then
+            url="$2"
+          else
+            url="$2"."$part"
+          fi
+          $fetch "$url" >>"$1".tar.gz 2>/dev/null &
+          pid=$!
+          die="trap - $sig; kill -- $pid 2>/dev/null; exit 1"
+          trap "$die" $sig
+          [ -z "$trapped" ] || eval "$die"
+          wait -- "$pid" 2>/dev/null
+          ret="$?"
+          trap - $sig
+          [ "$ret" = 0 ] || break
+          check_sha256 "$1" && break
+          part=$((part+1))
+        done
         echo -n >"$1".status
-        trap - $sig
         return "$ret"
       }
 
