@@ -4812,6 +4812,7 @@ function _p9k_taskwarrior_check_data() {
     zstat -A stat +mtime -- $_p9k_taskwarrior_data_files 2>/dev/null || return
   fi
   [[ $_p9k_taskwarrior_data_sig == ${(pj:\0:)stat}$'\0'$TASKRC$'\0'$TASKDATA ]] || return
+  (( _p9k_taskwarrior_next_due == 0 || _p9k_taskwarrior_next_due > EPOCHSECONDS )) || return
 }
 
 function _p9k_taskwarrior_init_data() {
@@ -4836,6 +4837,18 @@ function _p9k_taskwarrior_init_data() {
     _p9k_taskwarrior_counters[$name]=$val
   done
 
+  _p9k_taskwarrior_next_due=0
+
+  if (( _p9k_taskwarrior_counters[PENDING] > _p9k_taskwarrior_counters[OVERDUE] )); then
+    local -a ts
+    ts=($(task +PENDING -OVERDUE list \
+      rc.verbose=nothing rc.report.list.labels= rc.report.list.columns=due.epoch)) || ts=()
+    if (( $#ts )); then
+      _p9k_taskwarrior_next_due=${${(on)ts}[1]}
+      (( _p9k_taskwarrior_next_due > EPOCHSECONDS )) || _p9k_taskwarrior_next_due=$((EPOCHSECONDS+60))
+    fi
+  fi
+
   _p9k__state_dump_scheduled=1
 }
 
@@ -4846,6 +4859,7 @@ function prompt_taskwarrior() {
     _p9k_taskwarrior_data_non_files=()
     _p9k_taskwarrior_data_sig=
     _p9k_taskwarrior_counters=()
+    _p9k_taskwarrior_next_due=0
     _p9k_taskwarrior_check_meta || _p9k_taskwarrior_init_meta || return
     _p9k_taskwarrior_init_data
   fi
@@ -6555,6 +6569,7 @@ _p9k_init_vars() {
   typeset -ga _p9k_taskwarrior_data_non_files
   typeset -g  _p9k_taskwarrior_data_sig
   typeset -gA _p9k_taskwarrior_counters
+  typeset -gF _p9k_taskwarrior_next_due
 
   typeset -ga _p9k_asdf_meta_files
   typeset -ga _p9k_asdf_meta_non_files
@@ -7646,7 +7661,7 @@ _p9k_must_init() {
     [[ $sig == $_p9k__param_sig ]] && return 1
     _p9k_deinit
   fi
-  _p9k__param_pat=$'v89\1'${ZSH_VERSION}$'\1'${ZSH_PATCHLEVEL}$'\1'
+  _p9k__param_pat=$'v90\1'${ZSH_VERSION}$'\1'${ZSH_PATCHLEVEL}$'\1'
   _p9k__param_pat+=$'${#parameters[(I)POWERLEVEL9K_*]}\1${(%):-%n%#}\1$GITSTATUS_LOG_LEVEL\1'
   _p9k__param_pat+=$'$GITSTATUS_ENABLE_LOGGING\1$GITSTATUS_DAEMON\1$GITSTATUS_NUM_THREADS\1'
   _p9k__param_pat+=$'$GITSTATUS_CACHE_DIR\1\1${ZLE_RPROMPT_INDENT:-1}\1$__p9k_ksh_arrays\1'
