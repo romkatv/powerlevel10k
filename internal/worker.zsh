@@ -89,7 +89,8 @@ function _p9k_worker_invoke() {
 }
 
 function _p9k_worker_cleanup() {
-  eval "$__p9k_intro"
+  # langinfo may not be available here.
+  eval "$__p9k_intro_no_locale"
   [[ $_p9k__worker_shell_pid == $sysparams[pid] ]] && _p9k_worker_stop
   return 0
 }
