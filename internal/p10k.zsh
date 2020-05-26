@@ -4776,7 +4776,7 @@ function _p9k_taskwarrior_init_meta() {
   local last_sig=$_p9k_taskwarrior_meta_sig
   {
     local cfg
-    cfg="$(task show data.location </dev/null 2>/dev/null)" || return
+    cfg="$(command task show data.location </dev/null 2>/dev/null)" || return
     local lines=(${(@M)${(f)cfg}:#data.location[[:space:]]##[^[:space:]]*})
     (( $#lines == 1 )) || return
     local dir=${lines[1]##data.location[[:space:]]#}
@@ -4832,7 +4832,7 @@ function _p9k_taskwarrior_init_data() {
 
   local name val
   for name in PENDING OVERDUE; do
-    val="$(task +$name count </dev/null 2>/dev/null)" || continue
+    val="$(command task +$name count </dev/null 2>/dev/null)" || continue
     [[ $val == <1-> ]] || continue
     _p9k_taskwarrior_counters[$name]=$val
   done
@@ -4841,8 +4841,8 @@ function _p9k_taskwarrior_init_data() {
 
   if (( _p9k_taskwarrior_counters[PENDING] > _p9k_taskwarrior_counters[OVERDUE] )); then
     local -a ts
-    ts=($(task +PENDING -OVERDUE list \
-      rc.verbose=nothing rc.report.list.labels= rc.report.list.columns=due.epoch)) || ts=()
+    ts=($(command task +PENDING -OVERDUE list rc.verbose=nothing \
+      rc.report.list.labels= rc.report.list.columns=due.epoch </dev/null 2>/dev/null)) || ts=()
     if (( $#ts )); then
       _p9k_taskwarrior_next_due=${${(on)ts}[1]}
       (( _p9k_taskwarrior_next_due > EPOCHSECONDS )) || _p9k_taskwarrior_next_due=$((EPOCHSECONDS+60))
