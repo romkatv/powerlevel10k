@@ -7910,6 +7910,7 @@ _p9k_init_vcs() {
         }
       }
     fi
+    (( $+GITSTATUS_DAEMON_PID_POWERLEVEL9K )) || _p9k__instant_prompt_disabled=1
     return 0
   fi
   (( _POWERLEVEL9K_DISABLE_GITSTATUS )) && return
@@ -7952,6 +7953,7 @@ _p9k_init_vcs() {
       trap ':' INT
     }
   }
+  (( $+GITSTATUS_DAEMON_PID_POWERLEVEL9K )) || _p9k__instant_prompt_disabled=1
 }
 
 _p9k_init() {
