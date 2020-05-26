@@ -225,6 +225,7 @@ function gitstatus_start() {
   }
 
   if ! gitstatus_start_impl; then
+    echo "" >&2
     echo "gitstatus_start: failed to start gitstatusd" >&2
     [[ -z "${req_fifo:-}"  ]] || command rm -f "$req_fifo"
     [[ -z "${resp_fifo:-}" ]] || command rm -f "$resp_fifo"

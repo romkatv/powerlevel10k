@@ -56,9 +56,12 @@ appname=gitstatusd-"$gitstatus_kernel"-"$gitstatus_arch"
 libgit2_tmp="$outdir"/deps/"$appname".libgit2.tmp
 
 cleanup() {
-  cd /
-  command rm -rf -- "$workdir" "$outdir"/usrbin/"$appname".tmp "$libgit2_tmp"
   trap - INT QUIT TERM ILL PIPE
+  cd /
+  if ! command rm -rf -- "$workdir" "$outdir"/usrbin/"$appname".tmp "$libgit2_tmp"; then
+    command sleep 5
+    command rm -rf -- "$workdir" "$outdir"/usrbin/"$appname".tmp "$libgit2_tmp"
+  fi
 }
 trap cleanup INT QUIT TERM ILL PIPE
 

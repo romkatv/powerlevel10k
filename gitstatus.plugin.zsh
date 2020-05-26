@@ -725,60 +725,46 @@ function gitstatus_start"${1:-}"() {
     gitstatus_stop$fsuf $name
 
     setopt prompt_percent no_prompt_subst no_prompt_bang
+    (( $+functions[p10k] )) && p10k clear-instant-prompt
     print -ru2  -- ''
-    print -Pru2  -- '[%F{red}ERROR%f]: gitstatus failed to initialize.'
-    print -ru2   -- ''
-    print -ru2   -- '  Your Git prompt may disappear or become slow.'
+    print -Pru2 -- '[%F{red}ERROR%f]: gitstatus failed to initialize.'
+    print -ru2  -- ''
+    print -ru2  -- '  Your Git prompt may disappear or become slow.'
     if [[ -s $xtrace ]]; then
-      print -ru2   -- ''
-      print -ru2   -- "  The content of ${(q-)xtrace} (gitstatus_start xtrace):"
-      print -Pru2  -- '%F{yellow}'
-      >&2 awk '{print "    " $0}' <$xtrace
-      print -Pru2 -- "%F{red}                         ^ this command failed ($err)%f"
+      print -ru2  -- ''
+      print -Pru2 -- "  Zsh log (%U${xtrace//\%/%%}%u):"
+      print -Pru2 -- '%F{yellow}'
+      print -lru2 -- "${(@)${(@f)$(<$xtrace)}/#/    }"
+      print -Pru2 -- "                    %F{red}^ this command failed ($err)%f"
     fi
     if [[ -s $daemon_log ]]; then
       print -ru2   -- ''
-      print -ru2   -- "  The content of ${(q-)daemon_log} (gitstatus daemon log):"
+      print -Pru2  -- "  Daemon log (%U${daemon_log//\%/%%}%u):"
       print -Pru2  -- '%F{yellow}'
-      >&2 awk '{print "    " $0}' <$daemon_log
+      print -lru2  -- "${(@)${(@f)$(<$daemon_log)}/#/    }"
       print -Pnru2 -- '%f'
     fi
     if [[ $GITSTATUS_LOG_LEVEL == DEBUG ]]; then
       print -ru2   -- ''
-      print -ru2   -- '  Your system information:'
+      print -ru2   -- '  System information:'
       print -Pru2  -- '%F{yellow}'
       print -ru2   -- "    zsh:      $ZSH_VERSION"
       print -ru2   -- "    uname -a: $(uname -a)"
       print -Pru2  -- '%f'
       print -ru2   -- '  If you need help, open an issue and attach this whole error message to it:'
       print -ru2   -- ''
-      print -Pru2  -- '    %F{green}https://github.com/romkatv/gitstatus/issues/new%f'
+      print -Pru2  -- '    %Uhttps://github.com/romkatv/gitstatus/issues/new%u'
     else
       print -ru2   -- ''
-      print -ru2   -- '  Run the following command to retry with extra diagnostics:'
-      print -Pru2  -- '%F{green}'
-      local env="GITSTATUS_LOG_LEVEL=DEBUG"
-      if [[ -n $GITSTATUS_NUM_THREADS ]]; then
-        env+=" GITSTATUS_NUM_THREADS=${(q)GITSTATUS_NUM_THREADS}"
-      fi
-      if [[ -n $GITSTATUS_DAEMON ]]; then
-        env+=" GITSTATUS_DAEMON=${(q)GITSTATUS_DAEMON}"
-      fi
-      if [[ -n $GITSTATUS_AUTO_INSTALL ]]; then
-        env+=" GITSTATUS_AUTO_INSTALL=${(q)GITSTATUS_AUTO_INSTALL}"
-      fi
-      if [[ -n $GITSTATUS_CACHE_DIR ]]; then
-        env+=" GITSTATUS_CACHE_DIR=${(q)GITSTATUS_CACHE_DIR}"
-      fi
-      print -nru2  -- "    ${env} gitstatus_start ${(@q-)*}"
-      print -Pru2  -- '%f'
+      local home=~
+      local zshrc=${${${(q)${ZDOTDIR:-~}}/#${(q)home}/'~'}//\%/%%}/.zshrc
+      print -Pru2   -- "  Add the following parameter to %U$zshrc%u for extra diagnostics on error:"
       print -ru2   -- ''
-      local zshrc=${(D)ZDOTDIR:-~}/.zshrc
-      print -ru2   -- "  If this command produces no output, add the following parameter to $zshrc:"
+      print -Pru2  -- '    %BGITSTATUS_LOG_LEVEL=DEBUG%b'
       print -ru2   -- ''
-      print -Pru2  -- '%F{green}    GITSTATUS_LOG_LEVEL=DEBUG%f'
+      print -ru2   -- '  Restart Zsh to retry gitstatus initialization:'
       print -ru2   -- ''
-      print -ru2   -- '  With this parameter gitstatus will print additional information on error.'
+      print -Pru2   -- '    %F{green}%Uexec%u zsh%f'
     fi
   }
 }
