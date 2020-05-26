@@ -110,34 +110,44 @@ cpus="$(command getconf _NPROCESSORS_ONLN 2>/dev/null)" ||
   cpus=8
 
 case "$gitstatus_cpu" in
-  ppc64le)
-    archflag="-mcpu"
-  ;;
-  *)
-    archflag="-march"
-  ;;
+  ppc64le) archflag="-mcpu";;
+  *)       archflag="-march";;
 esac
 
+cflags="$archflag=$gitstatus_cpu -fno-plt"
+
+if [ "$gitstatus_cpu" = x86-64 ]; then
+  cflags="$cflags -mtune=generic"
+fi
+
 libgit2_cmake_flags=
-libgit2_cflags="$archflag=$gitstatus_cpu"
+libgit2_cflags="$cflags"
 
 gitstatus_cxx=g++
-gitstatus_cxxflags="-I${workdir}/libgit2/include -DGITSTATUS_ZERO_NSEC -D_GNU_SOURCE $archflag=$gitstatus_cpu"
+gitstatus_cxxflags="$cflags -I${workdir}/libgit2/include -DGITSTATUS_ZERO_NSEC -D_GNU_SOURCE"
 gitstatus_ldflags="-L${workdir}/libgit2/build"
 gitstatus_ldlibs=
 gitstatus_make=make
 
 case "$gitstatus_kernel" in
   linux)
-    gitstatus_ldflags="$gitstatus_ldflags -static"
+    if [ -n "$docker_cmd" ]; then
+      gitstatus_ldflags="$gitstatus_ldflags -static"
+    fi
+    gitstatus_ldflags="$gitstatus_ldflags -Wl,-O1,--sort-common,--as-needed,-z,relro,-z,now"
+    libgit2_cmake_flags="$libgit2_cmake_flags -DENABLE_REPRODUCIBLE_BUILDS=ON"
   ;;
   freebsd)
     gitstatus_make=gmake
     gitstatus_ldflags="$gitstatus_ldflags -static"
+    gitstatus_ldflags="$gitstatus_ldflags -Wl,-O1,--sort-common,--as-needed,-z,relro,-z,now"
+    libgit2_cmake_flags="$libgit2_cmake_flags -DENABLE_REPRODUCIBLE_BUILDS=ON"
   ;;
   netbsd)
     gitstatus_make=gmake
     gitstatus_ldflags="$gitstatus_ldflags -static"
+    gitstatus_ldflags="$gitstatus_ldflags -Wl,-O1,--sort-common,--as-needed,-z,relro,-z,now"
+    libgit2_cmake_flags="$libgit2_cmake_flags -DENABLE_REPRODUCIBLE_BUILDS=ON"
   ;;
   darwin)
     command mkdir -- "$workdir"/lib
@@ -147,12 +157,15 @@ case "$gitstatus_kernel" in
     gitstatus_cxxflags="$gitstatus_cxxflags -I/usr/local/opt/libiconv/include"
     gitstatus_ldlibs="$gitstatus_ldlibs -liconv"
     gitstatus_ldflags="$gitstatus_ldflags -L${workdir}/lib"
+    libgit2_cmake_flags="$libgit2_cmake_flags -DENABLE_REPRODUCIBLE_BUILDS=OFF"
   ;;
   msys*|mingw*)
     gitstatus_ldflags="$gitstatus_ldflags -static"
+    libgit2_cmake_flags="$libgit2_cmake_flags -DENABLE_REPRODUCIBLE_BUILDS=ON"
   ;;
   cygwin*)
     gitstatus_ldflags="$gitstatus_ldflags -static"
+    libgit2_cmake_flags="$libgit2_cmake_flags -DENABLE_REPRODUCIBLE_BUILDS=ON"
   ;;
   *)
     >&2 echo "[internal error] unhandled kernel: $gitstatus_kernel"
@@ -252,7 +265,6 @@ CFLAGS="$libgit2_cflags" command cmake \
   -DUSE_GSSAPI=OFF                     \
   -DUSE_NTLMCLIENT=OFF                 \
   -DBUILD_SHARED_LIBS=OFF              \
-  -DENABLE_REPRODUCIBLE_BUILDS=OFF     \
   $libgit2_cmake_flags                 \
   ..
 command make -j "$cpus" VERBOSE=1
@@ -490,6 +502,8 @@ fi
 
 if [ -n "$docker_cmd" ]; then
   "$docker_cmd" run                                       \
+    -e docker_cmd="$docker_cmd"                           \
+    -e docker_image="$docker_image"                       \
     -e gitstatus_kernel="$gitstatus_kernel"               \
     -e gitstatus_arch="$gitstatus_arch"                   \
     -e gitstatus_cpu="$gitstatus_cpu"                     \
