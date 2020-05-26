@@ -283,17 +283,24 @@ function mbuild() {
     print -r -- "starting build for $platform on $assets[$platform] (pid $!)"
     pids+=($platform $!)
   done
+  local failed=()
   for platform pid in $pids; do
     print -rn -- "$platform => "
     if wait $pid; then
       print -r -- "ok"
     else
-      print -r -- "error $?"
-      print -r -- "---------------------"
-      >&2 cat $logs/$platform
-      return 1
+      print -r -- "error"
+      failed+=$platform
     fi
   done
+  (( $#failed )) || return 0
+  print
+  print -r -- "Error logs:"
+  print
+  for platform in $failed; do
+    print -r -- "  $platform => $logs/$platform"
+  done
+  return 1
 }
 
 # Copied from https://github.com/romkatv/run-process-tree.

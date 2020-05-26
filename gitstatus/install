@@ -367,6 +367,8 @@ END
   done <"$gitstatus_dir"/install.info
 
   >&2 echo "[gitstatus] error: no gitstatusd found for $uname_s $uname_m"
+  >&2 echo ""
+  >&2 echo "See: https://github.com/romkatv/gitstatus/blob/master/README.md#compiling"
   return 1
 }
 
