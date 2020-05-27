@@ -591,7 +591,7 @@ The command to update Powerlevel10k depends on how it was installed.
 | Installation            | Update command                                 |
 |-------------------------|------------------------------------------------|
 | [Manual](#manual)       | `git -C ~/powerlevel10k pull`                  |
-| [Oh My Zsh](#oh-my-zsh) | `git -C $ZSH_CUSTOM/themes/powerlevel10k pull` |
+| [Oh My Zsh](#oh-my-zsh) | `git -C ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/themes/powerlevel10k pull` |
 | [Prezto](#prezto)       | `zprezto-update`                               |
 | [Zim](#zim)             | `zimfw update`                                 |
 | [Antigen](#antigen)     | `antigen update`                               |
@@ -603,6 +603,47 @@ The command to update Powerlevel10k depends on how it was installed.
 
 **IMPORTANT**: Restart Zsh after updating Powerlevel10k. [Do not use `source ~/.zshrc`](
   #weird-things-happen-after-typing-source-zshrc).
+
+### How do I uninstall Powerlevel10k?
+
+1. Remove all references to "p10k" from `~/.zshrc`. You might have this snippet at the top:
+   ```zsh
+   if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
+     source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
+   fi
+   ```
+   And this at the bottom:
+   ```zsh
+   [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
+   ```
+   These are added by the [configuration wizard](#configuration-wizard). Remove them.
+2. Remove all references to "powerlevel10k" from `~/.zshrc`, `~/.zpreztorc` and `~/.zimrc` (some
+   of these files may be missing -- this is normal). These references have been added manually by
+   yourself when installing Powerlevel10k. Refer to the [installation instructions](#installation)
+   if you need a reminder.
+3. Verify that all references to "p10k" and "powerlevel10k" are gone from `~/.zshrc`, `~/.zpreztorc`
+   and `~/.zimrc`.
+   ```zsh
+   grep -E 'p10k|powerlevel10k' ~/.zshrc ~/.zpreztorc ~/.zimrc 2>/dev/null
+   ```
+   If this command produces output, there are still references to "p10k" or "powerlevel10k". You
+   need to remove them.
+4. Delete Powerlevel10k source files. The command to do so depends on how you've installed
+   Powerlevel10k. Refer to the [installation instructions](#installation) if you need a reminder.
+
+   | Installation            | Uninstall command                                                   |
+   |-------------------------|---------------------------------------------------------------------|
+   | [Manual](#manual)       | `rm -rf ~/powerlevel10k`                                            |
+   | [Oh My Zsh](#oh-my-zsh) | `rm -rf -- ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/themes/powerlevel10k` |
+   | [Prezto](#prezto)       | n/a                                                                 |
+   | [Zim](#zim)             | `zimfw uninstall`                                                   |
+   | [Antigen](#antigen)     | `antigen purge romkatv/powerlevel10k`                               |
+   | [Zplug](#zplug)         | `zplug clean`                                                       |
+   | [Zgen](#zgen)           | `zgen reset`                                                        |
+   | [Zplugin](#zplugin)     | `zplugin delete romkatv/powerlevel10k`                              |
+   | [Zinit](#zinit)         | `zinit delete romkatv/powerlevel10k`                                |
+   | [Homebrew](#homebrew)   | `brew uninstall powerlevel10k; brew untap romkatv/powerlevel10k`    |
+5. Restart Zsh. [Do not use `source ~/.zshrc`](#weird-things-happen-after-typing-source-zshrc).
 
 ### Where can I ask for help and report bugs?
 
@@ -1105,7 +1146,6 @@ turn has spawned *Meslo*. Finally, extra glyphs have been added to *Meslo* with 
 from Nerd Fonts. The final font is released under the terms of
 [Apache License](
   https://raw.githubusercontent.com/romkatv/powerlevel10k-media/master/MesloLGS%20NF%20License.txt).
-
 
 MesloLGS NF font can be recreated with the following command (requires `git` and `docker`):
 
@@ -1664,6 +1704,7 @@ typeset -g POWERLEVEL9K_OS_ICON_CONTENT_EXPANSION='${P9K_CONTENT}'  # not bold
 - [License](#license)
 - [FAQ](#faq)
   - [How do I update Powerlevel10k?](#how-do-i-update-powerlevel10k)
+  - [How do I uninstall Powerlevel10k?](#how-do-i-uninstall-powerlevel10k)
   - [Where can I ask for help and report bugs?](#where-can-i-ask-for-help-and-report-bugs)
   - [Which aspects of shell and terminal does Powerlevel10k affect?](#which-aspects-of-shell-and-terminal-does-powerlevel10k-affect)
   - [I'm using Powerlevel9k with Oh My Zsh. How do I migrate?](#im-using-powerlevel9k-with-oh-my-zsh-how-do-i-migrate)
