@@ -628,7 +628,11 @@ The command to update Powerlevel10k depends on how it was installed.
    ```
    If this command produces output, there are still references to "p10k" or "powerlevel10k". You
    need to remove them.
-4. Delete Powerlevel10k source files. The command to do so depends on how you've installed
+4. Delete Powerlevel10k configuration file.
+   ```zsh
+   rm -f ~/.p10k.zsh
+   ```
+5. Delete Powerlevel10k source files. The command to do so depends on how you've installed
    Powerlevel10k. Refer to the [installation instructions](#installation) if you need a reminder.
 
    | Installation            | Uninstall command                                                   |
