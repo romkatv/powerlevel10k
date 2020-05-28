@@ -5608,7 +5608,7 @@ _p9k_set_instant_prompt() {
   [[ -n $RPROMPT ]] || unset RPROMPT
 }
 
-typeset -gri __p9k_instant_prompt_version=26
+typeset -gri __p9k_instant_prompt_version=27
 
 _p9k_dump_instant_prompt() {
   local user=${(%):-%n}
@@ -5639,7 +5639,7 @@ _p9k_dump_instant_prompt() {
   $__p9k_intro_no_locale
   (( ! \$+__p9k_instant_prompt_disabled )) || return
   typeset -gi __p9k_instant_prompt_disabled=1 __p9k_instant_prompt_sourced=$__p9k_instant_prompt_version
-  [[ -t 0 && -t 1 && -t 2 && \$ZSH_VERSION == ${(q)ZSH_VERSION} && \$ZSH_PATCHLEVEL == ${(q)ZSH_PATCHLEVEL} &&
+  [[ \$ZSH_VERSION == ${(q)ZSH_VERSION} && \$ZSH_PATCHLEVEL == ${(q)ZSH_PATCHLEVEL} &&
      \$TERM_PROGRAM $hyper 'Hyper' && \$+VTE_VERSION == $+VTE_VERSION &&
      \$POWERLEVEL9K_DISABLE_INSTANT_PROMPT != 'true' &&
      \$POWERLEVEL9K_INSTANT_PROMPT != 'off' ]] || { __p9k_instant_prompt_sourced=0; return 1; }
@@ -5661,6 +5661,8 @@ _p9k_dump_instant_prompt() {
     __p9k_instant_prompt_sourced=0
     return 1
   fi
+  [[ $ZSH_SUBSHELL == 0 && -z $ZSH_SCRIPT && -z $ZSH_EXECUTION_STRING &&
+     -t 0 && -t 1 && -t 2 && -o interactive && -o zle && -o no_xtrace ]] || return
   zmodload zsh/langinfo zsh/terminfo zsh/system || return
   if [[ $langinfo[CODESET] != (utf|UTF)(-|)8 ]]; then
     local loc_cmd=$commands[locale]
@@ -5893,34 +5895,41 @@ _p9k_dump_instant_prompt() {
   if source $__p9k_instant_prompt_dump_file 2>/dev/null && (( $+functions[_p9k_preinit] )); then
     _p9k_preinit
   fi
+  function _p9k_instant_prompt_cleanup() {
+    (( ZSH_SUBSHELL == 0 && ${+__p9k_instant_prompt_active} )) || return 0
+    '$__p9k_intro_no_locale'
+    unset __p9k_instant_prompt_active
+    exec 0<&$__p9k_fd_0 1>&$__p9k_fd_1 2>&$__p9k_fd_2 {__p9k_fd_0}>&- {__p9k_fd_1}>&- {__p9k_fd_2}>&-
+    unset __p9k_fd_0 __p9k_fd_1 __p9k_fd_2
+    typeset -gi __p9k_instant_prompt_erased=1
+    print -rn -- $terminfo[rc]${(%):-%b%k%f%s%u}$terminfo[ed]
+    if [[ -s $__p9k_instant_prompt_output ]]; then
+      command cat $__p9k_instant_prompt_output 2>/dev/null
+      if (( $1 )); then
+        local _p9k__ret mark="${(e)${PROMPT_EOL_MARK-%B%S%#%s%b}}"
+        _p9k_prompt_length $mark
+        local -i fill=$((COLUMNS > _p9k__ret ? COLUMNS - _p9k__ret : 0))
+        echo -nE - "${(%):-%b%k%f%s%u$mark${(pl.$fill.. .)}$cr%b%k%f%s%u%E}"
+      fi
+    fi
+    zshexit_functions=(${zshexit_functions:#_p9k_instant_prompt_cleanup})
+    zmodload -F zsh/files b:zf_rm || return
+    local user=${(%):-%n}
+    local root_dir=${__p9k_instant_prompt_dump_file:h}
+    zf_rm -f -- $__p9k_instant_prompt_output $__p9k_instant_prompt_dump_file{,.zwc} $root_dir/p10k-instant-prompt-$user.zsh{,.zwc} $root_dir/p10k-$user/prompt-*(N) 2>/dev/null
+  }
   function _p9k_instant_prompt_precmd_first() {
     '$__p9k_intro'
     function _p9k_instant_prompt_sched_last() {
-      (( $+__p9k_instant_prompt_active )) || return 0
-      () {
-        '$__p9k_intro'
-        exec 0<&$__p9k_fd_0 1>&$__p9k_fd_1 2>&$__p9k_fd_2 {__p9k_fd_0}>&- {__p9k_fd_1}>&- {__p9k_fd_2}>&-
-        unset __p9k_fd_0 __p9k_fd_1 __p9k_fd_2 __p9k_instant_prompt_active
-        typeset -gi __p9k_instant_prompt_erased=1
-        print -rn -- $terminfo[rc]${(%):-%b%k%f%s%u}$terminfo[ed]
-        if [[ -s $__p9k_instant_prompt_output ]]; then
-          cat $__p9k_instant_prompt_output 2>/dev/null
-          local _p9k__ret mark="${(e)${PROMPT_EOL_MARK-%B%S%#%s%b}}"
-          _p9k_prompt_length $mark
-          local -i fill=$((COLUMNS > _p9k__ret ? COLUMNS - _p9k__ret : 0))
-          echo -nE - "${(%):-%b%k%f%s%u$mark${(pl.$fill.. .)}$cr%b%k%f%s%u%E}"
-        fi
-        zmodload -F zsh/files b:zf_rm || return
-        local user=${(%):-%n}
-        local root_dir=${__p9k_instant_prompt_dump_file:h}
-        zf_rm -f -- $__p9k_instant_prompt_output $__p9k_instant_prompt_dump_file{,.zwc} $root_dir/p10k-instant-prompt-$user.zsh{,.zwc} $root_dir/p10k-$user/prompt-*(N) 2>/dev/null
-      }
+      (( ${+__p9k_instant_prompt_active} )) || return 0
+      _p9k_instant_prompt_cleanup 1
       setopt no_local_options prompt_cr prompt_sp
     }
     zmodload zsh/sched
     sched +0 _p9k_instant_prompt_sched_last
     precmd_functions=(${(@)precmd_functions:#_p9k_instant_prompt_precmd_first})
   }
+  zshexit_functions=(_p9k_instant_prompt_cleanup $zshexit_functions)
   precmd_functions=(_p9k_instant_prompt_precmd_first $precmd_functions)
   DISABLE_UPDATE_PROMPT=true
 } && unsetopt prompt_cr prompt_sp || true'
@@ -6073,6 +6082,7 @@ function _p9k_clear_instant_prompt() {
   fi
   exec 1>&$__p9k_fd_1 2>&$__p9k_fd_2 {__p9k_fd_1}>&- {__p9k_fd_2}>&-
   unset __p9k_fd_1 __p9k_fd_2
+  zshexit_functions=(${zshexit_functions:#_p9k_instant_prompt_cleanup})
   if (( _p9k__can_hide_cursor )); then
     echoti civis
     _p9k__cursor_hidden=1
@@ -6140,7 +6150,7 @@ function _p9k_clear_instant_prompt() {
           echo -E - ""
         fi
       fi
-      cat -- $__p9k_instant_prompt_output
+      command cat -- $__p9k_instant_prompt_output
       echo -nE - $sp
       zf_rm -f -- $__p9k_instant_prompt_output
     } 2>/dev/null
