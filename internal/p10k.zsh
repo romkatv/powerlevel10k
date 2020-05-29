@@ -6496,6 +6496,7 @@ _p9k_precmd_impl() {
 _p9k_trapint() {
   if (( __p9k_enabled )); then
     eval "$__p9k_intro"
+    _p9k_deschedule_redraw
     zle && _p9k_on_widget_zle-line-finish int
   fi
   return 0
@@ -6652,6 +6653,7 @@ _p9k_init_vars() {
   typeset -gi  _p9k__fully_initialized
   typeset -gi _p9k__must_restore_prompt
   typeset -gi _p9k__restore_prompt_fd
+  typeset -gi _p9k__redraw_fd
   typeset -gi _p9k__can_hide_cursor=$(( $+terminfo[civis] && $+terminfo[cnorm] ))
   typeset -gi _p9k__cursor_hidden
   typeset -gi _p9k__non_hermetic_expansion
@@ -7216,12 +7218,56 @@ function _p9k_display_segment() {
   __p9k_reset_state=2
 }
 
+function _p9k_redraw() {
+  zle -F $1
+  exec {1}>&-
+  _p9k__redraw_fd=0
+
+  local -a P9K_COMMANDS
+  _p9k__last_buffer="$PREBUFFER$BUFFER"
+  # this must run with user options
+  _p9k_parse_buffer "$_p9k__last_buffer" $_POWERLEVEL9K_COMMANDS_MAX_TOKEN_COUNT
+  _p9k__last_commands=(${P9K_COMMANDS[@]})
+
+  () {
+    eval "$__p9k_intro"
+    local -h WIDGET=zle-line-pre-redraw
+    (( _p9k__restore_prompt_fd )) && _p9k_restore_prompt $_p9k__restore_prompt_fd
+    local pat idx var
+    for pat idx var in $_p9k_show_on_command; do
+      if (( $P9K_COMMANDS[(I)$pat] )); then
+        _p9k_display_segment $idx $var show
+      else
+        _p9k_display_segment $idx $var hide
+      fi
+    done
+    (( $+functions[p10k-on-post-widget] )) && p10k-on-post-widget
+    (( __p9k_reset_state == 2 )) && _p9k_reset_prompt
+    __p9k_reset_state=0
+  }
+}
+
+function _p9k_deschedule_redraw() {
+  (( _p9k__redraw_fd )) || return
+  zle -F $_p9k__redraw_fd
+  exec {_p9k__redraw_fd}>&-
+  _p9k__redraw_fd=0
+}
+
 function _p9k_widget_hook() {
   if (( $+functions[p10k-on-post-widget] || $#_p9k_show_on_command )); then
     local -a P9K_COMMANDS
     if [[ "$_p9k__last_buffer" == "$PREBUFFER$BUFFER" ]]; then
       P9K_COMMANDS=(${_p9k__last_commands[@]})
+      _p9k_deschedule_redraw
+    elif [[ $1 == zle-line-pre-redraw ]] && (( PENDING || KEYS_QUEUED_COUNT )); then
+      P9K_COMMANDS=(${_p9k__last_commands[@]})
+      if (( ! _p9k__redraw_fd )); then
+        sysopen -o cloexec -ru _p9k__redraw_fd /dev/null
+        zle -F $_p9k__redraw_fd _p9k_redraw
+      fi
     else
+      _p9k_deschedule_redraw
       _p9k__last_buffer="$PREBUFFER$BUFFER"
       if [[ -n "$_p9k__last_buffer" ]]; then
         # this must run with user options
@@ -7671,7 +7717,7 @@ _p9k_must_init() {
     [[ $sig == $_p9k__param_sig ]] && return 1
     _p9k_deinit
   fi
-  _p9k__param_pat=$'v91\1'${ZSH_VERSION}$'\1'${ZSH_PATCHLEVEL}$'\1'
+  _p9k__param_pat=$'v92\1'${ZSH_VERSION}$'\1'${ZSH_PATCHLEVEL}$'\1'
   _p9k__param_pat+=$'${#parameters[(I)POWERLEVEL9K_*]}\1${(%):-%n%#}\1$GITSTATUS_LOG_LEVEL\1'
   _p9k__param_pat+=$'$GITSTATUS_ENABLE_LOGGING\1$GITSTATUS_DAEMON\1$GITSTATUS_NUM_THREADS\1'
   _p9k__param_pat+=$'$GITSTATUS_CACHE_DIR\1$GITSTATUS_AUTO_INSTALL\1${ZLE_RPROMPT_INDENT:-1}\1'
@@ -8115,7 +8161,18 @@ _p9k_deinit() {
   (( $+functions[_p9k_preinit] )) && unfunction _p9k_preinit
   (( $+functions[gitstatus_stop_p9k_] )) && gitstatus_stop_p9k_ POWERLEVEL9K
   _p9k_worker_stop
-  (( _p9k__state_dump_fd )) && exec {_p9k__state_dump_fd}>&-
+  if (( _p9k__state_dump_fd )); then
+    zle -F $_p9k__state_dump_fd
+    exec {_p9k__state_dump_fd}>&-
+  fi
+  if (( _p9k__restore_prompt_fd )); then
+    zle -F $_p9k__restore_prompt_fd
+    exec {_p9k__restore_prompt_fd}>&-
+  fi
+  if (( _p9k__redraw_fd )); then
+    zle -F $_p9k__redraw_fd
+    exec {_p9k__redraw_fd}>&-
+  fi
   (( $+_p9k__iterm2_precmd )) && functions[iterm2_precmd]=$_p9k__iterm2_precmd
   (( $+_p9k__iterm2_decorate_prompt )) && functions[iterm2_decorate_prompt]=$_p9k__iterm2_decorate_prompt
   unset -m '(_POWERLEVEL9K_|P9K_|_p9k_)*~(P9K_SSH|P9K_TTY)'
