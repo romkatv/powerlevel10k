@@ -735,7 +735,7 @@ function gitstatus_start"${1:-}"() {
       print -Pru2 -- "  Zsh log (%U${xtrace//\%/%%}%u):"
       print -Pru2 -- '%F{yellow}'
       print -lru2 -- "${(@)${(@f)$(<$xtrace)}/#/    }"
-      print -Pru2 -- "                    %F{red}^ this command failed ($err)%f"
+      print -Pnru2 -- '%f'
     fi
     if [[ -s $daemon_log ]]; then
       print -ru2   -- ''
