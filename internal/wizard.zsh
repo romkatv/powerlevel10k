@@ -1940,7 +1940,7 @@ while true; do
 
   unset pure_use_rprompt
 
-  if [[ $langinfo[CODESET] == (utf|UTF)(-|)8 ]]; then
+  if [[ $TERM != (dumb|linux) && $langinfo[CODESET] == (utf|UTF)(-|)8 ]]; then
     ask_font || continue
     ask_diamond || continue
     if [[ $AWESOME_GLYPHS_LOADED == 1 ]]; then
