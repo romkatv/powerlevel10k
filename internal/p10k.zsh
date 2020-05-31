@@ -6378,7 +6378,7 @@ _p9k_precmd_impl() {
       local -i instant_prompt_disabled
       if (( !__p9k_configured )); then
         __p9k_configured=1
-        if [[ -z "${parameters[(I)POWERLEVEL9K_*~(POWERLEVEL9K_MODE|POWERLEVEL9K_CONFIG_FILE)]}" ]]; then
+        if [[ -z "${parameters[(I)POWERLEVEL9K_*~POWERLEVEL9K_(MODE|CONFIG_FILE|GITSTATUS_DIR)]}" ]]; then
           _p9k_can_configure -q
           local -i ret=$?
           if (( ret == 2 && $+__p9k_instant_prompt_active )); then
