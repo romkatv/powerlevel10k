@@ -1590,7 +1590,7 @@ to the same position when prompt needs to be refreshed.
 
 *Note*: The patch doesn't work on Alacritty. On the plus side, it doesn't make things worse.
 
-There are two alternative approaches to fixing the bug that may seem to work at fight glance but in
+There are two alternative approaches to fixing the bug that may seem to work at first glance but in
 fact don't:
 
 - Instead of `sc`, use `u7` terminal capability to query the current cursor position and then `cup`
