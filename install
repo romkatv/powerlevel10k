@@ -286,7 +286,9 @@ END
           else
             url="$2"."$part"
           fi
-          $fetch "$url" >>"$1".tar.gz 2>/dev/null &
+          { $fetch "$url" >>"$1".tar.gz 2>/dev/null & } 2>/dev/null
+          ret=$?
+          [ "$ret" = 0 ] || break
           pid=$!
           die="trap - $sig; kill -- $pid 2>/dev/null; exit 1"
           trap "$die" $sig
