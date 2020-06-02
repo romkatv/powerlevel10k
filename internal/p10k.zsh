@@ -3294,10 +3294,9 @@ instant_prompt_date() {
 # todo.sh: shows the number of tasks in your todo.sh file
 prompt_todo() {
   unset P9K_TODO_TOTAL_TASK_COUNT P9K_TODO_FILTERED_TASK_COUNT
-  [[ -r $_p9k__todo_file ]] || return
-  local todo=$commands[todo.sh]
+  [[ -r $_p9k__todo_file && -x $_p9k__todo_command ]] || return
   if ! _p9k_cache_stat_get $0 $_p9k__todo_file; then
-    local count="$($todo -p ls | tail -1)"
+    local count="$($_p9k__todo_command -p ls | command tail -1)"
     if [[ $count == (#b)'TODO: '([[:digit:]]##)' of '([[:digit:]]##)' '* ]]; then
       _p9k_cache_stat_set 1 $match[1] $match[2]
     else
@@ -3319,7 +3318,7 @@ prompt_todo() {
 }
 
 _p9k_prompt_todo_init() {
-  typeset -g "_p9k__segment_cond_${_p9k__prompt_side}[_p9k__segment_index]"='$commands[todo.sh]'
+  typeset -g "_p9k__segment_cond_${_p9k__prompt_side}[_p9k__segment_index]"='$_p9k__todo_file'
 }
 
 ################################################################
@@ -6684,6 +6683,7 @@ _p9k_init_vars() {
   typeset -ga _p9k_left_join
   typeset -ga _p9k_right_join
   typeset -g  _p9k__public_ip
+  typeset -g  _p9k__todo_command
   typeset -g  _p9k__todo_file
   typeset -g  _p9k__git_dir
   # git workdir => 1 if gitstatus is slow on it, 0 if it's fast.
@@ -7717,7 +7717,7 @@ _p9k_must_init() {
     [[ $sig == $_p9k__param_sig ]] && return 1
     _p9k_deinit
   fi
-  _p9k__param_pat=$'v92\1'${ZSH_VERSION}$'\1'${ZSH_PATCHLEVEL}$'\1'
+  _p9k__param_pat=$'v93\1'${ZSH_VERSION}$'\1'${ZSH_PATCHLEVEL}$'\1'
   _p9k__param_pat+=$'${#parameters[(I)POWERLEVEL9K_*]}\1${(%):-%n%#}\1$GITSTATUS_LOG_LEVEL\1'
   _p9k__param_pat+=$'$GITSTATUS_ENABLE_LOGGING\1$GITSTATUS_DAEMON\1$GITSTATUS_NUM_THREADS\1'
   _p9k__param_pat+=$'$GITSTATUS_CACHE_DIR\1$GITSTATUS_AUTO_INSTALL\1${ZLE_RPROMPT_INDENT:-1}\1'
@@ -8091,19 +8091,22 @@ _p9k_init() {
   fi
 
   if _p9k_segment_in_use todo; then
-    local todo=$commands[todo.sh]
-    if [[ -n $todo ]]; then
-      local bash=${commands[bash]:-:}
-      _p9k__todo_file="$(exec -a $todo $bash 2>/dev/null -c "
+    if [[ -n ${_p9k__todo_command::=${commands[todo.sh]}} ]]; then
+      local todo_global=/etc/todo/config
+    elif [[ -n ${_p9k__todo_command::=${commands[todo-txt]}} ]]; then
+      local todo_global=/etc/todo-txt/config
+    fi
+    if [[ -n $_p9k__todo_command ]]; then
+      _p9k__todo_file="$(exec -a $_p9k__todo_command ${commands[bash]:-:} 3>&1 &>/dev/null -c "
         [ -e \"\$TODOTXT_CFG_FILE\" ] || TODOTXT_CFG_FILE=\$HOME/.todo/config
         [ -e \"\$TODOTXT_CFG_FILE\" ] || TODOTXT_CFG_FILE=\$HOME/todo.cfg
         [ -e \"\$TODOTXT_CFG_FILE\" ] || TODOTXT_CFG_FILE=\$HOME/.todo.cfg
         [ -e \"\$TODOTXT_CFG_FILE\" ] || TODOTXT_CFG_FILE=\${XDG_CONFIG_HOME:-\$HOME/.config}/todo/config
-        [ -e \"\$TODOTXT_CFG_FILE\" ] || TODOTXT_CFG_FILE=${(qqq)todo:h}/todo.cfg
-        [ -e \"\$TODOTXT_CFG_FILE\" ] || TODOTXT_CFG_FILE=\${TODOTXT_GLOBAL_CFG_FILE:-/etc/todo/config}
+        [ -e \"\$TODOTXT_CFG_FILE\" ] || TODOTXT_CFG_FILE=${(qqq)_p9k__todo_command:h}/todo.cfg
+        [ -e \"\$TODOTXT_CFG_FILE\" ] || TODOTXT_CFG_FILE=\${TODOTXT_GLOBAL_CFG_FILE:-${(qqq)todo_global}}
         [ -r \"\$TODOTXT_CFG_FILE\" ] || exit
-        source \"\$TODOTXT_CFG_FILE\" &>/dev/null
-        echo \"\$TODO_FILE\"")"
+        source \"\$TODOTXT_CFG_FILE\"
+        printf "%s" \"\$TODO_FILE\" >&3")"
     fi
   fi
 
