@@ -426,10 +426,8 @@ echo 'source /usr/local/opt/powerlevel10k/powerlevel10k.zsh-theme' >>! ~/.zshrc
 
 ### Arch Linux
 
-There is [zsh-theme-powerlevel10k](
-  https://www.archlinux.org/packages/community/any/zsh-theme-powerlevel10k/) community package and
-[zsh-theme-powerlevel10k-git](https://aur.archlinux.org/packages/zsh-theme-powerlevel10k-git/) AUR
-package. Both are old and broken. **Do not use them.**
+Arch Linux users may want to install the [zsh-theme-powerlevel10k](
+  https://www.archlinux.org/packages/community/x86_64/zsh-theme-powerlevel10k/) community package.
 
 ## Configuration
 
