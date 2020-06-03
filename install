@@ -9,7 +9,7 @@ _gitstatus_install_main() {
     set -u
   fi
 
-  local argv1=$1
+  local argv1="$1"
   shift
 
   local no_check= no_install= uname_s= uname_m= gitstatus_dir= dl_status=
@@ -227,91 +227,107 @@ END
       mkdir -p -- "$tmpdir" || return
     fi
 
+    if ! command -v curl >/dev/null 2>&1 && ! command -v wget >/dev/null 2>&1; then
+      >&2 echo "[gitstatus] error: please install curl or wget"
+      return 1
+    fi
+
     (
-      if [ -n "${ZSH_VERSION:-}" ]; then
-        builtin cd -q -- "$tmpdir" || exit
-      else
-        cd -- "$tmpdir" || exit
-      fi
-
-      local fetch
-      if command -v curl >/dev/null 2>&1; then
-        fetch="command curl -fsSL --"
-      elif command -v wget >/dev/null 2>&1; then
-        fetch="command wget -O- --"
-      else
-        >&2 echo "[gitstatus] error: please install curl or wget"
-        exit 1
-      fi
-
-      local url1="https://github.com/romkatv/gitstatus/releases/download/$version/$file.tar.gz"
-      local url2="https://gitee.com/romkatv/gitstatus/raw/release-$version/release/$file.tar.gz"
+      run_cmd() {
+        command -v "$1" >/dev/null 2>/dev/null || return 127
+        local trapped= pid die ret
+        trap 'trapped=1' $sig
+        # The only reason for suppressing stderr is that `curl -f` cannot be silenced:
+        # `-s` doesn't work despite what the docs say.
+        command "$@" 2>/dev/null &
+        ret="$?"
+        if [ "$ret" = 0 ]; then
+          pid="$!"
+          die="trap - $sig; kill -- $pid 2>/dev/null; wait -- $pid 2>/dev/null; exit 1"
+          trap "$die" $sig
+          [ -z "$trapped" ] || eval "$die"
+          wait -- "$pid" 2>/dev/null
+          ret="$?"
+        fi
+        trap - $sig
+        [ -z "$trapped" ] || exit
+        return "$ret"
+      }
 
       check_sha256() {
-        local file="$1".tar.gz
+        local data_file="$tmpdir"/"$1".tar.gz
+        local hash_file="$tmpdir"/"$1".tar.gz.sha256
         local hash=
         if command -v shasum >/dev/null 2>/dev/null; then
-          hash="$(command shasum -b -a 256 -- "$file")" || hash=
-          hash="${hash%% *}"
+          if run_cmd shasum -b -a 256 -- "$data_file" >"$hash_file"; then
+            IFS= read -r hash <"$hash_file" || hash=
+            hash="${hash%% *}"
+          fi
         elif command -v sha256sum >/dev/null 2>/dev/null; then
-          hash="$(command sha256sum -b -- "$file")" || hash=
-          hash="${hash%% *}"
+          if run_cmd sha256sum -b -- "$data_file" >"$hash_file"; then
+            IFS= read -r hash <"$hash_file" || hash=
+            hash="${hash%% *}"
+          fi
         elif command -v sha256 >/dev/null 2>/dev/null; then
-          hash="$(command sha256 -- "$file" </dev/null)" || hash=
-          # Ignore sha256 output if it's from hashalot. It's incompatible.
-          if [ ${#hash} -lt 64 ]; then
-            hash=
-          else
-            hash="${hash##* }"
+          if run_cmd sha256 -- "$data_file" </dev/null >"$hash_file"; then
+            IFS= read -r hash <"$hash_file" || hash=
+            # Ignore sha256 output if it's from hashalot. It's incompatible.
+            if [ ${#hash} -lt 64 ]; then
+              hash=
+            else
+              hash="${hash##* }"
+            fi
           fi
         fi
         [ "$1" = 1 -a -z "$hash" -o "$hash" = "$sha256" ]
       }
 
+      local url1="https://github.com/romkatv/gitstatus/releases/download/$version/$file.tar.gz"
+      local url2="https://gitee.com/romkatv/gitstatus/raw/release-$version/release/$file.tar.gz"
       local sig='INT QUIT TERM ILL PIPE'
 
       fetch() {
-        local trapped=
-        trap 'trapped=1' $sig
         if [ "$1" != 1 ] && command -v sleep >/dev/null 2>/dev/null; then
-          sleep "$1"
-        fi
-        local part=0 url ret pid die
-        while true; do
-          if [ "$part" = 3 ]; then
-            ret=1
-            break
-          elif [ "$part" = 0 ]; then
-            url="$2"
-          else
-            url="$2"."$part"
+          if ! run_cmd sleep "$1"; then
+            echo -n >"$tmpdir"/"$1".status
+            return 1
           fi
-          { $fetch "$url" >>"$1".tar.gz 2>/dev/null & } 2>/dev/null
-          ret=$?
-          [ "$ret" = 0 ] || break
-          pid=$!
-          die="trap - $sig; kill -- $pid 2>/dev/null; exit 1"
-          trap "$die" $sig
-          [ -z "$trapped" ] || eval "$die"
-          wait -- "$pid" 2>/dev/null
+        fi
+        local cmd part url ret
+        for cmd in 'curl -q -fsSL' 'wget --no-config -qO-'; do
+          part=0
+          while true; do
+            if [ "$part" = 2 ]; then
+              ret=1
+              break
+            elif [ "$part" = 0 ]; then
+              url="$2"
+            else
+              url="$2"."$part"
+            fi
+            run_cmd $cmd -- "$url" >>"$tmpdir"/"$1".tar.gz
+            ret="$?"
+            [ "$ret" = 0 ] || break
+            check_sha256 "$1" && break
+            part=$((part+1))
+          done
+          [ "$ret" = 0 ] && break
+          run_cmd rm -f -- "$tmpdir"/"$1".tar.gz && continue
           ret="$?"
-          trap - $sig
-          [ "$ret" = 0 ] || break
-          check_sha256 "$1" && break
-          part=$((part+1))
+          break
         done
-        echo -n >"$1".status
+        echo -n >"$tmpdir"/"$1".status
         return "$ret"
       }
 
       local trapped=
       trap 'trapped=1' $sig
       fetch 1 "$url1" & 
-      local pid1=$!
+      local pid1="$!"
       fetch 2 "$url2" & 
-      local pid2=$!
+      local pid2="$!"
 
-      local die="trap - $sig; kill -- $pid1 $pid2 2>/dev/null; exit 1"
+      local die="trap - $sig; kill -- $pid1 $pid2 2>/dev/null; wait -- $pid1 $pid2 2>/dev/null; exit 1"
       trap "$die" $sig
       [ -z "$trapped" ] || eval "$die"
 
@@ -323,27 +339,39 @@ END
         elif command -v true >/dev/null 2>/dev/null; then
           command true
         fi
-        if [ -n "$pid1" -a -e 1.status ]; then
+        if [ -n "$pid1" -a -e "$tmpdir"/1.status ]; then
           wait -- "$pid1" 2>/dev/null
           local ret="$?"
           pid1=
           if [ "$ret" = 0 ]; then
-            [ -z "$pid2" ] || kill -- "$pid2" 2>/dev/null
+            if [ -n "$pid2" ]; then
+              kill -- "$pid2" 2>/dev/null
+              wait -- "$pid2" 2>/dev/null
+            fi
             n=1
             break
           elif [ -z "$pid2" ]; then
             break
+          else
+            die="trap - $sig; kill -- $pid2 2>/dev/null; wait -- $pid2 2>/dev/null; exit 1"
+            trap "$die" $sig
           fi
-        elif [ -n "$pid2" -a -e 2.status ]; then
+        elif [ -n "$pid2" -a -e "$tmpdir"/2.status ]; then
           wait -- "$pid2" 2>/dev/null
           local ret="$?"
           pid2=
           if [ "$ret" = 0 ]; then
-            [ -z "$pid1" ] || kill -- "$pid1" 2>/dev/null
+            if [ -n "$pid1" ]; then
+              kill -- "$pid1" 2>/dev/null
+              wait -- "$pid1" 2>/dev/null
+            fi
             n=2
             break
           elif [ -z "$pid1" ]; then
             break
+          else
+            die="trap - $sig; kill -- $pid1 2>/dev/null; wait -- $pid1 2>/dev/null; exit 1"
+            trap "$die" $sig
           fi
         fi
       done
@@ -358,7 +386,7 @@ END
         exit 1
       fi
 
-      command tar -xzf "$n".tar.gz || exit
+      command tar -C "$tmpdir" -xzf "$tmpdir"/"$n".tar.gz || exit
 
       local tmpfile
       if ! command -v mktemp >/dev/null 2>&1 ||
@@ -366,7 +394,7 @@ END
         tmpfile="$cache_dir"/gitstatusd.tmp.$$
       fi
 
-      command mv -f -- gitstatusd-* "$tmpfile" || exit
+      command mv -f -- "$tmpdir"/gitstatusd-* "$tmpfile" || exit
       command mv -f -- "$tmpfile" "$cache_dir"/"$file" && exit
       command rm -f -- "$cache_dir"/"$file"
       command mv -f -- "$tmpfile" "$cache_dir"/"$file" && exit
@@ -374,7 +402,7 @@ END
       exit 1
     )
 
-    local ret=$?
+    local ret="$?"
     command rm -rf -- "$tmpdir"
     [ "$ret" = 0 ] || return
 
