@@ -600,7 +600,7 @@ The command to update Powerlevel10k depends on how it was installed.
 | [Zplugin](#zplugin)       | `zplugin update`                                            |
 | [Zinit](#zinit)           | `zinit update`                                              |
 | [Homebrew](#homebrew)     | `brew update && brew upgrade`                               |
-| [Arch Linux(#arch-linux)] | `yay -Syu --noconfirm --needed zsh-theme-powerlevel10k-git` |
+| [Arch Linux](#arch-linux) | `yay -Syu --noconfirm --needed zsh-theme-powerlevel10k-git` |
 
 **IMPORTANT**: Restart Zsh after updating Powerlevel10k. [Do not use `source ~/.zshrc`](
   #weird-things-happen-after-typing-source-zshrc).
