@@ -414,6 +414,9 @@ function _gitstatus_daemon"${1:-}"() {
 
       (( ! _gitstatus_zsh_downloaded ))                || return
       [[ ${GITSTATUS_AUTO_INSTALL:-1} == (|-|+)<1-> ]] || return
+      [[ $_gitstatus_zsh_daemon ==
+         ${GITSTATUS_CACHE_DIR:-${XDG_CACHE_HOME:-$HOME/.cache}/gitstatus}/* ]] || return
+
       set -- -f "$@"
       _gitstatus_zsh_daemon=
       _gitstatus_zsh_version=

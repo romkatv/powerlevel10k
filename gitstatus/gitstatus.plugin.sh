@@ -164,6 +164,9 @@ function gitstatus_start() {
 
           (( ! _gitstatus_bash_downloaded ))         || return
           [[ "${GITSTATUS_AUTO_INSTALL:-1}" -ne 0 ]] || return
+          [[ "$_gitstatus_bash_daemon" == \
+             "${GITSTATUS_CACHE_DIR:-${XDG_CACHE_HOME:-$HOME/.cache}/gitstatus}"/* ]] || return
+
           set -- -f "$@"
           _gitstatus_bash_daemon=
           _gitstatus_bash_version=
