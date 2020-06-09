@@ -7718,7 +7718,7 @@ _p9k_must_init() {
     [[ $sig == $_p9k__param_sig ]] && return 1
     _p9k_deinit
   fi
-  _p9k__param_pat=$'v95\1'${(q)ZSH_VERSION}$'\1'${(q)ZSH_PATCHLEVEL}$'\1'
+  _p9k__param_pat=$'v96\1'${(q)ZSH_VERSION}$'\1'${(q)ZSH_PATCHLEVEL}$'\1'
   _p9k__param_pat+=$'${#parameters[(I)POWERLEVEL9K_*]}\1${(%):-%n%#}\1$GITSTATUS_LOG_LEVEL\1'
   _p9k__param_pat+=$'$GITSTATUS_ENABLE_LOGGING\1$GITSTATUS_DAEMON\1$GITSTATUS_NUM_THREADS\1'
   _p9k__param_pat+=$'$GITSTATUS_CACHE_DIR\1$GITSTATUS_AUTO_INSTALL\1${ZLE_RPROMPT_INDENT:-1}\1'
@@ -7997,6 +7997,7 @@ _p9k_init_vcs() {
   local gitstatus_dir=${_POWERLEVEL9K_GITSTATUS_DIR:-${__p9k_root_dir}/gitstatus}
 
   typeset -g _p9k_preinit="function _p9k_preinit() {
+    (( $+commands[git] )) || { unfunction _p9k_preinit; return 1 }
     [[ \$ZSH_VERSION == ${(q)ZSH_VERSION} ]]              || return
     [[ -r ${(q)gitstatus_dir}/gitstatus.plugin.zsh ]]     || return
     source ${(q)gitstatus_dir}/gitstatus.plugin.zsh _p9k_ || return
