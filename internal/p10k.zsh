@@ -6091,13 +6091,13 @@ function _p9k_clear_instant_prompt() {
       local cr=$'\r'
       local sp="${(%):-%b%k%f%s%u$mark${(pl.$fill.. .)}$cr%b%k%f%s%u%E}"
       print -rn -- $terminfo[rc]${(%):-%b%k%f%s%u}$terminfo[ed]
-      local unexpected=${${${(S)content//$'\e'*($'\a'|$'\e\\')}//$'\e[?'<->'c'}//$'\e['<->' q'}
+      local unexpected=${${${(S)content//$'\e]0;'[^$'\a\e']#($'\a'|$'\e\\')}//$'\e[?'<->'c'}//$'\e['<->' q'}
       if [[ -n $unexpected ]]; then
         local omz1='[Oh My Zsh] Would you like to update? [Y/n]: '
         local omz2='Updating Oh My Zsh'
         local omz3='https://shop.planetargon.com/collections/oh-my-zsh'
         local omz4='There was an error updating. Try again later?'
-        if [[ -n ${${unexpected/$omz1}/$omz2*($omz3|$omz4)[^$'\n']#($'\n'|)} ]]; then
+        if [[ $unexpected != ($omz1|)$omz2*($omz3|$omz4)[^$'\n']#($'\n'|) ]]; then
           echo -E - ""
           echo -E - "${(%):-[%3FWARNING%f]: Console output during zsh initialization detected.}"
           echo -E - ""
