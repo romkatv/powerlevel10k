@@ -8122,44 +8122,53 @@ _p9k_init() {
   _p9k_init_vcs
 
   if (( _p9k__instant_prompt_disabled )); then
-    unset __p9k_instant_prompt_erased
+    (( _POWERLEVEL9K_DISABLE_INSTANT_PROMPT )) && unset __p9k_instant_prompt_erased
     _p9k_delete_instant_prompt
     _p9k_dumped_instant_prompt_sigs=()
   fi
 
   if (( $+__p9k_instant_prompt_erased )); then
     unset __p9k_instant_prompt_erased
-    >&2 echo -E - ""
-    >&2 echo -E - "${(%):-[%1FERROR%f]: When using instant prompt, Powerlevel10k must be loaded before the first prompt.}"
-    >&2 echo -E - ""
-    >&2 echo -E - "${(%):-You can:}"
-    >&2 echo -E - ""
-    >&2 echo -E - "${(%):-  - %BRecommended%b: Change the way Powerlevel10k is loaded from %B$__p9k_zshrc_u%b.}"
-    if (( _p9k_term_has_href )); then
-      >&2 echo    - "${(%):-    See \e]8;;https://github.com/romkatv/powerlevel10k/blob/master/README.md#installation\ahttps://github.com/romkatv/powerlevel10k/blob/master/README.md#installation\e]8;;\a.}"
-    else
-      >&2 echo    - "${(%):-    See https://github.com/romkatv/powerlevel10k/blob/master/README.md#installation.}"
-    fi
-    if (( $+functins[zplugin] )); then
-      >&2 echo -E - "${(%):-    NOTE: If using %2Fzplugin%f to load %3F'romkatv/powerlevel10k'%f, %Bdo not apply%b %1Fice wait%f.}"
-    fi
-    >&2 echo -E - ""
-    >&2 echo -E - "${(%):-    * You %Bwill not%b see this error message again.}"
-    >&2 echo -E - "${(%):-    * Zsh will start %Bquickly%b.}"
-    >&2 echo -E - ""
-    >&2 echo -E - "${(%):-  - Disable instant prompt either by running %Bp10k configure%b or by manually}"
-    >&2 echo -E - "${(%):-    defining the following parameter:}"
-    >&2 echo -E - ""
-    >&2 echo -E - "${(%):-      %3Ftypeset%f -g POWERLEVEL9K_INSTANT_PROMPT=off}"
-    >&2 echo -E - ""
-    >&2 echo -E - "${(%):-    * You %Bwill not%b see this error message again.}"
-    >&2 echo -E - "${(%):-    * Zsh will start %Bslowly%b.}"
-    >&2 echo -E - ""
-    >&2 echo -E - "${(%):-  - Do nothing.}"
-    >&2 echo -E - ""
-    >&2 echo -E - "${(%):-    * You %Bwill%b see this error message every time you start zsh.}"
-    >&2 echo -E - "${(%):-    * Zsh will start %Bslowly%b.}"
-    >&2 echo -E - ""
+    {
+      >&2 echo -E - ""
+      >&2 echo -E - "${(%):-[%1FERROR%f]: When using instant prompt, Powerlevel10k must be loaded before the first prompt.}"
+      >&2 echo -E - ""
+      >&2 echo -E - "${(%):-You can:}"
+      >&2 echo -E - ""
+      >&2 echo -E - "${(%):-  - %BRecommended%b: Change the way Powerlevel10k is loaded from %B$__p9k_zshrc_u%b.}"
+      if (( _p9k_term_has_href )); then
+        >&2 echo    - "${(%):-    See \e]8;;https://github.com/romkatv/powerlevel10k/blob/master/README.md#installation\ahttps://github.com/romkatv/powerlevel10k/blob/master/README.md#installation\e]8;;\a.}"
+      else
+        >&2 echo    - "${(%):-    See https://github.com/romkatv/powerlevel10k/blob/master/README.md#installation.}"
+      fi
+      if (( $+zsh_defer_options )); then
+        >&2 echo -E - ""
+        >&2 echo -E - "${(%):-    NOTE: Do not use %1Fzsh-defer%f to load %Upowerlevel10k.zsh-theme%u.}"
+      elif (( $+functins[zinit] )); then
+        >&2 echo -E - ""
+        >&2 echo -E - "${(%):-    NOTE: If using %2Fzinit%f to load %3F'romkatv/powerlevel10k'%f, %Bdo not apply%b %1Fice wait%f.}"
+      elif (( $+functins[zplugin] )); then
+        >&2 echo -E - ""
+        >&2 echo -E - "${(%):-    NOTE: If using %2Fzplugin%f to load %3F'romkatv/powerlevel10k'%f, %Bdo not apply%b %1Fice wait%f.}"
+      fi
+      >&2 echo -E - ""
+      >&2 echo -E - "${(%):-    * You %Bwill not%b see this error message again.}"
+      >&2 echo -E - "${(%):-    * Zsh will start %Bquickly%b.}"
+      >&2 echo -E - ""
+      >&2 echo -E - "${(%):-  - Disable instant prompt either by running %Bp10k configure%b or by manually}"
+      >&2 echo -E - "${(%):-    defining the following parameter:}"
+      >&2 echo -E - ""
+      >&2 echo -E - "${(%):-      %3Ftypeset%f -g POWERLEVEL9K_INSTANT_PROMPT=off}"
+      >&2 echo -E - ""
+      >&2 echo -E - "${(%):-    * You %Bwill not%b see this error message again.}"
+      >&2 echo -E - "${(%):-    * Zsh will start %Bslowly%b.}"
+      >&2 echo -E - ""
+      >&2 echo -E - "${(%):-  - Do nothing.}"
+      >&2 echo -E - ""
+      >&2 echo -E - "${(%):-    * You %Bwill%b see this error message every time you start zsh.}"
+      >&2 echo -E - "${(%):-    * Zsh will start %Bslowly%b.}"
+      >&2 echo -E - ""
+    } 2>>$TTY
   fi
 }
 
