@@ -678,6 +678,12 @@
   # typeset -g POWERLEVEL9K_ASDF_HASKELL_VISUAL_IDENTIFIER_EXPANSION='⭐'
   # typeset -g POWERLEVEL9K_ASDF_HASKELL_SHOW_ON_UPGLOB='*.foo|*.bar'
 
+  # Julia version from asdf.
+  typeset -g POWERLEVEL9K_ASDF_JULIA_FOREGROUND=0
+  typeset -g POWERLEVEL9K_ASDF_JULIA_BACKGROUND=2
+  # typeset -g POWERLEVEL9K_ASDF_JULIA_VISUAL_IDENTIFIER_EXPANSION='⭐'
+  # typeset -g POWERLEVEL9K_ASDF_JULIA_SHOW_ON_UPGLOB='*.foo|*.bar'
+
   ##########[ nordvpn: nordvpn connection status, linux only (https://nordvpn.com/) ]###########
   # NordVPN connection indicator color.
   # typeset -g POWERLEVEL9K_NORDVPN_FOREGROUND=7

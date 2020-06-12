@@ -141,6 +141,7 @@ function _p9k_init_icons() {
         PHP_ICON                       'php'
         HASKELL_ICON                   'hs'
         PACKAGE_ICON                   'pkg'
+        JULIA_ICON                     'jl'
       )
     ;;
     'awesome-fontconfig')
@@ -266,6 +267,7 @@ function _p9k_init_icons() {
         PHP_ICON                       'php'
         HASKELL_ICON                   'hs'
         PACKAGE_ICON                   'pkg'
+        JULIA_ICON                     'jl'
       )
     ;;
     'awesome-mapped-fontconfig')
@@ -394,6 +396,7 @@ function _p9k_init_icons() {
         PHP_ICON                       'php'
         HASKELL_ICON                   'hs'
         PACKAGE_ICON                   'pkg'
+        JULIA_ICON                     'jl'
       )
     ;;
     'nerdfont-complete'|'nerdfont-fontconfig')
@@ -520,6 +523,7 @@ function _p9k_init_icons() {
         PHP_ICON                       '\uE608'               # 
         HASKELL_ICON                   '\uE61F'               # 
         PACKAGE_ICON                   '\uF8D6'               # 
+        JULIA_ICON                     '\uE624'               # 
       )
     ;;
     ascii)
@@ -643,6 +647,7 @@ function _p9k_init_icons() {
         PHP_ICON                       'php'
         HASKELL_ICON                   'hs'
         PACKAGE_ICON                   'pkg'
+        JULIA_ICON                     'jl'
       )
     ;;
     *)
@@ -768,6 +773,7 @@ function _p9k_init_icons() {
         PHP_ICON                       'php'
         HASKELL_ICON                   'hs'
         PACKAGE_ICON                   'pkg'
+        JULIA_ICON                     'jl'
       )
     ;;
   esac
