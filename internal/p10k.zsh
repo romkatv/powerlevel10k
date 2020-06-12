@@ -6091,7 +6091,7 @@ function _p9k_clear_instant_prompt() {
       local cr=$'\r'
       local sp="${(%):-%b%k%f%s%u$mark${(pl.$fill.. .)}$cr%b%k%f%s%u%E}"
       print -rn -- $terminfo[rc]${(%):-%b%k%f%s%u}$terminfo[ed]
-      local unexpected=${${${(S)content//$'\e]0;'[^$'\a\e']#($'\a'|$'\e\\')}//$'\e[?'<->'c'}//$'\e['<->' q'}
+      local unexpected=${${${(S)content//$'\e[?'<->'c'}//$'\e['<->' q'}//$'\e'[^$'\a\e']#($'\a'|$'\e\\')}
       if [[ -n $unexpected ]]; then
         local omz1='[Oh My Zsh] Would you like to update? [Y/n]: '
         local omz2='Updating Oh My Zsh'
