@@ -146,8 +146,18 @@ function gitstatus_start() {
 
           local sig=(TERM ILL PIPE)
 
+          if (( UID == EUID )); then
+            local home=~
+          else
+            local user
+            user="$(command id -un)"            || return
+            [[ "$user" =~ ^[a-zA-Z0-9_,.-]+$ ]] || return
+            eval "local home=~$user"
+            [[ -n "$home" ]]                    || return
+          fi
+
           if [[ -x "$_gitstatus_bash_daemon" ]]; then
-            "$_gitstatus_bash_daemon" \
+            HOME="$home" "$_gitstatus_bash_daemon" \
               -G "$_gitstatus_bash_version" "${daemon_args[@]}" <&"$fd_in" >&"$fd_out" &
             local pid=$!
             trap "trap - ${sig[*]}; kill $pid &>/dev/null" ${sig[@]}
@@ -176,7 +186,7 @@ function gitstatus_start() {
           [[ -n "$_gitstatus_bash_version" ]]      || return
           [[ "$_gitstatus_bash_downloaded" == 1 ]] || return
 
-          "$_gitstatus_bash_daemon" \
+          HOME="$home" "$_gitstatus_bash_daemon" \
             -G "$_gitstatus_bash_version" "${daemon_args[@]}" <&"$fd_in" >&"$fd_out" &
           local pid=$!
           trap "trap - ${sig[*]}; kill $pid &>/dev/null" ${sig[@]}

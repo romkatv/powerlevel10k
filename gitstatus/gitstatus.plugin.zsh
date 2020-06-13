@@ -406,8 +406,17 @@ function _gitstatus_daemon"${1:-}"() {
       [[ -n $_gitstatus_zsh_version ]]         || return
       [[ $_gitstatus_zsh_downloaded == [01] ]] || return
 
+      if (( UID == EUID )); then
+        local home=~
+      else
+        local user
+        user="$(command id -un)" || return
+        local home=${userdirs[$user]}
+        [[ -n $home ]] || return
+      fi
+
       if [[ -x $_gitstatus_zsh_daemon ]]; then
-        $_gitstatus_zsh_daemon -G $_gitstatus_zsh_version "${(@)args}" >&$pipe_fd
+        HOME=$home $_gitstatus_zsh_daemon -G $_gitstatus_zsh_version "${(@)args}" >&$pipe_fd
         local -i ret=$?
         [[ $ret == (0|129|130|131|137|141|143) ]] && return ret
       fi
@@ -426,7 +435,7 @@ function _gitstatus_daemon"${1:-}"() {
       [[ -n $_gitstatus_zsh_version ]]      || return
       [[ $_gitstatus_zsh_downloaded == 1 ]] || return
 
-      $_gitstatus_zsh_daemon -G $_gitstatus_zsh_version "${(@)args}" >&$pipe_fd
+      HOME=$home $_gitstatus_zsh_daemon -G $_gitstatus_zsh_version "${(@)args}" >&$pipe_fd
     } always {
       local -i ret=$?
       zf_rm -f -- $file_prefix.lock $file_prefix.fifo
