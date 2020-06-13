@@ -6522,10 +6522,10 @@ function _p9k_reset_prompt() {
     setopt prompt_subst
     (( __p9k_ksh_arrays )) && setopt ksh_arrays
     (( __p9k_sh_glob )) && setopt sh_glob
-    (( _p9k__can_hide_cursor )) && echoti civis
     {
+      (( _p9k__can_hide_cursor )) && echoti civis
       zle .reset-prompt
-      zle -R
+      (( ${+functions[z4h]} )) || zle -R
     } always {
       (( _p9k__can_hide_cursor )) && echoti cnorm
       _p9k__cursor_hidden=0
