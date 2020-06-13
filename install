@@ -131,14 +131,8 @@ END
       >&2 echo "[gitstatus] error: GITSTATUS_DAEMON is not absolute path: $daemon"
       return 1
     fi
-    if [ -z "$daemon" ]; then
+    if [ -z "$daemon" && -e "$gitstatus_dir"/usrbin/gitstatusd ]; then
       daemon="$gitstatus_dir"/usrbin/gitstatusd
-      if [ ! -e "$daemon" ]; then
-        daemon="$daemon"-"$uname_s"-"$uname_m"
-        if [ ! -e "$daemon" ]; then
-          daemon=
-        fi
-      fi
     fi
     if [ -n "$daemon" ]; then
       local gitstatus_version= libgit2_version=
@@ -184,23 +178,13 @@ END
 
     if [ -z "$no_check" ]; then
       # Check if a suitable gitstatusd already exists.
-      local daemon="$cache_dir"/"$file"
-      if [ -e "$daemon" ]; then
-        [ $# = 0 ] || "$@" "$daemon" "$version" 0
-        return
+      local daemon="$gitstatus_dir"/usrbin/"$file"
+      if [ ! -e "$daemon" ]; then
+        daemon="$cache_dir"/"$file"
+        [ -e "$daemon" ] || daemon=
       fi
-      daemon="$daemon"-"$uname_s"-"$uname_m"
-      if [ -e "$daemon" ]; then
-        local gitstatus_version= libgit2_version=
-        if ! . "$gitstatus_dir"/build.info; then
-          >&2 echo "[gitstatus] internal error: failed to source build.info"
-          return 1
-        fi
-        if [ -z "$gitstatus_version" ]; then
-          >&2 echo "[gitstatus] internal error: empty gitstatus_version in build.info"
-          return 1
-        fi
-        [ $# = 0 ] || "$@" "$daemon" "$gitstatus_version" 0
+      if [ -n "$daemon" ]; then
+        [ $# = 0 ] || "$@" "$daemon" "$version" 0
         return
       fi
     fi

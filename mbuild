@@ -117,6 +117,7 @@ local -rA assets=(
   linux-armv6l           build-linux-armv7l
   linux-armv7l           build-linux-armv7l
   linux-i686             build-linux-x86_64
+  linux-ppc64le          build-linux-ppc64le
   linux-x86_64           build-linux-x86_64
 )
 
@@ -180,14 +181,15 @@ local build='
 function build-unix() {
   local intro flags=(-sw)
   case $2 in
-    darwin-*) intro='PATH="/usr/local/bin:$PATH"';;
+    linux-ppc64le);;
     linux-*)  flags+=(-d docker);;
+    darwin-*) intro='PATH="/usr/local/bin:$PATH"';;
   esac
   ssh $1 -- /bin/sh -uex <<<"
     $intro
     cd /tmp
     $build ${2##*-} ${(j: :)${(@q)flags}}"
-  scp $1:/tmp/gitstatus/usrbin/gitstatusd-$2 $binaries/
+  scp $1:/tmp/gitstatus/usrbin/gitstatusd $binaries/gitstatusd-$2
 }
 
 function build-windows() {
@@ -236,7 +238,7 @@ function build-windows() {
             while true; do
               IFS= read -u $fd -r line || return 0
               if [[ $line == *"warning: terminate MSYS2"* ]]; then
-                # At this point the machine is hosed. Rogue process with corrupted name
+                # At this point the machine is hosed. A rogue process with a corrupted name
                 # is eating all CPU. The top SSH connection won't terminate on its own.
                 ssh $1 powershell.exe <<<'Restart-Computer -Force' || true
                 sleep 30
@@ -260,7 +262,7 @@ function build-windows() {
     cd -- $tmp
     $build ${2##*-} ${(j: :)${(@q)flags}}
     exit"
-  scp $1:$c/tmp/gitstatus/usrbin/gitstatusd-$2 $binaries/
+  scp $1:$c/tmp/gitstatus/usrbin/gitstatusd $binaries/gitstatusd-$2
   chmod +x $binaries/gitstatusd-$2
 }
 
@@ -272,7 +274,7 @@ function build() (
   zsystem flock $locks/$machine
   build-${protocol[(k)$platform]} $machine $platform
   local tmp=gitstatusd-$platform.tmp.$$.tar.gz
-  ( cd -q -- $binaries; GZIP=-9 tar -czf $tmp gitstatusd-$platform )
+  ( cd -q -- $binaries; tar --owner=0 --group=0 -I 'gzip -9' -cf $tmp gitstatusd-$platform )
   mv -f -- $binaries/$tmp $binaries/gitstatusd-$platform.tar.gz
 )
 
