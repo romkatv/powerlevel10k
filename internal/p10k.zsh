@@ -7713,7 +7713,7 @@ _p9k_must_init() {
     [[ $sig == $_p9k__param_sig ]] && return 1
     _p9k_deinit
   fi
-  _p9k__param_pat=$'v97\1'${(q)ZSH_VERSION}$'\1'${(q)ZSH_PATCHLEVEL}$'\1'
+  _p9k__param_pat=$'v98\1'${(q)ZSH_VERSION}$'\1'${(q)ZSH_PATCHLEVEL}$'\1'
   _p9k__param_pat+=$'${#parameters[(I)POWERLEVEL9K_*]}\1${(%):-%n%#}\1$GITSTATUS_LOG_LEVEL\1'
   _p9k__param_pat+=$'$GITSTATUS_ENABLE_LOGGING\1$GITSTATUS_DAEMON\1$GITSTATUS_NUM_THREADS\1'
   _p9k__param_pat+=$'$GITSTATUS_CACHE_DIR\1$GITSTATUS_AUTO_INSTALL\1${ZLE_RPROMPT_INDENT:-1}\1'
@@ -7769,13 +7769,22 @@ function _p9k_init_cacheable() {
   done
 
   if [[ $_POWERLEVEL9K_TRANSIENT_PROMPT != off ]]; then
-    _p9k_transient_prompt='%b%k%s%u%F{%(?.'
+    local sep=$'\1'
+    _p9k_transient_prompt='%b%k%s%u%(?'$sep
     _p9k_color prompt_prompt_char_OK_VIINS FOREGROUND 76
-    _p9k_transient_prompt+=$_p9k__ret'.'
-    _p9k_color prompt_prompt_char_ERROR_VIINS FOREGROUND 196
-    _p9k_transient_prompt+=$_p9k__ret')}${${P9K_CONTENT::="❯"}+}'
+    _p9k_foreground $_p9k__ret
+    _p9k_transient_prompt+=$_p9k__ret
+    _p9k_transient_prompt+='${${P9K_CONTENT::="❯"}+}'
     _p9k_param prompt_prompt_char_OK_VIINS CONTENT_EXPANSION '${P9K_CONTENT}'
-    _p9k_transient_prompt+='${:-"'$_p9k__ret'"}%b%k%f%s%u '
+    _p9k_transient_prompt+='${:-"'$_p9k__ret'"}'
+    _p9k_transient_prompt+=$sep
+    _p9k_color prompt_prompt_char_ERROR_VIINS FOREGROUND 196
+    _p9k_foreground $_p9k__ret
+    _p9k_transient_prompt+=$_p9k__ret
+    _p9k_transient_prompt+='${${P9K_CONTENT::="❯"}+}'
+    _p9k_param prompt_prompt_char_ERROR_VIINS CONTENT_EXPANSION '${P9K_CONTENT}'
+    _p9k_transient_prompt+='${:-"'$_p9k__ret'"}'
+    _p9k_transient_prompt+=')%b%k%f%s%u '
     if [[ $ITERM_SHELL_INTEGRATION_INSTALLED == Yes ]]; then
       _p9k_transient_prompt=$'%{\e]133;A\a%}'$_p9k_transient_prompt$'%{\e]133;B\a%}'
     fi
