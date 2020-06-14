@@ -131,7 +131,7 @@ END
       >&2 echo "[gitstatus] error: GITSTATUS_DAEMON is not absolute path: $daemon"
       return 1
     fi
-    if [ -z "$daemon" && -e "$gitstatus_dir"/usrbin/gitstatusd ]; then
+    if [ -z "$daemon" -a -e "$gitstatus_dir"/usrbin/gitstatusd ]; then
       daemon="$gitstatus_dir"/usrbin/gitstatusd
     fi
     if [ -n "$daemon" ]; then

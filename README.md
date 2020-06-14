@@ -103,9 +103,9 @@ function my_set_prompt() {
 
   if gitstatus_query MY && [[ $VCS_STATUS_RESULT == ok-sync ]]; then
     RPROMPT=${${VCS_STATUS_LOCAL_BRANCH:-@${VCS_STATUS_COMMIT}}//\%/%%}  # escape %
-    (( $VCS_STATUS_NUM_STAGED    )) && RPROMPT+='+'
-    (( $VCS_STATUS_NUM_UNSTAGED  )) && RPROMPT+='!'
-    (( $VCS_STATUS_NUM_UNTRACKED )) && RPROMPT+='?'
+    (( VCS_STATUS_NUM_STAGED    )) && RPROMPT+='+'
+    (( VCS_STATUS_NUM_UNSTAGED  )) && RPROMPT+='!'
+    (( VCS_STATUS_NUM_UNTRACKED )) && RPROMPT+='?'
   fi
 
   setopt no_prompt_{bang,subst} prompt_percent  # enable/disable correct prompt expansions
@@ -204,9 +204,9 @@ function my_set_prompt() {
     else
       PS1+=" @${VCS_STATUS_COMMIT//\\/\\\\}"       # escape backslash
     fi
-    [[ "$VCS_STATUS_HAS_STAGED"    == 1 ]] && PS1+='+'
-    [[ "$VCS_STATUS_HAS_UNSTAGED"  == 1 ]] && PS1+='!'
-    [[ "$VCS_STATUS_HAS_UNTRACKED" == 1 ]] && PS1+='?'
+    (( VCS_STATUS_HAS_STAGED"    )) && PS1+='+'
+    (( VCS_STATUS_HAS_UNSTAGED"  )) && PS1+='!'
+    (( VCS_STATUS_HAS_UNTRACKED" )) && PS1+='?'
   fi
 
   PS1+='\n\$ '

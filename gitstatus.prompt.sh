@@ -94,7 +94,7 @@ shopt -s promptvars
 #
 # Example:
 #
-#   user@host ~/projects/skynet master+!
+#   user@host ~/projects/skynet master ⇡42
 #   $ █
 PS1='\[\033[01;32m\]\u@\h\[\033[00m\] '           # green user@host
 PS1+='\[\033[01;34m\]\w\[\033[00m\]'              # blue current working directory
