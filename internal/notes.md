@@ -76,16 +76,6 @@ emulate zsh -o prompt_percent -c 'print -P "%F{#ff0000}red%F{green}%B bold green
 
 ---
 
-bug: open a new tab and hit ctrl-p. an empty line will appear before prompt.
-
----
-
-take a look at https://github.com/skywind3000/z.lua. it claims to have fzf support. would be nice
-if alt-down showed two groups -- one for subdirs and another for directory history (sorted by
-frequency of use? by last use? three sections? more key bindings?).
-
----
-
 add `p10k explain` that prints something like this:
 
 ```text
@@ -163,7 +153,8 @@ Prompt connection should have matching options.
 Add `POWERLEVEL9K_{LEFT,RIGHT}_SEGMENT_MIRROR_SEPARATOR`. If set, left segments get separated with
 `POWERLEVEL9K_LEFT_SEGMENT_SEPARATOR` followed by `POWERLEVEL9K_LEFT_SEGMENT_MIRROR_SEPARATOR`.
 Each is drawn without background. The first with the foreground of left segment, the second with
-the background of right segment. To insert space in between, embed it in one of these parameters.
+the background of right segment. To insert space in between, embed it in
+`POWERLEVEL9K_{LEFT,RIGHT}_SEGMENT_MIRROR_SEPARATOR`.
 `POWERLEVEL9K_{LEFT,RIGHT}_SUBSEGMENT_SEPARATOR` is unused.
 
 ---
@@ -174,41 +165,6 @@ Add *Segment Connection* screen to configuration wizard with options *Fused*, *T
 
 *Fused* requires line separator (there is already a screen for it) but the other two options require
 two filled separators similar to heads and tail. Figure out how to present this choice.
-
----
-
-Get rid of `saved_columns` in the wizard and always present all options as if horizontal space was
-unlimited. `print_prompt` should print something like this if prompt is too wide:
-
-  Terminal window too narrow to display prompt.
-  Make it wider and press ENTER to refresh.
-
-Terminal dimensions will need to be checked more often.
-
-Try getting rid of the "press ENTER" requirement by trapping `SIGWINCH`. Might need to run `read -k`
-with timeout in a loop.
-
-Print all text with a helper function that keeps track of the number of lines remaining on screen.
-`print_prompt` will then be able to show a similar message for Terminal window being too short. This
-makes sense only for two-line prompts. This is probably OK.
-
-If `print_prompt` can be told in advance how many prompts we are going to display, it might be able
-to insert or avoid inserting `\n` in between, depending on terminal height. There is one screen
-where one prompt is a one-liner while another is a two-liner. This is fine because there are only
-two options. `print_prompt` can assume that all options will use the current prompt height.
-
-Don't use `print_prompt` directly. Create `ask_prompt` and use it like this:
-
-```zsh
-ask_prompt \
-  1 "No frame"   "left_frame=0 right_frame=0" \
-  2 "Left frame" "left_frame=1 right_frame=0" \
-  ...
-```
-
-There are two prompt questions that don't fit this pattern: `ask_empty_line` and
-`ask_transient_prompt`. The first is easy to adapt (`print_prompt` can print prompt twice if
-`empty_line=1`) but the second will probably have to be hand-coded.
 
 ---
 
@@ -234,3 +190,8 @@ Respect `POWERLEVEL9K_VCS_STASH_ICON` overrides but not anything with segment na
 Define `POWERLEVEL9K_VCS_*` parameters in config templates for all symbols used in
 `my_git_formatter`. Add missing entries to `icons`. Use `$P9K_ICON[...]` within `my_git_formatter`.
 Add a screen to the wizard to choose between clear and circled icons.
+
+---
+
+Add a screen to the wizard asking whether to set `POWERLEVEL9K_VCS_DISABLED_WORKDIR_PATTERN='~'`.
+Show it only if there is `$HOME/.git`. By default this parameter should be commented out.
