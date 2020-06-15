@@ -7219,27 +7219,9 @@ function _p9k_redraw() {
   exec {1}>&-
   _p9k__redraw_fd=0
 
-  local -a P9K_COMMANDS
-  _p9k__last_buffer="$PREBUFFER$BUFFER"
-  # this must run with user options
-  _p9k_parse_buffer "$_p9k__last_buffer" $_POWERLEVEL9K_COMMANDS_MAX_TOKEN_COUNT
-  _p9k__last_commands=(${P9K_COMMANDS[@]})
-
   () {
-    eval "$__p9k_intro"
     local -h WIDGET=zle-line-pre-redraw
-    (( _p9k__restore_prompt_fd )) && _p9k_restore_prompt $_p9k__restore_prompt_fd
-    local pat idx var
-    for pat idx var in $_p9k_show_on_command; do
-      if (( $P9K_COMMANDS[(I)$pat] )); then
-        _p9k_display_segment $idx $var show
-      else
-        _p9k_display_segment $idx $var hide
-      fi
-    done
-    (( $+functions[p10k-on-post-widget] )) && p10k-on-post-widget
-    (( __p9k_reset_state == 2 )) && _p9k_reset_prompt
-    __p9k_reset_state=0
+    _p9k_widget_hook ''
   }
 }
 
@@ -7251,19 +7233,13 @@ function _p9k_deschedule_redraw() {
 }
 
 function _p9k_widget_hook() {
+  _p9k_deschedule_redraw
+
   if (( $+functions[p10k-on-post-widget] || $#_p9k_show_on_command )); then
     local -a P9K_COMMANDS
     if [[ "$_p9k__last_buffer" == "$PREBUFFER$BUFFER" ]]; then
       P9K_COMMANDS=(${_p9k__last_commands[@]})
-      _p9k_deschedule_redraw
-    elif [[ $1 == zle-line-pre-redraw ]] && (( PENDING || KEYS_QUEUED_COUNT )); then
-      P9K_COMMANDS=(${_p9k__last_commands[@]})
-      if (( ! _p9k__redraw_fd )); then
-        sysopen -o cloexec -ru _p9k__redraw_fd /dev/null
-        zle -F $_p9k__redraw_fd _p9k_redraw
-      fi
     else
-      _p9k_deschedule_redraw
       _p9k__last_buffer="$PREBUFFER$BUFFER"
       if [[ -n "$_p9k__last_buffer" ]]; then
         # this must run with user options
@@ -7297,9 +7273,27 @@ function _p9k_widget_hook() {
 }
 
 function _p9k_widget() {
-  (( ! ${+widgets[._p9k_orig_$1]} )) || zle ._p9k_orig_$1 "${@:2}"
-  local res=$?
-  (( ! __p9k_enabled )) || [[ $CONTEXT != start ]] || _p9k_widget_hook "$@"
+  local f=${widgets[._p9k_orig_$1]:-}
+  local -i res
+  [[ -z $f ]] || {
+    [[ $f == user:-z4h-* ]] && {
+      "${f#user:}" "${@:2}"
+      res=$?
+    } || {
+      zle ._p9k_orig_$1 -- "${@:2}"
+      res=$?
+    }
+  }
+  (( ! __p9k_enabled )) || [[ $CONTEXT != start ]] || {
+    [[ $1 == zle-line-pre-redraw ]] && (( PENDING || KEYS_QUEUED_COUNT )) && {
+      (( _p9k__redraw_fd )) || {
+        sysopen -o cloexec -ru _p9k__redraw_fd /dev/null
+        zle -F $_p9k__redraw_fd _p9k_redraw
+      }
+      return res
+    }
+    _p9k_widget_hook "$@"
+  }
   return res
 }
 
