@@ -193,6 +193,7 @@ function _p9k_read_word() {
     local rest
     _p9k__ret=
     { read _p9k__ret rest <$1 } 2>/dev/null
+    _p9k__ret=${_p9k__ret%$'\r'}
     _p9k__read_word_cache[$1]=$stat[1]:$_p9k__ret
   fi
   [[ -n $_p9k__ret ]]
@@ -2078,7 +2079,7 @@ prompt_package() {
       # Redneck json parsing. Yields correct results for any well-formed json document.
       # Produces random garbage for invalid json.
       { data="$(<$file)" || return } 2>/dev/null
-      data=${data##[[:space:]]#}
+      data=${${data//$'\r'}##[[:space:]]#}
       [[ $data == '{'* ]] || return
       data[1]=
       local -i depth=1
@@ -2301,6 +2302,7 @@ function _p9k_nvm_ls_default() {
   while [[ -r $NVM_DIR/alias/$v ]]; do
     local target=
     IFS='' read -r target <$NVM_DIR/alias/$v
+    target=${target%$'\r'}
     [[ -z $target ]] && break
     (( $seen[(I)$target] )) && return
     seen+=$target
@@ -5012,7 +5014,7 @@ function _p9k_asdf_init_meta() {
       #   legacy_version_file = yes
       #
       # We do the same.
-      local lines=(${(@M)${(f)"$(<$cfg)"}:#[[:space:]]#legacy_version_file[[:space:]]#=*})
+      local lines=(${(@M)${(@)${(f)"$(<$cfg)"}%$'\r'}:#[[:space:]]#legacy_version_file[[:space:]]#=*})
       if [[ $#lines == 1 && ${${(s:=:)lines[1]}[2]} == [[:space:]]#yes[[:space:]]# ]]; then
         legacy_enabled=1
       fi
@@ -5092,6 +5094,7 @@ function _p9k_asdf_parse_version_file() {
           local v=($(${ASDF_DATA_DIR:-~/.asdf}/plugins/$plugin/bin/parse-legacy-file $file 2>/dev/null))
         else
           { local v=($(<$file)) } 2>/dev/null
+          v=(${v%$'\r'})
         fi
         v=${v[(r)$_p9k_asdf_plugins[$plugin]]:-$v[1]}
         _p9k_asdf_file2versions[$plugin:$file]=$stat[1]:"$v"
@@ -5105,7 +5108,7 @@ function _p9k_asdf_parse_version_file() {
       local file_versions=(${(0)${cached#*:}})
     else
       local file_versions=()
-      { local lines=(${(@)${(f)"$(<$file)"}/\#*}) } 2>/dev/null
+      { local lines=(${(@)${(@)${(f)"$(<$file)"}%$'\r'}/\#*}) } 2>/dev/null
       local line
       for line in $lines; do
         local words=($=line)
