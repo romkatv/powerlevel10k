@@ -650,7 +650,7 @@ The command to update Powerlevel10k depends on how it was installed.
    | [Zplugin](#zplugin)       | `zplugin delete romkatv/powerlevel10k`                              |
    | [Zinit](#zinit)           | `zinit delete romkatv/powerlevel10k`                                |
    | [Homebrew](#homebrew)     | `brew uninstall powerlevel10k; brew untap romkatv/powerlevel10k`    |
-   | [Arch Linux](#arch-linux) | `yay -R --noconfirm zsh-theme-powerlevel10k-git`                    |
+   | [Arch Linux](#arch-linux) | `pacman -S zsh-theme-powerlevel10k`                    |
 5. Restart Zsh. [Do not use `source ~/.zshrc`](#weird-things-happen-after-typing-source-zshrc).
 
 ### Where can I ask for help and report bugs?
