@@ -550,6 +550,9 @@ applications on your system. Configure your terminal to use this font:
 - **Blink** Type `config`, go to *Appearance*, tap *Add a new font*, tap *Open Gallery*, select
   *MesloLGS NF.css*, tap *import* and type `exit` in the home view to reload the font.
 - **Terminus**: Open *Settings → Appearance* and set *Font* to `MesloLGS NF`.
+- **Terminator**: Open *Preferences* using the context menu. Under *Profiles* select the *General*
+  tab (should be selected already), uncheck *Use the system fixed width font* (if not already)
+  and select `MesloLGS NF Regular`. Exit the Preferences dialog by clicking *Close*.
 
 **IMPORTANT:** Run `p10k configure` after changing terminal font. The old `~/.p10k.zsh` may work
 incorrectly with the new font.
