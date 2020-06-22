@@ -516,7 +516,7 @@ function gitstatus_start"${1:-}"() {
         args+=(-$opt $OPTARG)
         [[ $opt == m ]] && dirty_max_index_size=OPTARG
       ;;
-      e|U|W|D)    args+=$opt;;
+      e|U|W|D)    args+=-$opt;;
       +(e|U|W|D)) args=(${(@)args:#-$opt});;
       \?) print -ru2 -- "gitstatus_start: invalid option: $OPTARG"           ; return 1;;
       :)  print -ru2 -- "gitstatus_start: missing required argument: $OPTARG"; return 1;;
