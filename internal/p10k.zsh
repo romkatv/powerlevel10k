@@ -1229,7 +1229,7 @@ function _p9k_fvm_old() {
   local fvm=$_p9k__parent_dirs[$?]/fvm
   if [[ -L $fvm ]]; then
     if [[ ${fvm:A} == (#b)*/versions/([^/]##)/bin/flutter ]]; then
-      _p9k_prompt_segment $0 blue $_p9k_color1 FLUTTER_ICON 0 '' ${match[1]//\%/%%}
+      _p9k_prompt_segment prompt_fvm blue $_p9k_color1 FLUTTER_ICON 0 '' ${match[1]//\%/%%}
       return 0
     fi
   fi
@@ -1241,7 +1241,7 @@ function _p9k_fvm_new() {
   local sdk=$_p9k__parent_dirs[$?]/.fvm/flutter_sdk
   if [[ -L $sdk ]]; then
     if [[ ${sdk:A} == (#b)*/versions/([^/]##) ]]; then
-      _p9k_prompt_segment $0 blue $_p9k_color1 FLUTTER_ICON 0 '' ${match[1]//\%/%%}
+      _p9k_prompt_segment prompt_fvm blue $_p9k_color1 FLUTTER_ICON 0 '' ${match[1]//\%/%%}
       return 0
     fi
   fi
