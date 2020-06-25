@@ -1224,14 +1224,32 @@ function _p9k_read_file() {
   [[ -n $_p9k__ret ]]
 }
 
-prompt_fvm() {
-  _p9k_upglob fvm && return
-  local link=$_p9k__parent_dirs[$?]/fvm
-  if [[ -L $link ]]; then
-    if [[ ${link:A} == (#b)*/versions/([^/]##)/bin/flutter ]]; then
+function _p9k_fvm_old() {
+  _p9k_upglob fvm && return 1
+  local fvm=$_p9k__parent_dirs[$?]/fvm
+  if [[ -L $fvm ]]; then
+    if [[ ${fvm:A} == (#b)*/versions/([^/]##)/bin/flutter ]]; then
       _p9k_prompt_segment $0 blue $_p9k_color1 FLUTTER_ICON 0 '' ${match[1]//\%/%%}
+      return 0
     fi
   fi
+  return 1
+}
+
+function _p9k_fvm_new() {
+  _p9k_upglob .fvm && return 1
+  local sdk=$_p9k__parent_dirs[$?]/.fvm/flutter_sdk
+  if [[ -L $sdk ]]; then
+    if [[ ${sdk:A} == (#b)*/versions/([^/]##) ]]; then
+      _p9k_prompt_segment $0 blue $_p9k_color1 FLUTTER_ICON 0 '' ${match[1]//\%/%%}
+      return 0
+    fi
+  fi
+  return 1
+}
+
+prompt_fvm() {
+  _p9k_fvm_new || _p9k_fvm_old
 }
 
 _p9k_prompt_fvm_init() {
