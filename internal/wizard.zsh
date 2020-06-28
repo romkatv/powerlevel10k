@@ -535,7 +535,7 @@ function install_font() {
       )
       for k t v in $settings; do
         /usr/libexec/PlistBuddy -c "Set :\"New Bookmarks\":0:$k $v" \
-          ~/Library/Preferences/com.googlecode.iterm2.plist && continue
+          ~/Library/Preferences/com.googlecode.iterm2.plist 2>/dev/null && continue
         run_command "" /usr/libexec/PlistBuddy -c \
           "Add :\"New Bookmarks\":0:$k $t $v" ~/Library/Preferences/com.googlecode.iterm2.plist
       done
