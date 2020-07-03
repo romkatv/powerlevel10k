@@ -1216,6 +1216,8 @@
   typeset -g POWERLEVEL9K_TERRAFORM_DEFAULT_FOREGROUND=4
   typeset -g POWERLEVEL9K_TERRAFORM_DEFAULT_BACKGROUND=0
   # typeset -g POWERLEVEL9K_TERRAFORM_DEFAULT_VISUAL_IDENTIFIER_EXPANSION='⭐'
+  # Show terraform workspace even if it's default
+  typeset -g POWERLEVEL9K_TERRAFORM_SHOW_DEFAULT_WS=false
 
   #############[ kubecontext: current kubernetes context (https://kubernetes.io/) ]#############
   # Show kubecontext only when the the command you are typing invokes one of these tools.
