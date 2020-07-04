@@ -398,13 +398,13 @@ function _gitstatus_daemon"${1:-}"() {
 
       local gitstatus_plugin_dir_var=_gitstatus_plugin_dir$fsuf
       local gitstatus_plugin_dir=${(P)gitstatus_plugin_dir_var}
-      set -- -d $gitstatus_plugin_dir -s $uname_s -m $uname_m -p "printf . >&$pipe_fd" -- \
+      builtin set -- -d $gitstatus_plugin_dir -s $uname_s -m $uname_m -p "printf . >&$pipe_fd" -- \
         _gitstatus_set_daemon$fsuf
-      [[ ${GITSTATUS_AUTO_INSTALL:-1} == (|-|+)<1-> ]] || set -- -n "$@"
-      source $gitstatus_plugin_dir/install     || return
-      [[ -n $_gitstatus_zsh_daemon ]]          || return
-      [[ -n $_gitstatus_zsh_version ]]         || return
-      [[ $_gitstatus_zsh_downloaded == [01] ]] || return
+      [[ ${GITSTATUS_AUTO_INSTALL:-1} == (|-|+)<1-> ]] || builtin set -- -n "$@"
+      builtin source $gitstatus_plugin_dir/install     || return
+      [[ -n $_gitstatus_zsh_daemon ]]                  || return
+      [[ -n $_gitstatus_zsh_version ]]                 || return
+      [[ $_gitstatus_zsh_downloaded == [01] ]]         || return
 
       if (( UID == EUID )); then
         local home=~
@@ -426,14 +426,14 @@ function _gitstatus_daemon"${1:-}"() {
       [[ $_gitstatus_zsh_daemon == \
          ${GITSTATUS_CACHE_DIR:-${XDG_CACHE_HOME:-$HOME/.cache}/gitstatus}/* ]] || return
 
-      set -- -f "$@"
+      builtin set -- -f "$@"
       _gitstatus_zsh_daemon=
       _gitstatus_zsh_version=
       _gitstatus_zsh_downloaded=
-      source $gitstatus_plugin_dir/install  || return
-      [[ -n $_gitstatus_zsh_daemon ]]       || return
-      [[ -n $_gitstatus_zsh_version ]]      || return
-      [[ $_gitstatus_zsh_downloaded == 1 ]] || return
+      builtin source $gitstatus_plugin_dir/install || return
+      [[ -n $_gitstatus_zsh_daemon ]]              || return
+      [[ -n $_gitstatus_zsh_version ]]             || return
+      [[ $_gitstatus_zsh_downloaded == 1 ]]        || return
 
       HOME=$home $_gitstatus_zsh_daemon -G $_gitstatus_zsh_version "${(@)args}" >&$pipe_fd
     } always {
