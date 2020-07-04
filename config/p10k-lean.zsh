@@ -1217,6 +1217,8 @@
       '*'       DEFAULT)
   typeset -g POWERLEVEL9K_TERRAFORM_DEFAULT_FOREGROUND=38
   # typeset -g POWERLEVEL9K_TERRAFORM_DEFAULT_VISUAL_IDENTIFIER_EXPANSION='⭐'
+  # Show terraform workspace even if it's default
+  typeset -g POWERLEVEL9K_TERRAFORM_SHOW_DEFAULT_WS=false
 
   #[ aws: aws profile (https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-profiles.html) ]#
   # Show aws only when the the command you are typing invokes one of these tools.
