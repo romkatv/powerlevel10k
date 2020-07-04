@@ -4666,7 +4666,7 @@ function prompt_terraform() {
   if [[ -z $TF_WORKSPACE ]]; then
     _p9k_read_word ${${TF_DATA_DIR:-.terraform}:A}/environment && ws=$_p9k__ret
   fi
-  [[ $ws == (|default) ]] && return
+  [[ -z $ws || $ws == default && $_POWERLEVEL9K_TERRAFORM_SHOW_DEFAULT == 0 ]] && return
   local pat class
   for pat class in "${_POWERLEVEL9K_TERRAFORM_CLASSES[@]}"; do
     if [[ $ws == ${~pat} ]]; then
@@ -7114,6 +7114,7 @@ _p9k_init_params() {
   _p9k_declare -a POWERLEVEL9K_KUBECONTEXT_CLASSES --
   _p9k_declare -a POWERLEVEL9K_AWS_CLASSES --
   _p9k_declare -a POWERLEVEL9K_TERRAFORM_CLASSES --
+  _p9k_declare -b POWERLEVEL9K_TERRAFORM_SHOW_DEFAULT 0
   _p9k_declare -a POWERLEVEL9K_GOOGLE_APP_CRED_CLASSES -- 'service_account:*' SERVICE_ACCOUNT
   # Specifies the format of java version.
   #

@@ -1188,6 +1188,8 @@
   # typeset -g POWERLEVEL9K_KUBECONTEXT_PREFIX='%fat '
 
   ################[ terraform: terraform workspace (https://www.terraform.io) ]#################
+  # Don't show terraform workspace if it's literally "default".
+  typeset -g POWERLEVEL9K_TERRAFORM_SHOW_DEFAULT=false
   # POWERLEVEL9K_TERRAFORM_CLASSES is an array with even number of elements. The first element
   # in each pair defines a pattern against which the current terraform workspace gets matched.
   # More specifically, it's P9K_CONTENT prior to the application of context expansion (see below)
@@ -1201,7 +1203,7 @@
   #   typeset -g POWERLEVEL9K_TERRAFORM_CLASSES=(
   #     '*prod*'  PROD
   #     '*test*'  TEST
-  #     '*'       DEFAULT)
+  #     '*'       OTHER)
   #
   # If your current terraform workspace is "project_test", its class is TEST because "project_test"
   # doesn't match the pattern '*prod*' but does match '*test*'.
@@ -1214,9 +1216,9 @@
   typeset -g POWERLEVEL9K_TERRAFORM_CLASSES=(
       # '*prod*'  PROD    # These values are examples that are unlikely
       # '*test*'  TEST    # to match your needs. Customize them as needed.
-      '*'       DEFAULT)
-  typeset -g POWERLEVEL9K_TERRAFORM_DEFAULT_FOREGROUND=4
-  # typeset -g POWERLEVEL9K_TERRAFORM_DEFAULT_VISUAL_IDENTIFIER_EXPANSION='⭐'
+      '*'         OTHER)
+  typeset -g POWERLEVEL9K_TERRAFORM_OTHER_FOREGROUND=4
+  # typeset -g POWERLEVEL9K_TERRAFORM_OTHER_VISUAL_IDENTIFIER_EXPANSION='⭐'
 
   #[ aws: aws profile (https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-profiles.html) ]#
   # Show aws only when the the command you are typing invokes one of these tools.
