@@ -59,11 +59,11 @@ function p9k_configure() {
   _p9k_can_configure || return
   (
     set -- -f
-    source $__p9k_root_dir/internal/wizard.zsh
+    builtin source $__p9k_root_dir/internal/wizard.zsh
   )
   local ret=$?
   case $ret in
-    0)  source $__p9k_cfg_path; _p9k__force_must_init=1;;
+    0)  builtin source $__p9k_cfg_path; _p9k__force_must_init=1;;
     69) return 0;;
     *)  return $ret;;
   esac

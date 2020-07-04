@@ -49,10 +49,10 @@ if ! autoload -Uz is-at-least || ! is-at-least 5.1; then
   return 1
 fi
 
-source "${__p9k_root_dir}/internal/configure.zsh"
-source "${__p9k_root_dir}/internal/worker.zsh"
-source "${__p9k_root_dir}/internal/parser.zsh"
-source "${__p9k_root_dir}/internal/icons.zsh"
+builtin source "${__p9k_root_dir}/internal/configure.zsh"
+builtin source "${__p9k_root_dir}/internal/worker.zsh"
+builtin source "${__p9k_root_dir}/internal/parser.zsh"
+builtin source "${__p9k_root_dir}/internal/icons.zsh"
 
 # For compatibility with Powerlevel9k. It's not recommended to use mnemonic color
 # names in the configuration except for colors 0-7 as these are standard.
@@ -5623,7 +5623,7 @@ _p9k_set_instant_prompt() {
   [[ -n $RPROMPT ]] || unset RPROMPT
 }
 
-typeset -gri __p9k_instant_prompt_version=27
+typeset -gri __p9k_instant_prompt_version=28
 
 _p9k_dump_instant_prompt() {
   local user=${(%):-%n}
@@ -5907,7 +5907,7 @@ _p9k_dump_instant_prompt() {
   exec 2>&1 {fd_null}>&-
   typeset -gi __p9k_instant_prompt_active=1
   typeset -g __p9k_instant_prompt_dump_file=${XDG_CACHE_HOME:-~/.cache}/p10k-dump-${(%):-%n}.zsh
-  if source $__p9k_instant_prompt_dump_file 2>/dev/null && (( $+functions[_p9k_preinit] )); then
+  if builtin source $__p9k_instant_prompt_dump_file 2>/dev/null && (( $+functions[_p9k_preinit] )); then
     _p9k_preinit
   fi
   function _p9k_instant_prompt_cleanup() {
@@ -6413,12 +6413,12 @@ _p9k_precmd_impl() {
           fi
           if (( ret == 0 )); then
             (
-              source "$__p9k_root_dir"/internal/wizard.zsh
+              builtin source "$__p9k_root_dir"/internal/wizard.zsh
             )
             if (( $? )); then
               instant_prompt_disabled=1
             else
-              source "$__p9k_cfg_path"
+              builtin source "$__p9k_cfg_path"
               _p9k__force_must_init=1
               _p9k_must_init
             fi
@@ -8017,9 +8017,9 @@ _p9k_init_vcs() {
 
   typeset -g _p9k_preinit="function _p9k_preinit() {
     (( $+commands[git] )) || { unfunction _p9k_preinit; return 1 }
-    [[ \$ZSH_VERSION == ${(q)ZSH_VERSION} ]]              || return
-    [[ -r ${(q)gitstatus_dir}/gitstatus.plugin.zsh ]]     || return
-    source ${(q)gitstatus_dir}/gitstatus.plugin.zsh _p9k_ || return
+    [[ \$ZSH_VERSION == ${(q)ZSH_VERSION} ]]                      || return
+    [[ -r ${(q)gitstatus_dir}/gitstatus.plugin.zsh ]]             || return
+    builtin source ${(q)gitstatus_dir}/gitstatus.plugin.zsh _p9k_ || return
     GITSTATUS_AUTO_INSTALL=${(q)GITSTATUS_AUTO_INSTALL}         \
       GITSTATUS_DAEMON=${(q)GITSTATUS_DAEMON}                   \
       GITSTATUS_CACHE_DIR=${(q)GITSTATUS_CACHE_DIR}             \
@@ -8035,7 +8035,7 @@ _p9k_init_vcs() {
           ${${_POWERLEVEL9K_VCS_RECURSE_UNTRACKED_DIRS:#0}:+-e} \
           -a POWERLEVEL9K
   }"
-  source $gitstatus_dir/gitstatus.plugin.zsh _p9k_ || return
+  builtin source $gitstatus_dir/gitstatus.plugin.zsh _p9k_ || return
   () {
     trap 'return 130' INT
     {

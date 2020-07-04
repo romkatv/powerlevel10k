@@ -74,7 +74,7 @@ function _p9k_init_locale() {
       done
     fi
   fi
-  source $__p9k_root_dir/internal/p10k.zsh || true
+  builtin source $__p9k_root_dir/internal/p10k.zsh || true
 }
 
 (( $+__p9k_instant_prompt_active )) && unsetopt prompt_cr prompt_sp || setopt prompt_cr prompt_sp
