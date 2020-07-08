@@ -90,6 +90,7 @@
     todo                    # todo items (https://github.com/todotxt/todo.txt-cli)
     timewarrior             # timewarrior tracking status (https://timewarrior.net/)
     taskwarrior             # taskwarrior task count (https://taskwarrior.org/)
+    # git_duet              # git duet (https://github.com/git-duet/git-duet)
     # time                  # current time
     # =========================[ Line #2 ]=========================
     newline

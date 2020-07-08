@@ -90,6 +90,7 @@
     todo                    # todo items (https://github.com/todotxt/todo.txt-cli)
     timewarrior             # timewarrior tracking status (https://timewarrior.net/)
     taskwarrior             # taskwarrior task count (https://taskwarrior.org/)
+    # git_duet              # git duet (https://github.com/git-duet/git-duet)
     # time                  # current time
     # =========================[ Line #2 ]=========================
     newline                 # \n
@@ -1492,6 +1493,10 @@
   # typeset -g POWERLEVEL9K_TIME_VISUAL_IDENTIFIER_EXPANSION='⭐'
   # Custom prefix.
   # typeset -g POWERLEVEL9K_TIME_PREFIX='%248Fat '
+
+  ####################################[ git_duet: current author+committer ]####################################
+  # Current pair color
+  typeset -g POWERLEVEL9K_GIT_DUET_FOREGROUND=15
 
   # Example of a user-defined prompt segment. Function prompt_example will be called on every
   # prompt if `example` prompt segment is added to POWERLEVEL9K_LEFT_PROMPT_ELEMENTS or
