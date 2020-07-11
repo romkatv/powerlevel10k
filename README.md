@@ -366,14 +366,14 @@ make sure to disable the current theme in your plugin manager. See
 ### Oh My Zsh
 
 ```zsh
-git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/themes/powerlevel10k
+git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k
 ```
 
 Users in mainland China can use the official mirror on gitee.com for faster download.<br>
 中国大陆用户可以使用 gitee.com 上的官方镜像加速下载.
 
 ```zsh
-git clone --depth=1 https://gitee.com/romkatv/powerlevel10k.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/themes/powerlevel10k
+git clone --depth=1 https://gitee.com/romkatv/powerlevel10k.git ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k
 ```
 
 Set `ZSH_THEME="powerlevel10k/powerlevel10k"` in `~/.zshrc`.
@@ -591,19 +591,19 @@ Powerlevel10k is released under the
 
 The command to update Powerlevel10k depends on how it was installed.
 
-| Installation              | Update command                                                        |
-|---------------------------|-----------------------------------------------------------------------|
-| [Manual](#manual)         | `git -C ~/powerlevel10k pull`                                         |
-| [Oh My Zsh](#oh-my-zsh)   | `git -C ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/themes/powerlevel10k pull` |
-| [Prezto](#prezto)         | `zprezto-update`                                                      |
-| [Zim](#zim)               | `zimfw update`                                                        |
-| [Antigen](#antigen)       | `antigen update`                                                      |
-| [Zplug](#zplug)           | `zplug update`                                                        |
-| [Zgen](#zgen)             | `zgen update`                                                         |
-| [Zplugin](#zplugin)       | `zplugin update`                                                      |
-| [Zinit](#zinit)           | `zinit update`                                                        |
-| [Homebrew](#homebrew)     | `brew update && brew upgrade`                                         |
-| [Arch Linux](#arch-linux) | `yay -Syu --noconfirm --needed zsh-theme-powerlevel10k-git`           |
+| Installation              | Update command                                              |
+|---------------------------|-------------------------------------------------------------|
+| [Manual](#manual)         | `git -C ~/powerlevel10k pull`                               |
+| [Oh My Zsh](#oh-my-zsh)   | `git -C ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k pull` |
+| [Prezto](#prezto)         | `zprezto-update`                                            |
+| [Zim](#zim)               | `zimfw update`                                              |
+| [Antigen](#antigen)       | `antigen update`                                            |
+| [Zplug](#zplug)           | `zplug update`                                              |
+| [Zgen](#zgen)             | `zgen update`                                               |
+| [Zplugin](#zplugin)       | `zplugin update`                                            |
+| [Zinit](#zinit)           | `zinit update`                                              |
+| [Homebrew](#homebrew)     | `brew update && brew upgrade`                               |
+| [Arch Linux](#arch-linux) | `yay -Syu --noconfirm --needed zsh-theme-powerlevel10k-git` |
 
 **IMPORTANT**: Restart Zsh after updating Powerlevel10k. [Do not use `source ~/.zshrc`](
   #weird-things-happen-after-typing-source-zshrc).
@@ -641,19 +641,19 @@ The command to update Powerlevel10k depends on how it was installed.
    Powerlevel10k. The command to delete them depends on which installation method you'd chosen.
    Refer to the [installation instructions](#installation) if you need a reminder.
 
-   | Installation              | Uninstall command                                                   |
-   |---------------------------|---------------------------------------------------------------------|
-   | [Manual](#manual)         | `rm -rf ~/powerlevel10k`                                            |
-   | [Oh My Zsh](#oh-my-zsh)   | `rm -rf -- ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/themes/powerlevel10k` |
-   | [Prezto](#prezto)         | n/a                                                                 |
-   | [Zim](#zim)               | `zimfw uninstall`                                                   |
-   | [Antigen](#antigen)       | `antigen purge romkatv/powerlevel10k`                               |
-   | [Zplug](#zplug)           | `zplug clean`                                                       |
-   | [Zgen](#zgen)             | `zgen reset`                                                        |
-   | [Zplugin](#zplugin)       | `zplugin delete romkatv/powerlevel10k`                              |
-   | [Zinit](#zinit)           | `zinit delete romkatv/powerlevel10k`                                |
-   | [Homebrew](#homebrew)     | `brew uninstall powerlevel10k; brew untap romkatv/powerlevel10k`    |
-   | [Arch Linux](#arch-linux) | `yay -R --noconfirm zsh-theme-powerlevel10k-git`                    |
+   | Installation              | Uninstall command                                                |
+   |---------------------------|------------------------------------------------------------------|
+   | [Manual](#manual)         | `rm -rf ~/powerlevel10k`                                         |
+   | [Oh My Zsh](#oh-my-zsh)   | `rm -rf -- ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k` |
+   | [Prezto](#prezto)         | n/a                                                              |
+   | [Zim](#zim)               | `zimfw uninstall`                                                |
+   | [Antigen](#antigen)       | `antigen purge romkatv/powerlevel10k`                            |
+   | [Zplug](#zplug)           | `zplug clean`                                                    |
+   | [Zgen](#zgen)             | `zgen reset`                                                     |
+   | [Zplugin](#zplugin)       | `zplugin delete romkatv/powerlevel10k`                           |
+   | [Zinit](#zinit)           | `zinit delete romkatv/powerlevel10k`                             |
+   | [Homebrew](#homebrew)     | `brew uninstall powerlevel10k; brew untap romkatv/powerlevel10k` |
+   | [Arch Linux](#arch-linux) | `yay -R --noconfirm zsh-theme-powerlevel10k-git`                 |
 5. Restart Zsh. [Do not use `source ~/.zshrc`](#weird-things-happen-after-typing-source-zshrc).
 
 ### Where can I ask for help and report bugs?
