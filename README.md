@@ -553,6 +553,9 @@ applications on your system. Configure your terminal to use this font:
 - **Terminator**: Open *Preferences* using the context menu. Under *Profiles* select the *General*
   tab (should be selected already), uncheck *Use the system fixed width font* (if not already)
   and select `MesloLGS NF Regular`. Exit the Preferences dialog by clicking *Close*.
+- **Guake**: Right Click on an open terminal and open *Preferences*. Under *Appearance* 
+  tab, uncheck *Use the system fixed width font* (if not already) and select `MesloLGS NF Regular`. 
+  Exit the Preferences dialog by clicking *Close*.  
 
 **IMPORTANT:** Run `p10k configure` after changing terminal font. The old `~/.p10k.zsh` may work
 incorrectly with the new font.
