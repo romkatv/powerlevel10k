@@ -6413,7 +6413,16 @@ _p9k_precmd_impl() {
           fi
           if (( ret == 0 )); then
             (
-              builtin source "$__p9k_root_dir"/internal/wizard.zsh
+              local -i pid
+              {
+                { /bin/sh "$__p9k_root_dir"/gitstatus/install </dev/null &>/dev/null & } && pid=$!
+                ( builtin source "$__p9k_root_dir"/internal/wizard.zsh )
+              } always {
+                if (( pid )); then
+                  kill -- $pid 2>/dev/null
+                  wait -- $pid 2>/dev/null
+                fi
+              }
             )
             if (( $? )); then
               instant_prompt_disabled=1
