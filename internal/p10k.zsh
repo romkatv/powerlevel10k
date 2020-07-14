@@ -6412,18 +6412,22 @@ _p9k_precmd_impl() {
             ret=$?
           fi
           if (( ret == 0 )); then
-            (
-              local -i pid
-              {
-                { /bin/sh "$__p9k_root_dir"/gitstatus/install </dev/null &>/dev/null & } && pid=$!
-                ( builtin source "$__p9k_root_dir"/internal/wizard.zsh )
-              } always {
-                if (( pid )); then
-                  kill -- $pid 2>/dev/null
-                  wait -- $pid 2>/dev/null
-                fi
-              }
-            )
+            if (( $+commands[git] )); then
+              (
+                local -i pid
+                {
+                  { /bin/sh "$__p9k_root_dir"/gitstatus/install </dev/null &>/dev/null & } && pid=$!
+                  ( builtin source "$__p9k_root_dir"/internal/wizard.zsh )
+                } always {
+                  if (( pid )); then
+                    kill -- $pid 2>/dev/null
+                    wait -- $pid 2>/dev/null
+                  fi
+                }
+              )
+            else
+              ( builtin source "$__p9k_root_dir"/internal/wizard.zsh )
+            fi
             if (( $? )); then
               instant_prompt_disabled=1
             else
