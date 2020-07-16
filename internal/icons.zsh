@@ -459,7 +459,7 @@ function _p9k_init_icons() {
         HOME_SUB_ICON                  '\uF07C'$s             # 
         FOLDER_ICON                    '\uF115'$s             # 
         ETC_ICON                       '\uF013'$s             # 
-        NETWORK_ICON                   '\uF877'$s             # 
+        NETWORK_ICON                   '\uF50D'$s             # 
         LOAD_ICON                      '\uF080 '              # 
         SWAP_ICON                      '\uF464'$s             # 
         RAM_ICON                       '\uF0E4'$s             # 
