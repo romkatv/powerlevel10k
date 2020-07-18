@@ -1847,10 +1847,10 @@ prompt_dir() {
         done
         if [[ -n $_POWERLEVEL9K_DIR_TRUNCATE_BEFORE_MARKER ]]; then
           local _2=$'\2'
-          if [[ $_POWERLEVEL9K_DIR_TRUNCATE_BEFORE_MARKER == last ]]; then
-            (( e = ${parts[(I)*$_2]} ))
+          if [[ $_POWERLEVEL9K_DIR_TRUNCATE_BEFORE_MARKER == last* ]]; then
+            (( e = ${parts[(I)*$_2]} + ${_POWERLEVEL9K_DIR_TRUNCATE_BEFORE_MARKER#*:} ))
           else
-            (( e = ${parts[(ib:2:)*$_2]} ))
+            (( e = ${parts[(ib:2:)*$_2]} + ${_POWERLEVEL9K_DIR_TRUNCATE_BEFORE_MARKER#*:} ))
           fi
           if (( e > 1 && e <= $#parts )); then
             parts[1,e-1]=()
@@ -6980,9 +6980,8 @@ _p9k_init_params() {
   _p9k_declare -e POWERLEVEL9K_SHORTEN_DELIMITER
   _p9k_declare -s POWERLEVEL9K_DIR_TRUNCATE_BEFORE_MARKER ''
   case $_POWERLEVEL9K_DIR_TRUNCATE_BEFORE_MARKER in
-    first) ;;
-    last)  ;;
-    true)  _POWERLEVEL9K_DIR_TRUNCATE_BEFORE_MARKER=last;;
+    first|last) _POWERLEVEL9K_DIR_TRUNCATE_BEFORE_MARKER+=:0;;
+    (first|last):(|-)<->);;
     *)     _POWERLEVEL9K_DIR_TRUNCATE_BEFORE_MARKER=;;
   esac
   [[ -z $_POWERLEVEL9K_SHORTEN_FOLDER_MARKER ]] && _POWERLEVEL9K_DIR_TRUNCATE_BEFORE_MARKER=
@@ -7742,7 +7741,7 @@ _p9k_must_init() {
     [[ $sig == $_p9k__param_sig ]] && return 1
     _p9k_deinit
   fi
-  _p9k__param_pat=$'v100\1'${(q)ZSH_VERSION}$'\1'${(q)ZSH_PATCHLEVEL}$'\1'
+  _p9k__param_pat=$'v101\1'${(q)ZSH_VERSION}$'\1'${(q)ZSH_PATCHLEVEL}$'\1'
   _p9k__param_pat+=$'${#parameters[(I)POWERLEVEL9K_*]}\1${(%):-%n%#}\1$GITSTATUS_LOG_LEVEL\1'
   _p9k__param_pat+=$'$GITSTATUS_ENABLE_LOGGING\1$GITSTATUS_DAEMON\1$GITSTATUS_NUM_THREADS\1'
   _p9k__param_pat+=$'$GITSTATUS_CACHE_DIR\1$GITSTATUS_AUTO_INSTALL\1${ZLE_RPROMPT_INDENT:-1}\1'
