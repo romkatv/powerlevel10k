@@ -168,13 +168,13 @@ function gitstatus_query"${1:-}"() {
   done
 
   if (( OPTIND != ARGC )); then
-    print -ru2 -- "gitstatus_start: exactly one positional argument is required"
+    print -ru2 -- "gitstatus_query: exactly one positional argument is required"
     return 1
   fi
 
   local name=$*[OPTIND]
   if [[ $name != [[:IDENT:]]## ]]; then
-    print -ru2 -- "gitstatus_start: invalid positional argument: $name"
+    print -ru2 -- "gitstatus_query: invalid positional argument: $name"
     return 1
   fi
 
@@ -184,6 +184,12 @@ function gitstatus_query"${1:-}"() {
     [[ $dir == /* ]] || dir=${(%):-%/}/$dir
   else
     [[ $GIT_DIR == /* ]] && dir=:$GIT_DIR || dir=:${(%):-%/}/$GIT_DIR
+  fi
+
+  if [[ $dir != (|:)/* ]]; then
+    typeset -g VCS_STATUS_RESULT=norepo-sync
+    _gitstatus_clear$fsuf
+    return 0
   fi
 
   local -i req_fd=${(P)${:-_GITSTATUS_REQ_FD_$name}}
