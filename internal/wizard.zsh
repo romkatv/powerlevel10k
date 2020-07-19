@@ -1047,6 +1047,8 @@ function os_icon_name() {
           local lines=(${(f)"$(</etc/os-release)"})
           lines=(${(@M)lines:#ID=*})
           (( $#lines == 1 )) && os_release_id=${lines[1]#ID=}
+        elif [[ -e /etc/artix-release ]]; then
+          os_release_id=artix
         fi
         case $os_release_id in
           *arch*)                  echo LINUX_ARCH_ICON;;
@@ -1069,6 +1071,7 @@ function os_icon_name() {
           *devuan*)                echo LINUX_DEVUAN_ICON;;
           *manjaro*)               echo LINUX_MANJARO_ICON;;
           *void*)                  echo LINUX_VOID_ICON;;
+          *artix*)                 echo LINUX_ARTIX_ICON;;
           *)                       echo LINUX_ICON;;
         esac
         ;;

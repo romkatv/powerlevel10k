@@ -7742,7 +7742,7 @@ _p9k_must_init() {
     [[ $sig == $_p9k__param_sig ]] && return 1
     _p9k_deinit
   fi
-  _p9k__param_pat=$'v101\1'${(q)ZSH_VERSION}$'\1'${(q)ZSH_PATCHLEVEL}$'\1'
+  _p9k__param_pat=$'v102\1'${(q)ZSH_VERSION}$'\1'${(q)ZSH_PATCHLEVEL}$'\1'
   _p9k__param_pat+=$'${#parameters[(I)POWERLEVEL9K_*]}\1${(%):-%n%#}\1$GITSTATUS_LOG_LEVEL\1'
   _p9k__param_pat+=$'$GITSTATUS_ENABLE_LOGGING\1$GITSTATUS_DAEMON\1$GITSTATUS_NUM_THREADS\1'
   _p9k__param_pat+=$'$GITSTATUS_CACHE_DIR\1$GITSTATUS_AUTO_INSTALL\1${ZLE_RPROMPT_INDENT:-1}\1'
@@ -7838,6 +7838,8 @@ function _p9k_init_cacheable() {
           local lines=(${(f)"$(</etc/os-release)"})
           lines=(${(@M)lines:#ID=*})
           (( $#lines == 1 )) && os_release_id=${lines[1]#ID=}
+        elif [[ -e /etc/artix-release ]]; then
+          os_release_id=artix
         fi
         case $os_release_id in
           *arch*)                  _p9k_set_os Linux LINUX_ARCH_ICON;;
@@ -7860,6 +7862,7 @@ function _p9k_init_cacheable() {
           *devuan*)                _p9k_set_os Linux LINUX_DEVUAN_ICON;;
           *manjaro*)               _p9k_set_os Linux LINUX_MANJARO_ICON;;
           *void*)                  _p9k_set_os Linux LINUX_VOID_ICON;;
+          *artix*)                 _p9k_set_os Linux LINUX_ARTIX_ICON;;
           *)                       _p9k_set_os Linux LINUX_ICON;;
         esac
         ;;

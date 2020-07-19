@@ -68,6 +68,7 @@ function _p9k_init_icons() {
         LINUX_SABAYON_ICON             '\uE271'$s             # 
         LINUX_SLACKWARE_ICON           '\uE271'$s             # 
         LINUX_VOID_ICON                '\uE271'$s             # 
+        LINUX_ARTIX_ICON               '\uE271'$s             # 
         SUNOS_ICON                     '\U1F31E'$q            # 🌞
         HOME_ICON                      '\uE12C'$s             # 
         HOME_SUB_ICON                  '\uE18D'$s             # 
@@ -198,6 +199,7 @@ function _p9k_init_icons() {
         LINUX_SABAYON_ICON             '\uF17C'$s             # 
         LINUX_SLACKWARE_ICON           '\uF17C'$s             # 
         LINUX_VOID_ICON                '\uF17C'$s             # 
+        LINUX_ARTIX_ICON               '\uF17C'$s             # 
         SUNOS_ICON                     '\uF185 '              # 
         HOME_ICON                      '\uF015'$s             # 
         HOME_SUB_ICON                  '\uF07C'$s             # 
@@ -329,6 +331,7 @@ function _p9k_init_icons() {
         LINUX_SABAYON_ICON             "${CODEPOINT_OF_AWESOME_LINUX:+\\u$CODEPOINT_OF_AWESOME_LINUX$s}"
         LINUX_SLACKWARE_ICON           "${CODEPOINT_OF_AWESOME_LINUX:+\\u$CODEPOINT_OF_AWESOME_LINUX$s}"
         LINUX_VOID_ICON                "${CODEPOINT_OF_AWESOME_LINUX:+\\u$CODEPOINT_OF_AWESOME_LINUX$s}"
+        LINUX_ARTIX_ICON               "${CODEPOINT_OF_AWESOME_LINUX:+\\u$CODEPOINT_OF_AWESOME_LINUX$s}"
         SUNOS_ICON                     "${CODEPOINT_OF_AWESOME_SUN_O:+\\u$CODEPOINT_OF_AWESOME_SUN_O }"
         HOME_ICON                      "${CODEPOINT_OF_AWESOME_HOME:+\\u$CODEPOINT_OF_AWESOME_HOME$s}"
         HOME_SUB_ICON                  "${CODEPOINT_OF_AWESOME_FOLDER_OPEN:+\\u$CODEPOINT_OF_AWESOME_FOLDER_OPEN$s}"
@@ -452,6 +455,7 @@ function _p9k_init_icons() {
         LINUX_SABAYON_ICON             '\uF317'$s             # 
         LINUX_SLACKWARE_ICON           '\uF319'$s             # 
         LINUX_VOID_ICON                '\uF17C'               # 
+        LINUX_ARTIX_ICON               '\uF17C'               # 
         LINUX_UBUNTU_ICON              '\uF31b'$s             # 
         LINUX_ICON                     '\uF17C'               # 
         SUNOS_ICON                     '\uF185 '              # 
@@ -578,6 +582,7 @@ function _p9k_init_icons() {
         LINUX_SABAYON_ICON             'sabayon'
         LINUX_SLACKWARE_ICON           'slack'
         LINUX_VOID_ICON                'void'
+        LINUX_ARTIX_ICON               'artix'
         SUNOS_ICON                     'sunos'
         HOME_ICON                      ''
         HOME_SUB_ICON                  ''
@@ -704,6 +709,7 @@ function _p9k_init_icons() {
         LINUX_SABAYON_ICON             'Sab'
         LINUX_SLACKWARE_ICON           'Sla'
         LINUX_VOID_ICON                'Vo'
+        LINUX_ARTIX_ICON               'Art'
         SUNOS_ICON                     'Sun'
         HOME_ICON                      ''
         HOME_SUB_ICON                  ''
