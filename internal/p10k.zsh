@@ -201,10 +201,10 @@ function _p9k_read_word() {
 
 function _p9k_fetch_cwd() {
   _p9k__cwd=${(%):-%/}
-  _p9k__cwd_a=${_p9k__cwd:A}
+  _p9k__cwd_a=${${_p9k__cwd:A}:-.}
 
   case $_p9k__cwd in
-    ~|/)
+    ~|/|.)
       _p9k__parent_dirs=()
       _p9k__parent_mtimes=()
       _p9k__parent_mtimes_i=()
@@ -2011,7 +2011,7 @@ prompt_dir() {
     [[ $sep == *%* ]] && sep+=$style
 
     local content="${(pj.$sep.)parts}"
-    if (( _POWERLEVEL9K_DIR_HYPERLINK && _p9k_term_has_href )); then
+    if (( _POWERLEVEL9K_DIR_HYPERLINK && _p9k_term_has_href )) && [[ $_p9k__cwd == /* ]]; then
       local header=$'%{\e]8;;file://'${${_p9k__cwd//\%/%%25}//'#'/%%23}$'\a%}'
       local footer=$'%{\e]8;;\a%}'
       if (( expand )); then
@@ -2470,7 +2470,7 @@ prompt_nodenv() {
             (( ${_POWERLEVEL9K_NODENV_SOURCES[(I)local]} )) || return
             break
           fi
-          [[ $dir == / ]] && break
+          [[ $dir == (/|.) ]] && break
           dir=${dir:h}
         done
       fi
@@ -2631,7 +2631,7 @@ prompt_rbenv() {
             (( ${_POWERLEVEL9K_RBENV_SOURCES[(I)local]} )) || return
             break
           fi
-          [[ $dir == / ]] && break
+          [[ $dir == (/|.) ]] && break
           dir=${dir:h}
         done
       fi
@@ -2689,7 +2689,7 @@ prompt_phpenv() {
             (( ${_POWERLEVEL9K_PHPENV_SOURCES[(I)local]} )) || return
             break
           fi
-          [[ $dir == / ]] && break
+          [[ $dir == (/|.) ]] && break
           dir=${dir:h}
         done
       fi
@@ -2750,7 +2750,7 @@ prompt_luaenv() {
             (( ${_POWERLEVEL9K_LUAENV_SOURCES[(I)local]} )) || return
             break
           fi
-          [[ $dir == / ]] && break
+          [[ $dir == (/|.) ]] && break
           dir=${dir:h}
         done
       fi
@@ -2811,7 +2811,7 @@ prompt_jenv() {
             (( ${_POWERLEVEL9K_JENV_SOURCES[(I)local]} )) || return
             break
           fi
-          [[ $dir == / ]] && break
+          [[ $dir == (/|.) ]] && break
           dir=${dir:h}
         done
       fi
@@ -2872,7 +2872,7 @@ prompt_plenv() {
             (( ${_POWERLEVEL9K_PLENV_SOURCES[(I)local]} )) || return
             break
           fi
-          [[ $dir == / ]] && break
+          [[ $dir == (/|.) ]] && break
           dir=${dir:h}
         done
       fi
@@ -3600,7 +3600,7 @@ function _p9k_vcs_status_for_dir() {
     while true; do
       _p9k__ret=$_p9k__gitstatus_last[$dir]
       [[ -n $_p9k__ret ]] && return 0
-      [[ $dir == / ]] && return 1
+      [[ $dir == (/|.) ]] && return 1
       dir=${dir:h}
     done
   fi
@@ -3615,7 +3615,7 @@ function _p9k_vcs_status_purge() {
       # unset doesn't work if $dir contains weird shit
       _p9k__gitstatus_last[$dir]=""
       _p9k_git_slow[$dir]=""
-      [[ $dir == / ]] && break
+      [[ $dir == (/|.) ]] && break
       dir=${dir:h}
     done
   fi
@@ -3885,7 +3885,7 @@ function _p9k_vcs_gitstatus() {
           local dir=$_p9k__cwd_a
           while true; do
             case $_p9k_git_slow[$dir] in
-              "") [[ $dir == / ]] && break; dir=${dir:h};;
+              "") [[ $dir == (/|.) ]] && break; dir=${dir:h};;
               0) break;;
               1) timeout=0; break;;
             esac
@@ -4078,7 +4078,7 @@ prompt_pyenv() {
             (( ${_POWERLEVEL9K_PYENV_SOURCES[(I)local]} )) || return
             break
           fi
-          [[ $dir == / ]] && break
+          [[ $dir == (/|.) ]] && break
           dir=${dir:h}
         done
       fi
@@ -4146,7 +4146,7 @@ prompt_goenv() {
             (( ${_POWERLEVEL9K_GOENV_SOURCES[(I)local]} )) || return
             break
           fi
-          [[ $dir == / ]] && break
+          [[ $dir == (/|.) ]] && break
           dir=${dir:h}
         done
       fi
@@ -5623,7 +5623,7 @@ _p9k_set_instant_prompt() {
   [[ -n $RPROMPT ]] || unset RPROMPT
 }
 
-typeset -gri __p9k_instant_prompt_version=28
+typeset -gri __p9k_instant_prompt_version=29
 
 _p9k_dump_instant_prompt() {
   local user=${(%):-%n}
@@ -5692,6 +5692,7 @@ _p9k_dump_instant_prompt() {
   fi
   (( $+terminfo[cuu] && $+terminfo[cuf] && $+terminfo[ed] && $+terminfo[sc] && $+terminfo[rc] )) || return
   local pwd=${(%):-%/}
+  [[ $pwd == /* ]] || return
   local prompt_file=$prompt_dir/prompt-${#pwd}
   local key=$pwd:$ssh:${(%):-%#}
   local content
