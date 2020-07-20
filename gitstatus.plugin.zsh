@@ -424,7 +424,7 @@ function _gitstatus_daemon"${1:-}"() {
       if [[ -x $_gitstatus_zsh_daemon ]]; then
         HOME=$home $_gitstatus_zsh_daemon -G $_gitstatus_zsh_version "${(@)args}" >&$pipe_fd
         local -i ret=$?
-        [[ $ret == (0|129|130|131|137|141|143) ]] && return ret
+        [[ $ret == (0|129|130|131|137|141|143|159) ]] && return ret
       fi
 
       (( ! _gitstatus_zsh_downloaded ))                || return
