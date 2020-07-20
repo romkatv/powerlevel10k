@@ -165,7 +165,7 @@ function gitstatus_start() {
             local ret=$?
             trap - ${sig[@]}
             case "$ret" in
-              0|129|130|131|137|141|143)
+              0|129|130|131|137|141|143|159)
                 echo -nE $'bye\x1f0\x1e' >&"$fd_out"
                 exit "$ret"
               ;;
