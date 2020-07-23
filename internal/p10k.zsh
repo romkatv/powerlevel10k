@@ -7270,7 +7270,7 @@ function _p9k_deschedule_redraw() {
 function _p9k_widget_hook() {
   _p9k_deschedule_redraw
 
-  if (( $+functions[p10k-on-post-widget] || $#_p9k_show_on_command )); then
+  if (( ${+functions[p10k-on-post-widget]} || ${#_p9k_show_on_command} )); then
     local -a P9K_COMMANDS
     if [[ "$_p9k__last_buffer" == "$PREBUFFER$BUFFER" ]]; then
       P9K_COMMANDS=(${_p9k__last_commands[@]})
