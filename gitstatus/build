@@ -409,6 +409,7 @@ if [ -z "$gitstatus_cpu" ]; then
   case "$gitstatus_arch" in
     armv6l)         gitstatus_cpu=armv6;;
     armv7l)         gitstatus_cpu=armv7;;
+    arm64)          gitstatus_cpu=armv8;;
     aarch64)        gitstatus_cpu=armv8-a;;
     ppc64le)        gitstatus_cpu=powerpc64le;;
     riscv64)        gitstatus_cpu=rv64imafdc;;
