@@ -118,7 +118,7 @@ void ProcessRequest(const Options& opts, RepoCache& cache, Request req) {
   resp.Print(stats.num_untracked);
 
   if (remote && remote->ref) {
-    const char* ref = git_reference_shorthand(remote->ref);
+    const char* ref = git_reference_name(remote->ref);
     // Number of commits we are ahead of upstream. Non-negative integer.
     resp.Print(CountRange(repo->repo(), ref + "..HEAD"s));
     // Number of commits we are behind upstream. Non-negative integer.
@@ -152,7 +152,7 @@ void ProcessRequest(const Options& opts, RepoCache& cache, Request req) {
   resp.Print(push_remote ? push_remote->url : "");
 
   if (push_remote && push_remote->ref) {
-    const char* ref = git_reference_shorthand(push_remote->ref);
+    const char* ref = git_reference_name(push_remote->ref);
     // Number of commits we are ahead of push remote. Non-negative integer.
     resp.Print(CountRange(repo->repo(), ref + "..HEAD"s));
     // Number of commits we are behind upstream. Non-negative integer.
