@@ -1591,12 +1591,17 @@ upon terminal shrinking due to the command line wrapping around.
 
 #### Zsh patch
 
-The bug described above has been fixed in [this branch](
+The bug described above has been partially fixed (only for some terminals) in [this branch](
   https://github.com/romkatv/zsh/tree/fix-winchanged). The idea behind the fix is to use `sc` (save
 cursor) terminal capability before printing prompt and `rc` (restore cursor) to move cursor back
-to the same position when prompt needs to be refreshed.
+to the original position when prompt needs to be refreshed.
 
-*Note*: The patch doesn't work on Alacritty. On the plus side, it doesn't make things worse.
+The patch works only on terminals that reflow saved cursor position together with text when the
+terminal window is resized. The patch has no observable effect on terminals that don't reflow text
+on resize (both patched and unpatched Zsh behave correctly) and on terminals that reflow text but
+not saved cursor position (both patched and unpatched Zsh redraw prompt at the same incorrect
+position). In other words, the patch fixes the resizing issue on some terminals while keeping the
+behavior unchanged on others.
 
 There are two alternative approaches to fixing the bug that may seem to work at first glance but in
 fact don't:
@@ -1618,19 +1623,21 @@ There is no ETA for the patch making its way into upstream Zsh. See [discussion]
 There are a few mitigation options for this issue.
 
 - Apply [the patch](#zsh-patch) and [rebuild Zsh from source](
-    https://github.com/zsh-users/zsh/blob/master/INSTALL). It won't help if you are using Alacritty.
+    https://github.com/zsh-users/zsh/blob/master/INSTALL). It won't help if you are using Alacritty,
+  Kitty or some other terminal that reflows text on resize but doesn't reflow saved cursor position.
+  On such terminals the patch will have no visible effect.
 - Disable text reflowing on window resize in terminal settings. If your terminal doesn't have this
   setting, try a different terminal.
 - Avoid long lines between the start of prompt and cursor.
   1. Disable ruler with `POWERLEVEL9K_SHOW_RULER=false`.
-  1. Disable prompt connection with `POWERLEVEL9K_MULTILINE_FIRST_PROMPT_GAP_CHAR=' '`.
-  1. Disable right frame with `POWERLEVEL9K_MULTILINE_FIRST_PROMPT_SUFFIX=` and
-     `POWERLEVEL9K_MULTILINE_NEWLINE_PROMPT_SUFFIX=` and
-     `POWERLEVEL9K_MULTILINE_LAST_PROMPT_SUFFIX=`.
-  1. Remove all elements from `POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS`. Right prompt on the last prompt
-     line will cause resizing issues only when the cursor is below it. This isn't very common, so
-     you might want to keep some elements in `POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS` provided that
-     none of them are succeeded by `newline`.
+  2. Disable prompt connection with `POWERLEVEL9K_MULTILINE_FIRST_PROMPT_GAP_CHAR=' '`.
+  3. Disable right frame with `POWERLEVEL9K_MULTILINE_FIRST_PROMPT_SUFFIX=''`,
+     `POWERLEVEL9K_MULTILINE_NEWLINE_PROMPT_SUFFIX=''` and
+     `POWERLEVEL9K_MULTILINE_LAST_PROMPT_SUFFIX=''`.
+  4. Set `POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=()`. Right prompt on the last prompt line will cause
+     resizing issues only when the cursor is below it. This isn't very common, so you might want to
+     keep some elements in `POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS` provided that none of them are
+     succeeded by `newline`.
 
 ### Icons cut off in Konsole
 
