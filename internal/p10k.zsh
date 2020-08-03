@@ -8379,13 +8379,17 @@ Perform the final stage of initialization. Must be called at the very end of zsh
 
 typeset -gr __p9k_p10k_display_usage="Usage: %2Fp10k%f %Bdisplay%b part-pattern=state-list...
 
-Show, hide or toggle prompt parts. If called from zle, the current
-prompt is refreshed.
+  Show, hide or toggle prompt parts. If called from zle, the current
+  prompt is refreshed.
 
 Usage: %2Fp10k%f %Bdisplay%b -a [part-pattern]...
 
-Populate array \`reply\` with states of prompt parts matching the patterns.
-If no patterns are supplied, assume \`*\`.
+  Populate array \`reply\` with states of prompt parts matching the patterns.
+  If no patterns are supplied, assume \`*\`.
+
+Usage: %2Fp10k%f %Bdisplay%b -r
+
+  Redisplay prompt.
 
 Parts:
   empty_line    empty line (duh)
@@ -8498,8 +8502,15 @@ function p10k() {
       shift
       local -i k dump
       local opt prev new pair list name var
-      while getopts ':ha' opt; do
+      while getopts ':har' opt; do
         case $opt in
+          r)
+            if (( __p9k_reset_state > 0 )); then
+              __p9k_reset_state=2
+            else
+              __p9k_reset_state=-1
+            fi
+          ;;
           a) dump=1;;
           h) print -rP -- $__p9k_p10k_display_usage; return 0;;
           ?) print -rP -- $__p9k_p10k_display_usage >&2; return 1;;
@@ -8514,6 +8525,9 @@ function p10k() {
             reply+=($_p9k__display_v[k,k+1])
           done
         done
+        if (( __p9k_reset_state == -1 )); then
+          _p9k_reset_prompt
+        fi
         return 0
       fi
       local REPLY
