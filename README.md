@@ -1368,11 +1368,6 @@ configuration wizard won't offer prompt styles that use them. *Fix*: Restart you
 install [the recommended font](#meslo-nerd-font-patched-for-powerlevel10k). Verify by running
 `p10k configure` and checking that all glyphs render correctly.
 
-The minimum screen size at which configuration wizard can function is 55 columns by 21 lines.
-However, not all prompt styles are offered at such small screen size as there is simply not enough
-space to present them. *Fix*: Resize your terminal to at least 84 columns by 25 lines prior to
-running `p10k configure`. Verify with `print ${COLUMNS}x${LINES}`.
-
 ### Cannot install the recommended font
 
 Once you download [the recommended font](#meslo-nerd-font-patched-for-powerlevel10k),
