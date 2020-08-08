@@ -556,6 +556,13 @@ applications on your system. Configure your terminal to use this font:
 - **Guake**: Right Click on an open terminal and open *Preferences*. Under *Appearance* 
   tab, uncheck *Use the system fixed width font* (if not already) and select `MesloLGS NF Regular`. 
   Exit the Preferences dialog by clicking *Close*.  
+- **Alacritty**: Edit or create `~/.config/alacritty/alacritty.yml`. Append the `font` section below:
+  ```yaml
+  font:
+    normal:
+      family: "MesloLGS NF"
+  ```
+
 
 **IMPORTANT:** Run `p10k configure` after changing terminal font. The old `~/.p10k.zsh` may work
 incorrectly with the new font.
