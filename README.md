@@ -558,11 +558,11 @@ applications on your system. Configure your terminal to use this font:
   Exit the Preferences dialog by clicking *Close*.  
 - **Alacritty**: Create or open `~/.config/alacritty/alacritty.yml` and and the following section
   to it:
-```yaml
-font:
-  normal:
-    family: "MesloLGS NF"
-```
+  ```yaml
+  font:
+    normal:
+      family: "MesloLGS NF"
+  ```
 
 **IMPORTANT:** Run `p10k configure` after changing terminal font. The old `~/.p10k.zsh` may work
 incorrectly with the new font.
