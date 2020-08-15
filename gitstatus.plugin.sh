@@ -125,7 +125,7 @@ function gitstatus_start() {
 
         (
           local fd_in fd_out
-          exec {fd_in}<"$req_fifo" {fd_out}>"$resp_fifo" || exit
+          exec {fd_in}<"$req_fifo" {fd_out}>>"$resp_fifo" || exit
           echo "$BASHPID" >&"$fd_out"
 
           local _gitstatus_bash_daemon _gitstatus_bash_version _gitstatus_bash_downloaded
@@ -197,8 +197,8 @@ function gitstatus_start() {
       ) & disown
     } 0</dev/null &>"$GITSTATUS_DAEMON_LOG"
 
-    exec {_GITSTATUS_REQ_FD}>"$req_fifo" {_GITSTATUS_RESP_FD}<"$resp_fifo"   || return
-    command rm -f -- "$req_fifo" "$resp_fifo"                                || return
+    exec {_GITSTATUS_REQ_FD}>>"$req_fifo" {_GITSTATUS_RESP_FD}<"$resp_fifo"   || return
+    command rm -f -- "$req_fifo" "$resp_fifo"                                 || return
     [[ "$GITSTATUS_DAEMON_LOG" != /dev/null ]] || command rmdir -- "$tmpdir" 2>/dev/null
 
     IFS='' read -r -u $_GITSTATUS_RESP_FD GITSTATUS_DAEMON_PID || return
