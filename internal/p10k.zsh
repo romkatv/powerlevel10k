@@ -5589,7 +5589,7 @@ function _p9k_set_prompt() {
           fi
         fi
         _p9k__prompt+='${${_p9k__d::=$((_p9k__m-_p9k__h))}+}'
-        _p9k__prompt+='${_p9k__lprompt/\%\{d\%\}*\%\{d\%\}/'$_p9k__dir'}'
+        _p9k__prompt+='${_p9k__lprompt/\%\{d\%\}*\%\{d\%\}/${_p9k__'$_p9k__line_index'ldir-'$_p9k__dir'}}'
         _p9k__prompt+='${${_p9k__m::=$((_p9k__d+_p9k__h))}+}'
       else
         _p9k__prompt+='${_p9k__lprompt}'
