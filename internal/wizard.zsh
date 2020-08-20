@@ -1424,7 +1424,13 @@ function print_instant_prompt_link() {
 function ask_instant_prompt() {
   if ! is-at-least 5.4; then
     instant_prompt=off
+    options+=instant_prompt=auto-off
     return 0
+  fi
+  if (( $+functions[z4h] )); then
+    instant_prompt=quiet
+    options+=instant_prompt=auto-quiet
+    return
   fi
   add_widget 0 flowing -c "%BInstant Prompt Mode%b"
   add_widget 0 print_instant_prompt_link
