@@ -4903,12 +4903,19 @@ prompt_wifi() {
   (( _p9k__has_upglob )) || typeset -g "_p9k__segment_val_${_p9k__prompt_side}[_p9k__segment_index]"=$_p9k__prompt[len+1,-1]
 }
 
+
 _p9k_prompt_wifi_init() {
-  if [[ -x /System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Resources/airport ]]; then
+  if [[ -x /System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Resources/airport || -f /proc/net/wireless ]]; then
     typeset -g _p9k__wifi_on=
     typeset -g P9K_WIFI_LAST_TX_RATE=
     typeset -g P9K_WIFI_SSID=
-    typeset -g P9K_WIFI_LINK_AUTH=
+
+    # possible refactor to set link_auth only on darwin
+    # or also possible to simply set linux link_auth to empty string and leave this scope as-is
+    if [[ $_p9k_os == OSX ]]; then
+    	typeset -g P9K_WIFI_LINK_AUTH=
+    fi
+    
     typeset -g P9K_WIFI_RSSI=
     typeset -g P9K_WIFI_NOISE=
     typeset -g P9K_WIFI_BARS=
@@ -4918,27 +4925,64 @@ _p9k_prompt_wifi_init() {
   fi
 }
 
-_p9k_prompt_wifi_compute() {
-  _p9k_worker_async _p9k_prompt_wifi_async _p9k_prompt_wifi_sync
-}
-
 _p9k_prompt_wifi_async() {
-  local airport=/System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Resources/airport
   local last_tx_rate ssid link_auth rssi noise bars on out line v state
-  {
-    [[ -x $airport ]] || return 0
-    out="$($airport -I)" || return 0
-    for line in ${${${(f)out}##[[:space:]]#}%%[[:space:]]#}; do
-      v=${line#*: }
-      case $line[1,-$#v-3] in
-        agrCtlRSSI)  rssi=$v;;
-        agrCtlNoise) noise=$v;;
-        state)       state=$v;;
-        lastTxRate)  last_tx_rate=$v;;
-        link\ auth)  link_auth=$v;;
-        SSID)        ssid=$v;;
-      esac
-    done
+  
+	{
+  if [[ $_p9k_os == OSX ]]; then
+	  local airport=/System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Resources/airport
+	    [[ -x $airport ]] || return 0
+	    out="$($airport -I)" || return 0
+	    for line in ${${${(f)out}##[[:space:]]#}%%[[:space:]]#}; do
+	      v=${line#*: }
+	      case $line[1,-$#v-3] in
+	        agrCtlRSSI)  rssi=$v;;
+	        agrCtlNoise) noise=$v;;
+	        state)       state=$v;;
+	        lastTxRate)  last_tx_rate=$v;;
+	        link\ auth)  link_auth=$v;;
+	        SSID)        ssid=$v;;
+	      esac
+	    done
+  
+    elif [[ $_p9k_os == (Linux|Android)]]; then
+	  # iw tools only output 'noise' from a dump that requires superuser and a background service to be running, which probably isn't, so a separate process is needed
+	  # /proc/net/wireless displays noise level up to date, w/o requiring superuser
+	  local proc_less=/proc/net/wireless
+	  [[ -f $proc_less ]] || return 0
+  
+      # this method using iw is over 10x faster than the network manager method in benchmarking
+    	# it's possible some systems are still using 'wireless_tools' (iw's ancestor) but they are long deprecated anyway
+    	local device="$(iw dev | grep 'Interface ' | cut -d\  -f2)" || return 0
+	  out="$(iw dev $device link)" || return 0
+
+	  # 'running' state guaranteed by 'device' and 'proc_less' var assignment
+	  state='running'
+
+	  local proc_out="$(grep $device $proc_less | tr -s ' ')" || return 0
+	  # using cut is more performant than awk,sed,perl, but I haven't timed against zsh expansion pattern
+	  rssi="${$($proc_out | cut -d\  -f4)%.*}"
+	  noise="$($proc_out | cut -d\  -f5)"
+
+	  # it's possible to get boolean from iw to check authorization status from a dump, but getting the method (if any) requires superuser
+	  link_auth=""
+
+	  for line in ${${${(f)out}##[[:space:]]#}%%[[:space:]]#}; do
+	    v=${line#*: }
+	    case ${line[1,-$#v-3]} in
+	      SSID) 		  ssid=$v;;
+  
+	      # formatting here to remove ' dBm' from tail
+	      # note 'rssi' is also assigned up above, but this replacement pattern might be faster than using cut - needs benchmarking
+	      signal) 	  rssi=${v//[^0-9-]/};;
+
+	      # formatting here to transform from 'xxx.x MBit/s MCS xx short GI' to 'xxx.x' where x's are integers
+	      # benchmarking shows grep here is extremely fast (under .1 msc even on older hw), but you can change to native zsh pattern if you want
+	      tx\ bitrate) last_tx_rate=$(echo $v | grep -o "^[0-9]+.[0-9]");;
+	    esac
+	  done
+    fi
+  
     if [[ $state != running || $rssi != (0|-<->) || $noise != (0|-<->) ]]; then
       rssi=
       noise=
@@ -4989,13 +5033,6 @@ _p9k_prompt_wifi_async() {
       echo -E - 'reset=1'
     fi
   }
-}
-
-_p9k_prompt_wifi_sync() {
-  if [[ -n $REPLY ]]; then
-    eval $REPLY
-    _p9k_worker_reply $REPLY
-  fi
 }
 
 function _p9k_asdf_check_meta() {
