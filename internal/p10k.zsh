@@ -5035,6 +5035,13 @@ _p9k_prompt_wifi_async() {
   }
 }
 
+function _p9k_prompt_wifi_sync() {
+  if [[ -n $REPLY ]]; then
+    eval $REPLY
+    _p9k_worker_reply $REPLY
+  fi
+}
+
 function _p9k_asdf_check_meta() {
   [[ -n $_p9k_asdf_meta_sig ]] || return
   [[ -z $^_p9k_asdf_meta_non_files(#qN) ]] || return
