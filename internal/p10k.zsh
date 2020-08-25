@@ -4945,15 +4945,15 @@ _p9k_prompt_wifi_async() {
 	      esac
 	    done
   
-    elif [[ $_p9k_os == (Linux|Android)]]; then
+    elif [[ $_p9k_os == Linux]]; then
 	  # iw tools only output 'noise' from a dump that requires superuser and a background service to be running, which probably isn't, so a separate process is needed
 	  # /proc/net/wireless displays noise level up to date, w/o requiring superuser
 	  local proc_less=/proc/net/wireless
 	  [[ -f $proc_less ]] || return 0
   
-      # this method using iw is over 10x faster than the network manager method in benchmarking
-    	# it's possible some systems are still using 'wireless_tools' (iw's ancestor) but they are long deprecated anyway
-    	local device="$(iw dev | grep 'Interface ' | cut -d\  -f2)" || return 0
+    # this method using iw is over 10x faster than the network manager method in benchmarking
+    # it's possible some systems are still using 'wireless_tools' (iw's ancestor) but they are long deprecated anyway
+    local device="$(cut -d\  -f2 <<< $(iw dev | grep Interface))" || return 0
 	  out="$(iw dev $device link)" || return 0
 
 	  # 'running' state guaranteed by 'device' and 'proc_less' var assignment
@@ -4961,8 +4961,8 @@ _p9k_prompt_wifi_async() {
 
 	  local proc_out="$(grep $device $proc_less | tr -s ' ')" || return 0
 	  # using cut is more performant than awk,sed,perl, but I haven't timed against zsh expansion pattern
-	  rssi="${$($proc_out | cut -d\  -f4)%.*}"
-	  noise="$($proc_out | cut -d\  -f5)"
+	  rssi="${$(cut -d\  -f4 <<< $proc_out)%.*}"
+	  noise="$(cut -d\  -f5 <<< $proc_out)"
 
 	  # it's possible to get boolean from iw to check authorization status from a dump, but getting the method (if any) requires superuser
 	  link_auth=""
@@ -4978,7 +4978,7 @@ _p9k_prompt_wifi_async() {
 
 	      # formatting here to transform from 'xxx.x MBit/s MCS xx short GI' to 'xxx.x' where x's are integers
 	      # benchmarking shows grep here is extremely fast (under .1 msc even on older hw), but you can change to native zsh pattern if you want
-	      tx\ bitrate) last_tx_rate=$(echo $v | grep -o "^[0-9]+.[0-9]");;
+	      tx\ bitrate) last_tx_rate=$(cut -d\  -f1 <<< $v);;
 	    esac
 	  done
     fi
