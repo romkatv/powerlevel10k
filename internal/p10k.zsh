@@ -5337,8 +5337,8 @@ function _p9k_prompt_net_iface_async() {
   typeset -a iface2ip ips ifaces
   if (( $+commands[ifconfig] )); then
     for line in ${(f)"$(command ifconfig 2>/dev/null)"}; do
-      if [[ $line == (#b)([^[:space:]]##):[[:space:]]##flags=(<->)'<'* ]]; then
-        [[ $match[2] == *[13579] ]] && iface=$match[1] || iface=
+      if [[ $line == (#b)([^[:space:]]##):[[:space:]]##flags=([[:xdigit:]]##)'<'* ]]; then
+        [[ $match[2] == *[13579bdfBDF] ]] && iface=$match[1] || iface=
       elif [[ -n $iface && $line == (#b)[[:space:]]##inet[[:space:]]##([0-9.]##)* ]]; then
         iface2ip+=($iface $match[1])
         iface=
