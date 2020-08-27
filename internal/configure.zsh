@@ -1,5 +1,7 @@
-typeset -gr __p9k_wizard_columns=51
-typeset -gr __p9k_wizard_lines=12
+# Fewer than 47 columns will probably work. Haven't tried it.
+typeset -gr __p9k_wizard_columns=47
+# The bottleneck is ask_tails with nerd fonts. Everything else works fine with 12 lines.
+typeset -gr __p9k_wizard_lines=14
 typeset -gr __p9k_zd=${ZDOTDIR:-$HOME}
 typeset -gr __p9k_zd_u=${${${(q)__p9k_zd}/#(#b)${(q)HOME}(|\/*)/'~'$match[1]}//\%/%%}
 typeset -gr __p9k_zshrc=${${:-$__p9k_zd/.zshrc}:A}
@@ -44,7 +46,7 @@ function _p9k_can_configure() {
     done
 
     (( LINES >= __p9k_wizard_lines && COLUMNS >= __p9k_wizard_columns ))   || {
-      $0_error "terminal size too small; must be at least $__p9k_wizard_columns x $__p9k_wizard_lines"
+      $0_error "terminal size too small; must be at least $__p9k_wizard_columns columns by $__p9k_wizard_lines lines"
       return 1
     }
     [[ -t 0 && -t 1 ]]         || { $0_error "no TTY";                           return 2 }

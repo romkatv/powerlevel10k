@@ -281,6 +281,7 @@ function quit() {
 }
 
 local screen_widgets=()
+local -i max_priority
 local -i prompt_idx
 local choice
 
@@ -289,6 +290,7 @@ function add_widget() {
   shift
   local render="${(j: :)${(@q)*}}"
   screen_widgets+=("$priority" "$render")
+  (( priority <= max_priority )) || max_priority=priority
 }
 
 function render_screen_pass() {
@@ -327,7 +329,7 @@ function render_screen() {
         else
           break
         fi
-        while (( (COLUMNS > 88 ? 88 : COLUMNS) == wizard_columns && LINES == wizard_lines )); do
+        while (( get_columns() == wizard_columns && LINES == wizard_lines )); do
           sleep 1
         done
       done
@@ -356,7 +358,7 @@ function render_screen() {
       flowing -c %1FNot enough vertical space.%f
       print
       flowing Make terminal window %Btaller%b or press %BCtrl-C%b to abort Powerlevel10k configuration wizard.
-      while (( (COLUMNS > 88 ? 88 : COLUMNS) == wizard_columns && LINES == wizard_lines )); do
+      while (( get_columns() == wizard_columns && LINES == wizard_lines )); do
         sleep 1
       done
     done
@@ -389,6 +391,7 @@ function ask() {
   local -i lines columns wizard_lines wizard_columns
   add_widget 0 print -P "(q)  Quit and do nothing."
   add_widget 0 print
+  add_widget $((max_priority + 1))
   add_widget 0 print -P "%BChoice [${choices}q]: %b"
   while true; do
     =true
@@ -404,6 +407,7 @@ function ask() {
       fi
       if [[ $choices == *$choice* ]]; then
         screen_widgets=()
+        max_priority=0
         prompt_idx=0
         return
       fi
@@ -666,13 +670,13 @@ function ask_diamond() {
   add_widget 0 print
   add_widget 0 flowing -c -- "--->  \uE0B2\uE0B0  <---"
   add_widget 0 print
-  add_widget 1
+  add_widget 3
   add_widget 0 print -P "%B(y)  Yes.%b"
   add_widget 0 print
   add_widget 1
   add_widget 0 print -P "%B(n)  No.%b"
   add_widget 0 print
-  add_widget 1
+  add_widget 2
   if (( can_install_font )); then
     extra+=r
     add_widget 0 print -P "(r)  Restart from the beginning."
@@ -694,10 +698,13 @@ function ask_lock() {
   add_widget 0 print
   add_widget 0 flowing -c -- "--->  $1  <---"
   add_widget 0 print
+  add_widget 3
   add_widget 0 print -P "%B(y)  Yes.%b"
   add_widget 0 print
+  add_widget 1
   add_widget 0 print -P "%B(n)  No.%b"
   add_widget 0 print
+  add_widget 2
   add_widget 0 print -P "(r)  Restart from the beginning."
   ask ynr
   case $choice in
@@ -714,10 +721,13 @@ function ask_python() {
   add_widget 0 print -P ""
   add_widget 0 flowing -c -- "--->  \uE63C  <---"
   add_widget 0 print -P ""
+  add_widget 3
   add_widget 0 print -P "%B(y)  Yes.%b"
   add_widget 0 print -P ""
+  add_widget 1
   add_widget 0 print -P "%B(n)  No.%b"
   add_widget 0 print -P ""
+  add_widget 2
   add_widget 0 print -P "(r)  Restart from the beginning."
   ask ynr
   case $choice in
@@ -733,10 +743,13 @@ function ask_arrow() {
   add_widget 0 print -P ""
   add_widget 0 flowing -c -- "--->  \u276F\u276E  <---"
   add_widget 0 print -P ""
+  add_widget 3
   add_widget 0 print -P "%B(y)  Yes.%b"
   add_widget 0 print -P ""
+  add_widget 1
   add_widget 0 print -P "%B(n)  No.%b"
   add_widget 0 print -P ""
+  add_widget 2
   add_widget 0 print -P "(r)  Restart from the beginning."
   ask ynr
   case $choice in
@@ -753,10 +766,13 @@ function ask_debian() {
   add_widget 0 print -P ""
   add_widget 0 flowing -c -- "--->  \uF306  <---"
   add_widget 0 print -P ""
+  add_widget 3
   add_widget 0 print -P "%B(y)  Yes.%b"
   add_widget 0 print -P ""
+  add_widget 1
   add_widget 0 print -P "%B(n)  No.%b"
   add_widget 0 print -P ""
+  add_widget 2
   add_widget 0 print -P "(r)  Restart from the beginning."
   ask ynr
   case $choice in
@@ -787,10 +803,13 @@ function ask_icon_padding() {
   add_widget 0 print -P ""
   add_widget 0 flowing -c -- "--->  $text  <---"
   add_widget 0 print -P ""
+  add_widget 3
   add_widget 0 flowing +c -i 5 "%B(y)  Yes." Icons are very close to the crosses but there is "%b%2Fno overlap%f%B.%b"
   add_widget 0 print -P ""
+  add_widget 1
   add_widget 0 flowing +c -i 5 "%B(n)  No." Some icons "%b%2Foverlap%f%B" neighbouring crosses.%b
   add_widget 0 print -P ""
+  add_widget 2
   add_widget 0 print -P "(r)  Restart from the beginning."
   ask ynr
   case $choice in
@@ -1392,16 +1411,16 @@ function ask_empty_line() {
   add_widget 0 print -P "%B(1)  Compact.%b"
   add_widget 0 print
   add_widget 1
-  add_widget 0 print_prompt
-  add_widget 0 print_prompt
+  add_prompt_n
+  add_prompt_n
   add_widget 0 print
   add_widget 2
   add_widget 0 print -P "%B(2)  Sparse.%b"
   add_widget 0 print
   add_widget 1
-  add_widget 0 print_prompt
+  add_prompt_n
   add_widget 0 print
-  add_widget 0 print_prompt
+  add_prompt_n
   add_widget 0 print
   add_widget 2
   add_widget 0 print -P "(r)  Restart from the beginning."
@@ -1437,27 +1456,24 @@ function ask_instant_prompt() {
   add_widget 1
   add_widget 0 print
   add_widget 2
-  add_widget 0 flowing +c -i 5 "%B(1)  Off.%b" Disable instant prompt. Choose this if you\'ve \
-    tried instant prompt and found it incompatible with your zsh configuration files.
+  add_widget 0 flowing +c -i 5 "%B(1)  Verbose (recommended).%b"
   add_widget 0 print
   add_widget 1
-  add_widget 0 flowing +c -i 5 "%B(2)  Quiet.%b" Enable instant prompt and %Bdon\'t print      \
-    warnings%b when detecting console output during zsh initialization. Choose this if you\'ve \
-    read and understood instant prompt documentation.
+  add_widget 0 flowing +c -i 5 "%B(2)  Quiet.%b" Choose this if you\'ve read and understood \
+    instant prompt documentation.
   add_widget 0 print
   add_widget 1
-  add_widget 0 flowing +c -i 5 "%B(3)  Verbose.%b"  Enable instant prompt and %Bprint a warning%b \
-    when detecting console output during zsh initialization. %BChoose this if you\'ve never tried \
-    instant prompt, haven\'t seen the warning, or if you are unsure what this all means%b.
+  add_widget 0 flowing +c -i 5 "%B(3)  Off.%b" Choose this if you\'ve tried instant prompt \
+    and found it incompatible with your zsh configuration files.
   add_widget 0 print
   add_widget 2
   add_widget 0 print -P "(r)  Restart from the beginning."
   ask 123r
   case $choice in
     r) return 1;;
-    1) instant_prompt=off; options+=instant_prompt=off;;
+    1) instant_prompt=verbose; options+=instant_prompt=verbose;;
     2) instant_prompt=quiet; options+=instant_prompt=quiet;;
-    3) instant_prompt=verbose; options+=instant_prompt=verbose;;
+    3) instant_prompt=off; options+=instant_prompt=off;;
   esac
   return 0
 }
