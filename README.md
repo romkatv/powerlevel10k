@@ -697,6 +697,7 @@ Powerlevel10k does not affect:
 - Colors used by `ls`.
 - Content and style of command completions.
 - Command line colors (syntax highlighting, autosuggestions, etc.).
+- Key bindings.
 - Prompt parameters other than `PS1` and `RPS1`.
 - Zsh options other than those [related to prompt](
     http://zsh.sourceforge.net/Doc/Release/Options.html#Prompting).
