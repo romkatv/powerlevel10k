@@ -7241,6 +7241,10 @@ function _p9k_on_widget_zle-line-finish() {
   _p9k__line_finished='%{%}'
 }
 
+function _p9k_on_widget_send-break() {
+  _p9k_on_widget_zle-line-finish int
+}
+
 # Usage example: _p9k_display_segment 58 _p9k__1rkubecontext hide
 function _p9k_display_segment() {
   [[ $_p9k__display_v[$1] == $3 ]] && return
@@ -7332,6 +7336,14 @@ function _p9k_widget() {
   return res
 }
 
+function _p9k_widget_send-break() {
+  (( ! __p9k_enabled )) || [[ $CONTEXT != start ]] || {
+    _p9k_widget_hook send-break "$@"
+  }
+  local f=${widgets[._p9k_orig_send-break]:-}
+  [[ -z $f ]] || zle ._p9k_orig_send-break -- "$@"
+}
+
 typeset -gi __p9k_widgets_wrapped=0
 
 function _p9k_wrap_widgets() {
@@ -7350,6 +7362,7 @@ function _p9k_wrap_widgets() {
       visual-line-mode
       deactivate-region
       clear-screen
+      send-break
       $_POWERLEVEL9K_HOOK_WIDGETS
     )
   else
@@ -7366,6 +7379,7 @@ function _p9k_wrap_widgets() {
         zle-line-finish
         zle-history-line-set
         zle-keymap-select
+        send-break
         $_POWERLEVEL9K_HOOK_WIDGETS
         ${${${(f)"$(<$tmp)"}##* }:#(*\"|.*)}
       )
@@ -7375,7 +7389,9 @@ function _p9k_wrap_widgets() {
   fi
   local widget
   for widget in $widget_list; do
-    functions[_p9k_widget_$widget]='_p9k_widget '${(q)widget}' "$@"'
+    if (( ! $+functions[_p9k_widget_$widget] )); then
+      functions[_p9k_widget_$widget]='_p9k_widget '${(q)widget}' "$@"'
+    fi
     # The leading dot is to work around bugs in zsh-syntax-highlighting.
     zle -A $widget ._p9k_orig_$widget
     zle -N $widget _p9k_widget_$widget
