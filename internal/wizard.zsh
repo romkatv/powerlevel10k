@@ -505,19 +505,19 @@ function install_font() {
   clear
   case $terminal in
     Termux)
-      mkdir -p ~/.termux || quit -c
+      command mkdir -p -- ~/.termux || quit -c
       run_command "Downloading %BMesloLGS NF Regular.ttf%b" \
         curl -fsSL -o ~/.termux/font.ttf "$font_base_url/MesloLGS%20NF%20Regular.ttf"
       run_command "Reloading %BTermux%b settings" termux-reload-settings
     ;;
     iTerm2)
-      mkdir -p ~/Library/Fonts || quit -c
+      command mkdir -p -- ~/Library/Fonts || quit -c
       local style
       for style in Regular Bold Italic 'Bold Italic'; do
         local file="MesloLGS NF ${style}.ttf"
         run_command "Downloading %B$file%b" \
           curl -fsSL -o ~/Library/Fonts/$file.tmp "$font_base_url/${file// /%20}"
-        zf_mv -f -- ~/Library/Fonts/$file{.tmp,} || quit -c
+        command mv -f -- ~/Library/Fonts/$file{.tmp,} || quit -c
       done
       print -nP -- "Changing %BiTerm2%b settings ..."
       local size=$iterm2_font_size
@@ -1590,7 +1590,11 @@ function ask_zshrc_edit() {
   add_widget 0 print -P ""
   add_widget 1
   local modifiable=y
-  if [[ -e $__p9k_zshrc && ! -w $__p9k_zshrc ]]; then
+  if [[ ! -w $__p9k_zd ]]; then
+    modifiable=
+    add_widget 0 flowing -c %3FWARNING:%f %2F${__p9k_zd_u//\\/\\\\}%f %3Fis readonly.%f
+    add_widget 0 print -P ""
+  elif [[ -e $__p9k_zshrc && ! -w $__p9k_zshrc ]]; then
     local -a stat
     zstat -A stat +uid -- $__p9k_zshrc || quit -c
     if (( stat[1] == EUID )); then
@@ -1875,6 +1879,8 @@ function generate_config() {
   header+=$line
   header+=$'.\n# Type `p10k configure` to generate another config.\n#'
 
+  command mkdir -p -- ${__p9k_cfg_path:h} || return
+
   if [[ -e $__p9k_cfg_path ]]; then
     unlink $__p9k_cfg_path || return
   fi
@@ -1914,7 +1920,7 @@ fi" || return
 [[ ! -f ${(%)__p9k_cfg_path_u} ]] || source ${(%)__p9k_cfg_path_u}" || return
     fi
     (( writable )) || chmod u-w -- $tmp || return
-    zf_mv -f -- $tmp $__p9k_zshrc || return
+    command mv -f -- $tmp $__p9k_zshrc || return
   } always {
     zf_rm -f -- $tmp
   }

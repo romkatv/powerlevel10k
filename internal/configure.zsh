@@ -21,9 +21,19 @@ function _p9k_can_configure() {
     [[ -o multibyte ]]         || { $0_error "multibyte option is not set";      return 1 }
     [[ -e $__p9k_zd ]]         || { $0_error "$__p9k_zd_u does not exist";       return 1 }
     [[ -d $__p9k_zd ]]         || { $0_error "$__p9k_zd_u is not a directory";   return 1 }
-    [[ -w $__p9k_zd ]]         || { $0_error "$__p9k_zd_u is not writable";      return 1 }
     [[ ! -d $__p9k_cfg_path ]] || { $0_error "$__p9k_cfg_path_u is a directory"; return 1 }
     [[ ! -d $__p9k_zshrc ]]    || { $0_error "$__p9k_zshrc_u is a directory";    return 1 }
+
+    local dir=${__p9k_cfg_path:h}
+    while [[ ! -e $dir && $dir != ${dir:h} ]]; do dir=${dir:h}; done
+    if [[ ! -d $dir ]]; then
+      $0_error "cannot create $__p9k_cfg_path_u because ${dir//\%/%%} is not a directory"
+      return 1
+    fi
+    if [[ ! -w $dir ]]; then
+      $0_error "cannot create $__p9k_cfg_path_u because ${dir//\%/%%} is readonly"
+      return 1
+    fi
 
     [[ ! -e $__p9k_cfg_path || -f $__p9k_cfg_path || -h $__p9k_cfg_path ]] || {
       $0_error "$__p9k_cfg_path_u is a special file"
