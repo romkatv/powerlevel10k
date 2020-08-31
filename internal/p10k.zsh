@@ -1384,7 +1384,7 @@ _p9k_prompt_battery_set_args() {
     ;;
   esac
 
-  (( bat_percent >= _POWERLEVEL9K_BATTERY_HIDE_ABOVE_THRESHOLD )) && return
+  (( bat_percent >= _POWERLEVEL9K_BATTERY_${state}_HIDE_ABOVE_THRESHOLD )) && return
 
   local msg="$bat_percent%%"
   [[ $_POWERLEVEL9K_BATTERY_VERBOSE == 1 && -n $remain ]] && msg+=" ($remain)"
@@ -6869,6 +6869,7 @@ _p9k_init_params() {
   esac
   local state
   for state in CHARGED CHARGING LOW DISCONNECTED; do
+    _p9k_declare -i POWERLEVEL9K_BATTERY_${state}_HIDE_ABOVE_THRESHOLD $_POWERLEVEL9K_BATTERY_HIDE_ABOVE_THRESHOLD
     local var=POWERLEVEL9K_BATTERY_${state}_STAGES
     case $parameters[$var] in
       scalar*) eval "typeset -ga _$var=(${(@qq)${(@s::)${(g::)${(P)var}}}})";;
@@ -7758,7 +7759,7 @@ _p9k_must_init() {
     [[ $sig == $_p9k__param_sig ]] && return 1
     _p9k_deinit
   fi
-  _p9k__param_pat=$'v105\1'${(q)ZSH_VERSION}$'\1'${(q)ZSH_PATCHLEVEL}$'\1'
+  _p9k__param_pat=$'v106\1'${(q)ZSH_VERSION}$'\1'${(q)ZSH_PATCHLEVEL}$'\1'
   _p9k__param_pat+=$'${#parameters[(I)POWERLEVEL9K_*]}\1${(%):-%n%#}\1$GITSTATUS_LOG_LEVEL\1'
   _p9k__param_pat+=$'$GITSTATUS_ENABLE_LOGGING\1$GITSTATUS_DAEMON\1$GITSTATUS_NUM_THREADS\1'
   _p9k__param_pat+=$'$GITSTATUS_CACHE_DIR\1$GITSTATUS_AUTO_INSTALL\1${ZLE_RPROMPT_INDENT:-1}\1'
