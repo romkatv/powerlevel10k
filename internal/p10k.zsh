@@ -4940,15 +4940,7 @@ _p9k_prompt_wifi_async() {
           SSID)        ssid=$v;;
         esac
       done
-      if [[ $state != running || $rssi != (0|-<->) || $noise != (0|-<->) ]]; then
-        rssi=
-        noise=
-        last_tx_rate=
-        link_auth=
-        ssid=
-        return 0
-      fi
-      on=1
+      [[ $state == running && $rssi == (0|-<->) && $noise == (0|-<->) ]] || return 0
     elif [[ -r /proc/net/wireless && -n $commands[iw] ]]; then
       # Content example (https://github.com/romkatv/powerlevel10k/pull/973#issuecomment-680251804):
       #
@@ -4963,11 +4955,7 @@ _p9k_prompt_wifi_async() {
       state=${parts[2]}
       rssi=${parts[4]%.*}
       noise=${parts[5]%.*}
-      if [[ -z $iface || $state != 0## || $rssi != (0|-<->) || $noise != (0|-<->) ]]; then
-        rssi=
-        noise=
-        return 0
-      fi
+      [[ -n $iface && $state == 0## && $rssi == (0|-<->) && $noise == (0|-<->) ]] || return 0
       # Output example (https://github.com/romkatv/powerlevel10k/pull/973#issuecomment-680251804):
       #
       # Connected to 74:83:c2:be:76:da (on wlp3s0)
@@ -4992,14 +4980,7 @@ _p9k_prompt_wifi_async() {
           [[ $last_tx_rate == <->.<-> ]] && last_tx_rate=${${last_tx_rate%%0#}%.}
         fi
       done
-      if [[ -z $ssid || -z $last_tx_rate ]]; then
-        rssi=
-        noise=
-        ssid=
-        last_tx_rate=
-        return 0
-      fi
-      on=1
+      [[ -n $ssid && -n $last_tx_rate ]] || return 0
     else
       return 0
     fi
@@ -5017,7 +4998,16 @@ _p9k_prompt_wifi_async() {
     else
       bars=0
     fi
+    on=1
   } always {
+    if (( ! on )); then
+      rssi=
+      noise=
+      ssid=
+      last_tx_rate=
+      bars=
+      link_auth=
+    fi
     if [[ $_p9k__wifi_on         != $on           ||
           $P9K_WIFI_LAST_TX_RATE != $last_tx_rate ||
           $P9K_WIFI_SSID         != $ssid         ||
