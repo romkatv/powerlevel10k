@@ -467,7 +467,7 @@ _p9k_param() {
   if [[ -n $_p9k__ret ]]; then
     _p9k__ret[-1,-1]=''
   else
-    if [[ $1 == (#b)prompt_([a-z0-9_]#)(*) ]]; then
+    if [[ ${1//-/_} == (#b)prompt_([a-z0-9_]#)(*) ]]; then
       local var=_POWERLEVEL9K_${(U)match[1]}$match[2]_$2
       if (( $+parameters[$var] )); then
         _p9k__ret=${(P)var}
@@ -7839,7 +7839,7 @@ function _p9k_init_cacheable() {
   local -i i=0
 
   for i in {1..$#_p9k_line_segments_left}; do
-    for elem in ${${(@0)_p9k_line_segments_left[i]}%_joined}; do
+    for elem in ${${${(@0)_p9k_line_segments_left[i]}%_joined}//-/_}; do
       local var=POWERLEVEL9K_${(U)elem}_SHOW_ON_COMMAND
       (( $+parameters[$var] )) || continue
       _p9k_show_on_command+=(
@@ -7847,7 +7847,7 @@ function _p9k_init_cacheable() {
         $((1+_p9k_display_k[$i/left/$elem]))
         _p9k__${i}l$elem)
     done
-    for elem in ${${(@0)_p9k_line_segments_right[i]}%_joined}; do
+    for elem in ${${${(@0)_p9k_line_segments_right[i]}%_joined}//-/_}; do
       local var=POWERLEVEL9K_${(U)elem}_SHOW_ON_COMMAND
       (( $+parameters[$var] )) || continue
       local cmds=(${(P)var})
