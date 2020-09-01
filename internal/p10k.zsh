@@ -4903,19 +4903,13 @@ prompt_wifi() {
   (( _p9k__has_upglob )) || typeset -g "_p9k__segment_val_${_p9k__prompt_side}[_p9k__segment_index]"=$_p9k__prompt[len+1,-1]
 }
 
-
 _p9k_prompt_wifi_init() {
-  if [[ -x /System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Resources/airport || -f /proc/net/wireless ]]; then
+  if [[ -x /System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Resources/airport ||
+        -r /proc/net/wireless && -n $commands[iw] ]]; then
     typeset -g _p9k__wifi_on=
     typeset -g P9K_WIFI_LAST_TX_RATE=
     typeset -g P9K_WIFI_SSID=
-
-    # possible refactor to set link_auth only on darwin
-    # or also possible to simply set linux link_auth to empty string and leave this scope as-is
-    if [[ $_p9k_os == OSX ]]; then
-    	typeset -g P9K_WIFI_LINK_AUTH=
-    fi
-    
+    typeset -g P9K_WIFI_LINK_AUTH=
     typeset -g P9K_WIFI_RSSI=
     typeset -g P9K_WIFI_NOISE=
     typeset -g P9K_WIFI_BARS=
@@ -4925,71 +4919,88 @@ _p9k_prompt_wifi_init() {
   fi
 }
 
+_p9k_prompt_wifi_compute() {
+  _p9k_worker_async _p9k_prompt_wifi_async _p9k_prompt_wifi_sync
+}
+
 _p9k_prompt_wifi_async() {
-  local last_tx_rate ssid link_auth rssi noise bars on out line v state
-  
-	{
-  if [[ $_p9k_os == OSX ]]; then
-	  local airport=/System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Resources/airport
-	    [[ -x $airport ]] || return 0
-	    out="$($airport -I)" || return 0
-	    for line in ${${${(f)out}##[[:space:]]#}%%[[:space:]]#}; do
-	      v=${line#*: }
-	      case $line[1,-$#v-3] in
-	        agrCtlRSSI)  rssi=$v;;
-	        agrCtlNoise) noise=$v;;
-	        state)       state=$v;;
-	        lastTxRate)  last_tx_rate=$v;;
-	        link\ auth)  link_auth=$v;;
-	        SSID)        ssid=$v;;
-	      esac
-	    done
-  
-    elif [[ $_p9k_os == Linux]]; then
-	  # iw tools only output 'noise' from a dump that requires superuser and a background service to be running, which probably isn't, so a separate process is needed
-	  # /proc/net/wireless displays noise level up to date, w/o requiring superuser
-	  local proc_less=/proc/net/wireless
-	  [[ -f $proc_less ]] || return 0
-  
-    # this method using iw is over 10x faster than the network manager method in benchmarking
-    # it's possible some systems are still using 'wireless_tools' (iw's ancestor) but they are long deprecated anyway
-    local device="$(cut -d\  -f2 <<< $(iw dev | grep Interface))" || return 0
-	  out="$(iw dev $device link)" || return 0
-
-	  # 'running' state guaranteed by 'device' and 'proc_less' var assignment
-	  state='running'
-
-	  local proc_out="$(grep $device $proc_less | tr -s ' ')" || return 0
-	  # using cut is more performant than awk,sed,perl, but I haven't timed against zsh expansion pattern
-	  rssi="${$(cut -d\  -f4 <<< $proc_out)%.*}"
-	  noise="$(cut -d\  -f5 <<< $proc_out)"
-
-	  # it's possible to get boolean from iw to check authorization status from a dump, but getting the method (if any) requires superuser
-	  link_auth=""
-
-	  for line in ${${${(f)out}##[[:space:]]#}%%[[:space:]]#}; do
-	    v=${line#*: }
-	    case ${line[1,-$#v-3]} in
-	      SSID) 		  ssid=$v;;
-  
-	      # formatting here to remove ' dBm' from tail
-	      # note 'rssi' is also assigned up above, but this replacement pattern might be faster than using cut - needs benchmarking
-	      signal) 	  rssi=${v//[^0-9-]/};;
-
-	      # formatting here to transform from 'xxx.x MBit/s MCS xx short GI' to 'xxx.x' where x's are integers
-	      # benchmarking shows grep here is extremely fast (under .1 msc even on older hw), but you can change to native zsh pattern if you want
-	      tx\ bitrate) last_tx_rate=$(cut -d\  -f1 <<< $v);;
-	    esac
-	  done
-    fi
-  
-    if [[ $state != running || $rssi != (0|-<->) || $noise != (0|-<->) ]]; then
-      rssi=
-      noise=
-      last_tx_rate=
-      link_auth=
-      ssid=
-      bars=
+  local airport=/System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Resources/airport
+  local last_tx_rate ssid link_auth rssi noise bars on out line v state iface
+  {
+    if [[ -x $airport ]]; then
+      out="$($airport -I)" || return 0
+      for line in ${${${(f)out}##[[:space:]]#}%%[[:space:]]#}; do
+        v=${line#*: }
+        case $line[1,-$#v-3] in
+          agrCtlRSSI)  rssi=$v;;
+          agrCtlNoise) noise=$v;;
+          state)       state=$v;;
+          lastTxRate)  last_tx_rate=$v;;
+          link\ auth)  link_auth=$v;;
+          SSID)        ssid=$v;;
+        esac
+      done
+      if [[ $state != running || $rssi != (0|-<->) || $noise != (0|-<->) ]]; then
+        rssi=
+        noise=
+        last_tx_rate=
+        link_auth=
+        ssid=
+        return 0
+      fi
+      on=1
+    elif [[ -r /proc/net/wireless && -n $commands[iw] ]]; then
+      # Content example (https://github.com/romkatv/powerlevel10k/pull/973#issuecomment-680251804):
+      #
+      # Inter-| sta-|   Quality        |   Discarded packets               | Missed | WE
+      #  face | tus | link level noise |  nwid  crypt   frag  retry   misc | beacon | 22
+      # wlp3s0: 0000   58.  -52.  -256        0      0      0      0     76        0
+      local -a lines
+      lines=(${${(f)"$(</proc/net/wireless)"}:#*\|*}) || return 0
+      (( $#lines == 1 )) || return 0
+      local parts=(${=lines[1]})
+      iface=${parts[1]%:}
+      state=${parts[2]}
+      rssi=${parts[4]%.*}
+      noise=${parts[5]%.*}
+      if [[ -z $iface || $state != 0## || $rssi != (0|-<->) || $noise != (0|-<->) ]]; then
+        rssi=
+        noise=
+        return 0
+      fi
+      # Output example (https://github.com/romkatv/powerlevel10k/pull/973#issuecomment-680251804):
+      #
+      # Connected to 74:83:c2:be:76:da (on wlp3s0)
+      # 	SSID: DailyGrindGuest1
+      # 	freq: 5745
+      # 	RX: 35192066 bytes (27041 packets)
+      # 	TX: 4090471 bytes (24287 packets)
+      # 	signal: -52 dBm
+      # 	rx bitrate: 243.0 MBit/s VHT-MCS 6 40MHz VHT-NSS 2
+      # 	tx bitrate: 240.0 MBit/s VHT-MCS 5 40MHz short GI VHT-NSS 2
+      #
+      # 	bss flags:	short-slot-time
+      # 	dtim period:	1
+      # 	beacon int:	100
+      lines=(${(f)"$(command iw dev $iface link)"}) || return 0
+      local -a match mbegin mend
+      for line in $lines; do
+        if [[ $line == (#b)[[:space:]]#SSID:[[:space:]]##([^[:space:]]##) ]]; then
+          ssid=$match[1]
+        elif [[ $line == (#b)[[:space:]]#'tx bitrate:'[[:space:]]##([^[:space:]]##)' MBit/s'* ]]; then
+          last_tx_rate=$match[1]
+          [[ $last_tx_rate == <->.<-> ]] && last_tx_rate=${${last_tx_rate%%0#}%.}
+        fi
+      done
+      if [[ -z $ssid || -z $last_tx_rate ]]; then
+        rssi=
+        noise=
+        ssid=
+        last_tx_rate=
+        return 0
+      fi
+      on=1
+    else
       return 0
     fi
     # https://www.speedguide.net/faq/how-to-read-rssisignal-and-snrnoise-ratings-440
@@ -5006,7 +5017,6 @@ _p9k_prompt_wifi_async() {
     else
       bars=0
     fi
-    on=1
   } always {
     if [[ $_p9k__wifi_on         != $on           ||
           $P9K_WIFI_LAST_TX_RATE != $last_tx_rate ||
@@ -5035,7 +5045,7 @@ _p9k_prompt_wifi_async() {
   }
 }
 
-function _p9k_prompt_wifi_sync() {
+_p9k_prompt_wifi_sync() {
   if [[ -n $REPLY ]]; then
     eval $REPLY
     _p9k_worker_reply $REPLY
