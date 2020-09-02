@@ -298,7 +298,7 @@
   # Whenever the current directory is ~/work or a subdirectory of ~/work, it gets styled with class
   # WORK or WORK_NOT_WRITABLE.
   #
-  # Simply assigning classes to directories don't have any visible effects. It merely gives you an
+  # Simply assigning classes to directories doesn't have any visible effects. It merely gives you an
   # option to define custom colors and icons for different directory classes.
   #
   #   # Styling for WORK.
