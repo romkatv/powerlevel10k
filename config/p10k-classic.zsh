@@ -66,6 +66,7 @@
     jenv                    # java version from jenv (https://github.com/jenv/jenv)
     plenv                   # perl version from plenv (https://github.com/tokuhirom/plenv)
     phpenv                  # php version from phpenv (https://github.com/phpenv/phpenv)
+    scalaenv                # scala version from scalaenv (https://github.com/scalaenv/scalaenv)
     haskell_stack           # haskell version from stack (https://haskellstack.org/)
     kubecontext             # current kubernetes context (https://kubernetes.io/)
     terraform               # terraform workspace (https://www.terraform.io)
@@ -1114,6 +1115,19 @@
   typeset -g POWERLEVEL9K_PHPENV_SHOW_SYSTEM=true
   # Custom icon.
   # typeset -g POWERLEVEL9K_PHPENV_VISUAL_IDENTIFIER_EXPANSION='⭐'
+
+  #######[ scalaenv: scala version from scalaenv (https://github.com/scalaenv/scalaenv) ]#######
+  # Scala color.
+  typeset -g POWERLEVEL9K_SCALAENV_FOREGROUND=160
+  # Hide scala version if it doesn't come from one of these sources.
+  typeset -g POWERLEVEL9K_SCALAENV_SOURCES=(shell local global)
+  # If set to false, hide scala version if it's the same as global:
+  # $(scalaenv version-name) == $(scalaenv global).
+  typeset -g POWERLEVEL9K_SCALAENV_PROMPT_ALWAYS_SHOW=false
+  # If set to false, hide scala version if it's equal to "system".
+  typeset -g POWERLEVEL9K_SCALAENV_SHOW_SYSTEM=true
+  # Custom icon.
+  # typeset -g POWERLEVEL9K_SCALAENV_VISUAL_IDENTIFIER_EXPANSION='⭐'
 
   ##########[ haskell_stack: haskell version from stack (https://haskellstack.org/) ]###########
   # Haskell color.

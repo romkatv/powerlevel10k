@@ -143,6 +143,7 @@ function _p9k_init_icons() {
         HASKELL_ICON                   'hs'
         PACKAGE_ICON                   'pkg'
         JULIA_ICON                     'jl'
+        SCALA_ICON                     'scala'
       )
     ;;
     'awesome-fontconfig')
@@ -270,6 +271,7 @@ function _p9k_init_icons() {
         HASKELL_ICON                   'hs'
         PACKAGE_ICON                   'pkg'
         JULIA_ICON                     'jl'
+        SCALA_ICON                     'scala'
       )
     ;;
     'awesome-mapped-fontconfig')
@@ -400,6 +402,7 @@ function _p9k_init_icons() {
         HASKELL_ICON                   'hs'
         PACKAGE_ICON                   'pkg'
         JULIA_ICON                     'jl'
+        SCALA_ICON                     'scala'
       )
     ;;
     'nerdfont-complete'|'nerdfont-fontconfig')
@@ -528,6 +531,7 @@ function _p9k_init_icons() {
         HASKELL_ICON                   '\uE61F'               # 
         PACKAGE_ICON                   '\uF8D6'               # 
         JULIA_ICON                     '\uE624'               # 
+        SCALA_ICON                     '\uE737'               # 
       )
     ;;
     ascii)
@@ -653,6 +657,7 @@ function _p9k_init_icons() {
         HASKELL_ICON                   'hs'
         PACKAGE_ICON                   'pkg'
         JULIA_ICON                     'jl'
+        SCALA_ICON                     'scala'
       )
     ;;
     *)
@@ -780,6 +785,7 @@ function _p9k_init_icons() {
         HASKELL_ICON                   'hs'
         PACKAGE_ICON                   'pkg'
         JULIA_ICON                     'jl'
+        SCALA_ICON                     'scala'
       )
     ;;
   esac

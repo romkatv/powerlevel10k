@@ -2673,6 +2673,69 @@ function _p9k_phpenv_global_version() {
   _p9k_read_word ${PHPENV_ROOT:-$HOME/.phpenv}/version || _p9k__ret=system
 }
 
+function _p9k_scalaenv_global_version() {
+  _p9k_read_word ${SCALAENV_ROOT:-$HOME/.scalaenv}/version || _p9k__ret=system
+}
+
+# https://github.com/scalaenv/scalaenv
+prompt_scalaenv() {
+  if [[ -n $SCALAENV_VERSION ]]; then
+    (( ${_POWERLEVEL9K_SCALAENV_SOURCES[(I)shell]} )) || return
+    local v=$SCALAENV_VERSION
+  else
+    (( ${_POWERLEVEL9K_SCALAENV_SOURCES[(I)local|global]} )) || return
+    _p9k__ret=
+    if [[ $SCALAENV_DIR != (|.) ]]; then
+      [[ $SCALAENV_DIR == /* ]] && local dir=$SCALAENV_DIR || local dir="$_p9k__cwd_a/$SCALAENV_DIR"
+      dir=${dir:A}
+      if [[ $dir != $_p9k__cwd_a ]]; then
+        while true; do
+          if _p9k_read_word $dir/.scala-version; then
+            (( ${_POWERLEVEL9K_SCALAENV_SOURCES[(I)local]} )) || return
+            break
+          fi
+          [[ $dir == (/|.) ]] && break
+          dir=${dir:h}
+        done
+      fi
+    fi
+    if [[ -z $_p9k__ret ]]; then
+      _p9k_upglob .scala-version
+      local -i idx=$?
+      if (( idx )) && _p9k_read_word $_p9k__parent_dirs[idx]/.scala-version; then
+        (( ${_POWERLEVEL9K_SCALAENV_SOURCES[(I)local]} )) || return
+      else
+        _p9k__ret=
+      fi
+    fi
+    if [[ -z $_p9k__ret ]]; then
+      (( _POWERLEVEL9K_SCALAENV_PROMPT_ALWAYS_SHOW )) || return
+      (( ${_POWERLEVEL9K_SCALAENV_SOURCES[(I)global]} )) || return
+      _p9k_scalaenv_global_version
+    fi
+    local v=$_p9k__ret
+  fi
+
+  if (( !_POWERLEVEL9K_SCALAENV_PROMPT_ALWAYS_SHOW )); then
+    _p9k_scalaenv_global_version
+    [[ $v == $_p9k__ret ]] && return
+  fi
+
+  if (( !_POWERLEVEL9K_SCALAENV_SHOW_SYSTEM )); then
+    [[ $v == system ]] && return
+  fi
+
+  _p9k_prompt_segment "$0" "red" "$_p9k_color1" 'SCALA_ICON' 0 '' "${v//\%/%%}"
+}
+
+_p9k_prompt_scalaenv_init() {
+  typeset -g "_p9k__segment_cond_${_p9k__prompt_side}[_p9k__segment_index]"='${commands[scalaenv]:-${${+functions[scalaenv]}:#0}}'
+}
+
+function _p9k_phpenv_global_version() {
+  _p9k_read_word ${PHPENV_ROOT:-$HOME/.phpenv}/version || _p9k__ret=system
+}
+
 prompt_phpenv() {
   if [[ -n $PHPENV_VERSION ]]; then
     (( ${_POWERLEVEL9K_PHPENV_SOURCES[(I)shell]} )) || return
@@ -7057,6 +7120,9 @@ _p9k_init_params() {
   _p9k_declare -b POWERLEVEL9K_RBENV_PROMPT_ALWAYS_SHOW 0
   _p9k_declare -a POWERLEVEL9K_RBENV_SOURCES -- shell local global
   _p9k_declare -b POWERLEVEL9K_RBENV_SHOW_SYSTEM 1
+  _p9k_declare -b POWERLEVEL9K_SCALAENV_PROMPT_ALWAYS_SHOW 0
+  _p9k_declare -a POWERLEVEL9K_SCALAENV_SOURCES -- shell local global
+  _p9k_declare -b POWERLEVEL9K_SCALAENV_SHOW_SYSTEM 1
   _p9k_declare -b POWERLEVEL9K_PHPENV_PROMPT_ALWAYS_SHOW 0
   _p9k_declare -a POWERLEVEL9K_PHPENV_SOURCES -- shell local global
   _p9k_declare -b POWERLEVEL9K_PHPENV_SHOW_SYSTEM 1
