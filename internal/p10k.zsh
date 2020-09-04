@@ -1502,7 +1502,9 @@ prompt_context() {
 
   local state
   if (( P9K_SSH )); then
-    if [[ -n "$SUDO_COMMAND" ]]; then
+    if [[ "$UID" -eq 0 ]]; then
+      state="REMOTE_ROOT"
+    elif [[ -n "$SUDO_COMMAND" ]]; then
       state="REMOTE_SUDO"
     else
       state="REMOTE"
@@ -1514,7 +1516,13 @@ prompt_context() {
   fi
 
   local cond
-  for state cond in $state '${${(%):-%#}:#\#}' ROOT '${${(%):-%#}:#\%}'; do
+  local root
+  if [[ $state = "REMOTE_ROOT" ]]; then
+         root=$state
+  else
+         root="ROOT"
+  fi
+  for state cond in $state '${${(%):-%#}:#\#}' $root '${${(%):-%#}:#\%}'; do
     local text=$content
     if [[ -z $text ]]; then
       local var=_POWERLEVEL9K_CONTEXT_${state}_TEMPLATE
