@@ -4083,11 +4083,18 @@ prompt_virtualenv() {
   local v=${VIRTUAL_ENV:t}
   [[ $v == $~_POWERLEVEL9K_VIRTUALENV_GENERIC_NAMES ]] && v=${VIRTUAL_ENV:h:t}
   msg+="$_POWERLEVEL9K_VIRTUALENV_LEFT_DELIMITER${v//\%/%%}$_POWERLEVEL9K_VIRTUALENV_RIGHT_DELIMITER"
-  if (( _POWERLEVEL9K_VIRTUALENV_SHOW_WITH_PYENV )); then
-    _p9k_prompt_segment "$0" "blue" "$_p9k_color1" 'PYTHON_ICON' 0 '' "$msg"
-  else
-    _p9k_prompt_segment "$0" "blue" "$_p9k_color1" 'PYTHON_ICON' 0 '${(M)${#P9K_PYENV_PYTHON_VERSION}:#0}' "$msg"
-  fi
+  case $_POWERLEVEL9K_VIRTUALENV_SHOW_WITH_PYENV in
+    false)
+      _p9k_prompt_segment "$0" "blue" "$_p9k_color1" 'PYTHON_ICON' 0 '${(M)${#P9K_PYENV_PYTHON_VERSION}:#0}' "$msg"
+    ;;
+    if-different)
+      _p9k_escape $v
+      _p9k_prompt_segment "$0" "blue" "$_p9k_color1" 'PYTHON_ICON' 0 '${${:-'$_p9k__ret'}:#$_p9k__pyenv_version}' "$msg"
+    ;;
+    *)
+      _p9k_prompt_segment "$0" "blue" "$_p9k_color1" 'PYTHON_ICON' 0 '' "$msg"
+    ;;
+  esac
 }
 
 _p9k_prompt_virtualenv_init() {
@@ -4124,7 +4131,7 @@ function _p9k_pyenv_global_version() {
 # Segment to display pyenv information
 # https://github.com/pyenv/pyenv#choosing-the-python-version
 prompt_pyenv() {
-  unset P9K_PYENV_PYTHON_VERSION
+  unset P9K_PYENV_PYTHON_VERSION _p9k__pyenv_version
 
   local v=${(j.:.)${(@)${(s.:.)PYENV_VERSION}#python-}}
   if [[ -n $v ]]; then
@@ -4179,6 +4186,8 @@ prompt_pyenv() {
   if [[ $version == (#b)$versions/([^/]##)* ]]; then
     typeset -g P9K_PYENV_PYTHON_VERSION=$match[1]
   fi
+
+  typeset -g _p9k__pyenv_version=$v
 
   _p9k_prompt_segment "$0" "blue" "$_p9k_color1" 'PYTHON_ICON' 0 '' "${v//\%/%%}"
 }
@@ -7201,7 +7210,7 @@ _p9k_init_params() {
   _p9k_declare -e POWERLEVEL9K_VI_VISUAL_MODE_STRING
   # OVERWRITE mode is shown as INSERT unless POWERLEVEL9K_VI_OVERWRITE_MODE_STRING is explicitly set.
   _p9k_declare -e POWERLEVEL9K_VI_OVERWRITE_MODE_STRING
-  _p9k_declare -b POWERLEVEL9K_VIRTUALENV_SHOW_WITH_PYENV 1
+  _p9k_declare -s POWERLEVEL9K_VIRTUALENV_SHOW_WITH_PYENV true
   _p9k_declare -b POWERLEVEL9K_VIRTUALENV_SHOW_PYTHON_VERSION 1
   _p9k_declare -e POWERLEVEL9K_VIRTUALENV_LEFT_DELIMITER "("
   _p9k_declare -e POWERLEVEL9K_VIRTUALENV_RIGHT_DELIMITER ")"
@@ -7869,7 +7878,7 @@ _p9k_must_init() {
     [[ $sig == $_p9k__param_sig ]] && return 1
     _p9k_deinit
   fi
-  _p9k__param_pat=$'v106\1'${(q)ZSH_VERSION}$'\1'${(q)ZSH_PATCHLEVEL}$'\1'
+  _p9k__param_pat=$'v107\1'${(q)ZSH_VERSION}$'\1'${(q)ZSH_PATCHLEVEL}$'\1'
   _p9k__param_pat+=$'${#parameters[(I)POWERLEVEL9K_*]}\1${(%):-%n%#}\1$GITSTATUS_LOG_LEVEL\1'
   _p9k__param_pat+=$'$GITSTATUS_ENABLE_LOGGING\1$GITSTATUS_DAEMON\1$GITSTATUS_NUM_THREADS\1'
   _p9k__param_pat+=$'$GITSTATUS_CACHE_DIR\1$GITSTATUS_AUTO_INSTALL\1${ZLE_RPROMPT_INDENT:-1}\1'
