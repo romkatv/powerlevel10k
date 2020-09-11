@@ -278,7 +278,7 @@ END
           fi
         fi
         local cmd part url ret
-        for cmd in 'curl -q -fsSL' 'wget --no-config -qO-' 'wget -qO-' 'curl -fsSL'; do
+        for cmd in 'curl -q -kfsSL' 'wget --no-config -qO-' 'wget -qO-' 'curl -kfsSL'; do
           part=0
           while true; do
             if [ "$part" = 2 ]; then
