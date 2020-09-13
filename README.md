@@ -1179,6 +1179,19 @@ cd nerd-fonts
 
 If everything goes well, four `ttf` files will appear in `./out`.
 
+### How do I enable the virtualenv commands on prompt?
+
+In home, press `ctrl + H` to show hidden files and open `~/.zshrc`
+Add this at the file and save:
+
+```zsh
+  #virtualenv e virtualenvwrapper
+export WORKON_HOME=SHOME/.virtualenvs
+export VIRTUALENVWRAPPER_PYTHON=/usr/bin/python3.7
+source /usr/local/bin/virtualenvwrapper.sh
+
+```
+
 ### How to package Powerlevel10k for distribution?
 
 It's currently neither easy nor recommended to package and distribute Powerlevel10k. There are no
@@ -1752,6 +1765,7 @@ typeset -g POWERLEVEL9K_OS_ICON_CONTENT_EXPANSION='${P9K_CONTENT}'  # not bold
   - [What is the minimum supported Zsh version?](#what-is-the-minimum-supported-zsh-version)
   - [How were these screenshots and animated gifs created?](#how-were-these-screenshots-and-animated-gifs-created)
   - [How was the recommended font created?](#how-was-the-recommended-font-created)
+  - [How do I enable the virtualenv commands on prompt?](#how-do-i-enable-the-virtualenv-commands-on-prompt)
   - [How to package Powerlevel10k for distribution?](#how-to-package-powerlevel10k-for-distribution)
 - [Troubleshooting](#troubleshooting)
   - [Question mark in prompt](#question-mark-in-prompt)
