@@ -1185,7 +1185,7 @@ In home, press `ctrl + H` to show hidden files and open `~/.zshrc`
 Add this at the file and save:
 
 ```zsh
-  #virtualenv e virtualenvwrapper
+  #virtualenv and virtualenvwrapper
 export WORKON_HOME=SHOME/.virtualenvs
 export VIRTUALENVWRAPPER_PYTHON=/usr/bin/python3.7
 source /usr/local/bin/virtualenvwrapper.sh
