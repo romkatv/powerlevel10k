@@ -4328,7 +4328,7 @@ prompt_kubecontext() {
       if [[ $cluster == (#b)gke_(?*)_(asia|australia|europe|northamerica|southamerica|us)-([a-z]##<->)(-[a-z]|)_(?*) ]]; then
         cloud_name=gke
         cloud_account=$match[1]
-        cloud_zone=$match[2]-$match[3]-$match[4]
+        cloud_zone=$match[2]-$match[3]$match[4]
         cloud_cluster=$match[5]
         if (( ${_POWERLEVEL9K_KUBECONTEXT_SHORTEN[(I)gke]} )); then
           text=$cloud_cluster
@@ -7878,7 +7878,7 @@ _p9k_must_init() {
     [[ $sig == $_p9k__param_sig ]] && return 1
     _p9k_deinit
   fi
-  _p9k__param_pat=$'v107\1'${(q)ZSH_VERSION}$'\1'${(q)ZSH_PATCHLEVEL}$'\1'
+  _p9k__param_pat=$'v108\1'${(q)ZSH_VERSION}$'\1'${(q)ZSH_PATCHLEVEL}$'\1'
   _p9k__param_pat+=$'${#parameters[(I)POWERLEVEL9K_*]}\1${(%):-%n%#}\1$GITSTATUS_LOG_LEVEL\1'
   _p9k__param_pat+=$'$GITSTATUS_ENABLE_LOGGING\1$GITSTATUS_DAEMON\1$GITSTATUS_NUM_THREADS\1'
   _p9k__param_pat+=$'$GITSTATUS_CACHE_DIR\1$GITSTATUS_AUTO_INSTALL\1${ZLE_RPROMPT_INDENT:-1}\1'
