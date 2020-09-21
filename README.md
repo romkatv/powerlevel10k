@@ -431,6 +431,14 @@ yay -S --noconfirm zsh-theme-powerlevel10k-git
 echo 'source /usr/share/zsh-theme-powerlevel10k/powerlevel10k.zsh-theme' >>! ~/.zshrc
 ```
 
+[zsh-theme-powerlevel10k-git](https://aur.archlinux.org/packages/zsh-theme-powerlevel10k-git/)
+referenced above is the official Powerlevel10k package.
+
+There is also [zsh-theme-powerlevel10k](
+  https://www.archlinux.org/packages/community/x86_64/zsh-theme-powerlevel10k/) community package.
+Historicaly, [it has been breaking often and for extended periods of time](
+  https://github.com/romkatv/powerlevel10k/pull/786). **Do not use it.**
+
 ## Configuration
 
 ### For new users
