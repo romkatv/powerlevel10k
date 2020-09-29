@@ -2006,6 +2006,7 @@ prompt_dir() {
       sep=$_p9k__ret
     fi
     _p9k_param $state PATH_SEPARATOR /
+    _p9k__ret=${(g::)_p9k__ret}
     (( expand )) && _p9k_escape $_p9k__ret
     sep+=$_p9k__ret
     [[ $sep == *%* ]] && sep+=$style
