@@ -420,7 +420,7 @@ supported by Powerlevel10k.
 ### Homebrew
 
 ```zsh
-brew install romkatv/powerlevel10k/powerlevel10k
+brew install powerlevel10k
 echo 'source /usr/local/opt/powerlevel10k/powerlevel10k.zsh-theme' >>! ~/.zshrc
 ```
 
