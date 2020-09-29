@@ -1997,19 +1997,23 @@ prompt_dir() {
       parts=("${(@)parts//$'\3'}")
     fi
 
-    local sep=''
-    if (( $+parameters[_POWERLEVEL9K_DIR_PATH_SEPARATOR_FOREGROUND] ||
-          $+parameters[_POWERLEVEL9K_${(U)state}_PATH_SEPARATOR_FOREGROUND] )); then
-      _p9k_color $state PATH_SEPARATOR_FOREGROUND ''
-      _p9k_foreground $_p9k__ret
-      (( expand )) && _p9k_escape_style $_p9k__ret
-      sep=$_p9k__ret
+    if [[ $_p9k__cwd == / && $_POWERLEVEL9K_DIR_OMIT_FIRST_CHARACTER == 1 ]]; then
+      local sep='/'
+    else
+      local sep=''
+      if (( $+parameters[_POWERLEVEL9K_DIR_PATH_SEPARATOR_FOREGROUND] ||
+            $+parameters[_POWERLEVEL9K_${(U)state}_PATH_SEPARATOR_FOREGROUND] )); then
+        _p9k_color $state PATH_SEPARATOR_FOREGROUND ''
+        _p9k_foreground $_p9k__ret
+        (( expand )) && _p9k_escape_style $_p9k__ret
+        sep=$_p9k__ret
+      fi
+      _p9k_param $state PATH_SEPARATOR /
+      _p9k__ret=${(g::)_p9k__ret}
+      (( expand )) && _p9k_escape $_p9k__ret
+      sep+=$_p9k__ret
+      [[ $sep == *%* ]] && sep+=$style
     fi
-    _p9k_param $state PATH_SEPARATOR /
-    _p9k__ret=${(g::)_p9k__ret}
-    (( expand )) && _p9k_escape $_p9k__ret
-    sep+=$_p9k__ret
-    [[ $sep == *%* ]] && sep+=$style
 
     local content="${(pj.$sep.)parts}"
     if (( _POWERLEVEL9K_DIR_HYPERLINK && _p9k_term_has_href )) && [[ $_p9k__cwd == /* ]]; then
