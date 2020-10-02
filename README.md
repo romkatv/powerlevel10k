@@ -674,6 +674,29 @@ The command to update Powerlevel10k depends on how it was installed.
    | [Arch Linux](#arch-linux) | `yay -R --noconfirm zsh-theme-powerlevel10k-git`                 |
 5. Restart Zsh. [Do not use `source ~/.zshrc`](#weird-things-happen-after-typing-source-zshrc).
 
+### How do I install Powerlevel10k on a machine without Internet access?
+
+1. Run this command on the machine without Internet access:
+   ```sh
+   uname -sm | tr '[A-Z]' '[a-z]'
+   ```
+2. Run these commands on a machine connected to the Internet after replacing the value of
+   `target_uname` with the output of the previous command:
+   ```sh
+   target_uname="replace this with the output of the previous command"
+   git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ~/powerlevel10k
+   GITSTATUS_CACHE_DIR="$HOME"/powerlevel10k/gitstatus/usrbin ~/powerlevel10k/gitstatus/install -f -s "${target_uname% *}" -m "${target_uname#* }"
+   ```
+3. Copy `~/powerlevel10k` from the machine connected to the Internet to the one without Internet
+   access.
+4. Append the following lines to the bottom of `~/.zshrc` on the machine without Internet access:
+   ```zsh
+   source ~/powerlevel10k/powerlevel10k.zsh-theme
+   unset ZSH_THEME
+   ```
+
+To update, remove `~/powerlevel10k` on both machines and repeat steps 1-3.
+
 ### Where can I ask for help and report bugs?
 
 The best way to ask for help and to report bugs is to [open an issue](
@@ -1737,6 +1760,7 @@ typeset -g POWERLEVEL9K_OS_ICON_CONTENT_EXPANSION='${P9K_CONTENT}'  # not bold
 - [FAQ](#faq)
   - [How do I update Powerlevel10k?](#how-do-i-update-powerlevel10k)
   - [How do I uninstall Powerlevel10k?](#how-do-i-uninstall-powerlevel10k)
+  - [How do I install Powerlevel10k on a machine without Internet access?](how-do-i-install-powerlevel10k-on-a-machine-without-internet-access)
   - [Where can I ask for help and report bugs?](#where-can-i-ask-for-help-and-report-bugs)
   - [Which aspects of shell and terminal does Powerlevel10k affect?](#which-aspects-of-shell-and-terminal-does-powerlevel10k-affect)
   - [I'm using Powerlevel9k with Oh My Zsh. How do I migrate?](#im-using-powerlevel9k-with-oh-my-zsh-how-do-i-migrate)
