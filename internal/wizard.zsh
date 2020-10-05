@@ -978,7 +978,7 @@ function ask_color() {
     r) return 1;;
     [1-4]) color=$choice;;
   esac
-  options+=${(L)color_name[color]}
+  options+=${${(L)color_name[color]}//ı/i}
   return 0
 }
 
@@ -1005,7 +1005,7 @@ function ask_ornaments_color() {
     r) return 1;;
     [1-4]) color=$choice;;
   esac
-  options+=${(L)color_name[color]}-ornaments
+  options+=${${(L)color_name[color]}//ı/i}-ornaments
   return 0
 }
 

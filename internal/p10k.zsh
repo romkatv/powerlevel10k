@@ -468,11 +468,11 @@ _p9k_param() {
     _p9k__ret[-1,-1]=''
   else
     if [[ ${1//-/_} == (#b)prompt_([a-z0-9_]#)(*) ]]; then
-      local var=_POWERLEVEL9K_${(U)match[1]}$match[2]_$2
+      local var=_POWERLEVEL9K_${${(U)match[1]}//İ/I}$match[2]_$2
       if (( $+parameters[$var] )); then
         _p9k__ret=${(P)var}
       else
-        var=_POWERLEVEL9K_${(U)match[1]%_}_$2
+        var=_POWERLEVEL9K_${${(U)match[1]%_}//İ/I}_$2
         if (( $+parameters[$var] )); then
           _p9k__ret=${(P)var}
         else
@@ -522,7 +522,7 @@ _p9k_translate_color() {
   if [[ $1 == <-> ]]; then                  # decimal color code: 255
     _p9k__ret=${(l.3..0.)1}
   elif [[ $1 == '#'[[:xdigit:]]## ]]; then  # hexademical color code: #ffffff
-    _p9k__ret=${(L)1}
+    _p9k__ret=${${(L)1}//ı/i}
   else                                      # named color: red
     # Strip prifixes if there are any.
     _p9k__ret=$__p9k_colors[${${${1#bg-}#fg-}#br}]
@@ -1119,7 +1119,7 @@ prompt_aws() {
   local pat class
   for pat class in "${_POWERLEVEL9K_AWS_CLASSES[@]}"; do
     if [[ $aws_profile == ${~pat} ]]; then
-      [[ -n $class ]] && state=_${(U)class}
+      [[ -n $class ]] && state=_${${(U)class}//İ/I}
       break
     fi
   done
@@ -1910,7 +1910,7 @@ prompt_dir() {
     local a='' b='' c=''
     for a b c in "${_POWERLEVEL9K_DIR_CLASSES[@]}"; do
       if [[ $_p9k__cwd == ${~a} ]]; then
-        [[ -n $b ]] && state+=_${(U)b}
+        [[ -n $b ]] && state+=_${${(U)b}//İ/I}
         icon=$'\1'$c
         break
       fi
@@ -1923,6 +1923,8 @@ prompt_dir() {
       fi
       icon=LOCK_ICON
     fi
+
+    local state_u=${${(U)state}//İ/I}
 
     local style=%b
     _p9k_color $state BACKGROUND blue
@@ -1949,7 +1951,7 @@ prompt_dir() {
     _p9k_param $state PATH_HIGHLIGHT_BOLD ''
     [[ $_p9k__ret == true ]] && last_style+=%B
     if (( $+parameters[_POWERLEVEL9K_DIR_PATH_HIGHLIGHT_FOREGROUND] ||
-          $+parameters[_POWERLEVEL9K_${(U)state}_PATH_HIGHLIGHT_FOREGROUND] )); then
+          $+parameters[_POWERLEVEL9K_${state_u}_PATH_HIGHLIGHT_FOREGROUND] )); then
       _p9k_color $state PATH_HIGHLIGHT_FOREGROUND ''
       _p9k_foreground $_p9k__ret
       last_style+=$_p9k__ret
@@ -1963,7 +1965,7 @@ prompt_dir() {
     _p9k_param $state ANCHOR_BOLD ''
     [[ $_p9k__ret == true ]] && anchor_style+=%B
     if (( $+parameters[_POWERLEVEL9K_DIR_ANCHOR_FOREGROUND] ||
-          $+parameters[_POWERLEVEL9K_${(U)state}_ANCHOR_FOREGROUND] )); then
+          $+parameters[_POWERLEVEL9K_${state_u}_ANCHOR_FOREGROUND] )); then
       _p9k_color $state ANCHOR_FOREGROUND ''
       _p9k_foreground $_p9k__ret
       anchor_style+=$_p9k__ret
@@ -1981,7 +1983,7 @@ prompt_dir() {
     fi
 
     if (( $+parameters[_POWERLEVEL9K_DIR_SHORTENED_FOREGROUND] ||
-          $+parameters[_POWERLEVEL9K_${(U)state}_SHORTENED_FOREGROUND] )); then
+          $+parameters[_POWERLEVEL9K_${state_u}_SHORTENED_FOREGROUND] )); then
       _p9k_color $state SHORTENED_FOREGROUND ''
       _p9k_foreground $_p9k__ret
       (( expand )) && _p9k_escape_style $_p9k__ret
@@ -2002,7 +2004,7 @@ prompt_dir() {
     else
       local sep=''
       if (( $+parameters[_POWERLEVEL9K_DIR_PATH_SEPARATOR_FOREGROUND] ||
-            $+parameters[_POWERLEVEL9K_${(U)state}_PATH_SEPARATOR_FOREGROUND] )); then
+            $+parameters[_POWERLEVEL9K_${state_u}_PATH_SEPARATOR_FOREGROUND] )); then
         _p9k_color $state PATH_SEPARATOR_FOREGROUND ''
         _p9k_foreground $_p9k__ret
         (( expand )) && _p9k_escape_style $_p9k__ret
@@ -4021,7 +4023,7 @@ prompt_vcs() {
           current_state='CLEAN'
         fi
       fi
-      _p9k_prompt_segment "${0}_${(U)current_state}" "${__p9k_vcs_states[$current_state]}" "$_p9k_color1" "$vcs_visual_identifier" 0 '' "$vcs_prompt"
+      _p9k_prompt_segment "${0}_${${(U)current_state}//İ/I}" "${__p9k_vcs_states[$current_state]}" "$_p9k_color1" "$vcs_visual_identifier" 0 '' "$vcs_prompt"
     fi
   fi
 }
@@ -4357,7 +4359,7 @@ prompt_kubecontext() {
       local pat class
       for pat class in "${_POWERLEVEL9K_KUBECONTEXT_CLASSES[@]}"; do
         if [[ $text == ${~pat} ]]; then
-          [[ -n $class ]] && state=_${(U)class}
+          [[ -n $class ]] && state=_${${(U)class}//İ/I}
           break
         fi
       done
@@ -4542,7 +4544,7 @@ prompt_google_app_cred() {
       local pat class state
       for pat class in "${_POWERLEVEL9K_GOOGLE_APP_CRED_CLASSES[@]}"; do
         if [[ $text == ${~pat} ]]; then
-          [[ -n $class ]] && state=_${(U)class}
+          [[ -n $class ]] && state=_${${(U)class}//İ/I}
           break
         fi
       done
@@ -4655,14 +4657,14 @@ function prompt_nordvpn() {
   if [[ -e /run/nordvpnd.sock ]]; then
     _p9k_fetch_nordvpn_status 2>/dev/null
     if [[ $P9K_NORDVPN_SERVER == (#b)([[:alpha:]]##)[[:digit:]]##.nordvpn.com ]]; then
-      typeset -g P9K_NORDVPN_COUNTRY_CODE=${(U)match[1]}
+      typeset -g P9K_NORDVPN_COUNTRY_CODE=${${(U)match[1]}//İ/I}
     fi
   fi
   case $P9K_NORDVPN_STATUS in
     Connected)
       _p9k_prompt_segment $0_CONNECTED blue   white NORDVPN_ICON 0 '' "$P9K_NORDVPN_COUNTRY_CODE";;
     Disconnected|Connecting|Disconnecting)
-      local state=${(U)P9K_NORDVPN_STATUS}
+      local state=${${(U)P9K_NORDVPN_STATUS}//İ/I}
       _p9k_get_icon $0_$state FAIL_ICON
       _p9k_prompt_segment $0_$state    yellow white NORDVPN_ICON 0 '' "$_p9k__ret";;
     *)
@@ -4747,7 +4749,7 @@ function prompt_terraform() {
   local pat class
   for pat class in "${_POWERLEVEL9K_TERRAFORM_CLASSES[@]}"; do
     if [[ $ws == ${~pat} ]]; then
-      [[ -n $class ]] && state=_${(U)class}
+      [[ -n $class ]] && state=_${${(U)class}//İ/I}
       break
     fi
   done
@@ -5311,7 +5313,7 @@ function prompt_asdf() {
 
   local plugin
   for plugin in ${(k)_p9k_asdf_plugins}; do
-    local upper=${(U)plugin//-/_}
+    local upper=${${(U)plugin//-/_}//İ/I}
     if (( $+parameters[_POWERLEVEL9K_ASDF_${upper}_SOURCES] )); then
       local sources=(${(P)${:-_POWERLEVEL9K_ASDF_${upper}_SOURCES}})
     else
@@ -5604,7 +5606,7 @@ function _p9k_set_prompt() {
       if [[ $1 == instant_ ]]; then
         for _p9k__segment_name in ${${(0)_p9k_line_segments_right[_p9k__line_index]}%_joined}; do
           if (( $+functions[instant_prompt_$_p9k__segment_name] )); then
-            local disabled=_POWERLEVEL9K_${(U)_p9k__segment_name}_DISABLED_DIR_PATTERN
+            local disabled=_POWERLEVEL9K_${${(U)_p9k__segment_name}//İ/I}_DISABLED_DIR_PATTERN
             if [[ $_p9k__cwd != ${(P)~disabled} ]]; then
               local -i len=$#_p9k__prompt
               _p9k__non_hermetic_expansion=0
@@ -5620,7 +5622,7 @@ function _p9k_set_prompt() {
         for _p9k__segment_name in ${${(0)_p9k_line_segments_right[_p9k__line_index]}%_joined}; do
           local cond=$_p9k__segment_cond_right[_p9k__segment_index]
           if [[ -z $cond || -n ${(e)cond} ]]; then
-            local disabled=_POWERLEVEL9K_${(U)_p9k__segment_name}_DISABLED_DIR_PATTERN
+            local disabled=_POWERLEVEL9K_${${(U)_p9k__segment_name}//İ/I}_DISABLED_DIR_PATTERN
             if [[ $_p9k__cwd != ${(P)~disabled} ]]; then
               local val=$_p9k__segment_val_right[_p9k__segment_index]
               if [[ -n $val ]]; then
@@ -5650,7 +5652,7 @@ function _p9k_set_prompt() {
     if [[ $1 == instant_ ]]; then
       for _p9k__segment_name in ${${(0)_p9k_line_segments_left[_p9k__line_index]}%_joined}; do
         if (( $+functions[instant_prompt_$_p9k__segment_name] )); then
-          local disabled=_POWERLEVEL9K_${(U)_p9k__segment_name}_DISABLED_DIR_PATTERN
+          local disabled=_POWERLEVEL9K_${${(U)_p9k__segment_name}//İ/I}_DISABLED_DIR_PATTERN
           if [[ $_p9k__cwd != ${(P)~disabled} ]]; then
             local -i len=$#_p9k__prompt
             _p9k__non_hermetic_expansion=0
@@ -5666,7 +5668,7 @@ function _p9k_set_prompt() {
       for _p9k__segment_name in ${${(0)_p9k_line_segments_left[_p9k__line_index]}%_joined}; do
         local cond=$_p9k__segment_cond_left[_p9k__segment_index]
         if [[ -z $cond || -n ${(e)cond} ]]; then
-          local disabled=_POWERLEVEL9K_${(U)_p9k__segment_name}_DISABLED_DIR_PATTERN
+          local disabled=_POWERLEVEL9K_${${(U)_p9k__segment_name}//İ/I}_DISABLED_DIR_PATTERN
           if [[ $_p9k__cwd != ${(P)~disabled} ]]; then
             local val=$_p9k__segment_val_left[_p9k__segment_index]
             if [[ -n $val ]]; then
@@ -7275,7 +7277,7 @@ _p9k_init_params() {
 
   local -i i=1
   while (( i <= $#_POWERLEVEL9K_LEFT_PROMPT_ELEMENTS )); do
-    local segment=${(U)_POWERLEVEL9K_LEFT_PROMPT_ELEMENTS[i]}
+    local segment=${${(U)_POWERLEVEL9K_LEFT_PROMPT_ELEMENTS[i]}//İ/I}
     local var=POWERLEVEL9K_${segment}_LEFT_DISABLED
     (( $+parameters[$var] )) || var=POWERLEVEL9K_${segment}_DISABLED
     if [[ ${(P)var} == true ]]; then
@@ -7287,7 +7289,7 @@ _p9k_init_params() {
 
   local -i i=1
   while (( i <= $#_POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS )); do
-    local segment=${(U)_POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS[i]}
+    local segment=${${(U)_POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS[i]}//İ/I}
     local var=POWERLEVEL9K_${segment}_RIGHT_DISABLED
     (( $+parameters[$var] )) || var=POWERLEVEL9K_${segment}_DISABLED
     if [[ ${(P)var} == true ]]; then
@@ -7547,25 +7549,29 @@ instant_prompt__p9k_internal_nothing() { prompt__p9k_internal_nothing; }
 
 # _p9k_build_gap_post line_number
 _p9k_build_gap_post() {
-  [[ $1 == 1 ]] && local kind=first || local kind=newline
-  _p9k_get_icon '' MULTILINE_${(U)kind}_PROMPT_GAP_CHAR
+  if [[ $1 == 1 ]]; then
+    local kind_l=first kind_u=FIRST
+  else
+    local kind_l=newline kind_u=NEWLINE
+  fi
+  _p9k_get_icon '' MULTILINE_${kind_u}_PROMPT_GAP_CHAR
   local char=${_p9k__ret:- }
   _p9k_prompt_length $char
   if (( _p9k__ret != 1 || $#char != 1 )); then
-    >&2 print -rP -- "%F{red}WARNING!%f %BMULTILINE_${(U)kind}_PROMPT_GAP_CHAR%b is not one character long. Will use ' '."
-    >&2 print -rP -- "Either change the value of %BPOWERLEVEL9K_MULTILINE_${(U)kind}_PROMPT_GAP_CHAR%b or remove it."
+    >&2 print -rP -- "%F{red}WARNING!%f %BMULTILINE_${kind_u}_PROMPT_GAP_CHAR%b is not one character long. Will use ' '."
+    >&2 print -rP -- "Either change the value of %BPOWERLEVEL9K_MULTILINE_${kind_u}_PROMPT_GAP_CHAR%b or remove it."
     char=' '
   fi
   local style
-  _p9k_color prompt_multiline_${kind}_prompt_gap BACKGROUND ""
+  _p9k_color prompt_multiline_${kind_l}_prompt_gap BACKGROUND ""
   [[ -n $_p9k__ret ]] && _p9k_background $_p9k__ret
   style+=$_p9k__ret
-  _p9k_color prompt_multiline_${kind}_prompt_gap FOREGROUND ""
+  _p9k_color prompt_multiline_${kind_l}_prompt_gap FOREGROUND ""
   [[ -n $_p9k__ret ]] && _p9k_foreground $_p9k__ret
   style+=$_p9k__ret
   _p9k_escape_style $style
   style=$_p9k__ret
-  local exp=_POWERLEVEL9K_MULTILINE_${(U)kind}_PROMPT_GAP_EXPANSION
+  local exp=_POWERLEVEL9K_MULTILINE_${kind_u}_PROMPT_GAP_EXPANSION
   (( $+parameters[$exp] )) && exp=${(P)exp} || exp='${P9K_GAP}'
   [[ $char == '.' ]] && local s=',' || local s='.'
   _p9k__ret=$'${${_p9k__g+\n}:-'$style'${${${_p9k__m:#-*}:+'
@@ -7921,7 +7927,7 @@ function _p9k_init_cacheable() {
 
   for i in {1..$#_p9k_line_segments_left}; do
     for elem in ${${${(@0)_p9k_line_segments_left[i]}%_joined}//-/_}; do
-      local var=POWERLEVEL9K_${(U)elem}_SHOW_ON_COMMAND
+      local var=POWERLEVEL9K_${${(U)elem}//İ/I}_SHOW_ON_COMMAND
       (( $+parameters[$var] )) || continue
       _p9k_show_on_command+=(
         $'(|*[/\0])('${(j.|.)${(P)var}}')'
@@ -7929,7 +7935,7 @@ function _p9k_init_cacheable() {
         _p9k__${i}l$elem)
     done
     for elem in ${${${(@0)_p9k_line_segments_right[i]}%_joined}//-/_}; do
-      local var=POWERLEVEL9K_${(U)elem}_SHOW_ON_COMMAND
+      local var=POWERLEVEL9K_${${(U)elem}//İ/I}_SHOW_ON_COMMAND
       (( $+parameters[$var] )) || continue
       local cmds=(${(P)var})
       _p9k_show_on_command+=(
@@ -8632,7 +8638,7 @@ function p10k() {
       fi
       (( ref )) || icon=$'\1'$icon
       typeset -i _p9k__has_upglob
-      "_p9k_${_p9k__prompt_side}_prompt_segment" "prompt_${_p9k__segment_name}${state:+_${(U)state}}" \
+      "_p9k_${_p9k__prompt_side}_prompt_segment" "prompt_${_p9k__segment_name}${state:+_${${(U)state}//İ/I}}" \
           "$bg" "${fg:-$_p9k_color1}" "$icon" "$expand" "$cond" "$text"
       return 0
       ;;
