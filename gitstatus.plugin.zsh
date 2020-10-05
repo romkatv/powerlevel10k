@@ -371,8 +371,8 @@ function _gitstatus_daemon"${1:-}"() {
       trap '' PIPE
 
       local uname_sm
-      uname_sm="${(L)$(command uname -sm)}"          || return
-      [[ $uname_sm == [^' ']##' '[^' ']## ]] || return
+      uname_sm="${${(L)$(command uname -sm)}//ı/i}" || return
+      [[ $uname_sm == [^' ']##' '[^' ']## ]]        || return
       local uname_s=${uname_sm% *}
       local uname_m=${uname_sm#* }
 
