@@ -8333,10 +8333,10 @@ _p9k_init() {
       if (( $+zsh_defer_options )); then
         >&2 echo -E - ""
         >&2 echo -E - "${(%):-    NOTE: Do not use %1Fzsh-defer%f to load %Upowerlevel10k.zsh-theme%u.}"
-      elif (( $+functins[zinit] )); then
+      elif (( $+functions[zinit] )); then
         >&2 echo -E - ""
         >&2 echo -E - "${(%):-    NOTE: If using %2Fzinit%f to load %3F'romkatv/powerlevel10k'%f, %Bdo not apply%b %1Fice wait%f.}"
-      elif (( $+functins[zplugin] )); then
+      elif (( $+functions[zplugin] )); then
         >&2 echo -E - ""
         >&2 echo -E - "${(%):-    NOTE: If using %2Fzplugin%f to load %3F'romkatv/powerlevel10k'%f, %Bdo not apply%b %1Fice wait%f.}"
       fi
