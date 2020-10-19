@@ -2074,22 +2074,30 @@ while true; do
 done
 
 restore_screen
-print
 
-flowing +c New config: "%B${__p9k_cfg_path_u//\\/\\\\}%b."
-if [[ -n $config_backup ]]; then
-  flowing +c Backup of the old config: "%B${config_backup_u//\\/\\\\}%b."
-fi
-if [[ -n $zshrc_backup ]]; then
-  flowing +c Backup of "%B${__p9k_zshrc_u//\\/\\\\}%b:" "%B${zshrc_backup_u//\\/\\\\}%b."
+local -i print_outro=0
+[[ $force == 1 || -z $Z4H || ! -e $Z4H/welcome || $functions[z4h] == 0 ]] && print_outro=1
+
+if (( print_outro )); then
+  print
+
+  flowing +c New config: "%B${__p9k_cfg_path_u//\\/\\\\}%b."
+  if [[ -n $config_backup ]]; then
+    flowing +c Backup of the old config: "%B${config_backup_u//\\/\\\\}%b."
+  fi
+  if [[ -n $zshrc_backup ]]; then
+    flowing +c Backup of "%B${__p9k_zshrc_u//\\/\\\\}%b:" "%B${zshrc_backup_u//\\/\\\\}%b."
+  fi
 fi
 
 generate_config || return
 change_zshrc    || return
 
-print -rP ""
-flowing +c File feature requests and bug reports at "$(href https://github.com/romkatv/powerlevel10k/issues)"
-print -rP ""
+if (( print_outro )); then
+  print -rP ""
+  flowing +c File feature requests and bug reports at "$(href https://github.com/romkatv/powerlevel10k/issues)"
+  print -rP ""
+fi
 
 success=1
 
