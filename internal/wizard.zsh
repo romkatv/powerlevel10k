@@ -280,6 +280,8 @@ function quit() {
     print -P ""
   fi
   function quit() {}
+  stty echo 2>/dev/null
+  show_cursor
   exit 1
 }
 
@@ -554,28 +556,20 @@ function install_font() {
       sleep 3
       print -P " %2FOK%f"
       sleep 1
-      restore_screen
+      clear
+      hide_cursor
       print
       flowing +c "%2FMeslo Nerd Font%f" successfully installed.
       print -P ""
       flowing +c Please "%Brestart iTerm2%b" for the changes to take effect.
       print -P ""
-      while true; do
-        flowing +c -i 5 "  1. Click" "%BiTerm2 → Quit iTerm2%b" or press "%B⌘ Q%b."
-        flowing +c -i 5 "  2. Open %BiTerm2%b."
-        print -P ""
-        local key=
-        read -k key${(%):-"?%BWill you restart iTerm2 before proceeding? [yN]: %b"} || quit -c
-        if [[ $key = (y|Y) ]]; then
-          print -P ""
-          print -P ""
-          exit 69
-        fi
-        print -P ""
-        print -P ""
-        flowing +c "It's" important to "%Brestart iTerm2%b" for the changes to take effect.
-        print -P ""
-      done
+      flowing +c -i 5 "  1. Click" "%BiTerm2 → Quit iTerm2%b" or press "%B⌘ Q%b."
+      flowing +c -i 5 "  2. Open %BiTerm2%b."
+      print -P ""
+      flowing +c "It's" important to "%Brestart iTerm2%b" by following the instructions above.   \
+                 "It's" "%Bnot enough%b" to close iTerm2 by clicking on the red circle. You must \
+                 click "%BiTerm2 → Quit iTerm2%b" or press "%B⌘ Q%b."
+      while true; do sleep 60 2>/dev/null; done
     ;;
   esac
 
