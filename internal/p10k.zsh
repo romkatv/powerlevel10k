@@ -4290,6 +4290,17 @@ _p9k_prompt_swift_version_init() {
 }
 
 ################################################################
+# Segment to display terraform version in use with tfenv
+prompt_tfenv() {
+  local tfenv_use_version="$(tfenv list | grep '\*' | awk '{print $2}')"
+  _p9k_prompt_segment "$0" "white" "blue" "TERRAFORM_ICON" 0 '' "${tfenv_use_version//\%/%%}"
+}
+
+
+_p9k_prompt_tfenv_init() {
+  typeset -g "_p9k__segment_cond_${_p9k__prompt_side}[_p9k__segment_index]"='$commands[tfenv]'
+}
+################################################################
 # dir_writable: Display information about the user's permission to write in the current directory
 prompt_dir_writable() {
   if [[ ! -w "$_p9k__cwd_a" ]]; then
