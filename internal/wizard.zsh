@@ -23,6 +23,9 @@ else
   function restore_screen() {}
 fi
 
+local -i in_z4h_wizard=0
+[[ $force == 0 && $functions[z4h] == 1 && -n $Z4H && -e $Z4H/welcome ]] && in_z4h_wizard=1
+
 local -i success=0
 
 {  # always
@@ -418,6 +421,7 @@ function ask() {
 local -i greeting_printed=0
 
 function print_greeting() {
+  (( in_z4h_wizard )) && return
   (( greeting_printed )) && return
   if (( force )); then
     flowing -c This is %4FPowerlevel10k configuration wizard%f. \
@@ -2075,10 +2079,7 @@ done
 
 restore_screen
 
-local -i print_outro=0
-[[ $force == 1 || -z $Z4H || ! -e $Z4H/welcome || $functions[z4h] == 0 ]] && print_outro=1
-
-if (( print_outro )); then
+if (( !in_z4h_wizard )); then
   print
 
   flowing +c New config: "%B${__p9k_cfg_path_u//\\/\\\\}%b."
@@ -2093,7 +2094,7 @@ fi
 generate_config || return
 change_zshrc    || return
 
-if (( print_outro )); then
+if (( !in_z4h_wizard )); then
   print -rP ""
   flowing +c File feature requests and bug reports at "$(href https://github.com/romkatv/powerlevel10k/issues)"
   print -rP ""
