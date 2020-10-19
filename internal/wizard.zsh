@@ -24,7 +24,7 @@ else
 fi
 
 local -i in_z4h_wizard=0
-[[ $force == 0 && $functions[z4h] == 1 && -n $Z4H && -e $Z4H/welcome ]] && in_z4h_wizard=1
+[[ $force == 0 && $+functions[z4h] == 1 && -n $Z4H && -e $Z4H/welcome ]] && in_z4h_wizard=1
 
 local -i success=0
 
