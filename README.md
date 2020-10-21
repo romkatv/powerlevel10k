@@ -500,7 +500,7 @@ the default system fonts. The full choice of style options is available only whe
 
 👇 **Recommended font**: Meslo Nerd Font patched for Powerlevel10k. 👇
 
-### <a name='recommended-meslo-nerd-font-patched-for-powerlevel10k'></a>Meslo Nerd Font patched for Powerlevel10k
+### <a name='recommended-meslo-nerd-font-patched-for-powerlevel10k'></a><a name='font'></a>Meslo Nerd Font patched for Powerlevel10k
 
 Gorgeous monospace font designed by Jim Lyles for Bitstream, customized by the same for Apple,
 further customized by André Berg, and finally patched by yours truly with customized scripts
