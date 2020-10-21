@@ -4306,27 +4306,36 @@ prompt_kubecontext() {
     local name namespace cluster user cloud_name cloud_account cloud_zone cloud_cluster text state
     () {
       local cfg && cfg=(${(f)"$(kubectl config view -o=yaml 2>/dev/null)"}) || return
-      local ctx=(${(@M)cfg:#current-context: [^\"\'\|\>]*})
+      local qstr='"*"'
+      local str='([^"'\''|>]*|'$qstr')'
+      local ctx=(${(@M)cfg:#current-context: $~str})
       (( $#ctx == 1 )) || return
       name=${ctx[1]#current-context: }
       local -i pos=${cfg[(i)contexts:]}
-      (( pos <= $#cfg )) || return
-      shift $pos cfg
-      pos=${cfg[(i)  name: $name]}
-      (( pos <= $#cfg )) || return
-      (( --pos ))
-      for ((; pos > 0; --pos)); do
-        local line=$cfg[pos]
-        if [[ $line == '- context:' ]]; then
-          return 0
-        elif [[ $line == (#b)'    cluster: '([^\"\'\|\>]*) ]]; then
-          cluster=$match[1]
-        elif [[ $line == (#b)'    namespace: '([^\"\'\|\>]*) ]]; then
-          namespace=$match[1]
-        elif [[ $line == (#b)'    user: '([^\"\'\|\>]*) ]]; then
-          user=$match[1]
-        fi
-      done
+      {
+        (( pos <= $#cfg )) || return
+        shift $pos cfg
+        pos=${cfg[(i)  name: $name]}
+        (( pos <= $#cfg )) || return
+        (( --pos ))
+        for ((; pos > 0; --pos)); do
+          local line=$cfg[pos]
+          if [[ $line == '- context:' ]]; then
+            return 0
+          elif [[ $line == (#b)'    cluster: '($~str) ]]; then
+            cluster=$match[1]
+            [[ $cluster == $~qstr ]] && cluster=$cluster[2,-2]
+          elif [[ $line == (#b)'    namespace: '($~str) ]]; then
+            namespace=$match[1]
+            [[ $namespace == $~qstr ]] && namespace=$namespace[2,-2]
+          elif [[ $line == (#b)'    user: '($~str) ]]; then
+            user=$match[1]
+            [[ $user == $~qstr ]] && user=$user[2,-2]
+          fi
+        done
+      } always {
+        [[ $name == $~qstr ]] && name=$name[2,-2]
+      }
     }
     if [[ -n $name ]]; then
       : ${namespace:=default}
