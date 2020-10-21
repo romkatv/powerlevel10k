@@ -428,7 +428,7 @@ function print_greeting() {
     flowing -c %3FZsh for Humans%f uses %4FPowerlevel10k%f to print command        \
                line prompt. This wizard will ask you a few questions and configure \
                prompt for you.
-  else (( force )); then
+  elif (( force )); then
     flowing -c This is %4FPowerlevel10k configuration wizard%f. \
                It will ask you a few questions and configure your prompt.
   else
