@@ -3,7 +3,7 @@
 #
 # This value is also read by shell bindings (indirectly, through
 # ./install) when using GITSTATUS_DAEMON or usrbin/gitstatusd.
-gitstatus_version="v1.2.0"
+gitstatus_version="v1.3.1"
 
 # libgit2 is a build time dependency of gitstatusd. The values of
 # libgit2_version and libgit2_sha256 are read by ./build.
@@ -18,5 +18,5 @@ gitstatus_version="v1.2.0"
 #
 # If sha256 of ./deps/libgit2-${libgit2_version}.tar.gz doesn't match,
 # build gets aborted.
-libgit2_version="tag-d6c37a38587c9af2a9e63449fc8bf951dca0e854"
-libgit2_sha256="e3df79da60963f8711580dce53b1a7ed583bb534be9ebb95589e76346fa986be"
+libgit2_version="tag-82cefe2b42300224ad3c148f8b1a569757cc617a"
+libgit2_sha256="dc701c4e2080f7901f5d599d642b629569e5581086b9838d481d09f284dc7621"
