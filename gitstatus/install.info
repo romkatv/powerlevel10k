@@ -1,4 +1,4 @@
-# ae988158e1044abb1626a15d6a27751cd80c13be
+# 6a3d54a5a44abb4ee46ce72a8097389364746c6a
 #
 # This file is used by ./install and indirectly by shell bindings.
 #
@@ -8,26 +8,26 @@
 # of `git rev-parse HEAD`.
 
 # Official gitstatusd binaries.
-uname_s_glob="cygwin_nt-10.0"; uname_m_glob="i686";    file="gitstatusd-${uname_s}-${uname_m}";     version="v1.0.0"; sha256="c38342c7a70842067074710250fd8cebea87ae111f032277c2c70a77179b5355";
-uname_s_glob="cygwin_nt-10.0"; uname_m_glob="x86_64";  file="gitstatusd-${uname_s}-${uname_m}";     version="v1.0.0"; sha256="d30b455e371cd0895c9bd1ff87b8a27e6c3f3c2970b4e993e93fe1a6943962ad";
-uname_s_glob="darwin";         uname_m_glob="x86_64";  file="gitstatusd-${uname_s}-${uname_m}";     version="v1.0.0"; sha256="c71b30027b3c763faa3ff7ad09d66c84403851fafcf798bf5e629b98c2b8384a";
-uname_s_glob="freebsd";        uname_m_glob="amd64";   file="gitstatusd-${uname_s}-${uname_m}";     version="v1.0.0"; sha256="a72d4c5da2f9594bf1c4153d841bf61a35cbcbb8b74818649b1375902e9d9534";
-uname_s_glob="linux";          uname_m_glob="aarch64"; file="gitstatusd-${uname_s}-${uname_m}";     version="v1.0.0"; sha256="eb7f125d43c29f955239ef4014ab652b9162bbbb6c81c40f1d5ead46a209866e";
-uname_s_glob="linux";          uname_m_glob="armv6l";  file="gitstatusd-${uname_s}-${uname_m}";     version="v1.0.0"; sha256="051a9448d9cb4bb1d95e93cff51a6ab48a085465ec30eec40046977d4213feff";
-uname_s_glob="linux";          uname_m_glob="armv7l";  file="gitstatusd-${uname_s}-${uname_m}";     version="v1.0.0"; sha256="adaa47c8e8dec1e1e8686c3044ee0f45afda15deaa8388efcb4952747b66246e";
-uname_s_glob="linux";          uname_m_glob="armv8l";  file="gitstatusd-${uname_s}-aarch64";        version="v1.0.0"; sha256="eb7f125d43c29f955239ef4014ab652b9162bbbb6c81c40f1d5ead46a209866e";
-uname_s_glob="linux";          uname_m_glob="i686";    file="gitstatusd-${uname_s}-${uname_m}";     version="v1.0.0"; sha256="c80355664e7361e11215e64b523ed75a3d39f72393fa2204fefa85eae0342a67";
-uname_s_glob="linux";          uname_m_glob="ppc64le"; file="gitstatusd-${uname_s}-${uname_m}";     version="v1.2.0"; sha256="38a60b64f619d9db83747f1653b0b740380b1b2b9b414a0ff94815305cdd76bc";
-uname_s_glob="linux";          uname_m_glob="x86_64";  file="gitstatusd-${uname_s}-${uname_m}";     version="v1.0.0"; sha256="e33867063f091d3c31ede9916fef079ff8cd6fdcc70d051914f962ab3b8f36fd";
-uname_s_glob="msys_nt-10.0";   uname_m_glob="i686";    file="gitstatusd-${uname_s}-${uname_m}";     version="v1.0.0"; sha256="2cf6ff92a5c50e4181ceb402217162bebd5e52144eb52eacfef2f6d47d5c20d4";
-uname_s_glob="msys_nt-10.0";   uname_m_glob="x86_64";  file="gitstatusd-${uname_s}-${uname_m}";     version="v1.0.0"; sha256="960c3d9d90d7b96257a9746f7168faffdf9b5fbda464e354e7b14c42cc473f15";
+uname_s_glob="cygwin_nt-10.0"; uname_m_glob="i686";    file="gitstatusd-${uname_s}-${uname_m}";     version="v1.3.1"; sha256="c96baef70b81b5a1d46adcc9e93721eaf4bdc295562bdd2baf210a6b416b9911";
+uname_s_glob="cygwin_nt-10.0"; uname_m_glob="x86_64";  file="gitstatusd-${uname_s}-${uname_m}";     version="v1.3.1"; sha256="18b5be49f6eb9ff1cf25e76d6f2333c7402e686e05ce5b88ca107c80504210d8";
+uname_s_glob="darwin";         uname_m_glob="x86_64";  file="gitstatusd-${uname_s}-${uname_m}";     version="v1.3.1"; sha256="26d582fe9a0b2090c28e84e5e32a6d42d6988cedff51e41ec5f789512c53b0fc";
+uname_s_glob="freebsd";        uname_m_glob="amd64";   file="gitstatusd-${uname_s}-${uname_m}";     version="v1.3.1"; sha256="54a823373458a0908187ba8d1c5b8921015c844811916451674cc09fbdff88bb";
+uname_s_glob="linux";          uname_m_glob="aarch64"; file="gitstatusd-${uname_s}-${uname_m}";     version="v1.3.1"; sha256="4e0a506eafb14b009cf6670f0e11399ac7e765cad17b9fcf38ef65516d248bfa";
+uname_s_glob="linux";          uname_m_glob="armv6l";  file="gitstatusd-${uname_s}-${uname_m}";     version="v1.3.1"; sha256="4cc78bf24c6cfb4580ae48b13e1f26b6b00869c612b5d662632f7561f7475252";
+uname_s_glob="linux";          uname_m_glob="armv7l";  file="gitstatusd-${uname_s}-${uname_m}";     version="v1.3.1"; sha256="80f5ebc8efe62a0c322e92d15d469e80f9d3ce967c5d5118138674c47f96747b";
+uname_s_glob="linux";          uname_m_glob="armv8l";  file="gitstatusd-${uname_s}-aarch64";        version="v1.3.1"; sha256="4e0a506eafb14b009cf6670f0e11399ac7e765cad17b9fcf38ef65516d248bfa";
+uname_s_glob="linux";          uname_m_glob="i686";    file="gitstatusd-${uname_s}-${uname_m}";     version="v1.3.1"; sha256="ba506fbecf4a4430533e661bb63c7b77f6b4836ea013bdf8a6eabeace456f3b9";
+uname_s_glob="linux";          uname_m_glob="ppc64le"; file="gitstatusd-${uname_s}-${uname_m}";     version="v1.3.1"; sha256="1bf907db28ac7d6516add51be47b73b1854b84ecf46de56ccb1479e6a7e29ed2";
+uname_s_glob="linux";          uname_m_glob="x86_64";  file="gitstatusd-${uname_s}-${uname_m}";     version="v1.3.1"; sha256="91bcc1efafff8c896e8f172ff624d9407494f7a26b4ad1bf573f52623be2ca91";
+uname_s_glob="msys_nt-10.0";   uname_m_glob="i686";    file="gitstatusd-${uname_s}-${uname_m}";     version="v1.3.1"; sha256="618d2425c6a22fa3762fe6fe252f9ddb4ed9138df1377e48b2f119cd4875f400";
+uname_s_glob="msys_nt-10.0";   uname_m_glob="x86_64";  file="gitstatusd-${uname_s}-${uname_m}";     version="v1.3.1"; sha256="bdfae7a7c0fd83d0214a7eabde3b7d8709336bd08697a74d48bea4a04c352676";
 
 # Fallbacks to official gitstatusd binaries.
-uname_s_glob="cygwin_nt-*";    uname_m_glob="i686";    file="gitstatusd-cygwin_nt-10.0-${uname_m}"; version="v1.0.0"; sha256="c38342c7a70842067074710250fd8cebea87ae111f032277c2c70a77179b5355";
-uname_s_glob="cygwin_nt-*";    uname_m_glob="x86_64";  file="gitstatusd-cygwin_nt-10.0-${uname_m}"; version="v1.0.0"; sha256="d30b455e371cd0895c9bd1ff87b8a27e6c3f3c2970b4e993e93fe1a6943962ad";
-uname_s_glob="mingw32_nt-*";   uname_m_glob="i686";    file="gitstatusd-msys_nt-10.0-${uname_m}";   version="v1.0.0"; sha256="2cf6ff92a5c50e4181ceb402217162bebd5e52144eb52eacfef2f6d47d5c20d4";
-uname_s_glob="mingw32_nt-*";   uname_m_glob="x86_64";  file="gitstatusd-msys_nt-10.0-${uname_m}";   version="v1.0.0"; sha256="960c3d9d90d7b96257a9746f7168faffdf9b5fbda464e354e7b14c42cc473f15";
-uname_s_glob="mingw64_nt-*";   uname_m_glob="i686";    file="gitstatusd-msys_nt-10.0-${uname_m}";   version="v1.0.0"; sha256="2cf6ff92a5c50e4181ceb402217162bebd5e52144eb52eacfef2f6d47d5c20d4";
-uname_s_glob="mingw64_nt-*";   uname_m_glob="x86_64";  file="gitstatusd-msys_nt-10.0-${uname_m}";   version="v1.0.0"; sha256="960c3d9d90d7b96257a9746f7168faffdf9b5fbda464e354e7b14c42cc473f15";
-uname_s_glob="msys_nt-*";      uname_m_glob="i686";    file="gitstatusd-msys_nt-10.0-${uname_m}";   version="v1.0.0"; sha256="2cf6ff92a5c50e4181ceb402217162bebd5e52144eb52eacfef2f6d47d5c20d4";
-uname_s_glob="msys_nt-*";      uname_m_glob="x86_64";  file="gitstatusd-msys_nt-10.0-${uname_m}";   version="v1.0.0"; sha256="960c3d9d90d7b96257a9746f7168faffdf9b5fbda464e354e7b14c42cc473f15";
+uname_s_glob="cygwin_nt-*";    uname_m_glob="i686";    file="gitstatusd-cygwin_nt-10.0-${uname_m}"; version="v1.3.1"; sha256="c96baef70b81b5a1d46adcc9e93721eaf4bdc295562bdd2baf210a6b416b9911";
+uname_s_glob="cygwin_nt-*";    uname_m_glob="x86_64";  file="gitstatusd-cygwin_nt-10.0-${uname_m}"; version="v1.3.1"; sha256="18b5be49f6eb9ff1cf25e76d6f2333c7402e686e05ce5b88ca107c80504210d8";
+uname_s_glob="mingw32_nt-*";   uname_m_glob="i686";    file="gitstatusd-msys_nt-10.0-${uname_m}";   version="v1.3.1"; sha256="618d2425c6a22fa3762fe6fe252f9ddb4ed9138df1377e48b2f119cd4875f400";
+uname_s_glob="mingw32_nt-*";   uname_m_glob="x86_64";  file="gitstatusd-msys_nt-10.0-${uname_m}";   version="v1.3.1"; sha256="bdfae7a7c0fd83d0214a7eabde3b7d8709336bd08697a74d48bea4a04c352676";
+uname_s_glob="mingw64_nt-*";   uname_m_glob="i686";    file="gitstatusd-msys_nt-10.0-${uname_m}";   version="v1.3.1"; sha256="618d2425c6a22fa3762fe6fe252f9ddb4ed9138df1377e48b2f119cd4875f400";
+uname_s_glob="mingw64_nt-*";   uname_m_glob="x86_64";  file="gitstatusd-msys_nt-10.0-${uname_m}";   version="v1.3.1"; sha256="bdfae7a7c0fd83d0214a7eabde3b7d8709336bd08697a74d48bea4a04c352676";
+uname_s_glob="msys_nt-*";      uname_m_glob="i686";    file="gitstatusd-msys_nt-10.0-${uname_m}";   version="v1.3.1"; sha256="618d2425c6a22fa3762fe6fe252f9ddb4ed9138df1377e48b2f119cd4875f400";
+uname_s_glob="msys_nt-*";      uname_m_glob="x86_64";  file="gitstatusd-msys_nt-10.0-${uname_m}";   version="v1.3.1"; sha256="bdfae7a7c0fd83d0214a7eabde3b7d8709336bd08697a74d48bea4a04c352676";
