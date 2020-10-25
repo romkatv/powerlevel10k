@@ -572,7 +572,7 @@ applications on your system. Configure your terminal to use this font:
       family: "MesloLGS NF"
   ```
  - **Kitty**: Create or open `~/.config/kitty/kitty.conf` and add the following line to it:
-   ```
+   ```text
    font_family MesloLGS NF
    ```
    Restart Kitty by closing all sessions and opening a new session.
