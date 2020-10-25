@@ -69,6 +69,11 @@ applications on your system. Configure your terminal to use this font:
     normal:
       family: "MesloLGS NF"
   ```
+ - **kitty**: Create or open `~/.config/kitty/kitty.conf` and add the following sentence and then
+ restart kitty by closing all sessions and opening a new session.
+ ```
+ font_family MesloLGS NF
+ ```
 
 **IMPORTANT:** Run `p10k configure` after changing terminal font. The old `~/.p10k.zsh` may work
 incorrectly with the new font.
