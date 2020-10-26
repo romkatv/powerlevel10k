@@ -5755,7 +5755,7 @@ _p9k_set_instant_prompt() {
   [[ -n $RPROMPT ]] || unset RPROMPT
 }
 
-typeset -gri __p9k_instant_prompt_version=30
+typeset -gri __p9k_instant_prompt_version=31
 
 _p9k_dump_instant_prompt() {
   local user=${(%):-%n}
@@ -5833,7 +5833,8 @@ _p9k_dump_instant_prompt() {
   local tail=${content##*$rs$key$us}
   [[ ${#tail} != ${#content} ]] || return
   local P9K_PROMPT=instant
-  if [[ $P9K_TTY != old ]]; then'
+  if [[ $P9K_TTY != old || $_P9K_TTY != $TTY ]]; then
+    typeset -gx _P9K_TTY=$TTY'
       if (( _POWERLEVEL9K_NEW_TTY_MAX_AGE_SECONDS < 0 )); then
         >&$fd print -r -- '    typeset -gx P9K_TTY=new'
       else
@@ -6412,8 +6413,8 @@ function _p9k_on_expand() {
       zle -F $_p9k__state_dump_fd _p9k_do_dump
     fi
 
-    if (( ! $+P9K_TTY )); then
-      typeset -gx P9K_TTY=old
+    if (( ! $+P9K_TTY )) || [[ $_P9K_TTY != $TTY ]]; then
+      typeset -gx P9K_TTY=old _P9K_TTY=$TTY
       if (( _POWERLEVEL9K_NEW_TTY_MAX_AGE_SECONDS < 0 )); then
         P9K_TTY=new
       else
@@ -8388,7 +8389,7 @@ _p9k_deinit() {
   fi
   (( $+_p9k__iterm2_precmd )) && functions[iterm2_precmd]=$_p9k__iterm2_precmd
   (( $+_p9k__iterm2_decorate_prompt )) && functions[iterm2_decorate_prompt]=$_p9k__iterm2_decorate_prompt
-  unset -m '(_POWERLEVEL9K_|P9K_|_p9k_)*~(P9K_SSH|P9K_TTY)'
+  unset -m '(_POWERLEVEL9K_|P9K_|_p9k_)*~(P9K_SSH|P9K_TTY|_P9K_TTY)'
   [[ -n $__p9k_locale ]] || unset __p9k_locale
 }
 
