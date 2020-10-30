@@ -5755,7 +5755,7 @@ _p9k_set_instant_prompt() {
   [[ -n $RPROMPT ]] || unset RPROMPT
 }
 
-typeset -gri __p9k_instant_prompt_version=32
+typeset -gri __p9k_instant_prompt_version=33
 
 _p9k_dump_instant_prompt() {
   local user=${(%):-%n}
@@ -5800,7 +5800,7 @@ _p9k_dump_instant_prompt() {
   local -i height=$_POWERLEVEL9K_INSTANT_PROMPT_COMMAND_LINES
   local prompt_dir=${(q)prompt_dir}"
       >&$fd print -r -- '
-  (( __p9k_initial_screen_empty )) && height=0
+  [[ -n $_Z4H_TMUX_CMD ]] && height=0
   local real_gitstatus_header
   if [[ -r $gitstatus_dir/install.info ]]; then
     IFS= read -r real_gitstatus_header <$gitstatus_dir/install.info || real_gitstatus_header=borked
@@ -6042,6 +6042,13 @@ _p9k_dump_instant_prompt() {
   exec {__p9k_fd_0}<&0 {__p9k_fd_1}>&1 {__p9k_fd_2}>&2 0<&$fd_null 1>$__p9k_instant_prompt_output
   exec 2>&1 {fd_null}>&-
   typeset -gi __p9k_instant_prompt_active=1
+  typeset -g __p9k_instant_prompt_clear=$terminfo[rc]${(%):-%b%k%f%s%u}$terminfo[ed]
+  if [[ -n $_Z4H_TMUX ]]; then
+    local pane
+    if pane="$(TMUX=$_Z4H_TMUX TMUX_PANE= $_Z4H_TMUX_CMD capture-pane -p -e 2>/dev/null && print -n x)"; then
+      __p9k_instant_prompt_clear=${esc}0m${esc}H${${pane//$lf/${esc}K$lf}%${lf}x}$__p9k_instant_prompt_clear
+    fi
+  fi
   typeset -g __p9k_instant_prompt_dump_file=${XDG_CACHE_HOME:-~/.cache}/p10k-dump-${(%):-%n}.zsh
   if builtin source $__p9k_instant_prompt_dump_file 2>/dev/null && (( $+functions[_p9k_preinit] )); then
     _p9k_preinit
@@ -6053,11 +6060,7 @@ _p9k_dump_instant_prompt() {
     exec 0<&$__p9k_fd_0 1>&$__p9k_fd_1 2>&$__p9k_fd_2 {__p9k_fd_0}>&- {__p9k_fd_1}>&- {__p9k_fd_2}>&-
     unset __p9k_fd_0 __p9k_fd_1 __p9k_fd_2
     typeset -gi __p9k_instant_prompt_erased=1
-    if (( __p9k_initial_screen_empty )); then
-      print -rn -- $'\''\033[2J'\''$terminfo[rc]${(%):-%b%k%f%s%u}
-    else
-      print -rn -- $terminfo[rc]${(%):-%b%k%f%s%u}$terminfo[ed]
-    fi
+    print -rn -- $__p9k_instant_prompt_clear
     if [[ -s $__p9k_instant_prompt_output ]]; then
       command cat $__p9k_instant_prompt_output 2>/dev/null
       if (( $1 )); then
@@ -6251,11 +6254,7 @@ function _p9k_clear_instant_prompt() {
       local -i fill=$((COLUMNS > _p9k__ret ? COLUMNS - _p9k__ret : 0))
       local cr=$'\r'
       local sp="${(%):-%b%k%f%s%u$mark${(pl.$fill.. .)}$cr%b%k%f%s%u%E}"
-      if (( __p9k_initial_screen_empty )); then
-        print -rn -- $'\e[2J'$terminfo[rc]${(%):-%b%k%f%s%u}
-      else
-        print -rn -- $terminfo[rc]${(%):-%b%k%f%s%u}$terminfo[ed]
-      fi
+      print -rn -- ${__p9k_instant_prompt_clear-$terminfo[rc]${(%):-%b%k%f%s%u}$terminfo[ed]}
       local unexpected=${${${(S)content//$'\e[?'<->'c'}//$'\e['<->' q'}//$'\e'[^$'\a\e']#($'\a'|$'\e\\')}
       if [[ -n $unexpected ]]; then
         local omz1='[Oh My Zsh] Would you like to update? [Y/n]: '
@@ -6315,11 +6314,7 @@ function _p9k_clear_instant_prompt() {
     } 2>/dev/null
   else
     zf_rm -f -- $__p9k_instant_prompt_output 2>/dev/null
-    if (( __p9k_initial_screen_empty )); then
-      print -rn -- $'\e[2J'$terminfo[rc]${(%):-%b%k%f%s%u}
-    else
-      print -rn -- $terminfo[rc]${(%):-%b%k%f%s%u}$terminfo[ed]
-    fi
+    print -rn -- ${__p9k_instant_prompt_clear-$terminfo[rc]${(%):-%b%k%f%s%u}$terminfo[ed]}
   fi
   prompt_opts=(percent subst sp cr)
   if [[ $_POWERLEVEL9K_DISABLE_INSTANT_PROMPT == 0 && $__p9k_instant_prompt_active == 2 ]]; then
