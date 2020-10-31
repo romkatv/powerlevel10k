@@ -5755,7 +5755,7 @@ _p9k_set_instant_prompt() {
   [[ -n $RPROMPT ]] || unset RPROMPT
 }
 
-typeset -gri __p9k_instant_prompt_version=35
+typeset -gri __p9k_instant_prompt_version=36
 
 _p9k_dump_instant_prompt() {
   local user=${(%):-%n}
@@ -5834,8 +5834,7 @@ _p9k_dump_instant_prompt() {
   local tail=${content##*$rs$key$us}
   [[ ${#tail} != ${#content} ]] || return
   local P9K_PROMPT=instant
-  if [[ $P9K_TTY != old || $_P9K_TTY != $TTY ]]; then
-    typeset -gx _P9K_TTY=$TTY'
+  if [[ -z $P9K_TTY || $P9K_TTY == old && -n ${_P9K_TTY:#$TTY} ]]; then'
       if (( _POWERLEVEL9K_NEW_TTY_MAX_AGE_SECONDS < 0 )); then
         >&$fd print -r -- '    typeset -gx P9K_TTY=new'
       else
@@ -5850,6 +5849,7 @@ _p9k_dump_instant_prompt() {
     fi'
       fi
       >&$fd print -r -- '  fi
+  typeset -gx _P9K_TTY=$TTY
   local -i _p9k__empty_line_i=3 _p9k__ruler_i=3
   local -A _p9k_display_k=('${(j: :)${(@q)${(kv)_p9k_display_k}}}')
   local -a _p9k__display_v=('${(j: :)${(@q)display_v}}')
@@ -6430,8 +6430,8 @@ function _p9k_on_expand() {
       zle -F $_p9k__state_dump_fd _p9k_do_dump
     fi
 
-    if (( ! $+P9K_TTY )) || [[ $_P9K_TTY != $TTY ]]; then
-      typeset -gx P9K_TTY=old _P9K_TTY=$TTY
+    if [[ -z $P9K_TTY || $P9K_TTY == old && -n ${_P9K_TTY:#$TTY} ]]; then
+      typeset -gx P9K_TTY=old
       if (( _POWERLEVEL9K_NEW_TTY_MAX_AGE_SECONDS < 0 )); then
         P9K_TTY=new
       else
@@ -6442,6 +6442,8 @@ function _p9k_on_expand() {
         fi
       fi
     fi
+
+    typeset -gx _P9K_TTY=$TTY
 
     __p9k_reset_state=1
 
