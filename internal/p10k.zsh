@@ -7447,7 +7447,7 @@ function _p9k_widget_hook() {
 
   eval "$__p9k_intro"
   (( _p9k__restore_prompt_fd )) && _p9k_restore_prompt $_p9k__restore_prompt_fd
-  if [[ $1 == clear-screen ]]; then
+  if [[ $1 == (clear-screen|z4h-clear-screen-*-top) ]]; then
     P9K_TTY=new
     _p9k__expanded=0
     _p9k_reset_prompt
@@ -7519,6 +7519,8 @@ function _p9k_wrap_widgets() {
       visual-line-mode
       deactivate-region
       clear-screen
+      z4h-clear-screen-soft-top
+      z4h-clear-screen-hard-top
       send-break
       $_POWERLEVEL9K_HOOK_WIDGETS
     )
