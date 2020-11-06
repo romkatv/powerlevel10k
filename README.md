@@ -725,14 +725,14 @@ Powerlevel10k defines prompt and nothing else. It sets [prompt-related options](
   https://raw.githubusercontent.com/romkatv/powerlevel10k-media/master/prompt-highlight.png)
 
 Everything within the highlighted areas on the screenshot is produced by Powerlevel10k.
-Powerlevel10k has no control over the terminal content or color outside these areas.
+Powerlevel10k has no control over the terminal content or colors outside these areas.
 
 Powerlevel10k does not affect:
 
-- Terminal window title.
+- Terminal window/tab title.
 - Colors used by `ls`.
 - The behavior of `git` command.
-- The content and style of command completions.
+- The content and style of <kbd>Tab</kbd> completions.
 - Command line colors (syntax highlighting, autosuggestions, etc.).
 - Key bindings.
 - Aliases.
