@@ -7372,10 +7372,11 @@ function _p9k_on_widget_zle-line-finish() {
   (( _p9k_reset_on_line_finish )) && __p9k_reset_state=2
   (( $+functions[p10k-on-post-prompt] )) && p10k-on-post-prompt
 
+  local -i optimized
+
   if [[ -n $_p9k_transient_prompt ]]; then
     if [[ $_POWERLEVEL9K_TRANSIENT_PROMPT == always || $_p9k__cwd == $_p9k__last_prompt_pwd ]]; then
-      RPROMPT=
-      PROMPT=$_p9k_transient_prompt
+      optimized=1
       __p9k_reset_state=2
     else
       _p9k__last_prompt_pwd=$_p9k__cwd
@@ -7390,11 +7391,11 @@ function _p9k_on_widget_zle-line-finish() {
         zle -F $_p9k__restore_prompt_fd _p9k_restore_prompt
       fi
     fi
-    if (( $+termcap[up] )); then
-      (( _p9k__can_hide_cursor )) && local hide=$terminfo[civis] || local hide=
-      echo -nE - $hide$'\n'$termcap[up]
+    if (( optimized )); then
+      RPROMPT= PROMPT=$_p9k_transient_prompt _p9k_reset_prompt
+    else
+      _p9k_reset_prompt
     fi
-    _p9k_reset_prompt
   fi
 
   _p9k__line_finished='%{%}'
