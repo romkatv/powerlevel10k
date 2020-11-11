@@ -694,10 +694,14 @@ The command to update Powerlevel10k depends on how it was installed.
    ```
 3. Copy `~/powerlevel10k` from the machine connected to the Internet to the one without Internet
    access.
-4. Append the following lines to the bottom of `~/.zshrc` on the machine without Internet access:
+4. Add `source ~/powerlevel10k/powerlevel10k.zsh-theme` to `~/.zshrc` on the machine without
+   Internet access:
    ```zsh
-   source ~/powerlevel10k/powerlevel10k.zsh-theme
-   unset ZSH_THEME
+   echo 'source ~/powerlevel10k/powerlevel10k.zsh-theme' >>~/.zshrc
+   ```
+5. If `~/.zshrc` on the machine without Internet access sets `ZSH_THEME`, remove that line.
+   ```zsh
+   sed -i.bak '/^ZSH_THEME=/d' ~/.zshrc
    ```
 
 To update, remove `~/powerlevel10k` on both machines and repeat steps 1-3.
