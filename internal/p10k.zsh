@@ -6634,6 +6634,7 @@ _p9k_precmd_impl() {
       local -F start_time=EPOCHREALTIME
       unset _p9k__vcs
       unset _p9k__vcs_timeout
+      local -i _p9k__vcs_called
       _p9k_vcs_gitstatus
       local -i fast_vcs=1
     fi
