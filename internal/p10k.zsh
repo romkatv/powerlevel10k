@@ -3934,7 +3934,8 @@ function _p9k_vcs_resume() {
 }
 
 function _p9k_vcs_gitstatus() {
-  if [[ $_p9k__refresh_reason == precmd ]]; then
+  if [[ $_p9k__refresh_reason == precmd ]] && (( !_p9k__vcs_called )); then
+    typeset -gi _p9k__vcs_called=1
     if (( $+_p9k__gitstatus_next_dir )); then
       _p9k__gitstatus_next_dir=$_p9k__cwd_a
     else
@@ -5597,6 +5598,8 @@ _p9k_prompt_net_iface_sync() {
 }
 
 function _p9k_set_prompt() {
+  local -i _p9k__vcs_called
+
   PROMPT=
   RPROMPT=
   [[ $1 == instant_ ]] || PROMPT+='${$((_p9k_on_expand()))+}'
@@ -7367,6 +7370,8 @@ function _p9k_on_widget_zle-line-init() {
 
 function _p9k_on_widget_zle-line-finish() {
   (( $+_p9k__line_finished )) && return
+
+  local P9K_PROMPT=transient
 
   _p9k__line_finished=
   (( _p9k_reset_on_line_finish )) && __p9k_reset_state=2
