@@ -7388,14 +7388,15 @@ function _p9k_on_widget_zle-line-finish() {
     fi
   fi
 
-  if (( __p9k_reset_state == 2 )); then
-    if [[ $1 == int ]]; then
-      _p9k__must_restore_prompt=1
-      if (( !_p9k__restore_prompt_fd )); then
-        sysopen -o cloexec -ru _p9k__restore_prompt_fd /dev/null
-        zle -F $_p9k__restore_prompt_fd _p9k_restore_prompt
-      fi
+  if [[ $1 == int ]]; then
+    _p9k__must_restore_prompt=1
+    if (( !_p9k__restore_prompt_fd )); then
+      sysopen -o cloexec -ru _p9k__restore_prompt_fd /dev/null
+      zle -F $_p9k__restore_prompt_fd _p9k_restore_prompt
     fi
+  fi
+
+  if (( __p9k_reset_state == 2 )); then
     if (( optimized )); then
       RPROMPT= PROMPT=$_p9k_transient_prompt _p9k_reset_prompt
     else
