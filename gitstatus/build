@@ -11,6 +11,12 @@ fi
 
 export LC_ALL=C
 
+if [ -z "${ZSH_VERSION-}" ] && command -v zsh >/dev/null 2>&1; then
+  case "${BASH_VERSION-}" in
+    [0-3].*) exec zsh "$0" "$@";;
+  esac
+fi
+
 usage="$(command cat <<\END
 Usage: build [-m ARCH] [-c CPU] [-d CMD] [-i IMAGE] [-s] [-w]
 
@@ -29,7 +35,7 @@ Options:
             succeed; on some operating systems this option is not
             supported; on others it can have partial effect
   -w        automatically download tarballs for dependencies if they
-            don't already exist in ./deps; dependencies are described
+            do not already exist in ./deps; dependencies are described
             in ./build.info
 END
 )"
@@ -159,10 +165,11 @@ case "$gitstatus_kernel" in
   ;;
   darwin)
     command mkdir -- "$workdir"/lib
-    command ln -s -- /usr/local/opt/libiconv/lib/libiconv.a "$workdir"/lib
+    brew_prefix="$(command brew --prefix)"
+    command ln -s -- "$brew_prefix"/opt/libiconv/lib/libiconv.a "$workdir"/lib
     libgit2_cmake_flags="$libgit2_cmake_flags -DUSE_ICONV=ON"
-    libgit2_cflags="$libgit2_cflags -I/usr/local/opt/libiconv/include"
-    gitstatus_cxxflags="$gitstatus_cxxflags -I/usr/local/opt/libiconv/include"
+    libgit2_cflags="$libgit2_cflags -I"$brew_prefix"/opt/libiconv/include"
+    gitstatus_cxxflags="$gitstatus_cxxflags -I"$brew_prefix"/opt/libiconv/include"
     gitstatus_ldlibs="$gitstatus_ldlibs -liconv"
     gitstatus_ldflags="$gitstatus_ldflags -L${workdir}/lib"
     libgit2_cmake_flags="$libgit2_cmake_flags -DENABLE_REPRODUCIBLE_BUILDS=OFF"
