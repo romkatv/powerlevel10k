@@ -10,8 +10,6 @@ theme:
     - zsh
     - sh
     - yaml
-docs_dir: mkdocs
-site_dir: docs
 nav:
   - Home: index.md
   - Get Started: installation.md
