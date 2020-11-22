@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        
+        
+        <link rel="shortcut icon" href="../img/favicon.ico">
+        <title>Recommended font: Meslo Nerd Font patched for Powerlevel10k - Powerlevel10k</title>
+        <link href="../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../css/font-awesome.min.css" rel="stylesheet">
+        <link href="../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/atom-one-dark.min.css">
+
+        <script src="../js/jquery-1.10.2.min.js" defer></script>
+        <script src="../js/bootstrap.min.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/bash.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/zsh.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/sh.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/yaml.min.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-dark">
+            <div class="container">
+                <a class="navbar-brand" href="..">Powerlevel10k</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar-collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="navitem">
+                                <a href=".." class="nav-link">Home</a>
+                            </li>
+                            <li class="navitem">
+                                <a href="../installation/" class="nav-link">Get Started</a>
+                            </li>
+                            <li class="dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">Features <b class="caret"></b></a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../features/wizard/" class="dropdown-item">Configuration wizard</a>
+</li>
+                                    
+<li>
+    <a href="../features/uncompromising_performance/" class="dropdown-item">Uncompromising performance</a>
+</li>
+                                    
+<li>
+    <a href="../features/p9k_compatibility/" class="dropdown-item">Powerlevel9k Compatibility</a>
+</li>
+                                    
+<li>
+    <a href="../features/pure_compatibility/" class="dropdown-item">Pure compatibility</a>
+</li>
+                                    
+<li>
+    <a href="../features/instant_prompt/" class="dropdown-item">Instant prompt</a>
+</li>
+                                    
+<li>
+    <a href="../features/show_on_command/" class="dropdown-item">Show on command</a>
+</li>
+                                    
+<li>
+    <a href="../features/transient_prompt/" class="dropdown-item">Transient prompt</a>
+</li>
+                                    
+<li>
+    <a href="../features/current_directory/" class="dropdown-item">Current Directory that just works</a>
+</li>
+                                    
+<li>
+    <a href="../features/customizable/" class="dropdown-item">Extremely Customizable</a>
+</li>
+                                    
+<li>
+    <a href="../features/batteries_included/" class="dropdown-item">Batteries included</a>
+</li>
+                                    
+<li>
+    <a href="../features/extensible/" class="dropdown-item">Extensible</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="navitem">
+                                <a href="../faq/" class="nav-link">FAQ</a>
+                            </li>
+                            <li class="navitem">
+                                <a href="../troubleshooting/" class="nav-link">Troubleshooting</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-toggle="modal" data-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                            <li class="nav-item">
+                                <a href="https://github.com/romkatv/powerlevel10k/edit/master/docs/fonts.md" class="nav-link"><i class="fa fa-github"></i> Edit on GitHub</a>
+                            </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-light navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-toggle="collapse" data-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-level="1"><a href="#recommended-font-meslo-nerd-font-patched-for-powerlevel10k" class="nav-link">Recommended font: Meslo Nerd Font patched for Powerlevel10k</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-level="2"><a href="#automatic-font-installation" class="nav-link">Automatic font installation</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#manual-font-installation" class="nav-link">Manual font installation</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="recommended-font-meslo-nerd-font-patched-for-powerlevel10k">Recommended font: Meslo Nerd Font patched for Powerlevel10k</h1>
+<p>Gorgeous monospace font designed by Jim Lyles for Bitstream, customized by the same for Apple,
+further customized by André Berg, and finally patched by yours truly with customized scripts
+originally developed by Ryan L McIntyre of Nerd Fonts. Contains all glyphs and symbols that
+Powerlevel10k may need. Battle-tested in dozens of different terminals on all major operating
+systems.</p>
+<p><em>FAQ</em>: <a href="../faq/#how-was-the-recommended-font-created">How was the recommended font created?</a></p>
+<h2 id="automatic-font-installation">Automatic font installation</h2>
+<p>If you are using iTerm2 or Termux, <code>p10k configure</code> can install the recommended font for you.
+Simply answer <code>Yes</code> when asked whether to install <em>Meslo Nerd Font</em>.</p>
+<p>If you are using a different terminal, proceed with manual font installation. 👇</p>
+<h2 id="manual-font-installation">Manual font installation</h2>
+<p>Download these four ttf files:</p>
+<ul>
+<li><a href="https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Regular.ttf">MesloLGS NF Regular.ttf</a></li>
+<li><a href="https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Bold.ttf">MesloLGS NF Bold.ttf</a></li>
+<li><a href="https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Italic.ttf">MesloLGS NF Italic.ttf</a></li>
+<li><a href="https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Bold%20Italic.ttf">MesloLGS NF Bold Italic.ttf</a></li>
+</ul>
+<p>Double-click on each file and click "Install". This will make <code>MesloLGS NF</code> font available to all
+applications on your system. Configure your terminal to use this font:</p>
+<ul>
+<li><strong>iTerm2</strong>: Open <em>iTerm2 → Preferences → Profiles → Text</em> and set <em>Font</em> to <code>MesloLGS NF</code>.
+  Alternatively, type <code>p10k configure</code> and answer <code>Yes</code> when asked whether to install
+  <em>Meslo Nerd Font</em>.</li>
+<li><strong>Apple Terminal</strong> Open <em>Terminal → Preferences → Profiles → Text</em>, click <em>Change</em> under <em>Font</em>
+  and select <code>MesloLGS NF</code> family.</li>
+<li><strong>Hyper</strong>: Open <em>Hyper → Edit → Preferences</em> and change the value of <code>fontFamily</code> under
+  <code>module.exports.config</code> to <code>MesloLGS NF</code>.</li>
+<li><strong>Visual Studio Code</strong>: Open <em>File → Preferences → Settings</em>, enter
+  <code>terminal.integrated.fontFamily</code> in the search box and set the value to <code>MesloLGS NF</code>.</li>
+<li><strong>GNOME Terminal</strong> (the default Ubuntu terminal): Open <em>Terminal → Preferences</em> and click on the
+  selected profile under <em>Profiles</em>. Check <em>Custom font</em> under <em>Text Appearance</em> and select
+  <code>MesloLGS NF Regular</code>.</li>
+<li><strong>Konsole</strong>: Open <em>Settings → Edit Current Profile → Appearance</em>, click <em>Select Font</em> and select
+  <code>MesloLGS NF Regular</code>.</li>
+<li><strong>Tilix</strong>: Open <em>Tilix → Preferences</em> and click on the selected profile under <em>Profiles</em>. Check
+  <em>Custom font</em> under <em>Text Appearance</em> and select <code>MesloLGS NF Regular</code>.</li>
+<li><strong>Windows Console Host</strong> (the old thing): Click the icon in the top left corner, then
+  <em>Properties → Font</em> and set <em>Font</em> to <code>MesloLGS NF</code>.</li>
+<li><strong>Windows Terminal</strong> (the new thing): Open <em>Settings</em> (<code>Ctrl+,</code>), search for <code>fontFace</code> and set
+  value to <code>MesloLGS NF</code> for every profile.</li>
+<li><strong>Termux</strong>: Type <code>p10k configure</code> and answer <code>Yes</code> when asked whether to install
+  <em>Meslo Nerd Font</em>.</li>
+<li><strong>Blink</strong> Type <code>config</code>, go to <em>Appearance</em>, tap <em>Add a new font</em>, tap <em>Open Gallery</em>, select
+  <em>MesloLGS NF.css</em>, tap <em>import</em> and type <code>exit</code> in the home view to reload the font.</li>
+<li><strong>Terminus</strong>: Open <em>Settings → Appearance</em> and set <em>Font</em> to <code>MesloLGS NF</code>.</li>
+<li><strong>Terminator</strong>: Open <em>Preferences</em> using the context menu. Under <em>Profiles</em> select the <em>General</em>
+  tab (should be selected already), uncheck <em>Use the system fixed width font</em> (if not already)
+  and select <code>MesloLGS NF Regular</code>. Exit the Preferences dialog by clicking <em>Close</em>.</li>
+<li><strong>Guake</strong>: Right Click on an open terminal and open <em>Preferences</em>. Under <em>Appearance</em>
+  tab, uncheck <em>Use the system fixed width font</em> (if not already) and select <code>MesloLGS NF Regular</code>.
+  Exit the Preferences dialog by clicking <em>Close</em>.</li>
+<li><strong>Alacritty</strong>: Create or open <code>~/.config/alacritty/alacritty.yml</code> and add the following section
+  to it:</li>
+</ul>
+<pre><code class="yaml">font:
+  normal:
+    family: 'MesloLGS NF'
+</code></pre>
+
+<ul>
+<li><strong>Kitty</strong>: Create or open <code>~/.config/kitty/kitty.conf</code> and add the following line to it:</li>
+</ul>
+<pre><code class="text">font_family MesloLGS NF
+</code></pre>
+
+<p>Restart Kitty by closing all sessions and opening a new session.</p>
+<p><strong>IMPORTANT:</strong> Run <code>p10k configure</code> after changing terminal font. The old <code>~/.p10k.zsh</code> may work
+incorrectly with the new font.</p>
+<p><em>Using a different terminal and know how to set the font for it? Share your knowledge by sending a
+PR to expand the list!</em></p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>
+            var base_url = "..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../js/base.js" defer></script>
+        <script src="../search/main.js" defer></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+                <p>
+                    From here you can search these documents. Enter
+                    your search terms below.
+                </p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>

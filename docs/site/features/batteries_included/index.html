@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        
+        
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>Batteries included - Powerlevel10k</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/font-awesome.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/atom-one-dark.min.css">
+
+        <script src="../../js/jquery-1.10.2.min.js" defer></script>
+        <script src="../../js/bootstrap.min.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/bash.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/zsh.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/sh.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/yaml.min.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-dark">
+            <div class="container">
+                <a class="navbar-brand" href="../..">Powerlevel10k</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar-collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="navitem">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="navitem">
+                                <a href="../../installation/" class="nav-link">Get Started</a>
+                            </li>
+                            <li class="dropdown active">
+                                <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">Features <b class="caret"></b></a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../wizard/" class="dropdown-item">Configuration wizard</a>
+</li>
+                                    
+<li>
+    <a href="../uncompromising_performance/" class="dropdown-item">Uncompromising performance</a>
+</li>
+                                    
+<li>
+    <a href="../p9k_compatibility/" class="dropdown-item">Powerlevel9k Compatibility</a>
+</li>
+                                    
+<li>
+    <a href="../pure_compatibility/" class="dropdown-item">Pure compatibility</a>
+</li>
+                                    
+<li>
+    <a href="../instant_prompt/" class="dropdown-item">Instant prompt</a>
+</li>
+                                    
+<li>
+    <a href="../show_on_command/" class="dropdown-item">Show on command</a>
+</li>
+                                    
+<li>
+    <a href="../transient_prompt/" class="dropdown-item">Transient prompt</a>
+</li>
+                                    
+<li>
+    <a href="../current_directory/" class="dropdown-item">Current Directory that just works</a>
+</li>
+                                    
+<li>
+    <a href="../customizable/" class="dropdown-item">Extremely Customizable</a>
+</li>
+                                    
+<li>
+    <a href="./" class="dropdown-item active">Batteries included</a>
+</li>
+                                    
+<li>
+    <a href="../extensible/" class="dropdown-item">Extensible</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="navitem">
+                                <a href="../../faq/" class="nav-link">FAQ</a>
+                            </li>
+                            <li class="navitem">
+                                <a href="../../troubleshooting/" class="nav-link">Troubleshooting</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-toggle="modal" data-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                            <li class="nav-item">
+                                <a rel="prev" href="../customizable/" class="nav-link">
+                                    <i class="fa fa-arrow-left"></i> Previous
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a rel="next" href="../extensible/" class="nav-link">
+                                    Next <i class="fa fa-arrow-right"></i>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="https://github.com/romkatv/powerlevel10k/edit/master/docs/features/batteries_included.md" class="nav-link"><i class="fa fa-github"></i> Edit on GitHub</a>
+                            </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-light navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-toggle="collapse" data-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-level="1"><a href="#batteries-included" class="nav-link">Batteries included</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="batteries-included">Batteries included</h1>
+<p>Powerlevel10k comes with dozens of built-in high quality segments. When you run <code>p10k configure</code>
+and choose any style except <a href="../pure_compatibility/">Pure</a>, many of these segments get enabled by
+default while others be manually enabled by opening <code>~/.p10k.zsh</code> and uncommenting them. You can
+enable as many segments as you like. It won't slow down your prompt or Zsh startup.</p>
+<table>
+<thead>
+<tr>
+<th align="right">Segment</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="right"><code>os_icon</code></td>
+<td>your OS logo (apple for macOS, swirl for debian, etc.)</td>
+</tr>
+<tr>
+<td align="right"><code>dir</code></td>
+<td>current working directory</td>
+</tr>
+<tr>
+<td align="right"><code>vcs</code></td>
+<td>Git repository status</td>
+</tr>
+<tr>
+<td align="right"><code>prompt_char</code></td>
+<td>multi-functional prompt symbol; changes depending on vi mode: <code>❯</code>, <code>❮</code>, <code>V</code>, <code>▶</code> for insert, command, visual and replace mode respectively; turns red on error</td>
+</tr>
+<tr>
+<td align="right"><code>context</code></td>
+<td>user@hostname</td>
+</tr>
+<tr>
+<td align="right"><code>status</code></td>
+<td>exit code of the last command</td>
+</tr>
+<tr>
+<td align="right"><code>command_execution_time</code></td>
+<td>duration (wall time) of the last command</td>
+</tr>
+<tr>
+<td align="right"><code>background_jobs</code></td>
+<td>presence of background jobs</td>
+</tr>
+<tr>
+<td align="right"><code>time</code></td>
+<td>current time</td>
+</tr>
+<tr>
+<td align="right"><code>direnv</code></td>
+<td><a href="https://direnv.net/">direnv</a> status</td>
+</tr>
+<tr>
+<td align="right"><code>asdf</code></td>
+<td>tool versions from <a href="https://github.com/asdf-vm/asdf">asdf</a></td>
+</tr>
+<tr>
+<td align="right"><code>virtualenv</code></td>
+<td>python environment from <a href="https://docs.python.org/3/library/venv.html">venv</a></td>
+</tr>
+<tr>
+<td align="right"><code>anaconda</code></td>
+<td>virtual environment from <a href="https://conda.io/">conda</a></td>
+</tr>
+<tr>
+<td align="right"><code>pyenv</code></td>
+<td>python environment from <a href="https://github.com/pyenv/pyenv">pyenv</a></td>
+</tr>
+<tr>
+<td align="right"><code>goenv</code></td>
+<td>go environment from <a href="https://github.com/syndbg/goenv">goenv</a></td>
+</tr>
+<tr>
+<td align="right"><code>nodenv</code></td>
+<td>node.js environment from <a href="https://github.com/nodenv/nodenv">nodenv</a></td>
+</tr>
+<tr>
+<td align="right"><code>nvm</code></td>
+<td>node.js environment from <a href="https://github.com/nvm-sh/nvm">nvm</a></td>
+</tr>
+<tr>
+<td align="right"><code>nodeenv</code></td>
+<td>node.js environment from <a href="https://github.com/ekalinin/nodeenv">nodeenv</a></td>
+</tr>
+<tr>
+<td align="right"><code>rbenv</code></td>
+<td>ruby environment from <a href="https://github.com/rbenv/rbenv">rbenv</a></td>
+</tr>
+<tr>
+<td align="right"><code>rvm</code></td>
+<td>ruby environment from <a href="https://rvm.io">rvm</a></td>
+</tr>
+<tr>
+<td align="right"><code>fvm</code></td>
+<td>flutter environment from <a href="https://github.com/leoafarias/fvm">fvm</a></td>
+</tr>
+<tr>
+<td align="right"><code>luaenv</code></td>
+<td>lua environment from <a href="https://github.com/cehoffman/luaenv">luaenv</a></td>
+</tr>
+<tr>
+<td align="right"><code>jenv</code></td>
+<td>java environment from <a href="https://github.com/jenv/jenv">jenv</a></td>
+</tr>
+<tr>
+<td align="right"><code>plenv</code></td>
+<td>perl environment from <a href="https://github.com/tokuhirom/plenv">plenv</a></td>
+</tr>
+<tr>
+<td align="right"><code>phpenv</code></td>
+<td>php environment from <a href="https://github.com/phpenv/phpenv">phpenv</a></td>
+</tr>
+<tr>
+<td align="right"><code>haskell_stack</code></td>
+<td>haskell version from <a href="https://haskellstack.org/">stack</a></td>
+</tr>
+<tr>
+<td align="right"><code>node_version</code></td>
+<td><a href="https://nodejs.org/">node.js</a> version</td>
+</tr>
+<tr>
+<td align="right"><code>go_version</code></td>
+<td><a href="https://golang.org">go</a> version</td>
+</tr>
+<tr>
+<td align="right"><code>rust_version</code></td>
+<td><a href="https://www.rust-lang.org">rustc</a> version</td>
+</tr>
+<tr>
+<td align="right"><code>dotnet_version</code></td>
+<td><a href="https://dotnet.microsoft.com">dotnet</a> version</td>
+</tr>
+<tr>
+<td align="right"><code>php_version</code></td>
+<td><a href="https://www.php.net/">php</a> version</td>
+</tr>
+<tr>
+<td align="right"><code>laravel_version</code></td>
+<td><a href="https://laravel.com/">laravel php framework</a> version</td>
+</tr>
+<tr>
+<td align="right"><code>java_version</code></td>
+<td><a href="https://www.java.com/">java</a> version</td>
+</tr>
+<tr>
+<td align="right"><code>package</code></td>
+<td><code>name@version</code> from <a href="https://docs.npmjs.com/files/package.json">package.json</a></td>
+</tr>
+<tr>
+<td align="right"><code>kubecontext</code></td>
+<td>current <a href="https://kubernetes.io/">kubernetes</a> context</td>
+</tr>
+<tr>
+<td align="right"><code>terraform</code></td>
+<td><a href="https://www.terraform.io">terraform</a> workspace</td>
+</tr>
+<tr>
+<td align="right"><code>aws</code></td>
+<td><a href="https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-profiles.html">aws profile</a></td>
+</tr>
+<tr>
+<td align="right"><code>aws_eb_env</code></td>
+<td><a href="https://aws.amazon.com/elasticbeanstalk/">aws elastic beanstalk</a> environment</td>
+</tr>
+<tr>
+<td align="right"><code>azure</code></td>
+<td><a href="https://docs.microsoft.com/en-us/cli/azure">azure</a> account name</td>
+</tr>
+<tr>
+<td align="right"><code>gcloud</code></td>
+<td><a href="https://cloud.google.com/">google cloud</a> cli account and project</td>
+</tr>
+<tr>
+<td align="right"><code>google_app_cred</code></td>
+<td><a href="https://cloud.google.com/docs/authentication/production">google application credentials</a></td>
+</tr>
+<tr>
+<td align="right"><code>nordvpn</code></td>
+<td><a href="https://nordvpn.com/">nordvpn</a> connection status</td>
+</tr>
+<tr>
+<td align="right"><code>ranger</code></td>
+<td><a href="https://github.com/ranger/ranger">ranger</a> shell</td>
+</tr>
+<tr>
+<td align="right"><code>nnn</code></td>
+<td><a href="https://github.com/jarun/nnn">nnn</a> shell</td>
+</tr>
+<tr>
+<td align="right"><code>vim_shell</code></td>
+<td><a href="https://www.vim.org/">vim</a> shell (<code>:sh</code>)</td>
+</tr>
+<tr>
+<td align="right"><code>midnight_commander</code></td>
+<td><a href="https://midnight-commander.org/">midnight commander</a> shell</td>
+</tr>
+<tr>
+<td align="right"><code>nix_shell</code></td>
+<td><a href="https://nixos.org/nixos/nix-pills/developing-with-nix-shell.html">nix shell</a> indicator</td>
+</tr>
+<tr>
+<td align="right"><code>todo</code></td>
+<td><a href="https://github.com/todotxt/todo.txt-cli">todo</a> items</td>
+</tr>
+<tr>
+<td align="right"><code>timewarrior</code></td>
+<td><a href="https://timewarrior.net/">timewarrior</a> tracking status</td>
+</tr>
+<tr>
+<td align="right"><code>taskwarrior</code></td>
+<td><a href="https://taskwarrior.org/">taskwarrior</a> task count</td>
+</tr>
+<tr>
+<td align="right"><code>vpn_ip</code></td>
+<td>virtual private network indicator</td>
+</tr>
+<tr>
+<td align="right"><code>ip</code></td>
+<td>IP address and bandwidth usage for a specified network interface</td>
+</tr>
+<tr>
+<td align="right"><code>load</code></td>
+<td>CPU load</td>
+</tr>
+<tr>
+<td align="right"><code>disk_usage</code></td>
+<td>disk usage</td>
+</tr>
+<tr>
+<td align="right"><code>ram</code></td>
+<td>free RAM</td>
+</tr>
+<tr>
+<td align="right"><code>swap</code></td>
+<td>used swap</td>
+</tr>
+<tr>
+<td align="right"><code>public_ip</code></td>
+<td>public IP address</td>
+</tr>
+<tr>
+<td align="right"><code>proxy</code></td>
+<td>system-wide http/https/ftp proxy</td>
+</tr>
+<tr>
+<td align="right"><code>wifi</code></td>
+<td>WiFi speed</td>
+</tr>
+<tr>
+<td align="right"><code>battery</code></td>
+<td>internal battery state and charge level (yep, batteries <em>literally</em> included)</td>
+</tr>
+</tbody>
+</table></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js" defer></script>
+        <script src="../../search/main.js" defer></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+                <p>
+                    From here you can search these documents. Enter
+                    your search terms below.
+                </p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>
