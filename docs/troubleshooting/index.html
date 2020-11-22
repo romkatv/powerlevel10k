@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        
+        
+        <link rel="shortcut icon" href="../img/favicon.ico">
+        <title>Troubleshooting - Powerlevel10k</title>
+        <link href="../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../css/font-awesome.min.css" rel="stylesheet">
+        <link href="../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/atom-one-dark.min.css">
+
+        <script src="../js/jquery-1.10.2.min.js" defer></script>
+        <script src="../js/bootstrap.min.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/bash.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/zsh.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/sh.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/yaml.min.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-dark">
+            <div class="container">
+                <a class="navbar-brand" href="..">Powerlevel10k</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar-collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="navitem">
+                                <a href=".." class="nav-link">Home</a>
+                            </li>
+                            <li class="navitem">
+                                <a href="../installation/" class="nav-link">Get Started</a>
+                            </li>
+                            <li class="dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">Features <b class="caret"></b></a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../features/wizard/" class="dropdown-item">Configuration wizard</a>
+</li>
+                                    
+<li>
+    <a href="../features/uncompromising_performance/" class="dropdown-item">Uncompromising performance</a>
+</li>
+                                    
+<li>
+    <a href="../features/p9k_compatibility/" class="dropdown-item">Powerlevel9k Compatibility</a>
+</li>
+                                    
+<li>
+    <a href="../features/pure_compatibility/" class="dropdown-item">Pure compatibility</a>
+</li>
+                                    
+<li>
+    <a href="../features/instant_prompt/" class="dropdown-item">Instant prompt</a>
+</li>
+                                    
+<li>
+    <a href="../features/show_on_command/" class="dropdown-item">Show on command</a>
+</li>
+                                    
+<li>
+    <a href="../features/transient_prompt/" class="dropdown-item">Transient prompt</a>
+</li>
+                                    
+<li>
+    <a href="../features/current_directory/" class="dropdown-item">Current Directory that just works</a>
+</li>
+                                    
+<li>
+    <a href="../features/customizable/" class="dropdown-item">Extremely Customizable</a>
+</li>
+                                    
+<li>
+    <a href="../features/batteries_included/" class="dropdown-item">Batteries included</a>
+</li>
+                                    
+<li>
+    <a href="../features/extensible/" class="dropdown-item">Extensible</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="navitem">
+                                <a href="../faq/" class="nav-link">FAQ</a>
+                            </li>
+                            <li class="navitem active">
+                                <a href="./" class="nav-link">Troubleshooting</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-toggle="modal" data-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                            <li class="nav-item">
+                                <a rel="prev" href="../faq/" class="nav-link">
+                                    <i class="fa fa-arrow-left"></i> Previous
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a rel="next" class="nav-link disabled">
+                                    Next <i class="fa fa-arrow-right"></i>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="https://github.com/romkatv/powerlevel10k/edit/master/docs/troubleshooting.md" class="nav-link"><i class="fa fa-github"></i> Edit on GitHub</a>
+                            </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-light navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-toggle="collapse" data-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-level="1"><a href="#troubleshooting" class="nav-link">Troubleshooting</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-level="2"><a href="#question-mark-in-prompt" class="nav-link">Question mark in prompt</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#icons-glyphs-or-powerline-symbols-dont-render" class="nav-link">Icons, glyphs or powerline symbols don't render</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#sub-pixel-imperfections-around-powerline-symbols" class="nav-link">Sub-pixel imperfections around powerline symbols</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#error-character-not-in-range" class="nav-link">Error: character not in range</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#cursor-is-in-the-wrong-place" class="nav-link">Cursor is in the wrong place</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#prompt-wrapping-around-in-a-weird-way" class="nav-link">Prompt wrapping around in a weird way</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#right-prompt-is-in-the-wrong-place" class="nav-link">Right prompt is in the wrong place</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#configuration-wizard-runs-automatically-every-time-zsh-is-started" class="nav-link">Configuration wizard runs automatically every time Zsh is started</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#some-prompt-styles-are-missing-from-the-configuration-wizard" class="nav-link">Some prompt styles are missing from the configuration wizard</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#cannot-install-the-recommended-font" class="nav-link">Cannot install the recommended font</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#extra-or-missing-spaces-in-prompt-compared-to-powerlevel9k" class="nav-link">Extra or missing spaces in prompt compared to Powerlevel9k</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#weird-things-happen-after-typing-source-zshrc" class="nav-link">Weird things happen after typing source ~/.zshrc</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#transient-prompt-stops-working-after-some-time" class="nav-link">Transient prompt stops working after some time</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#cannot-make-powerlevel10k-work-with-my-plugin-manager" class="nav-link">Cannot make Powerlevel10k work with my plugin manager</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#directory-is-difficult-to-see-in-prompt-when-using-rainbow-style" class="nav-link">Directory is difficult to see in prompt when using Rainbow style</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#horrific-mess-when-resizing-terminal-window" class="nav-link">Horrific mess when resizing terminal window</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#icons-cut-off-in-konsole" class="nav-link">Icons cut off in Konsole</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#arch-linux-logo-has-a-dot-in-the-bottom-right-corner" class="nav-link">Arch Linux logo has a dot in the bottom right corner</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="troubleshooting">Troubleshooting</h1>
+<h2 id="question-mark-in-prompt">Question mark in prompt</h2>
+<p>If it looks like a regular <code>?</code>, that's normal. It means you have untracked files in the current Git
+repository. Type <code>git status</code> to see these files. You can change this symbol or disable the display
+of untracked files altogether. Search for <code>untracked files</code> in <code>~/.p10k.zsh</code>.</p>
+<p><em>FAQ</em>: <a href="../faq/#what-do-different-symbols-in-git-status-mean">What do different symbols in Git status mean?</a></p>
+<p>You can also get a weird-looking question mark in your prompt if your terminal's font is missing
+some glyphs. See <a href="#icons-glyphs-or-powerline-symbols-dont-render">icons, glyphs or powerline symbols don't render</a>.</p>
+<h2 id="icons-glyphs-or-powerline-symbols-dont-render">Icons, glyphs or powerline symbols don't render</h2>
+<p>Restart your terminal, <a href="../fonts/">install the recommended font</a>
+and run <code>p10k configure</code>.</p>
+<h2 id="sub-pixel-imperfections-around-powerline-symbols">Sub-pixel imperfections around powerline symbols</h2>
+<p><img alt="Powerline Prompt Imperfections" src="https://raw.githubusercontent.com/romkatv/powerlevel10k-media/master/powerline-imperfections.png" /></p>
+<p>There are three imperfections on the screenshot. From left to right:</p>
+<ol>
+<li>A thin blue line (a sub-pixel gap) between the content of a prompt segment and the following
+   powerline connection.</li>
+<li>Incorrect alignment of a powerline connection and the following prompt segment. The connection
+   appears shifted to the right.</li>
+<li>A thin red line below a powerline connection. The connection appears shifted up.</li>
+</ol>
+<p>Zsh themes don't have down-to-pixel control over the terminal content. Everything you see on the
+screen is made of monospace characters. A white powerline prompt segment is made of text on white
+background followed by U+E0B0 (a right-pointing triangle).</p>
+<p><img alt="Powerline Prompt Imperfections" src="https://raw.githubusercontent.com/romkatv/powerlevel10k-media/master/powerline-anatomy.png" /></p>
+<p>If Powerlevel10k prompt has imperfections around powerline symbols, you'll see exactly the same
+imperfections with all powerline themes (Agnoster, Powerlevel9k, Powerline, etc.)</p>
+<p>There are several things you can try to deal with these imperfections:</p>
+<ul>
+<li>Try <a href="../fonts/">the recommended font</a>. If you are already using
+  it, switching to another font may help but is unlikely.</li>
+<li>Change terminal font size one point up or down. For example, in iTerm2 powerline prompt looks
+  perfect at font sizes 11 and 13 but breaks down at 12.</li>
+<li>Enable builtin powerline glyphs in terminal settings if your terminal supports it (iTerm2 does).</li>
+<li>Change font hinting and/or anti-aliasing mode in the terminal settings.</li>
+<li>Shift all text one pixel up/down/left/right if your terminal has an option to do so.</li>
+<li>Try a different terminal.</li>
+</ul>
+<p>A more radical solution is to switch to prompt style without background. Type <code>p10k configure</code> and
+select <em>Lean</em>. This style has a modern lightweight look. As a bonus, it doesn't suffer from
+rendering imperfections that afflict powerline-style prompt.</p>
+<h2 id="error-character-not-in-range">Error: character not in range</h2>
+<p>Type <code>echo '\u276F'</code>. If you get an error saying "zsh: character not in range", your locale
+doesn't support UTF-8. You need to fix it. If you are running Zsh over SSH, see
+<a href="https://github.com/romkatv/powerlevel10k/issues/153#issuecomment-518347833">this</a>. If you are
+running Zsh locally, Google "set UTF-8 locale in <em>your OS</em>".</p>
+<h2 id="cursor-is-in-the-wrong-place">Cursor is in the wrong place</h2>
+<p>Type <code>echo '\u276F'</code>. If you get an error saying "zsh: character not in range", see the
+<a href="#error-character-not-in-range">previous section</a>.</p>
+<p>If the <code>echo</code> command prints <code>❯</code> but the cursor is still in the wrong place, install
+<a href="../fonts/">the recommended font</a> and run
+<code>p10k configure</code>.</p>
+<p>If this doesn't help, add <code>unset ZLE_RPROMPT_INDENT</code> at the bottom of <code>~/.zshrc</code>.</p>
+<p>Still having issues? Run the following command to diagnose the problem:</p>
+<pre><code class="zsh">() {
+  emulate -L zsh
+  setopt err_return no_unset
+  local text
+  print -rl -- 'Select a part of your prompt from the terminal window and paste it below.' ''
+  read -r '?Prompt: ' text
+  local -i len=${(m)#text}
+  local frame=&quot;+-${(pl.$len..-.):-}-+&quot;
+  print -lr -- $frame &quot;| $text |&quot; $frame
+}
+</code></pre>
+
+<h3 id="if-the-prompt-line-aligns-with-the-frame">If the prompt line aligns with the frame</h3>
+<pre><code class="text">+------------------------------+
+| romka@adam ✓ ~/powerlevel10k |
++------------------------------+
+</code></pre>
+
+<p>If the output of the command is aligned for every part of your prompt (left and right), this
+indicates a bug in the theme or your config. Use this command to diagnose it:</p>
+<pre><code class="zsh">print -rl -- ${(eq+)PROMPT} ${(eq+)RPROMPT}
+</code></pre>
+
+<p>Look for <code>%{...%}</code> and backslash escapes in the output. If there are any, they are the likely
+culprits. Open an issue if you get stuck.</p>
+<h3 id="if-the-prompt-line-is-longer-than-the-frame">If the prompt line is longer than the frame</h3>
+<pre><code class="text">+-----------------------------+
+| romka@adam ✓ ~/powerlevel10k |
++-----------------------------+
+</code></pre>
+
+<p>This is usually caused by a terminal bug or misconfiguration that makes it print ambiguous-width
+characters as double-width instead of single width. For example,
+<a href="https://github.com/romkatv/powerlevel10k/issues/165">this issue</a>.</p>
+<h3 id="if-the-prompt-line-is-shorter-than-the-frame-and-is-mangled">If the prompt line is shorter than the frame and is mangled</h3>
+<pre><code class="text">+------------------------------+
+| romka@adam ✓~/powerlevel10k |
++------------------------------+
+</code></pre>
+
+<p>Note that this prompt is different from the original as it's missing a space after the check mark.</p>
+<p>This can be caused by a low-level bug in macOS. See
+<a href="https://github.com/romkatv/powerlevel10k/issues/241">this issue</a>.</p>
+<p>This can also happen if prompt contains glyphs designated as "wide" in the Unicode standard and your
+terminal incorrectly displays them as non-wide. Terminals suffering from this limitation include
+Konsole, Hyper and the integrated VSCode Terminal. The solution is to use a different terminal or
+remove all wide glyphs from prompt.</p>
+<h3 id="if-the-prompt-line-is-shorter-than-the-frame-and-is-not-mangled">If the prompt line is shorter than the frame and is not mangled</h3>
+<pre><code class="text">+--------------------------------+
+| romka@adam ✓ ~/powerlevel10k |
++--------------------------------+
+</code></pre>
+
+<p>This can be caused by misconfigured locale. See
+<a href="https://github.com/romkatv/powerlevel10k/issues/251">this issue</a>.</p>
+<h2 id="prompt-wrapping-around-in-a-weird-way">Prompt wrapping around in a weird way</h2>
+<p>See <a href="#cursor-is-in-the-wrong-place">cursor is in the wrong place</a>.</p>
+<h2 id="right-prompt-is-in-the-wrong-place">Right prompt is in the wrong place</h2>
+<p>See <a href="#cursor-is-in-the-wrong-place">cursor is in the wrong place</a>.</p>
+<h2 id="configuration-wizard-runs-automatically-every-time-zsh-is-started">Configuration wizard runs automatically every time Zsh is started</h2>
+<p>When Powerlevel10k starts, it automatically runs <code>p10k configure</code> if no <code>POWERLEVEL9K_*</code>
+parameters are defined. Based on your prompt style choices, the configuration wizard creates
+<code>~/.p10k.zsh</code> with a bunch of <code>POWERLEVEL9K_*</code> parameters in it and adds a line to <code>~/.zshrc</code> to
+source this file. The next time you start Zsh, the configuration wizard shouldn't run automatically.
+If it does, this means the evaluation of <code>~/.zshrc</code> terminates prematurely before it reaches the
+line that sources <code>~/.p10k.zsh</code>. This most often happens due to syntax errors in <code>~/.zshrc</code>. These
+errors get hidden by the configuration wizard screen, so you don't notice them. When you exit
+configuration wizard, look for error messages. You can also use
+<code>POWERLEVEL9K_DISABLE_CONFIGURATION_WIZARD=true zsh</code> to start Zsh without automatically running the
+configuration wizard. Once you can see the errors, fix <code>~/.zshrc</code> to get rid of them.</p>
+<h2 id="some-prompt-styles-are-missing-from-the-configuration-wizard">Some prompt styles are missing from the configuration wizard</h2>
+<p>If Zsh version is below 5.7.1 or <code>COLORTERM</code> environment variable is neither <code>24bit</code> nor
+<code>truecolor</code>, configuration wizard won't offer Pure style with Snazzy color scheme. <em>Fix</em>: Install
+Zsh &gt;= 5.7.1 and use a terminal with truecolor support. Verify with <code>print -P '%F{#ff0000}red%f'</code>.</p>
+<p>If the terminal can display fewer than 256 colors, configuration wizard preselects Lean style with
+8 colors. All other styles require at least 256 colors. <em>Fix</em>: Use a terminal with 256 color support
+and make sure that <code>TERM</code> environment variable is set correctly. Verify with
+<code>print $terminfo[colors]</code>.</p>
+<p>If there is no UTF-8 locale on the system, configuration wizard won't offer prompt styles that use
+Unicode characters. <em>Fix</em>: Install a UTF-8 locale. Verify with <code>locale -a</code>.</p>
+<p>When a UTF-8 locale is available, the first few questions asked by the configuration wizard assess
+capabilities of the terminal font. If your answers indicate that some glyphs don't render correctly,
+configuration wizard won't offer prompt styles that use them. <em>Fix</em>: Restart your terminal and
+install <a href="../fonts/">the recommended font</a>. Verify by running
+<code>p10k configure</code> and checking that all glyphs render correctly.</p>
+<h2 id="cannot-install-the-recommended-font">Cannot install the recommended font</h2>
+<p>Once you download <a href="../fonts/">the recommended font</a>,
+you can install it just like any other font. Google "how to install fonts on <em>your OS</em>".</p>
+<h2 id="extra-or-missing-spaces-in-prompt-compared-to-powerlevel9k">Extra or missing spaces in prompt compared to Powerlevel9k</h2>
+<p>tl;dr: Add <code>ZLE_RPROMPT_INDENT=0</code> and <code>POWERLEVEL9K_LEGACY_ICON_SPACING=true</code> to <code>~/.zshrc</code> to get
+the same prompt spacing as in Powerlevel9k.</p>
+<p>When using Powerlevel10k with a Powerlevel9k config, you might get additional spaces in prompt here
+and there. These come in two flavors.</p>
+<h3 id="extra-space-without-background-on-the-right-side-of-right-prompt">Extra space without background on the right side of right prompt</h3>
+<p>tl;dr: Add <code>ZLE_RPROMPT_INDENT=0</code> to <code>~/.zshrc</code> to get rid of that space.</p>
+<p>From <a href="http://zsh.sourceforge.net/Doc/Release/Parameters.html#index-ZLE_005fRPROMPT_005fINDENT">Zsh documentation</a>:</p>
+<blockquote>
+<p><code>ZLE_RPROMPT_INDENT &lt;S&gt;</code></p>
+<p>If set, used to give the indentation between the right hand side of the right prompt in the line
+editor as given by <code>RPS1</code> or <code>RPROMPT</code> and the right hand side of the screen. If not set, the
+value <code>1</code> is used.</p>
+<p>Typically this will be used to set the value to <code>0</code> so that the prompt appears flush with the
+right hand side of the screen.</p>
+</blockquote>
+<p>Powerlevel10k respects this parameter. If you set <code>ZLE_RPROMPT_INDENT=1</code> (or leave it unset, which
+is the same thing as setting it to <code>1</code>), you'll get an empty space to the right of right prompt. If
+you set <code>ZLE_RPROMPT_INDENT=0</code>, your prompt will go to the edge of the terminal. This is how it
+works in every theme except Powerlevel9k.</p>
+<p><img alt="ZLE_RPROMPT_INDENT: Powerlevel10k vs Powerlevel9k" src="https://raw.githubusercontent.com/romkatv/powerlevel10k-media/master/p9k-vs-p10k-zle-rprompt-indent.png" /></p>
+<p>Powerlevel9k issue: <a href="https://github.com/Powerlevel9k/powerlevel9k/issues/1292">powerlevel9k#1292</a>.
+It's been fixed in the development branch of Powerlevel9k but the fix hasn't yet made it to
+<code>master</code>.</p>
+<p>Add <code>ZLE_RPROMPT_INDENT=0</code> to <code>~/.zshrc</code> to get the same spacing on the right edge of prompt as in
+Powerlevel9k.</p>
+<p><em>Note:</em> Several versions of Zsh have bugs that get triggered when you set <code>ZLE_RPROMPT_INDENT=0</code>.
+Powerlevel10k can work around these bugs when using powerline prompt style. If you notice visual
+artifacts in prompt, or wrong cursor position, try removing <code>ZLE_RPROMPT_INDENT</code> from <code>~/.zshrc</code>.</p>
+<h3 id="extra-or-missing-spaces-around-icons">Extra or missing spaces around icons</h3>
+<p>tl;dr: Add <code>POWERLEVEL9K_LEGACY_ICON_SPACING=true</code> to <code>~/.zshrc</code> to get the same spacing around
+icons as in Powerlevel9k.</p>
+<p>Spacing around icons in Powerlevel9k is inconsistent.</p>
+<p><img alt="ZLE_RPROMPT_INDENT: Powerlevel10k vs Powerlevel9k" src="https://raw.githubusercontent.com/romkatv/powerlevel10k-media/master/p9k-vs-p10k-icon-spacing.png" /></p>
+<p>This inconsistency is a constant source of annoyance, so it was fixed in Powerlevel10k. You can add
+<code>POWERLEVEL9K_LEGACY_ICON_SPACING=true</code> to <code>~/.zshrc</code> to get the same spacing around icons as in
+Powerlevel9k.</p>
+<p><em>Note:</em> It's not a good idea to define <code>POWERLEVEL9K_LEGACY_ICON_SPACING</code> when using
+<code>p10k configure</code>.</p>
+<h2 id="weird-things-happen-after-typing-source-zshrc">Weird things happen after typing <code>source ~/.zshrc</code></h2>
+<p>It's almost always a bad idea to run <code>source ~/.zshrc</code>, whether you are using Powerlevel10k or not.
+This command may result in random errors, misbehaving code and progressive slowdown of Zsh.</p>
+<p>If you've made changes to <code>~/.zshrc</code> or to files sourced by it, restart Zsh to apply them. The most
+reliable way to do this is to type <code>exit</code> and then start a new Zsh session. You can also use
+<code>exec zsh</code>. While not exactly equivalent to complete Zsh restart, this command is much more reliable
+than <code>source ~/.zshrc</code>.</p>
+<h2 id="transient-prompt-stops-working-after-some-time">Transient prompt stops working after some time</h2>
+<p>See <a href="#weird-things-happen-after-typing-source-zshrc">weird things happen after typing <code>source ~/.zshrc</code></a>.</p>
+<h2 id="cannot-make-powerlevel10k-work-with-my-plugin-manager">Cannot make Powerlevel10k work with my plugin manager</h2>
+<p>If the <a href="../installation/">installation instructions</a> didn't work for you, try disabling your current
+theme (so that you end up with no theme) and then installing Powerlevel10k manually.</p>
+<ol>
+<li>
+<p>Disable the current theme in your framework / plugin manager.</p>
+</li>
+<li>
+<p><strong>oh-my-zsh:</strong> Open <code>~/.zshrc</code> and remove the line that sets <code>ZSH_THEME</code>. It might look like this:
+  <code>ZSH_THEME="powerlevel9k/powerlevel9k"</code>.</p>
+</li>
+<li><strong>zplug:</strong> Open <code>~/.zshrc</code> and remove the <code>zplug</code> command that refers to your current theme. For
+  example, if you are currently using Powerlevel9k, look for
+  <code>zplug bhilburn/powerlevel9k, use:powerlevel9k.zsh-theme</code>.</li>
+<li><strong>prezto:</strong> Open <code>~/.zpreztorc</code> and put <code>zstyle :prezto:module:prompt theme off</code> in it. Remove
+  any other command that sets <code>theme</code> such as <code>zstyle :prezto:module:prompt theme powerlevel9k</code>.</li>
+<li>
+<p><strong>antigen:</strong> Open <code>~/.zshrc</code> and remove the line that sets <code>antigen theme</code>. It might look like
+  this: <code>antigen theme powerlevel9k/powerlevel9k</code>.</p>
+</li>
+<li>
+<p>Install Powerlevel10k manually.</p>
+</li>
+</ol>
+<pre><code class="zsh">git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ~/powerlevel10k
+echo 'source ~/powerlevel10k/powerlevel10k.zsh-theme' &gt;&gt;~/.zshrc
+</code></pre>
+
+<p>This method of installation won't make anything slower or otherwise sub-par.</p>
+<h2 id="directory-is-difficult-to-see-in-prompt-when-using-rainbow-style">Directory is difficult to see in prompt when using Rainbow style</h2>
+<p>In Rainbow style the current working directory is shown with bright white text on blue background.
+The white is fixed and always looks the same but the appearance of "blue" is defined by your
+terminal color palette. If it's very light, it may be difficult to see white text on it.</p>
+<p>There are several ways to fix this.</p>
+<ul>
+<li>Type <code>p10k configure</code> and choose a more readable prompt style.</li>
+<li><a href="../faq/#change-the-color-palette-used-by-your-terminal">Change terminal color palette</a>. Try Tango Dark
+  or Solarized Dark, or change just the "blue" color.</li>
+<li><a href="../faq/#set-colors-through-powerlevel10k-configuration-parameters">Change directory background and/or foreground color</a>.
+  The parameters you are looking for are called <code>POWERLEVEL9K_DIR_BACKGROUND</code>,
+  <code>POWERLEVEL9K_DIR_FOREGROUND</code>, <code>POWERLEVEL9K_DIR_SHORTENED_FOREGROUND</code>,
+  <code>POWERLEVEL9K_DIR_ANCHOR_FOREGROUND</code> and <code>POWERLEVEL9K_DIR_ANCHOR_BOLD</code>. You can find them in
+  in <code>~/.p10k.zsh</code>.</li>
+</ul>
+<h2 id="horrific-mess-when-resizing-terminal-window">Horrific mess when resizing terminal window</h2>
+<p>When you resize terminal window horizontally back and forth a few times, you might see this ugly
+picture.</p>
+<p><img alt="Powerlevel10k Resizing Mess" src="https://raw.githubusercontent.com/romkatv/powerlevel10k-media/master/resizing-mess.png" /></p>
+<p>tl;dr: This is a bug in Zsh that isn't specific to Powerlevel10k. See <a href="#mitigation">mitigation</a>.</p>
+<h3 id="zsh-bug">Zsh bug</h3>
+<p>This issue is caused by a bug in Zsh that gets triggered when the vertical distance between the
+start of the current prompt and the cursor (henceforth <code>VD</code>) changes when the terminal window is
+resized. This bug is not specific to Powerlevel10k.</p>
+<p>When a terminal window gets shrunk horizontally, there are two ways for a terminal to handle long
+lines that no longer fit: <em>reflow</em> or <em>truncate</em>.</p>
+<p>Terminal content before shrinking:</p>
+<p><img alt="Terminal Content Before Shrinking" src="https://raw.githubusercontent.com/romkatv/powerlevel10k-media/master/resize-original.png" /></p>
+<p>Terminal reflows text when shrinking:</p>
+<p><img alt="Terminal Reflows Text When Shrinking" src="https://raw.githubusercontent.com/romkatv/powerlevel10k-media/master/resize-reflow.png" /></p>
+<p>Terminal truncates text when shrinking:</p>
+<p><img alt="Terminal Truncates Text When Shrinking" src="https://raw.githubusercontent.com/romkatv/powerlevel10k-media/master/resize-truncate.png" /></p>
+<p>Reflowing strategy can change the height of terminal content. If such content happens to be between
+the start of the current prompt and the cursor, Zsh will print prompt on the wrong line. Truncation
+strategy never changes the height of terminal content, so it doesn't trigger this bug in Zsh.</p>
+<p>Let's see how the bug plays out in slow motion. We'll start by launching <code>zsh -df</code> and pasting
+the following code:</p>
+<pre><code class="zsh">function pause() { read -s }
+functions -M pause 0
+
+reset
+print -l {1..3}
+setopt prompt_subst
+PROMPT=$'${$((pause()))+}left&gt;${(pl.$((COLUMNS-12))..-.)}&lt;right\n&gt; '
+</code></pre>
+
+<p>When <code>PROMPT</code> gets expanded, it calls <code>pause</code> to let us observe the state of the terminal. Here's
+the initial state:</p>
+<p><img alt="Zsh Resizing Bug 1" src="https://raw.githubusercontent.com/romkatv/powerlevel10k-media/master/resize-bug-1.png" /></p>
+<p>Zsh keeps track of the cursor position relative to the start of the current prompt. In this case it
+knows that the cursor is one line below. When we shrink the terminal window, it looks like this:</p>
+<p><img alt="Zsh Resizing Bug 2" src="https://raw.githubusercontent.com/romkatv/powerlevel10k-media/master/resize-bug-2.png" /></p>
+<p>At this point the terminal sends <code>SIGWINCH</code> to Zsh to notify it about changes in the terminal
+dimensions. Note that this signal is sent <em>after</em> the content of the terminal has been reflown.</p>
+<p>When Zsh receives <code>SIGWINCH</code>, it attempts to erase the current prompt and print it anew. It goes to
+the position where it <em>thinks</em> the current prompt is -- one line above the cursor (!) -- erases all
+terminal content that follows and prints reexpanded prompt there. However, after resizing prompt is
+no longer one line above the cursor. It's two lines above! Zsh ends up printing new prompt one line
+too low.</p>
+<p><img alt="Zsh Resizing Bug 3" src="https://raw.githubusercontent.com/romkatv/powerlevel10k-media/master/resize-bug-3.png" /></p>
+<p>In this case we ended up with unwanted junk content because <code>VD</code> has <em>increased</em>. When you make
+terminal window wider, <code>VD</code> can also <em>decrease</em>, which would result in the new prompt being printed
+higher than intended, potentially erasing useful content in the process.</p>
+<p>Here are a few more examples where shrinking terminal window increased <code>VD</code>.</p>
+<p>Simple one-line left prompt with right prompt. No <code>prompt_subst</code>. Note that the cursor is below the
+prompt line (hit <em>ESC-ENTER</em> to get it there).</p>
+<p><img alt="Zsh Prompt That Breaks on Terminal Shrinking 1" src="https://raw.githubusercontent.com/romkatv/powerlevel10k-media/master/resize-breakable-1.png" /></p>
+<p>Simple one-line left prompt. No <code>prompt_subst</code>, no right prompt. Here <code>VD</code> is bound to increase
+upon terminal shrinking due to the command line wrapping around.</p>
+<p><img alt="Zsh Prompt That Breaks on Terminal Shrinking 2" src="https://raw.githubusercontent.com/romkatv/powerlevel10k-media/master/resize-breakable-2.png" /></p>
+<h3 id="zsh-patch">Zsh patch</h3>
+<p>The bug described above has been partially fixed (only for some terminals) in <a href="https://github.com/romkatv/zsh/tree/fix-winchanged">this branch</a>. The idea behind the fix is to use <code>sc</code> (save
+cursor) terminal capability before printing prompt and <code>rc</code> (restore cursor) to move cursor back
+to the original position when prompt needs to be refreshed.</p>
+<p>The patch works only on terminals that reflow saved cursor position together with text when the
+terminal window is resized. The patch has no observable effect on terminals that don't reflow text
+on resize (both patched and unpatched Zsh behave correctly) and on terminals that reflow text but
+not saved cursor position (both patched and unpatched Zsh redraw prompt at the same incorrect
+position). In other words, the patch fixes the resizing issue on some terminals while keeping the
+behavior unchanged on others.</p>
+<p>There are two alternative approaches to fixing the bug that may seem to work at first glance but in
+fact don't:</p>
+<ul>
+<li>Instead of <code>sc</code>, use <code>u7</code> terminal capability to query the current cursor position and then <code>cup</code>
+  to go back to it. This doesn't work because the absolute position of the start of the current
+  prompt changes when text gets reflown.</li>
+<li>Recompute <code>VD</code> based on new terminal dimensions before attempting to refresh prompt. This doesn't
+  work because Zsh doesn't know whether terminal reflows text or truncates it. If Zsh could somehow
+  know that the terminal reflows text, this approach still wouldn't work on terminals that
+  continuously reflow text and rapid-fire <code>SIGWINCH</code> when the window is being resized. In such
+  environment real terminal dimensions go out of sync with what Zsh thinks the dimensions are.</li>
+</ul>
+<p>There is no ETA for the patch making its way into upstream Zsh. See <a href="https://www.zsh.org/mla/workers//2019/msg00561.html">discussion</a>.</p>
+<h3 id="mitigation">Mitigation</h3>
+<p>There are a few mitigation options for this issue.</p>
+<ul>
+<li>Apply <a href="#zsh-patch">the patch</a> and <a href="https://github.com/zsh-users/zsh/blob/master/INSTALL">rebuild Zsh from source</a>. It won't help if you are using Alacritty,
+  Kitty or some other terminal that reflows text on resize but doesn't reflow saved cursor position.
+  On such terminals the patch will have no visible effect.</li>
+<li>Disable text reflowing on window resize in terminal settings. If your terminal doesn't have this
+  setting, try a different terminal.</li>
+<li>Avoid long lines between the start of prompt and cursor.</li>
+<li>Disable ruler with <code>POWERLEVEL9K_SHOW_RULER=false</code>.</li>
+<li>Disable prompt connection with <code>POWERLEVEL9K_MULTILINE_FIRST_PROMPT_GAP_CHAR=' '</code>.</li>
+<li>Disable right frame with <code>POWERLEVEL9K_MULTILINE_FIRST_PROMPT_SUFFIX=''</code>,
+     <code>POWERLEVEL9K_MULTILINE_NEWLINE_PROMPT_SUFFIX=''</code> and
+     <code>POWERLEVEL9K_MULTILINE_LAST_PROMPT_SUFFIX=''</code>.</li>
+<li>Set <code>POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=()</code>. Right prompt on the last prompt line will cause
+     resizing issues only when the cursor is below it. This isn't very common, so you might want to
+     keep some elements in <code>POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS</code> provided that none of them are
+     succeeded by <code>newline</code>.</li>
+</ul>
+<h2 id="icons-cut-off-in-konsole">Icons cut off in Konsole</h2>
+<p>When using Konsole with a non-monospace font, icons may be cut off on the right side. Here
+"non-monospace" refers to any font with glyphs wider than a single column, or wider than two columns
+for glyphs designated as "wide" in the Unicode standard.</p>
+<p><img alt="Icons cut off in Konsole" src="https://raw.githubusercontent.com/romkatv/powerlevel10k-media/master/konsole-non-monospace-font.png" /></p>
+<p>The last line on the screenshot shows a cut off Arch Linux logo.</p>
+<p>There are several mitigation options for this issue.</p>
+<ol>
+<li>Use a different terminal. Konsole is the only terminal that exhibits this behavior.</li>
+<li>Use a monospace font.</li>
+<li>Manually add an extra space after the icon that gets cut off. For example, if the content of
+   <code>os_icon</code> prompt segment gets cut off, open <code>~/.p10k.zsh</code>, search for
+   <code>POWERLEVEL9K_OS_ICON_CONTENT_EXPANSION</code> and change it as follows:</li>
+</ol>
+<pre><code class="zsh">typeset -g POWERLEVEL9K_OS_ICON_CONTENT_EXPANSION='${P9K_CONTENT} '  # extra space at the end
+</code></pre>
+
+<ol>
+<li>Use a different icon that is monospace. For example, if Arch Linux logo gets cut off, add
+   the following parameter to <code>~/.p10k.zsh</code>:</li>
+</ol>
+<pre><code class="zsh">typeset -g POWERLEVEL9K_LINUX_ARCH_ICON='Arch'  # plain &quot;Arch&quot; in place of a logo
+</code></pre>
+
+<ol>
+<li>Disable the display of the icon that gets cut off. For example, if the content of
+   <code>os_icon</code> prompt segment gets cut off, open <code>~/.p10k.zsh</code> and remove <code>os_icon</code> from
+   <code>POWERLEVEL9K_LEFT_PROMPT_ELEMENTS</code> and <code>POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS</code>.</li>
+</ol>
+<p><em>Note</em>: <a href="https://bugs.kde.org/show_bug.cgi?id=418553#c5">Non-monospace fonts are not officially supported by Konsole</a>.</p>
+<h2 id="arch-linux-logo-has-a-dot-in-the-bottom-right-corner">Arch Linux logo has a dot in the bottom right corner</h2>
+<p><img alt="Arch Linux Logo with a dot" src="https://raw.githubusercontent.com/romkatv/powerlevel10k-media/master/arch-linux-logo-dot.png" /></p>
+<p>Some fonts have this incorrect dotted icon in bold typeface. There are two ways to fix this issue.</p>
+<ol>
+<li>Use a font with a correct Arch Linux logo in bold typeface. For example,
+   <a href="../fonts/">the recommended Powerlevel10k font</a>.</li>
+<li>Display the icon in regular (non-bold) typeface. To do this, open <code>~/.p10k.zsh</code>, search for
+   <code>POWERLEVEL9K_OS_ICON_CONTENT_EXPANSION</code> and remove <code>%B</code> from its value.</li>
+</ol>
+<pre><code class="zsh">typeset -g POWERLEVEL9K_OS_ICON_CONTENT_EXPANSION='${P9K_CONTENT}'  # not bold
+</code></pre></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>
+            var base_url = "..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../js/base.js" defer></script>
+        <script src="../search/main.js" defer></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+                <p>
+                    From here you can search these documents. Enter
+                    your search terms below.
+                </p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>

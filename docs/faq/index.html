@@ -1,0 +1,970 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        
+        
+        <link rel="shortcut icon" href="../img/favicon.ico">
+        <title>FAQ - Powerlevel10k</title>
+        <link href="../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../css/font-awesome.min.css" rel="stylesheet">
+        <link href="../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/atom-one-dark.min.css">
+
+        <script src="../js/jquery-1.10.2.min.js" defer></script>
+        <script src="../js/bootstrap.min.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/bash.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/zsh.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/sh.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/yaml.min.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-dark">
+            <div class="container">
+                <a class="navbar-brand" href="..">Powerlevel10k</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar-collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="navitem">
+                                <a href=".." class="nav-link">Home</a>
+                            </li>
+                            <li class="navitem">
+                                <a href="../installation/" class="nav-link">Get Started</a>
+                            </li>
+                            <li class="dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">Features <b class="caret"></b></a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../features/wizard/" class="dropdown-item">Configuration wizard</a>
+</li>
+                                    
+<li>
+    <a href="../features/uncompromising_performance/" class="dropdown-item">Uncompromising performance</a>
+</li>
+                                    
+<li>
+    <a href="../features/p9k_compatibility/" class="dropdown-item">Powerlevel9k Compatibility</a>
+</li>
+                                    
+<li>
+    <a href="../features/pure_compatibility/" class="dropdown-item">Pure compatibility</a>
+</li>
+                                    
+<li>
+    <a href="../features/instant_prompt/" class="dropdown-item">Instant prompt</a>
+</li>
+                                    
+<li>
+    <a href="../features/show_on_command/" class="dropdown-item">Show on command</a>
+</li>
+                                    
+<li>
+    <a href="../features/transient_prompt/" class="dropdown-item">Transient prompt</a>
+</li>
+                                    
+<li>
+    <a href="../features/current_directory/" class="dropdown-item">Current Directory that just works</a>
+</li>
+                                    
+<li>
+    <a href="../features/customizable/" class="dropdown-item">Extremely Customizable</a>
+</li>
+                                    
+<li>
+    <a href="../features/batteries_included/" class="dropdown-item">Batteries included</a>
+</li>
+                                    
+<li>
+    <a href="../features/extensible/" class="dropdown-item">Extensible</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="navitem active">
+                                <a href="./" class="nav-link">FAQ</a>
+                            </li>
+                            <li class="navitem">
+                                <a href="../troubleshooting/" class="nav-link">Troubleshooting</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-toggle="modal" data-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                            <li class="nav-item">
+                                <a rel="prev" href="../features/extensible/" class="nav-link">
+                                    <i class="fa fa-arrow-left"></i> Previous
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a rel="next" href="../troubleshooting/" class="nav-link">
+                                    Next <i class="fa fa-arrow-right"></i>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="https://github.com/romkatv/powerlevel10k/edit/master/docs/faq.md" class="nav-link"><i class="fa fa-github"></i> Edit on GitHub</a>
+                            </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-light navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-toggle="collapse" data-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-level="1"><a href="#faq" class="nav-link">FAQ</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-level="2"><a href="#how-do-i-update-powerlevel10k" class="nav-link">How do I update Powerlevel10k?</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#how-do-i-uninstall-powerlevel10k" class="nav-link">How do I uninstall Powerlevel10k?</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#how-do-i-install-powerlevel10k-on-a-machine-without-internet-access" class="nav-link">How do I install Powerlevel10k on a machine without Internet access?</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#where-can-i-ask-for-help-and-report-bugs" class="nav-link">Where can I ask for help and report bugs?</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#which-aspects-of-shell-and-terminal-does-powerlevel10k-affect" class="nav-link">Which aspects of shell and terminal does Powerlevel10k affect?</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#im-using-powerlevel9k-with-oh-my-zsh-how-do-i-migrate" class="nav-link">I'm using Powerlevel9k with Oh My Zsh. How do I migrate?</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#is-it-really-fast" class="nav-link">Is it really fast?</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#how-do-i-enable-instant-prompt" class="nav-link">How do I enable instant prompt?</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#what-do-different-symbols-in-git-status-mean" class="nav-link">What do different symbols in Git status mean?</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#how-do-i-change-the-format-of-git-status" class="nav-link">How do I change the format of Git status?</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#why-is-git-status-from-homegit-not-displayed-in-prompt" class="nav-link">Why is Git status from $HOME/.git not displayed in prompt?</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#why-does-git-status-sometimes-appear-grey-and-then-gets-colored-after-a-short-period-of-time" class="nav-link">Why does Git status sometimes appear grey and then gets colored after a short period of time?</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#how-do-i-add-username-andor-hostname-to-prompt" class="nav-link">How do I add username and/or hostname to prompt?</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#why-some-prompt-segments-appear-and-disappear-as-im-typing" class="nav-link">Why some prompt segments appear and disappear as I'm typing?</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#how-do-i-change-prompt-colors" class="nav-link">How do I change prompt colors?</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#why-does-powerlevel10k-spawn-extra-processes" class="nav-link">Why does Powerlevel10k spawn extra processes?</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#are-there-configuration-options-that-make-powerlevel10k-slow" class="nav-link">Are there configuration options that make Powerlevel10k slow?</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#is-powerlevel10k-fast-to-load" class="nav-link">Is Powerlevel10k fast to load?</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#what-is-the-relationship-between-powerlevel9k-and-powerlevel10k" class="nav-link">What is the relationship between Powerlevel9k and Powerlevel10k?</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#does-powerlevel10k-always-render-exactly-the-same-prompt-as-powerlevel9k-given-the-same-config" class="nav-link">Does Powerlevel10k always render exactly the same prompt as Powerlevel9k given the same config?</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#what-is-the-best-prompt-style-in-the-configuration-wizard" class="nav-link">What is the best prompt style in the configuration wizard?</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#how-to-make-powerlevel10k-look-like-robbyrussell-oh-my-zsh-theme" class="nav-link">How to make Powerlevel10k look like robbyrussell Oh My Zsh theme?</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#can-prompts-for-completed-commands-display-error-status-for-those-commands-instead-of-the-commands-preceding-them" class="nav-link">Can prompts for completed commands display error status for those commands instead of the commands preceding them?</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#what-is-the-minimum-supported-zsh-version" class="nav-link">What is the minimum supported Zsh version?</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#how-were-these-screenshots-and-animated-gifs-created" class="nav-link">How were these screenshots and animated gifs created?</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#how-was-the-recommended-font-created" class="nav-link">How was the recommended font created?</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#how-to-package-powerlevel10k-for-distribution" class="nav-link">How to package Powerlevel10k for distribution?</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="faq">FAQ</h1>
+<h2 id="how-do-i-update-powerlevel10k">How do I update Powerlevel10k?</h2>
+<p>The command to update Powerlevel10k depends on how it was installed.</p>
+<table>
+<thead>
+<tr>
+<th>Installation</th>
+<th>Update command</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="../installation/#manual">Manual</a></td>
+<td><code>git -C ~/powerlevel10k pull</code></td>
+</tr>
+<tr>
+<td><a href="../installation/#oh-my-zsh">Oh My Zsh</a></td>
+<td><code>git -C ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k pull</code></td>
+</tr>
+<tr>
+<td><a href="../installation/#prezto">Prezto</a></td>
+<td><code>zprezto-update</code></td>
+</tr>
+<tr>
+<td><a href="../installation/#zim">Zim</a></td>
+<td><code>zimfw update</code></td>
+</tr>
+<tr>
+<td><a href="../installation/#antigen">Antigen</a></td>
+<td><code>antigen update</code></td>
+</tr>
+<tr>
+<td><a href="../installation/#zplug">Zplug</a></td>
+<td><code>zplug update</code></td>
+</tr>
+<tr>
+<td><a href="../installation/#zgen">Zgen</a></td>
+<td><code>zgen update</code></td>
+</tr>
+<tr>
+<td><a href="../installation/#zplugin">Zplugin</a></td>
+<td><code>zplugin update</code></td>
+</tr>
+<tr>
+<td><a href="../installation/#zinit">Zinit</a></td>
+<td><code>zinit update</code></td>
+</tr>
+<tr>
+<td><a href="../installation/#homebrew">Homebrew</a></td>
+<td><code>brew update &amp;&amp; brew upgrade</code></td>
+</tr>
+<tr>
+<td><a href="../installation/#arch-linux">Arch Linux</a></td>
+<td><code>yay -S --noconfirm zsh-theme-powerlevel10k-git</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>IMPORTANT</strong>: Restart Zsh after updating Powerlevel10k. <a href="../troubleshooting/#weird-things-happen-after-typing-source-zshrc">Do not use <code>source ~/.zshrc</code></a>.</p>
+<h2 id="how-do-i-uninstall-powerlevel10k">How do I uninstall Powerlevel10k?</h2>
+<p>Remove all references to "p10k" from <code>~/.zshrc</code>. You might have this snippet at the top:</p>
+<pre><code class="zsh">if [[ -r &quot;${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh&quot; ]]; then
+  source &quot;${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh&quot;
+fi
+</code></pre>
+
+<p>And this at the bottom:</p>
+<pre><code class="zsh">[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
+</code></pre>
+
+<p>These are added by the <a href="../features/wizard/">configuration wizard</a>. Remove them.</p>
+<p>Remove all references to "powerlevel10k" from <code>~/.zshrc</code>, <code>~/.zpreztorc</code> and <code>~/.zimrc</code> (some
+of these files may be missing -- this is normal). These references have been added manually by
+yourself when installing Powerlevel10k. Refer to the <a href="../installation/">installation instructions</a>
+if you need a reminder.
+Verify that all references to "p10k" and "powerlevel10k" are gone from <code>~/.zshrc</code>, <code>~/.zpreztorc</code>
+and <code>~/.zimrc</code>.</p>
+<pre><code class="zsh">grep -E 'p10k|powerlevel10k' ~/.zshrc ~/.zpreztorc ~/.zimrc 2&gt;/dev/null
+</code></pre>
+
+<p>If this command produces output, there are still references to "p10k" or "powerlevel10k". You
+need to remove them.</p>
+<p>Delete Powerlevel10k configuration file. This file is created by the
+<a href="../features/wizard/">configuration wizard</a> and may contain manual edits by yourself.</p>
+<pre><code class="zsh">rm -f ~/.p10k.zsh
+</code></pre>
+
+<p>Delete Powerlevel10k source files. These files have been downloaded when you've installed
+Powerlevel10k. The command to delete them depends on which installation method you'd chosen.
+Refer to the <a href="../installation/">installation instructions</a> if you need a reminder.</p>
+<table>
+<thead>
+<tr>
+<th>Installation</th>
+<th>Uninstall command</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="../installation/#manual">Manual</a></td>
+<td><code>rm -rf ~/powerlevel10k</code></td>
+</tr>
+<tr>
+<td><a href="../installation/#oh-my-zsh">Oh My Zsh</a></td>
+<td><code>rm -rf -- ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k</code></td>
+</tr>
+<tr>
+<td><a href="../installation/#prezto">Prezto</a></td>
+<td>n/a</td>
+</tr>
+<tr>
+<td><a href="../installation/#zim">Zim</a></td>
+<td><code>zimfw uninstall</code></td>
+</tr>
+<tr>
+<td><a href="../installation/#antigen">Antigen</a></td>
+<td><code>antigen purge romkatv/powerlevel10k</code></td>
+</tr>
+<tr>
+<td><a href="../installation/#zplug">Zplug</a></td>
+<td><code>zplug clean</code></td>
+</tr>
+<tr>
+<td><a href="../installation/#zgen">Zgen</a></td>
+<td><code>zgen reset</code></td>
+</tr>
+<tr>
+<td><a href="../installation/#zplugin">Zplugin</a></td>
+<td><code>zplugin delete romkatv/powerlevel10k</code></td>
+</tr>
+<tr>
+<td><a href="../installation/#zinit">Zinit</a></td>
+<td><code>zinit delete romkatv/powerlevel10k</code></td>
+</tr>
+<tr>
+<td><a href="../installation/#homebrew">Homebrew</a></td>
+<td><code>brew uninstall powerlevel10k; brew untap romkatv/powerlevel10k</code></td>
+</tr>
+<tr>
+<td><a href="../installation/#arch-linux">Arch Linux</a></td>
+<td><code>yay -R --noconfirm zsh-theme-powerlevel10k-git</code></td>
+</tr>
+</tbody>
+</table>
+<p>Restart Zsh. <a href="../troubleshooting/#weird-things-happen-after-typing-source-zshrc">Do not use <code>source ~/.zshrc</code></a>.</p>
+<h2 id="how-do-i-install-powerlevel10k-on-a-machine-without-internet-access">How do I install Powerlevel10k on a machine without Internet access?</h2>
+<p>Run this command on the machine without Internet access:</p>
+<pre><code class="sh">uname -sm | tr '[A-Z]' '[a-z]'
+</code></pre>
+
+<p>Run these commands on a machine connected to the Internet after replacing the value of <code>target_uname</code> with the output of the previous command:</p>
+<pre><code class="sh">target_uname=&quot;replace this with the output of the previous command&quot;
+git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ~/powerlevel10k
+GITSTATUS_CACHE_DIR=&quot;$HOME&quot;/powerlevel10k/gitstatus/usrbin ~/powerlevel10k/gitstatus/install -f -s &quot;${target_uname% *}&quot; -m &quot;${target_uname#* }&quot;
+</code></pre>
+
+<p>Copy <code>~/powerlevel10k</code> from the machine connected to the Internet to the one without Internet access.
+Add <code>source ~/powerlevel10k/powerlevel10k.zsh-theme</code> to <code>~/.zshrc</code> on the machine without Internet access:</p>
+<pre><code class="zsh">echo 'source ~/powerlevel10k/powerlevel10k.zsh-theme' &gt;&gt;~/.zshrc
+</code></pre>
+
+<p>If <code>~/.zshrc</code> on the machine without Internet access sets <code>ZSH_THEME</code>, remove that line.</p>
+<pre><code class="zsh">sed -i.bak '/^ZSH_THEME=/d' ~/.zshrc
+</code></pre>
+
+<p>To update, remove <code>~/powerlevel10k</code> on both machines and repeat steps 1-3.</p>
+<h2 id="where-can-i-ask-for-help-and-report-bugs">Where can I ask for help and report bugs?</h2>
+<p>The best way to ask for help and to report bugs is to <a href="https://github.com/romkatv/powerlevel10k/issues">open an issue</a>.</p>
+<p><a href="https://gitter.im/powerlevel10k/community?utm_source=badge&amp;utm_medium=badge&amp;utm_campaign=pr-badge">Gitter</a>
+is another option.</p>
+<p>If all else fails, email roman.perepelitsa@gmail.com.</p>
+<p>If necessary, encrypt your communication with <a href="https://api.github.com/users/romkatv/gpg_keys">this PGP key</a>.</p>
+<h2 id="which-aspects-of-shell-and-terminal-does-powerlevel10k-affect">Which aspects of shell and terminal does Powerlevel10k affect?</h2>
+<p>Powerlevel10k defines prompt and nothing else. It sets <a href="http://zsh.sourceforge.net/Doc/Release/Options.html#Prompting">prompt-related options</a>, and parameters <code>PS1</code> and <code>RPS1</code>.</p>
+<p><img alt="Prompt Highlight" src="https://raw.githubusercontent.com/romkatv/powerlevel10k-media/master/prompt-highlight.png" /></p>
+<p>Everything within the highlighted areas on the screenshot is produced by Powerlevel10k.
+Powerlevel10k has no control over the terminal content or colors outside these areas.</p>
+<p>Powerlevel10k does not affect:</p>
+<ul>
+<li>Terminal window/tab title.</li>
+<li>Colors used by <code>ls</code>.</li>
+<li>The behavior of <code>git</code> command.</li>
+<li>The content and style of <kbd>Tab</kbd> completions.</li>
+<li>Command line colors (syntax highlighting, autosuggestions, etc.).</li>
+<li>Key bindings.</li>
+<li>Aliases.</li>
+<li>Prompt parameters other than <code>PS1</code> and <code>RPS1</code>.</li>
+<li>Zsh options other than those <a href="http://zsh.sourceforge.net/Doc/Release/Options.html#Prompting">related to prompt</a>.</li>
+</ul>
+<h2 id="im-using-powerlevel9k-with-oh-my-zsh-how-do-i-migrate">I'm using Powerlevel9k with Oh My Zsh. How do I migrate?</h2>
+<ol>
+<li>Run this command:</li>
+</ol>
+<pre><code class="zsh"># Add powerlevel10k to the list of Oh My Zsh themes.
+git clone --depth=1 https://github.com/romkatv/powerlevel10k.git $ZSH_CUSTOM/themes/powerlevel10k
+# Replace ZSH_THEME=&quot;powerlevel9k/powerlevel9k&quot; with ZSH_THEME=&quot;powerlevel10k/powerlevel10k&quot;.
+sed -i.bak 's/powerlevel9k/powerlevel10k/g' ~/.zshrc
+# Restart Zsh.
+exec zsh
+</code></pre>
+
+<ol>
+<li><em>Optional but highly recommended:</em></li>
+<li>Install <a href="../fonts/">the recommended font</a>.</li>
+<li>Type <code>p10k configure</code> and choose your favorite prompt style.</li>
+</ol>
+<p><em>Related:</em></p>
+<ul>
+<li><a href="../features/p9k_compatibility/">Powerlevel9k compatibility.</a></li>
+<li><a href="#does-powerlevel10k-always-render-exactly-the-same-prompt-as-powerlevel9k-given-the-same-config">Does Powerlevel10k always render exactly the same prompt as Powerlevel9k given the same config?</a></li>
+<li><a href="../troubleshooting/#extra-or-missing-spaces-in-prompt-compared-to-powerlevel9k">Extra or missing spaces in prompt compared to Powerlevel9k.</a></li>
+<li><a href="../features/wizard/">Configuration wizard.</a></li>
+</ul>
+<h2 id="is-it-really-fast">Is it really fast?</h2>
+<p>Yes.</p>
+<script id="asciicast-249531" src="https://asciinema.org/a/249531.js" async></script>
+
+<p>Benchmark results obtained with
+<a href="https://github.com/romkatv/zsh-prompt-benchmark">zsh-prompt-benchmark</a> on an Intel i9-7900X
+running Ubuntu 18.04 with the config from the demo.</p>
+<table>
+<thead>
+<tr>
+<th>Theme</th>
+<th align="right">Prompt Latency</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>powerlevel9k/master</td>
+<td align="right">1046 ms</td>
+</tr>
+<tr>
+<td>powerlevel9k/next</td>
+<td align="right">1005 ms</td>
+</tr>
+<tr>
+<td><strong>powerlevel10k</strong></td>
+<td align="right"><strong>8.7 ms</strong></td>
+</tr>
+</tbody>
+</table>
+<p>Powerlevel10k is over 100 times faster than Powerlevel9k in this benchmark.</p>
+<p>In fairness, Powerlevel9k has acceptable latency when given a spartan configuration. If all you need
+is the current directory without truncation or shortening, Powerlevel9k can render it for you in
+17 ms. Powerlevel10k can do the same 30 times faster but it won't matter in practice because 17 ms
+is fast enough (the threshold where latency becomes noticeable is around 50 ms). You have to be
+careful with Powerlevel9k configuration as it's all too easy to make prompt frustratingly slow.
+Powerlevel10k, on the other hand, doesn't require trading latency for utility -- it's virtually
+instant with any configuration. It stays well below the 50 ms mark, leaving most of the latency
+budget for other plugins you might install.</p>
+<h2 id="how-do-i-enable-instant-prompt">How do I enable instant prompt?</h2>
+<p>See <a href="../features/instant_prompt/">instant prompt</a> to learn about instant prompt. This section explains how you
+can enable it and lists caveats that you should be aware of.</p>
+<p>Instant prompt can be enabled either through <code>p10k configure</code> or by manually adding the following
+code snippet at the top of <code>~/.zshrc</code>:</p>
+<pre><code class="zsh"># Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
+# Initialization code that may require console input (password prompts, [y/n]
+# confirmations, etc.) must go above this block; everything else may go below.
+if [[ -r &quot;${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh&quot; ]]; then
+  source &quot;${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh&quot;
+fi
+</code></pre>
+
+<p>It's important that you copy the lines verbatim. Don't replace <code>source</code> with something else, don't
+call <code>zcompile</code>, don't redirect output, etc.</p>
+<p>When instant prompt is enabled, for the duration of Zsh initialization standard input is redirected
+to <code>/dev/null</code> and standard output with standard error are redirected to a temporary file. Once Zsh
+is fully initialized, standard file descriptors are restored and the content of the temporary file
+is printed out.</p>
+<p>When using instant prompt, you should carefully check any output that appears on Zsh startup as it
+may indicate that initialization has been altered, or perhaps even broken, by instant prompt.
+Initialization code that may require console input, such as asking for a keyring password or for a
+<em>[y/n]</em> confirmation, must be moved above the instant prompt preamble in <code>~/.zshrc</code>. Initialization
+code that merely prints to console but never reads from it will work correctly with instant prompt,
+although output that normally has colors may appear uncolored. You can either leave it be, suppress
+the output, or move it above the instant prompt preamble.</p>
+<p>Here's an example of <code>~/.zshrc</code> that breaks when instant prompt is enabled:</p>
+<pre><code class="zsh">if [[ -r &quot;${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh&quot; ]]; then
+  source &quot;${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh&quot;
+fi
+
+keychain id_rsa --agents ssh  # asks for password
+chatty-script                 # spams to stdout even when everything is fine
+# ...
+</code></pre>
+
+<p>Fixed version:</p>
+<pre><code class="zsh">keychain id_rsa --agents ssh  # moved before instant prompt
+
+# OK to perform console I/O before this point.
+if [[ -r &quot;${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh&quot; ]]; then
+  source &quot;${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh&quot;
+fi
+# From this point on, until zsh is fully initialized, console input won't work and
+# console output may appear uncolored.
+
+chatty-script &gt;/dev/null      # spam output suppressed
+# ...
+</code></pre>
+
+<p>If <code>POWERLEVEL9K_INSTANT_PROMPT</code> is unset or set to <code>verbose</code>, Powerlevel10k will print a warning
+when it detects console output during initialization to bring attention to potential issues. You can
+silence this warning (without suppressing console output) with <code>POWERLEVEL9K_INSTANT_PROMPT=quiet</code>.
+This is recommended if some initialization code in <code>~/.zshrc</code> prints to console and it's infeasible
+to move it above the instant prompt preamble or to suppress its output. You can completely disable
+instant prompt with <code>POWERLEVEL9K_INSTANT_PROMPT=off</code>. Do this if instant prompt breaks Zsh
+initialization and you don't know how to fix it.</p>
+<p><em>Note</em>: Instant prompt requires Zsh &gt;= 5.4. It's OK to enable it even when using an older version of
+Zsh but it won't do anything.</p>
+<h2 id="what-do-different-symbols-in-git-status-mean">What do different symbols in Git status mean?</h2>
+<p>When using Lean, Classic or Rainbow style, Git status may look like this:</p>
+<pre><code class="text">feature:master ⇣42⇡42 ⇠42⇢42 *42 merge ~42 +42 !42 ?42
+</code></pre>
+
+<table>
+<thead>
+<tr>
+<th>Symbol</th>
+<th>Meaning</th>
+<th>Source</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>feature</code></td>
+<td>current branch; replaced with <code>#tag</code> or <code>@commit</code> if not on a branch</td>
+<td><code>git status --ignore-submodules=dirty</code></td>
+</tr>
+<tr>
+<td><code>master</code></td>
+<td>remote tracking branch; only shown if different from local branch</td>
+<td><code>git rev-parse --abbrev-ref --symbolic-full-name @{u}</code></td>
+</tr>
+<tr>
+<td><code>⇣42</code></td>
+<td>this many commits behind the remote</td>
+<td><code>git status --ignore-submodules=dirty</code></td>
+</tr>
+<tr>
+<td><code>⇡42</code></td>
+<td>this many commits ahead of the remote</td>
+<td><code>git status --ignore-submodules=dirty</code></td>
+</tr>
+<tr>
+<td><code>⇠42</code></td>
+<td>this many commits behind the push remote</td>
+<td><code>git rev-list --left-right --count HEAD...@{push}</code></td>
+</tr>
+<tr>
+<td><code>⇢42</code></td>
+<td>this many commits ahead of the push remote</td>
+<td><code>git rev-list --left-right --count HEAD...@{push}</code></td>
+</tr>
+<tr>
+<td><code>*42</code></td>
+<td>this many stashes</td>
+<td><code>git stash list</code></td>
+</tr>
+<tr>
+<td><code>merge</code></td>
+<td>repository state</td>
+<td><code>git status --ignore-submodules=dirty</code></td>
+</tr>
+<tr>
+<td><code>~42</code></td>
+<td>this many merge conflicts</td>
+<td><code>git status --ignore-submodules=dirty</code></td>
+</tr>
+<tr>
+<td><code>+42</code></td>
+<td>this many staged changes</td>
+<td><code>git status --ignore-submodules=dirty</code></td>
+</tr>
+<tr>
+<td><code>!42</code></td>
+<td>this many unstaged changes</td>
+<td><code>git status --ignore-submodules=dirty</code></td>
+</tr>
+<tr>
+<td><code>?42</code></td>
+<td>this many untracked files</td>
+<td><code>git status --ignore-submodules=dirty</code></td>
+</tr>
+<tr>
+<td><code>─</code></td>
+<td>the number of staged, unstaged or untracked files is unknown</td>
+<td><code>echo $POWERLEVEL9K_VCS_MAX_INDEX_SIZE_DIRTY</code> or <code>git config --get bash.showDirtyState</code></td>
+</tr>
+</tbody>
+</table>
+<p><em>Related</em>: <a href="#how-do-i-change-the-format-of-git-status">How do I change the format of Git status?</a></p>
+<h2 id="how-do-i-change-the-format-of-git-status">How do I change the format of Git status?</h2>
+<p>To change the format of Git status, open <code>~/.p10k.zsh</code>, search for <code>my_git_formatter</code> and edit its
+source code.</p>
+<p><em>Related</em>: <a href="#what-do-different-symbols-in-git-status-mean">What do different symbols in Git status mean?</a></p>
+<h2 id="why-is-git-status-from-homegit-not-displayed-in-prompt">Why is Git status from <code>$HOME/.git</code> not displayed in prompt?</h2>
+<p>When using Lean, Classic or Rainbow style, <code>~/.p10k.zsh</code> contains the following parameter:</p>
+<pre><code class="zsh"># Don't show Git status in prompt for repositories whose workdir matches this pattern.
+# For example, if set to '~', the Git repository at $HOME/.git will be ignored.
+# Multiple patterns can be combined with '|': '~(|/foo)|/bar/baz/*'.
+typeset -g POWERLEVEL9K_VCS_DISABLED_WORKDIR_PATTERN='~'
+</code></pre>
+
+<p>To see Git status for <code>$HOME/.git</code> in prompt, open <code>~/.p10k.zsh</code> and remove
+<code>POWERLEVEL9K_VCS_DISABLED_WORKDIR_PATTERN</code>.</p>
+<h2 id="why-does-git-status-sometimes-appear-grey-and-then-gets-colored-after-a-short-period-of-time">Why does Git status sometimes appear grey and then gets colored after a short period of time?</h2>
+<p>tl;dr: When Git status in prompt is greyed out, it means Powerlevel10k is currently computing
+up-to-date Git status in the background. Prompt will get automatically refreshed when this
+computation completes.</p>
+<p>When your current directory is within a Git repository, Powerlevel10k computes up-to-date Git
+status after every command. If the repository is large, or the machine is slow, this computation
+can take quite a bit of time. If it takes longer than 20 milliseconds (configurable via
+<code>POWERLEVEL9K_VCS_MAX_SYNC_LATENCY_SECONDS</code>), Powerlevel10k displays the last known Git status in
+grey and continues to compute up-to-date Git status in the background. When the computation
+completes, Powerlevel10k refreshes prompt with new information, this time with colored Git status.</p>
+<h2 id="how-do-i-add-username-andor-hostname-to-prompt">How do I add username and/or hostname to prompt?</h2>
+<p>When using Lean, Classic or Rainbow style, prompt shows <code>username@hostname</code> when you are logged in
+as root or via SSH. There is little value in showing <code>username</code> or <code>hostname</code> when you are logged in
+to your local machine as a normal user. So the absence of <code>username@hostname</code> in your prompt is an
+indication that you are working locally and that you aren't root. You can change it, however.</p>
+<p>Open <code>~/.p10k.zsh</code>. Close to the top you can see the most important parameters that define which
+segments are shown in your prompt. All generally useful prompt segments are listed in there. Some of
+them are enabled, others are commented out. One of them is of interest to you.</p>
+<pre><code class="zsh">typeset -g POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(
+  ...
+  context  # user@hostname
+  ...
+)
+</code></pre>
+
+<p>Search for <code>context</code> to find the section in the config that lists parameters specific to this prompt
+segment. You should see the following lines:</p>
+<pre><code class="zsh"># Don't show context unless running with privileges or in SSH.
+# Tip: Remove the next line to always show context.
+typeset -g POWERLEVEL9K_CONTEXT_{DEFAULT,SUDO}_{CONTENT,VISUAL_IDENTIFIER}_EXPANSION=
+</code></pre>
+
+<p>If you follow the tip and remove (or comment out) the last line, you'll always see
+<code>username@hostname</code> in prompt. You can change the format to just <code>username</code>, or change the color, by
+adjusting the values of parameters nearby. There are plenty of comments to help you navigate.</p>
+<p>You can also move <code>context</code> to a different position in <code>POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS</code> or even
+to <code>POWERLEVEL9K_LEFT_PROMPT_ELEMENTS</code>.</p>
+<h2 id="why-some-prompt-segments-appear-and-disappear-as-im-typing">Why some prompt segments appear and disappear as I'm typing?</h2>
+<p>Prompt segments can be configured to be shown only when the current command you are typing invokes
+a relevant tool.</p>
+<pre><code class="zsh"># Show prompt segment &quot;kubecontext&quot; only when the command you are typing
+# invokes kubectl, helm, kubens, kubectx, oc, istioctl, kogito, k9s or helmfile.
+typeset -g POWERLEVEL9K_KUBECONTEXT_SHOW_ON_COMMAND='kubectl|helm|kubens|kubectx|oc|istioctl|kogito|k9s|helmfile'
+</code></pre>
+
+<p>Configs created by <code>p10k configure</code> may contain parameters of this kind. To customize when different
+prompt segments are shown, open <code>~/.p10k.zsh</code>, search for <code>SHOW_ON_COMMAND</code> and either remove these
+parameters or change their values.</p>
+<p>You can also define a function in <code>~/.zshrc</code> to toggle the display of a prompt segment between
+<em>always</em> and <em>on command</em>. This is similar to <code>kubeon</code>/<code>kubeoff</code> from
+<a href="https://github.com/jonmosco/kube-ps1">kube-ps1</a>.</p>
+<pre><code class="zsh">function kube-toggle() {
+  if (( ${+POWERLEVEL9K_KUBECONTEXT_SHOW_ON_COMMAND} )); then
+    unset POWERLEVEL9K_KUBECONTEXT_SHOW_ON_COMMAND
+  else
+    POWERLEVEL9K_KUBECONTEXT_SHOW_ON_COMMAND='kubectl|helm|kubens|kubectx|oc|istioctl|kogito|k9s|helmfile'
+  fi
+  p10k reload
+  if zle; then
+    zle push-input
+    zle accept-line
+  fi
+}
+</code></pre>
+
+<p>Invoke this function by typing <code>kube-toggle</code>. You can also bind it to a key by adding two more lines
+to <code>~/.zshrc</code>:</p>
+<pre><code class="zsh">zle -N kube-toggle
+bindkey '^]' kube-toggle  # ctrl-] to toggle kubecontext in powerlevel10k prompt
+</code></pre>
+
+<h2 id="how-do-i-change-prompt-colors">How do I change prompt colors?</h2>
+<p>You can either <a href="#change-the-color-palette-used-by-your-terminal">change the color palette used by your terminal</a> or
+<a href="#set-colors-through-powerlevel10k-configuration-parameters">set colors through Powerlevel10k configuration parameters</a>.</p>
+<h3 id="change-the-color-palette-used-by-your-terminal">Change the color palette used by your terminal</h3>
+<p>How exactly you change the terminal color palette (a.k.a. color scheme, or theme) depends on the
+kind of terminal you are using. Look around in terminal's settings/preferences or consult
+documentation.</p>
+<p>When you change the terminal color palette, it usually affects only the first 16 colors, numbered
+from 0 to 15. In order to see any effect on Powerlevel10k prompt, you need to use prompt style that
+utilizes these low-numbered colors. Type <code>p10k configure</code> and select <em>Rainbow</em>, <em>Lean</em> → <em>8 colors</em>
+or <em>Pure</em> → <em>Original</em>. Other styles use higher-numbered colors, so they look the same in any
+terminal color palette.</p>
+<h3 id="set-colors-through-powerlevel10k-configuration-parameters">Set colors through Powerlevel10k configuration parameters</h3>
+<p>Open <code>~/.p10k.zsh</code>, search for "color", "foreground" and "background" and change values of
+appropriate parameters. For example, here's how you can set the foreground of <code>time</code> prompt segment
+to bright red:</p>
+<pre><code class="zsh">typeset -g POWERLEVEL9K_TIME_FOREGROUND=160
+</code></pre>
+
+<p>Colors are specified using numbers from 0 to 255. Colors from 0 to 15 look differently in different
+terminals. Many terminals also support customization of these colors through color palettes
+(a.k.a. color schemes, or themes). Colors from 16 to 255 always look the same.</p>
+<p>Type <code>source ~/.p10k.zsh</code> to apply your changes to the current Zsh session.</p>
+<p>To see how different colors look in your terminal, run the following command:</p>
+<pre><code class="zsh">for i in {0..255}; do print -Pn &quot;%K{$i}  %k%F{$i}${(l:3::0:)i}%f &quot; ${${(M)$((i%6)):#3}:+$'\n'}; done
+</code></pre>
+
+<h2 id="why-does-powerlevel10k-spawn-extra-processes">Why does Powerlevel10k spawn extra processes?</h2>
+<p>Powerlevel10k uses <a href="https://github.com/romkatv/gitstatus">gitstatus</a> as the backend behind <code>vcs</code>
+prompt; gitstatus spawns <code>gitstatusd</code> and <code>zsh</code>. See
+<a href="https://github.com/romkatv/gitstatus">gitstatus</a> for details. Powerlevel10k may also spawn <code>zsh</code>
+to perform computation without blocking prompt. To avoid security hazard, these background processes
+aren't shared by different interactive shells. They terminate automatically when the parent <code>zsh</code>
+process terminates or runs <code>exec(3)</code>.</p>
+<h2 id="are-there-configuration-options-that-make-powerlevel10k-slow">Are there configuration options that make Powerlevel10k slow?</h2>
+<p>No, Powerlevel10k is always fast, with any configuration you throw at it. If you have noticeable
+prompt latency when using Powerlevel10k, please
+<a href="https://github.com/romkatv/powerlevel10k/issues">open an issue</a>.</p>
+<h2 id="is-powerlevel10k-fast-to-load">Is Powerlevel10k fast to load?</h2>
+<p>Yes, provided that you are using Zsh &gt;= 5.4.</p>
+<p>Loading time, or time to first prompt, can be measured with the following benchmark:</p>
+<pre><code class="zsh">time (repeat 1000 zsh -dfis &lt;&lt;&lt; 'source ~/powerlevel10k/powerlevel10k.zsh-theme')
+</code></pre>
+
+<p><em>Note:</em> This measures time to first complete prompt. Powerlevel10k can also display a
+<a href="../features/instant_prompt/">limited prompt</a> before the full-featured prompt is ready.</p>
+<p>Running this command with <code>~/powerlevel10k</code> as the current directory on the same machine as in the
+<a href="#is-it-really-fast">prompt benchmark</a> takes 29 seconds (29 ms per invocation). This is about 6
+times faster than powerlevel9k/master and 17 times faster than powerlevel9k/next.</p>
+<h2 id="what-is-the-relationship-between-powerlevel9k-and-powerlevel10k">What is the relationship between Powerlevel9k and Powerlevel10k?</h2>
+<p>Powerlevel10k was forked from Powerlevel9k in March 2019 after a week-long discussion in
+<a href="https://github.com/Powerlevel9k/powerlevel9k/issues/1170">powerlevel9k#1170</a>. Powerlevel9k was
+already a mature project with large user base and release cycle measured in months. Powerlevel10k
+was spun off to iterate on performance improvements and new features at much higher pace.</p>
+<p>Powerlevel9k and Powerlevel10k are independent projects. When using one, you shouldn't install the
+other. Issues should be filed against the project that you actually use. There are no individuals
+that have commit rights in both repositories. All bug fixes and new features committed to
+Powerlevel9k repository get ported to Powerlevel10k.</p>
+<p>Over time, virtually all code in Powerlevel10k has been rewritten. There is currently no meaningful
+overlap between the implementations of Powerlevel9k and Powerlevel10k.</p>
+<p>Powerlevel10k is committed to maintaining backward compatibility with all configs indefinitely. This
+commitment covers all configuration parameters recognized by Powerlevel9k (see
+<a href="../features/p9k_compatibility/">Powerlevel9k compatibility</a>) and additional parameters that only
+Powerlevel10k understands. Names of all parameters in Powerlevel10k start with <code>POWERLEVEL9K_</code> for
+consistency.</p>
+<h2 id="does-powerlevel10k-always-render-exactly-the-same-prompt-as-powerlevel9k-given-the-same-config">Does Powerlevel10k always render exactly the same prompt as Powerlevel9k given the same config?</h2>
+<p>Almost. There are a few differences.</p>
+<ul>
+<li>By default only <code>git</code> vcs backend is enabled in Powerlevel10k. If you need <code>svn</code> and <code>hg</code>, add
+  them to <code>POWERLEVEL9K_VCS_BACKENDS</code>. These backends aren't yet optimized in Powerlevel10k, so
+  enabling them will make prompt <em>very slow</em>.</li>
+<li>Powerlevel10k doesn't support <code>POWERLEVEL9K_VCS_SHOW_SUBMODULE_DIRTY=true</code>.</li>
+<li>Powerlevel10k strives to be bug-compatible with Powerlevel9k but not when it comes to egregious
+  bugs. If you accidentally rely on these bugs, your prompt will differ between Powerlevel9k and
+  Powerlevel10k. Some examples:</li>
+<li>Powerlevel9k ignores some options that are set after the theme is sourced while Powerlevel10k
+    respects all options. If you see different icons in Powerlevel9k and Powerlevel10k, you've
+    probably defined <code>POWERLEVEL9K_MODE</code> before sourcing the theme. This parameter gets ignored
+    by Powerlevel9k but honored by Powerlevel10k. If you want your prompt to look in Powerlevel10k
+    the same as in Powerlevel9k, remove <code>POWERLEVEL9K_MODE</code>.</li>
+<li>Powerlevel9k doesn't respect <code>ZLE_RPROMPT_INDENT</code>. As a result, right prompt in Powerlevel10k
+    can have an extra space at the end compared to Powerlevel9k. Set <code>ZLE_RPROMPT_INDENT=0</code> if you
+    don't want that space. More details in
+    <a href="../troubleshooting/#extra-space-without-background-on-the-right-side-of-right-prompt">troubleshooting</a>.</li>
+<li>Powerlevel9k has inconsistent spacing around icons. This was fixed in Powerlevel10k. Set
+    <code>POWERLEVEL9K_LEGACY_ICON_SPACING=true</code> to get the same spacing as in Powerlevel9k. More
+    details in <a href="../troubleshooting/#extra-or-missing-spaces-around-icons">troubleshooting</a>.</li>
+<li>There are dozens more bugs in Powerlevel9k that don't exist in Powerlevel10k.</li>
+</ul>
+<p>If you notice any other changes in prompt appearance when switching from Powerlevel9k to
+Powerlevel10k, please <a href="https://github.com/romkatv/powerlevel10k/issues">open an issue</a>.</p>
+<h2 id="what-is-the-best-prompt-style-in-the-configuration-wizard">What is the best prompt style in the configuration wizard?</h2>
+<p>There are as many opinions on what constitutes the best prompt as there are people. It mostly comes
+down to personal preference. There are, however, a few hidden implications of different choices.</p>
+<p>Pure style is an exact replication of <a href="https://github.com/sindresorhus/pure">Pure Zsh theme</a>. It
+exists to ease the migration for users of this theme. Unless you are one of them, choose Lean
+style over Pure.</p>
+<p>If you want to confine prompt colors to the selected terminal color palette (say, <em>Solarized Dark</em>),
+use <em>Rainbow</em>, <em>Lean</em> → <em>8 colors</em> or <em>Pure</em> → <em>Original</em>. Other styles use fixed colors and thus
+look the same in any terminal color palette.</p>
+<p>All styles except Pure have an option to use <em>ASCII</em> charset. Prompt will look less pretty but will
+render correctly with all fonts and in all locales.</p>
+<p>If you enable transient prompt, take advantage of two-line prompt. You'll get the benefit of
+extra space for typing commands without the usual drawback of reduced scrollback density. Having
+all commands start from the same offset is also nice.</p>
+<p>Similarly, if you enable transient prompt, sparse prompt (with an empty line before prompt) is a
+great choice.</p>
+<p>If you are using vi keymap, choose prompt with <code>prompt_char</code> in it (shown as green <code>❯</code> in the
+wizard). This symbol changes depending on vi mode: <code>❯</code>, <code>❮</code>, <code>V</code>, <code>▶</code> for insert, command, visual
+and replace mode respectively. When a command fails, the symbol turns red. <em>Lean</em> style always has
+<code>prompt_char</code> in it. <em>Rainbow</em> and <em>Classic</em> styles have it only in the two-line configuration
+without left frame.</p>
+<p>If you value horizontal space or prefer minimalist aesthetics:</p>
+<ul>
+<li>Use a monospace font, such as <a href="../fonts/">the recommended font</a>.
+  Non-monospace fonts require extra space after icons that are larger than a single column.</li>
+<li>Use Lean style. Compared to Classic and Rainbow, it saves two characters per prompt segment.</li>
+<li>Disable <em>current time</em> and <em>frame</em>.</li>
+<li>Use <em>few icons</em>. The extra icons enabled by the <em>many icons</em> option primarily serve decorative
+  function. Informative icons, such as background job indicator, will be shown either way.</li>
+</ul>
+<p><em>Note</em>: You can run configuration wizard as many times as you like. Type <code>p10k configure</code> to try new
+prompt style.</p>
+<h2 id="how-to-make-powerlevel10k-look-like-robbyrussell-oh-my-zsh-theme">How to make Powerlevel10k look like robbyrussell Oh My Zsh theme?</h2>
+<p>Use <a href="https://github.com/romkatv/powerlevel10k/blob/master/config/p10k-robbyrussell.zsh">this config</a>.</p>
+<p>You can either download it, save as <code>~/.p10k.zsh</code> and <code>source ~/.p10k.zsh</code> from <code>~/.zshrc</code>, or
+source <code>p10k-robbyrussell.zsh</code> directly from your cloned <code>powerlevel10k</code> repository.</p>
+<h2 id="can-prompts-for-completed-commands-display-error-status-for-those-commands-instead-of-the-commands-preceding-them">Can prompts for completed commands display error status for <em>those</em> commands instead of the commands preceding them?</h2>
+<p>No. When you hit <em>ENTER</em> and the command you've typed starts running, its error status isn't yet
+known, so it cannot be shown in prompt. When the command completes, the error status gets known but
+it's no longer possible to update prompt for <em>that</em> command. This is why the error status for every
+command is reflected in the <em>next</em> prompt.</p>
+<p>For details, see <a href="https://www.reddit.com/r/zsh/comments/eg49ff/powerlevel10k_prompt_history_exit_code_colors/fc5huku">this post on /r/zsh</a>.</p>
+<h2 id="what-is-the-minimum-supported-zsh-version">What is the minimum supported Zsh version?</h2>
+<p>Zsh 5.1 or newer should work. Fast startup requires Zsh &gt;= 5.4.</p>
+<h2 id="how-were-these-screenshots-and-animated-gifs-created">How were these screenshots and animated gifs created?</h2>
+<p>All screenshots and animated gifs were recorded in GNOME Terminal with
+<a href="../fonts/">the recommended font</a> and Tango Dark color palette with
+custom background color (<code>#171A1B</code> instead of <code>#2E3436</code> -- twice as dark).</p>
+<p><img alt="GNOME Terminal Color Settings" src="https://raw.githubusercontent.com/romkatv/powerlevel10k-media/master/gnome-terminal-colors.png" /></p>
+<p>Syntax highlighting, where present, was provided by <a href="https://github.com/zsh-users/zsh-syntax-highlighting">zsh-syntax-highlighting</a>.</p>
+<h2 id="how-was-the-recommended-font-created">How was the recommended font created?</h2>
+<p><a href="../fonts/">The recommended font</a> is the product of many
+individuals. Its origin is <em>Bitstream Vera Sans Mono</em>, which has given birth to <em>Menlo</em>, which in
+turn has spawned <em>Meslo</em>. Finally, extra glyphs have been added to <em>Meslo</em> with scripts forked
+from Nerd Fonts. The final font is released under the terms of
+<a href="https://raw.githubusercontent.com/romkatv/powerlevel10k-media/master/MesloLGS%20NF%20License.txt">Apache License</a>.</p>
+<p>MesloLGS NF font can be recreated with the following command (requires <code>git</code> and <code>docker</code>):</p>
+<pre><code class="zsh">git clone --depth=1 https://github.com/romkatv/nerd-fonts.git
+cd nerd-fonts
+./build 'Meslo/S/*'
+</code></pre>
+
+<p>If everything goes well, four <code>ttf</code> files will appear in <code>./out</code>.</p>
+<h2 id="how-to-package-powerlevel10k-for-distribution">How to package Powerlevel10k for distribution?</h2>
+<p>It's currently neither easy nor recommended to package and distribute Powerlevel10k. There are no
+instructions you can follow that would allow you to easily update your package when new versions of
+Powerlevel10k are released. This may change in the future but not soon.</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>
+            var base_url = "..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../js/base.js" defer></script>
+        <script src="../search/main.js" defer></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+                <p>
+                    From here you can search these documents. Enter
+                    your search terms below.
+                </p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>
