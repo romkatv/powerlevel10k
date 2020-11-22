@@ -579,7 +579,7 @@
   typeset -g POWERLEVEL9K_ASDF_SHOW_SYSTEM=true
 
   # If set to non-empty value, hide tools unless there is a file matching the specified file pattern
-  # in the current directory, or its parent diretory, or its grandparent directory, and so on.
+  # in the current directory, or its parent directory, or its grandparent directory, and so on.
   #
   # Note: If this parameter is set to empty value, it won't hide tools.
   # Note: SHOW_ON_UPGLOB isn't specific to asdf. It works with all prompt segments.
