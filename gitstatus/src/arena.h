@@ -37,7 +37,7 @@ namespace gitstatus {
 //
 //   // Donates a block to the arena. When the time comes, it'll be freed with
 //   // free(p, size, userdata).
-//   void Donate(void* p, size_t size, void* userdata, void(*free)(void*, void*));
+//   void Donate(void* p, size_t size, void* userdata, void(*free)(void*, size_t, void*));
 class Arena {
  public:
   struct Options {
@@ -62,7 +62,7 @@ class Arena {
     //
     //   void* userdata;
     //   void (*alloc)(size_t size, size_t alignment, void* userdata);
-    //   void (*free)(size_t size, void* userdata);
+    //   void (*free)(void* p, size_t size, void* userdata);
   };
 
   // Requires: opt.min_block_size <= opt.max_block_size.
