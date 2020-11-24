@@ -211,14 +211,15 @@ char* DirenvConvert(Arena& arena, struct dirent& ent, bool do_convert) {
 
 bool ListDir(int dir_fd, Arena& arena, std::vector<char*>& entries, bool precompose_unicode,
              bool case_sensitive) {
-  VERIFY((dir_fd = dup(dir_fd)) >= 0);
+  entries.clear();
+  dir_fd = dup(dir_fd);
+  if (dir_fd < 0) return false;
   DIR* dir = fdopendir(dir_fd);
   if (!dir) {
     CHECK(!close(dir_fd)) << Errno();
-    return -1;
+    return false;
   }
   ON_SCOPE_EXIT(&) { CHECK(!closedir(dir)) << Errno(); };
-  entries.clear();
   while (struct dirent* ent = (errno = 0, readdir(dir))) {
     if (Dots(ent->d_name)) continue;
     entries.push_back(DirenvConvert(arena, *ent, precompose_unicode));
