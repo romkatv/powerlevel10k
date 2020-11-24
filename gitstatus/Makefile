@@ -35,7 +35,7 @@ clean:
 	rm -rf -- $(OBJDIR)
 
 pkg:
-	GITSTATUS_DAEMON= GITSTATUS_CACHE_DIR=$(PWD)/usrbin ./install -f
+	GITSTATUS_DAEMON= GITSTATUS_CACHE_DIR=$(shell pwd)/usrbin ./install -f
 	$(or $(ZSH),:) -fc 'for f in *.zsh install; do zcompile -R -- $$f.zwc $$f || exit; done'
 
 -include $(OBJS:.o=.dep)
