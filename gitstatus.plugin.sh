@@ -36,6 +36,17 @@
 #   -D        Unless this option is specified, report zero staged, unstaged and conflicted
 #             changes for repositories with bash.showDirtyState = false.
 function gitstatus_start() {
+  if [[ "$BASH_VERSION" < 4 ]]; then
+    >&2 printf 'gitstatus_start: need bash version >= 4.0, found %s\n' "$BASH_VERSION"
+    >&2 printf '\n'
+    >&2 printf 'To see the version of the current shell, type:\n'
+    >&2 printf '\n'
+    >&2 printf '    \033[32mecho\033[0m \033[33m"$BASH_VERSION"\033[0m\n'
+    >&2 printf '\n'
+    >&2 printf 'The output of `\033[32mbash\033[0m --version` may be different and is not relevant.\n'
+    return 1
+  fi
+
   unset OPTIND
   local opt timeout=5 max_dirty=-1 extra_flags
   local max_num_staged=1 max_num_unstaged=1 max_num_conflicted=1 max_num_untracked=1
@@ -69,7 +80,7 @@ function gitstatus_start() {
     local gitstatus_plugin_dir="$PWD"
   fi
 
-  local tmpdir req_fifo resp_fifo
+  local tmpdir req_fifo resp_fifo culprit
 
   function gitstatus_start_impl() {
     local log_level="${GITSTATUS_LOG_LEVEL:-}"
@@ -137,7 +148,7 @@ function gitstatus_start() {
           }
 
           set -- -d "$gitstatus_plugin_dir" -s "$uname_s" -m "$uname_m" \
-            -p "printf '.\036' >&$fd_out" -- _gitstatus_set_daemon
+            -p "printf '.\036' >&$fd_out" -e "$fd_out" -- _gitstatus_set_daemon
           [[ "${GITSTATUS_AUTO_INSTALL:-1}" -ne 0 ]]  || set -- -n "$@"
           source "$gitstatus_plugin_dir"/install      || return
           [[ -n "$_gitstatus_bash_daemon" ]]          || return
@@ -166,7 +177,7 @@ function gitstatus_start() {
             trap - ${sig[@]}
             case "$ret" in
               0|129|130|131|137|141|143|159)
-                echo -nE $'bye\x1f0\x1e' >&"$fd_out"
+                echo -nE $'}bye\x1f0\x1e' >&"$fd_out"
                 exit "$ret"
               ;;
             esac
@@ -192,7 +203,7 @@ function gitstatus_start() {
           trap "trap - ${sig[*]}; kill $pid &>/dev/null" ${sig[@]}
           wait "$pid"
           trap - ${sig[@]}
-          echo -nE $'bye\x1f0\x1e' >&"$fd_out"
+          echo -nE $'}bye\x1f0\x1e' >&"$fd_out"
         ) & disown
       ) & disown
     } 0</dev/null &>"$GITSTATUS_DAEMON_LOG"
@@ -205,12 +216,15 @@ function gitstatus_start() {
     [[ "$GITSTATUS_DAEMON_PID" == [1-9]* ]] || return
 
     local reply
-    echo -nE $'hello\x1f\x1e' >&$_GITSTATUS_REQ_FD                     || return
+    echo -nE $'}hello\x1f\x1e' >&$_GITSTATUS_REQ_FD || return
     local dl=
     while true; do
-      IFS='' read -rd $'\x1e' -u $_GITSTATUS_RESP_FD -t "$timeout" reply || return
-      [[ "$reply" == $'hello\x1f0' ]] && break
-      [[ "$reply" == . ]] || return
+      reply=
+      if ! IFS='' read -rd $'\x1e' -u $_GITSTATUS_RESP_FD -t "$timeout" reply; then
+        culprit="$reply"
+        return 1
+      fi
+      [[ "$reply" == $'}hello\x1f0' ]] && break
       if [[ -z "$dl" ]]; then
         dl=1
         if [[ -t 2 ]]; then
@@ -238,8 +252,11 @@ function gitstatus_start() {
   }
 
   if ! gitstatus_start_impl; then
-    echo "" >&2
-    echo "gitstatus_start: failed to start gitstatusd" >&2
+    >&2 printf '\n'
+    >&2 printf '[\033[31mERROR\033[0m]: gitstatus failed to initialize.\n'
+    if [[ -n "${culprit-}" ]]; then
+      >&2 printf '\n%s\n' "$culprit"
+    fi
     [[ -z "${req_fifo:-}"  ]] || command rm -f "$req_fifo"
     [[ -z "${resp_fifo:-}" ]] || command rm -f "$resp_fifo"
     unset -f gitstatus_start_impl

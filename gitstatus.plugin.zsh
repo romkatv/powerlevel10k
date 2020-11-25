@@ -404,8 +404,8 @@ function _gitstatus_daemon"${1:-}"() {
 
       local gitstatus_plugin_dir_var=_gitstatus_plugin_dir$fsuf
       local gitstatus_plugin_dir=${(P)gitstatus_plugin_dir_var}
-      builtin set -- -d $gitstatus_plugin_dir -s $uname_s -m $uname_m -p "printf . >&$pipe_fd" -- \
-        _gitstatus_set_daemon$fsuf
+      builtin set -- -d $gitstatus_plugin_dir -s $uname_s -m $uname_m \
+        -p "printf '\\001' >&$pipe_fd" -e $pipe_fd -- _gitstatus_set_daemon$fsuf
       [[ ${GITSTATUS_AUTO_INSTALL:-1} == (|-|+)<1-> ]] || builtin set -- -n "$@"
       builtin source $gitstatus_plugin_dir/install     || return
       [[ -n $_gitstatus_zsh_daemon ]]                  || return
@@ -542,7 +542,7 @@ function gitstatus_start"${1:-}"() {
   fi
 
   local -i lock_fd resp_fd stderr_fd
-  local file_prefix xtrace=/dev/null daemon_log=/dev/null
+  local file_prefix xtrace=/dev/null daemon_log=/dev/null culprit
 
   {
     if (( _GITSTATUS_STATE_$name )); then
@@ -637,8 +637,8 @@ function gitstatus_start"${1:-}"() {
         [[ $req_fd == <1-> ]]                                || return
         typeset -gi _GITSTATUS_REQ_FD_$name=req_fd
 
-        print -nru $req_fd -- $'hello\x1f\x1e' || return
-        local expected=$'hello\x1f0\x1e' actual
+        print -nru $req_fd -- $'}hello\x1f\x1e' || return
+        local expected=$'}hello\x1f0\x1e' actual
         if (( $+functions[p10k] )) && [[ ! -t 1 && ! -t 0 ]]; then
           local -F deadline='EPOCHREALTIME + 4'
         else
@@ -647,8 +647,15 @@ function gitstatus_start"${1:-}"() {
         while true; do
           [[ -t $resp_fd ]]
           sysread -s 1 -t $timeout -i $resp_fd actual || return
-          [[ $actual == h ]] && break
-          [[ $actual == . ]] || return
+          [[ $expected == $actual* ]] && break
+          if [[ $actual != $'\1' ]]; then
+            [[ -t $resp_fd ]]
+            while sysread -t $timeout -i $resp_fd 'actual[$#actual+1]'; do
+              [[ -t $resp_fd ]]
+            done
+            culprit=$actual
+            return 1
+          fi
           (( EPOCHREALTIME < deadline )) && continue
           if (( deadline > 0 )); then
             deadline=0
@@ -747,7 +754,10 @@ function gitstatus_start"${1:-}"() {
     print -ru2  -- ''
     print -Pru2 -- '[%F{red}ERROR%f]: gitstatus failed to initialize.'
     print -ru2  -- ''
-    print -ru2  -- '  Your Git prompt may disappear or become slow.'
+    if [[ -n $culprit ]]; then
+      print -ru2 -- $culprit
+      return err
+    fi
     if [[ -s $xtrace ]]; then
       print -ru2  -- ''
       print -Pru2 -- "  Zsh log (%U${xtrace//\%/%%}%u):"
