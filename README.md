@@ -42,10 +42,8 @@ See the [table of contents](#table-of-contents) at the bottom.
 
 Type `p10k configure` to access the builtin configuration wizard right from your terminal.
 
-<img
-  width="884" height="762"
-  alt="Powerlevel10k Configuration Wizard"
-  src="https://raw.githubusercontent.com/romkatv/powerlevel10k-media/master/configuration-wizard.gif"/>
+![Powerlevel10k Configuration Wizard](
+  https://raw.githubusercontent.com/romkatv/powerlevel10k-media/master/configuration-wizard.gif)
 
 All styles except [Pure](#pure-compatibility) are functionally equivalent. They display the same
 information and differ only in presentation.
