@@ -536,7 +536,7 @@ applications on your system. Configure your terminal to use this font:
 - **iTerm2**: Open *iTerm2 → Preferences → Profiles → Text* and set *Font* to `MesloLGS NF`.
   Alternatively, type `p10k configure` and answer `Yes` when asked whether to install
   *Meslo Nerd Font*.
-- **Apple Terminal** Open *Terminal → Preferences → Profiles → Text*, click *Change* under *Font*
+- **Apple Terminal**: Open *Terminal → Preferences → Profiles → Text*, click *Change* under *Font*
   and select `MesloLGS NF` family.
 - **Hyper**: Open *Hyper → Edit → Preferences* and change the value of `fontFamily` under
   `module.exports.config` to `MesloLGS NF`.
@@ -557,7 +557,7 @@ applications on your system. Configure your terminal to use this font:
   Select *Use console font instead of the default* and set the font name to `MesloLGS NF`.
 - **Termux**: Type `p10k configure` and answer `Yes` when asked whether to install
   *Meslo Nerd Font*.
-- **Blink** Type `config`, go to *Appearance*, tap *Add a new font*, tap *Open Gallery*, select
+- **Blink**: Type `config`, go to *Appearance*, tap *Add a new font*, tap *Open Gallery*, select
   *MesloLGS NF.css*, tap *import* and type `exit` in the home view to reload the font.
 - **Terminus**: Open *Settings → Appearance* and set *Font* to `MesloLGS NF`.
 - **Terminator**: Open *Preferences* using the context menu. Under *Profiles* select the *General*
