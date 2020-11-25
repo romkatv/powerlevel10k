@@ -300,20 +300,19 @@ function _p9k_upglob() {
 #   _p9k_prompt_length '%F{red}abc' => 3
 #   _p9k_prompt_length $'%{a\b%Gb%}' => 1
 function _p9k_prompt_length() {
-  local COLUMNS=1024
+  local -i COLUMNS=1024
   local -i x y=$#1 m
   if (( y )); then
     while (( ${${(%):-$1%$y(l.1.0)}[-1]} )); do
       x=y
-      (( y *= 2 ));
+      (( y *= 2 ))
     done
-    local xy
     while (( y > x + 1 )); do
-      m=$(( x + (y - x) / 2 ))
-      typeset ${${(%):-$1%$m(l.x.y)}[-1]}=$m
+      (( m = x + (y - x) / 2 ))
+      (( ${${(%):-$1%$m(l.x.y)}[-1]} = m ))
     done
   fi
-  _p9k__ret=$x
+  typeset -g _p9k__ret=$x
 }
 
 typeset -gr __p9k_byte_suffix=('B' 'K' 'M' 'G' 'T' 'P' 'E' 'Z' 'Y')
@@ -6005,20 +6004,19 @@ _p9k_dump_instant_prompt() {
   (( height += ${#${__p9k_used_instant_prompt[1]//[^$lf]}} ))
   local _p9k__ret
   function _p9k_prompt_length() {
-    local COLUMNS=1024
+    local -i COLUMNS=1024
     local -i x y=$#1 m
     if (( y )); then
       while (( ${${(%):-$1%$y(l.1.0)}[-1]} )); do
         x=y
-        (( y *= 2 ));
+        (( y *= 2 ))
       done
-      local xy
       while (( y > x + 1 )); do
-        m=$(( x + (y - x) / 2 ))
-        typeset ${${(%):-$1%$m(l.x.y)}[-1]}=$m
+        (( m = x + (y - x) / 2 ))
+        (( ${${(%):-$1%$m(l.x.y)}[-1]} = m ))
       done
     fi
-    _p9k__ret=$x
+    typeset -g _p9k__ret=$x
   }
   local out
   if [[ $+VTE_VERSION == 0 && $TERM_PROGRAM != Hyper ]] || (( ! $+_p9k__g )); then
