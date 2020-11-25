@@ -38,6 +38,8 @@ applications on your system. Configure your terminal to use this font:
   and select `MesloLGS NF` family.
 - **Hyper**: Open *Hyper → Edit → Preferences* and change the value of `fontFamily` under
   `module.exports.config` to `MesloLGS NF`.
+- **IntelliJ**: Open *Intellij → Edit → Preferences* then go to *Editor → Color Scheme → Console Font*. 
+    Select `Use console font instead of the default` and change the value of font to `MesloLGS NF`.
 - **Visual Studio Code**: Open *File → Preferences → Settings*, enter
   `terminal.integrated.fontFamily` in the search box and set the value to `MesloLGS NF`.
 - **GNOME Terminal** (the default Ubuntu terminal): Open *Terminal → Preferences* and click on the
