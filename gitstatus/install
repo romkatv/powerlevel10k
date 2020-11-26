@@ -15,7 +15,7 @@ _gitstatus_install_daemon_found() {
   esac
 
   local cpu
-  if [ "$uname_sm" != 'darwin arm64' ]                                       ||
+  if [ "$uname_s" != darwin ] || [ "$uname_m" != arm64 ]                     ||
      [ -e /Library/Apple/System/Library/LaunchDaemons/com.apple.oahd.plist ] ||
      [ ! -x /usr/sbin/softwareupdate ]                                       ||
      ! cpu="$(/usr/sbin/sysctl -n machdep.cpu.brand_string)"; then
