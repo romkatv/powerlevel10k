@@ -563,14 +563,25 @@ function install_font() {
       print
       flowing +c "%2FMeslo Nerd Font%f" successfully installed.
       print -P ""
-      flowing +c Please "%Brestart iTerm2%b" for the changes to take effect.
-      print -P ""
-      flowing +c -i 5 "  1. Click" "%BiTerm2 → Quit iTerm2%b" or press "%B⌘ Q%b."
-      flowing +c -i 5 "  2. Open %BiTerm2%b."
-      print -P ""
-      flowing +c "It's" important to "%Brestart iTerm2%b" by following the instructions above.   \
-                 "It's" "%Bnot enough%b" to close iTerm2 by clicking on the red circle. You must \
-                 click "%BiTerm2 → Quit iTerm2%b" or press "%B⌘ Q%b."
+      () {
+        local out
+        out=$(/usr/bin/defaults read 'Apple Global Domain' NSQuitAlwaysKeepsWindows 2>/dev/null) || return
+        [[ $out == 1 ]] || return
+        out="$(iterm_get OpenNoWindowsAtStartup 2>/dev/null)" || return
+        [[ $out == false ]]
+      }
+      if (( $? )); then
+        flowing +c Please "%Brestart iTerm2%b" for the changes to take effect.
+        print -P ""
+        flowing +c -i 5 "  1. Click" "%BiTerm2 → Quit iTerm2%b" or press "%B⌘ Q%b."
+        flowing +c -i 5 "  2. Open %BiTerm2%b."
+        print -P ""
+        flowing +c "It's" important to "%Brestart iTerm2%b" by following the instructions above.   \
+                   "It's" "%Bnot enough%b" to close iTerm2 by clicking on the red circle. You must \
+                   click "%BiTerm2 → Quit iTerm2%b" or press "%B⌘ Q%b."
+      else
+        flowing +c Please "%Brestart your computer%b" for the changes to take effect.
+      fi
       while true; do sleep 60 2>/dev/null; done
     ;;
   esac
