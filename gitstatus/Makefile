@@ -2,7 +2,7 @@ APPNAME ?= gitstatusd
 OBJDIR ?= obj
 
 CXX ?= g++
-ZSH ?= $(shell command -v zsh 2> /dev/null)
+ZSH := $(shell command -v zsh 2> /dev/null)
 
 VERSION ?= $(shell . ./build.info && printf "%s" "$$gitstatus_version")
 
