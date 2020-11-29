@@ -1,0 +1,153 @@
+@charset "utf-8";
+@import 'normalize';
+@import 'variables';
+@import 'icon-font';
+
+/*
+Copyright 2008-2013 Concur Technologies, Inc.
+
+Licensed under the Apache License, Version 2.0 (the "License"); you may
+not use this file except in compliance with the License. You may obtain
+a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+License for the specific language governing permissions and limitations
+under the License.
+*/
+
+$print-color: #999;
+$print-color-light: #ccc;
+$print-font-size: 12px;
+
+body {
+  @extend %default-font;
+}
+
+.tocify, .toc-footer, .lang-selector, .search, #nav-button {
+  display: none;
+}
+
+.tocify-wrapper>img {
+  margin: 0 auto;
+  display: block;
+}
+
+.content {
+  font-size: 12px;
+
+  pre, code {
+    @extend %code-font;
+    @extend %break-words;
+    border: 1px solid $print-color;
+    border-radius: 5px;
+    font-size: 0.8em;
+  }
+
+  pre {
+    code {
+      border: 0;
+    }
+  }
+
+  pre {
+    padding: 1.3em;
+  }
+
+  code {
+    padding: 0.2em;
+  }
+
+  table {
+    border: 1px solid $print-color;
+    tr {
+      border-bottom: 1px solid $print-color;
+    }
+    td,th {
+      padding: 0.7em;
+    }
+  }
+
+  p {
+    line-height: 1.5;
+  }
+
+  a {
+    text-decoration: none;
+    color: #000;
+  }
+
+  h1 {
+    @extend %header-font;
+    font-size: 2.5em;
+    padding-top: 0.5em;
+    padding-bottom: 0.5em;
+    margin-top: 1em;
+    margin-bottom: $h1-margin-bottom;
+    border: 2px solid $print-color-light;
+    border-width: 2px 0;
+    text-align: center;
+  }
+
+  h2 {
+    @extend %header-font;
+    font-size: 1.8em;
+    margin-top: 2em;
+    border-top: 2px solid $print-color-light;
+    padding-top: 0.8em;
+  }
+
+  h1+h2, h1+div+h2 {
+    border-top: none;
+    padding-top: 0;
+    margin-top: 0;
+  }
+
+  h3, h4 {
+    @extend %header-font;
+    font-size: 0.8em;
+    margin-top: 1.5em;
+    margin-bottom: 0.8em;
+    text-transform: uppercase;
+  }
+
+  h5, h6 {
+    text-transform: uppercase;
+  }
+
+  aside {
+    padding: 1em;
+    border: 1px solid $print-color-light;
+    border-radius: 5px;
+    margin-top: 1.5em;
+    margin-bottom: 1.5em;
+    line-height: 1.6;
+  }
+
+  aside:before {
+    vertical-align: middle;
+    padding-right: 0.5em;
+    font-size: 14px;
+  }
+
+  aside.notice:before {
+    @extend %icon-info-sign;
+  }
+
+  aside.warning:before {
+    @extend %icon-exclamation-sign;
+  }
+
+  aside.success:before {
+    @extend %icon-ok-sign;
+  }
+}
+
+.copy-clipboard {
+  @media print {
+    display: none
+  }
+}

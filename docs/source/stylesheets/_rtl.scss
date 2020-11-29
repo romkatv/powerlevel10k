@@ -1,0 +1,140 @@
+////////////////////////////////////////////////////////////////////////////////
+// RTL Styles Variables
+////////////////////////////////////////////////////////////////////////////////
+
+$default: auto;
+
+////////////////////////////////////////////////////////////////////////////////
+// TABLE OF CONTENTS
+////////////////////////////////////////////////////////////////////////////////
+
+#toc>ul>li>a>span {
+    float: left;
+}
+
+.toc-wrapper {
+    transition: right 0.3s ease-in-out !important;
+    left: $default !important;
+    #{right}: 0;
+}
+
+.toc-h2 {
+    padding-#{right}: $nav-padding + $nav-indent;
+}
+
+#nav-button {
+    #{right}: 0;
+    transition: right 0.3s ease-in-out;
+    &.open {
+        right: $nav-width
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// PAGE LAYOUT AND CODE SAMPLE BACKGROUND
+////////////////////////////////////////////////////////////////////////////////
+.page-wrapper {
+    margin-#{left}: $default !important;
+    margin-#{right}: $nav-width;
+    .dark-box {
+        #{right}: $default;
+        #{left}: 0;
+    }
+}
+
+.lang-selector {
+    width: $default !important;
+    a {
+        float: right;
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// CODE SAMPLE STYLES
+////////////////////////////////////////////////////////////////////////////////
+.content {
+    &>h1,
+    &>h2,
+    &>h3,
+    &>h4,
+    &>h5,
+    &>h6,
+    &>p,
+    &>table,
+    &>ul,
+    &>ol,
+    &>aside,
+    &>dl {
+        margin-#{left}: $examples-width;
+        margin-#{right}: $default !important;
+    }
+    &>ul,
+    &>ol {
+        padding-#{right}: $main-padding + 15px;
+    }
+    table {
+        th,
+        td {
+            text-align: right;
+        }
+    }
+    dd {
+        margin-#{right}: 15px;
+    }
+    aside {
+        aside:before {
+            padding-#{left}: 0.5em;
+        }
+        .search-highlight {
+            background: linear-gradient(to top right, #F7E633 0%, #F1D32F 100%);
+        }
+    }
+    pre,
+    blockquote {
+        float: left !important;
+        clear: left !important;
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// TYPOGRAPHY
+////////////////////////////////////////////////////////////////////////////////
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+aside {
+    text-align: right;
+    direction: rtl;
+}
+
+.toc-wrapper {
+    text-align: right;
+    direction: rtl;
+    font-weight: 100 !important;
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+// RESPONSIVE DESIGN
+////////////////////////////////////////////////////////////////////////////////
+@media (max-width: $tablet-width) {
+    .toc-wrapper {
+        #{right}: -$nav-width;
+        &.open {
+            #{right}: 0;
+        }
+    }
+    .page-wrapper {
+        margin-#{right}: 0;
+    }
+}
+
+@media (max-width: $phone-width) {
+    %left-col {
+        margin-#{left}: 0;
+    }
+}

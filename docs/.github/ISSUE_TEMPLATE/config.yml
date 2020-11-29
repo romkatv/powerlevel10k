@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Questions, Ideas, Discussions
+    url: https://github.com/slatedocs/slate/discussions
+    about: Ask and answer questions, and propose new features.

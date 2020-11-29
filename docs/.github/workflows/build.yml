@@ -1,0 +1,42 @@
+name: Build
+
+on:
+  push:
+    branches: [ '*' ]
+  pull_request:
+    branches: [ '*' ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        ruby-version: [2.3, 2.4, 2.5, 2.6, 2.7]
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Ruby
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: ${{ matrix.ruby-version }}
+
+    - uses: actions/cache@v2
+      with:
+        path: vendor/bundle
+        key: gems-${{ runner.os }}-${{ matrix.ruby-version }}-${{ hashFiles('**/Gemfile.lock') }}
+        restore-keys: |
+          gems-${{ runner.os }}-${{ matrix.ruby-version }}-
+          gems-${{ runner.os }}-
+
+    # necessary to get ruby 2.3 to work nicely with bundler vendor/bundle cache
+    # can remove once ruby 2.3 is no longer supported
+    - run: gem update --system
+
+    - run: bundle config set deployment 'true'
+    - name: bundle install
+      run: |
+        bundle config path vendor/bundle
+        bundle install --jobs 4 --retry 3
+
+    - run: bundle exec middleman build

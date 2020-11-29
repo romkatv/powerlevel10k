@@ -1,0 +1,136 @@
+GEM
+  remote: https://rubygems.org/
+  specs:
+    activesupport (5.2.4.4)
+      concurrent-ruby (~> 1.0, >= 1.0.2)
+      i18n (>= 0.7, < 2)
+      minitest (~> 5.1)
+      tzinfo (~> 1.1)
+    addressable (2.7.0)
+      public_suffix (>= 2.0.2, < 5.0)
+    autoprefixer-rails (9.5.1.1)
+      execjs
+    backports (3.18.2)
+    coffee-script (2.4.1)
+      coffee-script-source
+      execjs
+    coffee-script-source (1.12.2)
+    concurrent-ruby (1.1.7)
+    contracts (0.13.0)
+    dotenv (2.7.6)
+    erubis (2.7.0)
+    execjs (2.7.0)
+    fast_blank (1.0.0)
+    fastimage (2.2.0)
+    ffi (1.13.1)
+    haml (5.1.2)
+      temple (>= 0.8.0)
+      tilt
+    hamster (3.0.0)
+      concurrent-ruby (~> 1.0)
+    hashie (3.6.0)
+    i18n (0.9.5)
+      concurrent-ruby (~> 1.0)
+    kramdown (2.3.0)
+      rexml
+    listen (3.0.8)
+      rb-fsevent (~> 0.9, >= 0.9.4)
+      rb-inotify (~> 0.9, >= 0.9.7)
+    memoist (0.16.2)
+    middleman (4.3.11)
+      coffee-script (~> 2.2)
+      haml (>= 4.0.5)
+      kramdown (>= 2.3.0)
+      middleman-cli (= 4.3.11)
+      middleman-core (= 4.3.11)
+    middleman-autoprefixer (2.10.1)
+      autoprefixer-rails (~> 9.1)
+      middleman-core (>= 3.3.3)
+    middleman-cli (4.3.11)
+      thor (>= 0.17.0, < 2.0)
+    middleman-core (4.3.11)
+      activesupport (>= 4.2, < 6.0)
+      addressable (~> 2.3)
+      backports (~> 3.6)
+      bundler
+      contracts (~> 0.13.0)
+      dotenv
+      erubis
+      execjs (~> 2.0)
+      fast_blank
+      fastimage (~> 2.0)
+      hamster (~> 3.0)
+      hashie (~> 3.4)
+      i18n (~> 0.9.0)
+      listen (~> 3.0.0)
+      memoist (~> 0.14)
+      padrino-helpers (~> 0.13.0)
+      parallel
+      rack (>= 1.4.5, < 3)
+      sassc (~> 2.0)
+      servolux
+      tilt (~> 2.0.9)
+      uglifier (~> 3.0)
+    middleman-sprockets (4.1.1)
+      middleman-core (~> 4.0)
+      sprockets (>= 3.0)
+    middleman-syntax (3.2.0)
+      middleman-core (>= 3.2)
+      rouge (~> 3.2)
+    mini_portile2 (2.4.0)
+    minitest (5.14.2)
+    nokogiri (1.10.10)
+      mini_portile2 (~> 2.4.0)
+    padrino-helpers (0.13.3.4)
+      i18n (~> 0.6, >= 0.6.7)
+      padrino-support (= 0.13.3.4)
+      tilt (>= 1.4.1, < 3)
+    padrino-support (0.13.3.4)
+      activesupport (>= 3.1)
+    parallel (1.19.2)
+    public_suffix (4.0.6)
+    rack (2.2.3)
+    rb-fsevent (0.10.4)
+    rb-inotify (0.10.1)
+      ffi (~> 1.0)
+    redcarpet (3.5.0)
+    rexml (3.2.4)
+    rouge (3.24.0)
+    sass (3.7.4)
+      sass-listen (~> 4.0.0)
+    sass-listen (4.0.0)
+      rb-fsevent (~> 0.9, >= 0.9.4)
+      rb-inotify (~> 0.9, >= 0.9.7)
+    sassc (2.4.0)
+      ffi (~> 1.9)
+    servolux (0.13.0)
+    sprockets (3.7.2)
+      concurrent-ruby (~> 1.0)
+      rack (> 1, < 3)
+    temple (0.8.2)
+    thor (1.0.1)
+    thread_safe (0.3.6)
+    tilt (2.0.10)
+    tzinfo (1.2.7)
+      thread_safe (~> 0.1)
+    uglifier (3.2.0)
+      execjs (>= 0.3.0, < 3)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  middleman (~> 4.3)
+  middleman-autoprefixer (~> 2.7)
+  middleman-sprockets (~> 4.1)
+  middleman-syntax (~> 3.2)
+  nokogiri (~> 1.10.8)
+  redcarpet (~> 3.5.0)
+  rouge (~> 3.21)
+  sass
+
+RUBY VERSION
+   ruby 2.3.3p222
+
+BUNDLED WITH
+   2.1.4
