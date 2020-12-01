@@ -1,22 +1,25 @@
-name: Deploy Powerlevel10k Docs
-on:
-  push:
-    branches:
-      - master
-
+name: Powerlevel10k Documentation on Push
+on: push
 jobs:
-  build:
-    name: Deploy docs
-    runs-on: ubuntu-latest
+  action-filter:
+    runs-on: ubuntu-18.04
     steps:
-      - uses: actions/checkout@v2
-      - name: Setup Python
-        uses: actions/setup-python@v2
-        with:
-          python-version: 3.8
-      - name: Install Mkdocs
-        run: |
-          python3 -m pip install --upgrade pip
-          pip install mkdocs
-      - name: Deploy docs
-        run: mkdocs gh-deploy
+    - uses: actions/checkout@master
+    - name: action-filter
+      uses: actions/bin/filter@master
+      with:
+        args: branch master
+    - name: files-filter
+      uses: wcchristian/gh-pattern-filter-action@master
+      with:
+        args: .*\\.md$
+    - name: Build documentation
+      uses: docker://decathlon/slate-builder-action:2.0.0
+      env:
+        DOC_BASE_FOLDER: docs
+        ZIP_BUILD: false
+    - name: Deploy to GitHub Pages
+      uses: docker://maxheld83/ghpages@v0.2.1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        BUILD_DIR: test-documentation/build/
