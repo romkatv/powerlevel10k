@@ -23,11 +23,11 @@ jobs:
           gems-${{ runner.os }}-
     - run: bundle config set deployment 'true'
     - name: bundle install
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
       run: |
         cd docs
         bundle config path vendor/bundle
         bundle install --jobs 4 --retry 3
         chmod +x deploy.sh
         ./deploy.sh
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
