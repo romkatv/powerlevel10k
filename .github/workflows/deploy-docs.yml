@@ -4,7 +4,7 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     env:
-      ruby-version: 2.6
+      ruby-version: 2.5
 
     steps:
     - uses: actions/checkout@v2
@@ -12,7 +12,6 @@ jobs:
       uses: ruby/setup-ruby@v1
       with:
         ruby-version: ${{ env.ruby-version }}
-        bundler-cache: true # runs 'bundle install' and caches installed gems automaticall
 
     - uses: actions/cache@v2
       with:
@@ -23,8 +22,6 @@ jobs:
           gems-${{ runner.os }}-
     - run: bundle config set deployment 'true'
     - name: bundle install
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
       run: |
         cd docs
         bundle config path vendor/bundle
