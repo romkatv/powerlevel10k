@@ -1,21 +1,36 @@
 name: Powerlevel10k Documentation on Push
 on: push
 jobs:
-  action-filter:
-    runs-on: ubuntu-18.04
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      ruby-version: 2.5
+
     steps:
-    - uses: actions/checkout@master
-    - name: files-filter
-      uses: wcchristian/gh-pattern-filter-action@master
+    - uses: actions/checkout@v2
+    - name: Set up Ruby
+      uses: ruby/setup-ruby@v1
       with:
-        args: .*\\.md$
-    - name: Build documentation
-      uses: docker://decathlon/slate-builder-action:2.0.0
-      env:
-        DOC_BASE_FOLDER: docs
-        ZIP_BUILD: false
-    - name: Deploy to GitHub Pages
-      uses: docker://maxheld83/ghpages@v0.2.1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        BUILD_DIR: test-documentation/build/
+        ruby-version: ${{ env.ruby-version }}
+
+    - uses: actions/cache@v2
+      with:
+        path: vendor/bundle
+        key: gems-${{ runner.os }}-${{ matrix.ruby-version }}-${{ hashFiles('**/Gemfile.lock') }}
+        restore-keys: |
+          gems-${{ runner.os }}-${{ matrix.ruby-version }}-
+          gems-${{ runner.os }}-
+    - run: bundle config set deployment 'true'
+    - name: bundle install
+      run: |
+        cd docs
+        bundle config path vendor/bundle
+        bundle install --jobs 4 --retry 3
+    - run: bundle exec middleman build
+
+    - name: Deploy
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./docs/build
+        keep_files: true
