@@ -1,5 +1,9 @@
-name: Powerlevel10k Documentation on Push
-on: push
+name: Deploy
+
+on:
+  push:
+    branches: [ 'main' ]
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -20,11 +24,18 @@ jobs:
         restore-keys: |
           gems-${{ runner.os }}-${{ matrix.ruby-version }}-
           gems-${{ runner.os }}-
+
     - run: bundle config set deployment 'true'
     - name: bundle install
       run: |
-        cd docs
         bundle config path vendor/bundle
         bundle install --jobs 4 --retry 3
-        chmod +x deploy.sh
-        ./deploy.sh
+
+    - run: bundle exec middleman build
+
+    - name: Deploy
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./build
+        keep_files: true
