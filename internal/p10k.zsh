@@ -5061,7 +5061,7 @@ _p9k_prompt_wifi_async() {
       lines=(${(f)"$(command iw dev $iface link)"}) || return 0
       local -a match mbegin mend
       for line in $lines; do
-        if [[ $line == (#b)[[:space:]]#SSID:[[:space:]]##([^[:space:]]##) ]]; then
+        if [[ $line == (#b)[[:space:]]#SSID:[[:space:]]##(*) ]]; then
           ssid=$match[1]
         elif [[ $line == (#b)[[:space:]]#'tx bitrate:'[[:space:]]##([^[:space:]]##)' MBit/s'* ]]; then
           last_tx_rate=$match[1]
