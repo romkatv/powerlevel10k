@@ -2037,7 +2037,6 @@ prompt_dir() {
 
     (( expand )) && _p9k_prompt_length "${(e):-"\${\${_p9k__d::=0}+}$content"}" || _p9k__ret=
     _p9k_cache_ephemeral_set "$state" "$icon" "$expand" "$content" $_p9k__ret
-    typeset -p state >>/tmp/log
   fi
 
   if (( _p9k__cache_val[3] )); then
