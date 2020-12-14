@@ -1901,8 +1901,12 @@ prompt_dir() {
     ;;
   esac
 
-  [[ $_POWERLEVEL9K_DIR_SHOW_WRITABLE != 0 && ! -w $_p9k__cwd ]]
-  local w=$?
+  # w=0: writable
+  # w=1: not writable
+  # w=2: does not exist
+  (( !_POWERLEVEL9K_DIR_SHOW_WRITABLE )) || [[ -w $_p9k__cwd ]]
+  local -i w=$?
+  (( w && _POWERLEVEL9K_DIR_SHOW_WRITABLE > 2 )) && [[ ! -e $_p9k__cwd ]] && w=2
   if ! _p9k_cache_ephemeral_get $0 $_p9k__cwd $p $w $fake_first "${parts[@]}"; then
     local state=$0
     local icon=''
@@ -1914,9 +1918,11 @@ prompt_dir() {
         break
       fi
     done
-    if (( ! w )); then
+    if (( w )); then
       if (( _POWERLEVEL9K_DIR_SHOW_WRITABLE == 1 )); then
         state=${0}_NOT_WRITABLE
+      elif (( w == 2 )); then
+        state+=_NON_EXISTENT
       else
         state+=_NOT_WRITABLE
       fi
@@ -2031,6 +2037,7 @@ prompt_dir() {
 
     (( expand )) && _p9k_prompt_length "${(e):-"\${\${_p9k__d::=0}+}$content"}" || _p9k__ret=
     _p9k_cache_ephemeral_set "$state" "$icon" "$expand" "$content" $_p9k__ret
+    typeset -p state >>/tmp/log
   fi
 
   if (( _p9k__cache_val[3] )); then
@@ -7068,6 +7075,7 @@ _p9k_init_params() {
   case $_POWERLEVEL9K_DIR_SHOW_WRITABLE in
     true) _POWERLEVEL9K_DIR_SHOW_WRITABLE=1;;
     v2)   _POWERLEVEL9K_DIR_SHOW_WRITABLE=2;;
+    v3)   _POWERLEVEL9K_DIR_SHOW_WRITABLE=3;;
     *)    _POWERLEVEL9K_DIR_SHOW_WRITABLE=0;;
   esac
   typeset -gi _POWERLEVEL9K_DIR_SHOW_WRITABLE
@@ -7937,7 +7945,7 @@ _p9k_must_init() {
     [[ $sig == $_p9k__param_sig ]] && return 1
     _p9k_deinit
   fi
-  _p9k__param_pat=$'v112\1'${(q)ZSH_VERSION}$'\1'${(q)ZSH_PATCHLEVEL}$'\1'
+  _p9k__param_pat=$'v113\1'${(q)ZSH_VERSION}$'\1'${(q)ZSH_PATCHLEVEL}$'\1'
   _p9k__param_pat+=$'${#parameters[(I)POWERLEVEL9K_*]}\1${(%):-%n%#}\1$GITSTATUS_LOG_LEVEL\1'
   _p9k__param_pat+=$'$GITSTATUS_ENABLE_LOGGING\1$GITSTATUS_DAEMON\1$GITSTATUS_NUM_THREADS\1'
   _p9k__param_pat+=$'$GITSTATUS_CACHE_DIR\1$GITSTATUS_AUTO_INSTALL\1${ZLE_RPROMPT_INDENT:-1}\1'
