@@ -406,6 +406,7 @@ function ask() {
     fi
     typeset -g choice=
     if read -t1 -k choice; then
+      choice=${(L)choice}
       if [[ $choice == q ]]; then
         quit
       fi
