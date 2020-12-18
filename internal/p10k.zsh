@@ -4593,7 +4593,7 @@ typeset -gra __p9k_nordvpn_tag=(
 function _p9k_fetch_nordvpn_status() {
   setopt err_return
   local REPLY
-  zsocket /run/nordvpnd.sock
+  zsocket $1
   local -i fd=$REPLY
   {
     >&$fd echo -nE - $'PRI * HTTP/2.0\r\n\r\nSM\r\n\r\n\0\0\0\4\1\0\0\0\0\0\0N\1\4\0\0\0\1\203\206E\221bA\226\223\325\\k\337\31i=LnH\323j?A\223\266\243y\270\303\fYmLT{$\357]R.\203\223\257_\213\35u\320b\r&=LMedz\212\232\312\310\264\307`+\210K\203@\2te\206M\2035\5\261\37\0\0\5\0\1\0\0\0\1\0\0\0\0\0'
@@ -4669,21 +4669,29 @@ function _p9k_fetch_nordvpn_status() {
 #   POWERLEVEL9K_NORDVPN_CONNECTING_BACKGROUND=cyan
 function prompt_nordvpn() {
   unset $__p9k_nordvpn_tag P9K_NORDVPN_COUNTRY_CODE
-  if [[ -e /run/nordvpnd.sock ]]; then
-    _p9k_fetch_nordvpn_status 2>/dev/null
-    if [[ $P9K_NORDVPN_SERVER == (#b)([[:alpha:]]##)[[:digit:]]##.nordvpn.com ]]; then
-      typeset -g P9K_NORDVPN_COUNTRY_CODE=${${(U)match[1]}//İ/I}
-    fi
+  if [[ -e /run/nordvpn/nordvpnd.sock ]]; then
+    sock=/run/nordvpn/nordvpnd.sock
+  elif [[ -e /run/nordvpnd.sock ]]; then
+    sock=/run/nordvpnd.sock
+  else
+    return
+  fi
+  _p9k_fetch_nordvpn_status $sock 2>/dev/null
+  if [[ $P9K_NORDVPN_SERVER == (#b)([[:alpha:]]##)[[:digit:]]##.nordvpn.com ]]; then
+    typeset -g P9K_NORDVPN_COUNTRY_CODE=${${(U)match[1]}//İ/I}
   fi
   case $P9K_NORDVPN_STATUS in
     Connected)
-      _p9k_prompt_segment $0_CONNECTED blue   white NORDVPN_ICON 0 '' "$P9K_NORDVPN_COUNTRY_CODE";;
+      _p9k_prompt_segment $0_CONNECTED blue   white NORDVPN_ICON 0 '' "$P9K_NORDVPN_COUNTRY_CODE"
+    ;;
     Disconnected|Connecting|Disconnecting)
       local state=${${(U)P9K_NORDVPN_STATUS}//İ/I}
       _p9k_get_icon $0_$state FAIL_ICON
-      _p9k_prompt_segment $0_$state    yellow white NORDVPN_ICON 0 '' "$_p9k__ret";;
+      _p9k_prompt_segment $0_$state    yellow white NORDVPN_ICON 0 '' "$_p9k__ret"
+    ;;
     *)
-      _p9k_prompt_segment $0_MISSING   blue   white ''        0 '' '';;
+      return
+    ;;
   esac
 }
 
