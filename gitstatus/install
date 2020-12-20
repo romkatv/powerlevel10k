@@ -386,9 +386,9 @@ END
 
       local trapped=
       trap 'trapped=1' $sig
-      fetch 1 "$url1" & 
+      fetch 1 "$url1" &
       local pid1="$!"
-      fetch 2 "$url2" & 
+      fetch 2 "$url2" &
       local pid2="$!"
 
       local die="trap - $sig; kill -- $pid1 $pid2 2>/dev/null; wait -- $pid1 $pid2 2>/dev/null; exit 1"

@@ -553,7 +553,7 @@ applications on your system. Configure your terminal to use this font:
   *Properties → Font* and set *Font* to `MesloLGS NF`.
 - **Microsoft Terminal** (the new thing): Open *Settings* (`Ctrl+,`), search for `fontFace` and set
   value to `MesloLGS NF` for every profile.
-- **IntelliJ**: Open *Intellij → Edit → Preferences → Editor → Color Scheme → Console Font*. 
+- **IntelliJ**: Open *Intellij → Edit → Preferences → Editor → Color Scheme → Console Font*.
   Select *Use console font instead of the default* and set the font name to `MesloLGS NF`.
 - **Termux**: Type `p10k configure` and answer `Yes` when asked whether to install
   *Meslo Nerd Font*.
@@ -563,9 +563,9 @@ applications on your system. Configure your terminal to use this font:
 - **Terminator**: Open *Preferences* using the context menu. Under *Profiles* select the *General*
   tab (should be selected already), uncheck *Use the system fixed width font* (if not already)
   and select `MesloLGS NF Regular`. Exit the Preferences dialog by clicking *Close*.
-- **Guake**: Right Click on an open terminal and open *Preferences*. Under *Appearance* 
-  tab, uncheck *Use the system fixed width font* (if not already) and select `MesloLGS NF Regular`. 
-  Exit the Preferences dialog by clicking *Close*.  
+- **Guake**: Right Click on an open terminal and open *Preferences*. Under *Appearance*
+  tab, uncheck *Use the system fixed width font* (if not already) and select `MesloLGS NF Regular`.
+  Exit the Preferences dialog by clicking *Close*.
 - **Alacritty**: Create or open `~/.config/alacritty/alacritty.yml` and add the following section
   to it:
   ```yaml
@@ -1441,11 +1441,11 @@ From [Zsh documentation](
   http://zsh.sourceforge.net/Doc/Release/Parameters.html#index-ZLE_005fRPROMPT_005fINDENT):
 
 > `ZLE_RPROMPT_INDENT <S>`
-> 
+>
 > If set, used to give the indentation between the right hand side of the right prompt in the line
 > editor as given by `RPS1` or `RPROMPT` and the right hand side of the screen. If not set, the
 > value `1` is used.
-> 
+>
 > Typically this will be used to set the value to `0` so that the prompt appears flush with the
 > right hand side of the screen.
 
