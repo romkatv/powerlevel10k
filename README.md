@@ -925,10 +925,24 @@ computation completes.
 
 When your current directory is within a Git repository, Powerlevel10k computes up-to-date Git
 status after every command. If the repository is large, or the machine is slow, this computation
-can take quite a bit of time. If it takes longer than 20 milliseconds (configurable via
+can take quite a bit of time. If it takes longer than 10 milliseconds (configurable via
 `POWERLEVEL9K_VCS_MAX_SYNC_LATENCY_SECONDS`), Powerlevel10k displays the last known Git status in
 grey and continues to compute up-to-date Git status in the background. When the computation
 completes, Powerlevel10k refreshes prompt with new information, this time with colored Git status.
+
+When using *Rainbow* style, Git status is displayed as black on grey while it's still being
+computed. Depending on the terminal color palette, this may be difficult to read. In this case you
+might want to change the background color to something ligher for more contrast. To do that, open
+`~/.p10k.zsh`, search for `POWERLEVEL9K_VCS_LOADING_BACKGROUND`, uncomment it if it's commented out,
+and change the value.
+
+```zsh
+typeset -g POWERLEVEL9K_VCS_LOADING_BACKGROUND=244
+```
+
+Type `source ~/.p10k.zsh` to apply your changes to the current Zsh session.
+
+*Related*: [How do I change prompt colors?](#how-do-i-change-prompt-colors)
 
 ### How do I add username and/or hostname to prompt?
 
