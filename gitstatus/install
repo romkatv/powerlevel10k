@@ -5,24 +5,6 @@
 _gitstatus_install_daemon_found() {
   local installed="$1"
   shift
-
-  case "$daemon" in
-    *-darwin-x86_64)
-      if [ "$uname_m" = arm64 ]                                                    &&
-         [ ! -e /Library/Apple/System/Library/LaunchDaemons/com.apple.oahd.plist ] &&
-         [ -x /usr/sbin/softwareupdate ]; then
-        >&"$e" printf 'Please run the following command to install Rosetta:\n'
-        >&"$e" printf '\n'
-        >&"$e" printf '    \033[32m/usr/sbin/softwareupdate\033[0m --install-rosetta\n'
-        >&"$e" printf '\n'
-        >&"$e" printf 'See for details: \033[4mhttps://support.apple.com/en-us/HT211861\033[0m\n'
-        >&"$e" printf '\n'
-        >&"$e" printf 'Once Rosetta is installed, restart your shell.\n'
-        return 1
-      fi
-    ;;
-  esac
-
   [ $# = 0 ] || "$@" "$daemon" "$version" "$installed"
 }
 

@@ -1,15 +1,16 @@
-# 6a3d54a5a44abb4ee46ce72a8097389364746c6a
+# 0
 #
 # This file is used by ./install and indirectly by shell bindings.
 #
 # The first line is read by powerlevel10k instant prompt. It must
 # be updated whenever the content of this file changes. The actual
-# value doesn't matter as long as it's unique. You can use the output
-# of `git rev-parse HEAD`.
+# value doesn't matter as long as it's unique. Consecutive integers
+# work fine.
 
 # Official gitstatusd binaries.
 uname_s_glob="cygwin_nt-10.0"; uname_m_glob="i686";    file="gitstatusd-${uname_s}-${uname_m}";     version="v1.3.1"; sha256="c96baef70b81b5a1d46adcc9e93721eaf4bdc295562bdd2baf210a6b416b9911";
 uname_s_glob="cygwin_nt-10.0"; uname_m_glob="x86_64";  file="gitstatusd-${uname_s}-${uname_m}";     version="v1.3.1"; sha256="18b5be49f6eb9ff1cf25e76d6f2333c7402e686e05ce5b88ca107c80504210d8";
+uname_s_glob="darwin";         uname_m_glob="arm64";   file="gitstatusd-${uname_s}-${uname_m}";     version="v1.3.1"; sha256="0394e2ac880c1e190ace0346499d4670861297ecc2f84315ecb8ba3c98aa68d9";
 uname_s_glob="darwin";         uname_m_glob="x86_64";  file="gitstatusd-${uname_s}-${uname_m}";     version="v1.3.1"; sha256="26d582fe9a0b2090c28e84e5e32a6d42d6988cedff51e41ec5f789512c53b0fc";
 uname_s_glob="freebsd";        uname_m_glob="amd64";   file="gitstatusd-${uname_s}-${uname_m}";     version="v1.3.1"; sha256="54a823373458a0908187ba8d1c5b8921015c844811916451674cc09fbdff88bb";
 uname_s_glob="linux";          uname_m_glob="aarch64"; file="gitstatusd-${uname_s}-${uname_m}";     version="v1.3.1"; sha256="4e0a506eafb14b009cf6670f0e11399ac7e765cad17b9fcf38ef65516d248bfa";
@@ -25,7 +26,6 @@ uname_s_glob="msys_nt-10.0";   uname_m_glob="x86_64";  file="gitstatusd-${uname_
 # Fallbacks to official gitstatusd binaries.
 uname_s_glob="cygwin_nt-*";    uname_m_glob="i686";    file="gitstatusd-cygwin_nt-10.0-${uname_m}"; version="v1.3.1"; sha256="c96baef70b81b5a1d46adcc9e93721eaf4bdc295562bdd2baf210a6b416b9911";
 uname_s_glob="cygwin_nt-*";    uname_m_glob="x86_64";  file="gitstatusd-cygwin_nt-10.0-${uname_m}"; version="v1.3.1"; sha256="18b5be49f6eb9ff1cf25e76d6f2333c7402e686e05ce5b88ca107c80504210d8";
-uname_s_glob="darwin";         uname_m_glob="arm64";   file="gitstatusd-${uname_s}-x86_64";         version="v1.3.1"; sha256="26d582fe9a0b2090c28e84e5e32a6d42d6988cedff51e41ec5f789512c53b0fc";
 uname_s_glob="mingw32_nt-*";   uname_m_glob="i686";    file="gitstatusd-msys_nt-10.0-${uname_m}";   version="v1.3.1"; sha256="618d2425c6a22fa3762fe6fe252f9ddb4ed9138df1377e48b2f119cd4875f400";
 uname_s_glob="mingw32_nt-*";   uname_m_glob="x86_64";  file="gitstatusd-msys_nt-10.0-${uname_m}";   version="v1.3.1"; sha256="bdfae7a7c0fd83d0214a7eabde3b7d8709336bd08697a74d48bea4a04c352676";
 uname_s_glob="mingw64_nt-*";   uname_m_glob="i686";    file="gitstatusd-msys_nt-10.0-${uname_m}";   version="v1.3.1"; sha256="618d2425c6a22fa3762fe6fe252f9ddb4ed9138df1377e48b2f119cd4875f400";

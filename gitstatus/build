@@ -98,17 +98,20 @@ if [ -n "$gitstatus_install_tools" ]; then
         >&2 echo "[error] please run 'xcode-select --install' and retry"
         exit 1
       fi
-      if ! command -v brew >/dev/null 2>&1; then
-        >&2 echo "[error] please install homebrew from https://brew.sh/ and retry"
+      if command -v port >/dev/null 2>&1; then
+        sudo port -N install libiconv cmake wget
+      elif command -v brew >/dev/null 2>&1; then
+        for formula in libiconv cmake git wget; do
+          if command brew list "$formula" &>/dev/null; then
+            command brew upgrade "$formula"
+          else
+            command brew install "$formula"
+          fi
+        done
+      else
+        >&2 echo "[error] please install MacPorts or Homebrew and retry"
         exit 1
       fi
-      for formula in libiconv cmake git wget; do
-        if command brew list "$formula" &>/dev/null; then
-          command brew upgrade "$formula"
-        else
-          command brew install "$formula"
-        fi
-      done
     ;;
     msys*|mingw*)
       command pacman -Syu --noconfirm
@@ -165,11 +168,17 @@ case "$gitstatus_kernel" in
   ;;
   darwin)
     command mkdir -- "$workdir"/lib
-    brew_prefix="$(command brew --prefix)"
-    command ln -s -- "$brew_prefix"/opt/libiconv/lib/libiconv.a "$workdir"/lib
+    if [ -e /opt/local/lib/libiconv.a ]; then
+      command ln -s -- /opt/local/lib/libiconv.a "$workdir"/lib
+      libgit2_cflags="$libgit2_cflags -I/opt/local/include"
+      gitstatus_cxxflags="$gitstatus_cxxflags -I/opt/local/include"
+    else
+      brew_prefix="$(command brew --prefix)"
+      command ln -s -- "$brew_prefix"/opt/libiconv/lib/libiconv.a "$workdir"/lib
+      libgit2_cflags="$libgit2_cflags -I"$brew_prefix"/opt/libiconv/include"
+      gitstatus_cxxflags="$gitstatus_cxxflags -I"$brew_prefix"/opt/libiconv/include"
+    fi
     libgit2_cmake_flags="$libgit2_cmake_flags -DUSE_ICONV=ON"
-    libgit2_cflags="$libgit2_cflags -I"$brew_prefix"/opt/libiconv/include"
-    gitstatus_cxxflags="$gitstatus_cxxflags -I"$brew_prefix"/opt/libiconv/include"
     gitstatus_ldlibs="$gitstatus_ldlibs -liconv"
     gitstatus_ldflags="$gitstatus_ldflags -L${workdir}/lib"
     libgit2_cmake_flags="$libgit2_cmake_flags -DENABLE_REPRODUCIBLE_BUILDS=OFF"
