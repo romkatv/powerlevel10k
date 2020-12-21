@@ -5,7 +5,7 @@
 # Usage: mbuild [-b git-ref] [kernel-arch]...
 #
 # Builds a bunch of gitstatusd-* binaries. Without arguments builds binaries
-# for all platforms. git-ref defaults to src.
+# for all platforms. git-ref defaults to master.
 #
 # Before using this script you need to set up build servers and list them
 # in ~/.ssh/config. There should be a Host entry for every value of `assets`
@@ -111,6 +111,7 @@ local -rA assets=(
   cygwin_nt-10.0-x86_64  build-windows-x86_64
   msys_nt-10.0-i686      build-windows-x86_64
   msys_nt-10.0-x86_64    build-windows-x86_64
+  darwin-arm64           build-macos-arm64
   darwin-x86_64          build-macos-x86_64
   freebsd-amd64          build-freebsd-amd64
   linux-aarch64          build-linux-aarch64
@@ -138,7 +139,7 @@ function usage() {
   print -r -- 'usage: mbuild [-b REF] [KERNEL-ARCH]...'
 }
 
-local OPTARG opt git_ref=src
+local OPTARG opt git_ref=master
 local -i OPTIND
 while getopts ":b:h" opt; do
   case $opt in
@@ -183,7 +184,7 @@ function build-unix() {
   case $2 in
     linux-ppc64le) ;;
     linux-*)       flags+=(-d docker);;
-    darwin-arm64)  intro='PATH="/opt/homebrew/bin:$PATH"';;
+    darwin-arm64)  intro='PATH="/opt/local/bin:$PATH"';;
     darwin-*)      intro='PATH="/usr/local/bin:$PATH"';;
   esac
   ssh $1 -- /bin/sh -uex <<<"
