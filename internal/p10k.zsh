@@ -8044,7 +8044,7 @@ function _p9k_init_cacheable() {
     case $_p9k_uname in
       SunOS)                     _p9k_set_os Solaris SUNOS_ICON;;
       Darwin)                    _p9k_set_os OSX     APPLE_ICON;;
-      CYGWIN_NT-* | MSYS_NT-*)   _p9k_set_os Windows WINDOWS_ICON;;
+      CYGWIN_NT-*|MSYS_NT-*|MINGW64_NT-*|MINGW32_NT-*)   _p9k_set_os Windows WINDOWS_ICON;;
       FreeBSD|OpenBSD|DragonFly) _p9k_set_os BSD     FREEBSD_ICON;;
       Linux)
         _p9k_os='Linux'
