@@ -1070,7 +1070,7 @@ function os_icon_name() {
     case $uname in
       SunOS)                     echo SUNOS_ICON;;
       Darwin)                    echo APPLE_ICON;;
-      CYGWIN_NT-* | MSYS_NT-*)   echo WINDOWS_ICON;;
+      CYGWIN_NT-*|MSYS_NT-*|MINGW64_NT-*|MINGW32_NT-*)   echo WINDOWS_ICON;;
       FreeBSD|OpenBSD|DragonFly) echo FREEBSD_ICON;;
       Linux)
         local os_release_id
