@@ -2594,7 +2594,13 @@ _p9k_prompt_ram_async() {
       (( free_bytes += match[1] ))
       [[ $stat =~ 'Pages inactive:[[:space:]]+([0-9]+)' ]] || return
       (( free_bytes += match[1] ))
-      (( free_bytes *= 4096 ))
+      if (( ! $+_p9k__ram_pagesize )); then
+        local p
+        (( $+commands[pagesize] )) && p=$(pagesize 2>/dev/null) && [[ $p == <1-> ]] || p=4096
+        typeset -gi _p9k__ram_pagesize=p
+        _p9k_print_params _p9k__ram_pagesize
+      fi
+      (( free_bytes *= _p9k__ram_pagesize ))
     ;;
     BSD)
       local stat && stat="$(grep -F 'avail memory' /var/run/dmesg.boot 2>/dev/null)" || return
