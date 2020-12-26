@@ -5859,6 +5859,7 @@ _p9k_dump_instant_prompt() {
     typeset -gi __p9k_instant_prompt_sourced='$__p9k_instant_prompt_version'
     return 1
   fi
+  local _p9k__ipe
   local P9K_PROMPT=instant
   if [[ -z $P9K_TTY || $P9K_TTY == old && -n ${_P9K_TTY:#$TTY} ]]; then'
       if (( _POWERLEVEL9K_NEW_TTY_MAX_AGE_SECONDS < 0 )); then
@@ -7882,6 +7883,23 @@ _p9k_init_prompt() {
     _p9k_prompt_prefix_left+='${_p9k_t[${_p9k__empty_line_i:-'$#_p9k_t'}]}'
   fi
 
+  local -i num_lines=$#_p9k_line_segments_left
+  if (( $+terminfo[cuu1] )); then
+    _p9k_escape $terminfo[cuu1]
+    if (( __p9k_ksh_arrays )); then
+      local scroll=$'${_p9k_t[${_p9k__ruler_i:-1}-1]:+\n'$_p9k__ret'}'
+    else
+      local scroll=$'${_p9k_t[${_p9k__ruler_i:-1}]:+\n'$_p9k__ret'}'
+    fi
+    if (( num_lines > 1 )); then
+      local -i line_index=
+      for line_index in {1..$((num_lines-1))}; do
+        scroll='${_p9k__'$line_index-$'\n}'$scroll'${_p9k__'$line_index-$_p9k__ret'}'
+      done
+    fi
+    _p9k_prompt_prefix_left+='%{${_p9k__ipe-'$scroll'}%}'
+  fi
+
   _p9k_get_icon '' RULER_CHAR
   local ruler_char=$_p9k__ret
   _p9k_prompt_length $ruler_char
@@ -7958,7 +7976,7 @@ _p9k_must_init() {
     [[ $sig == $_p9k__param_sig ]] && return 1
     _p9k_deinit
   fi
-  _p9k__param_pat=$'v113\1'${(q)ZSH_VERSION}$'\1'${(q)ZSH_PATCHLEVEL}$'\1'
+  _p9k__param_pat=$'v114\1'${(q)ZSH_VERSION}$'\1'${(q)ZSH_PATCHLEVEL}$'\1'
   _p9k__param_pat+=$'${#parameters[(I)POWERLEVEL9K_*]}\1${(%):-%n%#}\1$GITSTATUS_LOG_LEVEL\1'
   _p9k__param_pat+=$'$GITSTATUS_ENABLE_LOGGING\1$GITSTATUS_DAEMON\1$GITSTATUS_NUM_THREADS\1'
   _p9k__param_pat+=$'$GITSTATUS_CACHE_DIR\1$GITSTATUS_AUTO_INSTALL\1${ZLE_RPROMPT_INDENT:-1}\1'
