@@ -76,6 +76,8 @@ applications on your system. Configure your terminal to use this font:
    font_family MesloLGS NF
    ```
    Restart Kitty by closing all sessions and opening a new session.
+ - **MobaXterm**: Settings → Configuration → Terminal → (Under "Terminal look and feel") change *Font* to MesloLGS NF.
+    (for existing sessions) Right click on session → Edit session → (Under "Terminal Settings" tab) click on *Terminal font settings* → Change font to MesloLGS NF.
 
 **IMPORTANT:** Run `p10k configure` after changing terminal font. The old `~/.p10k.zsh` may work
 incorrectly with the new font.
