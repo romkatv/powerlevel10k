@@ -568,6 +568,8 @@ applications on your system. Configure your terminal to use this font:
   Exit the Preferences dialog by clicking *Close*.
 - **MobaXterm**: Open *Settings* → *Configuration* → *Terminal* → (Under *Terminal look and feel*)
   and change *Font* to `MesloLGS NF`.
+- **WSLtty**: Right click on an open terminal and then on *Options*. In the *Text* section, under
+  *Font*, click *"Select..."* and set Font to `MesloLGS NF Regular`.
 - **Alacritty**: Create or open `~/.config/alacritty/alacritty.yml` and add the following section
   to it:
   ```yaml
@@ -580,7 +582,6 @@ applications on your system. Configure your terminal to use this font:
    font_family MesloLGS NF
    ```
    Restart Kitty by closing all sessions and opening a new session.
-- **WSLtty**: Right Click on an open terminal and open *Options*. In the *Text* section, under *Font*, click *"Select..."* and set Font to `MesloLGS NF Regular`.
 
 **IMPORTANT:** Run `p10k configure` after changing terminal font. The old `~/.p10k.zsh` may work
 incorrectly with the new font.
