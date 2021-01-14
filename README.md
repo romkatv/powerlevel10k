@@ -348,7 +348,7 @@ Powerlevel10k.
 
 ```zsh
 git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ~/powerlevel10k
-echo 'source ~/powerlevel10k/powerlevel10k.zsh-theme' >>~/.zshrc
+echo 'source ~/powerlevel10k/powerlevel10k.zsh-theme' >> ~/.zshrc
 ```
 
 Users in mainland China can use the official mirror on gitee.com for faster download.<br>
@@ -356,7 +356,7 @@ Users in mainland China can use the official mirror on gitee.com for faster down
 
 ```zsh
 git clone --depth=1 https://gitee.com/romkatv/powerlevel10k.git ~/powerlevel10k
-echo 'source ~/powerlevel10k/powerlevel10k.zsh-theme' >>~/.zshrc
+echo 'source ~/powerlevel10k/powerlevel10k.zsh-theme' >> ~/.zshrc
 ```
 
 This is the simplest kind of installation and it works even if you are using a plugin manager. Just
@@ -428,7 +428,7 @@ echo "source $(brew --prefix)/opt/powerlevel10k/powerlevel10k.zsh-theme" >> ~/.z
 
 ```zsh
 yay -S --noconfirm zsh-theme-powerlevel10k-git
-echo 'source /usr/share/zsh-theme-powerlevel10k/powerlevel10k.zsh-theme' >>~/.zshrc
+echo 'source /usr/share/zsh-theme-powerlevel10k/powerlevel10k.zsh-theme' >> ~/.zshrc
 ```
 
 [zsh-theme-powerlevel10k-git](https://aur.archlinux.org/packages/zsh-theme-powerlevel10k-git/)
@@ -599,7 +599,7 @@ docker run -e TERM -e COLORTERM -it --rm alpine sh -uec '
   apk update
   apk add git zsh nano vim
   git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ~/powerlevel10k
-  echo "source ~/powerlevel10k/powerlevel10k.zsh-theme" >>~/.zshrc
+  echo "source ~/powerlevel10k/powerlevel10k.zsh-theme" >> ~/.zshrc
   cd ~/powerlevel10k
   exec zsh'
 ```
@@ -703,7 +703,7 @@ The command to update Powerlevel10k depends on how it was installed.
 4. Add `source ~/powerlevel10k/powerlevel10k.zsh-theme` to `~/.zshrc` on the machine without
    Internet access:
    ```zsh
-   echo 'source ~/powerlevel10k/powerlevel10k.zsh-theme' >>~/.zshrc
+   echo 'source ~/powerlevel10k/powerlevel10k.zsh-theme' >> ~/.zshrc
    ```
 5. If `~/.zshrc` on the machine without Internet access sets `ZSH_THEME`, remove that line.
    ```zsh
@@ -1539,7 +1539,7 @@ theme (so that you end up with no theme) and then installing Powerlevel10k manua
 
 ```zsh
 git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ~/powerlevel10k
-echo 'source ~/powerlevel10k/powerlevel10k.zsh-theme' >>~/.zshrc
+echo 'source ~/powerlevel10k/powerlevel10k.zsh-theme' >> ~/.zshrc
 ```
 
 This method of installation won't make anything slower or otherwise sub-par.
