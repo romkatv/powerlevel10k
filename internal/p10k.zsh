@@ -6710,6 +6710,10 @@ _p9k_trapint() {
   return 0
 }
 
+_p9k_return_130() {
+  return 130
+}
+
 _p9k_precmd() {
   __p9k_new_status=$?
   __p9k_new_pipestatus=($pipestatus)
@@ -6726,7 +6730,8 @@ _p9k_precmd() {
   setopt no_local_options no_prompt_bang prompt_percent prompt_subst prompt_cr prompt_sp
 
   # See https://www.zsh.org/mla/workers/2020/msg00612.html for the reason behind __p9k_trapint.
-  typeset -g __p9k_trapint='_p9k_trapint; return 130'
+  [[ -v trapint_functions ]] || typeset -ga trapint_functions=( _p9k_trapint _p9k_return_130 )
+  typeset -g __p9k_trapint="${(j.; .)trapint_functions}"
   trap "$__p9k_trapint" INT
 
   : ${(%):-%b%k%s%u}
