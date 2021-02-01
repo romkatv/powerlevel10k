@@ -376,7 +376,11 @@ Users in mainland China can use the official mirror on gitee.com for faster down
 git clone --depth=1 https://gitee.com/romkatv/powerlevel10k.git ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k
 ```
 
-Set `ZSH_THEME="powerlevel10k/powerlevel10k"` in `~/.zshrc`.
+Set `ZSH_THEME="powerlevel10k/powerlevel10k"` in `~/.zshrc` by running the following command:
+
+```zsh
+sed -i 's/ZSH_THEME=.*/ZSH_THEME="powerlevel10k\/powerlevel10k"/g' ~/.zshrc
+```
 
 ### Prezto
 
