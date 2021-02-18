@@ -183,8 +183,8 @@ Here's the relevant parameter for kubernetes context:
 
 ```zsh
 # Show prompt segment "kubecontext" only when the command you are typing
-# invokes kubectl, helm, kubens, kubectx, oc, istioctl, kogito, k9s or helmfile.
-typeset -g POWERLEVEL9K_KUBECONTEXT_SHOW_ON_COMMAND='kubectl|helm|kubens|kubectx|oc|istioctl|kogito|k9s|helmfile'
+# invokes kubectl, helm, kubens, kubectx, oc, istioctl, kogito, k9s, helmfile, fluxctl or stern.
+typeset -g POWERLEVEL9K_KUBECONTEXT_SHOW_ON_COMMAND='kubectl|helm|kubens|kubectx|oc|istioctl|kogito|k9s|helmfile|fluxctl|stern'
 ```
 
 To customize when different prompt segments are shown, open `~/.p10k.zsh`, search for
@@ -990,8 +990,8 @@ a relevant tool.
 
 ```zsh
 # Show prompt segment "kubecontext" only when the command you are typing
-# invokes kubectl, helm, kubens, kubectx, oc, istioctl, kogito, k9s or helmfile.
-typeset -g POWERLEVEL9K_KUBECONTEXT_SHOW_ON_COMMAND='kubectl|helm|kubens|kubectx|oc|istioctl|kogito|k9s|helmfile'
+# invokes kubectl, helm, kubens, kubectx, oc, istioctl, kogito, k9s, helmfile, fluxctl or stern.
+typeset -g POWERLEVEL9K_KUBECONTEXT_SHOW_ON_COMMAND='kubectl|helm|kubens|kubectx|oc|istioctl|kogito|k9s|helmfile|fluxctl|stern'
 ```
 
 Configs created by `p10k configure` may contain parameters of this kind. To customize when different
@@ -1007,7 +1007,7 @@ function kube-toggle() {
   if (( ${+POWERLEVEL9K_KUBECONTEXT_SHOW_ON_COMMAND} )); then
     unset POWERLEVEL9K_KUBECONTEXT_SHOW_ON_COMMAND
   else
-    POWERLEVEL9K_KUBECONTEXT_SHOW_ON_COMMAND='kubectl|helm|kubens|kubectx|oc|istioctl|kogito|k9s|helmfile'
+    POWERLEVEL9K_KUBECONTEXT_SHOW_ON_COMMAND='kubectl|helm|kubens|kubectx|oc|istioctl|kogito|k9s|helmfile|fluxctl|stern'
   fi
   p10k reload
   if zle; then
