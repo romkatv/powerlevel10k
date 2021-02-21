@@ -4459,8 +4459,15 @@ prompt_azure() {
     fi
     _p9k_cache_stat_set "$name"
   fi
+  local pat class
+  for pat class in "${_POWERLEVEL9K_AZURE_CLASSES[@]}"; do
+    if [[ $name == ${~pat} ]]; then
+      [[ -n $class ]] && state=_${${(U)class}//İ/I}
+      break
+    fi
+  done
   [[ -n $_p9k__cache_val[1] ]] || return
-  _p9k_prompt_segment "$0" "blue" "white" "AZURE_ICON" 0 '' "${_p9k__cache_val[1]//\%/%%}"
+  _p9k_prompt_segment "$0$state" "blue" "white" "AZURE_ICON" 0 '' "${_p9k__cache_val[1]//\%/%%}"
 }
 
 _p9k_prompt_azure_init() {
@@ -7312,6 +7319,7 @@ _p9k_init_params() {
   #   POWERLEVEL9K_KUBECONTEXT_OTHER_BACKGROUND=yellow
   _p9k_declare -a POWERLEVEL9K_KUBECONTEXT_CLASSES --
   _p9k_declare -a POWERLEVEL9K_AWS_CLASSES --
+  _p9k_declare -a POWERLEVEL9K_AZURE_CLASSES --
   _p9k_declare -a POWERLEVEL9K_TERRAFORM_CLASSES --
   _p9k_declare -b POWERLEVEL9K_TERRAFORM_SHOW_DEFAULT 0
   _p9k_declare -a POWERLEVEL9K_GOOGLE_APP_CRED_CLASSES -- 'service_account:*' SERVICE_ACCOUNT
