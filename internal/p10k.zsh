@@ -1268,6 +1268,9 @@ _p9k_prompt_battery_init() {
     _p9k__async_segments_compute+='_p9k_worker_invoke battery _p9k_prompt_battery_compute'
     return
   fi
+  if [[ -x `which termux-battery-status` ]] && [[ -x `which jq` ]]; then
+    return
+  fi
   if [[ $_p9k_os != (Linux|Android) ||
         -z /sys/class/power_supply/(CMB*|BAT*|battery)/(energy_full|charge_full|charge_counter)(#qN) ]]; then
     typeset -g "_p9k__segment_cond_${_p9k__prompt_side}[_p9k__segment_index]"='${:-}'
@@ -1328,52 +1331,69 @@ _p9k_prompt_battery_set_args() {
     Linux|Android)
       # See https://sourceforge.net/projects/acpiclient.
       local -a bats=( /sys/class/power_supply/(CMB*|BAT*|battery)/(FN) )
-      (( $#bats )) || return
+      if (( $#bats )); then
+        local -i energy_now energy_full power_now
+        local -i is_full=1 is_calculating is_charching
+        local dir
+        for dir in $bats; do
+          local -i pow=0 full=0
+          if _p9k_read_file $dir/(energy_full|charge_full|charge_counter)(N); then
+            (( energy_full += ${full::=_p9k__ret} ))
+          fi
+          if _p9k_read_file $dir/(power|current)_now(N) && (( $#_p9k__ret < 9 )); then
+            (( power_now += ${pow::=$_p9k__ret} ))
+          fi
+          if _p9k_read_file $dir/(energy|charge)_now(N); then
+            (( energy_now += _p9k__ret ))
+          elif _p9k_read_file $dir/capacity(N); then
+            (( energy_now += _p9k__ret * full / 100. + 0.5 ))
+          fi
+          _p9k_read_file $dir/status(N) && local bat_status=$_p9k__ret || continue
+          [[ $bat_status != Full                                ]] && is_full=0
+          [[ $bat_status == Charging                            ]] && is_charching=1
+          [[ $bat_status == (Charging|Discharging) && $pow == 0 ]] && is_calculating=1
+        done
 
-      local -i energy_now energy_full power_now
-      local -i is_full=1 is_calculating is_charching
-      local dir
-      for dir in $bats; do
-        local -i pow=0 full=0
-        if _p9k_read_file $dir/(energy_full|charge_full|charge_counter)(N); then
-          (( energy_full += ${full::=_p9k__ret} ))
-        fi
-        if _p9k_read_file $dir/(power|current)_now(N) && (( $#_p9k__ret < 9 )); then
-          (( power_now += ${pow::=$_p9k__ret} ))
-        fi
-        if _p9k_read_file $dir/(energy|charge)_now(N); then
-          (( energy_now += _p9k__ret ))
-        elif _p9k_read_file $dir/capacity(N); then
-          (( energy_now += _p9k__ret * full / 100. + 0.5 ))
-        fi
-        _p9k_read_file $dir/status(N) && local bat_status=$_p9k__ret || continue
-        [[ $bat_status != Full                                ]] && is_full=0
-        [[ $bat_status == Charging                            ]] && is_charching=1
-        [[ $bat_status == (Charging|Discharging) && $pow == 0 ]] && is_calculating=1
-      done
+        (( energy_full )) || return
 
-      (( energy_full )) || return
+        bat_percent=$(( 100. * energy_now / energy_full + 0.5 ))
+        (( bat_percent > 100 )) && bat_percent=100
 
-      bat_percent=$(( 100. * energy_now / energy_full + 0.5 ))
-      (( bat_percent > 100 )) && bat_percent=100
-
-      if (( is_full || (bat_percent == 100 && is_charching) )); then
-        state=CHARGED
-      else
-        if (( is_charching )); then
-          state=CHARGING
-        elif (( bat_percent < _POWERLEVEL9K_BATTERY_LOW_THRESHOLD )); then
-          state=LOW
+        if (( is_full || (bat_percent == 100 && is_charching) )); then
+          state=CHARGED
         else
-          state=DISCONNECTED
+          if (( is_charching )); then
+            state=CHARGING
+          elif (( bat_percent < _POWERLEVEL9K_BATTERY_LOW_THRESHOLD )); then
+            state=LOW
+          else
+            state=DISCONNECTED
+          fi
+
+          if (( power_now > 0 )); then
+            (( is_charching )) && local -i e=$((energy_full - energy_now)) || local -i e=energy_now
+            local -i minutes=$(( 60 * e / power_now ))
+            (( minutes > 0 )) && remain=$((minutes/60)):${(l#2##0#)$((minutes%60))}
+          elif (( is_calculating )); then
+            remain="..."
+          fi
         fi
 
-        if (( power_now > 0 )); then
-          (( is_charching )) && local -i e=$((energy_full - energy_now)) || local -i e=energy_now
-          local -i minutes=$(( 60 * e / power_now ))
-          (( minutes > 0 )) && remain=$((minutes/60)):${(l#2##0#)$((minutes%60))}
-        elif (( is_calculating )); then
-          remain="..."
+      else
+        # See https://wiki.termux.com/wiki/Termux-battery-status
+        if [[ -x `which termux-battery-status` ]] && [[ -x `which jq` ]]; then
+          (( bat_percent = `termux-battery-status|jq -r .percentage` ))
+          state=`termux-battery-status|jq -r .status`
+          case $state in
+            NOT_CHARGING)
+              (( bat_percent < _POWERLEVEL9K_BATTERY_LOW_THRESHOLD )) && state=LOW || state=DISCONNECTED
+            ;;
+            CHARGING)
+              (( bat_percent == 100 )) && state=CHARGED
+            ;;
+          esac
+        else
+          return
         fi
       fi
     ;;
