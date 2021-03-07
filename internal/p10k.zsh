@@ -1341,10 +1341,10 @@ _p9k_prompt_battery_set_args() {
         if _p9k_read_file $dir/(power|current)_now(N) && (( $#_p9k__ret < 9 )); then
           (( power_now += ${pow::=$_p9k__ret} ))
         fi
-        if _p9k_read_file $dir/(energy|charge)_now(N); then
-          (( energy_now += _p9k__ret ))
-        elif _p9k_read_file $dir/capacity(N); then
+        if _p9k_read_file $dir/capacity(N); then
           (( energy_now += _p9k__ret * full / 100. + 0.5 ))
+        elif _p9k_read_file $dir/(energy|charge)_now(N); then
+          (( energy_now += _p9k__ret ))
         fi
         _p9k_read_file $dir/status(N) && local bat_status=$_p9k__ret || continue
         [[ $bat_status != Full                                ]] && is_full=0
