@@ -145,8 +145,9 @@ function _p9k_init_icons() {
         JULIA_ICON                     'jl'
         SCALA_ICON                     'scala'
         DOCKER_ICON                    '\UE7B0'
-        ONLINE_ICON                    '\UF674'
-        PAUSE_ICON                     '\UF04C'               # 
+        DOCKER_CONTAINER_ONLINE_ICON   '\UF674'
+        DOCKER_CONTAINER_PAUSE_ICON    '\UF04C'               # 
+        DOCKER_CONTAINER_EXIT_ICON     '\UF00D'
       )
     ;;
     'awesome-fontconfig')
@@ -276,8 +277,9 @@ function _p9k_init_icons() {
         JULIA_ICON                     'jl'
         SCALA_ICON                     'scala'
         DOCKER_ICON                    '\UE7B0'
-        ONLINE_ICON                    '\UF674'
-        PAUSE_ICON                     '\UF04C'               # 
+        DOCKER_CONTAINER_ONLINE_ICON   '\UF674'
+        DOCKER_CONTAINER_PAUSE_ICON    '\UF04C'               # 
+        DOCKER_CONTAINER_EXIT_ICON     '\UF00D'
       )
     ;;
     'awesome-mapped-fontconfig')
@@ -410,8 +412,9 @@ function _p9k_init_icons() {
         JULIA_ICON                     'jl'
         SCALA_ICON                     'scala'
         DOCKER_ICON                    '\UE7B0'
-        ONLINE_ICON                    '\UF674'
-        PAUSE_ICON                     '\UF04C'               # 
+        DOCKER_CONTAINER_ONLINE_ICON   '\UF674'
+        DOCKER_CONTAINER_PAUSE_ICON    '\UF04C'
+        DOCKER_CONTAINER_EXIT_ICON     '\UF00D'
       )
     ;;
     'nerdfont-complete'|'nerdfont-fontconfig')
@@ -542,8 +545,9 @@ function _p9k_init_icons() {
         JULIA_ICON                     '\uE624'               # 
         SCALA_ICON                     '\uE737'               # 
         DOCKER_ICON                    '\UE7B0'               # 
-        ONLINE_ICON                    '\UF674'               # 
-        PAUSE_ICON                     '\UF04C'               # 
+        DOCKER_CONTAINER_ONLINE_ICON   '\UF674'               # 
+        DOCKER_CONTAINER_PAUSE_ICON    '\UF04C'               # 
+        DOCKER_CONTAINER_EXIT_ICON     '\UF00D'               # 
       )
     ;;
     ascii)
@@ -671,8 +675,9 @@ function _p9k_init_icons() {
         JULIA_ICON                     'jl'
         SCALA_ICON                     'scala'
         DOCKER_ICON                    'docker'
-        ONLINE_ICON                    'o'
-        PAUSE_ICON                     '"'
+        DOCKER_CONTAINER_ONLINE_ICON   'o'
+        DOCKER_CONTAINER_PAUSE_ICON    '"'
+        DOCKER_CONTAINER_EXIT_ICON     'x'
       )
     ;;
     *)
@@ -802,8 +807,9 @@ function _p9k_init_icons() {
         JULIA_ICON                     'jl'
         SCALA_ICON                     'scala'
         DOCKER_ICON                    '\UE7B0'
-        ONLINE_ICON                    '\UF674'
-        PAUSE_ICON                     '\UF04C'               # 
+        DOCKER_CONTAINER_ONLINE_ICON   '\UF674'
+        DOCKER_CONTAINER_PAUSE_ICON    '\UF04C'               # 
+        DOCKER_CONTAINER_EXIT_ICON     '\UF00D'
       )
     ;;
   esac

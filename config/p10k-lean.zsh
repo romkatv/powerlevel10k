@@ -1140,6 +1140,8 @@
   #############[ docker: shows the whale when online, and the # running and exited containers (https://www.docker.io/) ]#############
   # typeset -g POWERLEVEL9K_DOCKER_ICON='🐳'
   # typeset -g POWERLEVEL9K_DOCKER_RUNNING_ICON=''
+  # typeset -g POWERLEVEL9K_DOCKER_RUNNING_ICON=''
+  # typeset -g POWERLEVEL9K_DOCKER_RUNNING_ICON=''
   # typeset -g POWERLEVEL9K_DOCKER_PAUSED_ICON=''
   # typeset -g POWERLEVEL9K_DOCKER_EXITED_ICON=''
 
