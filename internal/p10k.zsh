@@ -1273,6 +1273,7 @@ function _p9k_prompt_docker_init() {
 
   # Declare global variable to hold the segment content
   typeset -g _p9k__docker_segment=
+  typeset -g _p9k__docker_up=
 
   # Register this segment for async computation. Again note the pattern
   _p9k__async_segments_compute+='_p9k_worker_invoke docker _p9k_prompt_docker_compute'
