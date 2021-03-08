@@ -100,6 +100,7 @@
     # battery               # internal battery
     # wifi                  # wifi speed
     # example               # example user-defined segment (see prompt_example function below)
+    # docker                # Docker containers running and exited (https://www.docker.io)
   )
 
   # Defines character set used by powerlevel10k. It's best to let `p10k configure` set it for you.
@@ -1191,6 +1192,12 @@
       '*'         OTHER)
   typeset -g POWERLEVEL9K_TERRAFORM_OTHER_FOREGROUND=38
   # typeset -g POWERLEVEL9K_TERRAFORM_OTHER_VISUAL_IDENTIFIER_EXPANSION='⭐'
+
+  #############[ docker: shows the whale when online, and the # running and exited containers (https://www.docker.io/) ]#############
+  # typeset -g POWERLEVEL9K_DOCKER_ICON='🐳'
+  # typeset -g POWERLEVEL9K_DOCKER_RUNNING_ICON=''
+  # typeset -g POWERLEVEL9K_DOCKER_PAUSED_ICON=''
+  # typeset -g POWERLEVEL9K_DOCKER_EXITED_ICON=''
 
   #############[ kubecontext: current kubernetes context (https://kubernetes.io/) ]#############
   # Show kubecontext only when the the command you are typing invokes one of these tools.

@@ -144,6 +144,9 @@ function _p9k_init_icons() {
         PACKAGE_ICON                   'pkg'
         JULIA_ICON                     'jl'
         SCALA_ICON                     'scala'
+        DOCKER_ICON                    '\UE7B0'
+        ONLINE_ICON                    '\UF111'
+        PAUSE_ICON                     '\UF04C'               # 
       )
     ;;
     'awesome-fontconfig')
@@ -272,6 +275,9 @@ function _p9k_init_icons() {
         PACKAGE_ICON                   'pkg'
         JULIA_ICON                     'jl'
         SCALA_ICON                     'scala'
+        DOCKER_ICON                    '\UE7B0'
+        ONLINE_ICON                    '\UF111'
+        PAUSE_ICON                     '\UF04C'               # 
       )
     ;;
     'awesome-mapped-fontconfig')
@@ -403,6 +409,9 @@ function _p9k_init_icons() {
         PACKAGE_ICON                   'pkg'
         JULIA_ICON                     'jl'
         SCALA_ICON                     'scala'
+        DOCKER_ICON                    '\UE7B0'
+        ONLINE_ICON                    '\UF111'
+        PAUSE_ICON                     '\UF04C'               # 
       )
     ;;
     'nerdfont-complete'|'nerdfont-fontconfig')
@@ -532,6 +541,9 @@ function _p9k_init_icons() {
         PACKAGE_ICON                   '\uF8D6'               # 
         JULIA_ICON                     '\uE624'               # 
         SCALA_ICON                     '\uE737'               # 
+        DOCKER_ICON                    '\UE7B0'               # 
+        ONLINE_ICON                    '\UF111'               # 
+        PAUSE_ICON                     '\UF04C'               # 
       )
     ;;
     ascii)
@@ -658,6 +670,9 @@ function _p9k_init_icons() {
         PACKAGE_ICON                   'pkg'
         JULIA_ICON                     'jl'
         SCALA_ICON                     'scala'
+        DOCKER_ICON                    'docker'
+        ONLINE_ICON                    'o'
+        PAUSE_ICON                     '"'
       )
     ;;
     *)
@@ -786,6 +801,9 @@ function _p9k_init_icons() {
         PACKAGE_ICON                   'pkg'
         JULIA_ICON                     'jl'
         SCALA_ICON                     'scala'
+        DOCKER_ICON                    '\UE7B0'
+        ONLINE_ICON                    '\UF111'
+        PAUSE_ICON                     '\UF04C'               # 
       )
     ;;
   esac

@@ -1247,6 +1247,101 @@ function _p9k_fvm_new() {
   return 1
 }
 
+#####################################################################
+# Docker support - Appears if docker cli can talk to server.
+#                  Shows # running and # stopped containers.
+#
+# Also commented with instructions on how to write an async segment.
+#####################################################################
+# The main prompt_ function adds the prompt segment definitions, but
+# the data will be computed elsewhere.
+function prompt_docker() {
+  # Save the length for the last line
+  local -i len=$#_p9k__prompt _p9k__has_upglob
+
+  # Register the segments. Search for _p9k_left_prompt_segment for argument docs
+  _p9k_prompt_segment $0 NONE green DOCKER_ICON 1 '$_p9k__docker_segment' '$_p9k__docker_segment'
+
+  # Copy and paste this line; no changes needed.
+  (( _p9k__has_upglob )) || typeset -g "_p9k__segment_val_${_p9k__prompt_side}[_p9k__segment_index]"=$_p9k__prompt[len+1,-1]
+}
+
+# The _init function must be named according to the pattern seen here.
+function _p9k_prompt_docker_init() {
+  # Abort if the command isn't available.
+  (( $+commands[docker] )) || return
+
+  # Declare global variable to hold the segment content
+  typeset -g _p9k__docker_segment=
+
+  # Register this segment for async computation. Again note the pattern
+  _p9k__async_segments_compute+='_p9k_worker_invoke docker _p9k_prompt_docker_compute'
+}
+
+# Runs the workers
+function _p9k_prompt_docker_compute() {
+  (( $+commands[docker] )) || return
+
+  # Copy and paste this line. Follow the pattern and adapt for your segment name.
+  _p9k_worker_async _p9k_prompt_docker_async _p9k_prompt_docker_sync
+
+  # See the other invocations of _p9k_worker_async for examples of argument
+  # passing to the async impl. The sync impl should not take args.
+}
+
+# `_async` runs the slow processes and converts the output into variables.
+#
+# The content will then be rendered by the segment template that was previously
+# registered by the _p9k_prompt_segment in the `prompt_` function.
+#
+function _p9k_prompt_docker_async() {
+  (( $+commands[docker] )) || return
+
+  local -A container_status_counts
+  container_status_counts=(E 0 U 0 P 0)
+
+  # Minimize all use of subshells and command invocations in general.
+  # Async is not a license to be needlessly slow.
+  for line in ${(f)"$(command docker ps -a --format '{{ .Status }}' 2>/dev/null)"}; do
+    if [[ "$line" == *(Paused)* ]]; then
+      (( container_status_counts[P]++ ))
+    else
+      (( container_status_counts[${line:0:1}]++ ))
+    fi
+    _p9k__docker_up=1
+  done
+
+  _p9k__docker_segment=
+
+  _p9k_get_icon '' ONLINE_ICON
+  (( ${container_status_counts[U]} )) && \
+    _p9k__docker_segment="%F{green}${POWERLEVEL9K_DOCKER_RUNNING_ICON:-$_p9k__ret} ${container_status_counts[U]} %f"
+
+  _p9k_get_icon '' PAUSE_ICON
+  (( ${container_status_counts[P]} )) && \
+    _p9k__docker_segment+="%F{yellow}${POWERLEVEL9K_DOCKER_PAUSED_ICON:-$_p9k__ret} ${container_status_counts[P]} %f"
+
+  _p9k_get_icon '' FAIL_ICON
+  (( ${container_status_counts[E]} )) && \
+    _p9k__docker_segment+="%F{red}${POWERLEVEL9K_DOCKER_EXITED_ICON:-$_p9k__ret} ${container_status_counts[E]} %f"
+
+  # All vars that may have changed state must be sent to _p9k_print_params
+  _p9k_print_params     \
+    _p9k__docker_segment
+
+  # The function must end with a reset=value
+  echo -E - 'reset=1'
+}
+
+# Copy, paste, and rename this function.
+function _p9k_prompt_docker_sync() {
+  if [[ -n $REPLY ]]; then
+    eval $REPLY
+    _p9k_worker_reply $REPLY
+  fi
+}
+##########################################################################
+
 prompt_fvm() {
   _p9k_fvm_new || _p9k_fvm_old
 }

@@ -297,6 +297,7 @@ enable as many segments as you like. It won't slow down your prompt or Zsh start
 | `laravel_version` | [laravel php framework](https://laravel.com/) version |
 | `java_version` | [java](https://www.java.com/) version |
 | `package` | `name@version` from [package.json](https://docs.npmjs.com/files/package.json) |
+| `docker` | current number of running and exited [docker](https://docker.io/) containers |
 | `kubecontext` | current [kubernetes](https://kubernetes.io/) context |
 | `terraform` | [terraform](https://www.terraform.io) workspace |
 | `aws` | [aws profile](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-profiles.html) |
