@@ -1260,7 +1260,7 @@ function prompt_docker() {
   local -i len=$#_p9k__prompt _p9k__has_upglob
 
   # Register the segments. Search for _p9k_left_prompt_segment for argument docs
-  _p9k_prompt_segment $0 NONE green DOCKER_ICON 1 '$_p9k__docker_segment' '$_p9k__docker_segment'
+  _p9k_prompt_segment $0 NONE green DOCKER_ICON 1 '$_p9k__docker_up' '$_p9k__docker_segment'
 
   # Copy and paste this line; no changes needed.
   (( _p9k__has_upglob )) || typeset -g "_p9k__segment_val_${_p9k__prompt_side}[_p9k__segment_index]"=$_p9k__prompt[len+1,-1]
@@ -1298,11 +1298,14 @@ function _p9k_prompt_docker_async() {
   (( $+commands[docker] )) || return
 
   local -A container_status_counts
-  container_status_counts=(E 0 U 0 P 0)
+  container_status_counts=(E 0 U 0 P 0 S 0)
+
+  _p9k__docker_up=
+  _p9k__docker_segment=
 
   # Minimize all use of subshells and command invocations in general.
   # Async is not a license to be needlessly slow.
-  for line in ${(f)"$(command docker ps -a --format '{{ .Status }}' 2>/dev/null)"}; do
+  for line in ${(f)"$( docker ps -a --format 'table {{ .Status }}' 2>/dev/null)"}; do
     if [[ "$line" == *(Paused)* ]]; then
       (( container_status_counts[P]++ ))
     else
@@ -1310,8 +1313,6 @@ function _p9k_prompt_docker_async() {
     fi
     _p9k__docker_up=1
   done
-
-  _p9k__docker_segment=
 
   _p9k_get_icon '' ONLINE_ICON
   (( ${container_status_counts[U]} )) && \
@@ -1327,7 +1328,8 @@ function _p9k_prompt_docker_async() {
 
   # All vars that may have changed state must be sent to _p9k_print_params
   _p9k_print_params     \
-    _p9k__docker_segment
+    _p9k__docker_segment \
+    _p9k__docker_up
 
   # The function must end with a reset=value
   echo -E - 'reset=1'

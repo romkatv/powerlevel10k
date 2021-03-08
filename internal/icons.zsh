@@ -145,7 +145,7 @@ function _p9k_init_icons() {
         JULIA_ICON                     'jl'
         SCALA_ICON                     'scala'
         DOCKER_ICON                    '\UE7B0'
-        ONLINE_ICON                    '\UF111'
+        ONLINE_ICON                    '\UF674'
         PAUSE_ICON                     '\UF04C'               # 
       )
     ;;
@@ -276,7 +276,7 @@ function _p9k_init_icons() {
         JULIA_ICON                     'jl'
         SCALA_ICON                     'scala'
         DOCKER_ICON                    '\UE7B0'
-        ONLINE_ICON                    '\UF111'
+        ONLINE_ICON                    '\UF674'
         PAUSE_ICON                     '\UF04C'               # 
       )
     ;;
@@ -410,7 +410,7 @@ function _p9k_init_icons() {
         JULIA_ICON                     'jl'
         SCALA_ICON                     'scala'
         DOCKER_ICON                    '\UE7B0'
-        ONLINE_ICON                    '\UF111'
+        ONLINE_ICON                    '\UF674'
         PAUSE_ICON                     '\UF04C'               # 
       )
     ;;
@@ -542,7 +542,7 @@ function _p9k_init_icons() {
         JULIA_ICON                     '\uE624'               # 
         SCALA_ICON                     '\uE737'               # 
         DOCKER_ICON                    '\UE7B0'               # 
-        ONLINE_ICON                    '\UF111'               # 
+        ONLINE_ICON                    '\UF674'               # 
         PAUSE_ICON                     '\UF04C'               # 
       )
     ;;
@@ -802,7 +802,7 @@ function _p9k_init_icons() {
         JULIA_ICON                     'jl'
         SCALA_ICON                     'scala'
         DOCKER_ICON                    '\UE7B0'
-        ONLINE_ICON                    '\UF111'
+        ONLINE_ICON                    '\UF674'
         PAUSE_ICON                     '\UF04C'               # 
       )
     ;;
