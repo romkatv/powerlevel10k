@@ -1315,17 +1315,14 @@ function _p9k_prompt_docker_async() {
     _p9k__docker_up=1
   done
 
-  _p9k_get_icon '' DOCKER_CONTAINER_ONLINE_ICON
   (( ${container_status_counts[U]} )) && \
-    _p9k__docker_segment="%F{green}${POWERLEVEL9K_DOCKER_RUNNING_ICON:-$_p9k__ret} ${container_status_counts[U]} %f"
+    _p9k__docker_segment="%F{green}$(print_icon 'DOCKER_CONTAINER_ONLINE_ICON') ${container_status_counts[U]} %f"
 
-  _p9k_get_icon '' DOCKER_CONTAINER_PAUSE_ICON
   (( ${container_status_counts[P]} )) && \
-    _p9k__docker_segment+="%F{yellow}${POWERLEVEL9K_DOCKER_PAUSED_ICON:-$_p9k__ret} ${container_status_counts[P]} %f"
+    _p9k__docker_segment+="%F{yellow}$(print_icon 'DOCKER_CONTAINER_PAUSE_ICON') ${container_status_counts[P]} %f"
 
-  _p9k_get_icon '' DOCKER_CONTAINER_EXIT_ICON
   (( ${container_status_counts[E]} )) && \
-    _p9k__docker_segment+="%F{red}${POWERLEVEL9K_DOCKER_EXITED_ICON:-$_p9k__ret} ${container_status_counts[E]} %f"
+    _p9k__docker_segment+="%F{red}$(print_icon 'DOCKER_CONTAINER_EXIT_ICON') ${container_status_counts[E]} %f"
 
   # All vars that may have changed state must be sent to _p9k_print_params
   _p9k_print_params     \
