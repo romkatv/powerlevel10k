@@ -531,7 +531,17 @@ Download these four ttf files:
     https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Bold%20Italic.ttf)
 
 Double-click on each file and click "Install". This will make `MesloLGS NF` font available to all
-applications on your system. Configure your terminal to use this font:
+applications on your system. 
+
+Or install manually:
+
+```zsh
+[ -d ~/.fonts ] || mkdir ~/.fonts && cd ~/.fonts
+wget https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Regular.ttf https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Bold.ttf https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Italic.ttf https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Bold%20Italic.ttf
+fc-cache -f -v
+```
+
+Configure your terminal to use this font:
 
 - **iTerm2**: Type `p10k configure` and answer `Yes` when asked whether to install
   *Meslo Nerd Font*. Alternatively, open *iTerm2 → Preferences → Profiles → Text* and set *Font* to
