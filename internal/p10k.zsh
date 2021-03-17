@@ -5020,7 +5020,8 @@ prompt_wifi() {
 
 _p9k_prompt_wifi_init() {
   if [[ -x /System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Resources/airport ||
-        -r /proc/net/wireless && -n $commands[iw] ]]; then
+        -r /proc/net/wireless && -n $commands[iw] ||
+        -n $commands[termux-wifi-connectioninfo] && -n $commands[jq] ]]; then
     typeset -g _p9k__wifi_on=
     typeset -g P9K_WIFI_LAST_TX_RATE=
     typeset -g P9K_WIFI_SSID=
@@ -5096,6 +5097,14 @@ _p9k_prompt_wifi_async() {
         fi
       done
       [[ -n $ssid && -n $last_tx_rate ]] || return 0
+      # https://wiki.termux.com/wiki/Termux-wifi-connectioninfo
+    elif [[ -n $commands[termux-wifi-connectioninfo] && -n $commands[jq] && `termux-wifi-connectioninfo|jq -r .supplicant_state` == 'COMPLETED' ]]; then
+      on=1
+      rssi=`termux-wifi-connectioninfo|jq -r .rssi`
+      last_tx_rate=`termux-wifi-connectioninfo|jq -r .link_speed_mbps`
+      if [[ `termux-wifi-connectioninfo|jq -r .ssid_hidden` == false ]]; then
+        ssid=`termux-wifi-connectioninfo|jq -r .ssid`
+      fi
     else
       return 0
     fi
