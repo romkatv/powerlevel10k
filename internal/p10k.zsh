@@ -5064,7 +5064,7 @@ _p9k_prompt_wifi_async() {
       # wlp3s0: 0000   58.  -52.  -256        0      0      0      0     76        0
       local -a lines
       lines=(${${(f)"$(</proc/net/wireless)"}:#*\|*}) || return 0
-      (( $#lines == 1 )) || return 0
+      (( $#lines >= 1 )) || return 0
       local parts=(${=lines[1]})
       iface=${parts[1]%:}
       state=${parts[2]}
