@@ -582,6 +582,15 @@ applications on your system. Configure your terminal to use this font:
    font_family MesloLGS NF
    ```
    Restart Kitty by closing all sessions and opening a new session.
+- **WezTerm**: Create or open `$HOME/.config/wezterm/wezterm.lua` and add the following:
+  ```lua
+  local wezterm = require 'wezterm';
+  return {
+      font = wezterm.font("MesloLGS NF"),
+  }
+  ```
+  If the file already exists, only add the line with the font to the existing return. 
+  Also add the first line if it is not already present.
 
 **IMPORTANT:** Run `p10k configure` after changing terminal font. The old `~/.p10k.zsh` may work
 incorrectly with the new font.
