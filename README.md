@@ -591,6 +591,12 @@ applications on your system. Configure your terminal to use this font:
   ```
   If the file already exists, only add the line with the font to the existing return. 
   Also add the first line if it is not already present.
+- **urxvt**: Create or open `~/.Xresources` and add the following line to it:
+   ```text
+   URxvt.font: xft:MesloLGS NF:size=11
+   ```
+  You can adjust the font size to your preference. After changing the configuration use `xrdb ~/.Xresources` to reload the config. 
+  The new config is applied for all new terminals.
 
 **IMPORTANT:** Run `p10k configure` after changing terminal font. The old `~/.p10k.zsh` may work
 incorrectly with the new font.
