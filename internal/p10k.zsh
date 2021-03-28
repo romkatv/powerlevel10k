@@ -1768,9 +1768,12 @@ prompt_dir() {
       fi
     ;;
     truncate_to_last)
-      if [[ $#parts -gt 2 || $p[1] != / && $#parts -gt 1 ]]; then
+      shortenlen=${_POWERLEVEL9K_SHORTEN_DIR_LENGTH:-1}
+      (( shortenlen > 0 )) || shortenlen=1
+      local -i i='shortenlen+1'
+      if [[ $#parts -gt i || $p[1] != / && $#parts -gt shortenlen ]]; then
         fake_first=1
-        parts[1,-2]=()
+        parts[1,-i]=()
       fi
     ;;
     truncate_to_first_and_last)
