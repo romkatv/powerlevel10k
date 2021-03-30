@@ -4498,7 +4498,7 @@ _p9k_gcloud_prefetch() {
   P9K_GCLOUD_CONFIGURATION=$_p9k__ret
   if ! _p9k_cache_stat_get $0 ~/.config/gcloud/configurations/config_$P9K_GCLOUD_CONFIGURATION; then
     local pair account project_id
-    pair="$(gcloud config configurations describe $P9K_GCLOUD_CONFIGURATION \
+    pair="$(gcloud config configurations list $P9K_GCLOUD_CONFIGURATION \
       --format=$'value[separator="\1"](properties.core.account,properties.core.project)' \
       --filter=is_active:true)"
     (( ! $? )) && IFS=$'\1' read account project_id <<<$pair
