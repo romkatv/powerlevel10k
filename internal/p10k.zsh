@@ -4506,9 +4506,6 @@ _p9k_gcloud_prefetch() {
     local pair account project_id
     pair="$(gcloud config configurations list --configuration $P9K_GCLOUD_CONFIGURATION \
       --format=$'value[separator="\1"](properties.core.account,properties.core.project)' \
-      --filter=is_active:true 2>/dev/null)"
-    (( $? )) && pair="$(gcloud config configurations list $P9K_GCLOUD_CONFIGURATION \
-      --format=$'value[separator="\1"](properties.core.account,properties.core.project)' \
       --filter=is_active:true)"
     (( ! $? )) && IFS=$'\1' read account project_id <<<$pair
     _p9k_cache_stat_set "$account" "$project_id"
