@@ -807,8 +807,6 @@
   ######################################[ load: CPU load ]######################################
   # Show average CPU load over this many last minutes. Valid values are 1, 5 and 15.
   typeset -g POWERLEVEL9K_LOAD_WHICH=5
-  # don't show load below this threshold percentage
-  typeset -g POWERLEVEL9K_LOAD_THRESHOLD=40
   # Load color when load is under 50%.
   typeset -g POWERLEVEL9K_LOAD_NORMAL_FOREGROUND=0
   typeset -g POWERLEVEL9K_LOAD_NORMAL_BACKGROUND=2
