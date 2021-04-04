@@ -2239,6 +2239,9 @@ prompt_load() {
   _p9k_read_file /proc/loadavg || return
   local load=${${(A)=_p9k__ret}[_POWERLEVEL9K_LOAD_WHICH]//,/.}
   local -F pct='100. * load / _p9k_num_cpus'
+  if (( pct < _POWERLEVEL9K_LOAD_THRESHOLD )); then
+    return
+  fi
   if (( pct > 70 )); then
     _p9k_prompt_segment $0_CRITICAL red    "$_p9k_color1" LOAD_ICON 0 '' $load
   elif (( pct > 50 )); then
@@ -2274,6 +2277,9 @@ _p9k_prompt_load_async() {
   _p9k__load_warning=
   _p9k__load_critical=
   local -F pct='100. * _p9k__load_value / _p9k_num_cpus'
+  if (( pct < _POWERLEVEL9K_LOAD_THRESHOLD )); then
+    return
+  fi
   if (( pct > 70 )); then
     _p9k__load_critical=1
   elif (( pct > 50 )); then
@@ -7194,6 +7200,7 @@ _p9k_init_params() {
     15) _POWERLEVEL9K_LOAD_WHICH=3;;
     *) _POWERLEVEL9K_LOAD_WHICH=2;;
   esac
+  _p9k_declare -i POWERLEVEL9K_LOAD_THRESHOLD 0
   _p9k_declare -b POWERLEVEL9K_NODE_VERSION_PROJECT_ONLY 0
   _p9k_declare -b POWERLEVEL9K_PHP_VERSION_PROJECT_ONLY 0
   _p9k_declare -b POWERLEVEL9K_DOTNET_VERSION_PROJECT_ONLY 1
