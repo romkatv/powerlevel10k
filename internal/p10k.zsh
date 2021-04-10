@@ -2239,12 +2239,9 @@ prompt_load() {
   _p9k_read_file /proc/loadavg || return
   local load=${${(A)=_p9k__ret}[_POWERLEVEL9K_LOAD_WHICH]//,/.}
   local -F pct='100. * load / _p9k_num_cpus'
-  if (( pct < _POWERLEVEL9K_LOAD_THRESHOLD )); then
-    return
-  fi
-  if (( pct > 70 )); then
+  if (( pct > _POWERLEVEL9K_LOAD_CRITICAL_PCT )); then
     _p9k_prompt_segment $0_CRITICAL red    "$_p9k_color1" LOAD_ICON 0 '' $load
-  elif (( pct > 50 )); then
+  elif (( pct > _POWERLEVEL9K_LOAD_WARNING_PCT )); then
     _p9k_prompt_segment $0_WARNING  yellow "$_p9k_color1" LOAD_ICON 0 '' $load
   else
     _p9k_prompt_segment $0_NORMAL   green  "$_p9k_color1" LOAD_ICON 0 '' $load
@@ -2277,12 +2274,9 @@ _p9k_prompt_load_async() {
   _p9k__load_warning=
   _p9k__load_critical=
   local -F pct='100. * _p9k__load_value / _p9k_num_cpus'
-  if (( pct < _POWERLEVEL9K_LOAD_THRESHOLD )); then
-    return
-  fi
-  if (( pct > 70 )); then
+  if (( pct > _POWERLEVEL9K_LOAD_CRITICAL_PCT )); then
     _p9k__load_critical=1
-  elif (( pct > 50 )); then
+  elif (( pct > _POWERLEVEL9K_LOAD_WARNING_PCT )); then
     _p9k__load_warning=1
   else
     _p9k__load_normal=1
@@ -7199,7 +7193,8 @@ _p9k_init_params() {
     15) _POWERLEVEL9K_LOAD_WHICH=3;;
     *) _POWERLEVEL9K_LOAD_WHICH=2;;
   esac
-  _p9k_declare -i POWERLEVEL9K_LOAD_THRESHOLD 0
+  _p9k_declare -F POWERLEVEL9K_LOAD_WARNING_PCT 50
+  _p9k_declare -F POWERLEVEL9K_LOAD_CRITICAL_PCT 70
   _p9k_declare -b POWERLEVEL9K_NODE_VERSION_PROJECT_ONLY 0
   _p9k_declare -b POWERLEVEL9K_PHP_VERSION_PROJECT_ONLY 0
   _p9k_declare -b POWERLEVEL9K_DOTNET_VERSION_PROJECT_ONLY 1
@@ -8000,7 +7995,7 @@ _p9k_must_init() {
     [[ $sig == $_p9k__param_sig ]] && return 1
     _p9k_deinit
   fi
-  _p9k__param_pat=$'v115\1'${(q)ZSH_VERSION}$'\1'${(q)ZSH_PATCHLEVEL}$'\1'
+  _p9k__param_pat=$'v116\1'${(q)ZSH_VERSION}$'\1'${(q)ZSH_PATCHLEVEL}$'\1'
   _p9k__param_pat+=$'${#parameters[(I)POWERLEVEL9K_*]}\1${(%):-%n%#}\1$GITSTATUS_LOG_LEVEL\1'
   _p9k__param_pat+=$'$GITSTATUS_ENABLE_LOGGING\1$GITSTATUS_DAEMON\1$GITSTATUS_NUM_THREADS\1'
   _p9k__param_pat+=$'$GITSTATUS_CACHE_DIR\1$GITSTATUS_AUTO_INSTALL\1${ZLE_RPROMPT_INDENT:-1}\1'
