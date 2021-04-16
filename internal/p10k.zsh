@@ -4388,7 +4388,7 @@ prompt_kubecontext() {
         fi
       done
     fi
-    _p9k_cache_stat_set "$name" "$namespace" "$cluster" "$user" "$cloud_name" "$cloud_account" "$cloud_zone" "$cloud_cluster" "$text" "$state"
+    _p9k_cache_stat_set "${(g::)name}" "${(g::)namespace}" "${(g::)cluster}" "${(g::)user}" "${(g::)cloud_name}" "${(g::)cloud_account}" "${(g::)cloud_zone}" "${(g::)cloud_cluster}" "${(g::)text}" "$state"
   fi
 
   typeset -g P9K_KUBECONTEXT_NAME=$_p9k__cache_val[1]
