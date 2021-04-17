@@ -66,7 +66,7 @@ applications on your system. Configure your terminal to use this font:
   Exit the Preferences dialog by clicking *Close*.
 - **MobaXterm**: Open *Settings* → *Configuration* → *Terminal* → (Under *Terminal look and feel*)
   and change *Font* to `MesloLGS NF`.
-- **Asbrù Connection Manager**: Open *Preferences* → *Local Shell Options* → *Look and Feel* → Enable *Use these personal options* and change *Font:* (Under *Terminal UI*) to `MesloLGS NF Regular`.
+- **Asbrú Connection Manager**: Open *Preferences* → *Local Shell Options* → *Look and Feel* → Enable *Use these personal options* and change *Font:* (Under *Terminal UI*) to `MesloLGS NF Regular`.
     
     If you want to change the font for the remote host connections, go to *Preferences* → *Terminal Options* → *Look and Feel* and change *Font:* (Under *Terminal UI*) to `MesloLGS NF Regular`.
 - **WSLtty**: Right click on an open terminal and then on *Options*. In the *Text* section, under
@@ -83,7 +83,6 @@ applications on your system. Configure your terminal to use this font:
    font_family MesloLGS NF
    ```
    Restart Kitty by closing all sessions and opening a new session.
- 
  
 **IMPORTANT:** Run `p10k configure` after changing terminal font. The old `~/.p10k.zsh` may work
 incorrectly with the new font.
