@@ -4908,7 +4908,7 @@ function _p9k_taskwarrior_init_meta() {
   local last_sig=$_p9k_taskwarrior_meta_sig
   {
     local cfg
-    cfg="$(command task show data.location rc.color=0 </dev/null 2>/dev/null)" || return
+    cfg="$(command task show data.location rc.color=0 rc._forcecolor=0 </dev/null 2>/dev/null)" || return
     local lines=(${(@M)${(f)cfg}:#data.location[[:space:]]##[^[:space:]]*})
     (( $#lines == 1 )) || return
     local dir=${lines[1]##data.location[[:space:]]#}
@@ -4964,7 +4964,7 @@ function _p9k_taskwarrior_init_data() {
 
   local name val
   for name in PENDING OVERDUE; do
-    val="$(command task +$name count rc.color=0 </dev/null 2>/dev/null)" || continue
+    val="$(command task +$name count rc.color=0 rc._forcecolor=0 </dev/null 2>/dev/null)" || continue
     [[ $val == <1-> ]] || continue
     _p9k_taskwarrior_counters[$name]=$val
   done
@@ -4973,7 +4973,7 @@ function _p9k_taskwarrior_init_data() {
 
   if (( _p9k_taskwarrior_counters[PENDING] > _p9k_taskwarrior_counters[OVERDUE] )); then
     local -a ts
-    ts=($(command task +PENDING -OVERDUE list rc.verbose=nothing rc.color=0 \
+    ts=($(command task +PENDING -OVERDUE list rc.verbose=nothing rc.color=0 rc._forcecolor=0 \
       rc.report.list.labels= rc.report.list.columns=due.epoch </dev/null 2>/dev/null)) || ts=()
     if (( $#ts )); then
       _p9k_taskwarrior_next_due=${${(on)ts}[1]}
@@ -7995,7 +7995,7 @@ _p9k_must_init() {
     [[ $sig == $_p9k__param_sig ]] && return 1
     _p9k_deinit
   fi
-  _p9k__param_pat=$'v119\1'${(q)ZSH_VERSION}$'\1'${(q)ZSH_PATCHLEVEL}$'\1'
+  _p9k__param_pat=$'v120\1'${(q)ZSH_VERSION}$'\1'${(q)ZSH_PATCHLEVEL}$'\1'
   _p9k__param_pat+=$'${#parameters[(I)POWERLEVEL9K_*]}\1${(%):-%n%#}\1$GITSTATUS_LOG_LEVEL\1'
   _p9k__param_pat+=$'$GITSTATUS_ENABLE_LOGGING\1$GITSTATUS_DAEMON\1$GITSTATUS_NUM_THREADS\1'
   _p9k__param_pat+=$'$GITSTATUS_CACHE_DIR\1$GITSTATUS_AUTO_INSTALL\1${ZLE_RPROMPT_INDENT:-1}\1'
