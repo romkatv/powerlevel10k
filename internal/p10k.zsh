@@ -2119,15 +2119,8 @@ prompt_dir() {
 
     local content="${(pj.$sep.)parts}"
     if (( _POWERLEVEL9K_DIR_HYPERLINK && _p9k_term_has_href )) && [[ $_p9k__cwd == /* ]]; then
-      local header=$'%{\e]8;;file://'${${_p9k__cwd//\%/%%25}//'#'/%%23}$'\a%}'
-      local footer=$'%{\e]8;;\a%}'
-      if (( expand )); then
-        _p9k_escape $header
-        header=$_p9k__ret
-        _p9k_escape $footer
-        footer=$_p9k__ret
-      fi
-      content=$header$content$footer
+      _p9k_href $'file://'${${_p9k__cwd//\%/%%25}//'#'/%%23} $content $expand
+      content=$_p9k__ret
     fi
 
     (( expand )) && _p9k_prompt_length "${(e):-"\${\${_p9k__d::=0}+}$content"}" || _p9k__ret=
@@ -2384,6 +2377,26 @@ _p9k_prompt_load_async() {
 _p9k_prompt_load_sync() {
   eval $REPLY
   _p9k_worker_reply $REPLY
+}
+
+function _p9k_href() {
+  local link=${${1//\%/%%25}//'#'/%%23}
+  local content=${2:-$1}
+  local expand=$3
+
+  local header=$'%{\e]8;;'${link}$'\a%}'
+  local footer=$'%{\e]8;;\a%}'
+
+  if (( _p9k_term_has_href )) ; then
+    if (( expand )); then
+      _p9k_escape $header
+      header=$_p9k__ret
+      _p9k_escape $footer
+      footer=$_p9k__ret
+    fi
+    content=$header$content$footer
+  fi
+  _p9k__ret=$content
 }
 
 # Usage: _p9k_cached_cmd <0|1> <cmd> [args...]
@@ -6430,11 +6443,8 @@ function _p9k_clear_instant_prompt() {
           echo -E - "${(%):-    * Zsh will start %Bquickly%b but prompt will %Bjump down%b after initialization.}"
           echo -E - ""
           echo -E - "${(%):-For details, see:}"
-          if (( _p9k_term_has_href )); then
-            echo    - "${(%):-\e]8;;https://github.com/romkatv/powerlevel10k/blob/master/README.md#instant-prompt\ahttps://github.com/romkatv/powerlevel10k/blob/master/README.md#instant-prompt\e]8;;\a}"
-          else
-            echo    - "${(%):-https://github.com/romkatv/powerlevel10k/blob/master/README.md#instant-prompt}"
-          fi
+          _p9k_href 'https://github.com/romkatv/powerlevel10k/blob/master/README.md#instant-prompt'
+          echo -E - "$_p9k__ret"
           echo -E - ""
           echo    - "${(%):-%3F-- console output produced during zsh initialization follows --%f}"
           echo -E - ""
