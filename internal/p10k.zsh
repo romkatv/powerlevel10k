@@ -600,7 +600,7 @@ _p9k_escape() {
 #       the segment isn't rendered.
 # * $7: Content.
 _p9k_left_prompt_segment() {
-  if ! _p9k_cache_get "$0" "$1" "$2" "$3" "$4" "$_p9k__segment_index"; then
+  if _p9k_cache_get "$0" "$1" "$2" "$3" "$4" "$_p9k__segment_index"; then
     _p9k_color $1 BACKGROUND $2
     local bg_color=$_p9k__ret
     _p9k_background $bg_color
@@ -637,7 +637,7 @@ _p9k_left_prompt_segment() {
     _p9k_get_icon $1 LEFT_PROMPT_LAST_SEGMENT_END_SYMBOL $sep
     _p9k_escape $_p9k__ret
     local end_sep_=$_p9k__ret
-    if [[ $bg_color -eq 0 ]];then
+    if [[ -z $bg_color ]];then
       end_sep_=''
     fi
 
@@ -871,7 +871,7 @@ _p9k_right_prompt_segment() {
 
     _p9k_get_icon $1 RIGHT_PROMPT_FIRST_SEGMENT_START_SYMBOL $sep
     local start_sep=$_p9k__ret
-    [[ 0 -eq $bg_color ]] && start_sep=''
+    [[ -z $bg_color ]] && start_sep=''
     [[ -n $start_sep ]] && start_sep="%b%k%F{$bg_color}$start_sep"
 
     _p9k_get_icon $1 RIGHT_PROMPT_LAST_SEGMENT_END_SYMBOL
