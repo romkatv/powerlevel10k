@@ -600,7 +600,7 @@ _p9k_escape() {
 #       the segment isn't rendered.
 # * $7: Content.
 _p9k_left_prompt_segment() {
-  if _p9k_cache_get "$0" "$1" "$2" "$3" "$4" "$_p9k__segment_index"; then
+  if ! _p9k_cache_get "$0" "$1" "$2" "$3" "$4" "$_p9k__segment_index"; then
     _p9k_color $1 BACKGROUND $2
     local bg_color=$_p9k__ret
     _p9k_background $bg_color
