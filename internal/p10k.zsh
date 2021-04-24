@@ -637,6 +637,9 @@ _p9k_left_prompt_segment() {
     _p9k_get_icon $1 LEFT_PROMPT_LAST_SEGMENT_END_SYMBOL $sep
     _p9k_escape $_p9k__ret
     local end_sep_=$_p9k__ret
+    if [[ $bg_color -eq 0 ]];then
+      end_sep_=''
+    fi
 
     _p9k_get_icon $1 WHITESPACE_BETWEEN_LEFT_SEGMENTS ' '
     local space=$_p9k__ret
@@ -868,6 +871,7 @@ _p9k_right_prompt_segment() {
 
     _p9k_get_icon $1 RIGHT_PROMPT_FIRST_SEGMENT_START_SYMBOL $sep
     local start_sep=$_p9k__ret
+    [[ 0 -eq $bg_color ]] && start_sep=''
     [[ -n $start_sep ]] && start_sep="%b%k%F{$bg_color}$start_sep"
 
     _p9k_get_icon $1 RIGHT_PROMPT_LAST_SEGMENT_END_SYMBOL
@@ -1049,6 +1053,7 @@ _p9k_right_prompt_segment() {
     p+='${_p9k__sss::='
     p+=$style_$right_space_
     [[ $right_space_ == *%* ]] && p+=$style_
+    
     if [[ -n $end_sep_ ]]; then
       p+="%k%F{$bg_color\}$end_sep_$style_"
     fi
