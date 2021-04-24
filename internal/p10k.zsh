@@ -871,7 +871,9 @@ _p9k_right_prompt_segment() {
 
     _p9k_get_icon $1 RIGHT_PROMPT_FIRST_SEGMENT_START_SYMBOL $sep
     local start_sep=$_p9k__ret
-    [[ -z $bg_color ]] && start_sep=''
+    if [[ -z $bg_color ]];then
+      start_sep=''
+    fi
     [[ -n $start_sep ]] && start_sep="%b%k%F{$bg_color}$start_sep"
 
     _p9k_get_icon $1 RIGHT_PROMPT_LAST_SEGMENT_END_SYMBOL
