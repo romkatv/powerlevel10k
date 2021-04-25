@@ -637,7 +637,10 @@ _p9k_left_prompt_segment() {
     _p9k_get_icon $1 LEFT_PROMPT_LAST_SEGMENT_END_SYMBOL $sep
     _p9k_escape $_p9k__ret
     local end_sep_=$_p9k__ret
+
+    # clear sperate symbol in transparent mode 
     if [[ -z $bg_color ]];then
+      start_sep=''
       end_sep_=''
     fi
 
@@ -871,14 +874,17 @@ _p9k_right_prompt_segment() {
 
     _p9k_get_icon $1 RIGHT_PROMPT_FIRST_SEGMENT_START_SYMBOL $sep
     local start_sep=$_p9k__ret
-    if [[ -z $bg_color ]];then
-      start_sep=''
-    fi
     [[ -n $start_sep ]] && start_sep="%b%k%F{$bg_color}$start_sep"
 
     _p9k_get_icon $1 RIGHT_PROMPT_LAST_SEGMENT_END_SYMBOL
     _p9k_escape $_p9k__ret
     local end_sep_=$_p9k__ret
+
+    # clear sperate symbol in transparent mode 
+    if [[ -z $bg_color ]];then
+      start_sep=''
+      end_sep_=''
+    fi
 
     _p9k_get_icon $1 WHITESPACE_BETWEEN_RIGHT_SEGMENTS ' '
     local space=$_p9k__ret
