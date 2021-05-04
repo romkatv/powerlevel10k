@@ -269,6 +269,13 @@
   # the full directory that was used in previous commands.
   typeset -g POWERLEVEL9K_DIR_HYPERLINK=false
 
+  # If POWERLEVEL9K_DIR_HYPERLINK is true and using WSL, then set this to make the links work:
+  # You must also map this drive letter on the windows side:
+  # ```
+  # net use L: \\wsl$\Ubuntu-20.04 /persistent:yes
+  # ```
+  # typeset -g POWERLEVEL9K_WSL_NETWORK_DRIVE=L:
+
   # Enable special styling for non-writable directories. See POWERLEVEL9K_LOCK_ICON and
   # POWERLEVEL9K_DIR_CLASSES below.
   typeset -g POWERLEVEL9K_DIR_SHOW_WRITABLE=v2

@@ -2119,7 +2119,17 @@ prompt_dir() {
 
     local content="${(pj.$sep.)parts}"
     if (( _POWERLEVEL9K_DIR_HYPERLINK && _p9k_term_has_href )) && [[ $_p9k__cwd == /* ]]; then
-      _p9k_href $'file://'${${_p9k__cwd//\%/%%25}//'#'/%%23} $content $expand
+      local dirpath=${${_p9k__cwd//\%/%%25}//'#'/%%23}
+
+      if (( $+commands[wslpath] )); then
+        if [[ -n $_POWERLEVEL9K_WSL_NETWORK_DRIVE && $(wslpath -w ${_p9k__cwd}) == \\\\* ]]; then
+          dirpath=$_POWERLEVEL9K_WSL_NETWORK_DRIVE$dirpath
+        elif [[ $dirpath =~ '^(/(mnt/)*(.))/' ]]; then
+          dirpath=$match[3]:${dirpath:${#match[1]}}
+        fi
+      fi
+
+      _p9k_href $'file://'$dirpath $content $expand
       content=$_p9k__ret
     fi
 
