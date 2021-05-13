@@ -8211,6 +8211,7 @@ function _p9k_init_cacheable() {
         fi
         case $os_release_id in
           *arch*)                  _p9k_set_os Linux LINUX_ARCH_ICON;;
+          *kali*)                  _p9k_set_os Linux LINUX_KALI_ICON;;
           *debian*)                _p9k_set_os Linux LINUX_DEBIAN_ICON;;
           *raspbian*)              _p9k_set_os Linux LINUX_RASPBIAN_ICON;;
           *ubuntu*)                _p9k_set_os Linux LINUX_UBUNTU_ICON;;
