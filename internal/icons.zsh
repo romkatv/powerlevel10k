@@ -49,6 +49,7 @@ function _p9k_init_icons() {
         ANDROID_ICON                   '\uE270'$s             # 
         LINUX_ICON                     '\uE271'$s             # 
         LINUX_ARCH_ICON                '\uE271'$s             # 
+        LINUX_KALI_ICON                '\u327F'$s             # ㉿
         LINUX_DEBIAN_ICON              '\uE271'$s             # 
         LINUX_RASPBIAN_ICON            '\uE271'$s             # 
         LINUX_UBUNTU_ICON              '\uE271'$s             # 
