@@ -5468,6 +5468,8 @@ function _p9k_prompt_net_iface_init() {
   typeset -g P9K_IP_INTERFACE=
   typeset -g P9K_IP_TX_BYTES=
   typeset -g P9K_IP_RX_BYTES=
+  typeset -g P9K_IP_TX_BYTES_DELTA=
+  typeset -g P9K_IP_RX_BYTES_DELTA=
   typeset -g P9K_IP_TX_RATE=
   typeset -g P9K_IP_RX_RATE=
   typeset -g _p9__ip_timestamp=
@@ -5598,6 +5600,16 @@ function _p9k_prompt_net_iface_async() {
   _p9k__public_ip_not_vpn=$public_ip_not_vpn
   P9K_IP_IP=$ip_ip
   P9K_IP_INTERFACE=$ip_interface
+  if [[ -n $ip_tx_bytes && -n $P9K_IP_TX_BYTES ]]; then
+    P9K_IP_TX_BYTES_DELTA=$((ip_tx_bytes - P9K_IP_TX_BYTES))
+  else
+    P9K_IP_TX_BYTES_DELTA=
+  fi
+  if [[ -n $ip_rx_bytes && -n $P9K_IP_RX_BYTES ]]; then
+    P9K_IP_RX_BYTES_DELTA=$((ip_rx_bytes - P9K_IP_RX_BYTES))
+  else
+    P9K_IP_RX_BYTES_DELTA=
+  fi
   P9K_IP_TX_BYTES=$ip_tx_bytes
   P9K_IP_RX_BYTES=$ip_rx_bytes
   P9K_IP_TX_RATE=$ip_tx_rate
@@ -5611,6 +5623,8 @@ function _p9k_prompt_net_iface_async() {
     P9K_IP_INTERFACE        \
     P9K_IP_TX_BYTES         \
     P9K_IP_RX_BYTES         \
+    P9K_IP_TX_BYTES_DELTA   \
+    P9K_IP_RX_BYTES_DELTA   \
     P9K_IP_TX_RATE          \
     P9K_IP_RX_RATE          \
     _p9__ip_timestamp       \
