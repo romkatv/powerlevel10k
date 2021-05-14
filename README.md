@@ -307,6 +307,7 @@ enable as many segments as you like. It won't slow down your prompt or Zsh start
 | `nordvpn` | [nordvpn](https://nordvpn.com/) connection status |
 | `ranger` | [ranger](https://github.com/ranger/ranger) shell |
 | `nnn` | [nnn](https://github.com/jarun/nnn) shell |
+| `xplr` | [xplr](https://github.com/sayanarijit/xplr) shell |
 | `vim_shell` | [vim](https://www.vim.org/) shell (`:sh`) |
 | `midnight_commander` | [midnight commander](https://midnight-commander.org/) shell |
 | `nix_shell` | [nix shell](https://nixos.org/nixos/nix-pills/developing-with-nix-shell.html) indicator |
