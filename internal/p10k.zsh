@@ -4753,6 +4753,20 @@ function instant_prompt_nnn() {
   _p9k_prompt_segment prompt_nnn 6 $_p9k_color1 NNN_ICON 1 '${NNNLVL:#0}' '$NNNLVL'
 }
 
+function prompt_xplr() {
+  local -i len=$#_p9k__prompt _p9k__has_upglob
+  _p9k_prompt_segment $0 6 $_p9k_color1 XPLR_ICON 0 '' ''
+  (( _p9k__has_upglob )) || typeset -g "_p9k__segment_val_${_p9k__prompt_side}[_p9k__segment_index]"=$_p9k__prompt[len+1,-1]
+}
+
+_p9k_prompt_xplr_init() {
+  typeset -g "_p9k__segment_cond_${_p9k__prompt_side}[_p9k__segment_index]"='$XPLR_PID'
+}
+
+function instant_prompt_xplr() {
+  _p9k_prompt_segment prompt_xplr 6 $_p9k_color1 XPLR_ICON 0 '$XPLR_PID' ''
+}
+
 function prompt_vim_shell() {
   local -i len=$#_p9k__prompt _p9k__has_upglob
   _p9k_prompt_segment $0 green $_p9k_color1 VIM_ICON 0 '' ''
