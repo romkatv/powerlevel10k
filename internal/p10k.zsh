@@ -4754,7 +4754,9 @@ function instant_prompt_nnn() {
 }
 
 function prompt_xplr() {
-  _p9k_prompt_segment $0 6 $_p9k_color1 XPLR_ICON 0 '' $XPLR_PID
+  local -i len=$#_p9k__prompt _p9k__has_upglob
+  _p9k_prompt_segment $0 6 $_p9k_color1 XPLR_ICON 0 '' ''
+  (( _p9k__has_upglob )) || typeset -g "_p9k__segment_val_${_p9k__prompt_side}[_p9k__segment_index]"=$_p9k__prompt[len+1,-1]
 }
 
 _p9k_prompt_xplr_init() {
@@ -4762,7 +4764,7 @@ _p9k_prompt_xplr_init() {
 }
 
 function instant_prompt_xplr() {
-  _p9k_prompt_segment prompt_xplr 6 $_p9k_color1 XPLR_ICON 1 '$XPLR_PID' '$XPLR_PID'
+  _p9k_prompt_segment prompt_xplr 6 $_p9k_color1 XPLR_ICON 0 '$XPLR_PID' ''
 }
 
 function prompt_vim_shell() {
