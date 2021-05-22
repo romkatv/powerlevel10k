@@ -4154,7 +4154,7 @@ function _p9k_read_pyenv_like_version_file() {
       [[ -n $fd ]] && exec {fd}>&-
     }
     local MATCH
-    local versions=(${(@)${(f)content}/(#m)*/${MATCH[(w)1]#$2}})
+    local versions=(${${${${(f)content}/(#m)*/${MATCH[(w)1]}}##\#*}#$2})
     _p9k__ret=${(j.:.)versions}
     _p9k__read_pyenv_like_version_file_cache[$1:$2]=$stat[1]:$_p9k__ret
   fi
