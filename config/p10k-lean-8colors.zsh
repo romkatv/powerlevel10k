@@ -921,10 +921,10 @@
   #
   # The default format has the following logic:
   #
-  # 1. Display "$P9K_CONTENT $P9K_PYENV_PYTHON_VERSION" if $P9K_PYENV_PYTHON_VERSION is not
-  #   empty and unequal to $P9K_CONTENT.
-  # 2. Otherwise display just "$P9K_CONTENT".
-  typeset -g POWERLEVEL9K_PYENV_CONTENT_EXPANSION='${P9K_CONTENT}${${P9K_PYENV_PYTHON_VERSION:#$P9K_CONTENT}:+ $P9K_PYENV_PYTHON_VERSION}'
+  # 1. Display just "$P9K_CONTENT" if it's equal to "$P9K_PYENV_PYTHON_VERSION" or
+  #    starts with "$P9K_PYENV_PYTHON_VERSION/".
+  # 2. Otherwise display "$P9K_CONTENT $P9K_PYENV_PYTHON_VERSION".
+  typeset -g POWERLEVEL9K_PYENV_CONTENT_EXPANSION='${P9K_CONTENT}${${P9K_CONTENT:#$P9K_PYENV_PYTHON_VERSION(|/*)}:+ $P9K_PYENV_PYTHON_VERSION}'
 
   # Custom icon.
   # typeset -g POWERLEVEL9K_PYENV_VISUAL_IDENTIFIER_EXPANSION='⭐'
