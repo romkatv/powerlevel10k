@@ -1082,8 +1082,24 @@ function _p9k_prompt_segment() { "_p9k_${_p9k__prompt_side}_prompt_segment" "$@"
 function p9k_prompt_segment() { p10k segment "$@" }
 
 function _p9k_python_version() {
-  _p9k_cached_cmd 1 python --version || return
-  [[ $_p9k__ret == (#b)Python\ ([[:digit:].]##)* ]] && _p9k__ret=$match[1]
+  case $commands[python] in
+    "")
+      return 1
+    ;;
+    ${PYENV_ROOT:-~/.pyenv}/shims/python)
+      local P9K_PYENV_PYTHON_VERSION _p9k__pyenv_version
+      local -i _POWERLEVEL9K_PYENV_PROMPT_ALWAYS_SHOW=1 _POWERLEVEL9K_PYENV_SHOW_SYSTEM=1
+      local _POWERLEVEL9K_PYENV_SOURCES=(shell local global)
+      if _p9k_pyenv_compute && [[ $P9K_PYENV_PYTHON_VERSION == ([[:digit:].]##)* ]]; then
+        _p9k__ret=$P9K_PYENV_PYTHON_VERSION
+        return 0
+      fi
+    ;&  # fall through
+    *)
+      _p9k_cached_cmd 1 python --version || return
+      [[ $_p9k__ret == (#b)Python\ ([[:digit:].]##)* ]] && _p9k__ret=$match[1]
+    ;;
+  esac
 }
 
 ################################################################
@@ -4149,10 +4165,7 @@ function _p9k_pyenv_global_version() {
   _p9k_read_pyenv_like_version_file ${PYENV_ROOT:-$HOME/.pyenv}/version python- || _p9k__ret=system
 }
 
-################################################################
-# Segment to display pyenv information
-# https://github.com/pyenv/pyenv#choosing-the-python-version
-prompt_pyenv() {
+function _p9k_pyenv_compute() {
   unset P9K_PYENV_PYTHON_VERSION _p9k__pyenv_version
 
   local v=${(j.:.)${(@)${(s.:.)PYENV_VERSION}#python-}}
@@ -4194,11 +4207,11 @@ prompt_pyenv() {
 
   if (( !_POWERLEVEL9K_PYENV_PROMPT_ALWAYS_SHOW )); then
     _p9k_pyenv_global_version
-    [[ $v == $_p9k__ret ]] && return
+    [[ $v == $_p9k__ret ]] && return 1
   fi
 
   if (( !_POWERLEVEL9K_PYENV_SHOW_SYSTEM )); then
-    [[ $v == system ]] && return
+    [[ $v == system ]] && return 1
   fi
 
   local versions=${PYENV_ROOT:-$HOME/.pyenv}/versions
@@ -4210,8 +4223,14 @@ prompt_pyenv() {
   fi
 
   typeset -g _p9k__pyenv_version=$v
+}
 
-  _p9k_prompt_segment "$0" "blue" "$_p9k_color1" 'PYTHON_ICON' 0 '' "${v//\%/%%}"
+################################################################
+# Segment to display pyenv information
+# https://github.com/pyenv/pyenv#choosing-the-python-version
+prompt_pyenv() {
+  _p9k_pyenv_compute || return
+  _p9k_prompt_segment "$0" "blue" "$_p9k_color1" 'PYTHON_ICON' 0 '' "${_p9k__pyenv_version//\%/%%}"
 }
 
 _p9k_prompt_pyenv_init() {
@@ -8023,7 +8042,7 @@ _p9k_must_init() {
     [[ $sig == $_p9k__param_sig ]] && return 1
     _p9k_deinit
   fi
-  _p9k__param_pat=$'v120\1'${(q)ZSH_VERSION}$'\1'${(q)ZSH_PATCHLEVEL}$'\1'
+  _p9k__param_pat=$'v121\1'${(q)ZSH_VERSION}$'\1'${(q)ZSH_PATCHLEVEL}$'\1'
   _p9k__param_pat+=$'${#parameters[(I)POWERLEVEL9K_*]}\1${(%):-%n%#}\1$GITSTATUS_LOG_LEVEL\1'
   _p9k__param_pat+=$'$GITSTATUS_ENABLE_LOGGING\1$GITSTATUS_DAEMON\1$GITSTATUS_NUM_THREADS\1'
   _p9k__param_pat+=$'$GITSTATUS_CACHE_DIR\1$GITSTATUS_AUTO_INSTALL\1${ZLE_RPROMPT_INDENT:-1}\1'
