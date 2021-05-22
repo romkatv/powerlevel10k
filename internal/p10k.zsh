@@ -204,15 +204,15 @@ function _p9k_fetch_cwd() {
   _p9k__cwd_a=${${_p9k__cwd:A}:-.}
 
   case $_p9k__cwd in
-    ~|/|.)
+    /|.)
       _p9k__parent_dirs=()
       _p9k__parent_mtimes=()
       _p9k__parent_mtimes_i=()
       _p9k__parent_mtimes_s=
       return
     ;;
-    ~/*)
-      local parent=~/
+    ~|~/*)
+      local parent=${${${:-~/..}:a}%/}/
       local parts=(${(s./.)_p9k__cwd#$parent})
     ;;
     *)
@@ -255,7 +255,7 @@ function _p9k_glob() {
 #
 # Returns index within _p9k__parent_dirs or 0 if there is no match.
 #
-# Pattern cannot have slashes. Never matches in / or ~. Search stops before reaching / or ~.
+# Search stops before reaching ~/../ or / and never matches in those directories.
 #
 # Example: _p9k_upglob '*.csproj'
 function _p9k_upglob() {
@@ -8046,7 +8046,7 @@ _p9k_must_init() {
     [[ $sig == $_p9k__param_sig ]] && return 1
     _p9k_deinit
   fi
-  _p9k__param_pat=$'v121\1'${(q)ZSH_VERSION}$'\1'${(q)ZSH_PATCHLEVEL}$'\1'
+  _p9k__param_pat=$'v122\1'${(q)ZSH_VERSION}$'\1'${(q)ZSH_PATCHLEVEL}$'\1'
   _p9k__param_pat+=$'${#parameters[(I)POWERLEVEL9K_*]}\1${(%):-%n%#}\1$GITSTATUS_LOG_LEVEL\1'
   _p9k__param_pat+=$'$GITSTATUS_ENABLE_LOGGING\1$GITSTATUS_DAEMON\1$GITSTATUS_NUM_THREADS\1'
   _p9k__param_pat+=$'$GITSTATUS_CACHE_DIR\1$GITSTATUS_AUTO_INSTALL\1${ZLE_RPROMPT_INDENT:-1}\1'
