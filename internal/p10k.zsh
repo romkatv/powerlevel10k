@@ -4216,11 +4216,15 @@ function _p9k_pyenv_compute() {
 
   local versions=${PYENV_ROOT:-$HOME/.pyenv}/versions
   versions=${versions:A}
-  local version=$versions/$v
-  version=${version:A}
-  if [[ $version == (#b)$versions/([^/]##)* ]]; then
-    typeset -g P9K_PYENV_PYTHON_VERSION=$match[1]
-  fi
+  local name version
+  for name in ${(s.:.)v}; do
+    version=$versions/$name
+    version=${version:A}
+    if [[ $version(#qN/) == (#b)$versions/([^/]##)* ]]; then
+      typeset -g P9K_PYENV_PYTHON_VERSION=$match[1]
+      break
+    fi
+  done
 
   typeset -g _p9k__pyenv_version=$v
 }
