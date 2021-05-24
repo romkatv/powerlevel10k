@@ -152,7 +152,7 @@ function _p9k_parse_buffer() {
   local -r var="\$$id|\${$id}|\"\$$id\"|\"\${$id}\""
 
   local -i e ic c=${2:-'1 << 62'}
-  local skip n s r state cmd prev
+  local skip n s r state token cmd prev
   local -a aln alp alf v
 
   if [[ -o interactive_comments ]]; then
