@@ -5350,10 +5350,14 @@ function prompt_asdf() {
 
   local -A versions
   local -a stat
-  zstat -A stat +mtime ~ 2>/dev/null || return
-  local dirs=($_p9k__parent_dirs ~)
-  local mtimes=($_p9k__parent_mtimes $stat[1])
   local -i has_global
+  local dirs=($_p9k__parent_dirs)
+  local mtimes=($_p9k__parent_mtimes)
+  if [[ $dirs[-1] != ~ ]]; then
+    zstat -A stat +mtime ~ 2>/dev/null || return
+    dirs+=(~)
+    mtimes+=($stat[1])
+  fi
 
   local elem
   for elem in ${(@)${:-{1..$#dirs}}/(#m)*/${${:-$MATCH:$_p9k__asdf_dir2files[$dirs[MATCH]]}#$MATCH:$mtimes[MATCH]:}}; do
