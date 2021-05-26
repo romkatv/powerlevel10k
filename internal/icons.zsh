@@ -816,6 +816,7 @@ function _p9k_init_icons() {
     icons[LEFT_SEGMENT_END_SEPARATOR]+=' '
     icons[MULTILINE_LAST_PROMPT_PREFIX]+=' '
     icons[VCS_TAG_ICON]+=' '
+    icons[VCS_BOOKMARK_ICON]+=' '
     icons[VCS_COMMIT_ICON]+=' '
     icons[VCS_BRANCH_ICON]+=' '
     icons[VCS_REMOTE_BRANCH_ICON]+=' '
