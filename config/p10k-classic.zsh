@@ -1291,12 +1291,6 @@
   # Tip: Remove the next line to always show aws.
   typeset -g POWERLEVEL9K_AWS_SHOW_ON_COMMAND='aws|awless|terraform|pulumi|terragrunt'
 
-  # Include AWS region in prompt. (default: false)
-  # typeset -g POWERLEVEL9K_AWS_SHOW_REGION=false
-
-  # Shorten AWS region. (default: true)
-  # typeset -g POWERLEVEL9K_AWS_SHOW_REGION_SHORT=true
-
   # POWERLEVEL9K_AWS_CLASSES is an array with even number of elements. The first element
   # in each pair defines a pattern against which the current AWS profile gets matched.
   # More specifically, it's P9K_CONTENT prior to the application of context expansion (see below)
@@ -1326,6 +1320,12 @@
       '*'       DEFAULT)
   typeset -g POWERLEVEL9K_AWS_DEFAULT_FOREGROUND=208
   # typeset -g POWERLEVEL9K_AWS_DEFAULT_VISUAL_IDENTIFIER_EXPANSION='⭐'
+
+  # AWS segment format. The following parameters are available within the expansion.
+  #
+  # - P9K_AWS_PROFILE  The name of the current AWS profile.
+  # - P9K_AWS_REGION   The region associated with the current AWS profile.
+  typeset -g POWERLEVEL9K_AWS_CONTENT_EXPANSION='${P9K_AWS_PROFILE//\%/%%}${P9K_AWS_REGION:+ ${P9K_AWS_REGION//\%/%%}}'
 
   #[ aws_eb_env: aws elastic beanstalk environment (https://aws.amazon.com/elasticbeanstalk/) ]#
   # AWS Elastic Beanstalk environment color.

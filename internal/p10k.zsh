@@ -1127,37 +1127,62 @@ _p9k_prompt_anaconda_init() {
   typeset -g "_p9k__segment_cond_${_p9k__prompt_side}[_p9k__segment_index]"='${CONDA_PREFIX:-$CONDA_ENV_PATH}'
 }
 
+# Populates array `reply` with "$#profile:$profile:$region" where $profile and $region
+# come from the AWS config (~/.aws/config).
+function _p9k_parse_aws_config() {
+  local cfg=$1
+  typeset -ga reply=()
+  [[ -f $cfg && -r $cfg ]] || return
+
+  local -a lines
+  lines=(${(f)"$(<$cfg)"}) || return
+
+  local line profile
+  local -a match mbegin mend
+  for line in $lines; do
+    if [[ $line == [[:space:]]#'[default]'[[:space:]]#(|'#'*) ]]; then
+      # example: [default]
+      profile=default
+    elif [[ $line == (#b)'[profile'[[:space:]]##([^[:space:]]|[^[:space:]]*[^[:space:]])[[:space:]]#']'[[:space:]]#(|'#'*) ]]; then
+      # example: [profile prod]
+      profile=${(Q)match[1]}
+    elif [[ $line == (#b)[[:space:]]#region[[:space:]]#=[[:space:]]#([^[:space:]]|[^[:space:]]*[^[:space:]])[[:space:]]# ]]; then
+      # example: region = eu-west-1
+      if [[ -n $profile ]]; then
+        reply+=$#profile:$profile:$match[1]
+        profile=
+      fi
+    fi
+  done
+}
+
 ################################################################
 # AWS Profile
 prompt_aws() {
-  local aws_profile="${AWS_VAULT:-${AWSUME_PROFILE:-${AWS_PROFILE:-$AWS_DEFAULT_PROFILE}}}"
-  local text="${aws_profile//\%/%%}"
-  if (( _POWERLEVEL9K_AWS_SHOW_REGION )); then
-    local region_full
-    if [[ -v $AWS_DEFAULT_REGION ]]; then
-      region_full=$AWS_DEFAULT_REGION
-    else
-      if ! _p9k_cache_get "$0-$aws_profile-full"; then
-        _p9k_cache_set $(aws configure get region)
-      fi
-      region_full=$_p9k__cache_val[1]
-    fi
-    if (( _POWERLEVEL9K_AWS_SHOW_REGION_SHORT )); then
-      local region_short=${${${${${${region_full//-}//north/n}//south/s}//east/e}//west/w}//gov/g}
-      text="$text ($region_short)"
-    else
-      text="$text ($region_full)"
-    fi
-  fi
-
+  typeset -g P9K_AWS_PROFILE="${AWS_VAULT:-${AWSUME_PROFILE:-${AWS_PROFILE:-$AWS_DEFAULT_PROFILE}}}"
   local pat class
   for pat class in "${_POWERLEVEL9K_AWS_CLASSES[@]}"; do
-    if [[ $aws_profile == ${~pat} ]]; then
+    if [[ $P9K_AWS_PROFILE == ${~pat} ]]; then
       [[ -n $class ]] && state=_${${(U)class}//İ/I}
       break
     fi
   done
-  _p9k_prompt_segment "$0$state" red white 'AWS_ICON' 0 '' "$text"
+
+  if [[ -n $AWS_DEFAULT_REGION ]]; then
+    typeset -g P9K_AWS_REGION=$AWS_DEFAULT_REGION
+  else
+    local cfg=${AWS_CONFIG_FILE:-~/.aws/config}
+    if ! _p9k_cache_stat_get $0 $cfg; then
+      local -a reply
+      _p9k_parse_aws_config $cfg
+      _p9k_cache_stat_set $reply
+    fi
+    local prefix=$#P9K_AWS_PROFILE:$P9K_AWS_PROFILE:
+    local kv=$_p9k__cache_val[(r)${(b)prefix}*]
+    typeset -g P9K_AWS_REGION=${kv#$prefix}
+  fi
+
+  _p9k_prompt_segment "$0$state" red white 'AWS_ICON' 0 '' "${P9K_AWS_PROFILE//\%/%%}"
 }
 
 _p9k_prompt_aws_init() {
@@ -7398,8 +7423,6 @@ _p9k_init_params() {
   #   POWERLEVEL9K_KUBECONTEXT_OTHER_BACKGROUND=yellow
   _p9k_declare -a POWERLEVEL9K_KUBECONTEXT_CLASSES --
   _p9k_declare -a POWERLEVEL9K_AWS_CLASSES --
-  _p9k_declare -b POWERLEVEL9K_AWS_SHOW_REGION 0
-  _p9k_declare -b POWERLEVEL9K_AWS_SHOW_REGION_SHORT 1
   _p9k_declare -a POWERLEVEL9K_AZURE_CLASSES --
   _p9k_declare -a POWERLEVEL9K_TERRAFORM_CLASSES --
   _p9k_declare -b POWERLEVEL9K_TERRAFORM_SHOW_DEFAULT 0
