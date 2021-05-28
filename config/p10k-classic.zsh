@@ -1291,6 +1291,12 @@
   # Tip: Remove the next line to always show aws.
   typeset -g POWERLEVEL9K_AWS_SHOW_ON_COMMAND='aws|awless|terraform|pulumi|terragrunt'
 
+  # Include AWS region in prompt. (default: false)
+  # typeset -g POWERLEVEL9K_AWS_SHOW_REGION=false
+
+  # Shorten AWS region. (default: true)
+  # typeset -g POWERLEVEL9K_AWS_SHOW_REGION_SHORT=true
+
   # POWERLEVEL9K_AWS_CLASSES is an array with even number of elements. The first element
   # in each pair defines a pattern against which the current AWS profile gets matched.
   # More specifically, it's P9K_CONTENT prior to the application of context expansion (see below)
