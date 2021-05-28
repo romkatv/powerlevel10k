@@ -225,7 +225,7 @@ function _p9k_init_icons() {
         VCS_REMOTE_BRANCH_ICON         '\u2192'               # →
         VCS_LOADING_ICON               ''
         VCS_GIT_ICON                   '\uF1D3 '              # 
-        VCS_GIT_GITHUB_ICON            '\uF113 '              # 
+        VCS_GIT_GITHUB_ICON            '\uf09b '              # 
         VCS_GIT_BITBUCKET_ICON         '\uF171 '              # 
         VCS_GIT_GITLAB_ICON            '\uF296 '              # 
         VCS_HG_ICON                    '\uF0C3 '              # 
@@ -487,7 +487,7 @@ function _p9k_init_icons() {
         VCS_REMOTE_BRANCH_ICON         '\uE728 '              # 
         VCS_LOADING_ICON               ''
         VCS_GIT_ICON                   '\uF1D3 '              # 
-        VCS_GIT_GITHUB_ICON            '\uF113 '              # 
+        VCS_GIT_GITHUB_ICON            '\uf09b '              # 
         VCS_GIT_BITBUCKET_ICON         '\uE703 '              # 
         VCS_GIT_GITLAB_ICON            '\uF296 '              # 
         VCS_HG_ICON                    '\uF0C3 '              # 
