@@ -49,8 +49,8 @@ applications on your system. Configure your terminal to use this font:
   *Custom font* under *Text Appearance* and select `MesloLGS NF Regular`.
 - **Windows Console Host** (the old thing): Click the icon in the top left corner, then
   *Properties → Font* and set *Font* to `MesloLGS NF`.
-- **Microsoft Terminal** (the new thing): Open *Settings* (`Ctrl+,`), search for `fontFace` and set
-  value to `MesloLGS NF` for every profile.
+- **Windows Terminal** by Microsoft (the new thing): Open *Settings* (`Ctrl+,`), search for
+  `fontFace` and set value to `MesloLGS NF` for every profile.
 - **IntelliJ** (and other IDEs by Jet Brains): Open *IDE → Edit → Preferences → Editor →
   Color Scheme → Console Font*. Select *Use console font instead of the default* and set the font
   name to `MesloLGS NF`.
