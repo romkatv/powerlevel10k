@@ -239,4 +239,12 @@ PushRemotePtr GetPushRemote(git_repository* repo, const git_reference* local) {
   return PushRemotePtr(res.release());
 }
 
+CommitMessage GetCommitMessage(git_repository* repo, const git_oid& id) {
+  git_commit* commit;
+  VERIFY(!git_commit_lookup(&commit, repo, &id)) << GitError();
+  ON_SCOPE_EXIT(=) { git_commit_free(commit); };
+  return {.encoding = git_commit_message_encoding(commit) ?: "",
+          .summary = git_commit_summary(commit) ?: ""};
+}
+
 }  // namespace gitstatus

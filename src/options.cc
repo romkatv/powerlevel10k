@@ -53,6 +53,12 @@ long ParseInt(const char* s) {
   return res;
 }
 
+size_t ParseSizeT(const char* s) {
+  static_assert(sizeof(long) <= sizeof(size_t));
+  long res = ParseLong(s);
+  return res >= 0 ? res : -1;
+}
+
 void PrintUsage() {
   std::cout << "Usage: gitstatusd [OPTION]...\n"
             << "Print machine-readable status of the git repos for directores in stdin.\n"
@@ -81,11 +87,17 @@ void PrintUsage() {
             << "   repo that's been closed is much slower than for a repo that hasn't been.\n"
             << "   Negative value means infinity.\n"
             << "\n"
+            << "  -z, --max-commit-summary-length=NUM [default=256]\n"
+            << "   Truncate commit summary if it's longer than this many bytes.\n"
+            << "\n"
             << "  -s, --max-num-staged=NUM [default=1]\n"
             << "   Report at most this many staged changes; negative value means infinity.\n"
             << "\n"
             << "  -u, --max-num-unstaged=NUM [default=1]\n"
             << "   Report at most this many unstaged changes; negative value means infinity.\n"
+            << "\n"
+            << "  -c, --max-num-conflicted=NUM [default=1]\n"
+            << "   Report at most this many conflicted changes; negative value means infinity.\n"
             << "\n"
             << "  -d, --max-num-untracked=NUM [default=1]\n"
             << "   Report at most this many untracked files; negative value means infinity.\n"
@@ -170,6 +182,8 @@ void PrintUsage() {
             << "    25. Number of commits the current branch is behind push remote.\n"
             << "    26. Number of files in the index with skip-worktree bit set.\n"
             << "    27. Number of files in the index with assume-unchanged bit set.\n"
+            << "    28. Encoding of the HEAD's commit message. Empty value means UTF-8.\n"
+            << "    29. The first paragraph of the HEAD's commit message as one line.\n"
             << "\n"
             << "Note: Renamed files are reported as deleted plus new.\n"
             << "\n"
@@ -212,6 +226,8 @@ void PrintUsage() {
             << "    '0'\n"
             << "    '0'\n"
             << "    '0'\n"
+            << "    ''\n"
+            << "    'add a build server for darwin-arm64'\n"
             << "\n"
             << "EXIT STATUS\n"
             << "\n"
@@ -239,12 +255,13 @@ const char* Version() {
 Options ParseOptions(int argc, char** argv) {
   const struct option opts[] = {{"help", no_argument, nullptr, 'h'},
                                 {"version", no_argument, nullptr, 'V'},
-                                {"version-glob", no_argument, nullptr, 'G'},
+                                {"version-glob", required_argument, nullptr, 'G'},
                                 {"lock-fd", required_argument, nullptr, 'l'},
                                 {"parent-pid", required_argument, nullptr, 'p'},
                                 {"num-threads", required_argument, nullptr, 't'},
                                 {"log-level", required_argument, nullptr, 'v'},
                                 {"repo-ttl-seconds", required_argument, nullptr, 'r'},
+                                {"max-commit-summary-length", required_argument, nullptr, 'z'},
                                 {"max-num-staged", required_argument, nullptr, 's'},
                                 {"max-num-unstaged", required_argument, nullptr, 'u'},
                                 {"max-num-conflicted", required_argument, nullptr, 'c'},
@@ -257,7 +274,7 @@ Options ParseOptions(int argc, char** argv) {
                                 {}};
   Options res;
   while (true) {
-    switch (getopt_long(argc, argv, "hVG:l:p:t:v:r:s:u:c:d:m:eUWD", opts, nullptr)) {
+    switch (getopt_long(argc, argv, "hVG:l:p:t:v:r:z:s:u:c:d:m:eUWD", opts, nullptr)) {
       case -1:
         if (optind != argc) {
           std::cerr << "unexpected positional argument: " << argv[optind] << std::endl;
@@ -306,20 +323,23 @@ Options ParseOptions(int argc, char** argv) {
         res.num_threads = n;
         break;
       }
+      case 'z':
+        res.max_commit_summary_length = ParseSizeT(optarg);
+        break;
       case 's':
-        res.max_num_staged = ParseLong(optarg);
+        res.max_num_staged = ParseSizeT(optarg);
         break;
       case 'u':
-        res.max_num_unstaged = ParseLong(optarg);
+        res.max_num_unstaged = ParseSizeT(optarg);
         break;
       case 'c':
-        res.max_num_conflicted = ParseLong(optarg);
+        res.max_num_conflicted = ParseSizeT(optarg);
         break;
       case 'd':
-        res.max_num_untracked = ParseLong(optarg);
+        res.max_num_untracked = ParseSizeT(optarg);
         break;
       case 'm':
-        res.dirty_max_index_size = ParseLong(optarg);
+        res.dirty_max_index_size = ParseSizeT(optarg);
         break;
       case 'e':
         res.recurse_untracked_dirs = true;

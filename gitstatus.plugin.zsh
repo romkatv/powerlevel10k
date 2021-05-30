@@ -15,6 +15,8 @@
 #   VCS_STATUS_COMMIT=c000eddcff0fb38df2d0137efe24d9d2d900f209
 #   VCS_STATUS_COMMITS_AHEAD=0
 #   VCS_STATUS_COMMITS_BEHIND=0
+#   VCS_STATUS_COMMIT_ENCODING=''
+#   VCS_STATUS_COMMIT_SUMMARY='pull upstream changes from gitstatus'
 #   VCS_STATUS_HAS_CONFLICTED=0
 #   VCS_STATUS_HAS_STAGED=0
 #   VCS_STATUS_HAS_UNSTAGED=1
@@ -88,6 +90,8 @@ typeset -g _gitstatus_plugin_dir"${1:-}"="${${(%):-%x}:A:h}"
 #   VCS_STATUS_WORKDIR              Git repo working directory. Not empty.
 #   VCS_STATUS_COMMIT               Commit hash that HEAD is pointing to. Either 40 hex digits or
 #                                   empty if there is no HEAD (empty repo).
+#   VCS_STATUS_COMMIT_ENCODING      Encoding of the HEAD's commit message. Empty value means UTF-8.
+#   VCS_STATUS_COMMIT_SUMMARY       The first paragraph of the HEAD's commit message as one line.
 #   VCS_STATUS_LOCAL_BRANCH         Local branch name or empty if not on a branch.
 #   VCS_STATUS_REMOTE_NAME          The remote name, e.g. "upstream" or "origin".
 #   VCS_STATUS_REMOTE_BRANCH        Upstream branch name. Can be empty.
@@ -329,7 +333,9 @@ function _gitstatus_process_response"${1:-}"() {
           VCS_STATUS_PUSH_COMMITS_AHEAD   \
           VCS_STATUS_PUSH_COMMITS_BEHIND  \
           VCS_STATUS_NUM_SKIP_WORKTREE    \
-          VCS_STATUS_NUM_ASSUME_UNCHANGED in "${(@)resp[3,27]}"; do
+          VCS_STATUS_NUM_ASSUME_UNCHANGED \
+          VCS_STATUS_COMMIT_ENCODING      \
+          VCS_STATUS_COMMIT_SUMMARY in "${(@)resp[3,29]}"; do
       done
       typeset -gi VCS_STATUS_{INDEX_SIZE,NUM_STAGED,NUM_UNSTAGED,NUM_CONFLICTED,NUM_UNTRACKED,COMMITS_AHEAD,COMMITS_BEHIND,STASHES,NUM_UNSTAGED_DELETED,NUM_STAGED_NEW,NUM_STAGED_DELETED,PUSH_COMMITS_AHEAD,PUSH_COMMITS_BEHIND,NUM_SKIP_WORKTREE,NUM_ASSUME_UNCHANGED}
       typeset -gi VCS_STATUS_HAS_STAGED=$((VCS_STATUS_NUM_STAGED > 0))

@@ -48,6 +48,15 @@ git_reference* Head(git_repository* repo);
 // Returns the name of the local branch, or an empty string.
 const char* LocalBranchName(const git_reference* ref);
 
+struct CommitMessage {
+  // Can be empty, meaning "UTF-8".
+  std::string encoding;
+  // The first paragraph of the commit's message as a one-liner.
+  std::string summary;
+};
+
+CommitMessage GetCommitMessage(git_repository* repo, const git_oid& id);
+
 struct Remote {
   // Tip of the remote branch.
   git_reference* ref;

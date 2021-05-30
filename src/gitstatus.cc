@@ -41,6 +41,10 @@ namespace {
 
 using namespace std::string_literals;
 
+void Truncate(std::string& s, size_t max_len) {
+  if (s.size() > max_len) s.resize(max_len);
+}
+
 void ProcessRequest(const Options& opts, RepoCache& cache, Request req) {
   Timer timer;
   ON_SCOPE_EXIT(&) { timer.Report("request"); };
@@ -166,6 +170,11 @@ void ProcessRequest(const Options& opts, RepoCache& cache, Request req) {
   resp.Print(stats.num_skip_worktree);
   // The number of files in the index with assume-unchanged bit set.
   resp.Print(stats.num_assume_unchanged);
+
+  CommitMessage msg = head_target ? GetCommitMessage(repo->repo(), *head_target) : CommitMessage();
+  Truncate(msg.summary, opts.max_commit_summary_length);
+  resp.Print(msg.encoding);
+  resp.Print(msg.summary);
 
   resp.Dump("with git status");
 }
