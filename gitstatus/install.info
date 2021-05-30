@@ -1,4 +1,4 @@
-# 0
+# 1
 #
 # This file is used by ./install and indirectly by shell bindings.
 #
@@ -19,7 +19,7 @@ uname_s_glob="linux";          uname_m_glob="armv7l";  file="gitstatusd-${uname_
 uname_s_glob="linux";          uname_m_glob="armv8l";  file="gitstatusd-${uname_s}-aarch64";        version="v1.3.1"; sha256="4e0a506eafb14b009cf6670f0e11399ac7e765cad17b9fcf38ef65516d248bfa";
 uname_s_glob="linux";          uname_m_glob="i686";    file="gitstatusd-${uname_s}-${uname_m}";     version="v1.3.1"; sha256="ba506fbecf4a4430533e661bb63c7b77f6b4836ea013bdf8a6eabeace456f3b9";
 uname_s_glob="linux";          uname_m_glob="ppc64le"; file="gitstatusd-${uname_s}-${uname_m}";     version="v1.3.1"; sha256="1bf907db28ac7d6516add51be47b73b1854b84ecf46de56ccb1479e6a7e29ed2";
-uname_s_glob="linux";          uname_m_glob="x86_64";  file="gitstatusd-${uname_s}-${uname_m}";     version="v1.3.1"; sha256="91bcc1efafff8c896e8f172ff624d9407494f7a26b4ad1bf573f52623be2ca91";
+uname_s_glob="linux";          uname_m_glob="x86_64";  file="gitstatusd-${uname_s}-${uname_m}";     version="v1.5.0"; sha256="d88e33e6174b205d76eaa6f6a88129d5854f9f52348983807dede2e81caae844";
 uname_s_glob="msys_nt-10.0";   uname_m_glob="i686";    file="gitstatusd-${uname_s}-${uname_m}";     version="v1.3.1"; sha256="618d2425c6a22fa3762fe6fe252f9ddb4ed9138df1377e48b2f119cd4875f400";
 uname_s_glob="msys_nt-10.0";   uname_m_glob="x86_64";  file="gitstatusd-${uname_s}-${uname_m}";     version="v1.3.1"; sha256="bdfae7a7c0fd83d0214a7eabde3b7d8709336bd08697a74d48bea4a04c352676";
 

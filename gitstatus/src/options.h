@@ -27,6 +27,8 @@
 namespace gitstatus {
 
 struct Limits {
+  // Truncate commit summary if it's longer than this many bytes.
+  size_t max_commit_summary_length = 256;
   // Report at most this many staged changes.
   size_t max_num_staged = 1;
   // Report at most this many unstaged changes.

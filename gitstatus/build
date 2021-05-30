@@ -90,6 +90,9 @@ if [ -n "$gitstatus_install_tools" ]; then
     freebsd)
       command pkg install -y cmake gmake binutils gcc git perl5
     ;;
+    openbsd)
+      command pkg_add install cmake gmake gcc git wget
+    ;;
     netbsd)
       command pkgin -y install cmake gmake binutils git
     ;;
@@ -102,7 +105,7 @@ if [ -n "$gitstatus_install_tools" ]; then
         sudo port -N install libiconv cmake wget
       elif command -v brew >/dev/null 2>&1; then
         for formula in libiconv cmake git wget; do
-          if command brew list "$formula" &>/dev/null; then
+          if command brew ls --version "$formula" &>/dev/null; then
             command brew upgrade "$formula"
           else
             command brew install "$formula"
@@ -155,6 +158,13 @@ case "$gitstatus_kernel" in
     libgit2_cmake_flags="$libgit2_cmake_flags -DENABLE_REPRODUCIBLE_BUILDS=ON"
   ;;
   freebsd)
+    gitstatus_make=gmake
+    gitstatus_ldflags="$gitstatus_ldflags -static"
+    gitstatus_ldflags="$gitstatus_ldflags -Wl,-O1,--sort-common,--as-needed,-z,relro,-z,now"
+    libgit2_cmake_flags="$libgit2_cmake_flags -DENABLE_REPRODUCIBLE_BUILDS=ON"
+  ;;
+  openbsd)
+    gitstatus_cxx=eg++
     gitstatus_make=gmake
     gitstatus_ldflags="$gitstatus_ldflags -static"
     gitstatus_ldflags="$gitstatus_ldflags -Wl,-O1,--sort-common,--as-needed,-z,relro,-z,now"
@@ -473,7 +483,7 @@ case "$gitstatus_kernel" in
       fi
     fi
   ;;
-  freebsd|netbsd|darwin)
+  freebsd|openbsd|netbsd|darwin)
     if [ -n "$docker_cmd" ]; then
       >&2 echo "[error] docker (-d) is not supported on $gitstatus_kernel"
       exit 1
