@@ -1307,6 +1307,7 @@ function _p9k_prompt_docker_async() {
   # Minimize all use of subshells and command invocations in general.
   # Async is not a license to be needlessly slow.
   for line in ${(f)"$( docker ps -a --format 'table {{ .Status }}' 2>/dev/null)"}; do
+    if (( $? )); then break; fi
     if [[ "$line" == *(Paused)* ]]; then
       (( container_status_counts[P]++ ))
     else
