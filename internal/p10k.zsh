@@ -301,7 +301,7 @@ function _p9k_upglob() {
 #   _p9k_prompt_length $'%{a\b%Gb%}' => 1
 function _p9k_prompt_length() {
   local -i COLUMNS=1024
-  local -i x y=$#1 m
+  local -i x y=${#1} m
   if (( y )); then
     while (( ${${(%):-$1%$y(l.1.0)}[-1]} )); do
       x=y
@@ -5886,7 +5886,7 @@ _p9k_set_instant_prompt() {
   [[ -n $RPROMPT ]] || unset RPROMPT
 }
 
-typeset -gri __p9k_instant_prompt_version=38
+typeset -gri __p9k_instant_prompt_version=39
 
 _p9k_dump_instant_prompt() {
   local user=${(%):-%n}
@@ -6135,7 +6135,7 @@ _p9k_dump_instant_prompt() {
   local _p9k__ret
   function _p9k_prompt_length() {
     local -i COLUMNS=1024
-    local -i x y=$#1 m
+    local -i x y=${#1} m
     if (( y )); then
       while (( ${${(%):-$1%$y(l.1.0)}[-1]} )); do
         x=y
