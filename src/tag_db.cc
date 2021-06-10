@@ -212,13 +212,29 @@ void TagDb::ParsePack() {
   char* p = &pack_[0];
   char* e = p + pack_.size();
 
-  if (*p == '#') {
-    char* eol = std::strchr(p, '\n');
-    if (!eol) return;
-    *eol = 0;
-    if (!std::strstr(p, " fully-peeled") || !std::strstr(p, " sorted")) return;
-    p = eol + 1;
+  // Usually packed-refs starts with the following line:
+  //
+  //   # pack-refs with: peeled fully-peeled sorted
+  //
+  // However, some users can produce pack-refs without this line.
+  // See https://github.com/romkatv/powerlevel10k/issues/1428.
+  // I don't know how they do it. Without the header line we cannot
+  // assume that refs are sorted, which isn't a big deal because we
+  // can just sort them. What's worse is that refs cannot be assumed
+  // to be fully-peeled. We don't want to peel them, so we just drop
+  // all tags.
+  if (*p != '#') {
+    LOG(WARN) << "packed-refs doesn't have a header. Won't resolve tags.";
+    return;
   }
+
+  char* eol = std::strchr(p, '\n');
+  if (!eol) return;
+  *eol = 0;
+  if (!std::strstr(p, " fully-peeled") || !std::strstr(p, " sorted")) {
+    LOG(WARN) << "packed-refs has unexpected header. Won't resolve tags.";
+  }
+  p = eol + 1;
 
   name2id_.reserve(pack_.size() / 128);
   id2name_.reserve(pack_.size() / 128);
@@ -249,7 +265,10 @@ void TagDb::ParsePack() {
     id2name_.push_back(tag);
   }
 
-  VERIFY(std::is_sorted(name2id_.begin(), name2id_.end(), ByName));
+  if (!std::is_sorted(name2id_.begin(), name2id_.end(), ByName)) {
+    // "sorted" in the header of packed-refs promisses that this won't trigger.
+    std::sort(name2id_.begin(), name2id_.end(), ByName);
+  }
 
   id2name_dirty_ = true;
   GlobalThreadPool()->Schedule([this] {

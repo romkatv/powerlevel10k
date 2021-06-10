@@ -54,7 +54,7 @@ long ParseInt(const char* s) {
 }
 
 size_t ParseSizeT(const char* s) {
-  static_assert(sizeof(long) <= sizeof(size_t));
+  static_assert(sizeof(long) <= sizeof(size_t), "");
   long res = ParseLong(s);
   return res >= 0 ? res : -1;
 }
