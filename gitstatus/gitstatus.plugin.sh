@@ -35,6 +35,11 @@
 #
 #   -D        Unless this option is specified, report zero staged, unstaged and conflicted
 #             changes for repositories with bash.showDirtyState = false.
+#
+#   -r INT    Close git repositories that haven't been used for this many seconds. This is
+#             meant to release resources such as memory and file descriptors. The next request
+#             for a repo that's been closed is much slower than for a repo that hasn't been.
+#             Negative value means infinity. The default is 3600 (one hour).
 function gitstatus_start() {
   if [[ "$BASH_VERSION" < 4 ]]; then
     >&2 printf 'gitstatus_start: need bash version >= 4.0, found %s\n' "$BASH_VERSION"
@@ -48,10 +53,10 @@ function gitstatus_start() {
   fi
 
   unset OPTIND
-  local opt timeout=5 max_dirty=-1 extra_flags
+  local opt timeout=5 max_dirty=-1 ttl=3600 extra_flags
   local max_num_staged=1 max_num_unstaged=1 max_num_conflicted=1 max_num_untracked=1
   local ignore_status_show_untracked_files
-  while getopts "t:s:u:c:d:m:eUWD" opt; do
+  while getopts "t:s:u:c:d:m:r:eUWD" opt; do
     case "$opt" in
       t) timeout=$OPTARG;;
       s) max_num_staged=$OPTARG;;
@@ -59,6 +64,7 @@ function gitstatus_start() {
       c) max_num_conflicted=$OPTARG;;
       d) max_num_untracked=$OPTARG;;
       m) max_dirty=$OPTARG;;
+      r) ttl=$OPTARG;;
       e) extra_flags+='--recurse-untracked-dirs ';;
       U) extra_flags+='--ignore-status-show-untracked-files ';;
       W) extra_flags+='--ignore-bash-show-untracked-files ';;
@@ -113,6 +119,7 @@ function gitstatus_start() {
       --max-num-conflicted="$max_num_conflicted"
       --max-num-untracked="$max_num_untracked"
       --dirty-max-index-size="$max_dirty"
+      --repo-ttl-seconds="$ttl"
       $extra_flags)
 
     tmpdir="$(command mktemp -d "${TMPDIR:-/tmp}"/gitstatus.bash.$$.XXXXXXXXXX)" || return

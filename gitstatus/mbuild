@@ -212,10 +212,11 @@ function build-windows() {
       tmp='/cygdrive/c/tmp'
     ;|
     msys_nt-10.0-*)
-      flags+=(-s)
       tmp='/c/tmp'
       env='MSYSTEM=MSYS'
-      intro='pacman -Syu --noconfirm; pacman -S --needed --noconfirm git; '
+      # TODO: fix this (some errors about PGP keys).
+      # flags+=(-s)
+      # intro='pacman -S --needed --noconfirm git; '
       intro+='PATH="$PATH:/usr/bin/site_perl:/usr/bin/vendor_perl:/usr/bin/core_perl"'
       while true; do
         # TODO: run autorebase only when getting an error that can be fixed by autorebasing.
@@ -230,6 +231,8 @@ function build-windows() {
       done
       () {
         while true; do
+          # TODO: fix this (some errors about PGP keys).
+          break
           local -i fd
           exec {fd}< <(
             ssh $1 $c/$bin/env.exe $env c:/$bin/bash.exe -l 2>&1 <<<"
