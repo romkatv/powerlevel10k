@@ -101,6 +101,7 @@
     # battery               # internal battery
     # wifi                  # wifi speed
     # example               # example user-defined segment (see prompt_example function below)
+    # docker                # Docker containers running and exited (https://www.docker.io)
   )
 
   # Defines character set used by powerlevel10k. It's best to let `p10k configure` set it for you.
@@ -274,6 +275,13 @@
   # Can also be handy when the directory is shortened, as it allows you to see
   # the full directory that was used in previous commands.
   typeset -g POWERLEVEL9K_DIR_HYPERLINK=false
+
+  # If POWERLEVEL9K_DIR_HYPERLINK is true and using WSL, then set this to make the links work:
+  # You must also map this drive letter on the windows side:
+  # ```
+  # net use L: \\wsl$\Ubuntu-20.04 /persistent:yes
+  # ```
+  # typeset -g POWERLEVEL9K_WSL_NETWORK_DRIVE=L:
 
   # Enable special styling for non-writable and non-existent directories. See POWERLEVEL9K_LOCK_ICON
   # and POWERLEVEL9K_DIR_CLASSES below.
@@ -1203,6 +1211,14 @@
       '*'         OTHER)
   typeset -g POWERLEVEL9K_TERRAFORM_OTHER_FOREGROUND=38
   # typeset -g POWERLEVEL9K_TERRAFORM_OTHER_VISUAL_IDENTIFIER_EXPANSION='⭐'
+
+  #############[ docker: shows the whale when online, and the # running and exited containers (https://www.docker.io/) ]#############
+  # typeset -g POWERLEVEL9K_DOCKER_ICON='🐳'
+  # typeset -g POWERLEVEL9K_DOCKER_CONTAINER_ONLINE_ICON=''
+  # typeset -g POWERLEVEL9K_DOCKER_CONTAINER_ONLINE_ICON=''
+  # typeset -g POWERLEVEL9K_DOCKER_CONTAINER_ONLINE_ICON=''
+  # typeset -g POWERLEVEL9K_DOCKER_CONTAINER_PAUSE_ICON=''
+  # typeset -g POWERLEVEL9K_DOCKER_CONTAINER_EXIT_ICON=''
 
   #############[ kubecontext: current kubernetes context (https://kubernetes.io/) ]#############
   # Show kubecontext only when the the command you are typing invokes one of these tools.

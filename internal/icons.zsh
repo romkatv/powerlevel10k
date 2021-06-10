@@ -49,6 +49,7 @@ function _p9k_init_icons() {
         ANDROID_ICON                   '\uE270'$s             # 
         LINUX_ICON                     '\uE271'$s             # 
         LINUX_ARCH_ICON                '\uE271'$s             # 
+        LINUX_KALI_ICON                '\uE271'$s             # 
         LINUX_DEBIAN_ICON              '\uE271'$s             # 
         LINUX_RASPBIAN_ICON            '\uE271'$s             # 
         LINUX_UBUNTU_ICON              '\uE271'$s             # 
@@ -145,6 +146,10 @@ function _p9k_init_icons() {
         PACKAGE_ICON                   'pkg'
         JULIA_ICON                     'jl'
         SCALA_ICON                     'scala'
+        DOCKER_ICON                    '\UE7B0'
+        DOCKER_CONTAINER_ONLINE_ICON   '\UF674'
+        DOCKER_CONTAINER_PAUSE_ICON    '\UF04C'               # 
+        DOCKER_CONTAINER_EXIT_ICON     '\UF00D'
       )
     ;;
     'awesome-fontconfig')
@@ -182,6 +187,7 @@ function _p9k_init_icons() {
         ANDROID_ICON                   '\uE17B'$s             #  (doesn't always work)
         LINUX_ICON                     '\uF17C'$s             # 
         LINUX_ARCH_ICON                '\uF17C'$s             # 
+        LINUX_KALI_ICON                '\u327F'$s             # ㉿
         LINUX_DEBIAN_ICON              '\uF17C'$s             # 
         LINUX_RASPBIAN_ICON            '\uF17C'$s             # 
         LINUX_UBUNTU_ICON              '\uF17C'$s             # 
@@ -274,6 +280,10 @@ function _p9k_init_icons() {
         PACKAGE_ICON                   'pkg'
         JULIA_ICON                     'jl'
         SCALA_ICON                     'scala'
+        DOCKER_ICON                    '\UE7B0'
+        DOCKER_CONTAINER_ONLINE_ICON   '\UF674'
+        DOCKER_CONTAINER_PAUSE_ICON    '\UF04C'               # 
+        DOCKER_CONTAINER_EXIT_ICON     '\UF00D'
       )
     ;;
     'awesome-mapped-fontconfig')
@@ -316,6 +326,7 @@ function _p9k_init_icons() {
         FREEBSD_ICON                   '\U1F608'$q                                    # 😈
         LINUX_ICON                     "${CODEPOINT_OF_AWESOME_LINUX:+\\u$CODEPOINT_OF_AWESOME_LINUX$s}"
         LINUX_ARCH_ICON                "${CODEPOINT_OF_AWESOME_LINUX:+\\u$CODEPOINT_OF_AWESOME_LINUX$s}"
+        LINUX_KALI_ICON                "${CODEPOINT_OF_AWESOME_LINUX:+\\u$CODEPOINT_OF_AWESOME_LINUX$s}"
         LINUX_DEBIAN_ICON              "${CODEPOINT_OF_AWESOME_LINUX:+\\u$CODEPOINT_OF_AWESOME_LINUX$s}"
         LINUX_RASPBIAN_ICON            "${CODEPOINT_OF_AWESOME_LINUX:+\\u$CODEPOINT_OF_AWESOME_LINUX$s}"
         LINUX_UBUNTU_ICON              "${CODEPOINT_OF_AWESOME_LINUX:+\\u$CODEPOINT_OF_AWESOME_LINUX$s}"
@@ -406,6 +417,10 @@ function _p9k_init_icons() {
         PACKAGE_ICON                   'pkg'
         JULIA_ICON                     'jl'
         SCALA_ICON                     'scala'
+        DOCKER_ICON                    '\UE7B0'
+        DOCKER_CONTAINER_ONLINE_ICON   '\UF674'
+        DOCKER_CONTAINER_PAUSE_ICON    '\UF04C'
+        DOCKER_CONTAINER_EXIT_ICON     '\UF00D'
       )
     ;;
     'nerdfont-complete'|'nerdfont-fontconfig')
@@ -443,6 +458,7 @@ function _p9k_init_icons() {
         FREEBSD_ICON                   '\UF30C '              # 
         ANDROID_ICON                   '\uF17B'               # 
         LINUX_ARCH_ICON                '\uF303'               # 
+        LINUX_KALI_ICON                '\u327F'$s             # ㉿
         LINUX_CENTOS_ICON              '\uF304'$s             # 
         LINUX_COREOS_ICON              '\uF305'$s             # 
         LINUX_DEBIAN_ICON              '\uF306'               # 
@@ -536,6 +552,10 @@ function _p9k_init_icons() {
         PACKAGE_ICON                   '\uF8D6'               # 
         JULIA_ICON                     '\uE624'               # 
         SCALA_ICON                     '\uE737'               # 
+        DOCKER_ICON                    '\UE7B0'               # 
+        DOCKER_CONTAINER_ONLINE_ICON   '\UF674'               # 
+        DOCKER_CONTAINER_PAUSE_ICON    '\UF04C'               # 
+        DOCKER_CONTAINER_EXIT_ICON     '\UF00D'               # 
       )
     ;;
     ascii)
@@ -571,6 +591,7 @@ function _p9k_init_icons() {
         ANDROID_ICON                   'android'
         LINUX_ICON                     'linux'
         LINUX_ARCH_ICON                'arch'
+        LINUX_KALI_ICON                'kali'
         LINUX_DEBIAN_ICON              'debian'
         LINUX_RASPBIAN_ICON            'pi'
         LINUX_UBUNTU_ICON              'ubuntu'
@@ -663,6 +684,10 @@ function _p9k_init_icons() {
         PACKAGE_ICON                   'pkg'
         JULIA_ICON                     'jl'
         SCALA_ICON                     'scala'
+        DOCKER_ICON                    'docker'
+        DOCKER_CONTAINER_ONLINE_ICON   'o'
+        DOCKER_CONTAINER_PAUSE_ICON    '"'
+        DOCKER_CONTAINER_EXIT_ICON     'x'
       )
     ;;
     *)
@@ -700,6 +725,7 @@ function _p9k_init_icons() {
         ANDROID_ICON                   'And'
         LINUX_ICON                     'Lx'
         LINUX_ARCH_ICON                'Arc'
+        LINUX_KALI_ICON                'Kli'
         LINUX_DEBIAN_ICON              'Deb'
         LINUX_RASPBIAN_ICON            'RPi'
         LINUX_UBUNTU_ICON              'Ubu'
@@ -792,6 +818,10 @@ function _p9k_init_icons() {
         PACKAGE_ICON                   'pkg'
         JULIA_ICON                     'jl'
         SCALA_ICON                     'scala'
+        DOCKER_ICON                    '\UE7B0'
+        DOCKER_CONTAINER_ONLINE_ICON   '\UF674'
+        DOCKER_CONTAINER_PAUSE_ICON    '\UF04C'               # 
+        DOCKER_CONTAINER_EXIT_ICON     '\UF00D'
       )
     ;;
   esac

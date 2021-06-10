@@ -1083,6 +1083,7 @@ function os_icon_name() {
         fi
         case $os_release_id in
           *arch*)                  echo LINUX_ARCH_ICON;;
+          *kali*)                  echo LINUX_KALI_ICON;;
           *debian*)                echo LINUX_DEBIAN_ICON;;
           *raspbian*)              echo LINUX_RASPBIAN_ICON;;
           *ubuntu*)                echo LINUX_UBUNTU_ICON;;

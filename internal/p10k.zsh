@@ -1307,6 +1307,102 @@ function _p9k_fvm_new() {
   return 1
 }
 
+#####################################################################
+# Docker support - Appears if docker cli can talk to server.
+#                  Shows # running and # stopped containers.
+#
+# Also commented with instructions on how to write an async segment.
+#####################################################################
+# The main prompt_ function adds the prompt segment definitions, but
+# the data will be computed elsewhere.
+function prompt_docker() {
+  # Save the length for the last line
+  local -i len=$#_p9k__prompt _p9k__has_upglob
+
+  # Register the segments. Search for _p9k_left_prompt_segment for argument docs
+  _p9k_prompt_segment $0 NONE green DOCKER_ICON 1 '$_p9k__docker_up' '$_p9k__docker_segment'
+
+  # Copy and paste this line; no changes needed.
+  (( _p9k__has_upglob )) || typeset -g "_p9k__segment_val_${_p9k__prompt_side}[_p9k__segment_index]"=$_p9k__prompt[len+1,-1]
+}
+
+# The _init function must be named according to the pattern seen here.
+function _p9k_prompt_docker_init() {
+  # Abort if the command isn't available.
+  (( $+commands[docker] )) || return
+
+  # Declare global variable to hold the segment content
+  typeset -g _p9k__docker_segment=
+  typeset -g _p9k__docker_up=
+
+  # Register this segment for async computation. Again note the pattern
+  _p9k__async_segments_compute+='_p9k_worker_invoke docker _p9k_prompt_docker_compute'
+}
+
+# Runs the workers
+function _p9k_prompt_docker_compute() {
+  (( $+commands[docker] )) || return
+
+  # Copy and paste this line. Follow the pattern and adapt for your segment name.
+  _p9k_worker_async _p9k_prompt_docker_async _p9k_prompt_docker_sync
+
+  # See the other invocations of _p9k_worker_async for examples of argument
+  # passing to the async impl. The sync impl should not take args.
+}
+
+# `_async` runs the slow processes and converts the output into variables.
+#
+# The content will then be rendered by the segment template that was previously
+# registered by the _p9k_prompt_segment in the `prompt_` function.
+#
+function _p9k_prompt_docker_async() {
+  (( $+commands[docker] )) || return
+
+  local -A container_status_counts
+  container_status_counts=(E 0 U 0 P 0 S 0)
+
+  _p9k__docker_up=
+  _p9k__docker_segment=
+
+  # Minimize all use of subshells and command invocations in general.
+  # Async is not a license to be needlessly slow.
+  for line in ${(f)"$( docker ps -a --format 'table {{ .Status }}' 2>/dev/null)"}; do
+    if (( $? )); then break; fi
+    if [[ "$line" == *(Paused)* ]]; then
+      (( container_status_counts[P]++ ))
+    else
+      (( container_status_counts[${line:0:1}]++ ))
+    fi
+    _p9k__docker_up=1
+  done
+
+  (( ${container_status_counts[U]} )) && \
+    _p9k__docker_segment="%F{green}$(print_icon 'DOCKER_CONTAINER_ONLINE_ICON') ${container_status_counts[U]} %f"
+
+  (( ${container_status_counts[P]} )) && \
+    _p9k__docker_segment+="%F{yellow}$(print_icon 'DOCKER_CONTAINER_PAUSE_ICON') ${container_status_counts[P]} %f"
+
+  (( ${container_status_counts[E]} )) && \
+    _p9k__docker_segment+="%F{red}$(print_icon 'DOCKER_CONTAINER_EXIT_ICON') ${container_status_counts[E]} %f"
+
+  # All vars that may have changed state must be sent to _p9k_print_params
+  _p9k_print_params     \
+    _p9k__docker_segment \
+    _p9k__docker_up
+
+  # The function must end with a reset=value
+  echo -E - 'reset=1'
+}
+
+# Copy, paste, and rename this function.
+function _p9k_prompt_docker_sync() {
+  if [[ -n $REPLY ]]; then
+    eval $REPLY
+    _p9k_worker_reply $REPLY
+  fi
+}
+##########################################################################
+
 prompt_fvm() {
   _p9k_fvm_new || _p9k_fvm_old
 }
@@ -2087,15 +2183,18 @@ prompt_dir() {
 
     local content="${(pj.$sep.)parts}"
     if (( _POWERLEVEL9K_DIR_HYPERLINK && _p9k_term_has_href )) && [[ $_p9k__cwd == /* ]]; then
-      local header=$'%{\e]8;;file://'${${_p9k__cwd//\%/%%25}//'#'/%%23}$'\a%}'
-      local footer=$'%{\e]8;;\a%}'
-      if (( expand )); then
-        _p9k_escape $header
-        header=$_p9k__ret
-        _p9k_escape $footer
-        footer=$_p9k__ret
+      local dirpath=${${_p9k__cwd//\%/%%25}//'#'/%%23}
+
+      if (( $+commands[wslpath] )); then
+        if [[ -n $_POWERLEVEL9K_WSL_NETWORK_DRIVE && $(wslpath -w ${_p9k__cwd}) == \\\\* ]]; then
+          dirpath=$_POWERLEVEL9K_WSL_NETWORK_DRIVE$dirpath
+        elif [[ $dirpath =~ '^(/(mnt/)*(.))/' ]]; then
+          dirpath=$match[3]:${dirpath:${#match[1]}}
+        fi
       fi
-      content=$header$content$footer
+
+      _p9k_href $'file://'$dirpath $content $expand
+      content=$_p9k__ret
     fi
 
     (( expand )) && _p9k_prompt_length "${(e):-"\${\${_p9k__d::=0}+}$content"}" || _p9k__ret=
@@ -2352,6 +2451,26 @@ _p9k_prompt_load_async() {
 _p9k_prompt_load_sync() {
   eval $REPLY
   _p9k_worker_reply $REPLY
+}
+
+function _p9k_href() {
+  local link=${${1//\%/%%25}//'#'/%%23}
+  local content=${2:-$1}
+  local expand=$3
+
+  local header=$'%{\e]8;;'${link}$'\a%}'
+  local footer=$'%{\e]8;;\a%}'
+
+  if (( _p9k_term_has_href )) ; then
+    if (( expand )); then
+      _p9k_escape $header
+      header=$_p9k__ret
+      _p9k_escape $footer
+      footer=$_p9k__ret
+    fi
+    content=$header$content$footer
+  fi
+  _p9k__ret=$content
 }
 
 # Usage: _p9k_cached_cmd <0|1> <cmd> [args...]
@@ -6437,11 +6556,8 @@ function _p9k_clear_instant_prompt() {
           echo -E - "${(%):-    * Zsh will start %Bquickly%b but prompt will %Bjump down%b after initialization.}"
           echo -E - ""
           echo -E - "${(%):-For details, see:}"
-          if (( _p9k_term_has_href )); then
-            echo    - "${(%):-\e]8;;https://github.com/romkatv/powerlevel10k/blob/master/README.md#instant-prompt\ahttps://github.com/romkatv/powerlevel10k/blob/master/README.md#instant-prompt\e]8;;\a}"
-          else
-            echo    - "${(%):-https://github.com/romkatv/powerlevel10k/blob/master/README.md#instant-prompt}"
-          fi
+          _p9k_href 'https://github.com/romkatv/powerlevel10k/blob/master/README.md#instant-prompt'
+          echo -E - "$_p9k__ret"
           echo -E - ""
           echo    - "${(%):-%3F-- console output produced during zsh initialization follows --%f}"
           echo -E - ""
@@ -8200,6 +8316,7 @@ function _p9k_init_cacheable() {
         fi
         case $os_release_id in
           *arch*)                  _p9k_set_os Linux LINUX_ARCH_ICON;;
+          *kali*)                  _p9k_set_os Linux LINUX_KALI_ICON;;
           *debian*)                _p9k_set_os Linux LINUX_DEBIAN_ICON;;
           *raspbian*)              _p9k_set_os Linux LINUX_RASPBIAN_ICON;;
           *ubuntu*)                _p9k_set_os Linux LINUX_UBUNTU_ICON;;
