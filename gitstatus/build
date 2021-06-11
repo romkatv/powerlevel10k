@@ -316,16 +316,33 @@ app="$outdir"/usrbin/"$appname"
 command strip "$app".tmp
 
 command mkdir -- "$workdir"/repo
-command git -C "$workdir"/repo init
-command git -C "$workdir"/repo config user.name "Your Name"
-command git -C "$workdir"/repo config user.email "you@example.com"
-command git -C "$workdir"/repo commit --allow-empty --allow-empty-message --no-gpg-sign -m ''
+printf '[init]\n  defaultBranch = master\n' >"$workdir"/.gitconfig
+(
+  cd -- "$workdir"/repo
+  GIT_CONFIG_NOSYSTEM=1 HOME="$workdir" command git init
+  GIT_CONFIG_NOSYSTEM=1 HOME="$workdir" command git config user.name "Your Name"
+  GIT_CONFIG_NOSYSTEM=1 HOME="$workdir" command git config user.email "you@example.com"
+  GIT_CONFIG_NOSYSTEM=1 HOME="$workdir" command git commit \
+    --allow-empty --allow-empty-message --no-gpg-sign -m ''
+)
 
 resp="$(printf "hello\037$workdir/repo\036" | "$app".tmp)"
-[ -n "$resp" -a -z "${resp##hello*1*$workdir/repo*master*}" ]
+case "$resp" in
+  hello*1*/repo*master*);;
+  *)
+    >&2 echo 'error: invalid gitstatusd response for a git repo'
+    exit 1
+  ;;
+esac
 
 resp="$(printf 'hello\037\036' | "$app".tmp)"
-[ -n "$resp" -a -z "${resp##hello*0*}" ]
+case "$resp" in
+  hello*0*);;
+  *)
+    >&2 echo 'error: invalid gitstatusd response for a non-repo'
+    exit 1
+  ;;
+esac
 
 command mv -f -- "$app".tmp "$app"
 
