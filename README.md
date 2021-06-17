@@ -1091,6 +1091,10 @@ To see how different colors look in your terminal, run the following command:
 for i in {0..255}; do print -Pn "%K{$i}  %k%F{$i}${(l:3::0:)i}%f " ${${(M)$((i%6)):#3}:+$'\n'}; done
 ```
 
+*Related:*
+  - [Directory is difficult to see in prompt when using Rainbow style.](
+      #directory-is-difficult-to-see-in-prompt-when-using-rainbow-style)
+
 ### Why does Powerlevel10k spawn extra processes?
 
 Powerlevel10k uses [gitstatus](https://github.com/romkatv/gitstatus) as the backend behind `vcs`
