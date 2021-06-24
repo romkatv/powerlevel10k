@@ -5893,7 +5893,7 @@ _p9k_set_instant_prompt() {
   [[ -n $RPROMPT ]] || unset RPROMPT
 }
 
-typeset -gri __p9k_instant_prompt_version=39
+typeset -gri __p9k_instant_prompt_version=40
 
 _p9k_dump_instant_prompt() {
   local user=${(%):-%n}
@@ -6162,18 +6162,29 @@ _p9k_dump_instant_prompt() {
     local -i fill=$((COLUMNS > _p9k__ret ? COLUMNS - _p9k__ret : 0))
     out+="${(%):-%b%k%f%s%u$mark${(pl.$fill.. .)}$cr%b%k%f%s%u%E}"
   fi
-  (( _z4h_can_save_restore_screen == 1 )) || out+="${(pl.$height..$lf.)}$esc${height}A$terminfo[sc]"
+  if (( _z4h_can_save_restore_screen != 1 )); then
+    (( height )) && out+="${(pl.$height..$lf.)}$esc${height}A"
+    out+="$terminfo[sc]"
+  fi
   out+=${(%):-"$__p9k_used_instant_prompt[1]$__p9k_used_instant_prompt[2]"}
   if [[ -n $__p9k_used_instant_prompt[3] ]]; then
     _p9k_prompt_length "$__p9k_used_instant_prompt[2]"
     local -i left_len=_p9k__ret
     _p9k_prompt_length "$__p9k_used_instant_prompt[3]"
-    local -i gap=$((COLUMNS - left_len - _p9k__ret - ZLE_RPROMPT_INDENT))
-    if (( gap >= 40 )); then
-      out+="${(pl.$gap.. .)}${(%):-${__p9k_used_instant_prompt[3]}%b%k%f%s%u}$cr$esc${left_len}C"
+    if (( _p9k__ret )); then
+      local -i gap=$((COLUMNS - left_len - _p9k__ret - ZLE_RPROMPT_INDENT))
+      if (( gap >= 40 )); then
+        out+="${(pl.$gap.. .)}${(%):-${__p9k_used_instant_prompt[3]}%b%k%f%s%u}$cr$esc${left_len}C"
+      fi
     fi
   fi
-  (( _z4h_can_save_restore_screen == 1 )) && out+="$cr$esc${height}A$terminfo[sc]$out"
+  if (( _z4h_can_save_restore_screen == 1 )); then
+    if (( height )); then
+      out+="$cr$esc${height}A$terminfo[sc]$out"
+    else
+      out+="$cr$terminfo[sc]$out"
+    fi
+  fi
   typeset -g __p9k_instant_prompt_output=${TMPDIR:-/tmp}/p10k-instant-prompt-output-${(%):-%n}-$$
   { echo -n > $__p9k_instant_prompt_output } || return
   print -rn -- "$out" || return
