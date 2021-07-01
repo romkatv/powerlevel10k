@@ -1131,7 +1131,7 @@ times faster than powerlevel9k/master and 17 times faster than powerlevel9k/next
 
 Powerlevel10k was forked from Powerlevel9k in March 2019 after a week-long discussion in
 [powerlevel9k#1170](https://github.com/Powerlevel9k/powerlevel9k/issues/1170). Powerlevel9k was
-already a mature project with large user base and release cycle measured in months. Powerlevel10k
+already a mature project with a large user base and a release cycle measured in months. Powerlevel10k
 was spun off to iterate on performance improvements and new features at much higher pace.
 
 Powerlevel9k and Powerlevel10k are independent projects. When using one, you shouldn't install the
