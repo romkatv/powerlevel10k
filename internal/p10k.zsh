@@ -4887,6 +4887,15 @@ _p9k_prompt_terraform_init() {
   typeset -g "_p9k__segment_cond_${_p9k__prompt_side}[_p9k__segment_index]"='$commands[terraform]'
 }
 
+function prompt_terraform_version() {
+  local terraform_version="$(command terraform --version)"
+  _p9k_prompt_segment "$0$state" $_p9k_color1 red TERRAFORM_ICON 0 '' $terraform_version
+}
+
+_p9k_prompt_terraform_version_init() {
+  typeset -g "_p9k__segment_cond_${_p9k__prompt_side}[_p9k__segment_index]"='$commands[terraform]'
+}
+
 function prompt_proxy() {
   local -U p=(
     $all_proxy $http_proxy $https_proxy $ftp_proxy
