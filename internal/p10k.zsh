@@ -4888,8 +4888,10 @@ _p9k_prompt_terraform_init() {
 }
 
 function prompt_terraform_version() {
-  local terraform_version="$(command terraform --version)"
-  _p9k_prompt_segment "$0$state" $_p9k_color1 red TERRAFORM_ICON 0 '' $terraform_version
+  _p9k_cached_cmd 0 '' terraform --version
+  [[ $_p9k__ret == (#b)Terraform\ v([[:digit:].]##)* ]]
+  local terraform_version=$match[1]
+  _p9k_prompt_segment "$0$state" $_p9k_color1 red TERRAFORM_ICON 0 '' "tf:$terraform_version"
 }
 
 _p9k_prompt_terraform_version_init() {
