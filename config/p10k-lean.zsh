@@ -70,7 +70,7 @@
     haskell_stack           # haskell version from stack (https://haskellstack.org/)
     kubecontext             # current kubernetes context (https://kubernetes.io/)
     terraform               # terraform workspace (https://www.terraform.io)
-    terraform_version       # It shows current active terraform version
+    # terraform_version     # terraform version (https://www.terraform.io)
     aws                     # aws profile (https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-profiles.html)
     aws_eb_env              # aws elastic beanstalk environment (https://aws.amazon.com/elasticbeanstalk/)
     azure                   # azure account name (https://docs.microsoft.com/en-us/cli/azure)
@@ -1268,6 +1268,12 @@
       '*'         OTHER)
   typeset -g POWERLEVEL9K_TERRAFORM_OTHER_FOREGROUND=38
   # typeset -g POWERLEVEL9K_TERRAFORM_OTHER_VISUAL_IDENTIFIER_EXPANSION='⭐'
+
+  #############[ terraform_version: terraform version (https://www.terraform.io) ]##############
+  # Terraform version color.
+  typeset -g POWERLEVEL9K_TERRAFORM_VERSION_FOREGROUND=38
+  # Custom icon.
+  # typeset -g POWERLEVEL9K_TERRAFORM_VERSION_VISUAL_IDENTIFIER_EXPANSION='⭐'
 
   #[ aws: aws profile (https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-profiles.html) ]#
   # Show aws only when the the command you are typing invokes one of these tools.
