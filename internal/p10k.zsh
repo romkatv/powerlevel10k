@@ -1160,7 +1160,7 @@ function _p9k_parse_aws_config() {
 # AWS Profile
 prompt_aws() {
   typeset -g P9K_AWS_PROFILE="${AWS_VAULT:-${AWSUME_PROFILE:-${AWS_PROFILE:-$AWS_DEFAULT_PROFILE}}}"
-  local pat class
+  local pat class state
   for pat class in "${_POWERLEVEL9K_AWS_CLASSES[@]}"; do
     if [[ $P9K_AWS_PROFILE == ${~pat} ]]; then
       [[ -n $class ]] && state=_${${(U)class}//İ/I}
@@ -4536,7 +4536,7 @@ prompt_azure() {
     fi
     _p9k_cache_stat_set "$name"
   fi
-  local pat class
+  local pat class state
   for pat class in "${_POWERLEVEL9K_AZURE_CLASSES[@]}"; do
     if [[ $name == ${~pat} ]]; then
       [[ -n $class ]] && state=_${${(U)class}//İ/I}
@@ -4873,7 +4873,7 @@ function prompt_terraform() {
     _p9k_read_word ${${TF_DATA_DIR:-.terraform}:A}/environment && ws=$_p9k__ret
   fi
   [[ -z $ws || $ws == default && $_POWERLEVEL9K_TERRAFORM_SHOW_DEFAULT == 0 ]] && return
-  local pat class
+  local pat class state
   for pat class in "${_POWERLEVEL9K_TERRAFORM_CLASSES[@]}"; do
     if [[ $ws == ${~pat} ]]; then
       [[ -n $class ]] && state=_${${(U)class}//İ/I}
