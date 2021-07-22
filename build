@@ -136,14 +136,44 @@ case "$gitstatus_cpu" in
   *)           archflag="-march";;
 esac
 
-cflags="$archflag=$gitstatus_cpu -fno-plt"
+cflags="$archflag=$gitstatus_cpu -fno-plt -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security -fpie"
+ldflags=
+static_pie=
 
-command touch "$workdir"/file-prefix-map-test.c
-if 2>/dev/null "${CC:-/bin/cc}"           \
-     -ffile-prefix-map=x=y                \
-     -c "$workdir"/file-prefix-map-test.c \
-     -o "$workdir"/file-prefix-map-test.o; then
+printf 'int main() {}\n' >"$workdir"/cc-test.c
+if 2>/dev/null "${CC:-cc}"   \
+     -ffile-prefix-map=x=y   \
+     -Werror                 \
+     -c "$workdir"/cc-test.c \
+     -o "$workdir"/cc-test.o; then
   cflags="$cflags -ffile-prefix-map=$workdir/="
+fi
+
+command rm -f -- "$workdir"/cc-test "$workdir"/cc-test.o
+if 2>/dev/null "${CC:-cc}"                    \
+     -fstack-clash-protection -fcf-protection \
+     -Werror                                  \
+     -c "$workdir"/cc-test.c                  \
+     -o "$workdir"/cc-test.o; then
+  cflags="$cflags -fstack-clash-protection -fcf-protection"
+fi
+
+command rm -f -- "$workdir"/cc-test "$workdir"/cc-test.o
+if 2>/dev/null "${CC:-cc}"                             \
+     -Wl,-O1,--sort-common,--as-needed,-z,relro,-z,now \
+     -Werror                                           \
+     "$workdir"/cc-test.c                              \
+     -o "$workdir"/cc-test; then
+  ldflags="$ldflags -Wl,-O1,--sort-common,--as-needed,-z,relro,-z,now"
+fi
+
+command rm -f -- "$workdir"/cc-test "$workdir"/cc-test.o
+if 2>/dev/null "${CC:-cc}" \
+     -fpie -static-pie     \
+     -Werror               \
+     "$workdir"/cc-test.c  \
+     -o "$workdir"/cc-test; then
+  static_pie='-static-pie'
 fi
 
 if [ "$gitstatus_cpu" = x86-64 ]; then
@@ -151,37 +181,33 @@ if [ "$gitstatus_cpu" = x86-64 ]; then
 fi
 
 libgit2_cmake_flags=
-libgit2_cflags="$cflags"
+libgit2_cflags="${CFLAGS-} $cflags -O3 -DNDEBUG"
 
 gitstatus_cxx=g++
-gitstatus_cxxflags="$cflags -I${workdir}/libgit2/include -DGITSTATUS_ZERO_NSEC -D_GNU_SOURCE"
-gitstatus_ldflags="-L${workdir}/libgit2/build"
+gitstatus_cxxflags="${CXXFLAGS-} $cflags -I${workdir}/libgit2/include -DGITSTATUS_ZERO_NSEC -D_GNU_SOURCE -D_GLIBCXX_ASSERTIONS"
+gitstatus_ldflags="${LDFLAGS-} $ldflags -L${workdir}/libgit2/build"
 gitstatus_ldlibs=
 gitstatus_make=make
 
 case "$gitstatus_kernel" in
   linux)
-    gitstatus_ldflags="$gitstatus_ldflags -static"
-    gitstatus_ldflags="$gitstatus_ldflags -Wl,-O1,--sort-common,--as-needed,-z,relro,-z,now"
+    gitstatus_ldflags="$gitstatus_ldflags ${static_pie:--static}"
     libgit2_cmake_flags="$libgit2_cmake_flags -DENABLE_REPRODUCIBLE_BUILDS=ON"
   ;;
   freebsd)
     gitstatus_make=gmake
-    gitstatus_ldflags="$gitstatus_ldflags -static"
-    gitstatus_ldflags="$gitstatus_ldflags -Wl,-O1,--sort-common,--as-needed,-z,relro,-z,now"
+    gitstatus_ldflags="$gitstatus_ldflags ${static_pie:--static}"
     libgit2_cmake_flags="$libgit2_cmake_flags -DENABLE_REPRODUCIBLE_BUILDS=ON"
   ;;
   openbsd)
     gitstatus_cxx=eg++
     gitstatus_make=gmake
-    gitstatus_ldflags="$gitstatus_ldflags -static"
-    gitstatus_ldflags="$gitstatus_ldflags -Wl,-O1,--sort-common,--as-needed,-z,relro,-z,now"
+    gitstatus_ldflags="$gitstatus_ldflags ${static_pie:--static}"
     libgit2_cmake_flags="$libgit2_cmake_flags -DENABLE_REPRODUCIBLE_BUILDS=ON"
   ;;
   netbsd)
     gitstatus_make=gmake
-    gitstatus_ldflags="$gitstatus_ldflags -static"
-    gitstatus_ldflags="$gitstatus_ldflags -Wl,-O1,--sort-common,--as-needed,-z,relro,-z,now"
+    gitstatus_ldflags="$gitstatus_ldflags ${static_pie:--static}"
     libgit2_cmake_flags="$libgit2_cmake_flags -DENABLE_REPRODUCIBLE_BUILDS=ON"
   ;;
   darwin)
@@ -202,11 +228,11 @@ case "$gitstatus_kernel" in
     libgit2_cmake_flags="$libgit2_cmake_flags -DENABLE_REPRODUCIBLE_BUILDS=OFF"
   ;;
   msys*|mingw*)
-    gitstatus_ldflags="$gitstatus_ldflags -static"
+    gitstatus_ldflags="$gitstatus_ldflags ${static_pie:--static}"
     libgit2_cmake_flags="$libgit2_cmake_flags -DENABLE_REPRODUCIBLE_BUILDS=ON"
   ;;
   cygwin*)
-    gitstatus_ldflags="$gitstatus_ldflags -static"
+    gitstatus_ldflags="$gitstatus_ldflags ${static_pie:--static}"
     libgit2_cmake_flags="$libgit2_cmake_flags -DENABLE_REPRODUCIBLE_BUILDS=ON"
   ;;
   *)
@@ -295,7 +321,7 @@ command mkdir libgit2/build
 cd libgit2/build
 
 CFLAGS="$libgit2_cflags" command cmake \
-  -DCMAKE_BUILD_TYPE=Release           \
+  -DCMAKE_BUILD_TYPE=None              \
   -DZERO_NSEC=ON                       \
   -DTHREADSAFE=ON                      \
   -DUSE_BUNDLED_ZLIB=ON                \
