@@ -437,7 +437,7 @@ referenced above is the official Powerlevel10k package.
 
 There is also [zsh-theme-powerlevel10k](
   https://www.archlinux.org/packages/community/x86_64/zsh-theme-powerlevel10k/) community package.
-Historicaly, [it has been breaking often and for extended periods of time](
+Historically, [it has been breaking often and for extended periods of time](
   https://github.com/romkatv/powerlevel10k/pull/786). **Do not use it.**
 
 ## Configuration
