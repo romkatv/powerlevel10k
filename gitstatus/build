@@ -183,7 +183,7 @@ fi
 libgit2_cmake_flags=
 libgit2_cflags="${CFLAGS-} $cflags -O3 -DNDEBUG"
 
-gitstatus_cxx=g++
+gitstatus_cxx=${CXX:-g++}
 gitstatus_cxxflags="${CXXFLAGS-} $cflags -I${workdir}/libgit2/include -DGITSTATUS_ZERO_NSEC -D_GNU_SOURCE -D_GLIBCXX_ASSERTIONS"
 gitstatus_ldflags="${LDFLAGS-} $ldflags -L${workdir}/libgit2/build"
 gitstatus_ldlibs=
