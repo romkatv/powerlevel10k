@@ -339,7 +339,7 @@ command make -j "$cpus" VERBOSE=1
 
 APPNAME="$appname".tmp           \
   OBJDIR="$workdir"/gitstatus    \
-  CXX="$gitstatus_cxx"           \
+  CXX="${CXX:-$gitstatus_cxx}"   \
   CXXFLAGS="$gitstatus_cxxflags" \
   LDFLAGS="$gitstatus_ldflags"   \
   LDLIBS="$gitstatus_ldlibs"     \
@@ -487,8 +487,7 @@ if [ -z "$gitstatus_cpu" ]; then
     armel)          gitstatus_cpu=armv5;;
     armv6l|armhf)   gitstatus_cpu=armv6;;
     armv7l)         gitstatus_cpu=armv7;;
-    arm64)          gitstatus_cpu=armv8;;
-    aarch64)        gitstatus_cpu=armv8-a;;
+    arm64|aarch64)  gitstatus_cpu=armv8-a;;
     ppc64le)        gitstatus_cpu=powerpc64le;;
     riscv64)        gitstatus_cpu=rv64imafdc;;
     x86_64|amd64)   gitstatus_cpu=x86-64;;
