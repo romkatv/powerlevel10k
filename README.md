@@ -384,7 +384,7 @@ Add `zstyle :prezto:module:prompt theme powerlevel10k` to `~/.zpreztorc`.
 
 ### Zim
 
-Add `zmodule romkatv/powerlevel10k` to `~/.zimrc` and run `zimfw install`.
+Add `zmodule romkatv/powerlevel10k --use degit` to `~/.zimrc` and run `zimfw install`.
 
 ### Antibody
 
