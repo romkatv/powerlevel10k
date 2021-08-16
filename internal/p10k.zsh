@@ -3,7 +3,7 @@ if [[ $__p9k_sourced != 13 ]]; then
   >&2 print -P "[%F{1}ERROR%f]: Corrupted powerlevel10k installation."
   >&2 print -P ""
   if (( ${+functions[antigen]} )); then
-    >&2 print -P "If using %Bantigen%b, run the folowing command to fix:"
+    >&2 print -P "If using %Bantigen%b, run the following command to fix:"
     >&2 print -P ""
     >&2 print -P "    %F{2}antigen%f reset"
     if [[ -d ~/.antigen ]]; then
@@ -4888,6 +4888,9 @@ _p9k_prompt_terraform_init() {
 }
 
 function prompt_terraform_version() {
+  if [[ $_POWERLEVEL9K_TERRAFORM_VERSION_ALWAYS ]]; then
+    _p9k_upglob "*.tf" && return 1
+  fi
   _p9k_cached_cmd 0 '' terraform --version || return
   local v=${_p9k__ret#Terraform v}
   (( $#v < $#_p9k__ret )) || return
