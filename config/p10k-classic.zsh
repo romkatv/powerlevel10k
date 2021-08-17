@@ -1206,8 +1206,6 @@
   # typeset -g POWERLEVEL9K_TERRAFORM_OTHER_VISUAL_IDENTIFIER_EXPANSION='⭐'
 
   #############[ terraform_version: terraform version (https://www.terraform.io) ]##############
-  # Don't show terraform version if there is no "*.tf" files
-  typeset -g POWERLEVEL9K_TERRAFORM_VERSION_ALWAYS=false
   # Terraform version color.
   typeset -g POWERLEVEL9K_TERRAFORM_VERSION_FOREGROUND=38
   # Custom icon.
