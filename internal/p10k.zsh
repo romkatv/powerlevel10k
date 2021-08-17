@@ -4888,9 +4888,6 @@ _p9k_prompt_terraform_init() {
 }
 
 function prompt_terraform_version() {
-  if [[ $_POWERLEVEL9K_TERRAFORM_VERSION_ALWAYS ]]; then
-    _p9k_upglob "*.tf" && return 1
-  fi
   _p9k_cached_cmd 0 '' terraform --version || return
   local v=${_p9k__ret#Terraform v}
   (( $#v < $#_p9k__ret )) || return
