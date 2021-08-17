@@ -3,7 +3,7 @@ if [[ $__p9k_sourced != 13 ]]; then
   >&2 print -P "[%F{1}ERROR%f]: Corrupted powerlevel10k installation."
   >&2 print -P ""
   if (( ${+functions[antigen]} )); then
-    >&2 print -P "If using %Bantigen%b, run the folowing command to fix:"
+    >&2 print -P "If using %Bantigen%b, run the following command to fix:"
     >&2 print -P ""
     >&2 print -P "    %F{2}antigen%f reset"
     if [[ -d ~/.antigen ]]; then
