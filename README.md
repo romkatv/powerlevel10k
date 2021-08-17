@@ -299,6 +299,7 @@ enable as many segments as you like. It won't slow down your prompt or Zsh start
 | `package` | `name@version` from [package.json](https://docs.npmjs.com/files/package.json) |
 | `kubecontext` | current [kubernetes](https://kubernetes.io/) context |
 | `terraform` | [terraform](https://www.terraform.io) workspace |
+| `terraform_version` | [terraform](https://www.terraform.io) version |
 | `aws` | [aws profile](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-profiles.html) |
 | `aws_eb_env` | [aws elastic beanstalk](https://aws.amazon.com/elasticbeanstalk/) environment |
 | `azure` | [azure](https://docs.microsoft.com/en-us/cli/azure) account name |
