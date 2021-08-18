@@ -25,11 +25,11 @@
 
 namespace gitstatus {
 
-// On error, clears entries and returns false. Does not throw.
+// On error, leaves entries unchaged and returns false. Does not throw.
 //
-// On success, fills entries with the names of files from the specified directory and returns true.
-// Every entry is a null-terminated string. At -1 offset is its d_type. All elements point into the
-// arena. They are sorted either by strcmp or strcasecmp depending on case_sensitive.
+// On success, appends names of files from the specified directory to entries and returns true.
+// Every appended entry is a null-terminated string. At -1 offset is its d_type. All elements
+// point into the arena. They are sorted either by strcmp or strcasecmp depending on case_sensitive.
 //
 // Does not close dir_fd.
 //

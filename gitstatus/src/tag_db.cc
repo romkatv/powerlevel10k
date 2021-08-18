@@ -155,6 +155,8 @@ void TagDb::ReadLooseTags() {
   int dir_fd = open(dirname.c_str(), O_RDONLY | O_DIRECTORY | O_CLOEXEC);
   if (dir_fd < 0) return;
   ON_SCOPE_EXIT(&) { CHECK(!close(dir_fd)) << Errno(); };
+  // TODO: recursively traverse directories so that the file refs/tags/foo/bar gets interpreted
+  // as the tag foo/bar. See https://github.com/romkatv/gitstatus/issues/254.
   (void)ListDir(dir_fd, loose_arena_, loose_tags_, /* precompose_unicode = */ false,
                 /* case_sensitive = */ true);
 }

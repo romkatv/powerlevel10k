@@ -242,6 +242,7 @@ std::vector<const char*> ScanDirs(git_index* index, int root_fd, IndexDir* const
       dir.st = st;
     }
 
+    entries.clear();
     arena.Reuse();
     if (!ListDir(*dir_fd, arena, entries, caps.precompose_unicode, caps.case_sensitive)) {
       AddUnmached("");
