@@ -275,7 +275,14 @@ if [ ! -e "$libgit2_tarball" ]; then
       fi
     fi
     libgit2_url=https://github.com/romkatv/libgit2/archive/"$libgit2_version".tar.gz
-    command wget -O "$libgit2_tmp" -- "$libgit2_url"
+    if ! command wget -O "$libgit2_tmp" -- "$libgit2_url"; then
+      command which wget
+      command ls -lAd -- "$outdir"
+      command ls -lA -- "$outdir"
+      command ls -lAd -- "$outdir"/deps
+      command ls -lA -- "$outdir"/deps
+      exit 1
+    fi
     command mv -f -- "$libgit2_tmp" "$libgit2_tarball"
   else
     >&2 echo "[error] file not found: deps/libgit2-"$libgit2_version".tar.gz"

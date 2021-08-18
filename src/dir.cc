@@ -106,14 +106,14 @@ bool ListDir(int dir_fd, Arena& arena, std::vector<char*>& entries, bool precomp
   };
 
   constexpr size_t kBufSize = 8 << 10;
-  entries.clear();
+  const size_t orig_size = entries.size();
 
   while (true) {
     char* buf = static_cast<char*>(arena.Allocate(kBufSize, alignof(linux_dirent64)));
     // Save 256 bytes for the rainy day.
     int n = syscall(SYS_getdents64, dir_fd, buf, kBufSize - 256);
     if (n < 0) {
-      entries.clear();
+      entries.resize(orig_size);
       return false;
     }
     for (int pos = 0; pos < n;) {
@@ -131,9 +131,9 @@ bool ListDir(int dir_fd, Arena& arena, std::vector<char*>& entries, bool precomp
   }
 
   if (case_sensitive) {
-    SortEntries<true>(entries.data(), entries.data() + entries.size());
+    SortEntries<true>(entries.data() + orig_size, entries.data() + entries.size());
   } else {
-    SortEntries<false>(entries.data(), entries.data() + entries.size());
+    SortEntries<false>(entries.data() + orig_size, entries.data() + entries.size());
   }
 
   return true;
@@ -211,7 +211,7 @@ char* DirenvConvert(Arena& arena, struct dirent& ent, bool do_convert) {
 
 bool ListDir(int dir_fd, Arena& arena, std::vector<char*>& entries, bool precompose_unicode,
              bool case_sensitive) {
-  entries.clear();
+  const size_t orig_size = entries.size();
   dir_fd = dup(dir_fd);
   if (dir_fd < 0) return false;
   DIR* dir = fdopendir(dir_fd);
@@ -225,10 +225,10 @@ bool ListDir(int dir_fd, Arena& arena, std::vector<char*>& entries, bool precomp
     entries.push_back(DirenvConvert(arena, *ent, precompose_unicode));
   }
   if (errno) {
-    entries.clear();
+    entries.resize(orig_size);
     return false;
   }
-  StrSort(entries.data(), entries.data() + entries.size(), case_sensitive);
+  StrSort(entries.data() + orig_size, entries.data() + entries.size(), case_sensitive);
   return true;
 }
 
