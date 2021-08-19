@@ -1168,8 +1168,8 @@ prompt_aws() {
     fi
   done
 
-  if [[ -n ${AWS_REGION:-AWS_DEFAULT_REGION} ]]; then
-    typeset -g P9K_AWS_REGION=${AWS_REGION:-AWS_DEFAULT_REGION}
+  if [[ -n ${AWS_REGION:-$AWS_DEFAULT_REGION} ]]; then
+    typeset -g P9K_AWS_REGION=${AWS_REGION:-$AWS_DEFAULT_REGION}
   else
     local cfg=${AWS_CONFIG_FILE:-~/.aws/config}
     if ! _p9k_cache_stat_get $0 $cfg; then
