@@ -5906,7 +5906,7 @@ _p9k_set_instant_prompt() {
   [[ -n $RPROMPT ]] || unset RPROMPT
 }
 
-typeset -gri __p9k_instant_prompt_version=41
+typeset -gri __p9k_instant_prompt_version=42
 
 _p9k_dump_instant_prompt() {
   local user=${(%):-%n}
@@ -6172,12 +6172,14 @@ _p9k_dump_instant_prompt() {
     fi
     typeset -g _p9k__ret=$x
   }
-  local out
-  if [[ $+VTE_VERSION == 0 && $TERM_PROGRAM != Hyper ]] || (( ! $+_p9k__g )); then
+  local out=${(%):-%b%k%f%s%u}
+  if [[ $P9K_TTY == old && ( $+VTE_VERSION == 0 && $TERM_PROGRAM != Hyper || $+_p9k__g == 0 ) ]]; then
     local mark=${(e)PROMPT_EOL_MARK}
     [[ $mark == "%B%S%#%s%b" ]] && _p9k__ret=1 || _p9k_prompt_length $mark
     local -i fill=$((COLUMNS > _p9k__ret ? COLUMNS - _p9k__ret : 0))
-    out+="${(%):-%b%k%f%s%u$mark${(pl.$fill.. .)}$cr%b%k%f%s%u%E}"
+    out+="${(%):-$mark${(pl.$fill.. .)}$cr%b%k%f%s%u%E}"
+  else
+    out+="${(%):-$cr%E}"
   fi
   if (( _z4h_can_save_restore_screen != 1 )); then
     (( height )) && out+="${(pl.$height..$lf.)}$esc${height}A"
