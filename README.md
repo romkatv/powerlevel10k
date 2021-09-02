@@ -707,7 +707,11 @@ The command to update Powerlevel10k depends on how it was installed.
    | [Zinit](#zinit)           | `zinit delete romkatv/powerlevel10k`                             |
    | [Homebrew](#homebrew)     | `brew uninstall powerlevel10k; brew untap romkatv/powerlevel10k` |
    | [Arch Linux](#arch-linux) | `yay -R --noconfirm zsh-theme-powerlevel10k-git`                 |
-5. Restart Zsh. [Do not use `source ~/.zshrc`](#weird-things-happen-after-typing-source-zshrc).
+6. Restart Zsh. [Do not use `source ~/.zshrc`](#weird-things-happen-after-typing-source-zshrc).
+7. Delete Powerlevel10k cache files.
+   ```zsh
+   rm -rf -- "${XDG_CACHE_HOME:-$HOME/.cache}"/p10k-*(N) "${XDG_CACHE_HOME:-$HOME/.cache}"/gitstatus
+   ```
 
 ### How do I install Powerlevel10k on a machine without Internet access?
 
