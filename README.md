@@ -541,11 +541,13 @@ applications on your system. Configure your terminal to use this font:
   and select `MesloLGS NF` family.
 - **Hyper**: Open *Hyper → Edit → Preferences* and change the value of `fontFamily` under
   `module.exports.config` to `MesloLGS NF`.
-- **Visual Studio Code**: Open *File → Preferences → Settings*, enter
-  `terminal.integrated.fontFamily` in the search box and set the value to `MesloLGS NF`.
+- **Visual Studio Code**: Open *File → Preferences → Settings* (PC) or
+  *Code → Preferences → Settings* (Mac), enter `terminal.integrated.fontFamily` in the search box at
+  the top of *Settings* tab and set the value below to `MesloLGS NF`.
   Consult [this screenshot](
     https://raw.githubusercontent.com/romkatv/powerlevel10k-media/95a96c1555866350feb3ae2e86c3d5c101725174/visual-studio-code-font-settings.jpg)
-  to see how it should look like.
+  to see how it should look like or see [this issue](
+    https://github.com/romkatv/powerlevel10k/issues/671) for extra information.
 - **GNOME Terminal** (the default Ubuntu terminal): Open *Terminal → Preferences* and click on the
   selected profile under *Profiles*. Check *Custom font* under *Text Appearance* and select
   `MesloLGS NF Regular`.
