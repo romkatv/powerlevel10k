@@ -545,7 +545,7 @@ applications on your system. Configure your terminal to use this font:
   *Code → Preferences → Settings* (Mac), enter `terminal.integrated.fontFamily` in the search box at
   the top of *Settings* tab and set the value below to `MesloLGS NF`.
   Consult [this screenshot](
-    https://raw.githubusercontent.com/romkatv/powerlevel10k-media/95a96c1555866350feb3ae2e86c3d5c101725174/visual-studio-code-font-settings.jpg)
+    https://raw.githubusercontent.com/romkatv/powerlevel10k-media/389133fb8c9a2347929a23702ce3039aacc46c3d/visual-studio-code-font-settings.jpg)
   to see how it should look like or see [this issue](
     https://github.com/romkatv/powerlevel10k/issues/671) for extra information.
 - **GNOME Terminal** (the default Ubuntu terminal): Open *Terminal → Preferences* and click on the
