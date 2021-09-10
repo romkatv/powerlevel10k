@@ -1767,6 +1767,7 @@ function generate_config() {
       uncomment 'typeset -g POWERLEVEL9K_CONTEXT_PREFIX'
       uncomment 'typeset -g POWERLEVEL9K_KUBECONTEXT_PREFIX'
       uncomment 'typeset -g POWERLEVEL9K_TIME_PREFIX'
+      uncomment 'typeset -g POWERLEVEL9K_TOOLBOX_PREFIX'
       if [[ $style == (lean|classic) ]]; then
         [[ $style == classic ]] && local fg="%$prefix_color[$color]F" || local fg="%f"
         sub VCS_PREFIX "'${fg}on '"
@@ -1774,6 +1775,7 @@ function generate_config() {
         sub CONTEXT_PREFIX "'${fg}with '"
         sub KUBECONTEXT_PREFIX "'${fg}at '"
         sub TIME_PREFIX "'${fg}at '"
+        sub TOOLBOX_PREFIX "'${fg}in '"
       fi
     fi
 

@@ -1652,6 +1652,20 @@ prompt_host() {
 instant_prompt_host() { prompt_host; }
 
 ################################################################
+# Toolbox: https://github.com/containers/toolbox
+function prompt_toolbox() {
+  _p9k_prompt_segment $0 $_p9k_color1 yellow TOOLBOX_ICON 0 '' $P9K_TOOLBOX_NAME
+}
+
+_p9k_prompt_toolbox_init() {
+  typeset -g "_p9k__segment_cond_${_p9k__prompt_side}[_p9k__segment_index]"='$P9K_TOOLBOX_NAME'
+}
+
+function instant_prompt_toolbox() {
+  _p9k_prompt_segment prompt_toolbox $_p9k_color1 yellow TOOLBOX_ICON 1 '$P9K_TOOLBOX_NAME' '$P9K_TOOLBOX_NAME'
+}
+
+################################################################
 # The 'custom` prompt provides a way for users to invoke commands and display
 # the output in a segment.
 _p9k_custom_prompt() {
@@ -5906,7 +5920,7 @@ _p9k_set_instant_prompt() {
   [[ -n $RPROMPT ]] || unset RPROMPT
 }
 
-typeset -gri __p9k_instant_prompt_version=42
+typeset -gri __p9k_instant_prompt_version=43
 
 _p9k_dump_instant_prompt() {
   local user=${(%):-%n}
@@ -6117,6 +6131,9 @@ _p9k_dump_instant_prompt() {
   unfunction p10k-on-post-widget'
       fi
       >&$fd print -r -- '
+  () {
+'$functions[_p9k_init_toolbox]'
+  }
   trap "unset -m _p9k__\*; unfunction p10k" EXIT
   local -a _p9k_t=("${(@ps:$us:)${tail%%$rs*}}")
   if [[ $+VTE_VERSION == 1 || $TERM_PROGRAM == Hyper ]] && (( $+commands[stty] )); then
@@ -8123,6 +8140,17 @@ _p9k_init_ssh() {
   [[ $w =~ "\(?($ipv4|$ipv6|$hostname)\)?\$" ]] && P9K_SSH=1
 }
 
+_p9k_init_toolbox() {
+  [[ -z $P9K_TOOLBOX_NAME  &&
+     -e /run/.toolboxenv   &&
+     -f /run/.containerenv &&
+     -r /run/.containerenv ]] || return 0
+  local name=(${(Q)${${(@M)${(f)"$(</run/.containerenv)"}:#name=*}#name=}})
+  (( ${#name} == 1 )) || return 0
+  [[ -n ${name[1]} ]] || return 0
+  typeset -g P9K_TOOLBOX_NAME=${name[1]}
+}
+
 _p9k_must_init() {
   (( _POWERLEVEL9K_DISABLE_HOT_RELOAD && !_p9k__force_must_init )) && return 1
   _p9k__force_must_init=0
@@ -8132,7 +8160,7 @@ _p9k_must_init() {
     [[ $sig == $_p9k__param_sig ]] && return 1
     _p9k_deinit
   fi
-  _p9k__param_pat=$'v125\1'${(q)ZSH_VERSION}$'\1'${(q)ZSH_PATCHLEVEL}$'\1'
+  _p9k__param_pat=$'v126\1'${(q)ZSH_VERSION}$'\1'${(q)ZSH_PATCHLEVEL}$'\1'
   _p9k__param_pat+=$'${#parameters[(I)POWERLEVEL9K_*]}\1${(%):-%n%#}\1$GITSTATUS_LOG_LEVEL\1'
   _p9k__param_pat+=$'$GITSTATUS_ENABLE_LOGGING\1$GITSTATUS_DAEMON\1$GITSTATUS_NUM_THREADS\1'
   _p9k__param_pat+=$'$GITSTATUS_CACHE_DIR\1$GITSTATUS_AUTO_INSTALL\1${ZLE_RPROMPT_INDENT:-1}\1'
@@ -8631,7 +8659,7 @@ _p9k_deinit() {
   fi
   (( $+_p9k__iterm2_precmd )) && functions[iterm2_precmd]=$_p9k__iterm2_precmd
   (( $+_p9k__iterm2_decorate_prompt )) && functions[iterm2_decorate_prompt]=$_p9k__iterm2_decorate_prompt
-  unset -m '(_POWERLEVEL9K_|P9K_|_p9k_)*~(P9K_SSH|P9K_TTY|_P9K_TTY)'
+  unset -m '(_POWERLEVEL9K_|P9K_|_p9k_)*~(P9K_SSH|P9K_TOOLBOX_NAME|P9K_TTY|_P9K_TTY)'
   [[ -n $__p9k_locale ]] || unset __p9k_locale
 }
 
@@ -9044,4 +9072,5 @@ if [[ $__p9k_dump_file != $__p9k_instant_prompt_dump_file && -n $__p9k_instant_p
 fi
 
 _p9k_init_ssh
+_p9k_init_toolbox
 prompt_powerlevel9k_setup

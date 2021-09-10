@@ -145,6 +145,7 @@ function _p9k_init_icons() {
         PACKAGE_ICON                   'pkg'
         JULIA_ICON                     'jl'
         SCALA_ICON                     'scala'
+        TOOLBOX_ICON                   '\u2B22'               # ⬢
       )
     ;;
     'awesome-fontconfig')
@@ -274,6 +275,7 @@ function _p9k_init_icons() {
         PACKAGE_ICON                   'pkg'
         JULIA_ICON                     'jl'
         SCALA_ICON                     'scala'
+        TOOLBOX_ICON                   '\u2B22'               # ⬢
       )
     ;;
     'awesome-mapped-fontconfig')
@@ -406,6 +408,7 @@ function _p9k_init_icons() {
         PACKAGE_ICON                   'pkg'
         JULIA_ICON                     'jl'
         SCALA_ICON                     'scala'
+        TOOLBOX_ICON                   '\u2B22'                                       # ⬢
       )
     ;;
     'nerdfont-complete'|'nerdfont-fontconfig')
@@ -536,6 +539,7 @@ function _p9k_init_icons() {
         PACKAGE_ICON                   '\uF8D6'               # 
         JULIA_ICON                     '\uE624'               # 
         SCALA_ICON                     '\uE737'               # 
+        TOOLBOX_ICON                   '\uE20F'$s             # 
       )
     ;;
     ascii)
@@ -663,6 +667,7 @@ function _p9k_init_icons() {
         PACKAGE_ICON                   'pkg'
         JULIA_ICON                     'jl'
         SCALA_ICON                     'scala'
+        TOOLBOX_ICON                   'toolbox'
       )
     ;;
     *)
@@ -792,6 +797,7 @@ function _p9k_init_icons() {
         PACKAGE_ICON                   'pkg'
         JULIA_ICON                     'jl'
         SCALA_ICON                     'scala'
+        TOOLBOX_ICON                   '\u2B22'               # ⬢
       )
     ;;
   esac
