@@ -88,7 +88,7 @@ if [ -n "$gitstatus_install_tools" ]; then
       fi
     ;;
     freebsd)
-      command pkg install -y cmake gmake binutils gcc git perl5
+      command pkg install -y cmake gmake binutils git perl5 wget
     ;;
     openbsd)
       command pkg_add install cmake gmake gcc git wget
@@ -140,8 +140,15 @@ cflags="$archflag=$gitstatus_cpu -fno-plt -D_FORTIFY_SOURCE=2 -Wformat -Werror=f
 ldflags=
 static_pie=
 
+if [ -z "${CC-}" ]; then
+  case "$gitstatus_kernel" in
+    freebsd) export CC=clang;;
+    *)       export CC=cc;;
+  esac
+fi
+
 printf 'int main() {}\n' >"$workdir"/cc-test.c
-if 2>/dev/null "${CC:-cc}"   \
+if 2>/dev/null "$CC"   \
      -ffile-prefix-map=x=y   \
      -Werror                 \
      -c "$workdir"/cc-test.c \
@@ -150,7 +157,7 @@ if 2>/dev/null "${CC:-cc}"   \
 fi
 
 command rm -f -- "$workdir"/cc-test "$workdir"/cc-test.o
-if 2>/dev/null "${CC:-cc}"                    \
+if 2>/dev/null "$CC"                    \
      -fstack-clash-protection -fcf-protection \
      -Werror                                  \
      -c "$workdir"/cc-test.c                  \
@@ -159,7 +166,7 @@ if 2>/dev/null "${CC:-cc}"                    \
 fi
 
 command rm -f -- "$workdir"/cc-test "$workdir"/cc-test.o
-if 2>/dev/null "${CC:-cc}"                             \
+if 2>/dev/null "$CC"                             \
      -Wl,-O1,--sort-common,--as-needed,-z,relro,-z,now \
      -Werror                                           \
      "$workdir"/cc-test.c                              \
@@ -168,7 +175,7 @@ if 2>/dev/null "${CC:-cc}"                             \
 fi
 
 command rm -f -- "$workdir"/cc-test "$workdir"/cc-test.o
-if 2>/dev/null "${CC:-cc}" \
+if 2>/dev/null "$CC" \
      -fpie -static-pie     \
      -Werror               \
      "$workdir"/cc-test.c  \
@@ -195,6 +202,7 @@ case "$gitstatus_kernel" in
     libgit2_cmake_flags="$libgit2_cmake_flags -DENABLE_REPRODUCIBLE_BUILDS=ON"
   ;;
   freebsd)
+    gitstatus_cxx=clang++
     gitstatus_make=gmake
     gitstatus_ldflags="$gitstatus_ldflags ${static_pie:--static}"
     libgit2_cmake_flags="$libgit2_cmake_flags -DENABLE_REPRODUCIBLE_BUILDS=ON"
@@ -241,7 +249,7 @@ case "$gitstatus_kernel" in
   ;;
 esac
 
-for cmd in cat cmake gcc g++ git ld ln mkdir rm strip tar "$gitstatus_make"; do
+for cmd in cat cmake git ld ln mkdir rm strip tar "$gitstatus_make"; do
   if ! command -v "$cmd" >/dev/null 2>&1; then
     if [ -n "$gitstatus_install_tools" ]; then
       >&2 echo "[internal error] $cmd not found"
