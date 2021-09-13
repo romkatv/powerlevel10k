@@ -1057,7 +1057,7 @@ function ask_use_rprompt() {
   case $choice in
     r) return 1;;
     1) ;;
-    2) pure_use_rprompt=; options+=rpromt;;
+    2) pure_use_rprompt=; options+=rprompt;;
   esac
   return 0
 }
