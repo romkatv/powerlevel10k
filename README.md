@@ -582,7 +582,9 @@ If you are using a different terminal, proceed with manual font installation. �
      Look and Feel* and change *Font:* under *Terminal UI* to `MesloLGS NF Regular`.
    - **WSLtty**: Right click on an open terminal and then on *Options*. In the *Text* section, under
      *Font*, click *"Select..."* and set Font to `MesloLGS NF Regular`.
-   - **Yakuake**: Go to ≡ → *Manage Profiles*. Create a new profile. Click on *Appearance*. Click *Choose* next to the *Font* dropdown. Select `MesloLGS NF` and click *OK*.    Click *Ok* or *Apply* to save. Optionally, select the new profile and click *Set as Default* and then *OK*.
+   - **Yakuake**: Click *≡* → *Manage Profiles* → *New* → *Appearance*. Click *Choose* next to the
+     *Font* dropdown, select `MesloLGS NF` and click *OK*. Click *OK* to save the profile. Select the
+     new profile and click *Set as Default*.
    - **Alacritty**: Create or open `~/.config/alacritty/alacritty.yml` and add the following section
      to it:
      ```yaml
