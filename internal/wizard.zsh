@@ -1103,6 +1103,7 @@ function os_icon_name() {
           *manjaro*)               echo LINUX_MANJARO_ICON;;
           *void*)                  echo LINUX_VOID_ICON;;
           *artix*)                 echo LINUX_ARTIX_ICON;;
+          *rhel*)                  echo LINUX_RHEL_ICON;;
           *)                       echo LINUX_ICON;;
         esac
         ;;

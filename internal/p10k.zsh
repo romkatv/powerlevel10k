@@ -8286,6 +8286,7 @@ function _p9k_init_cacheable() {
           *manjaro*)               _p9k_set_os Linux LINUX_MANJARO_ICON;;
           *void*)                  _p9k_set_os Linux LINUX_VOID_ICON;;
           *artix*)                 _p9k_set_os Linux LINUX_ARTIX_ICON;;
+          *rhel*)                  _p9k_set_os Linux LINUX_RHEL_ICON;;
           *)                       _p9k_set_os Linux LINUX_ICON;;
         esac
         ;;
