@@ -1882,7 +1882,14 @@ prompt_dir() {
         local parent=$_p9k__cwd[1,-2-$#tail]
         _p9k_prompt_length $delim
         local -i real_delim_len=_p9k__ret
-        [[ -n $parts[i-1] ]] && parts[i-1]="\${(Q)\${:-${(qqq)${(q)parts[i-1]}}}}"$'\2'
+
+        # Color the root directory if it's an anchor.
+        local cwd_root_dir=$([[ $parts[1] == '~' ]] && echo $HOME || echo '/'$parts[2])
+        if [[ -n $_POWERLEVEL9K_SHORTEN_FOLDER_MARKER &&
+              -n $cwd_root_dir/${~_POWERLEVEL9K_SHORTEN_FOLDER_MARKER}(#qN) ]]; then
+          parts[i-1]="\${(Q)\${:-${(qqq)${(q)parts[i-1]}}}}"$'\2'
+        fi
+
         local -i d=${_POWERLEVEL9K_SHORTEN_DELIMITER_LENGTH:--1}
         (( d >= 0 )) || d=real_delim_len
         local -i m=1
