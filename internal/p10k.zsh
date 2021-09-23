@@ -2038,7 +2038,7 @@ prompt_dir() {
       _p9k_foreground $_p9k__ret
       last_style+=$_p9k__ret
     fi
-    if [[ -n $last_style ]]; then
+    if [[ -n $last_style && ! $parts[-1] =~ $'\2'$ ]]; then
       (( expand )) && _p9k_escape_style $last_style || _p9k__ret=$last_style
       parts[-1]=$_p9k__ret${parts[-1]//$'\1'/$'\1'$_p9k__ret}$style
     fi
@@ -2054,7 +2054,7 @@ prompt_dir() {
     fi
     if [[ -n $anchor_style ]]; then
       (( expand )) && _p9k_escape_style $anchor_style || _p9k__ret=$anchor_style
-      if [[ -z $last_style ]]; then
+      if [[ -z $last_style || $parts[-1] =~ $'\2'$ ]]; then
         parts=("${(@)parts/%(#b)(*)$'\2'/$_p9k__ret$match[1]$style}")
       else
         (( $#parts > 1 )) && parts[1,-2]=("${(@)parts[1,-2]/%(#b)(*)$'\2'/$_p9k__ret$match[1]$style}")
