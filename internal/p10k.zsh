@@ -4758,13 +4758,6 @@ function _p9k_fetch_nordvpn_status() {
 
 # Shows the state of NordVPN connection. Works only on Linux. Can be in the following 5 states.
 #
-# MISSING: NordVPN is not installed or nordvpnd is not running. By default the segment is not
-# shown in this state. To make it visible, override POWERLEVEL9K_NORDVPN_MISSING_CONTENT_EXPANSION
-# and/or POWERLEVEL9K_NORDVPN_MISSING_VISUAL_IDENTIFIER_EXPANSION.
-#
-#   # Display this icon when NordVPN is not installed or nordvpnd is not running
-#   POWERLEVEL9K_NORDVPN_MISSING_VISUAL_IDENTIFIER_EXPANSION='⭐'
-#
 # CONNECTED: NordVPN is connected. By default shows NORDVPN_ICON as icon and country code as
 # content. In addition, the following variables are set for the use by
 # POWERLEVEL9K_NORDVPN_CONNECTED_VISUAL_IDENTIFIER_EXPANSION and
