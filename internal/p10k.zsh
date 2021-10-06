@@ -4695,34 +4695,60 @@ typeset -gra __p9k_nordvpn_tag=(
 )
 
 function _p9k_fetch_nordvpn_status() {
-  setopt err_return
+  setopt err_return no_multi_byte
   local REPLY
-  zsocket $1
-  local -i fd=$REPLY
+  zsocket /run/nordvpn/nordvpnd.sock
+  local -i fd=REPLY
   {
-    >&$fd echo -nE - $'PRI * HTTP/2.0\r\n\r\nSM\r\n\r\n\0\0\0\4\1\0\0\0\0\0\0N\1\4\0\0\0\1\203\206E\221bA\226\223\325\\k\337\31i=LnH\323j?A\223\266\243y\270\303\fYmLT{$\357]R.\203\223\257_\213\35u\320b\r&=LMedz\212\232\312\310\264\307`+\210K\203@\2te\206M\2035\5\261\37\0\0\5\0\1\0\0\0\1\0\0\0\0\0'
-    local tag len val
-    local -i n
+    print -nu $fd 'PRI * HTTP/2.0\r\n\r\nSM\r\n\r\n\0\0\0\4\1\0\0\0\0\0\0;\1\4\0\0\0\1\203\206E\213b\270\327\2762\322z\230\326j\246A\206\240\344\35\23\235\t_\213\35u\320b\r&=LMedz\212\232\312\310\264\307`+\262\332\340@\2te\206M\2035\5\261\37\0\0\5\0\1\0\0\0\1\0\0\0\0\0\0\0\25\1\4\0\0\0\3\203\206E\215b\270\327\2762\322z\230\334\221\246\324\177\302\301\300\277\0\0\5\0\1\0\0\0\3\0\0\0\0\0'
+    local val
+    local -i len n wire tag
     {
-      IFS='' read -t 0.25 -r tag
-      tag=$'\n'
+      IFS='' read -t 0.25 -r val
+      val=$'\n'
       while true; do
-        tag=$((#tag))
+        tag=$((#val))
+        wire='tag & 7'
         (( (tag >>= 3) && tag <= $#__p9k_nordvpn_tag )) || break
-        tag=$__p9k_nordvpn_tag[tag]
-        [[ -t $fd ]] || true  # https://www.zsh.org/mla/workers/2020/msg00207.html
-        sysread -s 1 -t 0.25 len
-        len=$((#len))
-        val=
-        while true; do
-          (( len )) || break
+        if (( wire == 0 )); then
+          # varint
+          sysread -s 1 -t 0.25 val
+          n=$((#val))
+          (( n < 128 )) || break  # bail on multi-byte varints
+          if (( tag == 2 )); then
+            # P9K_NORDVPN_TECHNOLOGY
+            case $n in
+              1) typeset -g P9K_NORDVPN_TECHNOLOGY=OPENVPN;;
+              2) typeset -g P9K_NORDVPN_TECHNOLOGY=NORDLYNX;;
+              3) typeset -g P9K_NORDVPN_TECHNOLOGY=SKYLARK;;
+              *) typeset -g P9K_NORDVPN_TECHNOLOGY=UNKNOWN;;
+            esac
+          elif (( tag == 3 )); then
+            # P9K_NORDVPN_PROTOCOL
+            case $n in
+              1) typeset -g P9K_NORDVPN_PROTOCOL=UDP;;
+              2) typeset -g P9K_NORDVPN_PROTOCOL=TCP;;
+              *) typeset -g P9K_NORDVPN_PROTOCOL=UNKNOWN;;
+            esac
+          else
+            break
+          fi
+        else
+          # length-delimited
+          (( wire == 2 )) || break
+          (( tag != 2 && tag != 3 )) || break
           [[ -t $fd ]] || true  # https://www.zsh.org/mla/workers/2020/msg00207.html
-          sysread -c n -s $len -t 0.25 'val[$#val+1]'
-          len+=-n
-        done
-        typeset -g $tag=$val
+          sysread -s 1 -t 0.25 val
+          len=$((#val))
+          val=
+          while (( $#val < len )); do
+            [[ -t $fd ]] || true  # https://www.zsh.org/mla/workers/2020/msg00207.html
+            sysread -s $(( len - $#val )) -t 0.25 'val[$#val+1]'
+          done
+          typeset -g $__p9k_nordvpn_tag[tag]=$val
+        fi
         [[ -t $fd ]] || true  # https://www.zsh.org/mla/workers/2020/msg00207.html
-        sysread -s 1 -t 0.25 tag
+        sysread -s 1 -t 0.25 val
       done
     } <&$fd
   } always {
@@ -4773,14 +4799,8 @@ function _p9k_fetch_nordvpn_status() {
 #   POWERLEVEL9K_NORDVPN_CONNECTING_BACKGROUND=cyan
 function prompt_nordvpn() {
   unset $__p9k_nordvpn_tag P9K_NORDVPN_COUNTRY_CODE
-  if [[ -e /run/nordvpn/nordvpnd.sock ]]; then
-    sock=/run/nordvpn/nordvpnd.sock
-  elif [[ -e /run/nordvpnd.sock ]]; then
-    sock=/run/nordvpnd.sock
-  else
-    return
-  fi
-  _p9k_fetch_nordvpn_status $sock 2>/dev/null
+  [[ -e /run/nordvpn/nordvpnd.sock ]] || return
+  _p9k_fetch_nordvpn_status 2>/dev/null || return
   if [[ $P9K_NORDVPN_SERVER == (#b)([[:alpha:]]##)[[:digit:]]##.nordvpn.com ]]; then
     typeset -g P9K_NORDVPN_COUNTRY_CODE=${${(U)match[1]}//İ/I}
   fi
