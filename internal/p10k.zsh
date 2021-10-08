@@ -7693,17 +7693,23 @@ function _p9k_widget() {
       res=$?
     }
   }
-  (( ! __p9k_enabled )) || [[ $CONTEXT != start ]] || {
-    [[ $1 == zle-line-pre-redraw ]] && (( PENDING || KEYS_QUEUED_COUNT )) && {
-      (( _p9k__redraw_fd )) || {
-        sysopen -o cloexec -ru _p9k__redraw_fd /dev/null
-        zle -F $_p9k__redraw_fd _p9k_redraw
-      }
-      return res
-    }
-    _p9k_widget_hook "$@"
-  }
+  (( ! __p9k_enabled )) || [[ $CONTEXT != start ]] || _p9k_widget_hook "$@"
   return res
+}
+
+function _p9k_widget_zle-line-pre-redraw-impl() {
+  (( __p9k_enabled )) && [[ $CONTEXT == start ]] || return 0
+  ! (( ${+functions[p10k-on-post-widget]} || ${#_p9k_show_on_command} || _p9k__restore_prompt_fd || _p9k__redraw_fd )) &&
+      [[ ${KEYMAP:-} != vicmd ]] &&
+      return
+  (( PENDING || KEYS_QUEUED_COUNT )) && {
+    (( _p9k__redraw_fd )) || {
+      sysopen -o cloexec -ru _p9k__redraw_fd /dev/null
+      zle -F $_p9k__redraw_fd _p9k_redraw
+    }
+    return
+  }
+  _p9k_widget_hook zle-line-pre-redraw
 }
 
 function _p9k_widget_send-break() {
@@ -7718,6 +7724,7 @@ typeset -gi __p9k_widgets_wrapped=0
 
 function _p9k_wrap_widgets() {
   (( __p9k_widgets_wrapped )) && return
+
   typeset -gir __p9k_widgets_wrapped=1
   local -a widget_list
   if is-at-least 5.3; then
@@ -7759,6 +7766,7 @@ function _p9k_wrap_widgets() {
       zf_rm -f -- $tmp
     }
   fi
+
   local widget
   for widget in $widget_list; do
     if (( ! $+functions[_p9k_widget_$widget] )); then
@@ -7774,6 +7782,28 @@ function _p9k_wrap_widgets() {
       zle -N $widget _p9k_widget_$widget
     fi
   done 2>/dev/null  # `zle -A` fails for inexisting widgets and complains to stderr
+
+  case ${widgets[._p9k_orig_zle-line-pre-redraw]:-} in
+    user:-z4h-zle-line-pre-redraw)
+      function _p9k_widget_zle-line-pre-redraw() {
+        -z4h-zle-line-pre-redraw "$@"
+        _p9k_widget_zle-line-pre-redraw-impl
+      }
+    ;;
+    ?*)
+      function _p9k_widget_zle-line-pre-redraw() {
+        zle ._p9k_orig_zle-line-pre-redraw -- "$@"
+        local -i res=$?
+        _p9k_widget_zle-line-pre-redraw-impl
+        return res
+      }
+    ;;
+    '')
+      function _p9k_widget_zle-line-pre-redraw() {
+        _p9k_widget_zle-line-pre-redraw-impl
+      }
+    ;;
+  esac
 }
 
 function _p9k_restore_prompt() {
