@@ -5933,7 +5933,7 @@ _p9k_set_instant_prompt() {
   [[ -n $RPROMPT ]] || unset RPROMPT
 }
 
-typeset -gri __p9k_instant_prompt_version=43
+typeset -gri __p9k_instant_prompt_version=44
 
 _p9k_dump_instant_prompt() {
   local user=${(%):-%n}
@@ -6237,6 +6237,9 @@ _p9k_dump_instant_prompt() {
   typeset -g __p9k_instant_prompt_output=${TMPDIR:-/tmp}/p10k-instant-prompt-output-${(%):-%n}-$$
   { echo -n > $__p9k_instant_prompt_output } || return
   print -rn -- "$out" || return
+  if (( $+commands[stty] )); then
+    command stty -icanon 2>/dev/null
+  fi
   local fd_null
   sysopen -ru fd_null /dev/null || return
   exec {__p9k_fd_0}<&0 {__p9k_fd_1}>&1 {__p9k_fd_2}>&2 0<&$fd_null 1>$__p9k_instant_prompt_output
