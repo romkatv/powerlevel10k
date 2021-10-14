@@ -8645,6 +8645,13 @@ _p9k_init() {
 
   if (( $+__p9k_instant_prompt_erased )); then
     unset __p9k_instant_prompt_erased
+    if [[ -w $TTY ]]; then
+      local tty=$TTY
+    elif [[ -w /dev/tty ]]; then
+      local tty=/dev/tty
+    else
+      local tty=/dev/null
+    fi
     {
       >&2 echo -E - ""
       >&2 echo -E - "${(%):-[%1FERROR%f]: When using instant prompt, Powerlevel10k must be loaded before the first prompt.}"
@@ -8684,7 +8691,7 @@ _p9k_init() {
       >&2 echo -E - "${(%):-    * You %Bwill%b see this error message every time you start zsh.}"
       >&2 echo -E - "${(%):-    * Zsh will start %Bslowly%b.}"
       >&2 echo -E - ""
-    } 2>>$TTY
+    } 2>>$tty
   fi
 }
 
