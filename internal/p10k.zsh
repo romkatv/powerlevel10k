@@ -3980,10 +3980,12 @@ function _p9k_maybe_ignore_git_repo() {
 function _p9k_vcs_resume() {
   eval "$__p9k_intro"
 
+  print "vcs_resume $1: RESULT=$VCS_STATUS_RESULT" >>/tmp/log
+
   _p9k_maybe_ignore_git_repo
 
   if [[ $VCS_STATUS_RESULT == ok-async ]]; then
-    local latency=$((EPOCHREALTIME - _p9k__gitstatus_start_time))
+    local -F latency='EPOCHREALTIME - _p9k__gitstatus_start_time'
     if (( latency > _POWERLEVEL9K_VCS_MAX_SYNC_LATENCY_SECONDS )); then
       _p9k_git_slow[${${_p9k__git_dir:+GIT_DIR:$_p9k__git_dir}:-$VCS_STATUS_WORKDIR}]=1
     elif (( $1 && latency < 0.8 * _POWERLEVEL9K_VCS_MAX_SYNC_LATENCY_SECONDS )); then  # 0.8 to avoid flip-flopping
@@ -4002,18 +4004,20 @@ function _p9k_vcs_resume() {
 
   if [[ -n $_p9k__gitstatus_next_dir ]]; then
     _p9k__git_dir=$GIT_DIR
+    if (( $+_p9k__fast_vcs )); then
+      print "vcs_resume $1: hide" >>/tmp/log
+    fi
     if ! gitstatus_query_p9k_ -d $_p9k__gitstatus_next_dir -t 0 -c '_p9k_vcs_resume 1' POWERLEVEL9K; then
       unset _p9k__gitstatus_next_dir
       unset VCS_STATUS_RESULT
     else
-      _p9k_maybe_ignore_git_repo
-      case $VCS_STATUS_RESULT in
-        tout) _p9k__gitstatus_next_dir=''; _p9k__gitstatus_start_time=$EPOCHREALTIME;;
-        norepo-sync) _p9k_vcs_status_purge $_p9k__gitstatus_next_dir; unset _p9k__gitstatus_next_dir;;
-        ok-sync) _p9k_vcs_status_save; unset _p9k__gitstatus_next_dir;;
-      esac
+      typeset -g VCS_STATUS_RESULT=norepo-async
+      _p9k__gitstatus_next_dir=''
+      _p9k__gitstatus_start_time=EPOCHREALTIME
     fi
   fi
+
+  (( $+_p9k__fast_vcs )) && { print "vcs_resume $1: bail" >>/tmp/log; return }
 
   if (( _p9k_vcs_index && $+GITSTATUS_DAEMON_PID_POWERLEVEL9K )); then
     local _p9k__prompt _p9k__prompt_side=$_p9k_vcs_side _p9k__segment_name=vcs
@@ -4037,10 +4041,20 @@ function _p9k_vcs_gitstatus() {
       local -F timeout=_POWERLEVEL9K_VCS_MAX_SYNC_LATENCY_SECONDS
       if ! _p9k_vcs_status_for_dir; then
         _p9k__git_dir=$GIT_DIR
+        if (( _p9k_vcs_index && $+GITSTATUS_DAEMON_PID_POWERLEVEL9K )); then
+          if ! gitstatus_query_p9k_ -d $_p9k__cwd_a -t 0 -p -c '_p9k_vcs_resume 0' POWERLEVEL9K; then
+            unset VCS_STATUS_RESULT
+            return 1
+          fi
+          typeset -gF _p9k__vcs_timeout=timeout
+          _p9k__gitstatus_next_dir=''
+          _p9k__gitstatus_start_time=EPOCHREALTIME
+          return 0
+        fi
         gitstatus_query_p9k_ -d $_p9k__cwd_a -t $timeout -p -c '_p9k_vcs_resume 0' POWERLEVEL9K || return 1
         _p9k_maybe_ignore_git_repo
         case $VCS_STATUS_RESULT in
-          tout) _p9k__gitstatus_next_dir=''; _p9k__gitstatus_start_time=$EPOCHREALTIME; return 0;;
+          tout) _p9k__gitstatus_next_dir=''; _p9k__gitstatus_start_time=EPOCHREALTIME; return 0;;
           norepo-sync) return 0;;
           ok-sync) _p9k_vcs_status_save;;
         esac
@@ -4067,7 +4081,7 @@ function _p9k_vcs_gitstatus() {
         fi
         typeset -gF _p9k__vcs_timeout=timeout
         _p9k__gitstatus_next_dir=''
-        _p9k__gitstatus_start_time=$EPOCHREALTIME
+        _p9k__gitstatus_start_time=EPOCHREALTIME
         return 0
       fi
       if ! gitstatus_query_p9k_ -d $_p9k__cwd_a -t $timeout -c '_p9k_vcs_resume 1' POWERLEVEL9K; then
@@ -4076,7 +4090,7 @@ function _p9k_vcs_gitstatus() {
       fi
       _p9k_maybe_ignore_git_repo
       case $VCS_STATUS_RESULT in
-        tout) _p9k__gitstatus_next_dir=''; _p9k__gitstatus_start_time=$EPOCHREALTIME;;
+        tout) _p9k__gitstatus_next_dir=''; _p9k__gitstatus_start_time=EPOCHREALTIME;;
         norepo-sync) _p9k_vcs_status_purge $_p9k__cwd_a;;
         ok-sync) _p9k_vcs_status_save;;
       esac
@@ -6829,7 +6843,6 @@ _p9k_precmd_impl() {
   _p9k__refresh_reason=precmd
   __p9k_reset_state=1
 
-  local -i fast_vcs
   if (( _p9k_vcs_index && $+GITSTATUS_DAEMON_PID_POWERLEVEL9K )); then
     if [[ $_p9k__cwd != $~_POWERLEVEL9K_VCS_DISABLED_DIR_PATTERN ]]; then
       local -F start_time=EPOCHREALTIME
@@ -6837,7 +6850,7 @@ _p9k_precmd_impl() {
       unset _p9k__vcs_timeout
       local -i _p9k__vcs_called
       _p9k_vcs_gitstatus
-      local -i fast_vcs=1
+      local _p9k__fast_vcs
     fi
   fi
 
@@ -6862,12 +6875,15 @@ _p9k_precmd_impl() {
     preexec_functions=(${(@)preexec_functions:#_p9k_preexec2} _p9k_preexec2)
   fi
 
-  if (( fast_vcs && _p9k_vcs_index && $+GITSTATUS_DAEMON_PID_POWERLEVEL9K )); then
+  if (( $+_p9k__fast_vcs && _p9k_vcs_index && $+GITSTATUS_DAEMON_PID_POWERLEVEL9K )); then
+    print "fast_vcs start" >>/tmp/log
     if (( $+_p9k__vcs_timeout )); then
-      (( _p9k__vcs_timeout = _POWERLEVEL9K_VCS_MAX_SYNC_LATENCY_SECONDS + start_time - EPOCHREALTIME ))
-      (( _p9k__vcs_timeout >= 0 )) || (( _p9k__vcs_timeout = 0 ))
+      (( _p9k__vcs_timeout = _POWERLEVEL9K_VCS_MAX_SYNC_LATENCY_SECONDS + start_time - EPOCHREALTIME,
+         _p9k__vcs_timeout >= 0 || (_p9k__vcs_timeout = 0) ))
+      print "fast_vcs process: tmout=$_p9k__vcs_timeout" >>/tmp/log
       gitstatus_process_results_p9k_ -t $_p9k__vcs_timeout POWERLEVEL9K
     fi
+    print "fast_vcs end: HAS_UNTRACKED: $VCS_STATUS_HAS_UNTRACKED" >>/tmp/log
     if (( ! $+_p9k__vcs )); then
       local _p9k__prompt _p9k__prompt_side=$_p9k_vcs_side _p9k__segment_name=vcs
       local -i _p9k__has_upglob _p9k__segment_index=_p9k_vcs_index _p9k__line_index=_p9k_vcs_line_index
