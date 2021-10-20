@@ -340,7 +340,7 @@ END
           fi
         fi
         local cmd part url ret
-        for cmd in 'curl -q -kfsSL' 'wget --no-config -qO-' 'wget -qO-' 'curl -kfsSL'; do
+        for cmd in 'curl -kfsSL' 'wget -qO-' 'curl -q -kfsSL' 'wget --no-config -qO-'; do
           part=0
           while true; do
             if [ "$part" = 2 ]; then
