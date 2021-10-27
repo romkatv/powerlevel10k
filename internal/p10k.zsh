@@ -5777,7 +5777,7 @@ function _p9k_set_prompt() {
 
   PROMPT=
   RPROMPT=
-  [[ $1 == instant_ ]] || PROMPT+='${$((_p9k_on_expand()))+}'
+  [[ $1 == instant_ ]] || PROMPT+='${$((_p9k_on_expand()))+}%{${_p9k__raw_msg-}${_p9k__raw_msg::=}%}'
   PROMPT+=$_p9k_prompt_prefix_left
 
   local -i _p9k__has_upglob
