@@ -941,7 +941,7 @@ fi
 
 ### How do I export GPG_TTY when using instant prompt?
 
-You can set `GPG_TTY` like this anywhere in `~/.zshrc`:
+You can export `GPG_TTY` like this anywhere in `~/.zshrc`:
 
 ```zsh
 export GPG_TTY=$TTY
