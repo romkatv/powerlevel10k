@@ -2093,12 +2093,12 @@ restore_screen
 if (( !in_z4h_wizard )); then
   print
 
-  flowing +c New config: "%B${__p9k_cfg_path_u//\\/\\\\}%b."
+  flowing +c New config: "%U${__p9k_cfg_path_u//\\/\\\\}%u."
   if [[ -n $config_backup ]]; then
-    flowing +c Backup of the old config: "%B${config_backup_u//\\/\\\\}%b."
+    flowing +c Backup of the old config: "%U${config_backup_u//\\/\\\\}%u."
   fi
   if [[ -n $zshrc_backup ]]; then
-    flowing +c Backup of "%B${__p9k_zshrc_u//\\/\\\\}%b:" "%B${zshrc_backup_u//\\/\\\\}%b."
+    flowing +c Backup of "%U${__p9k_zshrc_u//\\/\\\\}%u:" "%U${zshrc_backup_u//\\/\\\\}%u."
   fi
 fi
 
