@@ -906,6 +906,54 @@ initialization and you don't know how to fix it.
 *Note*: Instant prompt requires Zsh >= 5.4. It's OK to enable it even when using an older version of
 Zsh but it won't do anything.
 
+*FAQ*:
+
+- [How do I initialize direnv when using instant prompt?](
+    #how-do-i-initialize-direnv-when-using-instant-prompt)
+- [How do I export GPG_TTY when using instant prompt?](
+    #how-do-i-export-gpg_tty-when-using-instant-prompt)
+
+### How do I initialize direnv when using instant prompt?
+
+If you've enabled [instant prompt](#instant-prompt), you should have these lines at the top of
+`~/.zshrc`:
+
+```zsh
+if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
+  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
+fi
+```
+
+To initialize direnv you need to add one line above that block and one line below it.
+
+```zsh
+(( ${+commands[direnv]} )) && emulate zsh -c "$(direnv export zsh)"
+
+if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
+  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
+fi
+
+(( ${+commands[direnv]} )) && emulate zsh -c "$(direnv hook zsh)"
+```
+
+*Related*: [How do I export GPG_TTY when using instant prompt?](
+  #how-do-i-export-gpg_tty-when-using-instant-prompt)
+
+### How do I export GPG_TTY when using instant prompt?
+
+You can set `GPG_TTY` like this anywhere in `~/.zshrc`:
+
+```zsh
+export GPG_TTY=$TTY
+```
+
+This works whether you are using [instant prompt](#instant-prompt) or not. It works even if you
+aren't using powerlevel10k. As an extra bonus, it's much faster than the commonly used
+`export GPG_TTY=$(tty)`.
+
+*Related*: [How do I initialize direnv when using instant prompt?](
+  #how-do-i-initialize-direnv-when-using-instant-prompt)
+
 ### What do different symbols in Git status mean?
 
 When using Lean, Classic or Rainbow style, Git status may look like this:
@@ -1835,6 +1883,8 @@ typeset -g POWERLEVEL9K_OS_ICON_CONTENT_EXPANSION='${P9K_CONTENT}'  # not bold
   - [I'm using Powerlevel9k with Oh My Zsh. How do I migrate?](#im-using-powerlevel9k-with-oh-my-zsh-how-do-i-migrate)
   - [Is it really fast?](#is-it-really-fast)
   - [How do I enable instant prompt?](#how-do-i-enable-instant-prompt)
+  - [How do I initialize direnv when using instant prompt?](#how-do-i-initialize-direnv-when-using-instant-prompt)
+  - [How do I export GPG_TTY when using instant prompt?](#how-do-i-export-gpg_tty-when-using-instant-prompt)
   - [What do different symbols in Git status mean?](#what-do-different-symbols-in-git-status-mean)
   - [How do I change the format of Git status?](#how-do-i-change-the-format-of-git-status)
   - [Why is Git status from `$HOME/.git` not displayed in prompt?](#why-is-git-status-from-homegit-not-displayed-in-prompt)
