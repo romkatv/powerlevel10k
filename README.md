@@ -1645,7 +1645,7 @@ There are several ways to fix this.
   The parameters you are looking for are called `POWERLEVEL9K_DIR_BACKGROUND`,
   `POWERLEVEL9K_DIR_FOREGROUND`, `POWERLEVEL9K_DIR_SHORTENED_FOREGROUND`,
   `POWERLEVEL9K_DIR_ANCHOR_FOREGROUND` and `POWERLEVEL9K_DIR_ANCHOR_BOLD`. You can find them in
-  in `~/.p10k.zsh`.
+  `~/.p10k.zsh`.
 
 ### Horrific mess when resizing terminal window
 
