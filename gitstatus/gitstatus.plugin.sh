@@ -371,7 +371,7 @@ function gitstatus_query() {
 
   local req_id="$RANDOM.$RANDOM.$RANDOM.$RANDOM"
   if [[ -z "${GIT_DIR:-}" ]]; then
-    [[ "$dir" == /* ]] || dir="$(pwd -P)/$dir" || return
+    [[ "${dir-}" == /* ]] || dir="$(pwd -P)/${dir-}" || return
   elif [[ "$GIT_DIR" == /* ]]; then
     dir=:"$GIT_DIR"
   else
