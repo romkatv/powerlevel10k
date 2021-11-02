@@ -53,9 +53,8 @@ function gitstatus_start() {
   fi
 
   unset OPTIND
-  local opt timeout=5 max_dirty=-1 ttl=3600 extra_flags
+  local opt timeout=5 max_dirty=-1 ttl=3600 extra_flags=
   local max_num_staged=1 max_num_unstaged=1 max_num_conflicted=1 max_num_untracked=1
-  local ignore_status_show_untracked_files
   while getopts "t:s:u:c:d:m:r:eUWD" opt; do
     case "$opt" in
       t) timeout=$OPTARG;;
@@ -356,7 +355,7 @@ function gitstatus_stop() {
 # shell or the call had failed.
 function gitstatus_query() {
   unset OPTIND
-  local opt dir timeout=() no_diff=0
+  local opt dir= timeout=() no_diff=0
   while getopts "d:c:t:p" opt "$@"; do
     case "$opt" in
       d) dir=$OPTARG;;
@@ -367,7 +366,7 @@ function gitstatus_query() {
   done
   (( OPTIND == $# + 1 )) || { echo "usage: gitstatus_query [OPTION]..." >&2; return 1; }
 
-  [[ -n "$GITSTATUS_DAEMON_PID" ]] || return  # not started
+  [[ -n "${GITSTATUS_DAEMON_PID-}" ]] || return  # not started
 
   local req_id="$RANDOM.$RANDOM.$RANDOM.$RANDOM"
   if [[ -z "${GIT_DIR:-}" ]]; then

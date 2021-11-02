@@ -304,27 +304,29 @@ END
         local data_file="$tmpdir"/"$1".tar.gz
         local hash_file="$tmpdir"/"$1".tar.gz.sha256
         local hash=
-        if command -v shasum >/dev/null 2>/dev/null; then
-          if run_cmd shasum -b -a 256 -- "$data_file" >"$hash_file"; then
-            IFS= read -r hash <"$hash_file" || hash=
-            hash="${hash%% *}"
-          fi
-        elif command -v sha256sum >/dev/null 2>/dev/null; then
-          if run_cmd sha256sum -b -- "$data_file" >"$hash_file"; then
-            IFS= read -r hash <"$hash_file" || hash=
-            hash="${hash%% *}"
-          fi
-        elif command -v sha256 >/dev/null 2>/dev/null; then
-          if run_cmd sha256 -- "$data_file" </dev/null >"$hash_file"; then
-            IFS= read -r hash <"$hash_file" || hash=
-            # Ignore sha256 output if it's from hashalot. It's incompatible.
-            if [ ${#hash} -lt 64 ]; then
-              hash=
-            else
-              hash="${hash##* }"
-            fi
-          fi
-        fi
+        {
+          command -v shasum >/dev/null 2>/dev/null                            &&
+            run_cmd shasum -b -a 256 -- "$data_file" >"$hash_file" </dev/null &&
+            IFS= read -r hash <"$hash_file"                                   &&
+            hash="${hash%% *}"                                                &&
+            [ ${#hash} -eq 64 ]
+        } || {
+          command -v sha256sum >/dev/null 2>/dev/null                         &&
+            run_cmd sha256sum -b -- "$data_file" >"$hash_file" </dev/null     &&
+            IFS= read -r hash <"$hash_file"                                   &&
+            hash="${hash%% *}"                                                &&
+            [ ${#hash} -eq 64 ]
+        } || {
+          # Note: sha256 can be from hashalot. It's incompatible.
+          # Thankfully, it produces shorter output.
+          command -v sha256 >/dev/null 2>/dev/null &&
+            run_cmd sha256 -- "$data_file" >"$hash_file" </dev/null &&
+            IFS= read -r hash <"$hash_file" &&
+            hash="${hash##* }" &&
+            [ ${#hash} -eq 64 ]
+        } || {
+          hash=
+        }
         [ "$1" = 1 -a -z "$hash" -o "$hash" = "$sha256" ]
       }
 
