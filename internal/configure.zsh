@@ -59,7 +59,10 @@ function _p9k_can_configure() {
       $0_error "terminal size too small; must be at least $__p9k_wizard_columns columns by $__p9k_wizard_lines lines"
       return 1
     }
-    [[ -t 0 && -t 1 ]]         || { $0_error "no TTY";                           return 2 }
+    [[ -t 0 && -t 1 ]]                                                     || {
+      $0_error "no TTY"
+      return 2
+    }
     return 0
   } always {
     unfunction $0_error
