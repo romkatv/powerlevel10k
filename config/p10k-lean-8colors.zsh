@@ -68,6 +68,7 @@
     phpenv                  # php version from phpenv (https://github.com/phpenv/phpenv)
     scalaenv                # scala version from scalaenv (https://github.com/scalaenv/scalaenv)
     haskell_stack           # haskell version from stack (https://haskellstack.org/)
+    docker_context          # current docker context (https://docs.docker.com/engine/context/working-with-contexts/)
     kubecontext             # current kubernetes context (https://kubernetes.io/)
     terraform               # terraform workspace (https://www.terraform.io)
     # terraform_version     # terraform version (https://www.terraform.io)
@@ -1153,6 +1154,13 @@
   typeset -g POWERLEVEL9K_HASKELL_STACK_ALWAYS_SHOW=true
   # Custom icon.
   # typeset -g POWERLEVEL9K_HASKELL_STACK_VISUAL_IDENTIFIER_EXPANSION='⭐'
+
+  #############[ docker_context: current docker context (https://docs.docker.com/engine/context/working-with-contexts/) ]#############
+  # Show docker context only when the command you are typing invokes one of these (pipe-separated) tools.
+  # Comment the next line to always show docker context.
+  typeset -g POWERLEVEL9K_DOCKER_CONTEXT_SHOW_ON_COMMAND='docker'
+  # Don't show docker context if it's literally "default".
+  typeset -g POWERLEVEL9K_DOCKER_CONTEXT_SHOW_DEFAULT=false
 
   #############[ kubecontext: current kubernetes context (https://kubernetes.io/) ]#############
   # Show kubecontext only when the the command you are typing invokes one of these tools.

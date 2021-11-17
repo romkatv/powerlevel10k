@@ -2131,6 +2131,27 @@ prompt_dir() {
 instant_prompt_dir() { prompt_dir; }
 
 ################################################################
+# Docker context
+prompt_docker_context() {
+  local ctx=${DOCKER_CONTEXT:-default}
+  if [[ -z ${DOCKER_CONTEXT:-} ]]; then
+    if (( $+commands[jq] )); then
+      local cfg=${DOCKER_CONFIG:-~/.docker/config.json}
+      ctx="$(jq -e -r '.currentContext' $cfg 2>/dev/null)" || ctx=default
+    else;
+      ctx=$(docker context show)
+    fi
+  fi
+  [[ -z $ctx || $ctx == default && $_POWERLEVEL9K_DOCKER_CONTEXT_SHOW_DEFAULT == 0 ]] && return
+  _p9k_prompt_segment "$0" "$_p9k_color1" "deepskyblue1" 'DOCKER_ICON' 0 '' "$ctx"
+}
+
+_p9k_prompt_docker_context_init() {
+  typeset -g "_p9k__segment_cond_${_p9k__prompt_side}[_p9k__segment_index]"='$commands[docker]'
+}
+
+
+################################################################
 # Docker machine
 prompt_docker_machine() {
   _p9k_prompt_segment "$0" "magenta" "$_p9k_color1" 'SERVER_ICON' 0 '' "${DOCKER_MACHINE_NAME//\%/%%}"
@@ -7495,6 +7516,7 @@ _p9k_init_params() {
   _p9k_declare -a POWERLEVEL9K_KUBECONTEXT_CLASSES --
   _p9k_declare -a POWERLEVEL9K_AWS_CLASSES --
   _p9k_declare -a POWERLEVEL9K_AZURE_CLASSES --
+  _p9k_declare -b POWERLEVEL9K_DOCKER_CONTEXT_SHOW_DEFAULT 0
   _p9k_declare -a POWERLEVEL9K_TERRAFORM_CLASSES --
   _p9k_declare -b POWERLEVEL9K_TERRAFORM_SHOW_DEFAULT 0
   _p9k_declare -a POWERLEVEL9K_GOOGLE_APP_CRED_CLASSES -- 'service_account:*' SERVICE_ACCOUNT
