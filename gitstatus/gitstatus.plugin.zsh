@@ -458,7 +458,7 @@ function _gitstatus_daemon"${1:-}"() {
   (( lock_fd == -1 )) && return
 
   {
-    if zsystem flock -- $file_prefix.lock && [[ -e $file_prefix.lock ]]; then
+    if zsystem flock -- $file_prefix.lock && command sleep 5 && [[ -e $file_prefix.lock ]]; then
       zf_rm -f -- $file_prefix.lock $file_prefix.fifo
       kill -- -$pgid
     fi
