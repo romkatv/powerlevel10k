@@ -5348,7 +5348,7 @@ function _p9k_asdf_init_meta() {
             files+=$parse
             [[ -x $parse ]] && has_parse=1
             local name
-            for name in $($list_names 2>/dev/null); do
+            for name in ${$($list_names 2>/dev/null)%$'\r'}; do
               [[ $name == (*/*|.tool-versions) ]] && continue
               _p9k_asdf_file_info[$name]+="${plugin:t} $has_parse "
             done
@@ -5402,8 +5402,8 @@ function _p9k_asdf_parse_version_file() {
           local v=($(${ASDF_DATA_DIR:-~/.asdf}/plugins/$plugin/bin/parse-legacy-file $file 2>/dev/null))
         else
           { local v=($(<$file)) } 2>/dev/null
-          v=(${v%$'\r'})
         fi
+        v=(${v%$'\r'})
         v=${v[(r)$_p9k_asdf_plugins[$plugin]]:-$v[1]}
         _p9k_asdf_file2versions[$plugin:$file]=$stat[1]:"$v"
         _p9k__state_dump_scheduled=1
