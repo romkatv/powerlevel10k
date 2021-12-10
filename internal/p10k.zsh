@@ -317,16 +317,24 @@ function _p9k_prompt_length() {
 
 typeset -gr __p9k_byte_suffix=('B' 'K' 'M' 'G' 'T' 'P' 'E' 'Z' 'Y')
 
-# 42 => 42B
-# 1536 => 1.5K
+# 512 => 512B
+# 1800 => 1.76K
+# 18000 => 17.6K
 function _p9k_human_readable_bytes() {
-  typeset -F 2 n=$1
+  typeset -F n=$1
   local suf
   for suf in $__p9k_byte_suffix; do
-    (( n < 100 )) && break
+    (( n < 1024 )) && break
     (( n /= 1024 ))
   done
-  _p9k__ret=${${n%%0#}%.}$suf
+  if (( n >= 100 )); then
+    printf -v _p9k__ret '%.0f.' $n
+  elif (( n >= 10 )); then
+    printf -v _p9k__ret '%.1f' $n
+  else
+    printf -v _p9k__ret '%.2f' $n
+  fi
+  _p9k__ret=${${_p9k__ret%%0#}%.}$suf
 }
 
 if is-at-least 5.4; then
