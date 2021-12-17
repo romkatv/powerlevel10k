@@ -1649,19 +1649,25 @@ There are several ways to fix this.
 
 ### Horrific mess when resizing terminal window
 
-When you resize terminal window horizontally back and forth a few times, you might see this ugly
+When you resize a terminal window horizontally back and forth a few times, you might see this ugly
 picture.
 
 ![Powerlevel10k Resizing Mess](
   https://raw.githubusercontent.com/romkatv/powerlevel10k-media/master/resizing-mess.png)
 
-tl;dr: This is a bug in Zsh that isn't specific to Powerlevel10k. See [mitigation](#mitigation).
+tl;dr: This issue arises when a terminal reflows Zsh prompt upon resizing. It isn't specific to
+Powerlevel10k. See [mitigation](#mitigation).
 
-#### Zsh bug
+*Note: This section [used to say](
+  https://github.com/romkatv/powerlevel10k/blob/dce00cdb5daaa8a519df234a7012ba3257b644d4/README.md#horrific-mess-when-resizing-terminal-window)
+that the problem is caused by a bug in Zsh. While it's true that it's possible to avoid the problem
+in many circumstances by modifying Zsh, it cannot be completely resolved this way. Thus it's unfair
+to pin the blame on Zsh.*
 
-This issue is caused by a bug in Zsh that gets triggered when the vertical distance between the
-start of the current prompt and the cursor (henceforth `VD`) changes when the terminal window is
-resized. This bug is not specific to Powerlevel10k.
+#### The anatomy of the problem
+
+The issue is manifested when the vertical distance between the start of the current prompt and the
+cursor (henceforth `VD`) changes when the terminal window is resized.
 
 When a terminal window gets shrunk horizontally, there are two ways for a terminal to handle long
 lines that no longer fit: *reflow* or *truncate*.
@@ -1683,9 +1689,9 @@ Terminal truncates text when shrinking:
 
 Reflowing strategy can change the height of terminal content. If such content happens to be between
 the start of the current prompt and the cursor, Zsh will print prompt on the wrong line. Truncation
-strategy never changes the height of terminal content, so it doesn't trigger this bug in Zsh.
+strategy never changes the height of terminal content, so it doesn't trigger this issue.
 
-Let's see how the bug plays out in slow motion. We'll start by launching `zsh -df` and pasting
+Let's see how the issue plays out in slow motion. We'll start by launching `zsh -f` and pasting
 the following code:
 
 ```zsh
@@ -1701,13 +1707,13 @@ PROMPT=$'${$((pause()))+}left>${(pl.$((COLUMNS-12))..-.)}<right\n> '
 When `PROMPT` gets expanded, it calls `pause` to let us observe the state of the terminal. Here's
 the initial state:
 
-![Zsh Resizing Bug 1](
+![Terminal Resizing Bug 1](
   https://raw.githubusercontent.com/romkatv/powerlevel10k-media/master/resize-bug-1.png)
 
 Zsh keeps track of the cursor position relative to the start of the current prompt. In this case it
 knows that the cursor is one line below. When we shrink the terminal window, it looks like this:
 
-![Zsh Resizing Bug 2](
+![Terminal Resizing Bug 2](
   https://raw.githubusercontent.com/romkatv/powerlevel10k-media/master/resize-bug-2.png)
 
 At this point the terminal sends `SIGWINCH` to Zsh to notify it about changes in the terminal
@@ -1719,7 +1725,7 @@ terminal content that follows and prints reexpanded prompt there. However, after
 no longer one line above the cursor. It's two lines above! Zsh ends up printing new prompt one line
 too low.
 
-![Zsh Resizing Bug 3](
+![Terminal Resizing Bug 3](
   https://raw.githubusercontent.com/romkatv/powerlevel10k-media/master/resize-bug-3.png)
 
 In this case we ended up with unwanted junk content because `VD` has *increased*. When you make
@@ -1728,33 +1734,30 @@ higher than intended, potentially erasing useful content in the process.
 
 Here are a few more examples where shrinking terminal window increased `VD`.
 
-Simple one-line left prompt with right prompt. No `prompt_subst`. Note that the cursor is below the
-prompt line (hit *ESC-ENTER* to get it there).
-
-![Zsh Prompt That Breaks on Terminal Shrinking 1](
-  https://raw.githubusercontent.com/romkatv/powerlevel10k-media/master/resize-breakable-1.png)
-
-Simple one-line left prompt. No `prompt_subst`, no right prompt. Here `VD` is bound to increase
-upon terminal shrinking due to the command line wrapping around.
-
-![Zsh Prompt That Breaks on Terminal Shrinking 2](
-  https://raw.githubusercontent.com/romkatv/powerlevel10k-media/master/resize-breakable-2.png)
+- Simple one-line left prompt with right prompt. No `prompt_subst`. Note that the cursor is below
+  the prompt line (hit *ESC-ENTER* to get it there).
+  ![Zsh Prompt That Breaks on Terminal Shrinking 1](
+    https://raw.githubusercontent.com/romkatv/powerlevel10k-media/master/resize-breakable-1.png)
+- Simple one-line left prompt. No `prompt_subst`, no right prompt. Here `VD` is bound to increase
+  upon terminal shrinking due to the command line wrapping around.
+  ![Zsh Prompt That Breaks on Terminal Shrinking 2](
+    https://raw.githubusercontent.com/romkatv/powerlevel10k-media/master/resize-breakable-2.png)
 
 #### Zsh patch
 
-The bug described above has been partially fixed (only for some terminals) in [this branch](
-  https://github.com/romkatv/zsh/tree/fix-winchanged). The idea behind the fix is to use `sc` (save
-cursor) terminal capability before printing prompt and `rc` (restore cursor) to move cursor back
-to the original position when prompt needs to be refreshed.
+[This Zsh patch](https://github.com/romkatv/zsh/tree/fix-winchanged) fixes the issue on some
+terminals. The idea behind the patch is to use `sc` (save cursor) terminal capability before
+printing prompt and `rc` (restore cursor) to move cursor back to the original position when prompt
+needs to be refreshed.
 
 The patch works only on terminals that reflow saved cursor position together with text when the
 terminal window is resized. The patch has no observable effect on terminals that don't reflow text
 on resize (both patched and unpatched Zsh behave correctly) and on terminals that reflow text but
-not saved cursor position (both patched and unpatched Zsh redraw prompt at the same incorrect
+not the saved cursor position (both patched and unpatched Zsh redraw prompt at the same incorrect
 position). In other words, the patch fixes the resizing issue on some terminals while keeping the
 behavior unchanged on others.
 
-There are two alternative approaches to fixing the bug that may seem to work at first glance but in
+There are two alternative approaches to patching Zsh that may seem to work at first glance but in
 fact don't:
 
 - Instead of `sc`, use `u7` terminal capability to query the current cursor position and then `cup`
@@ -1773,6 +1776,15 @@ There is no ETA for the patch making its way into upstream Zsh. See [discussion]
 
 There are a few mitigation options for this issue.
 
+- Use [Kitty](https://sw.kovidgoyal.net/kitty/) and enable terminal-shell integration in
+  Powerlevel10k. The latter can be done by appending these lines to `~/.zshrc`:
+  ```zsh
+  unset KITTY_SHELL_INTEGRATION
+  ITERM_SHELL_INTEGRATION_INSTALLED=Yes
+  ```
+  At the time of this writing (Dec 2021) the latest release of Kitty (0.23.1) doesn't have the
+  necessary code to fix the issue. If by the time you are reading this there is no newer version,
+  you'll have to build from source.
 - Apply [the patch](#zsh-patch) and [rebuild Zsh from source](
     https://github.com/zsh-users/zsh/blob/master/INSTALL). It won't help if you are using Alacritty,
   Kitty or some other terminal that reflows text on resize but doesn't reflow saved cursor position.
