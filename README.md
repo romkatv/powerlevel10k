@@ -403,9 +403,7 @@ Add `zplug romkatv/powerlevel10k, as:theme, depth:1` to `~/.zshrc`.
 
 ### ZPM
 
-```zsh
-zpm load romkatv/powerlevel10k
-```
+Run `zpm load romkatv/powerlevel10k`.
 
 ### Zgen
 
