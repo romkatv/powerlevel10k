@@ -28,6 +28,7 @@ See the [table of contents](#table-of-contents) at the bottom.
    - [Antibody](#antibody)
    - [Antigen](#antigen)
    - [Zplug](#zplug)
+   - [ZPM](#zpm)
    - [Zgen](#zgen)
    - [Zplugin](#zplugin)
    - [Zinit](#zinit)
@@ -399,6 +400,12 @@ somewhere after it.
 ### Zplug
 
 Add `zplug romkatv/powerlevel10k, as:theme, depth:1` to `~/.zshrc`.
+
+### ZPM
+
+```zsh
+zpm load romkatv/powerlevel10k
+```
 
 ### Zgen
 
