@@ -10,6 +10,11 @@
 # https://github.com/robbyrussell/oh-my-zsh/blob/74177c5320b2a1b2f8c4c695c05984b57fd7c6ea/themes/agnoster.zsh-theme
 ################################################################
 
+# According to the standard:
+# https://zdharma-continuum.github.io/Zsh-100-Commits-Club/Zsh-Plugin-Standard.html
+0="${${ZERO:-${0:#$ZSH_ARGZERO}}:-${(%):-%N}}"
+0="${${(M)0:#/*}:-$PWD/$0}"
+
 # Temporarily change options.
 'builtin' 'local' '-a' '__p9k_src_opts'
 [[ ! -o 'aliases'         ]] || __p9k_src_opts+=('aliases')
@@ -17,7 +22,7 @@
 [[ ! -o 'no_brace_expand' ]] || __p9k_src_opts+=('no_brace_expand')
 'builtin' 'setopt' 'no_aliases' 'no_sh_glob' 'brace_expand'
 
-(( $+__p9k_root_dir )) || typeset -gr __p9k_root_dir=${POWERLEVEL9K_INSTALLATION_DIR:-${${(%):-%x}:A:h}}
+(( $+__p9k_root_dir )) || typeset -gr __p9k_root_dir=${POWERLEVEL9K_INSTALLATION_DIR:-${0:A:h}}
 (( $+__p9k_intro )) || {
   # Leading spaces before `local` are important. Otherwise Antigen will remove `local` (!!!).
   # __p9k_trapint is to work around bugs in zsh: https://www.zsh.org/mla/workers/2020/msg00612.html.
