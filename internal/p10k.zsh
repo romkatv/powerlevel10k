@@ -767,8 +767,12 @@ _p9k_left_prompt_segment() {
         _p9k_foreground $_p9k__ret
         _p9k__ret=%b$bg$_p9k__ret
         _p9k__ret=${_p9k__ret//\}/\\\}}
-        [[ $_p9k__ret != $style_ || $need_style == 1 ]] && p+=$_p9k__ret
-        p+='${_p9k__v}'
+        if [[ $_p9k__ret != $style_ ]]; then
+          p+=$_p9k__ret'${_p9k__v}'$style_
+        else
+          (( need_style )) && p+=$style_
+          p+='${_p9k__v}'
+        fi
 
         _p9k_get_icon $1 LEFT_MIDDLE_WHITESPACE ' '
         if [[ -n $_p9k__ret ]]; then
@@ -1019,8 +1023,12 @@ _p9k_right_prompt_segment() {
         _p9k_foreground $_p9k__ret
         _p9k__ret=%b$bg$_p9k__ret
         _p9k__ret=${_p9k__ret//\}/\\\}}
-        [[ $_p9k__ret != $style_ || $need_style == 1 ]] && p+=$_p9k__ret
-        p+='${_p9k__v}'
+        if [[ $_p9k__ret != $style_ ]]; then
+          p+=$_p9k__ret'${_p9k__v}'$style_
+        else
+          (( need_style )) && p+=$style_
+          p+='${_p9k__v}'
+        fi
 
         _p9k_get_icon $1 RIGHT_MIDDLE_WHITESPACE ' '
         if [[ -n $_p9k__ret ]]; then
@@ -8213,7 +8221,7 @@ _p9k_must_init() {
     [[ $sig == $_p9k__param_sig ]] && return 1
     _p9k_deinit
   fi
-  _p9k__param_pat=$'v128\1'${(q)ZSH_VERSION}$'\1'${(q)ZSH_PATCHLEVEL}$'\1'
+  _p9k__param_pat=$'v129\1'${(q)ZSH_VERSION}$'\1'${(q)ZSH_PATCHLEVEL}$'\1'
   _p9k__param_pat+=$'${#parameters[(I)POWERLEVEL9K_*]}\1${(%):-%n%#}\1$GITSTATUS_LOG_LEVEL\1'
   _p9k__param_pat+=$'$GITSTATUS_ENABLE_LOGGING\1$GITSTATUS_DAEMON\1$GITSTATUS_NUM_THREADS\1'
   _p9k__param_pat+=$'$GITSTATUS_CACHE_DIR\1$GITSTATUS_AUTO_INSTALL\1${ZLE_RPROMPT_INDENT:-1}\1'
