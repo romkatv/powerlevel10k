@@ -200,7 +200,7 @@ function _p9k_read_word() {
 }
 
 function _p9k_fetch_cwd() {
-  _p9k__cwd=${(%):-%/}
+  _p9k__cwd=${(g:oce:)${(%):-%/}}
   _p9k__cwd_a=${${_p9k__cwd:A}:-.}
 
   case $_p9k__cwd in
@@ -1748,10 +1748,10 @@ function _p9k_shorten_delim_len() {
 # Dir: current working directory
 prompt_dir() {
   if (( _POWERLEVEL9K_DIR_PATH_ABSOLUTE )); then
-    local p=$_p9k__cwd
+    local p=${(V)_p9k__cwd}
     local -a parts=("${(s:/:)p}")
   elif [[ -o auto_name_dirs ]]; then
-    local p=${_p9k__cwd/#(#b)$HOME(|\/*)/'~'$match[1]}
+    local p=${(V)${_p9k__cwd/#(#b)$HOME(|\/*)/'~'$match[1]}}
     local -a parts=("${(s:/:)p}")
   else
     local p=${(%):-%~}
@@ -1765,15 +1765,15 @@ prompt_dir() {
       local -a parts=()
       for func in zsh_directory_name $zsh_directory_name_functions; do
         local reply=()
-        if (( $+functions[$func] )) && $func d $_p9k__cwd && [[ $p == '~['$reply[1]']'* ]]; then
-          parts+='~['$reply[1]']'
+        if (( $+functions[$func] )) && $func d $_p9k__cwd && [[ $p == '~['${(V)reply[1]}']'* ]]; then
+          parts+='~['${(V)reply[1]}']'
           break
         fi
       done
       if (( $#parts )); then
         parts+=(${(s:/:)${p#$parts[1]}})
       else
-        p=$_p9k__cwd
+        p=${(V)_p9k__cwd}
         parts=("${(s:/:)p}")
       fi
     else
@@ -1880,6 +1880,9 @@ prompt_dir() {
       delim=${_POWERLEVEL9K_SHORTEN_DELIMITER-'*'}
       shortenlen=${_POWERLEVEL9K_SHORTEN_DIR_LENGTH:-1}
       (( shortenlen >= 0 )) || shortenlen=1
+      local rp=${(g:oce:)p}
+      local rparts=("${(@s:/:)rp}")
+
       local -i i=2 e=$(($#parts - shortenlen))
       if [[ -n $_POWERLEVEL9K_DIR_TRUNCATE_BEFORE_MARKER ]]; then
         (( e += shortenlen ))
@@ -1894,8 +1897,8 @@ prompt_dir() {
         local key=
       fi
       if ! _p9k_cache_ephemeral_get $0 $e $i $_p9k__cwd || [[ $key != $_p9k__cache_val[1] ]]; then
-        local tail=${(j./.)parts[i,-1]}
-        local parent=$_p9k__cwd[1,-2-$#tail]
+        local rtail=${(j./.)rparts[i,-1]}
+        local parent=$_p9k__cwd[1,-2-$#rtail]
         _p9k_prompt_length $delim
         local -i real_delim_len=_p9k__ret
         [[ -n $parts[i-1] ]] && parts[i-1]="\${(Q)\${:-${(qqq)${(q)parts[i-1]}}}}"$'\2'
@@ -1904,7 +1907,8 @@ prompt_dir() {
         local -i m=1
         for (( ; i <= e; ++i, ++m )); do
           local sub=$parts[i]
-          local dir=$parent/$sub mtime=$mtimes[m]
+          local rsub=$rparts[i]
+          local dir=$parent/$rsub mtime=$mtimes[m]
           local pair=$_p9k__dir_stat_cache[$dir]
           if [[ $pair == ${mtime:-x}:* ]]; then
             parts[i]=${pair#*:}
@@ -1912,22 +1916,22 @@ prompt_dir() {
             [[ $sub != *["~!#\`\$^&*()\\\"'<>?{}[]"]* ]]
             local -i q=$?
             if [[ -n $_POWERLEVEL9K_SHORTEN_FOLDER_MARKER &&
-                  -n $parent/$sub/${~_POWERLEVEL9K_SHORTEN_FOLDER_MARKER}(#qN) ]]; then
+                  -n $dir/${~_POWERLEVEL9K_SHORTEN_FOLDER_MARKER}(#qN) ]]; then
               (( q )) && parts[i]="\${(Q)\${:-${(qqq)${(q)sub}}}}"
               parts[i]+=$'\2'
             else
-              local -i j=$sub[(i)[^.]]
-              for (( ; j + d < $#sub; ++j )); do
-                local -a matching=($parent/$sub[1,j]*/(N))
+              local -i j=$rsub[(i)[^.]]
+              for (( ; j + d < $#rsub; ++j )); do
+                local -a matching=($parent/$rsub[1,j]*/(N))
                 (( $#matching == 1 )) && break
               done
-              local -i saved=$(($#sub - j - d))
+              local -i saved=$((${(m)#${(V)${rsub:$j}}} - d))
               if (( saved > 0 )); then
                 if (( q )); then
                   parts[i]='${${${_p9k__d:#-*}:+${(Q)${:-'${(qqq)${(q)sub}}'}}}:-${(Q)${:-'
-                  parts[i]+=$'\3'${(qqq)${(q)sub[1,j]}}$'}}\1\3''${$((_p9k__d+='$saved'))+}}'
+                  parts[i]+=$'\3'${(qqq)${(q)${(V)${rsub[1,j]}}}}$'}}\1\3''${$((_p9k__d+='$saved'))+}}'
                 else
-                  parts[i]='${${${_p9k__d:#-*}:+'$sub$'}:-\3'$sub[1,j]$'\1\3''${$((_p9k__d+='$saved'))+}}'
+                  parts[i]='${${${_p9k__d:#-*}:+'$sub$'}:-\3'${(V)${rsub[1,j]}}$'\1\3''${$((_p9k__d+='$saved'))+}}'
                 fi
               else
                 (( q )) && parts[i]="\${(Q)\${:-${(qqq)${(q)sub}}}}"
@@ -1935,7 +1939,7 @@ prompt_dir() {
             fi
             [[ -n $mtime ]] && _p9k__dir_stat_cache[$dir]="$mtime:$parts[i]"
           fi
-          parent+=/$sub
+          parent+=/$rsub
         done
         if [[ -n $_POWERLEVEL9K_DIR_TRUNCATE_BEFORE_MARKER ]]; then
           local _2=$'\2'
@@ -8221,7 +8225,7 @@ _p9k_must_init() {
     [[ $sig == $_p9k__param_sig ]] && return 1
     _p9k_deinit
   fi
-  _p9k__param_pat=$'v129\1'${(q)ZSH_VERSION}$'\1'${(q)ZSH_PATCHLEVEL}$'\1'
+  _p9k__param_pat=$'v130\1'${(q)ZSH_VERSION}$'\1'${(q)ZSH_PATCHLEVEL}$'\1'
   _p9k__param_pat+=$'${#parameters[(I)POWERLEVEL9K_*]}\1${(%):-%n%#}\1$GITSTATUS_LOG_LEVEL\1'
   _p9k__param_pat+=$'$GITSTATUS_ENABLE_LOGGING\1$GITSTATUS_DAEMON\1$GITSTATUS_NUM_THREADS\1'
   _p9k__param_pat+=$'$GITSTATUS_CACHE_DIR\1$GITSTATUS_AUTO_INSTALL\1${ZLE_RPROMPT_INDENT:-1}\1'
