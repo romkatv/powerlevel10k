@@ -1744,6 +1744,19 @@ function _p9k_shorten_delim_len() {
   (( _p9k__ret >= 0 )) || _p9k_prompt_length $1
 }
 
+function _p9k_url_escape() {
+  if [[ $1 == [a-zA-Z0-9"/:_.-!'()~ "]# ]]; then
+    _p9k__ret=${1// /%20}
+  else
+    local c
+    _p9k__ret=
+    for c in ${(s::)1}; do
+      [[ $c == [a-zA-Z0-9"/:_.-!'()~"] ]] || printf -v c '%%%02X' $(( #c ))
+      _p9k__ret+=$c
+    done
+  fi
+}
+
 ################################################################
 # Dir: current working directory
 prompt_dir() {
@@ -2121,7 +2134,8 @@ prompt_dir() {
 
     local content="${(pj.$sep.)parts}"
     if (( _POWERLEVEL9K_DIR_HYPERLINK && _p9k_term_has_href )) && [[ $_p9k__cwd == /* ]]; then
-      local header=$'%{\e]8;;file://'${${_p9k__cwd//\%/%%25}//'#'/%%23}$'\a%}'
+      _p9k_url_escape $_p9k__cwd
+      local header=$'%{\e]8;;file://'$_p9k__ret$'\a%}'
       local footer=$'%{\e]8;;\a%}'
       if (( expand )); then
         _p9k_escape $header
