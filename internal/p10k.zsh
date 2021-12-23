@@ -7208,6 +7208,8 @@ _p9k_init_params() {
   _p9k_declare -s POWERLEVEL9K_TRANSIENT_PROMPT off
   [[ $_POWERLEVEL9K_TRANSIENT_PROMPT == (off|always|same-dir) ]] || _POWERLEVEL9K_TRANSIENT_PROMPT=off
 
+  _p9k_declare -b POWERLEVEL9K_TERM_SHELL_INTEGRATION 0
+
   _p9k_declare -s POWERLEVEL9K_WORKER_LOG_LEVEL
   _p9k_declare -i POWERLEVEL9K_COMMANDS_MAX_TOKEN_COUNT 64
   _p9k_declare -a POWERLEVEL9K_HOOK_WIDGETS --
@@ -8114,7 +8116,8 @@ _p9k_init_prompt() {
     _p9k_prompt_prefix_left+='${${_p9k__ind::=${${ZLE_RPROMPT_INDENT:-1}/#-*/0}}+}'
   fi
 
-  if [[ $ITERM_SHELL_INTEGRATION_INSTALLED == Yes ]]; then
+  if (( _POWERLEVEL9K_TERM_SHELL_INTEGRATION || __p9k_force_term_shell_integration )) ||
+     [[ $ITERM_SHELL_INTEGRATION_INSTALLED == Yes ]]; then
     _p9k_prompt_prefix_left+=$'%{\e]133;A\a%}'
     _p9k_prompt_suffix_left+=$'%{\e]133;B\a%}'
     if (( $+_z4h_iterm_cmd && _z4h_can_save_restore_screen == 1 )); then
@@ -8762,6 +8765,15 @@ fi
 
 _p9k_do_nothing() { true; }
 
+_p9k_precmd_first() {
+  eval "$__p9k_intro"
+  if [[ -n $KITTY_SHELL_INTEGRATION && KITTY_SHELL_INTEGRATION[(wIe)no-prompt-mark] -eq 0 ]]; then
+    KITTY_SHELL_INTEGRATION+=' no-prompt-mark'
+    (( $+__p9k_force_term_shell_integration )) || typeset -gri __p9k_force_term_shell_integration=1
+  fi
+  typeset -ga precmd_functions=(${precmd_functions:#_p9k_precmd_first})
+}
+
 _p9k_setup() {
   (( __p9k_enabled )) && return
 
@@ -8774,7 +8786,7 @@ _p9k_setup() {
   prompt_powerlevel9k_teardown
   __p9k_enabled=1
   typeset -ga preexec_functions=(_p9k_preexec1 $preexec_functions _p9k_preexec2)
-  typeset -ga precmd_functions=(_p9k_do_nothing $precmd_functions _p9k_precmd)
+  typeset -ga precmd_functions=(_p9k_do_nothing _p9k_precmd_first $precmd_functions _p9k_precmd)
 }
 
 prompt_powerlevel9k_setup() {
