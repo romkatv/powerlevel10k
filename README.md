@@ -698,7 +698,7 @@ Try Powerlevel10k in Docker. You can safely make any changes to the file system 
 the theme. Once you exit Zsh, the image is deleted.
 
 ```zsh
-docker run -e TERM -e COLORTERM -it --rm alpine sh -uec '
+docker run -e TERM -e COLORTERM -e LC_ALL=C.UTF-8 -it --rm alpine sh -uec '
   apk add git zsh nano vim
   git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ~/powerlevel10k
   echo "source ~/powerlevel10k/powerlevel10k.zsh-theme" >>~/.zshrc
