@@ -1195,20 +1195,7 @@ prompt latency when using Powerlevel10k, please
 
 ### Is Powerlevel10k fast to load?
 
-Yes, provided that you are using Zsh >= 5.4.
-
-Loading time, or time to first prompt, can be measured with the following benchmark:
-
-```zsh
-time (repeat 1000 zsh -dfis <<< 'source ~/powerlevel10k/powerlevel10k.zsh-theme')
-```
-
-*Note:* This measures time to first complete prompt. Powerlevel10k can also display a
-[limited prompt](#instant-prompt) before the full-featured prompt is ready.
-
-Running this command with `~/powerlevel10k` as the current directory on the same machine as in the
-[prompt benchmark](#is-it-really-fast) takes 29 seconds (29 ms per invocation). This is about 6
-times faster than powerlevel9k/master and 17 times faster than powerlevel9k/next.
+Yes. See [zsh-bench](https://github.com/romkatv/zsh-bench).
 
 ### What is the relationship between Powerlevel9k and Powerlevel10k?
 
