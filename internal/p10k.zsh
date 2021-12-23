@@ -7209,6 +7209,9 @@ _p9k_init_params() {
   [[ $_POWERLEVEL9K_TRANSIENT_PROMPT == (off|always|same-dir) ]] || _POWERLEVEL9K_TRANSIENT_PROMPT=off
 
   _p9k_declare -b POWERLEVEL9K_TERM_SHELL_INTEGRATION 0
+  if [[ __p9k_force_term_shell_integration -eq 1 || $ITERM_SHELL_INTEGRATION_INSTALLED == Yes ]]; then
+    _POWERLEVEL9K_TERM_SHELL_INTEGRATION=1
+  fi
 
   _p9k_declare -s POWERLEVEL9K_WORKER_LOG_LEVEL
   _p9k_declare -i POWERLEVEL9K_COMMANDS_MAX_TOKEN_COUNT 64
@@ -8116,8 +8119,7 @@ _p9k_init_prompt() {
     _p9k_prompt_prefix_left+='${${_p9k__ind::=${${ZLE_RPROMPT_INDENT:-1}/#-*/0}}+}'
   fi
 
-  if (( _POWERLEVEL9K_TERM_SHELL_INTEGRATION || __p9k_force_term_shell_integration )) ||
-     [[ $ITERM_SHELL_INTEGRATION_INSTALLED == Yes ]]; then
+  if (( _POWERLEVEL9K_TERM_SHELL_INTEGRATION )); then
     _p9k_prompt_prefix_left+=$'%{\e]133;A\a%}'
     _p9k_prompt_suffix_left+=$'%{\e]133;B\a%}'
     if (( $+_z4h_iterm_cmd && _z4h_can_save_restore_screen == 1 )); then
@@ -8243,6 +8245,7 @@ _p9k_must_init() {
     _p9k_deinit
   fi
   _p9k__param_pat=$'v130\1'${(q)ZSH_VERSION}$'\1'${(q)ZSH_PATCHLEVEL}$'\1'
+  _p9k__param_pat+=$__p9k_force_term_shell_integration$'\1'
   _p9k__param_pat+=$'${#parameters[(I)POWERLEVEL9K_*]}\1${(%):-%n%#}\1$GITSTATUS_LOG_LEVEL\1'
   _p9k__param_pat+=$'$GITSTATUS_ENABLE_LOGGING\1$GITSTATUS_DAEMON\1$GITSTATUS_NUM_THREADS\1'
   _p9k__param_pat+=$'$GITSTATUS_CACHE_DIR\1$GITSTATUS_AUTO_INSTALL\1${ZLE_RPROMPT_INDENT:-1}\1'
@@ -8315,7 +8318,7 @@ function _p9k_init_cacheable() {
     _p9k_param prompt_prompt_char_ERROR_VIINS CONTENT_EXPANSION '${P9K_CONTENT}'
     _p9k_transient_prompt+='${:-"'$_p9k__ret'"}'
     _p9k_transient_prompt+=')%b%k%f%s%u '
-    if [[ $ITERM_SHELL_INTEGRATION_INSTALLED == Yes ]]; then
+    if (( _POWERLEVEL9K_TERM_SHELL_INTEGRATION )); then
       _p9k_transient_prompt=$'%{\e]133;A\a%}'$_p9k_transient_prompt$'%{\e]133;B\a%}'
       if (( $+_z4h_iterm_cmd && _z4h_can_save_restore_screen == 1 )); then
         _p9k_transient_prompt=$'%{\ePtmux;\e\e]133;A\a\e\\%}'$_p9k_transient_prompt$'%{\ePtmux;\e\e]133;B\a\e\\%}'
