@@ -189,6 +189,9 @@ instantly upon Zsh startup allowing you to start typing while plugins are still 
 Other themes *increase* Zsh startup lag -- some by a lot, others by a just a little. Powerlevel10k
 *removes* it outright.
 
+If you are curious about how *Instant Prompt* works, see
+[this section in zsh-bench](https://github.com/romkatv/zsh-bench#instant-prompt).
+
 *FAQ:* [How do I configure instant prompt?](#how-do-i-configure-instant-prompt)
 
 ### Show on command
