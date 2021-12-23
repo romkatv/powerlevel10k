@@ -8,15 +8,17 @@ Powerlevel10k is a theme for Zsh. It emphasizes [speed](#uncompromising-performa
 ![Powerlevel10k](
 https://raw.githubusercontent.com/romkatv/powerlevel10k-media/master/prompt-styles-high-contrast.png)
 
-Ready to [get started](#get-started)? See below.
+- [Getting started](#getting-started)
+- [Features](#features)
+- [Installation](#installation)
+- [Configuration](#configuration)
+- [Fonts](#fonts)
+- [Try it in Docker](#try-it-in-docker)
+- [License](#license)
+- [FAQ](#faq)
+- [Troubleshooting](#troubleshooting)
 
-To see what Powerlevel10k is about go to [features](#features).
-
-Powerlevel9k users, go [here](#powerlevel9k-compatibility).
-
-See the [table of contents](#table-of-contents) at the bottom.
-
-## Get Started
+## Getting started
 
 1. Install [the recommended font](#meslo-nerd-font-patched-for-powerlevel10k). *Optional but highly
    recommended.*
@@ -33,10 +35,22 @@ See the [table of contents](#table-of-contents) at the bottom.
    - [Zinit](#zinit)
    - [Homebrew](#homebrew)
    - [Arch Linux](#arch-linux)
-1. Restart Zsh.
+1. Restart Zsh with `exec zsh`.
 1. Type `p10k configure` if the configuration wizard doesn't start automatically.
 
 ## Features
+
+- [Configuration wizard](#configuration-wizard)
+- [Uncompromising performance](#uncompromising-performance)
+- [Powerlevel9k compatibility](#powerlevel9k-compatibility)
+- [Pure compatibility](#pure-compatibility)
+- [Instant prompt](#instant-prompt)
+- [Show on command](#show-on-command)
+- [Transient prompt](#transient-prompt)
+- [Current directory that just works](#current-directory-that-just-works)
+- [Extremely customizable](#extremely-customizable)
+- [Batteries included](#batteries-included)
+- [Extensible](#extensible)
 
 ### Configuration wizard
 
@@ -390,6 +404,19 @@ Powerlevel10k.
 
 ## Installation
 
+- [Manual](#manual)
+- [Oh My Zsh](#oh-my-zsh)
+- [Prezto](#prezto)
+- [Zim](#zim)
+- [Antibody](#antibody)
+- [Antigen](#antigen)
+- [Zplug](#zplug)
+- [Zgen](#zgen)
+- [Zplugin](#zplugin)
+- [Zinit](#zinit)
+- [Homebrew](#homebrew)
+- [Arch Linux](#arch-linux)
+
 ### Manual
 
 ```zsh
@@ -485,6 +512,9 @@ Historically, [it has been breaking often and for extended periods of time](
   https://github.com/romkatv/powerlevel10k/pull/786). **Do not use it.**
 
 ## Configuration
+
+- [For new users](#for-new-users)
+- [For Powerlevel9k users](#for-powerlevel9k-users)
 
 ### For new users
 
@@ -669,7 +699,6 @@ the theme. Once you exit Zsh, the image is deleted.
 
 ```zsh
 docker run -e TERM -e COLORTERM -it --rm alpine sh -uec '
-  apk update
   apk add git zsh nano vim
   git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ~/powerlevel10k
   echo "source ~/powerlevel10k/powerlevel10k.zsh-theme" >>~/.zshrc
@@ -688,6 +717,36 @@ Powerlevel10k is released under the
 [MIT license](https://github.com/romkatv/powerlevel10k/blob/master/LICENSE).
 
 ## FAQ
+
+- [How do I update Powerlevel10k?](#how-do-i-update-powerlevel10k)
+- [How do I uninstall Powerlevel10k?](#how-do-i-uninstall-powerlevel10k)
+- [How do I install Powerlevel10k on a machine without Internet access?](#how-do-i-install-powerlevel10k-on-a-machine-without-internet-access)
+- [Where can I ask for help and report bugs?](#where-can-i-ask-for-help-and-report-bugs)
+- [Which aspects of shell and terminal does Powerlevel10k affect?](#which-aspects-of-shell-and-terminal-does-powerlevel10k-affect)
+- [I'm using Powerlevel9k with Oh My Zsh. How do I migrate?](#im-using-powerlevel9k-with-oh-my-zsh-how-do-i-migrate)
+- [Is it really fast?](#is-it-really-fast)
+- [How do I configure instant prompt?](#how-do-i-configure-instant-prompt)
+- [How do I initialize direnv when using instant prompt?](#how-do-i-initialize-direnv-when-using-instant-prompt)
+- [How do I export GPG_TTY when using instant prompt?](#how-do-i-export-gpg_tty-when-using-instant-prompt)
+- [What do different symbols in Git status mean?](#what-do-different-symbols-in-git-status-mean)
+- [How do I change the format of Git status?](#how-do-i-change-the-format-of-git-status)
+- [Why is Git status from `$HOME/.git` not displayed in prompt?](#why-is-git-status-from-homegit-not-displayed-in-prompt)
+- [Why does Git status sometimes appear grey and then gets colored after a short period of time?](#why-does-git-status-sometimes-appear-grey-and-then-gets-colored-after-a-short-period-of-time)
+- [How do I add username and/or hostname to prompt?](#how-do-i-add-username-andor-hostname-to-prompt)
+- [Why some prompt segments appear and disappear as I'm typing?](#why-some-prompt-segments-appear-and-disappear-as-im-typing)
+- [How do I change prompt colors?](#how-do-i-change-prompt-colors)
+- [Why does Powerlevel10k spawn extra processes?](#why-does-powerlevel10k-spawn-extra-processes)
+- [Are there configuration options that make Powerlevel10k slow?](#are-there-configuration-options-that-make-powerlevel10k-slow)
+- [Is Powerlevel10k fast to load?](#is-powerlevel10k-fast-to-load)
+- [What is the relationship between Powerlevel9k and Powerlevel10k?](#what-is-the-relationship-between-powerlevel9k-and-powerlevel10k)
+- [Does Powerlevel10k always render exactly the same prompt as Powerlevel9k given the same config?](#does-powerlevel10k-always-render-exactly-the-same-prompt-as-powerlevel9k-given-the-same-config)
+- [What is the best prompt style in the configuration wizard?](#what-is-the-best-prompt-style-in-the-configuration-wizard)
+- [How to make Powerlevel10k look like robbyrussell Oh My Zsh theme?](#how-to-make-powerlevel10k-look-like-robbyrussell-oh-my-zsh-theme)
+- [Can prompts for completed commands display error status for *those* commands instead of the commands preceding them?](#can-prompts-for-completed-commands-display-error-status-for-those-commands-instead-of-the-commands-preceding-them)
+- [What is the minimum supported Zsh version?](#what-is-the-minimum-supported-zsh-version)
+- [How were these screenshots and animated gifs created?](#how-were-these-screenshots-and-animated-gifs-created)
+- [How was the recommended font created?](#how-was-the-recommended-font-created)
+- [How to package Powerlevel10k for distribution?](#how-to-package-powerlevel10k-for-distribution)
 
 ### How do I update Powerlevel10k?
 
@@ -1348,6 +1407,27 @@ Powerlevel10k are released. This may change in the future but not soon.
 
 ## Troubleshooting
 
+- [Question mark in prompt](#question-mark-in-prompt)
+- [Icons, glyphs or powerline symbols don't render](#icons-glyphs-or-powerline-symbols-dont-render)
+- [Sub-pixel imperfections around powerline symbols](#sub-pixel-imperfections-around-powerline-symbols)
+- [Error: character not in range](#error-character-not-in-range)
+- [Cursor is in the wrong place](#cursor-is-in-the-wrong-place)
+- [Prompt wrapping around in a weird way](#prompt-wrapping-around-in-a-weird-way)
+- [Right prompt is in the wrong place](#right-prompt-is-in-the-wrong-place)
+- [Configuration wizard runs automatically every time Zsh is started](#configuration-wizard-runs-automatically-every-time-zsh-is-started)
+- [Some prompt styles are missing from the configuration wizard](#some-prompt-styles-are-missing-from-the-configuration-wizard)
+- [Cannot install the recommended font](#cannot-install-the-recommended-font)
+- [Extra or missing spaces in prompt compared to Powerlevel9k](#extra-or-missing-spaces-in-prompt-compared-to-powerlevel9k)
+  - [Extra space without background on the right side of right prompt](#extra-space-without-background-on-the-right-side-of-right-prompt)
+  - [Extra or missing spaces around icons](#extra-or-missing-spaces-around-icons)
+- [Weird things happen after typing `source ~/.zshrc`](#weird-things-happen-after-typing-source-zshrc)
+- [Transient prompt stops working after some time](#transient-prompt-stops-working-after-some-time)
+- [Cannot make Powerlevel10k work with my plugin manager](#cannot-make-powerlevel10k-work-with-my-plugin-manager)
+- [Directory is difficult to see in prompt when using Rainbow style](#directory-is-difficult-to-see-in-prompt-when-using-rainbow-style)
+- [Horrific mess when resizing terminal window](#horrific-mess-when-resizing-terminal-window)
+- [Icons cut off in Konsole](#icons-cut-off-in-konsole)
+- [Arch Linux logo has a dot in the bottom right corner](#arch-linux-logo-has-a-dot-in-the-bottom-right-corner)
+
 ### Question mark in prompt
 
 If it looks like a regular `?`, that's normal. It means you have untracked files in the current Git
@@ -1862,91 +1942,3 @@ Some fonts have this incorrect dotted icon in bold typeface. There are two ways 
 ```zsh
 typeset -g POWERLEVEL9K_OS_ICON_CONTENT_EXPANSION='${P9K_CONTENT}'  # not bold
 ```
-
-## Table of contents
-
-- [Features](#features)
-  - [Configuration wizard](#configuration-wizard)
-  - [Uncompromising performance](#uncompromising-performance)
-  - [Powerlevel9k compatibility](#powerlevel9k-compatibility)
-  - [Pure compatibility](#pure-compatibility)
-  - [Instant prompt](#instant-prompt)
-  - [Show on command](#show-on-command)
-  - [Transient prompt](#transient-prompt)
-  - [Current directory that just works](#current-directory-that-just-works)
-  - [Extremely customizable](#extremely-customizable)
-  - [Batteries included](#batteries-included)
-  - [Extensible](#extensible)
-- [Installation](#installation)
-  - [Manual](#manual)
-  - [Oh My Zsh](#oh-my-zsh)
-  - [Prezto](#prezto)
-  - [Zim](#zim)
-  - [Antibody](#antibody)
-  - [Antigen](#antigen)
-  - [Zplug](#zplug)
-  - [Zgen](#zgen)
-  - [Zplugin](#zplugin)
-  - [Zinit](#zinit)
-  - [Homebrew](#homebrew)
-  - [Arch Linux](#arch-linux)
-- [Configuration](#configuration)
-  - [For new users](#for-new-users)
-  - [For Powerlevel9k users](#for-powerlevel9k-users)
-- [Fonts](#fonts)
-  - [Meslo Nerd Font patched for Powerlevel10k](#meslo-nerd-font-patched-for-powerlevel10k)
-    - [Automatic font installation](#automatic-font-installation)
-    - [Manual font installation](#manual-font-installation)
-- [Try it in Docker](#try-it-in-docker)
-- [License](#license)
-- [FAQ](#faq)
-  - [How do I update Powerlevel10k?](#how-do-i-update-powerlevel10k)
-  - [How do I uninstall Powerlevel10k?](#how-do-i-uninstall-powerlevel10k)
-  - [How do I install Powerlevel10k on a machine without Internet access?](#how-do-i-install-powerlevel10k-on-a-machine-without-internet-access)
-  - [Where can I ask for help and report bugs?](#where-can-i-ask-for-help-and-report-bugs)
-  - [Which aspects of shell and terminal does Powerlevel10k affect?](#which-aspects-of-shell-and-terminal-does-powerlevel10k-affect)
-  - [I'm using Powerlevel9k with Oh My Zsh. How do I migrate?](#im-using-powerlevel9k-with-oh-my-zsh-how-do-i-migrate)
-  - [Is it really fast?](#is-it-really-fast)
-  - [How do I configure instant prompt?](#how-do-i-configure-instant-prompt)
-  - [How do I initialize direnv when using instant prompt?](#how-do-i-initialize-direnv-when-using-instant-prompt)
-  - [How do I export GPG_TTY when using instant prompt?](#how-do-i-export-gpg_tty-when-using-instant-prompt)
-  - [What do different symbols in Git status mean?](#what-do-different-symbols-in-git-status-mean)
-  - [How do I change the format of Git status?](#how-do-i-change-the-format-of-git-status)
-  - [Why is Git status from `$HOME/.git` not displayed in prompt?](#why-is-git-status-from-homegit-not-displayed-in-prompt)
-  - [Why does Git status sometimes appear grey and then gets colored after a short period of time?](#why-does-git-status-sometimes-appear-grey-and-then-gets-colored-after-a-short-period-of-time)
-  - [How do I add username and/or hostname to prompt?](#how-do-i-add-username-andor-hostname-to-prompt)
-  - [Why some prompt segments appear and disappear as I'm typing?](#why-some-prompt-segments-appear-and-disappear-as-im-typing)
-  - [How do I change prompt colors?](#how-do-i-change-prompt-colors)
-  - [Why does Powerlevel10k spawn extra processes?](#why-does-powerlevel10k-spawn-extra-processes)
-  - [Are there configuration options that make Powerlevel10k slow?](#are-there-configuration-options-that-make-powerlevel10k-slow)
-  - [Is Powerlevel10k fast to load?](#is-powerlevel10k-fast-to-load)
-  - [What is the relationship between Powerlevel9k and Powerlevel10k?](#what-is-the-relationship-between-powerlevel9k-and-powerlevel10k)
-  - [Does Powerlevel10k always render exactly the same prompt as Powerlevel9k given the same config?](#does-powerlevel10k-always-render-exactly-the-same-prompt-as-powerlevel9k-given-the-same-config)
-  - [What is the best prompt style in the configuration wizard?](#what-is-the-best-prompt-style-in-the-configuration-wizard)
-  - [How to make Powerlevel10k look like robbyrussell Oh My Zsh theme?](#how-to-make-powerlevel10k-look-like-robbyrussell-oh-my-zsh-theme)
-  - [Can prompts for completed commands display error status for *those* commands instead of the commands preceding them?](#can-prompts-for-completed-commands-display-error-status-for-those-commands-instead-of-the-commands-preceding-them)
-  - [What is the minimum supported Zsh version?](#what-is-the-minimum-supported-zsh-version)
-  - [How were these screenshots and animated gifs created?](#how-were-these-screenshots-and-animated-gifs-created)
-  - [How was the recommended font created?](#how-was-the-recommended-font-created)
-  - [How to package Powerlevel10k for distribution?](#how-to-package-powerlevel10k-for-distribution)
-- [Troubleshooting](#troubleshooting)
-  - [Question mark in prompt](#question-mark-in-prompt)
-  - [Icons, glyphs or powerline symbols don't render](#icons-glyphs-or-powerline-symbols-dont-render)
-  - [Sub-pixel imperfections around powerline symbols](#sub-pixel-imperfections-around-powerline-symbols)
-  - [Error: character not in range](#error-character-not-in-range)
-  - [Cursor is in the wrong place](#cursor-is-in-the-wrong-place)
-  - [Prompt wrapping around in a weird way](#prompt-wrapping-around-in-a-weird-way)
-  - [Right prompt is in the wrong place](#right-prompt-is-in-the-wrong-place)
-  - [Configuration wizard runs automatically every time Zsh is started](#configuration-wizard-runs-automatically-every-time-zsh-is-started)
-  - [Some prompt styles are missing from the configuration wizard](#some-prompt-styles-are-missing-from-the-configuration-wizard)
-  - [Cannot install the recommended font](#cannot-install-the-recommended-font)
-  - [Extra or missing spaces in prompt compared to Powerlevel9k](#extra-or-missing-spaces-in-prompt-compared-to-powerlevel9k)
-    - [Extra space without background on the right side of right prompt](#extra-space-without-background-on-the-right-side-of-right-prompt)
-    - [Extra or missing spaces around icons](#extra-or-missing-spaces-around-icons)
-  - [Weird things happen after typing `source ~/.zshrc`](#weird-things-happen-after-typing-source-zshrc)
-  - [Transient prompt stops working after some time](#transient-prompt-stops-working-after-some-time)
-  - [Cannot make Powerlevel10k work with my plugin manager](#cannot-make-powerlevel10k-work-with-my-plugin-manager)
-  - [Directory is difficult to see in prompt when using Rainbow style](#directory-is-difficult-to-see-in-prompt-when-using-rainbow-style)
-  - [Horrific mess when resizing terminal window](#horrific-mess-when-resizing-terminal-window)
-  - [Icons cut off in Konsole](#icons-cut-off-in-konsole)
-  - [Arch Linux logo has a dot in the bottom right corner](#arch-linux-logo-has-a-dot-in-the-bottom-right-corner)
