@@ -903,8 +903,8 @@ to move it above the instant prompt preamble or to suppress its output. You can 
 instant prompt with `POWERLEVEL9K_INSTANT_PROMPT=off`. Do this if instant prompt breaks Zsh
 initialization and you don't know how to fix it.
 
-The value of `POWERLEVEL9K_INSTANT_PROMPT` can be changed by `p10k configure` and selecting the
-appropriate option on the *Instant Prompt* screen. Alternatively, search for
+The value of `POWERLEVEL9K_INSTANT_PROMPT` can be changed by running `p10k configure` and selecting
+the appropriate option on the *Instant Prompt* screen. Alternatively, you can search for
 `POWERLEVEL9K_INSTANT_PROMPT` in the existing `~/.p10k.zsh` and change its value there.
 
 *Note*: Instant prompt requires Zsh >= 5.4. It's OK to enable it even when using an older version of
