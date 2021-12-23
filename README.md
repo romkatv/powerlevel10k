@@ -20,21 +20,9 @@ https://raw.githubusercontent.com/romkatv/powerlevel10k-media/master/prompt-styl
 
 ## Getting started
 
-1. Install [the recommended font](#meslo-nerd-font-patched-for-powerlevel10k). *Optional but highly
+1. [Install the recommended font](#meslo-nerd-font-patched-for-powerlevel10k). *Optional but highly
    recommended.*
-1. Install Powerlevel10k for your plugin manager.
-   - [Manual](#manual) 👈 **choose this if confused or uncertain**
-   - [Oh My Zsh](#oh-my-zsh)
-   - [Prezto](#prezto)
-   - [Zim](#zim)
-   - [Antibody](#antibody)
-   - [Antigen](#antigen)
-   - [Zplug](#zplug)
-   - [Zgen](#zgen)
-   - [Zplugin](#zplugin)
-   - [Zinit](#zinit)
-   - [Homebrew](#homebrew)
-   - [Arch Linux](#arch-linux)
+1. [Install Powerlevel10k](#installation) itself.
 1. Restart Zsh with `exec zsh`.
 1. Type `p10k configure` if the configuration wizard doesn't start automatically.
 
@@ -404,7 +392,7 @@ Powerlevel10k.
 
 ## Installation
 
-- [Manual](#manual)
+- [Manual](#manual) 👈 **choose this if confused or uncertain**
 - [Oh My Zsh](#oh-my-zsh)
 - [Prezto](#prezto)
 - [Zim](#zim)
