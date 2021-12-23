@@ -852,31 +852,9 @@ exec zsh
 
 ### Is it really fast?
 
-Yes.
-
-[![asciicast](https://asciinema.org/a/NHRjK3BMePw66jtRVY2livHwZ.svg)](
-  https://asciinema.org/a/NHRjK3BMePw66jtRVY2livHwZ)
-
-Benchmark results obtained with
-[zsh-prompt-benchmark](https://github.com/romkatv/zsh-prompt-benchmark) on an Intel i9-7900X
-running Ubuntu 18.04 with the config from the demo.
-
-| Theme               | Prompt Latency |
-|---------------------|---------------:|
-| powerlevel9k/master |        1046 ms |
-| powerlevel9k/next   |        1005 ms |
-| **powerlevel10k**   |     **8.7 ms** |
-
-Powerlevel10k is over 100 times faster than Powerlevel9k in this benchmark.
-
-In fairness, Powerlevel9k has acceptable latency when given a spartan configuration. If all you need
-is the current directory without truncation or shortening, Powerlevel9k can render it for you in
-17 ms. Powerlevel10k can do the same 30 times faster but it won't matter in practice because 17 ms
-is fast enough (the threshold where latency becomes noticeable is around 50 ms). You have to be
-careful with Powerlevel9k configuration as it's all too easy to make prompt frustratingly slow.
-Powerlevel10k, on the other hand, doesn't require trading latency for utility -- it's virtually
-instant with any configuration. It stays well below the 50 ms mark, leaving most of the latency
-budget for other plugins you might install.
+Yes. See [zsh-bench](https://github.com/romkatv/zsh-bench) or a direct comparison with
+[Powerlevel9k](https://asciinema.org/a/NHRjK3BMePw66jtRVY2livHwZ) and
+[Spaceship](https://asciinema.org/a/253094).
 
 ### <a name='how-do-i-enable-instant-prompt'></a>How do I configure instant prompt?
 
