@@ -42,8 +42,12 @@ See the [table of contents](#table-of-contents) at the bottom.
 
 Type `p10k configure` to access the builtin configuration wizard right from your terminal.
 
-![Powerlevel10k Configuration Wizard](
-  https://raw.githubusercontent.com/romkatv/powerlevel10k-media/master/configuration-wizard.gif)
+<details>
+  <summary>Screen recording</summary>
+
+  ![Powerlevel10k Configuration Wizard](
+    https://raw.githubusercontent.com/romkatv/powerlevel10k-media/master/configuration-wizard.gif)
+</details>
 
 All styles except [Pure](#pure-compatibility) are functionally equivalent. They display the same
 information and differ only in presentation.
@@ -82,8 +86,12 @@ segments to fill four prompt lines on both sides of the screen... wait, that's j
 one ever does that. Probably impossible, too. The point is, Powerlevel10k prompt is always fast, no
 matter what you do!
 
-![Powerlevel10k Performance](
-  https://raw.githubusercontent.com/romkatv/powerlevel10k-media/master/performance.gif)
+<details>
+  <summary>Screen recording</summary>
+
+  ![Powerlevel10k Performance](
+    https://raw.githubusercontent.com/romkatv/powerlevel10k-media/master/performance.gif)
+</details>
 
 Note how the effect of every command is instantly reflected by the very next prompt.
 
@@ -105,8 +113,12 @@ Powerlevel10k you get fast prompt *and* up-to-date information.
 Powerlevel10k understands all [Powerlevel9k](https://github.com/Powerlevel9k/powerlevel9k)
 configuration parameters.
 
-![Powerlevel10k Compatibility with 9k](
-  https://raw.githubusercontent.com/romkatv/powerlevel10k-media/master/9k-compatibility.gif)
+<details>
+  <summary>Screen recording</summary>
+
+  ![Powerlevel10k Compatibility with 9k](
+    https://raw.githubusercontent.com/romkatv/powerlevel10k-media/master/9k-compatibility.gif)
+</details>
 
 [Migration](#installation) from Powerlevel9k to Powerlevel10k is a straightforward process. All
 your `POWERLEVEL9K` configuration parameters will still work. Prompt will look the same as before
@@ -128,8 +140,12 @@ but it will be [much faster](#uncompromising-performance) ([certainly](#is-it-re
 Powerlevel10k can produce the same prompt as [Pure](https://github.com/sindresorhus/pure). Type
 `p10k configure` and select *Pure* style.
 
-![Powerlevel10k Pure Style](
-  https://raw.githubusercontent.com/romkatv/powerlevel10k-media/master/pure-style.gif)
+<details>
+  <summary>Screen recording</summary>
+
+  ![Powerlevel10k Pure Style](
+    https://raw.githubusercontent.com/romkatv/powerlevel10k-media/master/pure-style.gif)
+</details>
 
 You can still use Powerlevel10k features such as [transient prompt](#transient-prompt) or
 [instant prompt](#instant-prompt) when sporting Pure style.
@@ -148,13 +164,21 @@ If your `~/.zshrc` loads many plugins, or perhaps just a few slow ones
 (for example, [pyenv](https://github.com/pyenv/pyenv) or [nvm](https://github.com/nvm-sh/nvm)), you
 may have noticed that it takes some time for Zsh to start.
 
-![Powerlevel10k No Instant Prompt](
-  https://raw.githubusercontent.com/romkatv/powerlevel10k-media/master/no-instant-prompt.gif)
+<details>
+  <summary>Screen recording</summary>
+
+  ![Powerlevel10k No Instant Prompt](
+    https://raw.githubusercontent.com/romkatv/powerlevel10k-media/master/no-instant-prompt.gif)
+</details>
 
 Powerlevel10k can remove Zsh startup lag **even if it's not caused by a theme**.
 
-![Powerlevel10k Instant Prompt](
-  https://raw.githubusercontent.com/romkatv/powerlevel10k-media/master/instant-prompt.gif)
+<details>
+  <summary>Screen recording</summary>
+
+  ![Powerlevel10k Instant Prompt](
+    https://raw.githubusercontent.com/romkatv/powerlevel10k-media/master/instant-prompt.gif)
+</details>
 
 This feature is called *Instant Prompt*. You need to explicitly enable it through `p10k configure`
 or [manually](#how-do-i-configure-instant-prompt). It does what it says on the tin -- prints prompt
@@ -175,8 +199,12 @@ likewise for AWS, Azure and Google Cloud credentials, prompt will get pretty cro
 Enter *Show On Command*. This feature makes prompt segments appear only when they are relevant to
 the command you are currently typing.
 
-![Powerlevel10k Show On Command](
-  https://raw.githubusercontent.com/romkatv/powerlevel10k-media/master/show-on-command.gif)
+<details>
+  <summary>Screen recording</summary>
+
+  ![Powerlevel10k Show On Command](
+    https://raw.githubusercontent.com/romkatv/powerlevel10k-media/master/show-on-command.gif)
+</details>
 
 Configs created by `p10k configure` enable show on command for several prompt segments by default.
 Here's the relevant parameter for kubernetes context:
@@ -196,8 +224,12 @@ or change their values.
 When *Transient Prompt* is enabled through `p10k configure`, Powerlevel10k will trim down every
 prompt when accepting a command line.
 
-![Powerlevel10k Transient Prompt](
-  https://raw.githubusercontent.com/romkatv/powerlevel10k-media/master/transient-prompt.gif)
+<details>
+  <summary>Screen recording</summary>
+
+  ![Powerlevel10k Transient Prompt](
+    https://raw.githubusercontent.com/romkatv/powerlevel10k-media/master/transient-prompt.gif)
+</details>
 
 Transient prompt makes it much easier to copy-paste series of commands from the terminal scrollback.
 
@@ -211,8 +243,12 @@ The current working directory is perhaps the most important prompt segment. Powe
 great length to highlight its important parts and to truncate it with the least loss of information
 when horizontal space gets scarce.
 
-![Powerlevel10k Directory Truncation](
-  https://raw.githubusercontent.com/romkatv/powerlevel10k-media/master/directory-truncation.gif)
+<details>
+  <summary>Screen recording</summary>
+
+  ![Powerlevel10k Directory Truncation](
+    https://raw.githubusercontent.com/romkatv/powerlevel10k-media/master/directory-truncation.gif)
+</details>
 
 When the full directory doesn't fit, the leftmost segment gets truncated to its shortest unique
 prefix. In the screencast, `~/work` becomes `~/wo`. It couldn't be truncated to `~/w` because it
@@ -235,8 +271,12 @@ Directory segments are shown in one of three colors:
 
 Powerlevel10k can be configured to look like any other Zsh theme out there.
 
-![Powerlevel10k Other Theme Emulation](
-  https://raw.githubusercontent.com/romkatv/powerlevel10k-media/master/other-theme-emulation.gif)
+<details>
+  <summary>Screen recording</summary>
+
+  ![Powerlevel10k Other Theme Emulation](
+    https://raw.githubusercontent.com/romkatv/powerlevel10k-media/master/other-theme-emulation.gif)
+</details>
 
 [Pure](#pure-compatibility), [Powerlevel9k](#powerlevel9k-compatibility) and [robbyrussell](
   #how-to-make-powerlevel10k-look-like-robbyrussell-oh-my-zsh-theme) emulations are built-in.
@@ -331,8 +371,12 @@ enable as many segments as you like. It won't slow down your prompt or Zsh start
 If there is no prompt segment that does what you need, implement your own. Powerlevel10k provides
 public API for defining segments that are as fast and as flexible as built-in ones.
 
-![Powerlevel10k Custom Segment](
-  https://raw.githubusercontent.com/romkatv/powerlevel10k-media/master/custom-segment.gif)
+<details>
+  <summary>Screen recording</summary>
+
+  ![Powerlevel10k Custom Segment](
+    https://raw.githubusercontent.com/romkatv/powerlevel10k-media/master/custom-segment.gif)
+</details>
 
 On Linux you can fetch current CPU temperature by reading `/sys/class/thermal/thermal_zone0/temp`.
 The screencast shows how to define a prompt segment to display this value. Once the segment is
