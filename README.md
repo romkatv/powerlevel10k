@@ -157,13 +157,13 @@ Powerlevel10k can remove Zsh startup lag **even if it's not caused by a theme**.
   https://raw.githubusercontent.com/romkatv/powerlevel10k-media/master/instant-prompt.gif)
 
 This feature is called *Instant Prompt*. You need to explicitly enable it through `p10k configure`
-or [manually](#how-do-i-enable-instant-prompt). It does what it says on the tin -- prints prompt
+or [manually](#how-do-i-configure-instant-prompt). It does what it says on the tin -- prints prompt
 instantly upon Zsh startup allowing you to start typing while plugins are still loading.
 
 Other themes *increase* Zsh startup lag -- some by a lot, others by a just a little. Powerlevel10k
 *removes* it outright.
 
-*FAQ:* [How do I enable instant prompt?](#how-do-i-enable-instant-prompt)
+*FAQ:* [How do I configure instant prompt?](#how-do-i-configure-instant-prompt)
 
 ### Show on command
 
@@ -834,10 +834,10 @@ Powerlevel10k, on the other hand, doesn't require trading latency for utility --
 instant with any configuration. It stays well below the 50 ms mark, leaving most of the latency
 budget for other plugins you might install.
 
-### How do I enable instant prompt?
+### <a name='how-do-i-enable-instant-prompt'></a>How do I configure instant prompt?
 
 See [instant prompt](#instant-prompt) to learn about instant prompt. This section explains how you
-can enable it and lists caveats that you should be aware of.
+can enable and configure it and lists caveats that you should be aware of.
 
 Instant prompt can be enabled either through `p10k configure` or by manually adding the following
 code snippet at the top of `~/.zshrc`:
@@ -902,6 +902,10 @@ This is recommended if some initialization code in `~/.zshrc` prints to console 
 to move it above the instant prompt preamble or to suppress its output. You can completely disable
 instant prompt with `POWERLEVEL9K_INSTANT_PROMPT=off`. Do this if instant prompt breaks Zsh
 initialization and you don't know how to fix it.
+
+The value of `POWERLEVEL9K_INSTANT_PROMPT` can be changed by `p10k configure` and selecting the
+appropriate option on the *Instant Prompt* screen. Alternatively, search for
+`POWERLEVEL9K_INSTANT_PROMPT` in the existing `~/.p10k.zsh` and change its value there.
 
 *Note*: Instant prompt requires Zsh >= 5.4. It's OK to enable it even when using an older version of
 Zsh but it won't do anything.
@@ -1894,7 +1898,7 @@ typeset -g POWERLEVEL9K_OS_ICON_CONTENT_EXPANSION='${P9K_CONTENT}'  # not bold
   - [Which aspects of shell and terminal does Powerlevel10k affect?](#which-aspects-of-shell-and-terminal-does-powerlevel10k-affect)
   - [I'm using Powerlevel9k with Oh My Zsh. How do I migrate?](#im-using-powerlevel9k-with-oh-my-zsh-how-do-i-migrate)
   - [Is it really fast?](#is-it-really-fast)
-  - [How do I enable instant prompt?](#how-do-i-enable-instant-prompt)
+  - [How do I configure instant prompt?](#how-do-i-configure-instant-prompt)
   - [How do I initialize direnv when using instant prompt?](#how-do-i-initialize-direnv-when-using-instant-prompt)
   - [How do I export GPG_TTY when using instant prompt?](#how-do-i-export-gpg_tty-when-using-instant-prompt)
   - [What do different symbols in Git status mean?](#what-do-different-symbols-in-git-status-mean)
