@@ -1744,14 +1744,16 @@ function _p9k_shorten_delim_len() {
   (( _p9k__ret >= 0 )) || _p9k_prompt_length $1
 }
 
+# Percents are duplicated because this function is currently used only
+# where the result is going to be percent-expanded.
 function _p9k_url_escape() {
   if [[ $1 == [a-zA-Z0-9"/:_.-!'()~ "]# ]]; then
-    _p9k__ret=${1// /%20}
+    _p9k__ret=${1// /%%20}
   else
     local c
     _p9k__ret=
     for c in ${(s::)1}; do
-      [[ $c == [a-zA-Z0-9"/:_.-!'()~"] ]] || printf -v c '%%%02X' $(( #c ))
+      [[ $c == [a-zA-Z0-9"/:_.-!'()~"] ]] || printf -v c '%%%%%02X' $(( #c ))
       _p9k__ret+=$c
     done
   fi
@@ -8244,7 +8246,7 @@ _p9k_must_init() {
     [[ $sig == $_p9k__param_sig ]] && return 1
     _p9k_deinit
   fi
-  _p9k__param_pat=$'v130\1'${(q)ZSH_VERSION}$'\1'${(q)ZSH_PATCHLEVEL}$'\1'
+  _p9k__param_pat=$'v131\1'${(q)ZSH_VERSION}$'\1'${(q)ZSH_PATCHLEVEL}$'\1'
   _p9k__param_pat+=$__p9k_force_term_shell_integration$'\1'
   _p9k__param_pat+=$'${#parameters[(I)POWERLEVEL9K_*]}\1${(%):-%n%#}\1$GITSTATUS_LOG_LEVEL\1'
   _p9k__param_pat+=$'$GITSTATUS_ENABLE_LOGGING\1$GITSTATUS_DAEMON\1$GITSTATUS_NUM_THREADS\1'
