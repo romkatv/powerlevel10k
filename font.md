@@ -94,6 +94,8 @@ If you are using a different terminal, proceed with manual font installation. �
       font_family MesloLGS NF
       ```
       Restart Kitty by closing all sessions and opening a new session.
+   - **puTTY**: Set *Window* → *Appearance* → *Font* to `MesloLGS NF`. Requires puTTY
+     version >= 0.75.
    - **WezTerm**: Create or open `$HOME/.config/wezterm/wezterm.lua` and add the following:
      ```lua
      local wezterm = require 'wezterm';
