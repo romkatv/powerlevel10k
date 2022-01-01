@@ -662,6 +662,8 @@ If you are using a different terminal, proceed with manual font installation. ðŸ
       font_family MesloLGS NF
       ```
       Restart Kitty by closing all sessions and opening a new session.
+   - **puTTY**: puTTY only works in version >= 0.75 due to a unicode display [bug](https://github.com/romkatv/powerlevel10k/issues/674#issuecomment-835416130) 
+     fixed in 0.75.  Set Window -> Appearance -> Font to `MesloLGS NF`
    - **WezTerm**: Create or open `$HOME/.config/wezterm/wezterm.lua` and add the following:
      ```lua
      local wezterm = require 'wezterm';
