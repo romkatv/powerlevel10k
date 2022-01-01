@@ -89,11 +89,11 @@ If you are using a different terminal, proceed with manual font installation. ðŸ
        normal:
          family: "MesloLGS NF"
      ```
-    - **Kitty**: Create or open `~/.config/kitty/kitty.conf` and add the following line to it:
-      ```text
-      font_family MesloLGS NF
-      ```
-      Restart Kitty by closing all sessions and opening a new session.
+   - **Kitty**: Create or open `~/.config/kitty/kitty.conf` and add the following line to it:
+     ```text
+     font_family MesloLGS NF
+     ```
+     Restart Kitty by closing all sessions and opening a new session.
    - **puTTY**: Set *Window* â†’ *Appearance* â†’ *Font* to `MesloLGS NF`. Requires puTTY
      version >= 0.75.
    - **WezTerm**: Create or open `$HOME/.config/wezterm/wezterm.lua` and add the following:
@@ -106,9 +106,9 @@ If you are using a different terminal, proceed with manual font installation. ðŸ
      If the file already exists, only add the line with the font to the existing return.
      Also add the first line if it is not already present.
    - **urxvt**: Create or open `~/.Xresources` and add the following line to it:
-      ```text
-      URxvt.font: xft:MesloLGS NF:size=11
-      ```
+     ```text
+     URxvt.font: xft:MesloLGS NF:size=11
+     ```
      You can adjust the font size to your preference. After changing the configuration use `xrdb ~/.Xresources` to reload the config.
      The new config is applied for all new terminals.
 1. Run `p10k configure` to generate a new `~/.p10k.zsh`. The old config may work
