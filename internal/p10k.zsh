@@ -8227,14 +8227,17 @@ _p9k_init_ssh() {
 }
 
 _p9k_init_toolbox() {
-  [[ -z $P9K_TOOLBOX_NAME  &&
-     -e /run/.toolboxenv   &&
-     -f /run/.containerenv &&
-     -r /run/.containerenv ]] || return 0
-  local name=(${(Q)${${(@M)${(f)"$(</run/.containerenv)"}:#name=*}#name=}})
-  (( ${#name} == 1 )) || return 0
-  [[ -n ${name[1]} ]] || return 0
-  typeset -g P9K_TOOLBOX_NAME=${name[1]}
+  [[ -z $P9K_TOOLBOX_NAME ]] || return 0
+  if [[ -f /run/.containerenv && -r /run/.containerenv ]]; then
+    local name=(${(Q)${${(@M)${(f)"$(</run/.containerenv)"}:#name=*}#name=}})
+    [[ ${#name} -eq 1 && -n ${name[1]} ]] || return 0
+    typeset -g P9K_TOOLBOX_NAME=${name[1]}
+  elif [[ -n $DISTROBOX_ENTER_PATH && -n $NAME ]]; then
+    local name=${(%):-%m}
+    if [[ $name == $NAME* ]]; then
+      typeset -g P9K_TOOLBOX_NAME=$name
+    fi
+  fi
 }
 
 _p9k_must_init() {
