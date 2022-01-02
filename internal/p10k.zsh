@@ -200,7 +200,7 @@ function _p9k_read_word() {
 }
 
 function _p9k_fetch_cwd() {
-  _p9k__cwd=${(g:oce:)${(%):-%/}}
+  _p9k__cwd=${${${:-.}:a}:-.}
   _p9k__cwd_a=${${_p9k__cwd:A}:-.}
 
   case $_p9k__cwd in
