@@ -200,7 +200,11 @@ function _p9k_read_word() {
 }
 
 function _p9k_fetch_cwd() {
-  _p9k__cwd=${${${:-.}:a}:-.}
+  if [[ $PWD == /* && $PWD -ef . ]]; then
+    _p9k__cwd=$PWD
+  else
+    _p9k__cwd=${${${:-.}:a}:-.}
+  fi
   _p9k__cwd_a=${${_p9k__cwd:A}:-.}
 
   case $_p9k__cwd in
