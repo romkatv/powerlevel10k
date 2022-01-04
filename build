@@ -12,9 +12,22 @@ fi
 export LC_ALL=C
 
 if [ -z "${ZSH_VERSION-}" ] && command -v zsh >/dev/null 2>&1; then
+  # Avoid bash 3.*.
   case "${BASH_VERSION-}" in
     [0-3].*) exec zsh "$0" "$@";;
   esac
+fi
+
+# Avoid ksh: https://github.com/romkatv/gitstatus/issues/282.
+if [ -n "${KSH_VERSION-}" ]; then
+  if [ -z "${ZSH_VERSION-}" ] && command -v zsh >/dev/null 2>&1; then
+    exec zsh "$0" "$@"
+  elif [ -z "${BASH_VERSION-}" ] && command -v bash >/dev/null 2>&1 &&
+       bash_version="$(bash --version 2>&1)"; then
+    case "$bash_version" in
+      *version\ [4-9]*|*version\ [1-9][0-9]*) exec bash "$0" "$@";;
+    esac
+  fi
 fi
 
 usage="$(command cat <<\END
@@ -91,7 +104,7 @@ if [ -n "$gitstatus_install_tools" ]; then
       command pkg install -y cmake gmake binutils git perl5 wget
     ;;
     openbsd)
-      command pkg_add install cmake gmake gcc git wget
+      command pkg_add cmake gmake gcc g++ git wget
     ;;
     netbsd)
       command pkgin -y install cmake gmake binutils git
@@ -509,6 +522,7 @@ if [ -z "$gitstatus_cpu" ]; then
     arm64|aarch64)  gitstatus_cpu=armv8-a;;
     ppc64le)        gitstatus_cpu=powerpc64le;;
     riscv64)        gitstatus_cpu=rv64imafdc;;
+    loongarch64)    gitstatus_cpu=loongarch64;;
     x86_64|amd64)   gitstatus_cpu=x86-64;;
     x86)            gitstatus_cpu=i586;;
     s390x)          gitstatus_cpu=z900;;
