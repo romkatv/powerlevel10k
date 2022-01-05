@@ -657,11 +657,11 @@ If you are using a different terminal, proceed with manual font installation. �
        normal:
          family: "MesloLGS NF"
      ```
-    - **Kitty**: Create or open `~/.config/kitty/kitty.conf` and add the following line to it:
+    - **kitty**: Create or open `~/.config/kitty/kitty.conf` and add the following line to it:
       ```text
       font_family MesloLGS NF
       ```
-      Restart Kitty by closing all sessions and opening a new session.
+      Restart kitty by closing all sessions and opening a new session.
    - **puTTY**: Set *Window* → *Appearance* → *Font* to `MesloLGS NF`. Requires puTTY
      version >= 0.75.
    - **WezTerm**: Create or open `$HOME/.config/wezterm/wezterm.lua` and add the following:
@@ -1867,7 +1867,7 @@ There are a few mitigation options for this issue.
   `~/.p10k.zsh`.
 - Apply [the patch](#zsh-patch) and [rebuild Zsh from source](
     https://github.com/zsh-users/zsh/blob/master/INSTALL). It won't help if you are using Alacritty,
-  Kitty or some other terminal that reflows text on resize but doesn't reflow saved cursor position.
+  kitty or some other terminal that reflows text on resize but doesn't reflow saved cursor position.
   On such terminals the patch will have no visible effect.
 - Disable text reflowing on window resize in terminal settings. If your terminal doesn't have this
   setting, try a different terminal.

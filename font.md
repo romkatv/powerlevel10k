@@ -89,11 +89,11 @@ If you are using a different terminal, proceed with manual font installation. �
        normal:
          family: "MesloLGS NF"
      ```
-   - **Kitty**: Create or open `~/.config/kitty/kitty.conf` and add the following line to it:
+   - **kitty**: Create or open `~/.config/kitty/kitty.conf` and add the following line to it:
      ```text
      font_family MesloLGS NF
      ```
-     Restart Kitty by closing all sessions and opening a new session.
+     Restart kitty by closing all sessions and opening a new session.
    - **puTTY**: Set *Window* → *Appearance* → *Font* to `MesloLGS NF`. Requires puTTY
      version >= 0.75.
    - **WezTerm**: Create or open `$HOME/.config/wezterm/wezterm.lua` and add the following:
