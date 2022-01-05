@@ -1862,15 +1862,9 @@ There is no ETA for the patch making its way into upstream Zsh. See [discussion]
 
 There are a few mitigation options for this issue.
 
-- Use [Kitty](https://sw.kovidgoyal.net/kitty/) and enable terminal-shell integration in
-  Powerlevel10k. The latter can be done by appending these lines to `~/.zshrc`:
-  ```zsh
-  unset KITTY_SHELL_INTEGRATION
-  ITERM_SHELL_INTEGRATION_INSTALLED=Yes
-  ```
-  At the time of this writing (Dec 2021) the latest release of Kitty (0.23.1) doesn't have the
-  necessary code to fix the issue. If by the time you are reading this there is no newer version,
-  you'll have to build from source.
+- Use [kitty](https://sw.kovidgoyal.net/kitty/) terminal version >= 0.24.0 and enable terminal-shell
+  integration in Powerlevel10k by defining `POWERLEVEL9K_TERM_SHELL_INTEGRATION=true` in
+  `~/.p10k.zsh`.
 - Apply [the patch](#zsh-patch) and [rebuild Zsh from source](
     https://github.com/zsh-users/zsh/blob/master/INSTALL). It won't help if you are using Alacritty,
   Kitty or some other terminal that reflows text on resize but doesn't reflow saved cursor position.
