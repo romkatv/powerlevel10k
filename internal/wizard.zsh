@@ -1093,6 +1093,7 @@ function os_icon_name() {
           *void*)                  echo LINUX_VOID_ICON;;
           *artix*)                 echo LINUX_ARTIX_ICON;;
           *rhel*)                  echo LINUX_RHEL_ICON;;
+          amzn)                    echo LINUX_AMZN_ICON;;
           *)                       echo LINUX_ICON;;
         esac
         ;;
