@@ -308,69 +308,69 @@ enable as many segments as you like. It won't slow down your prompt or Zsh start
 
 | Segment | Meaning |
 |--------:|---------|
-| `os_icon` | your OS logo (apple for macOS, swirl for debian, etc.) |
-| `dir` | current working directory |
-| `vcs` | Git repository status |
-| `prompt_char` | multi-functional prompt symbol; changes depending on vi mode: `❯`, `❮`, `V`, `▶` for insert, command, visual and replace mode respectively; turns red on error |
-| `context` | user@hostname |
-| `status` | exit code of the last command |
-| `command_execution_time` | duration (wall time) of the last command |
-| `background_jobs` | presence of background jobs |
-| `time` | current time |
-| `direnv` | [direnv](https://direnv.net/) status |
-| `asdf` | tool versions from [asdf](https://github.com/asdf-vm/asdf) |
-| `virtualenv` | python environment from [venv](https://docs.python.org/3/library/venv.html) |
 | `anaconda` | virtual environment from [conda](https://conda.io/) |
-| `pyenv` | python environment from [pyenv](https://github.com/pyenv/pyenv) |
-| `goenv` | go environment from [goenv](https://github.com/syndbg/goenv) |
-| `nodenv` | node.js environment from [nodenv](https://github.com/nodenv/nodenv) |
-| `nvm` | node.js environment from [nvm](https://github.com/nvm-sh/nvm) |
-| `nodeenv` | node.js environment from [nodeenv](https://github.com/ekalinin/nodeenv) |
-| `rbenv` | ruby environment from [rbenv](https://github.com/rbenv/rbenv) |
-| `rvm` | ruby environment from [rvm](https://rvm.io) |
-| `fvm` | flutter environment from [fvm](https://github.com/leoafarias/fvm) |
-| `luaenv` | lua environment from [luaenv](https://github.com/cehoffman/luaenv) |
-| `jenv` | java environment from [jenv](https://github.com/jenv/jenv) |
-| `plenv` | perl environment from [plenv](https://github.com/tokuhirom/plenv) |
-| `phpenv` | php environment from [phpenv](https://github.com/phpenv/phpenv) |
-| `haskell_stack` | haskell version from [stack](https://haskellstack.org/) |
-| `node_version` | [node.js](https://nodejs.org/) version |
-| `go_version` | [go](https://golang.org) version |
-| `rust_version` | [rustc](https://www.rust-lang.org) version |
-| `dotnet_version` | [dotnet](https://dotnet.microsoft.com) version |
-| `php_version` | [php](https://www.php.net/) version |
-| `laravel_version` | [laravel php framework](https://laravel.com/) version |
-| `java_version` | [java](https://www.java.com/) version |
-| `package` | `name@version` from [package.json](https://docs.npmjs.com/files/package.json) |
-| `kubecontext` | current [kubernetes](https://kubernetes.io/) context |
-| `terraform` | [terraform](https://www.terraform.io) workspace |
-| `terraform_version` | [terraform](https://www.terraform.io) version |
+| `asdf` | tool versions from [asdf](https://github.com/asdf-vm/asdf) |
 | `aws` | [aws profile](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-profiles.html) |
 | `aws_eb_env` | [aws elastic beanstalk](https://aws.amazon.com/elasticbeanstalk/) environment |
 | `azure` | [azure](https://docs.microsoft.com/en-us/cli/azure) account name |
+| `background_jobs` | presence of background jobs |
+| `battery` | internal battery state and charge level (yep, batteries *literally* included) |
+| `command_execution_time` | duration (wall time) of the last command |
+| `context` | user@hostname |
+| `dir` | current working directory |
+| `direnv` | [direnv](https://direnv.net/) status |
+| `disk_usage` | disk usage |
+| `dotnet_version` | [dotnet](https://dotnet.microsoft.com) version |
+| `fvm` | flutter environment from [fvm](https://github.com/leoafarias/fvm) |
 | `gcloud` | [google cloud](https://cloud.google.com/) cli account and project |
+| `goenv` | go environment from [goenv](https://github.com/syndbg/goenv) |
 | `google_app_cred` | [google application credentials](https://cloud.google.com/docs/authentication/production) |
-| `toolbox` | [toolbox](https://github.com/containers/toolbox) name |
-| `nordvpn` | [nordvpn](https://nordvpn.com/) connection status |
-| `ranger` | [ranger](https://github.com/ranger/ranger) shell |
-| `nnn` | [nnn](https://github.com/jarun/nnn) shell |
-| `xplr` | [xplr](https://github.com/sayanarijit/xplr) shell |
-| `vim_shell` | [vim](https://www.vim.org/) shell (`:sh`) |
+| `go_version` | [go](https://golang.org) version |
+| `haskell_stack` | haskell version from [stack](https://haskellstack.org/) |
+| `ip` | IP address and bandwidth usage for a specified network interface |
+| `java_version` | [java](https://www.java.com/) version |
+| `jenv` | java environment from [jenv](https://github.com/jenv/jenv) |
+| `kubecontext` | current [kubernetes](https://kubernetes.io/) context |
+| `laravel_version` | [laravel php framework](https://laravel.com/) version |
+| `load` | CPU load |
+| `luaenv` | lua environment from [luaenv](https://github.com/cehoffman/luaenv) |
 | `midnight_commander` | [midnight commander](https://midnight-commander.org/) shell |
 | `nix_shell` | [nix shell](https://nixos.org/nixos/nix-pills/developing-with-nix-shell.html) indicator |
-| `todo` | [todo](https://github.com/todotxt/todo.txt-cli) items |
-| `timewarrior` | [timewarrior](https://timewarrior.net/) tracking status |
-| `taskwarrior` | [taskwarrior](https://taskwarrior.org/) task count |
-| `vpn_ip` | virtual private network indicator |
-| `ip` | IP address and bandwidth usage for a specified network interface |
-| `load` | CPU load |
-| `disk_usage` | disk usage |
-| `ram` | free RAM |
-| `swap` | used swap |
-| `public_ip` | public IP address |
+| `nnn` | [nnn](https://github.com/jarun/nnn) shell |
+| `nodeenv` | node.js environment from [nodeenv](https://github.com/ekalinin/nodeenv) |
+| `nodenv` | node.js environment from [nodenv](https://github.com/nodenv/nodenv) |
+| `node_version` | [node.js](https://nodejs.org/) version |
+| `nordvpn` | [nordvpn](https://nordvpn.com/) connection status |
+| `nvm` | node.js environment from [nvm](https://github.com/nvm-sh/nvm) |
+| `os_icon` | your OS logo (apple for macOS, swirl for debian, etc.) |
+| `package` | `name@version` from [package.json](https://docs.npmjs.com/files/package.json) |
+| `phpenv` | php environment from [phpenv](https://github.com/phpenv/phpenv) |
+| `php_version` | [php](https://www.php.net/) version |
+| `plenv` | perl environment from [plenv](https://github.com/tokuhirom/plenv) |
+| `prompt_char` | multi-functional prompt symbol; changes depending on vi mode: `❯`, `❮`, `V`, `▶` for insert, command, visual and replace mode respectively; turns red on error |
 | `proxy` | system-wide http/https/ftp proxy |
+| `public_ip` | public IP address |
+| `pyenv` | python environment from [pyenv](https://github.com/pyenv/pyenv) |
+| `ram` | free RAM |
+| `ranger` | [ranger](https://github.com/ranger/ranger) shell |
+| `rbenv` | ruby environment from [rbenv](https://github.com/rbenv/rbenv) |
+| `rust_version` | [rustc](https://www.rust-lang.org) version |
+| `rvm` | ruby environment from [rvm](https://rvm.io) |
+| `status` | exit code of the last command |
+| `swap` | used swap |
+| `taskwarrior` | [taskwarrior](https://taskwarrior.org/) task count |
+| `terraform` | [terraform](https://www.terraform.io) workspace |
+| `terraform_version` | [terraform](https://www.terraform.io) version |
+| `time` | current time |
+| `timewarrior` | [timewarrior](https://timewarrior.net/) tracking status |
+| `todo` | [todo](https://github.com/todotxt/todo.txt-cli) items |
+| `toolbox` | [toolbox](https://github.com/containers/toolbox) name |
+| `vcs` | Git repository status |
+| `vim_shell` | [vim](https://www.vim.org/) shell (`:sh`) |
+| `virtualenv` | python environment from [venv](https://docs.python.org/3/library/venv.html) |
+| `vpn_ip` | virtual private network indicator |
 | `wifi` | WiFi speed |
-| `battery` | internal battery state and charge level (yep, batteries *literally* included) |
+| `xplr` | [xplr](https://github.com/sayanarijit/xplr) shell |
 
 ### Extensible
 
