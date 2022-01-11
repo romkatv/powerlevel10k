@@ -350,6 +350,7 @@ enable as many segments as you like. It won't slow down your prompt or Zsh start
 | `azure` | [azure](https://docs.microsoft.com/en-us/cli/azure) account name |
 | `gcloud` | [google cloud](https://cloud.google.com/) cli account and project |
 | `google_app_cred` | [google application credentials](https://cloud.google.com/docs/authentication/production) |
+| `toolbox` | [toolbox](https://github.com/containers/toolbox) name |
 | `nordvpn` | [nordvpn](https://nordvpn.com/) connection status |
 | `ranger` | [ranger](https://github.com/ranger/ranger) shell |
 | `nnn` | [nnn](https://github.com/jarun/nnn) shell |
