@@ -111,6 +111,14 @@ If you are using a different terminal, proceed with manual font installation. ðŸ
      ```
      You can adjust the font size to your preference. After changing the configuration use `xrdb ~/.Xresources` to reload the config.
      The new config is applied for all new terminals.
+   - **xterm**: Create or open `~/.Xresources` and add the following two lines to it:
+     ```text
+     xterm*faceName: MesloLGS NF
+     xterm*faceSize: 11
+     ```
+     You can adjust the font size to your preference. After changing the configuration use `xrdb ~/.Xresources` to reload the config.
+     The new config is applied for all new terminals.    
+     
 1. Run `p10k configure` to generate a new `~/.p10k.zsh`. The old config may work
    incorrectly with the new font.
 
