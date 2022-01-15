@@ -1366,7 +1366,7 @@ https://www.reddit.com/r/zsh/comments/eg49ff/powerlevel10k_prompt_history_exit_c
 
 ### What is the minimum supported Zsh version?
 
-Zsh 5.1 or newer should work. Fast startup requires Zsh >= 5.4.
+Zsh 5.3 or newer should work. Fast startup requires Zsh >= 5.4.
 
 ### How were these screenshots and animated gifs created?
 
