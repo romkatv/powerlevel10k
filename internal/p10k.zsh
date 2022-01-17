@@ -3399,6 +3399,8 @@ _p9k_prompt_swap_async() {
     (( used_bytes *= 1024 ))
   fi
 
+  (( used_bytes >= 0 || (used_bytes = 0) ))
+
   _p9k_human_readable_bytes $used_bytes
   [[ $_p9k__ret != $_p9k__swap_used ]] || return
   _p9k__swap_used=$_p9k__ret
