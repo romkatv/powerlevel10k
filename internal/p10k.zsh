@@ -6441,7 +6441,7 @@ function _p9k_dump_state() {
       unset __p9k_cached_param_pat __p9k_cached_param_sig
       (( $+_p9k_preinit )) && { print -r -- $_p9k_preinit >&$fd || return }
       print -r -- '_p9k_restore_state_impl() {' >&$fd || return
-      typeset -pm '_POWERLEVEL9K_*|_p9k_[^_]*|icons|OS|DEFAULT_COLOR|DEFAULT_COLOR_INVERTED' >&$fd || return
+      typeset -pm '_POWERLEVEL9K_*|_p9k_[^_]*|icons' >&$fd || return
       print -r -- '}' >&$fd || return
     } always {
       exec {fd}>&-
@@ -8400,11 +8400,6 @@ function _p9k_init_cacheable() {
     _p9k_color1=0
     _p9k_color2=7
   fi
-
-  # Someone might be using these.
-  typeset -g OS=$_p9k_os
-  typeset -g DEFAULT_COLOR=$_p9k_color1
-  typeset -g DEFAULT_COLOR_INVERTED=$_p9k_color2
 
   _p9k_battery_states=(
     'LOW'           'red'
