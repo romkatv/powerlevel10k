@@ -7566,6 +7566,7 @@ _p9k_init_params() {
   _p9k_declare -b POWERLEVEL9K_TIME_UPDATE_ON_COMMAND 0
   # If set to true, time will update every second.
   _p9k_declare -b POWERLEVEL9K_EXPERIMENTAL_TIME_REALTIME 0
+  _p9k_declare -b POWERLEVEL9K_DONT_SET_OS 0
 
   local -i i=1
   while (( i <= $#_POWERLEVEL9K_LEFT_PROMPT_ELEMENTS )); do
@@ -8402,7 +8403,11 @@ function _p9k_init_cacheable() {
   fi
 
   # Someone might be using these.
+  # On Windows OS is already set to Windows_NT,
+  # and setting this to Windows can be problematic
+  if [ $_POWERLEVEL9K_DONT_SET_OS -eq 0 ]; then
   typeset -g OS=$_p9k_os
+  fi
   typeset -g DEFAULT_COLOR=$_p9k_color1
   typeset -g DEFAULT_COLOR_INVERTED=$_p9k_color2
 

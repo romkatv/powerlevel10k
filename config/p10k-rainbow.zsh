@@ -1710,6 +1710,11 @@
   # really need it.
   typeset -g POWERLEVEL9K_DISABLE_HOT_RELOAD=true
 
+  # Prevent the OS variable from being set.
+  # On Windows P10K sets OS to Windows by default, which can create problems for applications
+  # expecting it to be the default Windows_NT. By enabling this option, P10K won't set OS.
+  #typeset -g POWERLEVEL9K_DONT_SET_OS=true
+
   # If p10k is already loaded, reload configuration.
   # This works even with POWERLEVEL9K_DISABLE_HOT_RELOAD=true.
   (( ! $+functions[p10k] )) || p10k reload
