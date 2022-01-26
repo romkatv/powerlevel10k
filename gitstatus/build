@@ -145,8 +145,12 @@ cpus="$(command getconf _NPROCESSORS_ONLN 2>/dev/null)" ||
   cpus=8
 
 case "$gitstatus_cpu" in
-  powerpc64le) archflag="-mcpu";;
-  *)           archflag="-march";;
+  powerpc64|powerpc64le)
+    archflag="-mcpu"
+  ;;
+  *)
+    archflag="-march"
+  ;;
 esac
 
 cflags="$archflag=$gitstatus_cpu -fno-plt -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security -fpie"
@@ -520,7 +524,7 @@ if [ -z "$gitstatus_cpu" ]; then
     armv6l|armhf)   gitstatus_cpu=armv6;;
     armv7l)         gitstatus_cpu=armv7;;
     arm64|aarch64)  gitstatus_cpu=armv8-a;;
-    ppc64le)        gitstatus_cpu=powerpc64le;;
+    ppc64|ppc64le)  gitstatus_cpu=powerpc64le;;
     riscv64)        gitstatus_cpu=rv64imafdc;;
     loongarch64)    gitstatus_cpu=loongarch64;;
     x86_64|amd64)   gitstatus_cpu=x86-64;;
@@ -559,7 +563,7 @@ case "$gitstatus_kernel" in
           armv6l|armhf)       docker_image=arm32v6/alpine:3.11.6;;
           armv7l)             docker_image=arm32v7/alpine:3.11.6;;
           aarch64)            docker_image=arm64v8/alpine:3.11.6;;
-          ppc64le)            docker_image=ppc64le/alpine:3.11.6;;
+          ppc64|ppc64le)      docker_image=ppc64le/alpine:3.11.6;;
           s390x)              docker_image=s390x/alpine:3.11.6;;
           *)
             >&2 echo '[error] unable to infer docker image'

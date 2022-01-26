@@ -574,7 +574,12 @@ function gitstatus_start"${1:-}"() {
     else
       typeset -gi _GITSTATUS_START_COUNTER
       local log_level=$GITSTATUS_LOG_LEVEL
-      local file_prefix=${${TMPDIR:-/tmp}:A}/gitstatus.$name.$EUID
+      if [[ -n "$TMPDIR" && ( ( -d "$TMPDIR" && -w "$TMPDIR" ) || ! ( -d /tmp && -w /tmp ) ) ]]; then
+        local tmpdir=$TMPDIR
+      else
+        local tmpdir=/tmp
+      fi
+      local file_prefix=${tmpdir:A}/gitstatus.$name.$EUID
       file_prefix+=.$sysparams[pid].$EPOCHSECONDS.$((++_GITSTATUS_START_COUNTER))
       (( GITSTATUS_ENABLE_LOGGING )) && : ${log_level:=INFO}
       if [[ -n $log_level ]]; then
