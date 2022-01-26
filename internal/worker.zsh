@@ -181,7 +181,13 @@ function _p9k_worker_start() {
   setopt monitor || return
   {
     [[ -n $_p9k__worker_resp_fd ]] && return
-    _p9k__worker_file_prefix=${TMPDIR:-/tmp}/p10k.worker.$EUID.$sysparams[pid].$EPOCHSECONDS
+
+    if [[ -n "$TMPDIR" && ( ( -d "$TMPDIR" && -w "$TMPDIR" ) || ! ( -d /tmp && -w /tmp ) ) ]]; then
+      local tmpdir=$TMPDIR
+    else
+      local tmpdir=/tmp
+    fi
+    _p9k__worker_file_prefix=$tmpdir/p10k.worker.$EUID.$sysparams[pid].$EPOCHSECONDS
 
     sysopen -r -o cloexec -u _p9k__worker_resp_fd <(
       exec 0</dev/null

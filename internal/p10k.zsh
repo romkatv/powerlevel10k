@@ -6280,8 +6280,13 @@ _p9k_dump_instant_prompt() {
       out+="$cr${(pl:$((height-prompt_height))::\n:)}$terminfo[sc]$out"
     fi
   fi
-  typeset -g __p9k_instant_prompt_output=${TMPDIR:-/tmp}/p10k-instant-prompt-output-${(%):-%n}-$$
-  { echo -n > $__p9k_instant_prompt_output } || return
+  if [[ -n "$TMPDIR" && ( ( -d "$TMPDIR" && -w "$TMPDIR" ) || ! ( -d /tmp && -w /tmp ) ) ]]; then
+    local tmpdir=$TMPDIR
+  else
+    local tmpdir=/tmp
+  fi
+  typeset -g __p9k_instant_prompt_output=$tmpdir/p10k-instant-prompt-output-${(%):-%n}-$$
+  { : > $__p9k_instant_prompt_output } || return
   print -rn -- "${out}${esc}?2004h" || return
   if (( $+commands[stty] )); then
     command stty -icanon 2>/dev/null
@@ -7802,7 +7807,12 @@ function _p9k_wrap_widgets() {
     # There is no zle-line-pre-redraw in zsh < 5.3, so we have to wrap all widgets
     # with key bindings. This costs extra 3ms: 1.5ms to fetch the list of widgets and
     # another 1.5ms to wrap them.
-    local keymap tmp=${TMPDIR:-/tmp}/p10k.bindings.$sysparams[pid]
+    if [[ -n "$TMPDIR" && ( ( -d "$TMPDIR" && -w "$TMPDIR" ) || ! ( -d /tmp && -w /tmp ) ) ]]; then
+      local tmpdir=$TMPDIR
+    else
+      local tmpdir=/tmp
+    fi
+    local keymap tmp=$tmpdir/p10k.bindings.$sysparams[pid]
     {
       for keymap in $keymaps; do bindkey -M $keymap; done >$tmp
       local -aU widget_list=(
@@ -8259,7 +8269,7 @@ _p9k_must_init() {
     [[ $sig == $_p9k__param_sig ]] && return 1
     _p9k_deinit
   fi
-  _p9k__param_pat=$'v133\1'${(q)ZSH_VERSION}$'\1'${(q)ZSH_PATCHLEVEL}$'\1'
+  _p9k__param_pat=$'v134\1'${(q)ZSH_VERSION}$'\1'${(q)ZSH_PATCHLEVEL}$'\1'
   _p9k__param_pat+=$__p9k_force_term_shell_integration$'\1'
   _p9k__param_pat+=$'${#parameters[(I)POWERLEVEL9K_*]}\1${(%):-%n%#}\1$GITSTATUS_LOG_LEVEL\1'
   _p9k__param_pat+=$'$GITSTATUS_ENABLE_LOGGING\1$GITSTATUS_DAEMON\1$GITSTATUS_NUM_THREADS\1'

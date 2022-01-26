@@ -1537,9 +1537,16 @@ function ask_config_overwrite() {
   case $choice in
     r) return 1;;
     y)
-      config_backup="$(mktemp ${TMPDIR:-/tmp}/$__p9k_cfg_basename.XXXXXXXXXX)" || quit -c
+      if [[ -n "$TMPDIR" && ( ( -d "$TMPDIR" && -w "$TMPDIR" ) || ! ( -d /tmp && -w /tmp ) ) ]]; then
+        local tmpdir=$TMPDIR
+        local tmpdir_u='$TMPDIR'
+      else
+        local tmpdir=/tmp
+        local tmpdir_u=/tmp
+      fi
+      config_backup="$(mktemp $tmpdir/$__p9k_cfg_basename.XXXXXXXXXX)" || quit -c
       cp $__p9k_cfg_path $config_backup                                        || quit -c
-      config_backup_u=${${TMPDIR:+\$TMPDIR}:-/tmp}/${(q-)config_backup:t}
+      config_backup_u=$tmpdir_u/${(q-)config_backup:t}
     ;;
   esac
   return 0
@@ -1600,16 +1607,23 @@ function ask_zshrc_edit() {
     y)
       write_zshrc=1
       if [[ -n $zshrc_content ]]; then
-        zshrc_backup="$(mktemp ${TMPDIR:-/tmp}/.zshrc.XXXXXXXXXX)" || quit -c
-        cp -p $__p9k_zshrc $zshrc_backup                           || quit -c
+        if [[ -n "$TMPDIR" && ( ( -d "$TMPDIR" && -w "$TMPDIR" ) || ! ( -d /tmp && -w /tmp ) ) ]]; then
+          local tmpdir=$TMPDIR
+          local tmpdir_u='$TMPDIR'
+        else
+          local tmpdir=/tmp
+          local tmpdir_u=/tmp
+        fi
+        zshrc_backup="$(mktemp $tmpdir/.zshrc.XXXXXXXXXX)" || quit -c
+        cp -p $__p9k_zshrc $zshrc_backup                   || quit -c
         local -i writable=1
         if [[ ! -w $zshrc_backup ]]; then
-          chmod u+w -- $zshrc_backup                               || quit -c
+          chmod u+w -- $zshrc_backup                       || quit -c
           writable=0
         fi
-        print -r -- $zshrc_content >$zshrc_backup                  || quit -c
-        (( writable )) || chmod u-w -- $zshrc_backup               || quit -c
-        zshrc_backup_u=${${TMPDIR:+\$TMPDIR}:-/tmp}/${(q-)zshrc_backup:t}
+        print -r -- $zshrc_content >$zshrc_backup          || quit -c
+        (( writable )) || chmod u-w -- $zshrc_backup       || quit -c
+        zshrc_backup_u=$tmpdir_u/${(q-)zshrc_backup:t}
       fi
     ;;
   esac
