@@ -245,7 +245,7 @@ END
       return 1
     fi
 
-    if [ -n "$TMPDIR" -a '(' '(' -d "$TMPDIR" -a -w "$TMPDIR" ')' -o '!' '(' -d /tmp -a -w /tmp ')' ')' ]; then
+    if [ -n "${TMPDIR-}" -a '(' '(' -d "${TMPDIR-}" -a -w "${TMPDIR-}" ')' -o '!' '(' -d /tmp -a -w /tmp ')' ')' ]; then
       local tmp="$TMPDIR"
     else
       local tmp=/tmp
