@@ -245,27 +245,30 @@ END
       return 1
     fi
 
-    local tmpdir
+    if [ -n "$TMPDIR" -a '(' '(' -d "$TMPDIR" -a -w "$TMPDIR" ')' -o '!' '(' -d /tmp -a -w /tmp ')' ')' ]; then
+      local tmp="$TMPDIR"
+    else
+      local tmp=/tmp
+    fi
     if ! command -v mktemp >/dev/null 2>&1 ||
-       ! tmpdir="$(command mktemp -d "${TMPDIR:-/tmp}"/gitstatus-install.XXXXXXXXXX)"; then
-      tmpdir="${TMPDIR:-/tmp}/gitstatus-install.tmp.$$"
+       ! tmpdir="$(command mktemp -d "$tmp"/gitstatus-install.XXXXXXXXXX)"; then
+      tmpdir="$tmp/gitstatus-install.tmp.$$"
       if ! mkdir -p -- "$tmpdir"; then
-        local dir="${TMPDIR:-/tmp}"
-        if [ -z "${TMPDIR:-}" ]; then
+        if [ "$tmp" = /tmp ]; then
           local label='directory'
         else
           local label='directory (\033[1mTMPDIR\033[m)'
         fi
-        if [ ! -e "$dir" ]; then
-          >&"$e" printf 'Temporary '"$label"' does not exist: \033[4;31m%s\033[0m\n' "$dir"
+        if [ ! -e "$tmp" ]; then
+          >&"$e" printf 'Temporary '"$label"' does not exist: \033[4;31m%s\033[0m\n' "$tmp"
           >&"$e" printf '\n'
           >&"$e" printf 'Create it, then restart your shell.\n'
-        elif [ ! -d "$dir" ]; then
-          >&"$e" printf 'Not a '"$label"': \033[4;31m%s\033[0m\n' "$dir"
+        elif [ ! -d "$tmp" ]; then
+          >&"$e" printf 'Not a '"$label"': \033[4;31m%s\033[0m\n' "$tmp"
           >&"$e" printf '\n'
           >&"$e" printf 'Make it a directory, then restart your shell.\n'
-        elif [ ! -w "$dir" ]; then
-          >&"$e" printf 'Temporary '"$label"' is not writable: \033[4;31m%s\033[0m\n' "$dir"
+        elif [ ! -w "$tmp" ]; then
+          >&"$e" printf 'Temporary '"$label"' is not writable: \033[4;31m%s\033[0m\n' "$tmp"
           >&"$e" printf '\n'
           >&"$e" printf 'Make it writable, then restart your shell.\n'
         fi
