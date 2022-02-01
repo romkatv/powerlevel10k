@@ -5637,6 +5637,7 @@ _p9k_preexec2() {
   typeset -g _p9k__preexec_cmd=$2
   _p9k__timer_start=EPOCHREALTIME
   P9K_TTY=old
+  (( ! $+_p9k__iterm_cmd )) || _p9k_iterm2_preexec
 }
 
 function _p9k_prompt_net_iface_init() {
@@ -6873,6 +6874,10 @@ _p9k_precmd_impl() {
     _p9k__zle_state=insert
 
     (( ++_p9k__prompt_idx ))
+
+    if (( $+_p9k__iterm_cmd )); then
+      _p9k_iterm2_precmd $__p9k_new_status
+    fi
   fi
 
   _p9k_fetch_cwd
@@ -8600,6 +8605,20 @@ _p9k_init_vcs() {
   (( $+GITSTATUS_DAEMON_PID_POWERLEVEL9K )) || _p9k__instant_prompt_disabled=1
 }
 
+function _p9k_iterm2_precmd() {
+  builtin zle && return
+  if (( _p9k__iterm_cmd )) && [[ -t 1 ]]; then
+    (( _p9k__iterm_cmd == 1 )) && builtin print -n '\e]133;C;\a'
+    builtin printf '\e]133;D;%s\a' $1
+  fi
+  typeset -gi _p9k__iterm_cmd=1
+}
+
+function _p9k_iterm2_preexec() {
+  [[ -t 1 ]] && builtin print -n '\e]133;C;\a'
+  typeset -gi _p9k__iterm_cmd=2
+}
+
 _p9k_init() {
   _p9k_init_vars
   _p9k_restore_state || _p9k_init_cacheable
@@ -8661,6 +8680,13 @@ _p9k_init() {
   if (( $+functions[iterm2_precmd] )); then
     _p9k__iterm2_precmd=$functions[iterm2_precmd]
     functions[iterm2_precmd]='local _p9k_status=$?; zle && return; () { return $_p9k_status; }; '$_p9k__iterm2_precmd
+  fi
+
+  if (( _POWERLEVEL9K_TERM_SHELL_INTEGRATION  &&
+        ! $+_z4h_iterm_cmd                    &&
+        ! $+functions[iterm2_decorate_prompt] &&
+        ! $+functions[iterm2_precmd] )); then
+    typeset -gi _p9k__iterm_cmd=0
   fi
 
   if _p9k_segment_in_use todo; then
