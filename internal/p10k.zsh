@@ -5625,6 +5625,21 @@ _p9k_prompt_haskell_stack_init() {
   typeset -g "_p9k__segment_cond_${_p9k__prompt_side}[_p9k__segment_index]"='$commands[stack]'
 }
 
+################################################################
+# CPU Architecture
+prompt_arch() {
+  if ! _p9k_cache_ephemeral_get $0 ; then
+    _p9k_cache_ephemeral_set $(arch)
+  fi
+  [[ $_p9k__cache_val[1] == $POWERLEVEL9K_ARCH_DEFAULT ]] && return
+  _p9k_prompt_segment "$0" "orange1" "black" 'ARCH_ICON' 0 '' "$_p9k__cache_val[1]"
+}
+
+_p9k_prompt_arch_init() {
+  echo 'arch init' >> ~/p9k_debug.txt
+  typeset -g "_p9k__segment_cond_${_p9k__prompt_side}[_p9k__segment_index]"='$commands[arch]'
+}
+
 # Use two preexec hooks to survive https://github.com/MichaelAquilina/zsh-you-should-use with
 # YSU_HARDCORE=1. See https://github.com/romkatv/powerlevel10k/issues/427.
 _p9k_preexec1() {
