@@ -100,7 +100,7 @@ if [ -n "$gitstatus_install_tools" ]; then
         exit 1
       fi
     ;;
-    freebsd)
+    freebsd|dragonfly)
       command pkg install -y cmake gmake binutils git perl5 wget
     ;;
     openbsd)
@@ -141,7 +141,7 @@ if [ -n "$gitstatus_install_tools" ]; then
 fi
 
 cpus="$(command getconf _NPROCESSORS_ONLN 2>/dev/null)" ||
-  cpus="$(command sysctl -n hw.ncpu 2>/dev/null)" ||
+  cpus="$(command sysctl -n hw.ncpu 2>/dev/null)"       ||
   cpus=8
 
 case "$gitstatus_cpu" in
@@ -174,12 +174,21 @@ if 2>/dev/null "$CC"   \
 fi
 
 command rm -f -- "$workdir"/cc-test "$workdir"/cc-test.o
-if 2>/dev/null "$CC"                    \
-     -fstack-clash-protection -fcf-protection \
-     -Werror                                  \
-     -c "$workdir"/cc-test.c                  \
+if 2>/dev/null "$CC"          \
+     -fstack-clash-protection \
+     -Werror                  \
+     -c "$workdir"/cc-test.c  \
      -o "$workdir"/cc-test.o; then
-  cflags="$cflags -fstack-clash-protection -fcf-protection"
+  cflags="$cflags -fstack-clash-protection"
+fi
+
+command rm -f -- "$workdir"/cc-test "$workdir"/cc-test.o
+if 2>/dev/null "$CC"         \
+     -fcf-protection         \
+     -Werror                 \
+     -c "$workdir"/cc-test.c \
+     -o "$workdir"/cc-test.o; then
+  cflags="$cflags -fcf-protection"
 fi
 
 command rm -f -- "$workdir"/cc-test "$workdir"/cc-test.o
@@ -220,6 +229,12 @@ case "$gitstatus_kernel" in
   ;;
   freebsd)
     gitstatus_cxx=clang++
+    gitstatus_make=gmake
+    gitstatus_ldflags="$gitstatus_ldflags ${static_pie:--static}"
+    libgit2_cmake_flags="$libgit2_cmake_flags -DENABLE_REPRODUCIBLE_BUILDS=ON"
+  ;;
+  dragonfly)
+    gitstatus_cxx=clang++12
     gitstatus_make=gmake
     gitstatus_ldflags="$gitstatus_ldflags ${static_pie:--static}"
     libgit2_cmake_flags="$libgit2_cmake_flags -DENABLE_REPRODUCIBLE_BUILDS=ON"
@@ -574,7 +589,7 @@ case "$gitstatus_kernel" in
       fi
     fi
   ;;
-  freebsd|openbsd|netbsd|darwin)
+  freebsd|openbsd|netbsd|darwin|dragonfly)
     if [ -n "$docker_cmd" ]; then
       >&2 echo "[error] docker (-d) is not supported on $gitstatus_kernel"
       exit 1
