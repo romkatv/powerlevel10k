@@ -184,7 +184,7 @@ function build-unix() {
   case $2 in
     linux-ppc64le) ;;
     linux-*)       flags+=(-d docker);;
-    darwin-arm64)  intro='PATH="/opt/local/bin:$PATH"';;
+    darwin-arm64)  intro='PATH="/opt/homebrew/bin:$PATH"';;
     darwin-*)      intro='PATH="/usr/local/bin:$PATH"';;
   esac
   ssh $1 -- /bin/sh -uex <<<"
@@ -271,16 +271,52 @@ function build-windows() {
   chmod +x $binaries/gitstatusd-$2
 }
 
+if [[ -r /proc/version && "$(</proc/version)" == *Microsoft* ]]; then
+  () {
+    (( $# )) || return 0
+    print -ru2 -- "WARNING: lock files exist: $@"
+    (( $# )) && rm -- $@
+  } $locks/*(N)
+
+  function flock() {
+    local fd
+    sysopen -ro cloexec -u fd <(
+      exec </dev/null 2>/dev/null
+      (
+        trap '' TERM PIPE
+        local fd
+        while true; do
+          sysopen -wo create,excl -u fd -- $1 && break
+          sleep 1
+        done
+        exec {fd}>&-
+        while true; do
+          print || break
+        done
+        rm -- $1
+      ) &!
+    )
+    local REPLY
+    IFS= read -ru $fd
+  }
+else
+  function flock() {
+    : >>$1
+    zsystem flock $1
+  }
+fi
+
 function build() (
   setopt xtrace
   local platform=$1
   local machine=$assets[$platform]
-  print -n >>$locks/$machine
-  zsystem flock $locks/$machine
+  flock $locks/$machine
   build-${protocol[(k)$platform]} $machine $platform
   local tmp=gitstatusd-$platform.tmp.$$.tar.gz
   ( cd -q -- $binaries; tar --owner=0 --group=0 -I 'gzip -9' -cf $tmp gitstatusd-$platform )
   mv -f -- $binaries/$tmp $binaries/gitstatusd-$platform.tar.gz
+  # Make sure the last command is a built-in (important for flock).
+  :
 )
 
 function mbuild() {
@@ -365,4 +401,8 @@ function run-process-tree() {
 }
 
 mkdir -p -- $logs $locks $binaries
-run-process-tree mbuild $@
+
+() {
+  run-process-tree mbuild $@
+  exit
+} "$@"
