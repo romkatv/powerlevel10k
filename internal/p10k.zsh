@@ -4464,7 +4464,7 @@ prompt_kubecontext() {
       {
         (( pos <= $#cfg )) || return
         shift $pos cfg
-        pos=${cfg[(i)  name: $name]}
+        pos=${cfg[(i)  name: ${(b)name}]}
         (( pos <= $#cfg )) || return
         (( --pos ))
         for ((; pos > 0; --pos)); do
