@@ -5635,6 +5635,8 @@ prompt_arch() {
   _p9k_prompt_segment "$0" "$_p9k_color1" "orange1" 'ARCH_ICON' 0 '' "$_p9k__cache_val[1]"
 }
 
+instant_prompt_arch() { prompt_arch; }
+
 _p9k_prompt_arch_init() {
   echo 'arch init' >> ~/p9k_debug.txt
   typeset -g "_p9k__segment_cond_${_p9k__prompt_side}[_p9k__segment_index]"='$commands[arch]'
