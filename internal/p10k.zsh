@@ -5632,7 +5632,7 @@ prompt_arch() {
     _p9k_cache_ephemeral_set $(arch)
   fi
   [[ $_p9k__cache_val[1] == $POWERLEVEL9K_ARCH_DEFAULT ]] && return
-  _p9k_prompt_segment "$0" "orange1" "black" 'ARCH_ICON' 0 '' "$_p9k__cache_val[1]"
+  _p9k_prompt_segment "$0" "$_p9k_color1" "orange1" 'ARCH_ICON' 0 '' "$_p9k__cache_val[1]"
 }
 
 _p9k_prompt_arch_init() {
