@@ -98,6 +98,8 @@ function _p9k_init_icons() {
         VCS_LOADING_ICON               ''
         VCS_GIT_ICON                   '\uE20E '              # 
         VCS_GIT_GITHUB_ICON            '\uE20E '              #
+        VCS_GIT_GITHUB2_ICON           '\uE20E '              #
+        VCS_GIT_GITHUB3_ICON           '\uE20E '              #
         VCS_GIT_BITBUCKET_ICON         '\uE20E '              #
         VCS_GIT_GITLAB_ICON            '\uE20E '              #
         VCS_HG_ICON                    '\uE1C3 '              # 
@@ -231,6 +233,8 @@ function _p9k_init_icons() {
         VCS_LOADING_ICON               ''
         VCS_GIT_ICON                   '\uF1D3 '              # 
         VCS_GIT_GITHUB_ICON            '\uF113 '              # 
+        VCS_GIT_GITHUB2_ICON           '\uF09B '              # 
+        VCS_GIT_GITHUB3_ICON           '\uF092 '              # 
         VCS_GIT_BITBUCKET_ICON         '\uF171 '              # 
         VCS_GIT_GITLAB_ICON            '\uF296 '              # 
         VCS_HG_ICON                    '\uF0C3 '              # 
@@ -369,6 +373,8 @@ function _p9k_init_icons() {
         VCS_LOADING_ICON               ''
         VCS_GIT_ICON                   "${CODEPOINT_OF_AWESOME_GIT:+\\u$CODEPOINT_OF_AWESOME_GIT }"
         VCS_GIT_GITHUB_ICON            "${CODEPOINT_OF_AWESOME_GITHUB_ALT:+\\u$CODEPOINT_OF_AWESOME_GITHUB_ALT }"
+        VCS_GIT_GITHUB2_ICON           "${CODEPOINT_OF_AWESOME_GITHUB_ALT:+\\u$CODEPOINT_OF_AWESOME_GITHUB_ALT }"
+        VCS_GIT_GITHUB3_ICON           "${CODEPOINT_OF_AWESOME_GITHUB_ALT:+\\u$CODEPOINT_OF_AWESOME_GITHUB_ALT }"
         VCS_GIT_BITBUCKET_ICON         "${CODEPOINT_OF_AWESOME_BITBUCKET:+\\u$CODEPOINT_OF_AWESOME_BITBUCKET }"
         VCS_GIT_GITLAB_ICON            "${CODEPOINT_OF_AWESOME_GITLAB:+\\u$CODEPOINT_OF_AWESOME_GITLAB }"
         VCS_HG_ICON                    "${CODEPOINT_OF_AWESOME_FLASK:+\\u$CODEPOINT_OF_AWESOME_FLASK }"
@@ -501,6 +507,8 @@ function _p9k_init_icons() {
         VCS_LOADING_ICON               ''
         VCS_GIT_ICON                   '\uF1D3 '              # 
         VCS_GIT_GITHUB_ICON            '\uF113 '              # 
+        VCS_GIT_GITHUB2_ICON           '\uF09B '              # 
+        VCS_GIT_GITHUB3_ICON           '\uF092 '              # 
         VCS_GIT_BITBUCKET_ICON         '\uE703 '              # 
         VCS_GIT_GITLAB_ICON            '\uF296 '              # 
         VCS_HG_ICON                    '\uF0C3 '              # 
@@ -632,6 +640,8 @@ function _p9k_init_icons() {
         VCS_LOADING_ICON               ''
         VCS_GIT_ICON                   ''
         VCS_GIT_GITHUB_ICON            ''
+        VCS_GIT_GITHUB2_ICON           ''
+        VCS_GIT_GITHUB3_ICON           ''
         VCS_GIT_BITBUCKET_ICON         ''
         VCS_GIT_GITLAB_ICON            ''
         VCS_HG_ICON                    ''
@@ -765,6 +775,8 @@ function _p9k_init_icons() {
         VCS_LOADING_ICON               ''
         VCS_GIT_ICON                   ''
         VCS_GIT_GITHUB_ICON            ''
+        VCS_GIT_GITHUB2_ICON           ''
+        VCS_GIT_GITHUB3_ICON           ''
         VCS_GIT_BITBUCKET_ICON         ''
         VCS_GIT_GITLAB_ICON            ''
         VCS_HG_ICON                    ''

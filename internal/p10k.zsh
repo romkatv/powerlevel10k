@@ -3682,8 +3682,6 @@ function +vi-vcs-detect-changes() {
       vcs_visual_identifier='VCS_GIT_GITHUB_ICON'
     elif [[ "$remote" =~ "bitbucket" ]] then
       vcs_visual_identifier='VCS_GIT_BITBUCKET_ICON'
-    elif [[ "$remote" =~ "stash" ]] then
-      vcs_visual_identifier='VCS_GIT_BITBUCKET_ICON'
     elif [[ "$remote" =~ "gitlab" ]] then
       vcs_visual_identifier='VCS_GIT_GITLAB_ICON'
     else
@@ -3825,7 +3823,6 @@ function _p9k_vcs_icon() {
   case "$VCS_STATUS_REMOTE_URL" in
     *github*)    _p9k__ret=VCS_GIT_GITHUB_ICON;;
     *bitbucket*) _p9k__ret=VCS_GIT_BITBUCKET_ICON;;
-    *stash*)     _p9k__ret=VCS_GIT_BITBUCKET_ICON;;
     *gitlab*)    _p9k__ret=VCS_GIT_GITLAB_ICON;;
     *)           _p9k__ret=VCS_GIT_ICON;;
   esac
