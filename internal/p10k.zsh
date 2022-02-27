@@ -3116,6 +3116,26 @@ _p9k_prompt_plenv_init() {
 }
 
 ################################################################
+# Segment to display perlbrew information
+# https://github.com/gugod/App-perlbrew
+
+prompt_perlbrew() {
+  [[ -n $PERLBREW_PERL && ( -v commands[perlbrew] || -v functions[perlbrew] ) ]] || return
+  if (( _POWERLEVEL9K_PERLBREW_PROJECT_ONLY )); then
+    _p9k_upglob 'cpanfile|(MY|)META.(yml|json)|.perltidyrc|(Makefile|Build).PL|*.(pl|pm|t|pod)' && return
+  fi
+
+  local v=$PERLBREW_PERL
+  (( _POWERLEVEL9K_PERLBREW_SHOW_PREFIX )) || v=${v#*-}
+  [[ -n $v ]] || return
+  _p9k_prompt_segment "$0" "blue" "$_p9k_color1" 'PERL_ICON' 0 '' "${v//\%/%%}"
+}
+
+_p9k_prompt_perlbrew_init() {
+  typeset -g "_p9k__segment_cond_${_p9k__prompt_side}[_p9k__segment_index]"='${commands[perlbrew]:-${${+functions[perlbrew]}:#0}}'
+}
+
+################################################################
 # Segment to display chruby information
 # see https://github.com/postmodern/chruby/issues/245 for chruby_auto issue with ZSH
 prompt_chruby() {
