@@ -3120,9 +3120,8 @@ _p9k_prompt_plenv_init() {
 # https://github.com/gugod/App-perlbrew
 
 prompt_perlbrew() {
-  [[ -n $PERLBREW_PERL && ( -v commands[perlbrew] || -v functions[perlbrew] ) ]] || return
   if (( _POWERLEVEL9K_PERLBREW_PROJECT_ONLY )); then
-    _p9k_upglob 'cpanfile|(MY|)META.(yml|json)|.perltidyrc|(Makefile|Build).PL|*.(pl|pm|t|pod)' && return
+    _p9k_upglob 'cpanfile|.perltidyrc|(|MY)META.(yml|json)|(Makefile|Build).PL|*.(pl|pm|t|pod)' && return
   fi
 
   local v=$PERLBREW_PERL
@@ -3132,7 +3131,7 @@ prompt_perlbrew() {
 }
 
 _p9k_prompt_perlbrew_init() {
-  typeset -g "_p9k__segment_cond_${_p9k__prompt_side}[_p9k__segment_index]"='${commands[perlbrew]:-${${+functions[perlbrew]}:#0}}'
+  typeset -g "_p9k__segment_cond_${_p9k__prompt_side}[_p9k__segment_index]"='$PERLBREW_PERL'
 }
 
 ################################################################
@@ -8296,7 +8295,7 @@ _p9k_must_init() {
     [[ $sig == $_p9k__param_sig ]] && return 1
     _p9k_deinit
   fi
-  _p9k__param_pat=$'v134\1'${(q)ZSH_VERSION}$'\1'${(q)ZSH_PATCHLEVEL}$'\1'
+  _p9k__param_pat=$'v135\1'${(q)ZSH_VERSION}$'\1'${(q)ZSH_PATCHLEVEL}$'\1'
   _p9k__param_pat+=$__p9k_force_term_shell_integration$'\1'
   _p9k__param_pat+=$'${#parameters[(I)POWERLEVEL9K_*]}\1${(%):-%n%#}\1$GITSTATUS_LOG_LEVEL\1'
   _p9k__param_pat+=$'$GITSTATUS_ENABLE_LOGGING\1$GITSTATUS_DAEMON\1$GITSTATUS_NUM_THREADS\1'
