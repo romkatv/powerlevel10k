@@ -9242,6 +9242,8 @@ if [[ $__p9k_dump_file != $__p9k_instant_prompt_dump_file && -n $__p9k_instant_p
   zf_rm -f -- $__p9k_instant_prompt_dump_file{,.zwc} 2>/dev/null
 fi
 
+unset VSCODE_SHELL_INTEGRATION
+
 _p9k_init_ssh
 _p9k_init_toolbox
 prompt_powerlevel9k_setup
