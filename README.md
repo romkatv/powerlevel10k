@@ -408,6 +408,7 @@ Powerlevel10k.
 - [Zinit](#zinit)
 - [Homebrew](#homebrew)
 - [Arch Linux](#arch-linux)
+- [Alpine Linux](#alpine-linux)
 
 ### Manual
 
@@ -502,6 +503,25 @@ There is also [zsh-theme-powerlevel10k](
   https://www.archlinux.org/packages/community/x86_64/zsh-theme-powerlevel10k/) community package.
 Historically, [it has been breaking often and for extended periods of time](
   https://github.com/romkatv/powerlevel10k/pull/786). **Do not use it.**
+
+
+### Alpine Linux
+
+If you are using Alpine Linux v3.16+ or Edge, you can install powerlevel10k from the Alpine repositories and load it using the plugin loader available in the default Zsh configuration on Alpine (see `/etc/zsh/zshrc`).
+
+Install package [zsh-theme-powerlevel10k](https://pkgs.alpinelinux.org/packages?name=zsh-theme-powerlevel10k) (as root):
+```zsh
+apk add zsh-theme-powerlevel10k
+```
+
+Either symlink `zsh-theme-powerlevel10k` plugin to your Zsh plugins directory:
+```zsh
+mkdir -p ~/.local/share/zsh/plugins
+ln -s /usr/share/zsh/plugins/zsh-theme-powerlevel10k ~/.local/share/zsh/plugins/
+```
+
+…or add `ZSH_LOAD_SYSTEM_PLUGINS=yes` to your `.zshenv` (`~/.config/zsh/.zshenv` or `~/.zshenv`) to automatically load all Zsh plugins installed from the Alpine packages.
+
 
 ## Configuration
 
