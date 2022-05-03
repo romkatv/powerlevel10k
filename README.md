@@ -344,6 +344,7 @@ enable as many segments as you like. It won't slow down your prompt or Zsh start
 | `nvm` | node.js environment from [nvm](https://github.com/nvm-sh/nvm) |
 | `os_icon` | your OS logo (apple for macOS, swirl for debian, etc.) |
 | `package` | `name@version` from [package.json](https://docs.npmjs.com/files/package.json) |
+| `perlbrew` | perl version from [perlbrew](https://github.com/gugod/App-perlbrew) |
 | `phpenv` | php environment from [phpenv](https://github.com/phpenv/phpenv) |
 | `php_version` | [php](https://www.php.net/) version |
 | `plenv` | perl environment from [plenv](https://github.com/tokuhirom/plenv) |
@@ -356,6 +357,7 @@ enable as many segments as you like. It won't slow down your prompt or Zsh start
 | `rbenv` | ruby environment from [rbenv](https://github.com/rbenv/rbenv) |
 | `rust_version` | [rustc](https://www.rust-lang.org) version |
 | `rvm` | ruby environment from [rvm](https://rvm.io) |
+| `scalaenv` | scala version from [scalaenv](https://github.com/scalaenv/scalaenv) |
 | `status` | exit code of the last command |
 | `swap` | used swap |
 | `taskwarrior` | [taskwarrior](https://taskwarrior.org/) task count |
@@ -368,6 +370,7 @@ enable as many segments as you like. It won't slow down your prompt or Zsh start
 | `vcs` | Git repository status |
 | `vim_shell` | [vim](https://www.vim.org/) shell (`:sh`) |
 | `virtualenv` | python environment from [venv](https://docs.python.org/3/library/venv.html) |
+| `vi_mode` | vi mode (you don't need this if you've enabled prompt_char) |
 | `vpn_ip` | virtual private network indicator |
 | `wifi` | WiFi speed |
 | `xplr` | [xplr](https://github.com/sayanarijit/xplr) shell |
