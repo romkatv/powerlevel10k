@@ -39,69 +39,69 @@
   # last prompt line gets hidden if it would overlap with left prompt.
   typeset -g POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(
     # =========================[ Line #1 ]=========================
-    status                  # exit code of the last command
-    command_execution_time  # duration of the last command
-    background_jobs         # presence of background jobs
-    direnv                  # direnv status (https://direnv.net/)
-    asdf                    # asdf version manager (https://github.com/asdf-vm/asdf)
-    virtualenv              # python virtual environment (https://docs.python.org/3/library/venv.html)
     anaconda                # conda environment (https://conda.io/)
-    pyenv                   # python environment (https://github.com/pyenv/pyenv)
-    goenv                   # go environment (https://github.com/syndbg/goenv)
-    nodenv                  # node.js version from nodenv (https://github.com/nodenv/nodenv)
-    nvm                     # node.js version from nvm (https://github.com/nvm-sh/nvm)
-    nodeenv                 # node.js environment (https://github.com/ekalinin/nodeenv)
-    # node_version          # node.js version
-    # go_version            # go version (https://golang.org)
-    # rust_version          # rustc version (https://www.rust-lang.org)
-    # dotnet_version        # .NET version (https://dotnet.microsoft.com)
-    # php_version           # php version (https://www.php.net/)
-    # laravel_version       # laravel php framework version (https://laravel.com/)
-    # java_version          # java version (https://www.java.com/)
-    # package               # name@version from package.json (https://docs.npmjs.com/files/package.json)
-    rbenv                   # ruby version from rbenv (https://github.com/rbenv/rbenv)
-    rvm                     # ruby version from rvm (https://rvm.io)
-    fvm                     # flutter version management (https://github.com/leoafarias/fvm)
-    luaenv                  # lua version from luaenv (https://github.com/cehoffman/luaenv)
-    jenv                    # java version from jenv (https://github.com/jenv/jenv)
-    plenv                   # perl version from plenv (https://github.com/tokuhirom/plenv)
-    perlbrew                # perl version from perlbrew (https://github.com/gugod/App-perlbrew)
-    phpenv                  # php version from phpenv (https://github.com/phpenv/phpenv)
-    scalaenv                # scala version from scalaenv (https://github.com/scalaenv/scalaenv)
-    haskell_stack           # haskell version from stack (https://haskellstack.org/)
-    kubecontext             # current kubernetes context (https://kubernetes.io/)
-    terraform               # terraform workspace (https://www.terraform.io)
-    # terraform_version     # terraform version (https://www.terraform.io)
+    asdf                    # asdf version manager (https://github.com/asdf-vm/asdf)
     aws                     # aws profile (https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-profiles.html)
     aws_eb_env              # aws elastic beanstalk environment (https://aws.amazon.com/elasticbeanstalk/)
     azure                   # azure account name (https://docs.microsoft.com/en-us/cli/azure)
-    gcloud                  # google cloud cli account and project (https://cloud.google.com/)
-    google_app_cred         # google application credentials (https://cloud.google.com/docs/authentication/production)
-    toolbox                 # toolbox name (https://github.com/containers/toolbox)
+    background_jobs         # presence of background jobs
+    command_execution_time  # duration of the last command
     context                 # user@hostname
-    nordvpn                 # nordvpn connection status, linux only (https://nordvpn.com/)
-    ranger                  # ranger shell (https://github.com/ranger/ranger)
-    nnn                     # nnn shell (https://github.com/jarun/nnn)
-    xplr                    # xplr shell (https://github.com/sayanarijit/xplr)
-    vim_shell               # vim shell indicator (:sh)
+    direnv                  # direnv status (https://direnv.net/)
+    # disk_usage            # disk usage
+    # dotnet_version        # .NET version (https://dotnet.microsoft.com)
+    fvm                     # flutter version management (https://github.com/leoafarias/fvm)
+    gcloud                  # google cloud cli account and project (https://cloud.google.com/)
+    goenv                   # go environment (https://github.com/syndbg/goenv)
+    google_app_cred         # google application credentials (https://cloud.google.com/docs/authentication/production)
+    # go_version            # go version (https://golang.org)
+    haskell_stack           # haskell version from stack (https://haskellstack.org/)
+    # java_version          # java version (https://www.java.com/)
+    jenv                    # java version from jenv (https://github.com/jenv/jenv)
+    kubecontext             # current kubernetes context (https://kubernetes.io/)
+    # laravel_version       # laravel php framework version (https://laravel.com/)
+    # load                  # CPU load
+    luaenv                  # lua version from luaenv (https://github.com/cehoffman/luaenv)
     midnight_commander      # midnight commander shell (https://midnight-commander.org/)
     nix_shell               # nix shell (https://nixos.org/nixos/nix-pills/developing-with-nix-shell.html)
+    nnn                     # nnn shell (https://github.com/jarun/nnn)
+    nodeenv                 # node.js environment (https://github.com/ekalinin/nodeenv)
+    nodenv                  # node.js version from nodenv (https://github.com/nodenv/nodenv)
+    # node_version          # node.js version
+    nordvpn                 # nordvpn connection status, linux only (https://nordvpn.com/)
+    nvm                     # node.js version from nvm (https://github.com/nvm-sh/nvm)
+    # package               # name@version from package.json (https://docs.npmjs.com/files/package.json)
+    perlbrew                # perl version from perlbrew (https://github.com/gugod/App-perlbrew)
+    phpenv                  # php version from phpenv (https://github.com/phpenv/phpenv)
+    # php_version           # php version (https://www.php.net/)
+    plenv                   # perl version from plenv (https://github.com/tokuhirom/plenv)
+    pyenv                   # python environment (https://github.com/pyenv/pyenv)
+    # ram                   # free RAM
+    ranger                  # ranger shell (https://github.com/ranger/ranger)
+    rbenv                   # ruby version from rbenv (https://github.com/rbenv/rbenv)
+    # rust_version          # rustc version (https://www.rust-lang.org)
+    rvm                     # ruby version from rvm (https://rvm.io)
+    scalaenv                # scala version from scalaenv (https://github.com/scalaenv/scalaenv)
+    status                  # exit code of the last command
+    # swap                  # used swap
+    taskwarrior             # taskwarrior task count (https://taskwarrior.org/)
+    terraform               # terraform workspace (https://www.terraform.io)
+    # terraform_version     # terraform version (https://www.terraform.io)
+    # time                  # current time
+    timewarrior             # timewarrior tracking status (https://timewarrior.net/)
+    todo                    # todo items (https://github.com/todotxt/todo.txt-cli)
+    toolbox                 # toolbox name (https://github.com/containers/toolbox)
+    vim_shell               # vim shell indicator (:sh)
+    virtualenv              # python virtual environment (https://docs.python.org/3/library/venv.html)
     # vi_mode               # vi mode (you don't need this if you've enabled prompt_char)
     # vpn_ip                # virtual private network indicator
-    # load                  # CPU load
-    # disk_usage            # disk usage
-    # ram                   # free RAM
-    # swap                  # used swap
-    todo                    # todo items (https://github.com/todotxt/todo.txt-cli)
-    timewarrior             # timewarrior tracking status (https://timewarrior.net/)
-    taskwarrior             # taskwarrior task count (https://taskwarrior.org/)
-    # time                  # current time
+    xplr                    # xplr shell (https://github.com/sayanarijit/xplr)
     # =========================[ Line #2 ]=========================
     newline
-    # ip                    # ip address and bandwidth usage for a specified network interface
-    # public_ip             # public IP address
-    # proxy                 # system-wide http/https/ftp proxy
     # battery               # internal battery
+    # ip                    # ip address and bandwidth usage for a specified network interface
+    # proxy                 # system-wide http/https/ftp proxy
+    # public_ip             # public IP address
     # wifi                  # wifi speed
     # example               # example user-defined segment (see prompt_example function below)
   )
