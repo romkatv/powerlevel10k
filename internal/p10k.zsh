@@ -5999,7 +5999,7 @@ _p9k_set_instant_prompt() {
   [[ -n $RPROMPT ]] || unset RPROMPT
 }
 
-typeset -gri __p9k_instant_prompt_version=45
+typeset -gri __p9k_instant_prompt_version=46
 
 _p9k_dump_instant_prompt() {
   local user=${(%):-%n}
@@ -6033,7 +6033,7 @@ _p9k_dump_instant_prompt() {
   typeset -gi __p9k_instant_prompt_disabled=1
   [[ \$ZSH_VERSION == ${(q)ZSH_VERSION} && \$ZSH_PATCHLEVEL == ${(q)ZSH_PATCHLEVEL} &&
      $screen \${(M)TERM:#(screen*|tmux*)} &&
-     \${#\${(M)VTE_VERSION:#(<1-4602>|4801)}} == ${#${(M)VTE_VERSION:#(<1-4602>|4801)}} &&
+     \${#\${(M)VTE_VERSION:#(<1-4602>|4801)}} == "${#${(M)VTE_VERSION:#(<1-4602>|4801)}}" &&
      \$POWERLEVEL9K_DISABLE_INSTANT_PROMPT != 'true' &&
      \$POWERLEVEL9K_INSTANT_PROMPT != 'off' ]] || return
   typeset -g __p9k_instant_prompt_param_sig=${(q+)_p9k__param_sig}
