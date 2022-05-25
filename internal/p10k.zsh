@@ -5007,7 +5007,7 @@ _p9k_prompt_proxy_init() {
 
 function prompt_direnv() {
   local -i len=$#_p9k__prompt _p9k__has_upglob
-  _p9k_prompt_segment $0 $_p9k_color1 yellow DIRENV_ICON 0 '$DIRENV_DIR' ''
+  _p9k_prompt_segment $0 $_p9k_color1 yellow DIRENV_ICON 0 '${DIRENV_DIR:-}' ''
   (( _p9k__has_upglob )) || typeset -g "_p9k__segment_val_${_p9k__prompt_side}[_p9k__segment_index]"=$_p9k__prompt[len+1,-1]
 }
 
@@ -5018,7 +5018,7 @@ _p9k_prompt_direnv_init() {
 }
 
 function instant_prompt_direnv() {
-  if [[ -n $DIRENV_DIR && $precmd_functions[-1] == _p9k_precmd ]]; then
+  if [[ -n ${DIRENV_DIR:-} && $precmd_functions[-1] == _p9k_precmd ]]; then
     _p9k_prompt_segment prompt_direnv $_p9k_color1 yellow DIRENV_ICON 0 '' ''
   fi
 }
