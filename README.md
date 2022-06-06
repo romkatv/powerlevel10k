@@ -510,8 +510,9 @@ Historically, [it has been breaking often and for extended periods of time](
 ### Alpine Linux
 
 ```zsh
-apk add zsh-theme-powerlevel10k
-echo 'source /usr/share/zsh/plugins/powerlevel10k/powerlevel10k.zsh-theme' >>~/.zshrc
+apk add zsh zsh-theme-powerlevel10k
+mkdir -p ~/.local/share/zsh/plugins
+ln -s /usr/share/zsh/plugins/powerlevel10k ~/.local/share/zsh/plugins/
 ```
 
 ## Configuration
@@ -827,7 +828,7 @@ The command to update Powerlevel10k depends on how it was installed.
    | [Zinit](#zinit)               | `zinit delete romkatv/powerlevel10k`                             |
    | [Homebrew](#homebrew)         | `brew uninstall powerlevel10k; brew untap romkatv/powerlevel10k` |
    | [Arch Linux](#arch-linux)     | `yay -R --noconfirm zsh-theme-powerlevel10k-git`                 |
-   | [Alpine Linux](#alpine-linux) | `apk del zsh-theme-powerlevel10k`                            |
+   | [Alpine Linux](#alpine-linux) | `apk del zsh-theme-powerlevel10k`                                |
 6. Restart Zsh. [Do not use `source ~/.zshrc`](#weird-things-happen-after-typing-source-zshrc).
 7. Delete Powerlevel10k cache files.
    ```zsh
