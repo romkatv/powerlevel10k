@@ -401,6 +401,7 @@ Powerlevel10k.
 
 - [Manual](#manual) 👈 **choose this if confused or uncertain**
 - [Oh My Zsh](#oh-my-zsh)
+- [Fig](#fig)
 - [Prezto](#prezto)
 - [Zim](#zim)
 - [Antibody](#antibody)
@@ -445,6 +446,14 @@ make sure to disable the current theme in your plugin manager. See
     git clone --depth=1 https://gitee.com/romkatv/powerlevel10k.git ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k
     ```
 2. Set `ZSH_THEME="powerlevel10k/powerlevel10k"` in `~/.zshrc`.
+
+### Fig
+
+[Fig](https://fig.io) adds apps, shortcuts, and autocomplete to your existing terminal.
+
+Install `Powerlevel10k` in just one click.
+
+<a href="https://fig.io/plugins/other/powerlevel10k" target="_blank"><img src="https://fig.io/badges/install-with-fig.svg" /></a>
 
 ### Prezto
 
