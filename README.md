@@ -704,15 +704,9 @@ If you are using a different terminal, proceed with manual font installation. ðŸ
      ```
      After changing the config run `xrdb ~/.Xresources` to reload it. The new config is applied to
      all new terminals.
-   - **[Crostini](https://chromeos.dev/en/linux)**: Open internal terminal preferences:
-    ```
-    chrome-untrusted://terminal/html/nassh_preferences_editor.html
-    ```
-    Set *Text font family* to:
-     ```text
-     'Source Code Pro', 'MesloLGS NF', 'Powerline For Source Code Pro', 'Noto Sans Mono'
-     ```
-     and *Custom CSS (inline text)* to:
+   - Crostini (Linux on Chrome OS): Open [internal terminal preferences](
+      chrome-untrusted://terminal/html/nassh_preferences_editor.html), set *Text font family* to
+      `'MesloLGS NF'` and *Custom CSS (inline text)* to the following:
      ```css
      @font-face {
       font-family: "MesloLGS NF";
@@ -740,7 +734,6 @@ If you are using a different terminal, proceed with manual font installation. ðŸ
      }
      ```
      **_CAVEAT_**: If you open the normal terminal preferences these settings will be overwritten.
-
 1. Run `p10k configure` to generate a new `~/.p10k.zsh`. The old config may work
    incorrectly with the new font.
 
