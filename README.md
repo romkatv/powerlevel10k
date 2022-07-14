@@ -303,7 +303,7 @@ To ~~ridiculous~~ extravagant:
 
 Powerlevel10k comes with dozens of built-in high quality segments. When you run `p10k configure`
 and choose any style except [Pure](#pure-compatibility), many of these segments get enabled by
-default while others be manually enabled by opening `~/.p10k.zsh` and uncommenting them. You can
+default while others can be manually enabled by opening `~/.p10k.zsh` and uncommenting them. You can
 enable as many segments as you like. It won't slow down your prompt or Zsh startup.
 
 | Segment | Meaning |
