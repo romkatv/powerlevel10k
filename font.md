@@ -117,8 +117,8 @@ If you are using a different terminal, proceed with manual font installation. ðŸ
      ```
      After changing the config run `xrdb ~/.Xresources` to reload it. The new config is applied to
      all new terminals.
-   - Crostini (Linux on Chrome OS): Open [internal terminal preferences](
-      chrome-untrusted://terminal/html/nassh_preferences_editor.html), set *Text font family* to
+   - Crostini (Linux on Chrome OS): Open
+     chrome-untrusted://terminal/html/nassh_preferences_editor.html, set *Text font family* to
       `'MesloLGS NF'` and *Custom CSS (inline text)* to the following:
      ```css
      @font-face {
