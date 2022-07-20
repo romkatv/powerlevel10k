@@ -5999,7 +5999,7 @@ _p9k_set_instant_prompt() {
   [[ -n $RPROMPT ]] || unset RPROMPT
 }
 
-typeset -gri __p9k_instant_prompt_version=46
+typeset -gri __p9k_instant_prompt_version=47
 
 _p9k_dump_instant_prompt() {
   local user=${(%):-%n}
@@ -8280,9 +8280,10 @@ _p9k_init_toolbox() {
     local name=(${(Q)${${(@M)${(f)"$(</run/.containerenv)"}:#name=*}#name=}})
     [[ ${#name} -eq 1 && -n ${name[1]} ]] || return 0
     typeset -g P9K_TOOLBOX_NAME=${name[1]}
-  elif [[ -n $DISTROBOX_ENTER_PATH && -n $HOST ]]; then
+  elif [[ -n $DISTROBOX_ENTER_PATH ]]; then
     local name=${(%):-%m}
-    if [[ $name == $NAME* ]]; then
+    # $NAME can be empty, see https://github.com/romkatv/powerlevel10k/pull/1916.
+    if [[ -n $name && $name == $NAME* ]]; then
       typeset -g P9K_TOOLBOX_NAME=$name
     fi
   fi
