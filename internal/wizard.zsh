@@ -222,7 +222,12 @@ function hide_cursor() {
 }
 
 function show_cursor() {
-  echoti cnorm 2>/dev/null
+  local cnorm=${terminfo[cnorm]-}
+  if [[ $cnorm == *$'\e[?25h'(|'\e'*) ]]; then
+    print -n '\e[?25h'
+  else
+    print -n $cnorm
+  fi
 }
 
 function consume_input() {

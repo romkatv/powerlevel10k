@@ -6999,7 +6999,7 @@ function _p9k_reset_prompt() {
       zle .reset-prompt
       (( ${+functions[z4h]} )) || zle -R
     } always {
-      (( _p9k__can_hide_cursor )) && echoti cnorm
+      (( _p9k__can_hide_cursor )) && print -rn -- $_p9k__cnorm
       _p9k__cursor_hidden=0
     }
   fi
@@ -7121,6 +7121,14 @@ _p9k_init_vars() {
   typeset -gi _p9k__restore_prompt_fd
   typeset -gi _p9k__redraw_fd
   typeset -gi _p9k__can_hide_cursor=$(( $+terminfo[civis] && $+terminfo[cnorm] ))
+  if (( _p9k__can_hide_cursor )); then
+    # See https://github.com/romkatv/powerlevel10k/issues/1699
+    if [[ $terminfo[cnorm] == *$'\e[?25h'(|'\e'*) ]]; then
+      typeset -g _p9k__cnorm=$'\e[?25h'
+    else
+      typeset -g _p9k__cnorm=$terminfo[cnorm]
+    fi
+  fi
   typeset -gi _p9k__cursor_hidden
   typeset -gi _p9k__non_hermetic_expansion
   typeset -g  _p9k__time
@@ -7656,7 +7664,7 @@ function _p9k_on_widget_deactivate-region() { _p9k_check_visual_mode; }
 function _p9k_on_widget_zle-line-init() {
   (( _p9k__cursor_hidden )) || return 0
   _p9k__cursor_hidden=0
-  echoti cnorm
+  print -rn -- $_p9k__cnorm
 }
 
 function _p9k_on_widget_zle-line-finish() {
