@@ -487,11 +487,12 @@ Add `zinit ice depth=1; zinit light romkatv/powerlevel10k` to `~/.zshrc`.
 The use of `depth=1` ice is optional. Other types of ice are neither recommended nor officially
 supported by Powerlevel10k.
 
-### ZI
+### Zi
 
 Add `zi ice depth=1; zi light romkatv/powerlevel10k` to `~/.zshrc`.
 
-See [wiki.zshell.dev](https://wiki.zshell.dev/community/gallery/collection/themes#thp-romkatvpowerlevel10k) for more
+The use of `depth=1` ice is optional. Other types of ice are neither recommended nor officially
+supported by Powerlevel10k.
 
 ### Homebrew
 
@@ -820,7 +821,7 @@ The command to update Powerlevel10k depends on how it was installed.
 | [Zinit](#zinit)               | `zinit update`                                              |
 | [Zi](#zi)                     | `zi update`                                                 |
 | [Homebrew](#homebrew)         | `brew update && brew upgrade`                               |
-| [Arch Linux](#arch-linux)     | `yay -S --noconfirm zsh-theme-powerlevel10k-git`             |
+| [Arch Linux](#arch-linux)     | `yay -S --noconfirm zsh-theme-powerlevel10k-git`            |
 | [Alpine Linux](#alpine-linux) | `apk update && apk upgrade`                                 |
 
 **IMPORTANT**: Restart Zsh after updating Powerlevel10k. [Do not use `source ~/.zshrc`](
@@ -872,7 +873,7 @@ The command to update Powerlevel10k depends on how it was installed.
    | [Zinit](#zinit)               | `zinit delete romkatv/powerlevel10k`                             |
    | [Zi](#zi)                     | `zi delete romkatv/powerlevel10k`                                |
    | [Homebrew](#homebrew)         | `brew uninstall powerlevel10k; brew untap romkatv/powerlevel10k` |
-   | [Arch Linux](#arch-linux)     | `yay -R --noconfirm zsh-theme-powerlevel10k-git`                  |
+   | [Arch Linux](#arch-linux)     | `yay -R --noconfirm zsh-theme-powerlevel10k-git`                 |
    | [Alpine Linux](#alpine-linux) | `apk del zsh-theme-powerlevel10k`                                |
 6. Restart Zsh. [Do not use `source ~/.zshrc`](#weird-things-happen-after-typing-source-zshrc).
 7. Delete Powerlevel10k cache files.
