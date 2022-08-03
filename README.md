@@ -63,22 +63,17 @@ running `p10k configure` to unlock all prompt styles.
 
 *FAQ:*
 
-- [What is the best prompt style in the configuration wizard?](
-    #what-is-the-best-prompt-style-in-the-configuration-wizard)
-- [What do different symbols in Git status mean?](
-    #what-do-different-symbols-in-git-status-mean)
+- [What is the best prompt style in the configuration wizard?](#what-is-the-best-prompt-style-in-the-configuration-wizard)
+- [What do different symbols in Git status mean?](#what-do-different-symbols-in-git-status-mean)
 - [How do I change prompt colors?](#how-do-i-change-prompt-colors)
 
 *Troubleshooting*:
 
-- [Some prompt styles are missing from the configuration wizard](
-    #some-prompt-styles-are-missing-from-the-configuration-wizard).
+- [Some prompt styles are missing from the configuration wizard](#some-prompt-styles-are-missing-from-the-configuration-wizard).
 - [Question mark in prompt](#question-mark-in-prompt).
 - [Icons, glyphs or powerline symbols don't render](#icons-glyphs-or-powerline-symbols-dont-render).
-- [Sub-pixel imperfections around powerline symbols](
-    #sub-pixel-imperfections-around-powerline-symbols).
-- [Directory is difficult to see in prompt when using Rainbow style](
-    #directory-is-difficult-to-see-in-prompt-when-using-rainbow-style).
+- [Sub-pixel imperfections around powerline symbols](#sub-pixel-imperfections-around-powerline-symbols).
+- [Directory is difficult to see in prompt when using Rainbow style](#directory-is-difficult-to-see-in-prompt-when-using-rainbow-style).
 
 ### Uncompromising performance
 
@@ -546,8 +541,7 @@ through configuration options.
 
 - [What is the best prompt style in the configuration wizard?](
     #what-is-the-best-prompt-style-in-the-configuration-wizard)
-- [What do different symbols in Git status mean?](
-    #what-do-different-symbols-in-git-status-mean)
+- [What do different symbols in Git status mean?](#what-do-different-symbols-in-git-status-mean)
 - [How do I change the format of Git status?](#how-do-i-change-the-format-of-git-status)
 - [How do I add username and/or hostname to prompt?](
     #how-do-i-add-username-andor-hostname-to-prompt)
@@ -1131,8 +1125,7 @@ feature:master wip ⇣42⇡42 ⇠42⇢42 *42 merge ~42 +42 !42 ?42
 To change the format of Git status, open `~/.p10k.zsh`, search for `my_git_formatter` and edit its
 source code.
 
-*Related*: [What do different symbols in Git status mean?](
-  #what-do-different-symbols-in-git-status-mean)
+*Related*: [What do different symbols in Git status mean?](#what-do-different-symbols-in-git-status-mean)
 
 ### Why is Git status from `$HOME/.git` not displayed in prompt?
 
@@ -1494,8 +1487,7 @@ If it looks like a regular `?`, that's normal. It means you have untracked files
 repository. Type `git status` to see these files. You can change this symbol or disable the display
 of untracked files altogether. Search for `untracked files` in `~/.p10k.zsh`.
 
-*FAQ*: [What do different symbols in Git status mean?](
-  #what-do-different-symbols-in-git-status-mean)
+*FAQ*: [What do different symbols in Git status mean?](#what-do-different-symbols-in-git-status-mean)
 
 You can also get a weird-looking question mark in your prompt if your terminal's font is missing
 some glyphs. See [icons, glyphs or powerline symbols don't render](
