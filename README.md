@@ -405,6 +405,7 @@ Powerlevel10k.
 - [Zim](#zim)
 - [Antibody](#antibody)
 - [Antigen](#antigen)
+- [Znap](#znap)
 - [Zplug](#zplug)
 - [Zgen](#zgen)
 - [Zplugin](#zplugin)
@@ -464,6 +465,10 @@ Add `antibody bundle romkatv/powerlevel10k` to `~/.zshrc`.
 
 Add `antigen theme romkatv/powerlevel10k` to `~/.zshrc`. Make sure you have `antigen apply`
 somewhere after it.
+
+### Znap
+
+Add `znap source "romkatv/powerlevel10k"` to `~/.zshrc`.
 
 ### Zplug
 
