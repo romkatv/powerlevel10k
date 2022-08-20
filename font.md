@@ -119,7 +119,7 @@ If you are using a different terminal, proceed with manual font installation. ðŸ
      all new terminals.
    - Crostini (Linux on Chrome OS): Open
      chrome-untrusted://terminal/html/nassh_preferences_editor.html, set *Text font family* to
-      `'MesloLGS NF'` and *Custom CSS (inline text)* to the following:
+      `'MesloLGS NF'` (including the quotes) and *Custom CSS (inline text)* to the following:
      ```css
      @font-face {
       font-family: "MesloLGS NF";
