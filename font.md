@@ -52,11 +52,9 @@ If you are using a different terminal, proceed with manual font installation. �
      *Custom font* under *Text Appearance* and select `MesloLGS NF Regular`.
    - **Windows Console Host** (the old thing): Click the icon in the top left corner, then
      *Properties → Font* and set *Font* to `MesloLGS NF`.
-   - **Windows Terminal** by Microsoft (the new thing): Open `settings.json` (<kbd>Ctrl+Shift+,</kbd>),
-     search for `fontFace` and set the value to `MesloLGS NF` for every profile. If you don't find
-     `fontFace`, add it under *profiles → defaults*. See [this settings file](
-       https://raw.githubusercontent.com/romkatv/dotfiles-public/aba0e6c4657d705ed6c344d700d659977385f25c/dotfiles/microsoft-terminal-settings.json)
-     for example.
+   - **Windows Terminal** by Microsoft (the new thing): Open *Settings* (<kbd>Ctrl+,</kbd>), click
+     either on the selected profile under *Profiles* or on *Defaults*, click *Appearance* and set
+     *Font face* to `MesloLGS NF`.
    - **IntelliJ** (and other IDEs by Jet Brains): Open *IDE → Edit → Preferences → Editor →
      Color Scheme → Console Font*. Select *Use console font instead of the default* and set the font
      name to `MesloLGS NF`.
