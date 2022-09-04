@@ -404,6 +404,7 @@ Powerlevel10k.
 - [Prezto](#prezto)
 - [Zim](#zim)
 - [Antibody](#antibody)
+- [Antidote](#antidote)
 - [Antigen](#antigen)
 - [Zplug](#zplug)
 - [Zgen](#zgen)
@@ -459,6 +460,10 @@ Add `zmodule romkatv/powerlevel10k --use degit` to `~/.zimrc` and run `zimfw ins
 ### Antibody
 
 Add `antibody bundle romkatv/powerlevel10k` to `~/.zshrc`.
+
+### Antidote
+
+Add `romkatv/powerlevel10k` to `~/.zsh_plugins.txt`.
 
 ### Antigen
 
@@ -813,6 +818,7 @@ The command to update Powerlevel10k depends on how it was installed.
 | [Prezto](#prezto)             | `zprezto-update`                                            |
 | [Zim](#zim)                   | `zimfw update`                                              |
 | [Antigen](#antigen)           | `antigen update`                                            |
+| [Antidote](#antidote)         | `antidote update`
 | [Zplug](#zplug)               | `zplug update`                                              |
 | [Zgen](#zgen)                 | `zgen update`                                               |
 | [Zplugin](#zplugin)           | `zplugin update`                                            |
@@ -864,7 +870,8 @@ The command to update Powerlevel10k depends on how it was installed.
    | [Oh My Zsh](#oh-my-zsh)       | `rm -rf -- ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k` |
    | [Prezto](#prezto)             | n/a                                                              |
    | [Zim](#zim)                   | `zimfw uninstall`                                                |
-   | [Antigen](#antigen)           | `antigen purge romkatv/powerlevel10k`                            |
+   | [Antigen](#antigen)           | `antigen purge romkatv/powerlevel10k`
+   | [Antidote](#antidote)         | `antidote purge romkatv/powerlevel10k`                           |
    | [Zplug](#zplug)               | `zplug clean`                                                    |
    | [Zgen](#zgen)                 | `zgen reset`                                                     |
    | [Zplugin](#zplugin)           | `zplugin delete romkatv/powerlevel10k`                           |
