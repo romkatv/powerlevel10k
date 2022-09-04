@@ -818,7 +818,7 @@ The command to update Powerlevel10k depends on how it was installed.
 | [Prezto](#prezto)             | `zprezto-update`                                            |
 | [Zim](#zim)                   | `zimfw update`                                              |
 | [Antigen](#antigen)           | `antigen update`                                            |
-| [Antidote](#antidote)         | `antidote update`
+| [Antidote](#antidote)         | `antidote update`                                           |
 | [Zplug](#zplug)               | `zplug update`                                              |
 | [Zgen](#zgen)                 | `zgen update`                                               |
 | [Zplugin](#zplugin)           | `zplugin update`                                            |
@@ -870,7 +870,7 @@ The command to update Powerlevel10k depends on how it was installed.
    | [Oh My Zsh](#oh-my-zsh)       | `rm -rf -- ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k` |
    | [Prezto](#prezto)             | n/a                                                              |
    | [Zim](#zim)                   | `zimfw uninstall`                                                |
-   | [Antigen](#antigen)           | `antigen purge romkatv/powerlevel10k`
+   | [Antigen](#antigen)           | `antigen purge romkatv/powerlevel10k`                            |
    | [Antidote](#antidote)         | `antidote purge romkatv/powerlevel10k`                           |
    | [Zplug](#zplug)               | `zplug clean`                                                    |
    | [Zgen](#zgen)                 | `zgen reset`                                                     |
