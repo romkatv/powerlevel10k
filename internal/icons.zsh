@@ -91,6 +91,8 @@ function _p9k_init_icons() {
         #VCS_OUTGOING_CHANGES_ICON     '\uE1EC '              # 
         #VCS_OUTGOING_CHANGES_ICON     '\uE80E '              # 
         VCS_OUTGOING_CHANGES_ICON      '\uE132 '              # 
+        VCS_PUSH_INCOMING_CHANGES_ICON '\uE283 '              # 
+        VCS_PUSH_OUTGOING_CHANGES_ICON '\uE282 '              # 
         VCS_TAG_ICON                   '\uE817 '              # 
         VCS_BOOKMARK_ICON              '\uE87B'               # 
         VCS_COMMIT_ICON                '\uE821 '              # 
@@ -223,6 +225,8 @@ function _p9k_init_icons() {
         VCS_STASH_ICON                 '\uF01C '              # 
         VCS_INCOMING_CHANGES_ICON      '\uF01A '              # 
         VCS_OUTGOING_CHANGES_ICON      '\uF01B '              # 
+        VCS_PUSH_INCOMING_CHANGES_ICON '\uF190 '              # 
+        VCS_PUSH_OUTGOING_CHANGES_ICON '\uF18E '              # 
         VCS_TAG_ICON                   '\uF217 '              # 
         VCS_BOOKMARK_ICON              '\uF27B '              # 
         VCS_COMMIT_ICON                '\uF221 '              # 
@@ -360,6 +364,8 @@ function _p9k_init_icons() {
         VCS_STASH_ICON                 "${CODEPOINT_OF_AWESOME_INBOX:+\\u$CODEPOINT_OF_AWESOME_INBOX }"
         VCS_INCOMING_CHANGES_ICON      "${CODEPOINT_OF_AWESOME_ARROW_CIRCLE_DOWN:+\\u$CODEPOINT_OF_AWESOME_ARROW_CIRCLE_DOWN }"
         VCS_OUTGOING_CHANGES_ICON      "${CODEPOINT_OF_AWESOME_ARROW_CIRCLE_UP:+\\u$CODEPOINT_OF_AWESOME_ARROW_CIRCLE_UP }"
+        VCS_PUSH_INCOMING_CHANGES_ICON "${CODEPOINT_OF_AWESOME_ARROW_CIRCLE_LEFT:+\\u$CODEPOINT_OF_AWESOME_ARROW_CIRCLE_LEFT }"
+        VCS_PUSH_OUTGOING_CHANGES_ICON "${CODEPOINT_OF_AWESOME_ARROW_CIRCLE_RIGHT:+\\u$CODEPOINT_OF_AWESOME_ARROW_CIRCLE_RIGHT }"
         VCS_TAG_ICON                   "${CODEPOINT_OF_AWESOME_TAG:+\\u$CODEPOINT_OF_AWESOME_TAG }"
         VCS_BOOKMARK_ICON              "${CODEPOINT_OF_OCTICONS_BOOKMARK:+\\u$CODEPOINT_OF_OCTICONS_BOOKMARK}"
         VCS_COMMIT_ICON                "${CODEPOINT_OF_OCTICONS_GIT_COMMIT:+\\u$CODEPOINT_OF_OCTICONS_GIT_COMMIT }"
@@ -491,6 +497,8 @@ function _p9k_init_icons() {
         VCS_STASH_ICON                 '\uF01C '              # 
         VCS_INCOMING_CHANGES_ICON      '\uF01A '              # 
         VCS_OUTGOING_CHANGES_ICON      '\uF01B '              # 
+        VCS_PUSH_INCOMING_CHANGES_ICON '\uF190 '              # 
+        VCS_PUSH_OUTGOING_CHANGES_ICON '\uF18E '              # 
         VCS_TAG_ICON                   '\uF02B '              # 
         VCS_BOOKMARK_ICON              '\uF461 '              # 
         VCS_COMMIT_ICON                '\uE729 '              # 
@@ -621,6 +629,8 @@ function _p9k_init_icons() {
         VCS_STASH_ICON                 '#'
         VCS_INCOMING_CHANGES_ICON      '<'
         VCS_OUTGOING_CHANGES_ICON      '>'
+        VCS_PUSH_INCOMING_CHANGES_ICON 'v'
+        VCS_PUSH_OUTGOING_CHANGES_ICON '^'
         VCS_TAG_ICON                   ''
         VCS_BOOKMARK_ICON              '^'
         VCS_COMMIT_ICON                '@'
@@ -753,6 +763,8 @@ function _p9k_init_icons() {
         VCS_STASH_ICON                 '\u235F'               # ⍟
         VCS_INCOMING_CHANGES_ICON      '\u2193'               # ↓
         VCS_OUTGOING_CHANGES_ICON      '\u2191'               # ↑
+        VCS_PUSH_INCOMING_CHANGES_ICON '\u2190'               # ←
+        VCS_PUSH_OUTGOING_CHANGES_ICON '\u2192'               # →
         VCS_TAG_ICON                   ''
         VCS_BOOKMARK_ICON              '\u263F'               # ☿
         VCS_COMMIT_ICON                ''

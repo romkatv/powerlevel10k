@@ -3614,6 +3614,12 @@ function +vi-git-aheadbehind() {
   behind="$(git rev-list --count HEAD.."${hook_com[branch]}"@{upstream} 2>/dev/null)"
   (( behind )) && gitstatus+=( " $(print_icon 'VCS_INCOMING_CHANGES_ICON')${behind// /}" )
 
+  push_ahead="$(git rev-list --count "${hook_com[branch]}"@{push}..HEAD 2>/dev/null)"
+  (( push_ahead )) && gitstatus+=( " $(print_icon 'VCS_PUSH_OUTGOING_CHANGES_ICON')${push_ahead// /}" )
+
+  push_behind="$(git rev-list --count HEAD.."${hook_com[branch]}"@{push} 2>/dev/null)"
+  (( push_behind )) && gitstatus+=( " $(print_icon 'VCS_PUSH_INCOMING_CHANGES_ICON')${push_behind// /}" )
+
   hook_com[misc]+=${(j::)gitstatus}
 }
 
@@ -3890,7 +3896,7 @@ function _p9k_vcs_render() {
   fi
 
   (( ${_POWERLEVEL9K_VCS_GIT_HOOKS[(I)git-untracked]} )) || VCS_STATUS_HAS_UNTRACKED=0
-  (( ${_POWERLEVEL9K_VCS_GIT_HOOKS[(I)git-aheadbehind]} )) || { VCS_STATUS_COMMITS_AHEAD=0 && VCS_STATUS_COMMITS_BEHIND=0 }
+  (( ${_POWERLEVEL9K_VCS_GIT_HOOKS[(I)git-aheadbehind]} )) || { VCS_STATUS_COMMITS_AHEAD=0 && VCS_STATUS_COMMITS_BEHIND=0 && VCS_STATUS_PUSH_COMMITS_BEHIND=0 && VCS_STATUS_PUSH_COMMITS_AHEAD=0 }
   (( ${_POWERLEVEL9K_VCS_GIT_HOOKS[(I)git-stash]} )) || VCS_STATUS_STASHES=0
   (( ${_POWERLEVEL9K_VCS_GIT_HOOKS[(I)git-remotebranch]} )) || VCS_STATUS_REMOTE_BRANCH=""
   (( ${_POWERLEVEL9K_VCS_GIT_HOOKS[(I)git-tagname]} )) || VCS_STATUS_TAG=""
@@ -3900,6 +3906,12 @@ function _p9k_vcs_render() {
 
   (( _POWERLEVEL9K_VCS_COMMITS_BEHIND_MAX_NUM >= 0 && VCS_STATUS_COMMITS_BEHIND > _POWERLEVEL9K_VCS_COMMITS_BEHIND_MAX_NUM )) &&
     VCS_STATUS_COMMITS_BEHIND=$_POWERLEVEL9K_VCS_COMMITS_BEHIND_MAX_NUM
+
+  (( _POWERLEVEL9K_VCS_COMMITS_AHEAD_MAX_NUM >= 0 && VCS_STATUS_PUSH_COMMITS_AHEAD > _POWERLEVEL9K_VCS_COMMITS_AHEAD_MAX_NUM )) &&
+    VCS_STATUS_PUSH_COMMITS_AHEAD=$_POWERLEVEL9K_VCS_COMMITS_AHEAD_MAX_NUM
+
+  (( _POWERLEVEL9K_VCS_COMMITS_BEHIND_MAX_NUM >= 0 && VCS_STATUS_PUSH_COMMITS_BEHIND > _POWERLEVEL9K_VCS_COMMITS_BEHIND_MAX_NUM )) &&
+    VCS_STATUS_PUSH_COMMITS_BEHIND=$_POWERLEVEL9K_VCS_COMMITS_BEHIND_MAX_NUM
 
   local -a cache_key=(
     "$VCS_STATUS_LOCAL_BRANCH"
@@ -3915,6 +3927,8 @@ function _p9k_vcs_render() {
     "$VCS_STATUS_HAS_UNTRACKED"
     "$VCS_STATUS_COMMITS_AHEAD"
     "$VCS_STATUS_COMMITS_BEHIND"
+    "$VCS_STATUS_PUSH_COMMITS_AHEAD"
+    "$VCS_STATUS_PUSH_COMMITS_BEHIND"
     "$VCS_STATUS_STASHES"
     "$VCS_STATUS_TAG"
     "$VCS_STATUS_NUM_UNSTAGED_DELETED"
@@ -4018,6 +4032,16 @@ function _p9k_vcs_render() {
         _p9k_get_icon prompt_vcs_$state VCS_OUTGOING_CHANGES_ICON
         (( _POWERLEVEL9K_VCS_COMMITS_AHEAD_MAX_NUM != 1 )) && _p9k__ret+=$VCS_STATUS_COMMITS_AHEAD
         _$0_fmt OUTGOING_CHANGES " $_p9k__ret"
+      fi
+      if [[ $VCS_STATUS_PUSH_COMMITS_BEHIND -gt 0 ]]; then
+        _p9k_get_icon prompt_vcs_$state VCS_PUSH_INCOMING_CHANGES_ICON
+        (( _POWERLEVEL9K_VCS_COMMITS_BEHIND_MAX_NUM != 1 )) && _p9k__ret+=$VCS_STATUS_PUSH_COMMITS_BEHIND
+        _$0_fmt PUSH_INCOMING_CHANGES " $_p9k__ret"
+      fi
+      if [[ $VCS_STATUS_PUSH_COMMITS_AHEAD -gt 0 ]]; then
+        _p9k_get_icon prompt_vcs_$state VCS_PUSH_OUTGOING_CHANGES_ICON
+        (( _POWERLEVEL9K_VCS_COMMITS_AHEAD_MAX_NUM != 1 )) && _p9k__ret+=$VCS_STATUS_PUSH_COMMITS_AHEAD
+        _$0_fmt PUSH_OUTGOING_CHANGES " $_p9k__ret"
       fi
       if [[ $VCS_STATUS_STASHES -gt 0 ]]; then
         _p9k_get_icon prompt_vcs_$state VCS_STASH_ICON
