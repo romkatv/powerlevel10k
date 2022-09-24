@@ -469,8 +469,8 @@ function _p9k_init_icons() {
         LINUX_OPENSUSE_ICON            '\uF314'$s             # 
         LINUX_SABAYON_ICON             '\uF317'$s             # 
         LINUX_SLACKWARE_ICON           '\uF319'$s             # 
-        LINUX_VOID_ICON                '\uF17C'               # 
-        LINUX_ARTIX_ICON               '\uF17C'               # 
+        LINUX_VOID_ICON                '\uf32e'$s             # 
+        LINUX_ARTIX_ICON               '\uF31F'$s             # 
         LINUX_UBUNTU_ICON              '\uF31b'$s             # 
         LINUX_RHEL_ICON                '\uF316'$s             # 
         LINUX_AMZN_ICON                '\uF270'$s             # 
