@@ -20,7 +20,7 @@ if [[ $__p9k_sourced != 13 ]]; then
   return 1
 fi
 
-if ! autoload -Uz is-at-least || ! is-at-least 5.1; then
+if [[ $ZSH_VERSION != (5.<1->*|<6->.*) ]]; then
   () {
     >&2 echo -E "You are using ZSH version $ZSH_VERSION. The minimum required version for Powerlevel10k is 5.1."
     >&2 echo -E "Type 'echo \$ZSH_VERSION' to see your current zsh version."
@@ -31,7 +31,7 @@ if ! autoload -Uz is-at-least || ! is-at-least 5.1; then
       >&2 echo -E "The shell you are currently running is likely $cur."
     fi
     local other=${${:-zsh}:c}
-    if [[ -n $other ]] && $other -c 'autoload -Uz is-at-least && is-at-least 5.1' &>/dev/null; then
+    if [[ -n $other ]] && $other -c '[[ $ZSH_VERSION == (5.<1->*|<6->.*) ]]' &>/dev/null; then
       local other_v="$($other -c 'echo -E $ZSH_VERSION' 2>/dev/null)"
       if [[ -n $other_v && $other_v != $ZSH_VERSION ]]; then
         >&2 echo -E "You have $other with version $other_v but this is not what you are using."
@@ -341,7 +341,7 @@ function _p9k_human_readable_bytes() {
   _p9k__ret=${${_p9k__ret%%0#}%.}$suf
 }
 
-if is-at-least 5.4; then
+if [[ $ZSH_VERSION == (5.<4->*|<6->.*) ]]; then
   function _p9k_print_params() { typeset -p -- "$@" }
 else
   # Cannot use `typeset -p` unconditionally because of bugs in zsh.
@@ -7011,14 +7011,14 @@ function _p9k_reset_prompt() {
 # ZSH_PATCHLEVEL=zsh-5.4.2-159-gd8d9fee13. Released in 5.5.
 #
 # Fix: https://github.com/zsh-users/zsh/commit/64d13738357c9b9c212adbe17f271716abbcf6ea.
-# ZSH_PATCHLEVEL=zsh-5.7.1-50-g64d137383.
+# ZSH_PATCHLEVEL=zsh-5.7.1-50-g64d137383. Released in 5.7.2.
 #
 # Test: PROMPT="${(pl:$((COLUMNS))::-:)}<%1(l.%2(l.FAIL.PASS).FAIL)> " zsh -dfis <<<exit
 # Workaround: PROMPT="${(pl:$((COLUMNS))::-:)}%{%G%}<%1(l.%2(l.FAIL.PASS).FAIL)> " zsh -dfis <<<exit
 function _p9k_prompt_overflow_bug() {
   [[ $ZSH_PATCHLEVEL =~ '^zsh-5\.4\.2-([0-9]+)-' ]] && return $(( match[1] < 159 ))
   [[ $ZSH_PATCHLEVEL =~ '^zsh-5\.7\.1-([0-9]+)-' ]] && return $(( match[1] >= 50 ))
-  is-at-least 5.5 && ! is-at-least 5.7.2
+  [[ $ZSH_VERSION == (5.<5->*|5.<6->*) || $ZSH_VERSION == 5.<7->* && $ZSH_VERSION != 5.7.<2->* ]]
 }
 
 typeset -g  _p9k__param_pat
@@ -7645,7 +7645,7 @@ function _p9k_on_widget_zle-keymap-select() { _p9k_check_visual_mode; __p9k_rese
 function _p9k_on_widget_overwrite-mode()    { _p9k_check_visual_mode; __p9k_reset_state=2; }
 function _p9k_on_widget_vi-replace()        { _p9k_check_visual_mode; __p9k_reset_state=2; }
 
-if is-at-least 5.3; then
+if [[ $ZSH_VERSION == (5.<3->*|<6->.*) ]]; then
   function _p9k_check_visual_mode() {
     [[ ${KEYMAP:-} == vicmd ]] || return 0
     local region=${${REGION_ACTIVE:-0}/2/1}
@@ -7822,7 +7822,7 @@ function _p9k_wrap_widgets() {
 
   typeset -gir __p9k_widgets_wrapped=1
   local -a widget_list
-  if is-at-least 5.3; then
+  if [[ $ZSH_VERSION == (5.<3->*|<6->.*) ]]; then
     local -aU widget_list=(
       zle-line-pre-redraw
       zle-line-init
@@ -8168,7 +8168,7 @@ _p9k_init_prompt() {
        _p9k_all_params_eq '_POWERLEVEL9K_*WHITESPACE_BETWEEN_RIGHT_SEGMENTS' ' ' &&
        _p9k_all_params_eq '_POWERLEVEL9K_*RIGHT_RIGHT_WHITESPACE' ' ' &&
        _p9k_all_params_eq '_POWERLEVEL9K_*RIGHT_PROMPT_LAST_SEGMENT_END_SYMBOL' '' &&
-       ! is-at-least 5.7.2; then
+       [[ $ZSH_VERSION != (5.7.<2->*|<6->.*) ]]; then
     _p9k_emulate_zero_rprompt_indent=1
     _p9k_prompt_prefix_left+='${${:-${_p9k__real_zle_rprompt_indent:=$ZLE_RPROMPT_INDENT}${ZLE_RPROMPT_INDENT::=1}${_p9k__ind::=0}}+}'
     _p9k_line_suffix_right[-1]='${_p9k__sss:+${_p9k__sss% }%E}}'
@@ -8839,7 +8839,7 @@ typeset -gi __p9k_configured=0
 typeset -gri __p9k_instant_prompt_disabled=1
 
 # `typeset -g` doesn't roundtrip in zsh prior to 5.4.
-if is-at-least 5.4; then
+if [[ $ZSH_VERSION == (5.<4->*|<6->.*) ]]; then
   typeset -gri __p9k_dumps_enabled=1
 else
   typeset -gri __p9k_dumps_enabled=0

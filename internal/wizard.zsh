@@ -1449,7 +1449,7 @@ function print_instant_prompt_link() {
 }
 
 function ask_instant_prompt() {
-  if ! is-at-least 5.4; then
+  if [[ $ZSH_VERSION != (5.<4->*|<6->.*) ]]; then
     instant_prompt=off
     options+=instant_prompt=auto-off
     return 0
@@ -2008,9 +2008,8 @@ else
 fi
 
 zmodload zsh/terminfo                     || return
-autoload -Uz is-at-least                  || return
 
-if is-at-least 5.7.1 && [[ $COLORTERM == (24bit|truecolor) ]]; then
+if [[ $ZSH_VERSION == (5.7.<1->*|<6->.*) && $COLORTERM == (24bit|truecolor) ]]; then
   local -ir has_truecolor=1
 else
   local -ir has_truecolor=0
