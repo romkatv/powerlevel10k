@@ -31,8 +31,8 @@ if [[ $ZSH_VERSION != (5.<1->*|<6->.*) ]]; then
       >&2 echo -E "The shell you are currently running is likely $cur."
     fi
     local other=${${:-zsh}:c}
-    if [[ -n $other ]] && $other -c '[[ $ZSH_VERSION == (5.<1->*|<6->.*) ]]' &>/dev/null; then
-      local other_v="$($other -c 'echo -E $ZSH_VERSION' 2>/dev/null)"
+    if [[ -n $other ]] && $other -fc '[[ $ZSH_VERSION == (5.<1->*|<6->.*) ]]' &>/dev/null; then
+      local other_v="$($other -fc 'echo -E $ZSH_VERSION' 2>/dev/null)"
       if [[ -n $other_v && $other_v != $ZSH_VERSION ]]; then
         >&2 echo -E "You have $other with version $other_v but this is not what you are using."
         if [[ -n $def && $def != ${other:A} ]]; then
@@ -7018,7 +7018,7 @@ function _p9k_reset_prompt() {
 function _p9k_prompt_overflow_bug() {
   [[ $ZSH_PATCHLEVEL =~ '^zsh-5\.4\.2-([0-9]+)-' ]] && return $(( match[1] < 159 ))
   [[ $ZSH_PATCHLEVEL =~ '^zsh-5\.7\.1-([0-9]+)-' ]] && return $(( match[1] >= 50 ))
-  [[ $ZSH_VERSION == (5.<5->*|5.<6->*) || $ZSH_VERSION == 5.<7->* && $ZSH_VERSION != 5.7.<2->* ]]
+  [[ $ZSH_VERSION == 5.<5-7>* && $ZSH_VERSION != 5.7.<2->* ]]
 }
 
 typeset -g  _p9k__param_pat
@@ -8168,7 +8168,7 @@ _p9k_init_prompt() {
        _p9k_all_params_eq '_POWERLEVEL9K_*WHITESPACE_BETWEEN_RIGHT_SEGMENTS' ' ' &&
        _p9k_all_params_eq '_POWERLEVEL9K_*RIGHT_RIGHT_WHITESPACE' ' ' &&
        _p9k_all_params_eq '_POWERLEVEL9K_*RIGHT_PROMPT_LAST_SEGMENT_END_SYMBOL' '' &&
-       [[ $ZSH_VERSION != (5.7.<2->*|<6->.*) ]]; then
+       [[ $ZSH_VERSION != (5.7.<2->*|5.<8->*|<6->.*) ]]; then
     _p9k_emulate_zero_rprompt_indent=1
     _p9k_prompt_prefix_left+='${${:-${_p9k__real_zle_rprompt_indent:=$ZLE_RPROMPT_INDENT}${ZLE_RPROMPT_INDENT::=1}${_p9k__ind::=0}}+}'
     _p9k_line_suffix_right[-1]='${_p9k__sss:+${_p9k__sss% }%E}}'
@@ -8306,7 +8306,7 @@ _p9k_must_init() {
     [[ $sig == $_p9k__param_sig ]] && return 1
     _p9k_deinit
   fi
-  _p9k__param_pat=$'v135\1'${(q)ZSH_VERSION}$'\1'${(q)ZSH_PATCHLEVEL}$'\1'
+  _p9k__param_pat=$'v136\1'${(q)ZSH_VERSION}$'\1'${(q)ZSH_PATCHLEVEL}$'\1'
   _p9k__param_pat+=$__p9k_force_term_shell_integration$'\1'
   _p9k__param_pat+=$'${#parameters[(I)POWERLEVEL9K_*]}\1${(%):-%n%#}\1$GITSTATUS_LOG_LEVEL\1'
   _p9k__param_pat+=$'$GITSTATUS_ENABLE_LOGGING\1$GITSTATUS_DAEMON\1$GITSTATUS_NUM_THREADS\1'

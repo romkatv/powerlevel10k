@@ -2009,7 +2009,7 @@ fi
 
 zmodload zsh/terminfo                     || return
 
-if [[ $ZSH_VERSION == (5.7.<1->*|<6->.*) && $COLORTERM == (24bit|truecolor) ]]; then
+if [[ $ZSH_VERSION == (5.7.<1->*|5.<8>*|<6->.*) && $COLORTERM == (24bit|truecolor) ]]; then
   local -ir has_truecolor=1
 else
   local -ir has_truecolor=0
