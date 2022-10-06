@@ -148,6 +148,7 @@ function _p9k_init_icons() {
         JULIA_ICON                     'jl'
         SCALA_ICON                     'scala'
         TOOLBOX_ICON                   '\u2B22'               # ⬢
+        DOCKER_ICON                    '\U1F433'              # 🐳
       )
     ;;
     'awesome-fontconfig')
@@ -280,6 +281,7 @@ function _p9k_init_icons() {
         JULIA_ICON                     'jl'
         SCALA_ICON                     'scala'
         TOOLBOX_ICON                   '\u2B22'               # ⬢
+        DOCKER_ICON                    '\U1F433'              # 🐳
       )
     ;;
     'awesome-mapped-fontconfig')
@@ -415,6 +417,7 @@ function _p9k_init_icons() {
         JULIA_ICON                     'jl'
         SCALA_ICON                     'scala'
         TOOLBOX_ICON                   '\u2B22'                                       # ⬢
+        DOCKER_ICON                    '\U1F433'                                      # 🐳
       )
     ;;
     'nerdfont-complete'|'nerdfont-fontconfig')
@@ -548,6 +551,7 @@ function _p9k_init_icons() {
         JULIA_ICON                     '\uE624'               # 
         SCALA_ICON                     '\uE737'               # 
         TOOLBOX_ICON                   '\uE20F'$s             # 
+        DOCKER_ICON                    '\U1F433'              # 🐳
       )
     ;;
     ascii)
@@ -678,6 +682,7 @@ function _p9k_init_icons() {
         JULIA_ICON                     'jl'
         SCALA_ICON                     'scala'
         TOOLBOX_ICON                   'toolbox'
+        DOCKER_ICON                    'docker'
       )
     ;;
     *)
@@ -810,6 +815,7 @@ function _p9k_init_icons() {
         JULIA_ICON                     'jl'
         SCALA_ICON                     'scala'
         TOOLBOX_ICON                   '\u2B22'               # ⬢
+        DOCKER_ICON                    '\U1F433'              # 🐳
       )
     ;;
   esac
