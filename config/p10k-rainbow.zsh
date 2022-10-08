@@ -95,6 +95,7 @@
     todo                    # todo items (https://github.com/todotxt/todo.txt-cli)
     timewarrior             # timewarrior tracking status (https://timewarrior.net/)
     taskwarrior             # taskwarrior task count (https://taskwarrior.org/)
+    # arch                  # current CPU Architecture
     # time                  # current time
     # =========================[ Line #2 ]=========================
     newline
@@ -1644,6 +1645,10 @@
   #   P9K_WIFI_RSSI         | signal strength in dBm, from -120 to 0
   #   P9K_WIFI_NOISE        | noise in dBm, from -120 to 0
   #   P9K_WIFI_BARS         | signal strength in bars, from 0 to 4 (derived from P9K_WIFI_RSSI and P9K_WIFI_NOISE)
+
+  ##############################[ arch: current cup architecture ]##############################
+  # Default CPU Aricheture (section is hidden when current architecture matches default)
+  # typeset -g POWERLEVEL9K_ARCH_DEFAULT='i386'
 
   ####################################[ time: current time ]####################################
   # Current time color.
