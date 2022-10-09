@@ -148,7 +148,7 @@ function _p9k_init_icons() {
         JULIA_ICON                     'jl'
         SCALA_ICON                     'scala'
         TOOLBOX_ICON                   '\u2B22'               # ⬢
-        ARCH_ICON                      '\uE205'               # 
+        ARCH_ICON                      'arch'
       )
     ;;
     'awesome-fontconfig')
@@ -281,7 +281,7 @@ function _p9k_init_icons() {
         JULIA_ICON                     'jl'
         SCALA_ICON                     'scala'
         TOOLBOX_ICON                   '\u2B22'               # ⬢
-        ARCH_ICON                      '\uE205'               # 
+        ARCH_ICON                      'arch'
       )
     ;;
     'awesome-mapped-fontconfig')
@@ -417,7 +417,7 @@ function _p9k_init_icons() {
         JULIA_ICON                     'jl'
         SCALA_ICON                     'scala'
         TOOLBOX_ICON                   '\u2B22'                                       # ⬢
-        ARCH_ICON                      '\uE205'                                       # 
+        ARCH_ICON                      'arch'
       )
     ;;
     'nerdfont-complete'|'nerdfont-fontconfig')
@@ -551,7 +551,7 @@ function _p9k_init_icons() {
         JULIA_ICON                     '\uE624'               # 
         SCALA_ICON                     '\uE737'               # 
         TOOLBOX_ICON                   '\uE20F'$s             # 
-        ARCH_ICON                      '\uE266'
+        ARCH_ICON                      '\uE266'               # 
       )
     ;;
     ascii)
@@ -682,6 +682,7 @@ function _p9k_init_icons() {
         JULIA_ICON                     'jl'
         SCALA_ICON                     'scala'
         TOOLBOX_ICON                   'toolbox'
+        ARCH_ICON                      'arch'
       )
     ;;
     *)
@@ -814,7 +815,7 @@ function _p9k_init_icons() {
         JULIA_ICON                     'jl'
         SCALA_ICON                     'scala'
         TOOLBOX_ICON                   '\u2B22'               # ⬢
-        ARCH_ICON                      '\uE205'               # 
+        ARCH_ICON                      'arch'
       )
     ;;
   esac

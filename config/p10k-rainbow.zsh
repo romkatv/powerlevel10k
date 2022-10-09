@@ -95,7 +95,7 @@
     todo                    # todo items (https://github.com/todotxt/todo.txt-cli)
     timewarrior             # timewarrior tracking status (https://timewarrior.net/)
     taskwarrior             # taskwarrior task count (https://taskwarrior.org/)
-    # arch                  # current CPU Architecture
+    # cpu_arch              # CPU architecture
     # time                  # current time
     # =========================[ Line #2 ]=========================
     newline
@@ -896,6 +896,18 @@
   # Custom icon.
   # typeset -g POWERLEVEL9K_TASKWARRIOR_VISUAL_IDENTIFIER_EXPANSION='⭐'
 
+  ################################[ cpu_arch: CPU architecture ]################################
+  # CPU architecture color.
+  typeset -g POWERLEVEL9K_CPU_ARCH_FOREGROUND=0
+  typeset -g POWERLEVEL9K_CPU_ARCH_BACKGROUND=3
+
+  # Hide the segment when on a specific CPU architecture.
+  # typeset -g POWERLEVEL9K_CPU_ARCH_X86_64_CONTENT_EXPANSION=
+  # typeset -g POWERLEVEL9K_CPU_ARCH_X86_64_VISUAL_IDENTIFIER_EXPANSION=
+
+  # Custom icon.
+  # typeset -g POWERLEVEL9K_CPU_ARCH_VISUAL_IDENTIFIER_EXPANSION='⭐'
+
   ##################################[ context: user@hostname ]##################################
   # Context color when running with privileges.
   typeset -g POWERLEVEL9K_CONTEXT_ROOT_FOREGROUND=1
@@ -1645,10 +1657,6 @@
   #   P9K_WIFI_RSSI         | signal strength in dBm, from -120 to 0
   #   P9K_WIFI_NOISE        | noise in dBm, from -120 to 0
   #   P9K_WIFI_BARS         | signal strength in bars, from 0 to 4 (derived from P9K_WIFI_RSSI and P9K_WIFI_NOISE)
-
-  ##############################[ arch: current cup architecture ]##############################
-  # Default CPU Aricheture (section is hidden when current architecture matches default)
-  # typeset -g POWERLEVEL9K_ARCH_DEFAULT='i386'
 
   ####################################[ time: current time ]####################################
   # Current time color.
