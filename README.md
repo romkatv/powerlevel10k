@@ -447,7 +447,7 @@ make sure to disable the current theme in your plugin manager. See
     ```zsh
     git clone --depth=1 https://gitee.com/romkatv/powerlevel10k.git ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k
     ```
-2. Set `ZSH_THEME="powerlevel10k/powerlevel10k"` in `~/.zshrc` before the line `source $ZSH/oh-my-zsh.sh`
+2. Set `ZSH_THEME="powerlevel10k/powerlevel10k"` in `~/.zshrc` before the line `source $ZSH/oh-my-zsh.sh`.
 
 ### Prezto
 
