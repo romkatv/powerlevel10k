@@ -3139,7 +3139,9 @@ _p9k_prompt_perlbrew_init() {
 # see https://github.com/postmodern/chruby/issues/245 for chruby_auto issue with ZSH
 prompt_chruby() {
   local v
-  (( _POWERLEVEL9K_CHRUBY_SHOW_ENGINE )) && v=$RUBY_ENGINE
+  if (( _POWERLEVEL9K_CHRUBY_SHOW_ENGINE )) && [[ "$RUBY_ENGINE" != "ruby" || $_POWERLEVEL9K_CHRUBY_SHOW_ENGINE_IF_RUBY == 1 ]]; then
+    v=$RUBY_ENGINE
+  fi
   if [[ $_POWERLEVEL9K_CHRUBY_SHOW_VERSION == 1 && -n $RUBY_VERSION ]] && v+=${v:+ }$RUBY_VERSION
   _p9k_prompt_segment "$0" "red" "$_p9k_color1" 'RUBY_ICON' 0 '' "${v//\%/%%}"
 }
@@ -7534,6 +7536,7 @@ _p9k_init_params() {
   _p9k_declare -b POWERLEVEL9K_RVM_SHOW_PREFIX 0
   _p9k_declare -b POWERLEVEL9K_CHRUBY_SHOW_VERSION 1
   _p9k_declare -b POWERLEVEL9K_CHRUBY_SHOW_ENGINE 1
+  _p9k_declare -b POWERLEVEL9K_CHRUBY_SHOW_ENGINE_IF_RUBY 1
   _p9k_declare -b POWERLEVEL9K_STATUS_CROSS 0
   _p9k_declare -b POWERLEVEL9K_STATUS_OK 1
   _p9k_declare -b POWERLEVEL9K_STATUS_OK_PIPE 1
