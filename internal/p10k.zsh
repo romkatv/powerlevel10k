@@ -3138,11 +3138,8 @@ _p9k_prompt_perlbrew_init() {
 # Segment to display chruby information
 # see https://github.com/postmodern/chruby/issues/245 for chruby_auto issue with ZSH
 prompt_chruby() {
-  local v
-  if (( _POWERLEVEL9K_CHRUBY_SHOW_ENGINE )) && [[ "$RUBY_ENGINE" != "ruby" || $_POWERLEVEL9K_CHRUBY_SHOW_ENGINE_IF_RUBY == 1 ]]; then
-    v=$RUBY_ENGINE
-  fi
-  if [[ $_POWERLEVEL9K_CHRUBY_SHOW_VERSION == 1 && -n $RUBY_VERSION ]] && v+=${v:+ }$RUBY_VERSION
+  local v=${(M)RUBY_ENGINE:#$~_POWERLEVEL9K_CHRUBY_SHOW_ENGINE_PATTERN}
+  [[ $_POWERLEVEL9K_CHRUBY_SHOW_VERSION == 1 && -n $RUBY_VERSION ]] && v+=${v:+ }$RUBY_VERSION
   _p9k_prompt_segment "$0" "red" "$_p9k_color1" 'RUBY_ICON' 0 '' "${v//\%/%%}"
 }
 
@@ -7536,7 +7533,10 @@ _p9k_init_params() {
   _p9k_declare -b POWERLEVEL9K_RVM_SHOW_PREFIX 0
   _p9k_declare -b POWERLEVEL9K_CHRUBY_SHOW_VERSION 1
   _p9k_declare -b POWERLEVEL9K_CHRUBY_SHOW_ENGINE 1
-  _p9k_declare -b POWERLEVEL9K_CHRUBY_SHOW_ENGINE_IF_RUBY 1
+  _p9k_declare -s POWERLEVEL9K_CHRUBY_SHOW_ENGINE_PATTERN
+  if (( _POWERLEVEL9K_CHRUBY_SHOW_ENGINE )); then
+    : ${_POWERLEVEL9K_CHRUBY_SHOW_ENGINE_PATTERN=*}
+  fi
   _p9k_declare -b POWERLEVEL9K_STATUS_CROSS 0
   _p9k_declare -b POWERLEVEL9K_STATUS_OK 1
   _p9k_declare -b POWERLEVEL9K_STATUS_OK_PIPE 1
@@ -8334,7 +8334,7 @@ _p9k_must_init() {
     [[ $sig == $_p9k__param_sig ]] && return 1
     _p9k_deinit
   fi
-  _p9k__param_pat=$'v136\1'${(q)ZSH_VERSION}$'\1'${(q)ZSH_PATCHLEVEL}$'\1'
+  _p9k__param_pat=$'v137\1'${(q)ZSH_VERSION}$'\1'${(q)ZSH_PATCHLEVEL}$'\1'
   _p9k__param_pat+=$__p9k_force_term_shell_integration$'\1'
   _p9k__param_pat+=$'${#parameters[(I)POWERLEVEL9K_*]}\1${(%):-%n%#}\1$GITSTATUS_LOG_LEVEL\1'
   _p9k__param_pat+=$'$GITSTATUS_ENABLE_LOGGING\1$GITSTATUS_DAEMON\1$GITSTATUS_NUM_THREADS\1'
