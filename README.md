@@ -411,6 +411,7 @@ Powerlevel10k.
 - [Zplugin](#zplugin)
 - [Zinit](#zinit)
 - [Zi](#zi)
+- [Zap](#zap)
 - [Homebrew](#homebrew)
 - [Arch Linux](#arch-linux)
 - [Alpine Linux](#arch-linux)
@@ -498,6 +499,13 @@ Add `zi ice depth=1; zi light romkatv/powerlevel10k` to `~/.zshrc`.
 
 The use of `depth=1` ice is optional. Other types of ice are neither recommended nor officially
 supported by Powerlevel10k.
+
+### Zap
+
+Add `plug "romkatv/powerlevel10k"` to `~/.zshrc`. Then,
+```zsh
+source ~/.zshrc
+```
 
 ### Homebrew
 
@@ -824,6 +832,7 @@ The command to update Powerlevel10k depends on how it was installed.
 | [Zplugin](#zplugin)           | `zplugin update`                                            |
 | [Zinit](#zinit)               | `zinit update`                                              |
 | [Zi](#zi)                     | `zi update`                                                 |
+| [Zap](#zap)                   | `zap --update`                                              |
 | [Homebrew](#homebrew)         | `brew update && brew upgrade`                               |
 | [Arch Linux](#arch-linux)     | `yay -S --noconfirm zsh-theme-powerlevel10k-git`            |
 | [Alpine Linux](#alpine-linux) | `apk update && apk upgrade`                                 |
