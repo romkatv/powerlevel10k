@@ -502,10 +502,7 @@ supported by Powerlevel10k.
 
 ### Zap
 
-Add `plug "romkatv/powerlevel10k"` to `~/.zshrc`. Then,
-```zsh
-source ~/.zshrc
-```
+Add `plug "romkatv/powerlevel10k"` to `~/.zshrc`.
 
 ### Homebrew
 
@@ -886,6 +883,7 @@ The command to update Powerlevel10k depends on how it was installed.
    | [Zplugin](#zplugin)           | `zplugin delete romkatv/powerlevel10k`                           |
    | [Zinit](#zinit)               | `zinit delete romkatv/powerlevel10k`                             |
    | [Zi](#zi)                     | `zi delete romkatv/powerlevel10k`                                |
+   | [Zap](#zap)                   | `zsh -ic 'zap --clean'`                                          |
    | [Homebrew](#homebrew)         | `brew uninstall powerlevel10k; brew untap romkatv/powerlevel10k` |
    | [Arch Linux](#arch-linux)     | `yay -R --noconfirm zsh-theme-powerlevel10k-git`                 |
    | [Alpine Linux](#alpine-linux) | `apk del zsh-theme-powerlevel10k`                                |
