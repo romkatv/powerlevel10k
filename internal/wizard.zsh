@@ -1565,8 +1565,11 @@ function ask_config_overwrite() {
         local tmpdir=/tmp
         local tmpdir_u=/tmp
       fi
-      config_backup="$(mktemp $tmpdir/$__p9k_cfg_basename.XXXXXXXXXX)" || quit -c
-      cp $__p9k_cfg_path $config_backup                                        || quit -c
+      if (( ! $+commands[mktemp] )) ||
+         ! config_backup=$(mktemp $tmpdir/$__p9k_cfg_basename.XXXXXXXXXX 2>/dev/null); then
+        config_backup=$tmpdir/$__p9k_cfg_basename.$EPOCHREALTIME
+      fi
+      cp $__p9k_cfg_path $config_backup || quit -c
       config_backup_u=$tmpdir_u/${(q-)config_backup:t}
     ;;
   esac
@@ -2023,7 +2026,7 @@ else
   _p9k_can_configure -q || return
 fi
 
-zmodload zsh/terminfo                     || return
+zmodload zsh/terminfo zsh/datetime || return
 
 if [[ $ZSH_VERSION == (5.7.<1->*|5.<8->*|<6->.*) && $COLORTERM == (24bit|truecolor) ]]; then
   local -ir has_truecolor=1
