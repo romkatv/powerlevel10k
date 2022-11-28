@@ -1638,7 +1638,10 @@ function ask_zshrc_edit() {
           local tmpdir=/tmp
           local tmpdir_u=/tmp
         fi
-        zshrc_backup="$(mktemp $tmpdir/.zshrc.XXXXXXXXXX)" || quit -c
+        if (( ! $+commands[mktemp] )) ||
+           ! zshrc_backup="$(mktemp $tmpdir/.zshrc.XXXXXXXXXX 2>/dev/null)"; then
+          zshrc_backup=$tmpdir/.zshrc.$EPOCHREALTIME
+        fi
         cp -p $__p9k_zshrc $zshrc_backup                   || quit -c
         local -i writable=1
         if [[ ! -w $zshrc_backup ]]; then
