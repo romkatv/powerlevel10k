@@ -317,6 +317,7 @@ enable as many segments as you like. It won't slow down your prompt or Zsh start
 | `battery` | internal battery state and charge level (yep, batteries *literally* included) |
 | `command_execution_time` | duration (wall time) of the last command |
 | `context` | user@hostname |
+| `cpu_arch` | CPU architecture |
 | `dir` | current working directory |
 | `direnv` | [direnv](https://direnv.net/) status |
 | `disk_usage` | disk usage |
