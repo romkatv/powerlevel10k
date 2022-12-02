@@ -5656,7 +5656,9 @@ prompt_cpu_arch() {
     state=$_p9k__cache_val[1]
     text=$_p9k__cache_val[2]
   else
-    text=$(command arch) 2>/dev/null && [[ $text == [a-zA-Z][a-zA-Z0-9_]# ]] || text=
+    text=$(command machine) 2>/dev/null && [[ $text == [a-zA-Z][a-zA-Z0-9_]# ]] ||
+      text=$(command arch) 2>/dev/null && [[ $text == [a-zA-Z][a-zA-Z0-9_]# ]] ||
+      text=
     state=_${(U)text}
     _p9k_cache_ephemeral_set "$state" "$text"
   fi
