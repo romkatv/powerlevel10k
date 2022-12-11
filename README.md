@@ -426,7 +426,7 @@ echo 'source ~/powerlevel10k/powerlevel10k.zsh-theme' >>~/.zshrc
 ```
 
 Users in China can use the official mirror on gitee.com for faster download.<br>
-中国大陆用户可以使用 gitee.com 上的官方镜像加速下载.
+中国用户可以使用 gitee.com 上的官方镜像加速下载.
 
 ```zsh
 git clone --depth=1 https://gitee.com/romkatv/powerlevel10k.git ~/powerlevel10k
@@ -444,7 +444,7 @@ make sure to disable the current theme in your plugin manager. See
     git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k
     ```
     Users in China can use the official mirror on gitee.com for faster download.<br>
-    中国大陆用户可以使用 gitee.com 上的官方镜像加速下载.
+    中国用户可以使用 gitee.com 上的官方镜像加速下载.
 
     ```zsh
     git clone --depth=1 https://gitee.com/romkatv/powerlevel10k.git ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k
