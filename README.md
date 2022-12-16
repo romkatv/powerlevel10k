@@ -338,6 +338,7 @@ enable as many segments as you like. It won't slow down your prompt or Zsh start
 | `midnight_commander` | [midnight commander](https://midnight-commander.org/) shell |
 | `nix_shell` | [nix shell](https://nixos.org/nixos/nix-pills/developing-with-nix-shell.html) indicator |
 | `nnn` | [nnn](https://github.com/jarun/nnn) shell |
+| `lf` | [lf](https://github.com/gokcehan/lf) shell |
 | `nodeenv` | node.js environment from [nodeenv](https://github.com/ekalinin/nodeenv) |
 | `nodenv` | node.js environment from [nodenv](https://github.com/nodenv/nodenv) |
 | `node_version` | [node.js](https://nodejs.org/) version |
