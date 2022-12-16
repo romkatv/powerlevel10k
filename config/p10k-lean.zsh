@@ -718,6 +718,7 @@
   # Custom icon.
   # typeset -g POWERLEVEL9K_NNN_VISUAL_IDENTIFIER_EXPANSION='⭐'
 
+  ######################[ lf: lf shell (https://github.com/gokcehan/lf) ]#######################
   # lf shell color.
   typeset -g POWERLEVEL9K_LF_FOREGROUND=72
   # Custom icon.
