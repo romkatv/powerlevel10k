@@ -4921,6 +4921,18 @@ function instant_prompt_nnn() {
   _p9k_prompt_segment prompt_nnn 6 $_p9k_color1 NNN_ICON 1 '${NNNLVL:#0}' '$NNNLVL'
 }
 
+function prompt_lf() {
+  _p9k_prompt_segment $0 6 $_p9k_color1 LF_ICON 0 '' $LF_LEVEL
+}
+
+_p9k_prompt_lf_init() {
+  typeset -g "_p9k__segment_cond_${_p9k__prompt_side}[_p9k__segment_index]"='${LF_LEVEL:#0}'
+}
+
+function instant_prompt_lf() {
+  _p9k_prompt_segment prompt_lf 6 $_p9k_color1 LF_ICON 1 '${LF_LEVEL:#0}' '$LF_LEVEL'
+}
+
 function prompt_xplr() {
   local -i len=$#_p9k__prompt _p9k__has_upglob
   _p9k_prompt_segment $0 6 $_p9k_color1 XPLR_ICON 0 '' ''

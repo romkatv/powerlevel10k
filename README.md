@@ -338,6 +338,7 @@ enable as many segments as you like. It won't slow down your prompt or Zsh start
 | `midnight_commander` | [midnight commander](https://midnight-commander.org/) shell |
 | `nix_shell` | [nix shell](https://nixos.org/nixos/nix-pills/developing-with-nix-shell.html) indicator |
 | `nnn` | [nnn](https://github.com/jarun/nnn) shell |
+| `lf` | [lf](https://github.com/gokcehan/lf) shell |
 | `nodeenv` | node.js environment from [nodeenv](https://github.com/ekalinin/nodeenv) |
 | `nodenv` | node.js environment from [nodenv](https://github.com/nodenv/nodenv) |
 | `node_version` | [node.js](https://nodejs.org/) version |
@@ -426,7 +427,7 @@ echo 'source ~/powerlevel10k/powerlevel10k.zsh-theme' >>~/.zshrc
 ```
 
 Users in China can use the official mirror on gitee.com for faster download.<br>
-中国大陆用户可以使用 gitee.com 上的官方镜像加速下载.
+中国用户可以使用 gitee.com 上的官方镜像加速下载.
 
 ```zsh
 git clone --depth=1 https://gitee.com/romkatv/powerlevel10k.git ~/powerlevel10k
@@ -444,7 +445,7 @@ make sure to disable the current theme in your plugin manager. See
     git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k
     ```
     Users in China can use the official mirror on gitee.com for faster download.<br>
-    中国大陆用户可以使用 gitee.com 上的官方镜像加速下载.
+    中国用户可以使用 gitee.com 上的官方镜像加速下载.
 
     ```zsh
     git clone --depth=1 https://gitee.com/romkatv/powerlevel10k.git ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k
