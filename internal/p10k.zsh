@@ -8310,8 +8310,9 @@ _p9k_init_ssh() {
   #
   # License: https://github.com/sindresorhus/pure/blob/e8abf9d37185ec9b7b4398ca9c5eba555a1028eb/license.
 
-  [[ -n $P9K_SSH ]] && return
+  [[ -n $P9K_SSH && $_P9K_SSH_TTY == $TTY ]] && return
   typeset -gix P9K_SSH=0
+  typeset -gx _P9K_SSH_TTY=$TTY
   if [[ -n $SSH_CLIENT || -n $SSH_TTY || -n $SSH_CONNECTION ]]; then
     P9K_SSH=1
     return 0
@@ -8881,7 +8882,7 @@ _p9k_deinit() {
   fi
   (( $+_p9k__iterm2_precmd )) && functions[iterm2_precmd]=$_p9k__iterm2_precmd
   (( $+_p9k__iterm2_decorate_prompt )) && functions[iterm2_decorate_prompt]=$_p9k__iterm2_decorate_prompt
-  unset -m '(_POWERLEVEL9K_|P9K_|_p9k_)*~(P9K_SSH|P9K_TOOLBOX_NAME|P9K_TTY|_P9K_TTY)'
+  unset -m '(_POWERLEVEL9K_|P9K_|_p9k_)*~(P9K_SSH|_P9K_SSH_TTY|P9K_TOOLBOX_NAME|P9K_TTY|_P9K_TTY)'
   [[ -n $__p9k_locale ]] || unset __p9k_locale
 }
 
