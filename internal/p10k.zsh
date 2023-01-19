@@ -4520,7 +4520,7 @@ prompt_kubecontext() {
           text=$cloud_cluster
         fi
       # arn:aws:eks:us-east-1:123456789012:cluster/cluster-01
-      elif [[ $cluster == (#b)arn:aws:eks:([[:alnum:]-]##):([[:digit:]]##):cluster/(?*) ]]; then
+      elif [[ $cluster == (#b)arn:aws[[:alnum:]-]#:eks:([[:alnum:]-]##):([[:digit:]]##):cluster/(?*) ]]; then
         cloud_name=eks
         cloud_zone=$match[1]
         cloud_account=$match[2]
