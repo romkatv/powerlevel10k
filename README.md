@@ -761,7 +761,7 @@ PR to expand the list!_
 ## Try it in Docker
 
 Try Powerlevel10k in Docker. You can safely make any changes to the file system while trying out
-the theme. Once you exit Zsh, the image is deleted.
+the theme. Once you exit Zsh, the container is deleted.
 
 ```zsh
 docker run -e TERM -e COLORTERM -e LC_ALL=C.UTF-8 -it --rm alpine sh -uec '
