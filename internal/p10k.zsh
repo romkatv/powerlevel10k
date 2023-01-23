@@ -5744,7 +5744,7 @@ function _p9k_prompt_net_iface_async() {
   # netstat -inbI en0
   local iface ip line var
   typeset -a iface2ip ips ifaces
-  if (( $+commands[ip] )) && [[ $+commands[ifconfig] == 0 || $OSTYPE != linux* ]]; then
+  if (( $+commands[ip] )) && [[ $+commands[ifconfig] == 0 || $OSTYPE == linux* ]]; then
     for line in ${(f)"$(command ip -4 a show 2>/dev/null)"}; do
       if [[ $line == (#b)<->:[[:space:]]##([^:]##):[[:space:]]##\<([^\>]#)\>* ]]; then
         [[ ,$match[2], == *,UP,* ]] && iface=$match[1] || iface=
