@@ -233,7 +233,7 @@ function _p9k_fetch_cwd() {
   _p9k__parent_mtimes_s="$_p9k__parent_mtimes_i"
 }
 
-# Usage: _p9k_glob parent_dir_index pattern
+# Usage: _p9k_glob parent_dir_index pattern [glob_qual]
 #
 # parent_dir_index indexes _p9k__parent_dirs.
 #
@@ -250,12 +250,12 @@ function _p9k_glob() {
   fi
   local -a stat
   zstat -A stat +mtime -- $dir 2>/dev/null || stat=(-1)
-  local files=($dir/$~2(N:t))
+  eval 'local files=($dir/$~2('$3'N:t))'
   _p9k__glob_cache[$dir/$2]="$stat[1]:$#files"
   return $#files
 }
 
-# Usage: _p9k_upglob pattern
+# Usage: _p9k_upglob pattern [glob_qual]
 #
 # Returns index within _p9k__parent_dirs or 0 if there is no match.
 #
@@ -273,7 +273,7 @@ function _p9k_upglob() {
     cached[-1]=()
     local -i i
     for i in ${(@)${cached:|_p9k__parent_mtimes_i}%:*}; do
-      _p9k_glob $i $1 && continue
+      _p9k_glob $i "$@" && continue
       _p9k__upsearch_cache[$_p9k__cwd/$1]="${_p9k__parent_mtimes_i[1,i]} $i"
       return i
     done
@@ -286,7 +286,7 @@ function _p9k_upglob() {
     local -i i=1
   fi
   for ((; i <= $#_p9k__parent_mtimes; ++i)); do
-    _p9k_glob $i $1 && continue
+    _p9k_glob $i "$@" && continue
     _p9k__upsearch_cache[$_p9k__cwd/$1]="${_p9k__parent_mtimes_i[1,i]} $i"
     return i
   done
@@ -1212,7 +1212,7 @@ _p9k_prompt_aws_init() {
 ################################################################
 # Current Elastic Beanstalk environment
 prompt_aws_eb_env() {
-  _p9k_upglob .elasticbeanstalk && return
+  _p9k_upglob .elasticbeanstalk -/ && return
   local dir=$_p9k__parent_dirs[$?]
 
   if ! _p9k_cache_stat_get $0 $dir/.elasticbeanstalk/config.yml; then
@@ -1304,25 +1304,21 @@ function _p9k_read_file() {
 }
 
 function _p9k_fvm_old() {
-  _p9k_upglob fvm && return 1
+  _p9k_upglob fvm @ && return 1
   local fvm=$_p9k__parent_dirs[$?]/fvm
-  if [[ -L $fvm ]]; then
-    if [[ ${fvm:A} == (#b)*/versions/([^/]##)/bin/flutter ]]; then
-      _p9k_prompt_segment prompt_fvm blue $_p9k_color1 FLUTTER_ICON 0 '' ${match[1]//\%/%%}
-      return 0
-    fi
+  if [[ ${fvm:A} == (#b)*/versions/([^/]##)/bin/flutter ]]; then
+    _p9k_prompt_segment prompt_fvm blue $_p9k_color1 FLUTTER_ICON 0 '' ${match[1]//\%/%%}
+    return 0
   fi
   return 1
 }
 
 function _p9k_fvm_new() {
-  _p9k_upglob .fvm && return 1
+  _p9k_upglob .fvm @ && return 1
   local sdk=$_p9k__parent_dirs[$?]/.fvm/flutter_sdk
-  if [[ -L $sdk ]]; then
-    if [[ ${sdk:A} == (#b)*/versions/([^/]##) ]]; then
-      _p9k_prompt_segment prompt_fvm blue $_p9k_color1 FLUTTER_ICON 0 '' ${match[1]//\%/%%}
-      return 0
-    fi
+  if [[ ${sdk:A} == (#b)*/versions/([^/]##) ]]; then
+    _p9k_prompt_segment prompt_fvm blue $_p9k_color1 FLUTTER_ICON 0 '' ${match[1]//\%/%%}
+    return 0
   fi
   return 1
 }
@@ -2196,7 +2192,7 @@ prompt_go_version() {
       fi
     fi
     if [[ $_p9k__cwd/ != $p/* && $_p9k__cwd_a/ != $p/* ]]; then
-      _p9k_upglob go.mod && return
+      _p9k_upglob go.mod -. && return
     fi
   fi
   _p9k_prompt_segment "$0" "green" "grey93" "GO_ICON" 0 '' "${v//\%/%%}"
@@ -2216,7 +2212,7 @@ prompt_history() {
 
 prompt_package() {
   unset P9K_PACKAGE_NAME P9K_PACKAGE_VERSION
-  _p9k_upglob package.json && return
+  _p9k_upglob package.json -. && return
 
   local file=$_p9k__parent_dirs[$?]/package.json
   if ! _p9k_cache_stat_get $0 $file; then
@@ -2321,6 +2317,7 @@ _p9k_vpn_ip_render() {
 ################################################################
 # Segment to display laravel version
 prompt_laravel_version() {
+  # TODO: add a '-/' or '-.' here depending on whether artisan is a directory or a file.
   _p9k_upglob artisan && return
   local dir=$_p9k__parent_dirs[$?]
   local app=$dir/vendor/laravel/framework/src/Illuminate/Foundation/Application.php
@@ -2432,7 +2429,7 @@ function _p9k_cached_cmd() {
 ################################################################
 # Segment to diplay Node version
 prompt_node_version() {
-  _p9k_upglob package.json
+  _p9k_upglob package.json -.
   local -i idx=$?
   if (( idx )); then
     _p9k_cached_cmd 0 $_p9k__parent_dirs[idx]/package.json node --version || return
@@ -2612,7 +2609,7 @@ prompt_nodenv() {
       fi
     fi
     if [[ -z $_p9k__ret ]]; then
-      _p9k_upglob .node-version
+      _p9k_upglob .node-version -.
       local -i idx=$?
       if (( idx )) && _p9k_read_word $_p9k__parent_dirs[idx]/.node-version; then
         (( ${_POWERLEVEL9K_NODENV_SOURCES[(I)local]} )) || return
@@ -2648,11 +2645,11 @@ _p9k_prompt_nodenv_init() {
 
 prompt_dotnet_version() {
   if (( _POWERLEVEL9K_DOTNET_VERSION_PROJECT_ONLY )); then
-    _p9k_upglob 'project.json|global.json|packet.dependencies|*.csproj|*.fsproj|*.xproj|*.sln' && return
+    _p9k_upglob 'project.json|global.json|packet.dependencies|*.csproj|*.fsproj|*.xproj|*.sln' -. && return
   fi
 
   local cfg
-  _p9k_upglob global.json || cfg=$_p9k__parent_dirs[$?]/global.json
+  _p9k_upglob global.json -. || cfg=$_p9k__parent_dirs[$?]/global.json
   _p9k_cached_cmd 0 "$cfg" dotnet --version || return
   _p9k_prompt_segment "$0" "magenta" "white" 'DOTNET_ICON' 0 '' "$_p9k__ret"
 }
@@ -2675,7 +2672,7 @@ instant_prompt_os_icon() { prompt_os_icon; }
 # Segment to display PHP version number
 prompt_php_version() {
   if (( _POWERLEVEL9K_PHP_VERSION_PROJECT_ONLY )); then
-    _p9k_upglob 'composer.json|*.php' && return
+    _p9k_upglob 'composer.json|*.php' -. && return
   fi
   _p9k_cached_cmd 0 '' php --version || return
   [[ $_p9k__ret == (#b)(*$'\n')#'PHP '([[:digit:].]##)* ]] || return
@@ -2782,7 +2779,7 @@ prompt_rbenv() {
       fi
     fi
     if [[ -z $_p9k__ret ]]; then
-      _p9k_upglob .ruby-version
+      _p9k_upglob .ruby-version -.
       local -i idx=$?
       if (( idx )) && _p9k_read_word $_p9k__parent_dirs[idx]/.ruby-version; then
         (( ${_POWERLEVEL9K_RBENV_SOURCES[(I)local]} )) || return
@@ -2845,7 +2842,7 @@ prompt_scalaenv() {
       fi
     fi
     if [[ -z $_p9k__ret ]]; then
-      _p9k_upglob .scala-version
+      _p9k_upglob .scala-version -.
       local -i idx=$?
       if (( idx )) && _p9k_read_word $_p9k__parent_dirs[idx]/.scala-version; then
         (( ${_POWERLEVEL9K_SCALAENV_SOURCES[(I)local]} )) || return
@@ -2903,7 +2900,7 @@ prompt_phpenv() {
       fi
     fi
     if [[ -z $_p9k__ret ]]; then
-      _p9k_upglob .php-version
+      _p9k_upglob .php-version -.
       local -i idx=$?
       if (( idx )) && _p9k_read_word $_p9k__parent_dirs[idx]/.php-version; then
         (( ${_POWERLEVEL9K_PHPENV_SOURCES[(I)local]} )) || return
@@ -2964,7 +2961,7 @@ prompt_luaenv() {
       fi
     fi
     if [[ -z $_p9k__ret ]]; then
-      _p9k_upglob .lua-version
+      _p9k_upglob .lua-version -.
       local -i idx=$?
       if (( idx )) && _p9k_read_word $_p9k__parent_dirs[idx]/.lua-version; then
         (( ${_POWERLEVEL9K_LUAENV_SOURCES[(I)local]} )) || return
@@ -3025,7 +3022,7 @@ prompt_jenv() {
       fi
     fi
     if [[ -z $_p9k__ret ]]; then
-      _p9k_upglob .java-version
+      _p9k_upglob .java-version -.
       local -i idx=$?
       if (( idx )) && _p9k_read_word $_p9k__parent_dirs[idx]/.java-version; then
         (( ${_POWERLEVEL9K_JENV_SOURCES[(I)local]} )) || return
@@ -3086,7 +3083,7 @@ prompt_plenv() {
       fi
     fi
     if [[ -z $_p9k__ret ]]; then
-      _p9k_upglob .perl-version
+      _p9k_upglob .perl-version -.
       local -i idx=$?
       if (( idx )) && _p9k_read_word $_p9k__parent_dirs[idx]/.perl-version; then
         (( ${_POWERLEVEL9K_PLENV_SOURCES[(I)local]} )) || return
@@ -3124,7 +3121,7 @@ _p9k_prompt_plenv_init() {
 
 prompt_perlbrew() {
   if (( _POWERLEVEL9K_PERLBREW_PROJECT_ONLY )); then
-    _p9k_upglob 'cpanfile|.perltidyrc|(|MY)META.(yml|json)|(Makefile|Build).PL|*.(pl|pm|t|pod)' && return
+    _p9k_upglob 'cpanfile|.perltidyrc|(|MY)META.(yml|json)|(Makefile|Build).PL|*.(pl|pm|t|pod)' -. && return
   fi
 
   local v=$PERLBREW_PERL
@@ -3165,7 +3162,7 @@ instant_prompt_root_indicator() { prompt_root_indicator; }
 prompt_rust_version() {
   unset P9K_RUST_VERSION
   if (( _POWERLEVEL9K_RUST_VERSION_PROJECT_ONLY )); then
-    _p9k_upglob Cargo.toml && return
+    _p9k_upglob Cargo.toml -. && return
   fi
   local rustc=$commands[rustc] toolchain deps=()
   if (( $+commands[ldd] )); then
@@ -3198,7 +3195,7 @@ prompt_rust_version() {
         fi
       fi
       local -A overrides=($_p9k__cache_val)
-      _p9k_upglob rust-toolchain
+      _p9k_upglob rust-toolchain -.
       local dir=$_p9k__parent_dirs[$?]
       local -i n m=${dir[(I)/]}
       local pair
@@ -4321,7 +4318,7 @@ function _p9k_pyenv_compute() {
       fi
     fi
     if [[ -z $_p9k__ret ]]; then
-      _p9k_upglob .python-version
+      _p9k_upglob .python-version -.
       local -i idx=$?
       if (( idx )) && _p9k_read_pyenv_like_version_file $_p9k__parent_dirs[idx]/.python-version python-; then
         (( ${_POWERLEVEL9K_PYENV_SOURCES[(I)local]} )) || return
@@ -4401,7 +4398,7 @@ prompt_goenv() {
       fi
     fi
     if [[ -z $_p9k__ret ]]; then
-      _p9k_upglob .go-version
+      _p9k_upglob .go-version -.
       local -i idx=$?
       if (( idx )) && _p9k_read_pyenv_like_version_file $_p9k__parent_dirs[idx]/.go-version go-; then
         (( ${_POWERLEVEL9K_GOENV_SOURCES[(I)local]} )) || return
@@ -4586,7 +4583,7 @@ _p9k_prompt_dropbox_init() {
 # print Java version number
 prompt_java_version() {
   if (( _POWERLEVEL9K_JAVA_VERSION_PROJECT_ONLY )); then
-    _p9k_upglob 'pom.xml|build.gradle.kts|build.sbt|deps.edn|project.clj|build.boot|*.(java|class|jar|gradle|clj|cljc)' && return
+    _p9k_upglob 'pom.xml|build.gradle.kts|build.sbt|deps.edn|project.clj|build.boot|*.(java|class|jar|gradle|clj|cljc)' -. && return
   fi
 
   local java=$commands[java]
@@ -5631,7 +5628,7 @@ prompt_haskell_stack() {
     _p9k_haskell_stack_version $STACK_YAML
   else
     (( ${_POWERLEVEL9K_HASKELL_STACK_SOURCES[(I)local|global]} )) || return
-    if _p9k_upglob stack.yaml; then
+    if _p9k_upglob stack.yaml -.; then
       (( _POWERLEVEL9K_HASKELL_STACK_PROMPT_ALWAYS_SHOW )) || return
       (( ${_POWERLEVEL9K_HASKELL_STACK_SOURCES[(I)global]} )) || return
       _p9k_haskell_stack_version ${STACK_ROOT:-~/.stack}/global-project/stack.yaml
@@ -8358,7 +8355,7 @@ _p9k_must_init() {
     [[ $sig == $_p9k__param_sig ]] && return 1
     _p9k_deinit
   fi
-  _p9k__param_pat=$'v140\1'${(q)ZSH_VERSION}$'\1'${(q)ZSH_PATCHLEVEL}$'\1'
+  _p9k__param_pat=$'v141\1'${(q)ZSH_VERSION}$'\1'${(q)ZSH_PATCHLEVEL}$'\1'
   _p9k__param_pat+=$__p9k_force_term_shell_integration$'\1'
   _p9k__param_pat+=$'${#parameters[(I)POWERLEVEL9K_*]}\1${(%):-%n%#}\1$GITSTATUS_LOG_LEVEL\1'
   _p9k__param_pat+=$'$GITSTATUS_ENABLE_LOGGING\1$GITSTATUS_DAEMON\1$GITSTATUS_NUM_THREADS\1'
