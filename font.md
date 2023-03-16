@@ -115,17 +115,13 @@ If you are using a different terminal, proceed with manual font installation. ðŸ
      ```
      After changing the config run `xrdb ~/.Xresources` to reload it. The new config is applied to
      all new terminals.
-   - **Zed**: Open `settings.json` file (type `CMD + ,` or open `~/.config/zed/settings.json`).
-     Add the following lines to your existing settings:
+   - **Zed**: Open `~/.config/zed/settings.json` and set `terminal.font_family` to `"MesloLGS NF"`.
      ```jsonc
      {
-          // your existing settings
-
-          {
-              "terminal": {
-                  "font_family": "MesloLGS NF"
-              }
-          }
+       "terminal": {
+         "font_family": "MesloLGS NF"
+       },
+       // Other settings.
      }
      ```
    - Crostini (Linux on Chrome OS): Open
