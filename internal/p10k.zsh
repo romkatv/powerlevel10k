@@ -4963,11 +4963,13 @@ function prompt_nix_shell() {
 }
 
 _p9k_prompt_nix_shell_init() {
-  typeset -g "_p9k__segment_cond_${_p9k__prompt_side}[_p9k__segment_index]"='${IN_NIX_SHELL:#0}'
+  typeset -g "_p9k__segment_cond_${_p9k__prompt_side}[_p9k__segment_index]"='${IN_NIX_SHELL:#0}${${path[(I)/nix/store/*]}:#0}'
 }
 
 function instant_prompt_nix_shell() {
-  _p9k_prompt_segment prompt_nix_shell 4 $_p9k_color1 NIX_SHELL_ICON 1 '${IN_NIX_SHELL:#0}' '${(M)IN_NIX_SHELL:#(pure|impure)}'
+  _p9k_prompt_segment prompt_nix_shell 4 $_p9k_color1 NIX_SHELL_ICON 1 \
+    '${IN_NIX_SHELL:#0}${${path[(I)/nix/store/*]}:#0}'                 \
+    '${(M)IN_NIX_SHELL:#(pure|impure)}'
 }
 
 function prompt_terraform() {
