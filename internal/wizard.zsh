@@ -744,7 +744,7 @@ function ask_python() {
   return 0
 }
 
-function ask_arrow() {
+function ask_quotes() {
   add_widget 0 flowing -c %BDoes this look like%b "%2F><%f" %Bbut taller and "fatter?%b"
   add_widget 0 print -P ""
   add_widget 0 flowing -c -- "--->  \u276F\u276E  <---"
@@ -760,8 +760,8 @@ function ask_arrow() {
   ask ynr
   case $choice in
     r) return 1;;
-    y) cap_arrow=1;;
-    n) cap_arrow=0;;
+    y) cap_quotes=1;;
+    n) cap_quotes=0;;
   esac
   return 0
 }
@@ -912,7 +912,7 @@ function ask_charset() {
       cap_python=0
       cap_debian=0
       cap_lock=0
-      cap_arrow=0
+      cap_quotes=0
     ;;
   esac
   return 0
@@ -2047,7 +2047,7 @@ while true; do
   local gap_char=' ' prompt_char='❯' down_triangle='\uE0BC' up_triangle='\uE0BA' slanted_bar='\u2571'
   local left_subsep= right_subsep= left_tail= right_tail= left_head= right_head= time=
   local -i num_lines=2 empty_line=0 color=2 left_frame=1 right_frame=1 transient_prompt=0
-  local -i cap_diamond=0 cap_python=0 cap_debian=0 cap_lock=0 cap_arrow=0
+  local -i cap_diamond=0 cap_python=0 cap_debian=0 cap_lock=0 cap_quotes=0
   local -a extra_icons=('' '' '')
   local -a frame_color=(244 242 240 238)
   local -a color_name=(Lightest Light Dark Darkest)
@@ -2081,8 +2081,8 @@ while true; do
           if (( cap_diamond )); then
             POWERLEVEL9K_MODE=powerline
           else
-            ask_arrow || continue
-            (( cap_arrow )) && POWERLEVEL9K_MODE=compatible || POWERLEVEL9K_MODE=ascii
+            ask_quotes || continue
+            (( cap_quotes )) && POWERLEVEL9K_MODE=compatible || POWERLEVEL9K_MODE=ascii
           fi
         fi
       elif (( ! cap_diamond )); then
