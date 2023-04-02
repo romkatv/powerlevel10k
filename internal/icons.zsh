@@ -71,6 +71,7 @@ function _p9k_init_icons() {
         LINUX_ARTIX_ICON               '\uE271'$s             # 
         LINUX_RHEL_ICON                '\uE271'$s             # 
         LINUX_AMZN_ICON                '\uE271'$s             # 
+        LINUX_ENDEAVOUROS_ICON         '\uE271'$s             # 
         SUNOS_ICON                     '\U1F31E'$q            # 🌞
         HOME_ICON                      '\uE12C'$s             # 
         HOME_SUB_ICON                  '\uE18D'$s             # 
@@ -209,6 +210,7 @@ function _p9k_init_icons() {
         LINUX_ARTIX_ICON               '\uF17C'$s             # 
         LINUX_RHEL_ICON                '\uF17C'$s             # 
         LINUX_AMZN_ICON                '\uF17C'$s             # 
+        LINUX_ENDEAVOUROS_ICON         '\uF17C'$s             # 
         SUNOS_ICON                     '\uF185 '              # 
         HOME_ICON                      '\uF015'$s             # 
         HOME_SUB_ICON                  '\uF07C'$s             # 
@@ -348,6 +350,7 @@ function _p9k_init_icons() {
         LINUX_ARTIX_ICON               "${CODEPOINT_OF_AWESOME_LINUX:+\\u$CODEPOINT_OF_AWESOME_LINUX$s}"
         LINUX_RHEL_ICON                "${CODEPOINT_OF_AWESOME_LINUX:+\\u$CODEPOINT_OF_AWESOME_LINUX$s}"
         LINUX_AMZN_ICON                "${CODEPOINT_OF_AWESOME_LINUX:+\\u$CODEPOINT_OF_AWESOME_LINUX$s}"
+        LINUX_ENDEAVOUROS_ICON         "${CODEPOINT_OF_AWESOME_LINUX:+\\u$CODEPOINT_OF_AWESOME_LINUX$s}"
         SUNOS_ICON                     "${CODEPOINT_OF_AWESOME_SUN_O:+\\u$CODEPOINT_OF_AWESOME_SUN_O }"
         HOME_ICON                      "${CODEPOINT_OF_AWESOME_HOME:+\\u$CODEPOINT_OF_AWESOME_HOME$s}"
         HOME_SUB_ICON                  "${CODEPOINT_OF_AWESOME_FOLDER_OPEN:+\\u$CODEPOINT_OF_AWESOME_FOLDER_OPEN$s}"
@@ -480,6 +483,7 @@ function _p9k_init_icons() {
         LINUX_UBUNTU_ICON              '\uF31b'$s             # 
         LINUX_RHEL_ICON                '\uF316'$s             # 
         LINUX_AMZN_ICON                '\uF270'$s             # 
+        LINUX_ENDEAVOUROS_ICON         '\UF322'$s             # 
         LINUX_ICON                     '\uF17C'               # 
         SUNOS_ICON                     '\uF185 '              # 
         HOME_ICON                      '\uF015'$s             # 
@@ -615,6 +619,7 @@ function _p9k_init_icons() {
         LINUX_UBUNTU_ICON              '\uF31b'$s             # 
         LINUX_RHEL_ICON                '\uF316'$s             # 
         LINUX_AMZN_ICON                '\uF270'$s             # 
+        LINUX_ENDEAVOUROS_ICON         '\uF17C'               # 
         LINUX_ICON                     '\uF17C'               # 
         SUNOS_ICON                     '\uF185 '              # 
         HOME_ICON                      '\uF015'$s             # 
@@ -748,6 +753,7 @@ function _p9k_init_icons() {
         LINUX_ARTIX_ICON               'artix'
         LINUX_RHEL_ICON                'rhel'
         LINUX_AMZN_ICON                'amzn'
+        LINUX_ENDEAVOUROS_ICON         'edvos'
         SUNOS_ICON                     'sunos'
         HOME_ICON                      ''
         HOME_SUB_ICON                  ''
@@ -882,6 +888,7 @@ function _p9k_init_icons() {
         LINUX_ARTIX_ICON               'Art'
         LINUX_RHEL_ICON                'RH'
         LINUX_AMZN_ICON                'Amzn'
+        LINUX_ENDEAVOUROS_ICON         'Edv'
         SUNOS_ICON                     'Sun'
         HOME_ICON                      ''
         HOME_SUB_ICON                  ''

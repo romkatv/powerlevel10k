@@ -1115,6 +1115,7 @@ function os_icon_name() {
           *artix*)                 echo LINUX_ARTIX_ICON;;
           *rhel*)                  echo LINUX_RHEL_ICON;;
           amzn)                    echo LINUX_AMZN_ICON;;
+          endeavouros)             echo LINUX_ENDEAVOUROS_ICON;;
           *)                       echo LINUX_ICON;;
         esac
         ;;
