@@ -2094,13 +2094,13 @@ while true; do
       elif (( ! cap_diamond )); then
         POWERLEVEL9K_MODE=awesome-fontconfig
       else
-        ask_arrow '\UF0737' || continue
+        ask_arrow '\uFC35' || continue
         if (( cap_arrow )); then
-          POWERLEVEL9K_MODE=nerdfont-v3
+          POWERLEVEL9K_MODE=nerdfont-complete
         else
-          ask_arrow '\uFC35' "Let's try another one." || continue
+          ask_arrow '\UF0737' "Let's try another one." || continue
           if (( cap_arrow )); then
-            POWERLEVEL9K_MODE=nerdfont-complete
+            POWERLEVEL9K_MODE=nerdfont-v3
           else
             POWERLEVEL9K_MODE=awesome-fontconfig
             ask_python || continue
