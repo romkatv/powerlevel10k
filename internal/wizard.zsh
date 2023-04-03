@@ -1190,7 +1190,7 @@ function ask_separators() {
   add_widget 2
   add_widget 0 print -P "%B(2)  Vertical.%b"
   add_prompt left_sep='' right_sep='' left_subsep=$vertical_bar right_subsep=$vertical_bar
-  if [[ $POWERLEVEL9K_MODE == nerdfont-complete ]]; then
+  if [[ $POWERLEVEL9K_MODE == nerdfont-* ]]; then
     extra+=3
     add_widget 0 print -P "%B(3)  Slanted.%b"
     add_prompt left_sep=$down_triangle right_sep=$up_triangle left_subsep=$slanted_bar right_subsep=$slanted_bar
@@ -1254,7 +1254,7 @@ function ask_heads() {
   fi
   add_widget 0 print -P "%B(2)  Blurred.%b"
   add_prompt left_head=$fade_out right_head=$fade_in
-  if [[ $POWERLEVEL9K_MODE == nerdfont-complete ]]; then
+  if [[ $POWERLEVEL9K_MODE == nerdfont-* ]]; then
     extra+=3
     add_widget 0 print -P "%B(3)  Slanted.%b"
     add_prompt left_head=$down_triangle right_head=$up_triangle
@@ -1322,7 +1322,7 @@ function ask_tails() {
     extra+=3
     add_widget 0 print -P "%B(3)  Sharp.%b"
     add_prompt left_tail=$left_triangle right_tail=$right_triangle
-    if [[ $POWERLEVEL9K_MODE == nerdfont-complete ]]; then
+    if [[ $POWERLEVEL9K_MODE == nerdfont-* ]]; then
       extra+=4
       add_widget 0 print -P "%B(4)  Slanted.%b"
       add_prompt left_tail=$up_triangle right_tail=$down_triangle
