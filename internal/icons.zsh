@@ -524,7 +524,7 @@ function _p9k_init_icons() {
         EXECUTION_TIME_ICON            '\uF252'$s             # 
         SSH_ICON                       '\uF489'$s             # 
         VPN_ICON                       '\UF023'               # 
-        KUBERNETES_ICON                '\F10FE'               # 󱃾
+        KUBERNETES_ICON                '\UF10FE'              # 󱃾
         DROPBOX_ICON                   '\UF16B'$s             # 
         DATE_ICON                      '\uF073 '              # 
         TIME_ICON                      '\uF017 '              # 
