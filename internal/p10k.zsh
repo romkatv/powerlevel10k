@@ -1747,16 +1747,9 @@ function _p9k_shorten_delim_len() {
 # Percents are duplicated because this function is currently used only
 # where the result is going to be percent-expanded.
 function _p9k_url_escape() {
-  if [[ $1 == [a-zA-Z0-9"/:_.-!'()~ "]# ]]; then
-    _p9k__ret=${1// /%%20}
-  else
-    local c
-    _p9k__ret=
-    for c in ${(s::)1}; do
-      [[ $c == [a-zA-Z0-9"/:_.-!'()~"] ]] || printf -v c '%%%%%02X' $(( #c ))
-      _p9k__ret+=$c
-    done
-  fi
+  emulate -L zsh -o no_multi_byte -o extended_glob
+  local MATCH MBEGIN MEND
+  _p9k__ret=${1//(#m)[^a-zA-Z0-9"\/:_.-!'()~"]/%%${(l:2::0:)$(([##16]#MATCH))}}
 }
 
 ################################################################
