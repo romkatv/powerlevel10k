@@ -4956,13 +4956,11 @@ function prompt_nix_shell() {
 }
 
 _p9k_prompt_nix_shell_init() {
-  typeset -g "_p9k__segment_cond_${_p9k__prompt_side}[_p9k__segment_index]"='${IN_NIX_SHELL:#0}${${path[(I)/nix/store/*]}:#0}'
+  typeset -g "_p9k__segment_cond_${_p9k__prompt_side}[_p9k__segment_index]"=$_p9k_nix_shell_cond
 }
 
 function instant_prompt_nix_shell() {
-  _p9k_prompt_segment prompt_nix_shell 4 $_p9k_color1 NIX_SHELL_ICON 1 \
-    '${IN_NIX_SHELL:#0}${${path[(I)/nix/store/*]}:#0}'                 \
-    '${(M)IN_NIX_SHELL:#(pure|impure)}'
+  _p9k_prompt_segment prompt_nix_shell 4 $_p9k_color1 NIX_SHELL_ICON 1 "$_p9k_nix_shell_cond" '${(M)IN_NIX_SHELL:#(pure|impure)}'
 }
 
 function prompt_terraform() {
@@ -7650,6 +7648,12 @@ _p9k_init_params() {
   _p9k_declare -b POWERLEVEL9K_TIME_UPDATE_ON_COMMAND 0
   # If set to true, time will update every second.
   _p9k_declare -b POWERLEVEL9K_EXPERIMENTAL_TIME_REALTIME 0
+
+  _p9k_declare -b POWERLEVEL9K_NIX_SHELL_INFER_FROM_PATH 0
+  typeset -g _p9k_nix_shell_cond='${IN_NIX_SHELL:#0}'
+  if (( _POWERLEVEL9K_NIX_SHELL_INFER_FROM_PATH )); then
+    _p9k_nix_shell_cond+='${path[(r)/nix/store/*]}'
+  fi
 
   local -i i=1
   while (( i <= $#_POWERLEVEL9K_LEFT_PROMPT_ELEMENTS )); do
