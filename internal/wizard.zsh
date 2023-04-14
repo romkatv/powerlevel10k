@@ -1037,19 +1037,19 @@ function ask_time() {
   add_widget 0 flowing -c "%BShow current time?%b"
   add_widget 0 print
   add_widget 1
-  add_widget 0 print -P "%B(1)  No.%b"
+  add_widget 0 print -P "%B(n)  No.%b"
   add_prompt time=
+  add_widget 0 print -P "%B(1)  12-hour format.%b"
+  add_prompt time=$time_12h
   add_widget 0 print -P "%B(2)  24-hour format.%b"
   add_prompt time=$time_24h
-  add_widget 0 print -P "%B(3)  12-hour format.%b"
-  add_prompt time=$time_12h
   add_widget 0 print -P "(r)  Restart from the beginning."
-  ask 123r
+  ask n12r
   case $choice in
     r) return 1;;
-    1) time=;;
+    n) time=;;
+    1) time=$time_12h; options+='12h time';;
     2) time=$time_24h; options+='24h time';;
-    3) time=$time_12h; options+='12h time';;
   esac
   return 0
 }
