@@ -2424,14 +2424,41 @@ function _p9k_cached_cmd() {
 prompt_node_version() {
   _p9k_upglob package.json -.
   local -i idx=$?
-  if (( idx )); then
-    _p9k_cached_cmd 0 $_p9k__parent_dirs[idx]/package.json node --version || return
-  else
-    (( _POWERLEVEL9K_NODE_VERSION_PROJECT_ONLY )) && return
-    _p9k_cached_cmd 0 '' node --version || return
+  (( idx || ! _POWERLEVEL9K_NODE_VERSION_PROJECT_ONLY )) || return
+
+  local node=$commands[node]
+  local -a file_deps env_deps
+  if [[ $node == ${NODENV_ROOT:-$HOME/.nodenv}/shims/node ]]; then
+    env_deps+=("$NODENV_VERSION")
+    file_deps+=(${NODENV_ROOT:-$HOME/.nodenv}/version)
+    if [[ $NODENV_DIR != (|.) ]]; then
+      [[ $NODENV_DIR == /* ]] && local dir=$NODENV_DIR || local dir="$_p9k__cwd_a/$NODENV_DIR"
+      dir=${dir:A}
+      if [[ $dir != $_p9k__cwd_a ]]; then
+        while true; do
+          if [[ -e $dir/.node-version ]]; then
+            file_deps+=($dir/.node-version)
+            break
+          fi
+          [[ $dir == (/|.) ]] && break
+          dir=${dir:h}
+        done
+      fi
+    fi
+    _p9k_upglob .node-version -. || file_deps+=($_p9k__parent_dirs[idx]/.node-version)
+  elif (( idx )); then
+    file_deps+=($_p9k__parent_dirs[idx]/package.json)
   fi
-  [[ $_p9k__ret == v?* ]] || return
-  _p9k_prompt_segment "$0" "green" "white" 'NODE_ICON' 0 '' "${_p9k__ret#v}"
+
+  if ! _p9k_cache_stat_get "$0 $#env_deps ${(j: :)${(@q)env_deps}} ${(j: :)${(@q)file_deps}}" $file_deps $node; then
+    local out
+    out=$($node --version 2>/dev/null)
+    _p9k_cache_stat_set $(( ! $? )) "$out"
+  fi
+  (( $_p9k__cache_val[1] )) || return
+  local v=$_p9k__cache_val[2]
+  [[ $v == v?* ]] || return
+  _p9k_prompt_segment "$0" "green" "white" 'NODE_ICON' 0 '' "${${v#v}//\%/%%}"
 }
 
 _p9k_prompt_node_version_init() {
@@ -8354,7 +8381,7 @@ _p9k_must_init() {
     [[ $sig == $_p9k__param_sig ]] && return 1
     _p9k_deinit
   fi
-  _p9k__param_pat=$'v144\1'${(q)ZSH_VERSION}$'\1'${(q)ZSH_PATCHLEVEL}$'\1'
+  _p9k__param_pat=$'v145\1'${(q)ZSH_VERSION}$'\1'${(q)ZSH_PATCHLEVEL}$'\1'
   _p9k__param_pat+=$__p9k_force_term_shell_integration$'\1'
   _p9k__param_pat+=$'${#parameters[(I)POWERLEVEL9K_*]}\1${(%):-%n%#}\1$GITSTATUS_LOG_LEVEL\1'
   _p9k__param_pat+=$'$GITSTATUS_ENABLE_LOGGING\1$GITSTATUS_DAEMON\1$GITSTATUS_NUM_THREADS\1'
