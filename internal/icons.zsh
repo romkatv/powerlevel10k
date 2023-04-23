@@ -52,6 +52,7 @@ function _p9k_init_icons() {
         LINUX_DEBIAN_ICON              '\uE271'$s             # 
         LINUX_RASPBIAN_ICON            '\uE271'$s             # 
         LINUX_UBUNTU_ICON              '\uE271'$s             # 
+        LINUX_KALI_ICON                '\uE271'$s             # 
         LINUX_CENTOS_ICON              '\uE271'$s             # 
         LINUX_COREOS_ICON              '\uE271'$s             # 
         LINUX_ELEMENTARY_ICON          '\uE271'$s             # 
@@ -191,6 +192,7 @@ function _p9k_init_icons() {
         LINUX_DEBIAN_ICON              '\uF17C'$s             # 
         LINUX_RASPBIAN_ICON            '\uF17C'$s             # 
         LINUX_UBUNTU_ICON              '\uF17C'$s             # 
+        LINUX_KALI_ICON                '\uF17C'$s             # 
         LINUX_CENTOS_ICON              '\uF17C'$s             # 
         LINUX_COREOS_ICON              '\uF17C'$s             # 
         LINUX_ELEMENTARY_ICON          '\uF17C'$s             # 
@@ -331,6 +333,7 @@ function _p9k_init_icons() {
         LINUX_DEBIAN_ICON              "${CODEPOINT_OF_AWESOME_LINUX:+\\u$CODEPOINT_OF_AWESOME_LINUX$s}"
         LINUX_RASPBIAN_ICON            "${CODEPOINT_OF_AWESOME_LINUX:+\\u$CODEPOINT_OF_AWESOME_LINUX$s}"
         LINUX_UBUNTU_ICON              "${CODEPOINT_OF_AWESOME_LINUX:+\\u$CODEPOINT_OF_AWESOME_LINUX$s}"
+        LINUX_KALI_ICON                "${CODEPOINT_OF_AWESOME_LINUX:+\\u$CODEPOINT_OF_AWESOME_LINUX$s}"
         LINUX_CENTOS_ICON              "${CODEPOINT_OF_AWESOME_LINUX:+\\u$CODEPOINT_OF_AWESOME_LINUX$s}"
         LINUX_COREOS_ICON              "${CODEPOINT_OF_AWESOME_LINUX:+\\u$CODEPOINT_OF_AWESOME_LINUX$s}"
         LINUX_ELEMENTARY_ICON          "${CODEPOINT_OF_AWESOME_LINUX:+\\u$CODEPOINT_OF_AWESOME_LINUX$s}"
@@ -464,6 +467,7 @@ function _p9k_init_icons() {
         LINUX_CENTOS_ICON              '\uF304'$s             # 
         LINUX_COREOS_ICON              '\uF305'$s             # 
         LINUX_DEBIAN_ICON              '\uF306'               # 
+        LINUX_KALI_ICON                '\uF327'               # 
         LINUX_RASPBIAN_ICON            '\uF315'               # 
         LINUX_ELEMENTARY_ICON          '\uF309'$s             # 
         LINUX_FEDORA_ICON              '\uF30a'$s             # 
@@ -600,6 +604,7 @@ function _p9k_init_icons() {
         LINUX_CENTOS_ICON              '\uF304'$s             # 
         LINUX_COREOS_ICON              '\uF305'$s             # 
         LINUX_DEBIAN_ICON              '\uF306'               # 
+        LINUX_KALI_ICON                '\uF327'               # 
         LINUX_RASPBIAN_ICON            '\uF315'               # 
         LINUX_ELEMENTARY_ICON          '\uF309'$s             # 
         LINUX_FEDORA_ICON              '\uF30a'$s             # 
@@ -732,6 +737,7 @@ function _p9k_init_icons() {
         LINUX_ICON                     'linux'
         LINUX_ARCH_ICON                'arch'
         LINUX_DEBIAN_ICON              'debian'
+        LINUX_KALI_ICON                'kali'
         LINUX_RASPBIAN_ICON            'pi'
         LINUX_UBUNTU_ICON              'ubuntu'
         LINUX_CENTOS_ICON              'centos'
@@ -867,6 +873,7 @@ function _p9k_init_icons() {
         LINUX_ICON                     'Lx'
         LINUX_ARCH_ICON                'Arc'
         LINUX_DEBIAN_ICON              'Deb'
+        LINUX_KALI_ICON                'Kal'
         LINUX_RASPBIAN_ICON            'RPi'
         LINUX_UBUNTU_ICON              'Ubu'
         LINUX_CENTOS_ICON              'Cen'
