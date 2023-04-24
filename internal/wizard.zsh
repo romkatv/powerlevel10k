@@ -1100,6 +1100,7 @@ function os_icon_name() {
           *elementary*)            echo LINUX_ELEMENTARY_ICON;;
           *fedora*)                echo LINUX_FEDORA_ICON;;
           *coreos*)                echo LINUX_COREOS_ICON;;
+          *kali*)                  echo LINUX_KALI_ICON;;
           *gentoo*)                echo LINUX_GENTOO_ICON;;
           *mageia*)                echo LINUX_MAGEIA_ICON;;
           *centos*)                echo LINUX_CENTOS_ICON;;
