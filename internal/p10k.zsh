@@ -7611,7 +7611,7 @@ _p9k_init_params() {
   _p9k_declare -i POWERLEVEL9K_VCS_COMMITS_AHEAD_MAX_NUM -1
   _p9k_declare -i POWERLEVEL9K_VCS_COMMITS_BEHIND_MAX_NUM -1
   _p9k_declare -b POWERLEVEL9K_VCS_RECURSE_UNTRACKED_DIRS 0
-  _p9k_declare -F POWERLEVEL9K_GITSTATUS_INIT_TIMEOUT_SEC 5
+  _p9k_declare -F POWERLEVEL9K_GITSTATUS_INIT_TIMEOUT_SEC 10
   _p9k_declare -b POWERLEVEL9K_DISABLE_GITSTATUS 0
   _p9k_declare -e POWERLEVEL9K_VI_INSERT_MODE_STRING "INSERT"
   _p9k_declare -e POWERLEVEL9K_VI_COMMAND_MODE_STRING "NORMAL"
@@ -8382,7 +8382,7 @@ _p9k_must_init() {
     [[ $sig == $_p9k__param_sig ]] && return 1
     _p9k_deinit
   fi
-  _p9k__param_pat=$'v146\1'${(q)ZSH_VERSION}$'\1'${(q)ZSH_PATCHLEVEL}$'\1'
+  _p9k__param_pat=$'v147\1'${(q)ZSH_VERSION}$'\1'${(q)ZSH_PATCHLEVEL}$'\1'
   _p9k__param_pat+=$__p9k_force_term_shell_integration$'\1'
   _p9k__param_pat+=$'${#parameters[(I)POWERLEVEL9K_*]}\1${(%):-%n%#}\1$GITSTATUS_LOG_LEVEL\1'
   _p9k__param_pat+=$'$GITSTATUS_ENABLE_LOGGING\1$GITSTATUS_DAEMON\1$GITSTATUS_NUM_THREADS\1'
