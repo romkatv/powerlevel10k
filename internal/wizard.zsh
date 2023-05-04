@@ -767,6 +767,11 @@ function ask_quotes() {
 }
 
 function ask_arrow() {
+  # This condition holds as long as zsh is compiled with unicode 9 support.
+  if (( ${(m)#${(g::)1}} != 1 )); then
+    cap_arrow=0
+    return
+  fi
   [[ -n $2 ]] && add_widget 0 flowing -c "$2"
   add_widget 0 flowing -c %BDoes this look like an%b "%2Fupwards arrow%f%B?%b"
   add_widget 0 flowing -c reference: "$(href https://graphemica.com/%F0%9F%A0%89)"
