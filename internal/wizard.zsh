@@ -795,6 +795,39 @@ function ask_arrow() {
   return 0
 }
 
+function print_indented() {
+  local -i max_width=$1
+  local text=$2
+  local -i indent='(wizard_columns - max_width) / 2'
+  print -P "${(l:$indent:: :)}$text"
+}
+
+function ask_width() {
+  add_widget 0 flowing -c %BWhat digit is the%b "%2Fdownwards arrow%f" %Bpointing "at?%b"
+  add_widget 0 print -P ""
+  add_widget 0 print_indented 11 '%3F\UF0734%f %3F\UF0734%f %3F\UF0734%f %2F\UF072E%f'
+  add_widget 0 print_indented 11 '     111222'
+  add_widget 0 print -P ""
+  add_widget 3
+  add_widget 0 print -P "%B(1)  It is pointing at '1'.%b"
+  add_widget 0 print -P ""
+  add_widget 1
+  add_widget 0 print -P "%B(2)  It is pointing at '2'.%b"
+  add_widget 0 print -P ""
+  add_widget 1
+  add_widget 0 print -P "%B(3)  Something else.%b"
+  add_widget 0 print -P ""
+  add_widget 2
+  add_widget 0 print -P "(r)  Restart from the beginning."
+  ask 123r
+  case $choice in
+    r) return 1;;
+    1) cap_arrow=1;;
+    2|3) cap_arrow=0;;
+  esac
+  return 0
+}
+
 function ask_icon_padding() {
   if [[ $POWERLEVEL9K_MODE == (powerline|compatible|ascii) ]]; then
     POWERLEVEL9K_ICON_PADDING=none
@@ -2105,6 +2138,9 @@ while true; do
           POWERLEVEL9K_MODE=nerdfont-complete
         else
           ask_arrow '\UF0737' "Let's try another one." || continue
+          if (( cap_arrow )); then
+            ask_width || continue
+          fi
           if (( cap_arrow )); then
             POWERLEVEL9K_MODE=nerdfont-v3
           else
