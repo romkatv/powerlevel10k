@@ -1007,6 +1007,8 @@
   ##############[ nvm: node.js version from nvm (https://github.com/nvm-sh/nvm) ]###############
   # Nvm color.
   typeset -g POWERLEVEL9K_NVM_FOREGROUND=70
+  # If set to false, hide node version if it's equal to "system".
+  typeset -g POWERLEVEL9K_NVM_SHOW_SYSTEM=true
   # Custom icon.
   # typeset -g POWERLEVEL9K_NVM_VISUAL_IDENTIFIER_EXPANSION='⭐'
 
