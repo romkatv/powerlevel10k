@@ -2567,13 +2567,13 @@ _p9k_nvm_ls_current() {
 prompt_nvm() {
   [[ -n $NVM_DIR ]] && _p9k_nvm_ls_current || return
   local current=$_p9k__ret
-  _p9k_nvm_ls_default
-  if (( !_POWERLEVEL9K_NVM_PROMPT_ALWAYS_SHOW )); then
-    [[ $current == $_p9k__ret ]] && return
-  fi
-  if (( !_POWERLEVEL9K_NVM_SHOW_SYSTEM )); then
-    [[ $current == system ]] && return
-  fi
+  (( _POWERLEVEL9K_NVM_SHOW_SYSTEM )) ||
+    [[ $current != system ]]          ||
+    return
+  (( _POWERLEVEL9K_NVM_PROMPT_ALWAYS_SHOW )) ||
+    ! _p9k_nvm_ls_default                    ||
+    [[ $_p9k__ret != $current ]]             ||
+    return
   _p9k_prompt_segment "$0" "magenta" "black" 'NODE_ICON' 0 '' "${${current#v}//\%/%%}"
 }
 
@@ -7536,7 +7536,7 @@ _p9k_init_params() {
   _p9k_declare -b POWERLEVEL9K_NODENV_PROMPT_ALWAYS_SHOW 0
   _p9k_declare -a POWERLEVEL9K_NODENV_SOURCES -- shell local global
   _p9k_declare -b POWERLEVEL9K_NODENV_SHOW_SYSTEM 1
-  _p9k_declare -b POWERLEVEL9K_NVM_PROMPT_ALWAYS_SHOW 0
+  _p9k_declare -b POWERLEVEL9K_NVM_PROMPT_ALWAYS_SHOW 1
   _p9k_declare -b POWERLEVEL9K_NVM_SHOW_SYSTEM 1
   _p9k_declare -b POWERLEVEL9K_RBENV_PROMPT_ALWAYS_SHOW 0
   _p9k_declare -a POWERLEVEL9K_RBENV_SOURCES -- shell local global
@@ -8390,7 +8390,7 @@ _p9k_must_init() {
     [[ $sig == $_p9k__param_sig ]] && return 1
     _p9k_deinit
   fi
-  _p9k__param_pat=$'v147\1'${(q)ZSH_VERSION}$'\1'${(q)ZSH_PATCHLEVEL}$'\1'
+  _p9k__param_pat=$'v148\1'${(q)ZSH_VERSION}$'\1'${(q)ZSH_PATCHLEVEL}$'\1'
   _p9k__param_pat+=$__p9k_force_term_shell_integration$'\1'
   _p9k__param_pat+=$'${#parameters[(I)POWERLEVEL9K_*]}\1${(%):-%n%#}\1$GITSTATUS_LOG_LEVEL\1'
   _p9k__param_pat+=$'$GITSTATUS_ENABLE_LOGGING\1$GITSTATUS_DAEMON\1$GITSTATUS_NUM_THREADS\1'
