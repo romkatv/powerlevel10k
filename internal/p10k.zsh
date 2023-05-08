@@ -2567,7 +2567,10 @@ _p9k_nvm_ls_current() {
 prompt_nvm() {
   [[ -n $NVM_DIR ]] && _p9k_nvm_ls_current || return
   local current=$_p9k__ret
-  ! _p9k_nvm_ls_default || [[ $_p9k__ret != $current ]] || return
+  _p9k_nvm_ls_default
+  if (( !_POWERLEVEL9K_NVM_PROMPT_ALWAYS_SHOW )); then
+    [[ $current == $_p9k__ret ]] && return
+  fi
   if (( !_POWERLEVEL9K_NVM_SHOW_SYSTEM )); then
     [[ $current == system ]] && return
   fi
@@ -7533,6 +7536,7 @@ _p9k_init_params() {
   _p9k_declare -b POWERLEVEL9K_NODENV_PROMPT_ALWAYS_SHOW 0
   _p9k_declare -a POWERLEVEL9K_NODENV_SOURCES -- shell local global
   _p9k_declare -b POWERLEVEL9K_NODENV_SHOW_SYSTEM 1
+  _p9k_declare -b POWERLEVEL9K_NVM_PROMPT_ALWAYS_SHOW 0
   _p9k_declare -b POWERLEVEL9K_NVM_SHOW_SYSTEM 1
   _p9k_declare -b POWERLEVEL9K_RBENV_PROMPT_ALWAYS_SHOW 0
   _p9k_declare -a POWERLEVEL9K_RBENV_SOURCES -- shell local global
