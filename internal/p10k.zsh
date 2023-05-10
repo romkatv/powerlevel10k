@@ -6610,6 +6610,7 @@ function _p9k_clear_instant_prompt() {
       unexpected=${(S)unexpected//$'\e'[^$'\a\e']#($'\a'|$'\e\\')}
       # Visual Studio Code prints this garbage.
       unexpected=${${unexpected//$'\033[1;32mShell integration activated\033[0m\n'}//$'\r'}
+      typeset -g P9K_STARTUP_CONSOLE_OUTPUT=("$content" "$unexpected")
       if [[ -n $unexpected ]]; then
         local omz1='[Oh My Zsh] Would you like to update? [Y/n]: '
         local omz2='Updating Oh My Zsh'
