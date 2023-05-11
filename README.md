@@ -839,7 +839,7 @@ The command to update Powerlevel10k depends on how it was installed.
 | [Zplugin](#zplugin)           | `zplugin update`                                            |
 | [Zinit](#zinit)               | `zinit update`                                              |
 | [Zi](#zi)                     | `zi update`                                                 |
-| [Zap](#zap)                   | `zap --update`                                              |
+| [Zap](#zap)                   | `zap update`                                              |
 | [Homebrew](#homebrew)         | `brew update && brew upgrade`                               |
 | [Arch Linux](#arch-linux)     | `yay -S --noconfirm zsh-theme-powerlevel10k-git`            |
 | [Alpine Linux](#alpine-linux) | `apk update && apk upgrade`                                 |
@@ -893,7 +893,7 @@ The command to update Powerlevel10k depends on how it was installed.
    | [Zplugin](#zplugin)           | `zplugin delete romkatv/powerlevel10k`                           |
    | [Zinit](#zinit)               | `zinit delete romkatv/powerlevel10k`                             |
    | [Zi](#zi)                     | `zi delete romkatv/powerlevel10k`                                |
-   | [Zap](#zap)                   | `zsh -ic 'zap --clean'`                                          |
+   | [Zap](#zap)                   | `zsh -ic 'zap clean'`                                          |
    | [Homebrew](#homebrew)         | `brew uninstall powerlevel10k; brew untap romkatv/powerlevel10k` |
    | [Arch Linux](#arch-linux)     | `yay -R --noconfirm zsh-theme-powerlevel10k-git`                 |
    | [Alpine Linux](#alpine-linux) | `apk del zsh-theme-powerlevel10k`                                |
