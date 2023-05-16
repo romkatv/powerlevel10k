@@ -8950,6 +8950,8 @@ _p9k_precmd_first() {
   if [[ -n $KITTY_SHELL_INTEGRATION && KITTY_SHELL_INTEGRATION[(wIe)no-prompt-mark] -eq 0 ]]; then
     KITTY_SHELL_INTEGRATION+=' no-prompt-mark'
     (( $+__p9k_force_term_shell_integration )) || typeset -gri __p9k_force_term_shell_integration=1
+  elif [[ $TERM_PROGRAM == WarpTerminal ]]; then
+    (( $+__p9k_force_term_shell_integration )) || typeset -gri __p9k_force_term_shell_integration=1
   fi
   typeset -ga precmd_functions=(${precmd_functions:#_p9k_precmd_first})
 }
