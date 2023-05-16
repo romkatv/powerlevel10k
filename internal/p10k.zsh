@@ -1904,7 +1904,7 @@ prompt_dir() {
       else
         local key=
       fi
-      if ! _p9k_cache_ephemeral_get $0 $e $i $_p9k__cwd || [[ $key != $_p9k__cache_val[1] ]]; then
+      if ! _p9k_cache_ephemeral_get $0 $e $i $_p9k__cwd $p || [[ $key != $_p9k__cache_val[1] ]]; then
         local rtail=${(j./.)rparts[i,-1]}
         local parent=$_p9k__cwd[1,-2-$#rtail]
         _p9k_prompt_length $delim
