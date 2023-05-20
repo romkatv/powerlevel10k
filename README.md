@@ -415,7 +415,7 @@ Powerlevel10k.
 - [Zap](#zap)
 - [Homebrew](#homebrew)
 - [Arch Linux](#arch-linux)
-- [Alpine Linux](#arch-linux)
+- [Alpine Linux](#alpine-linux)
 - [Fig](#fig)
 
 ### Manual
