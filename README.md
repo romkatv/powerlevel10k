@@ -314,6 +314,7 @@ enable as many segments as you like. It won't slow down your prompt or Zsh start
 | `azure` | [azure](https://docs.microsoft.com/en-us/cli/azure) account name |
 | `background_jobs` | presence of background jobs |
 | `battery` | internal battery state and charge level (yep, batteries *literally* included) |
+| `chezmoi` | [chezmoi](https://github.com/twpayne/chezmoi) shell |
 | `command_execution_time` | duration (wall time) of the last command |
 | `context` | user@hostname |
 | `cpu_arch` | CPU architecture |
