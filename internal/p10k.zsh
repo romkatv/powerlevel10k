@@ -8266,9 +8266,17 @@ _p9k_init_prompt() {
   if (( _POWERLEVEL9K_TERM_SHELL_INTEGRATION )); then
     _p9k_prompt_prefix_left+=$'%{\e]133;A\a%}'
     _p9k_prompt_suffix_left+=$'%{\e]133;B\a%}'
+    if [[ $TERM_PROGRAM == WarpTerminal ]]; then
+      _p9k_prompt_prefix_right=$'%{\e]133;P;k=r\a%}'$_p9k_prompt_prefix_right
+      _p9k_prompt_suffix_right+=$'%{\e]133;B\a%}'
+    fi
     if (( $+_z4h_iterm_cmd && _z4h_can_save_restore_screen == 1 )); then
       _p9k_prompt_prefix_left+=$'%{\ePtmux;\e\e]133;A\a\e\\%}'
       _p9k_prompt_suffix_left+=$'%{\ePtmux;\e\e]133;B\a\e\\%}'
+      if [[ $TERM_PROGRAM == WarpTerminal ]]; then
+        _p9k_prompt_prefix_right=$'%{\ePtmux;\e\e]133;P;k=r\a\e\\%}'$_p9k_prompt_prefix_right
+        _p9k_prompt_suffix_right+=$'%{\ePtmux;\e\e]133;B\a\e\\%}'
+      fi
     fi
   fi
 
@@ -8393,8 +8401,8 @@ _p9k_must_init() {
     [[ $sig == $_p9k__param_sig ]] && return 1
     _p9k_deinit
   fi
-  _p9k__param_pat=$'v149\1'${(q)ZSH_VERSION}$'\1'${(q)ZSH_PATCHLEVEL}$'\1'
-  _p9k__param_pat+=$__p9k_force_term_shell_integration$'\1'
+  _p9k__param_pat=${(q)P9K_VERSION}$'\1'${(q)ZSH_VERSION}$'\1'${(q)ZSH_PATCHLEVEL}$'\1'
+  _p9k__param_pat+=$__p9k_force_term_shell_integration$'\1'${(q)TERM_PROGRAM}$'\1'
   _p9k__param_pat+=$'${#parameters[(I)POWERLEVEL9K_*]}\1${(%):-%n%#}\1$GITSTATUS_LOG_LEVEL\1'
   _p9k__param_pat+=$'$GITSTATUS_ENABLE_LOGGING\1$GITSTATUS_DAEMON\1$GITSTATUS_NUM_THREADS\1'
   _p9k__param_pat+=$'$GITSTATUS_CACHE_DIR\1$GITSTATUS_AUTO_INSTALL\1${ZLE_RPROMPT_INDENT:-1}\1'
@@ -8942,6 +8950,8 @@ _p9k_precmd_first() {
   if [[ -n $KITTY_SHELL_INTEGRATION && KITTY_SHELL_INTEGRATION[(wIe)no-prompt-mark] -eq 0 ]]; then
     KITTY_SHELL_INTEGRATION+=' no-prompt-mark'
     (( $+__p9k_force_term_shell_integration )) || typeset -gri __p9k_force_term_shell_integration=1
+  elif [[ $TERM_PROGRAM == WarpTerminal ]]; then
+    (( $+__p9k_force_term_shell_integration )) || typeset -gri __p9k_force_term_shell_integration=1
   fi
   typeset -ga precmd_functions=(${precmd_functions:#_p9k_precmd_first})
 }
@@ -9341,6 +9351,7 @@ if [[ $__p9k_dump_file != $__p9k_instant_prompt_dump_file && -n $__p9k_instant_p
   zf_rm -f -- $__p9k_instant_prompt_dump_file{,.zwc} 2>/dev/null
 fi
 
+typeset -g P9K_VERSION=1.18.1
 unset VSCODE_SHELL_INTEGRATION
 
 _p9k_init_ssh
