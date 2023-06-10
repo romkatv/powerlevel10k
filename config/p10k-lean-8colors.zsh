@@ -735,6 +735,12 @@
   # Custom icon.
   # typeset -g POWERLEVEL9K_XPLR_VISUAL_IDENTIFIER_EXPANSION='⭐'
 
+  ##################[ chezmoi: chezmoi shell (https://github.com/twpayne/chezmoi) ]##################
+  # chezmoi shell color.
+  typeset -g POWERLEVEL9K_CHEZMOI_FOREGROUND=72
+  # Custom icon.
+  # typeset -g POWERLEVEL9K_CHEZMOI_VISUAL_IDENTIFIER_EXPANSION='⭐'
+
   ###########################[ vim_shell: vim shell indicator (:sh) ]###########################
   # Vim shell indicator color.
   typeset -g POWERLEVEL9K_VIM_SHELL_FOREGROUND=3
