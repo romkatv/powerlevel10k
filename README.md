@@ -314,7 +314,6 @@ enable as many segments as you like. It won't slow down your prompt or Zsh start
 | `azure` | [azure](https://docs.microsoft.com/en-us/cli/azure) account name |
 | `background_jobs` | presence of background jobs |
 | `battery` | internal battery state and charge level (yep, batteries *literally* included) |
-| `chezmoi_shell` | [chezmoi](https://www.chezmoi.io/) shell |
 | `command_execution_time` | duration (wall time) of the last command |
 | `context` | user@hostname |
 | `cpu_arch` | CPU architecture |
@@ -339,6 +338,7 @@ enable as many segments as you like. It won't slow down your prompt or Zsh start
 | `nix_shell` | [nix shell](https://nixos.org/nixos/nix-pills/developing-with-nix-shell.html) indicator |
 | `nnn` | [nnn](https://github.com/jarun/nnn) shell |
 | `lf` | [lf](https://github.com/gokcehan/lf) shell |
+| `chezmoi_shell` | [chezmoi](https://www.chezmoi.io/) shell |
 | `nodeenv` | node.js environment from [nodeenv](https://github.com/ekalinin/nodeenv) |
 | `nodenv` | node.js environment from [nodenv](https://github.com/nodenv/nodenv) |
 | `node_version` | [node.js](https://nodejs.org/) version |
