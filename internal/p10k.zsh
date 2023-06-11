@@ -4260,19 +4260,17 @@ instant_prompt_vi_mode() {
   fi
 }
 
-################################################################
-# Segment to display chezmoi information.
-# More information: https://www.chezmoi.io/
-prompt_chezmoi() {
-  _p9k_prompt_segment "$0" "black" "white" 'CHEZMOI_ICON' 0 '' "chezmoi"
+# Chezmoi shell indicator: https://www.chezmoi.io/
+prompt_chezmoi_shell() {
+  _p9k_prompt_segment $0 blue $_p9k_color1 CHEZMOI_ICON 0 '' ''
 }
 
-_p9k_prompt_chezmoi_init() {
+_p9k_prompt_chezmoi_shell_init() {
   typeset -g "_p9k__segment_cond_${_p9k__prompt_side}[_p9k__segment_index]"='$CHEZMOI'
 }
 
-function instant_prompt_chezmoi() {
-  _p9k_prompt_segment prompt_chezmoi "black" "white" CHEZMOI_ICON 0 '' 'chezmoi'
+function instant_prompt_chezmoi_shell() {
+  _p9k_prompt_segment prompt_chezmoi_shell blue $_p9k_color1 CHEZMOI_ICON 1 '$CHEZMOI_ICON' ''
 }
 
 ################################################################

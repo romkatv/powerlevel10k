@@ -42,7 +42,6 @@
     status                  # exit code of the last command
     command_execution_time  # duration of the last command
     background_jobs         # presence of background jobs
-    chezmoi                 # chezmoi prompt (https://github.com/twpayne/chezmoi)
     direnv                  # direnv status (https://direnv.net/)
     asdf                    # asdf version manager (https://github.com/asdf-vm/asdf)
     virtualenv              # python virtual environment (https://docs.python.org/3/library/venv.html)
@@ -88,6 +87,7 @@
     vim_shell               # vim shell indicator (:sh)
     midnight_commander      # midnight commander shell (https://midnight-commander.org/)
     nix_shell               # nix shell (https://nixos.org/nixos/nix-pills/developing-with-nix-shell.html)
+    chezmoi_shell           # chezmoi shell (https://www.chezmoi.io/)
     # vpn_ip                # virtual private network indicator
     # load                  # CPU load
     # disk_usage            # disk usage
@@ -731,12 +731,6 @@
   # Custom icon.
   # typeset -g POWERLEVEL9K_XPLR_VISUAL_IDENTIFIER_EXPANSION='⭐'
 
-  ##################[ chezmoi: chezmoi shell (https://github.com/twpayne/chezmoi) ]##################
-  # chezmoi shell color.
-  typeset -g POWERLEVEL9K_CHEZMOI_FOREGROUND=72
-  # Custom icon.
-  # typeset -g POWERLEVEL9K_CHEZMOI_VISUAL_IDENTIFIER_EXPANSION='⭐'
-
   ###########################[ vim_shell: vim shell indicator (:sh) ]###########################
   # Vim shell indicator color.
   typeset -g POWERLEVEL9K_VIM_SHELL_FOREGROUND=34
@@ -761,6 +755,12 @@
 
   # Custom icon.
   # typeset -g POWERLEVEL9K_NIX_SHELL_VISUAL_IDENTIFIER_EXPANSION='⭐'
+
+  ##################[ chezmoi_shell: chezmoi shell (https://www.chezmoi.io/) ]##################
+  # chezmoi shell color.
+  typeset -g POWERLEVEL9K_CHEZMOI_SHELL_FOREGROUND=33
+  # Custom icon.
+  # typeset -g POWERLEVEL9K_CHEZMOI_SHELL_VISUAL_IDENTIFIER_EXPANSION='⭐'
 
   ##################################[ disk_usage: disk usage ]##################################
   # Colors for different levels of disk usage.
