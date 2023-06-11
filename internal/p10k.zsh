@@ -4261,6 +4261,21 @@ instant_prompt_vi_mode() {
 }
 
 ################################################################
+# Segment to display chezmoi information.
+# More information: https://www.chezmoi.io/
+prompt_chezmoi() {
+  _p9k_prompt_segment "$0" "black" "white" 'CHEZMOI_ICON' 0 '' "chezmoi"
+}
+
+_p9k_prompt_chezmoi_init() {
+  typeset -g "_p9k__segment_cond_${_p9k__prompt_side}[_p9k__segment_index]"='$CHEZMOI'
+}
+
+function instant_prompt_chezmoi() {
+  _p9k_prompt_segment prompt_chezmoi "black" "white" CHEZMOI_ICON 0 '' 'chezmoi'
+}
+
+################################################################
 # Virtualenv: current working virtualenv
 # More information on virtualenv (Python):
 # https://virtualenv.pypa.io/en/latest/

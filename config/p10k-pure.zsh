@@ -51,6 +51,7 @@
     newline                   # \n
     virtualenv                # python virtual environment
     prompt_char               # prompt symbol
+    chezmoi                   # chezmoi prompt (https://github.com/twpayne/chezmoi)
   )
 
   # Right prompt segments.

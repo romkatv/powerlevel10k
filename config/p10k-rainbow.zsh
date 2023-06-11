@@ -45,6 +45,7 @@
     direnv                  # direnv status (https://direnv.net/)
     asdf                    # asdf version manager (https://github.com/asdf-vm/asdf)
     virtualenv              # python virtual environment (https://docs.python.org/3/library/venv.html)
+    chezmoi                 # chezmoi prompt (https://github.com/twpayne/chezmoi)
     anaconda                # conda environment (https://conda.io/)
     pyenv                   # python environment (https://github.com/pyenv/pyenv)
     goenv                   # go environment (https://github.com/syndbg/goenv)
@@ -760,6 +761,13 @@
   typeset -g POWERLEVEL9K_XPLR_BACKGROUND=6
   # Custom icon.
   # typeset -g POWERLEVEL9K_XPLR_VISUAL_IDENTIFIER_EXPANSION='⭐'
+
+  ##################[ chezmoi: chezmoi shell (https://github.com/twpayne/chezmoi) ]##################
+  # chezmoi shell color.
+  typeset -g POWERLEVEL9K_CHEZMOI_FOREGROUND=0
+  typeset -g POWERLEVEL9K_CHEZMOI_BACKGROUND=6
+  # Custom icon.
+  # typeset -g POWERLEVEL9K_CHEZMOI_VISUAL_IDENTIFIER_EXPANSION='⭐'
 
   ###########################[ vim_shell: vim shell indicator (:sh) ]###########################
   # Vim shell indicator color.
