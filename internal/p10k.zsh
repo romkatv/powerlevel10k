@@ -5086,6 +5086,9 @@ function _p9k_timewarrior_clear() {
 function prompt_timewarrior() {
   local -a stat
   local dir=${TIMEWARRIORDB:-~/.timewarrior}/data
+  if [[ ! -d $dir ]]; then
+    dir=${XDG_DATA_HOME:-$HOME/.local/share}/timewarrior/data
+  fi
   [[ $dir == $_p9k_timewarrior_dir ]] || _p9k_timewarrior_clear
   if [[ -n $_p9k_timewarrior_file_name ]]; then
     zstat -A stat +mtime -- $dir $_p9k_timewarrior_file_name 2>/dev/null || stat=()
