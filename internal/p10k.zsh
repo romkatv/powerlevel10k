@@ -4260,6 +4260,19 @@ instant_prompt_vi_mode() {
   fi
 }
 
+# Chezmoi shell indicator: https://www.chezmoi.io/
+prompt_chezmoi_shell() {
+  _p9k_prompt_segment $0 blue $_p9k_color1 CHEZMOI_ICON 0 '' ''
+}
+
+_p9k_prompt_chezmoi_shell_init() {
+  typeset -g "_p9k__segment_cond_${_p9k__prompt_side}[_p9k__segment_index]"='$CHEZMOI'
+}
+
+function instant_prompt_chezmoi_shell() {
+  _p9k_prompt_segment prompt_chezmoi_shell blue $_p9k_color1 CHEZMOI_ICON 1 '$CHEZMOI_ICON' ''
+}
+
 ################################################################
 # Virtualenv: current working virtualenv
 # More information on virtualenv (Python):
@@ -5071,8 +5084,11 @@ function _p9k_timewarrior_clear() {
 }
 
 function prompt_timewarrior() {
+  local dir
+  [[ -n ${dir::=$TIMEWARRIORDB} || -n ${dir::=~/.timewarrior}(#qN/) ]] ||
+    dir=${XDG_DATA_HOME:-~/.local/share}/timewarrior
+  dir+=/data
   local -a stat
-  local dir=${TIMEWARRIORDB:-~/.timewarrior}/data
   [[ $dir == $_p9k_timewarrior_dir ]] || _p9k_timewarrior_clear
   if [[ -n $_p9k_timewarrior_file_name ]]; then
     zstat -A stat +mtime -- $dir $_p9k_timewarrior_file_name 2>/dev/null || stat=()
