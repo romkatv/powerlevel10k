@@ -1135,6 +1135,7 @@ feature:master wip ⇣42⇡42 ⇠42⇢42 *42 merge ~42 +42 !42 ?42
 | `feature` | current branch; replaced with `#tag` or `@commit` if not on a branch | `git status --ignore-submodules=dirty`                 |
 | `master`  | remote tracking branch; only shown if different from local branch    | `git rev-parse --abbrev-ref --symbolic-full-name @{upstream}` |
 | `wip`     | the latest commit's summary contains "wip" or "WIP"                  | `git show --pretty=%s --no-patch HEAD`                 |
+| `=`       | up to date with the remote (neither ahead nor behind)                | `git rev-list --count HEAD...@{upstream}`              |
 | `⇣42`     | this many commits behind the remote                                  | `git rev-list --right-only --count HEAD...@{upstream}` |
 | `⇡42`     | this many commits ahead of the remote                                | `git rev-list --left-only --count HEAD...@{upstream}`  |
 | `⇠42`     | this many commits behind the push remote                             | `git rev-list --right-only --count HEAD...@{push}`     |
