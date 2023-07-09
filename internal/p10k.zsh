@@ -8490,7 +8490,14 @@ function _p9k_init_cacheable() {
     _p9k_transient_prompt+='${${P9K_CONTENT::="❯"}+}'
     _p9k_param prompt_prompt_char_ERROR_VIINS CONTENT_EXPANSION '${P9K_CONTENT}'
     _p9k_transient_prompt+='${:-"'$_p9k__ret'"}'
-    _p9k_transient_prompt+=')%b%k%f%s%u '
+    _p9k_transient_prompt+=')%b%k%f%s%u'
+    _p9k_get_icon '' LEFT_SEGMENT_END_SEPARATOR
+    if [[ $_p9k__ret != (| ) ]]; then
+      _p9k__ret+=%b%k%f
+      # Not escaped for historical reasons.
+      _p9k__ret='${:-"'$_p9k__ret'"}'
+    fi
+    _p9k_transient_prompt+=$_p9k__ret
     if (( _POWERLEVEL9K_TERM_SHELL_INTEGRATION )); then
       _p9k_transient_prompt=$'%{\e]133;A\a%}'$_p9k_transient_prompt$'%{\e]133;B\a%}'
       if (( $+_z4h_iterm_cmd && _z4h_can_save_restore_screen == 1 )); then
@@ -9367,7 +9374,7 @@ if [[ $__p9k_dump_file != $__p9k_instant_prompt_dump_file && -n $__p9k_instant_p
   zf_rm -f -- $__p9k_instant_prompt_dump_file{,.zwc} 2>/dev/null
 fi
 
-typeset -g P9K_VERSION=1.19.0
+typeset -g P9K_VERSION=1.19.1
 unset VSCODE_SHELL_INTEGRATION
 
 _p9k_init_ssh
