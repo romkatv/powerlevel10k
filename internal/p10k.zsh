@@ -4655,6 +4655,7 @@ prompt_azure() {
   fi
   local pat class state
   for pat class in "${_POWERLEVEL9K_AZURE_CLASSES[@]}"; do
+    name="${_p9k__cache_val[1]//\%/%%}"
     if [[ $name == ${~pat} ]]; then
       [[ -n $class ]] && state=_${${(U)class}//İ/I}
       break
