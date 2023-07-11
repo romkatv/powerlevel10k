@@ -1394,7 +1394,7 @@
   #     '*test*'  TEST
   #     '*'       OTHER)
   #
-  # If your current azure account is "project_test", its class is TEST because "project_test"
+  # If your current azure account is "company_test", its class is TEST because "company_test"
   # doesn't match the pattern '*prod*' but does match '*test*'.
   #
   # You can define different colors, icons and content expansions for different classes:
