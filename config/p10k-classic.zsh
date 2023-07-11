@@ -1404,8 +1404,35 @@
   # Show azure only when the command you are typing invokes one of these tools.
   # Tip: Remove the next line to always show azure.
   typeset -g POWERLEVEL9K_AZURE_SHOW_ON_COMMAND='az|terraform|pulumi|terragrunt'
-  # Azure account name color.
-  typeset -g POWERLEVEL9K_AZURE_FOREGROUND=32
+
+  # POWERLEVEL9K_AZURE_CLASSES is an array with even number of elements. The first element
+  # in each pair defines a pattern against which the current AZURE subscription gets matched.
+  # More specifically, it's P9K_CONTENT prior to the application of context expansion (see below)
+  # that gets matched. If you unset all POWERLEVEL9K_AZURE_*CONTENT_EXPANSION parameters,
+  # you'll see this value in your prompt. The second element of each pair in
+  # POWERLEVEL9K_AZURE_CLASSES defines the profile class. Patterns are tried in order. The
+  # first match wins.
+  #
+  # For example, given these settings:
+  #
+  #   typeset -g POWERLEVEL9K_AZURE_CLASSES=(
+  #     '*prod*'  PROD
+  #     '*test*'  TEST
+  #     '*'       DEFAULT)
+  #
+  # If your current AZURE subscription is "company_test", its class is TEST
+  # because "company_test" doesn't match the pattern '*prod*' but does match '*test*'.
+  #
+  # You can define different colors, icons and content expansions for different classes:
+  #
+  #   typeset -g POWERLEVEL9K_AZURE_TEST_FOREGROUND=28
+  #   typeset -g POWERLEVEL9K_AZURE_TEST_VISUAL_IDENTIFIER_EXPANSION='⭐'
+  #   typeset -g POWERLEVEL9K_AZURE_TEST_CONTENT_EXPANSION='> ${P9K_CONTENT} <'
+  typeset -g POWERLEVEL9K_AZURE_CLASSES=(
+      # '*prod*'  PROD    # These values are examples that are unlikely
+      # '*test*'  TEST    # to match your needs. Customize them as needed.
+      '*'       DEFAULT)
+  typeset -g POWERLEVEL9K_AZURE_DEFAULT_FOREGROUND=32
   # Custom icon.
   # typeset -g POWERLEVEL9K_AZURE_VISUAL_IDENTIFIER_EXPANSION='⭐'
 
