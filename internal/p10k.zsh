@@ -1304,7 +1304,7 @@ function _p9k_read_file() {
 }
 
 function _p9k_fvm_old() {
-  _p9k_upglob fvm -/ && return 1
+  _p9k_upglob fvm @ && return 1
   local fvm=$_p9k__parent_dirs[$?]/fvm
   if [[ ${fvm:A} == (#b)*/versions/([^/]##)/bin/flutter ]]; then
     _p9k_prompt_segment prompt_fvm blue $_p9k_color1 FLUTTER_ICON 0 '' ${match[1]//\%/%%}
