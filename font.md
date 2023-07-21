@@ -62,7 +62,7 @@ If you are using a different terminal, proceed with manual font installation. �
      *Meslo Nerd Font*.
    - **Blink**: Type `config`, go to *Appearance*, tap *Add a new font*, tap *Open Gallery*, select
      *MesloLGS NF.css*, tap *import* and type `exit` in the home view to reload the font.
-   - **Terminus**: Open *Settings → Appearance* and set *Font* to `MesloLGS NF`.
+   - **Tabby** (formerly **Terminus**): Open *Settings → Appearance* and set *Font* to `MesloLGS NF`.
    - **Terminator**: Open *Preferences* using the context menu. Under *Profiles* select the *General*
      tab (should be selected already), uncheck *Use the system fixed width font* (if not already)
      and select `MesloLGS NF Regular`. Exit the Preferences dialog by clicking *Close*.
