@@ -153,6 +153,7 @@ function _p9k_init_icons() {
         SCALA_ICON                     'scala'
         TOOLBOX_ICON                   '\u2B22'               # ⬢
         ARCH_ICON                      'arch'
+        HISTORY_ICON                   'hist'
       )
     ;;
     'awesome-fontconfig')
@@ -290,6 +291,7 @@ function _p9k_init_icons() {
         SCALA_ICON                     'scala'
         TOOLBOX_ICON                   '\u2B22'               # ⬢
         ARCH_ICON                      'arch'
+        HISTORY_ICON                   'hist'
       )
     ;;
     'awesome-mapped-fontconfig')
@@ -430,6 +432,7 @@ function _p9k_init_icons() {
         SCALA_ICON                     'scala'
         TOOLBOX_ICON                   '\u2B22'                                       # ⬢
         ARCH_ICON                      'arch'
+        HISTORY_ICON                   'hist'
       )
     ;;
     'nerdfont-v3')
@@ -568,6 +571,7 @@ function _p9k_init_icons() {
         SCALA_ICON                     '\uE737'               # 
         TOOLBOX_ICON                   '\uE20F'$s             # 
         ARCH_ICON                      '\uE266'               # 
+        HISTORY_ICON                   '\uF1DA'$s             # 
       )
     ;;
     'nerdfont-complete'|'nerdfont-fontconfig')
@@ -706,6 +710,7 @@ function _p9k_init_icons() {
         SCALA_ICON                     '\uE737'               # 
         TOOLBOX_ICON                   '\uE20F'$s             # 
         ARCH_ICON                      '\uE266'               # 
+        HISTORY_ICON                   '\uF1DA'$s             # 
       )
     ;;
     ascii)
@@ -841,6 +846,7 @@ function _p9k_init_icons() {
         SCALA_ICON                     'scala'
         TOOLBOX_ICON                   'toolbox'
         ARCH_ICON                      'arch'
+        HISTORY_ICON                   'hist'
       )
     ;;
     *)
@@ -978,6 +984,7 @@ function _p9k_init_icons() {
         SCALA_ICON                     'scala'
         TOOLBOX_ICON                   '\u2B22'               # ⬢
         ARCH_ICON                      'arch'
+        HISTORY_ICON                   'hist'
       )
     ;;
   esac

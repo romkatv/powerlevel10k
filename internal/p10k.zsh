@@ -5731,6 +5731,31 @@ _p9k_prompt_cpu_arch_init() {
   typeset -g "_p9k__segment_cond_${_p9k__prompt_side}[_p9k__segment_index]"='$commands[machine]$commands[arch]'
 }
 
+################################################################
+# Oh My Zsh per-directory-history local/global indicator
+prompt_per_directory_history() {
+  if [[ $_per_directory_history_is_global == true ]]; then
+    _p9k_prompt_segment ${0}_GLOBAL 3 $_p9k_color1 HISTORY_ICON 0 '' global
+  else
+    _p9k_prompt_segment ${0}_LOCAL 5 $_p9k_color1 HISTORY_ICON 0 '' local
+  fi
+}
+
+instant_prompt_per_directory_history() {
+  case $HISTORY_START_WITH_GLOBAL in
+    true)
+      _p9k_prompt_segment prompt_per_directory_history_GLOBAL 3 $_p9k_color1 HISTORY_ICON 0 '' global
+    ;;
+    ?*)
+      _p9k_prompt_segment prompt_per_directory_history_LOCAL 5 $_p9k_color1 HISTORY_ICON 0 '' local
+    ;;
+  esac
+}
+
+_p9k_prompt_per_directory_history_init() {
+  typeset -g "_p9k__segment_cond_${_p9k__prompt_side}[_p9k__segment_index]"='$PER_DIRECTORY_HISTORY_TOGGLE'
+}
+
 # Use two preexec hooks to survive https://github.com/MichaelAquilina/zsh-you-should-use with
 # YSU_HARDCORE=1. See https://github.com/romkatv/powerlevel10k/issues/427.
 _p9k_preexec1() {
@@ -9375,7 +9400,7 @@ if [[ $__p9k_dump_file != $__p9k_instant_prompt_dump_file && -n $__p9k_instant_p
   zf_rm -f -- $__p9k_instant_prompt_dump_file{,.zwc} 2>/dev/null
 fi
 
-typeset -g P9K_VERSION=1.19.4
+typeset -g P9K_VERSION=1.19.5
 unset VSCODE_SHELL_INTEGRATION
 
 _p9k_init_ssh
