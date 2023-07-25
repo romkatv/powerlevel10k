@@ -1126,7 +1126,7 @@ function os_icon_name() {
         if [[ -r /etc/os-release ]]; then
           local lines=(${(f)"$(</etc/os-release)"})
           lines=(${(@M)lines:#ID=*})
-          (( $#lines == 1 )) && os_release_id=${lines[1]#ID=}
+          (( $#lines == 1 )) && os_release_id=${(Q)${lines[1]#ID=}}
         elif [[ -e /etc/artix-release ]]; then
           os_release_id=artix
         fi
