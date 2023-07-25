@@ -497,7 +497,7 @@ function _p9k_init_icons() {
         LINUX_RHEL_ICON                '\uF316'$s             # 
         LINUX_AMZN_ICON                '\uF270'$s             # 
         LINUX_ENDEAVOUROS_ICON         '\UF322'$s             # 
-        LINUX_ROCKY_ICON               '\UF32b'$s             # 
+        LINUX_ROCKY_ICON               '\UF32B'$s             # 
         LINUX_ICON                     '\uF17C'               # 
         SUNOS_ICON                     '\uF185 '              # 
         HOME_ICON                      '\uF015'$s             # 
