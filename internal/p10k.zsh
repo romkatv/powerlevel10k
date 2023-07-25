@@ -8525,7 +8525,7 @@ function _p9k_init_cacheable() {
         if [[ -r /etc/os-release ]]; then
           local lines=(${(f)"$(</etc/os-release)"})
           lines=(${(@M)lines:#ID=*})
-          (( $#lines == 1 )) && os_release_id=${lines[1]#ID=}
+          (( $#lines == 1 )) && os_release_id=${(Q)${lines[1]#ID=}}
         elif [[ -e /etc/artix-release ]]; then
           os_release_id=artix
         fi
@@ -9375,7 +9375,7 @@ if [[ $__p9k_dump_file != $__p9k_instant_prompt_dump_file && -n $__p9k_instant_p
   zf_rm -f -- $__p9k_instant_prompt_dump_file{,.zwc} 2>/dev/null
 fi
 
-typeset -g P9K_VERSION=1.19.2
+typeset -g P9K_VERSION=1.19.3
 unset VSCODE_SHELL_INTEGRATION
 
 _p9k_init_ssh
