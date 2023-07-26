@@ -1511,6 +1511,7 @@ Powerlevel10k are released. This may change in the future but not soon.
 - [Horrific mess when resizing terminal window](#horrific-mess-when-resizing-terminal-window)
 - [Icons cut off in Konsole](#icons-cut-off-in-konsole)
 - [Arch Linux logo has a dot in the bottom right corner](#arch-linux-logo-has-a-dot-in-the-bottom-right-corner)
+- [Git status looks incorrect](#git-status-looks-incorrect)
 
 ### Question mark in prompt
 
@@ -2020,3 +2021,15 @@ Some fonts have this incorrect dotted icon in bold typeface. There are two ways 
 ```zsh
 typeset -g POWERLEVEL9K_OS_ICON_CONTENT_EXPANSION='${P9K_CONTENT}'  # not bold
 ```
+
+### Git status looks incorrect
+
+Powerlevel10k uses [gitstatus](https://github.com/romkatv/gitstatus) to provide a much faster response to traditional `git status`.
+The project relies on the [libgit2](https://github.com/libgit2/libgit2) library however which has some gaps in it's implementation.
+
+#### skipHash not supported
+
+If your `.git/config` has `skipHash` enabled, then you will likely see an incorrect status prompt as this is not supported
+by libgit2 at the moment. [issue](https://github.com/libgit2/libgit2/issues/6531)
+
+Note: `skipHash` can be set by implicitly by other configuration toggles such as `feature.manyFiles`
