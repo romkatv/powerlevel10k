@@ -1696,10 +1696,15 @@ and make sure that `TERM` environment variable is set correctly. Verify with
 If there is no UTF-8 locale on the system, configuration wizard won't offer prompt styles that use
 Unicode characters. *Fix*: Install a UTF-8 locale. Verify with `locale -a`.
 
-When a UTF-8 locale is available, the first few questions asked by the configuration wizard assess
-capabilities of the terminal font. If your answers indicate that some glyphs don't render correctly,
-configuration wizard won't offer prompt styles that use them. *Fix*: Restart your terminal and
-install [the recommended font](#meslo-nerd-font-patched-for-powerlevel10k). Verify by running
+Another case in which configuration wizard may not offer Unicode prompt styles is when the
+`MULTIBYTE` shell option is disabled. *Fix*: Enable the `MULTIBYTE` option, or rather don't disable
+it (this option is enabled in Zsh by default). Verify with `print -r -- ${options[MULTIBYTE]}`.
+
+When `MULTIBYTE` is enabled and a UTF-8 locale is available, the first few questions asked by the
+configuration wizard assess capabilities of the terminal font. If your answers indicate that some
+glyphs don't render correctly, configuration wizard won't offer prompt styles that use them. *Fix*:
+Restart your terminal and install
+[the recommended font](#meslo-nerd-font-patched-for-powerlevel10k). Verify by running
 `p10k configure` and checking that all glyphs render correctly.
 
 ### Cannot install the recommended font

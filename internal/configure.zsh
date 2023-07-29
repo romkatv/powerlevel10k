@@ -18,7 +18,6 @@ function _p9k_can_configure() {
   typeset -g __p9k_cfg_path=${__p9k_cfg_path_o:A}
   typeset -g __p9k_cfg_path_u=${${${(q)__p9k_cfg_path_o}/#(#b)${(q)HOME}(|\/*)/'~'$match[1]}//\%/%%}
   {
-    [[ -o multibyte ]]         || { $0_error "multibyte option is not set";      return 1 }
     [[ -e $__p9k_zd ]]         || { $0_error "$__p9k_zd_u does not exist";       return 1 }
     [[ -d $__p9k_zd ]]         || { $0_error "$__p9k_zd_u is not a directory";   return 1 }
     [[ ! -d $__p9k_cfg_path ]] || { $0_error "$__p9k_cfg_path_u is a directory"; return 1 }
