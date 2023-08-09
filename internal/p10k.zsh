@@ -532,7 +532,7 @@ _p9k_get_icon() {
 _p9k_translate_color() {
   if [[ $1 == <-> ]]; then                  # decimal color code: 255
     _p9k__ret=${(l.3..0.)1}
-  elif [[ $1 == '#'[[:xdigit:]]## ]]; then  # hexademical color code: #ffffff
+  elif [[ $1 == '#'[[:xdigit:]]## ]]; then  # hexadecimal color code: #ffffff
     _p9k__ret=${${(L)1}//ı/i}
   else                                      # named color: red
     # Strip prifixes if there are any.
@@ -2420,7 +2420,7 @@ function _p9k_cached_cmd() {
 }
 
 ################################################################
-# Segment to diplay Node version
+# Segment to display Node version
 prompt_node_version() {
   _p9k_upglob package.json -.
   local -i idx=$?
@@ -3718,7 +3718,7 @@ function +vi-hg-bookmarks() {
   if [[ -n "${hgbmarks[@]}" ]]; then
     hook_com[hg-bookmark-string]=" $(print_icon 'VCS_BOOKMARK_ICON')${hgbmarks[@]}"
 
-    # To signal that we want to use the sting we just generated, set the special
+    # To signal that we want to use the string we just generated, set the special
     # variable `ret' to something other than the default zero:
     ret=1
     return 0
@@ -3962,7 +3962,7 @@ function _p9k_vcs_render() {
       fi
 
       # It's weird that removing vcs-detect-changes from POWERLEVEL9K_VCS_GIT_HOOKS gets rid
-      # of the GIT icon. That's what vcs_info does, so we do the same in the name of compatiblity.
+      # of the GIT icon. That's what vcs_info does, so we do the same in the name of compatibility.
       _p9k_vcs_icon
       icon=$_p9k__ret
     fi

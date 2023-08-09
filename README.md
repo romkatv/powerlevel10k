@@ -1187,7 +1187,7 @@ completes, Powerlevel10k refreshes prompt with new information, this time with c
 
 When using *Rainbow* style, Git status is displayed as black on grey while it's still being
 computed. Depending on the terminal color palette, this may be difficult to read. In this case you
-might want to change the background color to something ligher for more contrast. To do that, open
+might want to change the background color to something lighter for more contrast. To do that, open
 `~/.p10k.zsh`, search for `POWERLEVEL9K_VCS_LOADING_BACKGROUND`, uncomment it if it's commented out,
 and change the value.
 
@@ -2038,4 +2038,4 @@ Powerlevel10k prompt.
 Most notably, [libgit2 does not support `skipHash`](https://github.com/libgit2/libgit2/issues/6531).
 If you see incorrect git status in prompt, run `git config -l` and check whether `skipHash` is
 enabled. If it is, consider disabling it. Keep in mind that `skipHash` may be implicitly enabled
-when activating ceratin git features, such as `manyFiles`.
+when activating certain git features, such as `manyFiles`.
