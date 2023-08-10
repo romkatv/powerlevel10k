@@ -268,7 +268,7 @@ void TagDb::ParsePack() {
   }
 
   if (!std::is_sorted(name2id_.begin(), name2id_.end(), ByName)) {
-    // "sorted" in the header of packed-refs promisses that this won't trigger.
+    // "sorted" in the header of packed-refs promises that this won't trigger.
     std::sort(name2id_.begin(), name2id_.end(), ByName);
   }
 

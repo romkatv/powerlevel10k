@@ -61,7 +61,7 @@ size_t ParseSizeT(const char* s) {
 
 void PrintUsage() {
   std::cout << "Usage: gitstatusd [OPTION]...\n"
-            << "Print machine-readable status of the git repos for directores in stdin.\n"
+            << "Print machine-readable status of the git repos for directories in stdin.\n"
             << "\n"
             << "OPTIONS\n"
             << "  -l, --lock-fd=NUM [default=-1]\n"
@@ -78,7 +78,7 @@ void PrintUsage() {
             << "   maximum performance.\n"
             << "\n"
             << "  -v, --log-level=STR [default=INFO]\n"
-            << "   Don't write entires to log whose log level is below this. Log levels in\n"
+            << "   Don't write entries to log whose log level is below this. Log levels in\n"
             << "   increasing order: DEBUG, INFO, WARN, ERROR, FATAL.\n"
             << "\n"
             << "  -r, --repo-ttl-seconds=NUM [default=3600]\n"
@@ -141,7 +141,7 @@ void PrintUsage() {
             << "\n"
             << "    1. Request ID. Any string. Can be empty.\n"
             << "    2. Path to the directory for which git stats are being requested.\n"
-            << "       If the first character is ':', it is removed and the remaning path\n"
+            << "       If the first character is ':', it is removed and the remaining path\n"
             << "       is treated as GIT_DIR.\n"
             << "    3. (Optional) '1' to disable computation of anything that requires reading\n"
             << "       git index; '0' for the default behavior of computing everything.\n"

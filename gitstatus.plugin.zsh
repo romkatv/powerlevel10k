@@ -59,7 +59,7 @@ zmodload -F zsh/files b:zf_rm    || return
 
 typeset -g _gitstatus_plugin_dir"${1:-}"="${${(%):-%x}:A:h}"
 
-# Retrives status of a git repo from a directory under its working tree.
+# Retrieves status of a git repo from a directory under its working tree.
 #
 ## Usage: gitstatus_query [OPTION]... NAME
 #

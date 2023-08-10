@@ -155,7 +155,7 @@ IndexStats Repo::GetIndexStats(const git_oid* head, git_config* cfg) {
     VERIFY(!git_repository_index(&git_index_, repo_)) << GitError();
     // Query an attribute (doesn't matter which) to initialize repo's attribute
     // cache. It's a workaround for synchronization bugs (data races) in libgit2
-    // that result from lazy cache initialization without synchrnonization.
+    // that result from lazy cache initialization without synchronization.
     // Thankfully, subsequent cache reads and writes are properly synchronized.
     const char* attr;
     VERIFY(!git_attr_get(&attr, repo_, 0, "x", "x")) << GitError();
