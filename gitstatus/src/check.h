@@ -23,7 +23,7 @@
 #include <stdexcept>
 
 // The argument must be an expression convertible to bool.
-// Does nothing if the expression evalutes to true. Otherwise
+// Does nothing if the expression evaluates to true. Otherwise
 // it's equivalent to LOG(FATAL).
 #define CHECK(cond...) \
   static_cast<void>(0), (!!(cond)) ? static_cast<void>(0) : LOG(FATAL) << #cond << ": "

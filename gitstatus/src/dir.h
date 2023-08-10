@@ -25,7 +25,7 @@
 
 namespace gitstatus {
 
-// On error, leaves entries unchaged and returns false. Does not throw.
+// On error, leaves entries unchanged and returns false. Does not throw.
 //
 // On success, appends names of files from the specified directory to entries and returns true.
 // Every appended entry is a null-terminated string. At -1 offset is its d_type. All elements

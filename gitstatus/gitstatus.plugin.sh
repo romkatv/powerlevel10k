@@ -290,7 +290,7 @@ function gitstatus_stop() {
   unset _GITSTATUS_DIRTY_MAX_INDEX_SIZE _GITSTATUS_CLIENT_PID
 }
 
-# Retrives status of a git repository from a directory under its working tree.
+# Retrieves status of a git repository from a directory under its working tree.
 #
 # Usage: gitstatus_query [OPTION]...
 #

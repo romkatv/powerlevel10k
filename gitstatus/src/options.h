@@ -62,7 +62,7 @@ struct Options : Limits {
   // If non-negative, send signal 0 to the specified PID when not receiving any requests for one
   // second; exit if signal sending fails.
   int parent_pid = -1;
-  // Don't write entires to log whose log level is below this. Log levels in increasing order:
+  // Don't write entries to log whose log level is below this. Log levels in increasing order:
   // DEBUG, INFO, WARN, ERROR, FATAL.
   LogLevel log_level = INFO;
   // Close git repositories that haven't been used for this long. This is meant to release resources
