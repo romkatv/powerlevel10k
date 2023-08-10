@@ -44,3 +44,14 @@ pkg: zwc
 	GITSTATUS_DAEMON= GITSTATUS_CACHE_DIR=$(shell pwd)/usrbin ./install -f
 
 -include $(OBJS:.o=.dep)
+
+.PHONY: help
+
+help:
+	@echo "Usage: make [TARGET]"
+	@echo "Available targets:"
+	@echo "  all         Build $(APPNAME) (default target)"
+	@echo "  clean       Remove generated files and directories"
+	@echo "  zwc         Compile Zsh files"
+	@echo "  minify      Remove unnecessary files and folders"
+	@echo "  pkg         Create a package"
