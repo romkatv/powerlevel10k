@@ -518,6 +518,13 @@ function install_font() {
       local style
       for style in Regular Bold Italic 'Bold Italic'; do
         local file="MesloLGS NF ${style}.ttf"
+
+        print "$file ==Ready to download=="
+        if [[ -f ~"/Library/Fonts/$file" ]]; then
+          print "$file ==Already exist=="
+          continue
+        fi
+
         run_command "Downloading %B$file%b" \
           curl -fsSL -o ~/Library/Fonts/$file.tmp "$font_base_url/${file// /%20}"
         command mv -f -- ~/Library/Fonts/$file{.tmp,} || quit -c
