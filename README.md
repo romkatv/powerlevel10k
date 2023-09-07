@@ -509,7 +509,7 @@ Add `plug "romkatv/powerlevel10k"` to `~/.zshrc`.
 ### Homebrew
 
 ```zsh
-brew install romkatv/powerlevel10k/powerlevel10k
+brew install powerlevel10k
 echo "source $(brew --prefix)/opt/powerlevel10k/powerlevel10k.zsh-theme" >>~/.zshrc
 ```
 
@@ -894,8 +894,8 @@ The command to update Powerlevel10k depends on how it was installed.
    | [Zplugin](#zplugin)           | `zplugin delete romkatv/powerlevel10k`                           |
    | [Zinit](#zinit)               | `zinit delete romkatv/powerlevel10k`                             |
    | [Zi](#zi)                     | `zi delete romkatv/powerlevel10k`                                |
-   | [Zap](#zap)                   | `zsh -ic 'zap clean'`                                          |
-   | [Homebrew](#homebrew)         | `brew uninstall powerlevel10k; brew untap romkatv/powerlevel10k` |
+   | [Zap](#zap)                   | `zsh -ic 'zap clean'`                                            |
+   | [Homebrew](#homebrew)         | `brew uninstall powerlevel10k`                                   |
    | [Arch Linux](#arch-linux)     | `yay -R --noconfirm zsh-theme-powerlevel10k-git`                 |
    | [Alpine Linux](#alpine-linux) | `apk del zsh-theme-powerlevel10k`                                |
 6. Restart Zsh. [Do not use `source ~/.zshrc`](#weird-things-happen-after-typing-source-zshrc).
