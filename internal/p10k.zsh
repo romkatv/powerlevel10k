@@ -8581,6 +8581,7 @@ function _p9k_init_cacheable() {
           amzn)                    _p9k_set_os Linux LINUX_AMZN_ICON;;
           endeavouros)             _p9k_set_os Linux LINUX_ENDEAVOUROS_ICON;;
           rocky)                   _p9k_set_os Linux LINUX_ROCKY_ICON;;
+          guix)                    _p9k_set_os Linux LINUX_GUIX_ICON;;
           *)                       _p9k_set_os Linux LINUX_ICON;;
         esac
         ;;
