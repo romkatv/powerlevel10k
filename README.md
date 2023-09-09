@@ -510,7 +510,7 @@ Add `plug "romkatv/powerlevel10k"` to `~/.zshrc`.
 
 ```zsh
 brew install powerlevel10k
-echo "source $(brew --prefix)/opt/powerlevel10k/powerlevel10k.zsh-theme" >>~/.zshrc
+echo "source $(brew --prefix)/share/powerlevel10k/powerlevel10k.zsh-theme" >>~/.zshrc
 ```
 
 ### Arch Linux
