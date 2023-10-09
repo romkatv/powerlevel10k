@@ -105,6 +105,7 @@ function _p9k_init_icons() {
         VCS_GIT_GITHUB_ICON            '\uE20E '              #
         VCS_GIT_BITBUCKET_ICON         '\uE20E '              #
         VCS_GIT_GITLAB_ICON            '\uE20E '              #
+        VCS_GIT_AZURE_ICON             '\uE20E '              #
         VCS_HG_ICON                    '\uE1C3 '              # 
         VCS_SVN_ICON                   'svn'$q
         RUST_ICON                      'R'
@@ -245,6 +246,7 @@ function _p9k_init_icons() {
         VCS_GIT_GITHUB_ICON            '\uF113 '              # 
         VCS_GIT_BITBUCKET_ICON         '\uF171 '              # 
         VCS_GIT_GITLAB_ICON            '\uF296 '              # 
+        VCS_GIT_AZURE_ICON             '\u2601 '              # ☁
         VCS_HG_ICON                    '\uF0C3 '              # 
         VCS_SVN_ICON                   'svn'$q
         RUST_ICON                      '\uE6A8'               # 
@@ -390,6 +392,7 @@ function _p9k_init_icons() {
         VCS_GIT_GITHUB_ICON            "${CODEPOINT_OF_AWESOME_GITHUB_ALT:+\\u$CODEPOINT_OF_AWESOME_GITHUB_ALT }"
         VCS_GIT_BITBUCKET_ICON         "${CODEPOINT_OF_AWESOME_BITBUCKET:+\\u$CODEPOINT_OF_AWESOME_BITBUCKET }"
         VCS_GIT_GITLAB_ICON            "${CODEPOINT_OF_AWESOME_GITLAB:+\\u$CODEPOINT_OF_AWESOME_GITLAB }"
+        VCS_GIT_AZURE_ICON             '\u2601 '                                      # ☁
         VCS_HG_ICON                    "${CODEPOINT_OF_AWESOME_FLASK:+\\u$CODEPOINT_OF_AWESOME_FLASK }"
         VCS_SVN_ICON                   'svn'$q
         RUST_ICON                      '\uE6A8'                                       # 
@@ -529,6 +532,7 @@ function _p9k_init_icons() {
         VCS_GIT_GITHUB_ICON            '\uF113 '              # 
         VCS_GIT_BITBUCKET_ICON         '\uE703 '              # 
         VCS_GIT_GITLAB_ICON            '\uF296 '              # 
+        VCS_GIT_AZURE_ICON             '\UF0805 '             # 󰠅
         VCS_HG_ICON                    '\uF0C3 '              # 
         VCS_SVN_ICON                   '\uE72D'$q             # 
         RUST_ICON                      '\uE7A8'$q             # 
@@ -670,6 +674,7 @@ function _p9k_init_icons() {
         VCS_GIT_GITHUB_ICON            '\uF113 '              # 
         VCS_GIT_BITBUCKET_ICON         '\uE703 '              # 
         VCS_GIT_GITLAB_ICON            '\uF296 '              # 
+        VCS_GIT_AZURE_ICON             '\uFD03 '              # ﴃ
         VCS_HG_ICON                    '\uF0C3 '              # 
         VCS_SVN_ICON                   '\uE72D'$q             # 
         RUST_ICON                      '\uE7A8'$q             # 
@@ -808,6 +813,7 @@ function _p9k_init_icons() {
         VCS_GIT_GITHUB_ICON            ''
         VCS_GIT_BITBUCKET_ICON         ''
         VCS_GIT_GITLAB_ICON            ''
+        VCS_GIT_AZURE_ICON             ''
         VCS_HG_ICON                    ''
         VCS_SVN_ICON                   ''
         RUST_ICON                      'rust'
@@ -948,6 +954,7 @@ function _p9k_init_icons() {
         VCS_GIT_GITHUB_ICON            ''
         VCS_GIT_BITBUCKET_ICON         ''
         VCS_GIT_GITLAB_ICON            ''
+        VCS_GIT_AZURE_ICON             ''
         VCS_HG_ICON                    ''
         VCS_SVN_ICON                   ''
         RUST_ICON                      'R'
