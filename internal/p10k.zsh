@@ -4315,13 +4315,11 @@ prompt_virtualenv() {
   if [[ -n $VIRTUAL_ENV ]]; then
     n=$(_virtualenv_VIRTUAL_ENV)
   else
-    if [[ $POWERLEVEL9K_VIRTUALENV_ENABLE_POETRY == true ]]; then
-      local start end
-      _p9k_upglob pyproject.toml
-      local idx=$?
-      if (( idx > 0 )); then
-        n=$(_virtualenv_poetry $idx)
-      fi
+    local start end
+    _p9k_upglob pyproject.toml
+    local idx=$?
+    if (( idx > 0 )); then
+      n=$(_virtualenv_poetry $idx)
     fi
   fi
   msg+="$_POWERLEVEL9K_VIRTUALENV_LEFT_DELIMITER${n//\%/%%}$_POWERLEVEL9K_VIRTUALENV_RIGHT_DELIMITER"
