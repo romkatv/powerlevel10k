@@ -4285,11 +4285,19 @@ prompt_virtualenv() {
   if (( _POWERLEVEL9K_VIRTUALENV_SHOW_PYTHON_VERSION )) && _p9k_python_version; then
     msg="${_p9k__ret//\%/%%} "
   fi
-  local v=${VIRTUAL_ENV:t}
+  # Determine virtualenv name
+  # VIRTUAL_ENV* are set inside virtualenvs. VIRTUAL_ENV is the virtualenv's
+  # on-disk path, VIRTUAL_ENV_PROMPT is `(name_of_virtualenv) `.
+  local v
+  # Use custom name if it was set (python -m venv -p "foo" .venv)
   if [[ $VIRTUAL_ENV_PROMPT == '('?*') ' && $VIRTUAL_ENV_PROMPT != "($v) " ]]; then
     v=$VIRTUAL_ENV_PROMPT[2,-3]
+  # Use parent directory name if virtualenv name is generic (eg .venv)
   elif [[ $v == $~_POWERLEVEL9K_VIRTUALENV_GENERIC_NAMES ]]; then
     v=${VIRTUAL_ENV:h:t}
+  # Otherwise use the virtualenv name as-is
+  else
+    v=${VIRTUAL_ENV:t}
   fi
   msg+="$_POWERLEVEL9K_VIRTUALENV_LEFT_DELIMITER${v//\%/%%}$_POWERLEVEL9K_VIRTUALENV_RIGHT_DELIMITER"
   case $_POWERLEVEL9K_VIRTUALENV_SHOW_WITH_PYENV in
