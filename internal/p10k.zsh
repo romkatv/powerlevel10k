@@ -4289,7 +4289,7 @@ _virtualenv_load_name_VIRTUAL_ENV() {
   # Use parent directory name if virtualenv name is generic (eg .venv)
   elif [[ ${VIRTUAL_ENV:t} == $~_POWERLEVEL9K_VIRTUALENV_GENERIC_NAMES ]]; then
     _virtualenv_name=${VIRTUAL_ENV:h:t}
-  # Otherwise use the virtualenv name as-is
+  # Otherwise use the name as-is
   else
     _virtualenv_name=${VIRTUAL_ENV:t}
   fi
@@ -4298,7 +4298,10 @@ _virtualenv_load_name_poetry() {
   local idx=$1
   local dir=${_p9k__parent_dirs[idx]}
   local pyproject="$dir/pyproject.toml"
-  _p9k_cached_cmd 0 "$pyproject" poetry -C "$dir" version
+  if ! _p9k_cached_cmd 0 "$pyproject" poetry -C "$dir" version; then
+    # poetry execution failed. Display nothing.
+    _virtualenv_name=""
+  fi
   # Return the first word only, eg the value of pyproject.toml's `poetry.name`
   _virtualenv_name="${_p9k__ret%% *}"
 }
