@@ -4299,7 +4299,7 @@ _virtualenv_poetry() {
   local idx=$1
   local dir=${_p9k__parent_dirs[idx]}
   local pyproject="$dir/pyproject.toml"
-  _p9k_cached_cmd 0 '' poetry -C "$dir" version
+  _p9k_cached_cmd 0 '$pyproject' poetry -C "$dir" version
   # Return the first word only, eg the value of pyproject.toml's `poetry.name`
   _virtualenv_name="${_p9k__ret%% *}"
 }
