@@ -4320,6 +4320,10 @@ prompt_virtualenv() {
       _virtualenv_load_name_poetry $idx
     fi
   fi
+  # Display nothing if there's no active virtualenv
+  if [[ -z $_virtualenv_name ]]; then
+    return
+  fi
   msg+="$_POWERLEVEL9K_VIRTUALENV_LEFT_DELIMITER${_virtualenv_name//\%/%%}$_POWERLEVEL9K_VIRTUALENV_RIGHT_DELIMITER"
   case $_POWERLEVEL9K_VIRTUALENV_SHOW_WITH_PYENV in
     false)
