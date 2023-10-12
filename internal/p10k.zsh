@@ -4281,7 +4281,6 @@ function instant_prompt_chezmoi_shell() {
 # Virtualenv: current working virtualenv
 # More information on virtualenv (Python):
 # https://virtualenv.pypa.io/en/latest/
-
 _virtualenv_VIRTUAL_ENV() {
   local n
   # VIRTUAL_ENV is the on-disk path, VIRTUAL_ENV_PROMPT is `(name_of_virtualenv) `.
