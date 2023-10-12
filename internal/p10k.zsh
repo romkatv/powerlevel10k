@@ -4287,15 +4287,14 @@ _virtualenv_VIRTUAL_ENV() {
   # VIRTUAL_ENV is the on-disk path, VIRTUAL_ENV_PROMPT is `(name_of_virtualenv) `.
   # Use custom name if it was set (python -m venv -p "foo" .venv)
   if [[ $VIRTUAL_ENV_PROMPT == '('?*') ' && $VIRTUAL_ENV_PROMPT != "($n) " ]]; then
-    n=$VIRTUAL_ENV_PROMPT[2,-3]
+    _virtualenv_name=$VIRTUAL_ENV_PROMPT[2,-3]
   # Use parent directory name if virtualenv name is generic (eg .venv)
   elif [[ $v == $~_POWERLEVEL9K_VIRTUALENV_GENERIC_NAMES ]]; then
-    n=${VIRTUAL_ENV:h:t}
+    _virtualenv_name=${VIRTUAL_ENV:h:t}
   # Otherwise use the virtualenv name as-is
   else
-    n=${VIRTUAL_ENV:t}
+    _virtualenv_name=${VIRTUAL_ENV:t}
   fi
-  echo "$n"
 }
 _virtualenv_poetry() {
   local idx=$1
@@ -4303,32 +4302,31 @@ _virtualenv_poetry() {
   local pyproject="$dir/pyproject.toml"
   _p9k_cached_cmd 0 '' poetry -C "$dir" version
   # Return the first word only, eg the value of pyproject.toml's `poetry.name`
-  echo "${_p9k__ret%% *}"
+  _virtualenv_name="${_p9k__ret%% *}"
 }
 prompt_virtualenv() {
   local msg=''
   if (( _POWERLEVEL9K_VIRTUALENV_SHOW_PYTHON_VERSION )) && _p9k_python_version; then
     msg="${_p9k__ret//\%/%%} "
   fi
-  # Determine virtualenv name with a few strategies
-  local n=''
+  _virtualenv_name=''
   if [[ -n $VIRTUAL_ENV ]]; then
-    n=$(_virtualenv_VIRTUAL_ENV)
+    _virtualenv_VIRTUAL_ENV
   else
     local start end
     _p9k_upglob pyproject.toml
     local idx=$?
     if (( idx > 0 )); then
-      n=$(_virtualenv_poetry $idx)
+      _virtualenv_poetry $idx
     fi
   fi
-  msg+="$_POWERLEVEL9K_VIRTUALENV_LEFT_DELIMITER${n//\%/%%}$_POWERLEVEL9K_VIRTUALENV_RIGHT_DELIMITER"
+  msg+="$_POWERLEVEL9K_VIRTUALENV_LEFT_DELIMITER${_virtualenv_name//\%/%%}$_POWERLEVEL9K_VIRTUALENV_RIGHT_DELIMITER"
   case $_POWERLEVEL9K_VIRTUALENV_SHOW_WITH_PYENV in
     false)
       _p9k_prompt_segment "$0" "blue" "$_p9k_color1" 'PYTHON_ICON' 0 '${(M)${#P9K_PYENV_PYTHON_VERSION}:#0}' "$msg"
     ;;
     if-different)
-      _p9k_escape $n
+      _p9k_escape $_virtualenv_name
       _p9k_prompt_segment "$0" "blue" "$_p9k_color1" 'PYTHON_ICON' 0 '${${:-'$_p9k__ret'}:#$_p9k__pyenv_version}' "$msg"
     ;;
     *)
