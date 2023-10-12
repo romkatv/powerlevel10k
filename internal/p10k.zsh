@@ -4282,7 +4282,6 @@ function instant_prompt_chezmoi_shell() {
 # More information on virtualenv (Python):
 # https://virtualenv.pypa.io/en/latest/
 _virtualenv_VIRTUAL_ENV() {
-  local n
   # VIRTUAL_ENV is the on-disk path, VIRTUAL_ENV_PROMPT is `(name_of_virtualenv) `.
   # Use custom name if it was set (python -m venv -p "foo" .venv)
   if [[ $VIRTUAL_ENV_PROMPT == '('?*') ' && $VIRTUAL_ENV_PROMPT != "($n) " ]]; then
