@@ -4281,7 +4281,7 @@ function instant_prompt_chezmoi_shell() {
 # Virtualenv: current working virtualenv
 # More information on virtualenv (Python):
 # https://virtualenv.pypa.io/en/latest/
-_virtualenv_VIRTUAL_ENV() {
+_virtualenv_load_name_VIRTUAL_ENV() {
   # VIRTUAL_ENV is the on-disk path, VIRTUAL_ENV_PROMPT is `(name_of_virtualenv) `.
   # Use custom name if it was set (python -m venv -p "foo" .venv)
   if [[ $VIRTUAL_ENV_PROMPT == '('?*') ' && $VIRTUAL_ENV_PROMPT != "($n) " ]]; then
@@ -4294,7 +4294,7 @@ _virtualenv_VIRTUAL_ENV() {
     _virtualenv_name=${VIRTUAL_ENV:t}
   fi
 }
-_virtualenv_poetry() {
+_virtualenv_load_name_poetry() {
   local idx=$1
   local dir=${_p9k__parent_dirs[idx]}
   local pyproject="$dir/pyproject.toml"
@@ -4309,13 +4309,13 @@ prompt_virtualenv() {
   fi
   _virtualenv_name=''
   if [[ -n $VIRTUAL_ENV ]]; then
-    _virtualenv_VIRTUAL_ENV
+    _virtualenv_load_name_VIRTUAL_ENV
   else
     local start end
     _p9k_upglob pyproject.toml
     local idx=$?
     if (( idx > 0 )); then
-      _virtualenv_poetry $idx
+      _virtualenv_load_name_poetry $idx
     fi
   fi
   msg+="$_POWERLEVEL9K_VIRTUALENV_LEFT_DELIMITER${_virtualenv_name//\%/%%}$_POWERLEVEL9K_VIRTUALENV_RIGHT_DELIMITER"
