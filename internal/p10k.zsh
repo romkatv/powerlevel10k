@@ -4304,8 +4304,10 @@ _virtualenv_load_name_poetry() {
 }
 prompt_virtualenv() {
   local msg=''
+  local version=''
   if (( _POWERLEVEL9K_VIRTUALENV_SHOW_PYTHON_VERSION )) && _p9k_python_version; then
-    msg="${_p9k__ret//\%/%%} "
+    version="${_p9k__ret//\%/%%}"
+    msg="$version "
   fi
   _virtualenv_name=''
   if [[ -n $VIRTUAL_ENV ]]; then
@@ -4324,7 +4326,7 @@ prompt_virtualenv() {
       _p9k_prompt_segment "$0" "blue" "$_p9k_color1" 'PYTHON_ICON' 0 '${(M)${#P9K_PYENV_PYTHON_VERSION}:#0}' "$msg"
     ;;
     if-different)
-      _p9k_escape $_virtualenv_name
+      _p9k_escape $version
       _p9k_prompt_segment "$0" "blue" "$_p9k_color1" 'PYTHON_ICON' 0 '${${:-'$_p9k__ret'}:#$_p9k__pyenv_version}' "$msg"
     ;;
     *)
