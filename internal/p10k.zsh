@@ -4287,7 +4287,7 @@ _virtualenv_load_name_VIRTUAL_ENV() {
   if [[ $VIRTUAL_ENV_PROMPT == '('?*') ' && $VIRTUAL_ENV_PROMPT != "($n) " ]]; then
     _virtualenv_name=$VIRTUAL_ENV_PROMPT[2,-3]
   # Use parent directory name if virtualenv name is generic (eg .venv)
-  elif [[ $v == $~_POWERLEVEL9K_VIRTUALENV_GENERIC_NAMES ]]; then
+  elif [[ ${VIRTUAL_ENV:t} == $~_POWERLEVEL9K_VIRTUALENV_GENERIC_NAMES ]]; then
     _virtualenv_name=${VIRTUAL_ENV:h:t}
   # Otherwise use the virtualenv name as-is
   else
