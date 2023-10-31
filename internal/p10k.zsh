@@ -3724,6 +3724,8 @@ function +vi-vcs-detect-changes() {
       vcs_visual_identifier='VCS_GIT_BITBUCKET_ICON'
     elif [[ "$remote" =~ "gitlab" ]] then
       vcs_visual_identifier='VCS_GIT_GITLAB_ICON'
+    elif [[ "$remote" =~ "visualstudio" || "$remote" =~ "azure" ]] then
+      vcs_visual_identifier='VCS_GIT_AZURE_ICON'
     else
       vcs_visual_identifier='VCS_GIT_ICON'
     fi
@@ -3867,7 +3869,7 @@ function _p9k_vcs_icon() {
     *gitlab*)                          _p9k__ret=VCS_GIT_GITLAB_ICON;;
     # https://learn.microsoft.com/en-us/azure/devops/repos/git/use-ssh-keys-to-authenticate
     (|*@)vs-ssh.visualstudio.com(|:*)) _p9k__ret=VCS_GIT_AZURE_ICON;;  # old
-    (|*@)ssh.dev.azure.com(|:*))       _p9k__ret=VCS_GIT_AZURE_ICON;;  # new
+    *azure*)                           _p9k__ret=VCS_GIT_AZURE_ICON;;  # new
     *)                                 _p9k__ret=VCS_GIT_ICON;;
   esac
 }
