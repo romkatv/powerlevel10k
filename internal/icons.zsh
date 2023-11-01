@@ -532,7 +532,7 @@ function _p9k_init_icons() {
         VCS_GIT_GITHUB_ICON            '\uF113 '              # 
         VCS_GIT_BITBUCKET_ICON         '\uE703 '              # 
         VCS_GIT_GITLAB_ICON            '\uF296 '              # 
-        VCS_GIT_AZURE_ICON             '\UF0805 '             # 󰠅
+        VCS_GIT_AZURE_ICON             '\uEBE8 '              # 
         VCS_HG_ICON                    '\uF0C3 '              # 
         VCS_SVN_ICON                   '\uE72D'$q             # 
         RUST_ICON                      '\uE7A8'$q             # 
@@ -560,7 +560,7 @@ function _p9k_init_icons() {
         PROXY_ICON                     '\u2194'               # ↔
         DOTNET_ICON                    '\uE77F'               # 
         DOTNET_CORE_ICON               '\uE77F'               # 
-        AZURE_ICON                     '\UF0805'              # 󰠅
+        AZURE_ICON                     '\uEBD8 '              # 
         DIRENV_ICON                    '\u25BC'               # ▼
         FLUTTER_ICON                   'F'                    # F
         GCLOUD_ICON                    '\UF02AD'              # 󰊭
