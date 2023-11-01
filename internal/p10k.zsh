@@ -3865,9 +3865,11 @@ function _p9k_vcs_icon() {
     *bitbucket*)                       _p9k__ret=VCS_GIT_BITBUCKET_ICON;;
     *stash*)                           _p9k__ret=VCS_GIT_BITBUCKET_ICON;;
     *gitlab*)                          _p9k__ret=VCS_GIT_GITLAB_ICON;;
+    # Azure DevOps: visualstudio.com is the old hostname, dev.azure.com is the new one.
     # https://learn.microsoft.com/en-us/azure/devops/repos/git/use-ssh-keys-to-authenticate
-    (|*@)vs-ssh.visualstudio.com(|:*)) _p9k__ret=VCS_GIT_AZURE_ICON;;  # old
-    (|*@)ssh.dev.azure.com(|:*))       _p9k__ret=VCS_GIT_AZURE_ICON;;  # new
+    (|*@|*.)(visualstudio.com|dev.azure.com)(|:*|/*))
+      _p9k__ret=VCS_GIT_AZURE_ICON
+    ;;  # old
     *)                                 _p9k__ret=VCS_GIT_ICON;;
   esac
 }
@@ -9396,7 +9398,7 @@ if [[ $__p9k_dump_file != $__p9k_instant_prompt_dump_file && -n $__p9k_instant_p
   zf_rm -f -- $__p9k_instant_prompt_dump_file{,.zwc} 2>/dev/null
 fi
 
-typeset -g P9K_VERSION=1.19.9
+typeset -g P9K_VERSION=1.19.10
 unset VSCODE_SHELL_INTEGRATION
 
 _p9k_init_ssh
