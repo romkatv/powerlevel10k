@@ -3723,7 +3723,27 @@ function +vi-vcs-detect-changes() {
     elif [[ "$remote" =~ "stash" ]] then
       vcs_visual_identifier='VCS_GIT_BITBUCKET_ICON'
     elif [[ "$remote" =~ "gitlab" ]] then
-      vcs_visual_identifier='VCS_GIT_GITLAB_ICON'
+      elif [[ "$remote" =~ "archlinux" ]] then
+        vcs_visual_identifier='VCS_GIT_ARCH_ICON'
+      if [[ "$remote" =~ "freedesktop" ]] then
+        vcs_visual_identifier='VCS_GIT_FREEDESKTOP_ICON'
+      elif [[ "$remote" =~ "gnome" ]] then
+        vcs_visual_identifier='VCS_GIT_GNOME_ICON'
+      else
+        vcs_visual_identifier='VCS_GITLAB_ICON'
+      fi
+    elif [[ "$remote" =~ "codeberg" ]] then
+      vcs_visual_identifier='VCS_GIT_CODEBERG_ICON'
+    elif [[ "$remote" =~ "debian" ]] then
+      vcs_visual_identifier='VCS_GIT_DEBIAN_ICON'
+    elif [[ "$remote" =~ "freebsd" ]] then
+      vcs_visual_identifier='VCS_GIT_FREEBSD_ICON'
+    elif [[ "$remote" =~ "gnu" ]] then
+      vcs_visual_identifier='VCS_GIT_GNU_ICON'
+    elif [[ "$remote" =~ "kde" ]] then
+      vcs_visual_identifier='VCS_GIT_KDE_ICON'
+    elif [[ "$remote" =~ "kernel" ]] then
+      vcs_visual_identifier='VCS_GIT_LINUX_ICON'
     else
       vcs_visual_identifier='VCS_GIT_ICON'
     fi
@@ -3864,7 +3884,16 @@ function _p9k_vcs_icon() {
     *github*)                          _p9k__ret=VCS_GIT_GITHUB_ICON;;
     *bitbucket*)                       _p9k__ret=VCS_GIT_BITBUCKET_ICON;;
     *stash*)                           _p9k__ret=VCS_GIT_BITBUCKET_ICON;;
+    *archlinux*)                       _p9k__ret=VCS_GIT_ARCH_ICON;;
+    *freedesktop*)                     _p9k__ret=VCS_GIT_FREEDESKTOP_ICON;;
+    *gnome*)                           _p9k__ret=VCS_GIT_GNOME_ICON;;
     *gitlab*)                          _p9k__ret=VCS_GIT_GITLAB_ICON;;
+    *codeberg*)                        _p9k__ret=VCS_GIT_CODEBERG_ICON;;
+    *debian*)                          _p9k__ret=VCS_GIT_DEBIAN_ICON;;
+    (#i)*freebsd*)                     _p9k__ret=VCS_GIT_FREEBSD_ICON;;
+    *gnu*)                             _p9k__ret=VCS_GIT_GNU_ICON;;
+    *kde*)                             _p9k__ret=VCS_GIT_KDE_ICON;;
+    *kernel*)                          _p9k__ret=VCS_GIT_LINUX_ICON;;
     # Azure DevOps: visualstudio.com is the old hostname, dev.azure.com is the new one.
     # https://learn.microsoft.com/en-us/azure/devops/repos/git/use-ssh-keys-to-authenticate
     (|*@|*.)(visualstudio.com|dev.azure.com)(|:*|/*))
