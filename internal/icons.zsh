@@ -247,6 +247,15 @@ function _p9k_init_icons() {
         VCS_GIT_BITBUCKET_ICON         '\uF171 '              # 
         VCS_GIT_GITLAB_ICON            '\uF296 '              # 
         VCS_GIT_AZURE_ICON             '\u2601 '              # ☁
+        VCS_GIT_ARCH_ICON              '\uF303 '              # 
+        VCS_GIT_CODEBERG_ICON          '\uF330 '              # 
+        VCS_GIT_DEBIAN_ICON            '\uF306 '              # 
+        VCS_GIT_FREEBSD_ICON           '\UF30C '              # 
+        VCS_GIT_FREEDESKTOP_ICON       '\uF360 '              # 
+        VCS_GIT_GNOME_ICON             '\uF361 '              # 
+        VCS_GIT_GNU_ICON               '\uE779 '              # 
+        VCS_GIT_KDE_ICON               '\uF332 '              # 
+        VCS_GIT_LINUX_ICON             '\uF17C '              # 
         VCS_HG_ICON                    '\uF0C3 '              # 
         VCS_SVN_ICON                   'svn'$q
         RUST_ICON                      '\uE6A8'               # 
@@ -533,6 +542,15 @@ function _p9k_init_icons() {
         VCS_GIT_BITBUCKET_ICON         '\uE703 '              # 
         VCS_GIT_GITLAB_ICON            '\uF296 '              # 
         VCS_GIT_AZURE_ICON             '\uEBE8 '              # 
+        VCS_GIT_ARCH_ICON              '\uF303 '              # 
+        VCS_GIT_CODEBERG_ICON          '\uF330 '              # 
+        VCS_GIT_DEBIAN_ICON            '\uF306 '              # 
+        VCS_GIT_FREEBSD_ICON           '\UF30C '              # 
+        VCS_GIT_FREEDESKTOP_ICON       '\uF360 '              # 
+        VCS_GIT_GNOME_ICON             '\uF361 '              # 
+        VCS_GIT_GNU_ICON               '\uE779 '              # 
+        VCS_GIT_KDE_ICON               '\uF332 '              # 
+        VCS_GIT_LINUX_ICON             '\uF17C '              # 
         VCS_HG_ICON                    '\uF0C3 '              # 
         VCS_SVN_ICON                   '\uE72D'$q             # 
         RUST_ICON                      '\uE7A8'$q             # 
@@ -675,6 +693,15 @@ function _p9k_init_icons() {
         VCS_GIT_BITBUCKET_ICON         '\uE703 '              # 
         VCS_GIT_GITLAB_ICON            '\uF296 '              # 
         VCS_GIT_AZURE_ICON             '\uFD03 '              # ﴃ
+        VCS_GIT_ARCH_ICON              '\uF303 '              # 
+        VCS_GIT_CODEBERG_ICON          '\uF330 '              # 
+        VCS_GIT_DEBIAN_ICON            '\uF306 '              # 
+        VCS_GIT_FREEBSD_ICON           '\UF30C '              # 
+        VCS_GIT_FREEDESKTOP_ICON       '\uF360 '              # 
+        VCS_GIT_GNOME_ICON             '\uF361 '              # 
+        VCS_GIT_GNU_ICON               '\uE779 '              # 
+        VCS_GIT_KDE_ICON               '\uF332 '              # 
+        VCS_GIT_LINUX_ICON             '\uF17C '              # 
         VCS_HG_ICON                    '\uF0C3 '              # 
         VCS_SVN_ICON                   '\uE72D'$q             # 
         RUST_ICON                      '\uE7A8'$q             # 
@@ -814,6 +841,15 @@ function _p9k_init_icons() {
         VCS_GIT_BITBUCKET_ICON         ''
         VCS_GIT_GITLAB_ICON            ''
         VCS_GIT_AZURE_ICON             ''
+        VCS_GIT_ARCH_ICON              ''
+        VCS_GIT_CODEBERG_ICON          ''
+        VCS_GIT_DEBIAN_ICON            ''
+        VCS_GIT_FREEBSD_ICON           ''
+        VCS_GIT_FREEDESKTOP_ICON       ''
+        VCS_GIT_GNOME_ICON             ''
+        VCS_GIT_GNU_ICON               ''
+        VCS_GIT_KDE_ICON               ''
+        VCS_GIT_LINUX_ICON             ''
         VCS_HG_ICON                    ''
         VCS_SVN_ICON                   ''
         RUST_ICON                      'rust'
@@ -955,6 +991,15 @@ function _p9k_init_icons() {
         VCS_GIT_BITBUCKET_ICON         ''
         VCS_GIT_GITLAB_ICON            ''
         VCS_GIT_AZURE_ICON             ''
+        VCS_GIT_ARCH_ICON              ''
+        VCS_GIT_CODEBERG_ICON          ''
+        VCS_GIT_DEBIAN_ICON            ''
+        VCS_GIT_FREEBSD_ICON           ''
+        VCS_GIT_FREEDESKTOP_ICON       ''
+        VCS_GIT_GNOME_ICON             ''
+        VCS_GIT_GNU_ICON               ''
+        VCS_GIT_KDE_ICON               ''
+        VCS_GIT_LINUX_ICON             ''
         VCS_HG_ICON                    ''
         VCS_SVN_ICON                   ''
         RUST_ICON                      'R'
