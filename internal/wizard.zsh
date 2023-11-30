@@ -2026,7 +2026,7 @@ function check_zshrc_integration() {
   local h9='"$ZDOTDIR"/.p10k.zsh'
   local h10='$POWERLEVEL9K_CONFIG_FILE'
   local h11='"$POWERLEVEL9K_CONFIG_FILE"'
-  if [[ -n ${(@M)lines:#(#b)[^#]#([^[:IDENT:]]|)source[[:space:]]##($f1|$f2|$f3|$f4|$g1|$h0|$h1|$h2|$h3|$h4|$h5|$h6|$h7|$h8|$h9|$h10|$h11)(|[[:space:]]*|'#'*)} ]]; then
+  if [[ -n ${(@M)lines:#(#b)[^#]#([^[:IDENT:]]|)source[[:space:]]##(|--[[:space:]]##)($f1|$f2|$f3|$f4|$g1|$h0|$h1|$h2|$h3|$h4|$h5|$h6|$h7|$h8|$h9|$h10|$h11)(|[[:space:]]*|'#'*)} ]]; then
     zshrc_has_cfg=1
   fi
   local pre='${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh'
