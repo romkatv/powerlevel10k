@@ -3714,40 +3714,9 @@ function +vi-hg-bookmarks() {
 
 function +vi-vcs-detect-changes() {
   if [[ "${hook_com[vcs]}" == "git" ]]; then
-
     local remote="$(git ls-remote --get-url 2> /dev/null)"
-    if [[ "$remote" =~ "github" ]] then
-      vcs_visual_identifier='VCS_GIT_GITHUB_ICON'
-    elif [[ "$remote" =~ "bitbucket" ]] then
-      vcs_visual_identifier='VCS_GIT_BITBUCKET_ICON'
-    elif [[ "$remote" =~ "stash" ]] then
-      vcs_visual_identifier='VCS_GIT_BITBUCKET_ICON'
-    elif [[ "$remote" =~ "gitlab" ]] then
-      elif [[ "$remote" =~ "archlinux" ]] then
-        vcs_visual_identifier='VCS_GIT_ARCH_ICON'
-      if [[ "$remote" =~ "freedesktop" ]] then
-        vcs_visual_identifier='VCS_GIT_FREEDESKTOP_ICON'
-      elif [[ "$remote" =~ "gnome" ]] then
-        vcs_visual_identifier='VCS_GIT_GNOME_ICON'
-      else
-        vcs_visual_identifier='VCS_GITLAB_ICON'
-      fi
-    elif [[ "$remote" =~ "codeberg" ]] then
-      vcs_visual_identifier='VCS_GIT_CODEBERG_ICON'
-    elif [[ "$remote" =~ "debian" ]] then
-      vcs_visual_identifier='VCS_GIT_DEBIAN_ICON'
-    elif [[ "$remote" =~ "freebsd" ]] then
-      vcs_visual_identifier='VCS_GIT_FREEBSD_ICON'
-    elif [[ "$remote" =~ "gnu" ]] then
-      vcs_visual_identifier='VCS_GIT_GNU_ICON'
-    elif [[ "$remote" =~ "kde" ]] then
-      vcs_visual_identifier='VCS_GIT_KDE_ICON'
-    elif [[ "$remote" =~ "kernel" ]] then
-      vcs_visual_identifier='VCS_GIT_LINUX_ICON'
-    else
-      vcs_visual_identifier='VCS_GIT_ICON'
-    fi
-
+    _p9k_vcs_icon "$remote"
+    vcs_visual_identifier=$_p9k__ret
   elif [[ "${hook_com[vcs]}" == "hg" ]]; then
     vcs_visual_identifier='VCS_HG_ICON'
   elif [[ "${hook_com[vcs]}" == "svn" ]]; then
@@ -3880,27 +3849,14 @@ function _p9k_vcs_status_purge() {
 }
 
 function _p9k_vcs_icon() {
-  case "$VCS_STATUS_REMOTE_URL" in
-    *github*)                          _p9k__ret=VCS_GIT_GITHUB_ICON;;
-    *bitbucket*)                       _p9k__ret=VCS_GIT_BITBUCKET_ICON;;
-    *stash*)                           _p9k__ret=VCS_GIT_BITBUCKET_ICON;;
-    *archlinux*)                       _p9k__ret=VCS_GIT_ARCH_ICON;;
-    *freedesktop*)                     _p9k__ret=VCS_GIT_FREEDESKTOP_ICON;;
-    *gnome*)                           _p9k__ret=VCS_GIT_GNOME_ICON;;
-    *gitlab*)                          _p9k__ret=VCS_GIT_GITLAB_ICON;;
-    *codeberg*)                        _p9k__ret=VCS_GIT_CODEBERG_ICON;;
-    *debian*)                          _p9k__ret=VCS_GIT_DEBIAN_ICON;;
-    (#i)*freebsd*)                     _p9k__ret=VCS_GIT_FREEBSD_ICON;;
-    *gnu*)                             _p9k__ret=VCS_GIT_GNU_ICON;;
-    *kde*)                             _p9k__ret=VCS_GIT_KDE_ICON;;
-    *kernel*)                          _p9k__ret=VCS_GIT_LINUX_ICON;;
-    # Azure DevOps: visualstudio.com is the old hostname, dev.azure.com is the new one.
-    # https://learn.microsoft.com/en-us/azure/devops/repos/git/use-ssh-keys-to-authenticate
-    (|*@|*.)(visualstudio.com|dev.azure.com)(|:*|/*))
-      _p9k__ret=VCS_GIT_AZURE_ICON
-    ;;  # old
-    *)                                 _p9k__ret=VCS_GIT_ICON;;
-  esac
+  local pat icon
+  for pat icon in "${(@)_POWERLEVEL9K_VCS_GIT_REMOTE_ICONS}"; do
+    if [[ $1 == $~pat ]]; then
+      _p9k__ret=$icon
+      return
+    fi
+  done
+  _p9k__ret=
 }
 
 function _p9k_vcs_render() {
@@ -3930,7 +3886,7 @@ function _p9k_vcs_render() {
         state=CLEAN
       fi
     fi
-    _p9k_vcs_icon
+    _p9k_vcs_icon "$VCS_STATUS_REMOTE_URL"
     _p9k_prompt_segment prompt_vcs_$state "${__p9k_vcs_states[$state]}" "$_p9k_color1" "$_p9k__ret" 0 '' ""
     return 0
   fi
@@ -3984,7 +3940,7 @@ function _p9k_vcs_render() {
 
       # It's weird that removing vcs-detect-changes from POWERLEVEL9K_VCS_GIT_HOOKS gets rid
       # of the GIT icon. That's what vcs_info does, so we do the same in the name of compatibility.
-      _p9k_vcs_icon
+      _p9k_vcs_icon "$VCS_STATUS_REMOTE_URL"
       icon=$_p9k__ret
     fi
 
@@ -7435,6 +7391,36 @@ _p9k_init_params() {
   _p9k_declare -b POWERLEVEL9K_VCS_CONFLICTED_STATE 0
   _p9k_declare -b POWERLEVEL9K_HIDE_BRANCH_ICON 0
   _p9k_declare -b POWERLEVEL9K_VCS_HIDE_TAGS 0
+  _p9k_declare -a POWERLEVEL9K_VCS_GIT_REMOTE_ICONS
+  if (( $+_POWERLEVEL9K_VCS_GIT_REMOTE_ICONS )); then
+    (( $#_POWERLEVEL9K_VCS_GIT_REMOTE_ICONS & 1 )) && _POWERLEVEL9K_VCS_GIT_REMOTE_ICONS+=('')
+  else
+    local domain= icon= domain2icon=(
+      'archlinux.org'                  VCS_GIT_ARCHLINUX_ICON
+      'dev.azure.com|visualstudio.com' VCS_GIT_AZURE_ICON
+      'bitbucket.org'                  VCS_GIT_BITBUCKET_ICON
+      'codeberg.org'                   VCS_GIT_CODEBERG_ICON
+      'debian.org'                     VCS_GIT_DEBIAN_ICON
+      'freebsd.org'                    VCS_GIT_FREEBSD_ICON
+      'freedesktop.org'                VCS_GIT_FREEDESKTOP_ICON
+      'gitea.com|gitea.io'             VCS_GIT_GITEA_ICON
+      'github.com'                     VCS_GIT_GITHUB_ICON
+      'gitlab.com'                     VCS_GIT_GITLAB_ICON
+      'gnome.org'                      VCS_GIT_GNOME_ICON
+      'gnu.org'                        VCS_GIT_GNU_ICON
+      'kde.org'                        VCS_GIT_KDE_ICON
+      'kernel.org'                     VCS_GIT_LINUX_ICON
+      'sourcehut.org'                  VCS_GIT_SOURCEHUT_ICON
+    )
+    typeset -ga _POWERLEVEL9K_VCS_GIT_REMOTE_ICONS
+    for domain icon in "${domain2icon[@]}"; do
+      _POWERLEVEL9K_VCS_GIT_REMOTE_ICONS+=(
+        '(|[A-Za-z0-9][A-Za-z0-9+.-]#://)(|[^:/?#]#[.@])((#i)'$domain')(|[/:?#]*)'
+        $icon
+      )
+    done
+    _POWERLEVEL9K_VCS_GIT_REMOTE_ICONS+=('*' VCS_GIT_ICON)
+  fi
   _p9k_declare -i POWERLEVEL9K_CHANGESET_HASH_LENGTH 8
   # Specifies the maximum number of elements in the cache. When the cache grows over this limit,
   # it gets cleared. This is meant to avoid memory leaks when a rogue prompt is filling the cache
@@ -9427,7 +9413,7 @@ if [[ $__p9k_dump_file != $__p9k_instant_prompt_dump_file && -n $__p9k_instant_p
   zf_rm -f -- $__p9k_instant_prompt_dump_file{,.zwc} 2>/dev/null
 fi
 
-typeset -g P9K_VERSION=1.19.10
+typeset -g P9K_VERSION=1.19.11
 unset VSCODE_SHELL_INTEGRATION
 
 _p9k_init_ssh
