@@ -300,10 +300,11 @@ To ~~ridiculous~~ extravagant:
 
 ### Batteries included
 
-Powerlevel10k comes with dozens of built-in high quality segments. When you run `p10k configure`
-and choose any style except [Pure](#pure-compatibility), many of these segments get enabled by
-default while others can be manually enabled by opening `~/.p10k.zsh` and uncommenting them. You can
-enable as many segments as you like. It won't slow down your prompt or Zsh startup.
+Powerlevel10k comes with dozens of built-in high quality prompt segments that can display
+information from a variety of sources. When you run `p10k configure` and choose any style
+except [Pure](#pure-compatibility), many of these segments get enabled by
+default while others can be manually enabled by opening `~/.p10k.zsh` and uncommenting them.
+You can enable as many segments as you like. It won't slow down your prompt or Zsh startup.
 
 | Segment | Meaning |
 |--------:|---------|
@@ -968,6 +969,8 @@ Powerlevel10k does not affect:
 - Prompt parameters other than `PS1` and `RPS1`.
 - Zsh options other than those [related to prompt](
     http://zsh.sourceforge.net/Doc/Release/Options.html#Prompting).
+- The set of available commands. Powerlevel10k does not install any new commands
+  with the only exception of `p10k`.
 
 ### I'm using Powerlevel9k with Oh My Zsh. How do I migrate?
 
