@@ -397,6 +397,11 @@ it out of the box.
 
 Type `p10k help segment` for reference.
 
+*Note*: If you modify `POWERLEVEL9K_*` parameters in an already initialized interactive shell (as
+opposed to editing `~/.p10k.zsh`), the changes might not be immediately effective. To apply the
+modifications, invoke `p10k reload`. Setting `POWERLEVEL9K_DISABLE_HOT_RELOAD=false` eliminates the
+necessity for `p10k reload` but results in a marginally slower prompt.
+
 *Tip*: Prefix names of your own segments with `my_` to avoid clashes with future versions of
 Powerlevel10k.
 
