@@ -1950,7 +1950,7 @@ function generate_config() {
   command mkdir -p -- ${__p9k_cfg_path:h} || return
 
   if [[ -e $__p9k_cfg_path ]]; then
-    rm $__p9k_cfg_path || return
+    zf_rm -f -- $__p9k_cfg_path || return
   fi
   print -lr -- "$header" "$lines[@]" >$__p9k_cfg_path
 }
