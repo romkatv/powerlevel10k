@@ -6629,7 +6629,7 @@ function _p9k_clear_instant_prompt() {
       fi
       print -rn -- $terminfo[rc]${(%):-%b%k%f%s%u}$terminfo[ed]
       local unexpected=${${content//$'\e[?'<->'c'}//$'\e['<->' q'}
-      unexpected=${(S)unexpected//$'\eP'*[^$'\e']#($'\e\\')}
+      unexpected=${(S)unexpected//$'\eP'($'\e\\'|*[^$'\e']($'\e\\'))}
       unexpected=${(S)unexpected//$'\e'[^$'\a\e']#($'\a'|$'\e\\')}
       # Visual Studio Code prints this garbage.
       unexpected=${${unexpected//$'\033[1;32mShell integration activated\033[0m\n'}//$'\r'}
