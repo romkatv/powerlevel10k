@@ -2321,7 +2321,7 @@ prompt_laravel_version() {
     # In some versions the output is colorized.
     # https://github.com/romkatv/powerlevel10k/issues/2534
     v=${${v#$'\e['<->m}%$'\e['<->m}
-    _p9k_cache_stat_set "${${(M)v:#Laravel Framework *}#Laravel Framework }"
+    _p9k_cache_stat_set "$v"
   fi
   [[ -n $_p9k__cache_val[1] ]] || return
   _p9k_prompt_segment "$0" "maroon" "white" 'LARAVEL_ICON' 0 '' "${_p9k__cache_val[1]//\%/%%}"
