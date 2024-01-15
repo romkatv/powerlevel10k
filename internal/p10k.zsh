@@ -2317,6 +2317,10 @@ prompt_laravel_version() {
   [[ -r $app ]] || return
   if ! _p9k_cache_stat_get $0 $dir/artisan $app; then
     local v="$(php $dir/artisan --version 2> /dev/null)"
+    v="${${(M)v:#Laravel Framework *}#Laravel Framework }"
+    # In some versions the output is colorized.
+    # https://github.com/romkatv/powerlevel10k/issues/2534
+    v=${${v#$'\e['<->m}%$'\e['<->m}
     _p9k_cache_stat_set "${${(M)v:#Laravel Framework *}#Laravel Framework }"
   fi
   [[ -n $_p9k__cache_val[1] ]] || return
@@ -9413,7 +9417,7 @@ if [[ $__p9k_dump_file != $__p9k_instant_prompt_dump_file && -n $__p9k_instant_p
   zf_rm -f -- $__p9k_instant_prompt_dump_file{,.zwc} 2>/dev/null
 fi
 
-typeset -g P9K_VERSION=1.19.11
+typeset -g P9K_VERSION=1.19.12
 unset VSCODE_SHELL_INTEGRATION
 
 _p9k_init_ssh
