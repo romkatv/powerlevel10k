@@ -87,6 +87,10 @@ If you are using a different terminal, proceed with manual font installation. ðŸ
        normal:
          family: "MesloLGS NF"
      ```
+   - **foot**: Create or open `~/.config/foot/foot.ini` and add the following section to it:
+     ```ini
+     font=MesloLGS NF:size=12
+     ```
    - **kitty**: Create or open `~/.config/kitty/kitty.conf` and add the following line to it:
      ```text
      font_family MesloLGS NF
