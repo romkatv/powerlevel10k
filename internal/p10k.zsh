@@ -2407,6 +2407,7 @@ _p9k_prompt_load_sync() {
 # The first argument says whether to capture stderr (1) or ignore it (0).
 # The second argument can be empty or a file. If it's a file, the
 # output of the command is presumed to potentially depend on it.
+# Returns output in $_p9k__ret.
 function _p9k_cached_cmd() {
   local cmd=$commands[$3]
   [[ -n $cmd ]] || return
@@ -4258,24 +4259,59 @@ function instant_prompt_chezmoi_shell() {
 # Virtualenv: current working virtualenv
 # More information on virtualenv (Python):
 # https://virtualenv.pypa.io/en/latest/
+_virtualenv_load_name_VIRTUAL_ENV() {
+  # VIRTUAL_ENV is the on-disk path, VIRTUAL_ENV_PROMPT is `(name_of_virtualenv) `.
+  # Use custom name if it was set (python -m venv -p "foo" .venv)
+  if [[ $VIRTUAL_ENV_PROMPT == '('?*') ' && $VIRTUAL_ENV_PROMPT != "($n) " ]]; then
+    _virtualenv_name=$VIRTUAL_ENV_PROMPT[2,-3]
+  # Use parent directory name if virtualenv name is generic (eg .venv)
+  elif [[ ${VIRTUAL_ENV:t} == $~_POWERLEVEL9K_VIRTUALENV_GENERIC_NAMES ]]; then
+    _virtualenv_name=${VIRTUAL_ENV:h:t}
+  # Otherwise use the name as-is
+  else
+    _virtualenv_name=${VIRTUAL_ENV:t}
+  fi
+}
+_virtualenv_load_name_poetry() {
+  local idx=$1
+  local dir=${_p9k__parent_dirs[idx]}
+  local pyproject="$dir/pyproject.toml"
+  if ! _p9k_cached_cmd 0 "$pyproject" poetry -C "$dir" version; then
+    # poetry execution failed. Display nothing.
+    _virtualenv_name=""
+  fi
+  # Return the first word only, eg the value of pyproject.toml's `poetry.name`
+  _virtualenv_name="${_p9k__ret%% *}"
+}
 prompt_virtualenv() {
   local msg=''
+  local version=''
   if (( _POWERLEVEL9K_VIRTUALENV_SHOW_PYTHON_VERSION )) && _p9k_python_version; then
-    msg="${_p9k__ret//\%/%%} "
+    version="${_p9k__ret//\%/%%}"
+    msg="$version "
   fi
-  local v=${VIRTUAL_ENV:t}
-  if [[ $VIRTUAL_ENV_PROMPT == '('?*') ' && $VIRTUAL_ENV_PROMPT != "($v) " ]]; then
-    v=$VIRTUAL_ENV_PROMPT[2,-3]
-  elif [[ $v == $~_POWERLEVEL9K_VIRTUALENV_GENERIC_NAMES ]]; then
-    v=${VIRTUAL_ENV:h:t}
+  _virtualenv_name=''
+  if [[ -n $VIRTUAL_ENV ]]; then
+    _virtualenv_load_name_VIRTUAL_ENV
+  else
+    local start end
+    _p9k_upglob pyproject.toml
+    local idx=$?
+    if (( idx > 0 )); then
+      _virtualenv_load_name_poetry $idx
+    fi
   fi
-  msg+="$_POWERLEVEL9K_VIRTUALENV_LEFT_DELIMITER${v//\%/%%}$_POWERLEVEL9K_VIRTUALENV_RIGHT_DELIMITER"
+  # Display nothing if there's no active virtualenv
+  if [[ -z $_virtualenv_name ]]; then
+    return
+  fi
+  msg+="$_POWERLEVEL9K_VIRTUALENV_LEFT_DELIMITER${_virtualenv_name//\%/%%}$_POWERLEVEL9K_VIRTUALENV_RIGHT_DELIMITER"
   case $_POWERLEVEL9K_VIRTUALENV_SHOW_WITH_PYENV in
     false)
       _p9k_prompt_segment "$0" "blue" "$_p9k_color1" 'PYTHON_ICON' 0 '${(M)${#P9K_PYENV_PYTHON_VERSION}:#0}' "$msg"
     ;;
     if-different)
-      _p9k_escape $v
+      _p9k_escape $version
       _p9k_prompt_segment "$0" "blue" "$_p9k_color1" 'PYTHON_ICON' 0 '${${:-'$_p9k__ret'}:#$_p9k__pyenv_version}' "$msg"
     ;;
     *)
@@ -4285,7 +4321,8 @@ prompt_virtualenv() {
 }
 
 _p9k_prompt_virtualenv_init() {
-  typeset -g "_p9k__segment_cond_${_p9k__prompt_side}[_p9k__segment_index]"='$VIRTUAL_ENV'
+  # Init if VIRTUAL_ENV is non-null or poetry is installed
+  typeset -g "_p9k__segment_cond_${_p9k__prompt_side}[_p9k__segment_index]"='${VIRTUAL_ENV:-${commands[poetry]:-${${+functions[poetry]}:#0}}}'
 }
 
 # _p9k_read_pyenv_like_version_file <filepath> [prefix]
