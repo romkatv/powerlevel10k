@@ -4254,6 +4254,26 @@ function instant_prompt_chezmoi_shell() {
   _p9k_prompt_segment prompt_chezmoi_shell blue $_p9k_color1 CHEZMOI_ICON 1 '$CHEZMOI_ICON' ''
 }
 
+function _p9k_parse_virtualenv_cfg() {
+  local cfg=$1
+  echo $cfg
+  typeset -g reply
+  [[ -f $cfg && -r $cfg ]] || return
+
+  local -a lines
+  lines=(${(f)"$(<$cfg)"}) || return
+
+  local line prompt
+  local -a match mbegin mend
+  for line in $lines; do
+    if [[ $line =~ 'prompt = (.*)' ]]; then
+      prompt=$match[1]
+      eval "reply=$prompt"
+      return
+    fi
+  done
+}
+
 ################################################################
 # Virtualenv: current working virtualenv
 # More information on virtualenv (Python):
@@ -4268,6 +4288,15 @@ prompt_virtualenv() {
     v=$VIRTUAL_ENV_PROMPT[2,-3]
   elif [[ $v == $~_POWERLEVEL9K_VIRTUALENV_GENERIC_NAMES ]]; then
     v=${VIRTUAL_ENV:h:t}
+  fi
+  local cfg="$VIRTUAL_ENV/pyvenv.cfg"
+  if ! _p9k_cache_stat_get $0 $cfg; then
+    local -a reply
+    _p9k_parse_virtualenv_cfg $cfg
+    _p9k_cache_stat_set $reply
+  fi
+  if [[ -n $_p9k__cache_val[1] ]]; then
+      v=$_p9k__cache_val[1]
   fi
   msg+="$_POWERLEVEL9K_VIRTUALENV_LEFT_DELIMITER${v//\%/%%}$_POWERLEVEL9K_VIRTUALENV_RIGHT_DELIMITER"
   case $_POWERLEVEL9K_VIRTUALENV_SHOW_WITH_PYENV in
