@@ -1509,6 +1509,7 @@ Powerlevel10k are released. This may change in the future but not soon.
 
 ## Troubleshooting
 
+- [`[oh-my-zsh] theme 'powerlevel10k/powerlevel10k' not found`](#oh-my-zsh-theme-powerlevel10k-powerlevel10k-not-found)
 - [Question mark in prompt](#question-mark-in-prompt)
 - [Icons, glyphs or powerline symbols don't render](#icons-glyphs-or-powerline-symbols-dont-render)
 - [Sub-pixel imperfections around powerline symbols](#sub-pixel-imperfections-around-powerline-symbols)
@@ -1530,6 +1531,27 @@ Powerlevel10k are released. This may change in the future but not soon.
 - [Icons cut off in Konsole](#icons-cut-off-in-konsole)
 - [Arch Linux logo has a dot in the bottom right corner](#arch-linux-logo-has-a-dot-in-the-bottom-right-corner)
 - [Incorrect git status in prompt](#incorrect-git-status-in-prompt)
+
+### `[oh-my-zsh] theme 'powerlevel10k/powerlevel10k' not found`
+
+When opening a terminal, or starting zsh manually, you may encounter this error message:
+
+```text
+[oh-my-zsh] theme 'powerlevel10k/powerlevel10k' not found
+```
+
+1. First, run `typeset -p P9K_VERSION` to check whether Powerlevel10k has been loaded.
+   - If `typeset -p P9K_VERSION` succeeds and prints something like `typeset P9K_VERSION=1.19.14`
+     (the version could be different), remove the following line from `~/.zshrc`:
+     ```zsh
+     ZSH_THEME="powerlevel10k/powerlevel10k"
+     ```
+   - If `typeset -p P9K_VERSION` fails with the error `typeset: no such variable: P9K_VERSION`, run
+     the following command:
+     ```zsh
+     git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k
+     ```
+2. Restart Zsh with `exec zsh`.
 
 ### Question mark in prompt
 
