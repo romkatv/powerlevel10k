@@ -1509,7 +1509,7 @@ Powerlevel10k are released. This may change in the future but not soon.
 
 ## Troubleshooting
 
-- [`[oh-my-zsh] theme 'powerlevel10k/powerlevel10k' not found`](#oh-my-zsh-theme-powerlevel10k-powerlevel10k-not-found)
+- [`[oh-my-zsh] theme 'powerlevel10k/powerlevel10k' not found`](#oh-my-zsh-theme-powerlevel10kpowerlevel10k-not-found)
 - [Question mark in prompt](#question-mark-in-prompt)
 - [Icons, glyphs or powerline symbols don't render](#icons-glyphs-or-powerline-symbols-dont-render)
 - [Sub-pixel imperfections around powerline symbols](#sub-pixel-imperfections-around-powerline-symbols)
