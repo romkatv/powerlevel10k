@@ -347,6 +347,7 @@ You can enable as many segments as you like. It won't slow down your prompt or Z
 | `nvm` | node.js environment from [nvm](https://github.com/nvm-sh/nvm) |
 | `os_icon` | your OS logo (apple for macOS, swirl for debian, etc.) |
 | `package` | `name@version` from [package.json](https://docs.npmjs.com/files/package.json) |
+| `per_directory_history` | Oh My Zsh [per-directory-history](https://github.com/jimhester/per-directory-history) local/global indicator |
 | `perlbrew` | perl version from [perlbrew](https://github.com/gugod/App-perlbrew) |
 | `phpenv` | php environment from [phpenv](https://github.com/phpenv/phpenv) |
 | `php_version` | [php](https://www.php.net/) version |
