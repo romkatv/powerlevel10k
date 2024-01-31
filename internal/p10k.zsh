@@ -4254,36 +4254,6 @@ function instant_prompt_chezmoi_shell() {
   _p9k_prompt_segment prompt_chezmoi_shell blue $_p9k_color1 CHEZMOI_ICON 1 '$CHEZMOI_ICON' ''
 }
 
-function _p9k_parse_virtualenv_cfg() {
-  typeset -ga reply=(0)
-  [[ -f $1 && -r $1 ]] || return
-
-  local cfg
-  cfg=$(<$1) || return
-
-  local -a match mbegin mend
-  [[ $'\n'$cfg$'\n' == (#b)*$'\n'prompt[$' \t']#=[$' \t']#([^$' \t']#)[$' \t']#$'\n'* ]] || return
-  local res=$match[1]
-  if [[ $res == (\"*\"|\'*\') ]]; then
-    # The string is quoted in python style, which isn't the same as quoting in zsh.
-    # For example, the literal 'foo"\'bar' denotes foo"'bar in python but in zsh
-    # it is malformed.
-    #
-    # We cheat a bit and impelement not exactly correct unquoting. It may produce
-    # different visual results but won't perform unintended expansions or bleed out
-    # any escape sequences.
-    #
-    # Note that venv performs unusual and obviously unintended expansions on the
-    # value of `prompt`: single-word expansions are performed twice by `activate`,
-    # and then again on every prompt if `prompt_subst` is in effect. While in general
-    # I am OK with being bug-compatible with other software, the bugs in venv are a
-    # bit too extreme for my comfort. I am going to disable all expansions and
-    # display the configured prompt literally.
-    res=${(Vg:e:)${res[2,-2]}}
-  fi
-  reply=(1 "$res")
-}
-
 ################################################################
 # Virtualenv: current working virtualenv
 # More information on virtualenv (Python):
@@ -4293,21 +4263,11 @@ prompt_virtualenv() {
   if (( _POWERLEVEL9K_VIRTUALENV_SHOW_PYTHON_VERSION )) && _p9k_python_version; then
     msg="${_p9k__ret//\%/%%} "
   fi
-  local cfg=$VIRTUAL_ENV/pyvenv.cfg
-  if ! _p9k_cache_stat_get $0 $cfg; then
-    local -a reply
-    _p9k_parse_virtualenv_cfg $cfg
-    _p9k_cache_stat_set "${reply[@]}"
-  fi
-  if (( _p9k__cache_val[1] )); then
-    local v=$_p9k__cache_val[2]
-  else
-    local v=${VIRTUAL_ENV:t}
-    if [[ $VIRTUAL_ENV_PROMPT == '('?*') ' && $VIRTUAL_ENV_PROMPT != "($v) " ]]; then
-      v=$VIRTUAL_ENV_PROMPT[2,-3]
-    elif [[ $v == $~_POWERLEVEL9K_VIRTUALENV_GENERIC_NAMES ]]; then
-      v=${VIRTUAL_ENV:h:t}
-    fi
+  local v=${VIRTUAL_ENV:t}
+  if [[ $VIRTUAL_ENV_PROMPT == '('?*') ' && $VIRTUAL_ENV_PROMPT != "($v) " ]]; then
+    v=$VIRTUAL_ENV_PROMPT[2,-3]
+  elif [[ $v == $~_POWERLEVEL9K_VIRTUALENV_GENERIC_NAMES ]]; then
+    v=${VIRTUAL_ENV:h:t}
   fi
   msg+="$_POWERLEVEL9K_VIRTUALENV_LEFT_DELIMITER${v//\%/%%}$_POWERLEVEL9K_VIRTUALENV_RIGHT_DELIMITER"
   case $_POWERLEVEL9K_VIRTUALENV_SHOW_WITH_PYENV in
@@ -8637,6 +8597,7 @@ function _p9k_init_cacheable() {
           endeavouros)             _p9k_set_os Linux LINUX_ENDEAVOUROS_ICON;;
           rocky)                   _p9k_set_os Linux LINUX_ROCKY_ICON;;
           guix)                    _p9k_set_os Linux LINUX_GUIX_ICON;;
+          neon)                     _p9k_set_os Linux LINUX_NEON_ICON;;
           *)                       _p9k_set_os Linux LINUX_ICON;;
         esac
         ;;
@@ -9457,7 +9418,7 @@ if [[ $__p9k_dump_file != $__p9k_instant_prompt_dump_file && -n $__p9k_instant_p
   zf_rm -f -- $__p9k_instant_prompt_dump_file{,.zwc} 2>/dev/null
 fi
 
-typeset -g P9K_VERSION=1.19.14
+typeset -g P9K_VERSION=1.19.13
 unset VSCODE_SHELL_INTEGRATION
 
 _p9k_init_ssh
