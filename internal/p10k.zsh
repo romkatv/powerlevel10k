@@ -8637,7 +8637,7 @@ function _p9k_init_cacheable() {
           endeavouros)             _p9k_set_os Linux LINUX_ENDEAVOUROS_ICON;;
           rocky)                   _p9k_set_os Linux LINUX_ROCKY_ICON;;
           guix)                    _p9k_set_os Linux LINUX_GUIX_ICON;;
-          neon)                     _p9k_set_os Linux LINUX_NEON_ICON;;
+          neon)                    _p9k_set_os Linux LINUX_NEON_ICON;;
           *)                       _p9k_set_os Linux LINUX_ICON;;
         esac
         ;;
@@ -9458,7 +9458,7 @@ if [[ $__p9k_dump_file != $__p9k_instant_prompt_dump_file && -n $__p9k_instant_p
   zf_rm -f -- $__p9k_instant_prompt_dump_file{,.zwc} 2>/dev/null
 fi
 
-typeset -g P9K_VERSION=1.19.14
+typeset -g P9K_VERSION=1.19.15
 unset VSCODE_SHELL_INTEGRATION
 
 _p9k_init_ssh

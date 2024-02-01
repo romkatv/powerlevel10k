@@ -541,7 +541,7 @@ function _p9k_init_icons() {
         LINUX_ENDEAVOUROS_ICON         '\UF322'$s             # 
         LINUX_ROCKY_ICON               '\UF32B'$s             # 
         LINUX_GUIX_ICON                '\UF325'$s             # 
-        LINUX_NEON_ICON                '\UF331'$s             # 
+        LINUX_NEON_ICON                '\uF17C'               # 
         LINUX_ICON                     '\uF17C'               # 
         SUNOS_ICON                     '\uF185 '              # 
         HOME_ICON                      '\uF015'$s             # 
@@ -700,7 +700,7 @@ function _p9k_init_icons() {
         LINUX_ENDEAVOUROS_ICON         '\uF17C'               # 
         LINUX_ROCKY_ICON               '\uF17C'               # 
         LINUX_GUIX_ICON                '\uF325'$s             # 
-        LINUX_NEON_ICON                '\UF331'$s             # 
+        LINUX_NEON_ICON                '\uF17C'               # 
         LINUX_ICON                     '\uF17C'               # 
         SUNOS_ICON                     '\uF185 '              # 
         HOME_ICON                      '\uF015'$s             # 
