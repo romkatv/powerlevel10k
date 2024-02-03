@@ -7454,7 +7454,7 @@ _p9k_init_params() {
       'gnu.org'                        VCS_GIT_GNU_ICON
       'kde.org'                        VCS_GIT_KDE_ICON
       'kernel.org'                     VCS_GIT_LINUX_ICON
-      'sourcehut.org'                  VCS_GIT_SOURCEHUT_ICON
+      'sr.ht'                          VCS_GIT_SOURCEHUT_ICON
     )
     typeset -ga _POWERLEVEL9K_VCS_GIT_REMOTE_ICONS
     for domain icon in "${domain2icon[@]}"; do
