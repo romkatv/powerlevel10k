@@ -1407,7 +1407,7 @@ _p9k_prompt_battery_set_args() {
       (( $#bats )) || return
 
       local -i energy_now energy_full power_now
-      local -i is_full=1 is_calculating is_charching
+      local -i is_full=1 is_calculating is_charching only_unknown_found=1
       local dir
       for dir in $bats; do
         local -i pow=0 full=0
@@ -1423,6 +1423,8 @@ _p9k_prompt_battery_set_args() {
           (( energy_now += _p9k__ret ))
         fi
         _p9k_read_file $dir/status(N) && local bat_status=$_p9k__ret || continue
+        [[ $bat_status == Unknown                             ]] && continue
+        only_unknown_found=0
         [[ $bat_status != Full                                ]] && is_full=0
         [[ $bat_status == Charging                            ]] && is_charching=1
         [[ $bat_status == (Charging|Discharging) && $pow == 0 ]] && is_calculating=1
@@ -1433,7 +1435,7 @@ _p9k_prompt_battery_set_args() {
       bat_percent=$(( 100. * energy_now / energy_full + 0.5 ))
       (( bat_percent > 100 )) && bat_percent=100
 
-      if (( is_full || (bat_percent == 100 && is_charching) )); then
+      if (( is_full || (bat_percent == 100 && (is_charching || only_unknown_found) ) )); then
         state=CHARGED
       else
         if (( is_charching )); then
