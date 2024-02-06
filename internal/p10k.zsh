@@ -1410,6 +1410,9 @@ _p9k_prompt_battery_set_args() {
       local -i is_full=1 is_calculating is_charching
       local dir
       for dir in $bats; do
+        _p9k_read_file $dir/status(N) && local bat_status=$_p9k__ret || continue
+        # Skip batteries with "Unknown" status: https://github.com/romkatv/powerlevel10k/pull/2562.
+        [[ $bat_status == Unknown ]] && continue
         local -i pow=0 full=0
         if _p9k_read_file $dir/(energy_full|charge_full|charge_counter)(N); then
           (( energy_full += ${full::=_p9k__ret} ))
@@ -1422,7 +1425,6 @@ _p9k_prompt_battery_set_args() {
         elif _p9k_read_file $dir/(energy|charge)_now(N); then
           (( energy_now += _p9k__ret ))
         fi
-        _p9k_read_file $dir/status(N) && local bat_status=$_p9k__ret || continue
         [[ $bat_status != Full                                ]] && is_full=0
         [[ $bat_status == Charging                            ]] && is_charching=1
         [[ $bat_status == (Charging|Discharging) && $pow == 0 ]] && is_calculating=1
@@ -9458,7 +9460,7 @@ if [[ $__p9k_dump_file != $__p9k_instant_prompt_dump_file && -n $__p9k_instant_p
   zf_rm -f -- $__p9k_instant_prompt_dump_file{,.zwc} 2>/dev/null
 fi
 
-typeset -g P9K_VERSION=1.20.0
+typeset -g P9K_VERSION=1.20.1
 unset VSCODE_SHELL_INTEGRATION
 
 _p9k_init_ssh
