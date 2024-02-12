@@ -139,6 +139,7 @@ function _p9k_init_icons() {
         JAVA_ICON                      '\U2615'               # ☕︎
         LARAVEL_ICON                   ''
         RANGER_ICON                    '\u2B50'               # ⭐
+        YAZI_ICON                      '\u2B50'               # ⭐
         MIDNIGHT_COMMANDER_ICON        'mc'
         VIM_ICON                       'vim'
         TERRAFORM_ICON                 'tf'
@@ -292,6 +293,7 @@ function _p9k_init_icons() {
         JAVA_ICON                      '\U2615'               # ☕︎
         LARAVEL_ICON                   ''
         RANGER_ICON                    '\u2B50'               # ⭐
+        YAZI_ICON                      '\u2B50'               # ⭐
         MIDNIGHT_COMMANDER_ICON        'mc'
         VIM_ICON                       'vim'
         TERRAFORM_ICON                 'tf'
@@ -448,6 +450,7 @@ function _p9k_init_icons() {
         JAVA_ICON                      '\U2615'                                       # ☕︎
         LARAVEL_ICON                   ''
         RANGER_ICON                    '\u2B50'                                       # ⭐
+        YAZI_ICON                      '\u2B50'                                       # ⭐
         MIDNIGHT_COMMANDER_ICON        'mc'
         VIM_ICON                       'vim'
         TERRAFORM_ICON                 'tf'
@@ -607,6 +610,7 @@ function _p9k_init_icons() {
         JAVA_ICON                      '\uE738'               # 
         LARAVEL_ICON                   '\ue73f'$q             # 
         RANGER_ICON                    '\uF00b '              # 
+        YAZI_ICON                      '\uF00b '              # 
         MIDNIGHT_COMMANDER_ICON        'mc'                   # mc
         VIM_ICON                       '\uE62B'               # 
         TERRAFORM_ICON                 '\uF1BB '              # 
@@ -761,6 +765,7 @@ function _p9k_init_icons() {
         JAVA_ICON                      '\uE738'               # 
         LARAVEL_ICON                   '\ue73f'$q             # 
         RANGER_ICON                    '\uF00b '              # 
+        YAZI_ICON                      '\uF00b '              # 
         MIDNIGHT_COMMANDER_ICON        'mc'
         VIM_ICON                       '\uE62B'               # 
         TERRAFORM_ICON                 '\uF1BB '              # 
@@ -912,6 +917,7 @@ function _p9k_init_icons() {
         JAVA_ICON                      'java'
         LARAVEL_ICON                   ''
         RANGER_ICON                    'ranger'
+        YAZI_ICON                      'yazi'
         MIDNIGHT_COMMANDER_ICON        'mc'
         VIM_ICON                       'vim'
         TERRAFORM_ICON                 'tf'
@@ -1065,6 +1071,7 @@ function _p9k_init_icons() {
         JAVA_ICON                      '\U2615'               # ☕︎
         LARAVEL_ICON                   ''
         RANGER_ICON                    '\u2B50'               # ⭐
+        YAZI_ICON                      '\u2B50'               # ⭐
         MIDNIGHT_COMMANDER_ICON        'mc'
         VIM_ICON                       'vim'
         TERRAFORM_ICON                 'tf'

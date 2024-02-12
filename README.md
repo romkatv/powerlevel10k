@@ -358,6 +358,7 @@ You can enable as many segments as you like. It won't slow down your prompt or Z
 | `pyenv` | python environment from [pyenv](https://github.com/pyenv/pyenv) |
 | `ram` | free RAM |
 | `ranger` | [ranger](https://github.com/ranger/ranger) shell |
+| `yazi` | [yazi](https://github.com/sxyazi/yazi)) shell |
 | `rbenv` | ruby environment from [rbenv](https://github.com/rbenv/rbenv) |
 | `rust_version` | [rustc](https://www.rust-lang.org) version |
 | `rvm` | ruby environment from [rvm](https://rvm.io) |
