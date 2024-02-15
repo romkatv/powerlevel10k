@@ -1314,7 +1314,7 @@ function _p9k_fvm_old() {
 }
 
 function _p9k_fvm_new() {
-  _p9k_upglob .fvm @ && return 1
+  _p9k_upglob .fvm/flutter_sdk @ && return 1
   local sdk=$_p9k__parent_dirs[$?]/.fvm/flutter_sdk
   if [[ ${sdk:A} == (#b)*/versions/([^/]##) ]]; then
     _p9k_prompt_segment prompt_fvm blue $_p9k_color1 FLUTTER_ICON 0 '' ${match[1]//\%/%%}
@@ -9472,7 +9472,7 @@ if [[ $__p9k_dump_file != $__p9k_instant_prompt_dump_file && -n $__p9k_instant_p
   zf_rm -f -- $__p9k_instant_prompt_dump_file{,.zwc} 2>/dev/null
 fi
 
-typeset -g P9K_VERSION=1.20.2
+typeset -g P9K_VERSION=1.20.3
 unset VSCODE_SHELL_INTEGRATION
 
 _p9k_init_ssh
