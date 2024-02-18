@@ -1132,7 +1132,14 @@ function os_icon_name() {
         fi
         case $os_release_id in
           *arch*)                  echo LINUX_ARCH_ICON;;
-          *debian*)                echo LINUX_DEBIAN_ICON;;
+          *raspbian*)              echo LINUX_RASPBIAN_ICON;;
+          *debian*)
+            if [[ -f /etc/apt/sources.list.d/raspi.list ]]; then
+              echo LINUX_RASPBIAN_ICON
+            else
+              echo LINUX_DEBIAN_ICON
+            fi
+            ;;   
           *raspbian*)              echo LINUX_RASPBIAN_ICON;;
           *ubuntu*)                echo LINUX_UBUNTU_ICON;;
           *elementary*)            echo LINUX_ELEMENTARY_ICON;;
