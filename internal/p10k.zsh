@@ -8627,8 +8627,13 @@ function _p9k_init_cacheable() {
           *arch*)                  _p9k_set_os Linux LINUX_ARCH_ICON;;
           *debian*)                _p9k_set_os Linux LINUX_DEBIAN_ICON;;
           *raspbian*)              _p9k_set_os Linux LINUX_RASPBIAN_ICON;;
-          *ubuntu*)                _p9k_set_os Linux LINUX_UBUNTU_ICON;;
-          *elementary*)            _p9k_set_os Linux LINUX_ELEMENTARY_ICON;;
+          *debian*)
+            if [[ -f /etc/apt/sources.list.d/raspi.list ]]; then
+              _p9k_set_os Linux LINUX_RASPBIAN_ICON
+            else
+              _p9k_set_os Linux LINUX_RASPBIAN_ICON
+            fi
+            ;;          *elementary*)            _p9k_set_os Linux LINUX_ELEMENTARY_ICON;;
           *fedora*)                _p9k_set_os Linux LINUX_FEDORA_ICON;;
           *coreos*)                _p9k_set_os Linux LINUX_COREOS_ICON;;
           *kali*)                  _p9k_set_os Linux LINUX_KALI_ICON;;
