@@ -1139,7 +1139,7 @@ function os_icon_name() {
             else
               echo LINUX_DEBIAN_ICON
             fi
-            ;;   
+          ;;
           *raspbian*)              echo LINUX_RASPBIAN_ICON;;
           *ubuntu*)                echo LINUX_UBUNTU_ICON;;
           *elementary*)            echo LINUX_ELEMENTARY_ICON;;
