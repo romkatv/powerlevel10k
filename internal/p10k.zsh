@@ -8633,7 +8633,8 @@ function _p9k_init_cacheable() {
             else
               _p9k_set_os Linux LINUX_DEBIAN_ICON
             fi
-            ;;          *elementary*)            _p9k_set_os Linux LINUX_ELEMENTARY_ICON;;
+            ;;          
+          *elementary*)            _p9k_set_os Linux LINUX_ELEMENTARY_ICON;;
           *fedora*)                _p9k_set_os Linux LINUX_FEDORA_ICON;;
           *coreos*)                _p9k_set_os Linux LINUX_COREOS_ICON;;
           *kali*)                  _p9k_set_os Linux LINUX_KALI_ICON;;
