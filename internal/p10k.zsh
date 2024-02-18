@@ -8625,7 +8625,6 @@ function _p9k_init_cacheable() {
         fi
         case $os_release_id in
           *arch*)                  _p9k_set_os Linux LINUX_ARCH_ICON;;
-          *debian*)                _p9k_set_os Linux LINUX_DEBIAN_ICON;;
           *raspbian*)              _p9k_set_os Linux LINUX_RASPBIAN_ICON;;
           *debian*)
             if [[ -f /etc/apt/sources.list.d/raspi.list ]]; then
