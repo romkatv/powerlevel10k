@@ -8631,7 +8631,7 @@ function _p9k_init_cacheable() {
             if [[ -f /etc/apt/sources.list.d/raspi.list ]]; then
               _p9k_set_os Linux LINUX_RASPBIAN_ICON
             else
-              _p9k_set_os Linux LINUX_RASPBIAN_ICON
+              _p9k_set_os Linux LINUX_DEBIAN_ICON
             fi
             ;;          *elementary*)            _p9k_set_os Linux LINUX_ELEMENTARY_ICON;;
           *fedora*)                _p9k_set_os Linux LINUX_FEDORA_ICON;;
