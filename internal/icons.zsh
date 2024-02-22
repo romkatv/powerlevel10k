@@ -539,7 +539,7 @@ function _p9k_init_icons() {
         LINUX_ARTIX_ICON               '\UF31F'$s             # 
         LINUX_UBUNTU_ICON              '\uF31b'$s             # 
         LINUX_KALI_ICON                '\uF327'$s             # 
-        LINUX_RHEL_ICON                '\uF316'$s             # 
+        LINUX_RHEL_ICON                '\uF111b'$s            # 󱄛
         LINUX_AMZN_ICON                '\uF270'$s             # 
         LINUX_ENDEAVOUROS_ICON         '\UF322'$s             # 
         LINUX_ROCKY_ICON               '\UF32B'$s             # 
@@ -699,7 +699,7 @@ function _p9k_init_icons() {
         LINUX_ARTIX_ICON               '\uF17C'               # 
         LINUX_UBUNTU_ICON              '\uF31b'$s             # 
         LINUX_KALI_ICON                '\uF17C'               # 
-        LINUX_RHEL_ICON                '\uF316'$s             # 
+        LINUX_RHEL_ICON                '\uF111b'$s            # 󱄛
         LINUX_AMZN_ICON                '\uF270'$s             # 
         LINUX_ENDEAVOUROS_ICON         '\uF17C'               # 
         LINUX_ROCKY_ICON               '\uF17C'               # 
