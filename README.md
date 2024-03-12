@@ -685,7 +685,9 @@ If you are using a different terminal, proceed with manual font installation. �
      tab, uncheck *Use the system fixed width font* (if not already) and select `MesloLGS NF Regular`.
      Exit the Preferences dialog by clicking *Close*.
    - **MobaXterm**: Open *Settings* → *Configuration* → *Terminal* → (under *Terminal look and feel*)
-     and change *Font* to `MesloLGS NF`.
+     and change *Font* to `MesloLGS NF`. If you have *sessions*, you need to change the font in each
+     of them through *Settings* → right click on an individual session → *Edit Session* → *Terminal
+     Settings* → *Font settings*.
    - **Asbrú Connection Manager**: Open *Preferences → Local Shell Options → Look and Feel*, enable
      *Use these personal options* and change *Font:* under *Terminal UI* to `MesloLGS NF Regular`.
      To change the font for the remote host connections, go to *Preferences → Terminal Options →
