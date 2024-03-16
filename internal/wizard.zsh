@@ -1318,12 +1318,12 @@ function ask_heads() {
       right_head=
       options+='flat heads'
     ;;
-    2)
+    3)
       left_head=$right_triangle
       right_head=$left_triangle
       options+='sharp heads'
     ;;
-    3)
+    2)
       left_head=$fade_out
       right_head=$fade_in
       options+='blurred heads'
