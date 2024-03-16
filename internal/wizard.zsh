@@ -1289,54 +1289,51 @@ function ask_heads() {
   fi
   local extra
   add_widget 0 flowing -c "%BPrompt Heads%b"
-  if (( cap_diamond )); then
-    add_widget 0 print -Pl "                   head" "%B(1)  Sharp.%b         |" "                    v"
-    add_widget 3 print -P "%B(1)  Sharp.%b"
-    add_prompt_n left_head=$right_triangle right_head=$left_triangle
-    add_widget 0 print
-    add_widget 2
-  else
-    add_widget 0 print
-    add_widget 1
-    add_widget 0 print -P "%B(1)  Flat.%b"
-    add_prompt left_head= right_head=
-  fi
+  add_widget 0 print -Pl "                  head" "%B(1)  Flat.%b         |" "                   v"
+  add_widget 3 print -P "%B(1)  Flat.%b"
+  add_prompt_n left_head= right_head=
+  add_widget 0 print
+  add_widget 2
   add_widget 0 print -P "%B(2)  Blurred.%b"
   add_prompt left_head=$fade_out right_head=$fade_in
-  if [[ $POWERLEVEL9K_MODE == nerdfont-* ]]; then
+  if (( cap_diamond )); then
     extra+=3
-    add_widget 0 print -P "%B(3)  Slanted.%b"
-    add_prompt left_head=$down_triangle right_head=$up_triangle
-    extra+=4
-    add_widget 0 print -P "%B(4)  Round.%b"
-    add_prompt left_head=$right_circle right_head=$left_circle
+    add_widget 0 print -P "%B(3)  Sharp.%b"
+    add_prompt left_head=$right_triangle right_head=$left_triangle
+    if [[ $POWERLEVEL9K_MODE == nerdfont-* ]]; then
+      extra+=4
+      add_widget 0 print -P "%B(4)  Slanted.%b"
+      add_prompt left_head=$down_triangle right_head=$up_triangle
+      extra+=5
+      add_widget 0 print -P "%B(5)  Round.%b"
+      add_prompt left_head=$right_circle right_head=$left_circle
+    fi
   fi
   add_widget 0 print -P "(r)  Restart from the beginning."
   ask 12${extra}r
   case $choice in
     r) return 1;;
     1)
-      if (( cap_diamond )); then
-        left_head=$right_triangle
-        right_head=$left_triangle
-        options+='sharp heads'
-      else
-        left_head=
-        right_head=
-        options+='flat heads'
-      fi
+      left_head=
+      right_head=
+      options+='flat heads'
     ;;
     2)
+      left_head=$right_triangle
+      right_head=$left_triangle
+      options+='sharp heads'
+    ;;
+    3)
       left_head=$fade_out
       right_head=$fade_in
       options+='blurred heads'
     ;;
-    3)
+    4)
       left_head=$down_triangle
       right_head=$up_triangle
       options+='slanted heads'
     ;;
-    4)
+    5)
       left_head=$right_circle
       right_head=$left_circle
       options+='round heads'
