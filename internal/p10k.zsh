@@ -6467,6 +6467,12 @@ _p9k_dump_instant_prompt() {
   exec {__p9k_fd_0}<&0 {__p9k_fd_1}>&1 {__p9k_fd_2}>&2 0<&$fd_null 1>$__p9k_instant_prompt_output
   exec 2>&1 {fd_null}>&-
   typeset -gi __p9k_instant_prompt_active=1
+  function p10k-deactivate-instant-prompt() {
+    '$__p9k_intro_no_locale'
+    _p9k_clear_instant_prompt
+    builtin unset __p9k_instant_prompt_active
+    builtin unfunction p10k-deactivate-instant-prompt
+  }
   if (( _z4h_can_save_restore_screen == 1 )); then
     typeset -g _z4h_saved_screen
     -z4h-save-screen
@@ -6479,6 +6485,7 @@ _p9k_dump_instant_prompt() {
     (( ZSH_SUBSHELL == 0 && ${+__p9k_instant_prompt_active} )) || return 0
     '$__p9k_intro_no_locale'
     unset __p9k_instant_prompt_active
+    (( $+functions[p10k-deactivate-instant-prompt] )) && unfunction p10k-deactivate-instant-prompt
     exec 0<&$__p9k_fd_0 1>&$__p9k_fd_1 2>&$__p9k_fd_2 {__p9k_fd_0}>&- {__p9k_fd_1}>&- {__p9k_fd_2}>&-
     unset __p9k_fd_0 __p9k_fd_1 __p9k_fd_2
     typeset -gi __p9k_instant_prompt_erased=1
@@ -6906,10 +6913,7 @@ function _p9k_on_expand() {
     (( _p9k__fully_initialized )) || _p9k_wrap_widgets
   fi
 
-  if (( $+__p9k_instant_prompt_active )); then
-    _p9k_clear_instant_prompt
-    unset __p9k_instant_prompt_active
-  fi
+  (( $+functions[p10k-deactivate-instant-prompt] )) && p10k-deactivate-instant-prompt
 
   if (( ! _p9k__expanded )); then
     _p9k__expanded=1
@@ -6981,8 +6985,7 @@ _p9k_precmd_impl() {
           _p9k_can_configure -q
           local -i ret=$?
           if (( ret == 2 && $+__p9k_instant_prompt_active )); then
-            _p9k_clear_instant_prompt
-            unset __p9k_instant_prompt_active
+            p10k-deactivate-instant-prompt
             _p9k_delete_instant_prompt
             zf_rm -f -- $__p9k_dump_file{,.zwc} 2>/dev/null
             () {
@@ -9437,10 +9440,7 @@ function p10k() {
       return 1
       ;;
     clear-instant-prompt)
-      if (( $+__p9k_instant_prompt_active )); then
-        _p9k_clear_instant_prompt
-        unset __p9k_instant_prompt_active
-      fi
+      (( $+functions[p10k-deactivate-instant-prompt] )) && p10k-deactivate-instant-prompt
       return 0
       ;;
     *)
@@ -9477,7 +9477,7 @@ if [[ $__p9k_dump_file != $__p9k_instant_prompt_dump_file && -n $__p9k_instant_p
   zf_rm -f -- $__p9k_instant_prompt_dump_file{,.zwc} 2>/dev/null
 fi
 
-typeset -g P9K_VERSION=1.20.5
+typeset -g P9K_VERSION=1.20.6
 unset VSCODE_SHELL_INTEGRATION
 
 _p9k_init_ssh
