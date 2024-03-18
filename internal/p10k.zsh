@@ -9478,7 +9478,7 @@ if [[ $__p9k_dump_file != $__p9k_instant_prompt_dump_file && -n $__p9k_instant_p
   zf_rm -f -- $__p9k_instant_prompt_dump_file{,.zwc} 2>/dev/null
 fi
 
-typeset -g P9K_VERSION=1.20.5
+typeset -g P9K_VERSION=1.20.7
 unset VSCODE_SHELL_INTEGRATION
 
 _p9k_init_ssh
