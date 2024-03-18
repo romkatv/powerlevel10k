@@ -6515,7 +6515,6 @@ _p9k_dump_instant_prompt() {
   }
   zshexit_functions=(_p9k_instant_prompt_cleanup $zshexit_functions)
   precmd_functions=(_p9k_instant_prompt_precmd_first $precmd_functions)
-  DISABLE_UPDATE_PROMPT=true
 } && unsetopt prompt_cr prompt_sp && typeset -gi __p9k_instant_prompt_sourced='$__p9k_instant_prompt_version' ||
   typeset -gi __p9k_instant_prompt_sourced=${__p9k_instant_prompt_sourced:-0}'
     } always {
