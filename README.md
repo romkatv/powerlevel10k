@@ -331,6 +331,7 @@ You can enable as many segments as you like. It won't slow down your prompt or Z
 | `ip` | IP address and bandwidth usage for a specified network interface |
 | `java_version` | [java](https://www.java.com/) version |
 | `jenv` | java environment from [jenv](https://github.com/jenv/jenv) |
+| `kotlin_version` | [kotlin](https://kotlinlang.org/) version |
 | `kubecontext` | current [kubernetes](https://kubernetes.io/) context |
 | `laravel_version` | [laravel php framework](https://laravel.com/) version |
 | `load` | CPU load |

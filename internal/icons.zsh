@@ -124,6 +124,7 @@ function _p9k_init_icons() {
         PYTHON_ICON                    '\uE63C'$s             #  (doesn't always work)
         CHEZMOI_ICON                   '\uE12C'$s             # 
         SWIFT_ICON                     'Swift'
+        KOTLIN_ICON                    '\U1F17A'              # 🅺
         GO_ICON                        'Go'
         GOLANG_ICON                    'Go'
         PUBLIC_IP_ICON                 'IP'
@@ -278,6 +279,7 @@ function _p9k_init_icons() {
         PYTHON_ICON                    '\uE63C'$s             # 
         CHEZMOI_ICON                   '\uF015'$s             # 
         SWIFT_ICON                     'Swift'
+        KOTLIN_ICON                    '\U1F17A'              # 🅺
         GO_ICON                        'Go'
         GOLANG_ICON                    'Go'
         PUBLIC_IP_ICON                 'IP'
@@ -437,6 +439,7 @@ function _p9k_init_icons() {
         PYTHON_ICON                    '\U1F40D'                                      # 🐍
         CHEZMOI_ICON                    "${CODEPOINT_OF_AWESOME_HOME:+\\u$CODEPOINT_OF_AWESOME_HOME$s}"
         SWIFT_ICON                     '\uE655'$s                                     # 
+        KOTLIN_ICON                    '\U1F17A'                                      # 🅺
         PUBLIC_IP_ICON                 "${CODEPOINT_OF_AWESOME_GLOBE:+\\u$CODEPOINT_OF_AWESOME_GLOBE$s}"
         LOCK_ICON                      "${CODEPOINT_OF_AWESOME_LOCK:+\\u$CODEPOINT_OF_AWESOME_LOCK}"
         NORDVPN_ICON                   "${CODEPOINT_OF_AWESOME_LOCK:+\\u$CODEPOINT_OF_AWESOME_LOCK}"
@@ -595,6 +598,7 @@ function _p9k_init_icons() {
         PYTHON_ICON                    '\UE73C '              # 
         CHEZMOI_ICON                   '\uF015'$s             # 
         SWIFT_ICON                     '\uE755'               # 
+        KOTLIN_ICON                    '\U1F17A'              # 🅺
         GO_ICON                        '\uE626'               # 
         GOLANG_ICON                    '\uE626'               # 
         PUBLIC_IP_ICON                 '\UF0AC'$s             # 
@@ -750,6 +754,7 @@ function _p9k_init_icons() {
         PYTHON_ICON                    '\UE73C '              # 
         CHEZMOI_ICON                   '\uF015'$s             # 
         SWIFT_ICON                     '\uE755'               # 
+        KOTLIN_ICON                    '\U1F17A'              # 🅺
         GO_ICON                        '\uE626'               # 
         GOLANG_ICON                    '\uE626'               # 
         PUBLIC_IP_ICON                 '\UF0AC'$s             # 
@@ -902,6 +907,7 @@ function _p9k_init_icons() {
         PYTHON_ICON                    'py'
         CHEZMOI_ICON                   'chezmoi'
         SWIFT_ICON                     'swift'
+        KOTLIN_ICON                    'kotlin'
         GO_ICON                        'go'
         GOLANG_ICON                    'go'
         PUBLIC_IP_ICON                 'ip'
@@ -1056,6 +1062,7 @@ function _p9k_init_icons() {
         PYTHON_ICON                    'Py'
         CHEZMOI_ICON                   'Chez'
         SWIFT_ICON                     'Swift'
+        KOTLIN_ICON                    'Kotlin'
         GO_ICON                        'Go'
         GOLANG_ICON                    'Go'
         PUBLIC_IP_ICON                 'IP'

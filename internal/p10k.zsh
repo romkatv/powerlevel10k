@@ -4519,6 +4519,18 @@ _p9k_prompt_swift_version_init() {
 }
 
 ################################################################
+# Segment to display Kotlin version
+prompt_kotlin_version() {
+  _p9k_cached_cmd 0 '' kotlin -version || return
+  [[ $_p9k__ret == (#b)[^[:digit:]]#([[:digit:].]##)* ]] || return
+  _p9k_prompt_segment "$0" "magenta" "white" 'KOTLIN_ICON' 0 '' "${match[1]//\%/%%}"
+}
+
+_p9k_prompt_kotlin_version_init() {
+  typeset -g "_p9k__segment_cond_${_p9k__prompt_side}[_p9k__segment_index]"='$commands[kotlin]'
+}
+
+################################################################
 # dir_writable: Display information about the user's permission to write in the current directory
 prompt_dir_writable() {
   if [[ ! -w "$_p9k__cwd_a" ]]; then
