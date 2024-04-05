@@ -4260,18 +4260,23 @@ function _p9k_parse_virtualenv_cfg() {
   typeset -ga reply=(0)
   [[ -f $1 && -r $1 ]] || return
 
-  local cfg
-  cfg=$(<$1) || return
+  local line res=""
+  while IFS= read -r line; do
+    if [[ "$line" =~ '^prompt[[:space:]]*=[[:space:]]*(.*)' ]]; then
+      res="${match[1]}"
+      break
+    fi
+  done < "$1"
 
-  local -a match mbegin mend
-  [[ $'\n'$cfg$'\n' == (#b)*$'\n'prompt[$' \t']#=[$' \t']#([^$' \t']#)[$' \t']#$'\n'* ]] || return
-  local res=$match[1]
+  # Return if res is empty, meaning no match was found
+  [[ -z "$res" ]] && return
+
   if [[ $res == (\"*\"|\'*\') ]]; then
     # The string is quoted in python style, which isn't the same as quoting in zsh.
     # For example, the literal 'foo"\'bar' denotes foo"'bar in python but in zsh
     # it is malformed.
     #
-    # We cheat a bit and impelement not exactly correct unquoting. It may produce
+    # We cheat a bit and implement not exactly correct unquoting. It may produce
     # different visual results but won't perform unintended expansions or bleed out
     # any escape sequences.
     #
