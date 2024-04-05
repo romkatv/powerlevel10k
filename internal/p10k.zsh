@@ -4260,23 +4260,18 @@ function _p9k_parse_virtualenv_cfg() {
   typeset -ga reply=(0)
   [[ -f $1 && -r $1 ]] || return
 
-  local line res=""
-  while IFS= read -r line; do
-    if [[ "$line" =~ '^prompt[[:space:]]*=[[:space:]]*(.*)' ]]; then
-      res="${match[1]}"
-      break
-    fi
-  done < "$1"
+  local cfg
+  cfg=$(<$1) || return
 
-  # Return if res is empty, meaning no match was found
-  [[ -z "$res" ]] && return
-
+  local -a match mbegin mend
+  [[ $'\n'$cfg$'\n' == (#b)*$'\n'prompt[$' \t']#=([^$'\n']#)$'\n'* ]] || return
+  local res=${${match[1]##[$' \t']#}%%[$' \t']#}
   if [[ $res == (\"*\"|\'*\') ]]; then
     # The string is quoted in python style, which isn't the same as quoting in zsh.
     # For example, the literal 'foo"\'bar' denotes foo"'bar in python but in zsh
     # it is malformed.
     #
-    # We cheat a bit and implement not exactly correct unquoting. It may produce
+    # We cheat a bit and impelement not exactly correct unquoting. It may produce
     # different visual results but won't perform unintended expansions or bleed out
     # any escape sequences.
     #
@@ -9483,7 +9478,7 @@ if [[ $__p9k_dump_file != $__p9k_instant_prompt_dump_file && -n $__p9k_instant_p
   zf_rm -f -- $__p9k_instant_prompt_dump_file{,.zwc} 2>/dev/null
 fi
 
-typeset -g P9K_VERSION=1.20.7
+typeset -g P9K_VERSION=1.20.8
 unset VSCODE_SHELL_INTEGRATION
 
 _p9k_init_ssh
