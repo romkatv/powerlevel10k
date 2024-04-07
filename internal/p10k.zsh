@@ -5234,7 +5234,10 @@ function _p9k_taskwarrior_check_data() {
 }
 
 function _p9k_taskwarrior_init_data() {
-  local -a stat files=($_p9k_taskwarrior_data_dir/{pending,completed}.data)
+  local -a stat files=(
+    $_p9k_taskwarrior_data_dir/{pending,completed}.data
+    $_p9k_taskwarrior_data_dir/taskchampion.sqlite3
+  )
   _p9k_taskwarrior_data_files=($^files(N))
   _p9k_taskwarrior_data_non_files=(${files:|_p9k_taskwarrior_data_files})
   if (( $#_p9k_taskwarrior_data_files )); then
