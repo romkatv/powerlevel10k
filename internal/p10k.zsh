@@ -1344,6 +1344,12 @@ _p9k_prompt_battery_init() {
     _p9k__async_segments_compute+='_p9k_worker_invoke battery _p9k_prompt_battery_compute'
     return
   fi
+  if [[ $+commands[termux-battery-status] == 1 && $+commands[jq] == 1 &&
+    $POWERLEVEL9K_ENABLE_TERMUX == 'true' ]]; then
+    typeset -g _p9k__battery_termux_api_enable=1
+    return
+  fi
+  # search /sys/class/power_supply with higher privilege than Android APK
   if [[ $_p9k_os != (Linux|Android) ||
         -z /sys/class/power_supply/(CMB*|BAT*|*battery)/(energy_full|charge_full|charge_counter)(#qN) ]]; then
     typeset -g "_p9k__segment_cond_${_p9k__prompt_side}[_p9k__segment_index]"='${:-}'
@@ -1400,14 +1406,38 @@ _p9k_prompt_battery_set_args() {
         ;;
       esac
     ;;
-
-    Linux|Android)
+    Android)
+      # Output example (https://wiki.termux.com/wiki/Termux-battery-status):
+      #
+      # {
+      #   "health": "GOOD",
+      #   "percentage": 82,
+      #   "plugged": "PLUGGED_AC",
+      #   "status": "CHARGING",
+      #   "temperature": 36.0,
+      #   "current": 2930
+      # }
+      if (( $+_p9k__battery_termux_api_enable )); then
+        local info=$(termux-battery-status)
+        bat_percent=$(jq -nr "$info | .percentage")
+        local -i is_full is_calculating is_charching
+        case $(jq -nr "$info | .status") in
+          FULL)
+            is_full=1
+          ;&
+          CHARGING)
+            is_charching=1
+          ;;
+        esac
+      fi
+    ;&
+    Linux)
       # See https://sourceforge.net/projects/acpiclient.
       local -a bats=( /sys/class/power_supply/(CMB*|BAT*|*battery)/(FN) )
-      (( $#bats )) || return
+      (( $#bats || $+_p9k__battery_termux_api_enable )) || return
 
       local -i energy_now energy_full power_now
-      local -i is_full=1 is_calculating is_charching
+      local -i is_full is_calculating is_charching
       local dir
       for dir in $bats; do
         _p9k_read_file $dir/status(N) && local bat_status=$_p9k__ret || continue
@@ -1425,13 +1455,14 @@ _p9k_prompt_battery_set_args() {
         elif _p9k_read_file $dir/(energy|charge)_now(N); then
           (( energy_now += _p9k__ret ))
         fi
-        [[ $bat_status != Full                                ]] && is_full=0
+        [[ $bat_status == Full                                ]] && is_full=1
         [[ $bat_status == Charging                            ]] && is_charching=1
         [[ $bat_status == (Charging|Discharging) && $pow == 0 ]] && is_calculating=1
       done
 
-      (( energy_full )) || return
+      (( energy_full || $+_p9k__battery_termux_api_enable )) || return
 
+      (( $+_p9k__battery_termux_api_enable )) ||
       bat_percent=$(( 100. * energy_now / energy_full + 0.5 ))
       (( bat_percent > 100 )) && bat_percent=100
 
@@ -7431,6 +7462,7 @@ _p9k_init_params() {
   _p9k_declare -i POWERLEVEL9K_INSTANT_PROMPT_COMMAND_LINES
   _p9k_declare -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS -- context dir vcs
   _p9k_declare -a POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS -- status root_indicator background_jobs history time
+  _p9k_declare -b POWERLEVEL9K_ENABLE_TERMUX 0
   _p9k_declare -b POWERLEVEL9K_DISABLE_RPROMPT 0
   _p9k_declare -b POWERLEVEL9K_PROMPT_ADD_NEWLINE 0
   _p9k_declare -b POWERLEVEL9K_PROMPT_ON_NEWLINE 0
