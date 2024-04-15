@@ -5312,7 +5312,9 @@ prompt_wifi() {
 
 _p9k_prompt_wifi_init() {
   if [[ -x /System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Resources/airport ||
-        -r /proc/net/wireless && -n $commands[iw] ]]; then
+        -r /proc/net/wireless && -n $commands[iw] ||
+        $+commands[termux-wifi-connectioninfo] == 1 && $+commands[jq] == 1 &&
+        $POWERLEVEL9K_ENABLE_TERMUX == 'true' ]]; then
     typeset -g _p9k__wifi_on=
     typeset -g P9K_WIFI_LAST_TX_RATE=
     typeset -g P9K_WIFI_SSID=
@@ -5388,6 +5390,29 @@ _p9k_prompt_wifi_async() {
         fi
       done
       [[ -n $ssid && -n $last_tx_rate ]] || return 0
+    # Output example (https://wiki.termux.com/wiki/Termux-wifi-connectioninfo):
+    #
+    # {
+    #   "bssid": "02:00:00:00:00:00",
+    #   "frequency_mhz": 2412,
+    #   "ip": "100.64.135.224",
+    #   "link_speed_mbps": 117,
+    #   "mac_address": "02:00:00:00:00:00",
+    #   "network_id": -1,
+    #   "rssi": -65,
+    #   "ssid": "<unknown ssid>",
+    #   "ssid_hidden": true,
+    #   "supplicant_state": "COMPLETED"
+    # }
+    elif [[ $+commands[termux-wifi-connectioninfo] == 1 && $+commands[jq] == 1 ]]; then
+      local info=$(termux-wifi-connectioninfo)
+      [[ $(jq -nr "$info | .supplicant_state") == 'COMPLETED' ]] || return 0
+      on=1
+      rssi=$(jq -nr "$info | .rssi")
+      last_tx_rate=$(jq -nr "$info | .link_speed_mbps")
+      if [[ $(jq -nr "$info | .ssid_hidden") == false ]]; then
+        ssid=$(jq -nr "$info | .ssid")
+      fi
     else
       return 0
     fi
@@ -7431,6 +7456,7 @@ _p9k_init_params() {
   _p9k_declare -i POWERLEVEL9K_INSTANT_PROMPT_COMMAND_LINES
   _p9k_declare -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS -- context dir vcs
   _p9k_declare -a POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS -- status root_indicator background_jobs history time
+  _p9k_declare -b POWERLEVEL9K_ENABLE_TERMUX 0
   _p9k_declare -b POWERLEVEL9K_DISABLE_RPROMPT 0
   _p9k_declare -b POWERLEVEL9K_PROMPT_ADD_NEWLINE 0
   _p9k_declare -b POWERLEVEL9K_PROMPT_ON_NEWLINE 0
