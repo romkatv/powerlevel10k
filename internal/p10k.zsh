@@ -5312,9 +5312,8 @@ prompt_wifi() {
 
 _p9k_prompt_wifi_init() {
   if [[ -x /System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Resources/airport ||
-        -r /proc/net/wireless && -n $commands[iw] ||
-        $+commands[termux-wifi-connectioninfo] == 1 && $+commands[jq] == 1 &&
-        $POWERLEVEL9K_ENABLE_TERMUX == 'true' ]]; then
+        -r /proc/net/wireless && -n $commands[iw] ]] ||
+     (( _POWERLEVEL9K_USE_DANGEROUS_TERMUX_API && $+commands[termux-wifi-connectioninfo] )); then
     typeset -g _p9k__wifi_on=
     typeset -g P9K_WIFI_LAST_TX_RATE=
     typeset -g P9K_WIFI_SSID=
@@ -5404,9 +5403,13 @@ _p9k_prompt_wifi_async() {
     #   "ssid_hidden": true,
     #   "supplicant_state": "COMPLETED"
     # }
-    elif [[ $+commands[termux-wifi-connectioninfo] == 1 && $+commands[jq] == 1 ]]; then
-      local info=$(termux-wifi-connectioninfo)
-      [[ $(jq -nr "$info | .supplicant_state") == 'COMPLETED' ]] || return 0
+    elif (( _POWERLEVEL9K_USE_DANGEROUS_TERMUX_API && $+commands[termux-wifi-connectioninfo] )); then
+      local json
+      json=$(command termux-wifi-connectioninfo) || return 0
+      [[ $json == *'"supplicant_state"'[[:space:]]#:[[:space:]]#'"COMPLETED"' ]] || return 0
+      local -a match mbegin mend
+      [[ $json == (#b)*'"rssi"'[[:space:]]#:[[:space:]]#(()) ]] || return 0
+      
       on=1
       rssi=$(jq -nr "$info | .rssi")
       last_tx_rate=$(jq -nr "$info | .link_speed_mbps")
@@ -7456,7 +7459,10 @@ _p9k_init_params() {
   _p9k_declare -i POWERLEVEL9K_INSTANT_PROMPT_COMMAND_LINES
   _p9k_declare -a POWERLEVEL9K_LEFT_PROMPT_ELEMENTS -- context dir vcs
   _p9k_declare -a POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS -- status root_indicator background_jobs history time
-  _p9k_declare -b POWERLEVEL9K_ENABLE_TERMUX 0
+  # By default, powerlevel10k won't invoke Termux API utilities because
+  # they can hang. See https://github.com/termux/termux-packages/issues/334.
+  # This option allows powerlevel10k to make these calls.
+  _p9k_declare -b POWERLEVEL9K_USE_DANGEROUS_TERMUX_API 0
   _p9k_declare -b POWERLEVEL9K_DISABLE_RPROMPT 0
   _p9k_declare -b POWERLEVEL9K_PROMPT_ADD_NEWLINE 0
   _p9k_declare -b POWERLEVEL9K_PROMPT_ON_NEWLINE 0
