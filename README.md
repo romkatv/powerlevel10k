@@ -649,6 +649,7 @@ If you are using a different terminal, proceed with manual font installation. �
      `MesloLGS NF`.
    - **Apple Terminal**: Open *Terminal → Preferences → Profiles → Text*, click *Change* under *Font*
      and select `MesloLGS NF` family.
+     - If you don't see the `MesloLGS NF` font type, restart your device. `sudo reboot`
    - **Hyper**: Open *Hyper → Edit → Preferences* and change the value of `fontFamily` under
      `module.exports.config` to `MesloLGS NF`.
    - **Visual Studio Code**: Open *File → Preferences → Settings* (PC) or
