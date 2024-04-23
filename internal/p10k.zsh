@@ -5264,7 +5264,9 @@ function _p9k_taskwarrior_init_data() {
     local -a ts
     ts=($(command task +PENDING -OVERDUE list rc.verbose=nothing rc.color=0 rc._forcecolor=0 \
       rc.report.list.labels= rc.report.list.columns=due.epoch </dev/null 2>/dev/null)) || ts=()
-    if (( $#ts )); then
+    # The second condition is a workaround for a bug in timewarrior v3.0.1.
+    # https://github.com/romkatv/powerlevel10k/issues/2648.
+    if (( $#ts && ! ${#${(@)ts:#(|-)<->(|.<->)}} )); then
       _p9k_taskwarrior_next_due=${${(on)ts}[1]}
       (( _p9k_taskwarrior_next_due > EPOCHSECONDS )) || _p9k_taskwarrior_next_due=$((EPOCHSECONDS+60))
     fi
