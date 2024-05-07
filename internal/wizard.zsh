@@ -1506,7 +1506,7 @@ function ask_empty_line() {
 }
 
 function print_instant_prompt_link() {
-  local link='https://github.com/romkatv/powerlevel10k/blob/master/README.md#instant-prompt'
+  local link='https://github.com/romkatv/powerlevel10k#instant-prompt'
   (( wizard_columns < $#link )) && return
   print
   flowing -c "$(href $link)"
