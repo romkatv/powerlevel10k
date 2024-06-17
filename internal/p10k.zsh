@@ -6161,7 +6161,7 @@ _p9k_dump_instant_prompt() {
   local user=${(%):-%n}
   local root_dir=${__p9k_dump_file:h}
   local prompt_dir=${root_dir}/p10k-$user
-  local root_file=$root_dir/p10k-instant-prompt-$user.zsh
+  local root_file=$root_dir/p10k-instant-prompt-$user${_P10K_CACHE_SUFFIX}.zsh
   local prompt_file=$prompt_dir/prompt-${#_p9k__cwd}
   [[ -d $prompt_dir ]] || mkdir -p $prompt_dir || return
   [[ -w $root_dir && -w $prompt_dir ]] || return
@@ -6461,7 +6461,7 @@ _p9k_dump_instant_prompt() {
   else
     local tmpdir=/tmp
   fi
-  typeset -g __p9k_instant_prompt_output=$tmpdir/p10k-instant-prompt-output-${(%):-%n}-$$
+  typeset -g __p9k_instant_prompt_output=$tmpdir/p10k-instant-prompt-output-${(%):-%n}${_P10K_CACHE_SUFFIX}-$$
   { : > $__p9k_instant_prompt_output } || return
   print -rn -- "${out}${esc}?2004h" || return
   if (( $+commands[stty] )); then
@@ -6476,7 +6476,7 @@ _p9k_dump_instant_prompt() {
     typeset -g _z4h_saved_screen
     -z4h-save-screen
   fi
-  typeset -g __p9k_instant_prompt_dump_file=${XDG_CACHE_HOME:-~/.cache}/p10k-dump-${(%):-%n}.zsh
+  typeset -g __p9k_instant_prompt_dump_file=${XDG_CACHE_HOME:-~/.cache}/p10k-dump-${(%):-%n}${_P10K_CACHE_SUFFIX}.zsh
   if builtin source $__p9k_instant_prompt_dump_file 2>/dev/null && (( $+functions[_p9k_preinit] )); then
     _p9k_preinit
   fi

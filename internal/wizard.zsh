@@ -1981,8 +1981,8 @@ function change_zshrc() {
       >>$tmp print -r -- "# Enable Powerlevel10k instant prompt. Should stay close to the top of ${(%)__p9k_zshrc_u}.
 # Initialization code that may require console input (password prompts, [y/n]
 # confirmations, etc.) must go above this block; everything else may go below.
-if [[ -r \"\${XDG_CACHE_HOME:-\$HOME/.cache}/p10k-instant-prompt-\${(%):-%n}.zsh\" ]]; then
-  source \"\${XDG_CACHE_HOME:-\$HOME/.cache}/p10k-instant-prompt-\${(%):-%n}.zsh\"
+if [[ -r \"\${XDG_CACHE_HOME:-\$HOME/.cache}/p10k-instant-prompt-\${(%):-%n}\${_P10K_CACHE_SUFFIX}.zsh\" ]]; then
+  source \"\${XDG_CACHE_HOME:-\$HOME/.cache}/p10k-instant-prompt-\${(%):-%n}\${_P10K_CACHE_SUFFIX}.zsh\"
 fi" || return
     fi
     if [[ -n $zshrc_content ]]; then
@@ -2036,7 +2036,7 @@ function check_zshrc_integration() {
   if [[ -n ${(@M)lines:#(#b)[^#]#([^[:IDENT:]]|)source[[:space:]]##(|--[[:space:]]##)($f1|$f2|$f3|$f4|$g1|$h0|$h1|$h2|$h3|$h4|$h5|$h6|$h7|$h8|$h9|$h10|$h11)(|[[:space:]]*|'#'*)} ]]; then
     zshrc_has_cfg=1
   fi
-  local pre='${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh'
+  local pre='${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}${_P10K_CACHE_SUFFIX}.zsh'
   if [[ -n ${(@M)lines:#(#b)[^#]#([^[:IDENT:]]|)source[[:space:]]##($pre|\"$pre\")(|[[:space:]]*|'#'*)} ]]; then
     zshrc_has_instant_prompt=1
   fi
