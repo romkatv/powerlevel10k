@@ -8473,7 +8473,13 @@ _p9k_init_ssh() {
   typeset -gix P9K_SSH=0
   typeset -gx _P9K_SSH_TTY=$TTY
   if [[ -n $SSH_CLIENT || -n $SSH_TTY || -n $SSH_CONNECTION ]]; then
-    P9K_SSH=1
+    p9k_ssh=1
+    return 0
+  elif [[ \
+    $(grep -i Microsoft /proc/version) && \
+    $(cmd.exe /c 'echo %SSH_CLIENT%' 2>/dev/null | sed $'s/\r//' | grep ' 22$') \
+  ]]; then
+    p9k_ssh=1
     return 0
   fi
 
