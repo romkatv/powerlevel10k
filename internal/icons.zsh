@@ -695,14 +695,14 @@ function _p9k_init_icons() {
         LINUX_OPENSUSE_ICON            '\uF314'$s             # 
         LINUX_SABAYON_ICON             '\uF317'$s             # 
         LINUX_SLACKWARE_ICON           '\uF319'$s             # 
-        LINUX_VOID_ICON                '\uF17C'               # 
-        LINUX_ARTIX_ICON               '\uF17C'               # 
+        LINUX_VOID_ICON                '\UF32E'$s             # 
+        LINUX_ARTIX_ICON               '\UF31F'$s             # 
         LINUX_UBUNTU_ICON              '\uF31b'$s             # 
-        LINUX_KALI_ICON                '\uF17C'               # 
+        LINUX_KALI_ICON                '\uF327'$s             # 
         LINUX_RHEL_ICON                '\uF316'$s             # 
         LINUX_AMZN_ICON                '\uF270'$s             # 
-        LINUX_ENDEAVOUROS_ICON         '\uF17C'               # 
-        LINUX_ROCKY_ICON               '\uF17C'               # 
+        LINUX_ENDEAVOUROS_ICON         '\UF322'$s             # 
+        LINUX_ROCKY_ICON               '\UF32B'$s             # 
         LINUX_GUIX_ICON                '\uF325'$s             # 
         LINUX_NEON_ICON                '\uF17C'               # 
         LINUX_ICON                     '\uF17C'               # 
