@@ -55,6 +55,7 @@ If you are using a different terminal, proceed with manual font installation. �
    - **Windows Terminal** by Microsoft (the new thing): Open *Settings* (<kbd>Ctrl+,</kbd>), click
      either on the selected profile under *Profiles* or on *Defaults*, click *Appearance* and set
      *Font face* to `MesloLGS NF`.
+   - **Conemu**: Open *Setup → General → Fonts* and set *Main console font* to `MesloLGS NF`.
    - **IntelliJ** (and other IDEs by Jet Brains): Open *IDE → Edit → Preferences → Editor →
      Color Scheme → Console Font*. Select *Use console font instead of the default* and set the font
      name to `MesloLGS NF`.
