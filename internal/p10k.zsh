@@ -4287,6 +4287,44 @@ function _p9k_parse_virtualenv_cfg() {
 }
 
 ################################################################
+# Segment to display poetry virtualenv information
+# https://python-poetry.org/
+prompt_poetry() {
+  local msg=''
+  if (( _POWERLEVEL9K_VIRTUALENV_SHOW_PYTHON_VERSION )) && _p9k_python_version; then
+    msg="${_p9k__ret//\%/%%} "
+  fi
+  _p9k_poetry_compute || return
+  msg+="$P9K_POETRY_PYTHON_VENV"
+  _p9k_prompt_segment "$0" "blue" "$_p9k_color1" 'PYTHON_ICON' 0 '' "$msg"
+}
+
+_p9k_prompt_poetry_init() {
+  typeset -g "_p9k__segment_cond_${_p9k__prompt_side}[_p9k__segment_index]"='${commands[poetry]:-${${+functions[poetry]}:#0}}'
+}
+
+function _p9k_poetry_compute() {
+  unset P9K_POETRY_PYTHON_VENV
+  case $_POWERLEVEL9K_VIRTUALENV_SHOW_WITH_POETRY in
+    true)
+      _p9k_upglob pyproject.toml
+      local idx=$?
+      if (( idx == 1 )); then
+        _p9k_cached_cmd 0 $_p9k__parent_dirs[idx]/pyproject.toml poetry env info -p || return
+      elif (( idx > 1 )); then
+        (( _POWERLEVEL9K_POETRY_VENV_PROJECT_ONLY )) && return
+        _p9k_cached_cmd 0 '' poetry env info -p || return
+      fi
+      if [[ $_p9k__ret == (#b)*/([^/]##) ]]; then
+        typeset -g P9K_POETRY_PYTHON_VENV=$match[1]
+        return
+      fi
+    ;;
+  esac
+  return 1
+}
+
+################################################################
 # Virtualenv: current working virtualenv
 # More information on virtualenv (Python):
 # https://virtualenv.pypa.io/en/latest/
