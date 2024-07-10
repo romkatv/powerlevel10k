@@ -1332,6 +1332,7 @@ _p9k_prompt_fvm_init() {
 }
 
 ################################################################
+# Segment that displays the battery status in levels and colors
 prompt_battery() {
   [[ $_p9k_os == (Linux|Android) ]] && _p9k_prompt_battery_set_args
   (( $#_p9k__battery_args )) && _p9k_prompt_segment "${_p9k__battery_args[@]}"
