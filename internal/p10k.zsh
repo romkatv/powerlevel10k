@@ -1332,7 +1332,6 @@ _p9k_prompt_fvm_init() {
 }
 
 ################################################################
-# Segment that displays the battery status in levels and colors
 prompt_battery() {
   [[ $_p9k_os == (Linux|Android) ]] && _p9k_prompt_battery_set_args
   (( $#_p9k__battery_args )) && _p9k_prompt_segment "${_p9k__battery_args[@]}"
@@ -1344,6 +1343,16 @@ _p9k_prompt_battery_init() {
     _p9k__async_segments_compute+='_p9k_worker_invoke battery _p9k_prompt_battery_compute'
     return
   fi
+
+  if [[ $_p9k_os == Windows ]]; then
+    if command -v wmic > /dev/null 2>&1; then # Test "wimc" command
+      _p9k__async_segments_compute+='_p9k_worker_invoke battery _p9k_prompt_battery_compute'
+      return
+    else
+      typeset -g "_p9k__segment_cond_${_p9k__prompt_side}[_p9k__segment_index]"='${:-}'
+    fi
+  fi
+
   if [[ $_p9k_os != (Linux|Android) ||
         -z /sys/class/power_supply/(CMB*|BAT*|*battery)/(energy_full|charge_full|charge_counter)(#qN) ]]; then
     typeset -g "_p9k__segment_cond_${_p9k__prompt_side}[_p9k__segment_index]"='${:-}'
@@ -1454,6 +1463,48 @@ _p9k_prompt_battery_set_args() {
           remain="..."
         fi
       fi
+    ;;
+
+    Windows)
+      # See Win32_Battery class members at https://learn.microsoft.com/en-us/windows/win32/cimwin32prov/win32-battery
+      battery_data=$(wmic path Win32_Battery get EstimatedChargeRemaining,BatteryStatus,EstimatedRunTime /format:list)
+      bat_percent=$(echo "$battery_data" | grep "EstimatedChargeRemaining" | awk -F'=' '{print $2}')
+      bat_status=$(echo "$battery_data" | grep "BatteryStatus" | awk -F'=' '{print $2}')
+      bat_remain_minutes=$(echo "$battery_data" | grep "EstimatedRunTime" | awk -F'=' '{print $2}')
+
+      # Missing critical parameters
+      if [[ -z "$bat_percent" || -z "$bat_status" || -z "$bat_remain_minutes" ]]; then
+          return 0
+      fi
+
+      case $bat_status in 
+        '1'|'4'|'5')
+            # When the battery is charging, system will show that bat_remain_minutes is 71582788 (min)
+            (( bat_remain_minutes < 71582788 )) && remain=$((bat_remain_minutes/60)):${(l#2##0#)$((bat_remain_minutes%60))} || remain=''
+            if (( bat_percent < _POWERLEVEL9K_BATTERY_LOW_THRESHOLD )); then
+                state=LOW
+            else
+                state=DISCONNECTED
+            fi
+        ;;
+        '2'|'6'|'7'|'8'|'9'|'11')
+            if (( bat_percent == 100 )); then
+                remain=''
+                state=CHARGED
+            else
+                (( bat_remain_minutes < 71582788 )) && remain=$((bat_remain_minutes/60)):${(l#2##0#)$((bat_remain_minutes%60))} || remain=''
+                state=CHARGING
+            fi
+        ;;
+        '3')
+            (( bat_remain_minutes < 71582788 )) && remain=$((bat_remain_minutes/60)):${(l#2##0#)$((bat_remain_minutes%60))} || remain=''
+            state=CHARGED
+        ;;
+        *)
+            state=CHARGED
+            remain=''
+        ;;
+      esac
     ;;
 
     *)
