@@ -1467,20 +1467,27 @@ _p9k_prompt_battery_set_args() {
     ;;
 
     Windows)
-      # See Win32_Battery class members at https://learn.microsoft.com/en-us/windows/win32/cimwin32prov/win32-battery
-      battery_data=$(wmic path Win32_Battery get EstimatedChargeRemaining,BatteryStatus,EstimatedRunTime /format:list)
-      bat_percent=$(echo "$battery_data" | grep "EstimatedChargeRemaining" | awk -F'=' '{print $2}')
-      bat_status=$(echo "$battery_data" | grep "BatteryStatus" | awk -F'=' '{print $2}')
-      bat_remain_minutes=$(echo "$battery_data" | grep "EstimatedRunTime" | awk -F'=' '{print $2}')
+      local raw_data
+      local -a info_values
+      # See definitions to Win32_Battery class members at https://learn.microsoft.com/en-us/windows/win32/cimwin32prov/win32-battery
+      {
+        read -r 2>/dev/null
+        read -r raw_data
+      } <<< "$(wmic path Win32_Battery get BatteryStatus,EstimatedChargeRemaining,EstimatedRunTime)"
 
-      # Missing critical parameters
-      if [[ -z "$bat_percent" || -z "$bat_status" || -z "$bat_remain_minutes" ]]; then
-          return 0
-      fi
+      # info_values[1]: BatteryStatus
+      # info_values[2]: EstimatedChargeRemaining
+      # info_values[3]: EstimatedRunTime
+      info_values=(${(s: :)raw_data})
 
-      case $bat_status in 
+      (( ${#info_values[@]} == 4 )) || return # Missing info_values (index [4] is for the following CRCR)
+      
+      bat_percent=${info_values[2]}
+      local -i bat_remain_minutes=${info_values[3]}
+
+      case ${info_values[1]} in 
         '1'|'4'|'5')
-            # When the battery is charging, system will show that bat_remain_minutes is 71582788 (min)
+            # When the battery is charging or full, system will show that bat_remain_minutes (EstimatedRunTime) is 71582788 (min)
             (( bat_remain_minutes < 71582788 )) && remain=$((bat_remain_minutes/60)):${(l#2##0#)$((bat_remain_minutes%60))} || remain=''
             if (( bat_percent < _POWERLEVEL9K_BATTERY_LOW_THRESHOLD )); then
                 state=LOW
