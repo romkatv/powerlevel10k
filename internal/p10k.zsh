@@ -1495,12 +1495,11 @@ _p9k_prompt_battery_set_args() {
                 state=DISCONNECTED
             fi
         ;;
-        '2'|'6'|'7'|'8'|'9'|'11')
+        '2'|'6'|'7'|'8'|'9'|'11') # In this case, the battery is likely to be charged and disconnected, or still been charging.
+            remain=''
             if (( bat_percent == 100 )); then
-                remain=''
                 state=CHARGED
             else
-                (( bat_remain_minutes < 71582788 )) && remain=$((bat_remain_minutes/60)):${(l#2##0#)$((bat_remain_minutes%60))} || remain=''
                 state=CHARGING
             fi
         ;;
