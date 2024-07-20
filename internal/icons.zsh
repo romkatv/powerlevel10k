@@ -76,6 +76,7 @@ function _p9k_init_icons() {
         LINUX_ROCKY_ICON               '\uE271'$s             # 
         LINUX_GUIX_ICON                '\uE271'$s             # 
         LINUX_NEON_ICON                '\uE271'$s             # 
+        LINUX_POSTMARKETOS_ICON        '\uE271'$s             # 
         SUNOS_ICON                     '\U1F31E'$q            # 🌞
         HOME_ICON                      '\uE12C'$s             # 
         HOME_SUB_ICON                  '\uE18D'$s             # 
@@ -234,6 +235,7 @@ function _p9k_init_icons() {
         LINUX_ROCKY_ICON               '\uF17C'$s             # 
         LINUX_GUIX_ICON                '\uF17C'$s             # 
         LINUX_NEON_ICON                '\uF17C'$s             # 
+        LINUX_POSTMARKETOS_ICON        '\uF17C'$s             # 
         SUNOS_ICON                     '\uF185 '              # 
         HOME_ICON                      '\uF015'$s             # 
         HOME_SUB_ICON                  '\uF07C'$s             # 
@@ -393,6 +395,7 @@ function _p9k_init_icons() {
         LINUX_ROCKY_ICON               "${CODEPOINT_OF_AWESOME_LINUX:+\\u$CODEPOINT_OF_AWESOME_LINUX$s}"
         LINUX_GUIX_ICON                "${CODEPOINT_OF_AWESOME_LINUX:+\\u$CODEPOINT_OF_AWESOME_LINUX$s}"
         LINUX_NEON_ICON                "${CODEPOINT_OF_AWESOME_LINUX:+\\u$CODEPOINT_OF_AWESOME_LINUX$s}"
+        LINUX_POSTMARKETOS_ICON        "${CODEPOINT_OF_AWESOME_LINUX:+\\u$CODEPOINT_OF_AWESOME_LINUX$s}"
         SUNOS_ICON                     "${CODEPOINT_OF_AWESOME_SUN_O:+\\u$CODEPOINT_OF_AWESOME_SUN_O }"
         HOME_ICON                      "${CODEPOINT_OF_AWESOME_HOME:+\\u$CODEPOINT_OF_AWESOME_HOME$s}"
         HOME_SUB_ICON                  "${CODEPOINT_OF_AWESOME_FOLDER_OPEN:+\\u$CODEPOINT_OF_AWESOME_FOLDER_OPEN$s}"
@@ -545,6 +548,7 @@ function _p9k_init_icons() {
         LINUX_ROCKY_ICON               '\UF32B'$s             # 
         LINUX_GUIX_ICON                '\UF325'$s             # 
         LINUX_NEON_ICON                '\uF17C'               # 
+        LINUX_POSTMARKETOS_ICON        '\UF374'$s             # 
         LINUX_ICON                     '\uF17C'               # 
         SUNOS_ICON                     '\uF185 '              # 
         HOME_ICON                      '\uF015'$s             # 
@@ -705,6 +709,7 @@ function _p9k_init_icons() {
         LINUX_ROCKY_ICON               '\uF17C'               # 
         LINUX_GUIX_ICON                '\uF325'$s             # 
         LINUX_NEON_ICON                '\uF17C'               # 
+        LINUX_POSTMARKETOS_ICON        '\UF374'$s             # 
         LINUX_ICON                     '\uF17C'               # 
         SUNOS_ICON                     '\uF185 '              # 
         HOME_ICON                      '\uF015'$s             # 
