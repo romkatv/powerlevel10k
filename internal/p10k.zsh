@@ -5812,7 +5812,7 @@ _p9k_preexec2() {
   typeset -g _p9k__preexec_cmd=$2
   _p9k__timer_start=EPOCHREALTIME
   P9K_TTY=old
-  (( ! $+_p9k__iterm_cmd )) || _p9k_iterm2_preexec
+  (( ! $+_p9k__iterm_cmd )) || _p9k_iterm2_preexec $_p9k__preexec_cmd
 }
 
 function _p9k_prompt_net_iface_init() {
@@ -8877,7 +8877,7 @@ function _p9k_iterm2_precmd() {
 }
 
 function _p9k_iterm2_preexec() {
-  [[ -t 1 ]] && builtin print -n '\e]133;C;\a'
+  [[ -t 1 ]] && builtin print -n -f '\e]133;C;cmdline=%q\a' $1
   typeset -gi _p9k__iterm_cmd=2
 }
 
