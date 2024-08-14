@@ -431,6 +431,7 @@ Powerlevel10k.
 - [Arch Linux](#arch-linux)
 - [Alpine Linux](#alpine-linux)
 - [Fig](#fig)
+- [Sheldon](#sheldon)
 
 ### Manual
 
@@ -553,6 +554,21 @@ ln -s /usr/share/zsh/plugins/powerlevel10k ~/.local/share/zsh/plugins/
 
 Follow the instructions on
 [this page](https://fig.io/plugins/other/powerlevel10k).
+
+### Sheldon
+
+Add the following to the Sheldon config file.
+
+```toml
+[plugins.powerlevel10k]
+github = "romkatv/powerlevel10k"
+```
+
+Or run the following to automatically add it.
+
+```zsh
+sheldon add powerlevel10k --github romkatv/powerlevel10k
+```
 
 ## Configuration
 
