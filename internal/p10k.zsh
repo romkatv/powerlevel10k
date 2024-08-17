@@ -5812,7 +5812,7 @@ _p9k_preexec2() {
   typeset -g _p9k__preexec_cmd=$2
   _p9k__timer_start=EPOCHREALTIME
   P9K_TTY=old
-  (( ! $+_p9k__iterm_cmd )) || _p9k_iterm2_preexec
+  (( ! $+_p9k__iterm_cmd )) || _p9k_iterm2_preexec "$1"
 }
 
 function _p9k_prompt_net_iface_init() {
@@ -8877,7 +8877,17 @@ function _p9k_iterm2_precmd() {
 }
 
 function _p9k_iterm2_preexec() {
-  [[ -t 1 ]] && builtin print -n '\e]133;C;\a'
+  if [[ -t 1 ]]; then
+    if (( ${+__p9k_use_osc133_c_cmdline} )); then
+      () {
+        emulate -L zsh -o extended_glob -o no_multibyte
+        local MATCH MBEGIN MEND
+        builtin printf '\e]133;C;cmdline_url=%s\a' "${1//(#m)[^a-zA-Z0-9"\/:_.-!'()~"]/%${(l:2::0:)$(([##16]#MATCH))}}"
+      } "$1"
+    else
+      builtin print -n '\e]133;C;\a'
+    fi
+  fi
   typeset -gi _p9k__iterm_cmd=2
 }
 
@@ -9082,6 +9092,7 @@ _p9k_precmd_first() {
   if [[ -n $KITTY_SHELL_INTEGRATION && KITTY_SHELL_INTEGRATION[(wIe)no-prompt-mark] -eq 0 ]]; then
     KITTY_SHELL_INTEGRATION+=' no-prompt-mark'
     (( $+__p9k_force_term_shell_integration )) || typeset -gri __p9k_force_term_shell_integration=1
+    (( $+__p9k_use_osc133_c_cmdline         )) || typeset -gri __p9k_use_osc133_c_cmdline=1
   elif [[ $TERM_PROGRAM == WarpTerminal ]]; then
     (( $+__p9k_force_term_shell_integration )) || typeset -gri __p9k_force_term_shell_integration=1
   fi
@@ -9483,7 +9494,7 @@ if [[ $__p9k_dump_file != $__p9k_instant_prompt_dump_file && -n $__p9k_instant_p
   zf_rm -f -- $__p9k_instant_prompt_dump_file{,.zwc} 2>/dev/null
 fi
 
-typeset -g P9K_VERSION=1.20.11
+typeset -g P9K_VERSION=1.20.12
 
 if [[ ${VSCODE_SHELL_INTEGRATION-} == <1-> && ${+__p9k_force_term_shell_integration} == 0 ]]; then
   typeset -gri __p9k_force_term_shell_integration=1
