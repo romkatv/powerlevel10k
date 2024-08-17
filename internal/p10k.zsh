@@ -9483,7 +9483,11 @@ if [[ $__p9k_dump_file != $__p9k_instant_prompt_dump_file && -n $__p9k_instant_p
   zf_rm -f -- $__p9k_instant_prompt_dump_file{,.zwc} 2>/dev/null
 fi
 
-typeset -g P9K_VERSION=1.20.10
+typeset -g P9K_VERSION=1.20.11
+
+if [[ ${VSCODE_SHELL_INTEGRATION-} == <1-> && ${+__p9k_force_term_shell_integration} == 0 ]]; then
+  typeset -gri __p9k_force_term_shell_integration=1
+fi
 unset VSCODE_SHELL_INTEGRATION
 
 _p9k_init_ssh
