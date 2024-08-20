@@ -8878,7 +8878,7 @@ function _p9k_iterm2_precmd() {
 
 function _p9k_iterm2_preexec() {
   if [[ -t 1 ]]; then
-    if (( ${+KITTY_SHELL_INTEGRATION} )); then
+    if (( ${+__p9k_use_osc133_c_cmdline} )); then
       () {
         emulate -L zsh -o extended_glob -o no_multibyte
         local MATCH MBEGIN MEND
@@ -9092,6 +9092,7 @@ _p9k_precmd_first() {
   if [[ -n $KITTY_SHELL_INTEGRATION && KITTY_SHELL_INTEGRATION[(wIe)no-prompt-mark] -eq 0 ]]; then
     KITTY_SHELL_INTEGRATION+=' no-prompt-mark'
     (( $+__p9k_force_term_shell_integration )) || typeset -gri __p9k_force_term_shell_integration=1
+    (( $+__p9k_use_osc133_c_cmdline         )) || typeset -gri __p9k_use_osc133_c_cmdline=1
   elif [[ $TERM_PROGRAM == WarpTerminal ]]; then
     (( $+__p9k_force_term_shell_integration )) || typeset -gri __p9k_force_term_shell_integration=1
   fi
