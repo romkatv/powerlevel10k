@@ -779,15 +779,13 @@ If you are using a different terminal, proceed with manual font installation. ðŸ
          font-style: italic;
      }
      ```
-   - **Deepin Terminal**: Open `~/.config/deepin/deepin-terminal/config.conf` and set `basic.interface.font` to `"MesloLGS NF"`.
+     **_CAVEAT_**: If you open the normal terminal preferences these settings will be overwritten.
+   - **Deepin Terminal**: Create or open `~/.config/deepin/deepin-terminal/config.conf` and add the following section
+     to it:
      ```ini
      [basic.interface.font]
-        value="MesloLGS NF"
-
-      [basic.interface.font_size]
-        value=10
+     value = "MesloLGS NF"
      ```
-     **_CAVEAT_**: If you open the normal terminal preferences these settings will be overwritten.
 1. Run `p10k configure` to generate a new `~/.p10k.zsh`. The old config may work
    incorrectly with the new font.
 
