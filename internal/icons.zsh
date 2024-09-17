@@ -861,7 +861,7 @@ function _p9k_init_icons() {
         LINUX_AMZN_ICON                'amzn'
         LINUX_ENDEAVOUROS_ICON         'edvos'
         LINUX_ROCKY_ICON               'rocky'
-        LINUX_ALMALINUX_ICON           'almalinux'
+        LINUX_ALMALINUX_ICON           'alma'
         LINUX_GUIX_ICON                'guix'
         LINUX_NEON_ICON                'neon'
         SUNOS_ICON                     'sunos'
