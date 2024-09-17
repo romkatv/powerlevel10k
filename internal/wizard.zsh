@@ -1164,6 +1164,7 @@ function os_icon_name() {
           amzn)                    echo LINUX_AMZN_ICON;;
           endeavouros)             echo LINUX_ENDEAVOUROS_ICON;;
           rocky)                   echo LINUX_ROCKY_ICON;;
+          almalinux)               echo LINUX_ALMALINUX_ICON;;
           guix)                    echo LINUX_GUIX_ICON;;
           neon)                    echo LINUX_NEON_ICON;;
           *)                       echo LINUX_ICON;;
