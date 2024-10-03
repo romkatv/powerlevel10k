@@ -153,7 +153,16 @@ case "$gitstatus_cpu" in
   ;;
 esac
 
-cflags="$archflag=$gitstatus_cpu -fno-plt -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security -fpie"
+case "$gitstatus_arch" in
+  e2k)
+    nopltflag=""
+  ;;
+  *)
+    nopltflag="-fno-plt"
+  ;;
+esac
+
+cflags="$archflag=$gitstatus_cpu $nopltflag -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security -fpie"
 ldflags=
 static_pie=
 
@@ -384,6 +393,7 @@ CFLAGS="$libgit2_cflags" command cmake \
   -DUSE_GSSAPI=OFF                     \
   -DUSE_NTLMCLIENT=OFF                 \
   -DBUILD_SHARED_LIBS=OFF              \
+  -G "Unix Makefiles"                  \
   $libgit2_cmake_flags                 \
   ..
 command make -j "$cpus" VERBOSE=1
@@ -545,6 +555,7 @@ if [ -z "$gitstatus_cpu" ]; then
     x86_64|amd64)   gitstatus_cpu=x86-64;;
     x86)            gitstatus_cpu=i586;;
     s390x)          gitstatus_cpu=z900;;
+    e2k)            gitstatus_cpu=native;;
     i386|i586|i686) gitstatus_cpu="$gitstatus_arch";;
     *)
       >&2 echo '[error] unable to infer target CPU architecture'
