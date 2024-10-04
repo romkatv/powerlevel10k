@@ -1344,6 +1344,16 @@ _p9k_prompt_battery_init() {
     _p9k__async_segments_compute+='_p9k_worker_invoke battery _p9k_prompt_battery_compute'
     return
   fi
+
+  if [[ $_p9k_os == Windows ]]; then
+    if command -v wmic > /dev/null 2>&1; then # Test "wimc" command
+      _p9k__async_segments_compute+='_p9k_worker_invoke battery _p9k_prompt_battery_compute'
+      return
+    else
+      typeset -g "_p9k__segment_cond_${_p9k__prompt_side}[_p9k__segment_index]"='${:-}'
+    fi
+  fi
+
   if [[ $_p9k_os != (Linux|Android) ||
         -z /sys/class/power_supply/(CMB*|BAT*|*battery)/(energy_full|charge_full|charge_counter)(#qN) ]]; then
     typeset -g "_p9k__segment_cond_${_p9k__prompt_side}[_p9k__segment_index]"='${:-}'
@@ -1454,6 +1464,54 @@ _p9k_prompt_battery_set_args() {
           remain="..."
         fi
       fi
+    ;;
+
+    Windows)
+      local raw_data
+      local -a info_values
+      # See definitions to Win32_Battery class members at https://learn.microsoft.com/en-us/windows/win32/cimwin32prov/win32-battery
+      {
+        read -r 2>/dev/null
+        read -r raw_data
+      } <<< "$(wmic path Win32_Battery get BatteryStatus,EstimatedChargeRemaining,EstimatedRunTime)"
+
+      # info_values[1]: BatteryStatus
+      # info_values[2]: EstimatedChargeRemaining
+      # info_values[3]: EstimatedRunTime
+      info_values=(${(s: :)raw_data})
+
+      (( ${#info_values[@]} == 4 )) || return # Missing info_values (index [4] is for the following CRCR)
+      
+      bat_percent=${info_values[2]}
+      local -i bat_remain_minutes=${info_values[3]}
+
+      case ${info_values[1]} in 
+        '1'|'4'|'5')
+            # When the battery is charging or full, system will show that bat_remain_minutes (EstimatedRunTime) is 71582788 (min)
+            (( bat_remain_minutes < 71582788 )) && remain=$((bat_remain_minutes/60)):${(l#2##0#)$((bat_remain_minutes%60))} || remain=''
+            if (( bat_percent < _POWERLEVEL9K_BATTERY_LOW_THRESHOLD )); then
+                state=LOW
+            else
+                state=DISCONNECTED
+            fi
+        ;;
+        '2'|'6'|'7'|'8'|'9'|'11') # In this case, the battery is likely to be charged and disconnected, or still been charging.
+            remain=''
+            if (( bat_percent == 100 )); then
+                state=CHARGED
+            else
+                state=CHARGING
+            fi
+        ;;
+        '3')
+            (( bat_remain_minutes < 71582788 )) && remain=$((bat_remain_minutes/60)):${(l#2##0#)$((bat_remain_minutes%60))} || remain=''
+            state=CHARGED
+        ;;
+        *)
+            state=CHARGED
+            remain=''
+        ;;
+      esac
     ;;
 
     *)
