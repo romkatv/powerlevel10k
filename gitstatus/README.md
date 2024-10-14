@@ -1,5 +1,9 @@
 # gitstatus
 
+- **THE PROJECT HAS VERY LIMITED SUPPORT**
+- **NO NEW FEATURES ARE IN THE WORKS**
+- **MOST BUGS WILL GO UNFIXED**
+
 **gitstatus** is a 10x faster alternative to `git status` and `git describe`. Its primary use
 case is to enable fast git prompt in interactive shells.
 
