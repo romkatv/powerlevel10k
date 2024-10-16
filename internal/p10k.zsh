@@ -8479,7 +8479,8 @@ _p9k_init_ssh() {
 
   # When changing user on a remote system, the $SSH_CONNECTION environment variable can be lost.
   # Attempt detection via `who`.
-  (( $+commands[who] )) || return
+  [[ -z "$(command -v who)" ]] && return
+  #(( $+commands[who] )) || return
 
   local ipv6='(([0-9a-fA-F]+:)|:){2,}[0-9a-fA-F]+'  # Simplified, only checks partial pattern.
   local ipv4='([0-9]{1,3}\.){3}[0-9]+'              # Simplified, allows invalid ranges.
