@@ -5751,6 +5751,8 @@ prompt_cpu_arch() {
   if _p9k_cache_ephemeral_get $0; then
     state=$_p9k__cache_val[1]
     text=$_p9k__cache_val[2]
+  elif [[ $_p9k_os == (Linux|Android) ]]; then
+    text=$(</proc/sys/kernel/arch)
   else
     local cmd
     for cmd in machine arch; do
