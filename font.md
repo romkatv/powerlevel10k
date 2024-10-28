@@ -78,6 +78,8 @@ If you are using a different terminal, proceed with manual font installation. �
      *Use these personal options* and change *Font:* under *Terminal UI* to `MesloLGS NF Regular`.
      To change the font for the remote host connections, go to *Preferences → Terminal Options →
      Look and Feel* and change *Font:* under *Terminal UI* to `MesloLGS NF Regular`.
+   - **Warp**: Open Warp and Navigate to *Settings* then *Appearance*.  Scroll down to *Text* Section
+     and under *"Terminal Font"*, select the `MesloLGS NF` font.
    - **WSLtty**: Right click on an open terminal and then on *Options*. In the *Text* section, under
      *Font*, click *"Select..."* and set Font to `MesloLGS NF Regular`.
    - **Yakuake**: Click *≡* → *Manage Profiles* → *New* → *Appearance*. Click *Choose* next to the
