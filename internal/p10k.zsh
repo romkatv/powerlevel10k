@@ -5752,15 +5752,19 @@ prompt_cpu_arch() {
     state=$_p9k__cache_val[1]
     text=$_p9k__cache_val[2]
   else
-    local cmd
-    for cmd in machine arch; do
-      (( $+commands[$cmd] )) || continue
-      if text=$(command -- $cmd) 2>/dev/null && [[ $text == [a-zA-Z][a-zA-Z0-9_]# ]]; then
-        break
-      else
-        text=
-      fi
-    done
+    if [[ -r /proc/sys/kernel/arch ]]; then
+      text=$(</proc/sys/kernel/arch)
+    else
+      local cmd
+      for cmd in machine arch; do
+        (( $+commands[$cmd] )) || continue
+        if text=$(command -- $cmd) 2>/dev/null && [[ $text == [a-zA-Z][a-zA-Z0-9_]# ]]; then
+          break
+        else
+          text=
+        fi
+      done
+    fi
     state=_${${(U)text}//İ/I}
     _p9k_cache_ephemeral_set "$state" "$text"
   fi
@@ -9495,7 +9499,7 @@ if [[ $__p9k_dump_file != $__p9k_instant_prompt_dump_file && -n $__p9k_instant_p
   zf_rm -f -- $__p9k_instant_prompt_dump_file{,.zwc} 2>/dev/null
 fi
 
-typeset -g P9K_VERSION=1.20.13
+typeset -g P9K_VERSION=1.20.14
 
 if [[ ${VSCODE_SHELL_INTEGRATION-} == <1-> && ${+__p9k_force_term_shell_integration} == 0 ]]; then
   typeset -gri __p9k_force_term_shell_integration=1
