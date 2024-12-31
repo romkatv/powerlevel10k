@@ -601,6 +601,7 @@ function _p9k_init_icons() {
         SWIFT_ICON                     '\uE755'               # 
         GO_ICON                        '\uE626'               # 
         GOLANG_ICON                    '\uE626'               # 
+        ZIG_ICON                       '\uE6A9'               # 
         PUBLIC_IP_ICON                 '\UF0AC'$s             # 
         LOCK_ICON                      '\UF023'               # 
         NORDVPN_ICON                   '\UF023'               # 

@@ -2198,6 +2198,21 @@ _p9k_prompt_go_version_init() {
 }
 
 ################################################################
+# Zig prompt
+prompt_zig_version() {
+  _p9k_cached_cmd 0 '' zig version || return
+  local v=$_p9k__ret
+  if (( _POWERLEVEL9K_ZIG_VERSION_PROJECT_ONLY )); then
+    _p9k_upglob build.zig -. && return
+  fi
+  _p9k_prompt_segment "$0" "orange1" "black" "ZIG_ICON" 0 '' "${v//\%/%%}"
+}
+
+_p9k_prompt_zig_version_init() {
+  typeset -g "_p9k__segment_cond_${_p9k__prompt_side}[_p9k__segment_index]"='$commands[zig]'
+}
+
+################################################################
 # Command number (in local history)
 prompt_history() {
   local -i len=$#_p9k__prompt _p9k__has_upglob
@@ -7653,6 +7668,7 @@ _p9k_init_params() {
   _p9k_declare -b POWERLEVEL9K_DOTNET_VERSION_PROJECT_ONLY 1
   _p9k_declare -b POWERLEVEL9K_GO_VERSION_PROJECT_ONLY 1
   _p9k_declare -b POWERLEVEL9K_RUST_VERSION_PROJECT_ONLY 1
+  _p9k_declare -b POWERLEVEL9K_ZIG_VERSION_PROJECT_ONLY 1
   _p9k_declare -b POWERLEVEL9K_PERLBREW_PROJECT_ONLY 1
   _p9k_declare -b POWERLEVEL9K_PERLBREW_SHOW_PREFIX 0
   _p9k_declare -b POWERLEVEL9K_JAVA_VERSION_PROJECT_ONLY 0
