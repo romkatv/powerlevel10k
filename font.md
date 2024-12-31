@@ -168,6 +168,11 @@ If you are using a different terminal, proceed with manual font installation. �
      [basic.interface.font]
      value = "MesloLGS NF"
      ```
+   - **Ghostty**: Open *Menu → Open Configuration* (Linux) or *Ghostty → Settings...* (Mac) and add
+     the following line:
+     ```text
+     font-family = "MesloLGS NF"
+     ```
 1. Run `p10k configure` to generate a new `~/.p10k.zsh`. The old config may work
    incorrectly with the new font.
 
