@@ -455,13 +455,13 @@ make sure to disable the current theme in your plugin manager. See
 
 1. Clone the repository:
     ```zsh
-    git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k
+    git clone --depth=1 https://github.com/romkatv/powerlevel10k.git "${ZSH_CUSTOM:-"${HOME}/.oh-my-zsh/custom"}/themes/powerlevel10k"
     ```
     Users in China can use the official mirror on gitee.com for faster download.<br>
     中国用户可以使用 gitee.com 上的官方镜像加速下载.
 
     ```zsh
-    git clone --depth=1 https://gitee.com/romkatv/powerlevel10k.git ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k
+    git clone --depth=1 https://gitee.com/romkatv/powerlevel10k.git "${ZSH_CUSTOM:-"${HOME}/.oh-my-zsh/custom"}/themes/powerlevel10k"
     ```
 2. Open `~/.zshrc`, find the line that sets `ZSH_THEME`, and change its value to `"powerlevel10k/powerlevel10k"`.
 
@@ -523,7 +523,7 @@ Add `plug "romkatv/powerlevel10k"` to `~/.zshrc`.
 
 ```zsh
 brew install powerlevel10k
-echo "source $(brew --prefix)/share/powerlevel10k/powerlevel10k.zsh-theme" >>~/.zshrc
+echo "source \"$(brew --prefix)/share/powerlevel10k/powerlevel10k.zsh-theme\"" >>~/.zshrc
 ```
 
 ### Arch Linux
@@ -717,7 +717,7 @@ If you are using a different terminal, proceed with manual font installation. �
       Restart kitty by closing all sessions and opening a new session.
    - **puTTY**: Set *Window* → *Appearance* → *Font* to `MesloLGS NF`. Requires puTTY
      version >= 0.75.
-   - **WezTerm**: Create or open `$HOME/.config/wezterm/wezterm.lua` and add the following:
+   - **WezTerm**: Create or open `"${HOME}/.config/wezterm/wezterm.lua"` and add the following:
      ```lua
      local wezterm = require 'wezterm';
      return {
@@ -857,7 +857,7 @@ The command to update Powerlevel10k depends on how it was installed.
 | Installation                  | Update command                                              |
 |-------------------------------|-------------------------------------------------------------|
 | [Manual](#manual)             | `git -C ~/powerlevel10k pull`                               |
-| [Oh My Zsh](#oh-my-zsh)       | `git -C ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k pull` |
+| [Oh My Zsh](#oh-my-zsh)       | `git -C "${ZSH_CUSTOM:-"${HOME}/.oh-my-zsh/custom"}/themes/powerlevel10k" pull` |
 | [Prezto](#prezto)             | `zprezto-update`                                            |
 | [Zim](#zim)                   | `zimfw update`                                              |
 | [Antigen](#antigen)           | `antigen update`                                            |
@@ -879,8 +879,8 @@ The command to update Powerlevel10k depends on how it was installed.
 
 1. Remove all references to "p10k" from `~/.zshrc`. You might have this snippet at the top:
    ```zsh
-   if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
-     source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
+   if [[ -r "${XDG_CACHE_HOME:-"${HOME}/.cache"}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
+     source "${XDG_CACHE_HOME:-"${HOME}/.cache"}/p10k-instant-prompt-${(%):-%n}.zsh"
    fi
    ```
    And this at the bottom:
@@ -911,7 +911,7 @@ The command to update Powerlevel10k depends on how it was installed.
    | Installation                  | Uninstall command                                                |
    |-------------------------------|------------------------------------------------------------------|
    | [Manual](#manual)             | `rm -rf ~/powerlevel10k`                                         |
-   | [Oh My Zsh](#oh-my-zsh)       | `rm -rf -- ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k` |
+   | [Oh My Zsh](#oh-my-zsh)       | `rm -rf -- "${ZSH_CUSTOM:-"${HOME}/.oh-my-zsh/custom"}/themes/powerlevel10k"` |
    | [Prezto](#prezto)             | n/a                                                              |
    | [Zim](#zim)                   | `zimfw uninstall`                                                |
    | [Antigen](#antigen)           | `antigen purge romkatv/powerlevel10k`                            |
@@ -928,7 +928,7 @@ The command to update Powerlevel10k depends on how it was installed.
 6. Restart Zsh. [Do not use `source ~/.zshrc`](#weird-things-happen-after-typing-source-zshrc).
 7. Delete Powerlevel10k cache files.
    ```zsh
-   rm -rf -- "${XDG_CACHE_HOME:-$HOME/.cache}"/p10k-*(N) "${XDG_CACHE_HOME:-$HOME/.cache}"/gitstatus
+   rm -rf -- "${XDG_CACHE_HOME:-"${HOME}/.cache"}"/p10k-*(N) "${XDG_CACHE_HOME:-"${HOME}/.cache"}/gitstatus"
    ```
 
 ### How do I install Powerlevel10k on a machine without Internet access?
@@ -942,7 +942,7 @@ The command to update Powerlevel10k depends on how it was installed.
    ```sh
    target_uname="replace this with the output of the previous command"
    git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ~/powerlevel10k
-   GITSTATUS_CACHE_DIR="$HOME"/powerlevel10k/gitstatus/usrbin ~/powerlevel10k/gitstatus/install -f -s "${target_uname% *}" -m "${target_uname#* }"
+   GITSTATUS_CACHE_DIR="${HOME}/powerlevel10k/gitstatus/usrbin" ~/powerlevel10k/gitstatus/install -f -s "${target_uname% *}" -m "${target_uname#* }"
    ```
 3. Copy `~/powerlevel10k` from the machine connected to the Internet to the one without Internet
    access.
@@ -1003,7 +1003,7 @@ Powerlevel10k does not affect:
 1. Run this command:
 ```zsh
 # Add powerlevel10k to the list of Oh My Zsh themes.
-git clone --depth=1 https://github.com/romkatv/powerlevel10k.git $ZSH_CUSTOM/themes/powerlevel10k
+git clone --depth=1 https://github.com/romkatv/powerlevel10k.git "${ZSH_CUSTOM:-"${HOME}/.oh-my-zsh/custom"}/themes/powerlevel10k"
 # Replace ZSH_THEME="powerlevel9k/powerlevel9k" with ZSH_THEME="powerlevel10k/powerlevel10k".
 sed -i.bak 's/powerlevel9k/powerlevel10k/g' ~/.zshrc
 # Restart Zsh.
@@ -1039,8 +1039,8 @@ code snippet at the top of `~/.zshrc`:
 # Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
 # Initialization code that may require console input (password prompts, [y/n]
 # confirmations, etc.) must go above this block; everything else may go below.
-if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
-  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
+if [[ -r "${XDG_CACHE_HOME:-"${HOME}/.cache"}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
+  source "${XDG_CACHE_HOME:-"${HOME}/.cache"}/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
 ```
 
@@ -1063,8 +1063,8 @@ the output, or move it above the instant prompt preamble.
 Here's an example of `~/.zshrc` that breaks when instant prompt is enabled:
 
 ```zsh
-if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
-  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
+if [[ -r "${XDG_CACHE_HOME:-"${HOME}/.cache"}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
+  source "${XDG_CACHE_HOME:-"${HOME}/.cache"}/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
 
 keychain id_rsa --agents ssh  # asks for password
@@ -1078,8 +1078,8 @@ Fixed version:
 keychain id_rsa --agents ssh  # moved before instant prompt
 
 # OK to perform console I/O before this point.
-if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
-  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
+if [[ -r "${XDG_CACHE_HOME:-"${HOME}/.cache"}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
+  source "${XDG_CACHE_HOME:-"${HOME}/.cache"}/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
 # From this point on, until zsh is fully initialized, console input won't work and
 # console output may appear uncolored.
@@ -1116,8 +1116,8 @@ If you've enabled [instant prompt](#instant-prompt), you should have these lines
 `~/.zshrc`:
 
 ```zsh
-if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
-  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
+if [[ -r "${XDG_CACHE_HOME:-"${HOME}/.cache"}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
+  source "${XDG_CACHE_HOME:-"${HOME}/.cache"}/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
 ```
 
@@ -1126,8 +1126,8 @@ To initialize direnv you need to add one line above that block and one line belo
 ```zsh
 (( ${+commands[direnv]} )) && emulate zsh -c "$(direnv export zsh)"
 
-if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
-  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
+if [[ -r "${XDG_CACHE_HOME:-"${HOME}/.cache"}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
+  source "${XDG_CACHE_HOME:-"${HOME}/.cache"}/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
 
 (( ${+commands[direnv]} )) && emulate zsh -c "$(direnv hook zsh)"
@@ -1141,12 +1141,12 @@ fi
 You can export `GPG_TTY` like this anywhere in `~/.zshrc`:
 
 ```zsh
-export GPG_TTY=$TTY
+export GPG_TTY="${TTY}"
 ```
 
 This works whether you are using [instant prompt](#instant-prompt) or not. It works even if you
 aren't using powerlevel10k. As an extra bonus, it's much faster than the commonly used
-`export GPG_TTY=$(tty)`.
+`export GPG_TTY="$(tty)"`.
 
 *Related*: [How do I initialize direnv when using instant prompt?](
   #how-do-i-initialize-direnv-when-using-instant-prompt)
@@ -1574,7 +1574,7 @@ When opening a terminal, or starting zsh manually, you may encounter this error 
    - If `typeset -p P9K_VERSION` fails with the error `typeset: no such variable: P9K_VERSION`, run
      the following command:
      ```zsh
-     git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k
+     git clone --depth=1 https://github.com/romkatv/powerlevel10k.git "${ZSH_CUSTOM:-"${HOME}/.oh-my-zsh/custom"}/themes/powerlevel10k"
      ```
 2. Restart Zsh with `exec zsh`.
 
