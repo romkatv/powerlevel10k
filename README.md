@@ -455,13 +455,13 @@ make sure to disable the current theme in your plugin manager. See
 
 1. Clone the repository:
     ```zsh
-    git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k
+    git clone --depth=1 https://github.com/romkatv/powerlevel10k.git "${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k"
     ```
     Users in China can use the official mirror on gitee.com for faster download.<br>
     中国用户可以使用 gitee.com 上的官方镜像加速下载.
 
     ```zsh
-    git clone --depth=1 https://gitee.com/romkatv/powerlevel10k.git ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k
+    git clone --depth=1 https://gitee.com/romkatv/powerlevel10k.git "${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k"
     ```
 2. Open `~/.zshrc`, find the line that sets `ZSH_THEME`, and change its value to `"powerlevel10k/powerlevel10k"`.
 
@@ -523,7 +523,7 @@ Add `plug "romkatv/powerlevel10k"` to `~/.zshrc`.
 
 ```zsh
 brew install powerlevel10k
-echo "source $(brew --prefix)/share/powerlevel10k/powerlevel10k.zsh-theme" >>~/.zshrc
+echo "source \"$(brew --prefix)/share/powerlevel10k/powerlevel10k.zsh-theme\"" >>~/.zshrc
 ```
 
 ### Arch Linux
@@ -717,7 +717,7 @@ If you are using a different terminal, proceed with manual font installation. �
       Restart kitty by closing all sessions and opening a new session.
    - **puTTY**: Set *Window* → *Appearance* → *Font* to `MesloLGS NF`. Requires puTTY
      version >= 0.75.
-   - **WezTerm**: Create or open `$HOME/.config/wezterm/wezterm.lua` and add the following:
+   - **WezTerm**: Create or open `"$HOME/.config/wezterm/wezterm.lua"` and add the following:
      ```lua
      local wezterm = require 'wezterm';
      return {
@@ -857,7 +857,7 @@ The command to update Powerlevel10k depends on how it was installed.
 | Installation                  | Update command                                              |
 |-------------------------------|-------------------------------------------------------------|
 | [Manual](#manual)             | `git -C ~/powerlevel10k pull`                               |
-| [Oh My Zsh](#oh-my-zsh)       | `git -C ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k pull` |
+| [Oh My Zsh](#oh-my-zsh)       | `git -C "${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k" pull` |
 | [Prezto](#prezto)             | `zprezto-update`                                            |
 | [Zim](#zim)                   | `zimfw update`                                              |
 | [Antigen](#antigen)           | `antigen update`                                            |
@@ -911,7 +911,7 @@ The command to update Powerlevel10k depends on how it was installed.
    | Installation                  | Uninstall command                                                |
    |-------------------------------|------------------------------------------------------------------|
    | [Manual](#manual)             | `rm -rf ~/powerlevel10k`                                         |
-   | [Oh My Zsh](#oh-my-zsh)       | `rm -rf -- ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k` |
+   | [Oh My Zsh](#oh-my-zsh)       | `rm -rf -- "${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k"` |
    | [Prezto](#prezto)             | n/a                                                              |
    | [Zim](#zim)                   | `zimfw uninstall`                                                |
    | [Antigen](#antigen)           | `antigen purge romkatv/powerlevel10k`                            |
@@ -1003,7 +1003,7 @@ Powerlevel10k does not affect:
 1. Run this command:
 ```zsh
 # Add powerlevel10k to the list of Oh My Zsh themes.
-git clone --depth=1 https://github.com/romkatv/powerlevel10k.git $ZSH_CUSTOM/themes/powerlevel10k
+git clone --depth=1 https://github.com/romkatv/powerlevel10k.git "${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k"
 # Replace ZSH_THEME="powerlevel9k/powerlevel9k" with ZSH_THEME="powerlevel10k/powerlevel10k".
 sed -i.bak 's/powerlevel9k/powerlevel10k/g' ~/.zshrc
 # Restart Zsh.
@@ -1574,7 +1574,7 @@ When opening a terminal, or starting zsh manually, you may encounter this error 
    - If `typeset -p P9K_VERSION` fails with the error `typeset: no such variable: P9K_VERSION`, run
      the following command:
      ```zsh
-     git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k
+     git clone --depth=1 https://github.com/romkatv/powerlevel10k.git "${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k"
      ```
 2. Restart Zsh with `exec zsh`.
 
