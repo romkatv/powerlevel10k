@@ -523,7 +523,7 @@ Add `plug "romkatv/powerlevel10k"` to `~/.zshrc`.
 
 ```zsh
 brew install powerlevel10k
-echo "source \"$(brew --prefix)/share/powerlevel10k/powerlevel10k.zsh-theme\"" >>~/.zshrc
+echo "source $(brew --prefix)/share/powerlevel10k/powerlevel10k.zsh-theme" >>~/.zshrc
 ```
 
 ### Arch Linux
@@ -717,7 +717,7 @@ If you are using a different terminal, proceed with manual font installation. �
       Restart kitty by closing all sessions and opening a new session.
    - **puTTY**: Set *Window* → *Appearance* → *Font* to `MesloLGS NF`. Requires puTTY
      version >= 0.75.
-   - **WezTerm**: Create or open `"$HOME/.config/wezterm/wezterm.lua"` and add the following:
+   - **WezTerm**: Create or open `$HOME/.config/wezterm/wezterm.lua` and add the following:
      ```lua
      local wezterm = require 'wezterm';
      return {
