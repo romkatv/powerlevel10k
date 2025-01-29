@@ -102,7 +102,7 @@ typeset -grA __p9k_pb_term_skip=(
 
 # Usage: _p9k_parse_buffer <buffer> [token-limit]
 #
-# Parses the specified command line buffer and pupulates array P9K_COMMANDS
+# Parses the specified command line buffer and populates array P9K_COMMANDS
 # with commands from it. Terminates early and returns 1 if there are more
 # tokens than the specified limit.
 #
