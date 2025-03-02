@@ -176,7 +176,6 @@ If you are using a different terminal, proceed with manual font installation. ðŸ
    - **kmscon**: Add the line `font-name=MesloLGS NF` to `/etc/kmscon/kmscon.conf`. If `MesloLGS` is
      not rendered correctly, other fonts like `UbuntuMono Nerd Font Mono` or `Hack Nerd Font Mono`
      might work. Check [this issue](https://github.com/Aetf/kmscon/issues/18) for more information.
-
 1. Run `p10k configure` to generate a new `~/.p10k.zsh`. The old config may work
    incorrectly with the new font.
 
