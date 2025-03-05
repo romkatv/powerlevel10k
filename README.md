@@ -788,6 +788,8 @@ If you are using a different terminal, proceed with manual font installation. ðŸ
      ```text
      font-family = "MesloLGS NF"
      ```
+   - **ddterm** (Gnome Extension): Right click on open terminal and hover on *Preferences*. Select *Preferences...*
+     in submenu. Click *Text* tab and set the custom font to `MesloLGS NF Regular`.
 1. Run `p10k configure` to generate a new `~/.p10k.zsh`. The old config may work
    incorrectly with the new font.
 
