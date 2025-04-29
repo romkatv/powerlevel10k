@@ -4918,6 +4918,10 @@ function _p9k_fetch_nordvpn_status() {
 #   POWERLEVEL9K_NORDVPN_CONNECTING_CONTENT_EXPANSION='${P9K_NORDVPN_COUNTRY_CODE}'
 #   POWERLEVEL9K_NORDVPN_CONNECTING_BACKGROUND=cyan
 function prompt_nordvpn() {
+  # This prompt segment is broken. See https://github.com/romkatv/powerlevel10k/issues/2860.
+  # It is disabled until it is fixed.
+  return
+
   unset $__p9k_nordvpn_tag P9K_NORDVPN_COUNTRY_CODE
   [[ -e /run/nordvpn/nordvpnd.sock ]] || return
   _p9k_fetch_nordvpn_status 2>/dev/null || return
@@ -9499,7 +9503,7 @@ if [[ $__p9k_dump_file != $__p9k_instant_prompt_dump_file && -n $__p9k_instant_p
   zf_rm -f -- $__p9k_instant_prompt_dump_file{,.zwc} 2>/dev/null
 fi
 
-typeset -g P9K_VERSION=1.20.14
+typeset -g P9K_VERSION=1.20.15
 
 if [[ ${VSCODE_SHELL_INTEGRATION-} == <1-> && ${+__p9k_force_term_shell_integration} == 0 ]]; then
   typeset -gri __p9k_force_term_shell_integration=1
