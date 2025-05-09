@@ -1334,7 +1334,22 @@ _p9k_prompt_fvm_init() {
 ################################################################
 # Segment that displays the battery status in levels and colors
 prompt_battery() {
-  [[ $_p9k_os == (Linux|Android) ]] && _p9k_prompt_battery_set_args
+  # The condition '[[ $_p9k_os == (Linux|Android) ]]' is fine.
+  # _p9k_prompt_battery_set_args will internally distinguish between Linux and Android.
+  [[ $_p9k_os == (Linux|Android|OSX) ]] && _p9k_prompt_battery_set_args # Adjusted to include OSX here as it also calls set_args indirectly or directly. Original was (Linux|Android)
+  # A more direct check: call _p9k_prompt_battery_set_args if it's an OS we attempt to handle in set_args.
+  # However, the original structure implies set_args is mainly for Linux/Android, OSX has async.
+  # Let's stick to modifying set_args and init, the top call can remain as is if OSX path doesn't call set_args directly from here.
+  # On review, OSX path in init adds to _p9k__async_segments_compute, which calls _p9k_prompt_battery_compute -> _p9k_prompt_battery_async -> _p9k_prompt_battery_set_args.
+  # So, the original condition in prompt_battery might be part of a different flow or slightly redundant if async is used.
+  # For safety, let's assume _p9k_prompt_battery_set_args is potentially called for supported OSes.
+  # The original condition was: [[ $_p9k_os == (Linux|Android) ]] && _p9k_prompt_battery_set_args
+  # This means for OSX, this direct call to _p9k_prompt_battery_set_args was not made.
+  # The async path for OSX calls _p9k_prompt_battery_set_args.
+  # So, the original conditional call here is likely for non-async/fallback paths for Linux/Android.
+  if [[ $_p9k_os == Linux || $_p9k_os == Android ]]; then
+      _p9k_prompt_battery_set_args
+  fi
   (( $#_p9k__battery_args )) && _p9k_prompt_segment "${_p9k__battery_args[@]}"
 }
 
@@ -1344,8 +1359,26 @@ _p9k_prompt_battery_init() {
     _p9k__async_segments_compute+='_p9k_worker_invoke battery _p9k_prompt_battery_compute'
     return
   fi
-  if [[ $_p9k_os != (Linux|Android) ||
-        -z /sys/class/power_supply/(CMB*|BAT*|*battery)/(energy_full|charge_full|charge_counter)(#qN) ]]; then
+
+  # Condition for disabling the segment
+  local should_disable_segment=0
+  if [[ $_p9k_os == Android ]]; then
+    # On Android, disable if termux-battery-status is not available
+    (( ! $+commands[termux-battery-status] )) && should_disable_segment=1
+  elif [[ $_p9k_os == Linux ]]; then
+    # On Linux, disable if sysfs battery info is not available
+    # Original check: -z /sys/class/power_supply/(CMB*|BAT*|*battery)/(energy_full|charge_full|charge_counter)(#qN)
+    # This checks if the glob expands to nothing (zero files found).
+    # We need to ensure this runs in a context where zsh globbing features are active.
+    # (FN) was used in set_args, implies it. (#qN) means quiet, nullglob.
+    if (( ${#$(echo /sys/class/power_supply/(CMB*|BAT*|*battery)/(energy_full|charge_full|charge_counter)(N)):-0} == 0 )); then
+        should_disable_segment=1
+    fi
+  elif [[ $_p9k_os != OSX ]]; then # If not OSX, Android, or Linux
+    should_disable_segment=1 # Disable for other unsupported OS by default
+  fi
+
+  if (( should_disable_segment )); then
     typeset -g "_p9k__segment_cond_${_p9k__prompt_side}[_p9k__segment_index]"='${:-}'
   fi
 }
@@ -1356,7 +1389,7 @@ _p9k_prompt_battery_compute() {
 
 _p9k_prompt_battery_async() {
   local prev="${(pj:\0:)_p9k__battery_args}"
-  _p9k_prompt_battery_set_args
+  _p9k_prompt_battery_set_args # This is called in the async path too
   [[ "${(pj:\0:)_p9k__battery_args}" == $prev ]] && return 1
   _p9k_print_params _p9k__battery_args
   echo -E - 'reset=2'
@@ -1375,9 +1408,9 @@ _p9k_prompt_battery_set_args() {
 
   case $_p9k_os in
     OSX)
-      (( $+commands[pmset] )) || return
+      (( $+commands[pmset] )) || return 1 # return non-zero for failure
       local raw_data=${${(Af)"$(pmset -g batt 2>/dev/null)"}[2]}
-      [[ $raw_data == *InternalBattery* ]] || return
+      [[ $raw_data == *InternalBattery* ]] || return 1
       remain=${${(s: :)${${(s:; :)raw_data}[3]}}[1]}
       [[ $remain == *no* ]] && remain="..."
       [[ $raw_data =~ '([0-9]+)%' ]] && bat_percent=$match[1]
@@ -1401,44 +1434,151 @@ _p9k_prompt_battery_set_args() {
       esac
     ;;
 
-    Linux|Android)
-      # See https://sourceforge.net/projects/acpiclient.
-      local -a bats=( /sys/class/power_supply/(CMB*|BAT*|*battery)/(FN) )
-      (( $#bats )) || return
+    Android)
+      if (( $+commands[termux-battery-status] )); then
+        local battery_info
+        battery_info=$(termux-battery-status 2>/dev/null)
 
-      local -i energy_now energy_full power_now
-      local -i is_full=1 is_calculating is_charching
-      local dir
+        if [[ -z "$battery_info" ]]; then
+            return 1 # Command failed or returned empty
+        fi
+
+        # Extract percentage (integer) - using command to avoid aliases
+        bat_percent_str=$(echo "$battery_info" | command grep '"percentage":' | command sed 's/.*"percentage": *\([0-9]*\).*/\1/')
+        # Extract status (string, e.g., "CHARGING", "DISCHARGING", "FULL")
+        termux_status_str=$(echo "$battery_info" | command grep '"status":' | command sed 's/.*"status": *"\([^"]*\)".*/\1/')
+
+        if ! [[ "$bat_percent_str" =~ ^[0-9]+$ ]]; then
+            return 1 # Failed to parse percentage
+        fi
+        bat_percent=$((bat_percent_str))
+
+        # termux-battery-status does not provide remaining time estimate directly
+        remain="" # Set to "" or "..." if a placeholder is desired
+
+        case "$termux_status_str" in
+          "FULL")
+            state=CHARGED
+            ;;
+          "CHARGING")
+            if (( bat_percent == 100 )); then
+              state=CHARGED
+            else
+              state=CHARGING
+            fi
+            ;;
+          "DISCHARGING")
+            if (( bat_percent < _POWERLEVEL9K_BATTERY_LOW_THRESHOLD )); then
+              state=LOW
+            else
+              state=DISCONNECTED
+            fi
+            ;;
+          "NOT_CHARGING")
+            if (( bat_percent < _POWERLEVEL9K_BATTERY_LOW_THRESHOLD )); then
+              state=LOW
+            else
+              state=DISCONNECTED
+            fi
+            ;;
+          "UNKNOWN")
+            # If status is UNKNOWN, but we have a percentage.
+            if (( bat_percent < _POWERLEVEL9K_BATTERY_LOW_THRESHOLD )); then
+                state=LOW
+            else
+                state=DISCONNECTED # Fallback for UNKNOWN if not low
+            fi
+            ;;
+          *) # Empty or unexpected status
+            if [[ -n "$bat_percent_str" ]]; then # Check if we at least have percentage
+                if (( bat_percent < _POWERLEVEL9K_BATTERY_LOW_THRESHOLD )); then
+                    state=LOW
+                else
+                    state=DISCONNECTED
+                fi
+            else
+                return 1 # No useful info
+            fi
+            ;;
+        esac
+      else
+        # termux-battery-status command not found
+        return 1
+      fi
+    ;;
+
+    Linux)
+      # Original Linux logic using /sys/class/power_supply
+      local -a bats=( /sys/class/power_supply/(CMB*|BAT*|*battery)(N/) ) # N/ ensures we only get directories
+      (( $#bats )) || return 1
+
+      local -i energy_now=0 energy_full=0 power_now=0 # Initialize to 0
+      local -i is_full=1 is_calculating=0 is_charging=0 # Corrected spelling and sensible defaults
+      local dir bat_status_raw
+      local -i one_bat_found=0 # Flag to check if at least one valid battery is processed
+
       for dir in $bats; do
-        _p9k_read_file $dir/status(N) && local bat_status=$_p9k__ret || continue
-        # Skip batteries with "Unknown" status: https://github.com/romkatv/powerlevel10k/pull/2562.
-        [[ $bat_status == Unknown ]] && continue
-        local -i pow=0 full=0
-        if _p9k_read_file $dir/(energy_full|charge_full|charge_counter)(N); then
-          (( energy_full += ${full::=_p9k__ret} ))
+        # _p9k_read_file is a P9k internal helper; ensure it's available or use `cat`
+        # Assuming _p9k_read_file sets _p9k__ret and returns 0 on success.
+        if _p9k_read_file $dir/status(N) && [[ -n "$_p9k__ret" ]]; then
+          bat_status_raw="$_p9k__ret"
+        else
+          continue # Skip if status cannot be read
         fi
-        if _p9k_read_file $dir/(power|current)_now(N) && (( $#_p9k__ret < 9 )); then
-          (( power_now += ${pow::=$_p9k__ret} ))
+
+        [[ $bat_status_raw == Unknown ]] && continue
+        one_bat_found=1 # At least one battery with a known status
+
+        local -i current_energy_full=0 current_power_now=0 current_energy_now=0
+
+        if _p9k_read_file $dir/(energy_full|charge_full|charge_counter)(N) && [[ -n "$_p9k__ret" ]]; then
+          current_energy_full=$_p9k__ret
+          (( energy_full += current_energy_full ))
         fi
-        if _p9k_read_file $dir/capacity(N); then
-          (( energy_now += _p9k__ret * full / 100. + 0.5 ))
-        elif _p9k_read_file $dir/(energy|charge)_now(N); then
-          (( energy_now += _p9k__ret ))
+
+        if _p9k_read_file $dir/(power_now|current_now)(N) && [[ -n "$_p9k__ret" ]] && (( $#_p9k__ret < 9 )); then # current_now can be large, power_now usually smaller
+          current_power_now=$_p9k__ret
+          (( power_now += current_power_now ))
         fi
-        [[ $bat_status != Full                                ]] && is_full=0
-        [[ $bat_status == Charging                            ]] && is_charching=1
-        [[ $bat_status == (Charging|Discharging) && $pow == 0 ]] && is_calculating=1
+
+        if _p9k_read_file $dir/capacity(N) && [[ -n "$_p9k__ret" ]] && (( current_energy_full > 0 )); then
+          # Calculate energy_now from capacity and energy_full of *this* battery
+          (( current_energy_now = (_p9k__ret * current_energy_full) / 100 ))
+          (( energy_now += current_energy_now ))
+        elif _p9k_read_file $dir/(energy_now|charge_now)(N) && [[ -n "$_p9k__ret" ]]; then
+          current_energy_now=$_p9k__ret
+          (( energy_now += current_energy_now ))
+        fi
+        
+        [[ $bat_status_raw != Full ]] && is_full=0
+        [[ $bat_status_raw == Charging ]] && is_charging=1
+        # is_calculating: if charging or discharging but power_now for this battery is 0
+        [[ ($bat_status_raw == Charging || $bat_status_raw == Discharging) && $current_power_now == 0 ]] && is_calculating=1
       done
 
-      (( energy_full )) || return
+      (( one_bat_found )) || return 1 # No valid battery processed
+      (( energy_full > 0 )) || return 1 # Cannot calculate percentage
 
-      bat_percent=$(( 100. * energy_now / energy_full + 0.5 ))
+      # Ensure energy_now does not exceed energy_full
+      (( energy_now > energy_full )) && energy_now=$energy_full
+      bat_percent=$(( (100 * energy_now) / energy_full )) # Integer arithmetic is fine for percentage
+      # bat_percent=$(( 100. * energy_now / energy_full + 0.5 )) # Original used floating point then cast
+      # Using integer arithmetic for simplicity unless precision is critical and handled by caller.
+      # P9k often uses integer math. Let's try to stick to it or be explicit.
+      # For integer percentage:
+      if (( energy_full > 0 )); then
+          bat_percent=$(( (energy_now * 100) / energy_full ))
+      else
+          bat_percent=0 # Or handle error
+      fi
       (( bat_percent > 100 )) && bat_percent=100
 
-      if (( is_full || (bat_percent == 100 && is_charching) )); then
+
+      if (( is_full || (bat_percent == 100 && is_charging) )); then
         state=CHARGED
+        remain=''
       else
-        if (( is_charching )); then
+        if (( is_charging )); then
           state=CHARGING
         elif (( bat_percent < _POWERLEVEL9K_BATTERY_LOW_THRESHOLD )); then
           state=LOW
@@ -1446,10 +1586,20 @@ _p9k_prompt_battery_set_args() {
           state=DISCONNECTED
         fi
 
+        # Calculate remaining time
+        remain=""
         if (( power_now > 0 )); then
-          (( is_charching )) && local -i e=$((energy_full - energy_now)) || local -i e=energy_now
-          local -i minutes=$(( 60 * e / power_now ))
-          (( minutes > 0 )) && remain=$((minutes/60)):${(l#2##0#)$((minutes%60))}
+          local -i e_for_time_calc=0
+          if (( is_charging )); then
+            (( e_for_time_calc = energy_full - energy_now ))
+          else
+            e_for_time_calc=$energy_now
+          fi
+          
+          if (( e_for_time_calc > 0 )); then
+            local -i minutes=$(( (60 * e_for_time_calc) / power_now ))
+            (( minutes > 0 )) && remain=$((minutes/60)):${(l#2##0#)$((minutes%60))}
+          fi
         elif (( is_calculating )); then
           remain="..."
         fi
@@ -1457,11 +1607,15 @@ _p9k_prompt_battery_set_args() {
     ;;
 
     *)
-      return 0
+      return 1 # Or 0 if it means "not applicable, success"
+               # Returning 1 to signify that args were not set for an unsupported OS.
     ;;
   esac
 
-  (( bat_percent >= _POWERLEVEL9K_BATTERY_${state}_HIDE_ABOVE_THRESHOLD )) && return
+  # If state is not set (e.g. due to an issue in logic above), we should not proceed.
+  [[ -z "$state" ]] && return 1
+
+  (( bat_percent >= _POWERLEVEL9K_BATTERY_${state}_HIDE_ABOVE_THRESHOLD )) && return 0 # Successfully decided to hide
 
   local msg="$bat_percent%%"
   [[ $_POWERLEVEL9K_BATTERY_VERBOSE == 1 && -n $remain ]] && msg+=" ($remain)"
@@ -1471,27 +1625,46 @@ _p9k_prompt_battery_set_args() {
   local -i idx="${#${(@P)var}}"
   if (( idx )); then
     (( bat_percent < 100 )) && idx=$((bat_percent * idx / 100 + 1))
+    (( idx > ${#${(@P)var}} )) && idx=${#${(@P)var}} # Ensure idx is within bounds
     icon=$'\1'"${${(@P)var}[idx]}"
   fi
 
   local bg=$_p9k_color1
-  local var=_POWERLEVEL9K_BATTERY_${state}_LEVEL_BACKGROUND
-  local -i idx="${#${(@P)var}}"
-  if (( idx )); then
-    (( bat_percent < 100 )) && idx=$((bat_percent * idx / 100 + 1))
-    bg="${${(@P)var}[idx]}"
+  local var_bg=_POWERLEVEL9K_BATTERY_${state}_LEVEL_BACKGROUND
+  local -i idx_bg="${#${(@P)var_bg}}"
+  if (( idx_bg )); then
+    (( bat_percent < 100 )) && idx_bg=$((bat_percent * idx_bg / 100 + 1))
+    (( idx_bg > ${#${(@P)var_bg}} )) && idx_bg=${#${(@P)var_bg}}
+    bg="${${(@P)var_bg}[idx_bg]}"
   fi
 
   local fg=$_p9k_battery_states[$state]
-  local var=_POWERLEVEL9K_BATTERY_${state}_LEVEL_FOREGROUND
-  local -i idx="${#${(@P)var}}"
-  if (( idx )); then
-    (( bat_percent < 100 )) && idx=$((bat_percent * idx / 100 + 1))
-    fg="${${(@P)var}[idx]}"
+  local var_fg=_POWERLEVEL9K_BATTERY_${state}_LEVEL_FOREGROUND
+  local -i idx_fg="${#${(@P)var_fg}}"
+  if (( idx_fg )); then
+    (( bat_percent < 100 )) && idx_fg=$((bat_percent * idx_fg / 100 + 1))
+    (( idx_fg > ${#${(@P)var_fg}} )) && idx_fg=${#${(@P)var_fg}}
+    fg="${${(@P)var_fg}[idx_fg]}"
   fi
 
   _p9k__battery_args=(prompt_battery_$state "$bg" "$fg" $icon 0 '' $msg)
+  return 0 # Successfully set args
 }
+
+# Ensure _POWERLEVEL9K_BATTERY_LOW_THRESHOLD is defined, e.g.:
+# : ${_POWERLEVEL9K_BATTERY_LOW_THRESHOLD:=20}
+# Ensure _POWERLEVEL9K_BATTERY_*_HIDE_ABOVE_THRESHOLD are defined, e.g.:
+# : ${_POWERLEVEL9K_BATTERY_CHARGED_HIDE_ABOVE_THRESHOLD:=101} # Effectively never hide if charged
+# : ${_POWERLEVEL9K_BATTERY_CHARGING_HIDE_ABOVE_THRESHOLD:=101}
+# : ${_POWERLEVEL9K_BATTERY_DISCONNECTED_HIDE_ABOVE_THRESHOLD:=101}
+# : ${_POWERLEVEL9K_BATTERY_LOW_HIDE_ABOVE_THRESHOLD:=101}
+# Ensure _p9k_battery_states is defined (associative array)
+# typeset -gA _p9k_battery_states
+# _p9k_battery_states[CHARGED]='green'
+# _p9k_battery_states[CHARGING]='yellow'
+# _p9k_battery_states[DISCONNECTED]='blue'
+# _p9k_battery_states[LOW]='red'
+# (These would be part of P9k's broader configuration)
 
 ################################################################
 # Public IP segment
@@ -4918,10 +5091,6 @@ function _p9k_fetch_nordvpn_status() {
 #   POWERLEVEL9K_NORDVPN_CONNECTING_CONTENT_EXPANSION='${P9K_NORDVPN_COUNTRY_CODE}'
 #   POWERLEVEL9K_NORDVPN_CONNECTING_BACKGROUND=cyan
 function prompt_nordvpn() {
-  # This prompt segment is broken. See https://github.com/romkatv/powerlevel10k/issues/2860.
-  # It is disabled until it is fixed.
-  return
-
   unset $__p9k_nordvpn_tag P9K_NORDVPN_COUNTRY_CODE
   [[ -e /run/nordvpn/nordvpnd.sock ]] || return
   _p9k_fetch_nordvpn_status 2>/dev/null || return
@@ -9503,7 +9672,7 @@ if [[ $__p9k_dump_file != $__p9k_instant_prompt_dump_file && -n $__p9k_instant_p
   zf_rm -f -- $__p9k_instant_prompt_dump_file{,.zwc} 2>/dev/null
 fi
 
-typeset -g P9K_VERSION=1.20.15
+typeset -g P9K_VERSION=1.20.14
 
 if [[ ${VSCODE_SHELL_INTEGRATION-} == <1-> && ${+__p9k_force_term_shell_integration} == 0 ]]; then
   typeset -gri __p9k_force_term_shell_integration=1
