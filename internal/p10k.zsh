@@ -1509,7 +1509,7 @@ _p9k_prompt_battery_set_args() {
 
     Linux)
       # Original Linux logic using /sys/class/power_supply
-      local -a bats=( /sys/class/power_supply/(CMB*|BAT*|*battery)(N/) ) # N/ ensures we only get directories
+      local -a bats=( /sys/class/power_supply/(CMB*|BAT*|*battery)(N) ) # N/ ensures we only get directories
       (( $#bats )) || return 1
 
       local -i energy_now=0 energy_full=0 power_now=0 # Initialize to 0
