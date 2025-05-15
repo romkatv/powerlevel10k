@@ -553,6 +553,7 @@ Follow the instructions on
 ### NixOS
 
 **Home Manager**
+
 ```nix
 programs.zsh = {
   ...
@@ -564,11 +565,16 @@ programs.zsh = {
       }
     ];
 
+    # NixOS 24.11 or earlier:
     initExtra = ''
       source ~/.p10k.zsh
     '';
+
+    # NixOS 25.05 or later:
+    # initContent = let initExtra = lib.mkOrder 1000 '' [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh ''; in lib.mkMerge [initExtra];
 };
 ```
+
 **System wide**
 ```nix
 programs.zsh = {
