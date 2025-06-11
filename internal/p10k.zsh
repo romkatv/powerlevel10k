@@ -5384,17 +5384,17 @@ _p9k_prompt_wifi_async() {
       # Output example (https://github.com/romkatv/powerlevel10k/pull/973#issuecomment-680251804):
       #
       # Connected to 74:83:c2:be:76:da (on wlp3s0)
-      #     SSID: DailyGrindGuest1
-      #     freq: 5745
-      #     RX: 35192066 bytes (27041 packets)
-      #     TX: 4090471 bytes (24287 packets)
-      #     signal: -52 dBm
-      #     rx bitrate: 243.0 MBit/s VHT-MCS 6 40MHz VHT-NSS 2
-      #     tx bitrate: 240.0 MBit/s VHT-MCS 5 40MHz short GI VHT-NSS 2
+      # 	SSID: DailyGrindGuest1
+      # 	freq: 5745
+      # 	RX: 35192066 bytes (27041 packets)
+      # 	TX: 4090471 bytes (24287 packets)
+      # 	signal: -52 dBm
+      # 	rx bitrate: 243.0 MBit/s VHT-MCS 6 40MHz VHT-NSS 2
+      # 	tx bitrate: 240.0 MBit/s VHT-MCS 5 40MHz short GI VHT-NSS 2
       #
-      #     bss flags:  short-slot-time
-      #     dtim period:    1
-      #     beacon int: 100
+      # 	bss flags:	short-slot-time
+      # 	dtim period:	1
+      # 	beacon int:	100
       lines=(${(f)"$(command iw dev $iface link)"}) || return 0
       local -a match mbegin mend
       for line in $lines; do
