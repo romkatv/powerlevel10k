@@ -699,15 +699,15 @@ function _p9k_init_icons() {
         LINUX_OPENSUSE_ICON            '\uF314'$s             # 
         LINUX_SABAYON_ICON             '\uF317'$s             # 
         LINUX_SLACKWARE_ICON           '\uF319'$s             # 
-        LINUX_VOID_ICON                '\uF17C'               # 
-        LINUX_ARTIX_ICON               '\uF17C'               # 
+        LINUX_VOID_ICON                '\uF32E'               # 
+        LINUX_ARTIX_ICON               '\uF31F'               # 
         LINUX_UBUNTU_ICON              '\uF31b'$s             # 
-        LINUX_KALI_ICON                '\uF17C'               # 
+        LINUX_KALI_ICON                '\uF327'               # 
         LINUX_RHEL_ICON                '\uF316'$s             # 
         LINUX_AMZN_ICON                '\uF270'$s             # 
-        LINUX_ENDEAVOUROS_ICON         '\uF17C'               # 
-        LINUX_ROCKY_ICON               '\uF17C'               # 
-        LINUX_ALMALINUX_ICON           '\uF17C'               # 
+        LINUX_ENDEAVOUROS_ICON         '\uF322'               # 
+        LINUX_ROCKY_ICON               '\uF32B'               # 
+        LINUX_ALMALINUX_ICON           '\uF31D'               # 
         LINUX_GUIX_ICON                '\uF325'$s             # 
         LINUX_NEON_ICON                '\uF17C'               # 
         LINUX_ICON                     '\uF17C'               # 
@@ -773,7 +773,7 @@ function _p9k_init_icons() {
         YAZI_ICON                      '\uF00b '              # 
         MIDNIGHT_COMMANDER_ICON        'mc'
         VIM_ICON                       '\uE62B'               # 
-        TERRAFORM_ICON                 '\uF1BB '              # 
+        TERRAFORM_ICON                 '\uE8BD '              # 
         PROXY_ICON                     '\u2194'               # ↔
         DOTNET_ICON                    '\uE77F'               # 
         DOTNET_CORE_ICON               '\uE77F'               # 
