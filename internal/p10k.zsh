@@ -2134,7 +2134,7 @@ prompt_dir() {
       local cur_path=$_p9k__cwd
       if [[ $_p9k_os == Windows && $cur_path != *:* ]]; then
         # Change /c/current/path to /c:/current/path
-        cur_path="${_p9k__cwd:0:2}:${_p9k__cwd:2}"
+        cur_path="${_p9k__cwd:0:2:u}:${_p9k__cwd:2}"
       fi
       _p9k_url_escape $cur_path
       local header=$'%{\e]8;;file://'$_p9k__ret$'\a%}'
