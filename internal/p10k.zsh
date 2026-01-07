@@ -5817,6 +5817,7 @@ _p9k_preexec1() {
 }
 
 _p9k_preexec2() {
+  typeset -g _p9k__preexec_called=1 # Unset in precmd for "show error once"
   typeset -g _p9k__preexec_cmd=$2
   _p9k__timer_start=EPOCHREALTIME
   P9K_TTY=old
@@ -7136,6 +7137,11 @@ _p9k_trapint() {
 _p9k_precmd() {
   __p9k_new_status=$?
   __p9k_new_pipestatus=($pipestatus)
+  if (( _POWERLEVEL9K_STATUS_ERROR_SHOW_ONCE && ! _p9k__preexec_called )); then
+    __p9k_new_status=0
+    __p9k_new_pipestatus=(0)
+  fi
+  _p9k__preexec_called=0
 
   trap ":" INT
 
@@ -7718,6 +7724,7 @@ _p9k_init_params() {
   _p9k_declare -b POWERLEVEL9K_STATUS_ERROR 1
   _p9k_declare -b POWERLEVEL9K_STATUS_ERROR_PIPE 1
   _p9k_declare -b POWERLEVEL9K_STATUS_ERROR_SIGNAL 1
+  _p9k_declare -b POWERLEVEL9K_STATUS_ERROR_SHOW_ONCE 0
   _p9k_declare -b POWERLEVEL9K_STATUS_SHOW_PIPESTATUS 1
   _p9k_declare -b POWERLEVEL9K_STATUS_HIDE_SIGNAME 0
   _p9k_declare -b POWERLEVEL9K_STATUS_VERBOSE_SIGNAME 1
