@@ -3529,7 +3529,7 @@ _p9k_prompt_time_compute() {
 _p9k_prompt_time_async() {
   zmodload zsh/mathfunc zsh/zselect || return
   local -F t=_POWERLEVEL9K_EXPERIMENTAL_TIME_REALTIME_INTERVAL_SEC
-  zselect -t $((int(ceil(100 *(t - EPOCHREALTIME % t))))) || true
+  zselect -t $((int(ceil(100 * (t - EPOCHREALTIME % t))))) || true
 }
 
 _p9k_prompt_time_sync() {
