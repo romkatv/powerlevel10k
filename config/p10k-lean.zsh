@@ -548,6 +548,12 @@
   typeset -g POWERLEVEL9K_COMMAND_EXECUTION_TIME_FOREGROUND=101
   # Duration format: 1d 2h 3m 4s.
   typeset -g POWERLEVEL9K_COMMAND_EXECUTION_TIME_FORMAT='d h m s'
+  # Updates the active commandline at a regular interval (Every second by default)
+  # to keep the clock syncronized. This feature is experimental and may have
+  # unintended side effects.
+  # typeset -g POWERLEVEL9K_EXPERIMENTAL_TIME_REALTIME=true
+  # Change the update frequency of the realtime clock
+  # typeset -g POWERLEVEL9K_EXPERIMENTAL_TIME_REALTIME_INTERVAL=1
   # Custom icon.
   # typeset -g POWERLEVEL9K_COMMAND_EXECUTION_TIME_VISUAL_IDENTIFIER_EXPANSION='⭐'
   # Custom prefix.

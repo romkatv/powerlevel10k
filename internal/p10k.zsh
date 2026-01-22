@@ -3527,7 +3527,7 @@ _p9k_prompt_time_compute() {
 }
 
 _p9k_prompt_time_async() {
-  sleep 1 || true
+  sleep $POWERLEVEL9K_EXPERIMENTAL_TIME_REALTIME_INTERVAL || true
 }
 
 _p9k_prompt_time_sync() {

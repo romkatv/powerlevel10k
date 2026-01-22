@@ -153,6 +153,12 @@
   # commands will contain the start times of their commands rather than the end times of
   # their preceding commands.
   typeset -g POWERLEVEL9K_TIME_UPDATE_ON_COMMAND=false
+  # Updates the active commandline at a regular interval (Every second by default)
+  # to keep the clock syncronized. This feature is experimental and may have
+  # unintended side effects.
+  # typeset -g POWERLEVEL9K_EXPERIMENTAL_TIME_REALTIME=true
+  # Change the update frequency of the realtime clock
+  # typeset -g POWERLEVEL9K_EXPERIMENTAL_TIME_REALTIME_INTERVAL=1
 
   # Transient prompt works similarly to the builtin transient_rprompt option. It trims down prompt
   # when accepting a command line. Supported values:
