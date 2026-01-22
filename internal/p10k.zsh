@@ -3527,7 +3527,13 @@ _p9k_prompt_time_compute() {
 }
 
 _p9k_prompt_time_async() {
-  sleep $_POWERLEVEL9K_EXPERIMENTAL_TIME_REALTIME_INTERVAL || true
+  local I=$_POWERLEVEL9K_EXPERIMENTAL_TIME_REALTIME_INTERVAL
+
+  # No alignment needed in default case
+  (( I <= 1 )) && { sleep 1 || true; return }
+
+  # Sleep until the next aligned boundary: I - (now mod I)
+  sleep $(( I - ($(date +%s) % I) )) || true
 }
 
 _p9k_prompt_time_sync() {
