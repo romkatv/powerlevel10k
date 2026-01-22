@@ -3528,7 +3528,8 @@ _p9k_prompt_time_compute() {
 
 _p9k_prompt_time_async() {
   zmodload zsh/mathfunc zsh/zselect || return
-  zselect -t $((int(ceil(_POWERLEVEL9K_EXPERIMENTAL_TIME_REALTIME_INTERVAL_SEC * 100)))) || true
+  local -F t=_POWERLEVEL9K_EXPERIMENTAL_TIME_REALTIME_INTERVAL_SEC
+  zselect -t $((int(ceil(100 *(t - EPOCHREALTIME % t))))) || true
 }
 
 _p9k_prompt_time_sync() {
@@ -7814,6 +7815,9 @@ _p9k_init_params() {
   # POWERLEVEL9K_EXPERIMENTAL_TIME_REALTIME_INTERVAL_SEC seconds.
   _p9k_declare -b POWERLEVEL9K_EXPERIMENTAL_TIME_REALTIME 0
   _p9k_declare -F POWERLEVEL9K_EXPERIMENTAL_TIME_REALTIME_INTERVAL_SEC 1
+  if (( _POWERLEVEL9K_EXPERIMENTAL_TIME_REALTIME_INTERVAL_SEC <= 0 )); then
+    _POWERLEVEL9K_EXPERIMENTAL_TIME_REALTIME_INTERVAL_SEC=1
+  fi
 
   _p9k_declare -b POWERLEVEL9K_NIX_SHELL_INFER_FROM_PATH 0
   typeset -g _p9k_nix_shell_cond='${IN_NIX_SHELL:#0}'
