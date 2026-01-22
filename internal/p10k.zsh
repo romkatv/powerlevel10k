@@ -8679,6 +8679,7 @@ function _p9k_init_cacheable() {
           almalinux)               _p9k_set_os Linux LINUX_ALMALINUX_ICON;;
           guix)                    _p9k_set_os Linux LINUX_GUIX_ICON;;
           neon)                    _p9k_set_os Linux LINUX_NEON_ICON;;
+          postmarketos)            _p9k_set_os Linux LINUX_POSTMARKETOS_ICON;;
           *)                       _p9k_set_os Linux LINUX_ICON;;
         esac
         ;;
