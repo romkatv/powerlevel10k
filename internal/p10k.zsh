@@ -4973,6 +4973,18 @@ function instant_prompt_yazi() {
   _p9k_prompt_segment prompt_yazi $_p9k_color1 yellow YAZI_ICON 1 '$YAZI_LEVEL' '$YAZI_LEVEL'
 }
 
+function prompt_vifm() {
+  _p9k_prompt_segment $0 $_p9k_color1 yellow VIFM_ICON 0 '' $VIFM_LEVEL
+}
+
+_p9k_prompt_vifm_init() {
+  typeset -g "_p9k__segment_cond_${_p9k__prompt_side}[_p9k__segment_index]"='$VIFM_LEVEL'
+}
+
+function instant_prompt_vifm() {
+  _p9k_prompt_segment prompt_vifm $_p9k_color1 yellow VIFM_ICON 1 '$VIFM_LEVEL' '$VIFM_LEVEL'
+}
+
 function prompt_midnight_commander() {
   local -i len=$#_p9k__prompt _p9k__has_upglob
   _p9k_prompt_segment $0 $_p9k_color1 yellow MIDNIGHT_COMMANDER_ICON 0 '' ''
