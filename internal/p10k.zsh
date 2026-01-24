@@ -8490,6 +8490,12 @@ _p9k_init_ssh() {
   if [[ -n $SSH_CLIENT || -n $SSH_TTY || -n $SSH_CONNECTION ]]; then
     P9K_SSH=1
     return 0
+  elif [[ \
+    $(grep -i Microsoft /proc/version) && \
+    $(cmd.exe /c 'echo %SSH_CLIENT%' 2>/dev/null | sed $'s/\r//' | grep ' 22$') \
+  ]]; then
+    P9K_SSH=1
+    return 0
   fi
 
   # When changing user on a remote system, the $SSH_CONNECTION environment variable can be lost.
