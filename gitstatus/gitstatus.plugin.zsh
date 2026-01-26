@@ -475,6 +475,21 @@ function _gitstatus_daemon"${1:-}"() {
       kill -- -$pgid
     fi
   } &!
+
+  # Parent process monitor: detect orphaning and cleanup
+  # This handles cases where zshexit hook doesn't fire (e.g., tmux kill-session)
+  {
+    local orig_ppid=$sysparams[ppid]
+    while true; do
+      command sleep 2
+      # If PPID changed to 1 (init/launchd), parent died - cleanup and exit
+      if [[ $sysparams[ppid] != $orig_ppid ]]; then
+        zf_rm -f -- $file_prefix.lock $file_prefix.fifo
+        kill -- -$pgid 2>/dev/null
+        break
+      fi
+    done
+  } &!
 }
 
 # Starts gitstatusd in the background. Does nothing and succeeds if gitstatusd is already running.
