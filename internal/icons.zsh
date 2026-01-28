@@ -650,7 +650,7 @@ function _p9k_init_icons() {
     'nerdfont-complete'|'nerdfont-fontconfig')
       # nerd-font patched (complete) font required! See
       # https://github.com/ryanoasis/nerd-fonts
-      # http://nerdfonts.com/#cheat-sheet
+      # http://nerdfonts.com/cheat-sheet
       icons=(
         RULER_CHAR                     '\u2500'               # ─
         LEFT_SEGMENT_SEPARATOR         '\uE0B0'               # 
@@ -699,15 +699,15 @@ function _p9k_init_icons() {
         LINUX_OPENSUSE_ICON            '\uF314'$s             # 
         LINUX_SABAYON_ICON             '\uF317'$s             # 
         LINUX_SLACKWARE_ICON           '\uF319'$s             # 
-        LINUX_VOID_ICON                '\uF17C'               # 
-        LINUX_ARTIX_ICON               '\uF17C'               # 
+        LINUX_VOID_ICON                '\uF32E'               # 
+        LINUX_ARTIX_ICON               '\uF31F'               # 
         LINUX_UBUNTU_ICON              '\uF31b'$s             # 
-        LINUX_KALI_ICON                '\uF17C'               # 
+        LINUX_KALI_ICON                '\uF327'               # 
         LINUX_RHEL_ICON                '\uF316'$s             # 
         LINUX_AMZN_ICON                '\uF270'$s             # 
-        LINUX_ENDEAVOUROS_ICON         '\uF17C'               # 
-        LINUX_ROCKY_ICON               '\uF17C'               # 
-        LINUX_ALMALINUX_ICON           '\uF17C'               # 
+        LINUX_ENDEAVOUROS_ICON         '\uF322'               # 
+        LINUX_ROCKY_ICON               '\uF32B'               # 
+        LINUX_ALMALINUX_ICON           '\uF31D'               # 
         LINUX_GUIX_ICON                '\uF325'$s             # 
         LINUX_NEON_ICON                '\uF17C'               # 
         LINUX_ICON                     '\uF17C'               # 
@@ -737,7 +737,7 @@ function _p9k_init_icons() {
         VCS_GIT_GITHUB_ICON            '\uF113 '              # 
         VCS_GIT_BITBUCKET_ICON         '\uE703 '              # 
         VCS_GIT_GITLAB_ICON            '\uF296 '              # 
-        VCS_GIT_AZURE_ICON             '\uFD03 '              # ﴃ
+        VCS_GIT_AZURE_ICON             '\uEBE8 '              # 
         VCS_GIT_ARCHLINUX_ICON         '\uF303 '              # 
         VCS_GIT_CODEBERG_ICON          '\uF1D3 '              # 
         VCS_GIT_DEBIAN_ICON            '\uF306 '              # 
@@ -762,7 +762,7 @@ function _p9k_init_icons() {
         NORDVPN_ICON                   '\UF023'               # 
         EXECUTION_TIME_ICON            '\uF252'$s             # 
         SSH_ICON                       '\uF489'$s             # 
-        VPN_ICON                       '\UF023'
+        VPN_ICON                       '\UF023'               # 
         KUBERNETES_ICON                '\U2388'               # ⎈
         DROPBOX_ICON                   '\UF16B'$s             # 
         DATE_ICON                      '\uF073 '              # 
@@ -773,13 +773,13 @@ function _p9k_init_icons() {
         YAZI_ICON                      '\uF00b '              # 
         MIDNIGHT_COMMANDER_ICON        'mc'
         VIM_ICON                       '\uE62B'               # 
-        TERRAFORM_ICON                 '\uF1BB '              # 
+        TERRAFORM_ICON                 '\uE8BD '              # 
         PROXY_ICON                     '\u2194'               # ↔
         DOTNET_ICON                    '\uE77F'               # 
         DOTNET_CORE_ICON               '\uE77F'               # 
-        AZURE_ICON                     '\uFD03'               # ﴃ
+        AZURE_ICON                     '\uEBD8'               # 
         DIRENV_ICON                    '\u25BC'               # ▼
-        FLUTTER_ICON                   'F'
+        FLUTTER_ICON                   '\uE7DD'               # 
         GCLOUD_ICON                    '\uF7B7'               # 
         LUA_ICON                       '\uE620'               # 
         PERL_ICON                      '\uE769'               # 
