@@ -12,6 +12,9 @@ function _p9k_worker_main() {
   local -A _p9k_worker_fds       # fd => id$'\x1f'callback
   local -A _p9k_worker_inflight  # id => inflight count
 
+  # Store original parent PID to detect orphaning
+  local -i _p9k_worker_orig_ppid=$sysparams[ppid]
+
   function _p9k_worker_reply() {
     print -nr -- e${(pj:\n:)@}$'\x1e' || kill -- -$_p9k_worker_pgid
   }
@@ -24,10 +27,16 @@ function _p9k_worker_main() {
     _p9k_worker_fds[$fd]=$_p9k_worker_request_id$'\x1f'$2
   }
 
+  # Check if parent process is still alive (not orphaned)
+  # If PPID changes to 1 (init/launchd), parent has died
+  function _p9k_worker_check_parent() {
+    [[ $sysparams[ppid] == $_p9k_worker_orig_ppid ]]
+  }
+
   trap '' PIPE
 
   {
-    while zselect -a ready 0 ${(k)_p9k_worker_fds}; do
+    while _p9k_worker_check_parent && zselect -a ready 0 ${(k)_p9k_worker_fds}; do
       [[ $ready[1] == -r ]] || return
       for fd in ${ready:1}; do
         if [[ $fd == 0 ]]; then
