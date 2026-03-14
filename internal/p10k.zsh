@@ -2131,7 +2131,12 @@ prompt_dir() {
 
     local content="${(pj.$sep.)parts}"
     if (( _POWERLEVEL9K_DIR_HYPERLINK && _p9k_term_has_href )) && [[ $_p9k__cwd == /* ]]; then
-      _p9k_url_escape $_p9k__cwd
+      local cur_path=$_p9k__cwd
+      if [[ $_p9k_os == Windows && $cur_path != *:* ]]; then
+        # Change /c/current/path to /c:/current/path
+        cur_path="${_p9k__cwd:0:2:u}:${_p9k__cwd:2}"
+      fi
+      _p9k_url_escape $cur_path
       local header=$'%{\e]8;;file://'$_p9k__ret$'\a%}'
       local footer=$'%{\e]8;;\a%}'
       if (( expand )); then
