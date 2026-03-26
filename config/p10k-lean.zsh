@@ -78,6 +78,7 @@
     gcloud                  # google cloud cli account and project (https://cloud.google.com/)
     google_app_cred         # google application credentials (https://cloud.google.com/docs/authentication/production)
     toolbox                 # toolbox name (https://github.com/containers/toolbox)
+    # salesforce_org        # salesforce cli default org (https://developer.salesforce.com/tools/salesforcecli)
     context                 # user@hostname
     nordvpn                 # nordvpn connection status, linux only (https://nordvpn.com/)
     ranger                  # ranger shell (https://github.com/ranger/ranger)
@@ -1641,6 +1642,38 @@
   # typeset -g POWERLEVEL9K_TIME_VISUAL_IDENTIFIER_EXPANSION='⭐'
   # Custom prefix.
   # typeset -g POWERLEVEL9K_TIME_PREFIX='%fat '
+
+  ##[ salesforce_org: salesforce cli default org (https://developer.salesforce.com/tools/salesforcecli) ]##
+  # Displays the Salesforce CLI default target org from .sf/config.json.
+  # Only shown when inside a Salesforce DX project directory (or subdirectory).
+  function prompt_salesforce_org() {
+    local sf_config
+    local dir=$PWD
+    while [[ $dir != / ]]; do
+      if [[ -f "$dir/.sf/config.json" ]]; then
+        sf_config="$dir/.sf/config.json"
+        break
+      fi
+      dir=${dir:h}
+    done
+    [[ -z $sf_config ]] && return
+    local org
+    org=$(command awk -F'"' '/target-org/{print $4}' "$sf_config" 2>/dev/null)
+    [[ -z $org ]] && return
+    p10k segment -b 4 -f 255 -i $'\uf0c2' -t "$org"
+  }
+
+  function instant_prompt_salesforce_org() {
+    prompt_salesforce_org
+  }
+
+  typeset -g POWERLEVEL9K_SALESFORCE_ORG_FOREGROUND=255
+  typeset -g POWERLEVEL9K_SALESFORCE_ORG_BACKGROUND=4
+  # Show salesforce_org only when the command you are typing invokes one of these tools.
+  # Tip: Remove the next line to always show salesforce_org.
+  # typeset -g POWERLEVEL9K_SALESFORCE_ORG_SHOW_ON_COMMAND='sf|sfdx'
+  # Custom icon.
+  # typeset -g POWERLEVEL9K_SALESFORCE_ORG_VISUAL_IDENTIFIER_EXPANSION='⭐'
 
   # Example of a user-defined prompt segment. Function prompt_example will be called on every
   # prompt if `example` prompt segment is added to POWERLEVEL9K_LEFT_PROMPT_ELEMENTS or
