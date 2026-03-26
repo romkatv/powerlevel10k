@@ -1657,8 +1657,10 @@
       dir=${dir:h}
     done
     [[ -z $sf_config ]] && return
-    local org
-    org=$(command awk -F'"' '/target-org/{print $4}' "$sf_config" 2>/dev/null)
+    local content
+    content=$(<"$sf_config") || return
+    [[ $content =~ '"target-org"[[:space:]]*:[[:space:]]*"([^"]*)"' ]] || return
+    local org=$match[1]
     [[ -z $org ]] && return
     p10k segment -b 4 -f 255 -i $'\uf0c2' -t "$org"
   }
