@@ -1,0 +1,229 @@
+#compdef p10k
+
+__p10k_getpart(){
+
+    local -aU keys lines sides segments __p10k_prompt_selectors
+    local -A reply
+    local equals resparts resline resside reselem resCnt hadSecond hadThird
+    lines=()
+    sides=()
+    segments=()
+    equals="$1"
+    __p10k_prompt_selectors=("*$equals" "*/*$equals" "*/*/*$equals")
+
+    p10k display -a '*'
+    keys=( ${(uk)reply} )
+
+    for k in ${keys[@]};do
+
+        resparts=( ${(s:/:)k} )
+        resline=${resparts[1]}
+        resside=${resparts[2]}
+        reselem=${resparts[3]}
+
+        resCnt=$#resparts
+
+        if (( resCnt == 1 )); then
+            __p10k_prompt_selectors+=("$resline$equals")
+            lines+=("$resline")
+        elif (( resCnt == 2 )); then
+            __p10k_prompt_selectors+=("$resline/$resside$equals")
+            sides+=("$resside")
+        else
+            segments+=("$reselem")
+            __p10k_prompt_selectors+=("$resline/$resside/$reselem$equals")
+        fi
+
+    done
+
+    for line in ${lines}; do
+        p10k display -a "$line/*"
+        keys=( ${(uk)reply} )
+
+        hadSecond=false
+        hadThird=false
+        for k in ${keys[@]};do
+
+            resparts=( ${(s:/:)k} )
+            resline=${resparts[1]}
+            resside=${resparts[2]}
+            reselem=${resparts[3]}
+
+            resCnt=$#resparts
+
+            if (( resCnt == 2 )); then
+                hadSecond=true
+            elif (( resCnt == 3 )); then
+                __p10k_prompt_selectors+=("$resline/*/$reselem$equals")
+                hadThird=true
+            fi
+        done
+
+        if [[ $hadSecond == true ]]; then
+            __p10k_prompt_selectors+=("$line/*$equals")
+        fi
+
+        if [[ $hadThird == true ]]; then
+            __p10k_prompt_selectors+=("$line/*/*$equals")
+        fi
+    done
+
+    for side in ${sides}; do
+        p10k display -a "*/$side/*"
+        keys=( ${(uk)reply} )
+
+        __p10k_prompt_selectors+=("*/$side$equals")
+        hadThird=false
+        for k in ${keys[@]};do
+
+            resparts=( ${(s:/:)k} )
+            resline=${resparts[1]}
+            resside=${resparts[2]}
+            reselem=${resparts[3]}
+            resCnt=$#resparts
+
+            if (( resCnt == 3 )); then
+                __p10k_prompt_selectors+=("*/$side/$reselem$equals")
+                hadThird=true
+            fi
+        done
+        if [[ $hadThird == true ]]; then
+            __p10k_prompt_selectors+=("*/$side/*$equals")
+        fi
+    done
+
+    if [[ $equals != '' ]]; then
+        declare -gA __p10k_prompt_selectors_state=("${__p10k_prompt_selectors[@]}")
+    else
+        declare -gA __p10k_prompt_selectors_nostate=("${__p10k_prompt_selectors[@]}")
+    fi
+
+}
+
+__p10k_partpattern(){
+    if ! (( $+__p10k_prompt_selectors_nostate )) && ! _retrieve_cache p10k_segment_cache; then
+        __p10k_getpart ""
+        _store_cache p10k_segment_cache __p10k_prompt_selectors_nostate
+    fi
+
+    _multi_parts / __p10k_prompt_selectors_nostate
+
+}
+
+__p10k_partpattern_state(){
+
+    local -aU state=(
+        'show:the part is displayed'
+        'hide:the part is not displayed'
+        'print:the part is printed in precmd'
+    )
+
+    if compset -P '*='; then
+        _describe -t p10k-state 'p10k-state' state
+    else
+        if ! (( $+__p10k_prompt_selectors_state )) && ! _retrieve_cache p10k_segment_cache_state; then
+            __p10k_getpart '='
+            _store_cache p10k_segment_cache_state __p10k_prompt_selectors_state
+        fi
+        _multi_parts -qS '=' / __p10k_prompt_selectors_state
+    fi
+
+}
+
+__p10k_display(){
+
+    local arguments
+
+    arguments=(
+        '(-)-a[Populate array `reply` with states of prompt parts]:part-pattern:__p10k_partpattern'
+        '(- * :)-r[Redisplay prompt]'
+        '(-)*:part-pattern:__p10k_partpattern_state'
+    )
+
+    _arguments -S -s $arguments && return 0
+
+}
+
+__p10k_segment(){
+
+    local arguments
+
+    arguments=(
+        '-t[segment main content; will undergo prompt expansion]:text'
+        '-i[segment icon; default is empty]:icon'
+        '-r[icon is a symbolic reference that needs to be resolved]'
+        '+r[icon is already resolved and should be printed literally]'
+        '-b[background color; for example, empty value means]:bg'
+        '-f[foreground color; for example, empty value means]:fg'
+        '-s[segment state for the purpose of applying styling options]:state'
+        '-c[if empty after parameter expansion and process substitution]:condition'
+        '-e[segment main content will undergo parameter expansion and process]'
+        '+e[segment main content should not undergo parameter expansion and process]'
+        '(- * :)-h[print this help message]'
+    )
+
+    _arguments -S -s $arguments && return 0
+
+}
+
+function _p10k(){
+
+    local arguments verb
+    local curcontext=$curcontext state line ret=0 __p10k_commands
+
+    __p10k_commands=(
+        'configure:run interactive configuration wizard'
+        'finalize:finish instant prompt initialization'
+        'reload:reload configuration'
+        'segment:print a user-defined prompt segment'
+        'display:show, hide or toggle prompt parts'
+        'help:print this help message'
+    )
+
+    arguments=(
+        '1:p10k subcommand:->verb'
+        '*:: :->args'
+    )
+
+    _arguments -S -s $arguments && return 0
+
+    case $state in
+        verb)
+            _describe -t p10k-commands "p10k verbs" __p10k_commands && ret=0
+            ;;
+        args)
+            verb=$words[1]
+            curcontext="${curcontext%:*:*}:p10k-$verb:"
+            case $verb in
+                configure|reload|finalize)
+                    _message 'no more arguments'
+                    ret=1
+                    ;;
+                segment)
+                    __p10k_segment
+                    ret=$?
+                    ;;
+                display)
+                    __p10k_display
+                    ret=$?
+                    ;;
+                help)
+                    if (( $#words > 2)); then
+                        _message 'no more arguments'
+                        ret=1
+                    else
+                        _describe -t p10k-commands "p10k verbs" __p10k_commands && ret=0
+                    fi
+                    ;;
+                *)
+                    _message 'unknown p10k command'
+                    ret=1
+                    ;;
+            esac
+            ;;
+    esac
+
+    return $ret
+}
+
+_p10k "$@"
