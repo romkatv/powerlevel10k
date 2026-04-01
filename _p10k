@@ -4,6 +4,7 @@ __p10k_getpart(){
 
     local -aU keys lines sides segments __p10k_prompt_selectors
     local -A reply
+    local equals resparts resline resside reselem resCnt hadSecond hadThird
     lines=()
     sides=()
     segments=()
@@ -29,7 +30,7 @@ __p10k_getpart(){
             __p10k_prompt_selectors+=("$resline/$resside$equals")
             sides+=("$resside")
         else
-            segments+=("$segments")
+            segments+=("$reselem")
             __p10k_prompt_selectors+=("$resline/$resside/$reselem$equals")
         fi
 
@@ -39,7 +40,7 @@ __p10k_getpart(){
         p10k display -a "$line/*"
         keys=( ${(uk)reply} )
 
-        hadkkSecond=false
+        hadSecond=false
         hadThird=false
         for k in ${keys[@]};do
 
@@ -59,7 +60,7 @@ __p10k_getpart(){
         done
 
         if [[ $hadSecond == true ]]; then
-            __p10k_prompt_selectors+=("$line/*=")
+            __p10k_prompt_selectors+=("$line/*$equals")
         fi
 
         if [[ $hadThird == true ]]; then
@@ -145,18 +146,20 @@ __p10k_display(){
 
 __p10k_segment(){
 
-  arguments=(
-    '-t[segment main content; will undergo prompt expansion]:text'
-    '-i[segment icon; default is empty]:icon'
-    '-r[icon is a symbolic reference that needs to be resolved]'
-    '+r[icon is already resolved and should be printed literally; for example,⭐]'
-    '-b[background color; for example, empty value means]:bg'
-    '-f[foreground color; for example, empty value means]:fg'
-    '-s:segment state for the purpose of applying styling options]:state'
-    '-c[if empty after parameter expansion and process substitution]:condition'
-    '-e[segment main content will undergo parameter expansion and process]'
-    '+e[segment main content should not undergo parameter expansion and process]'
-    '(- * :)-h[print this help message]'
+    local arguments
+
+    arguments=(
+        '-t[segment main content; will undergo prompt expansion]:text'
+        '-i[segment icon; default is empty]:icon'
+        '-r[icon is a symbolic reference that needs to be resolved]'
+        '+r[icon is already resolved and should be printed literally]'
+        '-b[background color; for example, empty value means]:bg'
+        '-f[foreground color; for example, empty value means]:fg'
+        '-s[segment state for the purpose of applying styling options]:state'
+        '-c[if empty after parameter expansion and process substitution]:condition'
+        '-e[segment main content will undergo parameter expansion and process]'
+        '+e[segment main content should not undergo parameter expansion and process]'
+        '(- * :)-h[print this help message]'
     )
 
     _arguments -S -s $arguments && return 0
@@ -170,6 +173,7 @@ function _p10k(){
 
     __p10k_commands=(
         'configure:run interactive configuration wizard'
+        'finalize:finish instant prompt initialization'
         'reload:reload configuration'
         'segment:print a user-defined prompt segment'
         'display:show, hide or toggle prompt parts'
@@ -191,11 +195,7 @@ function _p10k(){
             verb=$words[1]
             curcontext="${curcontext%:*:*}:p10k-$verb:"
             case $verb in
-                configure)
-                    _message 'no more arguments'
-                    ret=1
-                    ;;
-                reload)
+                configure|reload|finalize)
                     _message 'no more arguments'
                     ret=1
                     ;;
