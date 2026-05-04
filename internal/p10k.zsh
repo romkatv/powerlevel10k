@@ -3532,7 +3532,9 @@ _p9k_prompt_time_compute() {
 }
 
 _p9k_prompt_time_async() {
-  sleep 1 || true
+  zmodload zsh/mathfunc zsh/zselect || return
+  local -F t=_POWERLEVEL9K_EXPERIMENTAL_TIME_REALTIME_INTERVAL_SEC
+  zselect -t $((int(ceil(100 * (t - EPOCHREALTIME % t))))) || true
 }
 
 _p9k_prompt_time_sync() {
@@ -4719,7 +4721,9 @@ _p9k_gcloud_prefetch() {
   if ! _p9k_cache_stat_get $0 ${CLOUDSDK_CONFIG:-~/.config/gcloud}/configurations/config_$P9K_GCLOUD_CONFIGURATION; then
     local pair account project_id
     pair="$(gcloud config configurations describe $P9K_GCLOUD_CONFIGURATION \
-      --format=$'value[separator="\1"](properties.core.account,properties.core.project)')"
+      --quiet \
+      --format=$'value[separator="\1"](properties.core.account,properties.core.project)' \
+      </dev/null)"
     (( ! $? )) && IFS=$'\1' read account project_id <<<$pair
     _p9k_cache_stat_set "$account" "$project_id"
   fi
@@ -7814,8 +7818,13 @@ _p9k_init_params() {
   # commands will contain the start times of their commands as opposed to the default
   # behavior where they contain the end times of their preceding commands.
   _p9k_declare -b POWERLEVEL9K_TIME_UPDATE_ON_COMMAND 0
-  # If set to true, time will update every second.
+  # If set to true, time will update every
+  # POWERLEVEL9K_EXPERIMENTAL_TIME_REALTIME_INTERVAL_SEC seconds.
   _p9k_declare -b POWERLEVEL9K_EXPERIMENTAL_TIME_REALTIME 0
+  _p9k_declare -F POWERLEVEL9K_EXPERIMENTAL_TIME_REALTIME_INTERVAL_SEC 1
+  if (( _POWERLEVEL9K_EXPERIMENTAL_TIME_REALTIME_INTERVAL_SEC <= 0 )); then
+    _POWERLEVEL9K_EXPERIMENTAL_TIME_REALTIME_INTERVAL_SEC=1
+  fi
 
   _p9k_declare -b POWERLEVEL9K_NIX_SHELL_INFER_FROM_PATH 0
   typeset -g _p9k_nix_shell_cond='${IN_NIX_SHELL:#0}'

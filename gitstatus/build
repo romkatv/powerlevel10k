@@ -272,9 +272,9 @@ case "$gitstatus_kernel" in
       gitstatus_cxxflags="$gitstatus_cxxflags -I"$brew_prefix"/opt/libiconv/include"
     fi
     libgit2_cmake_flags="$libgit2_cmake_flags -DUSE_ICONV=ON"
-    gitstatus_ldlibs="$gitstatus_ldlibs -liconv"
+    gitstatus_ldlibs="$gitstatus_ldlibs -liconv -lz"
     gitstatus_ldflags="$gitstatus_ldflags -L${workdir}/lib"
-    libgit2_cmake_flags="$libgit2_cmake_flags -DENABLE_REPRODUCIBLE_BUILDS=OFF"
+    libgit2_cmake_flags="$libgit2_cmake_flags -DENABLE_REPRODUCIBLE_BUILDS=OFF -DUSE_BUNDLED_ZLIB=OFF"
   ;;
   msys*|mingw*)
     gitstatus_ldflags="$gitstatus_ldflags ${static_pie:--static}"
@@ -551,6 +551,7 @@ if [ -z "$gitstatus_cpu" ]; then
     arm64|aarch64)  gitstatus_cpu=armv8-a;;
     ppc64|ppc64le)  gitstatus_cpu=powerpc64le;;
     riscv64)        gitstatus_cpu=rv64imafdc;;
+    mips64)         gitstatus_cpu=mips64;;
     loongarch64)    gitstatus_cpu=loongarch64;;
     x86_64|amd64)   gitstatus_cpu=x86-64;;
     x86)            gitstatus_cpu=i586;;

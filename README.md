@@ -658,6 +658,11 @@ If you are using a different terminal, proceed with manual font installation. ðŸ
        https://raw.githubusercontent.com/romkatv/powerlevel10k-media/389133fb8c9a2347929a23702ce3039aacc46c3d/visual-studio-code-font-settings.jpg)
      to see how it should look like or see [this issue](
        https://github.com/romkatv/powerlevel10k/issues/671) for extra information.
+
+     Note that software installed via [Snap](https://en.wikipedia.org/wiki/Snap_\(software\)) is
+     unable to use system fonts. If you've install Visual Studio Code via Snap, remove it by running
+     `sudo snap remove code` and install the official `.deb` build from the
+     [Visual Studio Code website](https://code.visualstudio.com/Download).
    - **GNOME Terminal** (the default Ubuntu terminal): Open *Terminal â†’ Preferences* and click on the
      selected profile under *Profiles*. Check *Custom font* under *Text Appearance* and select
      `MesloLGS NF Regular`.
