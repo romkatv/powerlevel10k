@@ -8399,14 +8399,16 @@ _p9k_init_prompt() {
   if (( _POWERLEVEL9K_TERM_SHELL_INTEGRATION )); then
     _p9k_prompt_prefix_left+=$'%{\e]133;A\a%}'
     _p9k_prompt_suffix_left+=$'%{\e]133;B\a%}'
-    if [[ $TERM_PROGRAM == WarpTerminal ]]; then
+    if [[ $TERM_PROGRAM == WarpTerminal ||
+          ( $TERM_PROGRAM == iTerm.app && $TERM_PROGRAM_VERSION == (3.<7->*|<4->.*) ) ]]; then
       _p9k_prompt_prefix_right=$'%{\e]133;P;k=r\a%}'$_p9k_prompt_prefix_right
       _p9k_prompt_suffix_right+=$'%{\e]133;B\a%}'
     fi
     if (( $+_z4h_iterm_cmd && _z4h_can_save_restore_screen == 1 )); then
       _p9k_prompt_prefix_left+=$'%{\ePtmux;\e\e]133;A\a\e\\%}'
       _p9k_prompt_suffix_left+=$'%{\ePtmux;\e\e]133;B\a\e\\%}'
-      if [[ $TERM_PROGRAM == WarpTerminal ]]; then
+      if [[ $TERM_PROGRAM == WarpTerminal ||
+            ( $TERM_PROGRAM == iTerm.app && $TERM_PROGRAM_VERSION == (3.<7->*|<4->.*) ) ]]; then
         _p9k_prompt_prefix_right=$'%{\ePtmux;\e\e]133;P;k=r\a\e\\%}'$_p9k_prompt_prefix_right
         _p9k_prompt_suffix_right+=$'%{\ePtmux;\e\e]133;B\a\e\\%}'
       fi
@@ -8965,6 +8967,11 @@ _p9k_init() {
     function iterm2_decorate_prompt() {
       typeset -g ITERM2_PRECMD_PS1=$PROMPT
       typeset -g ITERM2_SHOULD_DECORATE_PROMPT=
+      if [[ -n $PS2 && $PS2 != *$'\e]133;A;k=s\a'* && -z ${ITERM2_SQUELCH_PS2_MARK-} &&
+            $TERM_PROGRAM_VERSION == (3.<7->*|<4->.*) ]]; then
+        typeset -g ITERM2_PRECMD_PS2=$PS2
+        PS2=$'%{\e]133;A;k=s\a%}'$PS2$'%{\e]133;B\a%}'
+      fi
     }
   fi
   if (( $+functions[iterm2_precmd] )); then
