@@ -132,7 +132,10 @@ class Arena {
   inline char* StrCat(const Ts&... ts) {
     return [&](std::initializer_list<StringView> ss) {
       size_t len = 0;
-      for (StringView s : ss) len += s.len;
+      for (StringView s : ss) {
+        assert(len + s.len >= len);
+        len += s.len;
+      }
       char* p = Allocate<char>(len + 1);
       for (StringView s : ss) {
         std::memcpy(p, s.ptr, s.len);
