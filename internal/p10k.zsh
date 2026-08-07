@@ -2250,6 +2250,11 @@ prompt_package() {
               (( ! $+found[$field] ))   || return
               [[ -n $s ]]               || return
               [[ $s != *($'\n'|'\')* ]] || return
+              # Strip control characters (e.g. terminal escape sequences); a
+              # package.json field has no character restrictions, unlike a
+              # git ref name, so this can't be assumed safe to display as-is.
+              s=${s//[$'\x00'-$'\x1f'$'\x7f']/}
+              [[ -n $s ]]               || return
               found[$field]=$s
               (( $#found == 2 )) && break
             fi
