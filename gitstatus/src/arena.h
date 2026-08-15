@@ -94,6 +94,7 @@ class Arena {
   template <class T>
   inline T* Allocate(size_t n) {
     static_assert(!std::is_reference<T>(), "");
+    if (n > std::numeric_limits<size_t>::max() / sizeof(T)) throw std::bad_alloc();
     return static_cast<T*>(Allocate(n * sizeof(T), alignof(T)));
   }
 
