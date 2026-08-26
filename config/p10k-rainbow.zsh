@@ -229,6 +229,8 @@
   typeset -g POWERLEVEL9K_DIR_ANCHOR_FOREGROUND=255
   # Display anchor directory segments in bold.
   typeset -g POWERLEVEL9K_DIR_ANCHOR_BOLD=true
+  # Treat the first directory below '~' (or another named directory) as an anchor without bold.
+  typeset -g POWERLEVEL9K_DIR_ANCHOR_FIRST=false
   # Don't shorten directories that contain any of these files. They are anchors.
   local anchor_files=(
     .bzr
