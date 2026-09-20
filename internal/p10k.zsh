@@ -9126,7 +9126,7 @@ _p9k_precmd_first() {
     KITTY_SHELL_INTEGRATION+=' no-prompt-mark'
     (( $+__p9k_force_term_shell_integration )) || typeset -gri __p9k_force_term_shell_integration=1
     (( $+__p9k_use_osc133_c_cmdline         )) || typeset -gri __p9k_use_osc133_c_cmdline=1
-  elif [[ $TERM_PROGRAM == WarpTerminal ]]; then
+  elif [[ $TERM_PROGRAM == (WarpTerminal|ghostty) ]]; then
     (( $+__p9k_force_term_shell_integration )) || typeset -gri __p9k_force_term_shell_integration=1
   fi
   typeset -ga precmd_functions=(${precmd_functions:#_p9k_precmd_first})
