@@ -6175,7 +6175,7 @@ _p9k_set_instant_prompt() {
   [[ -n $RPROMPT ]] || unset RPROMPT
 }
 
-typeset -gri __p9k_instant_prompt_version=47
+typeset -gri __p9k_instant_prompt_version=48
 
 _p9k_dump_instant_prompt() {
   local user=${(%):-%n}
@@ -6482,15 +6482,15 @@ _p9k_dump_instant_prompt() {
     local tmpdir=/tmp
   fi
   typeset -g __p9k_instant_prompt_output=$tmpdir/p10k-instant-prompt-output-${(%):-%n}-$$
-  { : > $__p9k_instant_prompt_output } || return
   print -rn -- "${out}${esc}?2004h" || return
   if (( $+commands[stty] )); then
     command stty -icanon 2>/dev/null
   fi
-  local fd_null
+  local fd_out fd_null
+  sysopen -wo creat,excl -u fd_out -- $__p9k_instant_prompt_output || return
   sysopen -ru fd_null /dev/null || return
-  exec {__p9k_fd_0}<&0 {__p9k_fd_1}>&1 {__p9k_fd_2}>&2 0<&$fd_null 1>$__p9k_instant_prompt_output
-  exec 2>&1 {fd_null}>&-
+  exec {__p9k_fd_0}<&0 {__p9k_fd_1}>&1 {__p9k_fd_2}>&2 0<&$fd_null 1>&$fd_out
+  exec 2>&1 {fd_out}>&- {fd_null}>&-
   typeset -gi __p9k_instant_prompt_active=1
   if (( _z4h_can_save_restore_screen == 1 )); then
     typeset -g _z4h_saved_screen
@@ -9527,7 +9527,7 @@ if [[ $__p9k_dump_file != $__p9k_instant_prompt_dump_file && -n $__p9k_instant_p
   zf_rm -f -- $__p9k_instant_prompt_dump_file{,.zwc} 2>/dev/null
 fi
 
-typeset -g P9K_VERSION=1.20.18
+typeset -g P9K_VERSION=1.20.19
 
 if [[ ${VSCODE_SHELL_INTEGRATION-} == <1-> && ${+__p9k_force_term_shell_integration} == 0 ]]; then
   typeset -gri __p9k_force_term_shell_integration=1
