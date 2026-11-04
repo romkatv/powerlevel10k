@@ -4742,7 +4742,7 @@ _p9k_gcloud_prefetch() {
         $P9K_GCLOUD_PROJECT_ID == $_p9k_gcloud_project_id ]]; then
     [[ -n $_p9k_gcloud_project_name ]] && P9K_GCLOUD_PROJECT_NAME=$_p9k_gcloud_project_name
     if (( _POWERLEVEL9K_GCLOUD_REFRESH_PROJECT_NAME_SECONDS < 0 ||
-          _p9k__gcloud_last_fetch_ts + _POWERLEVEL9K_GCLOUD_REFRESH_PROJECT_NAME_SECONDS > EPOCHREALTIME )); then
+          _p9k_gcloud_last_fetch_ts + _POWERLEVEL9K_GCLOUD_REFRESH_PROJECT_NAME_SECONDS > EPOCHREALTIME )); then
       return
     fi
   else
@@ -4753,7 +4753,8 @@ _p9k_gcloud_prefetch() {
     _p9k__state_dump_scheduled=1
   fi
   [[ -n $P9K_GCLOUD_CONFIGURATION && -n $P9K_GCLOUD_ACCOUNT && -n $P9K_GCLOUD_PROJECT_ID ]] || return
-  _p9k__gcloud_last_fetch_ts=EPOCHREALTIME
+  _p9k_gcloud_last_fetch_ts=EPOCHREALTIME
+  _p9k__state_dump_scheduled=1
   _p9k_worker_invoke gcloud "_p9k_prompt_gcloud_compute ${(q)commands[gcloud]} ${(q)P9K_GCLOUD_CONFIGURATION} ${(q)P9K_GCLOUD_ACCOUNT} ${(q)P9K_GCLOUD_PROJECT_ID}"
 }
 
@@ -7204,7 +7205,7 @@ typeset -g  _p9k__param_pat
 typeset -g  _p9k__param_sig
 
 _p9k_init_vars() {
-  typeset -gF _p9k__gcloud_last_fetch_ts
+  typeset -gF _p9k_gcloud_last_fetch_ts
   typeset -g  _p9k_gcloud_configuration
   typeset -g  _p9k_gcloud_account
   typeset -g  _p9k_gcloud_project_id
