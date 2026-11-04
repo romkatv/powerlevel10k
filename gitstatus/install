@@ -253,7 +253,7 @@ END
     if ! command -v mktemp >/dev/null 2>&1 ||
        ! tmpdir="$(command mktemp -d "$tmp"/gitstatus-install.XXXXXXXXXX)"; then
       tmpdir="$tmp/gitstatus-install.tmp.$$"
-      if ! mkdir -p -- "$tmpdir"; then
+      if ! command rm -rf -- "$tmpdir" || ! command mkdir -- "$tmpdir"; then
         if [ "$tmp" = /tmp ]; then
           local label='directory'
         else
