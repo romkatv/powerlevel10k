@@ -6175,7 +6175,7 @@ _p9k_set_instant_prompt() {
   [[ -n $RPROMPT ]] || unset RPROMPT
 }
 
-typeset -gri __p9k_instant_prompt_version=48
+typeset -gri __p9k_instant_prompt_version=49
 
 _p9k_dump_instant_prompt() {
   local user=${(%):-%n}
@@ -6482,12 +6482,20 @@ _p9k_dump_instant_prompt() {
     local tmpdir=/tmp
   fi
   typeset -g __p9k_instant_prompt_output=$tmpdir/p10k-instant-prompt-output-${(%):-%n}-$$
-  print -rn -- "${out}${esc}?2004h" || return
+  local fd_out fd_null
+  zmodload -F zsh/files b:zf_rm || return
+  # Remove a stale file of our own (killed shell, reused PID). In sticky /tmp this cannot
+  # unlink a symlink planted by another user, so O_EXCL below still refuses it.
+  zf_rm -f -- $__p9k_instant_prompt_output 2>/dev/null
+  sysopen -wo creat,excl -m 600 -u fd_out -- $__p9k_instant_prompt_output || return
+  if ! print -rn -- "${out}${esc}?2004h"; then
+    exec {fd_out}>&-
+    zf_rm -f -- $__p9k_instant_prompt_output 2>/dev/null
+    return 1
+  fi
   if (( $+commands[stty] )); then
     command stty -icanon 2>/dev/null
   fi
-  local fd_out fd_null
-  sysopen -wo creat,excl -u fd_out -- $__p9k_instant_prompt_output || return
   sysopen -ru fd_null /dev/null || return
   exec {__p9k_fd_0}<&0 {__p9k_fd_1}>&1 {__p9k_fd_2}>&2 0<&$fd_null 1>&$fd_out
   exec 2>&1 {fd_out}>&- {fd_null}>&-
