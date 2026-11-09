@@ -381,15 +381,19 @@ function gitstatus_query() {
   else
     dir=:"$(pwd -P)/$GIT_DIR" || return
   fi
-  echo -nE "$req_id"$'\x1f'"$dir"$'\x1f'"$no_diff"$'\x1e' >&$_GITSTATUS_REQ_FD || return
+  local -a resp=()
+  # 0x1E and 0x1F are gitstatusd protocol separators. A directory name containing them cannot be
+  # sent as a well-formed request, so report it as not a repository without contacting gitstatusd.
+  if [[ "$dir" != *[$'\x1e\x1f']* ]]; then
+    echo -nE "$req_id"$'\x1f'"$dir"$'\x1f'"$no_diff"$'\x1e' >&$_GITSTATUS_REQ_FD || return
 
-  local -a resp
-  while true; do
-    IFS=$'\x1f' read -rd $'\x1e' -a resp -u $_GITSTATUS_RESP_FD "${timeout[@]}" || return
-    [[ "${resp[0]}" == "$req_id" ]] && break
-  done
+    while true; do
+      IFS=$'\x1f' read -rd $'\x1e' -a resp -u $_GITSTATUS_RESP_FD "${timeout[@]}" || return
+      [[ "${resp[0]}" == "$req_id" ]] && break
+    done
+  fi
 
-  if [[ "${resp[1]}" == 1 ]]; then
+  if [[ "${resp[1]-}" == 1 ]]; then
     VCS_STATUS_RESULT=ok-sync
     VCS_STATUS_WORKDIR="${resp[2]}"
     VCS_STATUS_COMMIT="${resp[3]}"
