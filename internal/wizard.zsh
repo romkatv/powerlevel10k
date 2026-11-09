@@ -1691,7 +1691,15 @@ function ask_zshrc_edit() {
            ! zshrc_backup="$(mktemp $tmpdir/.zshrc.XXXXXXXXXX 2>/dev/null)"; then
           zshrc_backup=$tmpdir/.zshrc.$EPOCHREALTIME
         fi
-        cp -p $__p9k_zshrc $zshrc_backup                   || quit -c
+        if ! cp -p -- $__p9k_zshrc $zshrc_backup 2>/dev/null; then
+          # cp -p fails on some network filesystems (NFS, CIFS) when copying to a local
+          # temp dir. Copy the content and the mode separately. See #2955 and #2896.
+          local -a zshrc_mode
+          cp -- $__p9k_zshrc $zshrc_backup                 || quit -c
+          zmodload -F zsh/stat b:zstat                     || quit -c
+          zstat -A zshrc_mode +mode -- $__p9k_zshrc        || quit -c
+          chmod -- $(( [##8] zshrc_mode[1] & 8#7777 )) $zshrc_backup || quit -c
+        fi
         local -i writable=1
         if [[ ! -w $zshrc_backup ]]; then
           chmod u+w -- $zshrc_backup                       || quit -c
