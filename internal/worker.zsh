@@ -19,7 +19,9 @@ function _p9k_worker_main() {
   # usage: _p9k_worker_async <work> <callback>
   function _p9k_worker_async() {
     local fd async=$1
-    sysopen -r -o cloexec -u fd <(() { eval $async; } && print -n '\x1e') || return
+    (print -n '\x1e' &)
+      pid=$!
+      wait $pid || return 1
     (( ++_p9k_worker_inflight[$_p9k_worker_request_id] ))
     _p9k_worker_fds[$fd]=$_p9k_worker_request_id$'\x1f'$2
   }
