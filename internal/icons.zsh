@@ -52,7 +52,7 @@ function _p9k_init_icons() {
         LINUX_DEBIAN_ICON              '\uE271'$s             # 
         LINUX_RASPBIAN_ICON            '\uE271'$s             # 
         LINUX_UBUNTU_ICON              '\uE271'$s             # 
-        LINUX_KALI_ICON                '\uE271'$s             # 
+        LINUX_KALI_ICON                '\uF327'$s             # 
         LINUX_CENTOS_ICON              '\uE271'$s             # 
         LINUX_COREOS_ICON              '\uE271'$s             # 
         LINUX_ELEMENTARY_ICON          '\uE271'$s             # 
@@ -211,7 +211,7 @@ function _p9k_init_icons() {
         LINUX_DEBIAN_ICON              '\uF17C'$s             # 
         LINUX_RASPBIAN_ICON            '\uF17C'$s             # 
         LINUX_UBUNTU_ICON              '\uF17C'$s             # 
-        LINUX_KALI_ICON                '\uF17C'$s             # 
+        LINUX_KALI_ICON                '\uF327'$s             # 
         LINUX_CENTOS_ICON              '\uF17C'$s             # 
         LINUX_COREOS_ICON              '\uF17C'$s             # 
         LINUX_ELEMENTARY_ICON          '\uF17C'$s             # 
@@ -702,7 +702,7 @@ function _p9k_init_icons() {
         LINUX_VOID_ICON                '\uF17C'               # 
         LINUX_ARTIX_ICON               '\uF17C'               # 
         LINUX_UBUNTU_ICON              '\uF31b'$s             # 
-        LINUX_KALI_ICON                '\uF17C'               # 
+        LINUX_KALI_ICON                '\uF327'               # 
         LINUX_RHEL_ICON                '\uF316'$s             # 
         LINUX_AMZN_ICON                '\uF270'$s             # 
         LINUX_ENDEAVOUROS_ICON         '\uF17C'               # 
