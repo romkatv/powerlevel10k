@@ -431,6 +431,7 @@ Powerlevel10k.
 - [Arch Linux](#arch-linux)
 - [Alpine Linux](#alpine-linux)
 - [Fig](#fig)
+- [NixOS](#nixos)
 
 ### Manual
 
@@ -548,6 +549,42 @@ ln -s /usr/share/zsh/plugins/powerlevel10k ~/.local/share/zsh/plugins/
 
 Follow the instructions on
 [this page](https://fig.io/plugins/other/powerlevel10k).
+
+### NixOS
+
+**Home Manager**
+
+```nix
+programs.zsh = {
+  ...
+  plugins = [
+      {
+        name = "zsh-powerlevel10k";
+        src = "${pkgs.zsh-powerlevel10k}/share/zsh-powerlevel10k/";
+        file = "powerlevel10k.zsh-theme";
+      }
+    ];
+
+    # NixOS 24.11 or earlier:
+    initExtra = ''
+      source ~/.p10k.zsh
+    '';
+
+    # NixOS 25.05 or later:
+    # initContent = let initExtra = lib.mkOrder 1000 '' [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh ''; in lib.mkMerge [initExtra];
+};
+```
+
+**System wide**
+```nix
+programs.zsh = {
+  ...
+  promptInit = ''
+    source ${pkgs.zsh-powerlevel10k}/share/zsh-powerlevel10k/powerlevel10k.zsh-theme
+    source ~/.p10k.zsh
+  '';
+};
+```
 
 ## Configuration
 
