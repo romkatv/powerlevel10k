@@ -1901,11 +1901,16 @@ prompt_dir() {
       local rp=${(g:oce:)p}
       local rparts=("${(@s:/:)rp}")
 
-      local -i i=2 e=$(($#parts - shortenlen))
+      local -i i=2 e=$(($#parts - shortenlen)) anchor_first=0
       if [[ -n $_POWERLEVEL9K_DIR_TRUNCATE_BEFORE_MARKER ]]; then
         (( e += shortenlen ))
         local orig=("$parts[2]" "${(@)parts[$((shortenlen > $#parts ? -$#parts : -shortenlen)),-1]}")
       elif [[ $p[1] == / ]]; then
+        (( ++i ))
+      elif (( _POWERLEVEL9K_DIR_ANCHOR_FIRST )) && (( $#parts > 1 )); then
+        # Treat the first directory below '~' (or any other named directory) as an
+        # anchor: never shortened, ANCHOR_FOREGROUND without ANCHOR_BOLD.
+        anchor_first=1
         (( ++i ))
       fi
       if (( i <= e )); then
@@ -1914,12 +1919,26 @@ prompt_dir() {
       else
         local key=
       fi
+      # The folder marker lookup for the leading anchor reads its content.
+      (( anchor_first )) && key+=":$_p9k__parent_mtimes[$#parts-i+2]"
       if ! _p9k_cache_ephemeral_get $0 $e $i $_p9k__cwd $p || [[ $key != $_p9k__cache_val[1] ]]; then
         local rtail=${(j./.)rparts[i,-1]}
         local parent=$_p9k__cwd[1,-2-$#rtail]
         _p9k_prompt_length $delim
         local -i real_delim_len=_p9k__ret
-        [[ -n $parts[i-1] ]] && parts[i-1]="\${(Q)\${:-${(qqq)${(q)parts[i-1]}}}}"$'\2'
+        # $'\4' is the anchor color without ANCHOR_BOLD, and only the deepest
+        # leading component can get it. $'\2' keeps the bold everywhere p10k has
+        # it: '~', the last component and folder marker dirs. parts and
+        # _p9k__parent_dirs align at the deep end. _p9k_glob returns the match
+        # count, hence success means "no marker".
+        local marker=$_POWERLEVEL9K_SHORTEN_FOLDER_MARKER mark
+        local -i k
+        for (( k = 1; k < i; ++k )); do
+          [[ -n $parts[k] ]] || continue
+          mark=$'\2'
+          (( anchor_first && k == i-1 && k < $#parts )) && { [[ -z $marker ]] || _p9k_glob $(($#parts-k+1)) $marker } && mark=$'\4'
+          parts[k]="\${(Q)\${:-${(qqq)${(q)parts[k]}}}}"$mark
+        done
         local -i d=${_POWERLEVEL9K_SHORTEN_DELIMITER_LENGTH:--1}
         (( d >= 0 )) || d=real_delim_len
         local -i m=1
@@ -2081,14 +2100,15 @@ prompt_dir() {
       parts[-1]=$_p9k__ret${parts[-1]//$'\1'/$'\1'$_p9k__ret}$style
     fi
 
-    local anchor_style=
+    local anchor_style= anchor_fg=
     _p9k_param $state ANCHOR_BOLD ''
     [[ $_p9k__ret == true ]] && anchor_style+=%B
     if (( $+parameters[_POWERLEVEL9K_DIR_ANCHOR_FOREGROUND] ||
           $+parameters[_POWERLEVEL9K_${state_u}_ANCHOR_FOREGROUND] )); then
       _p9k_color $state ANCHOR_FOREGROUND ''
       _p9k_foreground $_p9k__ret
-      anchor_style+=$_p9k__ret
+      anchor_fg=$_p9k__ret
+      anchor_style+=$anchor_fg
     fi
     if [[ -n $anchor_style ]]; then
       (( expand )) && _p9k_escape_style $anchor_style || _p9k__ret=$anchor_style
@@ -2100,6 +2120,17 @@ prompt_dir() {
       fi
     else
       parts=("${(@)parts/$'\2'}")
+    fi
+
+    # The ANCHOR_FIRST anchor ($'\4'): anchor foreground without ANCHOR_BOLD.
+    # Only the component right below '~' can carry the mark.
+    if (( _POWERLEVEL9K_DIR_ANCHOR_FIRST )); then
+      if [[ -n $anchor_fg ]]; then
+        (( expand )) && _p9k_escape_style $anchor_fg || _p9k__ret=$anchor_fg
+        parts[1,2]=("${(@)parts[1,2]/%(#b)(*)$'\4'/$_p9k__ret$match[1]$style}")
+      else
+        parts[1,2]=("${(@)parts[1,2]/$'\4'}")
+      fi
     fi
 
     if (( $+parameters[_POWERLEVEL9K_DIR_SHORTENED_FOREGROUND] ||
@@ -7582,6 +7613,13 @@ _p9k_init_params() {
   esac
   typeset -gi _POWERLEVEL9K_DIR_SHOW_WRITABLE
   _p9k_declare -b POWERLEVEL9K_DIR_OMIT_FIRST_CHARACTER 0
+  # When set to true, the first directory below '~' (or any other named
+  # directory) is an anchor: never shortened and colored with
+  # POWERLEVEL9K_DIR_ANCHOR_FOREGROUND. POWERLEVEL9K_DIR_ANCHOR_BOLD applies to
+  # it only if it holds a POWERLEVEL9K_SHORTEN_FOLDER_MARKER. Everything else
+  # keeps its usual style, '~' and the first directory below '/' included.
+  # Applies only when POWERLEVEL9K_SHORTEN_STRATEGY=truncate_to_unique.
+  _p9k_declare -b POWERLEVEL9K_DIR_ANCHOR_FIRST 0
   _p9k_declare -b POWERLEVEL9K_DIR_HYPERLINK 0
   _p9k_declare -s POWERLEVEL9K_SHORTEN_STRATEGY ""
   local markers=(
